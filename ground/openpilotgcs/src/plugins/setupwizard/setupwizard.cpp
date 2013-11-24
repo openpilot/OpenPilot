@@ -225,7 +225,22 @@ QString SetupWizard::getSummaryText()
 
         break;
     case VEHICLE_FIXEDWING:
-        summary.append(tr("Fixed wing"));
+	summary.append(tr("Fixed wing"));
+
+        summary.append("<br>");
+        summary.append("<b>").append(tr("Vehicle sub type: ")).append("</b>");
+        switch (getVehicleSubType()) {
+        case SetupWizard::FIXED_WING_AILERON:
+            summary.append(tr("Aileron"));
+            break;
+        case SetupWizard::FIXED_WING_VTAIL:
+            summary.append(tr("Vtail"));
+            break;
+        default:
+            summary.append(tr("Unknown"));
+            break;
+	}
+
         break;
     case VEHICLE_HELI:
         summary.append(tr("Helicopter"));

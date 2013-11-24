@@ -30,6 +30,9 @@
         <file>resources/bttn-turbo-down.png</file>
         <file>resources/bttn-turbo-up.png</file>
         <file>resources/multirotor-shapes.svg</file>
+	<!-- these are different from the files in /config/images -->
+        <file>resources/fixedwing-shapes.svg</file>
+        <file>resources/flyingwing-shapes.svg</file>
         <file>resources/bttn-illustration-down.png</file>
         <file>resources/bttn-illustration-up.png</file>
         <file>resources/bttn-save-down.png</file>

@@ -104,6 +104,23 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         break;
+// KF hack
+    case SetupWizard::FIXED_WING_AILERON:
+	qDebug() << "no clue what a wizard index is!";
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+        m_vehicleElementIds << "fixed-aileron" << "aileron";
+        m_vehicleHighlightElementIndexes << 0 << 1;
+        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
+    case SetupWizard::FIXED_WING_VTAIL:
+	qDebug() << "no clue what a wizard index is!";
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+        m_vehicleElementIds << "fixed-vtail" << "vtail";
+        m_vehicleHighlightElementIndexes << 0 << 1;
+        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
     default:
         break;
     }

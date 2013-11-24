@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 15.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="aileron" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="792px" height="1008px" viewBox="0 0 792 1008" enable-background="new 0 0 792 1008" xml:space="preserve">
 <path fill="#010101" d="M362.386,549.617l-45.657,17.535H134.987c0,0-19.025-2.023-17.592,45.59
 	c1.433,47.611,4.344,44.581,17.592,50.531h227.87l23.964,171.965h-71.977c0,0-11.272,1.641-11.22,23.54
@@ -15,7 +15,7 @@
 	<path d="M402.97,458.154c0,0,20-7.5,39.5-6.5s60.5,5.5,66.5,6.5c0,0-50.5,6-76.5,5.5S402.97,458.154,402.97,458.154z"/>
 	<path d="M394.476,458.592c0,0-20,7.5-39.5,6.5s-60.5-5.5-66.5-6.5c0,0,50.5-6,76.5-5.5S394.476,458.592,394.476,458.592z"/>
 </g>
-<linearGradient id="vtail" gradientUnits="userSpaceOnUse" x1="434.8428" y1="254.2417" x2="662.4346" y2="254.2417" gradientTransform="matrix(1 0 0 1 0 397)">
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="434.8428" y1="254.2417" x2="662.4346" y2="254.2417" gradientTransform="matrix(1 0 0 1 0 397)">
 	<stop  offset="0" style="stop-color:#FFFFFF"/>
 	<stop  offset="1" style="stop-color:#27AAE1"/>
 </linearGradient>

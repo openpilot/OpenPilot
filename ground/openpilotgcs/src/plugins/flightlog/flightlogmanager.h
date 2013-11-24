@@ -31,10 +31,12 @@
 #include <QObject>
 #include <QList>
 #include <QQmlListProperty>
+#include <QSemaphore>
 
 #include "uavobjectmanager.h"
 #include "debuglogentry.h"
 #include "debuglogstatus.h"
+#include "debuglogcontrol.h"
 
 class FlightLogManager : public QObject {
     Q_OBJECT
@@ -56,13 +58,17 @@ signals:
 
 public slots:
     void clearAllLogs();
-    void retrieveLogs(int flight = -1);
+    void retrieveLogs(int flightToRetrieve = -1);
     void exportLogs();
 
 private:
     UAVObjectManager *m_objectManager;
+    DebugLogControl *m_flightLogControl;
     DebugLogStatus *m_flightLogStatus;
+    DebugLogEntry *m_flightLogEntry;
     QList<DebugLogEntry *> m_logEntries;
+
+    const int UAVTALK_TIMEOUT = 4000;
 
 };
 

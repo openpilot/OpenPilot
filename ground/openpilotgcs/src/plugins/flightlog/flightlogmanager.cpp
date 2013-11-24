@@ -29,6 +29,7 @@
 #include "extensionsystem/pluginmanager.h"
 
 #include "debuglogcontrol.h"
+#include "uavobjecthelper.h"
 
 FlightLogManager::FlightLogManager(QObject *parent) :
     QObject(parent) {
@@ -37,8 +38,14 @@ FlightLogManager::FlightLogManager(QObject *parent) :
     m_objectManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(m_objectManager);
 
+    m_flightLogControl = DebugLogControl::GetInstance(m_objectManager);
+    Q_ASSERT(m_flightLogControl);
+
     m_flightLogStatus = DebugLogStatus::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogStatus);
+
+    m_flightLogEntry = DebugLogEntry::GetInstance(m_objectManager);
+    Q_ASSERT(m_flightLogEntry);
 
     DebugLogEntry *entry = new DebugLogEntry();
     entry->setFlight(1);
@@ -99,8 +106,59 @@ void FlightLogManager::clearAllLogs() {
     m_logEntries.clear();
 }
 
-void FlightLogManager::retrieveLogs(int flight) {
+void FlightLogManager::retrieveLogs(int flightToRetrieve) {
+
+    UAVObjectUpdaterHelper updateHelper;
+    UAVObjectRequestHelper requestHelper;
+
     //Get logs from flight side
+    m_logEntries.clear();
+
+    // Set up what to retrieve
+    bool timedOut = false;
+    int startFlight = (flightToRetrieve == -1) ? 0 : flightToRetrieve;
+    int endFlight = (flightToRetrieve == -1 ) ? m_flightLogStatus->getFlight() : flightToRetrieve;
+
+    // Prepare to send request for event retrieval
+    m_flightLogControl->setOperation(DebugLogControl::OPERATION_RETRIEVE);
+    for(int flight = startFlight; flight < endFlight; flight++) {
+        m_flightLogControl->setFlight(flight);
+        bool gotLast = false;
+        int entry = 0;
+        while(!gotLast) {
+
+            // Send request for loading flight entry on flight side and wait for ack/nack
+            m_flightLogControl->setEntry(entry);
+
+            UAVObjectUpdaterHelper::Result result = updateHelper.doObjectAndWait(m_flightLogControl, UAVTALK_TIMEOUT);
+            if(result == UAVObjectUpdaterHelper::SUCCESS) {
+                result = requestHelper.doObjectAndWait(m_flightLogEntry, UAVTALK_TIMEOUT);
+                if(result == UAVObjectUpdaterHelper::TIMEOUT) {
+                    timedOut = true;
+                    break;
+                } else {
+                    if(!m_flightLogEntry->getType() == DebugLogEntry::TYPE_EMPTY &&
+                            m_flightLogEntry->getFlight() == flight && m_flightLogEntry->getEntry() == entry) {
+
+                        //Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
+                        m_logEntries.append((DebugLogEntry*) m_flightLogEntry->clone(0));
+
+                        // Increment to get next entry from flight side
+                        entry++;
+                    } else {
+                        // We are done, not more entries on this flight
+                        break;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+        if(timedOut) {
+            // We timed out, do something smart here to alert the user
+            break;
+        }
+    }
 }
 
 void FlightLogManager::exportLogs()

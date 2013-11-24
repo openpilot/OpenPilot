@@ -121,7 +121,7 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve) {
 
     // Prepare to send request for event retrieval
     m_flightLogControl->setOperation(DebugLogControl::OPERATION_RETRIEVE);
-    for(int flight = startFlight; flight < endFlight; flight++) {
+    for(int flight = startFlight; flight <= endFlight; flight++) {
         m_flightLogControl->setFlight(flight);
         bool gotLast = false;
         int entry = 0;

@@ -70,7 +70,7 @@ AbstractUAVObjectHelper::Result AbstractUAVObjectHelper::doObjectAndWait(UAVObje
     if (!m_transactionCompleted) {
         return TIMEOUT;
     } else {
-        return (m_transactionResult != true) ? SUCCESS : FAIL;
+        return m_transactionResult ? SUCCESS : FAIL;
     }
 }
 

@@ -244,6 +244,7 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo *info)
         // Setup element names
         QString varElemName   = info->fields[n]->name + "ElemNames";
         finit.append(QString("    QStringList %1;\n").arg(varElemName));
+
         QStringList elemNames = info->fields[n]->elementNames;
         for (int m = 0; m < elemNames.length(); ++m) {
             finit.append(QString("    %1.append(\"%2\");\n")

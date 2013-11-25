@@ -46,58 +46,31 @@ FlightLogManager::FlightLogManager(QObject *parent) :
 
     m_flightLogEntry = DebugLogEntry::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogEntry);
-
-    DebugLogEntry *entry = new DebugLogEntry();
-    entry->setFlight(1);
-    m_logEntries.append(entry);
-    entry = new DebugLogEntry();
-    entry->setFlight(2);
-    m_logEntries.append(entry);
-    entry = new DebugLogEntry();
-    entry->setFlight(3);
-    m_logEntries.append(entry);
-    entry = new DebugLogEntry();
-    entry->setFlight(4);
-    m_logEntries.append(entry);
-    entry = new DebugLogEntry();
-    entry->setFlight(5);
-    m_logEntries.append(entry);
-    entry = new DebugLogEntry();
-    entry->setFlight(6);
-    m_logEntries.append(entry);
-    entry = new DebugLogEntry();
-    entry->setFlight(7);
-    m_logEntries.append(entry);
-    entry = new DebugLogEntry();
-    entry->setFlight(8);
-    m_logEntries.append(entry);
-    entry = new DebugLogEntry();
-    entry->setFlight(9);
-    m_logEntries.append(entry);
-
 }
 
 FlightLogManager::~FlightLogManager() {
 
 }
 
-void addEntries(QQmlListProperty<DebugLogEntry> *list, DebugLogEntry *entry) {
+void addEntries(QQmlListProperty<ExtendedDebugLogEntry> *list, ExtendedDebugLogEntry *entry) {
+    Q_UNUSED(list);
+    Q_UNUSED(entry);
 }
 
-int countEntries(QQmlListProperty<DebugLogEntry> *list) {
-    return static_cast< QList<DebugLogEntry *> *>(list->data)->size();
+int countEntries(QQmlListProperty<ExtendedDebugLogEntry> *list) {
+    return static_cast< QList<ExtendedDebugLogEntry *> *>(list->data)->size();
 }
 
-DebugLogEntry* entryAt(QQmlListProperty<DebugLogEntry> *list, int index) {
-    return static_cast< QList<DebugLogEntry *> *>(list->data)->at(index);
+ExtendedDebugLogEntry* entryAt(QQmlListProperty<ExtendedDebugLogEntry> *list, int index) {
+    return static_cast< QList<ExtendedDebugLogEntry *> *>(list->data)->at(index);
 }
 
-void clearEntries(QQmlListProperty<DebugLogEntry> *list) {
-    return static_cast< QList<DebugLogEntry *> *>(list->data)->clear();
+void clearEntries(QQmlListProperty<ExtendedDebugLogEntry> *list) {
+    return static_cast< QList<ExtendedDebugLogEntry *> *>(list->data)->clear();
 }
 
-QQmlListProperty<DebugLogEntry> FlightLogManager::logEntries() {
-    return QQmlListProperty<DebugLogEntry>(this, &m_logEntries, &addEntries, &countEntries, &entryAt, &clearEntries);
+QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries() {
+    return QQmlListProperty<ExtendedDebugLogEntry>(this, &m_logEntries, &addEntries, &countEntries, &entryAt, &clearEntries);
 }
 
 void FlightLogManager::clearAllLogs() {
@@ -141,7 +114,10 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve) {
                             m_flightLogEntry->getFlight() == flight && m_flightLogEntry->getEntry() == entry) {
 
                         //Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
-                        m_logEntries.append((DebugLogEntry*) m_flightLogEntry->clone(0));
+
+                        ExtendedDebugLogEntry* logEntry = new ExtendedDebugLogEntry();
+                        logEntry->setData(m_flightLogEntry->getData());
+                        m_logEntries.append(logEntry);
 
                         // Increment to get next entry from flight side
                         entry++;
@@ -159,9 +135,14 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve) {
             break;
         }
     }
+    emit logEntriesChanged();
 }
 
 void FlightLogManager::exportLogs()
 {
 
+}
+
+ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry()
+{
 }

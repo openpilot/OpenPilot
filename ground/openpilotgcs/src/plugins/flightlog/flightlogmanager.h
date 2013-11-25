@@ -38,23 +38,41 @@
 #include "debuglogstatus.h"
 #include "debuglogcontrol.h"
 
-class FlightLogManager : public QObject {
+class ExtendedDebugLogEntry : public DebugLogEntry {
     Q_OBJECT
+    Q_PROPERTY(QString LogString READ LogString)
+
+public:
+    explicit ExtendedDebugLogEntry();
+
+    QString LogString()
+    {
+        if(getType() == DebugLogEntry::TYPE_TEXT) {
+            return QString((const char*)getData().Data);
+        } else {
+            return "Object";
+        }
+    }
+};
+
+class FlightLogManager : public QObject {
+    Q_OBJECT    
     Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
-    Q_PROPERTY(QQmlListProperty<DebugLogEntry> logEntries READ logEntries CONSTANT)
+    Q_PROPERTY(QQmlListProperty<ExtendedDebugLogEntry> logEntries READ logEntries NOTIFY logEntriesChanged)
 
 public:
     explicit FlightLogManager(QObject *parent = 0);
     ~FlightLogManager();
 
-    QQmlListProperty<DebugLogEntry> logEntries();
+    QQmlListProperty<ExtendedDebugLogEntry> logEntries();
 
     DebugLogStatus* flightLogStatus() const
     {
         return m_flightLogStatus;
     }
 
-signals:
+signals:    
+    void logEntriesChanged();
 
 public slots:
     void clearAllLogs();
@@ -66,9 +84,9 @@ private:
     DebugLogControl *m_flightLogControl;
     DebugLogStatus *m_flightLogStatus;
     DebugLogEntry *m_flightLogEntry;
-    QList<DebugLogEntry *> m_logEntries;
+    QList<ExtendedDebugLogEntry *> m_logEntries;
 
-    const int UAVTALK_TIMEOUT = 4000;
+    static const int UAVTALK_TIMEOUT = 4000;
 
 };
 

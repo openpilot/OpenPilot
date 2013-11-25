@@ -34,12 +34,12 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 
-#include "debuglogentry.h"
+#include "flightlogmanager.h"
 
 FlightLogDialog::FlightLogDialog(QWidget *parent, FlightLogManager *flightLogManager) :
     QDialog(parent)
 {
-    qmlRegisterType<DebugLogEntry>("org.openpilot", 1, 0, "DebugLogEntry");
+    qmlRegisterType<ExtendedDebugLogEntry>("org.openpilot", 1, 0, "DebugLogEntry");
 
     setWindowIcon(QIcon(":/core/images/openpilot_logo_32.png"));
     setWindowTitle(tr("Manage flight side logs"));

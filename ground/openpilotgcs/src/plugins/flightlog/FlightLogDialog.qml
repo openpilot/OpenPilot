@@ -30,10 +30,43 @@ Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     model: logManager.logEntries
-                    TableViewColumn { role: "Flight"; title: "Flight"; width: 50; horizontalAlignment: Text.AlignRight}
-                    TableViewColumn { role: "FlightTime"; title: "Time";width: 50; horizontalAlignment: Text.AlignRight}
-                    TableViewColumn { role: "Entry"; title: "#"; width: 50; horizontalAlignment: Text.AlignRight}
-                    TableViewColumn { role: "Type"; title: "Contents"; width: 100}
+
+                    itemDelegate: Text {
+                        anchors.margins: 3
+                        font.pixelSize: 12
+                        text: styleData.value
+                    }
+
+                    TableViewColumn {
+                        role: "Flight"; title: qsTr("Flight"); width: 50;
+                        delegate:
+                            Text {
+                                anchors.margins: 3
+                                font.pixelSize: 12
+                                text: styleData.value + 1
+                            }
+
+                    }
+                    TableViewColumn { role: "FlightTime"; title: qsTr("Time"); width: 50}
+                    TableViewColumn { role: "Entry"; title: qsTr("#"); width: 50}
+                    TableViewColumn {
+                        role: "Type"; title: "Type"; width: 100;
+                        delegate:
+                            Text {
+                                anchors.margins: 3
+                                font.pixelSize: 12
+                                text: {
+                                    switch(styleData.value) {
+                                    case 0 : text: qsTr("Empty"); break;
+                                    case 1 : text: qsTr("Text"); break;
+                                    case 2 : text: qsTr("UAVO"); break;
+                                    default: text: qsTr("Unknown"); break;
+                                    }
+                                }
+                            }
+
+                    }
+                    TableViewColumn { role: "LogString"; title: qsTr("Data"); width: 280}
                 }
 
                 RowLayout {

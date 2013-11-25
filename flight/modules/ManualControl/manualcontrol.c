@@ -671,18 +671,18 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
     StabilizationSettingsData stabSettings;
     StabilizationSettingsGet(&stabSettings);
 
-    uint8_t *stab_settings;
+    uint8_t stab_settings[3];
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);
     switch (flightStatus.FlightMode) {
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
-        stab_settings = cast_struct_to_array(settings->Stabilization1Settings, settings->Stabilization1Settings.Roll);
+        memcpy(stab_settings, cast_struct_to_array(settings->Stabilization1Settings, settings->Stabilization1Settings.Roll), sizeof(stab_settings));
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
-        stab_settings = cast_struct_to_array(settings->Stabilization2Settings, settings->Stabilization2Settings.Roll);
+        memcpy(stab_settings, cast_struct_to_array(settings->Stabilization2Settings, settings->Stabilization2Settings.Roll), sizeof(stab_settings));
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
-        stab_settings = cast_struct_to_array(settings->Stabilization3Settings, settings->Stabilization3Settings.Roll);
+        memcpy(stab_settings, cast_struct_to_array(settings->Stabilization3Settings, settings->Stabilization3Settings.Roll), sizeof(stab_settings));
         break;
     default:
         // Major error, this should not occur because only enter this block when one of these is true
@@ -690,77 +690,96 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
         return;
     }
 
-    // TOOD: Add assumption about order of stabilization desired and manual control stabilization mode fields having same order
+    // If in Horizon Mode, massage the stabilization settings before sending them out
+
+    // The first Horizon Mode region begins at (stick position) 0.0f (center),
+    //   other regions are 0.0f<=begin<=1.0f
+    // Beginning of region 2 is limited to [0,98] by GCS
+    // Length    of region 2 is limited to [1,99] by GCS
+    // Uavo's HorizonModeRegionBegin and HorizonModeRegionLength are currently integers
+    //   representing percent of max stick deflection
+    float begin2, begin3;
+    begin2 = stabSettings.HorizonModeRegionBegin / 100.0f;
+    begin3 = begin2 + stabSettings.HorizonModeRegionLength / 100.0f;
+    // this bounding could be moved into the GCS
+    if (begin3 > 0.99f) {
+        begin3 = 0.99f;
+    }
+    // To avoid division by zero...
+    //   we have guarenteed that begin3 is not zero
+    //   we have guarenteed that begin3 is not one
+    //   we have guarenteed that begin3-begin2 is not zero
+
+    // Require Horizon mode to be configured on both roll and pitch, or neither;
+    //   never just one of them
+    // If Attitude mode were only on roll, you could do a pitch and a yaw
+    //   to get an effective roll without even moving the roll stick
+    if (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON
+        || stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON) {
+        float magnitude;
+        // Using max() rather than sqrt() for cpu speed;
+        //   this makes the stick region into a square;
+        //   this is a feature!
+        //   hold a roll angle and add just pitch without it suddenly jumping into rate mode
+        // magnitude = sqrt(cmd->Roll*cmd->Roll + cmd->Pitch*cmd->Pitch);
+        magnitude = fmaxf(fabsf(cmd->Roll), fabsf(cmd->Pitch));
+
+        // First region is unmodified attitude mode
+        if (magnitude < begin2) {
+            // Convert Horizon mode to Attitude mode on both roll and pitch
+            stab_settings[0] = stab_settings[1] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+        }
+        // Second region is increased sensitivity attitude mode
+        // Max rotation rate is still taken from attitude mode
+        // At the beginning of this region, the unmodified stick value is used as is so the transition is smooth
+        // At the end of this region, the stick value is (+-) 1.0
+        // This means that the end of this region acts like attitude mode max angle
+        //   so this region acts like a more sensitive attitude mode
+        else if (magnitude < begin3) {
+            // Convert Horizon mode to Attitude mode on both roll and pitch
+            stab_settings[0] = stab_settings[1] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+            // parametric goes from 0 -> 1
+            //   as stick angle (magnitude, any direction) goes from begin2 to begin3
+            float parametric;
+            parametric = (magnitude - begin2) / (begin3 - begin2);
+
+            // factor is the amount that the stick angle needs to be increased
+            //   so we get only normal attitude mode stick sensitivity at begin2
+            //   but we get full max attitude angle at begin3 (less than full stick)
+            // The stick is passed on as a full 1.0f at begin3
+            float factor;
+            factor = (parametric * ((1.0f/begin3)-1.0f) + 1.0f);
+            cmd->Roll *= factor;
+            cmd->Pitch *= factor;
+        }
+        // Third region is a 'compressed' Rate mode
+        // The beginning of this region has rate 0, the end has max Rate mode rate
+        // That means that the very beginning of this region doesn't rotate much
+        else {
+            // Convert Horizon mode to Rate mode on both roll and pitch
+            stab_settings[0] = stab_settings[1] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
+            // parametric goes from 0 -> 1
+            //   as stick angle (magnitude, any direction) goes from begin3 to 'max stick'
+            float parametric;
+            parametric = (magnitude - begin3) / (1.0f - begin3);
+
+            // Scale the stick commands from magnitude [begin3, 1.0f] to [0, 1.0f]
+            // We see as input, a large stick angle (in the last region) [begin3, 1.0f]
+            //   but pass that on with magnitude [0, 1.0f] and let the following code see that
+            cmd->Roll  *= parametric;
+            cmd->Pitch *= parametric;
+        }
+    }
+    // Other axes (yaw) cannot be Horizon, so use Rate
+    // Should really do this for Attitude mode as well?
+    if (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON) {
+        stab_settings[2] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
+    }
+
+    // TODO: Add assumption about order of stabilization desired and manual control stabilization mode fields having same order
     stabilization.StabilizationMode.Roll  = stab_settings[0];
     stabilization.StabilizationMode.Pitch = stab_settings[1];
     stabilization.StabilizationMode.Yaw   = stab_settings[2];
-
-    // first Horizon Mode region begins at (stick position) 0.0f (center), others are 0.0f<=p<=1.0f
-    float begin2, begin3;
-    // HorizonModeRegionBegin and HorizonModeRegionLength are currently integers 0->100 (percents)
-    begin2 = stabSettings.HorizonModeRegionBegin / 100.0f;
-    begin3 = begin2 + stabSettings.HorizonModeRegionLength / 100.0f;
-    // this test could be moved into the GCS
-    if (begin3 > 1.0f) {
-        begin3 = 1.0f;
-    }
-
-    // massage stabilization and stabSettings if we are in Horizon Mode
-    // currently we test each axis separately which means the stick corner will bank more
-    // we could generate a single combined bank angle
-    //
-    // should we even allow Horizon mode (or Attitude mode) on a single axis?
-    // with Attitude mode only on roll, you can do a pitch and a yaw to get an effective roll
-    //   without even moving the roll stick
-
-    // roll channel
-    if (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON) {
-        float roll;
-        roll = fabs(cmd->Roll);
-        if (roll < begin2) {
-            // first region is just attitude mode
-            stab_settings[0] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-        }
-        else if (roll < begin3) {
-            // second region is increased sensitivity attitude mode
-            stab_settings[0] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-            // at the beginning of this region, the stick value is left alone so the transition is smooth
-            // at the end of this region, the stick value is (+-) 1.0
-            // this means that the end of this region acts like attitude mode max angle
-            // so this region acts like a more sensitive attitude mode
-            cmd->Roll *= ((roll-begin2) / (begin3-begin2) * ((1.0f/begin3)-1.0f) + 1.0f);
-        }
-        else {
-            // third region is just rate mode
-            stab_settings[0] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
-        }
-    }
-    // pitch channel
-    if (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON) {
-        float pitch;
-        pitch = fabs(cmd->Pitch);
-        if (pitch < begin2) {
-            // first region is just attitude mode
-            stab_settings[1] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-        }
-        else if (pitch < begin3) {
-            // second region is increased sensitivity attitude mode
-            stab_settings[1] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-            // at the beginning of this region, the stick value is left alone so the transition is smooth
-            // at the end of this region, the stick value is (+-) 1.0
-            // this means that the end of this region acts like attitude mode max angle
-            // so this region acts like a more sensitive attitude mode
-            cmd->Pitch *= ((pitch-begin2) / (begin3-begin2) * ((1.0f/begin3)-1.0f) + 1.0f);
-        }
-        else {
-            // third region is just rate mode
-            stab_settings[1] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
-        }
-    }
-    // ignore yaw channel for now, just extra code that no one will use
-    // should it be taken out of yaw on the GCS?  that would make those matching enums a problem
-    // if (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON) {
-    // }
 
     stabilization.Roll =
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Roll :

@@ -88,8 +88,13 @@ static void StatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     DebugLogSettingsGet(&settings);
-    PIOS_DEBUGLOG_Enable(settings.LoggingEnabled);
-    PIOS_DEBUGLOG_Printf("Logging enabled");
+    if (settings.LoggingEnabled) {
+        PIOS_DEBUGLOG_Enable(settings.LoggingEnabled);
+        PIOS_DEBUGLOG_Printf("Logging enabled");
+    } else {
+        PIOS_DEBUGLOG_Printf("Logging disabled");
+        PIOS_DEBUGLOG_Enable(settings.LoggingEnabled);
+    }
 }
 
 static void ControlUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)

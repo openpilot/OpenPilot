@@ -22826,7 +22826,7 @@ border-radius: 5;</string>
                     <double>0.000000000000000</double>
                    </property>
                    <property name="maximum">
-                    <double>98.000000000000000</double>
+                    <double>99.000000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>1.000000000000000</double>
@@ -22881,7 +22881,7 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="minimum">
-                    <double>1.000000000000000</double>
+                    <double>0.000000000000000</double>
                    </property>
                    <property name="maximum">
                     <double>99.000000000000000</double>

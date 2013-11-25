@@ -694,21 +694,32 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
 
     // The first Horizon Mode region begins at (stick position) 0.0f (center),
     //   other regions are 0.0f<=begin<=1.0f
-    // Beginning of region 2 is limited to [0,98] by GCS
-    // Length    of region 2 is limited to [1,99] by GCS
+    // Beginning of region 2 is limited to [0,99] by GCS
+    // Length    of region 2 is limited to [0,99] by GCS
     // Uavo's HorizonModeRegionBegin and HorizonModeRegionLength are currently integers
     //   representing percent of max stick deflection
     float begin2, begin3;
     begin2 = stabSettings.HorizonModeRegionBegin / 100.0f;
-    begin3 = begin2 + stabSettings.HorizonModeRegionLength / 100.0f;
-    // this bounding could be moved into the GCS
-    if (begin3 > 0.99f) {
-        begin3 = 0.99f;
+    // This is done so that it will never enter region 2 if region 2 length is zero
+    // It shouldn't, because (float)a + (0/100.0f) should exactly equal (float)a
+    //   but that 0/100.0f might be epsilon if somebody converts the length to float in the future
+    if (stabSettings.HorizonModeRegionLength > 0) {
+        begin3 = begin2 + stabSettings.HorizonModeRegionLength / 100.0f;
+        // this bounding could be moved into the GCS
+        if (begin3 > 0.99f) {
+            begin3 = 0.99f;
+        }
+        if (begin2 > begin3-0.005f) {
+            begin2 = begin3;
+        }
+    }
+    else {
+        begin3 = begin2;
     }
     // To avoid division by zero...
     //   we have guarenteed that begin3 is not zero
     //   we have guarenteed that begin3 is not one
-    //   we have guarenteed that begin3-begin2 is not zero
+    // begin3-begin2 equal or close to zero is another thing to be careful of
 
     // Require Horizon mode to be configured on both roll and pitch, or neither;
     //   never just one of them
@@ -735,6 +746,9 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
         // At the end of this region, the stick value is (+-) 1.0
         // This means that the end of this region acts like attitude mode max angle
         //   so this region acts like a more sensitive attitude mode
+        // Note that if region 2 length is zero it can't get in here
+        //   that is important to avoid divide by zero
+        //   and also a big bump in the stick when region 2 is very small and close to center stick
         else if (magnitude < begin3) {
             // Convert Horizon mode to Attitude mode on both roll and pitch
             stab_settings[0] = stab_settings[1] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

@@ -40,19 +40,25 @@
 
 class ExtendedDebugLogEntry : public DebugLogEntry {
     Q_OBJECT
-    Q_PROPERTY(QString LogString READ LogString)
+    Q_PROPERTY(QString LogString READ getLogString WRITE setLogString NOTIFY LogStringUpdated)
 
 public:
     explicit ExtendedDebugLogEntry();
+    ~ExtendedDebugLogEntry();
 
-    QString LogString()
-    {
-        if(getType() == DebugLogEntry::TYPE_TEXT) {
-            return QString((const char*)getData().Data);
-        } else {
-            return "Object";
-        }
-    }
+    QString getLogString();
+    UAVDataObject* uavObject() { return m_object; }
+    void setObjectManager(UAVObjectManager *objectManager);
+
+public slots:
+    void setLogString(QString arg){ Q_UNUSED(arg); }
+
+signals:
+    void LogStringUpdated(QString arg);
+
+private:
+    UAVObjectManager *m_objectManager;
+    UAVDataObject *m_object;
 };
 
 class FlightLogManager : public QObject {

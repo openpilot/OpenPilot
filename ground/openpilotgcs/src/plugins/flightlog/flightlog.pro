@@ -15,7 +15,8 @@ SOURCES += flightlogplugin.cpp \
     flightlogdialog.cpp
 
 OTHER_FILES += Flightlog.pluginspec \
-    FlightLogDialog.qml
+    FlightLogDialog.qml \
+    functions.js
 
 FORMS +=
 

@@ -4,6 +4,8 @@ import QtQuick.Layouts 1.0
 
 import org.openpilot 1.0
 
+import "functions.js" as Functions
+
 Rectangle {
     width: 600
     height: 400
@@ -32,7 +34,9 @@ Rectangle {
                     model: logManager.logEntries
 
                     itemDelegate: Text {
-                        anchors.margins: 3
+                        anchors.fill: parent
+                        anchors.margins: 2
+                        anchors.leftMargin: 5
                         font.pixelSize: 12
                         text: styleData.value
                     }
@@ -41,19 +45,32 @@ Rectangle {
                         role: "Flight"; title: qsTr("Flight"); width: 50;
                         delegate:
                             Text {
-                                anchors.margins: 3
+                                anchors.fill: parent
+                                anchors.margins: 2
+                                anchors.leftMargin: 5
                                 font.pixelSize: 12
                                 text: styleData.value + 1
                             }
 
                     }
-                    TableViewColumn { role: "FlightTime"; title: qsTr("Time"); width: 50}
-                    TableViewColumn { role: "Entry"; title: qsTr("#"); width: 50}
                     TableViewColumn {
-                        role: "Type"; title: "Type"; width: 100;
+                        role: "FlightTime"; title: qsTr("Time"); width: 80;
                         delegate:
                             Text {
-                                anchors.margins: 3
+                                anchors.fill: parent
+                                anchors.margins: 2
+                                anchors.leftMargin: 5
+                                font.pixelSize: 12
+                                text: Functions.millisToTime(styleData.value)
+                            }
+                    }
+                    TableViewColumn {
+                        role: "Type"; title: "Type"; width: 50;
+                        delegate:
+                            Text {
+                                anchors.fill: parent
+                                anchors.margins: 2
+                                anchors.leftMargin: 5
                                 font.pixelSize: 12
                                 text: {
                                     switch(styleData.value) {

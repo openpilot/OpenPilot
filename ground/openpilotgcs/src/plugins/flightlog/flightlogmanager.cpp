@@ -116,6 +116,7 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve) {
                         //Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
 
                         ExtendedDebugLogEntry* logEntry = new ExtendedDebugLogEntry();
+                        logEntry->setObjectManager(m_objectManager);
                         logEntry->setData(m_flightLogEntry->getData());
                         m_logEntries.append(logEntry);
 
@@ -140,9 +141,37 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve) {
 
 void FlightLogManager::exportLogs()
 {
-
 }
 
-ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry()
+ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry(),
+    m_objectManager(0), m_object(0)
 {
+}
+
+ExtendedDebugLogEntry::~ExtendedDebugLogEntry()
+{
+    if(m_object) {
+        delete m_object;
+        m_object = 0;
+    }
+}
+
+QString ExtendedDebugLogEntry::getLogString()
+{
+    if(getType() == DebugLogEntry::TYPE_TEXT) {
+        return QString((const char*)getData().Data);
+    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+        UAVDataObject *object = (UAVDataObject*)m_objectManager->getObject(getObjectID(), getInstanceID());
+        object = object->clone(getInstanceID());
+        object->unpack(getData().Data);
+        m_object = object;
+        return object->toString().replace("\n", " ").replace("\t", " ");
+    } else {
+        return "";
+    }
+}
+
+void ExtendedDebugLogEntry::setObjectManager(UAVObjectManager *objectManager)
+{
+    m_objectManager = objectManager;
 }

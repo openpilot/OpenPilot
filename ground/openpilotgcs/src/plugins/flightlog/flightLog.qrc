@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/flightlog">
         <file>FlightLogDialog.qml</file>
+        <file>functions.js</file>
     </qresource>
 </RCC>

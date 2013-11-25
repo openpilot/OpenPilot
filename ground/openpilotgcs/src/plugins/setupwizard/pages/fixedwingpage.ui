@@ -63,7 +63,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Multirotor type:</string>
+            <string>FixedWing type:</string>
            </property>
           </widget>
          </item>

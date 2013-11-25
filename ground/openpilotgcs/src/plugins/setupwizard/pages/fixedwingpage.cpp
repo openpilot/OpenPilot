@@ -35,7 +35,6 @@ FixedWingPage::FixedWingPage(SetupWizard *wizard, QWidget *parent) :
 {
     ui->setupUi(this);
     QSvgRenderer *renderer = new QSvgRenderer();
-// What do we do about v-tail here? 
     renderer->load(QString(":/configgadget/images/fixedwing-shapes.svg"));
     m_fixedwingPic = new QGraphicsSvgItem();
     m_fixedwingPic->setSharedRenderer(renderer);

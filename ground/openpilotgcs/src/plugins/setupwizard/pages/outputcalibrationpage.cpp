@@ -36,6 +36,7 @@ OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *paren
 {
     ui->setupUi(this);
 
+    qDebug() << "calling output calibration page";
     m_vehicleRenderer = new QSvgRenderer();
     if (QFile::exists(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
         m_vehicleRenderer->load(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
@@ -107,7 +108,8 @@ void OutputCalibrationPage::setupVehicle()
 // KF hack
     case SetupWizard::FIXED_WING_AILERON:
 	qDebug() << "no clue what a wizard index is!";
-        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+//        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 2 << 3 << 4;
         m_vehicleElementIds << "fixed-aileron" << "aileron";
         m_vehicleHighlightElementIndexes << 0 << 1;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
@@ -115,7 +117,8 @@ void OutputCalibrationPage::setupVehicle()
         break;
     case SetupWizard::FIXED_WING_VTAIL:
 	qDebug() << "no clue what a wizard index is!";
-        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+//        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 2 << 3 << 4;
         m_vehicleElementIds << "fixed-vtail" << "vtail";
         m_vehicleHighlightElementIndexes << 0 << 1;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;

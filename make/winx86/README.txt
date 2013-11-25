@@ -27,7 +27,7 @@ OpenPilot.
 ------------------
 Fortunately, it requires only few small text files since all others components
 should already be installed on your system as parts of msysGit, QtSDK and
-CodeSourcery G++ packages required to build the OpenPilot.
+Arm compiler packages required to build the OpenPilot.
 
 It is expected that you have the following tools installed into the listed
 locations (but any other locations are fine as well):
@@ -39,8 +39,8 @@ locations (but any other locations are fine as well):
  - Unicode NSIS      in %ProgramFiles%\NSIS\Unicode
  - OpenOCD           in C:\OpenOCD\0.4.0\bin (optional)
 
-The SDL library and headers should be installed into Qt directories to build
-the GCS. Check the wiki or ground/openpilotgcs/copydata.pro for details.
+The SDL and SSL libraries and headers should be installed into Qt directories to 
+build the GCS. Check the wiki or ground/openpilotgcs/copydata.pro for details.
 
 Also it is assumed that you have the C:\Program Files\Git\cmd\ directory in
 the PATH. Usually this is the case for msysGit installation if you have chosen

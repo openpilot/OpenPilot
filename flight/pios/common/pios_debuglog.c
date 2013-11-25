@@ -113,8 +113,8 @@ void PIOS_DEBUGLOG_UAVObject(uint32_t objid, uint16_t instid, size_t size, uint8
 #else
     buffer->FlightTime = 0;
 #endif
-    buffer->Entry = lognum;
-    buffer->Type = DEBUGLOGENTRY_TYPE_UAVOBJECT;
+    buffer->Entry      = lognum;
+    buffer->Type       = DEBUGLOGENTRY_TYPE_UAVOBJECT;
     buffer->ObjectID   = objid;
     buffer->InstanceID = instid;
     if (size > sizeof(buffer->Data)) {

@@ -87,10 +87,17 @@ QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries()
 void FlightLogManager::clearAllLogs()
 {
     // Clear on flight side
+    UAVObjectUpdaterHelper updateHelper;
 
-    // Then delete locally
-    while (!m_logEntries.isEmpty()) {
-        delete m_logEntries.takeFirst();
+    m_flightLogControl->setFlight(0);
+    m_flightLogControl->setEntry(0);
+    m_flightLogControl->setOperation(DebugLogControl::OPERATION_FORMATFLASH);
+    if (updateHelper.doObjectAndWait(m_flightLogControl, UAVTALK_TIMEOUT) == UAVObjectUpdaterHelper::SUCCESS) {
+        // Then delete locally
+        while (!m_logEntries.isEmpty()) {
+            delete m_logEntries.takeFirst();
+        }
+        emit logEntriesChanged();
     }
 }
 

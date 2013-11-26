@@ -69,6 +69,7 @@ private:
 class FlightLogManager : public QObject {
     Q_OBJECT Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
     Q_PROPERTY(QQmlListProperty<ExtendedDebugLogEntry> logEntries READ logEntries NOTIFY logEntriesChanged)
+    Q_PROPERTY(bool disableControls READ disableControls WRITE setDisableControls NOTIFY disableControlsChanged)
 
 public:
     explicit FlightLogManager(QObject *parent = 0);
@@ -81,13 +82,28 @@ public:
         return m_flightLogStatus;
     }
 
+    bool disableControls() const
+    {
+        return m_disableControls;
+    }
+
 signals:
     void logEntriesChanged();
+
+    void disableControlsChanged(bool arg);
 
 public slots:
     void clearAllLogs();
     void retrieveLogs(int flightToRetrieve = -1);
     void exportLogs();
+
+    void setDisableControls(bool arg)
+    {
+        if (m_disableControls != arg) {
+            m_disableControls = arg;
+            emit disableControlsChanged(arg);
+        }
+    }
 
 private:
     UAVObjectManager *m_objectManager;
@@ -97,6 +113,7 @@ private:
     QList<ExtendedDebugLogEntry *> m_logEntries;
 
     static const int UAVTALK_TIMEOUT = 4000;
+    bool m_disableControls;
 };
 
 #endif // FLIGHTLOGMANAGER_H

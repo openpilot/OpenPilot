@@ -119,6 +119,7 @@ Rectangle {
 
                             ComboBox {
                                 id: flightCombo
+                                enabled: !logManager.disableControls
                                 property ListModel dataModel: ListModel {}
                                 model: dataModel
                                 Component.onCompleted: {
@@ -137,6 +138,7 @@ Rectangle {
                             }
                             Button {
                                 text: qsTr("Download logs")
+                                enabled: !logManager.disableControls
                                 activeFocusOnPress: true
                                 onClicked: logManager.retrieveLogs(flightCombo.currentIndex - 1)
                             }
@@ -151,6 +153,7 @@ Rectangle {
             height: 40
             Button {
                 id: exportButton
+                enabled: !logManager.disableControls
                 text: qsTr("Export...")
                 activeFocusOnPress: true
                 onClicked: logManager.exportLogs()
@@ -160,6 +163,7 @@ Rectangle {
             }
             Button {
                 id: okButton
+                enabled: !logManager.disableControls
                 text: qsTr("OK")
                 activeFocusOnPress: true
                 onClicked: dialog.close()

@@ -34,7 +34,7 @@
 #include "uavobjecthelper.h"
 
 FlightLogManager::FlightLogManager(QObject *parent) :
-    QObject(parent)
+    QObject(parent), m_disableControls(false)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
@@ -86,6 +86,9 @@ QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries()
 
 void FlightLogManager::clearAllLogs()
 {
+    setDisableControls(true);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     // Clear on flight side
     UAVObjectUpdaterHelper updateHelper;
 
@@ -99,10 +102,14 @@ void FlightLogManager::clearAllLogs()
         }
         emit logEntriesChanged();
     }
+
+    QApplication::restoreOverrideCursor();
+    setDisableControls(false);
 }
 
 void FlightLogManager::retrieveLogs(int flightToRetrieve)
 {
+    setDisableControls(true);
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     UAVObjectUpdaterHelper updateHelper;
@@ -151,6 +158,7 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
     }
     emit logEntriesChanged();
     QApplication::restoreOverrideCursor();
+    setDisableControls(false);
 }
 
 void FlightLogManager::exportLogs()

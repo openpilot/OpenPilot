@@ -120,14 +120,7 @@ Rectangle {
                             ComboBox {
                                 id: flightCombo
                                 enabled: !logManager.disableControls
-                                property ListModel dataModel: ListModel {}
-                                model: dataModel
-                                Component.onCompleted: {
-                                    dataModel.append({"value": "All"})
-                                    for (var a = 0; a <= logStatus.Flight ; a++) {
-                                        dataModel.append({"value": (a + 1).toString()})
-                                    }
-                                }
+                                model: logManager.flightEntries
                             }
                         }
                         RowLayout {
@@ -157,6 +150,13 @@ Rectangle {
                 text: qsTr("Export...")
                 activeFocusOnPress: true
                 onClicked: logManager.exportLogs()
+            }
+            Button {
+                id: clearButton
+                enabled: !logManager.disableControls
+                text: qsTr("Clear all logs")
+                activeFocusOnPress: true
+                onClicked: logManager.clearAllLogs()
             }
             Rectangle {
                 Layout.fillWidth: true

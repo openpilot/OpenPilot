@@ -46,9 +46,12 @@ FlightLogManager::FlightLogManager(QObject *parent) :
 
     m_flightLogStatus  = DebugLogStatus::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogStatus);
+    connect(m_flightLogStatus, SIGNAL(FlightChanged(quint16)), this, SLOT(updateFlightEntries(quint16)));
 
     m_flightLogEntry   = DebugLogEntry::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogEntry);
+
+    updateFlightEntries(m_flightLogStatus->getFlight());
 }
 
 FlightLogManager::~FlightLogManager()
@@ -58,30 +61,35 @@ FlightLogManager::~FlightLogManager()
     }
 }
 
-void addEntries(QQmlListProperty<ExtendedDebugLogEntry> *list, ExtendedDebugLogEntry *entry)
+void addLogEntries(QQmlListProperty<ExtendedDebugLogEntry> *list, ExtendedDebugLogEntry *entry)
 {
     Q_UNUSED(list);
     Q_UNUSED(entry);
 }
 
-int countEntries(QQmlListProperty<ExtendedDebugLogEntry> *list)
+int countLogEntries(QQmlListProperty<ExtendedDebugLogEntry> *list)
 {
     return static_cast< QList<ExtendedDebugLogEntry *> *>(list->data)->size();
 }
 
-ExtendedDebugLogEntry *entryAt(QQmlListProperty<ExtendedDebugLogEntry> *list, int index)
+ExtendedDebugLogEntry *logEntryAt(QQmlListProperty<ExtendedDebugLogEntry> *list, int index)
 {
     return static_cast< QList<ExtendedDebugLogEntry *> *>(list->data)->at(index);
 }
 
-void clearEntries(QQmlListProperty<ExtendedDebugLogEntry> *list)
+void clearLogEntries(QQmlListProperty<ExtendedDebugLogEntry> *list)
 {
     return static_cast< QList<ExtendedDebugLogEntry *> *>(list->data)->clear();
 }
 
 QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries()
 {
-    return QQmlListProperty<ExtendedDebugLogEntry>(this, &m_logEntries, &addEntries, &countEntries, &entryAt, &clearEntries);
+    return QQmlListProperty<ExtendedDebugLogEntry>(this, &m_logEntries, &addLogEntries, &countLogEntries, &logEntryAt, &clearLogEntries);
+}
+
+QStringList FlightLogManager::flightEntries()
+{
+    return m_flightEntries;
 }
 
 void FlightLogManager::clearAllLogs()
@@ -96,15 +104,24 @@ void FlightLogManager::clearAllLogs()
     m_flightLogControl->setEntry(0);
     m_flightLogControl->setOperation(DebugLogControl::OPERATION_FORMATFLASH);
     if (updateHelper.doObjectAndWait(m_flightLogControl, UAVTALK_TIMEOUT) == UAVObjectUpdaterHelper::SUCCESS) {
-        // Then delete locally
-        while (!m_logEntries.isEmpty()) {
-            delete m_logEntries.takeFirst();
-        }
-        emit logEntriesChanged();
+        // Then empty locally
+        clearLogList();
     }
 
     QApplication::restoreOverrideCursor();
     setDisableControls(false);
+}
+
+void FlightLogManager::clearLogList()
+{
+    QList<ExtendedDebugLogEntry*> tmpList(m_logEntries);
+    m_logEntries.clear();
+
+    emit logEntriesChanged();
+
+    while (!tmpList.isEmpty()) {
+        delete tmpList.takeFirst();
+    }
 }
 
 void FlightLogManager::retrieveLogs(int flightToRetrieve)
@@ -115,11 +132,7 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
     UAVObjectUpdaterHelper updateHelper;
     UAVObjectRequestHelper requestHelper;
 
-    // Get logs from flight side
-    while (!m_logEntries.isEmpty()) {
-        delete m_logEntries.takeFirst();
-    }
-    emit logEntriesChanged();
+    clearLogList();
 
     // Set up what to retrieve
     int startFlight = (flightToRetrieve == -1) ? 0 : flightToRetrieve;
@@ -163,6 +176,23 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
 
 void FlightLogManager::exportLogs()
 {}
+
+void FlightLogManager::updateFlightEntries(quint16 currentFlight)
+{
+    Q_UNUSED(currentFlight);
+
+    int flights = m_flightLogStatus->getFlight();
+    if (m_flightEntries.count() == 0 || (m_flightEntries.count() - 1 != flights)) {
+        m_flightEntries.clear();
+
+        m_flightEntries << tr("All");
+        for(int i = 0; i <= flights; i++) {
+            m_flightEntries << QString::number(i + 1);
+        }
+
+        emit flightEntriesChanged();
+    }
+}
 
 ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry(),
     m_objectManager(0), m_object(0)

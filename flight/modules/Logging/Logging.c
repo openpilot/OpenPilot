@@ -41,12 +41,14 @@
 static DebugLogSettingsData settings;
 static DebugLogControlData control;
 static DebugLogStatusData status;
+static FlightStatusData flightstatus;
 static DebugLogEntryData *entry; // would be better on stack but event dispatcher stack might be insufficient
 
 // private functions
 static void SettingsUpdatedCb(UAVObjEvent *ev);
 static void ControlUpdatedCb(UAVObjEvent *ev);
 static void StatusUpdatedCb(UAVObjEvent *ev);
+static void FlightStatusUpdatedCb(UAVObjEvent *ev);
 
 int32_t LoggingInitialize(void)
 {
@@ -68,6 +70,7 @@ int32_t LoggingStart(void)
 {
     DebugLogSettingsConnectCallback(SettingsUpdatedCb);
     DebugLogControlConnectCallback(ControlUpdatedCb);
+    FlightStatusConnectCallback(FlightStatusUpdatedCb);
     SettingsUpdatedCb(DebugLogSettingsHandle());
 
     UAVObjEvent ev = { .obj = DebugLogSettingsHandle(), .instId = 0, .event = EV_UPDATED_PERIODIC };
@@ -85,16 +88,26 @@ static void StatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     DebugLogStatusSet(&status);
 }
 
+static void FlightStatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    FlightStatusGet(&flightstatus);
+    switch (settings.LoggingEnabled) {
+    case DEBUGLOGSETTINGS_LOGGINGENABLED_ALWAYS:
+        PIOS_DEBUGLOG_Enable(1);
+        break;
+    case DEBUGLOGSETTINGS_LOGGINGENABLED_ONLYWHENARMED:
+        PIOS_DEBUGLOG_Enable(flightstatus.Armed == FLIGHTSTATUS_ARMED_ARMED);
+        break;
+    default:
+        PIOS_DEBUGLOG_Enable(0);
+    }
+}
+
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     DebugLogSettingsGet(&settings);
-    if (settings.LoggingEnabled) {
-        PIOS_DEBUGLOG_Enable(settings.LoggingEnabled);
-        PIOS_DEBUGLOG_Printf("Logging enabled");
-    } else {
-        PIOS_DEBUGLOG_Printf("Logging disabled");
-        PIOS_DEBUGLOG_Enable(settings.LoggingEnabled);
-    }
+    FlightStatusUpdatedCb(NULL);
+    PIOS_DEBUGLOG_Printf("On board logging enabled.");
 }
 
 static void ControlUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)

@@ -49,7 +49,9 @@ FlightLogManager::FlightLogManager(QObject *parent) :
 }
 
 FlightLogManager::~FlightLogManager() {
-
+    while (!m_logEntries.isEmpty()) {
+        delete m_logEntries.takeFirst();
+    }
 }
 
 void addEntries(QQmlListProperty<ExtendedDebugLogEntry> *list, ExtendedDebugLogEntry *entry) {
@@ -76,7 +78,11 @@ QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries() {
 void FlightLogManager::clearAllLogs() {
 
     //Clear on flight side
-    m_logEntries.clear();
+
+    //Then delete locally
+    while (!m_logEntries.isEmpty()) {
+        delete m_logEntries.takeFirst();
+    }
 }
 
 void FlightLogManager::retrieveLogs(int flightToRetrieve) {
@@ -85,7 +91,10 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve) {
     UAVObjectRequestHelper requestHelper;
 
     //Get logs from flight side
-    m_logEntries.clear();
+    while (!m_logEntries.isEmpty()) {
+        delete m_logEntries.takeFirst();
+    }
+    emit logEntriesChanged();
 
     // Set up what to retrieve
     bool timedOut = false;
@@ -114,7 +123,6 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve) {
                             m_flightLogEntry->getFlight() == flight && m_flightLogEntry->getEntry() == entry) {
 
                         //Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
-
                         ExtendedDebugLogEntry* logEntry = new ExtendedDebugLogEntry();
                         logEntry->setObjectManager(m_objectManager);
                         logEntry->setData(m_flightLogEntry->getData());

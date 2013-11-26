@@ -28,6 +28,8 @@
 #include "flightlogmanager.h"
 #include "extensionsystem/pluginmanager.h"
 
+#include <QApplication>
+
 #include "debuglogcontrol.h"
 #include "uavobjecthelper.h"
 
@@ -94,6 +96,8 @@ void FlightLogManager::clearAllLogs()
 
 void FlightLogManager::retrieveLogs(int flightToRetrieve)
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     UAVObjectUpdaterHelper updateHelper;
     UAVObjectRequestHelper requestHelper;
 
@@ -104,7 +108,6 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
     emit logEntriesChanged();
 
     // Set up what to retrieve
-    bool timedOut   = false;
     int startFlight = (flightToRetrieve == -1) ? 0 : flightToRetrieve;
     int endFlight   = (flightToRetrieve == -1) ? m_flightLogStatus->getFlight() : flightToRetrieve;
 
@@ -118,38 +121,29 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
             // Send request for loading flight entry on flight side and wait for ack/nack
             m_flightLogControl->setEntry(entry);
 
-            UAVObjectUpdaterHelper::Result result = updateHelper.doObjectAndWait(m_flightLogControl, UAVTALK_TIMEOUT);
-            if (result == UAVObjectUpdaterHelper::SUCCESS) {
-                result = requestHelper.doObjectAndWait(m_flightLogEntry, UAVTALK_TIMEOUT);
-                if (result == UAVObjectUpdaterHelper::TIMEOUT) {
-                    timedOut = true;
-                    break;
-                } else {
-                    if (!m_flightLogEntry->getType() == DebugLogEntry::TYPE_EMPTY &&
-                        m_flightLogEntry->getFlight() == flight && m_flightLogEntry->getEntry() == entry) {
-                        // Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
-                        ExtendedDebugLogEntry *logEntry = new ExtendedDebugLogEntry();
-                        logEntry->setObjectManager(m_objectManager);
-                        logEntry->setData(m_flightLogEntry->getData());
-                        m_logEntries << logEntry;
+            if (updateHelper.doObjectAndWait(m_flightLogControl, UAVTALK_TIMEOUT) == UAVObjectUpdaterHelper::SUCCESS &&
+                requestHelper.doObjectAndWait(m_flightLogEntry, UAVTALK_TIMEOUT) == UAVObjectUpdaterHelper::SUCCESS) {
+                if (m_flightLogEntry->getType() != DebugLogEntry::TYPE_EMPTY) {
+                    // Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
+                    ExtendedDebugLogEntry *logEntry = new ExtendedDebugLogEntry();
+                    logEntry->setObjectManager(m_objectManager);
+                    logEntry->setData(m_flightLogEntry->getData());
+                    m_logEntries << logEntry;
 
-                        // Increment to get next entry from flight side
-                        entry++;
-                    } else {
-                        // We are done, not more entries on this flight
-                        break;
-                    }
+                    // Increment to get next entry from flight side
+                    entry++;
+                } else {
+                    // We are done, not more entries on this flight
+                    gotLast = true;
                 }
             } else {
+                // We failed for some reason
                 break;
             }
         }
-        if (timedOut) {
-            // We timed out, do something smart here to alert the user
-            break;
-        }
     }
     emit logEntriesChanged();
+    QApplication::restoreOverrideCursor();
 }
 
 void FlightLogManager::exportLogs()

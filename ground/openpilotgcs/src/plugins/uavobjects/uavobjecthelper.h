@@ -35,14 +35,13 @@
 
 #include "uavobject.h"
 
-class UAVOBJECTS_EXPORT AbstractUAVObjectHelper : public QObject
-{
+class UAVOBJECTS_EXPORT AbstractUAVObjectHelper : public QObject {
     Q_OBJECT
 public:
     explicit AbstractUAVObjectHelper(QObject *parent = 0);
 
-    enum Result {SUCCESS, FAIL, TIMEOUT};
-    Result doObjectAndWait(UAVObject* object, int timeout);
+    enum Result { SUCCESS, FAIL, TIMEOUT };
+    Result doObjectAndWait(UAVObject *object, int timeout);
 
 protected:
     virtual void doObjectAndWaitImpl() = 0;
@@ -58,8 +57,7 @@ private:
     bool m_transactionCompleted;
 };
 
-class UAVOBJECTS_EXPORT UAVObjectUpdaterHelper : public AbstractUAVObjectHelper
-{
+class UAVOBJECTS_EXPORT UAVObjectUpdaterHelper : public AbstractUAVObjectHelper {
     Q_OBJECT
 public:
     explicit UAVObjectUpdaterHelper(QObject *parent = 0);
@@ -68,8 +66,7 @@ protected:
     virtual void doObjectAndWaitImpl();
 };
 
-class UAVOBJECTS_EXPORT UAVObjectRequestHelper : public AbstractUAVObjectHelper
-{
+class UAVOBJECTS_EXPORT UAVObjectRequestHelper : public AbstractUAVObjectHelper {
     Q_OBJECT
 public:
     explicit UAVObjectRequestHelper(QObject *parent = 0);

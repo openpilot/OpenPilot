@@ -30,8 +30,7 @@
 
 AbstractUAVObjectHelper::AbstractUAVObjectHelper(QObject *parent) :
     QObject(parent), m_transactionResult(false), m_transactionCompleted(false)
-{
-}
+{}
 
 AbstractUAVObjectHelper::Result AbstractUAVObjectHelper::doObjectAndWait(UAVObject *object, int timeout)
 {
@@ -41,14 +40,14 @@ AbstractUAVObjectHelper::Result AbstractUAVObjectHelper::doObjectAndWait(UAVObje
     m_object = object;
 
     // Reset variables
-    m_transactionResult = false;
+    m_transactionResult    = false;
     m_transactionCompleted = false;
 
     // Create timer and connect it, connect object tx completed to local slot
     QTimer timeoutTimer;
     timeoutTimer.setSingleShot(true);
     connect(&timeoutTimer, SIGNAL(timeout()), &m_eventLoop, SLOT(quit()));
-    connect(object, SIGNAL(transactionCompleted(UAVObject*, bool)), this, SLOT(transactionCompleted(UAVObject*, bool)));
+    connect(object, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
 
     // Start timeout timer
     timeoutTimer.start(timeout);
@@ -63,7 +62,7 @@ AbstractUAVObjectHelper::Result AbstractUAVObjectHelper::doObjectAndWait(UAVObje
     timeoutTimer.stop();
 
     // Disconnect
-    disconnect(object, SIGNAL(transactionCompleted(UAVObject*, bool)), this, SLOT(transactionCompleted(UAVObject*, bool)));
+    disconnect(object, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
     disconnect(&timeoutTimer, SIGNAL(timeout()), &m_eventLoop, SLOT(quit()));
 
     // Return result
@@ -79,14 +78,13 @@ void AbstractUAVObjectHelper::transactionCompleted(UAVObject *object, bool succe
     Q_UNUSED(object)
 
     // Set variables and quit event loop
-    m_transactionResult = success;
+    m_transactionResult    = success;
     m_transactionCompleted = true;
     m_eventLoop.quit();
 }
 
 UAVObjectUpdaterHelper::UAVObjectUpdaterHelper(QObject *parent) : AbstractUAVObjectHelper(parent)
-{
-}
+{}
 
 void UAVObjectUpdaterHelper::doObjectAndWaitImpl()
 {
@@ -94,8 +92,7 @@ void UAVObjectUpdaterHelper::doObjectAndWaitImpl()
 }
 
 UAVObjectRequestHelper::UAVObjectRequestHelper(QObject *parent) : AbstractUAVObjectHelper(parent)
-{
-}
+{}
 
 void UAVObjectRequestHelper::doObjectAndWaitImpl()
 {

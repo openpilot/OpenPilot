@@ -242,5 +242,6 @@ SUBDIRS += plugin_setupwizard
 plugin_flightlog.subdir = flightlog
 plugin_flightlog.depends = plugin_coreplugin
 plugin_flightlog.depends += plugin_uavobjects
+plugin_flightlog.depends += plugin_uavtalk
 SUBDIRS += plugin_flightlog
 

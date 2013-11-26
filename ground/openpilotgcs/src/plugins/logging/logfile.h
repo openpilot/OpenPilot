@@ -7,8 +7,7 @@
 #include <QMutexLocker>
 #include <QDebug>
 #include <QBuffer>
-#include "uavobjectmanager.h"
-#include <math.h>
+#include <QFile>
 
 class LogFile : public QIODevice {
     Q_OBJECT

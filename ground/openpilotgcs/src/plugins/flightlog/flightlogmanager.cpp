@@ -29,9 +29,11 @@
 #include "extensionsystem/pluginmanager.h"
 
 #include <QApplication>
+#include <QFileDialog>
 
 #include "debuglogcontrol.h"
 #include "uavobjecthelper.h"
+#include "uavtalk/uavtalk.h"
 
 FlightLogManager::FlightLogManager(QObject *parent) :
     QObject(parent), m_disableControls(false)
@@ -175,7 +177,23 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
 }
 
 void FlightLogManager::exportLogs()
-{}
+{
+    setDisableControls(true);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log"),
+                                                    tr("OP-%0.opl").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
+                                                    tr("OpenPilot Log (*.opl)"));
+    /*
+    if (!fileName.isEmpty()) {
+        logFile.setFileName(fileName);
+        logFile.open(QIODevice::WriteOnly);
+        UAVTalk uavTalk(file, m_objectManager);
+    }
+    */
+    QApplication::restoreOverrideCursor();
+    setDisableControls(false);
+}
 
 void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 {

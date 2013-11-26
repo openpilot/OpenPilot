@@ -118,7 +118,7 @@ private:
     QList<ObjectTimeInfo> objList;
     QQueue<ObjectQueueInfo> objQueue;
     QQueue<ObjectQueueInfo> objPriorityQueue;
-    QMap<quint32, ObjectTransactionInfo *>transMap;
+    QMap<quint32, QMap<quint32, ObjectTransactionInfo *> *> transMap;
     QMutex *mutex;
     QTimer *updateTimer;
     QTimer *statsTimer;
@@ -135,6 +135,11 @@ private:
     void processObjectUpdates(UAVObject *obj, EventMask event, bool allInstances, bool priority);
     void processObjectTransaction(ObjectTransactionInfo *transInfo);
     void processObjectQueue();
+
+    ObjectTransactionInfo *findTransaction(UAVObject *obj);
+    void openTransaction(ObjectTransactionInfo *trans);
+    void closeTransaction(ObjectTransactionInfo *trans);
+    void closeAllTransactions();
 
 private slots:
     void objectUpdatedAuto(UAVObject *obj);

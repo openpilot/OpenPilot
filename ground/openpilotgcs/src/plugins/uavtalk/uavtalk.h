@@ -93,7 +93,6 @@ private:
     static const int MAX_PACKET_LENGTH  = (MAX_HEADER_LENGTH + MAX_PAYLOAD_LENGTH + CHECKSUM_LENGTH);
 
     static const quint16 ALL_INSTANCES  = 0xFFFF;
-    static const quint16 OBJID_NOTFOUND = 0x0000;
 
     static const int TX_BUFFER_SIZE     = 2 * 1024;
     static const quint8 crc_table[256];
@@ -105,7 +104,7 @@ private:
     QPointer<QIODevice> io;
     UAVObjectManager *objMngr;
     QMutex *mutex;
-    QMap<quint32, Transaction *> transMap;
+    QMap<quint32, QMap<quint32, Transaction *> *> transMap;
     quint8 rxBuffer[MAX_PACKET_LENGTH];
     quint8 txBuffer[MAX_PACKET_LENGTH];
     // Variables used by the receive state machine
@@ -129,17 +128,21 @@ private:
     QByteArray rxDataArray;
 
     // Methods
-    bool objectTransaction(UAVObject *obj, quint8 type, bool allInstances);
+    bool objectTransaction(quint8 type, UAVObject *obj, bool allInstances);
     bool processInputByte(quint8 rxbyte);
     bool receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *data, qint32 length);
     UAVObject *updateObject(quint32 objId, quint16 instId, quint8 *data);
     void updateAck(UAVObject *obj);
     void updateNack(UAVObject *obj);
-    bool transmitNack(quint32 objId);
-    bool transmitObject(UAVObject *obj, quint8 type, bool allInstances);
-    bool transmitSingleObject(UAVObject *obj, quint8 type, bool allInstances);
+    bool transmitObject(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
+    bool transmitSingleObject(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
     quint8 updateCRC(quint8 crc, const quint8 data);
     quint8 updateCRC(quint8 crc, const quint8 *data, qint32 length);
+
+    Transaction *findTransaction(UAVObject *obj);
+    void openTransaction(Transaction *trans);
+    void closeTransaction(Transaction *trans);
+    void closeAllTransactions();
 };
 
 #endif // UAVTALK_H

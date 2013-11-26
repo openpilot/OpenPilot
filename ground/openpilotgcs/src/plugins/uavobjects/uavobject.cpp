@@ -436,6 +436,7 @@ QString UAVObject::toString()
     QString sout;
 
     sout.append(toStringBrief());
+    sout.append('\n');
     sout.append(toStringData());
     return sout;
 }
@@ -447,12 +448,12 @@ QString UAVObject::toStringBrief()
 {
     QString sout;
 
-    sout.append(QString("%1 (ID: %2, InstID: %3, NumBytes: %4, SInst: %5)\n")
+    sout.append(QString("%1 (ID: %2:%3, %4bytes, %5)")
                 .arg(getName())
                 .arg(getObjID())
                 .arg(getInstID())
                 .arg(getNumBytes())
-                .arg(isSingleInstance()));
+                .arg(isSingleInstance() ? "single" : "multiple"));
     return sout;
 }
 

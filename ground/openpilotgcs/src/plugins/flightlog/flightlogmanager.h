@@ -39,19 +39,24 @@
 #include "debuglogcontrol.h"
 
 class ExtendedDebugLogEntry : public DebugLogEntry {
-    Q_OBJECT
-    Q_PROPERTY(QString LogString READ getLogString WRITE setLogString NOTIFY LogStringUpdated)
+    Q_OBJECT Q_PROPERTY(QString LogString READ getLogString WRITE setLogString NOTIFY LogStringUpdated)
 
 public:
     explicit ExtendedDebugLogEntry();
     ~ExtendedDebugLogEntry();
 
     QString getLogString();
-    UAVDataObject* uavObject() { return m_object; }
+    UAVDataObject *uavObject()
+    {
+        return m_object;
+    }
     void setObjectManager(UAVObjectManager *objectManager);
 
 public slots:
-    void setLogString(QString arg){ Q_UNUSED(arg); }
+    void setLogString(QString arg)
+    {
+        Q_UNUSED(arg);
+    }
 
 signals:
     void LogStringUpdated(QString arg);
@@ -62,8 +67,7 @@ private:
 };
 
 class FlightLogManager : public QObject {
-    Q_OBJECT    
-    Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
+    Q_OBJECT Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
     Q_PROPERTY(QQmlListProperty<ExtendedDebugLogEntry> logEntries READ logEntries NOTIFY logEntriesChanged)
 
 public:
@@ -72,12 +76,12 @@ public:
 
     QQmlListProperty<ExtendedDebugLogEntry> logEntries();
 
-    DebugLogStatus* flightLogStatus() const
+    DebugLogStatus *flightLogStatus() const
     {
         return m_flightLogStatus;
     }
 
-signals:    
+signals:
     void logEntriesChanged();
 
 public slots:
@@ -93,7 +97,6 @@ private:
     QList<ExtendedDebugLogEntry *> m_logEntries;
 
     static const int UAVTALK_TIMEOUT = 4000;
-
 };
 
 #endif // FLIGHTLOGMANAGER_H

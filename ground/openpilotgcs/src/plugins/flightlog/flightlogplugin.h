@@ -47,7 +47,7 @@ private slots:
     void LogManagementDialogClosed();
 
 private:
-    FlightLogDialog* m_logDialog;
+    FlightLogDialog *m_logDialog;
 };
 
 #endif /* FLIGHTLOGPLUGIN_H_ */

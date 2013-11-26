@@ -2,10 +2,9 @@
 #define FLIGHTLOGDIALOG_H
 
 #include <QDialog>
-#include"flightlogmanager.h"
+#include "flightlogmanager.h"
 
-class FlightLogDialog : public QDialog
-{
+class FlightLogDialog : public QDialog {
     Q_OBJECT
 
 public:

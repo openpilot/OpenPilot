@@ -32,101 +32,106 @@
 #include "uavobjecthelper.h"
 
 FlightLogManager::FlightLogManager(QObject *parent) :
-    QObject(parent) {
-
+    QObject(parent)
+{
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    m_objectManager = pm->getObject<UAVObjectManager>();
+
+    m_objectManager    = pm->getObject<UAVObjectManager>();
     Q_ASSERT(m_objectManager);
 
     m_flightLogControl = DebugLogControl::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogControl);
 
-    m_flightLogStatus = DebugLogStatus::GetInstance(m_objectManager);
+    m_flightLogStatus  = DebugLogStatus::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogStatus);
 
-    m_flightLogEntry = DebugLogEntry::GetInstance(m_objectManager);
+    m_flightLogEntry   = DebugLogEntry::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogEntry);
 }
 
-FlightLogManager::~FlightLogManager() {
+FlightLogManager::~FlightLogManager()
+{
     while (!m_logEntries.isEmpty()) {
         delete m_logEntries.takeFirst();
     }
 }
 
-void addEntries(QQmlListProperty<ExtendedDebugLogEntry> *list, ExtendedDebugLogEntry *entry) {
+void addEntries(QQmlListProperty<ExtendedDebugLogEntry> *list, ExtendedDebugLogEntry *entry)
+{
     Q_UNUSED(list);
     Q_UNUSED(entry);
 }
 
-int countEntries(QQmlListProperty<ExtendedDebugLogEntry> *list) {
+int countEntries(QQmlListProperty<ExtendedDebugLogEntry> *list)
+{
     return static_cast< QList<ExtendedDebugLogEntry *> *>(list->data)->size();
 }
 
-ExtendedDebugLogEntry* entryAt(QQmlListProperty<ExtendedDebugLogEntry> *list, int index) {
+ExtendedDebugLogEntry *entryAt(QQmlListProperty<ExtendedDebugLogEntry> *list, int index)
+{
     return static_cast< QList<ExtendedDebugLogEntry *> *>(list->data)->at(index);
 }
 
-void clearEntries(QQmlListProperty<ExtendedDebugLogEntry> *list) {
+void clearEntries(QQmlListProperty<ExtendedDebugLogEntry> *list)
+{
     return static_cast< QList<ExtendedDebugLogEntry *> *>(list->data)->clear();
 }
 
-QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries() {
+QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries()
+{
     return QQmlListProperty<ExtendedDebugLogEntry>(this, &m_logEntries, &addEntries, &countEntries, &entryAt, &clearEntries);
 }
 
-void FlightLogManager::clearAllLogs() {
+void FlightLogManager::clearAllLogs()
+{
+    // Clear on flight side
 
-    //Clear on flight side
-
-    //Then delete locally
+    // Then delete locally
     while (!m_logEntries.isEmpty()) {
         delete m_logEntries.takeFirst();
     }
 }
 
-void FlightLogManager::retrieveLogs(int flightToRetrieve) {
-
+void FlightLogManager::retrieveLogs(int flightToRetrieve)
+{
     UAVObjectUpdaterHelper updateHelper;
     UAVObjectRequestHelper requestHelper;
 
-    //Get logs from flight side
+    // Get logs from flight side
     while (!m_logEntries.isEmpty()) {
         delete m_logEntries.takeFirst();
     }
     emit logEntriesChanged();
 
     // Set up what to retrieve
-    bool timedOut = false;
+    bool timedOut   = false;
     int startFlight = (flightToRetrieve == -1) ? 0 : flightToRetrieve;
-    int endFlight = (flightToRetrieve == -1 ) ? m_flightLogStatus->getFlight() : flightToRetrieve;
+    int endFlight   = (flightToRetrieve == -1) ? m_flightLogStatus->getFlight() : flightToRetrieve;
 
     // Prepare to send request for event retrieval
     m_flightLogControl->setOperation(DebugLogControl::OPERATION_RETRIEVE);
-    for(int flight = startFlight; flight <= endFlight; flight++) {
+    for (int flight = startFlight; flight <= endFlight; flight++) {
         m_flightLogControl->setFlight(flight);
         bool gotLast = false;
-        int entry = 0;
-        while(!gotLast) {
-
+        int entry    = 0;
+        while (!gotLast) {
             // Send request for loading flight entry on flight side and wait for ack/nack
             m_flightLogControl->setEntry(entry);
 
             UAVObjectUpdaterHelper::Result result = updateHelper.doObjectAndWait(m_flightLogControl, UAVTALK_TIMEOUT);
-            if(result == UAVObjectUpdaterHelper::SUCCESS) {
+            if (result == UAVObjectUpdaterHelper::SUCCESS) {
                 result = requestHelper.doObjectAndWait(m_flightLogEntry, UAVTALK_TIMEOUT);
-                if(result == UAVObjectUpdaterHelper::TIMEOUT) {
+                if (result == UAVObjectUpdaterHelper::TIMEOUT) {
                     timedOut = true;
                     break;
                 } else {
-                    if(!m_flightLogEntry->getType() == DebugLogEntry::TYPE_EMPTY &&
-                            m_flightLogEntry->getFlight() == flight && m_flightLogEntry->getEntry() == entry) {
-
-                        //Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
-                        ExtendedDebugLogEntry* logEntry = new ExtendedDebugLogEntry();
+                    if (!m_flightLogEntry->getType() == DebugLogEntry::TYPE_EMPTY &&
+                        m_flightLogEntry->getFlight() == flight && m_flightLogEntry->getEntry() == entry) {
+                        // Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
+                        ExtendedDebugLogEntry *logEntry = new ExtendedDebugLogEntry();
                         logEntry->setObjectManager(m_objectManager);
                         logEntry->setData(m_flightLogEntry->getData());
-                        m_logEntries.append(logEntry);
+                        m_logEntries << logEntry;
 
                         // Increment to get next entry from flight side
                         entry++;
@@ -139,7 +144,7 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve) {
                 break;
             }
         }
-        if(timedOut) {
+        if (timedOut) {
             // We timed out, do something smart here to alert the user
             break;
         }
@@ -148,17 +153,15 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve) {
 }
 
 void FlightLogManager::exportLogs()
-{
-}
+{}
 
 ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry(),
     m_objectManager(0), m_object(0)
-{
-}
+{}
 
 ExtendedDebugLogEntry::~ExtendedDebugLogEntry()
 {
-    if(m_object) {
+    if (m_object) {
         delete m_object;
         m_object = 0;
     }
@@ -166,11 +169,11 @@ ExtendedDebugLogEntry::~ExtendedDebugLogEntry()
 
 QString ExtendedDebugLogEntry::getLogString()
 {
-    if(getType() == DebugLogEntry::TYPE_TEXT) {
-        return QString((const char*)getData().Data);
+    if (getType() == DebugLogEntry::TYPE_TEXT) {
+        return QString((const char *)getData().Data);
     } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
-        UAVDataObject *object = (UAVDataObject*)m_objectManager->getObject(getObjectID(), getInstanceID());
-        object = object->clone(getInstanceID());
+        UAVDataObject *object = (UAVDataObject *)m_objectManager->getObject(getObjectID(), getInstanceID());
+        object   = object->clone(getInstanceID());
         object->unpack(getData().Data);
         m_object = object;
         return object->toString().replace("\n", " ").replace("\t", " ");

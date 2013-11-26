@@ -53,15 +53,14 @@ FlightLogDialog::FlightLogDialog(QWidget *parent, FlightLogManager *flightLogMan
     view->setResizeMode(QQuickView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/flightlog/FlightLogDialog.qml"));
 
-    QWidget * container = QWidget::createWindowContainer(view);
+    QWidget *container = QWidget::createWindowContainer(view);
     container->setMinimumSize(600, 400);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    QVBoxLayout *lay = new QVBoxLayout();
-    lay->setContentsMargins(0,0,0,0);
+    QVBoxLayout *lay   = new QVBoxLayout();
+    lay->setContentsMargins(0, 0, 0, 0);
     setLayout(lay);
     layout()->addWidget(container);
 }
 
 FlightLogDialog::~FlightLogDialog()
-{
-}
+{}

@@ -36,8 +36,7 @@
 #include "flightlogdialog.h"
 
 FlightLogPlugin::FlightLogPlugin() : m_logDialog(0)
-{
-}
+{}
 
 FlightLogPlugin::~FlightLogPlugin()
 {
@@ -48,7 +47,7 @@ bool FlightLogPlugin::initialize(const QStringList & args, QString *errMsg)
 {
     Q_UNUSED(args);
     Q_UNUSED(errMsg);
-    
+
     // Add Menu entry
     Core::ActionManager *am   = Core::ICore::instance()->actionManager();
     Core::ActionContainer *ac = am->actionContainer(Core::Constants::M_TOOLS);
@@ -72,7 +71,7 @@ bool FlightLogPlugin::initialize(const QStringList & args, QString *errMsg)
 
 void FlightLogPlugin::ShowLogManagementDialog()
 {
-    if(!m_logDialog) {
+    if (!m_logDialog) {
         m_logDialog = new FlightLogDialog(0, new FlightLogManager());
         connect(m_logDialog, SIGNAL(finished(int)), this, SLOT(LogManagementDialogClosed()));
         m_logDialog->show();
@@ -81,19 +80,18 @@ void FlightLogPlugin::ShowLogManagementDialog()
 
 void FlightLogPlugin::LogManagementDialogClosed()
 {
-    if(m_logDialog) {
+    if (m_logDialog) {
         m_logDialog->deleteLater();
         m_logDialog = 0;
     }
 }
 
 void FlightLogPlugin::extensionsInitialized()
-{
-}
+{}
 
 void FlightLogPlugin::shutdown()
 {
-    if(m_logDialog) {
+    if (m_logDialog) {
         m_logDialog->close();
         LogManagementDialogClosed();
     }

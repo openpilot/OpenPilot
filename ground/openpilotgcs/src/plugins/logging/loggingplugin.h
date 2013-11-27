@@ -35,7 +35,7 @@
 #include "uavobjectmanager.h"
 #include "gcstelemetrystats.h"
 #include <uavtalk/uavtalk.h>
-#include <logfile.h>
+#include <utils/logfile.h>
 
 #include <QThread>
 #include <QQueue>

@@ -30,18 +30,22 @@ set(opHID_SRCS
 
 add_library(opHID ${opHID_SRCS})
 
+if(WIN32)
+    set_target_properties(opHID PROPERTIES PREFIX "")
+endif()
+
 qt5_use_modules(opHID Core Widgets)
 
 target_link_libraries(opHID Core ExtensionSystem)
 
 if(WIN32)
-    target_link_libraries(opHID hid setupapi ExtensionSystem)
+    target_link_libraries(opHID setupapi hid)
 else()
     target_link_libraries(opHID usb udev usb-1.0 rt pthread)
 endif()
 
 add_definitions(-DOPHID_LIBRARY)
 
-configure_file(opHID.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(opHID.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 
 

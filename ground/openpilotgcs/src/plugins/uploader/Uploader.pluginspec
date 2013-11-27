@@ -9,5 +9,6 @@
         <dependency name="UAVObjects" version="1.0.0"/>
         <dependency name="UAVTalk" version="1.0.0"/>
         <dependency name="UAVObjectUtil" version="1.0.0"/>
+        <dependency name="opHID" version="1.0.0"/>
     </dependencyList>
 </plugin>    

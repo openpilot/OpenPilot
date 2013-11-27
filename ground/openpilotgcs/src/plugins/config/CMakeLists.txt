@@ -66,10 +66,14 @@ qt5_add_resources(Config_SRCS
 
 add_library(Config ${Config_SRCS})
 
+if(WIN32)
+    set_target_properties(Config PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(Config Core UAVObjectWidgetUtils)
 
 qt5_use_modules(Config Widgets Xml)
 
 add_definitions(-DCONFIG_LIBRARY)
 
-configure_file(Config.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(Config.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)

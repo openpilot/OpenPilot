@@ -24,9 +24,13 @@ qt5_add_resources(HITL_SRCS
 
 add_library(HITL ${HITL_SRCS})
 
+if(WIN32)
+    set_target_properties(HITL PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(HITL Core UAVTalk)
 
 qt5_use_modules(HITL Widgets Network)
 
-configure_file(hitl.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(hitl.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

@@ -17,9 +17,13 @@ qt5_add_resources(DialGadget_SRCS
 
 add_library(DialGadget ${DialGadget_SRCS})
 
+if(WIN32)
+    set_target_properties(DialGadget PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(DialGadget Core)
 
 qt5_use_modules(DialGadget Widgets)
 
-configure_file(DialGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(DialGadget.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

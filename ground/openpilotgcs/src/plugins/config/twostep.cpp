@@ -38,15 +38,22 @@
 
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
-#if defined(__APPLE__) || defined(_WIN32)
-// Qt bug work around
-  #ifndef isnan
-extern "C" int isnan(double);
-  #endif
-  #ifndef isinf
-extern "C" int isinf(double);
-  #endif
+#if !defined(__GNUC__)
+    #define isnan    _isnan
+    #define isinf(x) (!_finite(x))
+#elif defined(__APPLE__)
+    // Qt bug work around
+    #ifndef isnan
+        extern "C" int isnan(double);
+    #endif
+    #ifndef isinf
+        extern "C" int isinf(double);
+    #endif
+#else
+    #define isnan std::isnan
+    #define isinf std::isinf
 #endif
 
 /*
@@ -126,9 +133,9 @@ Vector3f twostep_bias_only(const Vector3f samples[],
                            const float noise)
 {
     // \tilde{H}
-    Vector3f centeredSamples[n_samples];
+    std::vector<Vector3f> centeredSamples(n_samples);
     // z_k
-    float sampleDeltaMag[n_samples];
+    std::vector<float> sampleDeltaMag(n_samples);
     // eq 7 and 8 applied to samples
     Vector3f avg = center(samples, n_samples);
     float refSquaredNorm = referenceField.squaredNorm();
@@ -146,9 +153,9 @@ Vector3f twostep_bias_only(const Vector3f samples[],
     Matrix3f P_bb;
     Matrix3f P_bb_inv;
     // Due to eq 12b
-    inv_fisher_information_matrix(P_bb, P_bb_inv, centeredSamples, n_samples, noise);
+    inv_fisher_information_matrix(P_bb, P_bb_inv, &centeredSamples[0], n_samples, noise);
     // Compute centered magnitudes
-    float sampleDeltaMagCentered[n_samples];
+    std::vector<float> sampleDeltaMagCentered(n_samples);
     for (size_t i = 0; i < n_samples; ++i) {
         sampleDeltaMagCentered[i] = sampleDeltaMag[i] - sampleDeltaMagCenter;
     }
@@ -164,7 +171,7 @@ Vector3f twostep_bias_only(const Vector3f samples[],
     // eq 14a and 14b
     float mu = -3 * noise;
     for (int i = 0; i < 6; ++i) {
-        Vector3f neg_gradiant = neg_dJdb(samples, sampleDeltaMag, n_samples,
+        Vector3f neg_gradiant = neg_dJdb(samples, &sampleDeltaMag[0], n_samples,
                                          estimate, mu, noise);
         Matrix3f scale = P_bb_inv + 4 / noise * (avg - estimate) * (avg - estimate).transpose();
         Vector3f neg_increment;
@@ -272,7 +279,7 @@ void twostep_bias_scale(Vector3f & bias,
     // \hbar{L} by eq 33, simplified by obesrving that the
     Matrix<double, 1, 6> centerSample = Matrix<double, 1, 6>::Zero();
     // Define the sample differences z_k by eq 23 a)
-    double sampleDeltaMag[n_samples];
+    std::vector<double> sampleDeltaMag(n_samples);
     // The center value \hbar{z}
     double sampleDeltaMagCenter = 0;
     double refSquaredNorm = referenceField.squaredNorm();
@@ -300,7 +307,7 @@ void twostep_bias_scale(Vector3f & bias,
     // Define \tilde{L}_k for k = 0 .. n_samples
     Matrix<double, Dynamic, 6> centeredSamples(n_samples, 6);
     // Define \tilde{z}_k for k = 0 .. n_samples
-    double centeredMags[n_samples];
+    std::vector<double> centeredMags(n_samples);
     // Compute the term under the summation of eq 37a
     Matrix<double, 6, 1> estimateSummation = Matrix<double, 6, 1>::Zero();
     for (size_t i = 0; i < n_samples; ++i) {
@@ -490,7 +497,7 @@ void twostep_bias_scale(Vector3f & bias,
     // makes this a simple average.
     Matrix<double, 1, 9> centerSample = Matrix<double, 1, 9>::Zero();
     // Define the sample differences z_k by eq 23 a)
-    double sampleDeltaMag[n_samples];
+    std::vector<double> sampleDeltaMag(n_samples);
     // The center value \hbar{z}
     double sampleDeltaMagCenter = 0;
     // The squared norm of the reference vector
@@ -516,7 +523,7 @@ void twostep_bias_scale(Vector3f & bias,
     // Define \tilde{L}_k for k = 0 .. n_samples
     Matrix<double, Dynamic, 9> centeredSamples(n_samples, 9);
     // Define \tilde{z}_k for k = 0 .. n_samples
-    double centeredMags[n_samples];
+    std::vector<double> centeredMags(n_samples);
     // Compute the term under the summation of eq 57a
     Matrix<double, 9, 1> estimateSummation = Matrix<double, 9, 1>::Zero();
     for (size_t i = 0; i < n_samples; ++i) {

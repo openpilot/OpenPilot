@@ -19,9 +19,13 @@ qt5_add_resources(OsgEarthviewGadget_SRCS
 
 add_library(OsgEarthviewGadget ${OsgEarthviewGadget_SRCS})
 
+if(WIN32)
+    set_target_properties(OsgEarthviewGadget PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(OsgEarthviewGadget Core)
 
 qt5_use_modules(OsgEarthviewGadget Widgets OpenGL)
 
-configure_file(OsgEarthviewGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(OsgEarthviewGadget.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

@@ -31,9 +31,9 @@
 #include <coreplugin/generalsettings.h>
 // #define UAVTALK_DEBUG
 #ifdef UAVTALK_DEBUG
-  #define UAVTALK_QXTLOG_DEBUG(args ...)
+  #define UAVTALK_QXTLOG_DEBUG(...)
 #else // UAVTALK_DEBUG
-  #define UAVTALK_QXTLOG_DEBUG(args ...)
+  #define UAVTALK_QXTLOG_DEBUG(...)
 #endif // UAVTALK_DEBUG
 
 #define SYNC_VAL 0x3C

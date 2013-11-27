@@ -54,13 +54,14 @@
 #include <windows.h>
 #include <dbt.h>
 #include <setupapi.h>
-#include <hidsdi.h>
-
-// from working mingw hidsdi.h
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <hidsdi.h>
+
+#ifdef __GNUC__
+// from working mingw hidsdi.h
 HIDAPI VOID WINAPI HidD_GetHidGuid(LPGUID);
 HIDAPI BOOL WINAPI HidD_GetPreparsedData(HANDLE, PHIDP_PREPARSED_DATA *);
 HIDAPI BOOL WINAPI HidD_FreePreparsedData(PHIDP_PREPARSED_DATA);
@@ -74,6 +75,7 @@ HIDAPI BOOL WINAPI HidD_GetManufacturerString(HANDLE, PVOID, ULONG);
 HIDAPI BOOL WINAPI HidD_GetProductString(HANDLE, PVOID, ULONG);
 HIDAPI BOOL WINAPI HidD_GetIndexedString(HANDLE, ULONG, PVOID, ULONG);
 HIDAPI BOOL WINAPI HidD_GetSerialNumberString(HANDLE, PVOID, ULONG);
+#endif
 
 #ifdef __cplusplus
 }

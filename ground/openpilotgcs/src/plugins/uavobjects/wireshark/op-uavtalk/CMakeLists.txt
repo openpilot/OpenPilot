@@ -52,7 +52,9 @@ register_dissector_files(plugin.c
 add_library(unistim ${LINK_MODE_MODULE}
 	${PLUGIN_FILES}
 )
-set_target_properties(unistim PROPERTIES PREFIX "")
+if(WIN32)
+    set_target_properties(unistim PROPERTIES PREFIX "")
+endif()
 set_target_properties(unistim PROPERTIES LINK_FLAGS "${WS_LINK_FLAGS}")
 
 target_link_libraries(op-uavtalk)

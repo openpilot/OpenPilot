@@ -49,6 +49,12 @@
 
 class UAVObjectField;
 
+#if __GNUC__
+  #define PACK( __Declaration__ ) __Declaration__ __attribute__((__packed__))
+#else
+  #define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop) )
+#endif
+
 class UAVOBJECTS_EXPORT UAVObject : public QObject {
     Q_OBJECT
 
@@ -88,12 +94,12 @@ public:
      *    4-5    telemetryUpdateMode        Update mode used by the telemetry module (UAVObjUpdateMode)
      *    6-7    gcsTelemetryUpdateMode     Update mode used by the GCS (UAVObjUpdateMode)
      */
-    typedef struct {
+    PACK(typedef struct {
         quint8  flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
         quint16 flightTelemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
         quint16 gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
         quint16 loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
-    } __attribute__((packed)) Metadata;
+    }) Metadata;
 
 
     UAVObject(quint32 objID, bool isSingleInst, const QString & name);

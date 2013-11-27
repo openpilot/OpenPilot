@@ -30,7 +30,15 @@
 #include "coordinateconversions.h"
 #include <stdint.h>
 #include <QDebug>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+
+
+#if defined WIN32 || !defined __GNUC__
+    #include <float.h>
+    #define copysign _copysign
+#endif
 
 #define RAD2DEG (180.0 / M_PI)
 #define DEG2RAD (M_PI / 180.0)

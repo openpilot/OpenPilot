@@ -67,6 +67,11 @@
 #include <coreplugin/threadmanager.h>
 #include <math.h>
 
+#ifndef __GNUC__
+    #define isnan    _isnan
+    #define isinf(x) (!_finite(x))
+#endif
+
 const float IL2Simulator::FT2M     = 12 * .254;
 const float IL2Simulator::KT2MPS   = 0.514444444;
 const float IL2Simulator::MPS2KMH  = 3.6;

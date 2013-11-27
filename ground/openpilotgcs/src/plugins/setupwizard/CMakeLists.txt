@@ -58,9 +58,13 @@ qt5_add_resources(SetupWizard_SRCS
 
 add_library(SetupWizard ${SetupWizard_SRCS})
 
+if(WIN32)
+    set_target_properties(SetupWizard PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(SetupWizard Core Config Uploader)
 
 qt5_use_modules(SetupWizard Widgets Svg)
 
-configure_file(SetupWizard.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(SetupWizard.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

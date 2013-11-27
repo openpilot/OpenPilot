@@ -78,8 +78,12 @@ qt5_add_resources(Core_SRCS
 
 add_library(Core ${Core_SRCS} ${Core_ITFS})
 
+if(WIN32)
+    set_target_properties(Core PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(Core utils opmapcontrol Aggregation UAVObjects version_info)
 
 qt5_use_modules(Core Widgets Xml)
 
-configure_file(Core.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(Core.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)

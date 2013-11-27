@@ -38,7 +38,6 @@
 #include "messagemanager.h"
 #include "modemanager.h"
 #include "mimedatabase.h"
-#include "outputpane.h"
 #include "plugindialog.h"
 #include "shortcutsettings.h"
 #include "uavgadgetmanager.h"

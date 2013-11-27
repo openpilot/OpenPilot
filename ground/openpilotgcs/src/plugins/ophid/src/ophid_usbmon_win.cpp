@@ -36,15 +36,9 @@
 
 /* Gordon Schumacher's macros for TCHAR -> QString conversions and vice versa */
 #ifdef UNICODE
-#define QStringToTCHAR(x)     (wchar_t *)x.utf16()
-#define PQStringToTCHAR(x)    (wchar_t *)x->utf16()
 #define TCHARToQString(x)     QString::fromUtf16((ushort *)(x))
-#define TCHARToQStringN(x, y) QString::fromUtf16((ushort *)(x), (y))
 #else
-#define QStringToTCHAR(x)     x.local8Bit().constData()
-#define PQStringToTCHAR(x)    x->local8Bit().constData()
 #define TCHARToQString(x)     QString::fromLocal8Bit((x))
-#define TCHARToQStringN(x, y) QString::fromLocal8Bit((x), (y))
 #endif /*UNICODE*/
 
 
@@ -192,7 +186,7 @@ LRESULT USBMonitor::onDeviceChangeWin(WPARAM wParam, LPARAM lParam)
         if (pHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
             PDEV_BROADCAST_DEVICEINTERFACE pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)pHdr;
             // delimiters are different across APIs...change to backslash.  ugh.
-            QString deviceID = TCHARToQString(pDevInf->dbcc_name).toUpper().replace("#", "\\");
+            QString deviceID = QString::fromUtf16((ushort *)(pDevInf->dbcc_name)).toUpper().replace("#", "\\");
             matchAndDispatchChangedDevice(deviceID, guid_hid, wParam);
         }
     }
@@ -416,7 +410,8 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
         ret = OPHID_ERROR_RET;
         goto leave;
     }
-    qDevicePath = QString().fromWCharArray((wchar_t *)details->DevicePath).toUpper();
+
+    qDevicePath = QString().fromLocal8Bit((const char *)details->DevicePath).toUpper();
 
     // Exclude any non-openpilot devices
     if (!qDevicePath.contains("VID_20A0")) {

@@ -12,9 +12,13 @@ qt5_wrap_ui(LoggingGadget_SRCS
 
 add_library(LoggingGadget ${LoggingGadget_SRCS})
 
+if(WIN32)
+    set_target_properties(LoggingGadget PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(LoggingGadget Core ScopeGadget)
 
 qt5_use_modules(LoggingGadget Widgets)
 
-configure_file(LoggingGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(LoggingGadget.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

@@ -93,7 +93,7 @@ bool SequentialPlotData::append(UAVObject *obj)
         UAVObjectField *field = obj->getField(uavField);
 
         if (field) {
-            double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
+            double currentValue = valueAsDouble(obj, field) * pow((float)10, scalePower);
 
             // Perform scope math, if necessary
             if (mathFunction == "Boxcar average" || mathFunction == "Standard deviation") {
@@ -156,7 +156,7 @@ bool ChronoPlotData::append(UAVObject *obj)
 
         if (field) {
             QDateTime NOW = QDateTime::currentDateTime(); // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
-            double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
+            double currentValue = valueAsDouble(obj, field) * pow((float)10, scalePower);
 
             // Perform scope math, if necessary
             if (mathFunction == "Boxcar average" || mathFunction == "Standard deviation") {

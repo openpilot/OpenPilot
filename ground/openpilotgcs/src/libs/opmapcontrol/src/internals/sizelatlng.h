@@ -27,13 +27,11 @@
 #ifndef SIZELATLNG_H
 #define SIZELATLNG_H
 
-
 #include <QString>
 
-
 namespace internals {
-struct PointLatLng;
-struct SizeLatLng {
+class PointLatLng;
+class SizeLatLng {
 public:
     SizeLatLng();
     static SizeLatLng Empty;

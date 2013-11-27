@@ -26,28 +26,28 @@
  */
 #include "pointlatlng.h"
 
-
 namespace internals {
 PointLatLng PointLatLng::Empty = PointLatLng();
 PointLatLng::PointLatLng() : lat(0), lng(0), empty(true)
 {}
 
-bool operator==(PointLatLng const & lhs, PointLatLng const & rhs)
+bool PointLatLng::operator==(PointLatLng const & rhs)
 {
-    return (lhs.Lng() == rhs.Lng()) && (lhs.Lat() == rhs.Lat());
+    return (this->Lng() == rhs.Lng()) && (this->Lat() == rhs.Lat());
 }
 
-bool operator!=(PointLatLng const & left, PointLatLng const & right)
+bool PointLatLng::operator!=(PointLatLng const & right)
 {
-    return !(left == right);
-}
-PointLatLng operator+(PointLatLng pt, SizeLatLng sz)
-{
-    return PointLatLng::Add(pt, sz);
+    return !(*this == right);
 }
 
-PointLatLng operator-(PointLatLng pt, SizeLatLng sz)
+PointLatLng PointLatLng::operator+(SizeLatLng sz)
 {
-    return PointLatLng::Subtract(pt, sz);
+    return Add(*this, sz);
+}
+
+PointLatLng PointLatLng::operator-(SizeLatLng sz)
+{
+    return Subtract(*this, sz);
 }
 }

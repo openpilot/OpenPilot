@@ -52,7 +52,9 @@ register_dissector_files(plugin.c
 add_library(op_uavobjects ${LINK_MODE_MODULE}
 	${PLUGIN_FILES}
 )
-set_target_properties(op_uavobjects PROPERTIES PREFIX "")
+if(WIN32)
+    set_target_properties(op_uavobjects PROPERTIES PREFIX "")
+endif()
 set_target_properties(op_uavobjects PROPERTIES LINK_FLAGS "${WS_LINK_FLAGS}")
 
 target_link_libraries(op-uavobjects)

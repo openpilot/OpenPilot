@@ -19,9 +19,13 @@ qt5_add_resources(ModelViewGadget_SRCS
 
 add_library(ModelViewGadget ${ModelViewGadget_SRCS})
 
+if(WIN32)
+    set_target_properties(ModelViewGadget PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(ModelViewGadget Core glc)
 
 qt5_use_modules(ModelViewGadget Widgets Svg OpenGL)
 
-configure_file(ModelViewGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(ModelViewGadget.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

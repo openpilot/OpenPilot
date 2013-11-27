@@ -19,9 +19,13 @@ qt5_add_resources(GCSControl_SRCS
 
 add_library(GCSControl ${GCSControl_SRCS})
 
-target_link_libraries(GCSControl Core UAVObjects sdlgamepad)
+if(WIN32)
+    set_target_properties(GCSControl PROPERTIES PREFIX "")
+endif()
+
+target_link_libraries(GCSControl Core sdlgamepad)
 
 qt5_use_modules(GCSControl Widgets Network)
 
-configure_file(GCSControl.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(GCSControl.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

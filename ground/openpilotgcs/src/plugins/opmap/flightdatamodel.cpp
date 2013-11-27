@@ -465,6 +465,8 @@ bool flightDataModel::insertRows(int row, int count, const QModelIndex & /*paren
         dataStorage.insert(row, data);
     }
     endInsertRows();
+
+    return true;
 }
 
 bool flightDataModel::removeRows(int row, int count, const QModelIndex & /*parent*/)
@@ -478,6 +480,8 @@ bool flightDataModel::removeRows(int row, int count, const QModelIndex & /*paren
         dataStorage.removeAt(row);
     }
     endRemoveRows();
+
+    return true;
 }
 
 bool flightDataModel::writeToFile(QString fileName)

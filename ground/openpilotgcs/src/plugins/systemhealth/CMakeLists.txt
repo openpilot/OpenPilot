@@ -17,9 +17,13 @@ qt5_add_resources(SystemHealthGadget_SRCS
 
 add_library(SystemHealthGadget ${SystemHealthGadget_SRCS})
 
+if(WIN32)
+    set_target_properties(SystemHealthGadget PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(SystemHealthGadget Core UAVTalk)
 
 qt5_use_modules(SystemHealthGadget Widgets)
 
-configure_file(SystemHealthGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(SystemHealthGadget.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

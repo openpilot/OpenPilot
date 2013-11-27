@@ -1,3 +1,11 @@
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE -DQT_NO_DEBUG)
+else()
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug") 
+        add_definitions(-DQT_NO_DEBUG)
+    endif()
+endif()
+
 add_subdirectory(libs)
 add_subdirectory(shared)
 add_subdirectory(app)

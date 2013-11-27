@@ -29,8 +29,10 @@
 # This needed to change because "proper" SDL convention
 # is #include "SDL.h", not <SDL/SDL.h>. This is done for portability
 # reasons because not all systems place things in SDL/ (see FreeBSD).
-FIND_PATH(SDL_INCLUDE_DIR SDL.h
+FIND_PATH(SDL_INCLUDE_DIR SDL/SDL.h
   $ENV{SDLDIR}/include
+  ${CMAKE_BINARY_DIR}/tools/qt-5.1.1/Tools/mingw48_32/i686-w64-mingw32/include
+  ${CMAKE_BINARY_DIR}/tools/SDL/include
   ~/Library/Frameworks/SDL.framework/Headers
   /Library/Frameworks/SDL.framework/Headers
   /usr/local/include/SDL
@@ -49,8 +51,8 @@ FIND_PATH(SDL_INCLUDE_DIR SDL.h
   /opt/csw/include 
   /opt/include/SDL
   /opt/include
-  C:/Programs/SDL/include
   )
+
 # I'm not sure if I should do a special casing for Apple. It is 
 # unlikely that other Unix systems will find the framework path.
 # But if they do ([Next|Open|GNU]Step?), 
@@ -87,13 +89,14 @@ ELSE(${SDL_INCLUDE_DIR} MATCHES ".framework")
     NAMES SDL SDL-1.1
     PATHS
     $ENV{SDLDIR}/lib
+    ${CMAKE_BINARY_DIR}/tools/qt-5.1.1/Tools/mingw48_32/lib
+    ${CMAKE_BINARY_DIR}/tools/SDL/lib
     /usr/local/lib
     /usr/lib
     /sw/lib
     /opt/local/lib
     /opt/csw/lib
     /opt/lib
-    C:/Programs/SDL/lib
     )
   # Non-OS X framework versions expect you to also dynamically link to 
   # SDLmain. This is mainly for Windows and OS X. Other platforms 
@@ -102,6 +105,8 @@ ELSE(${SDL_INCLUDE_DIR} MATCHES ".framework")
   FIND_LIBRARY(SDLMAIN_LIBRARY 
     NAMES SDLmain SDLmain-1.1
     PATHS
+    ${CMAKE_BINARY_DIR}/tools/qt-5.1.1/Tools/mingw48_32/lib
+    ${CMAKE_BINARY_DIR}/tools/SDL/lib
     $ENV{SDLDIR}/lib
     /usr/local/lib
     /usr/lib
@@ -109,7 +114,6 @@ ELSE(${SDL_INCLUDE_DIR} MATCHES ".framework")
     /opt/local/lib
     /opt/csw/lib
     /opt/lib
-    C:/Programs/SDL/lib
     )
 ENDIF(${SDL_INCLUDE_DIR} MATCHES ".framework")
 
@@ -130,6 +134,12 @@ ENDIF(MINGW)
 
 SET(SDL_FOUND "NO")
 IF(SDL_LIBRARY_TEMP)
+  
+  IF(WIN32)
+    get_filename_component(SDL_LIBRARY_PATH ${SDL_LIBRARY_TEMP} PATH)
+    SET(SDL_LIBRARY_PATH "${SDL_LIBRARY_PATH}/SDL.dll")
+  ENDIF()
+  
   # For SDLmain
   IF(SDLMAIN_LIBRARY)
     SET(SDL_LIBRARY_TEMP ${SDLMAIN_LIBRARY} ${SDL_LIBRARY_TEMP})

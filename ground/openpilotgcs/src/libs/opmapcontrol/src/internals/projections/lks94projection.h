@@ -27,9 +27,14 @@
 #ifndef LKS94PROJECTION_H
 #define LKS94PROJECTION_H
 #include <QVector>
-#include "cmath"
+#include <cmath>
 #include <opmapcontrol/src/internals/pureprojection.h>
 
+#if defined WIN32 || !defined __GNUC__
+    #define isnan _isnan
+#else
+    #define isnan std::isnan
+#endif
 
 namespace projections {
 class LKS94Projection : public internals::PureProjection {

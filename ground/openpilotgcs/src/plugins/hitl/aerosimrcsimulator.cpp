@@ -30,6 +30,10 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/threadmanager.h>
 
+#ifndef __GNUC__
+#define copysign _copysign
+#endif
+
 AeroSimRCSimulator::AeroSimRCSimulator(const SimulatorSettings &params)
     : Simulator(params)
 {

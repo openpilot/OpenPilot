@@ -29,7 +29,11 @@
 #include <wchar.h>
 #include <string.h>
 #include <stdlib.h>
+
+#ifdef __GNUC__
 #include <unistd.h>
+#endif
+
 #include "ophid_const.h"
 #include "ophid_hidapi.h"
 

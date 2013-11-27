@@ -47,6 +47,8 @@
 
 #include <stdint.h>
 #include <QDebug>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #define RAD2DEG(rad) ((rad) * (180.0 / M_PI))

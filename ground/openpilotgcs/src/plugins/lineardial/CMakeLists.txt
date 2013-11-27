@@ -17,9 +17,13 @@ qt5_add_resources(LineardialGadget_SRCS
 
 add_library(LineardialGadget ${LineardialGadget_SRCS})
 
+if(WIN32)
+    set_target_properties(LineardialGadget PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(LineardialGadget Core)
 
 qt5_use_modules(LineardialGadget Widgets)
 
-configure_file(LineardialGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(LineardialGadget.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

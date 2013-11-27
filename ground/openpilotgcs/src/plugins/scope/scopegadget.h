@@ -30,6 +30,7 @@
 #define SCOPEGADGET_H_
 
 #include <coreplugin/iuavgadget.h>
+#include "scope_global.h"
 #include "scopegadgetwidget.h"
 
 class IUAVGadget;
@@ -40,7 +41,7 @@ class ScopeGadgetWidget;
 
 using namespace Core;
 
-class ScopeGadget : public Core::IUAVGadget {
+class SCOPE_EXPORT ScopeGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent = 0);

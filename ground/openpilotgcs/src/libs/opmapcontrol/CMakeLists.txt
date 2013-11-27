@@ -53,6 +53,7 @@ set(opmapcontrol_ITFS
     src/core/accessmode.h
     src/core/maptype.h
     src/mapwidget/uavtrailtype.h
+    src/mapwidget/uavmapfollowtype.h
 )
 
 qt5_wrap_ui(opmapcontrol_SRCS
@@ -63,7 +64,7 @@ qt5_add_resources(opmapcontrol_SRCS
     src/mapwidget/mapresources.qrc
 ) 
 
-add_library(opmapcontrol ${opmapcontrol_SRCS} ${opmapcontrol_ITFS})
+add_library(opmapcontrol STATIC ${opmapcontrol_SRCS} ${opmapcontrol_ITFS})
 
 qt5_use_modules(opmapcontrol Core Widgets Network Sql OpenGL Svg)
 

@@ -28,6 +28,7 @@
 #include "uavobject.h"
 #include <QtEndian>
 #include <QDebug>
+#include <vector>
 
 // Constants
 #define UAVOBJ_ACCESS_SHIFT                    0
@@ -331,7 +332,7 @@ bool UAVObject::save()
 bool UAVObject::save(QFile & file)
 {
     QMutexLocker locker(mutex);
-    quint8 buffer[numBytes];
+    std::vector<quint8> buffer(numBytes);
     quint8 tmpId[4];
 
     // Write the object ID
@@ -349,8 +350,8 @@ bool UAVObject::save(QFile & file)
     }
 
     // Write the data
-    pack(buffer);
-    if (file.write((const char *)buffer, numBytes) == -1) {
+    pack(&buffer[0]);
+    if (file.write((const char *)&buffer[0], numBytes) == -1) {
         return false;
     }
 
@@ -395,7 +396,7 @@ bool UAVObject::load()
 bool UAVObject::load(QFile & file)
 {
     QMutexLocker locker(mutex);
-    quint8 buffer[numBytes];
+    std::vector<quint8> buffer(numBytes);
     quint8 tmpId[4];
 
     // Read the object ID
@@ -419,10 +420,10 @@ bool UAVObject::load(QFile & file)
     }
 
     // Read and unpack the data
-    if (file.read((char *)buffer, numBytes) != numBytes) {
+    if (file.read((char *)&buffer[0], numBytes) != numBytes) {
         return false;
     }
-    unpack(buffer);
+    unpack(&buffer[0]);
 
     // Done
     return true;

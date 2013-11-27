@@ -30,6 +30,7 @@ set(qwt_SRCS
     src/qwt_curve_fitter.cpp
     src/qwt_legend.cpp
     src/qwt_legend_item.cpp
+    src/qwt_plot.h
     src/qwt_plot.cpp
     src/qwt_plot_renderer.cpp
     src/qwt_plot_xml.cpp
@@ -64,3 +65,5 @@ set(qwt_SRCS
 add_library(qwt ${qwt_SRCS})
 
 qt5_use_modules(qwt Core Widgets PrintSupport)
+
+add_definitions(-DQWT_DLL -DQWT_MAKEDLL)

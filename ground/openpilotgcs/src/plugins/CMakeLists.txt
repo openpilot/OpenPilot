@@ -1,3 +1,7 @@
+include(GenerateExportHeader)
+
+file(MAKE_DIRECTORY ${GCS_PLUGINS_DIR})
+
 include_directories(
     ${PROJECT_SOURCE_DIR}/ground/openpilotgcs/src/libs
     ${PROJECT_SOURCE_DIR}/ground/openpilotgcs/src/plugins
@@ -7,11 +11,23 @@ include_directories(
 )
 
 if(MINGW)
-    include_directories(${PROJECT_BINARY_DIR}/tools/qt-5.1.1/Tools/mingw48_32/i686-w64-mingw32/include)
+    include_directories(AFTER ${PROJECT_BINARY_DIR}/tools/qt-5.1.1/Tools/mingw48_32/i686-w64-mingw32/include)
 endif()
 
 set(BUILD_SHARED_LIBS ON)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${GCS_PLUGINS_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${GCS_PLUGINS_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${GCS_PLUGINS_DIR})
+foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${GCS_PLUGINS_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${GCS_PLUGINS_DIR})
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${GCS_PLUGINS_DIR})
+endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
+
+if(WIN32)
+    set(CMAKE_DEBUG_POSTFIX "d")
+endif()
 
 add_subdirectory(antennatrack)
 add_subdirectory(config)

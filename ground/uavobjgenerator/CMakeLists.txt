@@ -1,5 +1,3 @@
-include(${PROJECT_SOURCE_DIR}/cmake/IncludeQt5.cmake)
-
 set(uavobjgenerator_SRCS
     main.cpp
     uavobjectparser.cpp
@@ -14,5 +12,7 @@ set(uavobjgenerator_SRCS
 )
 
 add_executable(uavobjgenerator ${uavobjgenerator_SRCS})
+
+add_dependencies(uavobjgenerator copydata)
 
 qt5_use_modules(uavobjgenerator Core Xml)

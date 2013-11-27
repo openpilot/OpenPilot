@@ -29,11 +29,10 @@
 #define UPLOADERPLUGIN_H
 
 #include <extensionsystem/iplugin.h>
-#include "uploader_global.h"
 
 class UploaderGadgetFactory;
 
-class UPLOADER_EXPORT UploaderPlugin : public ExtensionSystem::IPlugin {
+class UploaderPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "OpenPilot.Uploader")
 

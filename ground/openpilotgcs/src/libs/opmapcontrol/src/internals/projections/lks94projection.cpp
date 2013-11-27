@@ -101,7 +101,7 @@ QVector <double> LKS94Projection::DTM10(const QVector <double> & lonlat)
 
     double lon = DegreesToRadians(lonlat[0]);
     double lat = DegreesToRadians(lonlat[1]);
-    double h   = lonlat.count() < 3 ? 0 : std::isnan(lonlat[2]) ? 0 : lonlat[2]; // TODO NAN
+    double h   = lonlat.count() < 3 ? 0 : isnan(lonlat[2]) ? 0 : lonlat[2];  // TODO NAN
     double v   = semiMajor / sqrt(1 - es * pow(sin(lat), 2));
     double x   = (v + h) * cos(lat) * cos(lon);
     double y   = (v + h) * cos(lat) * sin(lon);
@@ -133,7 +133,7 @@ QVector <double>  LKS94Projection::MTD10(QVector <double> &  pnt)
     // ...
 
     bool AtPole   = false; // is location in polar region
-    double Z      = pnt.count() < 3 ? 0 : std::isnan(pnt[2]) ? 0 : pnt[2]; // TODO NaN
+    double Z      = pnt.count() < 3 ? 0 : isnan(pnt[2]) ? 0 : pnt[2]; // TODO NaN
 
     double lon    = 0;
     double lat    = 0;
@@ -275,7 +275,7 @@ QVector <double> LKS94Projection::DTM01(QVector <double> & lonlat)
 
     double lon = DegreesToRadians(lonlat[0]);
     double lat = DegreesToRadians(lonlat[1]);
-    double h   = lonlat.count() < 3 ? 0 : std::isnan(lonlat[2]) ? 0 : lonlat[2]; // TODO NaN
+    double h   = lonlat.count() < 3 ? 0 : isnan(lonlat[2]) ? 0 : lonlat[2]; // TODO NaN
     double v   = semiMajor / sqrt(1 - es * pow(sin(lat), 2));
     double x   = (v + h) * cos(lat) * cos(lon);
     double y   = (v + h) * cos(lat) * sin(lon);
@@ -306,7 +306,7 @@ QVector <double> LKS94Projection::MTD01(QVector <double> & pnt)
     // ...
 
     bool At_Pole  = false; // is location in polar region
-    double Z      = pnt.count() < 3 ? 0 : std::isnan(pnt[2]) ? 0 : pnt[2]; // TODO NaN
+    double Z      = pnt.count() < 3 ? 0 : isnan(pnt[2]) ? 0 : pnt[2]; // TODO NaN
 
     double lon    = 0;
     double lat    = 0;

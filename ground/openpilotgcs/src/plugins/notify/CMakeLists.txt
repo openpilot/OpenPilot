@@ -17,9 +17,13 @@ qt5_add_resources(NotifyPlugin_SRCS
 
 add_library(NotifyPlugin ${NotifyPlugin_SRCS})
 
+if(WIN32)
+    set_target_properties(NotifyPlugin PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(NotifyPlugin Core UAVTalk)
 
 qt5_use_modules(NotifyPlugin Widgets Svg MultimediaWidgets)
 
-configure_file(NotifyPlugin.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(NotifyPlugin.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

@@ -33,7 +33,7 @@
 #include "uavobject.h"
 #include "actuatorcommand.h"
 
-typedef struct {
+PACK(typedef struct {
     uint    VTOLMotorN : 4;
     uint    VTOLMotorS : 4;
     uint    VTOLMotorE : 4;
@@ -46,9 +46,9 @@ typedef struct {
     quint32 padding : 28; // 64 bits
     quint32 padding1;
     quint32 padding2; // 128 bits
-} __attribute__((packed))  multiGUISettingsStruct;
+})  multiGUISettingsStruct;
 
-typedef struct {
+PACK(typedef struct {
     uint    SwashplateType : 3;
     uint    FirstServoIndex : 2;
     uint    CorrectionAngle : 9;
@@ -66,9 +66,9 @@ typedef struct {
     uint    Tail : 4; // 65bits
     quint32 padding : 31; // 96 bits
     quint32 padding1; // 128 bits
-} __attribute__((packed))  heliGUISettingsStruct;
+})  heliGUISettingsStruct;
 
-typedef struct {
+PACK(typedef struct {
     uint    FixedWingThrottle : 4;
     uint    FixedWingRoll1 : 4;
     uint    FixedWingRoll2 : 4;
@@ -80,9 +80,9 @@ typedef struct {
     quint32 padding1;
     quint32 padding2;
     quint32 padding3; // 128 bits
-} __attribute__((packed))  fixedGUISettingsStruct;
+})  fixedGUISettingsStruct;
 
-typedef struct {
+PACK(typedef struct {
     uint    GroundVehicleThrottle1 : 4;
     uint    GroundVehicleThrottle2 : 4;
     uint    GroundVehicleSteering1 : 4;
@@ -91,7 +91,7 @@ typedef struct {
     quint32 padding1;
     quint32 padding2;
     quint32 padding3; // 128 bits
-} __attribute__((packed))  groundGUISettingsStruct;
+})  groundGUISettingsStruct;
 
 typedef union {
     uint UAVObject[4]; // 32 bits * 4

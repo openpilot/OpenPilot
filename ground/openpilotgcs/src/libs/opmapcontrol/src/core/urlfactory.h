@@ -42,7 +42,10 @@
 #include "cache.h"
 #include "placemark.h"
 #include <QTextCodec>
-#include "cmath"
+#include <cmath>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 namespace core {
 class UrlFactory : public QObject, public ProviderStrings {

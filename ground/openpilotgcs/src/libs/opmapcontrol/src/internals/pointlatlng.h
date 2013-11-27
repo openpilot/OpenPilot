@@ -32,12 +32,13 @@
 #include "sizelatlng.h"
 
 namespace internals {
-struct PointLatLng {
+class PointLatLng {
+public:
     // friend uint qHash(PointLatLng const& point);
-    friend bool operator==(PointLatLng const & lhs, PointLatLng const & rhs);
-    friend bool operator!=(PointLatLng const & left, PointLatLng const & right);
-    friend PointLatLng operator+(PointLatLng pt, SizeLatLng sz);
-    friend PointLatLng operator-(PointLatLng pt, SizeLatLng sz);
+    bool operator==(PointLatLng const & rhs);
+    bool operator!=(PointLatLng const & right);
+    PointLatLng operator+(SizeLatLng sz);
+    PointLatLng operator-(SizeLatLng sz);
 
     // TODO Sizelatlng friend PointLatLng operator+(PointLatLng pt, SizeLatLng sz);
 

@@ -43,7 +43,7 @@ Point MercatorProjectionYandex::FromLatLngToPixel(double lat, double lng, const 
     double k    = 0.0818191908426;
 
     double z    = tan(MathPiDiv4 + rLat / 2) / pow((tan(MathPiDiv4 + asin(k * sin(rLat)) / 2)), k);
-    double z1   = pow(2, 23 - zoom);
+    double z1   = pow((float)2, 23 - zoom);
 
     double DX   = ((20037508.342789 + a * rLon) * 53.5865938 / z1);
     double DY   = ((20037508.342789 - a * log(z)) * 53.5865938 / z1);

@@ -1001,7 +1001,7 @@ quint32 DFUObject::CRCFromQBArray(QByteArray array, quint32 Size)
     quint32 pad = Size - array.length();
 
     array.append(QByteArray(pad, 255));
-    quint32 t[Size / 4];
+    std::vector<quint32> t(Size / 4);
     for (int x = 0; x < array.length() / 4; x++) {
         quint32 aux = 0;
         aux  = (char)array[x * 4 + 3] & 0xFF;
@@ -1013,7 +1013,7 @@ quint32 DFUObject::CRCFromQBArray(QByteArray array, quint32 Size)
         aux += (char)array[x * 4 + 0] & 0xFF;
         t[x] = aux;
     }
-    return DFUObject::CRC32WideFast(0xFFFFFFFF, Size / 4, (quint32 *)t);
+    return DFUObject::CRC32WideFast(0xFFFFFFFF, Size / 4, &t[0]);
 }
 
 

@@ -184,7 +184,7 @@ void ModelViewGadgetWidget::resizeGL(int width, int height)
 void ModelViewGadgetWidget::CreateScene()
 {
     // put a black background if the 3D model is invalid or if the background image is also invalid
-    if (acFilename == ":/modelview/models/warning_sign.obj" or !QFile::exists(bgFilename)) {
+    if (acFilename == ":/modelview/models/warning_sign.obj" || !QFile::exists(bgFilename)) {
         bgFilename = ":/modelview/models/black.jpg";
     }
 
@@ -248,7 +248,7 @@ void ModelViewGadgetWidget::mouseMoveEvent(QMouseEvent *e)
 {
     GLC_UserInput userInput(e->x(), e->y());
 
-    if (not m_MoverController.hasActiveMover()) {
+    if (!m_MoverController.hasActiveMover()) {
         return;
     }
     m_MoverController.move(userInput);
@@ -258,7 +258,7 @@ void ModelViewGadgetWidget::mouseMoveEvent(QMouseEvent *e)
 
 void ModelViewGadgetWidget::mouseReleaseEvent(QMouseEvent *)
 {
-    if (not m_MoverController.hasActiveMover()) {
+    if (!m_MoverController.hasActiveMover()) {
         return;
     }
     m_MoverController.setNoMover();

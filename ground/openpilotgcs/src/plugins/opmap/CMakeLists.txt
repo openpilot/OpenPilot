@@ -33,9 +33,13 @@ qt5_add_resources(OPMapGadget_SRCS
 
 add_library(OPMapGadget ${OPMapGadget_SRCS})
 
+if(WIN32)
+    set_target_properties(OPMapGadget PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(OPMapGadget Core UAVObjectUtil UAVTalk)
 
 qt5_use_modules(OPMapGadget Widgets Xml)
 
-configure_file(OPMapGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(OPMapGadget.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

@@ -5,12 +5,14 @@ set(UAVObjectUtil_SRCS
 
 add_library(UAVObjectUtil ${UAVObjectUtil_SRCS})
 
-# qt5_use_modules(UAVObjectUtil Widgets)
+if(WIN32)
+    set_target_properties(UAVObjectUtil PROPERTIES PREFIX "")
+endif()
 
 target_link_libraries(UAVObjectUtil Core UAVObjects)
 
 add_definitions(-DUAVOBJECTUTIL_LIBRARY)
 
-configure_file(UAVObjectUtil.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(UAVObjectUtil.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 
 

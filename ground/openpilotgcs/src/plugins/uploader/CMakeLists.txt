@@ -26,10 +26,14 @@ qt5_add_resources(Uploader_SRCS uploader.qrc)
 
 add_library(Uploader ${Uploader_SRCS})
 
+if(WIN32)
+    set_target_properties(Uploader PROPERTIES PREFIX "")
+endif()
+
 qt5_use_modules(Uploader Widgets SerialPort)
 
-target_link_libraries(Uploader Core UAVObjects UAVObjectUtil UAVTalk opHID)
+target_link_libraries(Uploader Core UAVObjectUtil UAVTalk opHID)
 
 add_definitions(-DUPLOADER_LIBRARY)
 
-configure_file(Uploader.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(Uploader.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)

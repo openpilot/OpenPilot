@@ -24,6 +24,12 @@
 #ifndef AHRS_ASSERTIONS_HPP
 #define AHRS_ASSERTIONS_HPP
 
+#ifdef __GNUC__
+#define isnan std::isnan
+#else
+#define isnan _isnan
+#endif
+
 #include <Eigen/Core>
 #include <cmath>
 
@@ -41,7 +47,7 @@ bool hasNaN(const MatrixBase & expr)
 {
     for (int j = 0; j != expr.cols(); ++j) {
         for (int i = 0; i != expr.rows(); ++i) {
-            if (std::isnan(expr.coeff(i, j))) {
+            if (isnan(expr.coeff(i, j))) {
                 return true;
             }
         }

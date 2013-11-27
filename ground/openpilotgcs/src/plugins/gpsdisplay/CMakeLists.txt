@@ -24,9 +24,13 @@ qt5_add_resources(GpsDisplayGadget_SRCS
 
 add_library(GpsDisplayGadget ${GpsDisplayGadget_SRCS})
 
+if(WIN32)
+    set_target_properties(GpsDisplayGadget PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(GpsDisplayGadget Core)
 
 qt5_use_modules(GpsDisplayGadget Widgets SerialPort)
 
-configure_file(GpsDisplayGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(GpsDisplayGadget.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

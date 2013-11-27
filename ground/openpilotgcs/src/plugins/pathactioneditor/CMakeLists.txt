@@ -19,9 +19,13 @@ qt5_add_resources(PathActionEditor_SRCS
 
 add_library(PathActionEditor ${PathActionEditor_SRCS})
 
+if(WIN32)
+    set_target_properties(PathActionEditor PROPERTIES PREFIX "")
+endif()
+
 target_link_libraries(PathActionEditor Core)
 
 qt5_use_modules(PathActionEditor Widgets)
 
-configure_file(PathActionEditor.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
+configure_file(PathActionEditor.pluginspec ${GCS_PLUGINS_DIR} COPYONLY)
 

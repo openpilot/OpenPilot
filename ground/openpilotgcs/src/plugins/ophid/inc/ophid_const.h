@@ -29,18 +29,22 @@
 #define OPHID_CONST_H
 #include "QtDebug"
 
+#if !defined(__GNUC__)
+#define __func__ __FUNCTION__
+#endif
+
 #define printf         qDebug
 #define OPHID_DEBUG_ON 1
 #ifdef OPHID_DEBUG_ON
-#define OPHID_DEBUG(fmt, args ...)   qDebug("[DEBUG] "fmt,##args)
-#define OPHID_TRACE(fmt, args ...)   qDebug("[TRACE] %s:%s:%d: "fmt, __FILE__, __func__, __LINE__,##args)
-#define OPHID_ERROR(fmt, args ...)   qDebug("[ERROR] %s:%s:%d: "fmt, __FILE__, __func__, __LINE__,##args)
-#define OPHID_WARNING(fmt, args ...) qDebug("[WARNING] "fmt,##args)
+#define OPHID_DEBUG(fmt, ...)   qDebug("[DEBUG] "fmt, ##__VA_ARGS__)
+#define OPHID_TRACE(fmt, ...)   qDebug("[TRACE] %s:%s:%d: "fmt, __FILE__, __func__, __LINE__, ##__VA_ARGS__)
+#define OPHID_ERROR(fmt, ...)   qDebug("[ERROR] %s:%s:%d: "fmt, __FILE__, __func__, __LINE__, ##__VA_ARGS__)
+#define OPHID_WARNING(fmt, ...) qDebug("[WARNING] "fmt, ##__VA_ARGS__)
 #else
-#define OPHID_DEBUG(fmt, args ...)
-#define OPHID_TRACE(fmt, args ...)
-#define OPHID_ERROR(fmt, args ...)
-#define OPHID_WARNING(fmt, args ...)
+#define OPHID_DEBUG(fmt, ...)
+#define OPHID_TRACE(fmt, ...)
+#define OPHID_ERROR(fmt, ...)
+#define OPHID_WARNING(fmt, ...)
 #endif
 
 

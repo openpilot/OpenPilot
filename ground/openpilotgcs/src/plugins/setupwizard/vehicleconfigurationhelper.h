@@ -64,10 +64,10 @@ signals:
     void saveProgress(int total, int current, QString description);
 
 private:
+    // TODO enum there?
     static const int MIXER_TYPE_DISABLED = 0;
     static const int MIXER_TYPE_MOTOR    = 1;
     static const int MIXER_TYPE_SERVO    = 2;
-    static const float DEFAULT_ENABLED_ACCEL_TAU = 0.1;
 
     VehicleConfigurationSource *m_configSource;
     UAVObjectManager *m_uavoManager;
@@ -109,5 +109,7 @@ private slots:
     void uAVOTransactionCompleted(int oid, bool success);
     void saveChangesTimeout();
 };
+
+#define DEFAULT_ENABLED_ACCEL_TAU 0.1
 
 #endif // VEHICLECONFIGURATIONHELPER_H

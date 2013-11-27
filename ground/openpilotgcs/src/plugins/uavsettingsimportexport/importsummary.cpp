@@ -77,8 +77,8 @@ void ImportSummaryDialog::addLine(QString uavObjectName, QString text, bool stat
     ui->importSummaryList->setItem(row, 2, new QTableWidgetItem(text));
 
     // Disable editability and selectability in table elements
-    ui->importSummaryList->item(row, 1)->setFlags(!Qt::ItemIsEditable);
-    ui->importSummaryList->item(row, 2)->setFlags(!Qt::ItemIsEditable);
+    ui->importSummaryList->item(row, 1)->setFlags(Qt::NoItemFlags);
+    ui->importSummaryList->item(row, 2)->setFlags(Qt::NoItemFlags);
 
     if (status) {
         box->setChecked(true);

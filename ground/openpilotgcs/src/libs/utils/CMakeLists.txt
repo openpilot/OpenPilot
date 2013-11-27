@@ -7,10 +7,6 @@ set(GCS_DATA_BASENAME
 add_definitions(-DQTCREATOR_UTILS_LIB)
 add_definitions(-DGCS_DATA_BASENAME="${GCS_DATA_BASENAME}")
 
-if(MINGW)
-  include_directories(BEFORE ${CMAKE_BINARY_DIR}/tools/qt-5.1.1/Tools/mingw48_32/i686-w64-mingw32/include)
-endif()
-
 if(WIN32)
     set(platform_specific_SRCS
         abstractprocess_win.cpp

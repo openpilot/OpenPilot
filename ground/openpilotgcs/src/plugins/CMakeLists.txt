@@ -1,5 +1,3 @@
-include(GenerateExportHeader)
-
 file(MAKE_DIRECTORY ${GCS_PLUGINS_DIR})
 
 include_directories(
@@ -9,10 +7,6 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/ground/openpilotgcs/src/plugins/uavobjectutil
     ${PROJECT_BINARY_DIR}/uavobject-synthetics/gcs
 )
-
-if(MINGW)
-    include_directories(AFTER ${PROJECT_BINARY_DIR}/tools/qt-5.1.1/Tools/mingw48_32/i686-w64-mingw32/include)
-endif()
 
 set(BUILD_SHARED_LIBS ON)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${GCS_PLUGINS_DIR})

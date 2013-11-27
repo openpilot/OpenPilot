@@ -34,6 +34,7 @@
 #include "debuglogcontrol.h"
 #include "uavobjecthelper.h"
 #include "uavtalk/uavtalk.h"
+#include "utils/logfile.h"
 
 FlightLogManager::FlightLogManager(QObject *parent) :
     QObject(parent), m_disableControls(false)
@@ -155,8 +156,7 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
                 if (m_flightLogEntry->getType() != DebugLogEntry::TYPE_EMPTY) {
                     // Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
                     ExtendedDebugLogEntry *logEntry = new ExtendedDebugLogEntry();
-                    logEntry->setObjectManager(m_objectManager);
-                    logEntry->setData(m_flightLogEntry->getData());
+                    logEntry->setData(m_flightLogEntry->getData(), m_objectManager);
                     m_logEntries << logEntry;
 
                     // Increment to get next entry from flight side
@@ -184,13 +184,23 @@ void FlightLogManager::exportLogs()
     QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log"),
                                                     tr("OP-%0.opl").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
                                                     tr("OpenPilot Log (*.opl)"));
-    /*
     if (!fileName.isEmpty()) {
+        LogFile logFile;
+        logFile.useProvidedTimeStamp(true);
         logFile.setFileName(fileName);
         logFile.open(QIODevice::WriteOnly);
-        UAVTalk uavTalk(file, m_objectManager);
+        UAVTalk uavTalk(&logFile, m_objectManager);
+
+        foreach (ExtendedDebugLogEntry* entry, m_logEntries) {
+            if (entry->getType() == ExtendedDebugLogEntry::TYPE_UAVOBJECT) {
+                logFile.setNextTimeStamp(entry->getFlightTime());
+                uavTalk.sendObject(entry->uavObject(), false, false);
+            }
+        }
+
+        logFile.close();
     }
-    */
+
     QApplication::restoreOverrideCursor();
     setDisableControls(false);
 }
@@ -213,7 +223,7 @@ void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 }
 
 ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry(),
-    m_objectManager(0), m_object(0)
+    m_object(0)
 {}
 
 ExtendedDebugLogEntry::~ExtendedDebugLogEntry()
@@ -229,17 +239,19 @@ QString ExtendedDebugLogEntry::getLogString()
     if (getType() == DebugLogEntry::TYPE_TEXT) {
         return QString((const char *)getData().Data);
     } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
-        UAVDataObject *object = (UAVDataObject *)m_objectManager->getObject(getObjectID(), getInstanceID());
-        object   = object->clone(getInstanceID());
-        object->unpack(getData().Data);
-        m_object = object;
-        return object->toString().replace("\n", " ").replace("\t", " ");
+        return m_object->toString().replace("\n", " ").replace("\t", " ");
     } else {
         return "";
     }
 }
 
-void ExtendedDebugLogEntry::setObjectManager(UAVObjectManager *objectManager)
+void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVObjectManager *objectManager)
 {
-    m_objectManager = objectManager;
+    DebugLogEntry::setData(data);
+    if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+        UAVDataObject *object = (UAVDataObject *)objectManager->getObject(getObjectID(), getInstanceID());
+        Q_ASSERT(object);
+        m_object   = object->clone(getInstanceID());
+        m_object->unpack(getData().Data);
+    }
 }

@@ -50,7 +50,8 @@ public:
     {
         return m_object;
     }
-    void setObjectManager(UAVObjectManager *objectManager);
+
+    void setData(const DataFields& data, UAVObjectManager *objectManager);
 
 public slots:
     void setLogString(QString arg)
@@ -62,7 +63,6 @@ signals:
     void LogStringUpdated(QString arg);
 
 private:
-    UAVObjectManager *m_objectManager;
     UAVDataObject *m_object;
 };
 

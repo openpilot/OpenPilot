@@ -39,7 +39,7 @@ qt5_use_modules(opHID Core Widgets)
 target_link_libraries(opHID Core ExtensionSystem)
 
 if(WIN32)
-    target_link_libraries(opHID setupapi hid)
+    target_link_libraries(opHID setupapi ${HID_LIB})
 else()
     target_link_libraries(opHID usb udev usb-1.0 rt pthread)
 endif()

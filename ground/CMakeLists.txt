@@ -15,6 +15,11 @@ find_package(Qt5Declarative REQUIRED)
 # Find SDL
 find_package(Sdl REQUIRED)
 
+if(WIN32)
+    # Find HID
+    find_package(HID REQUIRED)
+endif()
+
 set(GCS_BINARY_DIR ${PROJECT_BINARY_DIR}/bin)
 set(GCS_LIBRARY_BASENAME lib)
 set(GCS_PLUGINS_DIR ${PROJECT_BINARY_DIR}/${GCS_LIBRARY_BASENAME}/openpilotgcs/plugins)

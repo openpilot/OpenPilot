@@ -71,12 +71,27 @@ qt5_wrap_ui(Core_SRCS
     workspacesettings.ui
 )
 
+set(AUTHORS_QML_FILE ${CMAKE_CURRENT_BINARY_DIR}/openpilotgcs-synthetics/AuthorsModel.qml)
+
+add_custom_command(
+    OUTPUT ${AUTHORS_QML_FILE}
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/authorsdialog.py
+                       --infile=${PROJECT_SOURCE_DIR}/CREDITS.txt
+                       --template=${CMAKE_CURRENT_SOURCE_DIR}/qml/AuthorsModel.qml.template
+                       --outfile=${AUTHORS_QML_FILE}
+    DEPENDS ${PROJECT_SOURCE_DIR}/CREDITS.txt ${CMAKE_CURRENT_SOURCE_DIR}/qml/AuthorsModel.qml.template ${CMAKE_CURRENT_SOURCE_DIR}/authorsdialog.py
+)
+
+configure_file(core.qrc.in ${CMAKE_CURRENT_BINARY_DIR}/core.qrc)
+
 qt5_add_resources(Core_SRCS
-    core.qrc
+    ${CMAKE_CURRENT_BINARY_DIR}/core.qrc
     fancyactionbar.qrc
 ) 
 
 add_library(Core ${Core_SRCS} ${Core_ITFS})
+
+add_dependencies(Core ${AUTHORS_QML_FILE})
 
 if(WIN32)
     set_target_properties(Core PROPERTIES PREFIX "")

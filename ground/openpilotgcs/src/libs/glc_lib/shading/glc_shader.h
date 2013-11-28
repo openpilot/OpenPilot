@@ -34,8 +34,6 @@
 #include <QString>
 #include <QMap>
 
-#include "../glc_config.h"
-
 //////////////////////////////////////////////////////////////////////
 //! \class GLC_Shader
 /*! \brief GLC_Shader : OpenGL shader abstraction*/

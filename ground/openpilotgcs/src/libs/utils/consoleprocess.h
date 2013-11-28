@@ -39,6 +39,7 @@
 #include <QtNetwork/QLocalServer>
 
 #ifdef Q_OS_WIN
+#define NOMINMAX
 #include <windows.h>
 QT_BEGIN_NAMESPACE
 class QWinEventNotifier;

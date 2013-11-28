@@ -31,8 +31,6 @@
 #include "../glc_ext.h"
 #include "glc_shader.h"
 
-#include "../glc_config.h"
-
 class QGLContext;
 class GLC_Material;
 

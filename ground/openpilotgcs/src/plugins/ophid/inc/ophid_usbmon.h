@@ -51,6 +51,7 @@
 #ifndef WINVER
     #define WINVER         0x0500
 #endif
+#define NOMINMAX
 #include <windows.h>
 #include <dbt.h>
 #include <setupapi.h>

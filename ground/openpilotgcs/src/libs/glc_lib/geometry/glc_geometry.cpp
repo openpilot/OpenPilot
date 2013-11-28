@@ -22,11 +22,11 @@
 
 //! \file glc_geometry.cpp Implementation of the GLC_Geometry class.
 
-#include "../shading/glc_selectionmaterial.h"
-#include "../glc_openglexception.h"
-#include "../glc_state.h"
-#include "../glc_context.h"
 #include "glc_geometry.h"
+#include "../glc_state.h"
+#include "../glc_openglexception.h"
+#include "../glc_context.h"
+#include "../shading/glc_selectionmaterial.h"
 
 //////////////////////////////////////////////////////////////////////
 // Constructor destructor

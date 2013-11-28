@@ -32,6 +32,8 @@
 #include "openpilot.h"
 #include "uavtalk_priv.h"
 
+// Size of instance ID (2 bytes)
+#define UAVTALK_INSTANCE_LENGTH 2
 
 // Private functions
 static int32_t objectTransaction(UAVTalkConnectionData *connection, uint8_t type, UAVObjHandle obj, uint16_t instId, int32_t timeout);
@@ -422,23 +424,23 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
             iproc->timestampLength = (iproc->type & UAVTALK_TIMESTAMPED) ? 2 : 0;
         }
 
-        // Message always contain an instance ID
-        iproc->instanceLength = 2;
-
         // Check length and determine next state
         if (iproc->length >= UAVTALK_MAX_PAYLOAD_LENGTH) {
+            // packet error - exceeded payload max length
             connection->stats.rxErrors++;
             iproc->state = UAVTALK_STATE_ERROR;
             break;
         }
 
         // Check the lengths match
-        if ((iproc->rxPacketLength + iproc->instanceLength + iproc->timestampLength + iproc->length) != iproc->packet_size) { // packet error - mismatched packet size
+        if ((iproc->rxPacketLength + UAVTALK_INSTANCE_LENGTH + iproc->timestampLength + iproc->length) != iproc->packet_size) {
+            // packet error - mismatched packet size
             connection->stats.rxErrors++;
             iproc->state = UAVTALK_STATE_ERROR;
             break;
         }
 
+        // Message always contain an instance ID
         iproc->rxCount = 0;
         iproc->instId = 0;
         iproc->state = UAVTALK_STATE_INSTID;
@@ -585,25 +587,23 @@ UAVTalkRxState UAVTalkRelayPacket(UAVTalkConnection inConnectionHandle, UAVTalkC
     // Lock
     xSemaphoreTakeRecursive(outConnection->lock, portMAX_DELAY);
 
-    // Setup type and object id fields
-    outConnection->txBuffer[0] = UAVTALK_SYNC_VAL; // sync byte
+    // Setup sync byte
+    outConnection->txBuffer[0] = UAVTALK_SYNC_VAL;
+    // Setup type
     outConnection->txBuffer[1] = inIproc->type;
-    // data length inserted here below
-    int32_t dataOffset = 8;
+    // next 2 bytes are reserved for data length (inserted here later)
+    int32_t dataOffset = 4;
     if (inIproc->objId != 0) {
+        // Setup object ID
         outConnection->txBuffer[4] = (uint8_t)(inIproc->objId & 0xFF);
         outConnection->txBuffer[5] = (uint8_t)((inIproc->objId >> 8) & 0xFF);
         outConnection->txBuffer[6] = (uint8_t)((inIproc->objId >> 16) & 0xFF);
         outConnection->txBuffer[7] = (uint8_t)((inIproc->objId >> 24) & 0xFF);
 
-        // Setup instance ID if one is required
-        if (inIproc->instanceLength > 0) {
-            outConnection->txBuffer[8] = (uint8_t)(inIproc->instId & 0xFF);
-            outConnection->txBuffer[9] = (uint8_t)((inIproc->instId >> 8) & 0xFF);
-            dataOffset = 10;
-        }
-    } else {
-        dataOffset = 4;
+        // Setup instance ID
+        outConnection->txBuffer[8] = (uint8_t)(inIproc->instId & 0xFF);
+        outConnection->txBuffer[9] = (uint8_t)((inIproc->instId >> 8) & 0xFF);
+        dataOffset = 10;
     }
 
     // Add timestamp when the transaction type is appropriate
@@ -860,26 +860,26 @@ static int32_t sendSingleObject(UAVTalkConnectionData *connection, uint8_t type,
     int32_t length;
     int32_t dataOffset;
 
-    // Important note : obj can be null (when type is NACK for example) so protect all obj dereferences.
+    // IMPORTANT : obj can be null (when type is NACK for example)
 
     if (!connection->outStream) {
         return -1;
     }
 
-    // Setup type and object id fields
-    connection->txBuffer[0] = UAVTALK_SYNC_VAL; // sync byte
+    // Setup sync byte
+    connection->txBuffer[0] = UAVTALK_SYNC_VAL;
+    // Setup type
     connection->txBuffer[1] = type;
-    // data length inserted here below
+    // next 2 bytes are reserved for data length (inserted here later)
+    // Setup object ID
     connection->txBuffer[4] = (uint8_t)(objId & 0xFF);
     connection->txBuffer[5] = (uint8_t)((objId >> 8) & 0xFF);
     connection->txBuffer[6] = (uint8_t)((objId >> 16) & 0xFF);
     connection->txBuffer[7] = (uint8_t)((objId >> 24) & 0xFF);
-    dataOffset = 8;
-
-    // The instance ID is always sent
+    // Setup instance ID
     connection->txBuffer[8] = (uint8_t)(instId & 0xFF);
     connection->txBuffer[9] = (uint8_t)((instId >> 8) & 0xFF);
-    dataOffset += 2;
+    dataOffset = 10;
 
     // Add timestamp when the transaction type is appropriate
     if (type & UAVTALK_TIMESTAMPED) {

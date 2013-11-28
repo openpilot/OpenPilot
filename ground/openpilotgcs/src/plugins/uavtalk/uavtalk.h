@@ -94,6 +94,8 @@ private:
 
     static const quint16 ALL_INSTANCES  = 0xFFFF;
 
+    static const quint8 INSTANCE_LENGTH = 2;
+
     static const int TX_BUFFER_SIZE     = 2 * 1024;
     static const quint8 crc_table[256];
 
@@ -114,7 +116,6 @@ private:
     quint16 rxInstId;
     quint16 rxLength;
     quint16 rxPacketLength;
-    quint8 rxInstanceLength;
 
     quint8 rxCSPacket, rxCS;
     qint32 rxCount;

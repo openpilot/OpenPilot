@@ -248,6 +248,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
     case STATE_SYNC:
 
         if (rxbyte != SYNC_VAL) {
+            // continue until synch byte is matched
             UAVTALK_QXTLOG_DEBUG("UAVTalk: Sync->Sync (" + QString::number(rxbyte) + " " + QString("0x%1").arg(rxbyte, 2, 16) + ")");
             break;
         }
@@ -337,14 +338,16 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             if (rxType == TYPE_OBJ_REQ || rxType == TYPE_ACK || rxType == TYPE_NACK) {
                 rxLength = 0;
             } else {
-                rxLength = rxObj->getNumBytes();
+                if (rxObj) {
+                    rxLength = rxObj->getNumBytes();
+                } else {
+                    rxLength = packetSize - rxPacketLength;
+                }
             }
-
-            // The instance ID is always sent
-            rxInstanceLength = 2;
 
             // Check length and determine next state
             if (rxLength >= MAX_PAYLOAD_LENGTH) {
+                // packet error - exceeded payload max length
                 stats.rxErrors++;
                 rxState = STATE_SYNC;
                 UAVTALK_QXTLOG_DEBUG("UAVTalk: ObjID->Sync (oversize)");
@@ -352,7 +355,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             }
 
             // Check the lengths match
-            if ((rxPacketLength + rxInstanceLength + rxLength) != packetSize) {
+            if ((rxPacketLength + INSTANCE_LENGTH + rxLength) != packetSize) {
                 // packet error - mismatched packet size
                 stats.rxErrors++;
                 rxState = STATE_SYNC;
@@ -360,6 +363,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 break;
             }
 
+            // Message always contain an instance ID
             rxCount = 0;
             rxInstId = 0;
             rxState = STATE_INSTID;
@@ -707,22 +711,25 @@ bool UAVTalk::transmitObject(quint8 type, quint32 objId, quint16 instId, UAVObje
  */
 bool UAVTalk::transmitSingleObject(quint8 type, quint32 objId, quint16 instId, UAVObject *obj)
 {
-#ifdef VERBOSE_UAVTALK
-    qDebug() << "UAVTalk - transmitting object" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
-#endif
     qint32 length;
     qint32 dataOffset;
 
-    // Setup type and object id fields
-    txBuffer[0] = SYNC_VAL;
-    txBuffer[1] = type;
-    // data length inserted here below
-    qToLittleEndian<quint32>(objId, &txBuffer[4]);
-    dataOffset = 8;
+    #ifdef VERBOSE_UAVTALK
+    qDebug() << "UAVTalk - transmitting object" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
+#endif
 
-    // The instance ID is always sent
+    // IMPORTANT : obj can be null (when type is NACK for example)
+
+    // Setup sync byte
+    txBuffer[0] = SYNC_VAL;
+    // Setup type
+    txBuffer[1] = type;
+    // next 2 bytes are reserved for data length (inserted here later)
+    // Setup object ID
+    qToLittleEndian<quint32>(objId, &txBuffer[4]);
+    // Setup instance ID
     qToLittleEndian<quint16>(instId, &txBuffer[8]);
-    dataOffset += 2;
+    dataOffset = 10;
 
     // Determine data length
     if (type == TYPE_OBJ_REQ || type == TYPE_ACK || type == TYPE_NACK) {
@@ -743,6 +750,7 @@ bool UAVTalk::transmitSingleObject(quint8 type, quint32 objId, quint16 instId, U
         }
     }
 
+    // Store the packet length
     qToLittleEndian<quint16>(dataOffset + length, &txBuffer[2]);
 
     // Calculate checksum

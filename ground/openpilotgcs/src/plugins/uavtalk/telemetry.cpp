@@ -374,7 +374,7 @@ void Telemetry::processObjectQueue()
         }
         transInfo->telem = this;
         // Insert the transaction into the transaction map.
-        openTransaction(transInfo);
+        startTransaction(transInfo);
         processObjectTransaction(transInfo);
     }
 
@@ -542,7 +542,7 @@ ObjectTransactionInfo *Telemetry::findTransaction(UAVObject *obj)
     return NULL;
 }
 
-void Telemetry::openTransaction(ObjectTransactionInfo *trans)
+void Telemetry::startTransaction(ObjectTransactionInfo *trans)
 {
     QMap<quint32, ObjectTransactionInfo *> *objTransactions = transMap.value(trans->obj->getObjID());
     if (objTransactions == NULL) {

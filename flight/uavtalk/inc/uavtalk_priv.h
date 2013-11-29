@@ -77,7 +77,8 @@ typedef struct {
     xSemaphoreHandle    lock;
     xSemaphoreHandle    transLock;
     xSemaphoreHandle    respSema;
-    UAVObjHandle respObj;
+    uint8_t      respType;
+    uint32_t     respObjId;
     uint16_t     respInstId;
     UAVTalkStats stats;
     UAVTalkInputProcessor iproc;

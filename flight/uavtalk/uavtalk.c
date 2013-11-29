@@ -40,7 +40,7 @@ static int32_t objectTransaction(UAVTalkConnectionData *connection, uint8_t type
 static int32_t sendObject(UAVTalkConnectionData *connection, uint8_t type, uint32_t objId, uint16_t instId, UAVObjHandle obj);
 static int32_t sendSingleObject(UAVTalkConnectionData *connection, uint8_t type, uint32_t objId, uint16_t instId, UAVObjHandle obj);
 static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, uint32_t objId, uint16_t instId, uint8_t *data, int32_t length);
-static void updateAck(UAVTalkConnectionData *connection, UAVObjHandle obj, uint16_t instId);
+static void updateAck(UAVTalkConnectionData *connection, uint8_t type, uint32_t objId, uint16_t instId);
 
 /**
  * Initialize the UAVTalk library
@@ -289,7 +289,9 @@ static int32_t objectTransaction(UAVTalkConnectionData *connection, uint8_t type
         xSemaphoreTakeRecursive(connection->transLock, portMAX_DELAY);
         // Send object
         xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
-        connection->respObj    = obj;
+        // expected response type
+        connection->respType   = (type == UAVTALK_TYPE_OBJ_REQ) ? UAVTALK_TYPE_OBJ : UAVTALK_TYPE_ACK;
+        connection->respObjId  =  UAVObjGetID(obj);
         connection->respInstId = instId;
         sendObject(connection, type, UAVObjGetID(obj), instId, obj);
         xSemaphoreGiveRecursive(connection->lock);
@@ -300,7 +302,6 @@ static int32_t objectTransaction(UAVTalkConnectionData *connection, uint8_t type
             // Cancel transaction
             xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
             xSemaphoreTake(connection->respSema, 0); // non blocking call to make sure the value is reset to zero (binary sema)
-            connection->respObj = 0;
             xSemaphoreGiveRecursive(connection->lock);
             xSemaphoreGiveRecursive(connection->transLock);
             return -1;
@@ -725,7 +726,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
                 // Check if this object acks a pending OBJ_REQ message
                 // any OBJ message can ack a pending OBJ_REQ message
                 // even one that was not sent in response to the OBJ_REQ message
-                updateAck(connection, obj, instId);
+                updateAck(connection, type, objId, instId);
             }
             else {
                 ret = -1;
@@ -770,12 +771,13 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
         break;
     case UAVTALK_TYPE_NACK:
         // Do nothing on flight side, let it time out.
+        // Why?
         break;
     case UAVTALK_TYPE_ACK:
         // All instances, not allowed for ACK messages
         if (obj && (instId != UAVOBJ_ALL_INSTANCES)) {
             // Check if an ACK is pending
-            updateAck(connection, obj, instId);
+            updateAck(connection, type, objId, instId);
         } else {
             ret = -1;
         }
@@ -797,11 +799,10 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
  * \param[in] obj Object
  * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.
  */
-static void updateAck(UAVTalkConnectionData *connection, UAVObjHandle obj, uint16_t instId)
+static void updateAck(UAVTalkConnectionData *connection, uint8_t type, uint32_t objId, uint16_t instId)
 {
-    if (connection->respObj == obj && (connection->respInstId == instId || connection->respInstId == UAVOBJ_ALL_INSTANCES)) {
+    if (connection->respType == type && connection->respObjId == objId && (connection->respInstId == instId || connection->respInstId == UAVOBJ_ALL_INSTANCES)) {
         xSemaphoreGive(connection->respSema);
-        connection->respObj = 0;
     }
 }
 

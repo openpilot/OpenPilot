@@ -155,7 +155,15 @@ bool UAVTalk::sendObjectRequest(UAVObject *obj, bool allInstances)
 {
     QMutexLocker locker(mutex);
 
-    return objectTransaction(TYPE_OBJ_REQ, obj, allInstances);
+    quint16 instId = 0;
+
+    if (allInstances) {
+        instId = ALL_INSTANCES;
+    }
+    else if (obj) {
+       instId = obj->getInstID();
+    }
+    return objectTransaction(TYPE_OBJ_REQ, obj->getObjID(), instId, obj);
 }
 
 /**
@@ -169,10 +177,18 @@ bool UAVTalk::sendObject(UAVObject *obj, bool acked, bool allInstances)
 {
     QMutexLocker locker(mutex);
 
+    quint16 instId = 0;
+
+    if (allInstances) {
+        instId = ALL_INSTANCES;
+    }
+    else if (obj) {
+       instId = obj->getInstID();
+    }
     if (acked) {
-        return objectTransaction(TYPE_OBJ_ACK, obj, allInstances);
+        return objectTransaction(TYPE_OBJ_ACK, obj->getObjID(), instId, obj);
     } else {
-        return objectTransaction(TYPE_OBJ, obj, allInstances);
+        return objectTransaction(TYPE_OBJ, obj->getObjID(), instId, obj);
     }
 }
 
@@ -186,7 +202,7 @@ void UAVTalk::cancelTransaction(UAVObject *obj)
     if (io.isNull()) {
         return;
     }
-    Transaction *trans = findTransaction(obj);
+    Transaction *trans = findTransaction(obj->getObjID(), obj->getInstID());
     if (trans != NULL) {
         closeTransaction(trans);
         delete trans;
@@ -203,24 +219,24 @@ void UAVTalk::cancelTransaction(UAVObject *obj)
  * \param[in] allInstances If set true then all instances will be updated
  * \return Success (true), Failure (false)
  */
-bool UAVTalk::objectTransaction(quint8 type, UAVObject *obj, bool allInstances)
+bool UAVTalk::objectTransaction(quint8 type, quint32 objId, quint16 instId, UAVObject *obj)
 {
 	Q_ASSERT(obj);
     // Send object depending on if a response is needed
     // transactions of TYPE_OBJ_REQ are acked by the response
-    quint16 instId = allInstances ? ALL_INSTANCES : obj->getInstID();
     if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ) {
-        if (transmitObject(type, obj->getObjID(), instId, obj)) {
+        if (transmitObject(type, objId, instId, obj)) {
             Transaction *trans = new Transaction();
-            trans->obj = obj;
-            trans->allInstances = allInstances;
-            openTransaction(trans);
+            trans->respType = (type == TYPE_OBJ_REQ) ? TYPE_OBJ : TYPE_ACK;
+            trans->respObjId = objId;
+            trans->respInstId = instId;
+            startTransaction(trans);
             return true;
         } else {
             return false;
         }
     } else if (type == TYPE_OBJ) {
-        return transmitObject(type, obj->getObjID(), instId, obj);
+        return transmitObject(type, objId, instId, obj);
     } else {
         return false;
     }
@@ -494,10 +510,10 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
             qDebug() << "UAVTalk - received object" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
 #endif
             if (obj != NULL) {
-                // Check if an ACK is pending
-                // TODO is it necessary to do that check?
-                // TODO if yes, why is the same check not done for OBJ_ACK below?
-                updateAck(obj);
+                // Check if this object acks a pending OBJ_REQ message
+                // any OBJ message can ack a pending OBJ_REQ message
+                // even one that was not sent in response to the OBJ_REQ message
+                updateAck(type, objId, instId, obj);
             } else {
                 error = true;
             }
@@ -559,7 +575,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
 #endif
             if (obj != NULL) {
                 // Check if a NACK is pending
-                updateNack(obj);
+                updateNack(type, objId, instId, obj);
             } else {
                 error = true;
             }
@@ -575,7 +591,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
 #endif
             if (obj != NULL) {
                 // Check if an ACK is pending
-                updateAck(obj);
+                updateAck(type, objId, instId, obj);
             } else {
                 error = true;
             }
@@ -630,15 +646,14 @@ UAVObject *UAVTalk::updateObject(quint32 objId, quint16 instId, quint8 *data)
 /**
  * Check if a transaction is pending and if yes complete it.
  */
-void UAVTalk::updateNack(UAVObject *obj)
+void UAVTalk::updateNack(quint8 type, quint32 objId, quint16 instId, UAVObject *obj)
 {
     Q_ASSERT(obj);
     if (!obj) {
         return;
     }
-    Transaction *trans = findTransaction(obj);
-    // TODO handle allInstances
-    if (trans != NULL /* || itr.value()->allInstances)*/) {
+    Transaction *trans = findTransaction(objId, instId);
+    if (trans) {
         closeTransaction(trans);
         delete trans;
         emit transactionCompleted(obj, false);
@@ -648,15 +663,14 @@ void UAVTalk::updateNack(UAVObject *obj)
 /**
  * Check if a transaction is pending and if yes complete it.
  */
-void UAVTalk::updateAck(UAVObject *obj)
+void UAVTalk::updateAck(quint8 type, quint32 objId, quint16 instId, UAVObject *obj)
 {
     Q_ASSERT(obj);
     if (!obj) {
         return;
     }
-    Transaction *trans = findTransaction(obj);
-    // TODO handle allInstances
-    if (trans != NULL /* || itr.value()->allInstances)*/) {
+    Transaction *trans = findTransaction(objId, instId);
+    if (trans && trans->respType == type) {
         closeTransaction(trans);
         delete trans;
         emit transactionCompleted(obj, true);
@@ -814,31 +828,31 @@ quint8 UAVTalk::updateCRC(quint8 crc, const quint8 *data, qint32 length)
     return crc;
 }
 
-UAVTalk::Transaction *UAVTalk::findTransaction(UAVObject *obj)
+UAVTalk::Transaction *UAVTalk::findTransaction(quint32 objId, quint16 instId)
 {
     // Lookup the transaction in the transaction map
-    QMap<quint32, Transaction *> *objTransactions = transMap.value(obj->getObjID());
+    QMap<quint32, Transaction *> *objTransactions = transMap.value(objId);
     if (objTransactions != NULL) {
-        return objTransactions->value(obj->getInstID());
+        return objTransactions->value(instId);
     }
     return NULL;
 }
 
-void UAVTalk::openTransaction(Transaction *trans)
+void UAVTalk::startTransaction(Transaction *trans)
 {
-    QMap<quint32, Transaction *> *objTransactions = transMap.value(trans->obj->getObjID());
+    QMap<quint32, Transaction *> *objTransactions = transMap.value(trans->respObjId);
     if (objTransactions == NULL) {
         objTransactions = new QMap<quint32, Transaction *>();
-        transMap.insert(trans->obj->getObjID(), objTransactions);
+        transMap.insert(trans->respObjId, objTransactions);
     }
-    objTransactions->insert(trans->obj->getInstID(), trans);
+    objTransactions->insert(trans->respInstId, trans);
 }
 
 void UAVTalk::closeTransaction(Transaction *trans)
 {
-    QMap<quint32, Transaction *> *objTransactions = transMap.value(trans->obj->getObjID());
+    QMap<quint32, Transaction *> *objTransactions = transMap.value(trans->respObjId);
     if (objTransactions != NULL) {
-        objTransactions->remove(trans->obj->getInstID());
+        objTransactions->remove(trans->respInstId);
         // Keep the map even if it is empty
         // There are at most 100 different object IDs...
     }
@@ -850,7 +864,7 @@ void UAVTalk::closeAllTransactions()
         QMap<quint32, Transaction *> *objTransactions = transMap.value(objId);
         foreach(quint32 instId, objTransactions->keys()) {
             Transaction *trans = objTransactions->value(instId);
-            qWarning() << "UAVTalk - closing active transaction for object" << trans->obj->toStringBrief();
+            qWarning() << "UAVTalk - closing active transaction for object" << trans->respObjId;
             objTransactions->remove(instId);
             delete trans;
         }

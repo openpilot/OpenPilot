@@ -70,8 +70,9 @@ private slots:
 private:
 
     typedef struct {
-        UAVObject *obj;
-        bool allInstances;
+        quint8 respType;
+        quint32 respObjId;
+        quint16 respInstId;
     } Transaction;
 
     // Constants
@@ -129,19 +130,19 @@ private:
     QByteArray rxDataArray;
 
     // Methods
-    bool objectTransaction(quint8 type, UAVObject *obj, bool allInstances);
+    bool objectTransaction(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
     bool processInputByte(quint8 rxbyte);
     bool receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *data, qint32 length);
     UAVObject *updateObject(quint32 objId, quint16 instId, quint8 *data);
-    void updateAck(UAVObject *obj);
-    void updateNack(UAVObject *obj);
+    void updateAck(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
+    void updateNack(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
     bool transmitObject(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
     bool transmitSingleObject(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
     quint8 updateCRC(quint8 crc, const quint8 data);
     quint8 updateCRC(quint8 crc, const quint8 *data, qint32 length);
 
-    Transaction *findTransaction(UAVObject *obj);
-    void openTransaction(Transaction *trans);
+    Transaction *findTransaction(quint32 objId, quint16 instId);
+    void startTransaction(Transaction *trans);
     void closeTransaction(Transaction *trans);
     void closeAllTransactions();
 };

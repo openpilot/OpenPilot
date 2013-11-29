@@ -137,7 +137,7 @@ private:
     void processObjectQueue();
 
     ObjectTransactionInfo *findTransaction(UAVObject *obj);
-    void openTransaction(ObjectTransactionInfo *trans);
+    void startTransaction(ObjectTransactionInfo *trans);
     void closeTransaction(ObjectTransactionInfo *trans);
     void closeAllTransactions();
 

@@ -462,6 +462,13 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
 /**
  * Receive an object. This function process objects received through the telemetry stream.
+ *
+ * Parser errors are considered as transmission errors and are not NACKed.
+ * Some senders (GCS) can timeout and retry if the message is not answered by an ack or nack.
+ *
+ * Object handling errors are considered as application errors and are NACked.
+ * In that case we want to nack as there is no point in the sender retrying to send invalid objects.
+ *
  * \param[in] type Type of received message (TYPE_OBJ, TYPE_OBJ_REQ, TYPE_OBJ_ACK, TYPE_ACK, TYPE_NACK)
  * \param[in] obj Handle of the received object
  * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.

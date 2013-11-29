@@ -671,11 +671,19 @@ uint32_t UAVTalkGetPacketObjId(UAVTalkConnection connectionHandle)
     UAVTalkConnectionData *connection;
 
     CHECKCONHANDLE(connectionHandle, connection, return 0);
+
     return connection->iproc.objId;
 }
 
 /**
  * Receive an object. This function process objects received through the telemetry stream.
+ *
+ * Parser errors are considered as transmission errors and are not NACKed.
+ * Some senders (GCS) can timeout and retry if the message is not answered by an ack or nack.
+ *
+ * Object handling errors are considered as application errors and are NACked.
+ * In that case we want to nack as there is no point in the sender retrying to send invalid objects.
+ *
  * \param[in] connection UAVTalkConnection to be used
  * \param[in] type Type of received message (UAVTALK_TYPE_OBJ, UAVTALK_TYPE_OBJ_REQ, UAVTALK_TYPE_OBJ_ACK, UAVTALK_TYPE_ACK, UAVTALK_TYPE_NACK)
  * \param[in] objId ID of the object to work on
@@ -714,9 +722,9 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
         if (obj && (instId != UAVOBJ_ALL_INSTANCES)) {
             // Unpack object, if the instance does not exist it will be created!
             if (UAVObjUnpack(obj, instId, data)) {
-                // Check if an ack is pending OBJ_ACK below
-                // TODO is it necessary to do that check?
-                // TODO if yes, why is the same check not done for OBJ_ACK below?
+                // Check if this object acks a pending OBJ_REQ message
+                // any OBJ message can ack a pending OBJ_REQ message
+                // even one that was not sent in response to the OBJ_REQ message
                 updateAck(connection, obj, instId);
             }
             else {
@@ -750,6 +758,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
         // Check if requested object exists
         if (obj && ((instId == UAVOBJ_ALL_INSTANCES) || instId < UAVObjGetNumInstances(obj))) {
             // Object found, transmit it
+            // This OBJ message will also ack this request
             sendObject(connection, UAVTALK_TYPE_OBJ, objId, instId, obj);
         } else {
             ret = -1;

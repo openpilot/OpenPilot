@@ -255,7 +255,7 @@ UAVObjectField *UAVObject::getField(const QString & name)
         }
     }
     // If this point is reached then the field was not found
-    qWarning() << "UAVObject::getField Non existant field " << name << " requested.  This indicates a bug.  Make sure you also have null checking for non-debug code.";
+    qWarning() << "UAVObject::getField Non existant field" << name << "requested. This indicates a bug. Make sure you also have null checking for non-debug code.";
     return NULL;
 }
 
@@ -448,7 +448,7 @@ QString UAVObject::toStringBrief()
 {
     QString sout;
 
-    sout.append(QString("%1 (ID: %2:%3, %4bytes, %5)")
+    sout.append(QString("%1 (ID: %2-%3, %4 bytes, %5)")
                 .arg(getName())
                 .arg(getObjID())
                 .arg(getInstID())

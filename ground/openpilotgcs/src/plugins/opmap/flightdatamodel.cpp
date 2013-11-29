@@ -191,6 +191,7 @@ bool flightDataModel::setColumnByIndex(pathPlanData *row, const int index, const
     }
     return false;
 }
+
 QVariant flightDataModel::getColumnByIndex(const pathPlanData *row, const int index) const
 {
     switch (index) {
@@ -285,7 +286,9 @@ QVariant flightDataModel::getColumnByIndex(const pathPlanData *row, const int in
     case LOCKED:
         return row->locked;
     }
+    return NULL;
 }
+
 QVariant flightDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole) {
@@ -394,7 +397,9 @@ QVariant flightDataModel::headerData(int section, Qt::Orientation orientation, i
     } else {
         return QAbstractTableModel::headerData(section, orientation, role);
     }
+    return NULL;
 }
+
 bool flightDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (role == Qt::EditRole) {
@@ -465,6 +470,7 @@ bool flightDataModel::insertRows(int row, int count, const QModelIndex & /*paren
         dataStorage.insert(row, data);
     }
     endInsertRows();
+    return true;
 }
 
 bool flightDataModel::removeRows(int row, int count, const QModelIndex & /*parent*/)
@@ -478,6 +484,7 @@ bool flightDataModel::removeRows(int row, int count, const QModelIndex & /*paren
         dataStorage.removeAt(row);
     }
     endRemoveRows();
+    return true;
 }
 
 bool flightDataModel::writeToFile(QString fileName)
@@ -617,6 +624,7 @@ bool flightDataModel::writeToFile(QString fileName)
     file.close();
     return true;
 }
+
 void flightDataModel::readFromFile(QString fileName)
 {
     // TODO warning message

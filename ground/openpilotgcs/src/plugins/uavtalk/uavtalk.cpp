@@ -264,7 +264,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
     case STATE_SYNC:
 
         if (rxbyte != SYNC_VAL) {
-            // continue until synch byte is matched
+            // continue until sync byte is matched
             UAVTALK_QXTLOG_DEBUG("UAVTalk: Sync->Sync (" + QString::number(rxbyte) + " " + QString("0x%1").arg(rxbyte, 2, 16) + ")");
             break;
         }
@@ -735,7 +735,7 @@ bool UAVTalk::transmitSingleObject(quint8 type, quint32 objId, quint16 instId, U
     qint32 length;
     qint32 dataOffset;
 
-    #ifdef VERBOSE_UAVTALK
+#ifdef VERBOSE_UAVTALK
     qDebug() << "UAVTalk - transmitting object" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
 #endif
 

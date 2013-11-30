@@ -118,31 +118,6 @@ uintptr_t pios_user_fs_id = 0;
  *  or we will need to configure the DMA task per line
  */
 #include "pios_tim_priv.h"
-#define NTSC_PX_CLOCK 6797088
-#define PAL_PX_CLOCK  6750130
-#define PX_PERIOD     ((PIOS_PERIPHERAL_APB1_CLOCK / NTSC_PX_CLOCK) + 1)
-#define LINE_PERIOD   PX_PERIOD * GRAPHICS_WIDTH
-
-static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
-    .TIM_Prescaler         = 0, // PIOS_PERIPHERAL_APB1_CLOCK,
-    .TIM_ClockDivision     = TIM_CKD_DIV1,
-    .TIM_CounterMode       = TIM_CounterMode_Up,
-    .TIM_Period            = LINE_PERIOD - 1,
-    .TIM_RepetitionCounter = 0x0000,
-};
-
-static const struct pios_tim_clock_cfg pios_tim4_cfg = {
-    .timer = TIM4,
-    .time_base_init                            = &tim_4_time_base,
-    .irq   = {
-        .init                                  = {
-            .NVIC_IRQChannel    = TIM4_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-            .NVIC_IRQChannelSubPriority        = 0,
-            .NVIC_IRQChannelCmd = ENABLE,
-        },
-    }
-};
 
 void PIOS_Board_Init(void)
 {

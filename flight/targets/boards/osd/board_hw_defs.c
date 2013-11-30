@@ -656,9 +656,7 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
         .init                                  = {
             .EXTI_Line    = EXTI_Line7, // matches above GPIO pin
             .EXTI_Mode    = EXTI_Mode_Interrupt,
-            // .EXTI_Trigger = EXTI_Trigger_Rising_Falling,
-            .EXTI_Trigger = EXTI_Trigger_Falling,
-            // .EXTI_Trigger = EXTI_Trigger_Rising,
+            .EXTI_Trigger = EXTI_Trigger_Rising,
             .EXTI_LineCmd = ENABLE,
         },
     },
@@ -688,7 +686,7 @@ static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
         .init                                  = {
             .EXTI_Line    = EXTI_Line5, // matches above GPIO pin
             .EXTI_Mode    = EXTI_Mode_Interrupt,
-            .EXTI_Trigger = EXTI_Trigger_Falling,
+            .EXTI_Trigger = EXTI_Trigger_Rising,
             .EXTI_LineCmd = ENABLE,
         },
     },
@@ -696,6 +694,7 @@ static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
 
 
 static const struct pios_video_cfg pios_video_cfg = {
+    .mask_dma = DMA1,
     .mask                                              = {
         .regs  = SPI3,
         .remap = GPIO_AF_SPI3,
@@ -703,7 +702,7 @@ static const struct pios_video_cfg pios_video_cfg = {
             .SPI_Mode              = SPI_Mode_Slave,
             .SPI_Direction         = SPI_Direction_1Line_Tx,
             .SPI_DataSize          = SPI_DataSize_8b,
-            .SPI_NSS                                   = SPI_NSS_Soft,
+            .SPI_NSS               = SPI_NSS_Soft,
             .SPI_FirstBit          = SPI_FirstBit_MSB,
             .SPI_CRCPolynomial     = 7,
             .SPI_CPOL              = SPI_CPOL_Low,
@@ -729,11 +728,11 @@ static const struct pios_video_cfg pios_video_cfg = {
                     .DMA_Channel            = DMA_Channel_0,
                     .DMA_PeripheralBaseAddr = (uint32_t)&(SPI3->DR),
                     .DMA_DIR                = DMA_DIR_MemoryToPeripheral,
-                    .DMA_BufferSize         = BUFFER_LINE_LENGTH,
+                    .DMA_BufferSize         = BUFFER_WIDTH,
                     .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
                     .DMA_MemoryInc          = DMA_MemoryInc_Enable,
                     .DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-                    .DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
+                    .DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
                     .DMA_Mode               = DMA_Mode_Normal,
                     .DMA_Priority           = DMA_Priority_VeryHigh,
                     .DMA_FIFOMode           = DMA_FIFOMode_Enable,
@@ -750,7 +749,7 @@ static const struct pios_video_cfg pios_video_cfg = {
                 .GPIO_Speed = GPIO_Speed_100MHz,
                 .GPIO_Mode  = GPIO_Mode_AF,
                 .GPIO_OType = GPIO_OType_PP,
-                .GPIO_PuPd  = GPIO_PuPd_NOPULL
+                .GPIO_PuPd  = GPIO_PuPd_NOPULL		// JR_HINT or GPIO_PuPd_UP ?
             },
         },
         .miso                                          = {
@@ -766,6 +765,7 @@ static const struct pios_video_cfg pios_video_cfg = {
         /*.mosi = {},*/
         .slave_count                                   = 1,
     },
+    .level_dma = DMA2,
     .level                                             = {
         .regs  = SPI1,
         .remap = GPIO_AF_SPI1,
@@ -773,7 +773,7 @@ static const struct pios_video_cfg pios_video_cfg = {
             .SPI_Mode              = SPI_Mode_Slave,
             .SPI_Direction         = SPI_Direction_1Line_Tx,
             .SPI_DataSize          = SPI_DataSize_8b,
-            .SPI_NSS                                   = SPI_NSS_Soft,
+            .SPI_NSS               = SPI_NSS_Soft,
             .SPI_FirstBit          = SPI_FirstBit_MSB,
             .SPI_CRCPolynomial     = 7,
             .SPI_CPOL              = SPI_CPOL_Low,
@@ -786,7 +786,7 @@ static const struct pios_video_cfg pios_video_cfg = {
                 .flags = (DMA_IT_TCIF5),
                 .init  = {
                     .NVIC_IRQChannel    = DMA2_Stream5_IRQn,
-                    .NVIC_IRQChannelPreemptionPriority = 0,
+                    .NVIC_IRQChannelPreemptionPriority = 0,		// JR_HINT or PIOS_IRQ_PRIO_HIGH ?
                     .NVIC_IRQChannelSubPriority        = 0,
                     .NVIC_IRQChannelCmd = ENABLE,
                 },
@@ -798,11 +798,11 @@ static const struct pios_video_cfg pios_video_cfg = {
                     .DMA_Channel            = DMA_Channel_3,
                     .DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
                     .DMA_DIR                = DMA_DIR_MemoryToPeripheral,
-                    .DMA_BufferSize         = BUFFER_LINE_LENGTH,
+                    .DMA_BufferSize         = BUFFER_WIDTH,
                     .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
                     .DMA_MemoryInc          = DMA_MemoryInc_Enable,
                     .DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-                    .DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
+                    .DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
                     .DMA_Mode               = DMA_Mode_Normal,
                     .DMA_Priority           = DMA_Priority_VeryHigh,
                     .DMA_FIFOMode           = DMA_FIFOMode_Enable,
@@ -819,7 +819,7 @@ static const struct pios_video_cfg pios_video_cfg = {
                 .GPIO_Speed = GPIO_Speed_100MHz,
                 .GPIO_Mode  = GPIO_Mode_AF,
                 .GPIO_OType = GPIO_OType_PP,
-                .GPIO_PuPd  = GPIO_PuPd_UP
+                .GPIO_PuPd  = GPIO_PuPd_UP			// JR_HINT or GPIO_PuPd_NOPULL ?
             },
         },
         .miso                                          = {

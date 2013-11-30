@@ -78,9 +78,9 @@
 /* #define PIOS_INCLUDE_MPU6000 */
 /* #define PIOS_MPU6000_ACCEL */
 /* #define PIOS_INCLUDE_HMC5843 */
-#define PIOS_INCLUDE_HMC5883
+/* #define PIOS_INCLUDE_HMC5883 */
 /* #define PIOS_HMC5883_HAS_GPIOS */
-#define PIOS_INCLUDE_BMP085
+/* #define PIOS_INCLUDE_BMP085 */
 /* #define PIOS_INCLUDE_MS5611 */
 /* #define PIOS_INCLUDE_MPXV */
 /* #define PIOS_INCLUDE_ETASV3 */
@@ -98,7 +98,7 @@
 /* PIOS abstract receiver interface */
 /* #define PIOS_INCLUDE_RCVR */
 
-/* PIOS common peripherals */
+/* PIOS common peripherals */						//JR_HINT clean up
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
 #define PIOS_INCLUDE_SERVO

@@ -43,8 +43,7 @@ int32_t osdgenInitialize(void);
 #define HUD_VSCALE_FLAG_NO_NEGATIVE 2
 
 // Macros for computing addresses and bit positions.
-// NOTE: /16 in y is because we are addressing by word not byte.
-#define CALC_BUFF_ADDR(x, y) (((x) / 8) + ((y) * (GRAPHICS_WIDTH_REAL / 8)))
+#define CALC_BUFF_ADDR(x, y) (((x) / 8) + ((y) * BUFFER_WIDTH))
 #define CALC_BIT_IN_WORD(x)  ((x) & 7)
 #define DEBUG_DELAY
 // Macro for writing a word with a mode (NAND = clear, OR = set, XOR = toggle)
@@ -123,11 +122,6 @@ struct FontDimensions {
 #define MAX3(a, b, c)        MAX(a, MAX(b, c))
 #define MIN3(a, b, c)        MIN(a, MIN(b, c))
 
-// Apply DeadBand
-#define APPLY_DEADBAND(x, y) { x = (x) + GRAPHICS_HDEADBAND; y = (y) + GRAPHICS_VDEADBAND; }
-#define APPLY_VDEADBAND(y)   ((y) + GRAPHICS_VDEADBAND)
-#define APPLY_HDEADBAND(x)   ((x) + GRAPHICS_HDEADBAND)
-
 // Check if coordinates are valid. If not, return. Assumes unsigned coordinate
 #define CHECK_COORDS(x, y)   if (x >= GRAPHICS_WIDTH_REAL || y >= GRAPHICS_HEIGHT_REAL) { return; }
 #define CHECK_COORD_X(x)     if (x >= GRAPHICS_WIDTH_REAL) { return; }
@@ -140,23 +134,6 @@ struct FontDimensions {
 
 // Macro to swap two variables using XOR swap.
 #define SWAP(a, b)           { a ^= b; b ^= a; a ^= b; }
-
-// Line triggering
-#define LAST_LINE 312 // 625/2 //PAL
-// #define LAST_LINE 525/2 //NTSC
-
-// Global vars
-
-#define DELAY_1_NOP()  asm ("nop\r\n")
-#define DELAY_2_NOP()  asm ("nop\r\nnop\r\n")
-#define DELAY_3_NOP()  asm ("nop\r\nnop\r\nnop\r\n")
-#define DELAY_4_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_5_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_6_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_7_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_8_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_9_NOP()  asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-#define DELAY_10_NOP() asm ("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
 
 uint8_t getCharData(uint16_t charPos);
 void introText();

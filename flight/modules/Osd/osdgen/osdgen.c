@@ -30,6 +30,10 @@
 
 // ****************
 
+//#define DEBUG_TIMING
+//#define DEBUG_SHOW_MINIMAL
+//#define DEMO_SCREENS
+
 #include <openpilot.h>
 
 #include "osdgen.h"
@@ -50,6 +54,7 @@
 #include "WMMInternal.h"
 
 #include "splash.h"
+
 /*
    static uint16_t angleA=0;
    static int16_t angleB=90;
@@ -95,6 +100,13 @@ xSemaphoreHandle osdSemaphore = NULL;
 
 static xTaskHandle osdgenTaskHandle;
 
+#ifdef DEBUG_TIMING
+static portTickType in_ticks = 0;
+static portTickType out_ticks = 0;
+static uint16_t in_time = 0;
+static uint16_t out_time = 0;
+#endif
+
 struct splashEntry {
     unsigned int   width, height;
     const uint16_t *level;
@@ -128,8 +140,8 @@ uint16_t mirror(uint16_t source)
 
 void clearGraphics()
 {
-    memset((uint8_t *)draw_buffer_mask, 0, GRAPHICS_WIDTH * GRAPHICS_HEIGHT);
-    memset((uint8_t *)draw_buffer_level, 0, GRAPHICS_WIDTH * GRAPHICS_HEIGHT);
+    memset((uint8_t *)draw_buffer_mask, 0, BUFFER_HEIGHT * BUFFER_WIDTH);
+    memset((uint8_t *)draw_buffer_level, 0, BUFFER_HEIGHT * BUFFER_WIDTH);
 }
 
 void copyimage(uint16_t offsetx, uint16_t offsety, int image)
@@ -144,13 +156,13 @@ void copyimage(uint16_t offsetx, uint16_t offsety, int image)
     for (uint16_t y = offsety; y < ((splash_info.height) + offsety); y++) {
         uint16_t x1 = offsetx;
         for (uint16_t x = offsetx; x < (((splash_info.width) / 16) + offsetx); x++) {
-            draw_buffer_level[y * GRAPHICS_WIDTH + x1 + 1] = (uint8_t)(
+            draw_buffer_level[y * BUFFER_WIDTH + x1 + 1] = (uint8_t)(
                 mirror(splash_info.level[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)]) >> 8);
-            draw_buffer_level[y * GRAPHICS_WIDTH + x1]     = (uint8_t)(
+            draw_buffer_level[y * BUFFER_WIDTH + x1]     = (uint8_t)(
                 mirror(splash_info.level[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)]) & 0xFF);
-            draw_buffer_mask[y * GRAPHICS_WIDTH + x1 + 1]  = (uint8_t)(
+            draw_buffer_mask[y * BUFFER_WIDTH + x1 + 1]  = (uint8_t)(
                 mirror(splash_info.mask[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)]) >> 8);
-            draw_buffer_mask[y * GRAPHICS_WIDTH + x1] = (uint8_t)(mirror(splash_info.mask[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)]) & 0xFF);
+            draw_buffer_mask[y * BUFFER_WIDTH + x1] = (uint8_t)(mirror(splash_info.mask[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)]) & 0xFF);
             x1 += 2;
         }
     }
@@ -158,7 +170,7 @@ void copyimage(uint16_t offsetx, uint16_t offsety, int image)
 
 uint8_t validPos(uint16_t x, uint16_t y)
 {
-    if (x < GRAPHICS_HDEADBAND || x >= GRAPHICS_WIDTH_REAL || y >= GRAPHICS_HEIGHT_REAL) {
+    if (x >= GRAPHICS_WIDTH_REAL || y >= GRAPHICS_HEIGHT_REAL) {
         return 0;
     }
     return 1;
@@ -457,7 +469,7 @@ void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int 
 {
     int stroke, fill;
 
-    SETUP_STROKE_FILL(stroke, fill, mode)
+    SETUP_STROKE_FILL(stroke, fill, mode);
     if (x0 > x1) {
         SWAP(x0, x1);
     }
@@ -500,7 +512,7 @@ void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1
     uint16_t mask = 1 << (7 - bitnum);
     /* Run from addr0 to addr1 placing pixels. Increment by the number
      * of words n each graphics line. */
-    for (a = addr0; a <= addr1; a += GRAPHICS_WIDTH_REAL / 8) {
+    for (a = addr0; a <= addr1; a += BUFFER_WIDTH) {
         WRITE_WORD_MODE(buff, a, mask, mode);
     }
 }
@@ -587,7 +599,7 @@ void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsig
         mask = COMPUTE_HLINE_ISLAND_MASK(addr0_bit, addr1_bit);
         while (height--) {
             WRITE_WORD_MODE(buff, addr0, mask, mode);
-            addr0 += GRAPHICS_WIDTH_REAL / 8;
+            addr0 += BUFFER_WIDTH;
         }
     } else {
         // Otherwise we need to write the edges and then the middle repeatedly.
@@ -600,8 +612,8 @@ void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsig
         while (yy < height) {
             WRITE_WORD_MODE(buff, addr0, mask_l, mode);
             WRITE_WORD_MODE(buff, addr1, mask_r, mode);
-            addr0 += GRAPHICS_WIDTH_REAL / 8;
-            addr1 += GRAPHICS_WIDTH_REAL / 8;
+            addr0 += BUFFER_WIDTH;
+            addr1 += BUFFER_WIDTH;
             yy++;
         }
         // Now write 0xffff words from start+1 to end-1 for each row.
@@ -613,8 +625,8 @@ void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsig
                 uint8_t m = 0xff;
                 WRITE_WORD_MODE(buff, i, m, mode);
             }
-            addr0 += GRAPHICS_WIDTH_REAL / 8;
-            addr1 += GRAPHICS_WIDTH_REAL / 8;
+            addr0 += BUFFER_WIDTH;
+            addr1 += BUFFER_WIDTH;
             yy++;
         }
     }
@@ -1104,7 +1116,7 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
             } else {
                 write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, wbit);
             }
-            addr += GRAPHICS_WIDTH_REAL / 8;
+            addr += BUFFER_WIDTH;
             row++;
         }
         // Level bits are more complicated. We need to set or clear
@@ -1131,7 +1143,7 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
             // If we're not bold write the AND mask.
             // if(!(flags & FONT_BOLD))
             write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
-            addr += GRAPHICS_WIDTH_REAL / 8;
+            addr += BUFFER_WIDTH;
             row++;
         }
     }
@@ -1181,7 +1193,7 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
         // We can write mask words easily.
         for (yy = y; yy < y + font_info.height; yy++) {
             write_word_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, wbit);
-            addr += GRAPHICS_WIDTH_REAL / 8;
+            addr += BUFFER_WIDTH;
             row++;
         }
         // Level bits are more complicated. We need to set or clear
@@ -1202,7 +1214,7 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
             // If we're not bold write the AND mask.
             // if(!(flags & FONT_BOLD))
             write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
-            addr += GRAPHICS_WIDTH_REAL / 8;
+            addr += BUFFER_WIDTH;
             row++;
         }
     }
@@ -1588,7 +1600,7 @@ void printTime(uint16_t x, uint16_t y)
 
     sprintf(temp, "%02d:%02d:%02d", timex.hour, timex.min, timex.sec);
     // printTextFB(x,y,temp);
-    write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+    write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 }
 
 /*
@@ -1643,7 +1655,6 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
         boundtick_start = x;
         boundtick_end   = x + boundtick_len;
     } else if (halign == +1) {
-        x = x - GRAPHICS_HDEADBAND;
         majtick_start   = GRAPHICS_WIDTH_REAL - x - 1;
         majtick_end     = GRAPHICS_WIDTH_REAL - x - majtick_len - 1;
         mintick_start   = GRAPHICS_WIDTH_REAL - x - 1;
@@ -1715,6 +1726,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     } else {
         xx = majtick_end - text_x_spacing;
     }
+    y++;
     // Draw an arrow from the number to the point.
     for (i = 0; i < arrow_len; i++) {
         if (halign == -1) {
@@ -1751,14 +1763,13 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     // disappear. We simply clear the areas above and below the ticker, and we
     // use little markers on the edges.
     if (halign == -1) {
-        write_filled_rectangle_lm(majtick_end + text_x_spacing, y + (height / 2) - (font_info.height / 2), max_text_y - boundtick_start, font_info.height, 0,
-                                  0);
-        write_filled_rectangle_lm(majtick_end + text_x_spacing, y - (height / 2) - (font_info.height / 2), max_text_y - boundtick_start, font_info.height, 0,
-                                  0);
-    } else {
+        write_filled_rectangle_lm(majtick_end + text_x_spacing, y + (height / 2) - (font_info.height / 2), max_text_y - boundtick_start, font_info.height, 0, 0);
+        write_filled_rectangle_lm(majtick_end + text_x_spacing, y - (height / 2) - (font_info.height / 2), max_text_y - boundtick_start, font_info.height, 0, 0);
+    } else {	// JR_HINT to fix
         write_filled_rectangle_lm(majtick_end - text_x_spacing - max_text_y, y + (height / 2) - (font_info.height / 2), max_text_y, font_info.height, 0, 0);
         write_filled_rectangle_lm(majtick_end - text_x_spacing - max_text_y, y - (height / 2) - (font_info.height / 2), max_text_y, font_info.height, 0, 0);
     }
+    y--;
     write_hline_outlined(boundtick_start, boundtick_end, y + (height / 2), 2, 2, 0, 1);
     write_hline_outlined(boundtick_start, boundtick_end, y - (height / 2), 2, 2, 0, 1);
 }
@@ -1920,7 +1931,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
         write_line_outlined(x1 + l_x, y1 + l_y, x2 + l_x, y2 + l_y, 0, 0, 0, 1);
         // fill
         if (angle <= 0.0f && angle > -90.0f) {
-            // write_string("1", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+            // write_string("1", GRAPHICS_RIGHT/2, GRAPHICS_BOTTOM-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = y2; i < size; i++) {
                 x2 = ((i - y0) + k * x0) / k;
                 if (x2 > size) {
@@ -1932,7 +1943,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
                 write_hline_lm(x2 + l_x, size + l_x, i + l_y, 1, 1);
             }
         } else if (angle < -90.0f) {
-            // write_string("2", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+            // write_string("2", GRAPHICS_RIGHT/2, GRAPHICS_BOTTOM-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = 0; i < y2; i++) {
                 x2 = ((i - y0) + k * x0) / k;
                 if (x2 > size) {
@@ -1944,7 +1955,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
                 write_hline_lm(size + l_x, x2 + l_x, i + l_y, 1, 1);
             }
         } else if (angle > 0.0f && angle < 90.0f) {
-            // write_string("3", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+            // write_string("3", GRAPHICS_RIGHT/2, GRAPHICS_BOTTOM-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = y1; i < size; i++) {
                 x2 = ((i - y0) + k * x0) / k;
                 if (x2 > size) {
@@ -1956,7 +1967,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
                 write_hline_lm(0 + l_x, x2 + l_x, i + l_y, 1, 1);
             }
         } else if (angle > 90.0f) {
-            // write_string("4", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+            // write_string("4", GRAPHICS_RIGHT/2, GRAPHICS_BOTTOM-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = 0; i < y1; i++) {
                 x2 = ((i - y0) + k * x0) / k;
                 if (x2 > size) {
@@ -1972,12 +1983,12 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
         // horizon line
         write_line_outlined(x0 + l_x, 0 + l_y, x0 + l_x, size + l_y, 0, 0, 0, 1);
         if (angle >= 90.0f) {
-            // write_string("5", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+            // write_string("5", GRAPHICS_RIGHT/2, GRAPHICS_BOTTOM-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = 0; i < size; i++) {
                 write_hline_lm(0 + l_x, x0 + l_x, i + l_y, 1, 1);
             }
         } else {
-            // write_string("6", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+            // write_string("6", GRAPHICS_RIGHT/2, GRAPHICS_BOTTOM-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = 0; i < size; i++) {
                 write_hline_lm(size + l_x, x0 + l_x, i + l_y, 1, 1);
             }
@@ -1986,12 +1997,12 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
         // horizon line
         write_hline_outlined(0 + l_x, size + l_x, y0 + l_y, 0, 0, 0, 1);
         if (angle < 0) {
-            // write_string("7", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+            // write_string("7", GRAPHICS_RIGHT/2, GRAPHICS_BOTTOM-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = 0; i < y0; i++) {
                 write_hline_lm(0 + l_x, size + l_x, i + l_y, 1, 1);
             }
         } else {
-            // write_string("8", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+            // write_string("8", GRAPHICS_RIGHT/2, GRAPHICS_BOTTOM-10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = y0; i < size; i++) {
                 write_hline_lm(0 + l_x, size + l_x, i + l_y, 1, 1);
             }
@@ -2006,9 +2017,37 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
     write_line_outlined(refx, refy, refx, refy - 3, 0, 0, 0, 1);
 }
 
+// JR_HINT work in progress, this will be fun after doing all the low level refactoring...
+// Artificial Horizon in HUD design
+void draw_artificial_horizon_HUD(int roll, int pitch, int16_t x, int16_t y, int16_t size)
+{
+    int16_t a = mySin(roll + 360);
+    int16_t b = myCos(roll + 360);
+
+    pitch = pitch % 90;
+    if (pitch > 90) {
+        pitch = pitch - 90;
+    }
+    if (pitch < -90) {
+        pitch = pitch + 90;
+    }
+    a = (a * (size / 2)) / 100;
+    b = (b * (size / 2)) / 100;
+
+    if (roll < -90 || roll > 90) {
+        pitch = pitch * -1;
+    }
+
+//    int16_t k;
+//    k = a * pitch / 90;
+
+    write_line_outlined((x) - 1 - b, (y) - 1 + a -  0, (x) - 1 + b, (y) - 1 - a -  0, 0, 0, 0, 1);
+
+}
+
 void introText()
 {
-    write_string("ver 0.2", APPLY_HDEADBAND((GRAPHICS_RIGHT / 2)), APPLY_VDEADBAND(GRAPHICS_BOTTOM - 10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
+    write_string("v 0.0.1", GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
 }
 
 void introGraphics()
@@ -2019,16 +2058,10 @@ void introGraphics()
 
     splash_info = splash[image];
 
-    copyimage(APPLY_HDEADBAND(GRAPHICS_RIGHT / 2 - (splash_info.width) / 2), APPLY_VDEADBAND(GRAPHICS_BOTTOM / 2 - (splash_info.height) / 2), image);
+    copyimage(GRAPHICS_RIGHT / 2 - (splash_info.width) / 2, GRAPHICS_BOTTOM / 2 - (splash_info.height) / 2, image);
 
     /* frame */
-    drawBox(APPLY_HDEADBAND(0), APPLY_VDEADBAND(0), APPLY_HDEADBAND(GRAPHICS_RIGHT - 8), APPLY_VDEADBAND(GRAPHICS_BOTTOM));
-
-    // Must mask out last half-word because SPI keeps clocking it out otherwise
-    for (uint32_t i = 0; i < 8; i++) {
-        write_vline(draw_buffer_level, GRAPHICS_WIDTH_REAL - i - 1, 0, GRAPHICS_HEIGHT_REAL - 1, 0);
-        write_vline(draw_buffer_mask, GRAPHICS_WIDTH_REAL - i - 1, 0, GRAPHICS_HEIGHT_REAL - 1, 0);
-    }
+    drawBox(0, 0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM);
 }
 
 void calcHomeArrow(int16_t m_yaw)
@@ -2098,16 +2131,16 @@ void calcHomeArrow(int16_t m_yaw)
     char temp[50] =
     { 0 };
     sprintf(temp, "hea:%d", (int)brng);
-    write_string(temp, APPLY_HDEADBAND(GRAPHICS_RIGHT / 2 - 30), APPLY_VDEADBAND(30), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+    write_string(temp, GRAPHICS_RIGHT / 2 - 30, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
     sprintf(temp, "ele:%d", (int)elevation);
-    write_string(temp, APPLY_HDEADBAND(GRAPHICS_RIGHT / 2 - 30), APPLY_VDEADBAND(30 + 10), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+    write_string(temp, GRAPHICS_RIGHT / 2 - 30, 40, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
     sprintf(temp, "dis:%d", (int)d);
-    write_string(temp, APPLY_HDEADBAND(GRAPHICS_RIGHT / 2 - 30), APPLY_VDEADBAND(30 + 10 + 10), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+    write_string(temp, GRAPHICS_RIGHT / 2 - 30, 50, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
     sprintf(temp, "u2g:%d", (int)u2g);
-    write_string(temp, APPLY_HDEADBAND(GRAPHICS_RIGHT / 2 - 30), APPLY_VDEADBAND(30 + 10 + 10 + 10), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+    write_string(temp, GRAPHICS_RIGHT / 2 - 30, 60, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 
     sprintf(temp, "%c%c", (int)(u2g / 22.5f) * 2 + 0x90, (int)(u2g / 22.5f) * 2 + 0x91);
-    write_string(temp, APPLY_HDEADBAND(250), APPLY_VDEADBAND(40 + 10 + 10), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+    write_string(temp, 250, 60, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 }
 
 int lama = 10;
@@ -2127,7 +2160,7 @@ void lamas(void)
     }
     for (int z = 0; z < 30; z++) {
         sprintf(temp, "%c", 0xe8 + (lama_loc[0][z] % 2));
-        write_string(temp, APPLY_HDEADBAND(lama_loc[0][z]), APPLY_VDEADBAND(lama_loc[1][z]), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, lama_loc[0][z], lama_loc[1][z], 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
     }
 }
 
@@ -2151,6 +2184,15 @@ void updateGraphics()
     PIOS_Servo_Set(0, OsdSettings.White);
     PIOS_Servo_Set(1, OsdSettings.Black);
 
+#ifdef DEMO_SCREENS
+    static int cnt = 0;
+    static int screen = 1;
+    if (cnt++ >= 200) {
+    	cnt = 0;
+    	screen = screen >= 7 ? 1 : screen + 1;
+    }
+    OsdSettings.Screen = screen;
+#endif
     switch (OsdSettings.Screen) {
     case 0: // Dave simple
     {
@@ -2159,7 +2201,7 @@ void updateGraphics()
             { 0 };
             sprintf(temps, "HOME NOT SET");
             // printTextFB(x,y,temp);
-            write_string(temps, APPLY_HDEADBAND(GRAPHICS_RIGHT / 2), (GRAPHICS_BOTTOM / 2), 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+            write_string(temps, GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM / 2, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
         }
 
         char temp[50] =
@@ -2168,15 +2210,15 @@ void updateGraphics()
         // Note: cast to double required due to -Wdouble-promotion compiler option is
         // being used, and there is no way in C to pass a float to a variadic function like sprintf()
         sprintf(temp, "Lat:%11.7f", (double)(gpsData.Latitude / 10000000.0f));
-        write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(GRAPHICS_BOTTOM - 30), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
+        write_string(temp, 20, GRAPHICS_BOTTOM - 30, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
         sprintf(temp, "Lon:%11.7f", (double)(gpsData.Longitude / 10000000.0f));
-        write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(GRAPHICS_BOTTOM - 10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
+        write_string(temp, 20, GRAPHICS_BOTTOM - 10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
         sprintf(temp, "Sat:%d", (int)gpsData.Satellites);
-        write_string(temp, APPLY_HDEADBAND(GRAPHICS_RIGHT - 40), APPLY_VDEADBAND(30), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+        write_string(temp, GRAPHICS_RIGHT - 40,  30, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
         /* Print ADC voltage FLIGHT*/
         sprintf(temp, "V:%5.2fV", (double)(PIOS_ADC_PinGet(2) * 3 * 6.1f / 4096));
-        write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(20), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+        write_string(temp, 20, 20, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 
         if (gpsData.Heading > 180) {
             calcHomeArrow((int16_t)(gpsData.Heading - 360));
@@ -2187,83 +2229,93 @@ void updateGraphics()
     break;
     case 1:
     {
-        /*drawBox(2,2,GRAPHICS_WIDTH_REAL-4,GRAPHICS_HEIGHT_REAL-4);
-           write_filled_rectangle(draw_buffer_mask,0,0,GRAPHICS_WIDTH_REAL-2,GRAPHICS_HEIGHT_REAL-2,0);
-           write_filled_rectangle(draw_buffer_mask,2,2,GRAPHICS_WIDTH_REAL-4-2,GRAPHICS_HEIGHT_REAL-4-2,2);
-           write_filled_rectangle(draw_buffer_mask,3,3,GRAPHICS_WIDTH_REAL-4-1,GRAPHICS_HEIGHT_REAL-4-1,0);*/
-        // write_filled_rectangle(draw_buffer_mask,5,5,GRAPHICS_WIDTH_REAL-4-5,GRAPHICS_HEIGHT_REAL-4-5,0);
-        // write_rectangle_outlined(10,10,GRAPHICS_WIDTH_REAL-20,GRAPHICS_HEIGHT_REAL-20,0,0);
-        // drawLine(GRAPHICS_WIDTH_REAL-1, GRAPHICS_HEIGHT_REAL-1,(GRAPHICS_WIDTH_REAL/2)-1, GRAPHICS_HEIGHT_REAL-1 );
-        // drawCircle((GRAPHICS_WIDTH_REAL/2)-1, (GRAPHICS_HEIGHT_REAL/2)-1, (GRAPHICS_HEIGHT_REAL/2)-1);
-        // drawCircle((GRAPHICS_SIZE/2)-1, (GRAPHICS_SIZE/2)-1, (GRAPHICS_SIZE/2)-2);
-        // drawLine(0, (GRAPHICS_SIZE/2)-1, GRAPHICS_SIZE-1, (GRAPHICS_SIZE/2)-1);
-        // drawLine((GRAPHICS_SIZE/2)-1, 0, (GRAPHICS_SIZE/2)-1, GRAPHICS_SIZE-1);
-        /*angleA++;
-           if(angleB<=-90)
-           {
-           sum=2;
-           }
-           if(angleB>=90)
-           {
-           sum=-2;
-           }
-           angleB+=sum;
-           angleC+=2;*/
+#ifndef DEBUG_SHOW_MINIMAL
 
+#if 0
         // GPS HACK
         if (gpsData.Heading > 180) {
             calcHomeArrow((int16_t)(gpsData.Heading - 360));
         } else {
             calcHomeArrow((int16_t)(gpsData.Heading));
         }
+#endif
 
         /* Draw Attitude Indicator */
         if (OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED) {
-            drawAttitude(APPLY_HDEADBAND(OsdSettings.AttitudeSetup.X),
-                         APPLY_VDEADBAND(OsdSettings.AttitudeSetup.Y), attitude.Pitch, attitude.Roll, 96);
+            drawAttitude(OsdSettings.AttitudeSetup.X, OsdSettings.AttitudeSetup.Y, attitude.Pitch, attitude.Roll, 96);
         }
-        // write_string("Hello OP-OSD", 60, 12, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
-        // printText16( 60, 12,"Hello OP-OSD");
+#endif
 
-        char temp[50] =
-        { 0 };
+        /* Draw Artificial Horizon in HUD design */
+        if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
+        	draw_artificial_horizon_HUD(attitude.Roll, attitude.Pitch, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, 48);
+        }
+
+#ifndef DEBUG_SHOW_MINIMAL
+
+        char temp[50] = { 0 };
         memset(temp, ' ', 40);
+
+#if 0
+    // show alarms
+    int k;
+    for (k=0; k<=17; k++) {
+        sprintf(temp, "Alarm: %2d %d", k, AlarmsGet(k));
+        write_string(temp, GRAPHICS_RIGHT - 24, 20 + 10 * k, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+    }
+#endif
+
         sprintf(temp, "Lat:%11.7f", (double)(gpsData.Latitude / 10000000.0f));
-        write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(5), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 5,  5, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         sprintf(temp, "Lon:%11.7f", (double)(gpsData.Longitude / 10000000.0f));
-        write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(15), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 5, 15, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         sprintf(temp, "Fix:%d", (int)gpsData.Status);
-        write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(25), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 5, 25, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         sprintf(temp, "Sat:%d", (int)gpsData.Satellites);
-        write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(35), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 5, 35, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 
         /* Print RTC time */
         if (OsdSettings.Time == OSDSETTINGS_TIME_ENABLED) {
-            printTime(APPLY_HDEADBAND(OsdSettings.TimeSetup.X), APPLY_VDEADBAND(OsdSettings.TimeSetup.Y));
+            printTime(OsdSettings.TimeSetup.X, OsdSettings.TimeSetup.Y);
         }
 
-        /* Print Number of detected video Lines */
-        sprintf(temp, "Lines:%4d", PIOS_Video_GetOSDLines());
-        write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(5), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-
         /* Print ADC voltage */
-        // sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
-        // write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-        sprintf(temp, "Rssi:%4.2fV", (double)(PIOS_ADC_PinGet(5) * 3.0f / 4096.0f));
-        write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(15), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+        sprintf(temp, "Rssi:%5.2fV", (double)(PIOS_ADC_PinGet(5) * 3.0f / 4096.0f));
+        write_string(temp, GRAPHICS_RIGHT,  5, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
         /* Print CPU temperature */
-        sprintf(temp, "Temp:%4.2fC", (double)(PIOS_ADC_PinGet(3) * 0.29296875f - 264));
-        write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(25), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+        sprintf(temp, "Temp:%5.2fC", (double)(PIOS_ADC_PinGet(3) * 0.29296875f - 264));
+        write_string(temp, GRAPHICS_RIGHT, 15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
         /* Print ADC voltage FLIGHT*/
-        sprintf(temp, "FltV:%4.2fV", (double)(PIOS_ADC_PinGet(2) * 3.0f * 6.1f / 4096.0f));
-        write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(35), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+        sprintf(temp, "FltV:%5.2fV", (double)(PIOS_ADC_PinGet(2) * 3.0f * 6.1f / 4096.0f));
+        write_string(temp, GRAPHICS_RIGHT, 25, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
         /* Print ADC voltage VIDEO*/
-        sprintf(temp, "VidV:%4.2fV", (double)(PIOS_ADC_PinGet(4) * 3.0f * 6.1f / 4096.0f));
-        write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(45), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+        sprintf(temp, "VidV:%5.2fV", (double)(PIOS_ADC_PinGet(4) * 3.0f * 6.1f / 4096.0f));
+        write_string(temp, GRAPHICS_RIGHT, 35, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
+#ifdef DEBUG_TIMING
+        sprintf(temp, "In: %7d", in_time);
+        write_string(temp, GRAPHICS_RIGHT, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+
+        sprintf(temp, "Out:%7d", out_time);
+        write_string(temp, GRAPHICS_RIGHT, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+#else
+        /* Print number of detected video lines */
+        sprintf(temp, "Lines:%5d", PIOS_Video_GetOSDLines());
+        write_string(temp, GRAPHICS_RIGHT, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+
+        /* Print number of video columns */
+        sprintf(temp, "Columns:%3d", GRAPHICS_WIDTH_REAL);
+        write_string(temp, GRAPHICS_RIGHT, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+
+        // show heap
+        sprintf(temp, "Heap:%6d", xPortGetFreeHeapSize());
+        write_string(temp, GRAPHICS_RIGHT, 75, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+#endif
+
+        // JR_HINT refactor
         /* Print ADC voltage RSSI */
         // sprintf(temp,"Curr:%4dA",(int)(PIOS_ADC_PinGet(0)*300*61/4096));
         // write_string(temp, (GRAPHICS_WIDTH_REAL - 2),60, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
@@ -2285,44 +2337,46 @@ void updateGraphics()
 
         /*if(OsdSettings.Battery == OSDSETTINGS_BATTERY_ENABLED)
            {
-           drawBattery(APPLY_HDEADBAND(OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_X]),APPLY_VDEADBAND(OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_Y]),m_batt,16);
+           drawBattery(OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_X], OsdSettings.BatterySetup[OSDSETTINGS_BATTERYSETUP_Y], m_batt, 16);
            }*/
 
         // drawAltitude(200,50,m_alt,dir);
         // drawArrow(96,GRAPHICS_HEIGHT_REAL/2,angleB,32);
         // Draw airspeed (left side.)
+
+        static int spd = 0;
+        gpsData.Groundspeed = spd++;
+        // Draw speedometer (left side)
         if (OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED) {
-            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, APPLY_HDEADBAND(OsdSettings.SpeedSetup.X),
-                                    APPLY_VDEADBAND(OsdSettings.SpeedSetup.Y), 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
+            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, OsdSettings.SpeedSetup.X, OsdSettings.SpeedSetup.Y, 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
-        // Draw altimeter (right side.)
+        static int alt = 0;
+        gpsData.Altitude = alt++;
+        // Draw altimeter (right side)
         if (OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED) {
-            hud_draw_vertical_scale((int)gpsData.Altitude, 200, +1, APPLY_HDEADBAND(OsdSettings.AltitudeSetup.X),
-                                    APPLY_VDEADBAND(OsdSettings.AltitudeSetup.Y), 100, 20, 100, 7, 12, 15, 500, 0);
+            hud_draw_vertical_scale((int)gpsData.Altitude, 200, +1, OsdSettings.AltitudeSetup.X, OsdSettings.AltitudeSetup.Y, 100, 20, 100, 7, 12, 15, 500, 0);
         }
-        // Draw compass.
+        // Draw compass (bottom)
         if (OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED) {
             if (attitude.Yaw < 0) {
-                hud_draw_linear_compass(360 + attitude.Yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup.X),
-                                        APPLY_VDEADBAND(OsdSettings.HeadingSetup.Y), 15, 30, 7, 12, 0);
+                hud_draw_linear_compass(360 + attitude.Yaw, 150, 120, OsdSettings.HeadingSetup.X, OsdSettings.HeadingSetup.Y, 15, 30, 7, 12, 0);
             } else {
-                hud_draw_linear_compass(attitude.Yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup.X),
-                                        APPLY_VDEADBAND(OsdSettings.HeadingSetup.Y), 15, 30, 7, 12, 0);
+                hud_draw_linear_compass(attitude.Yaw, 150, 120, OsdSettings.HeadingSetup.X, OsdSettings.HeadingSetup.Y, 15, 30, 7, 12, 0);
             }
         }
+#endif
     }
     break;
     case 2:
     {
         int size = 64;
         int x    = ((GRAPHICS_RIGHT / 2) - (size / 2)), y = (GRAPHICS_BOTTOM - size - 2);
-        draw_artificial_horizon(-attitude.Roll, attitude.Pitch, APPLY_HDEADBAND(x), APPLY_VDEADBAND(y), size);
-        hud_draw_vertical_scale((int)gpsData.Groundspeed, 20, +1, APPLY_HDEADBAND(GRAPHICS_RIGHT - (x - 1)), APPLY_VDEADBAND(y + (size / 2)), size, 5, 10, 4, 7,
-                                10, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
+        draw_artificial_horizon(-attitude.Roll, attitude.Pitch, x, y, size);
+        hud_draw_vertical_scale((int)gpsData.Groundspeed, 20, 1, GRAPHICS_RIGHT - (x - 1), y + (size / 2), size, 5, 10, 4, 7, 10, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
         if (OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_BARO) {
-            hud_draw_vertical_scale((int)baro.Altitude, 50, -1, APPLY_HDEADBAND((x + size + 1)), APPLY_VDEADBAND(y + (size / 2)), size, 10, 20, 4, 7, 10, 500, 0);
+            hud_draw_vertical_scale((int)baro.Altitude, 50, -1, (x + size + 1), y + (size / 2), size, 10, 20, 4, 7, 10, 500, 0);
         } else {
-            hud_draw_vertical_scale((int)gpsData.Altitude, 50, -1, APPLY_HDEADBAND((x + size + 1)), APPLY_VDEADBAND(y + (size / 2)), size, 10, 20, 4, 7, 10, 500,
+            hud_draw_vertical_scale((int)gpsData.Altitude, 50, -1, (x + size + 1), y + (size / 2), size, 10, 20, 4, 7, 10, 500,
                                     0);
         }
 
@@ -2355,7 +2409,7 @@ void updateGraphics()
             sprintf(temp, "Mode: %d", status.FlightMode);
             break;
         }
-        write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(5), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 5, 5, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
     }
     break;
     case 3:
@@ -2371,19 +2425,84 @@ void updateGraphics()
         struct splashEntry splash_info;
         splash_info = splash[image];
 
-        copyimage(APPLY_HDEADBAND(GRAPHICS_RIGHT / 2 - (splash_info.width) / 2), APPLY_VDEADBAND(GRAPHICS_BOTTOM / 2 - (splash_info.height) / 2), image);
+        copyimage(GRAPHICS_RIGHT / 2 - (splash_info.width) / 2, GRAPHICS_BOTTOM / 2 - (splash_info.height) / 2, image);
+    }
+    break;
+    case 7:
+    {
+    	int i;
+        for (i=0; i<GRAPHICS_RIGHT / 2; i+=16) {
+            write_vline_lm(GRAPHICS_RIGHT / 2 + i, 0, GRAPHICS_BOTTOM, 1, 1);
+            write_vline_lm(GRAPHICS_RIGHT / 2 - i, 0, GRAPHICS_BOTTOM, 1, 1);
+        }
+        for (i=0; i<GRAPHICS_BOTTOM / 2; i+=16) {
+            write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 + i, 1, 1);
+            write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 - i, 1, 1);
+        }
+        drawBox(0, 0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM);
+
+        static int16_t roll1 = 0;
+        static int16_t roll2 = 0;
+        static int16_t roll3 = 0;
+        static int16_t roll4 = 0;
+        static int16_t roll5 = 0;
+        static int16_t roll6 = 0;
+        int16_t a;
+        int16_t b;
+        roll1 += 3;
+        roll2 -= 3;
+        roll3 += 9;
+        roll4 -= 9;
+        roll5 += 12;
+        roll6 -= 12;
+        a = mySin(roll1 + 360);
+        b = myCos(roll1 + 360);
+        write_line_outlined(GRAPHICS_RIGHT / 2 - 1 - b, GRAPHICS_BOTTOM / 2 - 1 + a, GRAPHICS_RIGHT / 2 - 1 + b, GRAPHICS_BOTTOM / 2 - 1 - a, 0, 0, 0, 1);
+        a = mySin(roll2 + 360);
+        b = myCos(roll2 + 360);
+        write_line_outlined(GRAPHICS_RIGHT / 2 - 1 - b, GRAPHICS_BOTTOM / 2 - 1 + a, GRAPHICS_RIGHT / 2 - 1 + b, GRAPHICS_BOTTOM / 2 - 1 - a, 0, 0, 0, 1);
+        a = mySin(roll3 + 360);
+        b = myCos(roll3 + 360);
+        write_line_outlined(GRAPHICS_RIGHT / 2 - 1 - b, GRAPHICS_BOTTOM / 2 - 1 + a, GRAPHICS_RIGHT / 2 - 1 + b, GRAPHICS_BOTTOM / 2 - 1 - a, 0, 0, 0, 1);
+        a = mySin(roll4 + 360);
+        b = myCos(roll4 + 360);
+        write_line_outlined(GRAPHICS_RIGHT / 2 - 1 - b, GRAPHICS_BOTTOM / 2 - 1 + a, GRAPHICS_RIGHT / 2 - 1 + b, GRAPHICS_BOTTOM / 2 - 1 - a, 0, 0, 0, 1);
+        a = mySin(roll5 + 360);
+        b = myCos(roll5 + 360);
+        write_line_outlined(GRAPHICS_RIGHT / 2 - 1 - b, GRAPHICS_BOTTOM / 2 - 1 + a, GRAPHICS_RIGHT / 2 - 1 + b, GRAPHICS_BOTTOM / 2 - 1 - a, 0, 0, 0, 1);
+        a = mySin(roll6 + 360);
+        b = myCos(roll6 + 360);
+        write_line_outlined(GRAPHICS_RIGHT / 2 - 1 - b, GRAPHICS_BOTTOM / 2 - 1 + a, GRAPHICS_RIGHT / 2 - 1 + b, GRAPHICS_BOTTOM / 2 - 1 - a, 0, 0, 0, 1);
+
+        write_vline_lm(GRAPHICS_RIGHT / 2 + roll1 % (GRAPHICS_RIGHT / 2), 0, GRAPHICS_BOTTOM, 1, 1);
+        write_vline_lm(GRAPHICS_RIGHT / 2 - roll1 % (GRAPHICS_RIGHT / 2), 0, GRAPHICS_BOTTOM, 1, 1);
+        write_vline_lm(GRAPHICS_RIGHT / 2 + roll3 % (GRAPHICS_RIGHT / 2), 0, GRAPHICS_BOTTOM, 1, 1);
+        write_vline_lm(GRAPHICS_RIGHT / 2 - roll3 % (GRAPHICS_RIGHT / 2), 0, GRAPHICS_BOTTOM, 1, 1);
+        write_vline_lm(GRAPHICS_RIGHT / 2 + roll5 % (GRAPHICS_RIGHT / 2), 0, GRAPHICS_BOTTOM, 1, 1);
+        write_vline_lm(GRAPHICS_RIGHT / 2 - roll5 % (GRAPHICS_RIGHT / 2), 0, GRAPHICS_BOTTOM, 1, 1);
+
+        write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 + roll1 % (GRAPHICS_BOTTOM / 2), 1, 1);
+        write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 - roll1 % (GRAPHICS_BOTTOM / 2), 1, 1);
+        write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 + roll3 % (GRAPHICS_BOTTOM / 2), 1, 1);
+        write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 - roll3 % (GRAPHICS_BOTTOM / 2), 1, 1);
+        write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 + roll5 % (GRAPHICS_BOTTOM / 2), 1, 1);
+        write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 - roll5 % (GRAPHICS_BOTTOM / 2), 1, 1);
     }
     break;
     default:
-        write_vline_lm(APPLY_HDEADBAND(GRAPHICS_RIGHT / 2), APPLY_VDEADBAND(0), APPLY_VDEADBAND(GRAPHICS_BOTTOM), 1, 1);
-        write_hline_lm(APPLY_HDEADBAND(0), APPLY_HDEADBAND(GRAPHICS_RIGHT), APPLY_VDEADBAND(GRAPHICS_BOTTOM / 2), 1, 1);
-        break;
+    {
+    	int i;
+        for (i=0; i<GRAPHICS_RIGHT / 2; i+=16) {
+            write_vline_lm(GRAPHICS_RIGHT / 2 + i, 0, GRAPHICS_BOTTOM, 1, 1);
+            write_vline_lm(GRAPHICS_RIGHT / 2 - i, 0, GRAPHICS_BOTTOM, 1, 1);
+        }
+        for (i=0; i<GRAPHICS_BOTTOM / 2; i+=16) {
+            write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 + i, 1, 1);
+            write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 - i, 1, 1);
+        }
+        drawBox(0, 0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM);
     }
-
-    // Must mask out last half-word because SPI keeps clocking it out otherwise
-    for (uint32_t i = 0; i < 8; i++) {
-        write_vline(draw_buffer_level, GRAPHICS_WIDTH_REAL - i - 1, 0, GRAPHICS_HEIGHT_REAL - 1, 0);
-        write_vline(draw_buffer_mask, GRAPHICS_WIDTH_REAL - i - 1, 0, GRAPHICS_HEIGHT_REAL - 1, 0);
+    break;
     }
 }
 
@@ -2395,27 +2514,22 @@ void updateOnceEveryFrame()
 
 // ****************
 /**
- * Initialise the gps module
- * \return -1 if initialisation failed
- * \return 0 on success
+ * Start the osd module
  */
-
 int32_t osdgenStart(void)
 {
-    // Start gps task
     vSemaphoreCreateBinary(osdSemaphore);
     xTaskCreate(osdgenTask, (signed char *)"OSDGEN", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_OSDGEN, osdgenTaskHandle);
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_OSDGEN);
 #endif
+
     return 0;
 }
 
 /**
  * Initialise the osd module
- * \return -1 if initialisation failed
- * \return 0 on success
  */
 int32_t osdgenInitialize(void)
 {
@@ -2436,13 +2550,12 @@ int32_t osdgenInitialize(void)
 
     return 0;
 }
+
 MODULE_INITCALL(osdgenInitialize, osdgenStart);
 
-// ****************
 /**
  * Main osd task. It does not return.
  */
-
 static void osdgenTask(__attribute__((unused)) void *parameters)
 {
     // portTickType lastSysTime;
@@ -2455,16 +2568,8 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
     PIOS_Servo_Set(0, OsdSettings.White);
     PIOS_Servo_Set(1, OsdSettings.Black);
 
+#ifndef DEBUG_SHOW_MINIMAL
     // intro
-    for (int i = 0; i < 63; i++) {
-        if (xSemaphoreTake(osdSemaphore, LONG_TIME) == pdTRUE) {
-#ifdef PIOS_INCLUDE_WDG
-            PIOS_WDG_UpdateFlag(PIOS_WDG_OSDGEN);
-#endif
-            clearGraphics();
-            introGraphics();
-        }
-    }
     for (int i = 0; i < 63; i++) {
         if (xSemaphoreTake(osdSemaphore, LONG_TIME) == pdTRUE) {
 #ifdef PIOS_INCLUDE_WDG
@@ -2475,13 +2580,23 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
             introText();
         }
     }
+#endif
 
     while (1) {
         if (xSemaphoreTake(osdSemaphore, LONG_TIME) == pdTRUE) {
 #ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_UpdateFlag(PIOS_WDG_OSDGEN);
 #endif
+
+#ifdef DEBUG_TIMING
+            in_ticks = xTaskGetTickCount();
+            out_time = in_ticks - out_ticks;
+#endif
             updateOnceEveryFrame();
+#ifdef DEBUG_TIMING
+            out_ticks = xTaskGetTickCount();
+            in_time = out_ticks - in_ticks;
+#endif
         }
         // xSemaphoreTake(osdSemaphore, portMAX_DELAY);
         // vTaskDelayUntil(&lastSysTime, 10 / portTICK_RATE_MS);

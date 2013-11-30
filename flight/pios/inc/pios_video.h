@@ -36,7 +36,9 @@
 #include <pios_spi_priv.h>
 
 struct pios_video_cfg {
+    DMA_TypeDef *mask_dma;
     const struct pios_spi_cfg  mask;
+    DMA_TypeDef *level_dma;
     const struct pios_spi_cfg  level;
 
     const struct pios_exti_cfg *hsync;
@@ -57,46 +59,36 @@ typedef struct {
 
 extern TTime timex;
 
+extern bool PIOS_Vsync_ISR();
+extern bool PIOS_Hsync_ISR();
 extern void PIOS_Video_Init(const struct pios_video_cfg *cfg);
 uint16_t PIOS_Video_GetOSDLines(void);
-extern bool PIOS_Hsync_ISR();
-extern bool PIOS_Vsync_ISR();
 
-// First OSD line
-#define GRAPHICS_LINE      25
-
-// top/left deadband
-#define GRAPHICS_HDEADBAND 80
-#define GRAPHICS_VDEADBAND 0
 
 #define PAL
 
-// Real OSD size
+// OSD values
 #ifdef PAL
-// #define GRAPHICS_WIDTH_REAL (352+GRAPHICS_HDEADBAND)
-#define GRAPHICS_WIDTH_REAL   416
- #define GRAPHICS_HEIGHT_REAL (270 + GRAPHICS_VDEADBAND)
+#define GRAPHICS_COLUMN			70			// First visible OSD column (after Hsync)
+#define GRAPHICS_LINE			17			// First visible OSD line
+#define GRAPHICS_WIDTH_REAL		400			// Real visible columns
+#define GRAPHICS_HEIGHT_REAL	288			// Real visible lines
 #else
- #define GRAPHICS_WIDTH_REAL  (312 + GRAPHICS_HDEADBAND)
- #define GRAPHICS_HEIGHT_REAL (225 + GRAPHICS_VDEADBAND)
+#define GRAPHICS_COLUMN			60			// First visible OSD column (after Hsync)
+#define GRAPHICS_LINE			13			// First visible OSD line
+#define GRAPHICS_WIDTH_REAL		368			// Real visible columns
+#define GRAPHICS_HEIGHT_REAL	241			// Real visible lines
 #endif
 
 // draw area
-#define GRAPHICS_TOP          0
-#define GRAPHICS_LEFT         0
-#define GRAPHICS_BOTTOM       (GRAPHICS_HEIGHT_REAL - GRAPHICS_VDEADBAND - 1)
-#define GRAPHICS_RIGHT        (GRAPHICS_WIDTH_REAL - GRAPHICS_HDEADBAND - 1)
+#define GRAPHICS_TOP			0
+#define GRAPHICS_LEFT			0
+#define GRAPHICS_BOTTOM			(GRAPHICS_HEIGHT_REAL - 1)
+#define GRAPHICS_RIGHT			(GRAPHICS_WIDTH_REAL - 1)
 
-
-#define GRAPHICS_WIDTH        (GRAPHICS_WIDTH_REAL / 8)
-#define GRAPHICS_HEIGHT       GRAPHICS_HEIGHT_REAL
-
-// dma lenght
-#define BUFFER_LINE_LENGTH    (GRAPHICS_WIDTH)  // Yes, in bytes.
-
-// line types
-#define LINE_TYPE_UNKNOWN     0
-#define LINE_TYPE_GRAPHICS    2
+// draw and DMA/SPI buffer values
+#define BUFFER_WIDTH			(GRAPHICS_WIDTH_REAL / 8 + 1)	// Bytes plus one byte for SPI
+#define BUFFER_HEIGHT			(GRAPHICS_HEIGHT_REAL)
 
 // Macro to swap buffers given a temporary pointer.
 #define SWAP_BUFFS(tmp, a, b) { tmp = a; a = b; b = tmp; }

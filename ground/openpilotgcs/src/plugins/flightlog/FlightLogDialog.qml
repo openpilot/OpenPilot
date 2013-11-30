@@ -146,7 +146,7 @@ Rectangle {
             height: 40
             Button {
                 id: exportButton
-                enabled: !logManager.disableControls
+                enabled: !logManager.disableControls && !logManager.disableExport
                 text: qsTr("Export...")
                 activeFocusOnPress: true
                 onClicked: logManager.exportLogs()
@@ -162,9 +162,17 @@ Rectangle {
                 Layout.fillWidth: true
             }
             Button {
+                id: cancelButton
+                enabled: logManager.disableControls
+                text: qsTr("Cancel")
+                activeFocusOnPress: true
+                onClicked: logManager.cancelExportLogs()
+            }
+            Button {
                 id: okButton
                 enabled: !logManager.disableControls
                 text: qsTr("OK")
+                isDefault: true
                 activeFocusOnPress: true
                 onClicked: dialog.close()
             }

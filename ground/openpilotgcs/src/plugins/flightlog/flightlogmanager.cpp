@@ -37,7 +37,7 @@
 #include "utils/logfile.h"
 
 FlightLogManager::FlightLogManager(QObject *parent) :
-    QObject(parent), m_disableControls(false)
+    QObject(parent), m_disableControls(false), m_cancelDownload(false)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
@@ -121,6 +121,7 @@ void FlightLogManager::clearLogList()
     m_logEntries.clear();
 
     emit logEntriesChanged();
+    setDisableExport(true);
 
     while (!tmpList.isEmpty()) {
         delete tmpList.takeFirst();
@@ -131,7 +132,7 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
 {
     setDisableControls(true);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-
+    m_cancelDownload = false;
     UAVObjectUpdaterHelper updateHelper;
     UAVObjectRequestHelper requestHelper;
 
@@ -169,16 +170,30 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
                 // We failed for some reason
                 break;
             }
+            if (m_cancelDownload) {
+                break;
+            }
+        }
+        if (m_cancelDownload) {
+            break;
         }
     }
+
+    if (m_cancelDownload) {
+        clearLogList();
+        m_cancelDownload = false;
+    }
+
     emit logEntriesChanged();
+    setDisableExport(m_logEntries.count() == 0);
+
     QApplication::restoreOverrideCursor();
     setDisableControls(false);
 }
 
 void FlightLogManager::exportLogs()
 {
-    if(m_flightEntries.isEmpty()) {
+    if(m_logEntries.isEmpty()) {
         return;
     }
 
@@ -229,6 +244,11 @@ void FlightLogManager::exportLogs()
 
     QApplication::restoreOverrideCursor();
     setDisableControls(false);
+}
+
+void FlightLogManager::cancelExportLogs()
+{
+    m_cancelDownload = true;
 }
 
 void FlightLogManager::updateFlightEntries(quint16 currentFlight)

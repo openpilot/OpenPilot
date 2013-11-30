@@ -37,7 +37,7 @@
 #include "utils/logfile.h"
 
 FlightLogManager::FlightLogManager(QObject *parent) :
-    QObject(parent), m_disableControls(false), m_cancelDownload(false)
+    QObject(parent), m_disableControls(false), m_cancelDownload(false), m_disableExport(true)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 

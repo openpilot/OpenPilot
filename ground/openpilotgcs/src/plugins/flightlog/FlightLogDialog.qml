@@ -14,7 +14,6 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: 10
         spacing: 10
-
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true

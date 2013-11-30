@@ -91,23 +91,29 @@ static void StatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 static void FlightStatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     FlightStatusGet(&flightstatus);
-    switch (settings.LoggingEnabled) {
-    case DEBUGLOGSETTINGS_LOGGINGENABLED_ALWAYS:
-        PIOS_DEBUGLOG_Enable(1);
-        break;
-    case DEBUGLOGSETTINGS_LOGGINGENABLED_ONLYWHENARMED:
-        PIOS_DEBUGLOG_Enable(flightstatus.Armed == FLIGHTSTATUS_ARMED_ARMED);
-        break;
-    default:
-        PIOS_DEBUGLOG_Enable(0);
+    if (settings.LoggingEnabled == DEBUGLOGSETTINGS_LOGGINGENABLED_ONLYWHENARMED) {
+        if (flightstatus.Armed != FLIGHTSTATUS_ARMED_ARMED) {
+            PIOS_DEBUGLOG_Printf("FlightStatus Disarmed: On board Logging disabled.");
+            PIOS_DEBUGLOG_Enable(0);
+        } else {
+            PIOS_DEBUGLOG_Enable(1);
+            PIOS_DEBUGLOG_Printf("FlightStatus Armed: On board logging enabled.");
+        }
     }
 }
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     DebugLogSettingsGet(&settings);
-    FlightStatusUpdatedCb(NULL);
-    PIOS_DEBUGLOG_Printf("On board logging enabled.");
+    if (settings.LoggingEnabled == DEBUGLOGSETTINGS_LOGGINGENABLED_ALWAYS) {
+        PIOS_DEBUGLOG_Enable(1);
+        PIOS_DEBUGLOG_Printf("On board logging enabled.");
+    } else if (settings.LoggingEnabled == DEBUGLOGSETTINGS_LOGGINGENABLED_DISABLED) {
+        PIOS_DEBUGLOG_Printf("On board logging disabled.");
+        PIOS_DEBUGLOG_Enable(0);
+    } else {
+        FlightStatusUpdatedCb(NULL);
+    }
 }
 
 static void ControlUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)

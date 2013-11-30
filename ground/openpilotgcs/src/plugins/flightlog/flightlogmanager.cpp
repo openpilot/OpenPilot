@@ -178,27 +178,53 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
 
 void FlightLogManager::exportLogs()
 {
+    if(m_flightEntries.isEmpty()) {
+        return;
+    }
+
     setDisableControls(true);
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log"),
                                                     tr("OP-%0.opl").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
-                                                    tr("OpenPilot Log (*.opl)"));
+                                                    tr("OpenPilot Log (*.opl)"));    
     if (!fileName.isEmpty()) {
-        LogFile logFile;
-        logFile.useProvidedTimeStamp(true);
-        logFile.setFileName(fileName);
-        logFile.open(QIODevice::WriteOnly);
-        UAVTalk uavTalk(&logFile, m_objectManager);
+        // Loop and create a new file for each flight.
+        fileName = fileName.replace(QString(".opl"), QString("%1.opl"));
+        int currentEntry = 0;
+        int currentFlight = 0;
+        // Continue until all entries are exported
+        while(currentEntry < m_logEntries.count()) {
 
-        foreach (ExtendedDebugLogEntry* entry, m_logEntries) {
-            if (entry->getType() == ExtendedDebugLogEntry::TYPE_UAVOBJECT) {
-                logFile.setNextTimeStamp(entry->getFlightTime());
-                uavTalk.sendObject(entry->uavObject(), false, false);
+            // Get current flight
+            currentFlight = m_logEntries[currentEntry]->getFlight();
+
+            LogFile logFile;
+            logFile.useProvidedTimeStamp(true);
+
+            // Set the file name to contain flight number
+            logFile.setFileName(fileName.arg(tr("_flight-%1").arg(currentFlight + 1)));
+            logFile.open(QIODevice::WriteOnly);
+            UAVTalk uavTalk(&logFile, m_objectManager);
+
+            // Export entries until no more available or flight changes
+            while(currentEntry < m_logEntries.count() && m_logEntries[currentEntry]->getFlight() == currentFlight) {
+                ExtendedDebugLogEntry* entry = m_logEntries[currentEntry];
+
+                // Only log uavobjects
+                if (entry->getType() == ExtendedDebugLogEntry::TYPE_UAVOBJECT) {
+                    // Set timestamp that should be logged for this entry
+                    logFile.setNextTimeStamp(entry->getFlightTime());
+
+                    // Use UAVTalk to log complete message to file
+                    uavTalk.sendObject(entry->uavObject(), false, false);
+                }
+                currentEntry++;
             }
+
+            logFile.close();
         }
 
-        logFile.close();
     }
 
     QApplication::restoreOverrideCursor();

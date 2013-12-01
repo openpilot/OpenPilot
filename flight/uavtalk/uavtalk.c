@@ -301,7 +301,9 @@ static int32_t objectTransaction(UAVTalkConnectionData *connection, uint8_t type
         if (respReceived == pdFALSE) {
             // Cancel transaction
             xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
-            xSemaphoreTake(connection->respSema, 0); // non blocking call to make sure the value is reset to zero (binary sema)
+            // non blocking call to make sure the value is reset to zero (binary sema)
+            xSemaphoreTake(connection->respSema, 0);
+            connection->respObjId = 0;
             xSemaphoreGiveRecursive(connection->lock);
             xSemaphoreGiveRecursive(connection->transLock);
             return -1;
@@ -814,8 +816,9 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
  */
 static void updateAck(UAVTalkConnectionData *connection, uint8_t type, uint32_t objId, uint16_t instId)
 {
-    if (connection->respType == type && connection->respObjId == objId && (connection->respInstId == instId || connection->respInstId == UAVOBJ_ALL_INSTANCES)) {
+    if ((connection->respType == type) && (connection->respObjId == objId) && ((connection->respInstId == instId) || (connection->respInstId == UAVOBJ_ALL_INSTANCES))) {
         xSemaphoreGive(connection->respSema);
+        connection->respObjId = 0;
     }
 }
 

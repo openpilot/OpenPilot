@@ -37,7 +37,9 @@
 #include "utils/logfile.h"
 
 FlightLogManager::FlightLogManager(QObject *parent) :
-    QObject(parent), m_disableControls(false), m_cancelDownload(false), m_disableExport(true)
+    QObject(parent), m_disableControls(false),
+    m_disableExport(true), m_cancelDownload(false),
+    m_adjustExportedTimestamps(true)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
@@ -208,8 +210,13 @@ void FlightLogManager::exportLogs()
         fileName = fileName.replace(QString(".opl"), QString("%1.opl"));
         int currentEntry = 0;
         int currentFlight = 0;
+        quint32 adjustedBaseTime = 0;
         // Continue until all entries are exported
         while(currentEntry < m_logEntries.count()) {
+
+            if (m_adjustExportedTimestamps) {
+                adjustedBaseTime = m_logEntries[currentEntry]->getFlightTime();
+            }
 
             // Get current flight
             currentFlight = m_logEntries[currentEntry]->getFlight();
@@ -229,10 +236,11 @@ void FlightLogManager::exportLogs()
                 // Only log uavobjects
                 if (entry->getType() == ExtendedDebugLogEntry::TYPE_UAVOBJECT) {
                     // Set timestamp that should be logged for this entry
-                    logFile.setNextTimeStamp(entry->getFlightTime());
+                    logFile.setNextTimeStamp(entry->getFlightTime() - adjustedBaseTime);
 
                     // Use UAVTalk to log complete message to file
                     uavTalk.sendObject(entry->uavObject(), false, false);
+                    qDebug() << entry->getFlightTime() - adjustedBaseTime << "=" << entry->toStringBrief();
                 }
                 currentEntry++;
             }

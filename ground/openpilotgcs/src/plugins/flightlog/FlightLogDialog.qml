@@ -150,6 +150,15 @@ Rectangle {
                 activeFocusOnPress: true
                 onClicked: logManager.exportLogs()
             }
+            CheckBox {
+                id: exportRelativeTimeCB
+                enabled: !logManager.disableControls && !logManager.disableExport
+                text: qsTr("Adjust timestamps")
+                activeFocusOnPress: true
+                checked: logManager.adjustExportedTimestamps
+                onCheckedChanged: logManager.setAdjustExportedTimestamps(checked)
+            }
+
             Button {
                 id: clearButton
                 enabled: !logManager.disableControls

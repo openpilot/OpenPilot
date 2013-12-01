@@ -72,6 +72,7 @@ class FlightLogManager : public QObject {
     Q_PROPERTY(QStringList flightEntries READ flightEntries NOTIFY flightEntriesChanged)
     Q_PROPERTY(bool disableControls READ disableControls WRITE setDisableControls NOTIFY disableControlsChanged)
     Q_PROPERTY(bool disableExport READ disableExport WRITE setDisableExport NOTIFY disableExportChanged)
+    Q_PROPERTY(bool adjustExportedTimestamps READ adjustExportedTimestamps WRITE setAdjustExportedTimestamps NOTIFY adjustExportedTimestampsChanged)
 
 public:
     explicit FlightLogManager(QObject *parent = 0);
@@ -97,11 +98,18 @@ public:
 
     void clearLogList();
 
+    bool adjustExportedTimestamps() const
+    {
+        return m_adjustExportedTimestamps;
+    }
+
 signals:
     void logEntriesChanged();
     void flightEntriesChanged();
     void disableControlsChanged(bool arg);
     void disableExportChanged(bool arg);
+
+    void adjustExportedTimestampsChanged(bool arg);
 
 public slots:
     void clearAllLogs();
@@ -125,6 +133,14 @@ public slots:
         }
     }
 
+    void setAdjustExportedTimestamps(bool arg)
+    {
+        if (m_adjustExportedTimestamps != arg) {
+            m_adjustExportedTimestamps = arg;
+            emit adjustExportedTimestampsChanged(arg);
+        }
+    }
+
 private slots:
     void updateFlightEntries(quint16 currentFlight);
 
@@ -140,6 +156,7 @@ private:
     bool m_disableControls;
     bool m_disableExport;
     bool m_cancelDownload;
+    bool m_adjustExportedTimestamps;
 };
 
 #endif // FLIGHTLOGMANAGER_H

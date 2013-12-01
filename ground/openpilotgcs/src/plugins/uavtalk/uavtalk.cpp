@@ -126,8 +126,11 @@ void UAVTalk::processInputStream()
 
     if (io && io->isReadable()) {
         while (io->bytesAvailable() > 0) {
+    qDebug() << "io has " <<io->bytesAvailable() << "bytes available\n";
             io->read((char *)&tmp, 1);
-            processInputByte(tmp);
+            qDebug() << "processing byte " << tmp << "\n";
+    qDebug() << "io has now " <<io->bytesAvailable() << "bytes left\n";
+	    processInputByte(tmp);
         }
     }
 }
@@ -244,7 +247,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
     case STATE_SYNC:
 
         if (rxbyte != SYNC_VAL) {
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: Sync->Sync (" + QString::number(rxbyte) + " " + QString("0x%1").arg(rxbyte, 2, 16) + ")");
+            qDebug() << "UAVTalk: Sync->Sync (" + QString::number(rxbyte) + " " + QString("0x%1").arg(rxbyte, 2, 16) + ")" << "\n";
             break;
         }
 
@@ -259,7 +262,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         }
 
         rxState = STATE_TYPE;
-        UAVTALK_QXTLOG_DEBUG("UAVTalk: Sync->Type");
+        qDebug() << "UAVTalk: Sync->Type" << "\n";
         break;
 
     case STATE_TYPE:
@@ -269,7 +272,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         if ((rxbyte & TYPE_MASK) != TYPE_VER) {
             rxState = STATE_SYNC;
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: Type->Sync");
+            qDebug() << "UAVTalk: Type->Sync" << "\n";
             break;
         }
 
@@ -278,7 +281,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         packetSize = 0;
 
         rxState    = STATE_SIZE;
-        UAVTALK_QXTLOG_DEBUG("UAVTalk: Type->Size");
+        qDebug() << "UAVTalk: Type->Size" << "\n";
         rxCount    = 0;
         break;
 
@@ -290,7 +293,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         if (rxCount == 0) {
             packetSize += rxbyte;
             rxCount++;
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: Size->Size");
+            qDebug() << "UAVTalk: Size->Size" << "\n";
             break;
         }
 
@@ -298,13 +301,13 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         if (packetSize < MIN_HEADER_LENGTH || packetSize > MAX_HEADER_LENGTH + MAX_PAYLOAD_LENGTH) { // incorrect packet size
             rxState = STATE_SYNC;
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: Size->Sync");
+            qDebug() << "UAVTalk: Size->Sync" << "\n";
             break;
         }
 
         rxCount = 0;
         rxState = STATE_OBJID;
-        UAVTALK_QXTLOG_DEBUG("UAVTalk: Size->ObjID");
+        qDebug() << "UAVTalk: Size->ObjID" << "\n";
         break;
 
     case STATE_OBJID:
@@ -314,7 +317,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         rxTmpBuffer[rxCount++] = rxbyte;
         if (rxCount < 4) {
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: ObjID->ObjID");
+            qDebug() << "UAVTalk: ObjID->ObjID" << "\n";
             break;
         }
 
@@ -325,7 +328,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             if (rxObj == NULL && rxType != TYPE_OBJ_REQ) {
                 stats.rxErrors++;
                 rxState = STATE_SYNC;
-                UAVTALK_QXTLOG_DEBUG("UAVTalk: ObjID->Sync (badtype)");
+                qDebug() << "UAVTalk: ObjID->Sync (badtype)" << "\n";
                 break;
             }
 
@@ -342,7 +345,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             if (rxLength >= MAX_PAYLOAD_LENGTH) {
                 stats.rxErrors++;
                 rxState = STATE_SYNC;
-                UAVTALK_QXTLOG_DEBUG("UAVTalk: ObjID->Sync (oversize)");
+                qDebug() << "UAVTalk: ObjID->Sync (oversize)" << "\n";
                 break;
             }
 
@@ -350,7 +353,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             if ((rxPacketLength + rxInstanceLength + rxLength) != packetSize) { // packet error - mismatched packet size
                 stats.rxErrors++;
                 rxState = STATE_SYNC;
-                UAVTALK_QXTLOG_DEBUG("UAVTalk: ObjID->Sync (length mismatch)");
+                qDebug() << "UAVTalk: ObjID->Sync (length mismatch)" << "\n";
                 break;
             }
 
@@ -359,23 +362,23 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 // This is a non-existing object, just skip to checksum
                 // and we'll send a NACK next.
                 rxState  = STATE_CS;
-                UAVTALK_QXTLOG_DEBUG("UAVTalk: ObjID->CSum (no obj)");
+                qDebug() << "UAVTalk: ObjID->CSum (no obj)" << "\n";
                 rxInstId = 0;
                 rxCount  = 0;
             } else if (rxObj->isSingleInstance()) {
                 // If there is a payload get it, otherwise receive checksum
                 if (rxLength > 0) {
                     rxState = STATE_DATA;
-                    UAVTALK_QXTLOG_DEBUG("UAVTalk: ObjID->Data (needs data)");
+                    qDebug() << "UAVTalk: ObjID->Data (needs data)" << "\n";
                 } else {
                     rxState = STATE_CS;
-                    UAVTALK_QXTLOG_DEBUG("UAVTalk: ObjID->Checksum");
+                    qDebug() << "UAVTalk: ObjID->Checksum" << "\n";
                 }
                 rxInstId = 0;
                 rxCount  = 0;
             } else {
                 rxState = STATE_INSTID;
-                UAVTALK_QXTLOG_DEBUG("UAVTalk: ObjID->InstID");
+                qDebug() << "UAVTalk: ObjID->InstID" << "\n";
                 rxCount = 0;
             }
         }
@@ -389,7 +392,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         rxTmpBuffer[rxCount++] = rxbyte;
         if (rxCount < 2) {
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: InstID->InstID");
+            qDebug() << "UAVTalk: InstID->InstID" << "\n";
             break;
         }
 
@@ -400,10 +403,10 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         // If there is a payload get it, otherwise receive checksum
         if (rxLength > 0) {
             rxState = STATE_DATA;
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: InstID->Data");
+            qDebug() << "UAVTalk: InstID->Data" << "\n";
         } else {
             rxState = STATE_CS;
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: InstID->CSum");
+            qDebug() << "UAVTalk: InstID->CSum" << "\n";
         }
         break;
 
@@ -414,12 +417,12 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         rxBuffer[rxCount++] = rxbyte;
         if (rxCount < rxLength) {
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: Data->Data");
+            qDebug() << "UAVTalk: Data->Data" << "\n";
             break;
         }
 
         rxState = STATE_CS;
-        UAVTALK_QXTLOG_DEBUG("UAVTalk: Data->CSum");
+        qDebug() << "UAVTalk: Data->CSum" << "\n";
         rxCount = 0;
         break;
 
@@ -431,17 +434,17 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         if (rxCS != rxCSPacket) { // packet error - faulty CRC
             stats.rxErrors++;
             rxState = STATE_SYNC;
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: CSum->Sync (badcrc)");
+            qDebug() << "UAVTalk: CSum->Sync (badcrc)" << "\n";
             break;
         }
 
         if (rxPacketLength != packetSize + 1) { // packet error - mismatched packet size
             stats.rxErrors++;
             rxState = STATE_SYNC;
-            UAVTALK_QXTLOG_DEBUG("UAVTalk: CSum->Sync (length mismatch)");
+            qDebug() << "UAVTalk: CSum->Sync (length mismatch)" << "\n";
             break;
         }
-
+qDebug() << "succesfully received packet " << rxType << " object id " << rxObjId << "\n";
         mutex->lock();
         receiveObject(rxType, rxObjId, rxInstId, rxBuffer, rxLength);
         if (useUDPMirror) {
@@ -452,13 +455,13 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         mutex->unlock();
 
         rxState = STATE_SYNC;
-        UAVTALK_QXTLOG_DEBUG("UAVTalk: CSum->Sync (OK)");
+        qDebug() << "UAVTalk: CSum->Sync (OK)" << "\n";
         break;
 
     default:
         rxState = STATE_SYNC;
         stats.rxErrors++;
-        UAVTALK_QXTLOG_DEBUG("UAVTalk: \?\?\?->Sync"); // Use the escape character for '?' so that the tripgraph isn't triggered.
+        qDebug() << "UAVTalk: \?\?\?->Sync" << "\n"; // Use the escape character for '?' so that the tripgraph isn't triggered.
     }
 
     // Done
@@ -572,7 +575,7 @@ UAVObject *UAVTalk::updateObject(quint32 objId, quint16 instId, quint8 *data)
 {
     // Get object
     UAVObject *obj = objMngr->getObject(objId, instId);
-
+qDebug() << "updating object " << obj <<"\n";
     // If the instance does not exist create it
     if (obj == NULL) {
         // Get the object type

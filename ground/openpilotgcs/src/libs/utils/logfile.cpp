@@ -82,16 +82,20 @@ qint64 LogFile::writeData(const char *data, qint64 dataSize)
 qint64 LogFile::readData(char *data, qint64 maxSize)
 {
     QMutexLocker locker(&m_mutex);
+    qDebug() << "maxSize is " <<maxSize << "bytes...";
     qint64 toRead = qMin(maxSize, (qint64)m_dataBuffer.size());
 
     memcpy(data, m_dataBuffer.data(), toRead);
+    qDebug() << "reading " <<toRead << "bytes...";
+    qDebug() << "oldbuffer size: " << m_dataBuffer.size() << "/" << this->bytesAvailable();
     m_dataBuffer.remove(0, toRead);
+    qDebug() << "newbuffer size: " << m_dataBuffer.size() << "/" << this->bytesAvailable();
     return toRead;
 }
 
 qint64 LogFile::bytesAvailable() const
 {
-    return m_dataBuffer.size();
+    return m_dataBuffer.size() + QIODevice::bytesAvailable();
 }
 
 void LogFile::timerFired()
@@ -111,6 +115,7 @@ void LogFile::timerFired()
             }
 
             m_file.read((char *)&dataSize, sizeof(dataSize));
+	    qDebug() << "Logfile ... read packet of  ..." << dataSize <<"bytes.\n";
 
             if (dataSize < 1 || dataSize > (1024 * 1024)) {
                 qDebug() << "Error: Logfile corrupted! Unlikely packet size: " << dataSize << "\n";
@@ -143,6 +148,7 @@ void LogFile::timerFired()
                 stopReplay();
                 return;
             }
+	    qDebug() << "Logfile ... sleeping until ..." << m_lastTimeStamp <<"\n";
 
             m_timeOffset = time;
             time = m_myTime.elapsed();
@@ -159,6 +165,7 @@ bool LogFile::startReplay()
     m_timeOffset = 0;
     m_lastPlayed = 0;
     m_file.read((char *)&m_lastTimeStamp, sizeof(m_lastTimeStamp));
+	    qDebug() << "Logfile INITIAL START::: ... sleeping until ..." << m_lastTimeStamp <<"\n";
     m_timer.setInterval(10);
     m_timer.start();
     emit replayStarted();

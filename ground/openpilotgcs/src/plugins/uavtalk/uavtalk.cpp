@@ -37,7 +37,7 @@
   #define UAVTALK_QXTLOG_DEBUG(args ...)
 #endif // UAVTALK_DEBUG
 
-//#define VERBOSE_FILTER(objId) if (objId == 0xD23852DC)
+#define VERBOSE_FILTER(objId) //if (objId == 0xD23852DC)
 
 #define SYNC_VAL 0x3C
 

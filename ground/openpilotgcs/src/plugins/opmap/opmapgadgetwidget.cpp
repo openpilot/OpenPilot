@@ -226,8 +226,10 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     table->setModel(model, selectionModel);
     waypoint_edit_dialog = new opmap_edit_waypoint_dialog(this, model, selectionModel);
     UAVProxy = new ModelUavoProxy(this, model);
-    connect(table, SIGNAL(sendPathPlanToUAV()), UAVProxy, SLOT(modelToObjects()));
-    connect(table, SIGNAL(receivePathPlanFromUAV()), UAVProxy, SLOT(objectsToModel()));
+    // sending and receiving is asynchronous
+    // TODO : buttons should be disabled while a send or receive is in progress
+    connect(table, SIGNAL(sendPathPlanToUAV()), UAVProxy, SLOT(sendFlightPlan()));
+    connect(table, SIGNAL(receivePathPlanFromUAV()), UAVProxy, SLOT(receiveFlightPlan()));
 #endif
     magicWayPoint = m_map->magicWPCreate();
     magicWayPoint->setVisible(false);

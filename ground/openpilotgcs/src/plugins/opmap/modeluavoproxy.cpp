@@ -31,14 +31,83 @@
 ModelUavoProxy::ModelUavoProxy(QObject *parent, flightDataModel *model) : QObject(parent), myModel(model)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-
     Q_ASSERT(pm != NULL);
+
     objManager    = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objManager != NULL);
-    waypointObj   = Waypoint::GetInstance(objManager);
-    Q_ASSERT(waypointObj != NULL);
-    pathactionObj = PathAction::GetInstance(objManager);
-    Q_ASSERT(pathactionObj != NULL);
+}
+
+void ModelUavoProxy::sendFlightPlan()
+{
+    modelToObjects();
+
+    Waypoint *waypoint = Waypoint::GetInstance(objManager, 0);
+    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanSent(UAVObject *, bool)));
+
+    PathAction *action = PathAction::GetInstance(objManager, 0);
+    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanSent(UAVObject *, bool)));
+
+    completionCount = 0;
+    completionSuccessCount = 0;
+
+    waypoint->updatedAll();
+    action->updatedAll();
+}
+
+void ModelUavoProxy::flightPlanSent(UAVObject *obj, bool success)
+{
+    obj->disconnect(this);
+
+    completionCount++;
+    if (success) {
+        completionSuccessCount++;
+    }
+
+    if (completionCount == 2) {
+        qDebug() << "ModelUavoProxy::flightPlanSent - success" << (completionSuccessCount == 2);
+        if (completionSuccessCount == 2) {
+            // TODO : popup?
+        }
+        else {
+            // TODO : popup?
+        }
+    }
+}
+
+void ModelUavoProxy::receiveFlightPlan()
+{
+    Waypoint *waypoint = Waypoint::GetInstance(objManager, 0);
+    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanReceived(UAVObject *, bool)));
+
+    PathAction *action = PathAction::GetInstance(objManager, 0);
+    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanReceived(UAVObject *, bool)));
+
+    completionCount = 0;
+    completionSuccessCount = 0;
+
+    waypoint->requestUpdateAll();
+    action->requestUpdateAll();
+}
+
+void ModelUavoProxy::flightPlanReceived(UAVObject *obj, bool success)
+{
+    obj->disconnect(this);
+
+    completionCount++;
+    if (success) {
+        completionSuccessCount++;
+    }
+
+    if (completionCount == 2) {
+        qDebug() << "ModelUavoProxy::flightPlanReceived - success" << (completionSuccessCount == 2);
+        if (completionSuccessCount == 2) {
+            objectsToModel();
+            // TODO : popup?
+        }
+        else {
+            // TODO : popup?
+        }
+    }
 }
 
 void ModelUavoProxy::modelToObjects()
@@ -80,10 +149,8 @@ void ModelUavoProxy::modelToObjects()
             action = createPathAction(actionCount, action);
             actionCount++;
 
-            // send action update to UAV
+            // update UAVObject
             action->setData(actionData);
-            action->updated();
-            qDebug() << "ModelUAVProxy::modelToObjects - sent action instance :" << action->getInstID();
         }
         else {
             action->deleteLater();
@@ -104,16 +171,14 @@ void ModelUavoProxy::modelToObjects()
         // connect waypoint to path action
         waypointData.Action = action->getInstID();
 
-        // send waypoint update to UAV
+        // update UAVObject
         waypoint->setData(waypointData);
-        waypoint->updated();
-        qDebug() << "ModelUAVProxy::modelToObjects - sent waypoint instance :" << waypoint->getInstID();
     }
 }
 
 Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
     Waypoint *waypoint = NULL;
-    int count = objManager->getNumInstances(waypointObj->getObjID());
+    int count = objManager->getNumInstances(Waypoint::OBJID);
     if (index < count) {
         // reuse object
         qDebug() << "ModelUAVProxy::createWaypoint - reused waypoint instance :" << index << "/" << count;
@@ -138,7 +203,7 @@ Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
 
 PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
     PathAction *action = NULL;
-    int count = objManager->getNumInstances(pathactionObj->getObjID());
+    int count = objManager->getNumInstances(PathAction::OBJID);
     if (index < count) {
         // reuse object
         qDebug() << "ModelUAVProxy::createPathAction - reused action instance :" << index << "/" << count;
@@ -162,7 +227,7 @@ PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
 }
 
 PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields &actionData, int actionCount) {
-    int instancesCount = objManager->getNumInstances(pathactionObj->getObjID());
+    int instancesCount = objManager->getNumInstances(PathAction::OBJID);
     int count = actionCount <= instancesCount ? actionCount : instancesCount;
     for (int i = 0; i < count; ++i) {
         PathAction *action = PathAction::GetInstance(objManager, i);
@@ -189,21 +254,29 @@ PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields &actionD
 
 void ModelUavoProxy::objectsToModel()
 {
-    myModel->removeRows(0, myModel->rowCount());
+    int instanceCount = objManager->getNumInstances(Waypoint::OBJID);
+    // TODO retain only reachable waypoints
 
-    int instanceCount = objManager->getNumInstances(waypointObj->getObjID());
+    int rowCount = myModel->rowCount();
+    if (instanceCount < rowCount) {
+        myModel->removeRows(instanceCount, rowCount - instanceCount);
+    }
+    else if (instanceCount > rowCount) {
+        myModel->insertRows(rowCount, instanceCount - rowCount);
+    }
+
     for (int i = 0; i < instanceCount; ++i) {
         Waypoint *waypoint = Waypoint::GetInstance(objManager, i);
         Q_ASSERT(waypoint);
         if (!waypoint) {
             continue;
         }
-        myModel->insertRow(i);
 
         Waypoint::DataFields waypointData = waypoint->getData();
         waypointToModel(i, waypointData);
 
-        PathAction *action = PathAction::GetInstance(objManager, waypointData.Action);
+        int actionId = waypointData.Action;
+        PathAction *action = PathAction::GetInstance(objManager, actionId);
         Q_ASSERT(action);
         if (!action) {
             continue;
@@ -226,8 +299,8 @@ void ModelUavoProxy::modelToWaypoint(int i, Waypoint::DataFields &data) {
     index    = myModel->index(i, flightDataModel::VELOCITY);
     velocity = myModel->data(index).toFloat();
 
-    data.Position[Waypoint::POSITION_NORTH] = distance * cos(bearing / (180 * M_PI));
-    data.Position[Waypoint::POSITION_EAST]  = distance * sin(bearing / (180 * M_PI));
+    data.Position[Waypoint::POSITION_NORTH] = distance * cos(bearing / 180 * M_PI);
+    data.Position[Waypoint::POSITION_EAST]  = distance * sin(bearing / 180 * M_PI);
     data.Position[Waypoint::POSITION_DOWN]  = -altitude;
     data.Velocity = velocity;
 }
@@ -237,7 +310,7 @@ void ModelUavoProxy::waypointToModel(int i, Waypoint::DataFields &data) {
     double distance = sqrt(data.Position[Waypoint::POSITION_NORTH] * data.Position[Waypoint::POSITION_NORTH] +
                     data.Position[Waypoint::POSITION_EAST] * data.Position[Waypoint::POSITION_EAST]);
 
-    double bearing  = atan2(data.Position[Waypoint::POSITION_EAST], data.Position[Waypoint::POSITION_NORTH]) * (180 / M_PI);
+    double bearing  = atan2(data.Position[Waypoint::POSITION_EAST], data.Position[Waypoint::POSITION_NORTH]) * 180 / M_PI;
     if (bearing != bearing) {
         bearing = 0;
     }

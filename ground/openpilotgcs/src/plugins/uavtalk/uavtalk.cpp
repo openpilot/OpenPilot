@@ -29,12 +29,15 @@
 #include <QDebug>
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
+
 // #define UAVTALK_DEBUG
 #ifdef UAVTALK_DEBUG
   #define UAVTALK_QXTLOG_DEBUG(args ...)
 #else // UAVTALK_DEBUG
   #define UAVTALK_QXTLOG_DEBUG(args ...)
 #endif // UAVTALK_DEBUG
+
+//#define VERBOSE_FILTER(objId) if (objId == 0xD23852DC)
 
 #define SYNC_VAL 0x3C
 
@@ -205,7 +208,6 @@ void UAVTalk::cancelTransaction(UAVObject *obj)
     Transaction *trans = findTransaction(obj->getObjID(), obj->getInstID());
     if (trans != NULL) {
         closeTransaction(trans);
-        delete trans;
     }
 }
 
@@ -226,11 +228,7 @@ bool UAVTalk::objectTransaction(quint8 type, quint32 objId, quint16 instId, UAVO
     // transactions of TYPE_OBJ_REQ are acked by the response
     if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ) {
         if (transmitObject(type, objId, instId, obj)) {
-            Transaction *trans = new Transaction();
-            trans->respType = (type == TYPE_OBJ_REQ) ? TYPE_OBJ : TYPE_ACK;
-            trans->respObjId = objId;
-            trans->respInstId = instId;
-            startTransaction(trans);
+            openTransaction(type, objId, instId);
             return true;
         } else {
             return false;
@@ -507,7 +505,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
             // Get object and update its data
             obj = updateObject(objId, instId, data);
 #ifdef VERBOSE_UAVTALK
-            qDebug() << "UAVTalk - received object" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
+            VERBOSE_FILTER(objId) qDebug() << "UAVTalk - received object" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
 #endif
             if (obj != NULL) {
                 // Check if this object acks a pending OBJ_REQ message
@@ -521,13 +519,14 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
             error = true;
         }
         break;
+
     case TYPE_OBJ_ACK:
         // All instances, not allowed for OBJ_ACK messages
         if (!allInstances) {
             // Get object and update its data
             obj = updateObject(objId, instId, data);
 #ifdef VERBOSE_UAVTALK
-            qDebug() << "UAVTalk - received object (acked)" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
+            VERBOSE_FILTER(objId) qDebug() << "UAVTalk - received object (acked)" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
 #endif
             if (obj != NULL) {
                 // Object updated or created, transmit ACK
@@ -543,6 +542,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
             transmitObject(TYPE_NACK, objId, instId, NULL);
         }
         break;
+
     case TYPE_OBJ_REQ:
         // Check if requested object exists
         if (allInstances) {
@@ -552,10 +552,11 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
             obj = objMngr->getObject(objId, instId);
         }
 #ifdef VERBOSE_UAVTALK
-        qDebug() << "UAVTalk - received object request" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
+        VERBOSE_FILTER(objId) qDebug() << "UAVTalk - received object request" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
 #endif
         if (obj != NULL) {
             // Object found, transmit it
+            // The sent object will ack the object request on the receiver side
             transmitObject(TYPE_OBJ, objId, instId, obj);
         } else {
             error = true;
@@ -565,29 +566,14 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
             transmitObject(TYPE_NACK, objId, instId, NULL);
         }
         break;
-    case TYPE_NACK:
-        // All instances, not allowed for NACK messages
-        if (!allInstances) {
-            // Get object
-            obj = objMngr->getObject(objId, instId);
-#ifdef VERBOSE_UAVTALK
-            qDebug() << "UAVTalk - received nack" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
-#endif
-            if (obj != NULL) {
-                // Check if a NACK is pending
-                updateNack(type, objId, instId, obj);
-            } else {
-                error = true;
-            }
-        }
-        break;
+
     case TYPE_ACK:
         // All instances, not allowed for ACK messages
         if (!allInstances) {
             // Get object
             obj = objMngr->getObject(objId, instId);
 #ifdef VERBOSE_UAVTALK
-            qDebug() << "UAVTalk - received ack" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
+            VERBOSE_FILTER(objId) qDebug() << "UAVTalk - received ack" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
 #endif
             if (obj != NULL) {
                 // Check if an ACK is pending
@@ -597,6 +583,24 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
             }
         }
         break;
+
+    case TYPE_NACK:
+        // All instances, not allowed for NACK messages
+        if (!allInstances) {
+            // Get object
+            obj = objMngr->getObject(objId, instId);
+#ifdef VERBOSE_UAVTALK
+            VERBOSE_FILTER(objId) qDebug() << "UAVTalk - received nack" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
+#endif
+            if (obj != NULL) {
+                // Check if a NACK is pending
+                updateNack(objId, instId, obj);
+            } else {
+                error = true;
+            }
+        }
+        break;
+
     default:
         error = true;
     }
@@ -620,43 +624,29 @@ UAVObject *UAVTalk::updateObject(quint32 objId, quint16 instId, quint8 *data)
     // If the instance does not exist create it
     if (obj == NULL) {
         // Get the object type
-        UAVObject *tobj = objMngr->getObject(objId);
-        if (tobj == NULL) {
+        UAVObject *typeObj = objMngr->getObject(objId);
+        if (typeObj == NULL) {
+            qWarning() << "UAVTalk - Failed to get object, object ID :" << objId;
             return NULL;
         }
         // Make sure this is a data object
-        UAVDataObject *dobj = dynamic_cast<UAVDataObject *>(tobj);
-        if (dobj == NULL) {
+        UAVDataObject *dataObj = dynamic_cast<UAVDataObject *>(typeObj);
+        if (dataObj == NULL) {
+            qWarning() << "UAVTalk - Object is not a data object, object ID :" << objId;
             return NULL;
         }
         // Create a new instance, unpack and register
-        UAVDataObject *instobj = dobj->clone(instId);
-        if (!objMngr->registerObject(instobj)) {
+        UAVDataObject *instObj = dataObj->clone(instId);
+        if (!objMngr->registerObject(instObj)) {
+            qWarning() << "UAVTalk - Failed to register object " << instObj->toStringBrief();
             return NULL;
         }
-        instobj->unpack(data);
-        return instobj;
+        instObj->unpack(data);
+        return instObj;
     } else {
         // Unpack data into object instance
         obj->unpack(data);
         return obj;
-    }
-}
-
-/**
- * Check if a transaction is pending and if yes complete it.
- */
-void UAVTalk::updateNack(quint8 type, quint32 objId, quint16 instId, UAVObject *obj)
-{
-    Q_ASSERT(obj);
-    if (!obj) {
-        return;
-    }
-    Transaction *trans = findTransaction(objId, instId);
-    if (trans) {
-        closeTransaction(trans);
-        delete trans;
-        emit transactionCompleted(obj, false);
     }
 }
 
@@ -671,9 +661,26 @@ void UAVTalk::updateAck(quint8 type, quint32 objId, quint16 instId, UAVObject *o
     }
     Transaction *trans = findTransaction(objId, instId);
     if (trans && trans->respType == type) {
+        if (trans->respInstId != ALL_INSTANCES || instId == 0) {
+            closeTransaction(trans);
+            emit transactionCompleted(obj, true);
+        }
+    }
+}
+
+/**
+ * Check if a transaction is pending and if yes complete it.
+ */
+void UAVTalk::updateNack(quint32 objId, quint16 instId, UAVObject *obj)
+{
+    Q_ASSERT(obj);
+    if (!obj) {
+        return;
+    }
+    Transaction *trans = findTransaction(objId, instId);
+    if (trans) {
         closeTransaction(trans);
-        delete trans;
-        emit transactionCompleted(obj, true);
+        emit transactionCompleted(obj, false);
     }
 }
 
@@ -700,10 +707,12 @@ bool UAVTalk::transmitObject(quint8 type, quint32 objId, quint16 instId, UAVObje
         if (allInstances) {
             // Get number of instances
             quint32 numInst = objMngr->getNumInstances(objId);
-            // Send all instances
+            // Send all instances in reverse order
+            // This allows the receiver to detect when the last object has been received (i.e. when instance 0 is received)
             for (quint32 n = 0; n < numInst; ++n) {
-                UAVObject *o = objMngr->getObject(objId, n);
-                transmitSingleObject(type, objId, n, o);
+                quint32 i = numInst - n - 1;
+                UAVObject *o = objMngr->getObject(objId, i);
+                transmitSingleObject(type, objId, i, o);
             }
             return true;
         } else {
@@ -736,7 +745,7 @@ bool UAVTalk::transmitSingleObject(quint8 type, quint32 objId, quint16 instId, U
     qint32 dataOffset;
 
 #ifdef VERBOSE_UAVTALK
-    qDebug() << "UAVTalk - transmitting object" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
+    VERBOSE_FILTER(objId) qDebug() << "UAVTalk - transmitting object" << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
 #endif
 
     // IMPORTANT : obj can be null (when type is NACK for example)
@@ -833,13 +842,23 @@ UAVTalk::Transaction *UAVTalk::findTransaction(quint32 objId, quint16 instId)
     // Lookup the transaction in the transaction map
     QMap<quint32, Transaction *> *objTransactions = transMap.value(objId);
     if (objTransactions != NULL) {
-        return objTransactions->value(instId);
+        Transaction *trans = objTransactions->value(instId);
+        if (trans == NULL) {
+            // see if there is an ALL_INSTANCES transaction
+            trans = objTransactions->value(ALL_INSTANCES);
+        }
+        return trans;
     }
     return NULL;
 }
 
-void UAVTalk::startTransaction(Transaction *trans)
+void UAVTalk::openTransaction(quint8 type, quint32 objId, quint16 instId)
 {
+    Transaction *trans = new Transaction();
+    trans->respType = (type == TYPE_OBJ_REQ) ? TYPE_OBJ : TYPE_ACK;
+    trans->respObjId = objId;
+    trans->respInstId = instId;
+
     QMap<quint32, Transaction *> *objTransactions = transMap.value(trans->respObjId);
     if (objTransactions == NULL) {
         objTransactions = new QMap<quint32, Transaction *>();
@@ -855,6 +874,7 @@ void UAVTalk::closeTransaction(Transaction *trans)
         objTransactions->remove(trans->respInstId);
         // Keep the map even if it is empty
         // There are at most 100 different object IDs...
+        delete trans;
     }
 }
 

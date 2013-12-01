@@ -41,6 +41,8 @@ class UAVTALK_EXPORT UAVTalk : public QObject {
     Q_OBJECT
 
 public:
+    static const quint16 ALL_INSTANCES  = 0xFFFF;
+
     typedef struct {
         quint32 txBytes;
         quint32 rxBytes;
@@ -93,8 +95,6 @@ private:
 
     static const int MAX_PACKET_LENGTH  = (MAX_HEADER_LENGTH + MAX_PAYLOAD_LENGTH + CHECKSUM_LENGTH);
 
-    static const quint16 ALL_INSTANCES  = 0xFFFF;
-
     static const quint8 INSTANCE_LENGTH = 2;
 
     static const int TX_BUFFER_SIZE     = 2 * 1024;
@@ -135,14 +135,14 @@ private:
     bool receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *data, qint32 length);
     UAVObject *updateObject(quint32 objId, quint16 instId, quint8 *data);
     void updateAck(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
-    void updateNack(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
+    void updateNack(quint32 objId, quint16 instId, UAVObject *obj);
     bool transmitObject(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
     bool transmitSingleObject(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
     quint8 updateCRC(quint8 crc, const quint8 data);
     quint8 updateCRC(quint8 crc, const quint8 *data, qint32 length);
 
     Transaction *findTransaction(quint32 objId, quint16 instId);
-    void startTransaction(Transaction *trans);
+    void openTransaction(quint8 type, quint32 objId, quint16 instId);
     void closeTransaction(Transaction *trans);
     void closeAllTransactions();
 };

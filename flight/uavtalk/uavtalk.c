@@ -340,8 +340,10 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
     }
 
     if (iproc->rxPacketLength < 0xffff) {
-        iproc->rxPacketLength++; // update packet byte count
+        // update packet byte count
+        iproc->rxPacketLength++;
     }
+
     // Receive state machine
     switch (iproc->state) {
     case UAVTALK_STATE_SYNC:
@@ -445,7 +447,6 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
         iproc->rxCount = 0;
         iproc->instId = 0;
         iproc->state = UAVTALK_STATE_INSTID;
-
         break;
 
     case UAVTALK_STATE_INSTID:
@@ -472,7 +473,6 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
         } else {
             iproc->state = UAVTALK_STATE_CS;
         }
-
         break;
 
     case UAVTALK_STATE_TIMESTAMP:
@@ -653,11 +653,14 @@ int32_t UAVTalkReceiveObject(UAVTalkConnection connectionHandle)
     UAVTalkConnectionData *connection;
 
     CHECKCONHANDLE(connectionHandle, connection, return -1);
+
     UAVTalkInputProcessor *iproc = &connection->iproc;
     if (iproc->state != UAVTALK_STATE_COMPLETE) {
         return -1;
     }
+
     receiveObject(connection, iproc->type, iproc->objId, iproc->instId, connection->rxBuffer, iproc->length);
+
     return 0;
 }
 
@@ -755,11 +758,12 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
             sendObject(connection, UAVTALK_TYPE_NACK, objId, instId, NULL);
         }
         break;
+
     case UAVTALK_TYPE_OBJ_REQ:
         // Check if requested object exists
         if (obj && ((instId == UAVOBJ_ALL_INSTANCES) || instId < UAVObjGetNumInstances(obj))) {
             // Object found, transmit it
-            // This OBJ message will also ack this request
+            // The sent object will ack the object request on the receiver side
             sendObject(connection, UAVTALK_TYPE_OBJ, objId, instId, obj);
         } else {
             ret = -1;
@@ -769,10 +773,18 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
             sendObject(connection, UAVTALK_TYPE_NACK, objId, instId, NULL);
         }
         break;
+
     case UAVTALK_TYPE_NACK:
         // Do nothing on flight side, let it time out.
-        // Why?
+        // TODO:
+        // The transaction takes the result code of the "semaphore taking operation" into account to determine success.
+        // If we give that semaphore in time, its "success" (ack received)
+        // If we do not give that semaphore before the timeout it will return failure.
+        // What would have to be done here is give the semaphore, but set a flag (for example connection->respFail=true)
+        // that indicates failure and then above where it checks for the result code, have it behave as if it failed
+        // if the explicit failure is set.
         break;
+
     case UAVTALK_TYPE_ACK:
         // All instances, not allowed for ACK messages
         if (obj && (instId != UAVOBJ_ALL_INSTANCES)) {
@@ -782,6 +794,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
             ret = -1;
         }
         break;
+
     default:
         ret = -1;
     }
@@ -833,9 +846,10 @@ static int32_t sendObject(UAVTalkConnectionData *connection, uint8_t type, uint3
         if (instId == UAVOBJ_ALL_INSTANCES) {
             // Get number of instances
             numInst = UAVObjGetNumInstances(obj);
-            // Send all instances
+            // Send all instances in reverse order
+            // This allows the receiver to detect when the last object has been received (i.e. when instance 0 is received)
             for (n = 0; n < numInst; ++n) {
-                sendSingleObject(connection, type, objId, n, obj);
+                sendSingleObject(connection, type, objId, numInst - n - 1, obj);
             }
             return 0;
         } else {

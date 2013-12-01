@@ -180,12 +180,36 @@ void UAVObject::requestUpdate()
 }
 
 /**
+ * Request that all instances of this object are updated with the latest values from the autopilot
+ * Must be called on instance zero
+ */
+void UAVObject::requestUpdateAll()
+{
+    if (instID == 0) {
+        emit updateRequested(this, true);
+    }
+}
+
+/**
  * Signal that the object has been updated
  */
 void UAVObject::updated()
 {
     emit objectUpdatedManual(this);
     emit objectUpdated(this);
+}
+
+/**
+ * Signal that all instance of the object have been updated
+ * Must be called on instance zero
+ */
+void UAVObject::updatedAll()
+{
+    if (instID == 0) {
+        emit objectUpdatedManual(this, true);
+        // TODO call objectUpdated() for all instances?
+        //emit objectUpdated(this);
+    }
 }
 
 /**

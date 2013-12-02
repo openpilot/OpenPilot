@@ -32,9 +32,9 @@
 #include <coreplugin/dialogs/ioptionspage.h>
 
 #include <QtCore/QObject>
-#include <QtGui/QKeySequence>
-#include <QtGui/QTreeWidgetItem>
-#include <QtGui/QKeyEvent>
+#include <QKeySequence>
+#include <QTreeWidgetItem>
+#include <QKeyEvent>
 
 QT_BEGIN_NAMESPACE
 class Ui_ShortcutSettings;

@@ -273,5 +273,3 @@ bool RawHIDPlugin::initialize(const QStringList & arguments, QString *errorStrin
 
     return true;
 }
-
-Q_EXPORT_PLUGIN(RawHIDPlugin)

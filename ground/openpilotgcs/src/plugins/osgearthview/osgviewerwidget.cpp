@@ -31,13 +31,13 @@
 #include <QPainter>
 #include <QtOpenGL/QGLWidget>
 #include <cmath>
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QLabel>
 #include <QDebug>
 
 #include <QtCore/QTimer>
-#include <QtGui/QApplication>
-#include <QtGui/QGridLayout>
+#include <QtWidgets/QApplication>
+#include <QGridLayout>
 
 
 #include <osg/Notify>
@@ -95,10 +95,10 @@ using namespace osgEarth::Annotation;
 #include "utils/homelocationutil.h"
 #include "utils/worldmagmodel.h"
 #include "utils/coordinateconversions.h"
-#include "attitudeactual.h"
-#include "gpsposition.h"
+#include "attitudestate.h"
+#include "gpspositionsensor.h"
 #include "homelocation.h"
-#include "positionactual.h"
+#include "positionstate.h"
 #include "systemsettings.h"
 
 using namespace Utils;
@@ -256,12 +256,12 @@ void OsgViewerWidget::paintEvent(QPaintEvent *event)
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objMngr = pm->getObject<UAVObjectManager>();
 
-    PositionActual *positionActualObj  = PositionActual::GetInstance(objMngr);
-    PositionActual::DataFields positionActual = positionActualObj->getData();
-    double NED[3] = { positionActual.North, positionActual.East, positionActual.Down };
+    PositionState *positionStateObj    = PositionState::GetInstance(objMngr);
+    PositionState::DataFields positionState = positionStateObj->getData();
+    double NED[3] = { positionState.North, positionState.East, positionState.Down };
 
-    bool positionActualUpdate = true;
-    if (positionActualUpdate) {
+    bool positionStateUpdate = true;
+    if (positionStateUpdate) {
         HomeLocation *homeLocationObj = HomeLocation::GetInstance(objMngr);
         HomeLocation::DataFields homeLocation = homeLocationObj->getData();
         double homeLLA[3] = { homeLocation.Latitude / 10.0e6, homeLocation.Longitude / 10.0e6, homeLocation.Altitude };
@@ -270,15 +270,15 @@ void OsgViewerWidget::paintEvent(QPaintEvent *event)
         CoordinateConversions().NED2LLA_HomeLLA(homeLLA, NED, LLA);
         uavPos->getLocator()->setPosition(osg::Vec3d(LLA[1], LLA[0], LLA[2])); // Note this takes longtitude first
     } else {
-        GPSPosition *gpsPosObj = GPSPosition::GetInstance(objMngr);
-        GPSPosition::DataFields gpsPos = gpsPosObj->getData();
+        GPSPositionSensor *gpsPosObj = GPSPositionSensor::GetInstance(objMngr);
+        GPSPositionSensor::DataFields gpsPos = gpsPosObj->getData();
         uavPos->getLocator()->setPosition(osg::Vec3d(gpsPos.Longitude / 10.0e6, gpsPos.Latitude / 10.0e6, gpsPos.Altitude));
     }
 
     // Set the attitude (reverse the attitude)
-    AttitudeActual *attitudeActualObj = AttitudeActual::GetInstance(objMngr);
-    AttitudeActual::DataFields attitudeActual = attitudeActualObj->getData();
-    osg::Quat quat(attitudeActual.q2, attitudeActual.q3, attitudeActual.q4, attitudeActual.q1);
+    AttitudeState *attitudeStateObj = AttitudeState::GetInstance(objMngr);
+    AttitudeState::DataFields attitudeState = attitudeStateObj->getData();
+    osg::Quat quat(attitudeState.q2, attitudeState.q3, attitudeState.q4, attitudeState.q1);
 
     // Have to rotate the axes from OP NED frame to OSG frame (X east, Y north, Z down)
     double angle;

@@ -1,5 +1,5 @@
 <xml>
-    <object name="MixerSettings" singleinstance="true" settings="true">
+    <object name="MixerSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings for the @ref ActuatorModule that controls the channel assignments for the mixer based on AircraftType</description>
         <field name="MaxAccel" units="units/sec" type="float" elements="1" defaultvalue="1000"/>
         <field name="FeedForward" units="" type="float" elements="1" defaultvalue="0"/>

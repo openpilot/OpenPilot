@@ -1,5 +1,5 @@
 <xml>
-    <object name="TaskInfo" singleinstance="true" settings="false">
+    <object name="TaskInfo" singleinstance="true" settings="false" category="System">
         <description>Task information</description>
         <field name="StackRemaining" units="bytes" type="uint16">
 		<elementnames>
@@ -10,6 +10,7 @@
 			<elementname>TelemetryTx</elementname>
 			<elementname>TelemetryTxPri</elementname>
 			<elementname>TelemetryRx</elementname>
+			<elementname>RadioRx</elementname>
 			<elementname>GPS</elementname>
 			<elementname>ManualControl</elementname>
 			<elementname>Altitude</elementname>
@@ -44,6 +45,7 @@
 			<elementname>TelemetryTx</elementname>
 			<elementname>TelemetryTxPri</elementname>
 			<elementname>TelemetryRx</elementname>
+			<elementname>RadioRx</elementname>
 			<elementname>GPS</elementname>
 			<elementname>ManualControl</elementname>
 			<elementname>Altitude</elementname>
@@ -82,6 +84,7 @@
 			<elementname>TelemetryTx</elementname>
 			<elementname>TelemetryTxPri</elementname>
 			<elementname>TelemetryRx</elementname>
+			<elementname>RadioRx</elementname>
 			<elementname>GPS</elementname>
 			<elementname>ManualControl</elementname>
 			<elementname>Altitude</elementname>

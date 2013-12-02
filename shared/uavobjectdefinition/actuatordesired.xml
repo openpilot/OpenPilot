@@ -1,5 +1,5 @@
 <xml>
-    <object name="ActuatorDesired" singleinstance="true" settings="false">
+    <object name="ActuatorDesired" singleinstance="true" settings="false" category="Control">
         <description>Desired raw, pitch and yaw actuator settings.  Comes from either @ref StabilizationModule or @ref ManualControlModule depending on FlightMode.</description>
         <field name="Roll" units="%" type="float" elements="1"/>
         <field name="Pitch" units="%" type="float" elements="1"/>

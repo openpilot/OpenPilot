@@ -25,7 +25,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "QtDebug"
-
+#ifdef __APPLE__
+    #include "OpenGL/OpenGL.h"
+#endif
 #include "modelviewgadgetwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "glc_context.h"
@@ -39,7 +41,7 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
     : QGLWidget(new GLC_Context(QGLFormat(QGL::SampleBuffers)), parent)
     , m_Light()
     , m_World()
-    , m_GlView(this)
+    , m_GlView()
     , m_MoverController()
     , m_ModelBoundingBox()
     , m_MotionTimer()
@@ -47,17 +49,25 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
     , bgFilename()
     , vboEnable(false)
 {
+    connect(&m_GlView, SIGNAL(updateOpenGL()), this, SLOT(updateGL()));
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    CreateScene();
+
+    m_Light.setPosition(4000.0, 40000.0, 80000.0);
+    // m_GlView.setBackgroundColor(Qt::white);
+    m_Light.setAmbientColor(Qt::lightGray);
+
+    m_GlView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
+    m_GlView.cameraHandle()->setRearView();
 
     QColor repColor;
     repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
     m_MoverController = GLC_Factory::instance()->createDefaultMoverController(repColor, &m_GlView);
 
+    CreateScene();
     // Get required UAVObjects
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    attActual = AttitudeActual::GetInstance(objManager);
+    attState = AttitudeState::GetInstance(objManager);
 
     connect(&m_MotionTimer, SIGNAL(timeout()), this, SLOT(updateAttitude()));
 }
@@ -101,15 +111,16 @@ void ModelViewGadgetWidget::reloadScene()
 //// Private functions ////
 void ModelViewGadgetWidget::initializeGL()
 {
+    // For VSYNC problem under Mac OS X
+    #if defined(Q_OS_MAC)
+    const GLint swapInterval = 1;
+    CGLSetParameter(CGLGetCurrentContext(), kCGLCPSwapInterval, &swapInterval);
+    #endif
+
     // OpenGL initialization
     m_GlView.initGl();
-
-    m_Light.setPosition(4000.0, -40000.0, 80000.0);
-    m_Light.setAmbientColor(Qt::lightGray);
-
-    m_GlView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
-    m_GlView.cameraHandle()->setRearView();
-    m_GlView.setToOrtho(true); // orthogonal view
+    // Reframe the scene
+    m_GlView.reframe(m_ModelBoundingBox);
 
     glEnable(GL_NORMALIZE);
     // Enable antialiasing
@@ -135,7 +146,7 @@ void ModelViewGadgetWidget::paintGL()
         }
 
         // Load identity matrix
-        glLoadIdentity();
+        GLC_Context::current()->glcLoadIdentity();
 
         // Enable antialiasing
         glEnable(GL_MULTISAMPLE);
@@ -144,8 +155,8 @@ void ModelViewGadgetWidget::paintGL()
         m_GlView.setDistMinAndMax(m_World.boundingBox());
 
         // define view matrix
-        m_Light.glExecute();
         m_GlView.glExecuteCam();
+        m_Light.glExecute();
 
         // Display the collection of GLC_Object
         m_World.render(0, glc::ShadingFlag);
@@ -311,7 +322,7 @@ void ModelViewGadgetWidget::keyPressEvent(QKeyEvent *e) // switch between camera
 //////////////////////////////////////////////////////////////////////
 void ModelViewGadgetWidget::updateAttitude()
 {
-    AttitudeActual::DataFields data = attActual->getData(); // get attitude data
+    AttitudeState::DataFields data  = attState->getData(); // get attitude data
     GLC_StructOccurence *rootObject = m_World.rootOccurence(); // get the full 3D model
     double x = data.q3;
     double y = data.q2;
@@ -334,15 +345,7 @@ void ModelViewGadgetWidget::updateAttitude()
     m2.setRow(3, QVector4D(x, y, z, w));
     QMatrix4x4 m0 = m1 * m2;
     // convert QMatrix4x4 to GLC_Matrix4x4
-    GLC_Matrix4x4 rootObjectRotation;
-    {
-        double *newMatrixData = rootObjectRotation.setData();
-        double *oldMatrixData = (double *)m0.data();
-        for (int i = 0; i < 16; i++) {
-            newMatrixData[i] = oldMatrixData[i];
-        }
-    }
-    // sets and updates the 3D model's matrix
+    GLC_Matrix4x4 rootObjectRotation(m0.data());
     rootObject->structInstance()->setMatrix(rootObjectRotation);
     rootObject->updateChildrenAbsoluteMatrix();
     updateGL();

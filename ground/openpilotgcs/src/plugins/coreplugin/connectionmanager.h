@@ -29,15 +29,15 @@
 #ifndef CONNECTIONMANAGER_H
 #define CONNECTIONMANAGER_H
 
-#include <QWidget>
 #include "mainwindow.h"
 #include "generalsettings.h"
 #include <coreplugin/iconnection.h>
+#include <QWidget>
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
-#include <QtGui/QPushButton>
-#include <QtGui/QComboBox>
+#include <QPushButton>
+#include <QComboBox>
 
 #include "core_global.h"
 #include <QTimer>
@@ -49,7 +49,6 @@ class IConnection;
 namespace Internal {
 class MainWindow;
 } // namespace Internal
-
 
 class DevListItem {
 public:

@@ -33,6 +33,9 @@
 class DebugGadgetFactory;
 
 class DebugPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                            Q_PLUGIN_METADATA(IID "OpenPilot.Debug")
+
 public:
     DebugPlugin();
     ~DebugPlugin();
@@ -43,4 +46,5 @@ public:
 private:
     DebugGadgetFactory *mf;
 };
+
 #endif /* DEBUGPLUGIN_H_ */

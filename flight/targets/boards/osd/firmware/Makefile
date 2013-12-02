@@ -79,7 +79,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/systemstats.c
     SRC += $(OPUAVSYNTHDIR)/systemalarms.c
     SRC += $(OPUAVSYNTHDIR)/systemsettings.c
-    SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
+    SRC += $(OPUAVSYNTHDIR)/attitudestate.c
     SRC += $(OPUAVSYNTHDIR)/i2cstats.c
     SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
     SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
@@ -87,13 +87,14 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/homelocation.c
-    SRC += $(OPUAVSYNTHDIR)/gpsposition.c
+    SRC += $(OPUAVSYNTHDIR)/gpspositionsensor.c
     SRC += $(OPUAVSYNTHDIR)/gpssatellites.c
-    SRC += $(OPUAVSYNTHDIR)/gpsvelocity.c
+    SRC += $(OPUAVSYNTHDIR)/gpsvelocitysensor.c
     SRC += $(OPUAVSYNTHDIR)/gpstime.c
+    SRC += $(OPUAVSYNTHDIR)/gpssettings.c
     SRC += $(OPUAVSYNTHDIR)/osdsettings.c
-    SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
-    SRC += $(OPUAVSYNTHDIR)/magnetometer.c
+    SRC += $(OPUAVSYNTHDIR)/barosensor.c
+    SRC += $(OPUAVSYNTHDIR)/magsensor.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

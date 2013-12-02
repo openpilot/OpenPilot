@@ -1,0 +1,20 @@
+<xml>
+    <object name="GPSPositionSensor" singleinstance="true" settings="false" category="Sensors">
+        <description>Raw GPS data from @ref GPSModule.</description>
+        <field name="Status" units="" type="enum" elements="1" options="NoGPS,NoFix,Fix2D,Fix3D"/>
+        <field name="Latitude" units="degrees x 10^-7" type="int32" elements="1"/>
+        <field name="Longitude" units="degrees x 10^-7" type="int32" elements="1"/>
+        <field name="Altitude" units="meters" type="float" elements="1"/>
+        <field name="GeoidSeparation" units="meters" type="float" elements="1"/>
+        <field name="Heading" units="degrees" type="float" elements="1"/>
+        <field name="Groundspeed" units="m/s" type="float" elements="1"/>
+        <field name="Satellites" units="" type="int8" elements="1"/>
+        <field name="PDOP" units="" type="float" elements="1"/>
+        <field name="HDOP" units="" type="float" elements="1"/>
+        <field name="VDOP" units="" type="float" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="periodic" period="1000"/>
+	</object>
+</xml>

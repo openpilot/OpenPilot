@@ -28,18 +28,20 @@
 
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QList>
 
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
+#include "altitudeholdsettings.h"
 
-ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
+    boardModel(0)
 {
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
@@ -90,9 +92,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     connect(this, SIGNAL(widgetContentsChanged(QWidget *)), this, SLOT(processLinkedWidgets(QWidget *)));
 
-    // Link by default
-    ui->checkBox_7->setChecked(true);
-    ui->checkBox_8->setChecked(true);
+    connect(this, SIGNAL(autoPilotConnected()), this, SLOT(onBoardConnected()));
 
     disableMouseWheelEvents();
     updateEnableControls();
@@ -102,7 +102,6 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
 {
     // Do nothing
 }
-
 
 void ConfigStabilizationWidget::refreshWidgetsValues(UAVObject *o)
 {
@@ -192,5 +191,26 @@ void ConfigStabilizationWidget::processLinkedWidgets(QWidget *widget)
         } else if (widget == ui->RateResponsivenessSlider) {
             ui->ratePitchKi_4->setValue(ui->RateResponsivenessSlider->value());
         }
+    }
+}
+
+void ConfigStabilizationWidget::onBoardConnected()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
+
+    Q_ASSERT(utilMngr);
+    boardModel = utilMngr->getBoardModel();
+    // If Revolution board enable misc tab, otherwise disable it
+    ui->AltitudeHold->setEnabled((boardModel & 0xff00) == 0x0900);
+}
+
+bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
+{
+    // AltitudeHoldSettings should only be saved for Revolution board to avoid error.
+    if ((boardModel & 0xff00) != 0x0900) {
+        return dynamic_cast<AltitudeHoldSettings *>(object) == 0;
+    } else {
+        return true;
     }
 }

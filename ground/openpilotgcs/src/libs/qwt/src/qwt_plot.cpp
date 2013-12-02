@@ -25,7 +25,7 @@
 class QwtPlot::PrivateData
 {
 public:
-    QPointer<QwtTextLabel> lblTitle;
+    QPointer<QwtTextLabel> titleLabel;
     QPointer<QwtPlotCanvas> canvas;
     QPointer<QwtLegend> legend;
     QwtPlotLayout *layout;
@@ -75,19 +75,22 @@ void QwtPlot::initPlot( const QwtText &title )
     d_data->layout = new QwtPlotLayout;
     d_data->autoReplot = false;
 
-    d_data->lblTitle = new QwtTextLabel( title, this );
-    d_data->lblTitle->setObjectName( "QwtPlotTitle" );
-
-    d_data->lblTitle->setFont( QFont( fontInfo().family(), 14, QFont::Bold ) );
+    // title
+    d_data->titleLabel = new QwtTextLabel( this );
+    d_data->titleLabel->setObjectName( "QwtPlotTitle" );
+    d_data->titleLabel->setFont( QFont( fontInfo().family(), 14, QFont::Bold ) );
 
     QwtText text( title );
     text.setRenderFlags( Qt::AlignCenter | Qt::TextWordWrap );
-    d_data->lblTitle->setText( text );
+    d_data->titleLabel->setText( text );
 
+    // legend
     d_data->legend = NULL;
 
+    // axis
     initAxesData();
 
+    // canvas
     d_data->canvas = new QwtPlotCanvas( this );
     d_data->canvas->setObjectName( "QwtPlotCanvas" );
     d_data->canvas->setFrameStyle( QFrame::Panel | QFrame::Sunken );
@@ -163,9 +166,9 @@ bool QwtPlot::autoReplot() const
 */
 void QwtPlot::setTitle( const QString &title )
 {
-    if ( title != d_data->lblTitle->text().text() )
+    if ( title != d_data->titleLabel->text().text() )
     {
-        d_data->lblTitle->setText( title );
+        d_data->titleLabel->setText( title );
         updateLayout();
     }
 }
@@ -176,17 +179,17 @@ void QwtPlot::setTitle( const QString &title )
 */
 void QwtPlot::setTitle( const QwtText &title )
 {
-    if ( title != d_data->lblTitle->text() )
+    if ( title != d_data->titleLabel->text() )
     {
-        d_data->lblTitle->setText( title );
+        d_data->titleLabel->setText( title );
         updateLayout();
     }
 }
 
-//! \return the plot's title
+//! \return Title of the plot
 QwtText QwtPlot::title() const
 {
-    return d_data->lblTitle->text();
+    return d_data->titleLabel->text();
 }
 
 //! \return the plot's title
@@ -195,7 +198,7 @@ QwtPlotLayout *QwtPlot::plotLayout()
     return d_data->layout;
 }
 
-//! \return the plot's titel label.
+//! \return the plot's layout
 const QwtPlotLayout *QwtPlot::plotLayout() const
 {
     return d_data->layout;
@@ -204,7 +207,7 @@ const QwtPlotLayout *QwtPlot::plotLayout() const
 //! \return the plot's titel label.
 QwtTextLabel *QwtPlot::titleLabel()
 {
-    return d_data->lblTitle;
+    return d_data->titleLabel;
 }
 
 /*!
@@ -212,7 +215,7 @@ QwtTextLabel *QwtPlot::titleLabel()
 */
 const QwtTextLabel *QwtPlot::titleLabel() const
 {
-    return d_data->lblTitle;
+    return d_data->titleLabel;
 }
 
 /*!
@@ -352,17 +355,15 @@ void QwtPlot::updateLayout()
     QRect legendRect = d_data->layout->legendRect().toRect();
     QRect canvasRect = d_data->layout->canvasRect().toRect();
 
-    //
     // resize and show the visible widgets
-    //
-    if ( !d_data->lblTitle->text().isEmpty() )
+    if ( !d_data->titleLabel->text().isEmpty() )
     {
-        d_data->lblTitle->setGeometry( titleRect );
-        if ( !d_data->lblTitle->isVisibleTo( this ) )
-            d_data->lblTitle->show();
+        d_data->titleLabel->setGeometry( titleRect );
+        if ( !d_data->titleLabel->isVisibleTo( this ) )
+            d_data->titleLabel->show();
     }
     else
-        d_data->lblTitle->hide();
+        d_data->titleLabel->hide();
 
     for ( int axisId = 0; axisId < axisCnt; axisId++ )
     {
@@ -370,18 +371,22 @@ void QwtPlot::updateLayout()
         {
             axisWidget( axisId )->setGeometry( scaleRect[axisId] );
 
+#if 1
             if ( axisId == xBottom || axisId == xTop )
             {
+                // do we need this code any longer ???
+
                 QRegion r( scaleRect[axisId] );
                 if ( axisEnabled( yLeft ) )
-                    r = r.subtract( QRegion( scaleRect[yLeft] ) );
+                    r = r.subtracted( QRegion( scaleRect[yLeft] ) );
                 if ( axisEnabled( yRight ) )
-                    r = r.subtract( QRegion( scaleRect[yRight] ) );
-                r.translate( -d_data->layout->scaleRect( axisId ).x(),
+                    r = r.subtracted( QRegion( scaleRect[yRight] ) );
+                r.translate( -scaleRect[ axisId ].x(),
                     -scaleRect[axisId].y() );
 
                 axisWidget( axisId )->setMask( r );
             }
+#endif
             if ( !axisWidget( axisId )->isVisibleTo( this ) )
                 axisWidget( axisId )->show();
         }
@@ -584,9 +589,7 @@ QwtScaleMap QwtPlot::canvasMap( int axisId ) const
 void QwtPlot::setCanvasBackground( const QBrush &brush )
 {
     QPalette pal = d_data->canvas->palette();
-
-    for ( int i = 0; i < QPalette::NColorGroups; i++ )
-        pal.setBrush( ( QPalette::ColorGroup )i, QPalette::Window, brush );
+    pal.setBrush( QPalette::Window, brush );
 
     canvas()->setPalette( pal );
 }

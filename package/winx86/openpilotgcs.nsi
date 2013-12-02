@@ -98,11 +98,25 @@
   !define MUI_ICON "${NSIS_DATA_TREE}\resources\openpilot.ico"
   !define MUI_HEADERIMAGE
   !define MUI_HEADERIMAGE_BITMAP "${NSIS_DATA_TREE}\resources\header.bmp"
-  !define MUI_HEADERIMAGE_BITMAP_NOSTRETCH
   !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_DATA_TREE}\resources\welcome.bmp"
-  !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
   !define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSIS_DATA_TREE}\resources\welcome.bmp"
-  !define MUI_UNWELCOMEFINISHPAGE_BITMAP_NOSTRETCH
+
+  !define HEADER_BGCOLOR "0x8C8C8C"
+  !define HEADER_FGCOLOR "0x343434"
+
+  !macro SetHeaderColors un
+    Function ${un}SetHeaderColors
+      GetDlgItem $r3 $HWNDPARENT 1034
+      SetCtlColors $r3 ${HEADER_BGCOLOR} ${HEADER_FGCOLOR}
+      GetDlgItem $r3 $HWNDPARENT 1037
+      SetCtlColors $r3 ${HEADER_BGCOLOR} ${HEADER_FGCOLOR}
+      GetDlgItem $r3 $HWNDPARENT 1038
+      SetCtlColors $r3 ${HEADER_BGCOLOR} ${HEADER_FGCOLOR}
+    FunctionEnd
+  !macroend
+
+  !insertmacro SetHeaderColors ""
+  !insertmacro SetHeaderColors "un."
 
 ;--------------------------------
 ; Language selection dialog settings
@@ -122,12 +136,16 @@
 ;--------------------------------
 ; Pages
 
+  !define MUI_PAGE_CUSTOMFUNCTION_PRE "SetHeaderColors"
+
   !insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_LICENSE "$(LicenseFile)"
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
   !insertmacro MUI_PAGE_FINISH
+
+  !define MUI_PAGE_CUSTOMFUNCTION_PRE "un.SetHeaderColors"
 
   !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_CONFIRM
@@ -220,7 +238,7 @@ SectionEnd
 ; Copy driver files
 Section "-Drivers" InSecDrivers
   SetOutPath "$INSTDIR\drivers"
-  File "${PROJECT_ROOT}\flight\Project\Windows USB\OpenPilot-CDC.inf"
+  File /r "${PROJECT_ROOT}\flight\Project\Windows USB\*"
 SectionEnd
 
 ; Preinstall OpenPilot CDC driver

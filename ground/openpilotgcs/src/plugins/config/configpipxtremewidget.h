@@ -44,7 +44,7 @@ public slots:
     void updateSettings(UAVObject *object1);
 
 private:
-    Ui_PipXtremeWidget *m_oplink;
+    Ui_OPLinkWidget *m_oplink;
 
     // The OPLink status UAVObject
     UAVDataObject *oplinkStatusObj;
@@ -55,14 +55,16 @@ private:
     // Are the settings current?
     bool settingsUpdated;
 
-    // Signal mappers to add arguments to signals.
-    QSignalMapper *signalMapperAddBinding;
-    QSignalMapper *signalMapperRemBinding;
+    void SetPairID(QLineEdit *pairIdWidget);
 
 private slots:
     void disconnected();
-    void addBinding(QWidget *w);
-    void removeBinding(QWidget *w);
+    void bind1();
+    void bind2();
+    void bind3();
+    void bind4();
+    void ppmOnlyToggled(bool toggled);
+    void comSpeedChanged(int index);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

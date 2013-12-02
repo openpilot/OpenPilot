@@ -26,6 +26,7 @@
  */
 #include "../internals/pureprojection.h"
 #include "gpsitem.h"
+#include <QGraphicsSceneMouseEvent>
 namespace mapcontrol {
 GPSItem::GPSItem(MapGraphicItem *map, OPMapWidget *parent, QString uavPic) : map(map), mapwidget(parent), showtrail(true), showtrailline(true), trailtime(1), traildistance(2), autosetreached(true)
     , autosetdistance(100)

@@ -245,5 +245,3 @@ void TelemetryPlugin::shutdown()
 //    connect(phonon.mo, SIGNAL(stateChanged(Phonon::State, Phonon::State)),
 //            this, SLOT(stateChanged(Phonon::State, Phonon::State)));
 //}
-
-Q_EXPORT_PLUGIN(TelemetryPlugin)

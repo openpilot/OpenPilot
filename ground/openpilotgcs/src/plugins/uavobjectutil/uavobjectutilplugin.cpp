@@ -51,5 +51,3 @@ bool UAVObjectUtilPlugin::initialize(const QStringList & arguments, QString *err
 
 void UAVObjectUtilPlugin::shutdown()
 {}
-
-Q_EXPORT_PLUGIN(UAVObjectUtilPlugin)

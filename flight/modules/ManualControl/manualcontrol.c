@@ -34,18 +34,17 @@
  */
 
 #include <openpilot.h>
-
+#include <pios_struct_helper.h>
 #include "accessorydesired.h"
 #include "actuatordesired.h"
 #include "altitudeholddesired.h"
-#include "baroaltitude.h"
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
 #include "sanitycheck.h"
 #include "manualcontrol.h"
 #include "manualcontrolsettings.h"
 #include "manualcontrolcommand.h"
-#include "positionactual.h"
+#include "positionstate.h"
 #include "pathdesired.h"
 #include "stabilizationsettings.h"
 #include "stabilizationdesired.h"
@@ -62,13 +61,12 @@
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES  PIOS_MANUAL_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES  1024
+#define STACK_SIZE_BYTES  1152
 #endif
 
 #define TASK_PRIORITY     (tskIDLE_PRIORITY + 4)
 #define UPDATE_PERIOD_MS  20
 #define THROTTLE_FAILSAFE -0.1f
-#define ARMED_TIME_MS     1000
 #define ARMED_THRESHOLD   0.50f
 // safe band to allow a bit of calibration error or trim offset (in microseconds)
 #define CONNECTION_OFFSET 250
@@ -99,7 +97,7 @@ static void updateLandDesired(ManualControlCommandData *cmd, bool changed);
 static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed);
 static void updatePathDesired(ManualControlCommandData *cmd, bool changed, bool home);
 static void processFlightMode(ManualControlSettingsData *settings, float flightMode);
-static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings);
+static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, int8_t armSwitch);
 static void setArmedIfChanged(uint8_t val);
 static void configurationUpdatedCb(UAVObjEvent *ev);
 
@@ -126,7 +124,7 @@ static struct rcvr_activity_fsm activity_fsm;
 static void resetRcvrActivity(struct rcvr_activity_fsm *fsm);
 static bool updateRcvrActivity(struct rcvr_activity_fsm *fsm);
 
-#define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions7 && assumptions8 && assumptions_flightmode && assumptions_channelcount)
+#define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions_flightmode && assumptions_channelcount)
 
 /**
  * Module starting
@@ -247,10 +245,12 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
             for (uint8_t n = 0; n < MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM && n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM; ++n) {
                 extern uint32_t pios_rcvr_group_map[];
 
-                if (settings.ChannelGroups[n] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+                if (cast_struct_to_array(settings.ChannelGroups, settings.ChannelGroups.Roll)[n] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                     cmd.Channel[n] = PIOS_RCVR_INVALID;
                 } else {
-                    cmd.Channel[n] = PIOS_RCVR_Read(pios_rcvr_group_map[settings.ChannelGroups[n]], settings.ChannelNumber[n]);
+                    cmd.Channel[n] = PIOS_RCVR_Read(pios_rcvr_group_map[
+                                                        cast_struct_to_array(settings.ChannelGroups, settings.ChannelGroups.Pitch)[n]],
+                                                    cast_struct_to_array(settings.ChannelNumber, settings.ChannelNumber.Pitch)[n]);
                 }
 
                 // If a channel has timed out this is not valid data and we shouldn't update anything
@@ -258,15 +258,18 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 if (cmd.Channel[n] == (uint16_t)PIOS_RCVR_TIMEOUT) {
                     valid_input_detected = false;
                 } else {
-                    scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n], settings.ChannelMin[n], settings.ChannelNeutral[n]);
+                    scaledChannel[n] = scaleChannel(cmd.Channel[n],
+                                                    cast_struct_to_array(settings.ChannelMax, settings.ChannelMax.Pitch)[n],
+                                                    cast_struct_to_array(settings.ChannelMin, settings.ChannelMin.Pitch)[n],
+                                                    cast_struct_to_array(settings.ChannelNeutral, settings.ChannelNeutral.Pitch)[n]);
                 }
             }
 
             // Check settings, if error raise alarm
-            if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
-                || settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
-                || settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
-                || settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
+            if (settings.ChannelGroups.Roll >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
+                || settings.ChannelGroups.Pitch >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
+                || settings.ChannelGroups.Yaw >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
+                || settings.ChannelGroups.Throttle >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
                 ||
                 // Check all channel mappings are valid
                 cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] == (uint16_t)PIOS_RCVR_INVALID
@@ -283,7 +286,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 settings.FlightModeNumber < 1 || settings.FlightModeNumber > MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_NUMELEM ||
                 // Similar checks for FlightMode channel but only if more than one flight mode has been set. Otherwise don't care
                 ((settings.FlightModeNumber > 1)
-                 && (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
+                 && (settings.ChannelGroups.FlightMode >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
                      || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t)PIOS_RCVR_INVALID
                      || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t)PIOS_RCVR_NODRIVER))) {
                 AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
@@ -298,14 +301,14 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
             }
 
             // decide if we have valid manual input or not
-            valid_input_detected &= validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE],
-                                                    settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE])
-                                    && validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL],
-                                                       settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL])
-                                    && validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW],
-                                                       settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW])
-                                    && validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH],
-                                                       settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH]);
+            valid_input_detected &= validInputRange(settings.ChannelMin.Throttle,
+                                                    settings.ChannelMax.Throttle, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE])
+                                    && validInputRange(settings.ChannelMin.Roll,
+                                                       settings.ChannelMax.Roll, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL])
+                                    && validInputRange(settings.ChannelMin.Yaw,
+                                                       settings.ChannelMax.Yaw, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW])
+                                    && validInputRange(settings.ChannelMin.Pitch,
+                                                       settings.ChannelMax.Pitch, cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH]);
 
             // Implement hysteresis loop on connection status
             if (valid_input_detected && (++connected_count > 10)) {
@@ -318,34 +321,38 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 disconnected_count = 0;
             }
 
+            int8_t armSwitch = 0;
             if (cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE) {
                 cmd.Throttle   = -1;      // Shut down engine with no control
                 cmd.Roll       = 0;
                 cmd.Yaw = 0;
                 cmd.Pitch      = 0;
                 cmd.Collective = 0;
-                // cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO; // don't do until AUTO implemented and functioning
-                // Important: Throttle < 0 will reset Stabilization coefficients among other things. Either change this,
-                // or leave throttle at IDLE speed or above when going into AUTO-failsafe.
+                if (settings.FailsafeBehavior != MANUALCONTROLSETTINGS_FAILSAFEBEHAVIOR_NONE) {
+                    FlightStatusGet(&flightStatus);
+
+                    flightStatus.FlightMode = settings.FlightModePosition[settings.FailsafeBehavior - 1];
+                    FlightStatusSet(&flightStatus);
+                }
                 AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
 
                 AccessoryDesiredData accessory;
                 // Set Accessory 0
-                if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY0] != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+                if (settings.ChannelGroups.Accessory0 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                     accessory.AccessoryVal = 0;
                     if (AccessoryDesiredInstSet(0, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
                 }
                 // Set Accessory 1
-                if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY1] != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+                if (settings.ChannelGroups.Accessory1 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                     accessory.AccessoryVal = 0;
                     if (AccessoryDesiredInstSet(1, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
                 }
                 // Set Accessory 2
-                if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY2] != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+                if (settings.ChannelGroups.Accessory2 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                     accessory.AccessoryVal = 0;
                     if (AccessoryDesiredInstSet(2, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
@@ -387,31 +394,53 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
                 AccessoryDesiredData accessory;
                 // Set Accessory 0
-                if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY0] != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+                if (settings.ChannelGroups.Accessory0 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                     accessory.AccessoryVal = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY0];
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY0, &settings, dT);
 #endif
+                    if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY0) {
+                        if (accessory.AccessoryVal > ARMED_THRESHOLD) {
+                            armSwitch = 1;
+                        } else if (accessory.AccessoryVal < -ARMED_THRESHOLD) {
+                            armSwitch = -1;
+                        }
+                    }
                     if (AccessoryDesiredInstSet(0, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
                 }
                 // Set Accessory 1
-                if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY1] != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+                if (settings.ChannelGroups.Accessory1 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                     accessory.AccessoryVal = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY1];
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY1, &settings, dT);
 #endif
+                    if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY1) {
+                        if (accessory.AccessoryVal > ARMED_THRESHOLD) {
+                            armSwitch = 1;
+                        } else if (accessory.AccessoryVal < -ARMED_THRESHOLD) {
+                            armSwitch = -1;
+                        }
+                    }
                     if (AccessoryDesiredInstSet(1, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
                 }
                 // Set Accessory 2
-                if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY2] != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+                if (settings.ChannelGroups.Accessory2 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                     accessory.AccessoryVal = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY2];
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY2, &settings, dT);
 #endif
+                    if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY2) {
+                        if (accessory.AccessoryVal > ARMED_THRESHOLD) {
+                            armSwitch = 1;
+                        } else if (accessory.AccessoryVal < -ARMED_THRESHOLD) {
+                            armSwitch = -1;
+                        }
+                    }
+
                     if (AccessoryDesiredInstSet(2, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
@@ -421,7 +450,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
             }
 
             // Process arming outside conditional so system will disarm when disconnected
-            processArm(&cmd, &settings);
+            processArm(&cmd, &settings, armSwitch);
 
             // Update cmd object
             ManualControlCommandSet(&cmd);
@@ -429,8 +458,8 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
             if (pios_usb_rctx_id) {
                 PIOS_USB_RCTX_Update(pios_usb_rctx_id,
                                      cmd.Channel,
-                                     settings.ChannelMin,
-                                     settings.ChannelMax,
+                                     cast_struct_to_array(settings.ChannelMin, settings.ChannelMin.Roll),
+                                     cast_struct_to_array(settings.ChannelMax, settings.ChannelMax.Roll),
                                      NELEMENTS(cmd.Channel));
             }
 #endif /* PIOS_INCLUDE_USB_RCTX */
@@ -460,6 +489,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
         case FLIGHTMODE_GUIDANCE:
             switch (flightStatus.FlightMode) {
             case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
+            case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO:
                 altitudeHoldDesired(&cmd, lastFlightMode != flightStatus.FlightMode);
                 break;
             case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
@@ -646,13 +676,13 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
     FlightStatusGet(&flightStatus);
     switch (flightStatus.FlightMode) {
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
-        stab_settings = settings->Stabilization1Settings;
+        stab_settings = cast_struct_to_array(settings->Stabilization1Settings, settings->Stabilization1Settings.Roll);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
-        stab_settings = settings->Stabilization2Settings;
+        stab_settings = cast_struct_to_array(settings->Stabilization2Settings, settings->Stabilization2Settings.Roll);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
-        stab_settings = settings->Stabilization3Settings;
+        stab_settings = cast_struct_to_array(settings->Stabilization3Settings, settings->Stabilization3Settings.Roll);
         break;
     default:
         // Major error, this should not occur because only enter this block when one of these is true
@@ -661,44 +691,44 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
     }
 
     // TOOD: Add assumption about order of stabilization desired and manual control stabilization mode fields having same order
-    stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL]  = stab_settings[0];
-    stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = stab_settings[1];
-    stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW]   = stab_settings[2];
+    stabilization.StabilizationMode.Roll  = stab_settings[0];
+    stabilization.StabilizationMode.Pitch = stab_settings[1];
+    stabilization.StabilizationMode.Yaw   = stab_settings[2];
 
     stabilization.Roll =
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL] :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ?
-        cmd->Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL] :
+        cmd->Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL] :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ?
-        cmd->Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL] :
+        cmd->Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Roll * stabSettings.RollMax : 0; // this is an invalid mode
     ;
     stabilization.Pitch =
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH] :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ?
-        cmd->Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH] :
+        cmd->Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ?
-        cmd->Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH] :
+        cmd->Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ?
-        cmd->Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH] :
+        cmd->Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Pitch * stabSettings.PitchMax : 0; // this is an invalid mode
 
     stabilization.Yaw =
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Yaw :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW] :
+        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ?
-        cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW] :
+        cmd->Yaw * stabSettings.ManualRate.Yaw :
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Yaw * stabSettings.YawMax :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW] :
+        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Yaw :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW] :
+        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Yaw * stabSettings.YawMax : 0; // this is an invalid mode
 
     stabilization.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle;
@@ -722,34 +752,36 @@ static void updatePathDesired(__attribute__((unused)) ManualControlCommandData *
 
     if (home && changed) {
         // Simple Return To Base mode - keep altitude the same, fly to home position
-        PositionActualData positionActual;
-        PositionActualGet(&positionActual);
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
+        ManualControlSettingsData settings;
+        ManualControlSettingsGet(&settings);
 
         PathDesiredData pathDesired;
         PathDesiredGet(&pathDesired);
-        pathDesired.Start[PATHDESIRED_START_NORTH] = 0;
-        pathDesired.Start[PATHDESIRED_START_EAST]  = 0;
-        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionActual.Down - 10;
-        pathDesired.End[PATHDESIRED_END_NORTH]     = 0;
-        pathDesired.End[PATHDESIRED_END_EAST] = 0;
-        pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+        pathDesired.Start.North      = 0;
+        pathDesired.Start.East       = 0;
+        pathDesired.Start.Down       = positionState.Down - settings.ReturnToHomeAltitudeOffset;
+        pathDesired.End.North        = 0;
+        pathDesired.End.East         = 0;
+        pathDesired.End.Down         = positionState.Down - settings.ReturnToHomeAltitudeOffset;
         pathDesired.StartingVelocity = 1;
         pathDesired.EndingVelocity   = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
         PathDesiredSet(&pathDesired);
     } else if (changed) {
         // After not being in this mode for a while init at current height
-        PositionActualData positionActual;
-        PositionActualGet(&positionActual);
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
 
         PathDesiredData pathDesired;
         PathDesiredGet(&pathDesired);
-        pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
-        pathDesired.Start[PATHDESIRED_START_EAST]  = positionActual.East;
-        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionActual.Down;
-        pathDesired.End[PATHDESIRED_END_NORTH]     = positionActual.North;
-        pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
-        pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
+        pathDesired.Start.North      = positionState.North;
+        pathDesired.Start.East       = positionState.East;
+        pathDesired.Start.Down       = positionState.Down;
+        pathDesired.End.North        = positionState.North;
+        pathDesired.End.East         = positionState.East;
+        pathDesired.End.Down         = positionState.Down;
         pathDesired.StartingVelocity = 1;
         pathDesired.EndingVelocity   = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
@@ -778,25 +810,25 @@ static void updateLandDesired(__attribute__((unused)) ManualControlCommandData *
        lastSysTime = thisSysTime;
      */
 
-    PositionActualData positionActual;
+    PositionStateData positionState;
 
-    PositionActualGet(&positionActual);
+    PositionStateGet(&positionState);
 
     PathDesiredData pathDesired;
     PathDesiredGet(&pathDesired);
     if (changed) {
         // After not being in this mode for a while init at current height
-        pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
-        pathDesired.Start[PATHDESIRED_START_EAST]  = positionActual.East;
-        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionActual.Down;
-        pathDesired.End[PATHDESIRED_END_NORTH]     = positionActual.North;
-        pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
-        pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
+        pathDesired.Start.North      = positionState.North;
+        pathDesired.Start.East       = positionState.East;
+        pathDesired.Start.Down       = positionState.Down;
+        pathDesired.End.North        = positionState.North;
+        pathDesired.End.East         = positionState.East;
+        pathDesired.End.Down         = positionState.Down;
         pathDesired.StartingVelocity = 1;
         pathDesired.EndingVelocity   = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
     }
-    pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down + 5;
+    pathDesired.End.Down = positionState.Down + 5;
     PathDesiredSet(&pathDesired);
 }
 
@@ -820,17 +852,24 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     uint8_t throttleRate;
     uint8_t throttleExp;
 
+    static uint8_t flightMode;
     static portTickType lastSysTimeAH;
     static bool zeroed = false;
     portTickType thisSysTime;
     float dT;
 
-    AltitudeHoldDesiredData altitudeHoldDesiredData;
+    FlightStatusFlightModeGet(&flightMode);
 
+    AltitudeHoldDesiredData altitudeHoldDesiredData;
     AltitudeHoldDesiredGet(&altitudeHoldDesiredData);
 
-    AltitudeHoldSettingsThrottleExpGet(&throttleExp);
-    AltitudeHoldSettingsThrottleRateGet(&throttleRate);
+    if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
+        throttleExp  = 128;
+        throttleRate = 0;
+    } else {
+        AltitudeHoldSettingsThrottleExpGet(&throttleExp);
+        AltitudeHoldSettingsThrottleRateGet(&throttleRate);
+    }
 
     StabilizationSettingsData stabSettings;
     StabilizationSettingsGet(&stabSettings);
@@ -841,22 +880,23 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
 
     altitudeHoldDesiredData.Roll  = cmd->Roll * stabSettings.RollMax;
     altitudeHoldDesiredData.Pitch = cmd->Pitch * stabSettings.PitchMax;
-    altitudeHoldDesiredData.Yaw   = cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
+    altitudeHoldDesiredData.Yaw   = cmd->Yaw * stabSettings.ManualRate.Yaw;
 
     float currentDown;
-    PositionActualDownGet(&currentDown);
+    PositionStateDownGet(&currentDown);
     if (changed) {
         // After not being in this mode for a while init at current height
         altitudeHoldDesiredData.Altitude = 0;
         zeroed = false;
     } else if (cmd->Throttle > DEADBAND_HIGH && zeroed) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
-        // then apply an "exp" f(x,k) = (k∙x∙x∙x + x∙(256−k)) / 256
+        // then apply an "exp" f(x,k) = (k*x*x*x + x*(256−k)) / 256
         altitudeHoldDesiredData.Altitude += (throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
     } else if (cmd->Throttle < DEADBAND_LOW && zeroed) {
         altitudeHoldDesiredData.Altitude -= (throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
-    } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH) {
+    } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH && (throttleRate != 0)) {
         // Require the stick to enter the dead band before they can move height
+        // Vario is not "engaged" when throttleRate == 0
         zeroed = true;
     }
 
@@ -929,6 +969,9 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
  */
 static bool okToArm(void)
 {
+    // update checks
+    configuration_check();
+
     // read alarms
     SystemAlarmsData alarms;
 
@@ -936,7 +979,7 @@ static bool okToArm(void)
 
     // Check each alarm
     for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++) {
-        if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_ERROR) { // found an alarm thats set
+        if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[i] >= SYSTEMALARMS_ALARM_ERROR) { // found an alarm thats set
             if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY) {
                 continue;
             }
@@ -969,7 +1012,7 @@ static bool forcedDisArm(void)
 
     SystemAlarmsGet(&alarms);
 
-    if (alarms.Alarm[SYSTEMALARMS_ALARM_GUIDANCE] == SYSTEMALARMS_ALARM_CRITICAL) {
+    if (alarms.Alarm.Guidance == SYSTEMALARMS_ALARM_CRITICAL) {
         return true;
     }
     return false;
@@ -996,9 +1039,24 @@ static void setArmedIfChanged(uint8_t val)
  * @param[out] cmd The structure to set the armed in
  * @param[in] settings Settings indicating the necessary position
  */
-static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings)
+static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, int8_t armSwitch)
 {
     bool lowThrottle = cmd->Throttle <= 0;
+
+    /**
+     * do NOT check throttle if disarming via switch, must be instant
+     */
+    switch (settings->Arming) {
+    case MANUALCONTROLSETTINGS_ARMING_ACCESSORY0:
+    case MANUALCONTROLSETTINGS_ARMING_ACCESSORY1:
+    case MANUALCONTROLSETTINGS_ARMING_ACCESSORY2:
+        if (armSwitch < 0) {
+            lowThrottle = true;
+        }
+        break;
+    default:
+        break;
+    }
 
     if (forcedDisArm()) {
         // PathPlanner forces explicit disarming due to error condition (crash, impact, fire, ...)
@@ -1045,16 +1103,29 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
         float armingInputLevel = 0;
 
         // Calc channel see assumptions7
-        int8_t sign = ((settings->Arming - MANUALCONTROLSETTINGS_ARMING_ROLLLEFT) % 2) ? -1 : 1;
-        switch ((settings->Arming - MANUALCONTROLSETTINGS_ARMING_ROLLLEFT) / 2) {
-        case ARMING_CHANNEL_ROLL:
-            armingInputLevel = sign * cmd->Roll;
+        switch (settings->Arming) {
+        case MANUALCONTROLSETTINGS_ARMING_ROLLLEFT:
+            armingInputLevel = 1.0f * cmd->Roll;
             break;
-        case ARMING_CHANNEL_PITCH:
-            armingInputLevel = sign * cmd->Pitch;
+        case MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT:
+            armingInputLevel = -1.0f * cmd->Roll;
             break;
-        case ARMING_CHANNEL_YAW:
-            armingInputLevel = sign * cmd->Yaw;
+        case MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD:
+            armingInputLevel = 1.0f * cmd->Pitch;
+            break;
+        case MANUALCONTROLSETTINGS_ARMING_PITCHAFT:
+            armingInputLevel = -1.0f * cmd->Pitch;
+            break;
+        case MANUALCONTROLSETTINGS_ARMING_YAWLEFT:
+            armingInputLevel = 1.0f * cmd->Yaw;
+            break;
+        case MANUALCONTROLSETTINGS_ARMING_YAWRIGHT:
+            armingInputLevel = -1.0f * cmd->Yaw;
+            break;
+        case MANUALCONTROLSETTINGS_ARMING_ACCESSORY0:
+        case MANUALCONTROLSETTINGS_ARMING_ACCESSORY1:
+        case MANUALCONTROLSETTINGS_ARMING_ACCESSORY2:
+            armingInputLevel = -1.0f * (float)armSwitch;
             break;
         }
 
@@ -1081,7 +1152,7 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
         case ARM_STATE_ARMING_MANUAL:
             setArmedIfChanged(FLIGHTSTATUS_ARMED_ARMING);
 
-            if (manualArm && (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)) {
+            if (manualArm && (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings->ArmingSequenceTime)) {
                 armState = ARM_STATE_ARMED;
             } else if (!manualArm) {
                 armState = ARM_STATE_DISARMED;
@@ -1110,7 +1181,7 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
             break;
 
         case ARM_STATE_DISARMING_MANUAL:
-            if (manualDisarm && (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)) {
+            if (manualDisarm && (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings->DisarmingSequenceTime)) {
                 armState = ARM_STATE_DISARMED;
             } else if (!manualDisarm) {
                 armState = ARM_STATE_ARMED;
@@ -1180,8 +1251,8 @@ static void applyDeadband(float *value, float deadband)
  */
 static void applyLPF(float *value, ManualControlSettingsResponseTimeElem channel, ManualControlSettingsData *settings, float dT)
 {
-    if (settings->ResponseTime[channel]) {
-        float rt = (float)settings->ResponseTime[channel];
+    if (cast_struct_to_array(settings->ResponseTime, settings->ResponseTime.Roll)[channel]) {
+        float rt = (float)cast_struct_to_array(settings->ResponseTime, settings->ResponseTime.Roll)[channel];
         inputFiltered[channel] = ((rt * inputFiltered[channel]) + (dT * (*value))) / (rt + dT);
         *value = inputFiltered[channel];
     }

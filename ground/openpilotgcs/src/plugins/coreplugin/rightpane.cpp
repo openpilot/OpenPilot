@@ -33,10 +33,10 @@
 
 #include <QtCore/QSettings>
 
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QSplitter>
-#include <QtGui/QResizeEvent>
-#include <QtGui/QTextEdit>
+#include <QVBoxLayout>
+#include <QSplitter>
+#include <QResizeEvent>
+#include <QTextEdit>
 
 
 using namespace Core;

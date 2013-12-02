@@ -31,7 +31,7 @@
 #include <coreplugin/dialogs/ioptionspage.h>
 #include <QtCore/QObject>
 #include <QtCore/QStringList>
-#include <QtGui/QTabWidget>
+#include <QTabWidget>
 
 class QSettings;
 
@@ -76,6 +76,10 @@ public:
     QString modeName(int i) const
     {
         return m_modeNames.at(i);
+    }
+    bool restoreSelectedOnStartup() const
+    {
+        return m_restoreSelectedOnStartup;
     }
 
 signals:

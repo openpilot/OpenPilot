@@ -31,8 +31,18 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
     m_latitude(0),
     m_longitude(0),
     m_altitude(0),
-    m_cacheOnly(false)
+    m_cacheOnly(false),
+    m_speedFactor(1.0),
+    m_altitudeFactor(1.0)
 {
+    m_speedMap[1.0]       = "m/s";
+    m_speedMap[3.6]       = "km/h";
+    m_speedMap[2.2369]    = "mph";
+    m_speedMap[1.9438]    = "knots";
+
+    m_altitudeMap[1.0]    = "m";
+    m_altitudeMap[3.2808] = "ft";
+
     // if a saved configuration exists load it
     if (qSettings != 0) {
         m_qmlFile            = qSettings->value("qmlFile").toString();
@@ -48,6 +58,8 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
         m_longitude          = qSettings->value("longitude").toDouble();
         m_altitude           = qSettings->value("altitude").toDouble();
         m_cacheOnly          = qSettings->value("cacheOnly").toBool();
+        m_speedFactor        = qSettings->value("speedFactor").toDouble();
+        m_altitudeFactor     = qSettings->value("altitudeFactor").toDouble();
     }
 }
 
@@ -68,6 +80,8 @@ IUAVGadgetConfiguration *PfdQmlGadgetConfiguration::clone()
     m->m_longitude          = m_longitude;
     m->m_altitude           = m_altitude;
     m->m_cacheOnly          = m_cacheOnly;
+    m->m_speedFactor        = m_speedFactor;
+    m->m_altitudeFactor     = m_altitudeFactor;
 
     return m;
 }
@@ -91,4 +105,6 @@ void PfdQmlGadgetConfiguration::saveConfig(QSettings *qSettings) const
     qSettings->setValue("longitude", m_longitude);
     qSettings->setValue("altitude", m_altitude);
     qSettings->setValue("cacheOnly", m_cacheOnly);
+    qSettings->setValue("speedFactor", m_speedFactor);
+    qSettings->setValue("altitudeFactor", m_altitudeFactor);
 }

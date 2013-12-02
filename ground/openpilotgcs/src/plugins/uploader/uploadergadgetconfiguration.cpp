@@ -26,7 +26,8 @@
  */
 
 #include "uploadergadgetconfiguration.h"
-#include <qextserialport/src/qextserialport.h>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 
 /**
  * Loads a saved configuration or defaults if non exist.
@@ -35,20 +36,20 @@
 UploaderGadgetConfiguration::UploaderGadgetConfiguration(QString classId, QSettings *qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_defaultPort("Unknown"),
-    m_defaultSpeed(BAUD19200),
-    m_defaultDataBits(DATA_8),
-    m_defaultFlow(FLOW_OFF),
-    m_defaultParity(PAR_NONE),
-    m_defaultStopBits(STOP_1),
+    m_defaultSpeed(QSerialPort::UnknownBaud),
+    m_defaultDataBits(QSerialPort::UnknownDataBits),
+    m_defaultFlow(QSerialPort::UnknownFlowControl),
+    m_defaultParity(QSerialPort::UnknownParity),
+    m_defaultStopBits(QSerialPort::UnknownStopBits),
     m_defaultTimeOut(5000)
 {
     // if a saved configuration exists load it
     if (qSettings != 0) {
-        BaudRateType speed;
-        DataBitsType databits;
-        FlowType flow;
-        ParityType parity;
-        StopBitsType stopbits;
+        QSerialPort::BaudRate speed;
+        QSerialPort::DataBits databits;
+        QSerialPort::FlowControl flow;
+        QSerialPort::Parity parity;
+        QSerialPort::StopBits stopbits;
 
         int ispeed    = qSettings->value("defaultSpeed").toInt();
         int idatabits = qSettings->value("defaultDataBits").toInt();
@@ -57,11 +58,11 @@ UploaderGadgetConfiguration::UploaderGadgetConfiguration(QString classId, QSetti
         int istopbits = qSettings->value("defaultStopBits").toInt();
         QString port  = qSettings->value("defaultPort").toString();
 
-        databits = (DataBitsType)idatabits;
-        flow     = (FlowType)iflow;
-        parity   = (ParityType)iparity;
-        stopbits = (StopBitsType)istopbits;
-        speed    = (BaudRateType)ispeed;
+        databits = (QSerialPort::DataBits)idatabits;
+        flow     = (QSerialPort::FlowControl)iflow;
+        parity   = (QSerialPort::Parity)iparity;
+        stopbits = (QSerialPort::StopBits)istopbits;
+        speed    = (QSerialPort::BaudRate)ispeed;
         m_defaultPort     = port;
         m_defaultSpeed    = speed;
         m_defaultDataBits = databits;

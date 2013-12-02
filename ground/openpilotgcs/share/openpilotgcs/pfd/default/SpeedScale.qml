@@ -3,8 +3,8 @@ import Qt 4.7
 Item {
     id: sceneItem
     property variant sceneSize
-    property real groundSpeed : 3.6 * Math.sqrt(Math.pow(VelocityActual.North,2)+
-                                                Math.pow(VelocityActual.East,2))
+    property real groundSpeed : qmlWidget.speedFactor * Math.sqrt(Math.pow(VelocityState.North,2)+
+                                                Math.pow(VelocityState.East,2))
 
     SvgElementImage {
         id: speed_bg
@@ -58,7 +58,6 @@ Item {
         }
     }
 
-
     SvgElementImage {
         id: speed_window
         clip: true
@@ -80,6 +79,27 @@ Item {
                 pixelSize: parent.height * 0.6
             }
             anchors.centerIn: parent
+        }
+    }
+
+    SvgElementImage {
+        id: speed_unit
+        elementName: "speed-unit"
+        sceneSize: sceneItem.sceneSize
+        clip: true
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+        Text {
+            id: speed_unit_text
+            text: qmlWidget.speedUnit
+            color: "white"
+            font {
+                family: "Arial"
+                pixelSize: parent.height
+            }
+            anchors.right: parent.right
         }
     }
 }

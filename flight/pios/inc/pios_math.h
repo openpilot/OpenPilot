@@ -45,12 +45,40 @@
 #define M_LNPI_F     1.14472988584940017414342735135f      /* ln(pi) */
 #define M_EULER_F    0.57721566490153286060651209008f      /* Euler constant */
 
+#define M_E_D        2.71828182845904523536028747135d      /* e */
+#define M_LOG2E_D    1.44269504088896340735992468100d      /* log_2 (e) */
+#define M_LOG10E_D   0.43429448190325182765112891892d      /* log_10 (e) */
+#define M_SQRT2_D    1.41421356237309504880168872421d      /* sqrt(2) */
+#define M_SQRT1_2_D  0.70710678118654752440084436210d      /* sqrt(1/2) */
+#define M_SQRT3_D    1.73205080756887729352744634151d      /* sqrt(3) */
+#define M_PI_D       3.14159265358979323846264338328d      /* pi */
+#define M_PI_2_D     1.57079632679489661923132169164d      /* pi/2 */
+#define M_PI_4_D     0.78539816339744830961566084582d      /* pi/4 */
+#define M_SQRTPI_D   1.77245385090551602729816748334d      /* sqrt(pi) */
+#define M_2_SQRTPI_D 1.12837916709551257389615890312d /* 2/sqrt(pi) */
+#define M_1_PI_D     0.31830988618379067153776752675d      /* 1/pi */
+#define M_2_PI_D     0.63661977236758134307553505349d      /* 2/pi */
+#define M_LN10_D     2.30258509299404568401799145468d      /* ln(10) */
+#define M_LN2_D      0.69314718055994530941723212146d      /* ln(2) */
+#define M_LNPI_D     1.14472988584940017414342735135d      /* ln(pi) */
+#define M_EULER_D    0.57721566490153286060651209008d      /* Euler constant */
+
 // Conversion macro
-#define RAD2DEG(rad) ((rad) * (180.0f / M_PI_F))
-#define DEG2RAD(deg) ((deg) * (M_PI_F / 180.0f))
+#define RAD2DEG(rad)            ((rad) * (180.0f / M_PI_F))
+#define DEG2RAD(deg)            ((deg) * (M_PI_F / 180.0f))
+
+#define RAD2DEG_D(rad)          ((rad) * (180.0d / M_PI_D))
+#define DEG2RAD_D(deg)          ((deg) * (M_PI_D / 180.0d))
 
 // Useful math macros
-#define MAX(a, b)    ((a) > (b) ? (a) : (b))
-#define MIN(a, b)    ((a) < (b) ? (a) : (b))
+#define MAX(a, b)               ((a) > (b) ? (a) : (b))
+#define MIN(a, b)               ((a) < (b) ? (a) : (b))
+
+#define IS_REAL(f)              (!isnan(f) && !isinf(f))
+
+// Bitfield access
+#define IS_SET(field, mask)     (((field) & (mask)) == (mask))
+#define SET_MASK(field, mask)   (field) |= (mask)
+#define UNSET_MASK(field, mask) (field) &= ~(mask)
 
 #endif // PIOS_MATH_H

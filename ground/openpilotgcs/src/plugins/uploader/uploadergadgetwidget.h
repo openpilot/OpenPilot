@@ -33,9 +33,8 @@
 #include "devicewidget.h"
 #include "runningdevicewidget.h"
 #include "op_dfu.h"
-#include <qextserialport.h>
-#include <qextserialenumerator.h>
-
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 
 #include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
@@ -46,7 +45,7 @@
 #include "coreplugin/connectionmanager.h"
 
 #include "ophid/inc/ophid_plugin.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QLabel>
 #include <QLineEdit>
 #include <QThread>
@@ -97,6 +96,8 @@ private:
     int autoUpdateConnectTimeout;
     FlightStatus *getFlightStatus();
     void bootButtonsSetEnable(bool enabled);
+    static const int AUTOUPDATE_CLOSE_TIMEOUT;
+    QTimer autoUpdateCloseTimer;
 private slots:
     void onPhisicalHWConnect();
     void versionMatchCheck();

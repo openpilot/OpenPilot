@@ -31,7 +31,7 @@
 
 #include "utils_global.h"
 
-#include <QtGui/QToolButton>
+#include <QToolButton>
 
 namespace Utils {
 class QTCREATOR_UTILS_EXPORT QtColorButton : public QToolButton {

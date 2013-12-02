@@ -29,11 +29,11 @@
 #include "detailswidget.h"
 #include "detailsbutton.h"
 
-#include <QtGui/QGridLayout>
+#include <QGridLayout>
 #include <QtCore/QStack>
-#include <QtGui/QLabel>
-#include <QtGui/QGridLayout>
-#include <QtGui/QPainter>
+#include <QLabel>
+#include <QGridLayout>
+#include <QPainter>
 
 using namespace Utils;
 

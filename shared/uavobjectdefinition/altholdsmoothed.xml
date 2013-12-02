@@ -1,5 +1,5 @@
 <xml>
-    <object name="AltHoldSmoothed" singleinstance="true" settings="false">
+    <object name="AltHoldSmoothed" singleinstance="true" settings="false" category="State">
         <description>The output on the kalman filter on altitude.</description>
         <field name="Altitude" units="m" type="float" elements="1"/>
 	<field name="Velocity" units="m/s" type="float" elements="1"/>

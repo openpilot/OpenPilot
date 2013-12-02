@@ -1,5 +1,5 @@
 <xml>
-    <object name="SystemStats" singleinstance="true" settings="false">
+    <object name="SystemStats" singleinstance="true" settings="false" category="System">
         <description>CPU and memory usage from OpenPilot computer. </description>
         <field name="FlightTime" units="ms" type="uint32" elements="1"/>
         <field name="HeapRemaining" units="bytes" type="uint16" elements="1"/>

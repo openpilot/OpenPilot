@@ -32,7 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QTimer>
 
 class Ui_Widget;
@@ -56,8 +56,8 @@ private slots:
 private:
     Ui_ccattitude *ui;
     QTimer timer;
-    UAVObject::Metadata initialAccelsMdata;
-    UAVObject::Metadata initialGyrosMdata;
+    UAVObject::Metadata initialAccelStateMdata;
+    UAVObject::Metadata initialGyroStateMdata;
 
     int accelUpdates;
     int gyroUpdates;

@@ -29,7 +29,7 @@
 #define UAVOBJECTBROWSERCONFIGURATION_H
 
 #include <coreplugin/iuavgadgetconfiguration.h>
-#include <QtGui/QColor>
+#include <QColor>
 
 using namespace Core;
 

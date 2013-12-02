@@ -1,5 +1,5 @@
 <xml>
-    <object name="I2CStats" singleinstance="true" settings="false">
+    <object name="I2CStats" singleinstance="true" settings="false" category="System">
         <description>Tracks statistics on the I2C bus.</description>
         <field name="event_errors" units="" type="uint8" elements="1"/>
         <field name="fsm_errors" units="" type="uint8" elements="1"/>

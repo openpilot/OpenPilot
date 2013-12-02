@@ -29,9 +29,9 @@
 
 #include <stdint.h>
 
-struct PIOS_FLASHFS_Stats{
-        uint16_t num_free_slots; /* slots in free state */
-        uint16_t num_active_slots; /* slots in active state */
+struct PIOS_FLASHFS_Stats {
+    uint16_t num_free_slots; /* slots in free state */
+    uint16_t num_active_slots; /* slots in active state */
 };
 
 int32_t PIOS_FLASHFS_Format(uintptr_t fs_id);

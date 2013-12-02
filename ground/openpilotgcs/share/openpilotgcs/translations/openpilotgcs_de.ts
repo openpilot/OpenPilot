@@ -1767,7 +1767,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>AttitudeActual</source>
+        <source>AttitudeState</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1807,7 +1807,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>GPSPosition</source>
+        <source>GPSPositionSensor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13559,24 +13559,6 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetfactory.cpp" line="+25"/>
         <source>PFD (qml)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PowerlogPlugin</name>
-    <message>
-        <location filename="../../../src/plugins/powerlog/powerlogplugin.cpp" line="+295"/>
-        <source>Log filename</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>PowerLog-%0.csv</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Comma Separated Values (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -41,6 +41,7 @@
 #include <QBuffer>
 #include <QSpinBox>
 #include <QLineEdit>
+#include <QMediaPlaylist>
 
 #include "notifyplugin.h"
 #include "notifyitemdelegate.h"
@@ -126,11 +127,11 @@ void NotifyPluginOptionsPage::finish()
     disconnect(_optionsPage->UAVObjectField, SIGNAL(currentIndexChanged(QString)),
                this, SLOT(on_changedIndex_UAVField(QString)));
 
-    disconnect(_testSound.data(), SIGNAL(stateChanged(Phonon::State, Phonon::State)),
-               this, SLOT(on_changed_playButtonText(Phonon::State, Phonon::State)));
+    disconnect(_testSound, SIGNAL(stateChanged(QMediaPlayer::State)),
+               this, SLOT(on_changed_playButtonText(QMediaPlayer::State)));
     if (_testSound) {
         _testSound->stop();
-        _testSound->clear();
+        // _testSound->clear();
     }
 }
 
@@ -155,10 +156,11 @@ void NotifyPluginOptionsPage::initButtons()
 
 void NotifyPluginOptionsPage::initPhononPlayer()
 {
-    _testSound.reset(Phonon::createPlayer(Phonon::NotificationCategory));
-    connect(_testSound.data(), SIGNAL(stateChanged(Phonon::State, Phonon::State)),
-            this, SLOT(on_changed_playButtonText(Phonon::State, Phonon::State)));
-    connect(_testSound.data(), SIGNAL(finished(void)), this, SLOT(on_FinishedPlaying(void)));
+    _testSound = new QMediaPlayer;
+    // _testSound.reset(Phonon::createPlayer(Phonon::NotificationCategory));
+    connect(_testSound, SIGNAL(stateChanged(QMediaPlayer::State)),
+            this, SLOT(on_changed_playButtonText(QMediaPlayer::State)));
+    // connect(_testSound, SIGNAL(finished(void)), this, SLOT(on_FinishedPlaying(void)));
 }
 
 void NotifyPluginOptionsPage::initRulesTable()
@@ -515,15 +517,15 @@ void NotifyPluginOptionsPage::on_changedIndex_soundLanguage(int index)
 }
 
 
-void NotifyPluginOptionsPage::on_changed_playButtonText(Phonon::State newstate, Phonon::State /* oldstate */)
+void NotifyPluginOptionsPage::on_changed_playButtonText(QMediaPlayer::State newstate)
 {
     // Q_ASSERT(Phonon::ErrorState != newstate);
 
-    if (newstate == Phonon::PausedState || newstate == Phonon::StoppedState) {
+    if (newstate == QMediaPlayer::PausedState || newstate == QMediaPlayer::StoppedState) {
         _optionsPage->buttonPlayNotification->setText("Play");
         _optionsPage->buttonPlayNotification->setIcon(QPixmap(":/notify/images/play.png"));
     } else {
-        if (newstate == Phonon::PlayingState) {
+        if (newstate == QMediaPlayer::PlayingState) {
             _optionsPage->buttonPlayNotification->setText("Stop");
             _optionsPage->buttonPlayNotification->setIcon(QPixmap(":/notify/images/stop.png"));
         }
@@ -561,9 +563,10 @@ void NotifyPluginOptionsPage::on_clicked_buttonTestSoundNotification()
 {
     NotificationItem *notification = NULL;
 
+    playlist = new QMediaPlaylist;
     qNotifyDebug() << "on_buttonTestSoundNotification_clicked";
     Q_ASSERT(-1 != _notifyRulesSelection->currentIndex().row());
-    _testSound->clearQueue();
+    _testSound->stop();
     notification = _privListNotifications.at(_notifyRulesSelection->currentIndex().row());
     QStringList sequence = notification->toSoundList();
     if (sequence.isEmpty()) {
@@ -572,8 +575,9 @@ void NotifyPluginOptionsPage::on_clicked_buttonTestSoundNotification()
     }
     foreach(QString item, sequence) {
         qNotifyDebug() << item;
-        _testSound->enqueue(Phonon::MediaSource(item));
+        playlist->addMedia(QUrl::fromLocalFile(item));
     }
+    _testSound->setPlaylist(playlist);
     _testSound->play();
 }
 
@@ -631,14 +635,14 @@ void NotifyPluginOptionsPage::on_clicked_buttonModifyNotification()
 
 void NotifyPluginOptionsPage::on_FinishedPlaying()
 {
-    _testSound->clear();
+    _testSound->stop();
 }
 
 void NotifyPluginOptionsPage::on_toggled_checkEnableSound(bool state)
 {
     bool state1 = 1 ^ state;
 
-    QList<Phonon::Path> listOutputs  = _testSound->outputPaths();
-    Phonon::AudioOutput *audioOutput = (Phonon::AudioOutput *)listOutputs.last().sink();
-    audioOutput->setMuted(state1);
+    // QList<Phonon::Path> listOutputs  = _testSound->outputPaths();
+    // Phonon::AudioOutput *audioOutput = (Phonon::AudioOutput *)listOutputs.last().sink();
+    // _testSound->setMuted(state1);
 }

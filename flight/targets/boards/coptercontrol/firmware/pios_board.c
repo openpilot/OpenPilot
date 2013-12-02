@@ -145,7 +145,7 @@ void PIOS_Board_Init(void)
     const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
 #if defined(PIOS_INCLUDE_LED)
-    const struct pios_led_cfg *led_cfg   = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
+    const struct pios_gpio_cfg *led_cfg  = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
     PIOS_Assert(led_cfg);
     PIOS_LED_Init(led_cfg);
 #endif /* PIOS_INCLUDE_LED */
@@ -197,6 +197,9 @@ void PIOS_Board_Init(void)
         PIOS_Assert(0);
     }
 
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -236,9 +239,6 @@ void PIOS_Board_Init(void)
         HwSettingsSetDefaults(HwSettingsHandle(), 0);
         AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
     }
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
     /* Set up pulse timers */
     PIOS_TIM_InitClock(&tim_1_cfg);
@@ -864,8 +864,6 @@ void PIOS_Board_Init(void)
     default:
         PIOS_Assert(0);
     }
-
-    PIOS_GPIO_Init();
 
     /* Make sure we have at least one telemetry link configured or else fail initialization */
     PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);

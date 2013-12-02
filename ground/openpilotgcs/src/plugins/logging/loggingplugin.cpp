@@ -44,7 +44,9 @@
 #include "uavobjectmanager.h"
 
 
-LoggingConnection::LoggingConnection()
+LoggingConnection::LoggingConnection(LoggingPlugin *loggingPlugin) :
+    loggingPlugin(loggingPlugin),
+    m_deviceOpened(false)
 {}
 
 LoggingConnection::~LoggingConnection()
@@ -68,11 +70,9 @@ QList <Core::IConnection::device> LoggingConnection::availableDevices()
 
 QIODevice *LoggingConnection::openDevice(const QString &deviceName)
 {
-    Q_UNUSED(deviceName)
+    loggingPlugin->stopLogging();
+    closeDevice(deviceName);
 
-    if (logFile.isOpen()) {
-        logFile.close();
-    }
     QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open file"), QString(""), tr("OpenPilot Log (*.opl)"));
     if (!fileName.isNull()) {
         startReplay(fileName);
@@ -111,6 +111,11 @@ QString LoggingConnection::shortName()
     return QString("Logfile");
 }
 
+
+LoggingThread::~LoggingThread()
+{
+    stopLogging();
+}
 
 /**
  * Sets the file to use for logging and takes the parent plugin
@@ -282,16 +287,17 @@ void LoggingThread::transactionCompleted(UAVObject *obj, bool success)
  ********************************/
 
 
-LoggingPlugin::LoggingPlugin() : state(IDLE)
-{
-    logConnection = new LoggingConnection();
-}
+LoggingPlugin::LoggingPlugin() :
+    state(IDLE),
+    loggingThread(NULL),
+    logConnection(new LoggingConnection(this)),
+    mf(NULL),
+    cmd(NULL)
+{}
 
 LoggingPlugin::~LoggingPlugin()
 {
-    if (loggingThread) {
-        delete loggingThread;
-    }
+    delete loggingThread;
 
     // Don't delete it, the plugin manager will do it:
     // delete logConnection;
@@ -306,7 +312,6 @@ bool LoggingPlugin::initialize(const QStringList & args, QString *errMsg)
     Q_UNUSED(errMsg);
 
     loggingThread = NULL;
-
 
     // Add Menu entry
     Core::ActionManager *am   = Core::ICore::instance()->actionManager();
@@ -406,7 +411,7 @@ void LoggingPlugin::loggingStopped()
 
     emit stateChanged("IDLE");
 
-    free(loggingThread);
+    delete loggingThread;
     loggingThread = NULL;
 }
 
@@ -438,8 +443,6 @@ void LoggingPlugin::shutdown()
 {
     // Do nothing
 }
-Q_EXPORT_PLUGIN(LoggingPlugin)
-
 /**
  * @}
  * @}

@@ -51,18 +51,7 @@ GLC_CuttingPlane::GLC_CuttingPlane(const GLC_Point3d& center, const GLC_Vector3d
 		create3DviewInstance();
 	}
 
-	if (glc::Z_AXIS != m_Normal)
-	{
-		if (m_Normal != -glc::Z_AXIS)
-		{
-			m_CompMatrix.setMatRot(glc::Z_AXIS, m_Normal);
-		}
-		else
-		{
-			m_CompMatrix.setMatRot(glc::X_AXIS, glc::PI);
-		}
-	}
-
+	m_CompMatrix.setMatRot(glc::Z_AXIS, m_Normal);
 }
 
 GLC_CuttingPlane::GLC_CuttingPlane(const GLC_CuttingPlane& cuttingPlane)

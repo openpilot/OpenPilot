@@ -9,10 +9,10 @@
 #include "uavtalk/telemetrymanager.h"
 #include "uavobjectmanager.h"
 #include "actuatordesired.h"
-#include "altitudeactual.h"
-#include "attitudeactual.h"
-#include "velocityactual.h"
-#include "positionactual.h"
+#include "altitudestate.h"
+#include "attitudestate.h"
+#include "velocitystate.h"
+#include "positionstate.h"
 #include "gcstelemetrystats.h"
 
 class Simulator : public QObject {
@@ -48,10 +48,10 @@ private:
     QUdpSocket *inSocket;
     QUdpSocket *outSocket;
     ActuatorDesired *actDesired;
-    AltitudeActual *altActual;
-    VelocityActual *velActual;
-    AttitudeActual *attActual;
-    PositionActual *posActual;
+    AltitudeState *altState;
+    VelocityState *velState;
+    AttitudeState *attState;
+    PositionState *posState;
     GCSTelemetryStats *telStats;
     QHostAddress fgHost;
     int inPort;

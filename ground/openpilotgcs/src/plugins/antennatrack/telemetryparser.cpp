@@ -39,12 +39,12 @@ TelemetryParser::TelemetryParser(QObject *parent) : GPSParser(parent)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject *gpsObj = dynamic_cast<UAVDataObject *>(objManager->getObject("GPSPosition"));
+    UAVDataObject *gpsObj = dynamic_cast<UAVDataObject *>(objManager->getObject("GPSPositionSensor"));
 
     if (gpsObj != NULL) {
         connect(gpsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateGPS(UAVObject *)));
     } else {
-        qDebug() << "Error: Object is unknown (GPSPosition).";
+        qDebug() << "Error: Object is unknown (GPSPositionSensor).";
     }
 
     gpsObj = dynamic_cast<UAVDataObject *>(objManager->getObject("HomeLocation"));

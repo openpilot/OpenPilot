@@ -88,8 +88,12 @@ public:
 	inline bool containsTrianglesGroupId() const
 	{return !m_TrianglesId.isEmpty();}
 
-	//! Return the Triangle group ID
-	inline GLC_uint triangleGroupId(int index)
+	//! Return the triangle group ID
+	inline QList<GLC_uint> triangleGroupId() const
+	{return m_TrianglesId;}
+
+	//! Return the Triangle group ID at the given index
+	inline GLC_uint triangleGroupId(int index) const
 	{return m_TrianglesId.at(index);}
 
 	//! Return the size of list of triangles index of the group
@@ -132,7 +136,11 @@ public:
 	{return !m_StripsId.isEmpty();}
 
 	//! Return the strip ID
-	inline GLC_uint stripGroupId(int index)
+	inline QList<GLC_uint> stripGroupId() const
+	{return m_StripsId;}
+
+	//! Return the strip ID at the given index
+	inline GLC_uint stripGroupId(int index) const
 	{return m_StripsId.at(index);}
 
 	//! Return the size of index of strips
@@ -167,7 +175,11 @@ public:
 	{return !m_FansId.isEmpty();}
 
 	//! Return the fan ID
-	inline GLC_uint fanGroupId(int index)
+	inline QList<GLC_uint> fanGroupId() const
+	{return m_FansId;}
+
+	//! Return the fan ID at the given index
+	inline GLC_uint fanGroupId(int index) const
 	{return m_FansId.at(index);}
 
 	//! Return the size of index of fans

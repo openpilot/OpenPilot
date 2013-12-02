@@ -27,7 +27,7 @@
 #if defined(PIOS_INCLUDE_LED)
 
 #include <pios_led_priv.h>
-static const struct pios_led pios_leds[] = {
+static const struct pios_gpio pios_leds[] = {
     [PIOS_LED_USB] =  {
         .pin                =        {
             .gpio = GPIOA,
@@ -37,6 +37,7 @@ static const struct pios_led pios_leds[] = {
                 .GPIO_Speed = GPIO_Speed_50MHz,
             },
         },
+        .active_low         = true
     },
     [PIOS_LED_LINK] = {
         .pin                =        {
@@ -47,6 +48,7 @@ static const struct pios_led pios_leds[] = {
                 .GPIO_Speed = GPIO_Speed_50MHz,
             },
         },
+        .active_low         = true
     },
     [PIOS_LED_RX] =   {
         .pin                =        {
@@ -57,6 +59,7 @@ static const struct pios_led pios_leds[] = {
                 .GPIO_Speed = GPIO_Speed_50MHz,
             },
         },
+        .active_low         = true
     },
     [PIOS_LED_TX] =   {
         .pin                =        {
@@ -67,6 +70,7 @@ static const struct pios_led pios_leds[] = {
                 .GPIO_Speed = GPIO_Speed_50MHz,
             },
         },
+        .active_low         = true
     },
 #ifdef PIOS_RFM22B_DEBUG_ON_TELEM
     [PIOS_LED_D1] =   {
@@ -112,12 +116,12 @@ static const struct pios_led pios_leds[] = {
 #endif /* ifdef PIOS_RFM22B_DEBUG_ON_TELEM */
 };
 
-static const struct pios_led_cfg pios_led_cfg = {
-    .leds     = pios_leds,
-    .num_leds = NELEMENTS(pios_leds),
+static const struct pios_gpio_cfg pios_led_cfg = {
+    .gpios     = pios_leds,
+    .num_gpios = NELEMENTS(pios_leds),
 };
 
-const struct pios_led_cfg *PIOS_BOARD_HW_DEFS_GetLedCfg(__attribute__((unused)) uint32_t board_revision)
+const struct pios_gpio_cfg *PIOS_BOARD_HW_DEFS_GetLedCfg(__attribute__((unused)) uint32_t board_revision)
 {
     return &pios_led_cfg;
 }
@@ -432,7 +436,77 @@ static const struct pios_tim_clock_cfg tim_4_cfg = {
     },
 };
 
-static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
+static const struct pios_tim_channel pios_tim_all_port_pins[] = {
+    /* Main Tx */
+    {
+        .timer = TIM1,
+        .timer_chan = TIM_Channel_2,
+        .pin   = {
+            .gpio = GPIOA,
+            .init = {
+                .GPIO_Pin   = GPIO_Pin_9,
+                .GPIO_Mode  = GPIO_Mode_AF_PP,
+                .GPIO_Speed = GPIO_Speed_2MHz,
+            },
+        },
+    },
+    /* Main Rx */
+    {
+        .timer = TIM1,
+        .timer_chan = TIM_Channel_3,
+        .pin   = {
+            .gpio = GPIOA,
+            .init = {
+                .GPIO_Pin   = GPIO_Pin_10,
+                .GPIO_Mode  = GPIO_Mode_AF_PP,
+                .GPIO_Speed = GPIO_Speed_2MHz,
+            },
+        },
+    },
+    /* Flexi Tx */
+    {
+        .timer = TIM2,
+        .timer_chan = TIM_Channel_3,
+        .pin   = {
+            .gpio = GPIOB,
+            .init = {
+                .GPIO_Pin   = GPIO_Pin_10,
+                .GPIO_Mode  = GPIO_Mode_AF_PP,
+                .GPIO_Speed = GPIO_Speed_2MHz,
+            },
+        },
+        .remap = GPIO_PartialRemap2_TIM2,
+    },
+    /* Flexi Rx */
+    {
+        .timer = TIM2,
+        .timer_chan = TIM_Channel_4,
+        .pin   = {
+            .gpio = GPIOB,
+            .init = {
+                .GPIO_Pin   = GPIO_Pin_11,
+                .GPIO_Mode  = GPIO_Mode_AF_PP,
+                .GPIO_Speed = GPIO_Speed_2MHz,
+            },
+        },
+        .remap = GPIO_PartialRemap2_TIM2,
+    },
+};
+
+static const struct pios_tim_channel pios_tim_main_port_ppm = {
+    .timer = TIM1,
+    .timer_chan         = TIM_Channel_3,
+    .pin   = {
+        .gpio = GPIOA,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Mode  = GPIO_Mode_IPD,
+            .GPIO_Speed = GPIO_Speed_2MHz,
+        },
+    },
+};
+
+static const struct pios_tim_channel pios_tim_flexi_port_ppm = {
     .timer = TIM2,
     .timer_chan         = TIM_Channel_4,
     .pin   = {
@@ -446,20 +520,126 @@ static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
     .remap              = GPIO_PartialRemap2_TIM2,
 };
 
-static const struct pios_tim_channel pios_tim_ppm_main_port = {
-    .timer = TIM1,
-    .timer_chan         = TIM_Channel_2,
-    .pin   = {
-        .gpio = GPIOA,
-        .init = {
-            .GPIO_Pin   = GPIO_Pin_9,
-            .GPIO_Mode  = GPIO_Mode_IPD,
-            .GPIO_Speed = GPIO_Speed_2MHz,
-        },
+#endif /* PIOS_INCLUDE_TIM */
+
+#if defined(PIOS_INCLUDE_SERVO) && defined(PIOS_INCLUDE_TIM)
+/*
+ * Servo outputs
+ */
+#include <pios_servo_priv.h>
+
+const struct pios_servo_cfg pios_servo_main_cfg = {
+    .tim_oc_init          = {
+        .TIM_OCMode       = TIM_OCMode_PWM1,
+        .TIM_OutputState  = TIM_OutputState_Enable,
+        .TIM_OutputNState = TIM_OutputNState_Disable,
+        .TIM_Pulse        = PIOS_SERVOS_INITIAL_POSITION,
+        .TIM_OCPolarity   = TIM_OCPolarity_High,
+        .TIM_OCNPolarity  = TIM_OCPolarity_High,
+        .TIM_OCIdleState  = TIM_OCIdleState_Reset,
+        .TIM_OCNIdleState = TIM_OCNIdleState_Reset,
     },
+    .channels     = pios_tim_all_port_pins,
+    .num_channels = 2
 };
 
-#endif /* PIOS_INCLUDE_TIM */
+const struct pios_servo_cfg pios_servo_flexi_cfg = {
+    .tim_oc_init          = {
+        .TIM_OCMode       = TIM_OCMode_PWM1,
+        .TIM_OutputState  = TIM_OutputState_Enable,
+        .TIM_OutputNState = TIM_OutputNState_Disable,
+        .TIM_Pulse        = PIOS_SERVOS_INITIAL_POSITION,
+        .TIM_OCPolarity   = TIM_OCPolarity_High,
+        .TIM_OCNPolarity  = TIM_OCPolarity_High,
+        .TIM_OCIdleState  = TIM_OCIdleState_Reset,
+        .TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+    },
+    .channels     = &(pios_tim_all_port_pins[2]),
+    .num_channels = 2
+};
+
+const struct pios_servo_cfg pios_servo_main_flexi_cfg = {
+    .tim_oc_init          = {
+        .TIM_OCMode       = TIM_OCMode_PWM1,
+        .TIM_OutputState  = TIM_OutputState_Enable,
+        .TIM_OutputNState = TIM_OutputNState_Disable,
+        .TIM_Pulse        = PIOS_SERVOS_INITIAL_POSITION,
+        .TIM_OCPolarity   = TIM_OCPolarity_High,
+        .TIM_OCNPolarity  = TIM_OCPolarity_High,
+        .TIM_OCIdleState  = TIM_OCIdleState_Reset,
+        .TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+    },
+    .channels     = pios_tim_all_port_pins,
+    .num_channels = 4
+};
+
+#endif /* PIOS_INCLUDE_SERVO && PIOS_INCLUDE_TIM */
+
+/*
+ * PPM Inputs
+ */
+#if defined(PIOS_INCLUDE_PPM)
+#include <pios_ppm_priv.h>
+
+const struct pios_ppm_cfg pios_ppm_main_cfg = {
+    .tim_ic_init         = {
+        .TIM_ICPolarity  = TIM_ICPolarity_Rising,
+        .TIM_ICSelection = TIM_ICSelection_DirectTI,
+        .TIM_ICPrescaler = TIM_ICPSC_DIV1,
+        .TIM_ICFilter    = 0x0,
+    },
+    .channels     = &pios_tim_main_port_ppm,
+    .num_channels = 1,
+};
+
+const struct pios_ppm_cfg pios_ppm_flexi_cfg = {
+    .tim_ic_init         = {
+        .TIM_ICPolarity  = TIM_ICPolarity_Rising,
+        .TIM_ICSelection = TIM_ICSelection_DirectTI,
+        .TIM_ICPrescaler = TIM_ICPSC_DIV1,
+        .TIM_ICFilter    = 0x0,
+    },
+    .channels     = &pios_tim_flexi_port_ppm,
+    .num_channels = 1,
+};
+
+#endif /* PIOS_INCLUDE_PPM */
+
+/*
+ * PPM Output
+ */
+#if defined(PIOS_INCLUDE_PPM_OUT)
+#include <pios_ppm_out_priv.h>
+
+const struct pios_ppm_out_cfg pios_main_ppm_out_cfg = {
+    .tim_oc_init          = {
+        .TIM_OCMode       = TIM_OCMode_PWM1,
+        .TIM_OutputState  = TIM_OutputState_Enable,
+        .TIM_OutputNState = TIM_OutputNState_Disable,
+        .TIM_Pulse        = PIOS_SERVOS_INITIAL_POSITION,
+        .TIM_OCPolarity   = TIM_OCPolarity_Low,
+        .TIM_OCNPolarity  = TIM_OCPolarity_Low,
+        .TIM_OCIdleState  = TIM_OCIdleState_Reset,
+        .TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+    },
+    .channel              = &(pios_tim_all_port_pins[0]),
+};
+
+const struct pios_ppm_out_cfg pios_flexi_ppm_out_cfg = {
+    .tim_oc_init          = {
+        .TIM_OCMode       = TIM_OCMode_PWM1,
+        .TIM_OutputState  = TIM_OutputState_Enable,
+        .TIM_OutputNState = TIM_OutputNState_Disable,
+        .TIM_Pulse        = PIOS_SERVOS_INITIAL_POSITION,
+        .TIM_OCPolarity   = TIM_OCPolarity_Low,
+        .TIM_OCNPolarity  = TIM_OCPolarity_Low,
+        .TIM_OCIdleState  = TIM_OCIdleState_Reset,
+        .TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+    },
+    .channel              = &(pios_tim_all_port_pins[2]),
+};
+
+#endif /* PIOS_INCLUDE_PPM_OUT */
 
 #if defined(PIOS_INCLUDE_USART)
 
@@ -575,74 +755,6 @@ void PIOS_RTC_IRQ_Handler(void)
 }
 
 #endif /* if defined(PIOS_INCLUDE_RTC) */
-
-/*
- * PPM Inputs
- */
-#if defined(PIOS_INCLUDE_PPM)
-#include <pios_ppm_priv.h>
-
-const struct pios_ppm_cfg pios_ppm_flexi_cfg = {
-    .tim_ic_init         = {
-        .TIM_ICPolarity  = TIM_ICPolarity_Rising,
-        .TIM_ICSelection = TIM_ICSelection_DirectTI,
-        .TIM_ICPrescaler = TIM_ICPSC_DIV1,
-        .TIM_ICFilter    = 0x0,
-    },
-    .channels     = &pios_tim_ppm_flexi_port,
-    .num_channels = 1,
-};
-
-const struct pios_ppm_cfg pios_ppm_main_cfg = {
-    .tim_ic_init         = {
-        .TIM_ICPolarity  = TIM_ICPolarity_Rising,
-        .TIM_ICSelection = TIM_ICSelection_DirectTI,
-        .TIM_ICPrescaler = TIM_ICPSC_DIV1,
-        .TIM_ICFilter    = 0x0,
-    },
-    .channels     = &pios_tim_ppm_main_port,
-    .num_channels = 1,
-};
-
-#endif /* PIOS_INCLUDE_PPM */
-
-/*
- * PPM Output
- */
-#if defined(PIOS_INCLUDE_PPM_OUT)
-#include <pios_ppm_out_priv.h>
-
-static const struct pios_tim_channel pios_tim_ppmout[] = {
-    {
-        .timer = TIM2,
-        .timer_chan = TIM_Channel_3,
-        .pin   = {
-            .gpio = GPIOB,
-            .init = {
-                .GPIO_Pin   = GPIO_Pin_10,
-                .GPIO_Mode  = GPIO_Mode_AF_PP,
-                .GPIO_Speed = GPIO_Speed_2MHz,
-            },
-        },
-        .remap = GPIO_FullRemap_TIM2,
-    }
-};
-
-const struct pios_ppm_out_cfg pios_ppm_out_cfg = {
-    .tim_oc_init          = {
-        .TIM_OCMode       = TIM_OCMode_PWM1,
-        .TIM_OutputState  = TIM_OutputState_Enable,
-        .TIM_OutputNState = TIM_OutputNState_Disable,
-        .TIM_Pulse        = PIOS_SERVOS_INITIAL_POSITION,
-        .TIM_OCPolarity   = TIM_OCPolarity_Low,
-        .TIM_OCNPolarity  = TIM_OCPolarity_Low,
-        .TIM_OCIdleState  = TIM_OCIdleState_Reset,
-        .TIM_OCNIdleState = TIM_OCNIdleState_Reset,
-    },
-    .channel              = pios_tim_ppmout,
-};
-
-#endif /* PIOS_INCLUDE_PPM_OUT */
 
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"

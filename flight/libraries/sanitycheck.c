@@ -110,6 +110,7 @@ int32_t configuration_check()
             }
             break;
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
+        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEVARIO:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_ALTITUDEHOLD)) { // Revo supports altitude hold
@@ -203,13 +204,13 @@ static int32_t check_stabilization_settings(int index, bool multirotor)
     // Get the different axis modes for this switch position
     switch (index) {
     case 1:
-        ManualControlSettingsStabilization1SettingsGet(modes);
+        ManualControlSettingsStabilization1SettingsArrayGet(modes);
         break;
     case 2:
-        ManualControlSettingsStabilization2SettingsGet(modes);
+        ManualControlSettingsStabilization2SettingsArrayGet(modes);
         break;
     case 3:
-        ManualControlSettingsStabilization3SettingsGet(modes);
+        ManualControlSettingsStabilization3SettingsArrayGet(modes);
         break;
     default:
         return SYSTEMALARMS_ALARM_ERROR;

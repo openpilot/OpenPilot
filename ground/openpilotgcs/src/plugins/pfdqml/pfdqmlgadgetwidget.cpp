@@ -39,7 +39,11 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
     m_actualPositionUsed(false),
     m_latitude(46.671478),
     m_longitude(10.158932),
-    m_altitude(2000)
+    m_altitude(2000),
+    m_speedUnit("m/s"),
+    m_speedFactor(1.0),
+    m_altitudeUnit("m"),
+    m_altitudeFactor(1.0)
 {
     setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -48,14 +52,14 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
     // setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     QStringList objectsToExport;
-    objectsToExport << "VelocityActual" <<
-        "PositionActual" <<
-        "AttitudeActual" <<
-        "Accels" <<
+    objectsToExport << "VelocityState" <<
+        "PositionState" <<
+        "AttitudeState" <<
+        "AccelState" <<
         "VelocityDesired" <<
-        "PositionDesired" <<
-        "AttitudeHoldDesired" <<
-        "GPSPosition" <<
+        "PathDesired" <<
+        "AltitudeHoldDesired" <<
+        "GPSPositionSensor" <<
         "GCSTelemetryStats" <<
         "FlightBatteryState";
 
@@ -121,6 +125,38 @@ void PfdQmlGadgetWidget::setTerrainEnabled(bool arg)
     }
 }
 
+void PfdQmlGadgetWidget::setSpeedUnit(QString unit)
+{
+    if (m_speedUnit != unit) {
+        m_speedUnit = unit;
+        emit speedUnitChanged(unit);
+    }
+}
+
+void PfdQmlGadgetWidget::setSpeedFactor(double factor)
+{
+    if (m_speedFactor != factor) {
+        m_speedFactor = factor;
+        emit speedFactorChanged(factor);
+    }
+}
+
+void PfdQmlGadgetWidget::setAltitudeUnit(QString unit)
+{
+    if (m_altitudeUnit != unit) {
+        m_altitudeUnit = unit;
+        emit altitudeUnitChanged(unit);
+    }
+}
+
+void PfdQmlGadgetWidget::setAltitudeFactor(double factor)
+{
+    if (m_altitudeFactor != factor) {
+        m_altitudeFactor = factor;
+        emit altitudeFactorChanged(factor);
+    }
+}
+
 void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
 {
     if (m_openGLEnabled != arg) {
@@ -138,7 +174,7 @@ void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
     }
 }
 
-// Switch between PositionActual UAVObject position
+// Switch between PositionState UAVObject position
 // and pre-defined latitude/longitude/altitude properties
 void PfdQmlGadgetWidget::setActualPositionUsed(bool arg)
 {

@@ -36,11 +36,11 @@ quint32 GLC_Cylinder::m_ChunkId= 0xA705;
 // Constructor destructor
 //////////////////////////////////////////////////////////////////////
 
-GLC_Cylinder::GLC_Cylinder(double dRadius, double dLength)
+GLC_Cylinder::GLC_Cylinder(double dRadius, double dLength, int discretization)
 :GLC_Mesh()
 , m_Radius(dRadius)
 , m_Length(dLength)
-, m_Discret(glc::GLC_POLYDISCRET)	// Default discretion
+, m_Discret(discretization)	// Default discretion
 , m_EndedIsCaped(true)			// Cylinder ended are closed
 {
 	Q_ASSERT((m_Radius > 0.0) && (m_Length > 0.0));
@@ -55,9 +55,9 @@ GLC_Cylinder::GLC_Cylinder(const GLC_Cylinder& sourceCylinder)
 , m_EndedIsCaped(sourceCylinder.m_EndedIsCaped)
 {
 	Q_ASSERT((m_Radius > 0.0) && (m_Length > 0.0) && (m_Discret > 0));
-	createMeshAndWire();
-
+    if (isEmpty()) createMeshAndWire();
 }
+
 GLC_Cylinder::~GLC_Cylinder()
 {
 

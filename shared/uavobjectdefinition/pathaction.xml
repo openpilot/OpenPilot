@@ -1,5 +1,5 @@
 <xml>
-    <object name="PathAction" singleinstance="false" settings="false">
+    <object name="PathAction" singleinstance="false" settings="false" category="Navigation">
         <description>A waypoint command the pathplanner is to use at a certain waypoint</description>
 	<field name="Mode" units="" type="enum" elements="1" options="FlyEndpoint,FlyVector,FlyCircleRight,FlyCircleLeft,
 		DriveEndpoint,DriveVector,DriveCircleLeft,DriveCircleRight,
@@ -23,7 +23,7 @@
 	<field name="ErrorDestination" units="waypoint" type="int16" elements="1" default="0"/>
 
         <access gcs="readwrite" flight="readwrite"/>
-        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetrygcs acked="true" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="4000"/>
         <logging updatemode="periodic" period="1000"/>
     </object>

@@ -1,5 +1,5 @@
 <xml>
-    <object name="WaypointActive" singleinstance="true" settings="false">
+    <object name="WaypointActive" singleinstance="true" settings="false" category="Navigation">
 	<description>Indicates the currently active waypoint</description>
 	<field name="Index" units="" type="int16" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>

@@ -13,7 +13,7 @@ VOL_NAME="OpenPilot"
 rm -f "${TEMP_FILE}"
 rm -f "${OUT_FILE}"
 
-# if the file doesn't exist, try to create folder
+# if an OpenPilot volume is already mounted, unmount it
 if [ ! -f "/Volumes/${VOL_NAME}" ]
 then
 hdiutil unmount "/Volumes/${VOL_NAME}"

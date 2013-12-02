@@ -1,5 +1,5 @@
 <xml>
-    <object name="PoiLocation" singleinstance="true" settings="false">
+    <object name="PoiLocation" singleinstance="true" settings="false" category="Control">
         <description>Contains the current Point of interest relative to @ref HomeLocation</description>
         <field name="North" units="m" type="float" elements="1"/>
         <field name="East" units="m" type="float" elements="1"/>

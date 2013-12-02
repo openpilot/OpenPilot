@@ -38,13 +38,15 @@
 #include <QObject>
 #include <QDebug>
 
+class ConfigTaskWidget;
+
 class smartSaveButton : public QObject {
     enum buttonTypeEnum { save_button, apply_button };
 public:
     Q_OBJECT
 
 public:
-    smartSaveButton();
+    smartSaveButton(ConfigTaskWidget *configTaskWidget);
     void addButtons(QPushButton *save, QPushButton *apply);
     void setObjects(QList<UAVDataObject *>);
     void addObject(UAVDataObject *);
@@ -79,6 +81,7 @@ private:
     QEventLoop loop;
     QList<UAVDataObject *> objects;
     QMap<QPushButton *, buttonTypeEnum> buttonList;
+    ConfigTaskWidget *configWidget;
 
 public slots:
     void enableControls(bool value);

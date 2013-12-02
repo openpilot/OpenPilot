@@ -34,7 +34,7 @@ Rectangle {
                 anchors.centerIn: parent
                 //rotate it around the center of scene
                 transform: Rotation {
-                    angle: -AttitudeActual.Roll
+                    angle: -AttitudeState.Roll
                     origin.x : sceneItem.width/2 - x
                     origin.y : sceneItem.height/2 - y
                 }
@@ -54,7 +54,7 @@ Rectangle {
                 sceneSize: background.sceneSize
                 smooth: true
 
-                property real sideSlip: Accels.y
+                property real sideSlip: AccelState.y
                 //smooth side slip changes, a low pass filter replacement
                 //accels are updated once per second
                 Behavior on sideSlip {

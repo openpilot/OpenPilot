@@ -9,9 +9,10 @@
 # Ready to use:
 #    arm_sdk_install
 #    qt_sdk_install
-#    mingw_install (Windows only)
-#    python_install (Windows only)
+#    mingw_install (Windows only - NOT USED for Qt-5.1.x)
+#    python_install (Windows only - NOT USED for Qt-5.1.x)
 #    nsis_install (Windows only)
+#    openssl_install (Windows only)
 #    uncrustify_install
 #    doxygen_install
 #    gtest_install
@@ -57,24 +58,27 @@ endif
 ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
         ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-amd64.tar.bz2
-        QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
+        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.1/5.1.1/qt-linux-opensource-5.1.1-x86_64-offline.run
+        QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-linux-opensource-5.1.1-x86_64-offline.run.md5
+        QT_SDK_ARCH := gcc_64
     else
         ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-i686.tar.bz2
-        QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
+        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.1/5.1.1/qt-linux-opensource-5.1.1-x86-offline.run
+        QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-linux-opensource-5.1.1-x86-offline.run.md5
+        QT_SDK_ARCH := gcc
     endif
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
-    QT_SDK_URL     := "Please install native Qt 4.8.x SDK using package manager"
+    QT_SDK_URL     := "Please install native Qt 5.1.x SDK using package manager"
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
-    QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
-    MINGW_URL      := http://wiki.openpilot.org/download/attachments/18612236/mingw-4.4.0.tar.bz2
-    PYTHON_URL     := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
+    QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-5.1.1-windows.tar.bz2
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
+    OPENSSL_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
 endif
@@ -83,13 +87,16 @@ GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0
 
 # Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
-QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
-MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
-PYTHON_DIR      := $(TOOLS_DIR)/python-2.7.4
+QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.1.1
+MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
+PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin
 NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
+OPENSSL_DIR     := $(TOOLS_DIR)/openssl-1.0.1e-win32
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
+
+QT_SDK_PREFIX := $(QT_SDK_DIR)
 
 ##############################
 #
@@ -99,7 +106,7 @@ GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
 
 BUILD_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
-    BUILD_SDK_TARGETS += mingw python nsis
+    BUILD_SDK_TARGETS += mingw python nsis openssl
 endif
 ALL_SDK_TARGETS := $(BUILD_SDK_TARGETS) gtest uncrustify doxygen
 
@@ -130,15 +137,17 @@ export CUT	:= cut
 export SED	:= sed
 
 # Used only by this Makefile
-GIT		:= git
+GIT			:= git
 CURL		:= curl
-TAR		:= tar
+TAR			:= tar
 UNZIP		:= unzip
 OPENSSL		:= openssl
-ANT		:= ant
+ANT			:= ant
 JAVAC		:= javac
-JAR		:= jar
-
+JAR			:= jar
+SEVENZIP	:= 7z
+CD			:= cd
+GREP		:= grep
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
 # It does not work if make started under msysGit installed into a path with spaces.
 ifneq ($(UNAME), Windows)
@@ -179,13 +188,18 @@ MSG_NOTICE           = $(QUOTE) NOTE       $(QUOTE)
 
 # Verbosity level
 ifeq ($(V), 1)
-    CURL_OPTIONS  :=
     MAKE_SILENT   :=
     UNZIP_SILENT  :=
 else
-    CURL_OPTIONS  := --silent
     MAKE_SILENT   := --silent
     UNZIP_SILENT  := -q
+endif
+
+# Batch mode
+ifeq ($(BATCH), 1)
+    CURL_OPTIONS  := --silent -L
+else
+    CURL_OPTIONS  := -L
 endif
 
 # MSYS tar workaround
@@ -203,6 +217,7 @@ ifneq ($(strip $(filter $(addsuffix _install,all_sdk $(ALL_SDK_TARGETS)),$(MAKEC
     $(info $(EMPTY) NOTE        Use 'make all_sdk_distclean' to remove installation files)
     $(info $(EMPTY) NOTE        Use 'make all_sdk_version' to check toolchain versions)
     $(info $(EMPTY) NOTE        Add 'V=1' to make command line to diagnose make problems)
+    $(info $(EMPTY) NOTE        Add 'BATCH=1' to make command line to disable progress reporting during downloads)
 endif
 
 ##############################
@@ -212,9 +227,34 @@ endif
 #  $(2) = string compare operator, e.g. = or !=
 #
 ##############################
+
 define MD5_CHECK_TEMPLATE
 "`test -f \"$(1)\" && $(OPENSSL) dgst -md5 \"$(1)\" | $(CUT) -f2 -d' '`" $(2) "`$(CUT) -f1 -d' ' < \"$(1).md5\"`"
 endef
+
+##############################
+#
+# Cross platform download template
+#  $(1) = Package URL
+#  $(2) = Package file
+#  $(3) = URL for .md5 file to be tested against Package
+#
+##############################
+
+define DOWNLOAD_TEMPLATE
+@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(2))
+	$(V1) ( \
+		cd "$(DL_DIR)" && \
+		$(CURL) $(CURL_OPTIONS) --silent -o "$(DL_DIR)/$(2).md5" "$(3)" && \
+		if [ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(2),!=) ]; then \
+			$(ECHO) $(MSG_DOWNLOADING) $(1) && \
+			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(2)" "$(1)" && \
+			$(ECHO) $(MSG_CHECKSUMMING) $$(call toprel, $(DL_DIR)/$(2)) && \
+			[ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(2),=) ]; \
+		fi; \
+	)
+endef
+
 
 ##############################
 #
@@ -233,17 +273,8 @@ define TOOL_INSTALL_TEMPLATE
 .PHONY: $(addprefix $(1)_, install clean distclean)
 
 $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
-	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(4))
-	$(V1) ( \
-		cd "$(DL_DIR)" && \
-		$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
-		if [ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),!=) ]; then \
-			$(ECHO) $(MSG_DOWNLOADING) $(3) && \
-			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4)" "$(3)" && \
-			$(ECHO) $(MSG_CHECKSUMMING) $$(call toprel, $(DL_DIR)/$(4)) && \
-			[ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),=) ]; \
-		fi; \
-	)
+	
+	$(call DOWNLOAD_TEMPLATE,$(3),$(4),"$(3).md5")
 
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
@@ -264,6 +295,73 @@ $(1)_distclean:
 	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $(DL_DIR)/$(4))
 	$(V1) [ ! -f "$(DL_DIR)/$(4)" ]     || $(RM) "$(DL_DIR)/$(4)"
 	$(V1) [ ! -f "$(DL_DIR)/$(4).md5" ] || $(RM) "$(DL_DIR)/$(4).md5"
+
+endef
+
+##############################
+#
+# Linux QT install template
+#  $(1) = tool temp extract/build directory
+#  $(2) = tool install directory
+#  $(3) = tool distribution URL
+#  $(4) = tool distribution .md5 URL
+#  $(5) = tool distribution file
+#  $(6) = QT architecture
+#  $(7) = optional extra build recipes template
+#  $(8) = optional extra clean recipes template
+#
+##############################
+
+define LINUX_QT_INSTALL_TEMPLATE
+
+.PHONY: $(addprefix qt_sdk_, install clean distclean)
+
+qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
+	
+	$(call DOWNLOAD_TEMPLATE,$(3),$(5),"$(4)")
+# Explode .run file into install packages
+	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(1))
+	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(1)))
+	$(V1) chmod +x $(DL_DIR)/$(5) 
+	$(V1) $(DL_DIR)/$(5) --dump-binary-data -o  $(1)
+# Extract packages under tool directory
+	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0qt-project-url.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/1.0.0ThirdPartySoftware_Listing.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0readme.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1$(6)_qt5_essentials.7z" | grep -v Extracting
+	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
+	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1icu_path_patcher.sh.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).addons/5.1.1$(6)_qt5_addons.7z" | grep -v Extracting
+# go to OpenPilot/tools/5.1.1/gcc_64 and call patcher.sh
+	@$(ECHO)
+	@$(ECHO) "Running patcher in" $$(call toprel, $(QT_SDK_PREFIX))
+	$(V1) $(CD) $(QT_SDK_PREFIX)
+	$(V1) "$(QT_SDK_PREFIX)/patcher.sh" $(QT_SDK_PREFIX)
+# call qmake patcher
+	@$(ECHO) "Executing QtPatch in" $$(call toprel, $(QT_SDK_PREFIX))
+	$(V1) $(DL_DIR)/$(5) --runoperation QtPatch linux $(QT_SDK_PREFIX) qt5
+
+# Execute post build templates
+	$(7)
+	
+# Clean up temporary files
+	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(1))
+	$(V1) [ ! -d "$(1)" ] || $(RM) -rf "$(1)"
+	
+qt_sdk_clean:
+	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(1))
+	$(V1) [ ! -d "$(1)" ] || $(RM) -rf "$(1)"
+	@$(ECHO) $(MSG_CLEANING) $$(call toprel, "$(2)")
+	$(V1) [ ! -d "$(2)" ] || $(RM) -rf "$(2)"
+
+	$(8)
+
+qt_sdk_distclean:
+	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $(DL_DIR)/$(5))
+	$(V1) [ ! -f "$(DL_DIR)/$(5)" ]     || $(RM) "$(DL_DIR)/$(5)"
+	$(V1) [ ! -f "$(DL_DIR)/$(5).md5" ] || $(RM) "$(DL_DIR)/$(5).md5"
 
 endef
 
@@ -308,20 +406,29 @@ endef
 
 ifeq ($(UNAME), Windows)
 
+QT_SDK_PREFIX := $(QT_SDK_DIR)/5.1.1/mingw48_32
+
 define QT_SDK_CONFIGURE_TEMPLATE
 	@$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(QT_SDK_DIR))
-	$(V1) $(ECHO) $(QUOTE)[Paths]$(QUOTE) > $(QT_SDK_DIR)/bin/qt.conf
-	$(V1) $(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE) >> $(QT_SDK_DIR)/bin/qt.conf
+	$(V1) $(ECHO) $(QUOTE)[Paths]$(QUOTE) > $(QT_SDK_PREFIX)/bin/qt.conf
+	$(V1) $(ECHO) $(QUOTE)Prefix = $(QT_SDK_PREFIX)$(QUOTE) >> $(QT_SDK_PREFIX)/bin/qt.conf
 endef
 
     $(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_CONFIGURE_TEMPLATE)))
 
+else ifeq ($(UNAME), Linux)
+QT_SDK_PREFIX := "$(QT_SDK_DIR)/5.1.1/$(QT_SDK_ARCH)"
+QT_BUILD_DIR := $(BUILD_DIR)/QT_BUILD
+    $(eval $(call LINUX_QT_INSTALL_TEMPLATE,$(QT_BUILD_DIR),$(QT_SDK_DIR),$(QT_SDK_URL),$(QT_SDK_MD5_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_ARCH)))
+
 else
+
+QT_SDK_PREFIX := $(QT_SDK_DIR)
 
 .PHONY: qt_sdk_install
 qt_sdk_install:
 	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
-	@$(ECHO) $(MSG_NOTICE) Please install native Qt 4.8.x SDK using package manager
+	@$(ECHO) $(MSG_NOTICE) Please install native Qt 5.1.x SDK using package manager
 	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
 
 .PHONY: qt_sdk_clean
@@ -333,11 +440,11 @@ qt_sdk_distclean:
 endif
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    export QMAKE := $(QT_SDK_DIR)/bin/qmake
+    export QMAKE := $(QT_SDK_PREFIX)/bin/qmake
 
     # set Qt library search path
     ifeq ($(UNAME), Windows)
-        export PATH := $(QT_SDK_DIR)/bin:$(PATH)
+        export PATH := $(QT_SDK_PREFIX)/bin:$(PATH)
     else
         export LD_LIBRARY_PATH := $(QT_SDK_DIR)/lib:$(LD_LIBRARY_PATH)
     endif
@@ -359,7 +466,10 @@ qt_sdk_version:
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,mingw,$(MINGW_DIR),$(MINGW_URL),$(notdir $(MINGW_URL))))
+#$(eval $(call TOOL_INSTALL_TEMPLATE,mingw,$(MINGW_DIR),$(MINGW_URL),$(notdir $(MINGW_URL))))
+mingw_install:
+mingw_clean:
+mingw_distclean:
 
 ifeq ($(shell [ -d "$(MINGW_DIR)" ] && $(ECHO) "exists"), exists)
     # set MinGW binary and library paths (QTMINGW is used by qmake, do not rename)
@@ -395,7 +505,10 @@ endif
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,python,$(PYTHON_DIR),$(PYTHON_URL),$(notdir $(PYTHON_URL))))
+#$(eval $(call TOOL_INSTALL_TEMPLATE,python,$(PYTHON_DIR),$(PYTHON_URL),$(notdir $(PYTHON_URL))))
+python_install:
+python_clean:
+python_distclean:
 
 else # Linux or Mac
 
@@ -418,7 +531,7 @@ python_version:
 
 ##############################
 #
-# NSIS Unicode
+# NSIS Unicode (Windows only)
 #
 ##############################
 
@@ -437,6 +550,25 @@ endif
 .PHONY: nsis_version
 nsis_version:
 	-$(V1) $(NSIS) | head -n1
+
+endif
+
+##############################
+#
+# OpenSSL (Windows only)
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,openssl,$(OPENSSL_DIR),$(OPENSSL_URL),$(notdir $(OPENSSL_URL))))
+
+ifeq ($(shell [ -d "$(OPENSSL_DIR)" ] && $(ECHO) "exists"), exists)
+    export OPENSSL := $(OPENSSL_DIR)
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(OPENSSL_DIR)) not found (make openssl_install), using system PATH)
+endif
 
 endif
 

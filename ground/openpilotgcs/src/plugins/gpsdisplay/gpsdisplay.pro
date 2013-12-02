@@ -1,6 +1,7 @@
 TEMPLATE = lib
 TARGET = GpsDisplayGadget
 QT += svg
+QT += serialport
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(gpsdisplay_dependencies.pri)

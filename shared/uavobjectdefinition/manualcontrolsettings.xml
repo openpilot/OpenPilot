@@ -1,5 +1,5 @@
 <xml>
-    <object name="ManualControlSettings" singleinstance="true" settings="true">
+    <object name="ManualControlSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings to indicate how to decode receiver input by @ref ManualControlModule.</description>
         <field name="ChannelGroups" units="Channel Group" type="enum" 
 	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"
@@ -17,7 +17,7 @@
 
         <field name="Deadband" units="%" type="float" elements="1" defaultvalue="0"/>
 
-        <field name="Arming" units="" type="enum" elements="1" options="Always Disarmed,Always Armed,Roll Left,Roll Right,Pitch Forward,Pitch Aft,Yaw Left,Yaw Right" defaultvalue="Always Disarmed"/>
+        <field name="Arming" units="" type="enum" elements="1" options="Always Disarmed,Always Armed,Roll Left,Roll Right,Pitch Forward,Pitch Aft,Yaw Left,Yaw Right,Accessory 0,Accessory 1,Accessory 2" defaultvalue="Always Disarmed"/>
 
 	<!-- Note these options should be identical to those in StabilizationDesired.StabilizationMode -->
         <field name="Stabilization1Settings" units="" type="enum"
@@ -43,35 +43,38 @@
                units=""
                type="enum"
                elements="6"
-               options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,AltitudeHold,VelocityControl,PositionHold,ReturnToBase,Land,PathPlanner,POI"
+               options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,AltitudeHold,AltitudeVario,VelocityControl,PositionHold,ReturnToBase,Land,PathPlanner,POI"
                defaultvalue="Stabilized1,Stabilized2,Stabilized3,AltitudeHold,PositionHold,Manual"
                limits="\
-                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
+                       %0401NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0402NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0903NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
                        \
-                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
+                       %0401NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0402NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0903NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
                        \
-                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
+                       %0401NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0402NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0903NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
                        \
-                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
+                       %0401NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0402NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0903NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
                        \
-                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
+                       %0401NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0402NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0903NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI;\
                        \
-                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
-                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI"/>
+                       %0401NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0402NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
+                       %0903NE:Autotune:AltitudeVario:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI"/>
 
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
-        <field name="FailsafeBehavior" units="" type="enum" elements="1" options="None" defaultvalue="None"/>
+        <field name="ArmingSequenceTime" units="ms" type="uint16" elements="1" defaultvalue="1000"/>
+        <field name="DisarmingSequenceTime" units="ms" type="uint16" elements="1" defaultvalue="1000"/>
+        <field name="FailsafeBehavior" units="" type="enum" elements="1" options="None,ModePos1,ModePos2,ModePos3,ModePos4,ModePos5,ModePos6" defaultvalue="None"/>
+        <field name="ReturnToHomeAltitudeOffset" units="m" type="float" elements="1" defaultvalue="10"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

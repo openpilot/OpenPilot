@@ -36,8 +36,8 @@
 #include "modelmapproxy.h"
 #include "modeluavoproxy.h"
 
-#include <QtGui/QWidget>
-#include <QtGui/QMenu>
+#include <QWidget>
+#include <QMenu>
 #include <QStringList>
 #include <QStandardItemModel>
 #include <QList>
@@ -113,7 +113,7 @@ public:
     void setMaxUpdateRate(int update_rate);
     void setHomePosition(QPointF pos);
     void setOverlayOpacity(qreal value);
-    bool getGPSPosition(double &latitude, double &longitude, double &altitude);
+    bool getGPSPositionSensor(double &latitude, double &longitude, double &altitude);
 signals:
     void defaultLocationAndZoomChanged(double lng, double lat, double zoom);
     void overlayOpacityChanged(qreal);

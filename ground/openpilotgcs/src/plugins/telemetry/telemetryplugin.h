@@ -32,6 +32,10 @@
 class MonitorGadgetFactory;
 
 class TelemetryPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "OpenPilot.Telemetry")
+
+
 public:
     TelemetryPlugin();
     ~TelemetryPlugin();

@@ -40,8 +40,6 @@
 #include "mimedatabase.h"
 #include "outputpane.h"
 #include "plugindialog.h"
-#include "qxtlogger.h"
-#include "qxtbasicstdloggerengine.h"
 #include "shortcutsettings.h"
 #include "uavgadgetmanager.h"
 #include "uavgadgetinstancemanager.h"
@@ -74,18 +72,19 @@
 #include <QtCore/QtPlugin>
 #include <QtCore/QUrl>
 
-#include <QtGui/QApplication>
-#include <QtGui/QCloseEvent>
-#include <QtGui/QMenu>
-#include <QtGui/QPixmap>
-#include <QtGui/QShortcut>
-#include <QtGui/QStatusBar>
-#include <QtGui/QWizard>
-#include <QtGui/QToolButton>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QApplication>
+#include <QCloseEvent>
+#include <QMenu>
+#include <QPixmap>
+#include <QShortcut>
+#include <QStatusBar>
+#include <QWizard>
+#include <QToolButton>
+#include <QMessageBox>
 #include <QDesktopServices>
 #include <QElapsedTimer>
 #include <QDir>
+#include <QMimeData>
 
 using namespace Core;
 using namespace Core::Internal;
@@ -172,9 +171,6 @@ MainWindow::MainWindow() :
     m_modeStack->setMovable(false);
     m_modeStack->setMinimumWidth(512);
     m_modeStack->setElideMode(Qt::ElideRight);
-#ifndef Q_WS_MAC
-    m_modeStack->setDocumentMode(true);
-#endif
     m_modeManager = new ModeManager(this, m_modeStack);
 
     m_connectionManager = new ConnectionManager(this);
@@ -190,11 +186,6 @@ MainWindow::MainWindow() :
     connect(m_modeManager, SIGNAL(newModeOrder(QVector<IMode *>)), m_workspaceSettings, SLOT(newModeOrder(QVector<IMode *>)));
     statusBar()->setProperty("p_styled", true);
     setAcceptDrops(true);
-    foreach(QString engine, qxtLog->allLoggerEngines())
-    qxtLog->removeLoggerEngine(engine);
-    qxtLog->addLoggerEngine("std", new QxtBasicSTDLoggerEngine());
-    qxtLog->installAsMessageHandler();
-    qxtLog->enableAllLogLevels();
 }
 
 MainWindow::~MainWindow()
@@ -206,9 +197,6 @@ MainWindow::~MainWindow()
 
     hide();
 
-    qxtLog->removeAsMessageHandler();
-    foreach(QString engine, qxtLog->allLoggerEngines())
-    qxtLog->removeLoggerEngine(engine);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     if (m_uavGadgetManagers.count() > 0) {
         foreach(UAVGadgetManager * mode, m_uavGadgetManagers) {
@@ -1228,8 +1216,10 @@ void MainWindow::readSettings(QSettings *qs, bool workspaceDiffOnly)
     qs->endGroup();
 
     // Restore selected tab
-    int index = qs->value(QLatin1String("SelectedWorkspace")).toInt();
-    m_modeStack->setCurrentIndex(index);
+    if (m_workspaceSettings->restoreSelectedOnStartup()) {
+        int index = qs->value(QLatin1String("SelectedWorkspace")).toInt();
+        m_modeStack->setCurrentIndex(index);
+    }
 }
 
 

@@ -1,5 +1,5 @@
 <xml>
-    <object name="GPSTime" singleinstance="true" settings="false">
+    <object name="GPSTime" singleinstance="true" settings="false" category="Sensors">
         <description>Contains the GPS time from @ref GPSModule.  Required to compute the world magnetic model correctly when setting the home location.</description>
         <field name="Month" units="" type="int8" elements="1"/>
         <field name="Day" units="" type="int8" elements="1"/>

@@ -61,7 +61,8 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow) :
     // put everything together
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(5);
-    layout->setContentsMargins(5, 2, 5, 2);
+    // cheat a bit with the margin to "nicely" center things vertically
+    layout->setContentsMargins(5, 0, 5, 4);
     setLayout(layout);
 
     layout->addWidget(new QLabel(tr("Connections:")), 0, Qt::AlignVCenter);

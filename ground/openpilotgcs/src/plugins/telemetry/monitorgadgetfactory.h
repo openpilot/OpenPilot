@@ -33,14 +33,14 @@
 
 
 namespace Core {
-    class IUAVGadget;
-    class IUAVGadgetFactory;
+class IUAVGadget;
+class IUAVGadgetFactory;
 }
 
 using namespace Core;
 
-class MonitorGadgetFactory: public IUAVGadgetFactory {
-Q_OBJECT
+class MonitorGadgetFactory : public IUAVGadgetFactory {
+    Q_OBJECT
 public:
     MonitorGadgetFactory(QObject *parent = 0);
     ~MonitorGadgetFactory();

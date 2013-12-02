@@ -232,7 +232,7 @@ void TelemetryMonitor::processStatsUpdates()
         }
     }
 
-    emit telemetryUpdated((double) gcsStats.TxDataRate, (double) gcsStats.RxDataRate);
+    emit telemetryUpdated((double)gcsStats.TxDataRate, (double)gcsStats.RxDataRate);
 
     // Set data
     gcsStatsObj->setData(gcsStats);

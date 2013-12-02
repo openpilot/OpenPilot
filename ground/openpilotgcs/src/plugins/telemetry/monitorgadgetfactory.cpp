@@ -35,13 +35,11 @@
 #include <coreplugin/icore.h>
 
 MonitorGadgetFactory::MonitorGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("TelemetryMonitorGadget"), tr("Telemetry Monitor"), parent)
-{
-}
+    IUAVGadgetFactory(QString("TelemetryMonitorGadget"), tr("Telemetry Monitor"), parent)
+{}
 
 MonitorGadgetFactory::~MonitorGadgetFactory()
-{
-}
+{}
 
 Core::IUAVGadget *MonitorGadgetFactory::createGadget(QWidget *parent)
 {

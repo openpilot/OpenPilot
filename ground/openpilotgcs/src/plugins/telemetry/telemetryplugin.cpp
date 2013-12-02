@@ -43,12 +43,11 @@
 #include <coreplugin/iuavgadget.h>
 
 TelemetryPlugin::TelemetryPlugin()
-{
-}
+{}
 
 TelemetryPlugin::~TelemetryPlugin()
 {
-//    Core::ICore::instance()->saveSettings(this);
+// Core::ICore::instance()->saveSettings(this);
 }
 
 bool TelemetryPlugin::initialize(const QStringList & args, QString *errMsg)
@@ -59,15 +58,15 @@ bool TelemetryPlugin::initialize(const QStringList & args, QString *errMsg)
     MonitorGadgetFactory *mf = new MonitorGadgetFactory(this);
     addAutoReleasedObject(mf);
 
-    //  mop = new TelemetryPluginOptionsPage(this);
-    //addAutoReleasedObject(mop);
+    // mop = new TelemetryPluginOptionsPage(this);
+    // addAutoReleasedObject(mop);
 
     // TODO not so good... g is probalby leaked...
     MonitorWidget *w = mf->createMonitorWidget(NULL);
     w->setMaximumWidth(180);
 
     //
-    //setAlignment(Qt::AlignCenter);
+    // setAlignment(Qt::AlignCenter);
 
     // no border
     w->setFrameStyle(QFrame::NoFrame);
@@ -82,8 +81,8 @@ bool TelemetryPlugin::initialize(const QStringList & args, QString *errMsg)
 
     // add monitor widget to connection manager
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-//    connect(cm, SIGNAL(deviceConnected(QIODevice *)), w, SLOT(telemetryConnected()));
-//    connect(cm, SIGNAL(deviceDisconnected()), w, SLOT(telemetryDisconnected()));
+// connect(cm, SIGNAL(deviceConnected(QIODevice *)), w, SLOT(telemetryConnected()));
+// connect(cm, SIGNAL(deviceDisconnected()), w, SLOT(telemetryDisconnected()));
 
     cm->addWidget(w);
 
@@ -92,156 +91,156 @@ bool TelemetryPlugin::initialize(const QStringList & args, QString *errMsg)
 
 void TelemetryPlugin::extensionsInitialized()
 {
-//    Core::ICore::instance()->readSettings(this);
+// Core::ICore::instance()->readSettings(this);
 
-    //ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    // ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
-//    connect(pm, SIGNAL(objectAdded(QObject *)), this, SLOT(onTelemetryManagerAdded(QObject *)));
-//    _toRemoveNotifications.clear();
-//    connectNotifications();
+// connect(pm, SIGNAL(objectAdded(QObject *)), this, SLOT(onTelemetryManagerAdded(QObject *)));
+// _toRemoveNotifications.clear();
+// connectNotifications();
 }
 
-//void TelemetryPlugin::saveConfig(QSettings *settings, UAVConfigInfo *configInfo)
-//{
-//    configInfo->setVersion(VERSION);
+// void TelemetryPlugin::saveConfig(QSettings *settings, UAVConfigInfo *configInfo)
+// {
+// configInfo->setVersion(VERSION);
 //
-//    settings->beginWriteArray("Current");
-//    settings->setArrayIndex(0);
-//    currentNotification.saveState(settings);
-//    settings->endArray();
+// settings->beginWriteArray("Current");
+// settings->setArrayIndex(0);
+// currentNotification.saveState(settings);
+// settings->endArray();
 //
-//    settings->beginGroup("listNotifies");
-//    settings->remove("");
-//    settings->endGroup();
+// settings->beginGroup("listNotifies");
+// settings->remove("");
+// settings->endGroup();
 //
-//    settings->beginWriteArray("listNotifies");
-//    for (int i = 0; i < _notificationList.size(); i++) {
-//        settings->setArrayIndex(i);
-//        _notificationList.at(i)->saveState(settings);
-//    }
-//    settings->endArray();
-//    settings->setValue(QLatin1String("Enable"), enable);
-//}
+// settings->beginWriteArray("listNotifies");
+// for (int i = 0; i < _notificationList.size(); i++) {
+// settings->setArrayIndex(i);
+// _notificationList.at(i)->saveState(settings);
+// }
+// settings->endArray();
+// settings->setValue(QLatin1String("Enable"), enable);
+// }
 
-//void TelemetryPlugin::readConfig(QSettings *settings, UAVConfigInfo * /* configInfo */)
-//{
-//    // Just for migration to the new format.
-//    // Q_ASSERT(configInfo->version() == UAVConfigVersion());
+// void TelemetryPlugin::readConfig(QSettings *settings, UAVConfigInfo * /* configInfo */)
+// {
+//// Just for migration to the new format.
+//// Q_ASSERT(configInfo->version() == UAVConfigVersion());
 //
-//    settings->beginReadArray("Current");
-//    settings->setArrayIndex(0);
-//    currentNotification.restoreState(settings);
-//    settings->endArray();
+// settings->beginReadArray("Current");
+// settings->setArrayIndex(0);
+// currentNotification.restoreState(settings);
+// settings->endArray();
 //
-//    // read list of notifications from settings
-//    int size = settings->beginReadArray("listNotifies");
-//    for (int i = 0; i < size; ++i) {
-//        settings->setArrayIndex(i);
-//        NotificationItem *notification = new NotificationItem;
-//        notification->restoreState(settings);
-//        _notificationList.append(notification);
-//    }
-//    settings->endArray();
-//    setEnable(settings->value(QLatin1String("Enable"), 0).toBool());
-//}
+//// read list of notifications from settings
+// int size = settings->beginReadArray("listNotifies");
+// for (int i = 0; i < size; ++i) {
+// settings->setArrayIndex(i);
+// NotificationItem *notification = new NotificationItem;
+// notification->restoreState(settings);
+// _notificationList.append(notification);
+// }
+// settings->endArray();
+// setEnable(settings->value(QLatin1String("Enable"), 0).toBool());
+// }
 
-//void TelemetryPlugin::onTelemetryManagerAdded(QObject *obj)
-//{
-//    telMngr = qobject_cast<TelemetryManager *>(obj);
-//    if (telMngr) {
-//        connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
-//    }
-//}
+// void TelemetryPlugin::onTelemetryManagerAdded(QObject *obj)
+// {
+// telMngr = qobject_cast<TelemetryManager *>(obj);
+// if (telMngr) {
+// connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
+// }
+// }
 
 void TelemetryPlugin::shutdown()
 {
     // Do nothing
 }
 
-//void TelemetryPlugin::onAutopilotDisconnect()
-//{
-//    connectNotifications();
-//}
+// void TelemetryPlugin::onAutopilotDisconnect()
+// {
+// connectNotifications();
+// }
 
 ///*!
-//    clear any telemetry timers from previous flight;
-//    reset will be perform on start of option page
+// clear any telemetry timers from previous flight;
+// reset will be perform on start of option page
 // */
-//void TelemetryPlugin::resetNotification(void)
-//{
-//    // first, reject empty args and unknown fields.
-//    foreach(NotificationItem * ntf, _notificationList) {
-//        ntf->disposeTimer();
-//        disconnect(ntf->getTimer(), SIGNAL(timeout()), this, SLOT(on_timerRepeated_Notification()));
-//        ntf->disposeExpireTimer();
-//        disconnect(ntf->getExpireTimer(), SIGNAL(timeout()), this, SLOT(on_timerRepeated_Notification()));
-//    }
-//}
+// void TelemetryPlugin::resetNotification(void)
+// {
+//// first, reject empty args and unknown fields.
+// foreach(NotificationItem * ntf, _notificationList) {
+// ntf->disposeTimer();
+// disconnect(ntf->getTimer(), SIGNAL(timeout()), this, SLOT(on_timerRepeated_Notification()));
+// ntf->disposeExpireTimer();
+// disconnect(ntf->getExpireTimer(), SIGNAL(timeout()), this, SLOT(on_timerRepeated_Notification()));
+// }
+// }
 
-//void TelemetryPlugin::connectNotifications()
-//{
-//    foreach(UAVDataObject * obj, lstNotifiedUAVObjects) {
-//        if (obj != NULL) {
-//            disconnect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(on_arrived_Notification(UAVObject *)));
-//        }
-//    }
-//    if (phonon.mo != NULL) {
-//        delete phonon.mo;
-//        phonon.mo = NULL;
-//    }
+// void TelemetryPlugin::connectNotifications()
+// {
+// foreach(UAVDataObject * obj, lstNotifiedUAVObjects) {
+// if (obj != NULL) {
+// disconnect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(on_arrived_Notification(UAVObject *)));
+// }
+// }
+// if (phonon.mo != NULL) {
+// delete phonon.mo;
+// phonon.mo = NULL;
+// }
 //
-//    if (!enable) {
-//        return;
-//    }
+// if (!enable) {
+// return;
+// }
 //
-//    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-//    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+// ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+// UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 //
-//    lstNotifiedUAVObjects.clear();
-//    _pendingNotifications.clear();
-//    _notificationList.append(_toRemoveNotifications);
-//    _toRemoveNotifications.clear();
+// lstNotifiedUAVObjects.clear();
+// _pendingNotifications.clear();
+// _notificationList.append(_toRemoveNotifications);
+// _toRemoveNotifications.clear();
 //
-//    // first, reject empty args and unknown fields.
-//    foreach(NotificationItem * telemetry, _notificationList) {
-//        telemetry->_isPlayed    = false;
-//        telemetry->isNowPlaying = false;
+//// first, reject empty args and unknown fields.
+// foreach(NotificationItem * telemetry, _notificationList) {
+// telemetry->_isPlayed    = false;
+// telemetry->isNowPlaying = false;
 //
-//        if (telemetry->mute()) {
-//            continue;
-//        }
-//        // check is all sounds presented for notification,
-//        // if not - we must not subscribe to it at all
-//        if (telemetry->toList().isEmpty()) {
-//            continue;
-//        }
+// if (telemetry->mute()) {
+// continue;
+// }
+//// check is all sounds presented for notification,
+//// if not - we must not subscribe to it at all
+// if (telemetry->toList().isEmpty()) {
+// continue;
+// }
 //
-//        UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject(telemetry->getDataObject()));
-//        if (obj != NULL) {
-//            if (!lstNotifiedUAVObjects.contains(obj)) {
-//                lstNotifiedUAVObjects.append(obj);
+// UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject(telemetry->getDataObject()));
+// if (obj != NULL) {
+// if (!lstNotifiedUAVObjects.contains(obj)) {
+// lstNotifiedUAVObjects.append(obj);
 //
-//                connect(obj, SIGNAL(objectUpdated(UAVObject *)),
-//                        this, SLOT(on_arrived_Notification(UAVObject *)),
-//                        Qt::QueuedConnection);
-//            }
-//        } else {
-//            qTelemetryDebug() << "Error: Object is unknown (" << telemetry->getDataObject() << ").";
-//        }
-//    }
+// connect(obj, SIGNAL(objectUpdated(UAVObject *)),
+// this, SLOT(on_arrived_Notification(UAVObject *)),
+// Qt::QueuedConnection);
+// }
+// } else {
+// qTelemetryDebug() << "Error: Object is unknown (" << telemetry->getDataObject() << ").";
+// }
+// }
 //
-//    if (_notificationList.isEmpty()) {
-//        return;
-//    }
-//    // set notification message to current event
-//    phonon.mo = Phonon::createPlayer(Phonon::NotificationCategory);
-//    phonon.mo->clearQueue();
-//    phonon.firstPlay = true;
-//    QList<Phonon::AudioOutputDevice> audioOutputDevices =
-//        Phonon::BackendCapabilities::availableAudioOutputDevices();
-//    foreach(Phonon::AudioOutputDevice dev, audioOutputDevices) {
-//        qTelemetryDebug() << "Telemetry: Audio Output device: " << dev.name() << " - " << dev.description();
-//    }
-//    connect(phonon.mo, SIGNAL(stateChanged(Phonon::State, Phonon::State)),
-//            this, SLOT(stateChanged(Phonon::State, Phonon::State)));
-//}
+// if (_notificationList.isEmpty()) {
+// return;
+// }
+//// set notification message to current event
+// phonon.mo = Phonon::createPlayer(Phonon::NotificationCategory);
+// phonon.mo->clearQueue();
+// phonon.firstPlay = true;
+// QList<Phonon::AudioOutputDevice> audioOutputDevices =
+// Phonon::BackendCapabilities::availableAudioOutputDevices();
+// foreach(Phonon::AudioOutputDevice dev, audioOutputDevices) {
+// qTelemetryDebug() << "Telemetry: Audio Output device: " << dev.name() << " - " << dev.description();
+// }
+// connect(phonon.mo, SIGNAL(stateChanged(Phonon::State, Phonon::State)),
+// this, SLOT(stateChanged(Phonon::State, Phonon::State)));
+// }

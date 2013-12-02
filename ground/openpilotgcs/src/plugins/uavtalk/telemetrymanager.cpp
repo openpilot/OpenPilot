@@ -31,7 +31,7 @@
 #include <coreplugin/threadmanager.h>
 
 TelemetryManager::TelemetryManager() :
-        autopilotConnected(false)
+    autopilotConnected(false)
 {
     moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
     // Get UAVObjectManager instance
@@ -44,8 +44,7 @@ TelemetryManager::TelemetryManager() :
 }
 
 TelemetryManager::~TelemetryManager()
-{
-}
+{}
 
 bool TelemetryManager::isConnected()
 {
@@ -60,8 +59,8 @@ void TelemetryManager::start(QIODevice *dev)
 
 void TelemetryManager::onStart()
 {
-    utalk = new UAVTalk(device, objMngr);
-    telemetry = new Telemetry(utalk, objMngr);
+    utalk        = new UAVTalk(device, objMngr);
+    telemetry    = new Telemetry(utalk, objMngr);
     telemetryMon = new TelemetryMonitor(objMngr, telemetry);
     connect(telemetryMon, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(telemetryMon, SIGNAL(disconnected()), this, SLOT(onDisconnect()));

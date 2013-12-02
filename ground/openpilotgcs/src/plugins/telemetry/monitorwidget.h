@@ -8,8 +8,8 @@
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtCore/QPointer>
 
-class MonitorWidget: public QGraphicsView {
-Q_OBJECT
+class MonitorWidget : public QGraphicsView {
+    Q_OBJECT
 public:
     explicit MonitorWidget(QWidget *parent = 0);
     ~MonitorWidget();
@@ -54,8 +54,8 @@ private:
     QPointer<QGraphicsTextItem> txSpeed;
     QPointer<QGraphicsTextItem> rxSpeed;
 
-    QList<QGraphicsSvgItem*> txNodes;
-    QList<QGraphicsSvgItem*> rxNodes;
+    QList<QGraphicsSvgItem *> txNodes;
+    QList<QGraphicsSvgItem *> rxNodes;
 
     Qt::AspectRatioMode aspectRatioMode;
 };

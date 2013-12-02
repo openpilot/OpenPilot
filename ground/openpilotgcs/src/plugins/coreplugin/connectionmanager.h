@@ -43,7 +43,6 @@
 #include <QTimer>
 
 namespace Core {
-
 class IConnection;
 
 namespace Internal {

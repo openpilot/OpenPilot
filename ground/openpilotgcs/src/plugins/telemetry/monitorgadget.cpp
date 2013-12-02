@@ -30,9 +30,8 @@
 #include "monitorwidget.h"
 
 MonitorGadget::MonitorGadget(QString classId, MonitorWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent), m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent), m_widget(widget)
+{}
 
 MonitorGadget::~MonitorGadget()
 {
@@ -40,14 +39,14 @@ MonitorGadget::~MonitorGadget()
 }
 
 /*
- This is called when a configuration is loaded, and updates the plugin's settings.
- Careful: the plugin is already drawn before the loadConfiguration method is called the
- first time, so you have to be careful not to assume all the plugin values are initialized
- the first time you use them
+   This is called when a configuration is loaded, and updates the plugin's settings.
+   Careful: the plugin is already drawn before the loadConfiguration method is called the
+   first time, so you have to be careful not to assume all the plugin values are initialized
+   the first time you use them
  */
 void MonitorGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    //MonitorGadgetConfiguration *m = qobject_cast<MonitorGadgetConfiguration *>(config);
+    // MonitorGadgetConfiguration *m = qobject_cast<MonitorGadgetConfiguration *>(config);
 
-    //m_widget->setSystemFile(m->getSystemFile()); // Triggers widget repaint
+    // m_widget->setSystemFile(m->getSystemFile()); // Triggers widget repaint
 }

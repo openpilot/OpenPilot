@@ -31,8 +31,7 @@ MonitorGadgetConfiguration::MonitorGadgetConfiguration(QString classId, QSetting
     IUAVGadgetConfiguration(classId, parent)
 {
     // if a saved configuration exists load it
-    if (qSettings != 0) {
-    }
+    if (qSettings != 0) {}
 }
 
 IUAVGadgetConfiguration *MonitorGadgetConfiguration::clone()
@@ -48,7 +47,7 @@ IUAVGadgetConfiguration *MonitorGadgetConfiguration::clone()
  */
 void MonitorGadgetConfiguration::saveConfig(QSettings *qSettings) const
 {
-//    qSettings->setValue("acFilename", Utils::PathUtils().RemoveDataPath(m_acFilename));
-//    qSettings->setValue("bgFilename", Utils::PathUtils().RemoveDataPath(m_bgFilename));
-//    qSettings->setValue("enableVbo", m_enableVbo);
+// qSettings->setValue("acFilename", Utils::PathUtils().RemoveDataPath(m_acFilename));
+// qSettings->setValue("bgFilename", Utils::PathUtils().RemoveDataPath(m_bgFilename));
+// qSettings->setValue("enableVbo", m_enableVbo);
 }

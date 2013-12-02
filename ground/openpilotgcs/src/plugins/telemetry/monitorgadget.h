@@ -31,14 +31,14 @@
 #include <coreplugin/iuavgadget.h>
 #include "monitorwidget.h"
 
-//class IUAVGadget;
-//class QWidget;
-//class QString;
+// class IUAVGadget;
+// class QWidget;
+// class QString;
 // class NotifyPluginGadgetWidget;
 
 using namespace Core;
 
-class MonitorGadget: public IUAVGadget {
+class MonitorGadget : public IUAVGadget {
     Q_OBJECT
 public:
     MonitorGadget(QString classId, MonitorWidget *widget, QWidget *parent = 0);

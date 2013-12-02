@@ -27,81 +27,78 @@
 
 #include "monitorgadgetoptionspage.h"
 #include <coreplugin/icore.h>
-//#include "ui_telemetrypluginoptionspage.h"
+// #include "ui_telemetrypluginoptionspage.h"
 #include "extensionsystem/pluginmanager.h"
 
 MonitorGadgetOptionsPage::MonitorGadgetOptionsPage(MonitorGadgetConfiguration *config, QObject *parent)
     : IOptionsPage(parent)
-{
-}
+{}
 
 MonitorGadgetOptionsPage::~MonitorGadgetOptionsPage()
-{
-}
+{}
 
 QWidget *MonitorGadgetOptionsPage::createPage(QWidget * /* parent */)
 {
-//    _optionsPage.reset(new Ui::TelemetryPluginOptionsPage());
-//    // main widget
-//    QWidget *optionsPageWidget = new QWidget;
-//    _dynamicFieldWidget    = NULL;
-//    _dynamicFieldCondition = NULL;
-//    resetFieldType();
-//    // save ref to form, needed for binding dynamic fields in future
-//    _form = optionsPageWidget;
-//    // main layout
-//    _optionsPage->setupUi(optionsPageWidget);
+// _optionsPage.reset(new Ui::TelemetryPluginOptionsPage());
+//// main widget
+// QWidget *optionsPageWidget = new QWidget;
+// _dynamicFieldWidget    = NULL;
+// _dynamicFieldCondition = NULL;
+// resetFieldType();
+//// save ref to form, needed for binding dynamic fields in future
+// _form = optionsPageWidget;
+//// main layout
+// _optionsPage->setupUi(optionsPageWidget);
 //
-//    _optionsPage->SoundDirectoryPathChooser->setExpectedKind(Utils::PathChooser::Directory);
-//    _optionsPage->SoundDirectoryPathChooser->setPromptDialogTitle(tr("Choose sound collection directory"));
+// _optionsPage->SoundDirectoryPathChooser->setExpectedKind(Utils::PathChooser::Directory);
+// _optionsPage->SoundDirectoryPathChooser->setPromptDialogTitle(tr("Choose sound collection directory"));
 //
-//    connect(_optionsPage->SoundDirectoryPathChooser, SIGNAL(changed(const QString &)),
-//            this, SLOT(on_clicked_buttonSoundFolder(const QString &)));
-//    connect(_optionsPage->SoundCollectionList, SIGNAL(currentIndexChanged(int)),
-//            this, SLOT(on_changedIndex_soundLanguage(int)));
+// connect(_optionsPage->SoundDirectoryPathChooser, SIGNAL(changed(const QString &)),
+// this, SLOT(on_clicked_buttonSoundFolder(const QString &)));
+// connect(_optionsPage->SoundCollectionList, SIGNAL(currentIndexChanged(int)),
+// this, SLOT(on_changedIndex_soundLanguage(int)));
 //
-//    connect(this, SIGNAL(updateNotifications(QList<NotificationItem *>)),
-//            _owner, SLOT(updateNotificationList(QList<NotificationItem *>)));
-//    // connect(this, SIGNAL(resetNotification()),owner, SLOT(resetNotification()));
+// connect(this, SIGNAL(updateNotifications(QList<NotificationItem *>)),
+// _owner, SLOT(updateNotificationList(QList<NotificationItem *>)));
+//// connect(this, SIGNAL(resetNotification()),owner, SLOT(resetNotification()));
 //
-//    _privListNotifications = _owner->getListNotifications();
+// _privListNotifications = _owner->getListNotifications();
 //
 //
-//    // [1]
-//    setSelectedNotification(_owner->getCurrentNotification());
-//    addDynamicFieldLayout();
-//    // [2]
-//    updateConfigView(_selectedNotification);
+//// [1]
+// setSelectedNotification(_owner->getCurrentNotification());
+// addDynamicFieldLayout();
+//// [2]
+// updateConfigView(_selectedNotification);
 //
-//    initRulesTable();
-//    initButtons();
-//    initPhononPlayer();
+// initRulesTable();
+// initButtons();
+// initPhononPlayer();
 //
-//    int curr_row = _privListNotifications.indexOf(_selectedNotification);
-//    _telemetryRulesSelection->setCurrentIndex(_telemetryRulesModel->index(curr_row, 0, QModelIndex()),
-//                                           QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+// int curr_row = _privListNotifications.indexOf(_selectedNotification);
+// _telemetryRulesSelection->setCurrentIndex(_telemetryRulesModel->index(curr_row, 0, QModelIndex()),
+// QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 //
-//    return optionsPageWidget;
+// return optionsPageWidget;
     return NULL;
 }
 
 void MonitorGadgetOptionsPage::apply()
 {
-//    getOptionsPageValues(_owner->getCurrentNotification());
-//    _owner->setEnableSound(_optionsPage->chkEnableSound->isChecked());
-//    emit updateNotifications(_privListNotifications);
+// getOptionsPageValues(_owner->getCurrentNotification());
+// _owner->setEnableSound(_optionsPage->chkEnableSound->isChecked());
+// emit updateNotifications(_privListNotifications);
 }
 
 void MonitorGadgetOptionsPage::finish()
 {
-//    disconnect(_optionsPage->UAVObjectField, SIGNAL(currentIndexChanged(QString)),
-//               this, SLOT(on_changedIndex_UAVField(QString)));
+// disconnect(_optionsPage->UAVObjectField, SIGNAL(currentIndexChanged(QString)),
+// this, SLOT(on_changedIndex_UAVField(QString)));
 //
-//    disconnect(_testSound.data(), SIGNAL(stateChanged(Phonon::State, Phonon::State)),
-//               this, SLOT(on_changed_playButtonText(Phonon::State, Phonon::State)));
-//    if (_testSound) {
-//        _testSound->stop();
-//        _testSound->clear();
-//    }
+// disconnect(_testSound.data(), SIGNAL(stateChanged(Phonon::State, Phonon::State)),
+// this, SLOT(on_changed_playButtonText(Phonon::State, Phonon::State)));
+// if (_testSound) {
+// _testSound->stop();
+// _testSound->clear();
+// }
 }
-

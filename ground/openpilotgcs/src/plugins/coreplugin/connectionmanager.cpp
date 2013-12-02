@@ -40,7 +40,6 @@
 #include <QEventLoop>
 
 namespace Core {
-
 ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow) :
     QWidget(mainWindow),
     m_availableDevList(0),
@@ -97,7 +96,8 @@ void ConnectionManager::init()
 // TODO needs documentation?
 void ConnectionManager::addWidget(QWidget *widget)
 {
-    QHBoxLayout *l = (QHBoxLayout *) layout();
+    QHBoxLayout *l = (QHBoxLayout *)layout();
+
     l->insertWidget(0, widget, 0, Qt::AlignVCenter);
 }
 

@@ -727,7 +727,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
         // All instances, not allowed for OBJ messages
         if (obj && (instId != UAVOBJ_ALL_INSTANCES)) {
             // Unpack object, if the instance does not exist it will be created!
-            if (UAVObjUnpack(obj, instId, data)) {
+            if (UAVObjUnpack(obj, instId, data) == 0) {
                 // Check if this object acks a pending OBJ_REQ message
                 // any OBJ message can ack a pending OBJ_REQ message
                 // even one that was not sent in response to the OBJ_REQ message
@@ -853,6 +853,9 @@ static int32_t sendObject(UAVTalkConnectionData *connection, uint8_t type, uint3
             // This allows the receiver to detect when the last object has been received (i.e. when instance 0 is received)
             for (n = 0; n < numInst; ++n) {
                 sendSingleObject(connection, type, objId, numInst - n - 1, obj);
+                if (UAVTALK_TYPE_OBJ_ACK || type == UAVTALK_TYPE_OBJ_ACK_TS) {
+                    // TODO check semaphore and bail out if necessary
+                }
             }
             return 0;
         } else {

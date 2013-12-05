@@ -1748,6 +1748,7 @@ void printTime(uint16_t x, uint16_t y)
  * @param       max_val                 maximum expected value (used to compute size of arrow ticker)
  * @param       flags                   special flags (see hud.h.)
  */
+//#define VERTICAL_SCALE_BRUTE_FORCE_BLANK_OUT
 void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int height, int mintick_step, int majtick_step, int mintick_len, int majtick_len,
                              int boundtick_len, __attribute__((unused)) int max_val, int flags)
 {
@@ -1871,6 +1872,8 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     } else {
         write_string(temp, xx, y, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_RIGHT, 0, 0);
     }
+#ifdef VERTICAL_SCALE_BRUTE_FORCE_BLANK_OUT
+    // This is a bad brute force method destuctive to other things that maybe drawn underneath like e.g. the artificial horizon:
     // Then, add a slow cut off on the edges, so the text doesn't sharply
     // disappear. We simply clear the areas above and below the ticker, and we
     // use little markers on the edges.
@@ -1881,6 +1884,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
         write_filled_rectangle_lm(majtick_end - text_x_spacing - max_text_y, y + (height / 2) - (font_info.height / 2), max_text_y, font_info.height, 0, 0);
         write_filled_rectangle_lm(majtick_end - text_x_spacing - max_text_y, y - (height / 2) - (font_info.height / 2), max_text_y, font_info.height, 0, 0);
     }
+#endif
     y--;
     write_hline_outlined(boundtick_start, boundtick_end, y + (height / 2), 2, 2, 0, 1);
     write_hline_outlined(boundtick_start, boundtick_end, y - (height / 2), 2, 2, 0, 1);
@@ -2131,7 +2135,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 
 // JR_HINT work in progress
 // artificial horizon in HUD design
-#define DEBUG_HUD_AH
+//#define DEBUG_HUD_AH
 #define MAX_PITCH_VISIBLE		35.0f
 #define DELTA_DEGREE			15
 #define MAIN_HORIZON_WIDTH		250
@@ -2421,7 +2425,20 @@ void updateGraphics()
     break;
     case 1:
     {
-#ifndef DEBUG_SHOW_MINIMAL
+
+#ifdef DEBUG_SHOW_MINIMAL
+        char temp[10] = { 0 };
+    	int f, i, j;
+    	f = ((int)(attitude.Roll/8.0f)) % 4;
+        sprintf(temp, "Font: %d", f);
+        write_string(temp, 10, 0, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        for (i=0; i<16; i++) {
+            for (j=0; j<16; j++) {
+                sprintf(temp, "%c", j + i * 16);
+                write_string(temp, 10 + j * 20, 15 + i * 17, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, f);
+            }
+        }
+#endif
 
 #if 0
         // GPS HACK
@@ -2432,18 +2449,18 @@ void updateGraphics()
         }
 #endif
 
+
+#ifndef DEBUG_SHOW_MINIMAL
+
         /* Draw Attitude Indicator */
         if (OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED) {
             drawAttitude(OsdSettings.AttitudeSetup.X, OsdSettings.AttitudeSetup.Y, attitude.Pitch, attitude.Roll, 96);
         }
-#endif
 
         /* Draw Artificial Horizon in HUD design */
         if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
         	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, 100);
         }
-
-#ifndef DEBUG_SHOW_MINIMAL
 
         char temp[50] = { 0 };
         memset(temp, ' ', 40);
@@ -2493,13 +2510,16 @@ void updateGraphics()
 
         sprintf(temp, "T.out:%3dms", out_time);
         write_string(temp, GRAPHICS_RIGHT, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+
+        sprintf(temp, "V.type:%4s", PIOS_Video_GetType() == VIDEO_TYPE_NTSC ? "NTSC" : "PAL");
+        write_string(temp, GRAPHICS_RIGHT, 75, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 #else
         /* Print number of video columns */
         sprintf(temp, "Columns:%3d", GRAPHICS_WIDTH_REAL);
         write_string(temp, GRAPHICS_RIGHT, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
         /* Print number of detected video lines */
-        sprintf(temp, "Lines:%5d", PIOS_Video_GetOSDLines());
+        sprintf(temp, "Lines:%5d", PIOS_Video_GetLines());
         write_string(temp, GRAPHICS_RIGHT, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
         // show heap

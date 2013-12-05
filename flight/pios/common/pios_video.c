@@ -84,6 +84,8 @@ static const struct pios_video_cfg *dev_cfg;
 
 // Private variables
 static int16_t m_osdLines = 0;
+static int8_t video_type_tmp = VIDEO_TYPE_NTSC;
+static int8_t video_type_act = VIDEO_TYPE_NTSC;
 
 // Private functions
 static void swap_buffers();
@@ -108,6 +110,8 @@ bool PIOS_Vsync_ISR()
     gActiveLine = 0;
     Hsync_update = 0;
     Vsync_update++;
+    video_type_act = video_type_tmp;
+    video_type_tmp = VIDEO_TYPE_NTSC;
     if (Vsync_update >= 2) {		// every second field: swap buffers and trigger redraw
         Vsync_update = 0;
         swap_buffers();
@@ -127,6 +131,10 @@ bool PIOS_Hsync_ISR()
     // prepare data which will start clocking out on GRAPHICS_LINE+1
     if (Hsync_update++ == GRAPHICS_LINE) {
         prepare_line(0);
+    }
+    // check video type
+    if (Hsync_update > VIDEO_TYPE_PAL_ROWS) {
+    	video_type_tmp = VIDEO_TYPE_PAL;
     }
 
     return true;
@@ -376,9 +384,18 @@ void PIOS_Video_Init(const struct pios_video_cfg *cfg)
 /**
  *
  */
-uint16_t PIOS_Video_GetOSDLines(void)
+uint16_t PIOS_Video_GetLines(void)
 {
     return m_osdLines;
+}
+
+
+/**
+ *
+ */
+uint16_t PIOS_Video_GetType(void)
+{
+    return video_type_act;
 }
 
 

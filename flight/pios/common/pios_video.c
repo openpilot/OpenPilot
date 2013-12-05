@@ -322,7 +322,7 @@ void PIOS_Video_Init(const struct pios_video_cfg *cfg)
 
     TIM_OC1Init(cfg->pixel_timer.timer, &cfg->tim_oc_init);
     TIM_OC1PreloadConfig(cfg->pixel_timer.timer, TIM_OCPreload_Enable);
-    TIM_SelectInputTrigger(dev_cfg->pixel_timer.timer, TIM_TS_TI2FP2);
+    TIM_SelectInputTrigger(cfg->pixel_timer.timer, TIM_TS_TI2FP2);
 
     TIM_SetCompare1(cfg->pixel_timer.timer, dc);								// JR_HINT put to struct for PAL/NTSC auto detect
     TIM_SetAutoreload(cfg->pixel_timer.timer, period);							// JR_HINT put to struct for PAL/NTSC auto detect

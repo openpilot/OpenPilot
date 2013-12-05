@@ -33,6 +33,7 @@
 //#define DEBUG_TIMING
 //#define DEBUG_SHOW_MINIMAL
 //#define DEMO_SCREENS
+//#define SIMULATE_DATA
 
 #include <openpilot.h>
 
@@ -1705,14 +1706,14 @@ void drawBattery(uint16_t x, uint16_t y, uint8_t battery, uint16_t size)
     }
 }
 
-void printTime(uint16_t x, uint16_t y)
+void printTime(uint16_t x, uint16_t y, uint8_t font)
 {
     char temp[9] =
     { 0 };
 
     sprintf(temp, "%02d:%02d:%02d", timex.hour, timex.min, timex.sec);
     // printTextFB(x,y,temp);
-    write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+    write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, font);
 }
 
 /*
@@ -2138,7 +2139,6 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 //#define DEBUG_HUD_AH
 #define MAX_PITCH_VISIBLE		35.0f
 #define DELTA_DEGREE			15
-#define MAIN_HORIZON_WIDTH		250
 #define SUB_HORIZON_WIDTH		70
 #define SUB_NUMBERS_WIDTH		85
 #define SUB_HORIZON_GAP			20
@@ -2146,7 +2146,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 #define CENTER_BODY				3
 #define CENTER_WING				7
 #define CENTER_RUDDER			5
-void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)) float yaw, int16_t x, int16_t y, int16_t size)
+void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)) float yaw, int16_t x, int16_t y, int16_t main_line_width, int16_t size)
 {
     char temp[20] = { 0 };
     float sin_roll;
@@ -2182,7 +2182,7 @@ void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)
 	pp_y = y * (1 + (cos_roll * pitch) / MAX_PITCH_VISIBLE);
 
     // main horizon
-	side_length = MAIN_HORIZON_WIDTH * size / 200;
+	side_length = main_line_width * size / 200;
 	d_x = cos_roll * side_length;
 	d_y = sin_roll * side_length;
 	write_line_outlined_dashed_truncated(pp_x - d_x,   pp_y + d_y,   pp_x + d_x,   pp_y - d_y,   2, 2, 0, 1, 0);
@@ -2459,7 +2459,7 @@ void updateGraphics()
 
         /* Draw Artificial Horizon in HUD design */
         if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
-        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, 100);
+        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
         }
 
         char temp[50] = { 0 };
@@ -2485,7 +2485,7 @@ void updateGraphics()
 
         /* Print RTC time */
         if (OsdSettings.Time == OSDSETTINGS_TIME_ENABLED) {
-            printTime(OsdSettings.TimeSetup.X, OsdSettings.TimeSetup.Y);
+            printTime(OsdSettings.TimeSetup.X, OsdSettings.TimeSetup.Y, 2);
         }
 
         /* Print ADC voltage */
@@ -2699,6 +2699,57 @@ void updateGraphics()
         write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 - roll3 % (GRAPHICS_BOTTOM / 2), 1, 1);
         write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 + roll5 % (GRAPHICS_BOTTOM / 2), 1, 1);
         write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 - roll5 % (GRAPHICS_BOTTOM / 2), 1, 1);
+    }
+    break;
+    case 10:
+    {
+#ifdef SIMULATE_DATA
+        static int alt = 0;
+        gpsData.Altitude = alt++;
+        static int spd = 0;
+        gpsData.Groundspeed = spd++;
+#endif
+        char temp[50] = { 0 };
+        uint8_t char_size = (OsdSettings.CharSize == OSDSETTINGS_CHARSIZE_SMALL) ? 2 : 3;
+
+		// GPS coordinates
+        if (OsdSettings.GPSCoordinates == OSDSETTINGS_GPSCOORDINATES_ENABLED) {
+            sprintf(temp, "Lat%11.6f", (double)(gpsData.Latitude / 10000000.0f));
+            write_string(temp, OsdSettings.GPSCoordinatesSetup.LatX, OsdSettings.GPSCoordinatesSetup.LatY, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            sprintf(temp, "Lon%11.6f", (double)(gpsData.Longitude / 10000000.0f));
+            write_string(temp, OsdSettings.GPSCoordinatesSetup.LonX, OsdSettings.GPSCoordinatesSetup.LonY, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+        }
+		// Artificial horizon in HUD design
+        if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
+        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
+        }
+		// Home altitude in HUD design as vertical scale right side
+        if (OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED) {
+            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_BARO ? (int)baro.Altitude : (int)gpsData.Altitude, 200, +1, OsdSettings.AltitudeSetup.X, OsdSettings.AltitudeSetup.Y, 100, 20, 100, 7, 12, 15, 500, 0);
+        }
+		// Ground speed in HUD design as vertical scale left side
+        if (OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED) {
+            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, OsdSettings.SpeedSetup.X, OsdSettings.SpeedSetup.Y, 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
+        }
+		// Heading in HUD design
+        if (OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED) {
+        	hud_draw_linear_compass(attitude.Yaw < 0 ? 360 + attitude.Yaw : attitude.Yaw, 150, 120, OsdSettings.HeadingSetup.X, OsdSettings.HeadingSetup.Y, 15, 30, 7, 12, 0);
+        }
+		// Home distance
+		// Climb rate
+		// Direction to home
+		// RSSI
+		// SAT count
+		// SAT status
+		// Flight mode
+		// Throttle
+		// Flight time
+        if (OsdSettings.Time == OSDSETTINGS_TIME_ENABLED) {
+            printTime(OsdSettings.TimeSetup.X, OsdSettings.TimeSetup.Y, char_size);
+        }
+		// Voltage [V]
+		// Ampere consumed [mAh]
+		// Ampere current [A]
     }
     break;
     default:

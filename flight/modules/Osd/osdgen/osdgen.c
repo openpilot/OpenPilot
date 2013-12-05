@@ -392,6 +392,28 @@ void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode)
 }
 
 /**
+ * write_pixel_lm_truncated: write the pixel on both surfaces (level and mask.)
+ * Uses current draw buffer.
+ *
+ * @param       x       x coordinate
+ * @param       y       y coordinate
+ * @param       mmode   0 = clear, 1 = set, 2 = toggle
+ * @param       lmode   0 = black, 1 = white, 2 = toggle
+ */
+void write_pixel_lm_truncated(int x, int y, int mmode, int lmode)
+{
+    CHECK_COORDS_TRUNCATED(x, y);
+    // Determine the bit in the word to be set and the word
+    // index to set it in.
+    int bitnum    = CALC_BIT_IN_WORD(x);
+    int wordnum   = CALC_BUFF_ADDR(x, y);
+    // Apply the masks.
+    uint16_t mask = 1 << (7 - bitnum);
+    WRITE_WORD_MODE(draw_buffer_mask, wordnum, mask, mmode);
+    WRITE_WORD_MODE(draw_buffer_level, wordnum, mask, lmode);
+}
+
+/**
  * write_hline: optimised horizontal line writing algorithm
  *
  * @param       buff    pointer to buffer to write in
@@ -871,7 +893,6 @@ void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned i
 /**
  * write_line_outlined: Draw a line of arbitrary angle, with an outline.
  *
- * @param       buff            pointer to buffer to write in
  * @param       x0                      first x coordinate
  * @param       y0                      first y coordinate
  * @param       x1                      second x coordinate
@@ -944,6 +965,97 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
         } else {
             write_pixel_lm(x, y, mmode, imode);
         }
+        error -= deltay;
+        if (error < 0) {
+            y     += ystep;
+            error += deltax;
+        }
+    }
+}
+
+/**
+ * write_line_outlined_dashed_truncated: Draw a line of arbitrary angle, with an outline, potentially dashed and truncated when out of field.
+ *
+ * @param       x0              first x coordinate
+ * @param       y0              first y coordinate
+ * @param       x1              second x coordinate
+ * @param       y1              second y coordinate
+ * @param       endcap0         0 = none, 1 = single pixel, 2 = full cap
+ * @param       endcap1         0 = none, 1 = single pixel, 2 = full cap
+ * @param       mode            0 = black outline, white body, 1 = white outline, black body
+ * @param       mmode           0 = clear, 1 = set, 2 = toggle
+ * @param       dots			0 = not dashed, > 0 = # of set/unset dots for the dashed innards
+ */
+void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1,
+                         __attribute__((unused)) int endcap0, __attribute__((unused)) int endcap1,
+                         int mode, int mmode, int dots)
+{
+    // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+    // This could be improved for speed.
+    int omode, imode;
+
+    if (mode == 0) {
+        omode = 0;
+        imode = 1;
+    } else {
+        omode = 1;
+        imode = 0;
+    }
+    int steep = abs(y1 - y0) > abs(x1 - x0);
+    if (steep) {
+        SWAP(x0, y0);
+        SWAP(x1, y1);
+    }
+    if (x0 > x1) {
+        SWAP(x0, x1);
+        SWAP(y0, y1);
+    }
+    int deltax     = x1 - x0;
+    unsigned int deltay = abs(y1 - y0);
+    int error      = deltax / 2;
+    int ystep;
+    int y = y0;
+    int x;
+    if (y0 < y1) {
+        ystep = 1;
+    } else {
+        ystep = -1;
+    }
+    // Draw the outline.
+    for (x = x0; x < x1; x++) {
+        if (steep) {
+            write_pixel_lm_truncated(y - 1, x, mmode, omode);
+            write_pixel_lm_truncated(y + 1, x, mmode, omode);
+            write_pixel_lm_truncated(y, x - 1, mmode, omode);
+            write_pixel_lm_truncated(y, x + 1, mmode, omode);
+        } else {
+            write_pixel_lm_truncated(x - 1, y, mmode, omode);
+            write_pixel_lm_truncated(x + 1, y, mmode, omode);
+            write_pixel_lm_truncated(x, y - 1, mmode, omode);
+            write_pixel_lm_truncated(x, y + 1, mmode, omode);
+        }
+        error -= deltay;
+        if (error < 0) {
+            y     += ystep;
+            error += deltax;
+        }
+    }
+    // Now draw the innards.
+    error = deltax / 2;
+    y     = y0;
+    int dot_cnt = 0;
+    int draw = 1;
+    for (x = x0; x < x1; x++) {
+    	if (dots && !(dot_cnt++ % dots)) {
+    		draw++;
+    	}
+    	if (draw % 2) {
+            if (steep) {
+                write_pixel_lm_truncated(y, x, mmode, imode);
+            } else {
+                write_pixel_lm_truncated(x, y, mmode, imode);
+            }
+    	}
         error -= deltay;
         if (error < 0) {
             y     += ystep;
@@ -1765,7 +1877,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     if (halign == -1) {
         write_filled_rectangle_lm(majtick_end + text_x_spacing, y + (height / 2) - (font_info.height / 2), max_text_y - boundtick_start, font_info.height, 0, 0);
         write_filled_rectangle_lm(majtick_end + text_x_spacing, y - (height / 2) - (font_info.height / 2), max_text_y - boundtick_start, font_info.height, 0, 0);
-    } else {	// JR_HINT to fix
+    } else {
         write_filled_rectangle_lm(majtick_end - text_x_spacing - max_text_y, y + (height / 2) - (font_info.height / 2), max_text_y, font_info.height, 0, 0);
         write_filled_rectangle_lm(majtick_end - text_x_spacing - max_text_y, y - (height / 2) - (font_info.height / 2), max_text_y, font_info.height, 0, 0);
     }
@@ -2017,32 +2129,112 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
     write_line_outlined(refx, refy, refx, refy - 3, 0, 0, 0, 1);
 }
 
-// JR_HINT work in progress, this will be fun after doing all the low level refactoring...
-// Artificial Horizon in HUD design
-void draw_artificial_horizon_HUD(int roll, int pitch, int16_t x, int16_t y, int16_t size)
+// JR_HINT work in progress
+// artificial horizon in HUD design
+#define DEBUG_HUD_AH
+#define MAX_PITCH_VISIBLE		35.0f
+#define DELTA_DEGREE			15
+#define MAIN_HORIZON_WIDTH		250
+#define SUB_HORIZON_WIDTH		70
+#define SUB_NUMBERS_WIDTH		85
+#define SUB_HORIZON_GAP			20
+#define UP_DOWN_LENGTH			8
+#define CENTER_BODY				3
+#define CENTER_WING				7
+#define CENTER_RUDDER			5
+void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)) float yaw, int16_t x, int16_t y, int16_t size)
 {
-    int16_t a = mySin(roll + 360);
-    int16_t b = myCos(roll + 360);
+    char temp[20] = { 0 };
+    float sin_roll;
+    float cos_roll;
+    int8_t i;
+    int16_t pp_x;			// pitch point x
+    int16_t pp_y;			// pitch point y
+	int16_t mp_x;			// middle point x
+	int16_t mp_y;			// middle point y
+	int16_t s_x;			// sum x
+	int16_t s_y;			// sum y
+	int16_t d_x;			// delta x
+	int16_t d_y;			// delta y
+	int16_t side_length;
+    int16_t pitch_delta;
+//	int16_t gap_length;													// JR_HINT gap umsetzen
+//	int16_t ud_length;													// JR_HINT up/down umsetzen
 
-    pitch = pitch % 90;
-    if (pitch > 90) {
-        pitch = pitch - 90;
+#ifdef DEBUG_HUD_AH
+    sprintf(temp, "Roll: %4d", (int) roll);
+    write_string(temp, GRAPHICS_LEFT + 8, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+    sprintf(temp, "Pitch:%4d", (int) pitch);
+    write_string(temp, GRAPHICS_LEFT + 8, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+    sprintf(temp, "Yaw:  %4d", (int) yaw);
+    write_string(temp, GRAPHICS_LEFT + 8, 75, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+#endif
+
+    sin_roll = sinf(DEG2RAD(roll));
+    cos_roll = cosf(DEG2RAD(roll));
+
+	// roll to pitch transformation
+	pp_x = x * (1 + (sin_roll * pitch) / MAX_PITCH_VISIBLE);
+	pp_y = y * (1 + (cos_roll * pitch) / MAX_PITCH_VISIBLE);
+
+    // main horizon
+	side_length = MAIN_HORIZON_WIDTH * size / 200;
+	d_x = cos_roll * side_length;
+	d_y = sin_roll * side_length;
+	write_line_outlined_dashed_truncated(pp_x - d_x,   pp_y + d_y,   pp_x + d_x,   pp_y - d_y,   2, 2, 0, 1, 0);
+
+    // sub horizons
+	pitch_delta = GRAPHICS_BOTTOM / (2 * MAX_PITCH_VISIBLE / DELTA_DEGREE) + 2;
+//	gap_length = SUB_HORIZON_GAP * size / 200;
+//	ud_length = UP_DOWN_LENGTH * size / 100;
+
+    for (i = 1; i <= 180 / DELTA_DEGREE; i++) {
+        sprintf(temp, "%2d", DELTA_DEGREE * i);	// string for the sub horizon numbers
+    	mp_x = sin_roll * pitch_delta * i;		// x middle point of the current sub horizon
+    	mp_y = cos_roll * pitch_delta * i;		// y middle point of the current sub horizon
+
+    	// deltas for the sub horizon lines
+    	side_length = SUB_HORIZON_WIDTH * size / 200;
+    	d_x = cos_roll * side_length;
+    	d_y = sin_roll * side_length;
+
+    	// positive sub horizon line (solid)
+    	s_x = pp_x - mp_x;
+    	s_y = pp_y - mp_y;
+    	write_line_outlined_dashed_truncated(s_x - d_x,   s_y + d_y,   s_x + d_x,   s_y - d_y,   2, 2, 0, 1, 0);
+
+    	// negative sub horizon line (dashed)
+    	s_x = pp_x + mp_x;
+    	s_y = pp_y + mp_y;
+    	write_line_outlined_dashed_truncated(s_x - d_x,   s_y + d_y,   s_x + d_x,   s_y - d_y,   2, 2, 0, 1, 4);
+
+    	// deltas for the sub horizon numbers
+    	side_length = SUB_NUMBERS_WIDTH * size / 200;
+    	d_x = cos_roll * side_length;
+    	d_y = sin_roll * side_length;
+
+    	// positive sub horizon numbers
+    	s_x = pp_x - mp_x;
+    	s_y = pp_y - mp_y;
+        if (TEST_COORDS_BOUNDARY(s_x - d_x, s_y + d_y, 8, 4))
+        	write_string(temp,   s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        if (TEST_COORDS_BOUNDARY(s_x + d_x, s_y - d_y, 8, 4))
+        	write_string(temp,   s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+
+    	// negative sub horizon numbers
+    	s_x = pp_x + mp_x;
+    	s_y = pp_y + mp_y;
+        if (TEST_COORDS_BOUNDARY(s_x - d_x, s_y + d_y, 8, 4))
+        	write_string(temp,   s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        if (TEST_COORDS_BOUNDARY(s_x + d_x, s_y - d_y, 8, 4))
+        	write_string(temp,   s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
     }
-    if (pitch < -90) {
-        pitch = pitch + 90;
-    }
-    a = (a * (size / 2)) / 100;
-    b = (b * (size / 2)) / 100;
 
-    if (roll < -90 || roll > 90) {
-        pitch = pitch * -1;
-    }
-
-//    int16_t k;
-//    k = a * pitch / 90;
-
-    write_line_outlined((x) - 1 - b, (y) - 1 + a -  0, (x) - 1 + b, (y) - 1 - a -  0, 0, 0, 0, 1);
-
+	// center mark
+	write_circle_outlined(x, y, CENTER_BODY, 0, 0, 0, 1);
+    write_line_outlined(x - CENTER_WING - CENTER_BODY, y, x - CENTER_BODY, y, 2, 0, 0, 1);
+    write_line_outlined(x + 1 + CENTER_BODY, y, x + 1 + CENTER_BODY + CENTER_WING, y, 0, 2, 0, 1);
+    write_line_outlined(x, y - CENTER_RUDDER - CENTER_BODY, x, y - CENTER_BODY, 2, 0, 0, 1);
 }
 
 void introText()
@@ -2248,7 +2440,7 @@ void updateGraphics()
 
         /* Draw Artificial Horizon in HUD design */
         if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
-        	draw_artificial_horizon_HUD(attitude.Roll, attitude.Pitch, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, 48);
+        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, 100);
         }
 
 #ifndef DEBUG_SHOW_MINIMAL
@@ -2296,18 +2488,18 @@ void updateGraphics()
         write_string(temp, GRAPHICS_RIGHT, 35, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
 #ifdef DEBUG_TIMING
-        sprintf(temp, "In: %7d", in_time);
+        sprintf(temp, "T.in: %3dms", in_time);
         write_string(temp, GRAPHICS_RIGHT, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
-        sprintf(temp, "Out:%7d", out_time);
+        sprintf(temp, "T.out:%3dms", out_time);
         write_string(temp, GRAPHICS_RIGHT, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 #else
-        /* Print number of detected video lines */
-        sprintf(temp, "Lines:%5d", PIOS_Video_GetOSDLines());
-        write_string(temp, GRAPHICS_RIGHT, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-
         /* Print number of video columns */
         sprintf(temp, "Columns:%3d", GRAPHICS_WIDTH_REAL);
+        write_string(temp, GRAPHICS_RIGHT, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+
+        /* Print number of detected video lines */
+        sprintf(temp, "Lines:%5d", PIOS_Video_GetOSDLines());
         write_string(temp, GRAPHICS_RIGHT, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
         // show heap

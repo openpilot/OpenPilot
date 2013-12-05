@@ -132,6 +132,12 @@ struct FontDimensions {
 #define CLIP_COORD_Y(y)      { y = MIN(y, GRAPHICS_HEIGHT_REAL); }
 #define CLIP_COORDS(x, y)    { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
 
+// Check if coordinates are valid. If not, return. Assumes signed coordinate
+#define CHECK_COORDS_TRUNCATED(x, y)   if (x < GRAPHICS_LEFT || y < GRAPHICS_TOP || x > GRAPHICS_RIGHT || y > GRAPHICS_BOTTOM) { return; }
+
+// Test if coordinates are inside a boundary. false if not, true else. Assumes signed coordinate
+#define TEST_COORDS_BOUNDARY(x, y, bx, by)   (x < GRAPHICS_LEFT + bx || y < GRAPHICS_TOP + by || x > GRAPHICS_RIGHT - bx || y > GRAPHICS_BOTTOM - by) ? 0 : 1
+
 // Macro to swap two variables using XOR swap.
 #define SWAP(a, b)           { a ^= b; b ^= a; a ^= b; }
 
@@ -154,6 +160,7 @@ void drawGraphicsLine();
 void write_char16(char ch, unsigned int x, unsigned int y, int font);
 void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode);
 void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode);
+void write_pixel_lm_truncated(int x, int y, int mmode, int lmode);
 void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode);
 void write_hline_lm(unsigned int x0, unsigned int x1, unsigned int y, int lmode, int mmode);
 void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int endcap0, int endcap1, int mode, int mmode);
@@ -169,6 +176,7 @@ void write_circle_filled(uint8_t *buff, unsigned int cx, unsigned int cy, unsign
 void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode);
 void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mmode, int lmode);
 void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int endcap0, int endcap1, int mode, int mmode);
+void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1, int endcap0, int endcap1, int mode, int mmode, int dots);
 void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode);
 void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
 void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);

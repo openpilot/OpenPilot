@@ -32,8 +32,6 @@
 #include "pios.h"
 #include "pios_config.h"
 #include "pios_video.h"
-#include "stm32f4xx.h"
-#include "stm32f4xx_tim.h"
 
 
 // We need direct register bit manipulations for full resolution.

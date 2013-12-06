@@ -2,12 +2,16 @@ TEMPLATE = lib
 TARGET = Config
 DEFINES += CONFIG_LIBRARY
 QT += svg
+QT += opengl
+QT += qml quick
 
 include(config_dependencies.pri)
 
 INCLUDEPATH += ../../libs/eigen
 
-OTHER_FILES += Config.pluginspec
+OTHER_FILES += Config.pluginspec \
+    calibration/magcalibrationui.qml \
+    calibration/WizardStepIndicator.qml
 
 HEADERS += configplugin.h \
     configgadgetwidget.h \
@@ -41,7 +45,9 @@ HEADERS += configplugin.h \
     dblspindelegate.h \
     configrevohwwidget.h \
     calibration/calibrationutils.h \
-    calibration/thermalcalibration.h
+    calibration/thermalcalibration.h \
+    calibration/wizardstate.h \
+    calibration/wizardmodel.h
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \
@@ -76,7 +82,9 @@ SOURCES += configplugin.cpp \
     dblspindelegate.cpp \
     configrevohwwidget.cpp \
     calibration/calibrationutils.cpp \
-    calibration/thermalcalibration.cpp
+    calibration/thermalcalibration.cpp \
+    calibration/wizardstate.cpp \
+    calibration/wizardmodel.cpp
 
 FORMS += airframe.ui \
     airframe_ccpm.ui \

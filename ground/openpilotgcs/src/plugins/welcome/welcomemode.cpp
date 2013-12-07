@@ -100,7 +100,7 @@ int WelcomeMode::priority() const
 
 QWidget *WelcomeMode::widget()
 {
-    if(!m_container){
+    if (!m_container) {
         m_container = QWidget::createWindowContainer(m_d->quickView);
         m_container->setMinimumSize(64, 64);
         m_container->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);

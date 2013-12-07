@@ -58,7 +58,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
         "Built on %4 at %5<br/>"
         "Based on Qt %6 (%7 bit)<br/>"
         "<br/>"
-        "&copy; %8, 2010-%9. All rights reserved.<br/>"       
+        "&copy; %8, 2010-%9. All rights reserved.<br/>"
         ).arg(
         VersionInfo::revision().left(60), // %1
         VersionInfo::uavoHash().left(8), // %2
@@ -77,12 +77,12 @@ AboutDialog::AboutDialog(QWidget *parent) :
     view->setResizeMode(QQuickView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/core/qml/AboutDialog.qml"));
 
-    QWidget * container = QWidget::createWindowContainer(view);
+    QWidget *container = QWidget::createWindowContainer(view);
     container->setMinimumSize(600, 400);
     container->setMaximumSize(800, 600);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *lay = new QVBoxLayout();
-    lay->setContentsMargins(0,0,0,0);
+    lay->setContentsMargins(0, 0, 0, 0);
     setLayout(lay);
     layout()->addWidget(container);
 }
@@ -93,5 +93,4 @@ void AboutDialog::openUrl(const QString &url)
 }
 
 AboutDialog::~AboutDialog()
-{
-}
+{}

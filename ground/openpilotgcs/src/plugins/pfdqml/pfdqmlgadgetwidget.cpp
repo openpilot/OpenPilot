@@ -162,7 +162,7 @@ void PfdQmlGadgetWidget::setAltitudeFactor(double factor)
 
 void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
 {
-        setTerrainEnabled(m_terrainEnabled);
+    setTerrainEnabled(m_terrainEnabled);
 }
 
 // Switch between PositionState UAVObject position

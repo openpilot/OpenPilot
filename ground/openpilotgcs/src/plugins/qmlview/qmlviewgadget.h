@@ -46,7 +46,7 @@ public:
 
     QWidget *widget()
     {
-        if(!m_container){
+        if (!m_container) {
             m_container = QWidget::createWindowContainer(m_widget, m_parent);
             m_container->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
             m_container->setMinimumSize(64, 64);

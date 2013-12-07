@@ -26,8 +26,7 @@
 
 #include <QDialog>
 
-class AboutDialog : public QDialog
-{
+class AboutDialog : public QDialog {
     Q_OBJECT
 
 public:
@@ -36,7 +35,6 @@ public:
 
 public slots:
     void openUrl(const QString &url);
-
 };
 
 #endif // ABOUTDIALOG_H

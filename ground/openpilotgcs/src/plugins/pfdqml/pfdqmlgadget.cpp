@@ -23,7 +23,7 @@ PfdQmlGadget::PfdQmlGadget(QString classId, PfdQmlGadgetWidget *widget, QWidget 
     m_widget(widget)
 {
     m_container = NULL;
-    m_parent = parent;
+    m_parent    = parent;
 }
 
 PfdQmlGadget::~PfdQmlGadget()

@@ -8,7 +8,7 @@
         <field name="GPSSatInfo" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="GPSSatInfoSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,227"/>
         <field name="ArtificialHorizon" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="ArtificialHorizonSetup" units="" type="int16" elements="3" elementnames="X,Y,MainLineWidth" defaultvalue="200,144,500"/>
+        <field name="ArtificialHorizonSetup" units="" type="int16" elements="3" elementnames="X,Y,MaxPitchVisible,DeltaDegree,MainLineWidth" defaultvalue="200,144,35,15,500"/>
         <field name="Speed" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="SpeedSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,144"/>
         <field name="Altitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>

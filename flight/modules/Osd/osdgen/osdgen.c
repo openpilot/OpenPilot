@@ -2138,8 +2138,6 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 // JR_HINT work in progress
 // artificial horizon in HUD design
 //#define DEBUG_HUD_AH
-#define MAX_PITCH_VISIBLE		35.0f
-#define DELTA_DEGREE			15
 #define SUB_HORIZON_WIDTH		70
 #define SUB_NUMBERS_WIDTH		85
 #define SUB_HORIZON_GAP			20
@@ -2147,7 +2145,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 #define CENTER_BODY				3
 #define CENTER_WING				7
 #define CENTER_RUDDER			5
-void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)) float yaw, int16_t x, int16_t y, int16_t main_line_width, int16_t size)
+void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)) float yaw, int16_t x, int16_t y, int8_t max_pitch_visible, int8_t delta_degree, int16_t main_line_width, int16_t size)
 {
     char temp[20] = { 0 };
     float sin_roll;
@@ -2179,8 +2177,8 @@ void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)
     cos_roll = cosf(DEG2RAD(roll));
 
 	// roll to pitch transformation
-	pp_x = x * (1 + (sin_roll * pitch) / MAX_PITCH_VISIBLE);
-	pp_y = y * (1 + (cos_roll * pitch) / MAX_PITCH_VISIBLE);
+	pp_x = x * (1 + (sin_roll * pitch) / (float)max_pitch_visible);
+	pp_y = y * (1 + (cos_roll * pitch) / (float)max_pitch_visible);
 
     // main horizon
 	side_length = main_line_width * size / 200;
@@ -2189,12 +2187,12 @@ void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)
 	write_line_outlined_dashed_truncated(pp_x - d_x,   pp_y + d_y,   pp_x + d_x,   pp_y - d_y,   2, 2, 0, 1, 0);
 
     // sub horizons
-	pitch_delta = GRAPHICS_BOTTOM / (2 * MAX_PITCH_VISIBLE / DELTA_DEGREE) + 2;
+	pitch_delta = GRAPHICS_BOTTOM / (2 * (float)max_pitch_visible / (float)delta_degree) + 2;
 //	gap_length = SUB_HORIZON_GAP * size / 200;
 //	ud_length = UP_DOWN_LENGTH * size / 100;
 
-    for (i = 1; i <= 180 / DELTA_DEGREE; i++) {
-        sprintf(temp, "%2d", DELTA_DEGREE * i);	// string for the sub horizon numbers
+    for (i = 1; i <= 180 / delta_degree; i++) {
+        sprintf(temp, "%2d", delta_degree * i);	// string for the sub horizon numbers
     	mp_x = sin_roll * pitch_delta * i;		// x middle point of the current sub horizon
     	mp_y = cos_roll * pitch_delta * i;		// y middle point of the current sub horizon
 
@@ -2545,7 +2543,7 @@ void updateGraphics()
 
         /* Draw Artificial Horizon in HUD design */
         if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
-        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
+        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, 35, 15, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
         }
 
         char temp[50] = { 0 };
@@ -2815,7 +2813,7 @@ void updateGraphics()
         }
 		// Artificial horizon in HUD design (centered relative to x, y)
         if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
-        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
+        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
         }
 		// Home altitude in HUD design as vertical scale right side (centered relative to y)
         if (OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED) {

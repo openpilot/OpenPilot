@@ -114,7 +114,8 @@ public:
     QWidget *createEditor(QWidget *parent)
     {
         QComboBox *editor = new QComboBox(parent);
-        // Setting ClickFocus lets the ComboBox stay open on Mac OSX. 
+
+        // Setting ClickFocus lets the ComboBox stay open on Mac OSX.
         editor->setFocusPolicy(Qt::ClickFocus);
         foreach(QString option, m_enumOptions)
         editor->addItem(option);

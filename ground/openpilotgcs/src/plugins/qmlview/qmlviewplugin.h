@@ -33,6 +33,9 @@
 class QmlViewGadgetFactory;
 
 class QmlViewPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                              Q_PLUGIN_METADATA(IID "OpenPilot.QmlView")
+
 public:
     QmlViewPlugin();
     ~QmlViewPlugin();
@@ -43,4 +46,5 @@ public:
 private:
     QmlViewGadgetFactory *mf;
 };
+
 #endif /* QMLVIEWPLUGIN_H_ */

@@ -27,6 +27,8 @@
 #include <QGLWidget>
 #include <QPair>
 #include <QHash>
+#include <QObject>
+
 #include "glc_camera.h"
 #include "glc_imageplane.h"
 #include "../glc_boundingbox.h"
@@ -50,8 +52,9 @@ class GLC_3DViewInstance;
  * 		- Maximum zoom factor
  */
 //////////////////////////////////////////////////////////////////////
-class GLC_LIB_EXPORT GLC_Viewport
+class GLC_LIB_EXPORT GLC_Viewport : public QObject
 {
+	Q_OBJECT
 
 //////////////////////////////////////////////////////////////////////
 /*! @name Constructor / Destructor */
@@ -66,7 +69,7 @@ public:
 	 * 		- Angle of view			: <b>35</b>
 	 * 		- Maximum zoom factor	: <b>3.0</b>
 	 * */
-	GLC_Viewport(QGLWidget *GLWidget);
+	GLC_Viewport();
 
 	//! Delete Camera, Image Plane and orbit circle
 	virtual ~GLC_Viewport();
@@ -198,10 +201,6 @@ public:
 	/*! The size of the given list must be a multiple of 2*/
 	QList<GLC_Point3d> unproject(const QList<int>&)const;
 
-	//! Return an handle of the QGLWidget of this viewport
-	inline QGLWidget* qGLWidgetHandle()
-	{return m_pQGLWidget;}
-
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -302,8 +301,7 @@ public:
 	{m_3DWidgetCollection.add(widget);}
 
 	//! Clear the background color with the specified color
-	inline void clearBackground(const QColor& c) const
-	{m_pQGLWidget->qglClearColor(c);}
+	void clearBackground(const QColor& color) const;
 
 	//! Set othographic usage to the given flag
 	void setToOrtho(bool useOrtho);
@@ -326,6 +324,17 @@ public:
 
 //@} End Zooming functions
 /////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////
+//! @name Signals
+//{@
+signals:
+	//! Set the viewport's camera in order to reframe on the current scene
+	void updateOpenGL();
+
+//@} End Signals
+/////////////////////////////////////////////////////////////////////
+
 
 //////////////////////////////////////////////////////////////////////
 // private services functions
@@ -364,9 +373,6 @@ private:
 
 	//! View AspectRatio
 	double m_AspectRatio;
-
-	//! The QGLWidget attached to the viewport (rendering context)
-	QGLWidget* m_pQGLWidget;
 
 	//! Viewport Background color
 	QColor m_BackgroundColor;

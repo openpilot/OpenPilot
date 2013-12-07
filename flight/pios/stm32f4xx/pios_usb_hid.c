@@ -228,7 +228,7 @@ static bool PIOS_USB_HID_SendReport(struct pios_usb_hid_dev *usb_hid_dev)
 
 #if defined(PIOS_INCLUDE_FREERTOS)
     if (need_yield) {
-        vPortYieldFromISR();
+        vPortYield();
     }
 #endif /* PIOS_INCLUDE_FREERTOS */
 
@@ -542,7 +542,7 @@ static bool PIOS_USB_HID_EP_OUT_Callback(uint32_t usb_hid_id, __attribute__((unu
 
 #if defined(PIOS_INCLUDE_FREERTOS)
     if (need_yield) {
-        vPortYieldFromISR();
+        vPortYield();
     }
 #endif /* PIOS_INCLUDE_FREERTOS */
 

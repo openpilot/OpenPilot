@@ -31,13 +31,13 @@
 #include <QPainter>
 #include <QtOpenGL/QGLWidget>
 #include <cmath>
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QLabel>
 #include <QDebug>
 
 #include <QtCore/QTimer>
-#include <QtGui/QApplication>
-#include <QtGui/QGridLayout>
+#include <QtWidgets/QApplication>
+#include <QGridLayout>
 
 
 #include <osg/Notify>

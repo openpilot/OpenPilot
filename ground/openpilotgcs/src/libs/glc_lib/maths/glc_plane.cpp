@@ -23,6 +23,7 @@
 
 #include <QtDebug>
 #include "glc_plane.h"
+#include "glc_geomtools.h"
 
 GLC_Plane::GLC_Plane()
 {
@@ -101,12 +102,21 @@ bool GLC_Plane::operator==(GLC_Plane p2) const
 	GLC_Plane p1(*this);
 	p1.normalize();
 	p2.normalize();
-	bool areEqual= qFuzzyCompare(p1.m_Eq[0], p2.m_Eq[0]);
-	areEqual= areEqual && qFuzzyCompare(p1.m_Eq[1], p2.m_Eq[1]);
-	areEqual= areEqual && qFuzzyCompare(p1.m_Eq[2], p2.m_Eq[2]);
-	areEqual= areEqual && qFuzzyCompare(p1.m_Eq[3], p2.m_Eq[3]);
 
-	return areEqual;
+    bool areEqual= glc::compare(p1.m_Eq[0], p2.m_Eq[0], glc::EPSILON);
+    areEqual= areEqual && glc::compare(p1.m_Eq[1], p2.m_Eq[1], glc::EPSILON);
+    areEqual= areEqual && glc::compare(p1.m_Eq[2], p2.m_Eq[2], glc::EPSILON);
+    areEqual= areEqual && glc::compare(p1.m_Eq[3], p2.m_Eq[3], glc::EPSILON);
+
+    return areEqual;
+}
+
+bool GLC_Plane::lieOnThisPlane(const GLC_Point3d &p)
+{
+    const double value= (m_Eq[0] * p.x() + m_Eq[1] * p.y() + m_Eq[2] * p.z() + m_Eq[3]);
+    bool subject = glc::compare(value, 0.0, glc::EPSILON);
+
+    return subject;
 }
 
 QString GLC_Plane::toString() const
@@ -134,6 +144,15 @@ GLC_Plane& GLC_Plane::setPlane(const GLC_Vector3d& normal, const GLC_Point3d& po
 	m_Eq[1]= normal.y();
 	m_Eq[2]= normal.z();
 	m_Eq[3]= -normal * point;
+
+	return *this;
+}
+
+GLC_Plane& GLC_Plane::setNormal(const GLC_Vector3d& normal)
+{
+	m_Eq[0]= normal.x();
+	m_Eq[1]= normal.y();
+	m_Eq[2]= normal.z();
 
 	return *this;
 }

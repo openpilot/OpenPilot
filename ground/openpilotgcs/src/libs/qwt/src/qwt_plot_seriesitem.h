@@ -60,20 +60,64 @@ template <typename T>
 class QwtPlotSeriesItem: public QwtPlotAbstractSeriesItem
 {
 public:
+    /*!
+      Constructor
+      \param title Title of the series item
+    */
     explicit QwtPlotSeriesItem<T>( const QString &title = QString::null );
+
+    /*!
+      Constructor
+      \param title Title of the series item
+    */
     explicit QwtPlotSeriesItem<T>( const QwtText &title );
 
+    //! Destructor
     virtual ~QwtPlotSeriesItem<T>();
 
+    /*!
+      Assign a series of samples
+
+      \param data Data
+      \warning The item takes ownership of the data object, deleting
+               it when its not used anymore.
+    */
     void setData( QwtSeriesData<T> * );
 
+    //! \return the the curve data
     QwtSeriesData<T> *data();
+
+    //! \return the the curve data
     const QwtSeriesData<T> *data() const;
 
+    /*!
+      Return the size of the data arrays
+      \sa setData()
+    */
     size_t dataSize() const;
+
+    /*!
+        \param index Index
+        \return Sample at position index
+    */
     T sample( int index ) const;
 
+    /*!
+      \return Bounding rectangle of the data.
+      If there is no bounding rect, like for empty data the rectangle is invalid.
+
+      \sa QwtSeriesData<T>::boundingRect(), QRectF::isValid()
+    */
     virtual QRectF boundingRect() const;
+
+    /*!
+       Update the rect of interest according to the current scale ranges
+
+       \param xScaleDiv Scale division of the x-axis
+       \param yScaleDiv Scale division of the y-axis
+
+       \sa QwtSeriesData<T>::setRectOfInterest()
+    */
     virtual void updateScaleDiv( const QwtScaleDiv &,
                                  const QwtScaleDiv & );
 
@@ -82,10 +126,6 @@ protected:
     QwtSeriesData<T> *d_series;
 };
 
-/*!
-  Constructor
-  \param title Title of the series item
-*/
 template <typename T>
 QwtPlotSeriesItem<T>::QwtPlotSeriesItem( const QString &title ):
     QwtPlotAbstractSeriesItem( QwtText( title ) ),
@@ -93,10 +133,6 @@ QwtPlotSeriesItem<T>::QwtPlotSeriesItem( const QString &title ):
 {
 }
 
-/*!
-  Constructor
-  \param title Title of the series item
-*/
 template <typename T>
 QwtPlotSeriesItem<T>::QwtPlotSeriesItem( const QwtText &title ):
     QwtPlotAbstractSeriesItem( title ),
@@ -104,44 +140,30 @@ QwtPlotSeriesItem<T>::QwtPlotSeriesItem( const QwtText &title ):
 {
 }
 
-//! Destructor
 template <typename T>
 QwtPlotSeriesItem<T>::~QwtPlotSeriesItem()
 {
     delete d_series;
 }
 
-//! \return the the curve data
 template <typename T>
 inline QwtSeriesData<T> *QwtPlotSeriesItem<T>::data()
 {
     return d_series;
 }
 
-//! \return the the curve data
 template <typename T>
 inline const QwtSeriesData<T> *QwtPlotSeriesItem<T>::data() const
 {
     return d_series;
 }
 
-/*!
-    \param index Index
-    \return Sample at position index
-*/
 template <typename T>
 inline T QwtPlotSeriesItem<T>::sample( int index ) const
 {
     return d_series ? d_series->sample( index ) : T();
 }
 
-/*!
-  Assign a series of samples
-
-  \param data Data
-  \warning The item takes ownership of the data object, deleting
-           it when its not used anymore.
-*/
 template <typename T>
 void QwtPlotSeriesItem<T>::setData( QwtSeriesData<T> *data )
 {
@@ -153,10 +175,6 @@ void QwtPlotSeriesItem<T>::setData( QwtSeriesData<T> *data )
     }
 }
 
-/*!
-  Return the size of the data arrays
-  \sa setData()
-*/
 template <typename T>
 size_t QwtPlotSeriesItem<T>::dataSize() const
 {
@@ -166,12 +184,6 @@ size_t QwtPlotSeriesItem<T>::dataSize() const
     return d_series->size();
 }
 
-/*!
-  \return Bounding rectangle of the data.
-  If there is no bounding rect, like for empty data the rectangle is invalid.
-
-  \sa QwtSeriesData<T>::boundingRect(), QRectF::isValid()
-*/
 template <typename T>
 QRectF QwtPlotSeriesItem<T>::boundingRect() const
 {
@@ -181,23 +193,18 @@ QRectF QwtPlotSeriesItem<T>::boundingRect() const
     return d_series->boundingRect();
 }
 
-/*!
-   Update the rect of interest according to the current scale ranges
-
-   \param xScaleDiv Scale division of the x-axis
-   \param yScaleDiv Scale division of the y-axis
-
-   \sa QwtSeriesData<T>::setRectOfInterest()
-*/
 template <typename T>
 void QwtPlotSeriesItem<T>::updateScaleDiv( 
     const QwtScaleDiv &xScaleDiv, const QwtScaleDiv &yScaleDiv )
 {
-    const QRectF rect = QRectF(
-        xScaleDiv.lowerBound(), yScaleDiv.lowerBound(),
-        xScaleDiv.range(), yScaleDiv.range() );
+    if ( d_series )
+    {
+        const QRectF rect = QRectF(
+            xScaleDiv.lowerBound(), yScaleDiv.lowerBound(),
+            xScaleDiv.range(), yScaleDiv.range() );
 
-    d_series->setRectOfInterest( rect );
+        d_series->setRectOfInterest( rect );
+    }
 }
 
 #endif

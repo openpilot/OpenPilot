@@ -2,7 +2,7 @@ TEMPLATE = lib
 TARGET = QMLView
 QT += svg
 QT += opengl
-QT += declarative
+QT += qml quick
 
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)

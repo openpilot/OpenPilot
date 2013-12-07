@@ -69,6 +69,7 @@
 /* #define DEBUG_LEVEL 0 */
 /* #define PIOS_ENABLE_DEBUG_PINS */
 #include <pios_debug.h>
+#include <pios_debuglog.h>
 
 /* PIOS common functions */
 #include <pios_crc.h>
@@ -80,6 +81,8 @@
 #include "queue.h"
 #include "semphr.h"
 #endif
+
+#include <stdbool.h>
 
 #include <pios_architecture.h>
 

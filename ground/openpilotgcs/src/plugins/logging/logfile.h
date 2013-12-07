@@ -34,7 +34,8 @@ public:
 public slots:
     void setReplaySpeed(double val)
     {
-        playbackSpeed = val; qDebug() << playbackSpeed;
+        playbackSpeed = val;
+        qDebug() << "Playback speed is now" << playbackSpeed;
     };
     void pauseReplay();
     void resumeReplay();

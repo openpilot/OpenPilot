@@ -31,8 +31,8 @@
 #include <aggregation/aggregate.h>
 #include <coreplugin/iconnection.h>
 #include <extensionsystem/pluginmanager.h>
-#include "qextserialport/src/qextserialenumerator.h"
-#include "qextserialport/src/qextserialport.h"
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include <QDebug>
 #include <QLabel>
 #include <QHBoxLayout>
@@ -40,7 +40,7 @@
 #include <QEventLoop>
 
 namespace Core {
-ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack) :
+ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow) :
     QWidget(mainWindow),
     m_availableDevList(0),
     m_connectBtn(0),
@@ -72,8 +72,6 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     layout->addWidget(m_connectBtn, 0, Qt::AlignVCenter);
 
     setLayout(layout);
-
-    modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
     QObject::connect(m_connectBtn, SIGNAL(clicked()), this, SLOT(onConnectClicked()));
     QObject::connect(m_availableDevList, SIGNAL(currentIndexChanged(int)), this, SLOT(onDeviceSelectionChanged(int)));

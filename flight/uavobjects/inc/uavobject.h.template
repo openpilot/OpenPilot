@@ -51,6 +51,7 @@ int32_t $(NAME)Initialize();
 UAVObjHandle $(NAME)Handle();
 void $(NAME)SetDefaults(UAVObjHandle obj, uint16_t instId);
 
+$(DATASTRUCTURES)
 /*
  * Packed Object data (unaligned).
  * Should only be used where 4 byte alignment can be guaranteed
@@ -78,6 +79,8 @@ static inline void $(NAME)RequestUpdate() { UAVObjRequestUpdate($(NAME)Handle())
 static inline void $(NAME)RequestInstUpdate(uint16_t instId) { UAVObjRequestInstanceUpdate($(NAME)Handle(), instId); }
 static inline void $(NAME)Updated() { UAVObjUpdated($(NAME)Handle()); }
 static inline void $(NAME)InstUpdated(uint16_t instId) { UAVObjInstanceUpdated($(NAME)Handle(), instId); }
+static inline void $(NAME)Logging() { UAVObjLogging($(NAME)Handle()); }
+static inline void $(NAME)InstLogging(uint16_t instId) { UAVObjInstanceLogging($(NAME)Handle(), instId); }
 static inline int32_t $(NAME)GetMetadata(UAVObjMetadata *dataOut) { return UAVObjGetMetadata($(NAME)Handle(), dataOut); }
 static inline int32_t $(NAME)SetMetadata(const UAVObjMetadata *dataIn) { return UAVObjSetMetadata($(NAME)Handle(), dataIn); }
 static inline int8_t $(NAME)ReadOnly() { return UAVObjReadOnly($(NAME)Handle()); }

@@ -34,13 +34,13 @@
 #include <QtCore/QDebug>
 #include <QtCore/QSettings>
 
-#include <QtGui/QAbstractButton>
-#include <QtGui/QAction>
-#include <QtGui/QActionGroup>
-#include <QtGui/QCheckBox>
-#include <QtGui/QLineEdit>
-#include <QtGui/QRadioButton>
-#include <QtGui/QSpinBox>
+#include <QAbstractButton>
+#include <QAction>
+#include <QActionGroup>
+#include <QCheckBox>
+#include <QLineEdit>
+#include <QRadioButton>
+#include <QSpinBox>
 
 
 using namespace Utils;

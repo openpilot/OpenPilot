@@ -32,11 +32,11 @@
 
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QComboBox>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QComboBox>
 #include <QBrush>
 #include <math.h>
 #include <QMessageBox>
@@ -217,7 +217,7 @@ void ConfigMultiRotorWidget::setupEnabledControls(QString frameType)
     // disable all motor channel boxes
     for (int i = 1; i <= 8; i++) {
         // do it manually so we can turn off any error decorations
-        QComboBox *combobox = qFindChild<QComboBox *>(this, "multiMotorChannelBox" + QString::number(i));
+        QComboBox *combobox = this->findChild<QComboBox *>("multiMotorChannelBox" + QString::number(i));
         if (combobox) {
             combobox->setEnabled(false);
             combobox->setItemData(0, 0, Qt::DecorationRole);
@@ -1005,7 +1005,7 @@ bool ConfigMultiRotorWidget::throwConfigError(int numMotors)
     // Iterate through all instances of multiMotorChannelBox
     for (int i = 0; i < numMotors; i++) {
         // Fine widgets with text "multiMotorChannelBox.x", where x is an integer
-        QComboBox *combobox = qFindChild<QComboBox *>(this, "multiMotorChannelBox" + QString::number(i + 1));
+        QComboBox *combobox = this->findChild<QComboBox *>("multiMotorChannelBox" + QString::number(i + 1));
         if (combobox) {
             if (combobox->currentText() == "None") {
                 int size = combobox->style()->pixelMetric(QStyle::PM_SmallIconSize);

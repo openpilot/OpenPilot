@@ -45,7 +45,7 @@ public:
 	 *  By default, Axis of Cylinder is Z Axis
 	 *  dRadius must be > 0
 	 *  dLength must be > 0*/
-	GLC_Cone(double dRadius, double dLength);
+	GLC_Cone(double dRadius, double dLength, int discretization= glc::GLC_POLYDISCRET);
 
 	//! Copy contructor
 	GLC_Cone(const GLC_Cone& sourceCone);

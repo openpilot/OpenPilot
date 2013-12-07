@@ -27,13 +27,13 @@
 
 #include "uploadergadgetoptionspage.h"
 #include "uploadergadgetconfiguration.h"
-#include <QtGui/QLabel>
-#include <QtGui/QSpinBox>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QTextEdit>
-#include <QtGui/QComboBox>
+#include <QLabel>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QTextEdit>
+#include <QComboBox>
 #include <QtAlgorithms>
 #include <QStringList>
 

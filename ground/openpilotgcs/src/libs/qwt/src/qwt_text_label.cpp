@@ -176,8 +176,8 @@ QSize QwtTextLabel::minimumSizeHint() const
 }
 
 /*!
-   Returns the preferred height for this widget, given the width.
    \param width Width
+   \return Preferred height for this widget, given the width.
 */
 int QwtTextLabel::heightForWidth( int width ) const
 {
@@ -191,8 +191,8 @@ int QwtTextLabel::heightForWidth( int width ) const
     if ( renderFlags & Qt::AlignLeft || renderFlags & Qt::AlignRight )
         width -= indent;
 
-    int height = d_data->text.heightForWidth( width, font() );
-    if ( renderFlags & Qt::AlignTop || renderFlags & Qt::AlignBottom )
+    int height = qCeil( d_data->text.heightForWidth( width, font() ) );
+    if ( ( renderFlags & Qt::AlignTop ) || ( renderFlags & Qt::AlignBottom ) )
         height += indent;
 
     height += 2 * frameWidth();

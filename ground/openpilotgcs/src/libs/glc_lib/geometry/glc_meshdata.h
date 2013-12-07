@@ -146,8 +146,13 @@ public:
 	//! Return the number of triangle from the given lod index
 	inline unsigned int trianglesCount(int lod) const
 	{
-		Q_ASSERT(lod < m_LodList.size());
-		return m_LodList.at(lod)->trianglesCount();
+		unsigned int subject= 0;
+		if (!m_LodList.isEmpty())
+		{
+			Q_ASSERT(lod < m_LodList.size());
+			subject= m_LodList.at(lod)->trianglesCount();
+		}
+		return subject;
 	}
 
 	//! Return true if the position size is set

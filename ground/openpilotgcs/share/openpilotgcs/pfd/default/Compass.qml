@@ -1,4 +1,4 @@
-import Qt 4.7
+import QtQuick 2.0
 import "."
 
 Item {
@@ -6,32 +6,57 @@ Item {
     property variant sceneSize
 
     SvgElementImage {
-        id: compass
-        elementName: "compass"
+        id: compass_fixed
+        elementName: "compass-fixed"
         sceneSize: sceneItem.sceneSize
-
-        clip: true
 
         x: Math.floor(scaledBounds.x * sceneItem.width)
         y: Math.floor(scaledBounds.y * sceneItem.height)
-        //anchors.horizontalCenter: parent.horizontalCenter
+    }
 
-        //split compass band to 8 parts to ensure it doesn't exceed the max texture size
-        Row {
-            anchors.centerIn: parent
-            //the band is 540 degrees wide, AttitudeState.Yaw is converted to -180..180 range
-            anchors.horizontalCenterOffset: -1*((AttitudeState.Yaw+180+720) % 360 - 180)/540*width
+    SvgElementImage {
+        id: compass_plane
+        elementName: "compass-plane"
+        sceneSize: sceneItem.sceneSize
 
-            Repeater {
-                model: 5
-                SvgElementImage {
-                    id: compass_band
-                    elementName: "compass-band"
-                    sceneSize: background.sceneSize
-                    hSliceCount: 5
-                    hSlice: index
-                }
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+    }
+
+    SvgElementImage {
+        id: compass_wheel
+        elementName: "compass-wheel"
+        sceneSize: sceneItem.sceneSize
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+        rotation: -AttitudeState.Yaw
+        transformOrigin: Item.Center
+
+        smooth: true
+    }
+
+    Item {
+        id: compass_text_box
+
+        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "compass-text")
+
+        x: scaledBounds.x * sceneItem.width
+        y: scaledBounds.y * sceneItem.height
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+
+        Text {
+            id: compass_text
+            text: Math.floor(AttitudeState.Yaw).toFixed()
+            color: "white"
+            font {
+                family: "Arial"
+                pixelSize: parent.height * 1.2
             }
+            anchors.centerIn: parent
         }
     }
+
 }

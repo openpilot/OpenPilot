@@ -42,7 +42,7 @@ QmlViewGadgetFactory::~QmlViewGadgetFactory()
 
 Core::IUAVGadget *QmlViewGadgetFactory::createGadget(QWidget *parent)
 {
-    QmlViewGadgetWidget *gadgetWidget = new QmlViewGadgetWidget(parent);
+    QmlViewGadgetWidget *gadgetWidget = new QmlViewGadgetWidget();
 
     return new QmlViewGadget(QString("QmlViewGadget"), gadgetWidget, parent);
 }

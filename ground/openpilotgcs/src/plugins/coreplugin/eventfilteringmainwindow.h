@@ -29,7 +29,7 @@
 #ifndef EVENTFILTERINGMAINWINDOW_H
 #define EVENTFILTERINGMAINWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 
 namespace Core {
 namespace Internal {
@@ -45,7 +45,11 @@ public:
 
 #ifdef Q_OS_WIN
 protected:
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     bool winEvent(MSG *message, long *result);
+#else
+    bool nativeEvent(const QByteArray & /*eventType*/, void *message, long *result);
+#endif
 #endif
 
 signals:

@@ -26,12 +26,18 @@
  */
 #include "port.h"
 #include "delay.h"
-port::port(PortSettings settings, QString name) : mstatus(port::closed)
+port::port(QString name) : mstatus(port::closed)
 {
     timer.start();
-    sport = new QextSerialPort(name, settings, QextSerialPort::Polling);
+    sport = new QSerialPort(name);
     if (sport->open(QIODevice::ReadWrite | QIODevice::Unbuffered)) {
-        mstatus = port::open;
+        if (sport->setBaudRate(57600)
+            && sport->setDataBits(QSerialPort::Data8)
+            && sport->setParity(QSerialPort::NoParity)
+            && sport->setStopBits(QSerialPort::OneStop)
+            && sport->setFlowControl(QSerialPort::NoFlowControl)) {
+            mstatus = port::open;
+        }
         // sport->setDtr();
     } else {
         mstatus = port::error;

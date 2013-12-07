@@ -91,7 +91,7 @@ int32_t BatteryInitialize(void)
 #endif
 
     uint8_t adcRouting[HWSETTINGS_ADCROUTING_NUMELEM];
-    HwSettingsADCRoutingGet(adcRouting);
+    HwSettingsADCRoutingArrayGet(adcRouting);
 
     // Determine if the battery sensors are routed to ADC pins
     for (int i = 0; i < HWSETTINGS_ADCROUTING_NUMELEM; i++) {
@@ -135,13 +135,13 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
 
     // calculate the battery parameters
     if (voltageADCPin >= 0) {
-        flightBatteryData.Voltage = (PIOS_ADC_PinGetVolt(voltageADCPin) - batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEZERO]) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_VOLTAGEFACTOR]; // in Volts
+        flightBatteryData.Voltage = (PIOS_ADC_PinGetVolt(voltageADCPin) - batterySettings.SensorCalibrations.VoltageZero) * batterySettings.SensorCalibrations.VoltageFactor; // in Volts
     } else {
         flightBatteryData.Voltage = 0; // Dummy placeholder value. This is in case we get another source of battery current which is not from the ADC
     }
 
     if (currentADCPin >= 0) {
-        flightBatteryData.Current = (PIOS_ADC_PinGetVolt(currentADCPin) - batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTZERO]) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; // in Amps
+        flightBatteryData.Current = (PIOS_ADC_PinGetVolt(currentADCPin) - batterySettings.SensorCalibrations.CurrentZero) * batterySettings.SensorCalibrations.CurrentFactor; // in Amps
         if (flightBatteryData.Current > flightBatteryData.PeakCurrent) {
             flightBatteryData.PeakCurrent = flightBatteryData.Current; // in Amps
         }
@@ -184,9 +184,9 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
 
         // FIXME: should make the battery voltage detection dependent on battery type.
         /*Not so sure. Some users will want to run their batteries harder than others, so it should be the user's choice. [KDS]*/
-        if (flightBatteryData.Voltage < batterySettings.CellVoltageThresholds[FLIGHTBATTERYSETTINGS_CELLVOLTAGETHRESHOLDS_ALARM] * batterySettings.NbCells) {
+        if (flightBatteryData.Voltage < batterySettings.CellVoltageThresholds.Alarm * batterySettings.NbCells) {
             AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_CRITICAL);
-        } else if (flightBatteryData.Voltage < batterySettings.CellVoltageThresholds[FLIGHTBATTERYSETTINGS_CELLVOLTAGETHRESHOLDS_WARNING] * batterySettings.NbCells) {
+        } else if (flightBatteryData.Voltage < batterySettings.CellVoltageThresholds.Warning * batterySettings.NbCells) {
             AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_WARNING);
         } else {
             AlarmsClear(SYSTEMALARMS_ALARM_BATTERY);

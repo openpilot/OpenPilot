@@ -10,6 +10,6 @@
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="10000"/>
-        <logging updatemode="periodic" period="30000"/>
+        <logging updatemode="manual" period="0"/>
     </object>
 </xml>

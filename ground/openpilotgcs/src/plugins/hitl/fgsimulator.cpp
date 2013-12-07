@@ -82,7 +82,7 @@ bool FGSimulator::setupProcess()
     // xmlFile.close();
     // QFile xmlFileOut(pathData + "/Protocol/opfgprotocol.xml");
     // xmlFileOut.open(QIODevice::WriteOnly | QIODevice::Text);
-    // xmlFileOut.write(xml.toAscii());
+    // xmlFileOut.write(xml.toLatin1());
     // xmlFileOut.close();
 
     Qt::HANDLE mainThread = QThread::currentThreadId();
@@ -125,7 +125,7 @@ bool FGSimulator::setupProcess()
     // Start FlightGear - only if checkbox is selected in HITL options page
     if (settings.startSim) {
         QString cmd("\"" + settings.binPath + "\" " + args + "\n");
-        simProcess->write(cmd.toAscii());
+        simProcess->write(cmd.toLatin1());
     } else {
         emit processOutput("Start Flightgear from the command line with the following arguments: \n\n" + args + "\n\n" +
                            "You can optionally run Flightgear from a networked computer.\n" +
@@ -197,7 +197,7 @@ void FGSimulator::transmitUpdate()
               .arg(throttle) // throttle
               .arg(udpCounterGCSsend); // UDP packet counter delay
 
-        QByteArray data = cmd.toAscii();
+        QByteArray data = cmd.toLatin1();
 
         if (outSocket->writeDatagram(data, QHostAddress(settings.remoteAddress), settings.outPort) == -1) {
             emit processOutput("Error sending UDP packet to FG: " + outSocket->errorString() + "\n");

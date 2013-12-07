@@ -422,38 +422,38 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 {
     RevoCalibrationGet(&cal);
 
-    mag_bias[0]        = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_X];
-    mag_bias[1]        = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_Y];
-    mag_bias[2]        = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_Z];
-    mag_scale[0]       = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_X];
-    mag_scale[1]       = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_Y];
-    mag_scale[2]       = cal.mag_scale[REVOCALIBRATION_MAG_SCALE_Z];
-    accel_bias[0]      = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_X];
-    accel_bias[1]      = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_Y];
-    accel_bias[2]      = cal.accel_bias[REVOCALIBRATION_ACCEL_BIAS_Z];
-    accel_scale[0]     = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_X];
-    accel_scale[1]     = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Y];
-    accel_scale[2]     = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Z];
-    gyro_staticbias[0] = cal.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
-    gyro_staticbias[1] = cal.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Y];
-    gyro_staticbias[2] = cal.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Z];
-    gyro_scale[0]      = cal.gyro_scale[REVOCALIBRATION_GYRO_SCALE_X];
-    gyro_scale[1]      = cal.gyro_scale[REVOCALIBRATION_GYRO_SCALE_Y];
-    gyro_scale[2]      = cal.gyro_scale[REVOCALIBRATION_GYRO_SCALE_Z];
+    mag_bias[0]        = cal.mag_bias.X;
+    mag_bias[1]        = cal.mag_bias.Y;
+    mag_bias[2]        = cal.mag_bias.Z;
+    mag_scale[0]       = cal.mag_scale.X;
+    mag_scale[1]       = cal.mag_scale.Y;
+    mag_scale[2]       = cal.mag_scale.Z;
+    accel_bias[0]      = cal.accel_bias.X;
+    accel_bias[1]      = cal.accel_bias.Y;
+    accel_bias[2]      = cal.accel_bias.Z;
+    accel_scale[0]     = cal.accel_scale.X;
+    accel_scale[1]     = cal.accel_scale.Y;
+    accel_scale[2]     = cal.accel_scale.Z;
+    gyro_staticbias[0] = cal.gyro_bias.X;
+    gyro_staticbias[1] = cal.gyro_bias.Y;
+    gyro_staticbias[2] = cal.gyro_bias.Z;
+    gyro_scale[0]      = cal.gyro_scale.X;
+    gyro_scale[1]      = cal.gyro_scale.Y;
+    gyro_scale[2]      = cal.gyro_scale.Z;
 
 
     AttitudeSettingsData attitudeSettings;
     AttitudeSettingsGet(&attitudeSettings);
 
     // Indicates not to expend cycles on rotation
-    if (attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&
-        attitudeSettings.BoardRotation[2] == 0) {
+    if (attitudeSettings.BoardRotation.Roll == 0 && attitudeSettings.BoardRotation.Pitch == 0 &&
+        attitudeSettings.BoardRotation.Yaw == 0) {
         rotate = 0;
     } else {
         float rotationQuat[4];
-        const float rpy[3] = { attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_ROLL],
-                               attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_PITCH],
-                               attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_YAW] };
+        const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
+                               attitudeSettings.BoardRotation.Pitch,
+                               attitudeSettings.BoardRotation.Yaw };
         RPY2Quaternion(rpy, rotationQuat);
         Quaternion2R(rotationQuat, R);
         rotate = 1;

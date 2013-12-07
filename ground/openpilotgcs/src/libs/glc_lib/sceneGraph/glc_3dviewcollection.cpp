@@ -402,7 +402,6 @@ void GLC_3DViewCollection::setPolygonModeForAll(GLenum face, GLenum mode)
 
     while (iEntry != m_3DViewInstanceHash.constEnd())
     {
-    	// Update Instance Polygon Mode
     	iEntry.value().setPolygonMode(face, mode);
     	iEntry++;
     }
@@ -424,8 +423,7 @@ void GLC_3DViewCollection::showAll()
 
     while (iEntry != m_3DViewInstanceHash.constEnd())
     {
-    	// Update Instance Polygon Mode
-    	iEntry.value().setVisibility(true);
+     	iEntry.value().setVisibility(true);
     	iEntry++;
     }
 }
@@ -436,7 +434,6 @@ void GLC_3DViewCollection::hideAll()
 
     while (iEntry != m_3DViewInstanceHash.constEnd())
     {
-    	// Update Instance Polygon Mode
     	iEntry.value().setVisibility(false);
     	iEntry++;
     }

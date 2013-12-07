@@ -70,8 +70,7 @@ SOURCES += mainwindow.cpp \
     uavgadgetdecorator.cpp \
     workspacesettings.cpp \
     uavconfiginfo.cpp \
-    telemetrymonitorwidget.cpp \
-    aboutdialog.cpp
+    aboutdialog.cpp \
 
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
@@ -130,8 +129,8 @@ HEADERS += mainwindow.h \
     uavgadgetdecorator.h \
     workspacesettings.h \
     uavconfiginfo.h \
+    authorsdialog.h \
     iconfigurableplugin.h \
-    telemetrymonitorwidget.h \
     aboutdialog.h
 
 FORMS += dialogs/settingsdialog.ui \

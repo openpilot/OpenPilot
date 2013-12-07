@@ -1,13 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       telemetrymanager.cpp
+ * @file       flightlogplugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup UAVTalkPlugin UAVTalk Plugin
- * @{
- * @brief The UAVTalk protocol plugin
+ * @brief A plugin to view and download flight side logs.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,49 +23,31 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef TELEMETRYMANAGER_H
-#define TELEMETRYMANAGER_H
+#ifndef FLIGHTLOGPLUGIN_H_
+#define FLIGHTLOGPLUGIN_H_
 
-#include "uavtalk_global.h"
-#include "telemetrymonitor.h"
-#include "telemetry.h"
-#include "uavtalk.h"
-#include "uavobjectmanager.h"
-#include <QIODevice>
-#include <QObject>
+#include <extensionsystem/iplugin.h>
+#include "flightlogmanager.h"
+#include "flightlogdialog.h"
 
-class UAVTALK_EXPORT TelemetryManager : public QObject {
+class FlightLogPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "OpenPilot.FlightLog")
 
 public:
-    TelemetryManager();
-    ~TelemetryManager();
+    FlightLogPlugin();
+    ~FlightLogPlugin();
 
-    void start(QIODevice *dev);
-    void stop();
-    bool isConnected();
-
-signals:
-    void connected();
-    void disconnected();
-    void telemetryUpdated(double txRate, double rxRate);
-    void myStart();
-    void myStop();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 
 private slots:
-    void onConnect();
-    void onDisconnect();
-    void onTelemetryUpdate(double txRate, double rxRate);
-    void onStart();
-    void onStop();
+    void ShowLogManagementDialog();
+    void LogManagementDialogClosed();
 
 private:
-    UAVObjectManager *objMngr;
-    UAVTalk *utalk;
-    Telemetry *telemetry;
-    TelemetryMonitor *telemetryMon;
-    QIODevice *device;
-    bool autopilotConnected;
+    FlightLogDialog *m_logDialog;
 };
 
-#endif // TELEMETRYMANAGER_H
+#endif /* FLIGHTLOGPLUGIN_H_ */

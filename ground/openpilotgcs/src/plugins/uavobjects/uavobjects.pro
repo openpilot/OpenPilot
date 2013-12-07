@@ -11,14 +11,16 @@ HEADERS += uavobjects_global.h \
     uavdataobject.h \
     uavobjectfield.h \
     uavobjectsinit.h \
-    uavobjectsplugin.h
+    uavobjectsplugin.h \
+    uavobjecthelper.h
 
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
     uavdataobject.cpp \
     uavobjectfield.cpp \
-    uavobjectsplugin.cpp
+    uavobjectsplugin.cpp \
+    uavobjecthelper.cpp
 
 OTHER_FILES += UAVObjects.pluginspec
 

@@ -45,7 +45,7 @@
 #include "uavgadgetinstancemanager.h"
 #include "workspacesettings.h"
 
-#include "authorsdialog.h"
+#include "aboutdialog.h"
 #include "baseview.h"
 #include "ioutputpane.h"
 #include "icorelistener.h"
@@ -56,7 +56,6 @@
 #include "threadmanager.h"
 #include "uniqueidmanager.h"
 #include "variablemanager.h"
-#include "versiondialog.h"
 
 #include <coreplugin/settingsdatabase.h>
 #include <extensionsystem/pluginmanager.h>
@@ -114,8 +113,7 @@ MainWindow::MainWindow() :
     m_modeManager(0),
     m_connectionManager(0),
     m_mimeDatabase(new MimeDatabase),
-    m_versionDialog(0),
-    m_authorsDialog(0),
+    m_aboutDialog(0),
     m_activeContext(0),
     m_generalSettings(new GeneralSettings),
     m_shortcutSettings(new ShortcutSettings),
@@ -790,7 +788,7 @@ void MainWindow::registerDefaultActions()
 #ifdef Q_WS_MAC
     cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
 #endif
-    connect(tmpaction, SIGNAL(triggered()), this, SLOT(aboutOpenPilotAuthors()));
+    connect(tmpaction, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
 }
 
 void MainWindow::newFile()
@@ -798,42 +796,6 @@ void MainWindow::newFile()
 
 void MainWindow::openFile()
 {}
-
-/*static QList<IFileFactory*> getNonEditorFileFactories()
-   {
-    QList<IFileFactory*> tmp;
-    return tmp;
-   }
-
-   static IFileFactory *findFileFactory(const QList<IFileFactory*> &fileFactories,
-                                     const MimeDatabase *db,
-                                     const QFileInfo &fi)
-   {
-    if (const MimeType mt = db->findByFile(fi)) {
-        const QString type = mt.type();
-        foreach (IFileFactory *factory, fileFactories) {
-            if (factory->mimeTypes().contains(type))
-                return factory;
-        }
-    }
-    return 0;
-   }
-
-   // opens either an editor or loads a project
-   void MainWindow::openFiles(const QStringList &fileNames)
-   {
-    QList<IFileFactory*> nonEditorFileFactories = getNonEditorFileFactories();
-
-    foreach (const QString &fileName, fileNames) {
-        const QFileInfo fi(fileName);
-        const QString absoluteFilePath = fi.absoluteFilePath();
-        if (IFileFactory *fileFactory = findFileFactory(nonEditorFileFactories, mimeDatabase(), fi)) {
-            fileFactory->open(absoluteFilePath);
-        } else {
-
-        }
-    }
-   }*/
 
 void MainWindow::setFocusToEditor()
 {}
@@ -1401,42 +1363,23 @@ void MainWindow::openRecentFile()
     if (!fileName.isEmpty()) {}
 }
 
-void MainWindow::aboutOpenPilotGCS()
+void MainWindow::showAboutDialog()
 {
-    if (!m_versionDialog) {
-        m_versionDialog = new VersionDialog(this);
-        connect(m_versionDialog, SIGNAL(finished(int)),
-                this, SLOT(destroyVersionDialog()));
+    if (!m_aboutDialog) {
+        m_aboutDialog = new AboutDialog(this);
+        connect(m_aboutDialog, SIGNAL(finished(int)),
+                this, SLOT(destroyAboutDialog()));
     }
-    m_versionDialog->show();
+    m_aboutDialog->show();
 }
 
-void MainWindow::destroyVersionDialog()
+void MainWindow::destroyAboutDialog()
 {
-    if (m_versionDialog) {
-        m_versionDialog->deleteLater();
-        m_versionDialog = 0;
+    if (m_aboutDialog) {
+        m_aboutDialog->deleteLater();
+        m_aboutDialog = 0;
     }
 }
-
-void MainWindow::aboutOpenPilotAuthors()
-{
-    if (!m_authorsDialog) {
-        m_authorsDialog = new AuthorsDialog(this);
-        connect(m_authorsDialog, SIGNAL(finished(int)),
-                this, SLOT(destroyAuthorsDialog()));
-    }
-    m_authorsDialog->show();
-}
-
-void MainWindow::destroyAuthorsDialog()
-{
-    if (m_authorsDialog) {
-        m_authorsDialog->deleteLater();
-        m_authorsDialog = 0;
-    }
-}
-
 
 void MainWindow::aboutPlugins()
 {
@@ -1453,12 +1396,8 @@ void MainWindow::setFullScreen(bool on)
 
     if (on) {
         setWindowState(windowState() | Qt::WindowFullScreen);
-        // statusBar()->hide();
-        // menuBar()->hide();
     } else {
         setWindowState(windowState() & ~Qt::WindowFullScreen);
-        // menuBar()->show();
-        // statusBar()->show();
     }
 }
 

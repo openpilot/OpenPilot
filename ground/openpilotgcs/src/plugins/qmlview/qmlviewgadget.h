@@ -46,11 +46,18 @@ public:
 
     QWidget *widget()
     {
-        return m_widget;
+        if (!m_container) {
+            m_container = QWidget::createWindowContainer(m_widget, m_parent);
+            m_container->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+            m_container->setMinimumSize(64, 64);
+        }
+        return m_container;
     }
     void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
+    QWidget *m_container;
+    QWidget *m_parent;
     QmlViewGadgetWidget *m_widget;
 };
 

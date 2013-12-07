@@ -1,14 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       versiondialog.h
+ * @file       aboutdialog.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @addtogroup GCSPlugins GCS Plugins
- * @{
- * @addtogroup CorePlugin Core Plugin
- * @{
- * @brief The Core GCS plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -26,19 +21,20 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef VERSIONDIALOG_H
-#define VERSIONDIALOG_H
+#ifndef ABOUTDIALOG_H
+#define ABOUTDIALOG_H
 
 #include <QDialog>
 
-namespace Core {
-namespace Internal {
-class VersionDialog : public QDialog {
+class AboutDialog : public QDialog {
     Q_OBJECT
-public:
-    explicit VersionDialog(QWidget *parent);
-};
-} // namespace Internal
-} // namespace Core
 
-#endif // VERSIONDIALOG_H
+public:
+    explicit AboutDialog(QWidget *parent = 0);
+    ~AboutDialog();
+
+public slots:
+    void openUrl(const QString &url);
+};
+
+#endif // ABOUTDIALOG_H

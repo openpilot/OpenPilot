@@ -102,7 +102,7 @@
 // TELEMETRY
 // ------------------------
 #define TELEM_QUEUE_SIZE           20
-#define PIOS_TELEM_STACK_SIZE      624
+#define PIOS_TELEM_STACK_SIZE      800
 
 // *****************************************************************
 // Interrupt Priorities

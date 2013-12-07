@@ -59,8 +59,8 @@
 #include <positionstate.h>
 // Private constants
 
-#define CALLBACK_PRIORITY CALLBACK_PRIORITY_LOW
-#define CBTASK_PRIORITY   CALLBACK_TASK_FLIGHTCONTROL
+#define CALLBACK_PRIORITY      CALLBACK_PRIORITY_LOW
+#define CBTASK_PRIORITY        CALLBACK_TASK_FLIGHTCONTROL
 
 #define STACK_SIZE_BYTES       1024
 #define DESIRED_UPDATE_RATE_MS 100 // milliseconds
@@ -116,88 +116,90 @@ MODULE_INITCALL(AltitudeHoldInitialize, AltitudeHoldStart);
  */
 static void altitudeHoldTask(void)
 {
+    static float startThrottle = 0.5f;
 
-	static float startThrottle =0.5f;
+    // make sure we run only when we are supposed to run
+    FlightStatusData flightStatus;
 
-	// make sure we run only when we are supposed to run
-	FlightStatusData flightStatus;
-	FlightStatusGet(&flightStatus);
-	switch (flightStatus.FlightMode) {
-		case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
-		case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO:
-			break;
-		default:
-			pid_zero(&accelpid);
-			StabilizationDesiredThrottleGet(&startThrottle);
-			DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
-			return;
-			break;
-	}
+    FlightStatusGet(&flightStatus);
+    switch (flightStatus.FlightMode) {
+    case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
+    case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO:
+        break;
+    default:
+        pid_zero(&accelpid);
+        StabilizationDesiredThrottleGet(&startThrottle);
+        DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+        return;
 
-	// do the actual control loop(s)
-	AltitudeHoldDesiredData altitudeHoldDesired;
-	AltitudeHoldDesiredGet(&altitudeHoldDesired);
-	float positionStateDown;
-	PositionStateDownGet(&positionStateDown);
-	float velocityStateDown;
-	VelocityStateDownGet(&velocityStateDown);
+        break;
+    }
 
-	// altitude control loop
-	float velocityDesiredDown = altitudeHoldSettings.AltitudeP * (positionStateDown - altitudeHoldDesired.Altitude) + altitudeHoldDesired.Velocity;
+    // do the actual control loop(s)
+    AltitudeHoldDesiredData altitudeHoldDesired;
+    AltitudeHoldDesiredGet(&altitudeHoldDesired);
+    float positionStateDown;
+    PositionStateDownGet(&positionStateDown);
+    float velocityStateDown;
+    VelocityStateDownGet(&velocityStateDown);
 
-	// velocity control loop
-	float realAccelDesired = altitudeHoldSettings.VelocityP * (velocityStateDown - velocityDesiredDown) -9.81f;
+    // altitude control loop
+    float velocityDesiredDown = altitudeHoldSettings.AltitudeP * (positionStateDown - altitudeHoldDesired.Altitude) + altitudeHoldDesired.Velocity;
+
+    // velocity control loop
+    float realAccelDesired    = altitudeHoldSettings.VelocityP * (velocityStateDown - velocityDesiredDown) - 9.81f;
 
 
-	// compensate acceleration by rotation
-	// explanation: Rbe[2][2] is the Down component of a 0,0,1 vector rotated by Attitude.Q
-	// It is 1.0 for no rotation, 0.0 for a 90 degrees roll or pitch and -1.0 for a 180 degrees flipped rotation
-	// multiplying with 1/Rbe[2][2] therefore is the acceleration/thrust required to overcome gravity and achieve the wanted vertical
-	// acceleration at the current tilt angle.
-	// around 90 degrees rotation this is infinite (since no possible acceleration would get us up or down) so we set the error to zero to keep
-	// integrals from winding in any direction
- 
-	AttitudeStateData attitudeState;
-	AttitudeStateGet(&attitudeState);
-	float Rbe[3][3];
-	Quaternion2R(&attitudeState.q1,Rbe);
-	
-	float rotatedAccelDesired = realAccelDesired;
-	if (fabsf(Rbe[2][2])>1e-3f) {
-		rotatedAccelDesired /= Rbe[2][2];
-	} else {
-		rotatedAccelDesired = accelStateDown;
-	}
-	
-	// acceleration control loop
-	float throttle = startThrottle + pid_apply_setpoint(&accelpid, 1.0f, rotatedAccelDesired, accelStateDown, 1000/DESIRED_UPDATE_RATE_MS);
+    // compensate acceleration by rotation
+    // explanation: Rbe[2][2] is the Down component of a 0,0,1 vector rotated by Attitude.Q
+    // It is 1.0 for no rotation, 0.0 for a 90 degrees roll or pitch and -1.0 for a 180 degrees flipped rotation
+    // multiplying with 1/Rbe[2][2] therefore is the acceleration/thrust required to overcome gravity and achieve the wanted vertical
+    // acceleration at the current tilt angle.
+    // around 90 degrees rotation this is infinite (since no possible acceleration would get us up or down) so we set the error to zero to keep
+    // integrals from winding in any direction
 
-	if (throttle>=1.0f) {
-		throttle=1.0f;
-	}
-	if (throttle<=0.0f) {
-		throttle=0.0f;
-	}
-	StabilizationDesiredData stab;
-	StabilizationDesiredGet(&stab);
-	stab.Roll = altitudeHoldDesired.Roll;
-	stab.Pitch = altitudeHoldDesired.Pitch;
-	stab.Yaw = altitudeHoldDesired.Yaw;
-	stab.Throttle = throttle;
-        stab.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-        stab.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-        stab.StabilizationMode.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
-	
-	StabilizationDesiredSet(&stab);
+    AttitudeStateData attitudeState;
+    AttitudeStateGet(&attitudeState);
+    float Rbe[3][3];
+    Quaternion2R(&attitudeState.q1, Rbe);
 
-	DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+    float rotatedAccelDesired = realAccelDesired;
+    if (fabsf(Rbe[2][2]) > 1e-3f) {
+        rotatedAccelDesired /= Rbe[2][2];
+    } else {
+        rotatedAccelDesired = accelStateDown;
+    }
+
+    // acceleration control loop
+    float throttle = startThrottle + pid_apply_setpoint(&accelpid, 1.0f, rotatedAccelDesired, accelStateDown, 1000 / DESIRED_UPDATE_RATE_MS);
+
+    if (throttle >= 1.0f) {
+        throttle = 1.0f;
+    }
+    if (throttle <= 0.0f) {
+        throttle = 0.0f;
+    }
+    StabilizationDesiredData stab;
+    StabilizationDesiredGet(&stab);
+    stab.Roll     = altitudeHoldDesired.Roll;
+    stab.Pitch    = altitudeHoldDesired.Pitch;
+    stab.Yaw      = altitudeHoldDesired.Yaw;
+    stab.Throttle = throttle;
+    stab.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stab.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stab.StabilizationMode.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
+
+    StabilizationDesiredSet(&stab);
+
+    DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
 }
 
 static void AccelStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-	float down;
-	AccelStatezGet(&down);
-	accelStateDown = down * altitudeHoldSettings.AccelAlpha + accelStateDown * (1.0f - altitudeHoldSettings.AccelAlpha);
+    float down;
+
+    AccelStatezGet(&down);
+    accelStateDown = down * altitudeHoldSettings.AccelAlpha + accelStateDown * (1.0f - altitudeHoldSettings.AccelAlpha);
 }
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
@@ -205,5 +207,5 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     AltitudeHoldSettingsGet(&altitudeHoldSettings);
     pid_configure(&accelpid, altitudeHoldSettings.AccelPI.Kp, altitudeHoldSettings.AccelPI.Kp, 0, altitudeHoldSettings.AccelPI.Ilimit);
     pid_zero(&accelpid);
-    accelStateDown=0.0f;
+    accelStateDown = 0.0f;
 }

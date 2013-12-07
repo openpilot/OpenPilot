@@ -53,7 +53,7 @@ FlightLogManager::FlightLogManager(QObject *parent) :
     Q_ASSERT(m_flightLogStatus);
     connect(m_flightLogStatus, SIGNAL(FlightChanged(quint16)), this, SLOT(updateFlightEntries(quint16)));
 
-    m_flightLogEntry   = DebugLogEntry::GetInstance(m_objectManager);
+    m_flightLogEntry = DebugLogEntry::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogEntry);
 
     updateFlightEntries(m_flightLogStatus->getFlight());
@@ -119,7 +119,7 @@ void FlightLogManager::clearAllLogs()
 
 void FlightLogManager::clearLogList()
 {
-    QList<ExtendedDebugLogEntry*> tmpList(m_logEntries);
+    QList<ExtendedDebugLogEntry *> tmpList(m_logEntries);
     m_logEntries.clear();
 
     emit logEntriesChanged();
@@ -195,7 +195,7 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
 
 void FlightLogManager::exportLogs()
 {
-    if(m_logEntries.isEmpty()) {
+    if (m_logEntries.isEmpty()) {
         return;
     }
 
@@ -204,16 +204,15 @@ void FlightLogManager::exportLogs()
 
     QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log"),
                                                     tr("OP-%0.opl").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
-                                                    tr("OpenPilot Log (*.opl)"));    
+                                                    tr("OpenPilot Log (*.opl)"));
     if (!fileName.isEmpty()) {
         // Loop and create a new file for each flight.
         fileName = fileName.replace(QString(".opl"), QString("%1.opl"));
-        int currentEntry = 0;
+        int currentEntry  = 0;
         int currentFlight = 0;
         quint32 adjustedBaseTime = 0;
         // Continue until all entries are exported
-        while(currentEntry < m_logEntries.count()) {
-
+        while (currentEntry < m_logEntries.count()) {
             if (m_adjustExportedTimestamps) {
                 adjustedBaseTime = m_logEntries[currentEntry]->getFlightTime();
             }
@@ -230,8 +229,8 @@ void FlightLogManager::exportLogs()
             UAVTalk uavTalk(&logFile, m_objectManager);
 
             // Export entries until no more available or flight changes
-            while(currentEntry < m_logEntries.count() && m_logEntries[currentEntry]->getFlight() == currentFlight) {
-                ExtendedDebugLogEntry* entry = m_logEntries[currentEntry];
+            while (currentEntry < m_logEntries.count() && m_logEntries[currentEntry]->getFlight() == currentFlight) {
+                ExtendedDebugLogEntry *entry = m_logEntries[currentEntry];
 
                 // Only log uavobjects
                 if (entry->getType() == ExtendedDebugLogEntry::TYPE_UAVOBJECT) {
@@ -247,7 +246,6 @@ void FlightLogManager::exportLogs()
 
             logFile.close();
         }
-
     }
 
     QApplication::restoreOverrideCursor();
@@ -268,7 +266,7 @@ void FlightLogManager::updateFlightEntries(quint16 currentFlight)
         m_flightEntries.clear();
 
         m_flightEntries << tr("All");
-        for(int i = 0; i <= flights; i++) {
+        for (int i = 0; i <= flights; i++) {
             m_flightEntries << QString::number(i + 1);
         }
 
@@ -302,10 +300,11 @@ QString ExtendedDebugLogEntry::getLogString()
 void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVObjectManager *objectManager)
 {
     DebugLogEntry::setData(data);
+
     if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
         UAVDataObject *object = (UAVDataObject *)objectManager->getObject(getObjectID(), getInstanceID());
         Q_ASSERT(object);
-        m_object   = object->clone(getInstanceID());
+        m_object = object->clone(getInstanceID());
         m_object->unpack(getData().Data);
     }
 }

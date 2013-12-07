@@ -51,7 +51,7 @@ public:
         return m_object;
     }
 
-    void setData(const DataFields& data, UAVObjectManager *objectManager);
+    void setData(const DataFields & data, UAVObjectManager *objectManager);
 
 public slots:
     void setLogString(QString arg)

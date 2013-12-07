@@ -32,7 +32,7 @@
 
 class FlightLogPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "OpenPilot.FlightLog")
+                                                Q_PLUGIN_METADATA(IID "OpenPilot.FlightLog")
 
 public:
     FlightLogPlugin();

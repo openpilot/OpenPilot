@@ -2828,11 +2828,11 @@ void updateGraphics()
         }
 		// Home altitude in HUD design as vertical scale right side (centered relative to y)
         if (OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED) {
-            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)gpsData.Altitude : (int)baro.Altitude, 200, +1, OsdSettings.AltitudeSetup.X, OsdSettings.AltitudeSetup.Y, 100, 20, 100, 7, 12, 15, 500, 0);
+            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)gpsData.Altitude : (int)baro.Altitude, 100, +1, OsdSettings.AltitudeSetup.X, OsdSettings.AltitudeSetup.Y, 100, 10, 20, 7, 12, 15, 100, 0);
         }
 		// Ground speed in HUD design as vertical scale left side (centered relative to y)
         if (OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED) {
-            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, OsdSettings.SpeedSetup.X, OsdSettings.SpeedSetup.Y, 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
+            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, OsdSettings.SpeedSetup.X, OsdSettings.SpeedSetup.Y, 100, 10, 20, 7, 12, 15, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
 		// Heading in HUD design (centered relative to x)
         // JR_HINT TODO test both in-flight

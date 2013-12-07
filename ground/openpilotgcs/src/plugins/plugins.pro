@@ -244,3 +244,10 @@ plugin_setupwizard.depends += plugin_config
 plugin_setupwizard.depends += plugin_uploader
 SUBDIRS += plugin_setupwizard
 
+# Flight Logs plugin
+plugin_flightlog.subdir = flightlog
+plugin_flightlog.depends = plugin_coreplugin
+plugin_flightlog.depends += plugin_uavobjects
+plugin_flightlog.depends += plugin_uavtalk
+SUBDIRS += plugin_flightlog
+

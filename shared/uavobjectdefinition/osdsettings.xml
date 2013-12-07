@@ -2,7 +2,7 @@
     <object name="OsdSettings" singleinstance="true" settings="true" category="System">
         <description>OSD settings used by the OPOSD</description>
         <field name="Warnings" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="WarningsSetup" units="" type="int16" elements="3" elementnames="X,Y,VerticalSpacing" defaultvalue="200,80,25"/>
+        <field name="WarningsSetup" units="" type="int16" elements="3" elementnames="X,Y,VerticalSpacing,Mask" defaultvalue="200,80,25,0x0FFF"/>
         <field name="GPSCoordinates" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="GPSCoordinatesSetup" units="" type="int16" elements="4" elementnames="LatX,LatY,LonX,LonY" defaultvalue="2,2,226,2"/>
         <field name="GPSSatInfo" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>

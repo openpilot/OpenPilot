@@ -2360,6 +2360,9 @@ void lamas(void)
 }
 
 
+#define WARN_ON_TIME			 500			// [ms]
+#define WARN_OFF_TIME			 250			// [ms]
+#define WARN_CALL_TIME			  40			// [ms]
 #define WARN_NO_SAT_FIX			0x01
 #define WARN_HOME_NOT_SET		0x02
 #define WARN_DISARMED			0x04
@@ -2367,33 +2370,40 @@ void lamas(void)
 #define WARN_BATT_LOW			0x10
 void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, int8_t char_size)
 {
+	static uint16_t on_off_cnt = 0;
     char temp[20] = { 0 };
 	int d_y = 0;
 
-	if (WarnMask & WARN_NO_SAT_FIX) {
-        sprintf(temp,  "NO SAT FIX");
-        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-        d_y += v_spacing;
+	if (!WarnMask || (on_off_cnt > (WARN_ON_TIME + WARN_OFF_TIME) / WARN_CALL_TIME)) {
+		on_off_cnt = 0;
 	}
-	if (WarnMask & WARN_HOME_NOT_SET) {
-        sprintf(temp,  "HOME NOT SET");
-        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-        d_y += v_spacing;
-	}
-	if (WarnMask & WARN_DISARMED) {
-        sprintf(temp,  "DISARMED");
-        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-        d_y += v_spacing;
-	}
-	if (WarnMask & WARN_RSSI_LOW) {
-        sprintf(temp,  "RSSI LOW");
-        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-        d_y += v_spacing;
-	}
-	if (WarnMask & WARN_BATT_LOW) {
-        sprintf(temp,  "BATT LOW");
-        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-        d_y += v_spacing;
+
+	if (WarnMask && (on_off_cnt++ < WARN_ON_TIME / WARN_CALL_TIME)) {
+		if (WarnMask & WARN_NO_SAT_FIX) {
+	        sprintf(temp,  "NO SAT FIX");
+	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+	        d_y += v_spacing;
+		}
+		if (WarnMask & WARN_HOME_NOT_SET) {
+	        sprintf(temp,  "HOME NOT SET");
+	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+	        d_y += v_spacing;
+		}
+		if (WarnMask & WARN_DISARMED) {
+	        sprintf(temp,  "DISARMED");
+	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+	        d_y += v_spacing;
+		}
+		if (WarnMask & WARN_RSSI_LOW) {
+	        sprintf(temp,  "RSSI LOW");
+	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+	        d_y += v_spacing;
+		}
+		if (WarnMask & WARN_BATT_LOW) {
+	        sprintf(temp,  "BATT LOW");
+	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+	        d_y += v_spacing;
+		}
 	}
 }
 
@@ -2796,6 +2806,11 @@ void updateGraphics()
         char temp[50] = { 0 };
         uint8_t char_size = (OsdSettings.CharSize == OSDSETTINGS_CHARSIZE_SMALL) ? 2 : 3;
 
+        // Draw AH first so that it is underneath everything else
+		// Artificial horizon in HUD design (centered relative to x, y)
+        if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
+        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
+        }
 		// GPS coordinates
         // JR_HINT TODO use nice icons
         if (OsdSettings.GPSCoordinates == OSDSETTINGS_GPSCOORDINATES_ENABLED) {
@@ -2811,10 +2826,6 @@ void updateGraphics()
             sprintf(temp, "Sat%3d%c", gpsData.Satellites, fix);
             write_string(temp, OsdSettings.GPSSatInfoSetup.X, OsdSettings.GPSSatInfoSetup.Y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
         }
-		// Artificial horizon in HUD design (centered relative to x, y)
-        if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
-        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
-        }
 		// Home altitude in HUD design as vertical scale right side (centered relative to y)
         if (OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED) {
             hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)gpsData.Altitude : (int)baro.Altitude, 200, +1, OsdSettings.AltitudeSetup.X, OsdSettings.AltitudeSetup.Y, 100, 20, 100, 7, 12, 15, 500, 0);
@@ -2828,16 +2839,6 @@ void updateGraphics()
         if (OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED) {
         	int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
     		hud_draw_linear_compass(heading < 0 ? heading + 360: heading, 150, 120, OsdSettings.HeadingSetup.X, OsdSettings.HeadingSetup.Y, 15, 30, 7, 12, 0);
-        }
-        // Warnings (centered relative to x)
-        if (OsdSettings.Warnings == OSDSETTINGS_WARNINGS_ENABLED) {
-        	uint32_t WarnMask = 0;
-        	WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D		? WARN_NO_SAT_FIX	: 0x00;
-        	WarnMask |= home.Set == HOMELOCATION_SET_FALSE					? WARN_HOME_NOT_SET	: 0x00;
-        	WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED				? WARN_DISARMED		: 0x00;
-        	WarnMask |= 0													? WARN_RSSI_LOW		: 0x00;		// JR_HINT TODO
-        	WarnMask |= 0													? WARN_BATT_LOW		: 0x00;		// JR_HINT TODO
-        	draw_warnings(WarnMask, OsdSettings.WarningsSetup.X, OsdSettings.WarningsSetup.Y, OsdSettings.WarningsSetup.VerticalSpacing, char_size);
         }
 		// Flight mode
         if (OsdSettings.FlightMode == OSDSETTINGS_FLIGHTMODE_ENABLED) {
@@ -2860,6 +2861,7 @@ void updateGraphics()
             sprintf(temp, "Thr%3d%c", (int)(value + 0.5f), '%');
             write_string(temp, OsdSettings.ThrottleSetup.X, OsdSettings.ThrottleSetup.Y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
         }
+
         // JR_HINT TODO						Prio
         // for the following 3 use if (OsdSettings.Battery == OSDSETTINGS_BATTERY_ENABLED) {
 		// Voltage [V]						1
@@ -2869,6 +2871,18 @@ void updateGraphics()
 		// Climb rate						2
 		// Direction to home				2
 		// RSSI								3
+
+        // Draw warnings last so that they are above everything else
+        // Warnings (centered relative to x)
+        if (OsdSettings.Warnings == OSDSETTINGS_WARNINGS_ENABLED) {
+        	uint32_t WarnMask = 0;
+        	WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D		? WARN_NO_SAT_FIX	: 0x00;
+        	WarnMask |= home.Set == HOMELOCATION_SET_FALSE					? WARN_HOME_NOT_SET	: 0x00;
+        	WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED				? WARN_DISARMED		: 0x00;
+        	WarnMask |= 0													? WARN_RSSI_LOW		: 0x00;		// JR_HINT TODO
+        	WarnMask |= 0													? WARN_BATT_LOW		: 0x00;		// JR_HINT TODO
+        	draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, OsdSettings.WarningsSetup.X, OsdSettings.WarningsSetup.Y, OsdSettings.WarningsSetup.VerticalSpacing, char_size);
+        }
     }
     break;
     default:

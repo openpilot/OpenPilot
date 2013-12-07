@@ -1,27 +1,34 @@
 <xml>
     <object name="OsdSettings" singleinstance="true" settings="true" category="System">
         <description>OSD settings used by the OPOSD</description>
+        <field name="Warnings" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="WarningsSetup" units="" type="int16" elements="3" elementnames="X,Y,VerticalSpacing" defaultvalue="200,80,25"/>
         <field name="GPSCoordinates" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="GPSCoordinatesSetup" units="" type="int16" elements="4" elementnames="LatX,LatY,LonX,LonY" defaultvalue="2,2,2,12"/>
+        <field name="GPSCoordinatesSetup" units="" type="int16" elements="4" elementnames="LatX,LatY,LonX,LonY" defaultvalue="2,2,226,2"/>
+        <field name="GPSSatInfo" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="GPSSatInfoSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,227"/>
         <field name="ArtificialHorizon" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="ArtificialHorizonSetup" units="" type="int16" elements="3" elementnames="X,Y,MainLineWidth" defaultvalue="200,144,500"/>
-        <field name="Attitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="AttitudeSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="200,144"/>
-        <field name="Time" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="TimeSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,275"/>
-        <field name="Battery" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="BatterySetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="316,210"/>
         <field name="Speed" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="SpeedSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,144"/>
         <field name="Altitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="AltitudeSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,144"/>
         <field name="Heading" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="HeadingSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="200,260"/>
-        <field name="CharSize" units="" type="enum" elements="1" options="Small,Large" defaultvalue="Small"/>
+        <field name="FlightMode" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="FlightModeSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,267"/>
+        <field name="Throttle" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="ThrottleSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,247"/>
+        <field name="Time" units="" type="enum" elements="1" options="Disabled,HourMinSec,MinSec" defaultvalue="MinSec"/>
+        <field name="TimeSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="322,267"/>
+        <field name="Battery" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="BatterySetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="316,210"/>
+        <field name="CharSize" units="" type="enum" elements="1" options="Small,Large" defaultvalue="Large"/>
 		<field name="Screen" units=""  type="uint8"  elements="1" defaultvalue="10"/>
-		<field name="White" units=""  type="uint8"  elements="1" defaultvalue="4"/>
-		<field name="Black" units=""  type="uint8"  elements="1" defaultvalue="1"/>
+		<field name="White" units=""  type="uint8"  elements="1" defaultvalue="6"/>
+		<field name="Black" units=""  type="uint8"  elements="1" defaultvalue="3"/>
 		<field name="AltitudeSource" units="" type="enum" elements="1" options="GPS,Baro" defaultvalue="GPS"/>
+		<field name="HeadingSource" units="" type="enum" elements="1" options="GPS,Mag" defaultvalue="GPS"/>
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 	<telemetryflight acked="true" updatemode="onchange" period="0"/>

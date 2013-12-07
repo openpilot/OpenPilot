@@ -46,39 +46,37 @@
 #include <openpilot.h>
 
 #include <math.h>
+#include <pid.h>
 #include <CoordinateConversions.h>
-#include <altholdsmoothed.h>
 #include <attitudestate.h>
 #include <altitudeholdsettings.h>
 #include <altitudeholddesired.h> // object that will be updated by the module
-#include <barosensor.h>
-#include <positionstate.h>
 #include <flightstatus.h>
 #include <stabilizationdesired.h>
 #include <accelstate.h>
-#include <taskinfo.h>
 #include <pios_constants.h>
 #include <velocitystate.h>
 #include <positionstate.h>
 // Private constants
-#define MAX_QUEUE_SIZE         2
+
+#define CALLBACK_PRIORITY CALLBACK_PRIORITY_LOW
+#define CBTASK_PRIORITY   CALLBACK_TASK_FLIGHTCONTROL
+
 #define STACK_SIZE_BYTES       1024
-#define TASK_PRIORITY          (tskIDLE_PRIORITY + 1)
-#define ACCEL_DOWNSAMPLE       4
-#define TIMEOUT_TRESHOLD       200000
 #define DESIRED_UPDATE_RATE_MS 100 // milliseconds
 // Private types
 
 // Private variables
-static xTaskHandle altitudeHoldTaskHandle;
-static xQueueHandle queue;
+static DelayedCallbackInfo *altitudeHoldCBInfo;
 static AltitudeHoldSettingsData altitudeHoldSettings;
-static float throttleAlpha = 1.0f;
-static float throttle_old  = 0.0f;
+static struct pid accelpid;
+static float accelStateDown;
+
 
 // Private functions
-static void altitudeHoldTask(void *parameters);
+static void altitudeHoldTask(void);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
+static void AccelStateUpdatedCb(UAVObjEvent *ev);
 
 /**
  * Initialise the module, called on startup
@@ -87,8 +85,8 @@ static void SettingsUpdatedCb(UAVObjEvent *ev);
 int32_t AltitudeHoldStart()
 {
     // Start main task
-    xTaskCreate(altitudeHoldTask, (signed char *)"AltitudeHold", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &altitudeHoldTaskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ALTITUDEHOLD, altitudeHoldTaskHandle);
+    SettingsUpdatedCb(NULL);
+    DelayedCallbackDispatch(altitudeHoldCBInfo);
 
     return 0;
 }
@@ -101,216 +99,111 @@ int32_t AltitudeHoldInitialize()
 {
     AltitudeHoldSettingsInitialize();
     AltitudeHoldDesiredInitialize();
-    AltHoldSmoothedInitialize();
 
     // Create object queue
-    queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
+    altitudeHoldCBInfo = DelayedCallbackCreate(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, STACK_SIZE_BYTES);
     AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
+    AccelStateConnectCallback(&AccelStateUpdatedCb);
 
     return 0;
 }
 MODULE_INITCALL(AltitudeHoldInitialize, AltitudeHoldStart);
 
-float tau;
-float positionAlpha;
-float velAlpha;
-bool running = false;
-
-float velocity;
-float velocityIntegral;
-float altitudeIntegral;
-float error;
-float velError;
-float derivative;
-uint32_t timeval;
-bool posUpdated;
 
 /**
  * Module thread, should not return.
  */
-static void altitudeHoldTask(__attribute__((unused)) void *parameters)
+static void altitudeHoldTask(void)
 {
-    AltitudeHoldDesiredData altitudeHoldDesired;
-    StabilizationDesiredData stabilizationDesired;
-    AltHoldSmoothedData altHold;
-    VelocityStateData velocityData;
-    float dT;
-    float fblimit = 0;
 
-    portTickType thisTime, lastUpdateTime;
-    UAVObjEvent ev;
+	static float startThrottle =0.5f;
 
-    dT = 0;
-    timeval = 0;
-    lastUpdateTime = 0;
-    // Force update of the settings
-    SettingsUpdatedCb(&ev);
-    // Failsafe handling
-    uint32_t lastAltitudeHoldDesiredUpdate = 0;
-    bool enterFailSafe = false;
-    // Listen for updates.
-    AltitudeHoldDesiredConnectQueue(queue);
-    // PositionStateConnectQueue(queue);
-    FlightStatusConnectQueue(queue);
-    VelocityStateConnectQueue(queue);
-    bool altitudeHoldFlightMode = false;
-    running = false;
-    enum init_state { WAITING_BARO, WAITIING_INIT, INITED } init = WAITING_BARO;
+	// make sure we run only when we are supposed to run
+	FlightStatusData flightStatus;
+	FlightStatusGet(&flightStatus);
+	switch (flightStatus.FlightMode) {
+		case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
+		case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO:
+			break;
+		default:
+			pid_zero(&accelpid);
+			StabilizationDesiredThrottleGet(&startThrottle);
+			DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+			return;
+			break;
+	}
 
-    uint8_t flightMode;
-    FlightStatusFlightModeGet(&flightMode);
-    // initialize enable flag
-    altitudeHoldFlightMode = flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD || flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO;
-    // Main task loop
-    while (1) {
-        enterFailSafe = PIOS_DELAY_DiffuS(lastAltitudeHoldDesiredUpdate) > TIMEOUT_TRESHOLD;
-        // Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
-        if (xQueueReceive(queue, &ev, 100 / portTICK_RATE_MS) != pdTRUE) {
-            if (!running) {
-                altitudeIntegral = 0;
-            }
+	// do the actual control loop(s)
+	AltitudeHoldDesiredData altitudeHoldDesired;
+	AltitudeHoldDesiredGet(&altitudeHoldDesired);
+	float positionStateDown;
+	PositionStateDownGet(&positionStateDown);
+	float velocityStateDown;
+	VelocityStateDownGet(&velocityStateDown);
 
-            // Todo: Add alarm if it should be running
-            continue;
-        } else if (ev.obj == FlightStatusHandle()) {
-            FlightStatusFlightModeGet(&flightMode);
-            altitudeHoldFlightMode = flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD || flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO;
-            if (altitudeHoldFlightMode && !running) {
-                AttitudeStateData attitudeState;
-                float q[4], Rbe[3][3];
-                AttitudeStateGet(&attitudeState);
-                q[0] = attitudeState.q1;
-                q[1] = attitudeState.q2;
-                q[2] = attitudeState.q3;
-                q[3] = attitudeState.q4;
-                Quaternion2R(q, Rbe);
-                // Copy the current throttle as a starting point for integral
-                float initThrottle;
-                StabilizationDesiredThrottleGet(&initThrottle);
-                initThrottle *= Rbe[2][2]; // rotate into earth frame
-                if (initThrottle > 1) {
-                    initThrottle = 1;
-                } else if (initThrottle < 0) {
-                    initThrottle = 0;
-                }
-                error = 0;
-                altitudeHoldDesired.Velocity = 0;
-                altitudeHoldDesired.Altitude = altHold.Altitude;
-                altitudeIntegral = initThrottle;
-                velocityIntegral = 0;
-                running = true;
-            } else if (!altitudeHoldFlightMode) {
-                running = false;
-                lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
-            }
-        } else if (ev.obj == VelocityStateHandle()) {
-            init    = (init == WAITING_BARO) ? WAITIING_INIT : init;
-            dT      = 0.1f * PIOS_DELAY_DiffuS(timeval) / 1.0e6f + 0.9f * dT;
-            timeval = PIOS_DELAY_GetRaw();
+	// altitude control loop
+	float velocityDesiredDown = altitudeHoldSettings.AltitudeP * (positionStateDown - altitudeHoldDesired.Altitude) + altitudeHoldDesired.Velocity;
 
-            AltHoldSmoothedGet(&altHold);
-
-            VelocityStateGet(&velocityData);
-
-            altHold.Velocity = -(velAlpha * altHold.Velocity + (1 - velAlpha) * velocityData.Down);
-
-            float position;
-            PositionStateDownGet(&position);
-            altHold.Altitude = -(positionAlpha * position) + (1 - positionAlpha) * altHold.Altitude;
-
-            AltHoldSmoothedSet(&altHold);
-
-            // Verify that we are in altitude hold mode
-            uint8_t armed;
-            FlightStatusArmedGet(&armed);
-            if (!altitudeHoldFlightMode || armed != FLIGHTSTATUS_ARMED_ARMED) {
-                running = false;
-            }
-
-            if (!running) {
-                lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
-                continue;
-            }
-
-            float lastError = error;
-            error      = altitudeHoldDesired.Altitude - altHold.Altitude;
-            derivative = (error - lastError) / dT;
-
-            velError   = altitudeHoldDesired.Velocity - altHold.Velocity;
-
-            // Compute altitude and velocity integral
-            altitudeIntegral += (error - fblimit) * altitudeHoldSettings.AltitudePID[ALTITUDEHOLDSETTINGS_ALTITUDEPID_KI] * dT;
-            velocityIntegral += (velError - fblimit) * altitudeHoldSettings.VelocityPI[ALTITUDEHOLDSETTINGS_VELOCITYPI_KI] * dT;
+	// velocity control loop
+	float realAccelDesired = altitudeHoldSettings.VelocityP * (velocityStateDown - velocityDesiredDown) -9.81f;
 
 
-            thisTime = xTaskGetTickCount();
-            // Only update stabilizationDesired less frequently
-            if ((thisTime - lastUpdateTime) * 1000 / configTICK_RATE_HZ < DESIRED_UPDATE_RATE_MS) {
-                continue;
-            }
-            lastUpdateTime = thisTime;
+	// compensate acceleration by rotation
+	// explanation: Rbe[2][2] is the Down component of a 0,0,1 vector rotated by Attitude.Q
+	// It is 1.0 for no rotation, 0.0 for a 90 degrees roll or pitch and -1.0 for a 180 degrees flipped rotation
+	// multiplying with 1/Rbe[2][2] therefore is the acceleration/thrust required to overcome gravity and achieve the wanted vertical
+	// acceleration at the current tilt angle.
+	// around 90 degrees rotation this is infinite (since no possible acceleration would get us up or down) so we set the error to zero to keep
+	// integrals from winding in any direction
+ 
+	AttitudeStateData attitudeState;
+	AttitudeStateGet(&attitudeState);
+	float Rbe[3][3];
+	Quaternion2R(&attitudeState.q1,Rbe);
+	
+	float rotatedAccelDesired = realAccelDesired;
+	if (fabsf(Rbe[2][2])>1e-3f) {
+		rotatedAccelDesired /= Rbe[2][2];
+	} else {
+		rotatedAccelDesired = accelStateDown;
+	}
+	
+	// acceleration control loop
+	float throttle = startThrottle + pid_apply_setpoint(&accelpid, 1.0f, rotatedAccelDesired, accelStateDown, 1000/DESIRED_UPDATE_RATE_MS);
 
-            // Instead of explicit limit on integral you output limit feedback
-            StabilizationDesiredGet(&stabilizationDesired);
-            if (!enterFailSafe) {
-                stabilizationDesired.Throttle = altitudeIntegral + velocityIntegral
-                                                + error * altitudeHoldSettings.AltitudePID[ALTITUDEHOLDSETTINGS_ALTITUDEPID_KP]
-                                                + velError * altitudeHoldSettings.VelocityPI[ALTITUDEHOLDSETTINGS_VELOCITYPI_KP]
-                                                + derivative * altitudeHoldSettings.AltitudePID[ALTITUDEHOLDSETTINGS_ALTITUDEPID_KD];
+	if (throttle>=1.0f) {
+		throttle=1.0f;
+	}
+	if (throttle<=0.0f) {
+		throttle=0.0f;
+	}
+	StabilizationDesiredData stab;
+	StabilizationDesiredGet(&stab);
+	stab.Roll = altitudeHoldDesired.Roll;
+	stab.Pitch = altitudeHoldDesired.Pitch;
+	stab.Yaw = altitudeHoldDesired.Yaw;
+	stab.Throttle = throttle;
+        stab.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+        stab.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+        stab.StabilizationMode.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
+	
+	StabilizationDesiredSet(&stab);
 
-                // scale up throttle to compensate for roll/pitch angle but limit this to 60 deg (cos(60) == 0.5) to prevent excessive scaling
-                AttitudeStateData attitudeState;
-                float q[4], Rbe[3][3];
-                AttitudeStateGet(&attitudeState);
-                q[0] = attitudeState.q1;
-                q[1] = attitudeState.q2;
-                q[2] = attitudeState.q3;
-                q[3] = attitudeState.q4;
-                Quaternion2R(q, Rbe);
-                float throttlescale = Rbe[2][2] < 0.5f ? 0.5f : Rbe[2][2];
-                stabilizationDesired.Throttle /= throttlescale;
-                stabilizationDesired.Throttle  = stabilizationDesired.Throttle * throttleAlpha + throttle_old * (1.0f - throttleAlpha);
-                throttle_old = stabilizationDesired.Throttle;
-                fblimit = 0;
+	DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+}
 
-                if (stabilizationDesired.Throttle > 1) {
-                    fblimit = stabilizationDesired.Throttle - 1;
-                    stabilizationDesired.Throttle = 1;
-                } else if (stabilizationDesired.Throttle < 0) {
-                    fblimit = stabilizationDesired.Throttle;
-                    stabilizationDesired.Throttle = 0;
-                }
-            } else {
-                // shutdown motors
-                stabilizationDesired.Throttle = -1;
-            }
-            stabilizationDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-            stabilizationDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-            stabilizationDesired.StabilizationMode.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
-            stabilizationDesired.Roll  = altitudeHoldDesired.Roll;
-            stabilizationDesired.Pitch = altitudeHoldDesired.Pitch;
-            stabilizationDesired.Yaw   = altitudeHoldDesired.Yaw;
-
-            StabilizationDesiredSet(&stabilizationDesired);
-        } else if (ev.obj == AltitudeHoldDesiredHandle()) {
-            // reset the failsafe timer
-            lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
-            AltitudeHoldDesiredGet(&altitudeHoldDesired);
-        }
-    }
+static void AccelStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+	float down;
+	AccelStatezGet(&down);
+	accelStateDown = down * altitudeHoldSettings.AccelAlpha + accelStateDown * (1.0f - altitudeHoldSettings.AccelAlpha);
 }
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     AltitudeHoldSettingsGet(&altitudeHoldSettings);
-    positionAlpha = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.PositionTau);
-    velAlpha = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.VelocityTau);
-
-    // don't use throttle filter if specified cutoff frequency is too low or above nyquist criteria (half the sampling frequency)
-    if (altitudeHoldSettings.ThrottleFilterCutoff > 0.001f && altitudeHoldSettings.ThrottleFilterCutoff < 2000.0f / DESIRED_UPDATE_RATE_MS) {
-        throttleAlpha = (float)DESIRED_UPDATE_RATE_MS / ((float)DESIRED_UPDATE_RATE_MS + 1000.0f / (2.0f * M_PI_F * altitudeHoldSettings.ThrottleFilterCutoff));
-    } else {
-        throttleAlpha = 1.0f;
-    }
+    pid_configure(&accelpid, altitudeHoldSettings.AccelPI.Kp, altitudeHoldSettings.AccelPI.Kp, 0, altitudeHoldSettings.AccelPI.Ilimit);
+    pid_zero(&accelpid);
+    accelStateDown=0.0f;
 }

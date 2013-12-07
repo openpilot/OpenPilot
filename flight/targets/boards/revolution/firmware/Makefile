@@ -47,6 +47,7 @@ MODULES += Radio
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
 MODULES += Osd/osdoutout
+MODULES += Logging
 MODULES += Telemetry
 
 OPTMODULES += ComUsbBridge

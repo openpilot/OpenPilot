@@ -130,7 +130,7 @@ public:
     void emitNewInstance(UAVObject *);
 
     bool isKnownByFlightSide() { return knownByFlightSide; }
-    bool setKnownByFlightSide(bool known) { knownByFlightSide = known; }
+    void setKnownByFlightSide(bool known) { knownByFlightSide = known; }
 
     // Metadata accessors
     static void MetadataInitialize(Metadata & meta);

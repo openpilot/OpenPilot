@@ -405,12 +405,12 @@ Qt::ItemFlags UAVObjectTreeModel::flags(const QModelIndex &index) const
         return 0;
     }
 
+    TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
     if (index.column() == TreeItem::dataColumn) {
         if (item->isEditable()) {
             return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
         }
     } else {
-        TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
         DataObjectTreeItem* objectItem = dynamic_cast<DataObjectTreeItem *>(item);
         if (objectItem) {
             UAVDataObject* dataObj = dynamic_cast<UAVDataObject *>(objectItem->object());

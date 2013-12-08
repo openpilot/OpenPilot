@@ -171,7 +171,7 @@ static void altitudeHoldTask(void)
     }
 
     // acceleration control loop
-    float throttle = startThrottle + pid_apply_setpoint(&accelpid, 1.0f, rotatedAccelDesired, accelStateDown, 1000 / DESIRED_UPDATE_RATE_MS);
+    float throttle = startThrottle - pid_apply_setpoint(&accelpid, 1.0f, rotatedAccelDesired, accelStateDown, 1000 / DESIRED_UPDATE_RATE_MS);
 
     if (throttle >= 1.0f) {
         throttle = 1.0f;

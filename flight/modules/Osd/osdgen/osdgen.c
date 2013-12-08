@@ -2510,9 +2510,8 @@ void updateGraphics()
     BaroSensorGet(&baro);
     FlightStatusData status;
     FlightStatusGet(&status);
-
-    PIOS_Servo_Set(0, OsdSettings.White);
-    PIOS_Servo_Set(1, OsdSettings.Black);
+    ManualControlCommandData mcc;
+    ManualControlCommandGet(&mcc);
 
 #ifdef DEMO_SCREENS
     static int cnt = 0;
@@ -2839,18 +2838,19 @@ void updateGraphics()
         gpsData.Groundspeed = spd++;
 #endif
         char temp[50] = { 0 };
-        int8_t screen = 1;
+        int8_t screen = 2;
         int8_t check;
         int16_t x, y;
 
-        // JR_HINT TODO set screen using a configurable channel with configurable pulses in ms
-#if 0
-        screen = 2;
-        if (attitude.Roll < -30.0f)
-        	screen = 1;
-        if (attitude.Roll > 30.0f)
-        	screen = 3;
-#endif
+        // Screen switching via RC-RX or GCS
+        if (mcc.Connected) {
+            if (mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] < OsdSettings.ScreenSwitching.Switch1Pulse)
+            	screen = 1;
+            if (mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] > OsdSettings.ScreenSwitching.Switch3Pulse)
+            	screen = 3;
+        } else {
+        	screen = OsdSettings.ScreenSwitching.UnconnectedScreen;
+        }
 
         // Draw AH first so that it is underneath everything else
 		// Artificial horizon in HUD design (centered relative to x, y)
@@ -2894,9 +2894,7 @@ void updateGraphics()
         }
 		// Throttle
         if (check_enable_and_srceen(OsdSettings.Throttle, (OsdSettingsWarningsSetupData*)&OsdSettings.ThrottleSetup, screen, &x, &y)) {
-        	float value = 0;
-//        	ManualControlCommandThrottleGet(&value);					// JR_HINT currently not compiling
-            sprintf(temp, "Thr%3d%c", (int)(value + 0.5f), '%');
+            sprintf(temp, "Thr%3d%c", (int)(mcc.Throttle + 0.5f), '%');
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.ThrottleSetup.CharSize);
         }
 		// Flight time
@@ -3019,6 +3017,7 @@ int32_t osdgenInitialize(void)
     OsdSettingsInitialize();
     BaroSensorInitialize();
     FlightStatusInitialize();
+    ManualControlCommandInitialize();
 
     return 0;
 }

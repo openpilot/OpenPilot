@@ -1,6 +1,9 @@
 <xml>
     <object name="OsdSettings" singleinstance="true" settings="true" category="System">
         <description>OSD settings used by the OPOSD</description>
+        
+        <field name="ScreenSwitching" units="" type="int16" elements="4" elementnames="UnconnectedScreen,SwitchChannel,Switch1Pulse,Switch3Pulse" defaultvalue="1,6,1300,1700"/>
+        
         <field name="Warnings" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="WarningsSetup" units="" type="int16" elements="9" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize,VerticalSpacing,Mask" defaultvalue="200,80,200,80,200,80,3,25,4095"/>
         

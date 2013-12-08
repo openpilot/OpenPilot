@@ -34,6 +34,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/attitudesimulated.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.h \
+    $$UAVOBJECT_SYNTHETICS/altitudeholdstatus.h \
     $$UAVOBJECT_SYNTHETICS/altitudefiltersettings.h \
     $$UAVOBJECT_SYNTHETICS/debuglogsettings.h \
     $$UAVOBJECT_SYNTHETICS/debuglogcontrol.h \
@@ -124,6 +125,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudesimulated.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/altitudeholdstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/debuglogsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/debuglogcontrol.cpp \
     $$UAVOBJECT_SYNTHETICS/debuglogstatus.cpp \

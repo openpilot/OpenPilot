@@ -51,6 +51,7 @@
 #include <attitudestate.h>
 #include <altitudeholdsettings.h>
 #include <altitudeholddesired.h> // object that will be updated by the module
+#include <altitudeholdstatus.h>
 #include <flightstatus.h>
 #include <stabilizationdesired.h>
 #include <accelstate.h>
@@ -99,6 +100,7 @@ int32_t AltitudeHoldInitialize()
 {
     AltitudeHoldSettingsInitialize();
     AltitudeHoldDesiredInitialize();
+    AltitudeHoldStatusInitialize();
 
     // Create object queue
 
@@ -135,6 +137,9 @@ static void altitudeHoldTask(void)
         break;
     }
 
+    AltitudeHoldStatusData altitudeHoldStatus;
+    AltitudeHoldStatusGet(&altitudeHoldStatus);
+
     // do the actual control loop(s)
     AltitudeHoldDesiredData altitudeHoldDesired;
     AltitudeHoldDesiredGet(&altitudeHoldDesired);
@@ -144,11 +149,12 @@ static void altitudeHoldTask(void)
     VelocityStateDownGet(&velocityStateDown);
 
     // altitude control loop
-    float velocityDesiredDown = altitudeHoldSettings.AltitudeP * (positionStateDown - altitudeHoldDesired.Altitude) + altitudeHoldDesired.Velocity;
+    altitudeHoldStatus.VelocityDesired     = altitudeHoldSettings.AltitudeP * (positionStateDown - altitudeHoldDesired.Altitude) + altitudeHoldDesired.Velocity;
 
     // velocity control loop
-    float realAccelDesired    = altitudeHoldSettings.VelocityP * (velocityStateDown - velocityDesiredDown) - 9.81f;
+    altitudeHoldStatus.AccelerationDesired = altitudeHoldSettings.VelocityP * (velocityStateDown - altitudeHoldStatus.VelocityDesired) - 9.81f;
 
+    AltitudeHoldStatusSet(&altitudeHoldStatus);
 
     // compensate acceleration by rotation
     // explanation: Rbe[2][2] is the Down component of a 0,0,1 vector rotated by Attitude.Q
@@ -163,12 +169,14 @@ static void altitudeHoldTask(void)
     float Rbe[3][3];
     Quaternion2R(&attitudeState.q1, Rbe);
 
-    float rotatedAccelDesired = realAccelDesired;
+    float rotatedAccelDesired = altitudeHoldStatus.AccelerationDesired;
+#if 0
     if (fabsf(Rbe[2][2]) > 1e-3f) {
         rotatedAccelDesired /= Rbe[2][2];
     } else {
         rotatedAccelDesired = accelStateDown;
     }
+#endif
 
     // acceleration control loop
     float throttle = startThrottle - pid_apply_setpoint(&accelpid, 1.0f, rotatedAccelDesired, accelStateDown, 1000 / DESIRED_UPDATE_RATE_MS);

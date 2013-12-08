@@ -113,8 +113,6 @@ int32_t configuration_check()
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEVARIO:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_ALTITUDEHOLD)) { // Revo supports altitude hold
-                severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:

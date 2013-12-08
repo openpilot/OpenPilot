@@ -75,16 +75,11 @@ void TelemetryMonitor::startRetrievingObjects()
         UAVMetaObject *mobj = dynamic_cast<UAVMetaObject *>(obj);
         UAVDataObject *dobj = dynamic_cast<UAVDataObject *>(obj);
         UAVObject::Metadata mdata = obj->getMetadata();
-        if (mobj != NULL) {
+        if (mobj != NULL ||
+                (dobj != NULL &&
+                 (dobj->isSettings() || UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE))) {
+            obj->setKnownByFlightSide(false);
             queue.enqueue(obj);
-        } else if (dobj != NULL) {
-            if (dobj->isSettings()) {
-                queue.enqueue(obj);
-            } else {
-                if (UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE) {
-                    queue.enqueue(obj);
-                }
-            }
         }
     }
     // Start retrieving
@@ -135,7 +130,6 @@ void TelemetryMonitor::retrieveNextObject()
  */
 void TelemetryMonitor::transactionCompleted(UAVObject *obj, bool success)
 {
-    Q_UNUSED(success);
     QMutexLocker locker(mutex);
 
     if (obj == objPending) {
@@ -144,6 +138,8 @@ void TelemetryMonitor::transactionCompleted(UAVObject *obj, bool success)
         objPending = NULL;
         // Process next object if telemetry is still available
         GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
+
+        obj->setKnownByFlightSide(success);
 
         if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED) {
             retrieveNextObject();

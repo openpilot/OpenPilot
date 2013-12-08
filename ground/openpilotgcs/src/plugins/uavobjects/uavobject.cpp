@@ -48,7 +48,8 @@
  * @param isSingleInst True if this object can only have a single instance
  * @param name Object name
  */
-UAVObject::UAVObject(quint32 objID, bool isSingleInst, const QString & name)
+UAVObject::UAVObject(quint32 objID, bool isSingleInst, const QString & name):
+    knownByFlightSide(false)
 {
     this->objID  = objID;
     this->instID = 0;

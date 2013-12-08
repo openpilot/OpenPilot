@@ -129,6 +129,9 @@ public:
     void emitTransactionCompleted(bool success);
     void emitNewInstance(UAVObject *);
 
+    bool isKnownByFlightSide() { return knownByFlightSide; }
+    bool setKnownByFlightSide(bool known) { knownByFlightSide = known; }
+
     // Metadata accessors
     static void MetadataInitialize(Metadata & meta);
     static AccessMode GetFlightAccess(const Metadata & meta);
@@ -172,6 +175,7 @@ protected:
     QMutex *mutex;
     quint8 *data;
     QList<UAVObjectField *> fields;
+    bool knownByFlightSide;
 
     void initializeFields(QList<UAVObjectField *> & fields, quint8 *data, quint32 numBytes);
     void setDescription(const QString & description);

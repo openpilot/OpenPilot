@@ -351,9 +351,6 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
         return item->data(index.column());
     }
 
-// if (role == Qt::DecorationRole)
-// return QIcon(":/core/images/openpilot_logo_128.png");
-
     if (role == Qt::ToolTipRole) {
         TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
         return item->description();
@@ -409,9 +406,17 @@ Qt::ItemFlags UAVObjectTreeModel::flags(const QModelIndex &index) const
     }
 
     if (index.column() == TreeItem::dataColumn) {
-        TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
         if (item->isEditable()) {
             return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+        }
+    } else {
+        TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
+        DataObjectTreeItem* objectItem = dynamic_cast<DataObjectTreeItem *>(item);
+        if (objectItem) {
+            UAVDataObject* dataObj = dynamic_cast<UAVDataObject *>(objectItem->object());
+            if(dataObj && dataObj->isSettings() && !dataObj->isKnownByFlightSide()) {
+              return Qt::ItemNeverHasChildren;
+            }
         }
     }
 

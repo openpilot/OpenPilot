@@ -2360,6 +2360,41 @@ void lamas(void)
 }
 
 
+uint8_t check_enable_and_srceen(uint8_t info, OsdSettingsWarningsSetupData *setup, uint8_t screen, int16_t *x, int16_t *y)
+{
+	if (!info) return 0;
+
+    switch (screen) {
+    case 1:
+    	if (setup->X1 || setup->Y1) {
+    		*x = setup->X1;
+    		*y = setup->Y1;
+    		return info;
+    	}
+        break;
+    case 2:
+    	if (setup->X2 || setup->Y2) {
+    		*x = setup->X2;
+    		*y = setup->Y2;
+    		return info;
+    	}
+        break;
+    case 3:
+    	if (setup->X3 || setup->Y3) {
+    		*x = setup->X3;
+    		*y = setup->Y3;
+    		return info;
+    	}
+        break;
+    default:
+    	return 0;
+        break;
+    }
+
+	return 0;
+}
+
+
 #define WARN_ON_TIME			 500			// [ms]
 #define WARN_OFF_TIME			 250			// [ms]
 #define WARN_CALL_TIME			  40			// [ms]
@@ -2553,7 +2588,7 @@ void updateGraphics()
 
         /* Draw Artificial Horizon in HUD design */
         if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
-        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, 35, 15, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
+        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X1, OsdSettings.ArtificialHorizonSetup.Y1, 35, 15, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
         }
 
         char temp[50] = { 0 };
@@ -2579,7 +2614,7 @@ void updateGraphics()
 
         /* Print RTC time */
         if (OsdSettings.Time != OSDSETTINGS_TIME_DISABLED) {
-            printTime(OsdSettings.TimeSetup.X, OsdSettings.TimeSetup.Y, 2);
+            printTime(OsdSettings.TimeSetup.X1, OsdSettings.TimeSetup.Y1, 2);
         }
 
         /* Print ADC voltage */
@@ -2654,20 +2689,20 @@ void updateGraphics()
         gpsData.Groundspeed = spd++;
         // Draw speedometer (left side)
         if (OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED) {
-            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, OsdSettings.SpeedSetup.X, OsdSettings.SpeedSetup.Y, 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
+            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, OsdSettings.SpeedSetup.X1, OsdSettings.SpeedSetup.Y1, 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
         static int alt = 0;
         gpsData.Altitude = alt++;
         // Draw altimeter (right side)
         if (OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED) {
-            hud_draw_vertical_scale((int)gpsData.Altitude, 200, +1, OsdSettings.AltitudeSetup.X, OsdSettings.AltitudeSetup.Y, 100, 20, 100, 7, 12, 15, 500, 0);
+            hud_draw_vertical_scale((int)gpsData.Altitude, 200, +1, OsdSettings.AltitudeSetup.X1, OsdSettings.AltitudeSetup.Y1, 100, 20, 100, 7, 12, 15, 500, 0);
         }
         // Draw compass (bottom)
         if (OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED) {
             if (attitude.Yaw < 0) {
-                hud_draw_linear_compass(360 + attitude.Yaw, 150, 120, OsdSettings.HeadingSetup.X, OsdSettings.HeadingSetup.Y, 15, 30, 7, 12, 0);
+                hud_draw_linear_compass(360 + attitude.Yaw, 150, 120, OsdSettings.HeadingSetup.X1, OsdSettings.HeadingSetup.Y1, 15, 30, 7, 12, 0);
             } else {
-                hud_draw_linear_compass(attitude.Yaw, 150, 120, OsdSettings.HeadingSetup.X, OsdSettings.HeadingSetup.Y, 15, 30, 7, 12, 0);
+                hud_draw_linear_compass(attitude.Yaw, 150, 120, OsdSettings.HeadingSetup.X1, OsdSettings.HeadingSetup.Y1, 15, 30, 7, 12, 0);
             }
         }
 #endif
@@ -2804,62 +2839,76 @@ void updateGraphics()
         gpsData.Groundspeed = spd++;
 #endif
         char temp[50] = { 0 };
-        uint8_t char_size = (OsdSettings.CharSize == OSDSETTINGS_CHARSIZE_SMALL) ? 2 : 3;
+        int8_t screen = 1;
+        int8_t check;
+        int16_t x, y;
+
+        // JR_HINT TODO set screen using a configurable channel with configurable pulses in ms
+#if 0
+        screen = 2;
+        if (attitude.Roll < -30.0f)
+        	screen = 1;
+        if (attitude.Roll > 30.0f)
+        	screen = 3;
+#endif
 
         // Draw AH first so that it is underneath everything else
 		// Artificial horizon in HUD design (centered relative to x, y)
-        if (OsdSettings.ArtificialHorizon == OSDSETTINGS_ARTIFICIALHORIZON_ENABLED) {
-        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, OsdSettings.ArtificialHorizonSetup.X, OsdSettings.ArtificialHorizonSetup.Y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
+        if (check_enable_and_srceen(OsdSettings.ArtificialHorizon, (OsdSettingsWarningsSetupData*)&OsdSettings.ArtificialHorizonSetup, screen, &x, &y)) {
+        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, x, y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
         }
 		// GPS coordinates
         // JR_HINT TODO use nice icons
-        if (OsdSettings.GPSCoordinates == OSDSETTINGS_GPSCOORDINATES_ENABLED) {
+        if (check_enable_and_srceen(OsdSettings.GPSLatitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLatitudeSetup, screen, &x, &y)) {
             sprintf(temp, "Lat%11.6f", (double)(gpsData.Latitude / 10000000.0f));
-            write_string(temp, OsdSettings.GPSCoordinatesSetup.LatX, OsdSettings.GPSCoordinatesSetup.LatY, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLatitudeSetup.CharSize);
+        }
+        if (check_enable_and_srceen(OsdSettings.GPSLongitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLongitudeSetup, screen, &x, &y)) {
             sprintf(temp, "Lon%11.6f", (double)(gpsData.Longitude / 10000000.0f));
-            write_string(temp, OsdSettings.GPSCoordinatesSetup.LonX, OsdSettings.GPSCoordinatesSetup.LonY, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLongitudeSetup.CharSize);
         }
 		// GPS satellite info
         // JR_HINT TODO use nice icons
-        if (OsdSettings.GPSSatInfo == OSDSETTINGS_GPSSATINFO_ENABLED) {
+        if (check_enable_and_srceen(OsdSettings.GPSSatInfo, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSSatInfoSetup, screen, &x, &y)) {
         	uint8_t fix = gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX2D ? '-' : gpsData.Status - 1;
             sprintf(temp, "Sat%3d%c", gpsData.Satellites, fix);
-            write_string(temp, OsdSettings.GPSSatInfoSetup.X, OsdSettings.GPSSatInfoSetup.Y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
-        }
-		// Home altitude in HUD design as vertical scale right side (centered relative to y)
-        if (OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED) {
-            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)gpsData.Altitude : (int)baro.Altitude, 100, +1, OsdSettings.AltitudeSetup.X, OsdSettings.AltitudeSetup.Y, 100, 10, 20, 7, 12, 15, 100, 0);
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSSatInfoSetup.CharSize);
         }
 		// Ground speed in HUD design as vertical scale left side (centered relative to y)
-        if (OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED) {
-            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, OsdSettings.SpeedSetup.X, OsdSettings.SpeedSetup.Y, 100, 10, 20, 7, 12, 15, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
+        if (check_enable_and_srceen(OsdSettings.Speed, (OsdSettingsWarningsSetupData*)&OsdSettings.SpeedSetup, screen, &x, &y)) {
+            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, x, y, 100, 10, 20, 7, 12, 15, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
+        }
+		// Home altitude in HUD design as vertical scale right side (centered relative to y)
+        if (check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData*)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
+            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)gpsData.Altitude : (int)baro.Altitude, 100, +1, x, y, 100, 10, 20, 7, 12, 15, 100, 0);
         }
 		// Heading in HUD design (centered relative to x)
         // JR_HINT TODO test both in-flight
-        if (OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED) {
+        if (check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData*)&OsdSettings.HeadingSetup, screen, &x, &y)) {
         	int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
-    		hud_draw_linear_compass(heading < 0 ? heading + 360: heading, 150, 120, OsdSettings.HeadingSetup.X, OsdSettings.HeadingSetup.Y, 15, 30, 7, 12, 0);
+    		hud_draw_linear_compass(heading < 0 ? heading + 360: heading, 150, 120, x, y, 15, 30, 7, 12, 0);
         }
 		// Flight mode
-        if (OsdSettings.FlightMode == OSDSETTINGS_FLIGHTMODE_ENABLED) {
-        	draw_flight_mode(status.FlightMode, OsdSettings.FlightModeSetup.X, OsdSettings.FlightModeSetup.Y, char_size);
-        }
-		// Flight time
-        if (OsdSettings.Time == OSDSETTINGS_TIME_HOURMINSEC) {
-            sprintf(temp, "%02d:%02d:%02d", timex.hour, timex.min, timex.sec);
-        }
-        if (OsdSettings.Time == OSDSETTINGS_TIME_MINSEC) {
-            sprintf(temp, "%02d:%02d", timex.min, timex.sec);
-        }
-        if (OsdSettings.Time != OSDSETTINGS_TIME_DISABLED) {
-            write_string(temp, OsdSettings.TimeSetup.X, OsdSettings.TimeSetup.Y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+        if (check_enable_and_srceen(OsdSettings.FlightMode, (OsdSettingsWarningsSetupData*)&OsdSettings.FlightModeSetup, screen, &x, &y)) {
+        	draw_flight_mode(status.FlightMode, x, y, OsdSettings.FlightModeSetup.CharSize);
         }
 		// Throttle
-        if (OsdSettings.Throttle == OSDSETTINGS_THROTTLE_ENABLED) {
+        if (check_enable_and_srceen(OsdSettings.Throttle, (OsdSettingsWarningsSetupData*)&OsdSettings.ThrottleSetup, screen, &x, &y)) {
         	float value = 0;
 //        	ManualControlCommandThrottleGet(&value);					// JR_HINT currently not compiling
             sprintf(temp, "Thr%3d%c", (int)(value + 0.5f), '%');
-            write_string(temp, OsdSettings.ThrottleSetup.X, OsdSettings.ThrottleSetup.Y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.ThrottleSetup.CharSize);
+        }
+		// Flight time
+        check = check_enable_and_srceen(OsdSettings.Time, (OsdSettingsWarningsSetupData*)&OsdSettings.TimeSetup, screen, &x, &y);
+        if (check == OSDSETTINGS_TIME_HOURMINSEC) {
+            sprintf(temp, "%02d:%02d:%02d", timex.hour, timex.min, timex.sec);
+        }
+        if (check == OSDSETTINGS_TIME_MINSEC) {
+            sprintf(temp, "%02d:%02d", timex.min, timex.sec);
+        }
+        if (check != OSDSETTINGS_TIME_DISABLED) {
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.TimeSetup.CharSize);
         }
 
         // JR_HINT TODO						Prio
@@ -2867,21 +2916,48 @@ void updateGraphics()
 		// Voltage [V]						1
 		// Ampere consumed [mAh]			1
 		// Ampere current [A]				1
-		// Home distance					2
-		// Climb rate						2
-		// Direction to home				2
-		// RSSI								3
+        // Flight voltage					2
+        // Video voltage					2
+		// RSSI								2
+		// Home distance					3
+		// Climb rate						3
+		// Direction to home				3
+
+#define ADC_CURR			0
+#define ADC_VOLT			1
+#define ADC_FLIGHT			2
+#define ADC_TEMP			3
+#define ADC_VIDEO			4
+#define ADC_RSSI			5
+#define ADC_VREF			6
+#if 0
+        // Print ADC Surrent
+        sprintf(temp, "SC%5.2fC", (double)(PIOS_ADC_PinGet(ADC_CURR) * 3.0f / 4096.0f));
+        write_string(temp, GRAPHICS_RIGHT, 35, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+        // Print ADC Voltage
+        sprintf(temp, "SV%5.2fV", (double)(PIOS_ADC_PinGet(ADC_VOLT) * 3.0f / 4096.0f));
+        write_string(temp, GRAPHICS_RIGHT, 45, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+        // Print ADC Flight
+        sprintf(temp, "FV%5.2fV", (double)(PIOS_ADC_PinGet(ADC_FLIGHT) * 3.0f * 6.1f / 4096.0f));
+        write_string(temp, GRAPHICS_RIGHT, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+        // Print ADC Video
+        sprintf(temp, "VV%5.2fV", (double)(PIOS_ADC_PinGet(ADC_VIDEO) * 3.0f * 6.1f / 4096.0f));
+        write_string(temp, GRAPHICS_RIGHT, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+        // Print ADC RSSI
+        sprintf(temp, "RI%5.2f%%", (double)(PIOS_ADC_PinGet(ADC_RSSI) * 3.0f / 4096.0f));
+        write_string(temp, GRAPHICS_RIGHT, 75, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
+#endif
 
         // Draw warnings last so that they are above everything else
         // Warnings (centered relative to x)
-        if (OsdSettings.Warnings == OSDSETTINGS_WARNINGS_ENABLED) {
+        if (check_enable_and_srceen(OsdSettings.Warnings, (OsdSettingsWarningsSetupData*)&OsdSettings.WarningsSetup, screen, &x, &y)) {
         	uint32_t WarnMask = 0;
         	WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D		? WARN_NO_SAT_FIX	: 0x00;
         	WarnMask |= home.Set == HOMELOCATION_SET_FALSE					? WARN_HOME_NOT_SET	: 0x00;
         	WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED				? WARN_DISARMED		: 0x00;
         	WarnMask |= 0													? WARN_RSSI_LOW		: 0x00;		// JR_HINT TODO
         	WarnMask |= 0													? WARN_BATT_LOW		: 0x00;		// JR_HINT TODO
-        	draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, OsdSettings.WarningsSetup.X, OsdSettings.WarningsSetup.Y, OsdSettings.WarningsSetup.VerticalSpacing, char_size);
+        	draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, x, y, OsdSettings.WarningsSetup.VerticalSpacing, OsdSettings.WarningsSetup.CharSize);
         }
     }
     break;

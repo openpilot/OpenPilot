@@ -37,7 +37,7 @@
 // Private constants
 
 #define STACK_REQUIRED 64
-#define INIT_CYCLES    1000
+#define INIT_CYCLES    100
 
 // Private types
 struct data {
@@ -83,8 +83,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     if (this->first_run) {
         // Initialize to current altitude reading at initial location
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
-            this->baroOffset = (INIT_CYCLES - this->first_run) / INIT_CYCLES * this->baroOffset + (this->first_run / INIT_CYCLES) * state->baro[0];
-            this->baroAlt    = this->baroOffset;
+            this->baroOffset = ((float)(INIT_CYCLES)-this->first_run) / (float)(INIT_CYCLES)*this->baroOffset + (this->first_run / (float)(INIT_CYCLES)) * state->baro[0];
+            this->baroAlt    = 0;
             this->first_run--;
             UNSET_MASK(state->updated, SENSORUPDATES_baro);
         }

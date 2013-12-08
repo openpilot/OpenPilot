@@ -25,10 +25,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uavtalk.h"
-#include <QtEndian>
-#include <QDebug>
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
+
+#include <QtEndian>
+#include <QDebug>
+#include <QEventLoop>
 
 // #define UAVTALK_DEBUG
 #ifdef UAVTALK_DEBUG
@@ -64,20 +66,13 @@ const quint8 UAVTalk::crc_table[256] = {
 /**
  * Constructor
  */
-UAVTalk::UAVTalk(QIODevice *iodev, UAVObjectManager *objMngr)
+UAVTalk::UAVTalk(QIODevice *iodev, UAVObjectManager *objMngr) : io(iodev), objMngr(objMngr), mutex(QMutex::Recursive)
 {
-    io = iodev;
-
-    this->objMngr  = objMngr;
-
     rxState = STATE_SYNC;
     rxPacketLength = 0;
 
-    mutex = new QMutex(QMutex::Recursive);
-
     memset(&stats, 0, sizeof(ComStats));
 
-    connect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
     useUDPMirror = settings->useUDPMirror();
@@ -94,9 +89,9 @@ UAVTalk::UAVTalk(QIODevice *iodev, UAVObjectManager *objMngr)
 
 UAVTalk::~UAVTalk()
 {
-    // According to Qt, it is not necessary to disconnect upon
-    // object deletion.
-    // disconnect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
+    // According to Qt, it is not necessary to disconnect upon object deletion.
+    // disconnect(io, SIGNAL(readyRead()), worker, SLOT(processInputStream()));
+
     closeAllTransactions();
 }
 
@@ -106,7 +101,7 @@ UAVTalk::~UAVTalk()
  */
 void UAVTalk::resetStats()
 {
-    QMutexLocker locker(mutex);
+    QMutexLocker locker(&mutex);
 
     memset(&stats, 0, sizeof(ComStats));
 }
@@ -116,24 +111,9 @@ void UAVTalk::resetStats()
  */
 UAVTalk::ComStats UAVTalk::getStats()
 {
-    QMutexLocker locker(mutex);
+    QMutexLocker locker(&mutex);
 
     return stats;
-}
-
-/**
- * Called each time there are data in the input buffer
- */
-void UAVTalk::processInputStream()
-{
-    quint8 tmp;
-
-    if (io && io->isReadable()) {
-        while (io->bytesAvailable() > 0) {
-            io->read((char *)&tmp, 1);
-            processInputByte(tmp);
-        }
-    }
 }
 
 void UAVTalk::dummyUDPRead()
@@ -148,6 +128,35 @@ void UAVTalk::dummyUDPRead()
 }
 
 /**
+ * Send the specified object through the telemetry link.
+ * \param[in] obj Object to send
+ * \param[in] acked Selects if an ack is required
+ * \param[in] allInstances If set true then all instances will be updated
+ * \return Success (true), Failure (false)
+ */
+bool UAVTalk::sendObject(UAVObject *obj, bool acked, bool allInstances)
+{
+    QMutexLocker locker(&mutex);
+
+    quint16 instId = 0;
+
+    if (allInstances) {
+        instId = ALL_INSTANCES;
+    }
+    else if (obj) {
+       instId = obj->getInstID();
+    }
+    bool success = false;
+    if (acked) {
+        success = objectTransaction(TYPE_OBJ_ACK, obj->getObjID(), instId, obj);
+    } else {
+        success = objectTransaction(TYPE_OBJ, obj->getObjID(), instId, obj);
+    }
+
+    return success;
+}
+
+/**
  * Request an update for the specified object, on success the object data would have been
  * updated by the GCS.
  * \param[in] obj Object to update
@@ -156,7 +165,7 @@ void UAVTalk::dummyUDPRead()
  */
 bool UAVTalk::sendObjectRequest(UAVObject *obj, bool allInstances)
 {
-    QMutexLocker locker(mutex);
+    QMutexLocker locker(&mutex);
 
     quint16 instId = 0;
 
@@ -170,37 +179,11 @@ bool UAVTalk::sendObjectRequest(UAVObject *obj, bool allInstances)
 }
 
 /**
- * Send the specified object through the telemetry link.
- * \param[in] obj Object to send
- * \param[in] acked Selects if an ack is required
- * \param[in] allInstances If set true then all instances will be updated
- * \return Success (true), Failure (false)
- */
-bool UAVTalk::sendObject(UAVObject *obj, bool acked, bool allInstances)
-{
-    QMutexLocker locker(mutex);
-
-    quint16 instId = 0;
-
-    if (allInstances) {
-        instId = ALL_INSTANCES;
-    }
-    else if (obj) {
-       instId = obj->getInstID();
-    }
-    if (acked) {
-        return objectTransaction(TYPE_OBJ_ACK, obj->getObjID(), instId, obj);
-    } else {
-        return objectTransaction(TYPE_OBJ, obj->getObjID(), instId, obj);
-    }
-}
-
-/**
  * Cancel a pending transaction
  */
 void UAVTalk::cancelTransaction(UAVObject *obj)
 {
-    QMutexLocker locker(mutex);
+    QMutexLocker locker(&mutex);
 
     if (io.isNull()) {
         return;
@@ -237,6 +220,21 @@ bool UAVTalk::objectTransaction(quint8 type, quint32 objId, quint16 instId, UAVO
         return transmitObject(type, objId, instId, obj);
     } else {
         return false;
+    }
+}
+
+/**
+ * Called each time there are data in the input buffer
+ */
+void UAVTalk::processInputStream()
+{
+    quint8 tmp;
+
+    if (io && io->isReadable()) {
+        while (io->bytesAvailable() > 0) {
+            io->read((char *)&tmp, 1);
+            processInputByte(tmp);
+        }
     }
 }
 
@@ -446,18 +444,18 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             break;
         }
 
-        mutex->lock();
+        mutex.lock();
 
         receiveObject(rxType, rxObjId, rxInstId, rxBuffer, rxLength);
-
-        if (useUDPMirror) {
-            udpSocketTx->writeDatagram(rxDataArray, QHostAddress::LocalHost, udpSocketRx->localPort());
-        }
 
         stats.rxObjectBytes += rxLength;
         stats.rxObjects++;
 
-        mutex->unlock();
+        mutex.unlock();
+
+        if (useUDPMirror) {
+            udpSocketTx->writeDatagram(rxDataArray, QHostAddress::LocalHost, udpSocketRx->localPort());
+        }
 
         rxState = STATE_SYNC;
         UAVTALK_QXTLOG_DEBUG("UAVTalk: CSum->Sync (OK)");
@@ -661,7 +659,17 @@ void UAVTalk::updateAck(quint8 type, quint32 objId, quint16 instId, UAVObject *o
     }
     Transaction *trans = findTransaction(objId, instId);
     if (trans && trans->respType == type) {
-        if (trans->respInstId != ALL_INSTANCES || instId == 0) {
+        if (trans->respInstId == ALL_INSTANCES) {
+            if (instId == 0) {
+            	// last instance received, complete transaction
+                closeTransaction(trans);
+                emit transactionCompleted(obj, true);
+            }
+            else {
+            	// TODO extend timeout?
+            }
+        }
+        else {
             closeTransaction(trans);
             emit transactionCompleted(obj, true);
         }
@@ -705,14 +713,27 @@ bool UAVTalk::transmitObject(quint8 type, quint32 objId, quint16 instId, UAVObje
     // Process message type
     if (type == TYPE_OBJ || type == TYPE_OBJ_ACK) {
         if (allInstances) {
-            // Get number of instances
-            quint32 numInst = objMngr->getNumInstances(objId);
             // Send all instances in reverse order
             // This allows the receiver to detect when the last object has been received (i.e. when instance 0 is received)
+            quint32 numInst = objMngr->getNumInstances(objId);
             for (quint32 n = 0; n < numInst; ++n) {
                 quint32 i = numInst - n - 1;
+
                 UAVObject *o = objMngr->getObject(objId, i);
-                transmitSingleObject(type, objId, i, o);
+                if (!transmitSingleObject(type, objId, i, o)) {
+                    return false;
+                }
+
+                if (false) {
+                    // yield
+                    mutex.unlock();
+                    // going back to the event loop is necessary to allow timeout events to be fired
+                    // but don't allow user events as the event can cause the main thread to reenter UAVTalk
+                    // the timer event suffers from the same issue but this case is handled
+                    //QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 10);
+                    QThread::msleep(1);
+                    mutex.lock();
+                }
             }
             return true;
         } else {

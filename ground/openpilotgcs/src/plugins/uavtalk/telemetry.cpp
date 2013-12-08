@@ -230,11 +230,6 @@ void Telemetry::transactionCompleted(UAVObject *obj, bool success)
     // Lookup the transaction in the transaction map.
     ObjectTransactionInfo *transInfo = findTransaction(obj);
     if (transInfo) {
-        // Remove this transaction as it's complete.
-        transInfo->timer->stop();
-        closeTransaction(transInfo);
-        delete transInfo;
-        // Send signal
         if (success) {
 #ifdef VERBOSE_TELEMETRY
             qDebug() << "Telemetry - transaction successful for object" << obj->toStringBrief();
@@ -242,7 +237,13 @@ void Telemetry::transactionCompleted(UAVObject *obj, bool success)
         } else {
             qWarning() << "Telemetry - !!! transaction failed for object" << obj->toStringBrief();
         }
+
+        // Remove this transaction as it's complete.
+        closeTransaction(transInfo);
+
+        // Send signal
         obj->emitTransactionCompleted(success);
+
         // Process new object updates from queue
         processObjectQueue();
     } else {
@@ -255,30 +256,33 @@ void Telemetry::transactionCompleted(UAVObject *obj, bool success)
  */
 void Telemetry::transactionTimeout(ObjectTransactionInfo *transInfo)
 {
-    transInfo->timer->stop();
     // Check if more retries are pending
     if (transInfo->retriesRemaining > 0) {
 #ifdef VERBOSE_TELEMETRY
         qDebug().nospace() << "Telemetry - transaction timed out for object " << transInfo->obj->toStringBrief() << ", retrying...";
 #endif
-        --transInfo->retriesRemaining;
-        processObjectTransaction(transInfo);
         ++txRetries;
+        --transInfo->retriesRemaining;
+		
+        // Retry the transaction
+        processObjectTransaction(transInfo);
     } else {
-        // Stop the timer.
-        transInfo->timer->stop();
+        qWarning().nospace() << "Telemetry - !!! transaction timed out for object " << transInfo->obj->toStringBrief();
+
+        ++txErrors;
+        
         // Terminate transaction
         utalk->cancelTransaction(transInfo->obj);
-        // Send signal
-        qWarning().nospace() << "Telemetry - !!! transaction timed out for object " << transInfo->obj->toStringBrief();
-        transInfo->obj->emitTransactionCompleted(false);
+        
         // Remove this transaction as it's complete.
-        // FIXME : also remove transaction from UAVTalk transaction map
+        UAVObject *obj = transInfo->obj;
         closeTransaction(transInfo);
-        delete transInfo;
+
+        // Send signal
+        obj->emitTransactionCompleted(false);
+
         // Process new object updates from queue
         processObjectQueue();
-        ++txErrors;
     }
 }
 
@@ -288,24 +292,33 @@ void Telemetry::transactionTimeout(ObjectTransactionInfo *transInfo)
 void Telemetry::processObjectTransaction(ObjectTransactionInfo *transInfo)
 {
     // Initiate transaction
+    bool sent = false;
     if (transInfo->objRequest) {
 #ifdef VERBOSE_TELEMETRY
-        qDebug().nospace() << "Telemetry - sending object request for " << transInfo->obj->toStringBrief() << ", " << (transInfo->allInstances ? "all" : "single") << " " << (transInfo->acked ? "acked" : "");
+        qDebug().nospace() << "Telemetry - sending request for object " << transInfo->obj->toStringBrief() << ", " << (transInfo->allInstances ? "all" : "single") << " " << (transInfo->acked ? "acked" : "");
 #endif
-        utalk->sendObjectRequest(transInfo->obj, transInfo->allInstances);
+        sent = utalk->sendObjectRequest(transInfo->obj, transInfo->allInstances);
     } else {
 #ifdef VERBOSE_TELEMETRY
         qDebug().nospace() << "Telemetry - sending object " << transInfo->obj->toStringBrief() << ", " << (transInfo->allInstances ? "all" : "single") << " " << (transInfo->acked ? "acked" : "");
 #endif
-        utalk->sendObject(transInfo->obj, transInfo->acked, transInfo->allInstances);
+        sent = utalk->sendObject(transInfo->obj, transInfo->acked, transInfo->allInstances);
     }
-    // Start timer if a response is expected
+    // Check if a response is needed now or will arrive asynchronously
     if (transInfo->objRequest || transInfo->acked) {
-        transInfo->timer->start(REQ_TIMEOUT_MS);
-    } else {
-        // Otherwise, remove this transaction as it's complete.
+        if (sent) {
+            // Start timer if a response is expected
+            transInfo->timer->start(REQ_TIMEOUT_MS);
+        }
+        else {
+            // message was not sent, the transaction will not complete and will timeout
+            // there is no need to wait to close the transaction and notify of completion failure
+            //transactionCompleted(transInfo->obj, false);
+        }
+    }
+    else {
+        // not transacted, so just close the transaction with no notification of completion
         closeTransaction(transInfo);
-        delete transInfo;
     }
 }
 
@@ -380,7 +393,7 @@ void Telemetry::processObjectQueue()
         // TODO make the above logic a reality...
         if (findTransaction(objInfo.obj)) {
             qWarning() << "Telemetry - !!! Making request for a object " << objInfo.obj->toStringBrief() << " for which a request is already in progress";
-            objInfo.obj->emitTransactionCompleted(false);
+            //objInfo.obj->emitTransactionCompleted(false);
             return;
         }
         UAVObject::Metadata metadata     = objInfo.obj->getMetadata();
@@ -599,6 +612,7 @@ void Telemetry::closeTransaction(ObjectTransactionInfo *trans)
         // Keep the map even if it is empty
         // There are at most 100 different object IDs...
     }
+    delete trans;
 }
 
 void Telemetry::closeAllTransactions()
@@ -626,7 +640,7 @@ ObjectTransactionInfo::ObjectTransactionInfo(QObject *parent) : QObject(parent)
     telem = 0;
     // Setup transaction timer
     timer = new QTimer(this);
-    timer->stop();
+    timer->setSingleShot(true);
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 

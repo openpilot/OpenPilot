@@ -27,18 +27,21 @@
 #ifndef UAVTALK_H
 #define UAVTALK_H
 
+#include "uavobjectmanager.h"
+#include "uavtalk_global.h"
+
 #include <QtCore>
 #include <QIODevice>
 #include <QMutex>
 #include <QMutexLocker>
 #include <QMap>
-#include <QSemaphore>
-#include "uavobjectmanager.h"
-#include "uavtalk_global.h"
+#include <QThread>
 #include <QtNetwork/QUdpSocket>
 
 class UAVTALK_EXPORT UAVTalk : public QObject {
     Q_OBJECT
+
+    friend class IODeviceReader;
 
 public:
     static const quint16 ALL_INSTANCES  = 0xFFFF;
@@ -56,17 +59,19 @@ public:
 
     UAVTalk(QIODevice *iodev, UAVObjectManager *objMngr);
     ~UAVTalk();
+
+    ComStats getStats();
+    void resetStats();
+
     bool sendObject(UAVObject *obj, bool acked, bool allInstances);
     bool sendObjectRequest(UAVObject *obj, bool allInstances);
     void cancelTransaction(UAVObject *obj);
-    ComStats getStats();
-    void resetStats();
 
 signals:
     void transactionCompleted(UAVObject *obj, bool success);
 
 private slots:
-    void processInputStream(void);
+    void processInputStream();
     void dummyUDPRead();
 
 private:
@@ -106,7 +111,7 @@ private:
     // Variables
     QPointer<QIODevice> io;
     UAVObjectManager *objMngr;
-    QMutex *mutex;
+    QMutex mutex;
     QMap<quint32, QMap<quint32, Transaction *> *> transMap;
     quint8 rxBuffer[MAX_PACKET_LENGTH];
     quint8 txBuffer[MAX_PACKET_LENGTH];

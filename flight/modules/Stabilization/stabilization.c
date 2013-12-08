@@ -333,10 +333,10 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 // Compute what Rate mode would give for this stick angle
 
                 // Store to rate desired variable for storing to UAVO
-                // this bound() seems unnecessary
+                // this bound() seems unnecessary both here and in Rate mode where this came from
                 float rateDesiredAxisRate;
-                rateDesiredAxisRate =
-                    bound(stabDesiredAxis[i], cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
+                rateDesiredAxisRate = bound(stabDesiredAxis[i], 1.0f)
+                    * cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i];
 
                 // Compute the inner loop
                 //actuatorDesiredAxisRate = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxisRate, gyro_filtered[i], dT);
@@ -597,9 +597,14 @@ right this is OK
                     // - but pass that on with magnitude [0, 1.0f] and let the following code see that
 
                     // Store to rate desired variable for storing to UAVO
-                    // this bound() seems unnecessary
+                    // this bound() seems unnecessary, here and in Rate mode where this came from
+                    // stabDesiredAxis[i] comes here unscaled ([-1.0f,+1.0f])
+                    // - so we have to scale it to degrees per second
+                    // - multiply it by Rate mode max rate
                     rateDesiredAxis[i] =
-                        bound(stabDesiredAxis[i] * parametric, cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
+                        bound(stabDesiredAxis[i], 1.0f)
+                            * cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]
+                            * parametric;
 
                     // Compute the inner loop
                     actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);

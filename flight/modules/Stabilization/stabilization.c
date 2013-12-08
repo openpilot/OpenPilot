@@ -88,6 +88,7 @@ bool lowThrottleZeroIntegral;
 bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay = 0.991f;
 struct pid pids[PID_MAX];
+static float horizon_begin2, horizon_begin3;
 
 // Private functions
 static void stabilizationTask(void *parameters);
@@ -246,9 +247,9 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
 #else /* if defined(PIOS_QUATERNION_STABILIZATION) */
         // Simpler algorithm for CC, less memory
-        float local_error[3] = { stabDesired.Roll - attitudeState.Roll,
+        float local_error[3] = { stabDesired.Roll  - attitudeState.Roll,
                                  stabDesired.Pitch - attitudeState.Pitch,
-                                 stabDesired.Yaw - attitudeState.Yaw };
+                                 stabDesired.Yaw   - attitudeState.Yaw };
         // find shortest way
         float modulo = fmodf(local_error[2] + 180.0f, 360.0f);
         if (modulo < 0) {
@@ -263,7 +264,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         gyro_filtered[1] = gyro_filtered[1] * gyro_alpha + gyroStateData.y * (1 - gyro_alpha);
         gyro_filtered[2] = gyro_filtered[2] * gyro_alpha + gyroStateData.z * (1 - gyro_alpha);
 
-        float *attitudeDesiredAxis = &stabDesired.Roll;
+        float *stabDesiredAxis     = &stabDesired.Roll;
         float *actuatorDesiredAxis = &actuatorDesired.Roll;
         float *rateDesiredAxis     = &rateDesired.Roll;
 
@@ -287,8 +288,9 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 }
 
                 // Store to rate desired variable for storing to UAVO
+                // this bound() seems unnecessary
                 rateDesiredAxis[i] =
-                    bound(attitudeDesiredAxis[i], cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
+                    bound(stabDesiredAxis[i], cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
 
                 // Compute the inner loop
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
@@ -313,10 +315,91 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                 break;
 
+            case STABILIZATIONDESIRED_STABILIZATIONMODE_MULTIWIIHORIZON:
+            {
+                if (reinit) {
+                    pids[PID_ROLL + i].iAccumulator = 0;
+                    pids[PID_RATE_ROLL + i].iAccumulator = 0;
+                }
+
+                // Taper the Attitude mode PID's
+                // - from full configured value at center stick
+                // - to zero at max stick
+                // Otherwise this is just Attitude mode
+
+                // Or just calculate both the Rate actuator and the Attitude actuator
+                // - and parameterize a weighted average of the two
+
+                // Compute what Rate mode would give for this stick angle
+
+                // Store to rate desired variable for storing to UAVO
+                // this bound() seems unnecessary
+                float rateDesiredAxisRate;
+                rateDesiredAxisRate =
+                    bound(stabDesiredAxis[i], cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
+
+                // Compute the inner loop
+                //actuatorDesiredAxisRate = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxisRate, gyro_filtered[i], dT);
+                //actuatorDesiredAxisRate = bound(actuatorDesiredAxisRate, 1.0f);
+
+                // Compute what Attitude mode would give for this stick angle
+
+                // stabDesired for this mode is [-1.0f,+1.0f]
+                // - multiply by Attitude mode max angle to get desired angle
+                // - subtract off the actual angle to get the angle error
+                local_error[0] = stabDesired.Roll  * settings.RollMax  - attitudeState.Roll;
+                local_error[1] = stabDesired.Pitch * settings.PitchMax - attitudeState.Pitch;
+                local_error[2] = stabDesired.Yaw   * settings.YawMax   - attitudeState.Yaw;
+                // find shortest way
+                modulo = fmodf(local_error[2] + 180.0f, 360.0f);
+                if (modulo < 0) {
+                    local_error[2] = modulo + 180.0f;
+                } else {
+                    local_error[2] = modulo - 180.0f;
+                }
+
+                // Compute the outer loop
+                float rateDesiredAxisAttitude;
+                rateDesiredAxisAttitude = pid_apply(&pids[PID_ROLL + i], local_error[i], dT);
+                rateDesiredAxisAttitude = bound(rateDesiredAxisAttitude,
+                                           cast_struct_to_array(settings.MaximumRate, settings.MaximumRate.Roll)[i]);
+
+                // Using max() rather than sqrt() for cpu speed;
+                // - this makes the stick region into a square;
+                // - this is a feature!
+                // - hold a roll angle and add just pitch without it jumping into rate mode
+                // magnitude = sqrt(cmd->Roll*cmd->Roll + cmd->Pitch*cmd->Pitch);
+                float magnitude;
+                magnitude = fmaxf(fabsf(stabDesired.Roll), fabsf(stabDesired.Pitch));
+                rateDesiredAxis[i] = (1.0f-magnitude) * rateDesiredAxisAttitude + magnitude * rateDesiredAxisRate;
+
+                // Compute the inner loop
+                actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
+                actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
+
+/*
+need a way of keeping both iAccumulator's from winding up
+do we need an anti-windup alpha setting? (factor)
+  
+it should be parametric with magnitude
+*/
+
+// At magnitudes close to one,  the Attitude accumulator gets zeroed
+pids[PID_ROLL      + i].iAccumulator *= (1.0f-magnitude); // * factor;
+// At magnitudes close to zero, the Rate     accumulator gets zeroed
+pids[PID_RATE_ROLL + i].iAccumulator *= magnitude;        // * factor;
+
+// TODO: put a factor in?
+
+// TODO: fix weak leveling?
+
+                break;
+            }
+
             case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
 
                 // Store for debugging output
-                rateDesiredAxis[i] = attitudeDesiredAxis[i];
+                rateDesiredAxis[i] = stabDesiredAxis[i];
 
                 // Run a virtual flybar stabilization algorithm on this axis
                 stabilization_virtual_flybar(gyro_filtered[i], rateDesiredAxis[i], &actuatorDesiredAxis[i], dT, reinit, i, &settings);
@@ -333,25 +416,40 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 weak_leveling = bound(weak_leveling, weak_leveling_max);
 
                 // Compute desired rate as input biased towards leveling
-                rateDesiredAxis[i]     = attitudeDesiredAxis[i] + weak_leveling;
+                rateDesiredAxis[i]     = stabDesiredAxis[i] + weak_leveling;
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
                 actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
                 break;
             }
 
+/*
+perhaps I just need to run both rate and attitude in parallel
+and have magnitude parameterize between the two actuator values
+
+or I need to do a weak leveling
+with a full attitude PID
+
+local_error is wrong here.  it is rate - angle
+
+I could have stabilization.c send an angle so that local_error is correct
+no, just use +-1.0f and scale it here (into rate or attitude) according to magnitude
+
+what will it act like if the max angle is very small?
+*/
+
             case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
                 if (reinit) {
                     pids[PID_RATE_ROLL + i].iAccumulator = 0;
                 }
 
-                if (fabsf(attitudeDesiredAxis[i]) > max_axislock_rate) {
+                if (fabsf(stabDesiredAxis[i]) > max_axislock_rate) {
                     // While getting strong commands act like rate mode
-                    rateDesiredAxis[i] = attitudeDesiredAxis[i];
+                    rateDesiredAxis[i] = stabDesiredAxis[i];
                     axis_lock_accum[i] = 0;
                 } else {
                     // For weaker commands or no command simply attitude lock (almost) on no gyro change
-                    axis_lock_accum[i] += (attitudeDesiredAxis[i] - gyro_filtered[i]) * dT;
+                    axis_lock_accum[i] += (stabDesiredAxis[i] - gyro_filtered[i]) * dT;
                     axis_lock_accum[i]  = bound(axis_lock_accum[i], max_axis_lock);
                     rateDesiredAxis[i]  = pid_apply(&pids[PID_ROLL + i], axis_lock_accum[i], dT);
                 }
@@ -364,9 +462,158 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                 break;
 
+            case STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON:
+            case STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON2:
+            {
+                // Require Horizon mode to be configured on both roll and pitch, or neither;
+                // - never just one of them
+                // If Attitude mode were only on roll, you could do a pitch and a yaw
+                // - to get an effective roll without even moving the roll stick
+
+                // Magnitude of stick angle [0,1]
+                float magnitude;
+                // old_magnitude is used to detect region changes to zero iAccumulator
+                static float old_magnitude; // = 0.0f
+                // Using max() rather than sqrt() for cpu speed;
+                // - this makes the stick region into a square;
+                // - this is a feature!
+                // - hold a roll angle and add just pitch without it jumping into rate mode
+                // magnitude = sqrt(cmd->Roll*cmd->Roll + cmd->Pitch*cmd->Pitch);
+                magnitude = fmaxf(fabsf(stabDesired.Roll), fabsf(stabDesired.Pitch));
+
+                if (reinit) {
+                    pids[PID_ROLL + i].iAccumulator = 0;
+                    pids[PID_RATE_ROLL + i].iAccumulator = 0;
+                    // Keep iAcc from getting zeroed twice in case someone worries about that
+                    // - it wouldn't hurt, but it would not be deterministic and clean
+                    old_magnitude = magnitude;
+                }
+
+/*
+make sure begin2 and 3 are [0,1]
+don't modify stabDesiredAxis[i], put it in temps instead
+  two cases (fix begin3 too)
+better yet, scope factor out into the open, default it to 1.0f
+  and use it in calculating local_error or when using local_error
+problem: with this, stabDesired artificially grows to 1 at begin3-eps
+  so local_error jumps down at begin3 because stabDesired jumps down from
+  an inflated 1 at begin3-eps to an uninflated 2/3 at begin3
+avoiding the inflation means it won't go to Attitude max angle at 2/3'rds stick
+right this is OK
+  there is a switch to rate mode at begin3
+  the code thinks it went from full stick in attitude mode
+  to 2/3rds stick in rate mode
+  and that is OK
+*/
+
+                // If in either region 1 or 2 we use Attitude mode
+                if (magnitude < horizon_begin3) {
+                    // If there was an Rate -> Attitude mode change
+                    if (old_magnitude >= horizon_begin3) {
+                        pids[PID_ROLL + i].iAccumulator = 0;
+                        pids[PID_RATE_ROLL + i].iAccumulator = 0;
+                    }
+                    // In region 1, parametric stays zero to force use of default rate
+                    // In region 2, parametric goes from 0 -> 1
+                    // - as stick angle (magnitude, any direction) goes from begin2 to begin3
+                    float parametric = 0.0f;
+
+                    // factor is the amount that the stick angle needs to be increased
+                    // - so we get only normal attitude mode stick sensitivity at begin2
+                    // - but we get full max attitude angle at begin3 (less than full stick)
+                    // The stick is passed on as a full = 1.0f at begin3
+                    // In region 1, factor stays at 1.0f
+                    // In region 2, factor grows from 1 to a factor that increases the stick
+                    // - to 1.0f by begin3
+                    // - for the default config, that is 3/2 because default begin3 is 2/3
+                    float factor = 1.0f;
+
+                    // if in region 1 we use the commanded stick angle and configured rates
+                    // - first region is unmodified attitude mode
+                    // If in region 2 we tweak the stick position and the aircraft rotation rate
+                    // Second region is increased sensitivity attitude mode
+                    // Max rotation rate is still taken from attitude mode and tapered from full to zero
+                    // - over the range begin2 -> begin3
+                    // At the beginning of this region, the unmodified stick value is used as is so the transition is smooth
+                    // At the end of this region, the stick value is (+-) 1.0
+                    // This means that the end of this region acts like attitude mode max angle
+                    // - so this region acts like a more sensitive attitude mode
+                    // Note that if region 2 length is zero it can't get in here
+                    // - that is important to avoid divide by zero
+                    // - and also a big bump in the stick when region 2 is very small and close to center stick
+                    if (magnitude >= horizon_begin2) {
+                        parametric = (magnitude - horizon_begin2) / (horizon_begin3 - horizon_begin2);
+
+                        // Increase the stick angle for region 2
+                        factor = (parametric * ((1.0f/horizon_begin3)-1.0f) + 1.0f);
+                    }
+
+                    // for HORIZON, use the initial (full) rate for the whole of region2
+                    // this is thought to be not good leave it here to compare HORIZON and HORIZON2
+                    if (cast_struct_to_array(stabDesired.StabilizationMode, stabDesired.StabilizationMode.Roll)[i] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON) {
+                        // Leave the rotation rate at maximum for HORIZON (not HORIZON2)
+                        parametric = 0.0f;
+                    }
+
+                    // stabDesired for this mode is [-1.0f,+1.0f]
+                    // - multiply by Attitude mode max angle to get desired angle
+                    // - subtract off the actual angle to get the angle error
+                    local_error[0] = stabDesired.Roll  * settings.RollMax  * factor - attitudeState.Roll;
+                    local_error[1] = stabDesired.Pitch * settings.PitchMax * factor - attitudeState.Pitch;
+                    local_error[2] = stabDesired.Yaw   * settings.YawMax   * factor - attitudeState.Yaw;
+                    // find shortest way
+                    modulo = fmodf(local_error[2] + 180.0f, 360.0f);
+                    if (modulo < 0) {
+                        local_error[2] = modulo + 180.0f;
+                    } else {
+                        local_error[2] = modulo - 180.0f;
+                    }
+
+                    // Compute the inner loop
+                    rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], local_error[i], dT);
+                    rateDesiredAxis[i] = bound(rateDesiredAxis[i],
+                                               cast_struct_to_array(settings.MaximumRate, settings.MaximumRate.Roll)[i] * (1.0f-parametric));
+
+                    // Compute the outer loop
+                    actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
+                    actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
+                }
+
+                // Third region is a 'compressed' Rate mode
+                // The beginning of this region has rate 0, the end has max Rate mode rate
+                // That means that the very beginning of this region doesn't rotate much
+                else {
+                    // If there was an Attitude -> Rate mode change
+                    if (old_magnitude < horizon_begin3) {
+                        pids[PID_RATE_ROLL + i].iAccumulator = 0;
+                    }
+                    // parametric goes from 0 -> 1
+                    // - as stick angle (magnitude, any direction) goes from begin3 to 'max stick'
+                    float parametric;
+                    parametric = (magnitude - horizon_begin3) / (1.0f - horizon_begin3);
+
+                    // Scale the stick commands from magnitude [begin3, 1.0f] to [0, 1.0f]
+                    // We see as input, a large stick angle (in the last region) [begin3, 1.0f]
+                    // - but pass that on with magnitude [0, 1.0f] and let the following code see that
+
+                    // Store to rate desired variable for storing to UAVO
+                    // this bound() seems unnecessary
+                    rateDesiredAxis[i] =
+                        bound(stabDesiredAxis[i] * parametric, cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
+
+                    // Compute the inner loop
+                    actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
+                    actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
+                }
+                // track mode changes
+                old_magnitude = magnitude;
+
+                break;
+            }
+
             case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE:
                 // Store to rate desired variable for storing to UAVO
-                rateDesiredAxis[i] = bound(attitudeDesiredAxis[i],
+                rateDesiredAxis[i] = bound(stabDesiredAxis[i],
                                            cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
 
                 // Run the relay controller which also estimates the oscillation parameters
@@ -392,7 +639,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 break;
 
             case STABILIZATIONDESIRED_STABILIZATIONMODE_NONE:
-                actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i], 1.0f);
+                actuatorDesiredAxis[i] = bound(stabDesiredAxis[i], 1.0f);
                 break;
             default:
                 error = true;
@@ -554,6 +801,34 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     // Compute time constant for vbar decay term based on a tau
     vbar_decay = expf(-fakeDt / settings.VbarTau);
+
+    // The first Horizon Mode region begins at (stick position) 0.0f (center),
+    // - other regions are 0.0f<=begin<=1.0f
+    // Beginning of region 2 is limited to [0,99] by GCS
+    // Length    of region 2 is limited to [0,99] by GCS
+    // Uavo's HorizonModeRegionBegin and HorizonModeRegionLength are currently integers
+    // - representing percent of max stick deflection
+    horizon_begin2 = settings.HorizonModeRegionBegin / 100.0f;
+    // This is done so that it will never enter region 2 if region 2 length is zero
+    // It shouldn't, because (float)a + (0/100.0f) should exactly equal (float)a
+    // - but that 0/100.0f might be epsilon if somebody converts the length to float in the future
+    if (settings.HorizonModeRegionLength > 0) {
+        horizon_begin3 = horizon_begin2 + settings.HorizonModeRegionLength / 100.0f;
+        // this bounding could be moved into the GCS
+        if (horizon_begin3 > 0.99f) {
+            horizon_begin3 = 0.99f;
+        }
+        if (horizon_begin2 > horizon_begin3-0.005f) {
+            horizon_begin2 = horizon_begin3;
+        }
+    }
+    else {
+        horizon_begin3 = horizon_begin2;
+    }
+    // To avoid division by zero...
+    // - we have guarenteed that begin3 is not zero
+    // - we have guarenteed that begin3 is not one
+    // begin3-begin2 close to zero but not zero is another thing to be careful of
 }
 
 

@@ -40,6 +40,9 @@
 	<field name="ScaleToAirspeed" units="m/s" type="float" elements="1" defaultvalue="0"/>
 	<field name="ScaleToAirspeedLimits" units="" type="float" elementnames="Min,Max" defaultvalue="0.05,3"/>
 
+	<field name="HorizonModeRegionBegin" units="deg" type="uint8" elements="1" defaultvalue="33"/>
+	<field name="HorizonModeRegionLength" units="deg" type="uint8" elements="1" defaultvalue="33"/>
+
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 	<telemetryflight acked="true" updatemode="onchange" period="0"/>

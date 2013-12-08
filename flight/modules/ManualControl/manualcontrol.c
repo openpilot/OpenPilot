@@ -703,6 +703,9 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON) ? cmd->Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON2) ? cmd->Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_MULTIWIIHORIZON) ? cmd->Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ?
         cmd->Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Roll * stabSettings.RollMax : 0; // this is an invalid mode
@@ -716,6 +719,9 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ?
         cmd->Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON) ? cmd->Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON2) ? cmd->Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_MULTIWIIHORIZON) ? cmd->Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ?
         cmd->Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Pitch * stabSettings.PitchMax : 0; // this is an invalid mode
@@ -728,6 +734,9 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Yaw * stabSettings.YawMax :
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Yaw :
+        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON) ? cmd->Yaw :
+        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_HORIZON2) ? cmd->Yaw :
+        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_MULTIWIIHORIZON) ? cmd->Yaw :
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
         (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Yaw * stabSettings.YawMax : 0; // this is an invalid mode
 

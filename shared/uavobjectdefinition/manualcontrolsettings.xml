@@ -22,17 +22,17 @@
 	<!-- Note these options should be identical to those in StabilizationDesired.StabilizationMode -->
         <field name="Stabilization1Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw"
-		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude"
+		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Horizon,Horizon2,MultiWiiHorizon,RelayRate,RelayAttitude"
 		defaultvalue="Attitude,Attitude,AxisLock"
 		limits="%NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude;"/>
         <field name="Stabilization2Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw"
-		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude"
+		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Horizon,Horizon2,MultiWiiHorizon,RelayRate,RelayAttitude"
 		defaultvalue="Attitude,Attitude,Rate"
 		limits="%NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude;"/>
         <field name="Stabilization3Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw"
-		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude"
+		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Horizon,Horizon2,MultiWiiHorizon,RelayRate,RelayAttitude"
 		defaultvalue="Rate,Rate,Rate"
 		limits="%NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude;"/>
 

@@ -154,6 +154,8 @@ static void altitudeHoldTask(void)
     // velocity control loop
     altitudeHoldStatus.AccelerationDesired = altitudeHoldSettings.VelocityP * (velocityStateDown - altitudeHoldStatus.VelocityDesired) - 9.81f;
 
+    altitudeHoldStatus.AccelerationFiltered = accelStateDown;
+
     AltitudeHoldStatusSet(&altitudeHoldStatus);
 
     // compensate acceleration by rotation

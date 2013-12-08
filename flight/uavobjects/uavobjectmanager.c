@@ -183,6 +183,7 @@ static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue,
                           UAVObjEventCallback cb, uint8_t eventMask);
 static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue,
                              UAVObjEventCallback cb);
+static void autoUpdated(UAVObjHandle obj_handle, uint16_t instId);
 
 #if defined(PIOS_USE_SETTINGS_ON_SDCARD) && defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
 #error Both PIOS_USE_SETTINGS_ON_SDCARD and PIOS_INCLUDE_FLASH_LOGFS_SETTINGS. Only one settings storage allowed.
@@ -399,8 +400,8 @@ UAVObjHandle UAVObjRegister(uint32_t id,
     }
 
     // fire events for outer object and its embedded meta object
-    UAVObjInstanceUpdated((UAVObjHandle)uavo_data, 0);
-    UAVObjInstanceUpdated((UAVObjHandle) & (uavo_data->metaObj), 0);
+    autoUpdated((UAVObjHandle)uavo_data, 0);
+    autoUpdated((UAVObjHandle) & (uavo_data->metaObj), 0);
 
 unlock_exit:
     xSemaphoreGiveRecursive(mutex);
@@ -1820,6 +1821,19 @@ void UAVObjInstanceUpdated(UAVObjHandle obj_handle, uint16_t instId)
 }
 
 /**
+ * Send the object's data to the GCS (triggers a EV_UPDATED_MANUAL event on this object).
+ * \param[in] obj The object handle
+ * \param[in] instId The object instance ID
+ */
+static void autoUpdated(UAVObjHandle obj_handle, uint16_t instId)
+{
+    PIOS_Assert(obj_handle);
+    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+    sendEvent((struct UAVOBase *)obj_handle, instId, EV_UPDATED);
+    xSemaphoreGiveRecursive(mutex);
+}
+
+/**
  * Iterate through all objects in the list.
  * \param iterator This function will be called once for each object,
  * the object will be passed as a parameter
@@ -1925,7 +1939,7 @@ static InstanceHandle createInstance(struct UAVOData *obj, uint16_t instId)
     ((struct UAVOMulti *)obj)->num_instances++;
 
     // Fire event
-    UAVObjInstanceUpdated((UAVObjHandle)obj, instId);
+    autoUpdated((UAVObjHandle)obj, instId);
 
     // Done
     return InstanceDataOffset(instEntry);

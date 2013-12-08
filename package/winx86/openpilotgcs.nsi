@@ -238,7 +238,7 @@ SectionEnd
 ; Copy driver files
 Section "-Drivers" InSecDrivers
   SetOutPath "$INSTDIR\drivers"
-  File "${PROJECT_ROOT}\flight\Project\Windows USB\OpenPilot-CDC.inf"
+  File /r "${PROJECT_ROOT}\flight\Project\Windows USB\*"
 SectionEnd
 
 ; Preinstall OpenPilot CDC driver
@@ -368,8 +368,8 @@ Section "un.Maps cache" UnSecCache
   RMDir /r /rebootok "$APPDATA\OpenPilot\mapscache"
 SectionEnd
 
-Section /o "un.Configuration" UnSecConfig
-  ; Remove configuration
+Section "un.GCS Layout" UnSecConfig
+  ; Remove GCS configuration files
   SetShellVarContext current
   Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS*.db"
   Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS*.xml"

@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="620"
+   height="81"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="tx-rx.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3790"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#00ffff;stop-opacity:1;"
+         offset="0"
+         id="stop3792" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="6.5619509"
+     inkscape:cx="421.10913"
+     inkscape:cy="26.137279"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     showguides="false"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1680"
+     inkscape:window-height="988"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     borderlayer="false"
+     inkscape:showpageshadow="false"
+     showborder="true">
+    <sodipodi:guide
+       orientation="1,0"
+       position="5.0373595,-46.290199"
+       id="guide3775" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="184.30564,4.9293069"
+       id="guide3912" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="background"
+     inkscape:label="background"
+     inkscape:groupmode="layer"
+     style="display:inline">
+     transform="translate(0,0)"
+    <g
+       id="g3045"
+       inkscape:label="#g3045"
+       transform="translate(0,0)">
+      <rect
+         id="bg1"
+         ry="13"
+         y="0"
+         x="0"
+         height="81"
+         width="633"
+         style="fill:#333333;stroke:none" />
+      <text
+         id="txTitle"
+         x="13"
+         y="35"
+         style="font-size:36px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"
+         sodipodi:linespacing="125%"
+         transform="scale(1,1)"><tspan
+           sodipodi:role="line"
+           id="tspan3042"
+           x="13"
+           y="35">Tx</tspan></text>
+      <rect
+         id="tx_bg0"
+         ry="13"
+         y="10"
+         x="72"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="tx_bg1"
+         ry="13"
+         y="10"
+         x="132"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="tx_bg2"
+         ry="13"
+         y="10"
+         x="192"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="tx_bg3"
+         ry="13"
+         y="10"
+         x="252"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="tx_bg4"
+         ry="13"
+         y="10"
+         x="312"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="tx_bg5"
+         ry="13"
+         y="10"
+         x="372"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="tx_bg6"
+         ry="13"
+         y="10"
+         x="432"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <text
+         id="rxTitle"
+         x="13"
+         y="71"
+         style="font-size:36px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+         xml:space="preserve"
+         sodipodi:linespacing="125%"
+         transform="scale(1,1)"><tspan
+           x="35"
+           y="71"
+           id="tspan3046"
+           sodipodi:role="line">Rx</tspan></text>
+      <rect
+         id="rx_bg0"
+         ry="13"
+         y="46"
+         x="72"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="rx_bg1"
+         ry="13"
+         y="46"
+         x="132"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="rx_bg2"
+         ry="13"
+         y="46"
+         x="192"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="rx_bg3"
+         ry="13"
+         y="46"
+         x="252"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="rx_bg4"
+         ry="13"
+         y="46"
+         x="312"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="rx_bg5"
+         ry="13"
+         y="46"
+         x="372"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+      <rect
+         id="rx_bg6"
+         ry="13"
+         y="46"
+         x="432"
+         width="54"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+    </g>
+  </g>
+  <g
+     id="text"
+     inkscape:groupmode="layer"
+     inkscape:label="text"
+     style="display:inline"
+     transform="translate(0,0)">
+      <rect
+         id="txSpeed"
+         x="499"
+         y="10"
+         width="115"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+         inkscape:label="txSpeed" />
+      <rect
+         id="rxSpeed"
+         x="499"
+         y="46"
+         width="115"
+         height="25"
+         style="fill:#4d4d4d;stroke:none" />
+         inkscape:label="rxSpeed" />
+  </g>
+<g
+     id="tx"
+     inkscape:groupmode="layer"
+     inkscape:label="tx"
+     style="display:inline"
+     transform="translate(0,-100)">
+    <rect
+       id="tx0"
+       width="54"
+       height="25"
+       x="72"
+       y="10"
+       ry="13"
+       style="fill:#00c200;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-1-2-9" />
+    <rect
+       id="tx1"
+       width="54"
+       height="25"
+       x="132"
+       y="10"
+       ry="13"
+       style="fill:#00c200;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-1-4-5-3" />
+    <rect
+       id="tx2"
+       width="54"
+       height="25"
+       x="192"
+       y="10"
+       ry="13"
+       style="fill:#00c200;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-1-1-19" />
+    <rect
+       id="tx3"
+       width="54"
+       height="25"
+       x="252"
+       y="10"
+       ry="13"
+       style="fill:#00c200;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-1-4-1-8" />
+    <rect
+       id="tx4"
+       width="54"
+       height="25"
+       x="312"
+       y="10"
+       ry="13"
+       style="fill:#ffd800;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-1-2-5-6" />
+    <rect
+       id="tx5"
+       width="54"
+       height="25"
+       x="372"
+       y="10"
+       ry="13"
+       style="fill:#ffd800;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-1-4-5-7-5" />
+    <rect
+       id="tx6"
+       width="54"
+       height="25"
+       x="432"
+       y="10"
+       ry="13"
+       style="fill:#ff0000;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-1-4-1-2-2" />
+  </g>
+  <g
+     id="rx"
+     inkscape:groupmode="layer"
+     inkscape:label="rx"
+     style="display:inline"
+     transform="translate(0,-100)">
+    <rect
+       id="rx0"
+       width="54"
+       height="25"
+       x="72"
+       y="46"
+       ry="13"
+       style="fill:#00c200;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-8-12" />
+    <rect
+       id="rx1"
+       width="54"
+       height="25"
+       x="132"
+       y="46"
+       ry="13"
+       style="fill:#00c200;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-7-4-3" />
+    <rect
+       id="rx2"
+       width="54"
+       height="25"
+       x="192"
+       y="46"
+       ry="13"
+       style="fill:#00c200;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-5-3" />
+    <rect
+       id="rx3"
+       width="54"
+       height="25"
+       x="252"
+       y="46"
+       ry="13"
+       style="fill:#00c200;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-7-7-41" />
+    <rect
+       id="rx4"
+       width="54"
+       height="25"
+       x="312"
+       y="46"
+       ry="13"
+       style="fill:#ffd800;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-8-1-1" />
+    <rect
+       id="rx5"
+       width="54"
+       height="25"
+       x="372"
+       y="46"
+       ry="13"
+       style="fill:#ffd800;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-7-4-2-3" />
+    <rect
+       id="rx6"
+       width="54"
+       height="25"
+       x="432"
+       y="46"
+       ry="13"
+       style="fill:#ff0000;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect3755-7-7-4-7" />
+  </g>
+</svg>

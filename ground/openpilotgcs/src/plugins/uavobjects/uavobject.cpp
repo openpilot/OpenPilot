@@ -36,6 +36,7 @@
 #define UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT       3
 #define UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT     4
 #define UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT 6
+#define UAVOBJ_LOGGING_UPDATE_MODE_SHIFT       8
 #define UAVOBJ_UPDATE_MODE_MASK                0x3
 
 // Macros
@@ -523,7 +524,8 @@ void UAVObject::MetadataInitialize(UAVObject::Metadata & metadata)
         1 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
         1 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
         UPDATEMODE_ONCHANGE << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
-        UPDATEMODE_ONCHANGE << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+        UPDATEMODE_ONCHANGE << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT |
+        UPDATEMODE_ONCHANGE << UAVOBJ_LOGGING_UPDATE_MODE_SHIFT;
     metadata.flightTelemetryUpdatePeriod = 0;
     metadata.gcsTelemetryUpdatePeriod    = 0;
     metadata.loggingUpdatePeriod = 0;

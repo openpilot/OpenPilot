@@ -11,14 +11,16 @@ HEADERS += uavobjects_global.h \
     uavdataobject.h \
     uavobjectfield.h \
     uavobjectsinit.h \
-    uavobjectsplugin.h
+    uavobjectsplugin.h \
+    uavobjecthelper.h
 
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
     uavdataobject.cpp \
     uavobjectfield.cpp \
-    uavobjectsplugin.cpp
+    uavobjectsplugin.cpp \
+    uavobjecthelper.cpp
 
 OTHER_FILES += UAVObjects.pluginspec
 
@@ -34,6 +36,10 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.h \
     $$UAVOBJECT_SYNTHETICS/altitudefiltersettings.h \
+    $$UAVOBJECT_SYNTHETICS/debuglogsettings.h \
+    $$UAVOBJECT_SYNTHETICS/debuglogcontrol.h \
+    $$UAVOBJECT_SYNTHETICS/debuglogstatus.h \
+    $$UAVOBJECT_SYNTHETICS/debuglogentry.h \
     $$UAVOBJECT_SYNTHETICS/ekfconfiguration.h \
     $$UAVOBJECT_SYNTHETICS/ekfstatevariance.h \
     $$UAVOBJECT_SYNTHETICS/revocalibration.h \
@@ -120,6 +126,10 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/debuglogsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/debuglogcontrol.cpp \
+    $$UAVOBJECT_SYNTHETICS/debuglogstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/debuglogentry.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudefiltersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/ekfconfiguration.cpp \
     $$UAVOBJECT_SYNTHETICS/ekfstatevariance.cpp \

@@ -1,14 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       versiondialog.h
+ * @file       monitorgadgetfactory.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @addtogroup GCSPlugins GCS Plugins
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   monitorgadget
  * @{
- * @addtogroup CorePlugin Core Plugin
- * @{
- * @brief The Core GCS plugin
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -26,19 +25,31 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef VERSIONDIALOG_H
-#define VERSIONDIALOG_H
+#ifndef MONITORGADGETFACTORY_H
+#define MONITORGADGETFACTORY_H
 
-#include <QDialog>
+#include "monitorwidget.h"
+#include <coreplugin/iuavgadgetfactory.h>
+
 
 namespace Core {
-namespace Internal {
-class VersionDialog : public QDialog {
+class IUAVGadget;
+class IUAVGadgetFactory;
+}
+
+using namespace Core;
+
+class MonitorGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
-    explicit VersionDialog(QWidget *parent);
-};
-} // namespace Internal
-} // namespace Core
+    MonitorGadgetFactory(QObject *parent = 0);
+    ~MonitorGadgetFactory();
 
-#endif // VERSIONDIALOG_H
+    Core::IUAVGadget *createGadget(QWidget *parent);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
+    IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
+
+    MonitorWidget *createMonitorWidget(QWidget *parent);
+};
+
+#endif // MONITORGADGETFACTORY_H

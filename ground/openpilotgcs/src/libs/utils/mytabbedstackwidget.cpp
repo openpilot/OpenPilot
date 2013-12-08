@@ -78,6 +78,7 @@ void MyTabbedStackWidget::insertTab(const int index, QWidget *tab, const QIcon &
     tab->setContentsMargins(0, 0, 0, 0);
     m_stackWidget->insertWidget(index, tab);
     QListWidgetItem *item = new QListWidgetItem(icon, label);
+    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     item->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     item->setToolTip(label);
     m_listWidget->insertItem(index, item);

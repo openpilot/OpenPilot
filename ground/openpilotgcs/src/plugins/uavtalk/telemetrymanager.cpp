@@ -87,8 +87,8 @@ void TelemetryManager::onStart()
 
     connect(telemetryMon, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(telemetryMon, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
+    connect(telemetryMon, SIGNAL(telemetryUpdated(double, double)), this, SLOT(onTelemetryUpdate(double, double)));
 }
-
 
 void TelemetryManager::stop()
 {
@@ -121,6 +121,11 @@ void TelemetryManager::onDisconnect()
     emit disconnected();
 }
 
+void TelemetryManager::onTelemetryUpdate(double txRate, double rxRate)
+{
+    emit telemetryUpdated(txRate, rxRate);
+}
+
 IODeviceReader::IODeviceReader(UAVTalk *uavTalk) : uavTalk(uavTalk)
 {
 }
@@ -129,4 +134,3 @@ void IODeviceReader::read()
 {
     uavTalk->processInputStream();
 }
-

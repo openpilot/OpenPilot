@@ -18,9 +18,9 @@
 #define PFDQMLGADGETWIDGET_H_
 
 #include "pfdqmlgadgetconfiguration.h"
-#include <QtDeclarative/qdeclarativeview.h>
+#include <QQuickView>
 
-class PfdQmlGadgetWidget : public QDeclarativeView {
+class PfdQmlGadgetWidget : public QQuickView {
     Q_OBJECT Q_PROPERTY(QString earthFile READ earthFile WRITE setEarthFile NOTIFY earthFileChanged)
     Q_PROPERTY(bool terrainEnabled READ terrainEnabled WRITE setTerrainEnabled NOTIFY terrainEnabledChanged)
 
@@ -37,7 +37,7 @@ class PfdQmlGadgetWidget : public QDeclarativeView {
     Q_PROPERTY(double altitude READ altitude WRITE setAltitude NOTIFY altitudeChanged)
 
 public:
-    PfdQmlGadgetWidget(QWidget *parent = 0);
+    PfdQmlGadgetWidget(QWindow *parent = 0);
     ~PfdQmlGadgetWidget();
     void setQmlFile(QString fn);
 
@@ -114,6 +114,9 @@ signals:
     void speedFactorChanged(double arg);
     void altitudeUnitChanged(QString arg);
     void altitudeFactorChanged(double arg);
+
+protected:
+    void mouseReleaseEvent(QMouseEvent *event);
 
 private:
     QString m_qmlFileName;

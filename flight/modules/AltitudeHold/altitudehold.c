@@ -149,10 +149,10 @@ static void altitudeHoldTask(void)
     VelocityStateDownGet(&velocityStateDown);
 
     // altitude control loop
-    altitudeHoldStatus.VelocityDesired     = altitudeHoldSettings.AltitudeP * (positionStateDown - altitudeHoldDesired.Altitude) + altitudeHoldDesired.Velocity;
+    altitudeHoldStatus.VelocityDesired      = altitudeHoldSettings.AltitudeP * (positionStateDown - altitudeHoldDesired.Altitude) + altitudeHoldDesired.Velocity;
 
     // velocity control loop
-    altitudeHoldStatus.AccelerationDesired = altitudeHoldSettings.VelocityP * (velocityStateDown - altitudeHoldStatus.VelocityDesired) - 9.81f;
+    altitudeHoldStatus.AccelerationDesired  = altitudeHoldSettings.VelocityP * (velocityStateDown - altitudeHoldStatus.VelocityDesired) - 9.81f;
 
     altitudeHoldStatus.AccelerationFiltered = accelStateDown;
 

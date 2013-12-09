@@ -28,6 +28,9 @@
         <field name="Heading" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="HeadingSetup" units="" type="int16" elements="6" elementnames="X1,Y1,X2,Y2,X3,Y3" defaultvalue="200,260,200,260,0,0"/>
         
+        <field name="VerticalSpeed" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="VerticalSpeedSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="298,247,298,247,0,0,3"/>
+        
         <field name="FlightMode" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="FlightModeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,267,2,267,0,0,3"/>
         

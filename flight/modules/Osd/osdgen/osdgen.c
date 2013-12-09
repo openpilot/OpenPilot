@@ -31,6 +31,7 @@
 // ****************
 
 //#define DEBUG_TIMING
+//#define DEBUG_STUFF
 //#define DEBUG_SHOW_MINIMAL
 //#define DEMO_SCREENS
 //#define SIMULATE_DATA
@@ -45,10 +46,12 @@
 #include "gpstime.h"
 #include "gpssatellites.h"
 #include "osdsettings.h"
+#include "osdsettings2.h"
 #include "barosensor.h"
 #include "taskinfo.h"
 #include "flightstatus.h"
 #include "manualcontrolcommand.h"
+#include "gpsvelocitysensor.h"
 
 #include "fonts.h"
 #include "font12x18.h"
@@ -2395,14 +2398,34 @@ uint8_t check_enable_and_srceen(uint8_t info, OsdSettingsWarningsSetupData *setu
 }
 
 
+#define ACCUMULATE_MIN_PERIOD		35
+void accumulate_current(double current_amp, double *current_total)
+{
+	static portTickType callTimer = 0;
+	portTickType current_ms;
+	portTickType delta_ms;
+
+	current_ms = xTaskGetTickCount();
+
+	if (callTimer + ACCUMULATE_MIN_PERIOD <= current_ms) {
+		delta_ms	= current_ms - callTimer;
+		callTimer	= current_ms;
+		*current_total += current_amp * (double) delta_ms * 0.0002778d;		// .0002778 is 1/3600 (conversion to hours)
+	}
+}
+
+
 #define WARN_ON_TIME			 500			// [ms]
 #define WARN_OFF_TIME			 250			// [ms]
 #define WARN_CALL_TIME			  40			// [ms]
-#define WARN_NO_SAT_FIX			0x01
-#define WARN_HOME_NOT_SET		0x02
-#define WARN_DISARMED			0x04
-#define WARN_RSSI_LOW			0x08
-#define WARN_BATT_LOW			0x10
+#define WARN_NO_SAT_FIX			0x0001
+#define WARN_HOME_NOT_SET		0x0002
+#define WARN_DISARMED			0x0004
+#define WARN_RSSI_LOW			0x0008
+#define WARN_BATT_FLIGHT_LOW	0x0010
+#define WARN_BATT_VIDEO_LOW		0x0020
+#define WARN_BATT_SCURR_HIGH	0x0040
+#define WARN_BATT_SVOLT_LOW		0x0080
 void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, int8_t char_size)
 {
 	static uint16_t on_off_cnt = 0;
@@ -2434,8 +2457,23 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
 	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
 	        d_y += v_spacing;
 		}
-		if (WarnMask & WARN_BATT_LOW) {
-	        sprintf(temp,  "BATT LOW");
+		if (WarnMask & WARN_BATT_FLIGHT_LOW) {
+	        sprintf(temp,  "FLIGHT BATT LOW");
+	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+	        d_y += v_spacing;
+		}
+		if (WarnMask & WARN_BATT_VIDEO_LOW) {
+	        sprintf(temp,  "VIDEO BATT LOW");
+	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+	        d_y += v_spacing;
+		}
+		if (WarnMask & WARN_BATT_SCURR_HIGH) {
+	        sprintf(temp,  "CURRENT HIGH");
+	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+	        d_y += v_spacing;
+		}
+		if (WarnMask & WARN_BATT_SVOLT_LOW) {
+	        sprintf(temp,  "VOLTAGE LOW");
 	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
 	        d_y += v_spacing;
 		}
@@ -2500,10 +2538,14 @@ void updateGraphics()
 {
     OsdSettingsData OsdSettings;
     OsdSettingsGet(&OsdSettings);
+    OsdSettings2Data OsdSettings2;
+    OsdSettings2Get(&OsdSettings2);
     AttitudeStateData attitude;
     AttitudeStateGet(&attitude);
     GPSPositionSensorData gpsData;
     GPSPositionSensorGet(&gpsData);
+    GPSVelocitySensorData gpsVelocityData;
+    GPSVelocitySensorGet(&gpsVelocityData);
     HomeLocationData home;
     HomeLocationGet(&home);
     BaroSensorData baro;
@@ -2837,10 +2879,14 @@ void updateGraphics()
         static int spd = 0;
         gpsData.Groundspeed = spd++;
 #endif
+
+        static double current_total = 0;		// accumulated sensor current [mAh]
         char temp[50] = { 0 };
         int8_t screen = 2;
         int8_t check;
         int16_t x, y;
+    	uint32_t WarnMask = 0;
+        double adc_value;
 
         // Screen switching via RC-RX or GCS
         if (mcc.Connected) {
@@ -2858,7 +2904,6 @@ void updateGraphics()
         	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, x, y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
         }
 		// GPS coordinates
-        // JR_HINT TODO use nice icons
         if (check_enable_and_srceen(OsdSettings.GPSLatitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLatitudeSetup, screen, &x, &y)) {
             sprintf(temp, "Lat%11.6f", (double)(gpsData.Latitude / 10000000.0f));
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLatitudeSetup.CharSize);
@@ -2868,7 +2913,6 @@ void updateGraphics()
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLongitudeSetup.CharSize);
         }
 		// GPS satellite info
-        // JR_HINT TODO use nice icons
         if (check_enable_and_srceen(OsdSettings.GPSSatInfo, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSSatInfoSetup, screen, &x, &y)) {
         	uint8_t fix = gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX2D ? '-' : gpsData.Status - 1;
             sprintf(temp, "Sat%3d%c", gpsData.Satellites, fix);
@@ -2887,6 +2931,11 @@ void updateGraphics()
         if (check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData*)&OsdSettings.HeadingSetup, screen, &x, &y)) {
         	int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
     		hud_draw_linear_compass(heading < 0 ? heading + 360: heading, 150, 120, x, y, 15, 30, 7, 12, 0);
+        }
+        // Vertical speed
+        if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData*)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
+            sprintf(temp, "VS%5.1f", (double)-gpsVelocityData.Down);
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.VerticalSpeedSetup.CharSize);
         }
 		// Flight mode
         if (check_enable_and_srceen(OsdSettings.FlightMode, (OsdSettingsWarningsSetupData*)&OsdSettings.FlightModeSetup, screen, &x, &y)) {
@@ -2910,17 +2959,14 @@ void updateGraphics()
         }
 
         // JR_HINT TODO						Prio
-        // for the following 3 use if (OsdSettings.Battery == OSDSETTINGS_BATTERY_ENABLED) {
-		// Voltage [V]						1
-		// Ampere consumed [mAh]			1
-		// Ampere current [A]				1
-        // Flight voltage					2
-        // Video voltage					2
-		// RSSI								2
-		// Home distance					3
-		// Climb rate						3
-		// Direction to home				3
+		// Home distance					1
+		// Direction to home				1
+        // RSSI version PacketRxOk			2
+        // RSSI version Scherrer digital	2
+        // use nice icons for some of the displayed values
 
+#define ADC_REFERENCE		3.0f
+#define	ADC_RESOLUTION		4096.0f
 #define ADC_CURR			0
 #define ADC_VOLT			1
 #define ADC_FLIGHT			2
@@ -2928,35 +2974,100 @@ void updateGraphics()
 #define ADC_VIDEO			4
 #define ADC_RSSI			5
 #define ADC_VREF			6
-#if 0
-        // Print ADC Surrent
-        sprintf(temp, "SC%5.2fC", (double)(PIOS_ADC_PinGet(ADC_CURR) * 3.0f / 4096.0f));
-        write_string(temp, GRAPHICS_RIGHT, 35, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-        // Print ADC Voltage
-        sprintf(temp, "SV%5.2fV", (double)(PIOS_ADC_PinGet(ADC_VOLT) * 3.0f / 4096.0f));
-        write_string(temp, GRAPHICS_RIGHT, 45, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-        // Print ADC Flight
-        sprintf(temp, "FV%5.2fV", (double)(PIOS_ADC_PinGet(ADC_FLIGHT) * 3.0f * 6.1f / 4096.0f));
-        write_string(temp, GRAPHICS_RIGHT, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-        // Print ADC Video
-        sprintf(temp, "VV%5.2fV", (double)(PIOS_ADC_PinGet(ADC_VIDEO) * 3.0f * 6.1f / 4096.0f));
-        write_string(temp, GRAPHICS_RIGHT, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-        // Print ADC RSSI
-        sprintf(temp, "RI%5.2f%%", (double)(PIOS_ADC_PinGet(ADC_RSSI) * 3.0f / 4096.0f));
-        write_string(temp, GRAPHICS_RIGHT, 75, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-#endif
+        // ADC RSSI
+        if (OsdSettings2.RSSI) {
+        	adc_value = (double)(PIOS_ADC_PinGet(ADC_RSSI) * ADC_REFERENCE * OsdSettings2.RSSICalibration.Factor / ADC_RESOLUTION + OsdSettings2.RSSICalibration.Offset);
+        	WarnMask |= adc_value < (double)OsdSettings2.RSSICalibration.Warning ? WARN_RSSI_LOW : 0x00;
+            check = check_enable_and_srceen(OsdSettings2.RSSI, (OsdSettingsWarningsSetupData*)&OsdSettings2.RSSISetup, screen, &x, &y);
+            if (check == OSDSETTINGS2_RSSI_ANALOG) {
+                sprintf(temp, "RI%5.2f%%", adc_value);
+            }
+        	if (check == OSDSETTINGS2_RSSI_PWM) {
+        		sprintf(temp, "RI ----%%"); 						// JR_HINT TODO
+        	}
+            if (check != OSDSETTINGS2_RSSI_DISABLED) {
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.RSSISetup.CharSize);
+            }
+        }
+        // ADC Flight
+        if (OsdSettings2.FlightVoltage) {
+        	adc_value = (double)(PIOS_ADC_PinGet(ADC_FLIGHT) * ADC_REFERENCE * OsdSettings2.FlightVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.FlightVoltageCalibration.Offset);
+        	WarnMask |= adc_value < (double)OsdSettings2.FlightVoltageCalibration.Warning ? WARN_BATT_FLIGHT_LOW : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.FlightVoltage, (OsdSettingsWarningsSetupData*)&OsdSettings2.FlightVoltageSetup, screen, &x, &y)) {
+                sprintf(temp, "FV%5.2fV", adc_value);
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.FlightVoltageSetup.CharSize);
+            }
+        }
+        // ADC Video
+        if (OsdSettings2.VideoVoltage) {
+        	adc_value = (double)(PIOS_ADC_PinGet(ADC_VIDEO) * ADC_REFERENCE * OsdSettings2.VideoVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.VideoVoltageCalibration.Offset);
+        	WarnMask |= adc_value < (double)OsdSettings2.VideoVoltageCalibration.Warning ? WARN_BATT_VIDEO_LOW : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.VideoVoltage, (OsdSettingsWarningsSetupData*)&OsdSettings2.VideoVoltageSetup, screen, &x, &y)) {
+                sprintf(temp, "VV%5.2fV", adc_value);
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.VideoVoltageSetup.CharSize);
+            }
+        }
+        // ADC Sensor voltage
+        if (OsdSettings2.SensorVoltage) {
+        	adc_value = (double)(PIOS_ADC_PinGet(ADC_VOLT) * ADC_REFERENCE * OsdSettings2.SensorVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorVoltageCalibration.Offset);
+        	WarnMask |= adc_value < (double)OsdSettings2.SensorVoltageCalibration.Warning ? WARN_BATT_SVOLT_LOW : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.SensorVoltage, (OsdSettingsWarningsSetupData*)&OsdSettings2.SensorVoltageSetup, screen, &x, &y)) {
+                sprintf(temp, "SV%5.2fV", adc_value);
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorVoltageSetup.CharSize);
+            }
+        }
+        // ADC Sensor current
+        if (OsdSettings2.SensorCurrent) {
+        	adc_value = (double)(PIOS_ADC_PinGet(ADC_CURR) * ADC_REFERENCE * OsdSettings2.SensorCurrentCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorCurrentCalibration.Offset);
+        	WarnMask |= adc_value > (double)OsdSettings2.SensorCurrentCalibration.Warning ? WARN_BATT_SCURR_HIGH : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.SensorCurrent, (OsdSettingsWarningsSetupData*)&OsdSettings2.SensorCurrentSetup, screen, &x, &y)) {
+                sprintf(temp, "SC%5.2fA", adc_value);
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorCurrentSetup.CharSize);
+            }
+        }
+        // ADC Sensor current consumed
+        if (OsdSettings2.SensorCurrentConsumed) {
+        	adc_value = (double)(PIOS_ADC_PinGet(ADC_CURR) * ADC_REFERENCE * OsdSettings2.SensorCurrentCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorCurrentCalibration.Offset);
+            accumulate_current(adc_value, &current_total);
+            if (check_enable_and_srceen(OsdSettings2.SensorCurrentConsumed, (OsdSettingsWarningsSetupData*)&OsdSettings2.SensorCurrentConsumedSetup, screen, &x, &y)) {
+                sprintf(temp, "T%4dmAh", (int)current_total);
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorCurrentConsumedSetup.CharSize);
+            }
+        }
 
         // Draw warnings last so that they are above everything else
         // Warnings (centered relative to x)
         if (check_enable_and_srceen(OsdSettings.Warnings, (OsdSettingsWarningsSetupData*)&OsdSettings.WarningsSetup, screen, &x, &y)) {
-        	uint32_t WarnMask = 0;
-        	WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D		? WARN_NO_SAT_FIX	: 0x00;
-        	WarnMask |= home.Set == HOMELOCATION_SET_FALSE					? WARN_HOME_NOT_SET	: 0x00;
-        	WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED				? WARN_DISARMED		: 0x00;
-        	WarnMask |= 0													? WARN_RSSI_LOW		: 0x00;		// JR_HINT TODO
-        	WarnMask |= 0													? WARN_BATT_LOW		: 0x00;		// JR_HINT TODO
+        	WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D		? WARN_NO_SAT_FIX		: 0x00;
+        	WarnMask |= home.Set == HOMELOCATION_SET_FALSE					? WARN_HOME_NOT_SET		: 0x00;
+        	WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED				? WARN_DISARMED			: 0x00;
         	draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, x, y, OsdSettings.WarningsSetup.VerticalSpacing, OsdSettings.WarningsSetup.CharSize);
         }
+
+#ifdef DEBUG_TIMING
+        // show in time
+        sprintf(temp, "T.in: %3dms", in_time);
+        write_string(temp, 200, 20, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        // show out time
+        sprintf(temp, "T.out:%3dms", out_time);
+        write_string(temp, 200, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+#endif
+
+#ifdef DEBUG_STUFF
+        // show heap
+        sprintf(temp, "Heap:%6d", xPortGetFreeHeapSize());
+        write_string(temp, 200, 40, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        // show detected video type
+        sprintf(temp, "V.type:%4s", PIOS_Video_GetType() == VIDEO_TYPE_NTSC ? "NTSC" : "PAL");
+        write_string(temp, 200, 50, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        // show number of video columns
+        sprintf(temp, "Columns:%3d", GRAPHICS_WIDTH_REAL);
+        write_string(temp, 200, 60, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        // show number of detected video lines
+        sprintf(temp, "Lines:%5d", PIOS_Video_GetLines());
+        write_string(temp, 200, 70, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+#endif
+
     }
     break;
     default:
@@ -3006,6 +3117,7 @@ int32_t osdgenInitialize(void)
     AttitudeStateInitialize();
 #ifdef PIOS_INCLUDE_GPS
     GPSPositionSensorInitialize();
+    GPSVelocitySensorInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
     GPSTimeInitialize();
     GPSSatellitesInitialize();
@@ -3015,6 +3127,7 @@ int32_t osdgenInitialize(void)
 #endif
 #endif
     OsdSettingsInitialize();
+    OsdSettings2Initialize();
     BaroSensorInitialize();
     FlightStatusInitialize();
     ManualControlCommandInitialize();

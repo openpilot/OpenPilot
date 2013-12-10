@@ -195,27 +195,27 @@ int32_t PIOS_MS5611_ReadADC(void)
         int64_t Sens;
         // used for second order temperature compensation
         int64_t Offset2 = 0;
-        int64_t Sens2 = 0;
+        int64_t Sens2   = 0;
 
         /* Read the pressure conversion */
         if (PIOS_MS5611_Read(MS5611_ADC_READ, Data, 3) != 0) {
             return -1;
         }
         // check if temperature is less than 20°C
-        if(Temperature < 2000){
+        if (Temperature < 2000) {
             Offset2 = 5 * (Temperature - 2000) >> 1;
-            Sens2 = Offset2 >> 1;
-            t2 = (deltaTemp*deltaTemp) >> 31;
+            Sens2   = Offset2 >> 1;
+            t2 = (deltaTemp * deltaTemp) >> 31;
             // Apply the "Very low temperature compensation" when temp is less than -15°C
-            if(Temperature < -1500){
-                int64_t tcorr = (Temperature + 1500)*(Temperature + 1500);
+            if (Temperature < -1500) {
+                int64_t tcorr = (Temperature + 1500) * (Temperature + 1500);
                 Offset2 += 7 * tcorr;
-                Sens2 += (11 * tcorr) >> 1;
+                Sens2   += (11 * tcorr) >> 1;
             }
         } else {
-            t2 = 0;
+            t2      = 0;
             Offset2 = 0;
-            Sens2 = 0;
+            Sens2   = 0;
         }
         RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]);
         Offset   = (((int64_t)CalibData.C[1]) << 16) + ((((int64_t)CalibData.C[3]) * deltaTemp) >> 7) - Offset2;

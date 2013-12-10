@@ -91,6 +91,7 @@ bool lowThrottleZeroIntegral;
 bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay = 0.991f;
 struct pid pids[PID_MAX];
+int flight_mode = -1;
 
 // Private functions
 static void stabilizationTask(void *parameters);
@@ -201,6 +202,12 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 #ifdef DIAG_RATEDESIRED
         RateDesiredGet(&rateDesired);
 #endif
+
+        if(flight_mode != flightStatus.FlightMode){
+            BankChanged();
+            flight_mode = flightStatus.FlightMode;
+        }
+
 #ifdef REVOLUTION
         float speedScaleFactor;
         // Scale PID coefficients based on current airspeed estimation - needed for fixed wing planes
@@ -496,11 +503,12 @@ static float bound(float val, float range)
 
 static void BankChanged()
 {
-    StabilizationBankData bank;
+    StabilizationBankData bank, oldBank;
     FlightStatusData flightStatus;
 
     StabilizationBankGet(&bank);
     FlightStatusGet(&flightStatus);
+    memcpy(&oldBank, &bank, sizeof(StabilizationBankData));
 
     int offset = flightStatus.FlightMode;
     bank.RollMax = settings.RollMax[offset];
@@ -521,7 +529,11 @@ static void BankChanged()
     memcpy(&bank.PitchPI, (&settings.PitchPI) + offset, sizeof(float) * ATT_OFFSET);
     memcpy(&bank.YawPI, (&settings.YawPI) + offset, sizeof(float) * ATT_OFFSET);
 
-    StabilizationBankSet(&bank);
+//Need to do this to prevent an infinite loop
+    if(memcmp(&oldBank, &bank, sizeof(StabilizationBankData)) != 0)
+    {
+        StabilizationBankSet(&bank);
+    }
 }
 
 static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
@@ -532,73 +544,31 @@ static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     StabilizationBankGet(&bank);
     FlightStatusGet(&flightStatus);
 
-    bool change = false;
+    StabilizationSettingsData oldSettings;
+    memcpy(&oldSettings, &settings, sizeof(StabilizationSettingsData));
 
     int offset = flightStatus.FlightMode;
-    if(bank.RollMax != settings.RollMax[offset])
-    {
-        change = true;
-        settings.RollMax[offset] = bank.RollMax;
-    }
-    if(bank.PitchMax != settings.PitchMax[offset])
-    {
-        change = true;
-        settings.PitchMax[offset] = bank.PitchMax;
-    }
-    if(bank.YawMax != settings.YawMax[offset])
-    {
-        change = true;
-        settings.YawMax[offset] = bank.YawMax;
-    }
+    settings.RollMax[offset] = bank.RollMax;
+    settings.PitchMax[offset] = bank.PitchMax;
+    settings.YawMax[offset] = bank.YawMax;
 
 
     offset = flightStatus.FlightMode * MAX_AXES;
-    if(memcmp(&bank.ManualRate, (&settings.ManualRate) + offset, sizeof(float) * MAX_AXES) != 0)
-    {
-        change = true;
-        memcpy((&settings.ManualRate) + offset, &bank.ManualRate, sizeof(float) * MAX_AXES);
-    }
-    if(memcmp(&bank.MaximumRate, (&settings.MaximumRate) + offset, sizeof(float) * MAX_AXES) != 0)
-    {
-        change = true;
-        memcpy((&settings.MaximumRate) + offset, &bank.MaximumRate, sizeof(float) * MAX_AXES);
-    }
+    memcpy((&settings.ManualRate) + offset, &bank.ManualRate, sizeof(float) * MAX_AXES);
+    memcpy((&settings.MaximumRate) + offset, &bank.MaximumRate, sizeof(float) * MAX_AXES);
 
     offset = flightStatus.FlightMode * RATE_OFFSET;
-    if(memcmp(&bank.RollRatePID, (&settings.RollRatePID) + offset, sizeof(float) * RATE_OFFSET) != 0)
-    {
-        change = true;
-        memcpy((&settings.RollRatePID) + offset, &bank.RollRatePID, sizeof(float) * RATE_OFFSET);
-    }
-    if(memcmp(&bank.PitchRatePID, (&settings.PitchRatePID) + offset, sizeof(float) * RATE_OFFSET) != 0)
-    {
-        change = true;
-        memcpy((&settings.PitchRatePID) + offset, &bank.PitchRatePID, sizeof(float) * RATE_OFFSET);
-    }
-    if(memcmp(&bank.YawRatePID, (&settings.YawRatePID) + offset, sizeof(float) * RATE_OFFSET) != 0)
-    {
-        change = true;
-        memcpy((&settings.YawRatePID) + offset, &bank.YawRatePID, sizeof(float) * RATE_OFFSET);
-    }
+    memcpy((&settings.RollRatePID) + offset, &bank.RollRatePID, sizeof(float) * RATE_OFFSET);
+    memcpy((&settings.PitchRatePID) + offset, &bank.PitchRatePID, sizeof(float) * RATE_OFFSET);
+    memcpy((&settings.YawRatePID) + offset, &bank.YawRatePID, sizeof(float) * RATE_OFFSET);
 
     offset = flightStatus.FlightMode * ATT_OFFSET;
-    if(memcmp(&bank.RollPI, (&settings.RollPI) + offset, sizeof(float) * ATT_OFFSET) != 0)
-    {
-        change = true;
-        memcpy((&settings.RollPI) + offset, &bank.RollPI, sizeof(float) * ATT_OFFSET);
-    }
-    if(memcmp(&bank.PitchPI, (&settings.PitchPI) + offset, sizeof(float) * ATT_OFFSET) != 0)
-    {
-        change = true;
-        memcpy((&settings.PitchPI) + offset, &bank.PitchPI, sizeof(float) * ATT_OFFSET);
-    }
-    if(memcmp(&bank.YawPI, (&settings.YawPI) + offset, sizeof(float) * ATT_OFFSET) != 0)
-    {
-        change = true;
-        memcpy((&settings.YawPI) + offset, &bank.YawPI, sizeof(float) * ATT_OFFSET);
-    }
+    memcpy((&settings.RollPI) + offset, &bank.RollPI, sizeof(float) * ATT_OFFSET);
+    memcpy((&settings.PitchPI) + offset, &bank.PitchPI, sizeof(float) * ATT_OFFSET);
+    memcpy((&settings.YawPI) + offset, &bank.YawPI, sizeof(float) * ATT_OFFSET);
 
-    if(change)
+//Need to do this to prevent an infinite loop
+    if(memcmp(&oldSettings, &settings, sizeof(StabilizationSettingsData)) != 0)
     {
         StabilizationSettingsSet(&settings);
     }

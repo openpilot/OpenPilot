@@ -33,6 +33,7 @@
 //#define DEBUG_TIMING
 //#define DEBUG_STUFF
 //#define SIMULATE_DATA
+#define TEMP_GPS_STATUS_WORKAROUND
 
 #include <openpilot.h>
 
@@ -2282,6 +2283,67 @@ void calcHomeArrow(int16_t m_yaw)
 }
 
 
+// check for stable gps as home position
+// criteria for a stable home position:
+//  - GPS status > GPSPOSITIONSENSOR_STATUS_FIX2D
+//  - with at least CHECK_HOME_MIN_SATS satellites
+//  - osd_alt stable for CHECK_HOME_STABLE ms
+//  - osd_alt stable means the delta is lower CHECK_HOME_MAX_DEV m
+#define CHECK_HOME_CALL_TIME	40			// [ms]
+#define CHECK_HOME_STABLE		3000		// [ms]
+#define CHECK_HOME_MIN_SATS		5
+#define CHECK_HOME_MAX_DEV		0.5f		// [m]
+void check_gps_home(HomePosition *homePos, GPSPositionSensorData *gpsData)
+{
+	static int16_t call_cnt = 0;
+	static float alt_prev = 0.0f;
+
+	if (gpsData->Status > GPSPOSITIONSENSOR_STATUS_FIX2D && gpsData->Satellites >= CHECK_HOME_MIN_SATS && call_cnt < (CHECK_HOME_STABLE / CHECK_HOME_CALL_TIME)) {
+		if (fabsf(alt_prev - gpsData->Altitude) > CHECK_HOME_MAX_DEV) {
+			call_cnt = 0;
+			alt_prev = gpsData->Altitude;
+		} else {
+			if (++call_cnt >= (CHECK_HOME_STABLE / CHECK_HOME_CALL_TIME)) {
+				homePos->Latitude = gpsData->Latitude;		// take this Latitude as home Latitude
+				homePos->Longitude = gpsData->Longitude;	// take this Longitude as home Longitude
+				homePos->Altitude = gpsData->Altitude;		// take this stable Altitude as home Altitude
+				homePos->GotHome = TRUE;					// we got home
+			}
+		}
+	}
+}
+
+
+// calculate home distance and direction
+void calc_home_data(HomePosition *homePos, GPSPositionSensorData *gpsData)
+{
+    // shrinking factor for longitude going to poles direction
+	float rad = DEG2RAD(fabsf((float)homePos->Latitude / 10000000.0f));
+    float scaleLongDown = cosf(rad);
+    float scaleLongUp = 1.0f / scaleLongDown;
+
+    // deltas
+    float dLat = (float)(homePos->Latitude - gpsData->Latitude) / 10000000.0f;
+    float dLon = (float)(homePos->Longitude - gpsData->Longitude) / 10000000.0f;
+
+    // distance to home
+    float dstlat = fabsf(dLat) * 111319.5f;
+    float dstlon = fabsf(dLon) * 111319.5f * scaleLongDown;
+    homePos->Distance = (uint32_t)sqrtf(dstlat * dstlat + dstlon * dstlon);
+
+    // direction to home
+    dstlat = dLat * scaleLongUp;
+    dstlon = dLon;
+    int16_t direction = (int16_t)(90.0f + RAD2DEG(atan2f(dstlat, -dstlon)));	// absolut home direction
+    if (direction < 0) direction += 360;										// normalization
+    direction = direction - 180;												// absolut return direction
+    if (direction < 0) direction += 360;										// normalization
+    direction = direction - (int16_t)gpsData->Heading;							// relative home direction
+    if (direction < 0) direction += 360;										// normalization
+    homePos->Direction = (uint16_t)direction;
+}
+
+
 uint8_t check_enable_and_srceen(uint8_t info, OsdSettingsWarningsSetupData *setup, uint8_t screen, int16_t *x, int16_t *y)
 {
 	if (!info) return 0;
@@ -2485,12 +2547,29 @@ void updateGraphics()
 #endif
 
         static double current_total = 0;		// accumulated sensor current [mAh]
+        static HomePosition homePos;
         char temp[50] = { 0 };
         int8_t screen = 2;
         int8_t check;
         int16_t x, y;
     	uint32_t WarnMask = 0;
         double adc_value;
+
+#ifdef TEMP_GPS_STATUS_WORKAROUND
+        static uint8_t gps_status = 0;
+        if (gpsData.Status == GPSPOSITIONSENSOR_STATUS_FIX3D && gpsData.Satellites >= 5) {
+        	gps_status = GPSPOSITIONSENSOR_STATUS_FIX3D;
+        }
+        if (gps_status == GPSPOSITIONSENSOR_STATUS_FIX3D && gpsData.Satellites >= 3) {
+        	gpsData.Status = GPSPOSITIONSENSOR_STATUS_FIX3D;
+        }
+#endif
+
+        // JR_HINT TODO
+        //		RSSI version PacketRxOk
+        //		RSSI version Scherrer digital
+        //		use nice icons for some of the displayed values
+        //		use homePos.Altitude for baro.Altitude correction?
 
         // Screen switching via RC-RX or GCS
         if (mcc.Connected) {
@@ -2502,6 +2581,20 @@ void updateGraphics()
         	screen = OsdSettings.ScreenSwitching.UnconnectedScreen;
         }
 
+        // Home position calculations
+        if (homePos.GotHome) {
+        	calc_home_data(&homePos, &gpsData);
+        } else {
+        	if (OsdSettings.HomeSource == OSDSETTINGS_HOMESOURCE_CONFIG && home.Set == HOMELOCATION_SET_TRUE) {
+        		homePos.Latitude = home.Latitude;
+                homePos.Longitude = home.Longitude;
+                homePos.Altitude = home.Altitude;
+                homePos.GotHome = TRUE;
+        	} else {
+            	check_gps_home(&homePos, &gpsData);
+        	}
+        }
+
         // Draw AH first so that it is underneath everything else
 		// Artificial horizon in HUD design (centered relative to x, y)
         if (check_enable_and_srceen(OsdSettings.ArtificialHorizon, (OsdSettingsWarningsSetupData*)&OsdSettings.ArtificialHorizonSetup, screen, &x, &y)) {
@@ -2509,17 +2602,17 @@ void updateGraphics()
         }
 		// GPS coordinates
         if (check_enable_and_srceen(OsdSettings.GPSLatitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLatitudeSetup, screen, &x, &y)) {
-            sprintf(temp, "Lat%11.6f", (double)(gpsData.Latitude / 10000000.0f));
+            sprintf(temp, "Lat%11.6f", homePos.GotHome ? (double)(gpsData.Latitude / 10000000.0f - OsdSettings.PositionStealth) : 0.0d);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLatitudeSetup.CharSize);
         }
         if (check_enable_and_srceen(OsdSettings.GPSLongitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLongitudeSetup, screen, &x, &y)) {
-            sprintf(temp, "Lon%11.6f", (double)(gpsData.Longitude / 10000000.0f));
+            sprintf(temp, "Lon%11.6f", homePos.GotHome ? (double)(gpsData.Longitude / 10000000.0f - OsdSettings.PositionStealth) : 0.0d);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLongitudeSetup.CharSize);
         }
 		// GPS satellite info
         if (check_enable_and_srceen(OsdSettings.GPSSatInfo, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSSatInfoSetup, screen, &x, &y)) {
         	uint8_t fix = gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX2D ? '-' : gpsData.Status - 1;
-            sprintf(temp, "Sat%3d%c", gpsData.Satellites, fix);
+            sprintf(temp, "Sat%4d%c", gpsData.Satellites, fix);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSSatInfoSetup.CharSize);
         }
 		// Ground speed in HUD design as vertical scale left side (centered relative to y)
@@ -2528,13 +2621,26 @@ void updateGraphics()
         }
 		// Home altitude in HUD design as vertical scale right side (centered relative to y)
         if (check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData*)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
-            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)gpsData.Altitude : (int)baro.Altitude, 100, +1, x, y, 100, 10, 20, 7, 12, 15, 100, 0);
+            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)(gpsData.Altitude - homePos.Altitude) : (int)baro.Altitude, 100, +1, x, y, 100, 10, 20, 7, 12, 15, 100, 0);
         }
 		// Heading in HUD design (centered relative to x)
         // JR_HINT TODO test both in-flight
         if (check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData*)&OsdSettings.HeadingSetup, screen, &x, &y)) {
         	int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
     		hud_draw_linear_compass(heading < 0 ? heading + 360: heading, 150, 120, x, y, 15, 30, 7, 12, 0);
+        }
+        // Home arrow
+        if (check_enable_and_srceen(OsdSettings.HomeArrow, (OsdSettingsWarningsSetupData*)&OsdSettings.HomeArrowSetup, screen, &x, &y)) {
+        	drawArrow(x, y, homePos.Direction, OsdSettings.HomeArrowSetup.Size);
+        }
+        // Home distance
+        if (check_enable_and_srceen(OsdSettings.HomeDistance, (OsdSettingsWarningsSetupData*)&OsdSettings.HomeDistanceSetup, screen, &x, &y)) {
+        	if (homePos.GotHome) {
+                sprintf(temp, "HD%5dm", (int)homePos.Distance <= 99999 ? (int)homePos.Distance : 99999);
+        	} else {
+                sprintf(temp, "HD  ---m");
+        	}
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.HomeDistanceSetup.CharSize);
         }
         // Vertical speed
         if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData*)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
@@ -2547,7 +2653,7 @@ void updateGraphics()
         }
 		// Throttle
         if (check_enable_and_srceen(OsdSettings.Throttle, (OsdSettingsWarningsSetupData*)&OsdSettings.ThrottleSetup, screen, &x, &y)) {
-            sprintf(temp, "Thr%3d%c", (int)(mcc.Throttle + 0.5f), '%');
+            sprintf(temp, "Thr%4d%c", (int)(mcc.Throttle + 0.5f), '%');
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.ThrottleSetup.CharSize);
         }
 		// Flight time
@@ -2556,18 +2662,11 @@ void updateGraphics()
             sprintf(temp, "%02d:%02d:%02d", timex.hour, timex.min, timex.sec);
         }
         if (check == OSDSETTINGS_TIME_MINSEC) {
-            sprintf(temp, "%02d:%02d", timex.min, timex.sec);
+            sprintf(temp, "FT%02d:%02d", timex.min, timex.sec);
         }
         if (check != OSDSETTINGS_TIME_DISABLED) {
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.TimeSetup.CharSize);
         }
-
-        // JR_HINT TODO						Prio
-		// Home distance					1
-		// Direction to home				1		use calcHomeArrow or drawArrow
-        // RSSI version PacketRxOk			2
-        // RSSI version Scherrer digital	2
-        // use nice icons for some of the displayed values
 
 #define ADC_REFERENCE		3.0f
 #define	ADC_RESOLUTION		4096.0f
@@ -2642,9 +2741,9 @@ void updateGraphics()
         // Draw warnings last so that they are above everything else
         // Warnings (centered relative to x)
         if (check_enable_and_srceen(OsdSettings.Warnings, (OsdSettingsWarningsSetupData*)&OsdSettings.WarningsSetup, screen, &x, &y)) {
-        	WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D		? WARN_NO_SAT_FIX		: 0x00;
-        	WarnMask |= home.Set == HOMELOCATION_SET_FALSE					? WARN_HOME_NOT_SET		: 0x00;
-        	WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED				? WARN_DISARMED			: 0x00;
+        	WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D			? WARN_NO_SAT_FIX		: 0x00;
+        	WarnMask |= !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE	? WARN_HOME_NOT_SET		: 0x00;
+        	WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED					? WARN_DISARMED			: 0x00;
         	draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, x, y, OsdSettings.WarningsSetup.VerticalSpacing, OsdSettings.WarningsSetup.CharSize);
         }
 

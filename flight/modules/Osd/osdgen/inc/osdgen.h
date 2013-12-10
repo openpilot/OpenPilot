@@ -116,6 +116,16 @@ struct FontDimensions {
     int width, height;
 };
 
+// Home position for calculations
+typedef struct {
+    int32_t Latitude;
+    int32_t Longitude;
+    float Altitude;
+	uint8_t GotHome;
+    uint32_t Distance;
+    uint16_t Direction;
+} HomePosition;
+
 // Max/Min macros.
 #define MAX(a, b)            ((a) > (b) ? (a) : (b))
 #define MIN(a, b)            ((a) < (b) ? (a) : (b))

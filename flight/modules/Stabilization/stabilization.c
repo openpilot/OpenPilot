@@ -47,6 +47,7 @@
 #include "manualcontrol.h" // Just to get a macro
 #include "taskinfo.h"
 
+
 // Math libraries
 #include "CoordinateConversions.h"
 #include "pid.h"
@@ -71,9 +72,6 @@
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 4)
 #define FAILSAFE_TIMEOUT_MS 30
 
-enum { PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_MAX };
-
-
 // Private variables
 static xTaskHandle taskHandle;
 static StabilizationSettingsData settings;
@@ -88,12 +86,14 @@ bool lowThrottleZeroIntegral;
 bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay = 0.991f;
 struct pid pids[PID_MAX];
+int flight_mode = 0;
 
 // Private functions
 static void stabilizationTask(void *parameters);
 static float bound(float val, float range);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
+static void UpdatePids(StabilizationSettings* settings);
 
 /**
  * Module initialization
@@ -484,42 +484,75 @@ static float bound(float val, float range)
     return val;
 }
 
+static void UpdatePids(StabilizationSettings* settings)
+{
+
+    enum{RATE_P, RATE_I, RATE_D, RATE_LIMIT, RATE_OFFSET};
+    enum{ATT_P, ATT_I, ATT_LIMIT, ATT_OFFSET};
+
+    int offset = flight_mode * RATE_OFFSET;
+    // Set the roll rate PID constants
+    float* pid = &settings.RollRatePID.Kp1;
+    pid += offset;
+    pid_configure(&pids[PID_RATE_ROLL],
+                pid[RATE_P],
+                pid[RATE_I],
+                pid[RATE_D],
+                pid[RATE_LIMIT]);
+
+    // Set the pitch rate PID constants
+    pid = &settings.PitchRatePID.Kp1;
+    pid += offset;
+    pid_configure(&pids[PID_RATE_PITCH],
+                pid[RATE_P],
+                pid[RATE_I],
+                pid[RATE_D],
+                pid[RATE_LIMIT]);
+
+    // Set the yaw rate PID constants
+    pid = &settings.YawRatePID.Kp1;
+    pid += offset;
+    pid_configure(&pids[PID_RATE_YAW],
+                pid[RATE_P],
+                pid[RATE_I],
+                pid[RATE_D],
+                pid[RATE_LIMIT]);
+
+    offset = flight_mode * ATT_OFFSET;
+
+    // Set the roll attitude PI constants
+    pid = &settings.RollPI.Kp1;
+    pid += offset;
+    pid_configure(&pids[PID_ROLL],
+                pid[ATT_P],
+                pid[ATT_I],
+                0,
+                pid[ATT_LIMIT]);
+
+    // Set the pitch attitude PI constants
+    pid = &settings.PitchPI.Kp1;
+    pid += offset;
+    pid_configure(&pids[PID_PITCH],
+                pid[ATT_P],
+                pid[ATT_I],
+                0,
+                pid[ATT_LIMIT]);
+
+
+    // Set the yaw attitude PI constants
+    pid = &settings.YawPI.Kp1;
+    pid += offset;
+    pid_configure(&pids[PID_YAW],
+                pid[ATT_P],
+                pid[ATT_I],
+                0,
+                pid[ATT_LIMIT]);
+}
+
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     StabilizationSettingsGet(&settings);
-
-    // Set the roll rate PID constants
-    pid_configure(&pids[PID_RATE_ROLL], settings.RollRatePID.Kp,
-                  settings.RollRatePID.Ki,
-                  pids[PID_RATE_ROLL].d = settings.RollRatePID.Kd,
-                  pids[PID_RATE_ROLL].iLim = settings.RollRatePID.ILimit);
-
-    // Set the pitch rate PID constants
-    pid_configure(&pids[PID_RATE_PITCH], settings.PitchRatePID.Kp,
-                  pids[PID_RATE_PITCH].i = settings.PitchRatePID.Ki,
-                  pids[PID_RATE_PITCH].d = settings.PitchRatePID.Kd,
-                  pids[PID_RATE_PITCH].iLim = settings.PitchRatePID.ILimit);
-
-    // Set the yaw rate PID constants
-    pid_configure(&pids[PID_RATE_YAW], settings.YawRatePID.Kp,
-                  pids[PID_RATE_YAW].i = settings.YawRatePID.Ki,
-                  pids[PID_RATE_YAW].d = settings.YawRatePID.Kd,
-                  pids[PID_RATE_YAW].iLim = settings.YawRatePID.ILimit);
-
-    // Set the roll attitude PI constants
-    pid_configure(&pids[PID_ROLL], settings.RollPI.Kp,
-                  settings.RollPI.Ki, 0,
-                  pids[PID_ROLL].iLim = settings.RollPI.ILimit);
-
-    // Set the pitch attitude PI constants
-    pid_configure(&pids[PID_PITCH], settings.PitchPI.Kp,
-                  pids[PID_PITCH].i = settings.PitchPI.Ki, 0,
-                  settings.PitchPI.ILimit);
-
-    // Set the yaw attitude PI constants
-    pid_configure(&pids[PID_YAW], settings.YawPI.Kp,
-                  settings.YawPI.Ki, 0,
-                  settings.YawPI.ILimit);
+    UpdatePids(&settings);
 
     // Set up the derivative term
     pid_configure_derivative(settings.DerivativeCutoff, settings.DerivativeGamma);

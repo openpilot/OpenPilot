@@ -37,6 +37,42 @@ enum { ROLL, PITCH, YAW, MAX_AXES };
 
 int32_t StabilizationInitialize();
 
+typedef struct stab_rate_pid{
+    float Kp;
+    float Ki;
+    float Kd;
+    float ILimit;
+};
+
+typedef struct stab_att_pid{
+    float Kp;
+    float Ki;
+    float ILimit;
+};
+
+typedef struct stab_rpy{
+    float Roll;
+    float Pitch;
+    float Yaw;
+};
+
+typedef struct stab_bank {
+    float RollMax;
+    float PitchMax;
+    float YawMax;
+    struct{
+        float Roll;
+        float Pitch;
+        float Yaw;
+    };
+    float ManualRate;
+    float iAccumulator;
+    float lastErr;
+    float lastDer;
+};
+
+
+
 #endif // STABILIZATION_H
 
 /**

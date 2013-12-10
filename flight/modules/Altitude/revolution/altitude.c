@@ -40,22 +40,24 @@
 
 #include "altitude.h"
 #include "barosensor.h" // object that will be updated by the module
+#include "revosettings.h"
 #if defined(PIOS_INCLUDE_HCSR04)
 #include "sonaraltitude.h" // object that will be updated by the module
 #endif
 #include "taskinfo.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 500
+#define STACK_SIZE_BYTES 550
 #define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
 
 // Private types
 
 // Private variables
 static xTaskHandle taskHandle;
-
+static RevoSettingsBaroTempCorrectionPolynomialData baroCorrection;
 // Private functions
 static void altitudeTask(void *parameters);
+static void SettingsUpdatedCb(UAVObjEvent *ev);
 
 /**
  * Initialise the module, called on startup
@@ -77,6 +79,9 @@ int32_t AltitudeStart()
 int32_t AltitudeInitialize()
 {
     BaroSensorInitialize();
+    RevoSettingsInitialize();
+    RevoSettingsConnectCallback(&SettingsUpdatedCb);
+
 #if defined(PIOS_INCLUDE_HCSR04)
     SonarAltitudeInitialize();
 #endif
@@ -102,6 +107,8 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
 // Option to change the interleave between Temp and Pressure conversions
 // Undef for normal operation
 // #define PIOS_MS5611_SLOW_TEMP_RATE 20
+
+    RevoSettingsBaroTempCorrectionPolynomialGet(&baroCorrection);
 
 #ifdef PIOS_MS5611_SLOW_TEMP_RATE
     uint8_t temp_press_interleave_count = 1;
@@ -154,12 +161,12 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
         vTaskDelay(PIOS_MS5611_GetDelay());
         PIOS_MS5611_ReadADC();
 
-
         temp  = PIOS_MS5611_GetTemperature();
         press = PIOS_MS5611_GetPressure();
+        float temp2      = temp * temp;
+        float correction = baroCorrection.a + temp * baroCorrection.b + temp2 * baroCorrection.c + temp * temp2 * baroCorrection.d;
 
-
-        float altitude = 44330.0f * (1.0f - powf(press / MS5611_P0, (1.0f / 5.255f)));
+        float altitude   = 44330.0f * (1.0f - powf((press - correction) / MS5611_P0, (1.0f / 5.255f)));
 
         if (!isnan(altitude)) {
             data.Altitude    = altitude;
@@ -171,6 +178,10 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
     }
 }
 
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    RevoSettingsBaroTempCorrectionPolynomialGet(&baroCorrection);
+}
 /**
  * @}
  * @}

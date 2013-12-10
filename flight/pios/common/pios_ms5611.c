@@ -51,7 +51,7 @@ static int64_t Temperature;
 static int32_t lastConversionStart;
 static int32_t PIOS_MS5611_Read(uint8_t address, uint8_t *buffer, uint8_t len);
 static int32_t PIOS_MS5611_WriteCommand(uint8_t command);
-
+static int64_t t2;
 // Move into proper driver structure with cfg stored
 static uint32_t oversampling;
 static const struct pios_ms5611_cfg *dev_cfg;
@@ -73,6 +73,9 @@ void PIOS_MS5611_Init(const struct pios_ms5611_cfg *cfg, int32_t i2c_device)
     PIOS_DELAY_WaitmS(20);
 
     uint8_t data[2];
+
+    // reset calibration values
+    t2 = 0;
 
     /* Calibration parameters */
     for (int i = 0; i < 6; i++) {
@@ -190,17 +193,34 @@ int32_t PIOS_MS5611_ReadADC(void)
     } else {
         int64_t Offset;
         int64_t Sens;
+        // used for second order temperature compensation
+        int64_t Offset2 = 0;
+        int64_t Sens2 = 0;
 
         /* Read the pressure conversion */
         if (PIOS_MS5611_Read(MS5611_ADC_READ, Data, 3) != 0) {
             return -1;
         }
+        // check if temperature is less than 20°C
+        if(Temperature < 2000){
+            Offset2 = 5 * (Temperature - 2000) >> 1;
+            Sens2 = Offset2 >> 1;
+            t2 = (deltaTemp*deltaTemp) >> 31;
+            // Apply the "Very low temperature compensation" when temp is less than -15°C
+            if(Temperature < -1500){
+                int64_t tcorr = (Temperature + 1500)*(Temperature + 1500);
+                Offset2 += 7 * tcorr;
+                Sens2 += (11 * tcorr) >> 1;
+            }
+        } else {
+            t2 = 0;
+            Offset2 = 0;
+            Sens2 = 0;
+        }
         RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]);
-
-        Offset   = (((int64_t)CalibData.C[1]) << 16) + ((((int64_t)CalibData.C[3]) * deltaTemp) >> 7);
+        Offset   = (((int64_t)CalibData.C[1]) << 16) + ((((int64_t)CalibData.C[3]) * deltaTemp) >> 7) - Offset2;
         Sens     = ((int64_t)CalibData.C[0]) << 15;
-        Sens     = Sens + ((((int64_t)CalibData.C[2]) * deltaTemp) >> 8);
-
+        Sens     = Sens + ((((int64_t)CalibData.C[2]) * deltaTemp) >> 8) - Sens2;
         Pressure = (((((int64_t)RawPressure) * Sens) >> 21) - Offset) >> 15;
     }
     return 0;
@@ -211,7 +231,7 @@ int32_t PIOS_MS5611_ReadADC(void)
  */
 float PIOS_MS5611_GetTemperature(void)
 {
-    return ((float)Temperature) / 100.0f;
+    return ((float)(Temperature - t2)) / 100.0f;
 }
 
 /**

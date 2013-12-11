@@ -179,6 +179,7 @@ void TelemetryMonitor::firmwareIAPUpdated(UAVObject *obj)
     QMutexLocker locker(mutex);
 
     if (firmwareIAPObj->getBoardType() != 0) {
+        disconnect(firmwareIAPObj);
         emit connected();
     }
 }

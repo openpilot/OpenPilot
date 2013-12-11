@@ -84,6 +84,9 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/systemsettings.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationdesired.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationsettings.c
+    SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank1.c
+    SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank2.c
+    SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank3.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationbank.c
     SRC += $(OPUAVSYNTHDIR)/actuatorcommand.c
     SRC += $(OPUAVSYNTHDIR)/actuatordesired.c

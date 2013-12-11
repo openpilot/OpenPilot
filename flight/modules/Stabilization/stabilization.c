@@ -135,6 +135,7 @@ int32_t StabilizationInitialize()
 {
     // Initialize variables
     StabilizationSettingsInitialize();
+    StabilizationBankInitialize();
     ActuatorDesiredInitialize();
 #ifdef DIAG_RATEDESIRED
     RateDesiredInitialize();

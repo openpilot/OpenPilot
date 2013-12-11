@@ -66,10 +66,10 @@ void ModelUavoProxy::flightPlanSent(UAVObject *obj, bool success)
     if (completionCount == 2) {
         qDebug() << "ModelUavoProxy::flightPlanSent - success" << (completionSuccessCount == 2);
         if (completionSuccessCount == 2) {
-            // TODO : popup?
+            QMessageBox::information(NULL, tr("Flight Plan Upload Successful"), tr("Flight plan upload was successful."));
         }
         else {
-            // TODO : popup?
+            QMessageBox::critical(NULL, tr("Flight Plan Upload Failed !"), tr("Failed to upload the flight plan !"));
         }
     }
 }
@@ -102,10 +102,10 @@ void ModelUavoProxy::flightPlanReceived(UAVObject *obj, bool success)
         qDebug() << "ModelUavoProxy::flightPlanReceived - success" << (completionSuccessCount == 2);
         if (completionSuccessCount == 2) {
             objectsToModel();
-            // TODO : popup?
+            QMessageBox::information(NULL, tr("Flight Plan Download Successful"), tr("Flight plan download was successful."));
         }
         else {
-            // TODO : popup?
+            QMessageBox::critical(NULL, tr("Flight Plan Download Failed !"), tr("Failed to download the flight plan !"));
         }
     }
 }
@@ -254,8 +254,11 @@ PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields &actionD
 
 void ModelUavoProxy::objectsToModel()
 {
+    // build model from uav objects
+    // the list of objects can end with "garbage" instances due to previous flightpath
+    // they need to be ignored
+
     int instanceCount = objManager->getNumInstances(Waypoint::OBJID);
-    // TODO retain only reachable waypoints
 
     int rowCount = myModel->rowCount();
     if (instanceCount < rowCount) {
@@ -275,8 +278,7 @@ void ModelUavoProxy::objectsToModel()
         Waypoint::DataFields waypointData = waypoint->getData();
         waypointToModel(i, waypointData);
 
-        int actionId = waypointData.Action;
-        PathAction *action = PathAction::GetInstance(objManager, actionId);
+        PathAction *action = PathAction::GetInstance(objManager, waypoint->getAction());
         Q_ASSERT(action);
         if (!action) {
             continue;

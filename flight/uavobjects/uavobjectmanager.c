@@ -183,7 +183,7 @@ static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue,
                           UAVObjEventCallback cb, uint8_t eventMask);
 static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue,
                              UAVObjEventCallback cb);
-static void autoUpdated(UAVObjHandle obj_handle, uint16_t instId);
+static void instanceAutoUpdated(UAVObjHandle obj_handle, uint16_t instId);
 
 // Private variables
 static xSemaphoreHandle mutex;
@@ -391,8 +391,8 @@ UAVObjHandle UAVObjRegister(uint32_t id,
     }
 
     // fire events for outer object and its embedded meta object
-    autoUpdated((UAVObjHandle)uavo_data, 0);
-    autoUpdated((UAVObjHandle) & (uavo_data->metaObj), 0);
+    instanceAutoUpdated((UAVObjHandle)uavo_data, 0);
+    instanceAutoUpdated((UAVObjHandle) & (uavo_data->metaObj), 0);
 
 unlock_exit:
     xSemaphoreGiveRecursive(mutex);
@@ -1583,8 +1583,8 @@ void UAVObjRequestUpdate(UAVObjHandle obj_handle)
 }
 
 /**
- * Request an update of the object's data from the GCS. The call will not wait for the response, a EV_UPDATED event
- * will be generated as soon as the object is updated.
+ * Request an update of the object's data from the GCS.
+ * The call will not wait for the response, a EV_UPDATED event will be generated as soon as the object is updated.
  * \param[in] obj The object handle
  * \param[in] instId Object instance ID to update
  */
@@ -1597,7 +1597,7 @@ void UAVObjRequestInstanceUpdate(UAVObjHandle obj_handle, uint16_t instId)
 }
 
 /**
- * Send the object's data to the GCS (triggers a EV_UPDATED_MANUAL event on this object).
+ * Trigger a EV_UPDATED_MANUAL event for an object.
  * \param[in] obj The object handle
  */
 void UAVObjUpdated(UAVObjHandle obj_handle)
@@ -1606,7 +1606,7 @@ void UAVObjUpdated(UAVObjHandle obj_handle)
 }
 
 /**
- * Send the object's data to the GCS (triggers a EV_UPDATED_MANUAL event on this object).
+ * Trigger a EV_UPDATED_MANUAL event for an object instance.
  * \param[in] obj The object handle
  * \param[in] instId The object instance ID
  */
@@ -1619,12 +1619,11 @@ void UAVObjInstanceUpdated(UAVObjHandle obj_handle, uint16_t instId)
 }
 
 /**
-<<<<<<< HEAD
- * Send the object's data to the GCS (triggers a EV_UPDATED_MANUAL event on this object).
+ * Trigger a EV_UPDATED event for an object instance.
  * \param[in] obj The object handle
  * \param[in] instId The object instance ID
  */
-static void autoUpdated(UAVObjHandle obj_handle, uint16_t instId)
+static void instanceAutoUpdated(UAVObjHandle obj_handle, uint16_t instId)
 {
     PIOS_Assert(obj_handle);
     xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -1760,7 +1759,7 @@ static InstanceHandle createInstance(struct UAVOData *obj, uint16_t instId)
     ((struct UAVOMulti *)obj)->num_instances++;
 
     // Fire event
-    autoUpdated((UAVObjHandle)obj, instId);
+    instanceAutoUpdated((UAVObjHandle)obj, instId);
 
     // Done
     return InstanceDataOffset(instEntry);

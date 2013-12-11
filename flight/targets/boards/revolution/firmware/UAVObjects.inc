@@ -82,6 +82,7 @@ UAVOBJSRCFILENAMES += revosettings
 UAVOBJSRCFILENAMES += sonaraltitude
 UAVOBJSRCFILENAMES += stabilizationdesired
 UAVOBJSRCFILENAMES += stabilizationsettings
+UAVOBJSRCFILENAMES += stabilizationbank
 UAVOBJSRCFILENAMES += systemalarms
 UAVOBJSRCFILENAMES += systemsettings
 UAVOBJSRCFILENAMES += systemstats

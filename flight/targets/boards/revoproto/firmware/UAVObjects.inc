@@ -4,7 +4,7 @@
 # Makefile for OpenPilot UAVObject code
 #
 # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2011.
-# 
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
@@ -82,6 +82,7 @@ UAVOBJSRCFILENAMES += revosettings
 UAVOBJSRCFILENAMES += sonaraltitude
 UAVOBJSRCFILENAMES += stabilizationdesired
 UAVOBJSRCFILENAMES += stabilizationsettings
+UAVOBJSRCFILENAMES += stabilizationbank
 UAVOBJSRCFILENAMES += systemalarms
 UAVOBJSRCFILENAMES += systemsettings
 UAVOBJSRCFILENAMES += systemstats

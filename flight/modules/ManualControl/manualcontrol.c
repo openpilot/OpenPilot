@@ -668,8 +668,8 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
 
     StabilizationDesiredGet(&stabilization);
 
-    StabilizationSettingsData stabSettings;
-    StabilizationSettingsGet(&stabSettings);
+    StabilizationBankData stabSettings;
+    StabilizationBankGet(&stabSettings);
 
     uint8_t *stab_settings;
     FlightStatusData flightStatus;
@@ -871,8 +871,8 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
         AltitudeHoldSettingsThrottleRateGet(&throttleRate);
     }
 
-    StabilizationSettingsData stabSettings;
-    StabilizationSettingsGet(&stabSettings);
+    StabilizationBankData stabSettings;
+    StabilizationBankGet(&stabSettings);
 
     thisSysTime   = xTaskGetTickCount();
     dT = ((thisSysTime == lastSysTimeAH) ? 0.001f : (thisSysTime - lastSysTimeAH) * portTICK_RATE_MS * 0.001f);

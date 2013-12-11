@@ -116,6 +116,15 @@ struct FontDimensions {
     int width, height;
 };
 
+// to convert metric -> imperial
+// for speeds see http://en.wikipedia.org/wiki/Miles_per_hour
+typedef struct {					//	from		metric			imperial
+	float		m_to_m_feet;		//	m			m		1.0		feet	3.280840
+	float		ms_to_ms_fts;		//	m/s			m/s		1.0		ft/s	3.280840
+	float		ms_to_kmh_mph;		//	m/s			km/h	3.6		mph		2.236936
+	uint8_t		char_m_feet;		//	char		'm'				'f'
+} Unit;
+
 // Home position for calculations
 typedef struct {
     int32_t Latitude;

@@ -1,6 +1,6 @@
 <xml>
     <object name="OsdSettings" singleinstance="true" settings="true" category="System">
-        <description>OSD settings used by the OPOSD</description>
+        <description>OSD settings part 1</description>
         
         <field name="ScreenSwitching" units="" type="int16" elements="4" elementnames="UnconnectedScreen,SwitchChannel,Switch1Pulse,Switch3Pulse" defaultvalue="1,6,1300,1700"/>
         
@@ -46,7 +46,7 @@
         <field name="Time" units="" type="enum" elements="1" options="Disabled,HourMinSec,MinSec" defaultvalue="MinSec"/>
         <field name="TimeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="298,267,298,267,0,0,3"/>
         
-		<field name="PositionStealth" units=""  type="float"  elements="1" defaultvalue="0.0"/>
+		<field name="Units" units="" type="enum" elements="1" options="Metric,Imperial" defaultvalue="Metric"/>
 		<field name="HomeSource" units="" type="enum" elements="1" options="GPS,Config" defaultvalue="GPS"/>
 		<field name="AltitudeSource" units="" type="enum" elements="1" options="GPS,Baro" defaultvalue="GPS"/>
 		<field name="HeadingSource" units="" type="enum" elements="1" options="GPS,Mag" defaultvalue="GPS"/>

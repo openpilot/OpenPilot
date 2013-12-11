@@ -1,6 +1,8 @@
 <xml>
     <object name="OsdSettings2" singleinstance="true" settings="true" category="System">
-        <description>OSD settings part 2 used by the OPOSD</description>
+        <description>OSD settings part 2</description>
+        
+		<field name="PositionStealth" units=""  type="float"  elements="1" defaultvalue="0.0"/>
         
         <field name="RSSI" units="" type="enum" elements="1" options="Disabled,Analog,PWM" defaultvalue="Disabled"/>
         <field name="RSSISetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,25,2,25,0,0,2"/>

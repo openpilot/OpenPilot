@@ -80,6 +80,7 @@ static void osdgenTask(void *parameters);
 static xTaskHandle osdgenTaskHandle;
 xSemaphoreHandle osdSemaphore = NULL;
 TTime timex;
+Unit Convert[2];
 
 #ifdef DEBUG_TIMING
 static portTickType in_ticks = 0;
@@ -2554,6 +2555,7 @@ void updateGraphics()
         int16_t x, y;
     	uint32_t WarnMask = 0;
         double adc_value;
+        Unit *convert;
 
 #ifdef TEMP_GPS_STATUS_WORKAROUND
         static uint8_t gps_status = 0;
@@ -2581,6 +2583,9 @@ void updateGraphics()
         	screen = OsdSettings.ScreenSwitching.UnconnectedScreen;
         }
 
+        // Set the units to metric or imperial
+        convert = OsdSettings.Units == OSDSETTINGS_UNITS_METRIC ? &Convert[0] : &Convert[1];
+
         // Home position calculations
         if (homePos.GotHome) {
         	calc_home_data(&homePos, &gpsData);
@@ -2602,11 +2607,11 @@ void updateGraphics()
         }
 		// GPS coordinates
         if (check_enable_and_srceen(OsdSettings.GPSLatitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLatitudeSetup, screen, &x, &y)) {
-            sprintf(temp, "Lat%11.6f", homePos.GotHome ? (double)(gpsData.Latitude / 10000000.0f - OsdSettings.PositionStealth) : 0.0d);
+            sprintf(temp, "Lat%11.6f", homePos.GotHome ? (double)(gpsData.Latitude / 10000000.0f + OsdSettings2.PositionStealth) : 0.0d);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLatitudeSetup.CharSize);
         }
         if (check_enable_and_srceen(OsdSettings.GPSLongitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLongitudeSetup, screen, &x, &y)) {
-            sprintf(temp, "Lon%11.6f", homePos.GotHome ? (double)(gpsData.Longitude / 10000000.0f - OsdSettings.PositionStealth) : 0.0d);
+            sprintf(temp, "Lon%11.6f", homePos.GotHome ? (double)(gpsData.Longitude / 10000000.0f + OsdSettings2.PositionStealth) : 0.0d);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLongitudeSetup.CharSize);
         }
 		// GPS satellite info
@@ -2617,11 +2622,11 @@ void updateGraphics()
         }
 		// Ground speed in HUD design as vertical scale left side (centered relative to y)
         if (check_enable_and_srceen(OsdSettings.Speed, (OsdSettingsWarningsSetupData*)&OsdSettings.SpeedSetup, screen, &x, &y)) {
-            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, x, y, 100, 10, 20, 7, 12, 15, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
+            hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, -1, x, y, 100, 10, 20, 7, 12, 15, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
 		// Home altitude in HUD design as vertical scale right side (centered relative to y)
         if (check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData*)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
-            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)(gpsData.Altitude - homePos.Altitude) : (int)baro.Altitude, 100, +1, x, y, 100, 10, 20, 7, 12, 15, 100, 0);
+            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, +1, x, y, 100, 10, 20, 7, 12, 15, 100, 0);
         }
 		// Heading in HUD design (centered relative to x)
         // JR_HINT TODO test both in-flight
@@ -2635,16 +2640,18 @@ void updateGraphics()
         }
         // Home distance
         if (check_enable_and_srceen(OsdSettings.HomeDistance, (OsdSettingsWarningsSetupData*)&OsdSettings.HomeDistanceSetup, screen, &x, &y)) {
+        	int d = (int)(homePos.Distance * convert->m_to_m_feet);
         	if (homePos.GotHome) {
-                sprintf(temp, "HD%5dm", (int)homePos.Distance <= 99999 ? (int)homePos.Distance : 99999);
+                sprintf(temp, "HD%5d%c", d <= 99999 ? d : 99999, convert->char_m_feet);
         	} else {
-                sprintf(temp, "HD  ---m");
+                sprintf(temp, "HD  ---%c", convert->char_m_feet);
         	}
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.HomeDistanceSetup.CharSize);
         }
         // Vertical speed
         if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData*)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
-            sprintf(temp, "VS%5.1f", (double)-gpsVelocityData.Down);
+            sprintf(temp, "VS%5.1f", (double)-gpsVelocityData.Down);										// TODO currently m/s for both
+            //sprintf(temp, "VS%5.1f", (double)(-gpsVelocityData.Down * convert->ms_to_ms_fts));			// TODO is ft/s or ft/m the common unit for imperial?
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.VerticalSpeedSetup.CharSize);
         }
 		// Flight mode
@@ -2881,6 +2888,16 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
 
     PIOS_Servo_Set(0, OsdSettings.White);
     PIOS_Servo_Set(1, OsdSettings.Black);
+
+    Convert[0].m_to_m_feet		= 1.0f;
+    Convert[0].ms_to_ms_fts		= 1.0f;
+    Convert[0].ms_to_kmh_mph	= 3.6f;
+    Convert[0].char_m_feet		= 'm';
+
+    Convert[1].m_to_m_feet		= 3.280840f;
+    Convert[1].ms_to_ms_fts		= 3.280840f;
+    Convert[1].ms_to_kmh_mph	= 2.236936f;
+    Convert[1].char_m_feet		= 'f';
 
     // intro
     for (int i = 0; i < 63; i++) {

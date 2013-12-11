@@ -32,32 +32,21 @@
 #include "uavobjectsinit.h"
 
 // Private types and constants
-typedef struct {
-    uint8_t  sync;
-    uint8_t  type;
-    uint16_t size;
-    uint32_t objId;
-} uavtalk_min_header;
-#define UAVTALK_MIN_HEADER_LENGTH sizeof(uavtalk_min_header)
 
-typedef struct {
-    uint8_t  sync;
-    uint8_t  type;
-    uint16_t size;
-    uint32_t objId;
-    uint16_t instId;
-    uint16_t timestamp;
-} uavtalk_max_header;
-#define UAVTALK_MAX_HEADER_LENGTH  sizeof(uavtalk_max_header)
+// min header : sync(1), type (1), size(2), object ID(4), instance ID(2)
+#define UAVTALK_MIN_HEADER_LENGTH 10
 
-typedef uint8_t uavtalk_checksum;
-#define UAVTALK_CHECKSUM_LENGTH    sizeof(uavtalk_checksum)
+// max header : sync(1), type (1), size(2), object ID(4), instance ID(2), timestamp(2)
+#define UAVTALK_MAX_HEADER_LENGTH 12
+
+#define UAVTALK_CHECKSUM_LENGTH    1
+
 #define UAVTALK_MAX_PAYLOAD_LENGTH (UAVOBJECTS_LARGEST + 1)
+
 #define UAVTALK_MIN_PACKET_LENGTH  UAVTALK_MAX_HEADER_LENGTH + UAVTALK_CHECKSUM_LENGTH
 #define UAVTALK_MAX_PACKET_LENGTH  UAVTALK_MIN_PACKET_LENGTH + UAVTALK_MAX_PAYLOAD_LENGTH
 
 typedef struct {
-    UAVObjHandle obj;
     uint8_t type;
     uint16_t     packet_size;
     uint32_t     objId;

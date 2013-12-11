@@ -52,6 +52,7 @@ Telemetry::Telemetry(UAVTalk *utalk, UAVObjectManager *objMngr) : objMngr(objMng
     connect(objMngr, SIGNAL(newInstance(UAVObject *)), this, SLOT(newInstance(UAVObject *)));
 
     // Listen to transaction completions
+    // TODO should send a status (SUCCESS, FAILED, TIMEOUT)
     connect(utalk, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
 
     // Get GCS stats object
@@ -392,7 +393,7 @@ void Telemetry::processObjectQueue()
         // If a single instance transaction is running, then starting an "all instance" transaction is not allowed
         // TODO make the above logic a reality...
         if (findTransaction(objInfo.obj)) {
-            qWarning() << "Telemetry - !!! Making request for a object " << objInfo.obj->toStringBrief() << " for which a request is already in progress";
+            qWarning().nospace() << "Telemetry - !!! Making request for an object " << objInfo.obj->toStringBrief() << " for which a request is already in progress";
             //objInfo.obj->emitTransactionCompleted(false);
             return;
         }

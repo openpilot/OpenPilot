@@ -91,18 +91,17 @@ private:
     static const int TYPE_ACK     = (TYPE_VER | 0x03);
     static const int TYPE_NACK    = (TYPE_VER | 0x04);
 
-    static const int MIN_HEADER_LENGTH  = 8; // sync(1), type (1), size(2), object ID(4)
-    static const int MAX_HEADER_LENGTH  = 10; // sync(1), type (1), size(2), object ID (4), instance ID(2, not used in single objects)
-
-    static const int CHECKSUM_LENGTH    = 1;
+    // header : sync(1), type (1), size(2), object ID(4), instance ID(2)
+    static const int HEADER_LENGTH  = 10;
 
     static const int MAX_PAYLOAD_LENGTH = 256;
 
-    static const int MAX_PACKET_LENGTH  = (MAX_HEADER_LENGTH + MAX_PAYLOAD_LENGTH + CHECKSUM_LENGTH);
+    static const int CHECKSUM_LENGTH    = 1;
 
-    static const quint8 INSTANCE_LENGTH = 2;
+    static const int MAX_PACKET_LENGTH  = (HEADER_LENGTH + MAX_PAYLOAD_LENGTH + CHECKSUM_LENGTH);
 
     static const int TX_BUFFER_SIZE     = 2 * 1024;
+
     static const quint8 crc_table[256];
 
     // Types
@@ -150,6 +149,8 @@ private:
     void openTransaction(quint8 type, quint32 objId, quint16 instId);
     void closeTransaction(Transaction *trans);
     void closeAllTransactions();
+
+    const char *typeToString(quint8 type);
 };
 
 #endif // UAVTALK_H

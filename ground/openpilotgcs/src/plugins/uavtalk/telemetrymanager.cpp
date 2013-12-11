@@ -59,10 +59,7 @@ void TelemetryManager::start(QIODevice *dev)
 
 void TelemetryManager::onStart()
 {
-    utalk        = new UAVTalk(device, objMngr);
-    telemetry    = new Telemetry(utalk, objMngr);
-    telemetryMon = new TelemetryMonitor(objMngr, telemetry);
-
+    utalk = new UAVTalk(device, objMngr);
     if (false) {
         // UAVTalk must be thread safe and for that:
         // 1- all public methods must lock a mutex
@@ -84,6 +81,9 @@ void TelemetryManager::onStart()
         // Connect IO device to reader
         connect(device, SIGNAL(readyRead()), utalk, SLOT(processInputStream()));
     }
+
+    telemetry    = new Telemetry(utalk, objMngr);
+    telemetryMon = new TelemetryMonitor(objMngr, telemetry);
 
     connect(telemetryMon, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(telemetryMon, SIGNAL(disconnected()), this, SLOT(onDisconnect()));

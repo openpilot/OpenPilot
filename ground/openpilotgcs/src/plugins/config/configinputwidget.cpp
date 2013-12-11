@@ -27,7 +27,8 @@
 
 #include "configinputwidget.h"
 
-#include "uavtalk/telemetrymanager.h"
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 #include <QDebug>
 #include <QStringList>
@@ -40,9 +41,6 @@
 #include <QMessageBox>
 #include <utils/stylehelper.h>
 #include <QMessageBox>
-
-#include <extensionsystem/pluginmanager.h>
-#include <coreplugin/generalsettings.h>
 
 #define ACCESS_MIN_MOVE -3
 #define ACCESS_MAX_MOVE 3

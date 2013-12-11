@@ -29,14 +29,16 @@
 #include "notificationitem.h"
 #include "notifypluginoptionspage.h"
 #include "notifylogging.h"
+
+#include <extensionsystem/pluginmanager.h>
 #include <coreplugin/icore.h>
+#include <uavtalk/telemetrymanager.h>
+
+#include <iostream>
+
 #include <QDebug>
 #include <QtPlugin>
 #include <QStringList>
-
-#include <extensionsystem/pluginmanager.h>
-
-#include <iostream>
 
 static const QString VERSION = "1.0.0";
 
@@ -125,7 +127,7 @@ void SoundNotifyPlugin::readConfig(QSettings *settings, UAVConfigInfo * /* confi
 
 void SoundNotifyPlugin::onTelemetryManagerAdded(QObject *obj)
 {
-    telMngr = qobject_cast<TelemetryManager *>(obj);
+    TelemetryManager *telMngr = qobject_cast<TelemetryManager *>(obj);
     if (telMngr) {
         connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
     }

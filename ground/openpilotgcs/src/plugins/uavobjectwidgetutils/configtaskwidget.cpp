@@ -25,9 +25,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configtaskwidget.h"
+
+#include <uavtalk/telemetrymanager.h>
+#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
+
 #include <QWidget>
 #include <QLineEdit>
-#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
 /**
  * Constructor
@@ -324,7 +327,8 @@ void ConfigTaskWidget::forceConnectedState() // dynamic widgets don't recieve th
 void ConfigTaskWidget::onAutopilotConnect()
 {
     if (utilMngr) {
-        currentBoard = utilMngr->getBoardModel(); // TODO REMEMBER TO ADD THIS TO FORCE CONNECTED FUNC ON CC3D_RELEASE
+        // TODO REMEMBER TO ADD THIS TO FORCE CONNECTED FUNC ON CC3D_RELEASE
+        currentBoard = utilMngr->getBoardModel();
     }
     invalidateObjects();
     isConnected = true;
@@ -1226,8 +1230,8 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget *widget, UAVObjectField *field, 
 void ConfigTaskWidget::updateEnableControls()
 {
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
-
     Q_ASSERT(telMngr);
+
     enableControls(telMngr->isConnected());
 }
 

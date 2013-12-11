@@ -256,11 +256,9 @@ int UAVObjectUtilManager::getBoardModel()
 {
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    qDebug() << "Board type=" << firmwareIapData.BoardType;
-    qDebug() << "Board revision=" << firmwareIapData.BoardRevision;
     int ret = firmwareIapData.BoardType << 8;
     ret = ret + firmwareIapData.BoardRevision;
-    qDebug() << "Board info=" << ret;
+
     return ret;
 }
 

@@ -537,7 +537,8 @@ static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         break;
 
     default:
-        return; //bank number is invalid. All we can do is ignore it.
+        memset(&bank, 0, sizeof(StabilizationBankDataPacked));
+//        return; //bank number is invalid. All we can do is ignore it.
     }
 
 //Need to do this to prevent an infinite loop
@@ -549,9 +550,12 @@ static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
 static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    StabilizationBankData curBank, bank;
+    StabilizationBankData bank;
     StabilizationBankGet(&bank);
 
+//this code will be needed if any other modules alter stabilizationbank
+/*
+    StabilizationBankData curBank;
     if(flight_mode < 0) return;
 
     switch(cast_struct_to_array(settings.FlightModeMap, settings.FlightModeMap.Stabilized1)[flight_mode])
@@ -583,6 +587,8 @@ static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     default:
         return; //invalid bank number
     }
+*/
+
 
     // Set the roll rate PID constants
     pid_configure(&pids[PID_RATE_ROLL], bank.RollRatePID.Kp,

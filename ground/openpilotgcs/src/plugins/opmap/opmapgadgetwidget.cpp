@@ -502,7 +502,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
         contextMenu.addAction(wayPointEditorAct);
         contextMenu.addAction(addWayPointActFromContextMenu);
 
-        if (m_mouse_waypoint) { // we have a waypoint under the mouse
+        if (m_mouse_waypoint) {
+            // we have a waypoint under the mouse
             contextMenu.addAction(editWayPointAct);
 
             lockWayPointAct->setChecked(waypoint_locked);
@@ -1870,8 +1871,12 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
 
 void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
+    // open dialog
     table->show();
+    // bring dialog to the front in case it was already open and hidden away
+    table->raise();
 }
+
 void OPMapGadgetWidget::onAddWayPointAct_triggeredFromContextMenu()
 {
     onAddWayPointAct_triggered(m_context_menu_lat_lon);

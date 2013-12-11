@@ -46,7 +46,7 @@
 #include "manualcontrolcommand.h"
 #include "positionstate.h"
 #include "pathdesired.h"
-#include "stabilizationsettings.h"
+#include "stabilizationbank.h"
 #include "stabilizationdesired.h"
 #include "receiveractivity.h"
 #include "systemsettings.h"

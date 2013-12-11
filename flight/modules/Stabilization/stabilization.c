@@ -36,6 +36,9 @@
 #include "stabilization.h"
 #include "stabilizationsettings.h"
 #include "stabilizationbank.h"
+#include "stabilizationsettingsbank1.h"
+#include "stabilizationsettingsbank2.h"
+#include "stabilizationsettingsbank3.h"
 #include "actuatordesired.h"
 #include "ratedesired.h"
 #include "relaytuning.h"
@@ -97,9 +100,9 @@ int flight_mode = -1;
 static void stabilizationTask(void *parameters);
 static float bound(float val, float range);
 static void ZeroPids(void);
-static void BankChanged();
 static void SettingsUpdatedCb(UAVObjEvent *ev);
 static void BankUpdatedCb(UAVObjEvent *ev);
+static void SettingsBankUpdatedCb(UAVObjEvent *ev);
 
 /**
  * Module initialization
@@ -119,6 +122,11 @@ int32_t StabilizationStart()
 
     StabilizationBankConnectCallback(BankUpdatedCb);
 
+    StabilizationSettingsBank1ConnectCallback(SettingsBankUpdatedCb);
+    StabilizationSettingsBank2ConnectCallback(SettingsBankUpdatedCb);
+    StabilizationSettingsBank3ConnectCallback(SettingsBankUpdatedCb);
+
+
     // Start main task
     xTaskCreate(stabilizationTask, (signed char *)"Stabilization", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_STABILIZATION, taskHandle);
@@ -136,6 +144,9 @@ int32_t StabilizationInitialize()
     // Initialize variables
     StabilizationSettingsInitialize();
     StabilizationBankInitialize();
+    StabilizationSettingsBank1Initialize();
+    StabilizationSettingsBank2Initialize();
+    StabilizationSettingsBank3Initialize();
     ActuatorDesiredInitialize();
 #ifdef DIAG_RATEDESIRED
     RateDesiredInitialize();
@@ -205,8 +216,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 #endif
 
         if(flight_mode != flightStatus.FlightMode){
-            BankChanged();
             flight_mode = flightStatus.FlightMode;
+            SettingsBankUpdatedCb(NULL);
         }
 
 #ifdef REVOLUTION
@@ -502,36 +513,35 @@ static float bound(float val, float range)
     return val;
 }
 
-static void BankChanged()
+
+
+static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     StabilizationBankData bank, oldBank;
-    FlightStatusData flightStatus;
+    StabilizationBankGet(&oldBank);
 
-    StabilizationBankGet(&bank);
-    FlightStatusGet(&flightStatus);
-    memcpy(&oldBank, &bank, sizeof(StabilizationBankData));
+    if(flight_mode < 0) return;
 
-    int offset = flightStatus.FlightMode;
-    bank.RollMax = settings.RollMax[offset];
-    bank.PitchMax = settings.PitchMax[offset];
-    bank.YawMax = settings.YawMax[offset];
+    switch(cast_struct_to_array(settings.FlightModeMap, settings.FlightModeMap.Stabilized1)[flight_mode])
+    {
+    case 0:
+        StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *) &bank);
+        break;
 
-    offset = flightStatus.FlightMode * MAX_AXES;
-    memcpy(&bank.ManualRate, (&settings.ManualRate) + offset, sizeof(float) * MAX_AXES);
-    memcpy(&bank.MaximumRate, (&settings.MaximumRate) + offset, sizeof(float) * MAX_AXES);
+    case 1:
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *) &bank);
+        break;
 
-    offset = flightStatus.FlightMode * RATE_OFFSET;
-    memcpy(&bank.RollRatePID, (&settings.RollRatePID) + offset, sizeof(float) * RATE_OFFSET);
-    memcpy(&bank.PitchRatePID, (&settings.PitchRatePID) + offset, sizeof(float) * RATE_OFFSET);
-    memcpy(&bank.YawRatePID, (&settings.YawRatePID) + offset, sizeof(float) * RATE_OFFSET);
+    case 2:
+        StabilizationSettingsBank3Get((StabilizationSettingsBank3Data *) &bank);
+        break;
 
-    offset = flightStatus.FlightMode * ATT_OFFSET;
-    memcpy(&bank.RollPI, (&settings.RollPI) + offset, sizeof(float) * ATT_OFFSET);
-    memcpy(&bank.PitchPI, (&settings.PitchPI) + offset, sizeof(float) * ATT_OFFSET);
-    memcpy(&bank.YawPI, (&settings.YawPI) + offset, sizeof(float) * ATT_OFFSET);
+    default:
+        return; //bank number is invalid. All we can do is ignore it.
+    }
 
 //Need to do this to prevent an infinite loop
-    if(memcmp(&oldBank, &bank, sizeof(StabilizationBankData)) != 0)
+    if(memcmp(&oldBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
     {
         StabilizationBankSet(&bank);
     }
@@ -539,49 +549,40 @@ static void BankChanged()
 
 static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    StabilizationBankData bank;
-    FlightStatusData flightStatus;
-
+    StabilizationBankData curBank, bank;
     StabilizationBankGet(&bank);
-    FlightStatusGet(&flightStatus);
 
-    StabilizationSettingsData oldSettings;
-    memcpy(&oldSettings, &settings, sizeof(StabilizationSettingsData));
+    if(flight_mode < 0) return;
 
-    int offset = flightStatus.FlightMode;
-    settings.RollMax[offset] = bank.RollMax;
-    settings.PitchMax[offset] = bank.PitchMax;
-    settings.YawMax[offset] = bank.YawMax;
-
-
-    offset = flightStatus.FlightMode * MAX_AXES;
-    memcpy((&settings.ManualRate) + offset, &bank.ManualRate, sizeof(float) * MAX_AXES);
-    memcpy((&settings.MaximumRate) + offset, &bank.MaximumRate, sizeof(float) * MAX_AXES);
-
-    offset = flightStatus.FlightMode * RATE_OFFSET;
-    memcpy((&settings.RollRatePID) + offset, &bank.RollRatePID, sizeof(float) * RATE_OFFSET);
-    memcpy((&settings.PitchRatePID) + offset, &bank.PitchRatePID, sizeof(float) * RATE_OFFSET);
-    memcpy((&settings.YawRatePID) + offset, &bank.YawRatePID, sizeof(float) * RATE_OFFSET);
-
-    offset = flightStatus.FlightMode * ATT_OFFSET;
-    memcpy((&settings.RollPI) + offset, &bank.RollPI, sizeof(float) * ATT_OFFSET);
-    memcpy((&settings.PitchPI) + offset, &bank.PitchPI, sizeof(float) * ATT_OFFSET);
-    memcpy((&settings.YawPI) + offset, &bank.YawPI, sizeof(float) * ATT_OFFSET);
-
-//Need to do this to prevent an infinite loop
-    if(memcmp(&oldSettings, &settings, sizeof(StabilizationSettingsData)) != 0)
+    switch(cast_struct_to_array(settings.FlightModeMap, settings.FlightModeMap.Stabilized1)[flight_mode])
     {
-        StabilizationSettingsSet(&settings);
+    case 0:
+        StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *) &curBank);
+        if(memcmp(&curBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
+        {
+            StabilizationSettingsBank1Set((StabilizationSettingsBank1Data *) &bank);
+        }
+        break;
+
+    case 1:
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *) &curBank);
+        if(memcmp(&curBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
+        {
+            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *) &bank);
+        }
+        break;
+
+    case 2:
+        StabilizationSettingsBank3Get((StabilizationSettingsBank3Data *) &curBank);
+        if(memcmp(&curBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
+        {
+            StabilizationSettingsBank3Set((StabilizationSettingsBank3Data *) &bank);
+        }
+        break;
+
+    default:
+        return; //invalid bank number
     }
-}
-
-
-static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
-{
-    StabilizationSettingsGet(&settings);
-    BankChanged();
-    StabilizationBankData bank;
-    StabilizationBankGet(&bank);
 
     // Set the roll rate PID constants
     pid_configure(&pids[PID_RATE_ROLL], bank.RollRatePID.Kp,
@@ -618,6 +619,12 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
                   bank.YawPI.Ki,
                   0,
                   bank.YawPI.ILimit);
+}
+
+
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    StabilizationSettingsGet(&settings);
 
     // Set up the derivative term
     pid_configure_derivative(settings.DerivativeCutoff, settings.DerivativeGamma);
@@ -652,6 +659,8 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     // Compute time constant for vbar decay term based on a tau
     vbar_decay = expf(-fakeDt / settings.VbarTau);
+
+    flight_mode = -1; //force flight mode update
 }
 
 

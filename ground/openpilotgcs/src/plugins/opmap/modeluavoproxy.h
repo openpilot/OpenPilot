@@ -38,9 +38,6 @@ class ModelUavoProxy : public QObject {
 public:
     explicit ModelUavoProxy(QObject *parent, flightDataModel *model);
 
-    void modelToObjects();
-    void objectsToModel();
-
 public slots:
     void sendFlightPlan();
     void receiveFlightPlan();
@@ -51,16 +48,21 @@ private:
     uint completionCount;
     uint completionSuccessCount;
 
+    void modelToObjects();
+    void objectsToModel();
+
     Waypoint *createWaypoint(int index, Waypoint *newWaypoint);
-    void modelToWaypoint(int i, Waypoint::DataFields &data);
-    void waypointToModel(int i, Waypoint::DataFields &data);
+    PathAction *createPathAction(int index, PathAction *newAction);
 
     PathAction *findPathAction(const PathAction::DataFields& actionFields, int actionCount);
-    PathAction *createPathAction(int index, PathAction *newAction);
+
+    void modelToWaypoint(int i, Waypoint::DataFields &data);
     void modelToPathAction(int i, PathAction::DataFields &data);
+
+    void waypointToModel(int i, Waypoint::DataFields &data);
     void pathActionToModel(int i, PathAction::DataFields &data);
 
-public slots:
+private slots:
     void flightPlanSent(UAVObject *, bool success);
     void flightPlanReceived(UAVObject *, bool success);
 

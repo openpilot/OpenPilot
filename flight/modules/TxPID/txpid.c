@@ -57,6 +57,9 @@
 #include "manualcontrolcommand.h"
 #include "stabilizationsettings.h"
 #include "stabilizationbank.h"
+#include "stabilizationsettingsbank1.h"
+#include "stabilizationsettingsbank2.h"
+#include "stabilizationsettingsbank3.h"
 #include "flightstatus.h"
 #include "hwsettings.h"
 
@@ -165,7 +168,23 @@ static void updatePIDs(UAVObjEvent *ev)
     }
 
     StabilizationBankData bank;
-    StabilizationBankGet(&bank);
+    switch(inst.UpdateMode)
+    {
+    case 0:
+        StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *) &bank);
+        break;
+
+    case 1:
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *) &bank);
+        break;
+
+    case 2:
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *) &bank);
+        break;
+
+    default:
+        return;
+    }
     StabilizationSettingsData stab;
     StabilizationSettingsGet(&stab);
     AccessoryDesiredData accessory;
@@ -298,7 +317,23 @@ static void updatePIDs(UAVObjEvent *ev)
         StabilizationSettingsSet(&stab);
     }
     if (needsUpdateBank) {
-        StabilizationBankSet(&bank);
+        switch(inst.UpdateMode)
+        {
+        case 0:
+            StabilizationSettingsBank1Set((StabilizationSettingsBank1Data *) &bank);
+            break;
+
+        case 1:
+            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *) &bank);
+            break;
+
+        case 2:
+            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *) &bank);
+            break;
+
+        default:
+            return;
+        }
     }
 }
 

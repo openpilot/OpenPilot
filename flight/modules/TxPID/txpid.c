@@ -168,7 +168,7 @@ static void updatePIDs(UAVObjEvent *ev)
     }
 
     StabilizationBankData bank;
-    switch(inst.UpdateMode)
+    switch(inst.BankNumber)
     {
     case 0:
         StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *) &bank);
@@ -317,7 +317,7 @@ static void updatePIDs(UAVObjEvent *ev)
         StabilizationSettingsSet(&stab);
     }
     if (needsUpdateBank) {
-        switch(inst.UpdateMode)
+        switch(inst.BankNumber)
         {
         case 0:
             StabilizationSettingsBank1Set((StabilizationSettingsBank1Data *) &bank);

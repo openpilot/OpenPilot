@@ -5,6 +5,15 @@
     SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415b", MODE="0664", GROUP="plugdev"
     # OpenPilot OPLink Mini radio modem board
     SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415c", MODE="0664", GROUP="plugdev"
+    # OpenPilot Revolution board
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415e", MODE="0664", GROUP="plugdev"
+    
+    # Other OpenPilot reserved pids
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415d", MODE="0664", GROUP="plugdev" 
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4194", MODE="0664", GROUP="plugdev"
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4195", MODE="0664", GROUP="plugdev"
+    
+    
     # unprogrammed openpilot flight control board
     SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5750", MODE="0664", GROUP="plugdev"
     # FTDI FT2232C Dual USB-UART/FIFO IC

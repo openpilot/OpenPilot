@@ -51,7 +51,10 @@ static int64_t Temperature;
 static int32_t lastConversionStart;
 static int32_t PIOS_MS5611_Read(uint8_t address, uint8_t *buffer, uint8_t len);
 static int32_t PIOS_MS5611_WriteCommand(uint8_t command);
-static int64_t t2;
+
+// Second order temperature compensation. Temperature offset
+static int64_t compensation_t2;
+
 // Move into proper driver structure with cfg stored
 static uint32_t oversampling;
 static const struct pios_ms5611_cfg *dev_cfg;
@@ -74,8 +77,8 @@ void PIOS_MS5611_Init(const struct pios_ms5611_cfg *cfg, int32_t i2c_device)
 
     uint8_t data[2];
 
-    // reset calibration values
-    t2 = 0;
+    // reset temperature compensation values
+    compensation_t2 = 0;
 
     /* Calibration parameters */
     for (int i = 0; i < 6; i++) {
@@ -205,7 +208,7 @@ int32_t PIOS_MS5611_ReadADC(void)
         if (Temperature < 2000) {
             Offset2 = 5 * (Temperature - 2000) >> 1;
             Sens2   = Offset2 >> 1;
-            t2 = (deltaTemp * deltaTemp) >> 31;
+            compensation_t2 = (deltaTemp * deltaTemp) >> 31;
             // Apply the "Very low temperature compensation" when temp is less than -15°C
             if (Temperature < -1500) {
                 int64_t tcorr = (Temperature + 1500) * (Temperature + 1500);
@@ -213,9 +216,9 @@ int32_t PIOS_MS5611_ReadADC(void)
                 Sens2   += (11 * tcorr) >> 1;
             }
         } else {
-            t2      = 0;
+            compensation_t2 = 0;
             Offset2 = 0;
-            Sens2   = 0;
+            Sens2 = 0;
         }
         RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]);
         Offset   = (((int64_t)CalibData.C[1]) << 16) + ((((int64_t)CalibData.C[3]) * deltaTemp) >> 7) - Offset2;
@@ -231,7 +234,8 @@ int32_t PIOS_MS5611_ReadADC(void)
  */
 float PIOS_MS5611_GetTemperature(void)
 {
-    return ((float)(Temperature - t2)) / 100.0f;
+    // Apply the second order low and very low temperature compensation offset
+    return ((float)(Temperature - compensation_t2)) / 100.0f;
 }
 
 /**

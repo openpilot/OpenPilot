@@ -306,17 +306,19 @@ void ellipse(int centerX, int centerY, int horizontalRadius, int verticalRadius)
     }
 }
 
-void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size)
+void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size_quarter)
 {
-    int16_t a = myCos(angle);
-    int16_t b = mySin(angle);
+	float sin_angle = sinf(DEG2RAD(angle));
+	float cos_angle = cosf(DEG2RAD(angle));
+	int16_t peak_x  = (int16_t)(sin_angle * size_quarter * 2);
+	int16_t peak_y  = (int16_t)(cos_angle * size_quarter * 2);
+	int16_t d_end_x = (int16_t)(cos_angle * size_quarter);
+	int16_t d_end_y = (int16_t)(sin_angle * size_quarter);
 
-    a = (a * (size / 2)) / 100;
-    b = (b * (size / 2)) / 100;
-    write_line_lm((x) - 1 - b, (y) - 1 + a, (x) - 1 + b, (y) - 1 - a, 1, 1); // Direction line
-    // write_line_lm((GRAPHICS_SIZE/2)-1 + a/2, (GRAPHICS_SIZE/2)-1 + b/2, (GRAPHICS_SIZE/2)-1 - a/2, (GRAPHICS_SIZE/2)-1 - b/2, 1, 1); //Arrow bottom line
-    write_line_lm((x) - 1 + b, (y) - 1 - a, (x) - 1 - a / 2, (y) - 1 - b / 2, 1, 1); // Arrow "wings"
-    write_line_lm((x) - 1 + b, (y) - 1 - a, (x) - 1 + a / 2, (y) - 1 + b / 2, 1, 1);
+	write_line_lm(x + peak_x, y - peak_y, x - peak_x - d_end_x, y + peak_y - d_end_y, 1, 1);
+	write_line_lm(x + peak_x, y - peak_y, x - peak_x + d_end_x, y + peak_y + d_end_y, 1, 1);
+	write_line_lm(x,          y,          x - peak_x - d_end_x, y + peak_y - d_end_y, 1, 1);
+	write_line_lm(x,          y,          x - peak_x + d_end_x, y + peak_y + d_end_y, 1, 1);
 }
 
 void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
@@ -1852,6 +1854,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
  * @param       majtick_len             major tick length
  * @param       flags                   special flags (see hud.h.)
  */
+#define COMPASS_SMALL_NUMBER
 void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mintick_step, int majtick_step, int mintick_len, int majtick_len, __attribute__((unused)) int flags)
 {
     v %= 360; // wrap, just in case.
@@ -1918,16 +1921,22 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
     // Then, draw a rectangle with the present heading in it.
     // We want to cover up any other markers on the bottom.
     // First compute font size.
-    fetch_font_info(0, 3, &font_info, NULL);
-    int text_width = (font_info.width + 1) * 3;
-    int rect_width = text_width + 2;
-    write_filled_rectangle_lm(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 1);
-    write_rectangle_outlined(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 1);
     headingstr[0] = '0' + (v / 100);
     headingstr[1] = '0' + ((v / 10) % 10);
     headingstr[2] = '0' + (v % 10);
     headingstr[3] = 0;
+    fetch_font_info(0, 3, &font_info, NULL);
+#ifdef COMPASS_SMALL_NUMBER
+    int rect_width = font_info.width * 3;
+    write_filled_rectangle_lm(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 1);
+    write_rectangle_outlined(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 1);
+    write_string(headingstr, x + 1, majtick_start + textoffset - 4, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 0);
+#else
+    int rect_width = (font_info.width + 1) * 3 + 2;
+    write_filled_rectangle_lm(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 1);
+    write_rectangle_outlined(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 1);
     write_string(headingstr, x + 1, majtick_start + textoffset + 2, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 3);
+#endif
 }
 
 void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y, int16_t size)
@@ -2400,14 +2409,15 @@ void accumulate_current(double current_amp, double *current_total)
 #define WARN_ON_TIME			 500			// [ms]
 #define WARN_OFF_TIME			 250			// [ms]
 #define WARN_CALL_TIME			  40			// [ms]
-#define WARN_NO_SAT_FIX			0x0001
-#define WARN_HOME_NOT_SET		0x0002
-#define WARN_DISARMED			0x0004
-#define WARN_RSSI_LOW			0x0008
-#define WARN_BATT_FLIGHT_LOW	0x0010
-#define WARN_BATT_VIDEO_LOW		0x0020
-#define WARN_BATT_SCURR_HIGH	0x0040
-#define WARN_BATT_SVOLT_LOW		0x0080
+#define WARN_DO_NOT_MOVE		0x0001
+#define WARN_NO_SAT_FIX			0x0002
+#define WARN_HOME_NOT_SET		0x0004
+#define WARN_DISARMED			0x0008
+#define WARN_RSSI_LOW			0x0010
+#define WARN_BATT_FLIGHT_LOW	0x0020
+#define WARN_BATT_VIDEO_LOW		0x0040
+#define WARN_BATT_SCURR_HIGH	0x0080
+#define WARN_BATT_SVOLT_LOW		0x0100
 void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, int8_t char_size)
 {
 	static uint16_t on_off_cnt = 0;
@@ -2419,6 +2429,11 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
 	}
 
 	if (WarnMask && (on_off_cnt++ < WARN_ON_TIME / WARN_CALL_TIME)) {
+		if (WarnMask & WARN_DO_NOT_MOVE) {
+	        sprintf(temp,  "DO NOT MOVE");
+	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+	        d_y += v_spacing;
+		}
 		if (WarnMask & WARN_NO_SAT_FIX) {
 	        sprintf(temp,  "NO SAT FIX");
 	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
@@ -2547,6 +2562,7 @@ void updateGraphics()
         gpsData.Groundspeed = spd++;
 #endif
 
+        static uint8_t power_on_time = 0;
         static double current_total = 0;		// accumulated sensor current [mAh]
         static HomePosition homePos;
         char temp[50] = { 0 };
@@ -2634,7 +2650,7 @@ void updateGraphics()
         	int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
     		hud_draw_linear_compass(heading < 0 ? heading + 360: heading, 150, 120, x, y, 15, 30, 7, 12, 0);
         }
-        // Home arrow
+        // Home direction visualization
         if (check_enable_and_srceen(OsdSettings.HomeArrow, (OsdSettingsWarningsSetupData*)&OsdSettings.HomeArrowSetup, screen, &x, &y)) {
         	drawArrow(x, y, homePos.Direction, OsdSettings.HomeArrowSetup.Size);
         }
@@ -2660,7 +2676,8 @@ void updateGraphics()
         }
 		// Throttle
         if (check_enable_and_srceen(OsdSettings.Throttle, (OsdSettingsWarningsSetupData*)&OsdSettings.ThrottleSetup, screen, &x, &y)) {
-            sprintf(temp, "Thr%4d%c", (int)(mcc.Throttle + 0.5f), '%');
+        	int throttle = (int)(mcc.Throttle * 100.0f);
+            sprintf(temp, "Thr%4d%c", throttle < 0 ? 0 : throttle, '%');
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.ThrottleSetup.CharSize);
         }
 		// Flight time
@@ -2677,8 +2694,8 @@ void updateGraphics()
 
 #define ADC_REFERENCE		3.0f
 #define	ADC_RESOLUTION		4096.0f
-#define ADC_CURR			0
-#define ADC_VOLT			1
+#define ADC_VOLT			0
+#define ADC_CURR			1
 #define ADC_FLIGHT			2
 #define ADC_TEMP			3
 #define ADC_VIDEO			4
@@ -2745,9 +2762,12 @@ void updateGraphics()
             }
         }
 
+#define DO_NOT_MOVE_SECONDS	10
         // Draw warnings last so that they are above everything else
         // Warnings (centered relative to x)
         if (check_enable_and_srceen(OsdSettings.Warnings, (OsdSettingsWarningsSetupData*)&OsdSettings.WarningsSetup, screen, &x, &y)) {
+        	power_on_time = power_on_time < DO_NOT_MOVE_SECONDS ? timex.sec : DO_NOT_MOVE_SECONDS;
+        	WarnMask |= power_on_time < DO_NOT_MOVE_SECONDS						? WARN_DO_NOT_MOVE		: 0x00;
         	WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D			? WARN_NO_SAT_FIX		: 0x00;
         	WarnMask |= !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE	? WARN_HOME_NOT_SET		: 0x00;
         	WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED					? WARN_DISARMED			: 0x00;

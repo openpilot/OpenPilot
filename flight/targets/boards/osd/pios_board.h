@@ -198,8 +198,8 @@ extern uint32_t pios_com_telem_usb_id;
 
 // -------------------------
 // ADC
-// PIOS_ADC_PinGet(0) = Current
-// PIOS_ADC_PinGet(1) = Voltage
+// PIOS_ADC_PinGet(0) = Voltage
+// PIOS_ADC_PinGet(1) = Current
 // PIOS_ADC_PinGet(2) = Flight
 // PIOS_ADC_PinGet(3) = Temperature sensor
 // PIOS_ADC_PinGet(4) = Video

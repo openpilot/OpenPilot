@@ -17,10 +17,10 @@
         <field name="AltitudeSetup" units="" type="int16" elements="6" elementnames="X1,Y1,X2,Y2,X3,Y3" defaultvalue="2,144,2,144,0,0"/>
         
         <field name="Heading" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="HeadingSetup" units="" type="int16" elements="6" elementnames="X1,Y1,X2,Y2,X3,Y3" defaultvalue="200,260,200,260,0,0"/>
+        <field name="HeadingSetup" units="" type="int16" elements="6" elementnames="X1,Y1,X2,Y2,X3,Y3" defaultvalue="200,270,200,270,0,0"/>
         
         <field name="HomeArrow" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="HomeArrowSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,Size" defaultvalue="200,230,200,230,0,0,30"/>
+        <field name="HomeArrowSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,Size" defaultvalue="200,230,200,230,0,0,10"/>
         
         <field name="GPSLatitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="GPSLatitudeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,2,2,2,2,2,3"/>

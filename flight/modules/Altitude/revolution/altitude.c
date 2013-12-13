@@ -163,10 +163,10 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
 
         temp  = PIOS_MS5611_GetTemperature();
         press = PIOS_MS5611_GetPressure();
-        float temp2      = temp * temp;
+        float temp2    = temp * temp;
         press = press - baroCorrection.a + temp * baroCorrection.b + temp2 * baroCorrection.c + temp * temp2 * baroCorrection.d;
 
-        float altitude   = 44330.0f * (1.0f - powf((press) / MS5611_P0, (1.0f / 5.255f)));
+        float altitude = 44330.0f * (1.0f - powf((press) / MS5611_P0, (1.0f / 5.255f)));
 
         if (!isnan(altitude)) {
             data.Altitude    = altitude;

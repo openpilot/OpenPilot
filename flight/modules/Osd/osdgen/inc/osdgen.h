@@ -161,7 +161,6 @@ typedef struct {
 #define SWAP(a, b)           { a ^= b; b ^= a; a ^= b; }
 
 uint8_t getCharData(uint16_t charPos);
-void introText();
 
 void clearGraphics();
 uint8_t validPos(uint16_t x, uint16_t y);
@@ -172,9 +171,6 @@ void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size);
 void drawAttitude(uint16_t x, uint16_t y, int16_t pitch, int16_t roll, uint16_t size);
-void introGraphics();
-void updateGraphics();
-void drawGraphicsLine();
 
 void write_char16(char ch, unsigned int x, unsigned int y, int font);
 void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode);
@@ -205,7 +201,5 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font);
 // void calc_text_dimensions(char *str, struct FontEntry font, int xs, int ys, struct FontDimensions *dim);
 void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags, int font);
 void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags);
-
-void updateOnceEveryFrame();
 
 #endif /* OSDGEN_H_ */

@@ -2194,23 +2194,29 @@ void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)
     write_line_outlined(x, y - CENTER_RUDDER - CENTER_BODY, x, y - CENTER_BODY, 2, 0, 0, 1);
 }
 
-void introText()
+void introGraphics(int16_t x, int16_t y)
 {
-    write_string("v 0.0.1", GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 10, 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
-}
+    int i;
 
-void introGraphics()
-{
     /* logo */
-    int image = 0;
-    struct splashEntry splash_info;
-
-    splash_info = splash[image];
-
-    copyimage(GRAPHICS_RIGHT / 2 - (splash_info.width) / 2, GRAPHICS_BOTTOM / 2 - (splash_info.height) / 2, image);
+    copyimage(x - splash[0].width / 2, y - splash[0].height / 2, 0);
 
     /* frame */
-    drawBox(0, 0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM);
+    for (i = 0; i <= 20; i += 10)
+    	drawBox(i, i, GRAPHICS_RIGHT - i, GRAPHICS_BOTTOM - i);
+}
+
+void introText(int16_t x, int16_t y)
+{
+    write_string("v 0.0.1", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+}
+
+void showVideoType(int16_t x, int16_t y)
+{
+	if (PIOS_Video_GetType() == VIDEO_TYPE_NTSC)
+		write_string("NTSC", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+	else
+		write_string("PAL", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
 }
 
 void calcHomeArrow(int16_t m_yaw)
@@ -2623,11 +2629,11 @@ void updateGraphics()
         }
 		// GPS coordinates
         if (check_enable_and_srceen(OsdSettings.GPSLatitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLatitudeSetup, screen, &x, &y)) {
-            sprintf(temp, "Lat%11.6f", homePos.GotHome ? (double)(gpsData.Latitude / 10000000.0f + OsdSettings2.PositionStealth) : 0.0d);
+            sprintf(temp, "Lat%11.6f", homePos.GotHome ? (double)(gpsData.Latitude / 10000000.0f + OsdSettings2.PositionStealth) : (double)0.0f);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLatitudeSetup.CharSize);
         }
         if (check_enable_and_srceen(OsdSettings.GPSLongitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLongitudeSetup, screen, &x, &y)) {
-            sprintf(temp, "Lon%11.6f", homePos.GotHome ? (double)(gpsData.Longitude / 10000000.0f + OsdSettings2.PositionStealth) : 0.0d);
+            sprintf(temp, "Lon%11.6f", homePos.GotHome ? (double)(gpsData.Longitude / 10000000.0f + OsdSettings2.PositionStealth) : (double)0.0f);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLongitudeSetup.CharSize);
         }
 		// GPS satellite info
@@ -2898,6 +2904,7 @@ MODULE_INITCALL(osdgenInitialize, osdgenStart);
 /**
  * Main osd task. It does not return.
  */
+#define INTRO_TIME	4000
 static void osdgenTask(__attribute__((unused)) void *parameters)
 {
     // portTickType lastSysTime;
@@ -2920,14 +2927,15 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
     Convert[1].char_m_feet		= 'f';
 
     // intro
-    for (int i = 0; i < 63; i++) {
+    while (xTaskGetTickCount() <= INTRO_TIME) {
         if (xSemaphoreTake(osdSemaphore, LONG_TIME) == pdTRUE) {
 #ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_UpdateFlag(PIOS_WDG_OSDGEN);
 #endif
             clearGraphics();
-            introGraphics();
-            introText();
+            introGraphics	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM / 2 - 30);
+            introText		(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 90);
+            showVideoType	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 60);
         }
     }
 

@@ -135,6 +135,15 @@ typedef struct {
     uint16_t Direction;
 } HomePosition;
 
+// ADC values filtered
+typedef struct {
+    double rssi;
+    double flight;
+    double video;
+    double volt;
+    double curr;
+} ADCfiltered;
+
 // Max/Min macros.
 #define MAX(a, b)            ((a) > (b) ? (a) : (b))
 #define MIN(a, b)            ((a) < (b) ? (a) : (b))

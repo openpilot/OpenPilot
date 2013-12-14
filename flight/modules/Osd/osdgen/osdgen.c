@@ -2569,14 +2569,15 @@ void updateGraphics()
 #endif
 
         static uint8_t power_on_time = 0;
+        static uint8_t airborne = FALSE;
         static double current_total = 0;		// accumulated sensor current [mAh]
         static HomePosition homePos;
+        static ADCfiltered filteredADC;
         char temp[50] = { 0 };
         int8_t screen = 2;
         int8_t check;
         int16_t x, y;
     	uint32_t WarnMask = 0;
-        double adc_value;
         Unit *convert;
 
 #ifdef TEMP_GPS_STATUS_WORKAROUND
@@ -2698,6 +2699,7 @@ void updateGraphics()
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.TimeSetup.CharSize);
         }
 
+#define ADC_FILTER			(double)0.1f
 #define ADC_REFERENCE		3.0f
 #define	ADC_RESOLUTION		4096.0f
 #define ADC_VOLT			0
@@ -2709,11 +2711,11 @@ void updateGraphics()
 #define ADC_VREF			6
         // ADC RSSI
         if (OsdSettings2.RSSI) {
-        	adc_value = (double)(PIOS_ADC_PinGet(ADC_RSSI) * ADC_REFERENCE * OsdSettings2.RSSICalibration.Factor / ADC_RESOLUTION + OsdSettings2.RSSICalibration.Offset);
-        	WarnMask |= adc_value < (double)OsdSettings2.RSSICalibration.Warning ? WARN_RSSI_LOW : 0x00;
+        	filteredADC.rssi = filteredADC.rssi * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_RSSI) * ADC_REFERENCE * OsdSettings2.RSSICalibration.Factor / ADC_RESOLUTION + OsdSettings2.RSSICalibration.Offset) * ADC_FILTER;
+        	WarnMask |= filteredADC.rssi < (double)OsdSettings2.RSSICalibration.Warning ? WARN_RSSI_LOW : 0x00;
             check = check_enable_and_srceen(OsdSettings2.RSSI, (OsdSettingsWarningsSetupData*)&OsdSettings2.RSSISetup, screen, &x, &y);
             if (check == OSDSETTINGS2_RSSI_ANALOG) {
-                sprintf(temp, "RI%5.2f%%", adc_value);
+                sprintf(temp, "RI%5.2f%%", filteredADC.rssi);
             }
         	if (check == OSDSETTINGS2_RSSI_PWM) {
         		sprintf(temp, "RI ----%%"); 						// JR_HINT TODO
@@ -2724,48 +2726,57 @@ void updateGraphics()
         }
         // ADC Flight
         if (OsdSettings2.FlightVoltage) {
-        	adc_value = (double)(PIOS_ADC_PinGet(ADC_FLIGHT) * ADC_REFERENCE * OsdSettings2.FlightVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.FlightVoltageCalibration.Offset);
-        	WarnMask |= adc_value < (double)OsdSettings2.FlightVoltageCalibration.Warning ? WARN_BATT_FLIGHT_LOW : 0x00;
+        	filteredADC.flight = filteredADC.flight * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_FLIGHT) * ADC_REFERENCE * OsdSettings2.FlightVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.FlightVoltageCalibration.Offset) * ADC_FILTER;
+        	WarnMask |= filteredADC.flight < (double)OsdSettings2.FlightVoltageCalibration.Warning ? WARN_BATT_FLIGHT_LOW : 0x00;
             if (check_enable_and_srceen(OsdSettings2.FlightVoltage, (OsdSettingsWarningsSetupData*)&OsdSettings2.FlightVoltageSetup, screen, &x, &y)) {
-                sprintf(temp, "FV%5.2fV", adc_value);
+                sprintf(temp, "FV%5.2fV", filteredADC.flight);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.FlightVoltageSetup.CharSize);
             }
         }
         // ADC Video
         if (OsdSettings2.VideoVoltage) {
-        	adc_value = (double)(PIOS_ADC_PinGet(ADC_VIDEO) * ADC_REFERENCE * OsdSettings2.VideoVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.VideoVoltageCalibration.Offset);
-        	WarnMask |= adc_value < (double)OsdSettings2.VideoVoltageCalibration.Warning ? WARN_BATT_VIDEO_LOW : 0x00;
+        	filteredADC.video = filteredADC.video * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_VIDEO) * ADC_REFERENCE * OsdSettings2.VideoVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.VideoVoltageCalibration.Offset) * ADC_FILTER;
+        	WarnMask |= filteredADC.video < (double)OsdSettings2.VideoVoltageCalibration.Warning ? WARN_BATT_VIDEO_LOW : 0x00;
             if (check_enable_and_srceen(OsdSettings2.VideoVoltage, (OsdSettingsWarningsSetupData*)&OsdSettings2.VideoVoltageSetup, screen, &x, &y)) {
-                sprintf(temp, "VV%5.2fV", adc_value);
+                sprintf(temp, "VV%5.2fV", filteredADC.video);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.VideoVoltageSetup.CharSize);
             }
         }
         // ADC Sensor voltage
         if (OsdSettings2.SensorVoltage) {
-        	adc_value = (double)(PIOS_ADC_PinGet(ADC_VOLT) * ADC_REFERENCE * OsdSettings2.SensorVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorVoltageCalibration.Offset);
-        	WarnMask |= adc_value < (double)OsdSettings2.SensorVoltageCalibration.Warning ? WARN_BATT_SVOLT_LOW : 0x00;
+        	filteredADC.volt = filteredADC.volt * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_VOLT) * ADC_REFERENCE * OsdSettings2.SensorVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorVoltageCalibration.Offset) * ADC_FILTER;
+        	WarnMask |= filteredADC.volt < (double)OsdSettings2.SensorVoltageCalibration.Warning ? WARN_BATT_SVOLT_LOW : 0x00;
             if (check_enable_and_srceen(OsdSettings2.SensorVoltage, (OsdSettingsWarningsSetupData*)&OsdSettings2.SensorVoltageSetup, screen, &x, &y)) {
-                sprintf(temp, "SV%5.2fV", adc_value);
+                sprintf(temp, "SV%5.2fV", filteredADC.volt);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorVoltageSetup.CharSize);
             }
         }
+        // ADC Sensor current or ADC Sensor current consumed
+        if (OsdSettings2.SensorCurrent || OsdSettings2.SensorCurrentConsumed || OsdSettings2.AirborneResetTime) {
+        	filteredADC.curr = filteredADC.curr * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_CURR) * ADC_REFERENCE * OsdSettings2.SensorCurrentCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorCurrentCalibration.Offset) * ADC_FILTER;
+        }
         // ADC Sensor current
         if (OsdSettings2.SensorCurrent) {
-        	adc_value = (double)(PIOS_ADC_PinGet(ADC_CURR) * ADC_REFERENCE * OsdSettings2.SensorCurrentCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorCurrentCalibration.Offset);
-        	WarnMask |= adc_value > (double)OsdSettings2.SensorCurrentCalibration.Warning ? WARN_BATT_SCURR_HIGH : 0x00;
+        	WarnMask |= filteredADC.curr > (double)OsdSettings2.SensorCurrentCalibration.Warning ? WARN_BATT_SCURR_HIGH : 0x00;
             if (check_enable_and_srceen(OsdSettings2.SensorCurrent, (OsdSettingsWarningsSetupData*)&OsdSettings2.SensorCurrentSetup, screen, &x, &y)) {
-                sprintf(temp, "SC%5.2fA", adc_value);
+                sprintf(temp, "SC%5.2fA", filteredADC.curr);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorCurrentSetup.CharSize);
             }
         }
         // ADC Sensor current consumed
         if (OsdSettings2.SensorCurrentConsumed) {
-        	adc_value = (double)(PIOS_ADC_PinGet(ADC_CURR) * ADC_REFERENCE * OsdSettings2.SensorCurrentCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorCurrentCalibration.Offset);
-            accumulate_current(adc_value, &current_total);
+            accumulate_current(filteredADC.curr, &current_total);
             if (check_enable_and_srceen(OsdSettings2.SensorCurrentConsumed, (OsdSettingsWarningsSetupData*)&OsdSettings2.SensorCurrentConsumedSetup, screen, &x, &y)) {
                 sprintf(temp, "T%4dmAh", (int)current_total);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorCurrentConsumedSetup.CharSize);
             }
+        }
+        // Airborne reset time
+		if (OsdSettings2.AirborneResetTime && !airborne && filteredADC.curr >= (double)OsdSettings2.AirborneResetTimeCurrent) {
+			airborne = TRUE;
+			timex.sec = 0;
+			timex.min = 0;
+			timex.hour = 0;
         }
 
 #define DO_NOT_MOVE_SECONDS	10

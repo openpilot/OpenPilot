@@ -354,7 +354,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         {
             UAVObject *rxObj = objMngr->getObject(rxObjId);
             if (rxObj == NULL && rxType != TYPE_OBJ_REQ) {
-                qWarning() << "UAVTalk - error : missing object" << rxObjId;
+                qWarning() << "UAVTalk - error : unknown object" << rxObjId;
                 stats.rxErrors++;
                 rxState = STATE_SYNC;
                 break;
@@ -420,13 +420,13 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         if (rxCS != rxCSPacket) {
             // packet error - faulty CRC
-            qWarning() << "UAVTalk - error : faulty CRC" << rxObjId;
+            qWarning() << "UAVTalk - error : failed CRC check" << rxObjId;
             stats.rxErrors++;
             rxState = STATE_SYNC;
             break;
         }
 
-        if (rxPacketLength != packetSize + 1) {
+        if (rxPacketLength != packetSize + CHECKSUM_LENGTH) {
             // packet error - mismatched packet size
             qWarning() << "UAVTalk - error : mismatched packet size" << rxObjId;
             stats.rxErrors++;
@@ -773,6 +773,7 @@ bool UAVTalk::transmitSingleObject(quint8 type, quint32 objId, quint16 instId, U
     // Check length
     if (length >= MAX_PAYLOAD_LENGTH) {
         qWarning() << "UAVTalk - error transmitting : object exceeds max payload length" << obj->toStringBrief();
+        ++stats.txErrors;
         return false;
     }
 
@@ -780,6 +781,7 @@ bool UAVTalk::transmitSingleObject(quint8 type, quint32 objId, quint16 instId, U
     if (length > 0) {
         if (!obj->pack(&txBuffer[HEADER_LENGTH])) {
             qWarning() << "UAVTalk - error transmitting : failed to pack object" << obj->toStringBrief();
+            ++stats.txErrors;
             return false;
         }
     }

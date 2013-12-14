@@ -72,7 +72,6 @@ typedef struct {
     UAVTalkStats stats;
     UAVTalkInputProcessor iproc;
     uint8_t      *rxBuffer;
-    uint32_t     txSize;
     uint8_t      *txBuffer;
 } UAVTalkConnectionData;
 

@@ -1678,8 +1678,7 @@ xSemaphoreGiveRecursive(mutex);
 /**
  * Send a triggered event to all event queues registered on the object.
  */
-static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId,
-                         UAVObjEventType triggered_event)
+static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType triggered_event)
 {
     /* Set up the message that will be sent to all registered listeners */
     UAVObjEvent msg = {
@@ -1692,14 +1691,13 @@ static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId,
     struct ObjectEventEntry *event;
 
     LL_FOREACH(obj->next_event, event) {
-        if (event->eventMask == 0
-            || (event->eventMask & triggered_event) != 0) {
+        if (event->eventMask == 0 || (event->eventMask & triggered_event) != 0) {
             // Send to queue if a valid queue is registered
             if (event->queue) {
                 // will not block
                 if (xQueueSend(event->queue, &msg, 0) != pdTRUE) {
-                    stats.lastQueueErrorID = UAVObjGetID(obj);
                     ++stats.eventQueueErrors;
+                    stats.lastQueueErrorID = UAVObjGetID(obj);
                 }
             }
 

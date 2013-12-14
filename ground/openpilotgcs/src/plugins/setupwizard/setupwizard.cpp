@@ -112,6 +112,9 @@ int SetupWizard::nextId() const
     case PAGE_MULTI:
         return PAGE_OUTPUT;
 
+    case PAGE_FIXEDWING:
+        return PAGE_OUTPUT;
+
     case PAGE_INPUT:
         if (isRestartNeeded()) {
             saveHardwareSettings();

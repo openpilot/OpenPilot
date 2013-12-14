@@ -1,5 +1,5 @@
-#ifndef TELEMETRYMONITORWIDGET_H
-#define TELEMETRYMONITORWIDGET_H
+#ifndef MONITORWIDGET_H
+#define MONITORWIDGET_H
 
 #include <QWidget>
 #include <QObject>
@@ -8,59 +8,56 @@
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtCore/QPointer>
 
-class TelemetryMonitorWidget : public QGraphicsView {
+class MonitorWidget : public QGraphicsView {
     Q_OBJECT
 public:
-    explicit TelemetryMonitorWidget(QWidget *parent = 0);
-    ~TelemetryMonitorWidget();
+    explicit MonitorWidget(QWidget *parent = 0);
+    ~MonitorWidget();
 
     void setMin(double min)
     {
         minValue = min;
     }
+
     double getMin()
     {
         return minValue;
     }
+
     void setMax(double max)
     {
         maxValue = max;
     }
+
     double getMax()
     {
         return maxValue;
     }
 
-    // number of tx/rx nodes in the graph
-    static const int NODE_NUMELEM = 7;
-
-signals:
-
 public slots:
-    void connect();
-    void disconnect();
-
-    void updateTelemetry(double txRate, double rxRate);
-    void showTelemetry();
+    void telemetryConnected();
+    void telemetryDisconnected();
+    void telemetryUpdated(double txRate, double rxRate);
 
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
 
 private:
+    bool connected;
+
+    double minValue;
+    double maxValue;
+
     QGraphicsSvgItem *graph;
+
     QPointer<QGraphicsTextItem> txSpeed;
     QPointer<QGraphicsTextItem> rxSpeed;
+
     QList<QGraphicsSvgItem *> txNodes;
     QList<QGraphicsSvgItem *> rxNodes;
 
-    bool connected;
-    double txIndex;
-    double txValue;
-    double rxIndex;
-    double rxValue;
-    double minValue;
-    double maxValue;
+    Qt::AspectRatioMode aspectRatioMode;
 };
 
-#endif // TELEMETRYMONITORWIDGET_H
+#endif // MONITORWIDGET_H

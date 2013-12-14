@@ -31,7 +31,6 @@
 
 #include "mainwindow.h"
 #include "generalsettings.h"
-#include "telemetrymonitorwidget.h"
 #include <coreplugin/iconnection.h>
 #include <QWidget>
 #include <QtCore/QVector>
@@ -104,6 +103,8 @@ public:
         return m_ioDev != 0;
     }
 
+    void addWidget(QWidget *widget);
+
     bool connectDevice(DevListItem device);
     bool disconnectDevice();
     void suspendPolling();
@@ -123,7 +124,6 @@ signals:
 public slots:
     void telemetryConnected();
     void telemetryDisconnected();
-    void telemetryUpdated(double txRate, double rxRate);
 
 private slots:
     void objectAdded(QObject *obj);
@@ -143,9 +143,6 @@ protected:
     QPushButton *m_connectBtn;
     QLinkedList<DevListItem> m_devList;
     QList<IConnection *> m_connectionsList;
-
-    // tx/rx telemetry monitor
-    TelemetryMonitorWidget *m_monitorWidget;
 
     // currently connected connection plugin
     DevListItem m_connectionDevice;

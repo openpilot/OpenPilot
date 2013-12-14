@@ -865,6 +865,7 @@ help:
 	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
 	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
 	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
+	@$(ECHO) "     openssl_install      - Install the OpenSSL libraries (Windows only)"
 	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     doxygen_install      - Install the Doxygen documentation generator"
 	@$(ECHO) "     gtest_install        - Install the GoogleTest framework"

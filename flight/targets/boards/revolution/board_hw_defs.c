@@ -682,12 +682,12 @@ const struct pios_rfm22b_cfg *PIOS_BOARD_HW_DEFS_GetRfm22Cfg(uint32_t board_revi
 #include "pios_flash_internal_priv.h"
 
 static const struct flashfs_logfs_cfg flashfs_external_user_cfg = {
-    .fs_magic      = 0x99abcdef,
+    .fs_magic      = 0x99abceff,
     .total_fs_size = 0x001C0000, /* 2M bytes (32 sectors = entire chip) */
-    .arena_size    = 0x00010000, /* 256 * slot size */
+    .arena_size    = 0x000E0000, /* biggest possible arena size fssize/2 */
     .slot_size     = 0x00000100, /* 256 bytes */
 
-    .start_offset  = 0x40000,    /* start offset */
+    .start_offset  = 0x00040000, /* start offset */
     .sector_size   = 0x00010000, /* 64K bytes */
     .page_size     = 0x00000100, /* 256 bytes */
 };

@@ -1,6 +1,6 @@
 TEMPLATE = lib
 TARGET = Welcome
-QT += network declarative
+QT += network qml quick
 
 include(../../openpilotgcsplugin.pri)
 include(welcome_dependencies.pri)

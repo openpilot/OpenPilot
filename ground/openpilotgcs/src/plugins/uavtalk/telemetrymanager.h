@@ -50,12 +50,14 @@ public:
 signals:
     void connected();
     void disconnected();
+    void telemetryUpdated(double txRate, double rxRate);
     void myStart();
     void myStop();
 
 private slots:
     void onConnect();
     void onDisconnect();
+    void onTelemetryUpdate(double txRate, double rxRate);
     void onStart();
     void onStop();
 

@@ -43,6 +43,8 @@ class QToolButton;
 class MyTabWidget;
 QT_END_NAMESPACE
 
+class AboutDialog;
+
 namespace Core {
 class ActionManager;
 class BaseMode;
@@ -72,8 +74,6 @@ class FancyTabWidget;
 class GeneralSettings;
 class ShortcutSettings;
 class WorkspaceSettings;
-class VersionDialog;
-class AuthorsDialog;
 
 class CORE_EXPORT MainWindow : public EventFilteringMainWindow {
     Q_OBJECT
@@ -154,12 +154,10 @@ private slots:
     void openRecentFile();
     void setFocusToEditor();
     void saveAll();
-    void aboutOpenPilotGCS();
+    void showAboutDialog();
+    void destroyAboutDialog();
     void aboutPlugins();
-    void aboutOpenPilotAuthors();
     void updateFocusWidget(QWidget *old, QWidget *now);
-    void destroyVersionDialog();
-    void destroyAuthorsDialog();
     void modeChanged(Core::IMode *mode);
     void showUavGadgetMenus(bool show, bool hasSplitter);
     void applyTabBarSettings(QTabWidget::TabPosition pos, bool movable);
@@ -191,8 +189,7 @@ private:
     MimeDatabase *m_mimeDatabase;
     MyTabWidget *m_modeStack;
     Core::BaseView *m_outputView;
-    VersionDialog *m_versionDialog;
-    AuthorsDialog *m_authorsDialog;
+    AboutDialog *m_aboutDialog;
 
     IContext *m_activeContext;
 

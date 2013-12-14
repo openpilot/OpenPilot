@@ -4,12 +4,14 @@
 
 LogFile::LogFile(QObject *parent) :
     QIODevice(parent),
-    lastTimeStamp(0),
-    lastPlayed(0),
-    timeOffset(0),
-    playbackSpeed(1.0)
+    m_lastTimeStamp(0),
+    m_lastPlayed(0),
+    m_timeOffset(0),
+    m_playbackSpeed(1.0),
+    m_nextTimeStamp(0),
+    m_useProvidedTimeStamp(false)
 {
-    connect(&timer, SIGNAL(timeout()), this, SLOT(timerFired()));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(timerFired()));
 }
 
 /**
@@ -20,8 +22,8 @@ LogFile::LogFile(QObject *parent) :
 bool LogFile::open(OpenMode mode)
 {
     // start a timer for playback
-    myTime.restart();
-    if (file.isOpen()) {
+    m_myTime.restart();
+    if (m_file.isOpen()) {
         // We end up here when doing a replay, because the connection
         // manager will also try to open the QIODevice, even though we just
         // opened it after selecting the file, which happens before the
@@ -29,8 +31,8 @@ bool LogFile::open(OpenMode mode)
         return true;
     }
 
-    if (file.open(mode) == false) {
-        qDebug() << "Unable to open " << file.fileName() << " for logging";
+    if (m_file.open(mode) == false) {
+        qDebug() << "Unable to open " << m_file.fileName() << " for logging";
         return false;
     }
 
@@ -49,25 +51,27 @@ void LogFile::close()
 {
     emit aboutToClose();
 
-    if (timer.isActive()) {
-        timer.stop();
+    if (m_timer.isActive()) {
+        m_timer.stop();
     }
-    file.close();
+    m_file.close();
     QIODevice::close();
 }
 
 qint64 LogFile::writeData(const char *data, qint64 dataSize)
 {
-    if (!file.isWritable()) {
+    if (!m_file.isWritable()) {
         return dataSize;
     }
 
-    quint32 timeStamp = myTime.elapsed();
+    // If m_nextTimeStamp != -1 then use this timestamp instead of the timer
+    // This is used when saving logs from on-board logging
+    quint32 timeStamp = m_useProvidedTimeStamp ? m_nextTimeStamp : m_myTime.elapsed();
 
-    file.write((char *)&timeStamp, sizeof(timeStamp));
-    file.write((char *)&dataSize, sizeof(dataSize));
+    m_file.write((char *)&timeStamp, sizeof(timeStamp));
+    m_file.write((char *)&dataSize, sizeof(dataSize));
 
-    qint64 written = file.write(data, dataSize);
+    qint64 written = m_file.write(data, dataSize);
     if (written != -1) {
         emit bytesWritten(written);
     }
@@ -77,36 +81,36 @@ qint64 LogFile::writeData(const char *data, qint64 dataSize)
 
 qint64 LogFile::readData(char *data, qint64 maxSize)
 {
-    QMutexLocker locker(&mutex);
-    qint64 toRead = qMin(maxSize, (qint64)dataBuffer.size());
+    QMutexLocker locker(&m_mutex);
+    qint64 toRead = qMin(maxSize, (qint64)m_dataBuffer.size());
 
-    memcpy(data, dataBuffer.data(), toRead);
-    dataBuffer.remove(0, toRead);
+    memcpy(data, m_dataBuffer.data(), toRead);
+    m_dataBuffer.remove(0, toRead);
     return toRead;
 }
 
 qint64 LogFile::bytesAvailable() const
 {
-    return dataBuffer.size();
+    return m_dataBuffer.size();
 }
 
 void LogFile::timerFired()
 {
     qint64 dataSize;
 
-    if (file.bytesAvailable() > 4) {
+    if (m_file.bytesAvailable() > 4) {
         int time;
-        time = myTime.elapsed();
+        time = m_myTime.elapsed();
 
         // TODO: going back in time will be a problem
-        while ((lastPlayed + ((time - timeOffset) * playbackSpeed) > lastTimeStamp)) {
-            lastPlayed += ((time - timeOffset) * playbackSpeed);
-            if (file.bytesAvailable() < sizeof(dataSize)) {
+        while ((m_lastPlayed + ((time - m_timeOffset) * m_playbackSpeed) > m_lastTimeStamp)) {
+            m_lastPlayed += ((time - m_timeOffset) * m_playbackSpeed);
+            if (m_file.bytesAvailable() < sizeof(dataSize)) {
                 stopReplay();
                 return;
             }
 
-            file.read((char *)&dataSize, sizeof(dataSize));
+            m_file.read((char *)&dataSize, sizeof(dataSize));
 
             if (dataSize < 1 || dataSize > (1024 * 1024)) {
                 qDebug() << "Error: Logfile corrupted! Unlikely packet size: " << dataSize << "\n";
@@ -114,34 +118,34 @@ void LogFile::timerFired()
                 return;
             }
 
-            if (file.bytesAvailable() < dataSize) {
+            if (m_file.bytesAvailable() < dataSize) {
                 stopReplay();
                 return;
             }
 
-            mutex.lock();
-            dataBuffer.append(file.read(dataSize));
-            mutex.unlock();
+            m_mutex.lock();
+            m_dataBuffer.append(m_file.read(dataSize));
+            m_mutex.unlock();
 
             emit readyRead();
 
-            if (file.bytesAvailable() < sizeof(lastTimeStamp)) {
+            if (m_file.bytesAvailable() < sizeof(m_lastTimeStamp)) {
                 stopReplay();
                 return;
             }
 
-            int save = lastTimeStamp;
-            file.read((char *)&lastTimeStamp, sizeof(lastTimeStamp));
+            int save = m_lastTimeStamp;
+            m_file.read((char *)&m_lastTimeStamp, sizeof(m_lastTimeStamp));
             // some validity checks
-            if (lastTimeStamp < save // logfile goes back in time
-                || (lastTimeStamp - save) > (60 * 60 * 1000)) { // gap of more than 60 minutes)
-                qDebug() << "Error: Logfile corrupted! Unlikely timestamp " << lastTimeStamp << " after " << save << "\n";
+            if (m_lastTimeStamp < save // logfile goes back in time
+                || (m_lastTimeStamp - save) > (60 * 60 * 1000)) { // gap of more than 60 minutes)
+                qDebug() << "Error: Logfile corrupted! Unlikely timestamp " << m_lastTimeStamp << " after " << save << "\n";
                 stopReplay();
                 return;
             }
 
-            timeOffset = time;
-            time = myTime.elapsed();
+            m_timeOffset = time;
+            time = m_myTime.elapsed();
         }
     } else {
         stopReplay();
@@ -150,13 +154,13 @@ void LogFile::timerFired()
 
 bool LogFile::startReplay()
 {
-    dataBuffer.clear();
-    myTime.restart();
-    timeOffset = 0;
-    lastPlayed = 0;
-    file.read((char *)&lastTimeStamp, sizeof(lastTimeStamp));
-    timer.setInterval(10);
-    timer.start();
+    m_dataBuffer.clear();
+    m_myTime.restart();
+    m_timeOffset = 0;
+    m_lastPlayed = 0;
+    m_file.read((char *)&m_lastTimeStamp, sizeof(m_lastTimeStamp));
+    m_timer.setInterval(10);
+    m_timer.start();
     emit replayStarted();
     return true;
 }
@@ -170,11 +174,11 @@ bool LogFile::stopReplay()
 
 void LogFile::pauseReplay()
 {
-    timer.stop();
+    m_timer.stop();
 }
 
 void LogFile::resumeReplay()
 {
-    timeOffset = myTime.elapsed();
-    timer.start();
+    m_timeOffset = m_myTime.elapsed();
+    m_timer.start();
 }

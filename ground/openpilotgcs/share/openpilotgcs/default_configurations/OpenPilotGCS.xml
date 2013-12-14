@@ -2491,6 +2491,17 @@
         </data>
       </default>
     </SystemHealthGadget>
+    <TelemetryMonitorGadget>
+      <default>
+        <configInfo>
+          <locked>true</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <diagram>%%DATAPATH%%diagrams/default/system-health.svg</diagram>
+        </data>
+      </default>
+    </TelemetryMonitorGadget>
     <UAVObjectBrowser>
       <default>
         <configInfo>

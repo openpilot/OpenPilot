@@ -323,7 +323,7 @@ bool LoggingPlugin::initialize(const QStringList & args, QString *errMsg)
                              QList<int>() <<
                              Core::Constants::C_GLOBAL_ID);
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+L"));
-    cmd->action()->setText("Start logging...");
+    cmd->action()->setText(tr("Start logging..."));
 
     ac->menu()->addSeparator();
     ac->appendGroup("Logging");

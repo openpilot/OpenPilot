@@ -1,14 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       authorsdialog.cpp
+ * @file       aboutdialog.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @addtogroup GCSPlugins GCS Plugins
- * @{
- * @addtogroup CorePlugin Core Plugin
- * @{
- * @brief The Core GCS plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -26,58 +21,37 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "authorsdialog.h"
+#include "aboutdialog.h"
 
 #include "version_info/version_info.h"
 #include "coreconstants.h"
 #include "icore.h"
 
-#include <utils/qtcassert.h>
-
 #include <QtCore/QDate>
 #include <QtCore/QFile>
 #include <QtCore/QSysInfo>
+#include <QDesktopServices>
+#include <QLayout>
+#include <QVBoxLayout>
 
-#include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QTextBrowser>
+#include <QtQuick>
+#include <QQuickView>
+#include <QQmlEngine>
+#include <QQmlContext>
 
-#include <QtDeclarative/qdeclarative.h>
-#include <QtDeclarative/qdeclarativeview.h>
-#include <QtDeclarative/qdeclarativeengine.h>
-#include <QtDeclarative/qdeclarativecontext.h>
-
-using namespace Core;
-using namespace Core::Internal;
 using namespace Core::Constants;
 
-AuthorsDialog::AuthorsDialog(QWidget *parent)
-    : QDialog(parent)
+AboutDialog::AboutDialog(QWidget *parent) :
+    QDialog(parent)
 {
-    // We need to set the window icon explicitly here since for some reason the
-    // application icon isn't used when the size of the dialog is fixed (at least not on X11/GNOME)
-
     setWindowIcon(QIcon(":/core/images/openpilot_logo_32.png"));
     setWindowTitle(tr("About OpenPilot"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    // This loads a QML doc containing a Tabbed view
-    QDeclarativeView *view = new QDeclarativeView(this);
-    view->setSource(QUrl("qrc:/core/qml/AboutDialog.qml"));
-
-
-    QString version = QLatin1String(GCS_VERSION_LONG);
-    version += QDate(2007, 25, 10).toString(Qt::SystemLocaleDate);
-
-    QString ideRev;
-
-    // : This gets conditionally inserted as argument %8 into the description string.
-    ideRev = tr("From revision %1<br/>").arg(VersionInfo::revision().left(10));
+    setMinimumSize(600, 400);
+    setMaximumSize(800, 600);
 
     const QString description = tr(
-        "<h3>OpenPilot Ground Control Station</h3>"
-        "GCS Revision: <b>%1</b><br/>"
+        "Revision: <b>%1</b><br/>"
         "UAVO Hash: <b>%2</b><br/>"
         "<br/>"
         "Built from %3<br/>"
@@ -85,15 +59,6 @@ AuthorsDialog::AuthorsDialog(QWidget *parent)
         "Based on Qt %6 (%7 bit)<br/>"
         "<br/>"
         "&copy; %8, 2010-%9. All rights reserved.<br/>"
-        "<br/>"
-        "<small>This program is free software; you can redistribute it and/or modify<br/>"
-        "it under the terms of the GNU General Public License as published by<br/>"
-        "the Free Software Foundation; either version 3 of the License, or<br/>"
-        "(at your option) any later version.<br/>"
-        "<br/>"
-        "The program is provided AS IS with NO WARRANTY OF ANY KIND, "
-        "INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A "
-        "PARTICULAR PURPOSE.</small>"
         ).arg(
         VersionInfo::revision().left(60), // %1
         VersionInfo::uavoHash().left(8), // %2
@@ -105,6 +70,27 @@ AuthorsDialog::AuthorsDialog(QWidget *parent)
         QLatin1String(GCS_AUTHOR), // %8
         VersionInfo::year() // %9
         );
-    // Expose the version description to the QML doc
+
+    QQuickView *view = new QQuickView();
+    view->rootContext()->setContextProperty("dialog", this);
     view->rootContext()->setContextProperty("version", description);
+    view->setResizeMode(QQuickView::SizeRootObjectToView);
+    view->setSource(QUrl("qrc:/core/qml/AboutDialog.qml"));
+
+    QWidget *container = QWidget::createWindowContainer(view);
+    container->setMinimumSize(600, 400);
+    container->setMaximumSize(800, 600);
+    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QVBoxLayout *lay = new QVBoxLayout();
+    lay->setContentsMargins(0, 0, 0, 0);
+    setLayout(lay);
+    layout()->addWidget(container);
 }
+
+void AboutDialog::openUrl(const QString &url)
+{
+    QDesktopServices::openUrl(QUrl(url));
+}
+
+AboutDialog::~AboutDialog()
+{}

@@ -37,6 +37,14 @@
         <string>Airplane type:</string>
        </property>
       </widget>
+       <widget class="QGraphicsView" name="planeShape">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
      </item>
      <item>
       <widget class="QComboBox" name="fixedWingType"/>

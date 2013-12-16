@@ -34,8 +34,9 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
+
+#include <QtCore/QList>
 #include <QWidget>
-#include <QList>
 #include <QItemDelegate>
 
 class Ui_Widget;
@@ -44,6 +45,7 @@ class ConfigFixedWingWidget : public VehicleConfig {
     Q_OBJECT
 
 public:
+    static const QString CHANNELBOXNAME;
     static QStringList getChannelDescriptions();
 
     ConfigFixedWingWidget(QWidget *parent = 0);
@@ -52,8 +54,14 @@ public:
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
+protected:      									      
+    void showEvent(QShowEvent *event);					      
+    void resizeEvent(QResizeEvent *event);
+    void enableControls(bool enable);
+
 private:
     Ui_FixedWingConfigWidget *m_aircraft;
+    QGraphicsSvgItem *plane;
 
     virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
@@ -62,9 +70,8 @@ private:
     bool setupFrameElevon(QString airframeType);
     bool setupFrameVtail(QString airframeType);
 
-protected:
-    void enableControls(bool enable);
-
+    void updateAirframe(QString multiRotorType);
+    void setupEnabledControls(QString airframeType);
 private slots:
     virtual void setupUI(QString airframeType);
     virtual bool throwConfigError(QString airframeType);

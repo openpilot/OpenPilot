@@ -40,6 +40,8 @@
 #include <math.h>
 #include <QMessageBox>
 
+const QString ConfigFixedWingWidget::CHANNELBOXNAME = QString("fixedWingChannelBox");
+
 QStringList ConfigFixedWingWidget::getChannelDescriptions()
 {
     // init a channel_numelem list of channel desc defaults
@@ -83,6 +85,32 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
 
     populateChannelComboBoxes();
 
+    QSvgRenderer *renderer = new QSvgRenderer();
+    renderer->load(QString(":/configgadget/images/fixedwing-shapes.svg"));
+    plane = new QGraphicsSvgItem();
+    plane->setSharedRenderer(renderer);
+
+    QString type = "aileron"; // This needs fixed. Need to be able to obtain the aircraft type. 
+
+    // not sure why m_aircraft->fixedWingType->currentText() is not working here! fix it 
+    if (type == "vtail")
+    {
+        plane->setElementId("vtail");
+    }
+    else if (type == "aileron")
+    {
+        plane->setElementId("aileron");
+    }
+    else 
+    {
+	plane->setElementId("unknown");
+    }
+
+    QGraphicsScene *scene = new QGraphicsScene();
+    scene->addItem(plane);
+    scene->setSceneRect(plane->boundingRect());
+    m_aircraft->planeShape->setScene(scene);
+
     QStringList fixedWingTypes;
     fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";
     m_aircraft->fixedWingType->addItems(fixedWingTypes);
@@ -90,6 +118,7 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
     // Set default model to "Elevator aileron rudder"
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
     m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+
     setupUI(m_aircraft->fixedWingType->currentText());
 }
 
@@ -156,6 +185,26 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonSlider1->setEnabled(true);
         m_aircraft->elevonSlider2->setEnabled(true);
     }
+}
+
+void ConfigFixedWingWidget::setupEnabledControls(QString frameType)
+{
+
+    // disable all motor channel boxes
+    for (int i = 1; i <= 8; i++) {
+        // do it manually so we can turn off any error decorations
+        QComboBox *combobox = this->findChild<QComboBox *>("fixedWingChannelBox" + QString::number(i));
+        if (combobox) {
+            combobox->setEnabled(false);
+            combobox->setItemData(0, 0, Qt::DecorationRole);
+        }
+    }
+
+    if (frameType == "Vtail" || frameType == "Elevon") {
+        enableComboBoxes(this, CHANNELBOXNAME, 3, true);
+    } else if (frameType == "aileron" || frameType == "Elevator aileron rudder") {
+        enableComboBoxes(this, CHANNELBOXNAME, 4, true);
+    } 
 }
 
 void ConfigFixedWingWidget::registerWidgets(ConfigTaskWidget &parent)
@@ -276,6 +325,16 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
     }
 
     return airframeType;
+}
+
+void ConfigFixedWingWidget::updateAirframe(QString frameType)
+{
+    qDebug() << "ConfigFixedWingWidget::updateAirframe - frame type" << frameType;
+    
+    // this is not doing anything right now 
+
+    m_aircraft->planeShape->setSceneRect(plane->boundingRect());
+    m_aircraft->planeShape->fitInView(plane, Qt::KeepAspectRatio);
 }
 
 /**
@@ -502,15 +561,6 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
     return true;
 }
 
-void ConfigFixedWingWidget::enableControls(bool enable)
-{
-    ConfigTaskWidget::enableControls(enable);
-
-    if (enable) {
-        setupUI(m_aircraft->fixedWingType->currentText());
-    }
-}
-
 /**
    This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
@@ -600,3 +650,34 @@ bool ConfigFixedWingWidget::throwConfigError(QString airframeType)
 
     return error;
 }
+
+/**
+   WHAT DOES THIS DO???
+ */
+void ConfigFixedWingWidget::showEvent(QShowEvent *event)
+{
+    Q_UNUSED(event)
+    // Thit fitInView method should only be called now, once the
+    // widget is shown, otherwise it cannot compute its values and
+    // the result is usually a ahrsbargraph that is way too small.
+    m_aircraft->planeShape->fitInView(plane, Qt::KeepAspectRatio);
+}
+
+/**
+   Resize the GUI contents when the user changes the window size
+ */
+void ConfigFixedWingWidget::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+    m_aircraft->planeShape->fitInView(plane, Qt::KeepAspectRatio);
+}
+
+void ConfigFixedWingWidget::enableControls(bool enable)
+{
+    ConfigTaskWidget::enableControls(enable);
+
+    if (enable) {
+        setupEnabledControls(m_aircraft->fixedWingType->currentText());
+    }
+}
+

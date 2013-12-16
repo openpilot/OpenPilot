@@ -38,6 +38,9 @@ OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *paren
 
     qDebug() << "calling output calibration page";
     m_vehicleRenderer = new QSvgRenderer();
+
+// need to determine multi rotor or fixed wing. and pick the right svg
+
     if (QFile::exists(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
         m_vehicleRenderer->load(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
         m_vehicleRenderer->isValid()) {

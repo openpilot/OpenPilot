@@ -92,6 +92,7 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
 
     QString type = "aileron"; // This needs fixed. Need to be able to obtain the aircraft type. 
 
+    qDebug() << "Current Aircraft type: " << m_aircraft->fixedWingType->currentText();
     // not sure why m_aircraft->fixedWingType->currentText() is not working here! fix it 
     if (type == "vtail")
     {

@@ -246,9 +246,9 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
 #else /* if defined(PIOS_QUATERNION_STABILIZATION) */
         // Simpler algorithm for CC, less memory
-        float local_error[3] = { stabDesired.Roll - attitudeState.Roll,
+        float local_error[3] = { stabDesired.Roll  - attitudeState.Roll,
                                  stabDesired.Pitch - attitudeState.Pitch,
-                                 stabDesired.Yaw - attitudeState.Yaw };
+                                 stabDesired.Yaw   - attitudeState.Yaw };
         // find shortest way
         float modulo = fmodf(local_error[2] + 180.0f, 360.0f);
         if (modulo < 0) {
@@ -263,7 +263,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         gyro_filtered[1] = gyro_filtered[1] * gyro_alpha + gyroStateData.y * (1 - gyro_alpha);
         gyro_filtered[2] = gyro_filtered[2] * gyro_alpha + gyroStateData.z * (1 - gyro_alpha);
 
-        float *attitudeDesiredAxis = &stabDesired.Roll;
+        float *stabDesiredAxis     = &stabDesired.Roll;
         float *actuatorDesiredAxis = &actuatorDesired.Roll;
         float *rateDesiredAxis     = &rateDesired.Roll;
 
@@ -287,8 +287,9 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 }
 
                 // Store to rate desired variable for storing to UAVO
+                // this bound() seems unnecessary
                 rateDesiredAxis[i] =
-                    bound(attitudeDesiredAxis[i], cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
+                    bound(stabDesiredAxis[i], cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
 
                 // Compute the inner loop
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
@@ -313,10 +314,74 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                 break;
 
+            case STABILIZATIONDESIRED_STABILIZATIONMODE_MULTIWIIHORIZON:
+            // A parameterization from Attitude mode at center stick
+            // - to Rate mode at full stick
+            // This is done by parameterizing to use the rotation rate that Attitude mode
+            // - would use at center stick to using the rotation rate that Rate mode
+            // - would use at full stick in a weighted average sort of way.
+            {
+                if (reinit) {
+                    pids[PID_ROLL + i].iAccumulator = 0;
+                    pids[PID_RATE_ROLL + i].iAccumulator = 0;
+                }
+
+                // Compute what Rate mode would give for this stick angle's rate
+                // Save in a Rate's rate in a temp for later merging with Attitude's rate
+                // This bound() seems unnecessary both here and in Rate mode where this came from
+                float rateDesiredAxisRate;
+                rateDesiredAxisRate = bound(stabDesiredAxis[i], 1.0f)
+                    * cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i];
+
+                // Compute what Attitude mode would give for this stick angle's rate
+
+                // stabDesired for this mode is [-1.0f,+1.0f]
+                // - multiply by Attitude mode max angle to get desired angle
+                // - subtract off the actual angle to get the angle error
+                // This is what local_error[] holds for Attitude mode
+                float attitude_error = stabDesiredAxis[i]
+                   * cast_struct_to_array(settings.RollMax, settings.RollMax)[i]
+                   - cast_struct_to_array(attitudeState.Roll, attitudeState.Roll)[i];
+
+                // Compute the outer loop just like Attitude mode does
+                float rateDesiredAxisAttitude;
+                rateDesiredAxisAttitude = pid_apply(&pids[PID_ROLL + i], attitude_error, dT);
+                rateDesiredAxisAttitude = bound(rateDesiredAxisAttitude,
+                                           cast_struct_to_array(settings.MaximumRate, settings.MaximumRate.Roll)[i]);
+
+                // Compute the weighted average rate desired
+                // Using max() rather than sqrt() for cpu speed;
+                // - this makes the stick region into a square;
+                // - this is a feature!
+                // - hold a roll angle and add just pitch without the stick sensitivity changing
+                // magnitude = sqrt(stabDesired.Roll*stabDesired.Roll + stabDesired.Pitch*stabDesired.Pitch);
+                float magnitude;
+                magnitude = fmaxf(fabsf(stabDesired.Roll), fabsf(stabDesired.Pitch));
+                rateDesiredAxis[i] = (1.0f-magnitude) * rateDesiredAxisAttitude + magnitude * rateDesiredAxisRate;
+
+                // Compute the inner loop
+                actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
+                actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
+
+                // TODO: put a configurable scale factor in for the PID zeroing?
+                // Do we need a setting for this to dial down the iAccumulator zeroing
+                // - so both iAccumulators don't get held too close to zero at mid stick?
+
+                // Not sure if this is the best way to do this but I suspect that there
+                // - would be severe windup without it since they fight each other.
+
+                // At magnitudes close to one,  the Attitude accumulator gets zeroed
+                pids[PID_ROLL      + i].iAccumulator *= (1.0f-magnitude); // * factor;
+                // At magnitudes close to zero, the Rate     accumulator gets zeroed
+                pids[PID_RATE_ROLL + i].iAccumulator *= magnitude;        // * factor;
+
+                break;
+            }
+
             case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
 
                 // Store for debugging output
-                rateDesiredAxis[i] = attitudeDesiredAxis[i];
+                rateDesiredAxis[i] = stabDesiredAxis[i];
 
                 // Run a virtual flybar stabilization algorithm on this axis
                 stabilization_virtual_flybar(gyro_filtered[i], rateDesiredAxis[i], &actuatorDesiredAxis[i], dT, reinit, i, &settings);
@@ -324,6 +389,11 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 break;
 
             case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
+            // FIXME: local_error[] is rate - attitude for Weak Leveling
+            // The only ramifications are:
+            // Weak Leveling Kp is off by a factor of 3 to 12 and may need a different default in GCS
+            // Changing Rate mode max rate currently requires a change to Kp
+            // That would be changed to Attitude mode max angle affecting Kp
             {
                 if (reinit) {
                     pids[PID_RATE_ROLL + i].iAccumulator = 0;
@@ -333,7 +403,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 weak_leveling = bound(weak_leveling, weak_leveling_max);
 
                 // Compute desired rate as input biased towards leveling
-                rateDesiredAxis[i]     = attitudeDesiredAxis[i] + weak_leveling;
+                rateDesiredAxis[i]     = stabDesiredAxis[i] + weak_leveling;
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
                 actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
@@ -345,13 +415,13 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                     pids[PID_RATE_ROLL + i].iAccumulator = 0;
                 }
 
-                if (fabsf(attitudeDesiredAxis[i]) > max_axislock_rate) {
+                if (fabsf(stabDesiredAxis[i]) > max_axislock_rate) {
                     // While getting strong commands act like rate mode
-                    rateDesiredAxis[i] = attitudeDesiredAxis[i];
+                    rateDesiredAxis[i] = stabDesiredAxis[i];
                     axis_lock_accum[i] = 0;
                 } else {
                     // For weaker commands or no command simply attitude lock (almost) on no gyro change
-                    axis_lock_accum[i] += (attitudeDesiredAxis[i] - gyro_filtered[i]) * dT;
+                    axis_lock_accum[i] += (stabDesiredAxis[i] - gyro_filtered[i]) * dT;
                     axis_lock_accum[i]  = bound(axis_lock_accum[i], max_axis_lock);
                     rateDesiredAxis[i]  = pid_apply(&pids[PID_ROLL + i], axis_lock_accum[i], dT);
                 }
@@ -366,7 +436,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
             case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE:
                 // Store to rate desired variable for storing to UAVO
-                rateDesiredAxis[i] = bound(attitudeDesiredAxis[i],
+                rateDesiredAxis[i] = bound(stabDesiredAxis[i],
                                            cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
 
                 // Run the relay controller which also estimates the oscillation parameters
@@ -392,7 +462,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 break;
 
             case STABILIZATIONDESIRED_STABILIZATIONMODE_NONE:
-                actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i], 1.0f);
+                actuatorDesiredAxis[i] = bound(stabDesiredAxis[i], 1.0f);
                 break;
             default:
                 error = true;

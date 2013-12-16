@@ -85,33 +85,6 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
 
     populateChannelComboBoxes();
 
-    QSvgRenderer *renderer = new QSvgRenderer();
-    renderer->load(QString(":/configgadget/images/fixedwing-shapes.svg"));
-    plane = new QGraphicsSvgItem();
-    plane->setSharedRenderer(renderer);
-
-    QString type = "aileron"; // This needs fixed. Need to be able to obtain the aircraft type. 
-
-    qDebug() << "Current Aircraft type: " << m_aircraft->fixedWingType->currentText();
-    // not sure why m_aircraft->fixedWingType->currentText() is not working here! fix it 
-    if (type == "vtail")
-    {
-        plane->setElementId("vtail");
-    }
-    else if (type == "aileron")
-    {
-        plane->setElementId("aileron");
-    }
-    else 
-    {
-	plane->setElementId("unknown");
-    }
-
-    QGraphicsScene *scene = new QGraphicsScene();
-    scene->addItem(plane);
-    scene->setSceneRect(plane->boundingRect());
-    m_aircraft->planeShape->setScene(scene);
-
     QStringList fixedWingTypes;
     fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";
     m_aircraft->fixedWingType->addItems(fixedWingTypes);
@@ -135,7 +108,17 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
 
+    // This had to be moved from ConfigFixedWingWidget() here since m_aircraft->fixedWingType->currentText() 
+    // did not seem to work properly to choose alternate .svg files. 
+    QSvgRenderer *renderer = new QSvgRenderer();
+    renderer->load(QString(":/configgadget/images/fixedwing-shapes.svg"));
+    plane = new QGraphicsSvgItem();
+    plane->setSharedRenderer(renderer);
+
+    qDebug() << "Current Aircraft type: \n" << m_aircraft->fixedWingType->currentText();
+
     if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
+        plane->setElementId("aileron");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
         m_aircraft->fwRudder2ChannelBox->setEnabled(true);
@@ -152,6 +135,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonSlider1->setEnabled(false);
         m_aircraft->elevonSlider2->setEnabled(false);
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
+        plane->setElementId("aileron");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevon"));
         m_aircraft->fwAileron1Label->setText("Elevon 1");
         m_aircraft->fwAileron2Label->setText("Elevon 2");
@@ -168,6 +152,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonSlider1->setEnabled(true);
         m_aircraft->elevonSlider2->setEnabled(true);
     } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
+        plane->setElementId("vtail");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Vtail"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(false);
         m_aircraft->fwRudder2ChannelBox->setEnabled(false);
@@ -186,6 +171,12 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonSlider1->setEnabled(true);
         m_aircraft->elevonSlider2->setEnabled(true);
     }
+
+    QGraphicsScene *scene = new QGraphicsScene();
+    scene->addItem(plane);
+    scene->setSceneRect(plane->boundingRect());
+    m_aircraft->planeShape->setScene(scene);
+
 }
 
 void ConfigFixedWingWidget::setupEnabledControls(QString frameType)

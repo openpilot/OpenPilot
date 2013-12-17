@@ -135,7 +135,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonSlider1->setEnabled(false);
         m_aircraft->elevonSlider2->setEnabled(false);
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
-        plane->setElementId("aileron");
+        plane->setElementId("vtail");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevon"));
         m_aircraft->fwAileron1Label->setText("Elevon 1");
         m_aircraft->fwAileron2Label->setText("Elevon 2");

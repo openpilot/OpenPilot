@@ -147,8 +147,7 @@ void OutputCalibrationPage::setupVehicle()
            ui->vehicleView->setScene(m_vehicleScene);
     	}
 	qDebug() << "no clue what a wizard index is!";
-//        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
-        m_wizardIndexes << 0 << 1 << 1 << 1 << 2 << 3 << 4;
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "fixed-aileron" << "aileron";
         m_vehicleHighlightElementIndexes << 0 << 1;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
@@ -161,8 +160,7 @@ void OutputCalibrationPage::setupVehicle()
            ui->vehicleView->setScene(m_vehicleScene);
     	}
 	qDebug() << "no clue what a wizard index is!";
-//        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
-        m_wizardIndexes << 0 << 1 << 1 << 1 << 2 << 3 << 4;
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "fixed-vtail" << "vtail";
         m_vehicleHighlightElementIndexes << 0 << 1;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
@@ -255,7 +253,7 @@ void OutputCalibrationPage::setWizardPage()
             ui->servoMaxAngleSlider->setValue(m_actuatorSettings[currentChannel].channelMax);
         }
     }
-    setupVehicleHighlightedPart();
+    // setupVehicleHighlightedPart(); // turn this off for now, need to fix fixedwing image elements
 }
 
 void OutputCalibrationPage::initializePage()

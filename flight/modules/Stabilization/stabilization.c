@@ -73,7 +73,7 @@
 
 // The PID_RATE_ROLL set is used by Rate mode and the rate portion of Attitude mode
 // The PID_RATE set is used by the attitude portion of Attitude mode
-// The PID_RATEA_ROLL set is used by MultiWiiHorizon mode because it needs to maintain
+// The PID_RATEA_ROLL set is used by Rattitude mode because it needs to maintain
 // - two independant rate PIDs because it does rate and attitude simultaneously
 enum { PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_RATEA_ROLL, PID_RATEA_PITCH, PID_RATEA_YAW, PID_MAX };
 
@@ -91,6 +91,7 @@ bool lowThrottleZeroIntegral;
 bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay = 0.991f;
 struct pid pids[PID_MAX];
+float rattitude_anti_windup;
 
 // Private functions
 static void stabilizationTask(void *parameters);
@@ -178,7 +179,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
 #endif
 
-        // Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
+        // Wait until the AttitudeRaw (wrong, it is Gyro) object is updated, if a timeout then go to failsafe
         if (xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE) {
             AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION, SYSTEMALARMS_ALARM_WARNING);
             continue;
@@ -317,7 +318,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                 break;
 
-            case STABILIZATIONDESIRED_STABILIZATIONMODE_MULTIWIIHORIZON:
+            case STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE:
             // A parameterization from Attitude mode at center stick
             // - to Rate mode at full stick
             // This is done by parameterizing to use the rotation rate that Attitude mode
@@ -351,7 +352,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 float rateDesiredAxisAttitude;
                 rateDesiredAxisAttitude = pid_apply(&pids[PID_ROLL + i], attitude_error, dT);
                 rateDesiredAxisAttitude = bound(rateDesiredAxisAttitude,
-                                           cast_struct_to_array(settings.MaximumRate, settings.MaximumRate.Roll)[i]);
+                                                cast_struct_to_array(settings.MaximumRate,
+                                                                     settings.MaximumRate.Roll)[i]);
 
                 // Compute the weighted average rate desired
                 // Using max() rather than sqrt() for cpu speed;
@@ -361,7 +363,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 // magnitude = sqrt(stabDesired.Roll*stabDesired.Roll + stabDesired.Pitch*stabDesired.Pitch);
                 float magnitude;
                 magnitude = fmaxf(fabsf(stabDesired.Roll), fabsf(stabDesired.Pitch));
-                rateDesiredAxis[i] = (1.0f-magnitude) * rateDesiredAxisAttitude + magnitude * rateDesiredAxisRate;
+                rateDesiredAxis[i] = (1.0f-magnitude) * rateDesiredAxisAttitude
+                                   +       magnitude  * rateDesiredAxisRate;
 
                 // Compute the inner loop for both Rate mode and Attitude mode
                 // actuatorDesiredAxis[i] is the weighted average of the two PIDs from the two rates
@@ -370,19 +373,58 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                     +     magnitude  * pid_apply_setpoint(&pids[PID_RATE_ROLL  + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
                 actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
-                // TODO: put a configurable scale factor in for the PID zeroing?
-                // Do we need a setting for this to dial down the iAccumulator zeroing
-                // - so both iAccumulators don't get held too close to zero at mid stick?
+                // settings.RattitudeAntiWindup controls the iAccumulator zeroing
+                // - so both iAccs don't wind up too far;
+                // - nor do both iAccs get held too close to zero at mid stick
 
-                // Not sure if this is the best way to do this but I suspect that there
-                // - would be severe windup without it since they fight each other.
+                // Not sure if this is the best way to do this but I suspect that there would
+                // - be windup without it since rate and attitude fight each other here
+                // - rate trying to pull it over the top and attitude trying to pull it back down
 
-                // At magnitudes close to one,  the Attitude accumulators gets zeroed
-                pids[PID_ROLL       + i].iAccumulator *= (1.0f-magnitude); // * factor;
-                pids[PID_RATEA_ROLL + i].iAccumulator *= (1.0f-magnitude); // * factor;
+                // Wind-up increases linearly with cycles for a fixed error.
+                // We need to cut it down faster than that to keep ahead of it.
+                // We must never increase the iAcc or we risk oscillation.
 
-                // At magnitudes close to zero, the Rate     accumulator  gets zeroed
-                pids[PID_RATE_ROLL  + i].iAccumulator *= magnitude;        // * factor;
+                // Use the powf() function to make two anti-windup curves
+                // - one for zeroing rate close to center stick
+                // - the other for zeroing attitude close to max stick
+
+                // the bigger the dT      the more anti windup needed
+                // the bigger the PID[].i the more anti windup needed
+                // more anti windup is achieved with a lower powf() power
+
+                // some quick napkin calculations say that 1/10th second, 50 cycles
+                // to reduce an iAcc by half we should have a factor of about .986
+                // this is so that at half stick, iAcc gets reduced to half in .1 second
+                // this sounds about right for a default anti windup
+                // so powf(.5, x) = .014
+                // .5^x = .014
+                // x about 6
+                // for rate     6 = 1 / (aw * .002 * .003), aw = 1 / (6 * .002 * .003) = 27777
+                // for attitude 6 = 1 / (aw * .002 * 1)   , aw = 1 / (6 * .002 * 2.5)  = 33
+                // multiply by 833 for rate, use as is for attitude
+                // hand testing showed that aw=10 reduced the windup by maybe half
+
+                // This may only be useful for aircraft with large Ki values and limits
+                if (dT > 0.0f && rattitude_anti_windup > 0.0f) {
+                    float factor;
+
+                    // At magnitudes close to one, the Attitude accumulators gets zeroed
+                    if (pids[PID_ROLL+i].i > 0.0f) {
+                        factor = 1.0f - powf(magnitude, 1.0f / (rattitude_anti_windup * dT * pids[PID_ROLL+i].i));
+                        pids[PID_ROLL+i].iAccumulator *= factor;
+                    }
+                    if (pids[PID_RATEA_ROLL+i].i > 0.0f) {
+                        factor = 1.0f - powf(magnitude, 1.0f / (rattitude_anti_windup * dT * pids[PID_RATEA_ROLL+i].i * 833.0f));
+                        pids[PID_RATEA_ROLL+i].iAccumulator *= factor;
+                    }
+
+                    // At magnitudes close to zero, the Rate accumulator gets zeroed
+                    if (pids[PID_RATE_ROLL+i].i > 0.0f) {
+                        factor = 1.0f - powf(1.0f-magnitude, 1.0f / (rattitude_anti_windup * dT * pids[PID_RATE_ROLL+i].i * 833.0f));
+                        pids[PID_RATE_ROLL+i].iAccumulator *= factor;
+                    }
+                }
 
                 break;
             }
@@ -403,6 +445,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
             // Weak Leveling Kp is off by a factor of 3 to 12 and may need a different default in GCS
             // Changing Rate mode max rate currently requires a change to Kp
             // That would be changed to Attitude mode max angle affecting Kp
+            // Also does not take dT into account
             {
                 if (reinit) {
                     pids[PID_RATE_ROLL + i].iAccumulator = 0;
@@ -609,21 +652,21 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
                   0,
                   settings.YawPI.ILimit);
 
-    // Set the MWHorizon roll rate PID constants
+    // Set the Rattitude roll rate PID constants
     pid_configure(&pids[PID_RATEA_ROLL],
                   settings.RollRatePID.Kp,
                   settings.RollRatePID.Ki,
                   settings.RollRatePID.Kd,
                   settings.RollRatePID.ILimit);
 
-    // Set the MWHorizon pitch rate PID constants
+    // Set the Rattitude pitch rate PID constants
     pid_configure(&pids[PID_RATEA_PITCH],
                   settings.PitchRatePID.Kp,
                   settings.PitchRatePID.Ki,
                   settings.PitchRatePID.Kd,
                   settings.PitchRatePID.ILimit);
 
-    // Set the MWHorizon yaw rate PID constants
+    // Set the Rattitude yaw rate PID constants
     pid_configure(&pids[PID_RATEA_YAW],
                   settings.YawRatePID.Kp,
                   settings.YawRatePID.Ki,
@@ -663,6 +706,9 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     // Compute time constant for vbar decay term based on a tau
     vbar_decay = expf(-fakeDt / settings.VbarTau);
+
+    // Rattitude flight mode anti-windup factor
+    rattitude_anti_windup = (float) settings.RattitudeAntiWindup;
 }
 
 

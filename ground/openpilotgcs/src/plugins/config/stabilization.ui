@@ -507,7 +507,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -8868,7 +8868,7 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>784</width>
+            <width>545</width>
             <height>711</height>
            </rect>
           </property>
@@ -27213,8 +27213,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>798</width>
-            <height>656</height>
+            <width>407</width>
+            <height>518</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_23">

@@ -147,10 +147,29 @@ void OutputCalibrationPage::setupVehicle()
            ui->vehicleView->setScene(m_vehicleScene);
     	}
 	qDebug() << "no clue what a wizard index is!";
-        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "fixed-aileron" << "aileron";
         m_vehicleHighlightElementIndexes << 0 << 1;
-        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4;
+
+	// see Servo city for an example. 1500 usec is center on MS85mg for example. - http://www.servocity.com/html/hs-85mg__mighty_micro.html
+        // make sure Aileron servo one does not go to an extreme value
+        m_actuatorSettings[1].channelMin     = 1500;
+        m_actuatorSettings[1].channelNeutral = 1500;
+        m_actuatorSettings[1].channelMax     = 1500;
+        // make sure Aileron servo two does not go to an extreme value
+        m_actuatorSettings[2].channelMin     = 1500;
+        m_actuatorSettings[2].channelNeutral = 1500;
+        m_actuatorSettings[2].channelMax     = 1500;
+        // make sure Elevator servo one does not go to an extreme value
+        m_actuatorSettings[3].channelMin     = 1500;
+        m_actuatorSettings[4].channelNeutral = 1500;
+        m_actuatorSettings[3].channelMax     = 1500;
+        // make sure Rudder servo one does not go to an extreme value
+        m_actuatorSettings[4].channelMin     = 1500;
+        m_actuatorSettings[4].channelNeutral = 1500;
+        m_actuatorSettings[4].channelMax     = 1500;
+
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
     case SetupWizard::FIXED_WING_VTAIL:
@@ -160,10 +179,20 @@ void OutputCalibrationPage::setupVehicle()
            ui->vehicleView->setScene(m_vehicleScene);
     	}
 	qDebug() << "no clue what a wizard index is!";
-        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+        m_wizardIndexes << 0 << 1 << 1 << 1;
         m_vehicleElementIds << "fixed-vtail" << "vtail";
         m_vehicleHighlightElementIndexes << 0 << 1;
-        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        m_channelIndex << 0 << 0 << 1 << 2;
+
+        // make sure elevon servo one does not go to an extreme value
+        m_actuatorSettings[1].channelMin     = 1500;
+        m_actuatorSettings[1].channelNeutral = 1500;
+        m_actuatorSettings[1].channelMax     = 1500;
+        // make sure elevon servo two does not go to an extreme value
+        m_actuatorSettings[2].channelMin     = 1500;
+        m_actuatorSettings[2].channelNeutral = 1500;
+        m_actuatorSettings[2].channelMax     = 1500;
+
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
     default:

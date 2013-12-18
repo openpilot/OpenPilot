@@ -67,7 +67,6 @@ private:
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
     bool setupFrameFixedWing(QString airframeType);
-    bool setupFrameElevon(QString airframeType);
     bool setupFrameVtail(QString airframeType);
 
     void updateAirframe(QString multiRotorType);

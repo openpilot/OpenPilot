@@ -219,9 +219,6 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
         case VehicleConfigurationSource::FIXED_WING_AILERON:
             setupAileron();
             break;
-/*      case VehicleConfigurationSource::FIXED_WING_ELEVON:
-            setupElevon();
-            break; */ 
         case VehicleConfigurationSource::FIXED_WING_VTAIL:
             setupVtail();
             break;
@@ -1304,7 +1301,6 @@ void VehicleConfigurationHelper::setupOctoCopter()
     applyMultiGUISettings(frame, guiSettings);
 }
 
-// This is all wrong... I just copied the Tricopter stuff 
 void VehicleConfigurationHelper::setupVtail()
 {
 
@@ -1314,41 +1310,32 @@ void VehicleConfigurationHelper::setupVtail()
     channels[0].type      = MIXER_TYPE_MOTOR;
     channels[0].throttle1 = 100;
     channels[0].throttle2 = 0;
-    channels[0].roll      = 100;
-    channels[0].pitch     = 50;
+    channels[0].roll      = 0;
+    channels[0].pitch     = 0;
     channels[0].yaw = 0;
 
-    channels[1].type      = MIXER_TYPE_MOTOR;
-    channels[1].throttle1 = 100;
+    channels[1].type      = MIXER_TYPE_SERVO;
+    channels[1].throttle1 = 0;
     channels[1].throttle2 = 0;
     channels[1].roll      = -100;
     channels[1].pitch     = 50;
     channels[1].yaw = 0;
 
-    channels[2].type      = MIXER_TYPE_MOTOR;
-    channels[2].throttle1 = 100;
+    channels[2].type      = MIXER_TYPE_SERVO;
+    channels[2].throttle1 = 0;
     channels[2].throttle2 = 0;
-    channels[2].roll      = 0;
-    channels[2].pitch     = -100;
+    channels[2].roll      = 100;
+    channels[2].pitch     = -50;
     channels[2].yaw = 0;
 
-    channels[3].type      = MIXER_TYPE_SERVO;
-    channels[3].throttle1 = 0;
-    channels[3].throttle2 = 0;
-    channels[3].roll      = 0;
-    channels[3].pitch     = 0;
-    channels[3].yaw = 100;
-
-    guiSettings.multi.VTOLMotorNW = 1;
-    guiSettings.multi.VTOLMotorNE = 2;
-    guiSettings.multi.VTOLMotorS  = 3;
-    guiSettings.multi.TRIYaw = 4;
+    guiSettings.fixedwing.FixedWingThrottle = 1;
+    guiSettings.fixedwing.FixedWingRoll1 = 2;
+    guiSettings.fixedwing.FixedWingRoll2  = 3;
 
     applyMixerConfiguration(channels);
     applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL, guiSettings);
 }
 
-// This is all wrong... I just copied the Tricopter stuff 
 void VehicleConfigurationHelper::setupAileron()
 {
     // Typical vehicle setup
@@ -1362,23 +1349,30 @@ void VehicleConfigurationHelper::setupAileron()
     channels[0].type      = MIXER_TYPE_MOTOR;
     channels[0].throttle1 = 100;
     channels[0].throttle2 = 0;
-    channels[0].roll      = 100;
-    channels[0].pitch     = 50;
+    channels[0].roll      = 0;
+    channels[0].pitch     = 0;
     channels[0].yaw = 0;
 
-    channels[1].type      = MIXER_TYPE_MOTOR;
-    channels[1].throttle1 = 100;
+    channels[1].type      = MIXER_TYPE_SERVO;
+    channels[1].throttle1 = 0;
     channels[1].throttle2 = 0;
     channels[1].roll      = -100;
-    channels[1].pitch     = 50;
+    channels[1].pitch     = 0;
     channels[1].yaw = 0;
 
-    channels[2].type      = MIXER_TYPE_MOTOR;
-    channels[2].throttle1 = 100;
+    channels[2].type      = MIXER_TYPE_SERVO;
+    channels[2].throttle1 = 0;
     channels[2].throttle2 = 0;
-    channels[2].roll      = 0;
-    channels[2].pitch     = -100;
+    channels[2].roll      = 100;
+    channels[2].pitch     = 0;
     channels[2].yaw = 0;
+
+    channels[3].type      = MIXER_TYPE_SERVO;
+    channels[3].throttle1 = 0;
+    channels[3].throttle2 = 0;
+    channels[3].roll      = 0;
+    channels[3].pitch     = 100;
+    channels[3].yaw = 0;
 
     channels[3].type      = MIXER_TYPE_SERVO;
     channels[3].throttle1 = 0;
@@ -1387,60 +1381,12 @@ void VehicleConfigurationHelper::setupAileron()
     channels[3].pitch     = 0;
     channels[3].yaw = 100;
 
-    guiSettings.multi.VTOLMotorNW = 1;
-    guiSettings.multi.VTOLMotorNE = 2;
-    guiSettings.multi.VTOLMotorS  = 3;
-    guiSettings.multi.TRIYaw = 4;
+    guiSettings.fixedwing.FixedWingThrottle = 1;
+    guiSettings.fixedwing.FixedWingRoll1 = 2;
+    guiSettings.fixedwing.FixedWingRoll2  = 3;
+    guiSettings.fixedwing.FixedWingPitch1 = 4;
+    guiSettings.fixedwing.FixedWingYaw1  = 5;
 
     applyMixerConfiguration(channels);
-    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL, guiSettings);
+    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWINGAILERON, guiSettings);
 }
-
-// This is all wrong... I just copied the Tricopter stuff 
-void VehicleConfigurationHelper::setupElevon()
-{
-    // Typical vehicle setup
-    // 1. Setup mixer data
-    // 2. Setup GUI data
-    // 3. Apply changes
-
-    mixerChannelSettings channels[10];
-    GUIConfigDataUnion guiSettings = getGUIConfigData();
-
-    channels[0].type      = MIXER_TYPE_MOTOR;
-    channels[0].throttle1 = 100;
-    channels[0].throttle2 = 0;
-    channels[0].roll      = 100;
-    channels[0].pitch     = 50;
-    channels[0].yaw = 0;
-
-    channels[1].type      = MIXER_TYPE_MOTOR;
-    channels[1].throttle1 = 100;
-    channels[1].throttle2 = 0;
-    channels[1].roll      = -100;
-    channels[1].pitch     = 50;
-    channels[1].yaw = 0;
-
-    channels[2].type      = MIXER_TYPE_MOTOR;
-    channels[2].throttle1 = 100;
-    channels[2].throttle2 = 0;
-    channels[2].roll      = 0;
-    channels[2].pitch     = -100;
-    channels[2].yaw = 0;
-
-    channels[3].type      = MIXER_TYPE_SERVO;
-    channels[3].throttle1 = 0;
-    channels[3].throttle2 = 0;
-    channels[3].roll      = 0;
-    channels[3].pitch     = 0;
-    channels[3].yaw = 100;
-
-    guiSettings.multi.VTOLMotorNW = 1;
-    guiSettings.multi.VTOLMotorNE = 2;
-    guiSettings.multi.VTOLMotorS  = 3;
-    guiSettings.multi.TRIYaw = 4;
-
-    applyMixerConfiguration(channels);
-    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON, guiSettings);
-}
-

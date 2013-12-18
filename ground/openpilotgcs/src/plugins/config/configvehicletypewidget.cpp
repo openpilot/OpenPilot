@@ -68,9 +68,11 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     QStringList channelDesc;
     switch (systemSettingsData.AirframeType) {
     case SystemSettings::AIRFRAMETYPE_FIXEDWING:
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        break;
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
+	// do nothing for elevon support for the time being. 
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
-        // fixed wing
         channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
         break;
     case SystemSettings::AIRFRAMETYPE_HELICP:
@@ -268,8 +270,7 @@ QString ConfigVehicleTypeWidget::frameCategory(QString frameType)
 {
     QString category;
 
-    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
-        || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
+    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingVtail" || frameType == "Vtail") {
         category = "Fixed Wing";
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
                || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"

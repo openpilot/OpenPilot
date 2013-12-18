@@ -105,7 +105,6 @@ private:
     void setupOctoCopter();
     void setupVtail();
     void setupAileron();
-    void setupElevon();
 
 private slots:
     void uAVOTransactionCompleted(UAVObject *object, bool success);

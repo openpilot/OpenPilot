@@ -268,6 +268,8 @@ void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
                 getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH) * 100);
         }
     }
+
+    updateAirframe(frameType);
 }
 
 /**
@@ -275,20 +277,15 @@ void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
  */
 QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
 {
-    QString airframeType = "FixedWing";
-
-    // Save the curve (common to all Fixed wing frames)
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
 
     Q_ASSERT(mixer);
 
-    // Remove Feed Forward, it is pointless on a plane:
-    setMixerValue(mixer, "FeedForward", 0.0);
-
     // Set the throttle curve
     setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->fixedWingThrottle->getCurve());
 
-    // All airframe types must start with "FixedWing"
+    QString airframeType;
+
     if (m_aircraft->fixedWingType->currentText() == "Elevator aileron rudder") {
         airframeType = "FixedWing";
         setupFrameFixedWing(airframeType);
@@ -296,6 +293,9 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
         airframeType = "FixedWingVtail";
         setupFrameVtail(airframeType);
     }
+ 
+    // Remove Feed Forward, it is pointless on a plane:
+    setMixerValue(mixer, "FeedForward", 0.0);
 
     return airframeType;
 }

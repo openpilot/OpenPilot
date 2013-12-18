@@ -54,9 +54,9 @@ static void printchar(char * *str, int c)
 #define PAD_RIGHT 1
 #define PAD_ZERO  2
 
-static int prints(char * *out, const char *string, int width, int pad)
+static int prints(char * *out, const char *string, int width, int pad, int limit)
 {
-    register int pc = 0, padchar = ' ';
+    register int pc = limit, padchar = ' ';
 
     if (width > 0) {
         register int len = 0;
@@ -74,37 +74,37 @@ static int prints(char * *out, const char *string, int width, int pad)
         }
     }
     if (!(pad & PAD_RIGHT)) {
-        for (; width > 0; --width) {
+        for (; width > 0 && pc; --width) {
             printchar(out, padchar);
-            ++pc;
+            --pc;
         }
     }
-    for (; *string; ++string) {
+    for (; *string && pc; ++string) {
         printchar(out, *string);
-        ++pc;
+        --pc;
     }
-    for (; width > 0; --width) {
+    for (; width > 0 && pc; --width) {
         printchar(out, padchar);
-        ++pc;
+        --pc;
     }
 
-    return pc;
+    return limit - pc;
 }
 
 /* the following should be enough for 32 bit int */
 #define PRINT_BUF_LEN 12
 
-static int printi(char * *out, int i, int b, int sg, int width, int pad, int letbase)
+static int printi(char * *out, int i, int b, int sg, int width, int pad, int letbase, int limit)
 {
     char print_buf[PRINT_BUF_LEN];
     register char *s;
-    register int t, neg = 0, pc = 0;
+    register int t, neg = 0, pc = limit;
     register unsigned int u = i;
 
     if (i == 0) {
         print_buf[0] = '0';
         print_buf[1] = '\0';
-        return prints(out, print_buf, width, pad);
+        return prints(out, print_buf, width, pad, limit);
     }
 
     if (sg && b == 10 && i < 0) {
@@ -124,26 +124,26 @@ static int printi(char * *out, int i, int b, int sg, int width, int pad, int let
         u   /= b;
     }
 
-    if (neg) {
+    if (neg && pc) {
         if (width && (pad & PAD_ZERO)) {
             printchar(out, '-');
-            ++pc;
+            --pc;
             --width;
         } else {
             *--s = '-';
         }
     }
 
-    return pc + prints(out, s, width, pad);
+    return (limit - pc) + prints(out, s, width, pad, pc);
 }
 
-static int print(char * *out, const char *format, va_list args)
+static int print(int limit, char * *out, const char *format, va_list args)
 {
     register int width, pad;
-    register int pc = 0;
+    register int pc = limit;
     char scr[2];
 
-    for (; *format != 0; ++format) {
+    for (; *format != 0 && pc; ++format) {
         if (*format == '%') {
             ++format;
             width = pad = 0;
@@ -167,43 +167,43 @@ static int print(char * *out, const char *format, va_list args)
             }
             if (*format == 's') {
                 register char *s = (char *)va_arg(args, int);
-                pc += prints(out, s ? s : "(null)", width, pad);
+                pc -= prints(out, s ? s : "(null)", width, pad, pc);
                 continue;
             }
             if (*format == 'd') {
-                pc += printi(out, va_arg(args, int), 10, 1, width, pad, 'a');
+                pc -= printi(out, va_arg(args, int), 10, 1, width, pad, 'a', pc);
                 continue;
             }
             if (*format == 'x') {
-                pc += printi(out, va_arg(args, int), 16, 0, width, pad, 'a');
+                pc -= printi(out, va_arg(args, int), 16, 0, width, pad, 'a', pc);
                 continue;
             }
             if (*format == 'X') {
-                pc += printi(out, va_arg(args, int), 16, 0, width, pad, 'A');
+                pc -= printi(out, va_arg(args, int), 16, 0, width, pad, 'A', pc);
                 continue;
             }
             if (*format == 'u') {
-                pc += printi(out, va_arg(args, int), 10, 0, width, pad, 'a');
+                pc -= printi(out, va_arg(args, int), 10, 0, width, pad, 'a', pc);
                 continue;
             }
             if (*format == 'c') {
                 /* char are converted to int then pushed on the stack */
                 scr[0] = (char)va_arg(args, int);
                 scr[1] = '\0';
-                pc    += prints(out, scr, width, pad);
+                pc    -= prints(out, scr, width, pad, pc);
                 continue;
             }
         } else {
 out:
             printchar(out, *format);
-            ++pc;
+            --pc;
         }
     }
     if (out) {
         **out = '\0';
     }
     va_end(args);
-    return pc;
+    return limit - pc;
 }
 
 int printf(const char *format, ...)
@@ -211,13 +211,13 @@ int printf(const char *format, ...)
     va_list args;
 
     va_start(args, format);
-    return print(0, format, args);
+    return print(-1, 0, format, args);
 }
 
 // TK: added for alternative parameter passing
 int vprintf(const char *format, va_list args)
 {
-    return print(0, format, args);
+    return print(-1, 0, format, args);
 }
 
 int sprintf(char *out, const char *format, ...)
@@ -225,7 +225,7 @@ int sprintf(char *out, const char *format, ...)
     va_list args;
 
     va_start(args, format);
-    return print(&out, format, args);
+    return print(-1, &out, format, args);
 }
 
 // TK: added for alternative parameter passing
@@ -234,17 +234,22 @@ int vsprintf(char *out, const char *format, va_list args)
     char *_out;
 
     _out = out;
-    return print(&_out, format, args);
+    return print(-1, &_out, format, args);
 }
 
 int snprintf(char *buf, size_t count, const char *format, ...)
 {
     va_list args;
 
-    (void)count;
 
     va_start(args, format);
-    return print(&buf, format, args);
+    return print(count, &buf, format, args);
+}
+
+// TK: added for alternative parameter passing
+int vsnprintf(char *buf, size_t count, const char *format, va_list args)
+{
+    return print(count, &buf, format, args);
 }
 
 /**

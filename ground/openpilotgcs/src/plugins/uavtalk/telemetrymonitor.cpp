@@ -32,32 +32,23 @@
 /**
  * Constructor
  */
-TelemetryMonitor::TelemetryMonitor(UAVObjectManager *objMngr, Telemetry *tel)
+TelemetryMonitor::TelemetryMonitor(UAVObjectManager *objMngr, Telemetry *tel) :
+    objMngr(objMngr),
+    tel(tel),
+    gcsStatsObj(GCSTelemetryStats::GetInstance(objMngr)),
+    flightStatsObj(FlightTelemetryStats::GetInstance(objMngr)),
+    firmwareIAPObj(FirmwareIAPObj::GetInstance(objMngr)),
+    statsTimer(new QTimer(this)),
+    objPending(NULL),
+    mutex(new QMutex(QMutex::Recursive)),
+    connectionTimer(new QTime())
 {
-    this->objMngr    = objMngr;
-    this->tel        = tel;
-    this->objPending = NULL;
-    this->connectionTimer = new QTime();
-
-    // Create mutex
-    mutex = new QMutex(QMutex::Recursive);
-
-    // Get stats objects
-    gcsStatsObj    = GCSTelemetryStats::GetInstance(objMngr);
-    flightStatsObj = FlightTelemetryStats::GetInstance(objMngr);
-
     // Listen for flight stats updates
     connect(flightStatsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(flightStatsUpdated(UAVObject *)));
 
     // Start update timer
-    statsTimer = new QTimer(this);
     connect(statsTimer, SIGNAL(timeout()), this, SLOT(processStatsUpdates()));
     statsTimer->start(STATS_CONNECT_PERIOD_MS);
-
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    connect(this, SIGNAL(connected()), cm, SLOT(telemetryConnected()));
-    connect(this, SIGNAL(disconnected()), cm, SLOT(telemetryDisconnected()));
-    connect(this, SIGNAL(telemetryUpdated(double, double)), cm, SLOT(telemetryUpdated(double, double)));
 }
 
 TelemetryMonitor::~TelemetryMonitor()
@@ -119,14 +110,21 @@ void TelemetryMonitor::retrieveNextObject()
     // If queue is empty return
     if (queue.isEmpty()) {
         qDebug("Object retrieval completed");
-        emit connected();
+        if (firmwareIAPObj->getBoardType()) {
+            emit connected();
+        } else {
+            connect(firmwareIAPObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(firmwareIAPUpdated(UAVObject *)));
+        }
         return;
     }
+
     // Get next object from the queue
     UAVObject *obj = queue.dequeue();
     // qDebug( tr("Retrieving object: %1").arg(obj->getName()) );
+
     // Connect to object
     connect(obj, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
+
     // Request update
     obj->requestUpdate();
     objPending = obj;
@@ -139,15 +137,19 @@ void TelemetryMonitor::transactionCompleted(UAVObject *obj, bool success)
 {
     Q_UNUSED(success);
     QMutexLocker locker(mutex);
-    // Disconnect from sending object
-    obj->disconnect(this);
-    objPending = NULL;
-    // Process next object if telemetry is still available
-    GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
-    if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED) {
-        retrieveNextObject();
-    } else {
-        stopRetrievingObjects();
+
+    if (obj == objPending) {
+        // Disconnect from sending object
+        obj->disconnect(this);
+        objPending = NULL;
+        // Process next object if telemetry is still available
+        GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
+
+        if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED) {
+            retrieveNextObject();
+        } else {
+            stopRetrievingObjects();
+        }
     }
 }
 
@@ -165,6 +167,19 @@ void TelemetryMonitor::flightStatsUpdated(UAVObject *obj)
     if (gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED ||
         flightStats.Status != FlightTelemetryStats::STATUS_CONNECTED) {
         processStatsUpdates();
+    }
+}
+
+/**
+ * Called each time the firmwareIAP object is updated by the autopilot
+ */
+void TelemetryMonitor::firmwareIAPUpdated(UAVObject *obj)
+{
+    Q_UNUSED(obj);
+    QMutexLocker locker(mutex);
+
+    if (firmwareIAPObj->getBoardType() != 0) {
+        emit connected();
     }
 }
 

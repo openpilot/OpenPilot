@@ -1,6 +1,6 @@
 BOARD_TYPE          := 0x09
 BOARD_REVISION      := 0x03
-BOOTLOADER_VERSION  := 0x05
+BOOTLOADER_VERSION  := 0x06
 HW_TYPE             := 0x00
 
 MCU                 := cortex-m4
@@ -39,7 +39,7 @@ EE_BANK_SIZE        := 0x00008000  # Size of EEPROM storage area
 # Leave the remaining 64KB sectors for other uses
 
 FW_BANK_BASE        := 0x08020000  # Start of firmware flash
-FW_BANK_SIZE        := 0x00060000  # Should include FW_DESC_SIZE
+FW_BANK_SIZE        := 0x000A0000  # Should include FW_DESC_SIZE
 
 FW_DESC_SIZE        := 0x00000064
 

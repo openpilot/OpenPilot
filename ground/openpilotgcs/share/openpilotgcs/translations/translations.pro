@@ -12,8 +12,11 @@ defineReplace(prependAll) {
 }
 
 XMLPATTERNS = $$targetPath($$[QT_INSTALL_BINS]/xmlpatterns)
-LUPDATE = $$targetPath($$[QT_INSTALL_BINS]/lupdate) -locations relative -no-ui-lines -no-sort -noobsolete
+LUPDATE = $$targetPath($$[QT_INSTALL_BINS]/lupdate) -locations relative -no-ui-lines -no-sort
 LRELEASE = $$targetPath($$[QT_INSTALL_BINS]/lrelease)
+LCONVERT = $$targetPath($$[QT_INSTALL_BINS]/lconvert)
+
+wd = $$replace(GCS_SOURCE_TREE, /, $$QMAKE_DIR_SEP)
 
 TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/openpilotgcs_,.ts)
 
@@ -34,7 +37,7 @@ QMAKE_EXTRA_TARGETS += ts
 
 TEMPLATE = app
 TARGET = phony_target2
-CONFIG -= qt
+CONFIG -= qt sdk separate_debug_info gdb_dwarf_index
 QT =
 LIBS =
 

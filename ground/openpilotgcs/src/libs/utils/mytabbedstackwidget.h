@@ -51,10 +51,7 @@ public:
     int currentIndex() const;
 
     void insertCornerWidget(int index, QWidget *widget);
-    int cornerWidgetCount()
-    {
-        return m_cornerWidgetCount;
-    }
+
     QWidget *currentWidget()
     {
         return m_stackWidget->currentWidget();
@@ -77,10 +74,8 @@ private slots:
 private:
     QListWidget *m_listWidget;
     QStackedWidget *m_stackWidget;
-    QWidget *m_selectionWidget;
     bool m_vertical;
     bool m_iconAbove;
-    int m_cornerWidgetCount;
 };
 
 #endif // MYTABBEDSTACKWIDGET_H

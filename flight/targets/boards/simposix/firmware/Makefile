@@ -37,6 +37,7 @@ MODULES += FixedWingPathFollower
 MODULES += VtolPathFollower
 MODULES += CameraStab
 MODULES += Telemetry
+MODULES += Logging
 MODULES += FirmwareIAP
 MODULES += StateEstimation
 #MODULES += Sensors/simulated/Sensors
@@ -97,6 +98,8 @@ SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
+SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
+SRC += $(PIOSCORECOMMON)/pios_debuglog.c
 
 ## PIOS Hardware
 include $(PIOS)/posix/library.mk

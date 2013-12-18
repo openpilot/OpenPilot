@@ -68,11 +68,13 @@ void SerialEnumerationThread::run()
 }
 
 
-SerialConnection::SerialConnection()
-    : enablePolling(true), m_enumerateThread(this)
+SerialConnection::SerialConnection() :
+    serialHandle(NULL),
+    enablePolling(true),
+    m_enumerateThread(this),
+    m_deviceOpened(false)
 {
-    serialHandle  = NULL;
-    m_config      = new SerialPluginConfiguration("Serial Telemetry", NULL, this);
+    m_config = new SerialPluginConfiguration("Serial Telemetry", NULL, this);
     m_config->restoresettings();
 
     m_optionspage = new SerialPluginOptionsPage(m_config, this);

@@ -85,7 +85,7 @@ private:
 
 class IPconnection_EXPORT IPconnectionPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "OpenPilot.IPconnection")
+                          Q_PLUGIN_METADATA(IID "OpenPilot.IPconnection")
 
 public:
     IPconnectionPlugin();

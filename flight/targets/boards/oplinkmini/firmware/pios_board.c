@@ -105,6 +105,9 @@ void PIOS_Board_Init(void)
         PIOS_Assert(0);
     }
 
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -145,8 +148,6 @@ void PIOS_Board_Init(void)
     OPLinkStatusInitialize();
 #endif /* PIOS_INCLUDE_RFM22B */
 
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
 #if defined(PIOS_INCLUDE_TIM)
     /* Set up pulse timers */

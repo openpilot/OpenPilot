@@ -35,7 +35,7 @@ class DialGadgetFactory;
 
 class DialPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "OpenPilot.Dial")
+                                           Q_PLUGIN_METADATA(IID "OpenPilot.Dial")
 
 public:
     DialPlugin();

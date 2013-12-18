@@ -25,6 +25,7 @@ GTAGS
 openpilotgcs-build-desktop
 
 # Ignore some of the .pro.user files
+*.pro.user
 /ground/openpilotgcs/openpilotgcs.pro.user
 /ground/uavobjgenerator/uavobjgenerator.pro.user
 /ground/uavobjects/uavobjects.pro.user

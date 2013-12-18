@@ -1763,7 +1763,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Initial latitude (decimal):</source>
-        <translation>Latitude Initiale (décimal) :</translation>
+        <translation>Latitude Initiale (décimale) :</translation>
     </message>
     <message>
         <location/>
@@ -1843,7 +1843,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Initial longitude (decimal):</source>
-        <translation>Longitude initiale (décimal) :</translation>
+        <translation>Longitude initiale (décimale) :</translation>
     </message>
     <message>
         <location/>
@@ -3988,11 +3988,13 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Jump Destination</source>
+        <translatorcomment>Va à la Destination ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Error Destination</source>
+        <translatorcomment>Destination d&apos;Erreur ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4880,31 +4882,31 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
         <location/>
         <source>objname:CameraStabSettings</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:OutputRange</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Yaw</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:1</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4926,7 +4928,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
         <location/>
         <source>element:Pitch</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4942,7 +4944,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
         <location/>
         <source>element:Roll</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4974,19 +4976,19 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
         <location/>
         <source>Yaw</source>
         <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
         <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
         <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5006,7 +5008,7 @@ N&apos;oubliez pas de déclarer ce canal dans l&apos;onglet Input.</translation>
         <location/>
         <source>fieldname:Input</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5060,7 +5062,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
         <location/>
         <source>fieldname:InputRange</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5071,13 +5073,13 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
         <location/>
         <source>fieldname:InputRate</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:ResponseTime</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5130,7 +5132,7 @@ value.</source>
         <location/>
         <source>fieldname:MaxAxisLockRate</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5146,7 +5148,7 @@ value.</source>
         <location/>
         <source>button:help</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5192,7 +5194,7 @@ Apply or Save button afterwards.</source>
         <location/>
         <source>button:reload</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5208,7 +5210,7 @@ Apply or Save button afterwards.</source>
         <location/>
         <source>button:apply</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5224,7 +5226,7 @@ Apply or Save button afterwards.</source>
         <location/>
         <source>button:save</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5306,7 +5308,8 @@ Too high value may burn your servo!</source>
     <message>
         <location/>
         <source>fieldname:FeedForward</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5343,7 +5346,8 @@ Range: 0-50ms, default is 5.</source>
     <message>
         <location/>
         <source>fieldname:AccelTime</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5374,7 +5378,8 @@ Range: 0-50ms, default is 5.</source>
     <message>
         <location/>
         <source>fieldname:DecelTime</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5406,7 +5411,8 @@ Generic type provides no limit.</source>
     <message>
         <location/>
         <source>fieldname:GimbalType</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5430,7 +5436,8 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>fieldname:MaxAccel</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5700,7 +5707,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Front</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avant</translation>
     </message>
     <message>
         <location/>
@@ -5710,7 +5717,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Rear</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arrière</translation>
     </message>
     <message>
         <location/>
@@ -6804,17 +6811,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7559,7 +7566,8 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This function will avoid integral windup when at idle. Integral windup is an accumulation of over-correction and can make the vehicle flip during a slow takeoff.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Traduction Windup ??</translatorcomment>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette fonction permet d&apos;annuler le terme intégral au ralenti. Le terme intégral est une accumulation de sur-correction et peut faire retourner l&apos;appareil lors d&apos;un décollage lent.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7634,7 +7642,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglages</translation>
     </message>
     <message>
         <location/>
@@ -8770,7 +8778,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/multipage.cpp" line="+85"/>
         <source>Tricopter</source>
-        <translation></translation>
+        <translation>Tricoptère</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -8780,7 +8788,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+4"/>
         <source>Quadcopter X</source>
-        <translation>Quadricopter X</translation>
+        <translation>Quadricoptère X</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -8790,7 +8798,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+4"/>
         <source>Quadcopter +</source>
-        <translation>Quadricopter +</translation>
+        <translation>Quadricoptère +</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -8945,7 +8953,7 @@ Soyez certain d&apos;utiliser la bonne version de firmware puis redémarrer l&ap
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation. Soyez certain que les moteurs tournent dans le bon sens comme indiqué sur le dessin. Permutez deux fils d&apos;un moteur pour changer son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation. Soyez certain que les moteurs tournent dans le bon sens comme indiqué sur le diagramme. Permutez deux fils d&apos;un moteur pour changer son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -9908,25 +9916,25 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
         <location line="+5"/>
         <source>Mode 1: Elevator and Rudder on the left, Throttle and Ailerons on the right</source>
         <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
-        <translation type="unfinished">Mode 1 : Profondeur et Dérive à gauche, Gaz et Ailerons à droite</translation>
+        <translation>Mode 1 : Profondeur et Dérive à gauche, Gaz et Ailerons à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 2: Throttle and Rudder on the left, Elevator and Ailerons on the right</source>
         <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
-        <translation type="unfinished">Mode 2 : Gaz et Dérive à gauche, Profondeur et Ailerons à droite</translation>
+        <translation>Mode 2 : Gaz et Dérive à gauche, Profondeur et Ailerons à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 3: Elevator and Ailerons on the left, Throttle and Rudder on the right</source>
         <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
-        <translation type="unfinished">Mode 3 : Profondeur et Ailerons à gauche, Gaz et Dérive à droite</translation>
+        <translation>Mode 3 : Profondeur et Ailerons à gauche, Gaz et Dérive à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 4: Throttle and Ailerons on the left, Elevator and Rudder on the right</source>
         <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
-        <translation type="unfinished">Mode 4 : Gaz et Ailerons à gauche, Profondeur et Dérive à droite</translation>
+        <translation>Mode 4 : Gaz et Ailerons à gauche, Profondeur et Dérive à droite</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -10352,7 +10360,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="-92"/>
         <source>Vehicle type: </source>
-        <translation>Type de véhicule :</translation>
+        <translation>Type de véhicule : </translation>
     </message>
     <message>
         <location line="+3"/>
@@ -10432,7 +10440,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+7"/>
         <source>Input type: </source>
-        <translation>Type d&apos;entrée :</translation>
+        <translation>Type d&apos;entrée : </translation>
     </message>
     <message>
         <location line="+3"/>
@@ -10467,7 +10475,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+7"/>
         <source>ESC type: </source>
-        <translation>Type de variateur :</translation>
+        <translation>Type de variateur : </translation>
     </message>
     <message>
         <location line="+3"/>
@@ -11482,7 +11490,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11499,7 +11507,7 @@ Les valeurs classiques sont de 100% en configuration + et 50% en configuration X
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11511,7 +11519,7 @@ Les valeurs classiques sont de 100% en configuration + et 50% en configuration X
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12480,7 +12488,7 @@ The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRAN
     <message>
         <location line="+28"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>&lt;h4&gt;These people have been key contributors to the OpenPilot project. Without the work of the people in this list, OpenPilot would not be what it is today.&lt;/h4&gt;&lt;p&gt;This list is sorted alphabetically by name&lt;/p&gt;</source>

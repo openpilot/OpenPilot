@@ -76,9 +76,8 @@ typedef struct {
 } UAVTalkConnectionData;
 
 #define UAVTALK_CANARI          0xCA
-#define UAVTALK_WAITFOREVER     -1
-#define UAVTALK_NOWAIT          0
 #define UAVTALK_SYNC_VAL        0x3C
+
 #define UAVTALK_TYPE_MASK       0x78
 #define UAVTALK_TYPE_VER        0x20
 #define UAVTALK_TIMESTAMPED     0x80

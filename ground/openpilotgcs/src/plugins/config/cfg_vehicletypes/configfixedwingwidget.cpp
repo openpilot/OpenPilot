@@ -53,27 +53,28 @@ QStringList ConfigFixedWingWidget::getChannelDescriptions()
 
     // get the gui config data
     GUIConfigDataUnion configData = getConfigData();
+    fixedGUISettingsStruct fixed  = configData.fixedwing;
 
-    if (configData.fixedwing.FixedWingPitch1 > 0) {
-        channelDesc[configData.fixedwing.FixedWingPitch1 - 1] = QString("FixedWingPitch1");
+    if (fixed.FixedWingThrottle > 0 && fixed.FixedWingThrottle <= ConfigFixedWingWidget::CHANNEL_NUMELEM) {
+        channelDesc[fixed.FixedWingThrottle - 1] = QString("fixed.WingThrottle");
     }
-    if (configData.fixedwing.FixedWingPitch2 > 0) {
-        channelDesc[configData.fixedwing.FixedWingPitch2 - 1] = QString("FixedWingPitch2");
+    if (fixed.FixedWingPitch1 > 0 && fixed.FixedWingPitch1 <= ConfigFixedWingWidget::CHANNEL_NUMELEM) {
+        channelDesc[fixed.FixedWingPitch1 - 1] = QString("FixedWingPitch1");
     }
-    if (configData.fixedwing.FixedWingRoll1 > 0) {
-        channelDesc[configData.fixedwing.FixedWingRoll1 - 1] = QString("FixedWingRoll1");
+    if (fixed.FixedWingPitch2 > 0 && fixed.FixedWingPitch2 <= ConfigFixedWingWidget::CHANNEL_NUMELEM) {
+        channelDesc[fixed.FixedWingPitch2 - 1] = QString("FixedWingPitch2");
     }
-    if (configData.fixedwing.FixedWingRoll2 > 0) {
-        channelDesc[configData.fixedwing.FixedWingRoll2 - 1] = QString("FixedWingRoll2");
+    if (fixed.FixedWingRoll1 > 0 && fixed.FixedWingRoll1 <= ConfigFixedWingWidget::CHANNEL_NUMELEM) {
+        channelDesc[fixed.FixedWingRoll1 - 1] = QString("FixedWingRoll1");
     }
-    if (configData.fixedwing.FixedWingYaw1 > 0) {
-        channelDesc[configData.fixedwing.FixedWingYaw1 - 1] = QString("FixedWingYaw1");
+    if (fixed.FixedWingRoll2 > 0 && fixed.FixedWingRoll2 <= ConfigFixedWingWidget::CHANNEL_NUMELEM) {
+        channelDesc[fixed.FixedWingRoll2 - 1] = QString("FixedWingRoll2");
     }
-    if (configData.fixedwing.FixedWingYaw2 > 0) {
-        channelDesc[configData.fixedwing.FixedWingYaw2 - 1] = QString("FixedWingYaw2");
+    if (fixed.FixedWingYaw1 > 0 && fixed.FixedWingYaw1 <= ConfigFixedWingWidget::CHANNEL_NUMELEM) {
+        channelDesc[fixed.FixedWingYaw1 - 1] = QString("FixedWingYaw1");
     }
-    if (configData.fixedwing.FixedWingThrottle > 0) {
-        channelDesc[configData.fixedwing.FixedWingThrottle - 1] = QString("FixedWingThrottle");
+    if (fixed.FixedWingYaw2 > 0 && fixed.FixedWingYaw2 <= ConfigFixedWingWidget::CHANNEL_NUMELEM) {
+        channelDesc[fixed.FixedWingYaw2 - 1] = QString("FixedWingYaw2");
     }
     return channelDesc;
 }

@@ -56,7 +56,7 @@ QStringList ConfigFixedWingWidget::getChannelDescriptions()
     fixedGUISettingsStruct fixed  = configData.fixedwing;
 
     if (fixed.FixedWingThrottle > 0 && fixed.FixedWingThrottle <= ConfigFixedWingWidget::CHANNEL_NUMELEM) {
-        channelDesc[fixed.FixedWingThrottle - 1] = QString("fixed.WingThrottle");
+        channelDesc[fixed.FixedWingThrottle - 1] = QString("WingThrottle");
     }
     if (fixed.FixedWingPitch1 > 0 && fixed.FixedWingPitch1 <= ConfigFixedWingWidget::CHANNEL_NUMELEM) {
         channelDesc[fixed.FixedWingPitch1 - 1] = QString("FixedWingPitch1");
@@ -91,10 +91,13 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
     m_aircraft->fixedWingType->addItems(fixedWingTypes);
 
     // Set default model to "Elevator aileron rudder"
-    connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
     m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
 
-    setupUI(m_aircraft->fixedWingType->currentText());
+    // setupUI(m_aircraft->fixedWingType->currentText());    
+
+    connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
+
+    updateEnableControls();
 }
 
 ConfigFixedWingWidget::~ConfigFixedWingWidget()
@@ -108,9 +111,12 @@ ConfigFixedWingWidget::~ConfigFixedWingWidget()
 void ConfigFixedWingWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
+    Q_ASSERT(plane);
 
     // This had to be moved from ConfigFixedWingWidget() here since m_aircraft->fixedWingType->currentText() 
     // did not seem to work properly to choose alternate .svg files. 
+    m_aircraft->planeShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_aircraft->planeShape->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/configgadget/images/fixedwing-shapes.svg"));
     plane = new QGraphicsSvgItem();
@@ -161,6 +167,9 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
     scene->setSceneRect(plane->boundingRect());
     m_aircraft->planeShape->setScene(scene);
 
+    setupEnabledControls(frameType);
+    // Draw the appropriate airframe
+    updateAirframe(frameType);
 }
 
 void ConfigFixedWingWidget::setupEnabledControls(QString frameType)

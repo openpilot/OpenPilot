@@ -14,7 +14,7 @@
         <translation>Impossible de passer les arguments de la ligne de commande à l&apos;instance en cours d&apos;exécution. Elle semble ne pas répondre.</translation>
     </message>
     <message>
-        <location line="+353"/>
+        <location line="+354"/>
         <source>Could not find &apos;Core.pluginspec&apos; in %1</source>
         <translatorcomment>[Platypus]Ajout de &quot;est&quot;</translatorcomment>
         <translation>&apos;Core.pluginspec&apos; est introuvable dans %1</translation>
@@ -120,7 +120,7 @@
 <context>
     <name>Core::Internal::MainWindow</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+443"/>
+        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+438"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
@@ -145,12 +145,12 @@
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location line="-347"/>
+        <location line="-344"/>
         <source>OpenPilot GCS</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+464"/>
+        <location line="+461"/>
         <source>Ctrl+Shift+S</source>
         <translation type="unfinished">Ctrl+Maj+S</translation>
     </message>
@@ -309,7 +309,7 @@
         <translation>À propos d&apos;&amp;OpenPilot...</translation>
     </message>
     <message>
-        <location line="+699"/>
+        <location line="+640"/>
         <source>Settings...</source>
         <translation>Paramètres...</translation>
     </message>
@@ -401,14 +401,12 @@
 <context>
     <name>Core::Internal::VersionDialog</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/versiondialog.cpp" line="+57"/>
         <source>About OpenPilot GCS</source>
-        <translation>A propos d&apos;OpenPilot GCS</translation>
+        <translation type="obsolete">A propos d&apos;OpenPilot GCS</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation>&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
+        <translation type="obsolete">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
@@ -1484,7 +1482,7 @@ Raison : %3</translation>
 <context>
     <name>Welcome::WelcomeMode</name>
     <message>
-        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+87"/>
+        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+88"/>
         <source>Welcome</source>
         <translation>Accueil</translation>
     </message>
@@ -3485,6 +3483,16 @@ uniquement lorsque les valeurs changent</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="+0"/>
+        <source>LoggingUpdatePeriodic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>LoggingUpdateOnChange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+2"/>
         <source>Modes</source>
         <translation type="unfinished"></translation>
@@ -3528,7 +3536,7 @@ uniquement lorsque les valeurs changent</translation>
 <context>
     <name>TelemetryMonitor</name>
     <message>
-        <location filename="../../../src/plugins/uavtalk/telemetrymonitor.cpp" line="+100"/>
+        <location filename="../../../src/plugins/uavtalk/telemetrymonitor.cpp" line="+91"/>
         <source>Starting to retrieve meta and settings objects from the autopilot (%1 objects)</source>
         <translation>Démarrage de la récupération des objets meta et paramètres depuis l&apos;autopilote (%1 objets)</translation>
     </message>
@@ -5827,7 +5835,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Commands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Commandes</translation>
     </message>
     <message>
         <location/>
@@ -8756,19 +8764,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot multirotor configuration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the wizard will set up the OpenPilot controller for use with a flying platform utilizing multiple rotors. The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom configuration options in the Configuration plugin in the GCS.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Please select the type of multirotor you want to create a configuration for below:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Multirotor type:</source>
         <translation>Type Multirotor :</translation>
     </message>
@@ -8823,6 +8818,27 @@ p, li { white-space: pre-wrap; }
         <location line="+1"/>
         <source>Hexacopter H</source>
         <translation>Hexacoptère H</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/multipage.ui"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Multirotor Configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the wizard will set up the OpenPilot controller for use with a flying platform utilizing multiple rotors. The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom configuration options in the Configuration plugin in the GCS.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Please select the type of multirotor you want to create a configuration for below:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Configuration Multirotor OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette partie de l&apos;assistant configure la carte OpenPilot avec une plateforme de vol utilisant plusieurs rotors. L&apos;assistant reconnait la plupart des types de multirotors. Les autres variantes de multirotors peuvent-être configurées en utilisant les options de configuration avancées dans l&apos;onglet Configuration de GCS.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Veuillez choisir ci-dessous le type de multirotor que vous souhaitez pour créér une configuration :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -8882,9 +8898,8 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;En fonction du véhicule que vous avez sélectionné, les moteurs pilotés par des variateurs et/ou les servos contrôlés directement par la carte OpenPilot devront-être calibrés. Les étapes suivantes vous guideront en toute sécurité dans ce processus. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Plase pay attention to the details and in particular the motors position and its rotation direction.&lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stably. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8926,6 +8941,11 @@ Please make sure the correct firmware version is used then restart the wizard an
         <translation>Le module de sortie est dans un état d&apos;erreur.
 
 Soyez certain d&apos;utiliser la bonne version de firmware puis redémarrer l&apos;assistant et essayez à nouveau. Si le problème persiste, consultez le forum openpilot.org.</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation. Soyez certain que les moteurs tournent dans le bon sens comme indiqué sur le dessin. Permutez deux fils d&apos;un moteur pour changer son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -9999,30 +10019,33 @@ Bougez le manche %1.</translation>
 <context>
     <name>Core::Internal::AuthorsDialog</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/authorsdialog.cpp" line="+63"/>
         <source>About OpenPilot</source>
-        <translation>À propos d&apos;OpenPilot</translation>
+        <translation type="obsolete">À propos d&apos;OpenPilot</translation>
     </message>
     <message>
-        <location line="+13"/>
         <source>From revision %1&lt;br/&gt;</source>
-        <translation>Depuis la révision %1&lt;br/&gt;</translation>
+        <translation type="obsolete">Depuis la révision %1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation>&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
+        <translation type="obsolete">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
     <name>Core::ConnectionManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/connectionmanager.cpp" line="+70"/>
+        <location filename="../../../src/plugins/coreplugin/connectionmanager.cpp" line="+68"/>
         <source>Connections:</source>
         <translation>Connexions :</translation>
     </message>
     <message>
-        <location line="-9"/>
+        <location line="+71"/>
+        <source>Disconnect</source>
+        <translation>Déconnecter</translation>
+    </message>
+    <message>
+        <location line="-81"/>
+        <location line="+127"/>
         <source>Connect</source>
         <translation>Connecter</translation>
     </message>
@@ -10109,7 +10132,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>LoggingThread</name>
     <message>
-        <location line="+157"/>
+        <location line="+162"/>
         <source>Logging: retrieve settings objects from the autopilot (%1 objects)</source>
         <translation>Journalisation : récupération des objets de configuration de l&apos;autopilote (%1 objets)</translation>
     </message>
@@ -10764,7 +10787,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
 <context>
     <name>NewsPanel</name>
     <message>
-        <location filename="../../../src/plugins/welcome/qml/NewsPanel.qml" line="+13"/>
+        <location filename="../../../src/plugins/welcome/qml/NewsPanel.qml" line="+14"/>
         <source>Project News</source>
         <translation>Nouvelles du Projet</translation>
     </message>
@@ -11762,7 +11785,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>TX Seq. No.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seq Tx N° </translation>
     </message>
     <message>
         <location/>
@@ -11772,7 +11795,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>RX Seq. No.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seq. Rx N° </translation>
     </message>
     <message>
         <location/>
@@ -11897,12 +11920,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Com speed in bps.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse com en bps.</translation>
     </message>
     <message>
         <location/>
         <source>Com Speed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse Com</translation>
     </message>
     <message>
         <location/>
@@ -12435,19 +12458,43 @@ Veuillez sélectionner une zone de la carte à télécharger avec &lt;CTRL&gt;+C
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/qml/AboutDialog.qml" line="+52"/>
         <source>OpenPilot GCS</source>
-        <translation>OpenPilot GCS</translation>
+        <translation type="obsolete">OpenPilot GCS</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location filename="../../../src/plugins/coreplugin/qml/AboutDialog.qml" line="+75"/>
+        <source>OpenPilot Ground Control Station</source>
+        <translation type="unfinished">Station de Contrôle au Sol OpenPilot (GCS)</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</source>
+        <translation type="unfinished">Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier dans le cadre des termes de la licence GNU General Public Licence publiée par la Free Software Foundation; soit à la version 3 de la Licence, ou (en option) à une version ultérieure. Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Contributors</source>
         <translation>Contributeurs</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+28"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&lt;h4&gt;These people have been key contributors to the OpenPilot project. Without the work of the people in this list, OpenPilot would not be what it is today.&lt;/h4&gt;&lt;p&gt;This list is sorted alphabetically by name&lt;/p&gt;</source>
-        <translation>&lt;h4&gt;Ces personnes ont été des contributeurs déterminants pour le projet OpenPilot. Sans le travail des personnes figurant sur cette liste, OpenPilot ne serait pas ce qu&apos;il est aujourd&apos;hui.&lt;/h4&gt;&lt;p&gt;Cette liste est triée par ordre alphabétique&lt;/p&gt;</translation>
+        <translation type="obsolete">&lt;h4&gt;Ces personnes ont été des contributeurs déterminants pour le projet OpenPilot. Sans le travail des personnes figurant sur cette liste, OpenPilot ne serait pas ce qu&apos;il est aujourd&apos;hui.&lt;/h4&gt;&lt;p&gt;Cette liste est triée par ordre alphabétique&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/aboutdialog.cpp" line="+48"/>
+        <source>About OpenPilot</source>
+        <translation type="unfinished">À propos d&apos;OpenPilot</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;</source>
+        <translation type="unfinished">Révision : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -12541,12 +12588,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ActivityPanel</name>
     <message>
-        <location filename="../../../src/plugins/welcome/qml/ActivityPanel.qml" line="+12"/>
+        <location filename="../../../src/plugins/welcome/qml/ActivityPanel.qml" line="+13"/>
         <source>Project Activity</source>
         <translation type="unfinished">Activité Projet</translation>
     </message>
     <message>
-        <location line="+128"/>
+        <location line="+130"/>
         <source>Commented on </source>
         <translation type="unfinished">Commenté sur </translation>
     </message>
@@ -12633,34 +12680,170 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>main</name>
     <message>
-        <location filename="../../../src/plugins/welcome/qml/main.qml" line="+62"/>
         <source>Flight Data</source>
-        <translation type="unfinished">Données de Vol</translation>
+        <translation type="obsolete">Données de Vol</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Configuration</source>
-        <translation type="unfinished">Configuration</translation>
+        <translation type="obsolete">Configuration</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>System</source>
-        <translation type="unfinished">Système</translation>
+        <translation type="obsolete">Système</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Scopes</source>
-        <translation type="unfinished">Graphiques</translation>
+        <translation type="obsolete">Graphiques</translation>
     </message>
+</context>
+<context>
+    <name>FlightLogDialog</name>
     <message>
-        <location line="+6"/>
-        <source>HITL</source>
+        <location filename="../../../src/plugins/flightlog/FlightLogDialog.qml" line="+27"/>
+        <source>Log entries</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Firmware</source>
+        <location line="+17"/>
+        <source>Flight</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UAVO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Inconnu</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Flights recorded: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Entries logged (free): </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Flight to download:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Download logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Export...</source>
+        <translation type="unfinished">Exporter...</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Adjust timestamps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Clear all logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/flightlog/flightlogdialog.cpp" line="+45"/>
+        <source>Manage flight side logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FlightLogManager</name>
+    <message>
+        <location filename="../../../src/plugins/flightlog/flightlogmanager.cpp" line="+205"/>
+        <source>Save Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OP-%0.opl</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot Log (*.opl)</source>
+        <translation type="unfinished">Journal OpenPilot (*.opl)</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>_flight-%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FlightLogPlugin</name>
+    <message>
+        <location filename="../../../src/plugins/flightlog/flightlogplugin.cpp" line="+60"/>
+        <source>Manage flight side logs...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MonitorGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/telemetry/monitorgadgetfactory.cpp" line="+38"/>
+        <source>Telemetry Monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MonitorWidget</name>
+    <message>
+        <location filename="../../../src/plugins/telemetry/monitorwidget.cpp" line="+216"/>
+        <source>Connected</source>
+        <translation type="unfinished">Connecté</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Disconnected</source>
+        <translation type="unfinished">Déconnecté</translation>
     </message>
 </context>
 </TS>

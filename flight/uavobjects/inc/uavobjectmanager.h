@@ -49,6 +49,8 @@
 
 typedef void *UAVObjHandle;
 
+#define MetaObjectId(id) ((id) + 1)
+
 /**
  * Object update mode, used by multiple modules (e.g. telemetry and logger)
  */

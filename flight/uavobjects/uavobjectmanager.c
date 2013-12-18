@@ -167,7 +167,6 @@ struct UAVOMulti {
 #define MetaObjectPtr(obj)               ((struct UAVODataMeta *)&((obj)->metaObj))
 #define MetaDataPtr(obj)                 ((UAVObjMetadata *)&((obj)->instance0))
 #define LinkedMetaDataPtr(obj)           ((UAVObjMetadata *)&((obj)->metaObj.instance0))
-#define MetaObjectId(id)                 ((id) + 1)
 
 /** all information about instances are dependant on object type **/
 #define ObjSingleInstanceDataOffset(obj) ((void *)(&(((struct UAVOSingle *)obj)->instance0)))

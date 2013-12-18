@@ -306,7 +306,23 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         addModifiedObject(actSettings, tr("Writing actuator settings"));
         break;
     }
+/*
     case VehicleConfigurationSource::VEHICLE_FIXEDWING:
+    {
+        ActuatorSettings::DataFields data = actSettings->getData();
+
+	qDebug() << "Override center pulse for fixed wing servos\n";
+	// move all but first chan to 1500 center pluse
+        QList<actuatorChannelSettings> actuatorSettings = m_configSource->getActuatorSettings();
+        for (quint16 i = 1; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
+            data.ChannelType[i]    = ActuatorSettings::CHANNELTYPE_PWM;
+            data.ChannelAddr[i]    = i;
+            data.ChannelMin[i]     = 1500;
+            data.ChannelNeutral[i] = 1500;
+            data.ChannelMax[i]     = 1500;
+        }
+    }
+*/
     case VehicleConfigurationSource::VEHICLE_HELI:
     case VehicleConfigurationSource::VEHICLE_SURFACE:
         // TODO: Implement settings for other vehicle types?
@@ -1388,5 +1404,5 @@ void VehicleConfigurationHelper::setupAileron()
     guiSettings.fixedwing.FixedWingYaw1  = 5;
 
     applyMixerConfiguration(channels);
-    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWINGAILERON, guiSettings);
+    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWING, guiSettings);
 }

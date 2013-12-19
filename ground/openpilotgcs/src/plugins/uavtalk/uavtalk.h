@@ -48,13 +48,16 @@ public:
 
     typedef struct {
         quint32 txBytes;
-        quint32 rxBytes;
         quint32 txObjectBytes;
-        quint32 rxObjectBytes;
-        quint32 rxObjects;
         quint32 txObjects;
         quint32 txErrors;
+
+        quint32 rxBytes;
+        quint32 rxObjectBytes;
+        quint32 rxObjects;
         quint32 rxErrors;
+        quint32 rxSyncErrors;
+        quint32 rxCrcErrors;
     } ComStats;
 
     UAVTalk(QIODevice *iodev, UAVObjectManager *objMngr);
@@ -105,28 +108,41 @@ private:
     static const quint8 crc_table[256];
 
     // Types
-    typedef enum { STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS } RxStateType;
+    typedef enum {
+        STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS
+    } RxStateType;
 
     // Variables
     QPointer<QIODevice> io;
+
     UAVObjectManager *objMngr;
+
+    ComStats stats;
+
     QMutex mutex;
+
     QMap<quint32, QMap<quint32, Transaction *> *> transMap;
+
+//    quint16 rxReadOffset;
+//    quint16 rxSyncOffset;
     quint8 rxBuffer[MAX_PACKET_LENGTH];
+
     quint8 txBuffer[MAX_PACKET_LENGTH];
+
     // Variables used by the receive state machine
+    // state machine variables
+    qint32 rxCount;
+    qint32 packetSize;
+    RxStateType rxState;
+    // data variables
     quint8 rxTmpBuffer[4];
     quint8 rxType;
     quint32 rxObjId;
     quint16 rxInstId;
     quint16 rxLength;
     quint16 rxPacketLength;
-
-    quint8 rxCSPacket, rxCS;
-    qint32 rxCount;
-    qint32 packetSize;
-    RxStateType rxState;
-    ComStats stats;
+    quint8 rxCSPacket;
+    quint8 rxCS;
 
     bool useUDPMirror;
     QUdpSocket *udpSocketTx;

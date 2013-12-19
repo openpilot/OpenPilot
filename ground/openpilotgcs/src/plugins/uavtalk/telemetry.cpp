@@ -377,7 +377,9 @@ void Telemetry::processObjectQueue()
     GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
     if (gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED) {
         objQueue.clear();
-        if (objInfo.obj->getObjID() != GCSTelemetryStats::OBJID && objInfo.obj->getObjID() != OPLinkSettings::OBJID && objInfo.obj->getObjID() != ObjectPersistence::OBJID) {
+        if ((objInfo.obj->getObjID() != GCSTelemetryStats::OBJID) &&
+                (objInfo.obj->getObjID() != OPLinkSettings::OBJID) &&
+                (objInfo.obj->getObjID() != ObjectPersistence::OBJID)) {
             objInfo.obj->emitTransactionCompleted(false);
             return;
         }
@@ -498,14 +500,17 @@ Telemetry::TelemetryStats Telemetry::getStats()
     TelemetryStats stats;
 
     stats.txBytes       = utalkStats.txBytes;
-    stats.rxBytes       = utalkStats.rxBytes;
     stats.txObjectBytes = utalkStats.txObjectBytes;
-    stats.rxObjectBytes = utalkStats.rxObjectBytes;
-    stats.rxObjects     = utalkStats.rxObjects;
     stats.txObjects     = utalkStats.txObjects;
     stats.txErrors      = utalkStats.txErrors + txErrors;
-    stats.rxErrors      = utalkStats.rxErrors;
     stats.txRetries     = txRetries;
+
+    stats.rxBytes       = utalkStats.rxBytes;
+    stats.rxObjectBytes = utalkStats.rxObjectBytes;
+    stats.rxObjects     = utalkStats.rxObjects;
+    stats.rxErrors      = utalkStats.rxErrors;
+    stats.rxSyncErrors  = utalkStats.rxSyncErrors;
+    stats.rxCrcErrors   = utalkStats.rxCrcErrors;
 
     // Done
     return stats;

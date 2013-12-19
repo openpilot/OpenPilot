@@ -60,14 +60,17 @@ class Telemetry : public QObject {
 public:
     typedef struct {
         quint32 txBytes;
-        quint32 rxBytes;
         quint32 txObjectBytes;
-        quint32 rxObjectBytes;
-        quint32 rxObjects;
         quint32 txObjects;
         quint32 txErrors;
-        quint32 rxErrors;
         quint32 txRetries;
+
+        quint32 rxBytes;
+        quint32 rxObjectBytes;
+        quint32 rxObjects;
+        quint32 rxErrors;
+        quint32 rxSyncErrors;
+        quint32 rxCrcErrors;
     } TelemetryStats;
 
     Telemetry(UAVTalk *utalk, UAVObjectManager *objMngr);

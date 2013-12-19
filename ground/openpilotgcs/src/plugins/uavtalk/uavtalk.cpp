@@ -33,7 +33,7 @@
 #include <QEventLoop>
 
 #ifdef VERBOSE_UAVTALK
-#define VERBOSE_FILTER(objId) if (objId == 0xD23852DC || objId == 0x2472A0AE)
+#define VERBOSE_FILTER(objId) if (objId == 0x173E3850 || objId == 0x99C63292)
 #endif
 
 #define SYNC_VAL 0x3C
@@ -255,7 +255,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         if (rxbyte != SYNC_VAL) {
             // continue until sync byte is matched
-            // TODO stats.rxSyncErrror++;
+            stats.rxSyncErrors++;
             break;
         }
 
@@ -282,7 +282,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         if ((rxbyte & TYPE_MASK) != TYPE_VER) {
             qWarning() << "UAVTalk - error : bad type";
-            // TODO stats.rxSyncErrror++;
+            stats.rxErrors++;
             rxState = STATE_SYNC;
             break;
         }
@@ -421,7 +421,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         if (rxCS != rxCSPacket) {
             // packet error - faulty CRC
             qWarning() << "UAVTalk - error : failed CRC check" << rxObjId;
-            stats.rxErrors++;
+            stats.rxCrcErrors++;
             rxState = STATE_SYNC;
             break;
         }
@@ -453,8 +453,8 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
     default:
 
         qWarning() << "UAVTalk - error : bad state";
-        stats.rxErrors++;
         rxState = STATE_SYNC;
+        break;
     }
 
     // Done
@@ -518,7 +518,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
 #endif
             if (obj != NULL) {
                 // Object updated or created, transmit ACK
-                transmitObject(TYPE_ACK, objId, instId, obj);
+                error = !transmitObject(TYPE_ACK, objId, instId, obj);
             } else {
                 error = true;
             }
@@ -545,7 +545,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
         if (obj != NULL) {
             // Object found, transmit it
             // The sent object will ack the object request on the receiver side
-            transmitObject(TYPE_OBJ, objId, instId, obj);
+            error = !transmitObject(TYPE_OBJ, objId, instId, obj);
         } else {
             error = true;
         }

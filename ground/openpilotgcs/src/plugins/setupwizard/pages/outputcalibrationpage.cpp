@@ -179,7 +179,7 @@ void OutputCalibrationPage::setupVehicle()
            ui->vehicleView->setScene(m_vehicleScene);
     	}
 	qDebug() << "no clue what a wizard index is!";
-        m_wizardIndexes << 0 << 0 << 3 << 3; // These come from OutputCalibrationPage::setWizardPage()
+        m_wizardIndexes << 0 << 1 << 3 << 3; // These come from OutputCalibrationPage::setWizardPage()
         m_vehicleElementIds << "fixed-vtail" << "vtail";
         m_vehicleHighlightElementIndexes << 0 << 1;
         m_channelIndex << 0 << 0 << 1 << 2;

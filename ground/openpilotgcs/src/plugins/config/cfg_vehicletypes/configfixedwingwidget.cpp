@@ -36,6 +36,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QComboBox>
 #include <QBrush>
 #include <math.h>
 #include <QMessageBox>
@@ -96,7 +97,6 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
     // setupUI(m_aircraft->fixedWingType->currentText());    
 
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
-
     updateEnableControls();
 }
 
@@ -105,9 +105,6 @@ ConfigFixedWingWidget::~ConfigFixedWingWidget()
     delete m_aircraft;
 }
 
-/**
-   Virtual function to setup the UI
- */
 void ConfigFixedWingWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
@@ -273,7 +270,7 @@ void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
 }
 
 /**
-   Virtual function to update the UI widget objects
+   Helper function to update the UI widget objects
  */
 QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
 {
@@ -281,23 +278,90 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
 
     Q_ASSERT(mixer);
 
-    // Set the throttle curve
+    // Curve is also common to all quads:
     setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->fixedWingThrottle->getCurve());
 
     QString airframeType;
+    QList<QString> motor_servo_List;
 
     if (m_aircraft->fixedWingType->currentText() == "Elevator aileron rudder") {
         airframeType = "FixedWing";
         setupFrameFixedWing(airframeType);
-    } else if (m_aircraft->fixedWingType->currentText() == "vtail") {
+
+        motor_servo_List << "FixedWingThrottle" << "FixedWingPitch1" << "FixedWingPitch2" << "FixedWingRoll1" << "FixedWingRoll2" << "FixedWingYaw1" << "FixedWingYaw2";
+        setupMotors(motor_servo_List);
+	
+	GUIConfigDataUnion config = getConfigData();
+	setConfigData(config);
+
+	m_aircraft->fwStatusLabel->setText(tr("Configuration OK"));
+
+    } 
+    else if (m_aircraft->fixedWingType->currentText() == "vtail") {
         airframeType = "FixedWingVtail";
         setupFrameVtail(airframeType);
+
+        motor_servo_List << "FixedWingThrottle" << "FixedWingRoll1" << "FixedWingRoll2";
+        setupMotors(motor_servo_List);
+	
+	GUIConfigDataUnion config = getConfigData();
+	setConfigData(config);
+
+        // Vtail Layout:
+        // pitch   roll    yaw
+        double mixerMatrix[8][3] = {
+            { 0,   0,  0 },
+            { 0,   0,  0 },
+            { 0,   0,  0 },
+            { 0,   0,  0 },
+            { 0,   0,  0 },
+            { 0,   0,  0 },
+            { 0,   0,  0 },
+            { 0,   0,  0 }
+        };
+        setupFixedWingMixer(mixerMatrix);
+
+      	m_aircraft->fwStatusLabel->setText(tr("Configuration OK"));
+
     }
  
     // Remove Feed Forward, it is pointless on a plane:
     setMixerValue(mixer, "FeedForward", 0.0);
 
     return airframeType;
+}
+
+void ConfigFixedWingWidget::setupMotors(QList<QString> motorList)
+{
+    QList<QComboBox *> mmList;
+    mmList << m_aircraft->fwEngineChannelBox << m_aircraft->fwAileron1ChannelBox
+           << m_aircraft->fwAileron2ChannelBox << m_aircraft->fwElevator1ChannelBox
+           << m_aircraft->fwElevator2ChannelBox << m_aircraft->fwRudder1ChannelBox
+           << m_aircraft->fwRudder2ChannelBox;
+
+    GUIConfigDataUnion configData = getConfigData();
+    resetActuators(&configData);
+
+    foreach(QString motor, motorList) {
+        int index = mmList.takeFirst()->currentIndex();
+
+        if (motor == QString("FixedWingThrottle")) {
+            configData.fixedwing.FixedWingThrottle = index;
+        } else if (motor == QString("FixedWingPitch1")) {
+            configData.fixedwing.FixedWingPitch1 = index;
+        } else if (motor == QString("FixedWingPitch2")) {
+            configData.fixedwing.FixedWingPitch2 = index;
+        } else if (motor == QString("FixedWingRoll1")) {
+            configData.fixedwing.FixedWingRoll1 = index;
+        } else if (motor == QString("FixedWingRoll2")) {
+            configData.fixedwing.FixedWingRoll2 = index;
+        } else if (motor == QString("FixedWingYaw1")) {
+            configData.fixedwing.FixedWingYaw1 = index;
+        } else if (motor == QString("FixedWingYaw2")) {
+            configData.fixedwing.FixedWingYaw1 = index;
+        }
+    }
+    setConfigData(configData);
 }
 
 void ConfigFixedWingWidget::updateAirframe(QString frameType)
@@ -334,6 +398,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
     config.fixedwing.FixedWingRoll1    = m_aircraft->fwAileron1ChannelBox->currentIndex();
     config.fixedwing.FixedWingRoll2    = m_aircraft->fwAileron2ChannelBox->currentIndex();
     config.fixedwing.FixedWingYaw1     = m_aircraft->fwRudder1ChannelBox->currentIndex();
+    config.fixedwing.FixedWingYaw2     = m_aircraft->fwRudder2ChannelBox->currentIndex();
     config.fixedwing.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
 
     setConfigData(config);
@@ -461,6 +526,41 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
     }
 
     m_aircraft->fwStatusLabel->setText("Mixer generated");
+    return true;
+}
+
+/**
+   This function sets up the vtail fixed wing mixer values.
+ */
+bool ConfigFixedWingWidget::setupFixedWingMixer(double mixerFactors[8][3])
+{
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+
+    Q_ASSERT(mixer);
+    resetMotorAndServoMixers(mixer);
+
+    // and enable only the relevant channels:
+//    double pFactor = (double)m_aircraft->fwPitchMixLevel->value() / 100.0;
+//    double rFactor = (double)m_aircraft->fwRollMixLevel->value() / 100.0;
+    //invertMotors = m_aircraft->MultirotorRevMixerCheckBox->isChecked();
+//    double yFactor = (double)m_aircraft->fwYawMixLevel->value() / 100.0;
+
+    QList<QComboBox *> mmList;
+    mmList << m_aircraft->fwEngineChannelBox << m_aircraft->fwAileron1ChannelBox
+           << m_aircraft->fwAileron2ChannelBox << m_aircraft->fwElevator1ChannelBox
+           << m_aircraft->fwElevator2ChannelBox << m_aircraft->fwRudder1ChannelBox
+           << m_aircraft->fwRudder2ChannelBox;
+
+    for (int i = 0; i < 8; i++) {
+        if (mmList.at(i)->isEnabled()) {
+            int channel = mmList.at(i)->currentIndex() - 1;
+            if (channel > -1) {
+		  qDebug() << "code needs to be written here!";
+//                setupQuadMotor(channel, mixerFactors[i][0] * pFactor, rFactor * mixerFactors[i][1],
+//                               yFactor * mixerFactors[i][2]);
+            }
+        }
+    }
     return true;
 }
 

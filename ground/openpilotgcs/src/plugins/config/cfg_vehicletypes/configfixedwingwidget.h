@@ -68,6 +68,8 @@ private:
 
     bool setupFrameFixedWing(QString airframeType);
     bool setupFrameVtail(QString airframeType);
+    bool setupFixedWingMixer(double mixerFactors[8][3]);
+    void setupMotors(QList<QString> motorList);
 
     void updateAirframe(QString multiRotorType);
     void setupEnabledControls(QString airframeType);

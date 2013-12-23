@@ -431,6 +431,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         if (rxCS != rxCSPacket) { // packet error - faulty CRC
             stats.rxErrors++;
             rxState = STATE_SYNC;
+	    qDebug() << "******** CRC ERROR *********";
             UAVTALK_QXTLOG_DEBUG("UAVTalk: CSum->Sync (badcrc)");
             break;
         }

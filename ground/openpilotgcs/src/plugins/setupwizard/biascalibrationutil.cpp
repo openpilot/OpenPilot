@@ -33,6 +33,7 @@
 #include "gyrostate.h"
 #include "qdebug.h"
 #include "revocalibration.h"
+#include "accelgyrosettings.h"
 
 
 BiasCalibrationUtil::BiasCalibrationUtil(long measurementCount, long measurementRate) : QObject(),
@@ -140,13 +141,18 @@ void BiasCalibrationUtil::startMeasurement()
 
     RevoCalibration *revolutionCalibration = RevoCalibration::GetInstance(uavObjectManager);
     Q_ASSERT(revolutionCalibration);
+    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(uavObjectManager);
+    Q_ASSERT(accelGyroSettings);
+
     RevoCalibration::DataFields revoCalibrationData = revolutionCalibration->getData();
-    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] = 0;
-    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] = 0;
-    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] = 0;
-    revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_X]   = 0;
-    revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Y]   = 0;
-    revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Z]   = 0;
+    AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
+
+    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X] = 0;
+    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y] = 0;
+    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z] = 0;
+    accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X]   = 0;
+    accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y]   = 0;
+    accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z]   = 0;
     revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_FALSE;
     int i;
     for (i = 0; i < 5; i++) {

@@ -35,6 +35,7 @@
 #include "manualcontrolsettings.h"
 #include "stabilizationsettings.h"
 #include "revocalibration.h"
+#include "accelgyrosettings.h"
 
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE = 50;
 const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE  = 400;
@@ -368,19 +369,24 @@ void VehicleConfigurationHelper::applySensorBiasConfiguration()
             RevoCalibration *revolutionCalibration = RevoCalibration::GetInstance(m_uavoManager);
             Q_ASSERT(revolutionCalibration);
             RevoCalibration::DataFields data = revolutionCalibration->getData();
+            AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(m_uavoManager);
+            Q_ASSERT(accelGyroSettings);
+            AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
 
             data.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
 
-            data.accel_bias[RevoCalibration::ACCEL_BIAS_X] += bias.m_accelerometerXBias;
-            data.accel_bias[RevoCalibration::ACCEL_BIAS_Y] += bias.m_accelerometerYBias;
-            data.accel_bias[RevoCalibration::ACCEL_BIAS_Z] += bias.m_accelerometerZBias + G;
+            accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X] += bias.m_accelerometerXBias;
+            accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y] += bias.m_accelerometerYBias;
+            accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z] += bias.m_accelerometerZBias + G;
 
-            data.gyro_bias[RevoCalibration::GYRO_BIAS_X]    = bias.m_gyroXBias;
-            data.gyro_bias[RevoCalibration::GYRO_BIAS_Y]    = bias.m_gyroYBias;
-            data.gyro_bias[RevoCalibration::GYRO_BIAS_Z]    = bias.m_gyroZBias;
+            accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X]    = bias.m_gyroXBias;
+            accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y]    = bias.m_gyroYBias;
+            accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z]    = bias.m_gyroZBias;
 
             revolutionCalibration->setData(data);
+            accelGyroSettings->setData(accelGyroSettingsData);
             addModifiedObject(revolutionCalibration, tr("Writing gyro and accelerometer bias settings"));
+            addModifiedObject(accelGyroSettings, tr("Writing gyro and accelerometer bias settings"));
             break;
         }
         default:

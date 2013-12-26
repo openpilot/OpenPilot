@@ -55,6 +55,7 @@
 #include <attitudestate.h>
 #include <attitudesettings.h>
 #include <revocalibration.h>
+#include <accelgyrosettings.h>
 #include <flightstatus.h>
 #include <taskinfo.h>
 
@@ -78,6 +79,7 @@ static void settingsUpdatedCb(UAVObjEvent *objEv);
 // Private variables
 static xTaskHandle sensorsTaskHandle;
 RevoCalibrationData cal;
+AccelGyroSettingsData agcal;
 
 // These values are initialized by settings but can be updated by the attitude algorithm
 
@@ -116,12 +118,13 @@ int32_t SensorsInitialize(void)
     MagSensorInitialize();
     RevoCalibrationInitialize();
     AttitudeSettingsInitialize();
+    AccelGyroSettingsInitialize();
 
     rotate = 0;
 
     RevoCalibrationConnectCallback(&settingsUpdatedCb);
     AttitudeSettingsConnectCallback(&settingsUpdatedCb);
-
+    AccelGyroSettingsConnectCallback(&settingsUpdatedCb);
     return 0;
 }
 
@@ -437,32 +440,32 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 {
     RevoCalibrationGet(&cal);
-
+    AccelGyroSettingsGet(&agcal);
     mag_bias[0]        = cal.mag_bias.X;
     mag_bias[1]        = cal.mag_bias.Y;
     mag_bias[2]        = cal.mag_bias.Z;
     mag_scale[0]       = cal.mag_scale.X;
     mag_scale[1]       = cal.mag_scale.Y;
     mag_scale[2]       = cal.mag_scale.Z;
-    accel_bias[0]      = cal.accel_bias.X;
-    accel_bias[1]      = cal.accel_bias.Y;
-    accel_bias[2]      = cal.accel_bias.Z;
-    accel_scale[0]     = cal.accel_scale.X;
-    accel_scale[1]     = cal.accel_scale.Y;
-    accel_scale[2]     = cal.accel_scale.Z;
-    gyro_staticbias[0] = cal.gyro_bias.X;
-    gyro_staticbias[1] = cal.gyro_bias.Y;
-    gyro_staticbias[2] = cal.gyro_bias.Z;
-    gyro_scale[0]      = cal.gyro_scale.X;
-    gyro_scale[1]      = cal.gyro_scale.Y;
-    gyro_scale[2]      = cal.gyro_scale.Z;
-    gyro_temp_coeff[0] = cal.gyro_temp_coeff.X;
-    gyro_temp_coeff[1] = cal.gyro_temp_coeff.Y;
-    gyro_temp_coeff[2] = cal.gyro_temp_coeff.Z;
-    gyro_temp_coeff[3] = cal.gyro_temp_coeff.Z2;
-    accel_temp_coeff[0] = cal.accel_temp_coeff.X;
-    accel_temp_coeff[1] = cal.accel_temp_coeff.Y;
-    accel_temp_coeff[2] = cal.accel_temp_coeff.Z;
+    accel_bias[0]      = agcal.accel_bias.X;
+    accel_bias[1]      = agcal.accel_bias.Y;
+    accel_bias[2]      = agcal.accel_bias.Z;
+    accel_scale[0]     = agcal.accel_scale.X;
+    accel_scale[1]     = agcal.accel_scale.Y;
+    accel_scale[2]     = agcal.accel_scale.Z;
+    gyro_staticbias[0] = agcal.gyro_bias.X;
+    gyro_staticbias[1] = agcal.gyro_bias.Y;
+    gyro_staticbias[2] = agcal.gyro_bias.Z;
+    gyro_scale[0]      = agcal.gyro_scale.X;
+    gyro_scale[1]      = agcal.gyro_scale.Y;
+    gyro_scale[2]      = agcal.gyro_scale.Z;
+    gyro_temp_coeff[0] = agcal.gyro_temp_coeff.X;
+    gyro_temp_coeff[1] = agcal.gyro_temp_coeff.Y;
+    gyro_temp_coeff[2] = agcal.gyro_temp_coeff.Z;
+    gyro_temp_coeff[3] = agcal.gyro_temp_coeff.Z2;
+    accel_temp_coeff[0] = agcal.accel_temp_coeff.X;
+    accel_temp_coeff[1] = agcal.accel_temp_coeff.Y;
+    accel_temp_coeff[2] = agcal.accel_temp_coeff.Z;
 
     AttitudeSettingsData attitudeSettings;
     AttitudeSettingsGet(&attitudeSettings);

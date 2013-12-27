@@ -42,6 +42,7 @@ MODULES += FirmwareIAP
 MODULES += StateEstimation
 #MODULES += Sensors/simulated/Sensors
 MODULES += Airspeed
+MODULES += AltitudeHold
 #MODULES += OveroSync
 
 # Paths

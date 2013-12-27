@@ -70,14 +70,12 @@
 // Private variables
 static DelayedCallbackInfo *altitudeHoldCBInfo;
 static AltitudeHoldSettingsData altitudeHoldSettings;
-static struct pid accelpid;
-static float accelStateDown;
+static struct pid pid0, pid1;
 
 
 // Private functions
 static void altitudeHoldTask(void);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
-static void AccelStateUpdatedCb(UAVObjEvent *ev);
 
 /**
  * Initialise the module, called on startup
@@ -106,7 +104,6 @@ int32_t AltitudeHoldInitialize()
 
     altitudeHoldCBInfo = DelayedCallbackCreate(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, STACK_SIZE_BYTES);
     AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
-    AccelStateConnectCallback(&AccelStateUpdatedCb);
 
     return 0;
 }
@@ -129,7 +126,8 @@ static void altitudeHoldTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO:
         break;
     default:
-        pid_zero(&accelpid);
+        pid_zero(&pid0);
+        pid_zero(&pid1);
         StabilizationDesiredThrottleGet(&startThrottle);
         DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
         return;
@@ -149,39 +147,12 @@ static void altitudeHoldTask(void)
     VelocityStateDownGet(&velocityStateDown);
 
     // altitude control loop
-    altitudeHoldStatus.VelocityDesired      = altitudeHoldSettings.AltitudeP * (altitudeHoldDesired.Altitude - positionStateDown) + altitudeHoldDesired.Velocity;
+    altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, 1.0f, altitudeHoldDesired.Altitude, positionStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
 
     // velocity control loop
-    altitudeHoldStatus.AccelerationDesired  = altitudeHoldSettings.VelocityP * (altitudeHoldStatus.VelocityDesired - velocityStateDown) - 9.81f;
-
-    altitudeHoldStatus.AccelerationFiltered = accelStateDown;
+    float throttle = startThrottle - pid_apply_setpoint(&pid1, 1.0f, altitudeHoldStatus.VelocityDesired, velocityStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
 
     AltitudeHoldStatusSet(&altitudeHoldStatus);
-
-    // compensate acceleration by rotation
-    // explanation: Rbe[2][2] is the Down component of a 0,0,1 vector rotated by Attitude.Q
-    // It is 1.0 for no rotation, 0.0 for a 90 degrees roll or pitch and -1.0 for a 180 degrees flipped rotation
-    // multiplying with 1/Rbe[2][2] therefore is the acceleration/thrust required to overcome gravity and achieve the wanted vertical
-    // acceleration at the current tilt angle.
-    // around 90 degrees rotation this is infinite (since no possible acceleration would get us up or down) so we set the error to zero to keep
-    // integrals from winding in any direction
-
-    AttitudeStateData attitudeState;
-    AttitudeStateGet(&attitudeState);
-    float Rbe[3][3];
-    Quaternion2R(&attitudeState.q1, Rbe);
-
-    float rotatedAccelDesired = altitudeHoldStatus.AccelerationDesired;
-#if 0
-    if (fabsf(Rbe[2][2]) > 1e-3f) {
-        rotatedAccelDesired /= Rbe[2][2];
-    } else {
-        rotatedAccelDesired = accelStateDown;
-    }
-#endif
-
-    // acceleration control loop
-    float throttle = startThrottle - pid_apply_setpoint(&accelpid, 1.0f, rotatedAccelDesired, accelStateDown, 1000 / DESIRED_UPDATE_RATE_MS);
 
     if (throttle >= 1.0f) {
         throttle = 1.0f;
@@ -204,18 +175,11 @@ static void altitudeHoldTask(void)
     DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
 }
 
-static void AccelStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
-{
-    float down;
-
-    AccelStatezGet(&down);
-    accelStateDown = down * altitudeHoldSettings.AccelAlpha + accelStateDown * (1.0f - altitudeHoldSettings.AccelAlpha);
-}
-
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     AltitudeHoldSettingsGet(&altitudeHoldSettings);
-    pid_configure(&accelpid, altitudeHoldSettings.AccelPI.Kp, altitudeHoldSettings.AccelPI.Kp, 0, altitudeHoldSettings.AccelPI.Ilimit);
-    pid_zero(&accelpid);
-    accelStateDown = 0.0f;
+    pid_configure(&pid0, altitudeHoldSettings.AltitudePI.Kp, altitudeHoldSettings.AltitudePI.Ki, 0, altitudeHoldSettings.AltitudePI.Ilimit);
+    pid_zero(&pid0);
+    pid_configure(&pid1, altitudeHoldSettings.VelocityPI.Kp, altitudeHoldSettings.VelocityPI.Ki, 0, altitudeHoldSettings.VelocityPI.Ilimit);
+    pid_zero(&pid1);
 }

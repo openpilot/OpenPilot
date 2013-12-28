@@ -4271,7 +4271,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Armed</source>
-        <translation type="unfinished">Armé</translation>
+        <translation>Armé</translation>
     </message>
     <message>
         <location/>
@@ -4281,7 +4281,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>UDP Control</source>
-        <translation type="unfinished">Contrôle UDP</translation>
+        <translation>Contrôle UDP</translation>
     </message>
 </context>
 <context>
@@ -4576,7 +4576,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/autotune.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -4596,92 +4596,101 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Autotune Setup</source>
-        <translation type="unfinished">Paramètres Autotune</translation>
+        <translation>Paramètres Autotune</translation>
     </message>
     <message>
         <location/>
         <source>Tuning Aggressiveness</source>
-        <translation type="unfinished">Réglage Agressivité</translation>
+        <translation>Réglage Agressivité</translation>
     </message>
     <message>
         <location/>
         <source>Rate Tuning:</source>
-        <translation type="unfinished">Réglage Rate :</translation>
+        <translation>Réglage Rate :</translation>
     </message>
     <message>
         <location/>
         <source>Attitude Tuning:</source>
-        <translation type="unfinished">Réglage Attitude :</translation>
+        <translation>Réglage Attitude :</translation>
     </message>
     <message>
         <location/>
         <source>objname:RelayTuningSettings</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RateGain</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.01</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:AttitudeGain</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Measured Properties</source>
-        <translation type="unfinished">Propriétés Mesurées</translation>
+        <translation>Propriétés Mesurées</translation>
     </message>
     <message>
         <location/>
         <source>Roll:</source>
-        <translation type="unfinished">Roll :</translation>
+        <translation>Roll :</translation>
     </message>
     <message>
         <location/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>objname:RelayTuning</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Period</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Roll</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Gain</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Period (ms)</source>
-        <translation type="unfinished">Période (ms)</translation>
+        <translation>Période (ms)</translation>
     </message>
     <message>
         <location/>
         <source>Gain (deg/s) / output</source>
-        <translation type="unfinished">Gain (deg/s) / sortie</translation>
+        <translation>Gain (deg/s) / sortie</translation>
     </message>
     <message>
         <location/>
@@ -4691,12 +4700,13 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>element:Pitch</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Computed Values</source>
-        <translation type="unfinished">Valeurs Calculées</translation>
+        <translation>Valeurs Calculées</translation>
     </message>
     <message>
         <location/>
@@ -4726,23 +4736,24 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Apply Computed Values</source>
-        <translation type="unfinished">Utiliser les Valeurs Calculées</translation>
+        <translation>Utiliser les Valeurs Calculées</translation>
     </message>
     <message>
         <location/>
         <source>Step Size</source>
-        <translation type="unfinished">Taille Sautillements</translation>
+        <translation>Taille Sautillements</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Amplitude</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>The Apply and Save buttons below save the autotuning settings which
 will alter settings for the next autotuning flight</source>
-        <translation type="unfinished">Les boutons Appliquer et Enregistrer ci-dessous enregistrent les paramètres de réglage automatique qui seront pris en compte pour le prochain vol en mode Autotune</translation>
+        <translation>Les boutons Appliquer et Enregistrer ci-dessous enregistrent les paramètres de réglage automatique qui seront pris en compte pour le prochain vol en mode Autotune</translation>
     </message>
     <message>
         <location/>
@@ -4770,32 +4781,34 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte sans enregistrer dans la mémoire</translation>
+        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire</translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">Appliquer</translation>
+        <translation>Appliquer</translation>
     </message>
     <message>
         <location/>
         <source>button:apply</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire</translation>
+        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">Enregistrer</translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location/>
         <source>button:save</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4814,7 +4827,7 @@ p, li { white-space: pre-wrap; }
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We&apos;d recommend checking your stabilization settings before trying them out (ie: compare to what you currently use, if they are VASTLY different, probably a good indication bad things will happen).&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly the new settings.&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you&apos;re ready to proceed, click the &lt;span style=&quot; font-style:italic;&quot;&gt;Enable Autotune Module&lt;/span&gt; checkbox above this text, click &lt;span style=&quot; font-style:italic;&quot;&gt;save&lt;/span&gt; and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -4833,7 +4846,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>After enabling the module, you must power cycle before using and configuring.</source>
-        <translation type="unfinished">Après activation du module, vous devez redémarrer la carte avant de l&apos;utiliser et le configurer.</translation>
+        <translation>Après activation du module, vous devez redémarrer la carte avant de l&apos;utiliser et le configurer.</translation>
     </message>
 </context>
 <context>
@@ -5697,47 +5710,47 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Servo W</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Servo X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Front</source>
-        <translation type="unfinished">Avant</translation>
+        <translation>Avant</translation>
     </message>
     <message>
         <location/>
         <source>Right</source>
-        <translation type="unfinished">Droite</translation>
+        <translation>Droite</translation>
     </message>
     <message>
         <location/>
         <source>Rear</source>
-        <translation type="unfinished">Arrière</translation>
+        <translation>Arrière</translation>
     </message>
     <message>
         <location/>
         <source>Left</source>
-        <translation type="unfinished">Gauche</translation>
+        <translation>Gauche</translation>
     </message>
     <message>
         <location/>
         <source>1st Servo</source>
-        <translation type="unfinished">1er Servo</translation>
+        <translation>1er Servo</translation>
     </message>
     <message>
         <location/>
         <source>Servo Z</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Servo Y</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7607,7 +7620,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In Weak Leveling mode, this is the maximum number of degrees per second that weak leveling will move the vehicle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode Weak Leveling, correspond à la vitesse de rotation maximale en degrés par seconde de l&apos;appareil.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode Weak Leveling, correspond à la vitesse de rotation maximale en degrés par seconde de l&apos;appareil.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7746,7 +7759,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7787,7 +7800,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Attitude Mode. Adding Ki in Attitude when Ki is present in Rate is not recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Attitude. Ajouter une valeur d&apos;intégrale en mode Attitude lorsque une intégrale est présente en mode Rate n&apos;est pas recommandé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Attitude. Ajouter une valeur d&apos;intégrale en mode Attitude lorsque une intégrale est présente en mode Rate n&apos;est pas recommandé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -9400,7 +9413,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>ic</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10187,7 +10200,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/modelview/modelviewgadgetfactory.cpp" line="+36"/>
         <source>ModelView</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VueModèle</translation>
     </message>
 </context>
 <context>
@@ -10297,7 +10310,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/qmlview/qmlviewgadgetfactory.cpp" line="+36"/>
         <source>QML Viewer, QML</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Visionneur QML, QML</translation>
     </message>
 </context>
 <context>
@@ -10305,7 +10318,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetfactory.cpp" line="+36"/>
         <source>Scope</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Graphique</translation>
     </message>
 </context>
 <context>
@@ -10883,37 +10896,37 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Servo W</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Servo X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Front</source>
-        <translation type="unfinished"></translation>
+        <translation>Avant</translation>
     </message>
     <message>
         <location/>
         <source>Right</source>
-        <translation type="unfinished">Droite</translation>
+        <translation>Droite</translation>
     </message>
     <message>
         <location/>
         <source>Rear</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrière</translation>
     </message>
     <message>
         <location/>
         <source>Left</source>
-        <translation type="unfinished">Gauche</translation>
+        <translation>Gauche</translation>
     </message>
     <message>
         <location/>
         <source>1st Servo</source>
-        <translation type="unfinished">1er Servo</translation>
+        <translation>1er Servo</translation>
     </message>
     <message>
         <location/>
@@ -10988,12 +11001,12 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>100%</source>
-        <translation type="unfinished">100%</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>0%</source>
-        <translation type="unfinished">0%</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11028,57 +11041,57 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Commands</source>
-        <translation type="unfinished"></translation>
+        <translation>Commandes</translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished">Démarrer</translation>
+        <translation>Démarrer</translation>
     </message>
     <message>
         <location/>
         <source>Next</source>
-        <translation type="unfinished">Suivant</translation>
+        <translation>Suivant</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location/>
         <source>Finish</source>
-        <translation type="unfinished">Terminer</translation>
+        <translation>Terminer</translation>
     </message>
     <message>
         <location/>
         <source>Status</source>
-        <translation type="unfinished">Statut</translation>
+        <translation>Statut</translation>
     </message>
     <message>
         <location/>
         <source>Neutral</source>
-        <translation type="unfinished">Neutre</translation>
+        <translation>Neutre</translation>
     </message>
     <message>
         <location/>
         <source>Max</source>
-        <translation type="unfinished">Maxi</translation>
+        <translation>Maxi</translation>
     </message>
     <message>
         <location/>
         <source>Min</source>
-        <translation type="unfinished">Mini</translation>
+        <translation>Mini</translation>
     </message>
     <message>
         <location/>
         <source>Verify</source>
-        <translation type="unfinished">Vérifier</translation>
+        <translation>Vérifier</translation>
     </message>
     <message>
         <location/>
         <source>Position</source>
-        <translation type="unfinished">Position</translation>
+        <translation>Position</translation>
     </message>
     <message>
         <location/>
@@ -11088,27 +11101,27 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Curve settings</source>
-        <translation type="unfinished">Paramètres de la courbe</translation>
+        <translation>Paramètres de la courbe</translation>
     </message>
     <message>
         <location/>
         <source>Advanced settings</source>
-        <translation type="unfinished">Paramètres avancés</translation>
+        <translation>Paramètres avancés</translation>
     </message>
     <message>
         <location/>
         <source>Channel</source>
-        <translation type="unfinished">Canal</translation>
+        <translation>Canal</translation>
     </message>
     <message>
         <location/>
         <source>Curve 1</source>
-        <translation type="unfinished">Courbe 1</translation>
+        <translation>Courbe 1</translation>
     </message>
     <message>
         <location/>
         <source>Curve 2</source>
-        <translation type="unfinished">Courbe 2</translation>
+        <translation>Courbe 2</translation>
     </message>
     <message>
         <location/>
@@ -11118,7 +11131,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
 </context>
 <context>
@@ -11161,67 +11174,67 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Ch 1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 10</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 11</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Ch 12</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
 </context>
 <context>
@@ -12472,13 +12485,13 @@ Veuillez sélectionner une zone de la carte à télécharger avec &lt;CTRL&gt;+C
     <message>
         <location filename="../../../src/plugins/coreplugin/qml/AboutDialog.qml" line="+75"/>
         <source>OpenPilot Ground Control Station</source>
-        <translation type="unfinished">Station de Contrôle au Sol OpenPilot (GCS)</translation>
+        <translation>Station de Contrôle au Sol OpenPilot (GCS)</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</source>
-        <translation type="unfinished">Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier dans le cadre des termes de la licence GNU General Public Licence publiée par la Free Software Foundation; soit à la version 3 de la Licence, ou (en option) à une version ultérieure. Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.</translation>
+        <translation>Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier dans le cadre des termes de la licence GNU General Public Licence publiée par la Free Software Foundation; soit à la version 3 de la Licence, ou (en option) à une version ultérieure. Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -12497,12 +12510,12 @@ The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRAN
     <message>
         <location filename="../../../src/plugins/coreplugin/aboutdialog.cpp" line="+48"/>
         <source>About OpenPilot</source>
-        <translation type="unfinished">À propos d&apos;OpenPilot</translation>
+        <translation>À propos d&apos;OpenPilot</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;</source>
-        <translation type="unfinished">Révision : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;</translation>
+        <translation>Révision : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -12598,78 +12611,78 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/welcome/qml/ActivityPanel.qml" line="+13"/>
         <source>Project Activity</source>
-        <translation type="unfinished">Activité Projet</translation>
+        <translation>Activité Projet</translation>
     </message>
     <message>
         <location line="+130"/>
         <source>Commented on </source>
-        <translation type="unfinished">Commenté sur </translation>
+        <translation>Commenté sur </translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Created </source>
-        <translation type="unfinished">Créé </translation>
+        <translation>Créé </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Created and started </source>
-        <translation type="unfinished">Créé et démarré </translation>
+        <translation>Créé et démarré </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Completed </source>
-        <translation type="unfinished">Terminé </translation>
+        <translation>Terminé </translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Closed </source>
-        <translation type="unfinished">Fermé </translation>
+        <translation>Fermé </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Abandoned </source>
-        <translation type="unfinished">Abandonné </translation>
+        <translation>Abandonné </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Committed </source>
         <translatorcomment>Traduction FR ? http://fr.wikipedia.org/wiki/Commit</translatorcomment>
-        <translation type="unfinished">Liste des modifications effectuées </translation>
+        <translation>Liste des modifications effectuées </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Resolved </source>
-        <translation type="unfinished">Résolu </translation>
+        <translation>Résolu </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Started </source>
-        <translation type="unfinished">Démarré </translation>
+        <translation>Démarré </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Started working on </source>
-        <translation type="unfinished">Débuté travaux sur </translation>
+        <translation>Débuté travaux sur </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stopped working on </source>
-        <translation type="unfinished">Arrêté travaux sur </translation>
+        <translation>Arrêté travaux sur </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Requested code review on </source>
-        <translation type="unfinished">Demandé relecture code le </translation>
+        <translation>Demandé relecture code le </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Requested testing of </source>
-        <translation type="unfinished">Demandé phase de tests sur </translation>
+        <translation>Demandé phase de tests sur </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Updated </source>
-        <translation type="unfinished">Mis à Jour </translation>
+        <translation>Mis à Jour </translation>
     </message>
 </context>
 <context>
@@ -12709,27 +12722,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/flightlog/FlightLogDialog.qml" line="+27"/>
         <source>Log entries</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Entrées log</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Flight</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vol</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temps</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Empty</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vide</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Text</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Texte</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -12739,17 +12752,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>Unknown</source>
-        <translation type="unfinished">Inconnu</translation>
+        <translation>Inconnu</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Données</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Flights recorded: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vols enregistrés : </translation>
     </message>
     <message>
         <location line="+5"/>
@@ -12759,12 +12772,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+15"/>
         <source>Flight to download:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vols à télécharger :</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Download logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Télécharger logs</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -12779,7 +12792,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+9"/>
         <source>Clear all logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Effacer tous les logs</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -12789,7 +12802,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+7"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OK</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/flightlog/flightlogdialog.cpp" line="+45"/>
@@ -12802,27 +12815,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/flightlog/flightlogmanager.cpp" line="+205"/>
         <source>Save Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Enregistrer Log</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OP-%0.opl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot Log (*.opl)</source>
-        <translation type="unfinished">Journal OpenPilot (*.opl)</translation>
+        <translation>Journal OpenPilot (*.opl)</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>_flight-%1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">_vol-%1</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tout</translation>
     </message>
 </context>
 <context>
@@ -12830,7 +12843,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/flightlog/flightlogplugin.cpp" line="+60"/>
         <source>Manage flight side logs...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gérer les logs de vol...</translation>
     </message>
 </context>
 <context>
@@ -12838,7 +12851,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/telemetry/monitorgadgetfactory.cpp" line="+38"/>
         <source>Telemetry Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Moniteur de Télémétrie</translation>
     </message>
 </context>
 <context>
@@ -12846,12 +12859,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/telemetry/monitorwidget.cpp" line="+216"/>
         <source>Connected</source>
-        <translation type="unfinished">Connecté</translation>
+        <translation>Connecté</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Disconnected</source>
-        <translation type="unfinished">Déconnecté</translation>
+        <translation>Déconnecté</translation>
     </message>
 </context>
 </TS>

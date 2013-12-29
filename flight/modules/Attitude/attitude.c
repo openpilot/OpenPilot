@@ -103,15 +103,17 @@ static int8_t rotate = 0;
 static bool zero_during_arming = false;
 static bool bias_correct_gyro  = true;
 
+// static float gyros_passed[3];
+
 // temp coefficient to calculate gyro bias
-static bool apply_gyro_temp = false;
-static bool apply_accel_temp = false;
-static float gyro_temp_coeff[4] = {0};
-static float accel_temp_coeff[4] = {0};
+static bool apply_gyro_temp     = false;
+static bool apply_accel_temp    = false;
+static float gyro_temp_coeff[4] = { 0 };
+static float accel_temp_coeff[4] = { 0 };
 
 // Accel and Gyro scaling (this is the product of sensor scale and adjustement in AccelGyroSettings
-static float gyro_scale[3] = {0};
-static float accel_scale[3] = {0};
+static float gyro_scale[3] = { 0 };
+static float accel_scale[3] = { 0 };
 
 
 // For running trim flights
@@ -120,15 +122,15 @@ static volatile int32_t trim_accels[3];
 static volatile int32_t trim_samples;
 int32_t const MAX_TRIM_FLIGHT_SAMPLES = 65535;
 
-#define GRAV        9.81f
-#define STD_CC_ACCEL_SCALE (GRAV * 0.004f)
+#define GRAV                       9.81f
+#define STD_CC_ACCEL_SCALE         (GRAV * 0.004f)
 /* 0.004f is gravity / LSB */
-#define STD_CC_ANALOG_GYRO_NEUTRAL  1665
-#define STD_CC_ANALOG_GYRO_GAIN     0.42f
+#define STD_CC_ANALOG_GYRO_NEUTRAL 1665
+#define STD_CC_ANALOG_GYRO_GAIN    0.42f
 
-//  Used to detect CC vs CC3D
+// Used to detect CC vs CC3D
 static const struct pios_board_info *bdinfo = &pios_board_info_blob;
-#define BOARDISCC3D (bdinfo->board_rev == 0x02)
+#define BOARDISCC3D                (bdinfo->board_rev == 0x02)
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
@@ -330,9 +332,9 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
         z += -accel_data.z;
     } while ((i < 32) && (samples_remaining > 0));
 
-    float accel[3] = {  accel_scale[0] * (float)x / i,
-                        accel_scale[1] * (float)y / i,
-                        accel_scale[2] * (float)z / i };
+    float accel[3] = { accel_scale[0] * (float)x / i,
+                       accel_scale[1] * (float)y / i,
+                       accel_scale[2] * (float)z / i };
 
     if (rotate) {
         // TODO: rotate sensors too so stabilization is well behaved
@@ -424,13 +426,13 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     accels[1] = mpu6000_data.accel_y * accel_scale[1];
     accels[2] = mpu6000_data.accel_z * accel_scale[2];
 
-    if(apply_gyro_temp) {
-        gyros[0]  -= gyro_temp_coeff[0] * mpu6000_data.temperature;
-        gyros[1]  -= gyro_temp_coeff[1] * mpu6000_data.temperature;
-        gyros[2]  -= (gyro_temp_coeff[2] + gyro_temp_coeff[3] * mpu6000_data.temperature) * mpu6000_data.temperature;
+    if (apply_gyro_temp) {
+        gyros[0] -= gyro_temp_coeff[0] * mpu6000_data.temperature;
+        gyros[1] -= gyro_temp_coeff[1] * mpu6000_data.temperature;
+        gyros[2] -= (gyro_temp_coeff[2] + gyro_temp_coeff[3] * mpu6000_data.temperature) * mpu6000_data.temperature;
     }
 
-    if(apply_accel_temp){
+    if (apply_accel_temp) {
         accels[0] -= accel_temp_coeff[0] * mpu6000_data.temperature;
         accels[1] -= accel_temp_coeff[1] * mpu6000_data.temperature;
         accels[2] -= accel_temp_coeff[2] * mpu6000_data.temperature;
@@ -629,53 +631,53 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         accel_filter_enabled = true;
     }
 
-    zero_during_arming = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
-    bias_correct_gyro  = attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE;
+    zero_during_arming  = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
+    bias_correct_gyro   = attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE;
 
-    gyro_temp_coeff[0] = accelGyroSettings.gyro_temp_coeff.X;
-    gyro_temp_coeff[1] = accelGyroSettings.gyro_temp_coeff.Y;
-    gyro_temp_coeff[2] = accelGyroSettings.gyro_temp_coeff.Z;
-    gyro_temp_coeff[3] = accelGyroSettings.gyro_temp_coeff.Z2;
+    gyro_temp_coeff[0]  = accelGyroSettings.gyro_temp_coeff.X;
+    gyro_temp_coeff[1]  = accelGyroSettings.gyro_temp_coeff.Y;
+    gyro_temp_coeff[2]  = accelGyroSettings.gyro_temp_coeff.Z;
+    gyro_temp_coeff[3]  = accelGyroSettings.gyro_temp_coeff.Z2;
 
     accel_temp_coeff[0] = accelGyroSettings.accel_temp_coeff.X;
     accel_temp_coeff[1] = accelGyroSettings.accel_temp_coeff.Y;
     accel_temp_coeff[2] = accelGyroSettings.accel_temp_coeff.Z;
 
-    apply_gyro_temp = ( fabsf(gyro_temp_coeff[0])> 1e-6f ||
-                        fabsf(gyro_temp_coeff[1])> 1e-6f ||
-                        fabsf(gyro_temp_coeff[2])> 1e-6f ||
-                        fabsf(gyro_temp_coeff[3])> 1e-6f);
+    apply_gyro_temp     = (fabsf(gyro_temp_coeff[0]) > 1e-6f ||
+                           fabsf(gyro_temp_coeff[1]) > 1e-6f ||
+                           fabsf(gyro_temp_coeff[2]) > 1e-6f ||
+                           fabsf(gyro_temp_coeff[3]) > 1e-6f);
 
-    apply_accel_temp = (fabsf(accel_temp_coeff[0])> 1e-6f ||
-                        fabsf(accel_temp_coeff[1])> 1e-6f ||
-                        fabsf(accel_temp_coeff[2])> 1e-6f);
+    apply_accel_temp = (fabsf(accel_temp_coeff[0]) > 1e-6f ||
+                        fabsf(accel_temp_coeff[1]) > 1e-6f ||
+                        fabsf(accel_temp_coeff[2]) > 1e-6f);
 
     gyro_correct_int[0] = accelGyroSettings.gyro_bias.X;
     gyro_correct_int[1] = accelGyroSettings.gyro_bias.Y;
     gyro_correct_int[2] = accelGyroSettings.gyro_bias.Z;
 
 
-    if(BOARDISCC3D) {
-        accelbias[0] = accelGyroSettings.accel_bias.X;
-        accelbias[1] = accelGyroSettings.accel_bias.Y;
-        accelbias[2] = accelGyroSettings.accel_bias.Z;
+    if (BOARDISCC3D) {
+        accelbias[0]   = accelGyroSettings.accel_bias.X;
+        accelbias[1]   = accelGyroSettings.accel_bias.Y;
+        accelbias[2]   = accelGyroSettings.accel_bias.Z;
 
-        gyro_scale[0] = accelGyroSettings.gyro_scale.X * PIOS_MPU6000_GetScale ();
-        gyro_scale[1] = accelGyroSettings.gyro_scale.Y * PIOS_MPU6000_GetScale ();
-        gyro_scale[2] = accelGyroSettings.gyro_scale.Z * PIOS_MPU6000_GetScale ();
+        gyro_scale[0]  = accelGyroSettings.gyro_scale.X * PIOS_MPU6000_GetScale();
+        gyro_scale[1]  = accelGyroSettings.gyro_scale.Y * PIOS_MPU6000_GetScale();
+        gyro_scale[2]  = accelGyroSettings.gyro_scale.Z * PIOS_MPU6000_GetScale();
 
         accel_scale[0] = accelGyroSettings.accel_scale.X * PIOS_MPU6000_GetAccelScale();
         accel_scale[1] = accelGyroSettings.accel_scale.Y * PIOS_MPU6000_GetAccelScale();
         accel_scale[2] = accelGyroSettings.accel_scale.Z * PIOS_MPU6000_GetAccelScale();
     } else {
         // Original CC with analog gyros and ADXL accel
-        accelbias[0] = accelGyroSettings.accel_bias.X;
-        accelbias[1] = accelGyroSettings.accel_bias.Y;
-        accelbias[2] = accelGyroSettings.accel_bias.Z;
+        accelbias[0]   = accelGyroSettings.accel_bias.X;
+        accelbias[1]   = accelGyroSettings.accel_bias.Y;
+        accelbias[2]   = accelGyroSettings.accel_bias.Z;
 
-        gyro_scale[0] = accelGyroSettings.gyro_scale.X * STD_CC_ANALOG_GYRO_GAIN;
-        gyro_scale[1] = accelGyroSettings.gyro_scale.Y * STD_CC_ANALOG_GYRO_GAIN;
-        gyro_scale[2] = accelGyroSettings.gyro_scale.Z * STD_CC_ANALOG_GYRO_GAIN;
+        gyro_scale[0]  = accelGyroSettings.gyro_scale.X * STD_CC_ANALOG_GYRO_GAIN;
+        gyro_scale[1]  = accelGyroSettings.gyro_scale.Y * STD_CC_ANALOG_GYRO_GAIN;
+        gyro_scale[2]  = accelGyroSettings.gyro_scale.Z * STD_CC_ANALOG_GYRO_GAIN;
 
         accel_scale[0] = accelGyroSettings.accel_scale.X * STD_CC_ACCEL_SCALE;
         accel_scale[1] = accelGyroSettings.accel_scale.Y * STD_CC_ACCEL_SCALE;
@@ -712,7 +714,7 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         accelGyroSettings.accel_scale.Y = trim_accels[1] / trim_samples;
         // Z should average -grav
         accelGyroSettings.accel_scale.Z = trim_accels[2] / trim_samples + GRAV;
-        attitudeSettings.TrimFlight  = ATTITUDESETTINGS_TRIMFLIGHT_NORMAL;
+        attitudeSettings.TrimFlight     = ATTITUDESETTINGS_TRIMFLIGHT_NORMAL;
         AttitudeSettingsSet(&attitudeSettings);
     } else {
         trim_requested = false;

@@ -90,8 +90,8 @@ static float accel_scale[3] = { 0, 0, 0 };
 static float gyro_staticbias[3] = { 0, 0, 0 };
 static float gyro_scale[3] = { 0, 0, 0 };
 // temp coefficient to calculate gyro bias
-static float gyro_temp_coeff[4] = {0};
-static float accel_temp_coeff[4] = {0};
+static float gyro_temp_coeff[4] = { 0 };
+static float accel_temp_coeff[4] = { 0 };
 
 static float R[3][3] = {
     { 0 }
@@ -358,7 +358,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                                 - accel_temp_coeff[1] * accelSensorData.temperature,
                                 accels[2] * accel_scaling * accel_scale[2]
                                 - accel_bias[2]
-                                - accel_temp_coeff[2] * accelSensorData.temperature};
+                                - accel_temp_coeff[2] * accelSensorData.temperature };
         if (rotate) {
             rot_mult(R, accels_out, accels);
             accelSensorData.x = accels[0];
@@ -376,15 +376,15 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                                (float)gyro_accum[1] / gyro_samples,
                                (float)gyro_accum[2] / gyro_samples };
         float gyros_out[3] = { gyros[0] * gyro_scaling * gyro_scale[0]
-                                - gyro_staticbias[0]
-                                - gyro_temp_coeff[0] * gyroSensorData.temperature,
+                               - gyro_staticbias[0]
+                               - gyro_temp_coeff[0] * gyroSensorData.temperature,
                                gyros[1] * gyro_scaling * gyro_scale[1]
-                                - gyro_staticbias[1]
-                                - gyro_temp_coeff[1] * gyroSensorData.temperature,
+                               - gyro_staticbias[1]
+                               - gyro_temp_coeff[1] * gyroSensorData.temperature,
                                gyros[2] * gyro_scaling * gyro_scale[2]
-                                - gyro_staticbias[2]
-                                - gyro_temp_coeff[2] * gyroSensorData.temperature
-                                - gyro_temp_coeff[3] * gyroSensorData.temperature * gyroSensorData.temperature};
+                               - gyro_staticbias[2]
+                               - gyro_temp_coeff[2] * gyroSensorData.temperature
+                               - gyro_temp_coeff[3] * gyroSensorData.temperature * gyroSensorData.temperature };
         if (rotate) {
             rot_mult(R, gyros_out, gyros);
             gyroSensorData.x = gyros[0];
@@ -441,28 +441,28 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 {
     RevoCalibrationGet(&cal);
     AccelGyroSettingsGet(&agcal);
-    mag_bias[0]        = cal.mag_bias.X;
-    mag_bias[1]        = cal.mag_bias.Y;
-    mag_bias[2]        = cal.mag_bias.Z;
-    mag_scale[0]       = cal.mag_scale.X;
-    mag_scale[1]       = cal.mag_scale.Y;
-    mag_scale[2]       = cal.mag_scale.Z;
-    accel_bias[0]      = agcal.accel_bias.X;
-    accel_bias[1]      = agcal.accel_bias.Y;
-    accel_bias[2]      = agcal.accel_bias.Z;
-    accel_scale[0]     = agcal.accel_scale.X;
-    accel_scale[1]     = agcal.accel_scale.Y;
-    accel_scale[2]     = agcal.accel_scale.Z;
-    gyro_staticbias[0] = agcal.gyro_bias.X;
-    gyro_staticbias[1] = agcal.gyro_bias.Y;
-    gyro_staticbias[2] = agcal.gyro_bias.Z;
-    gyro_scale[0]      = agcal.gyro_scale.X;
-    gyro_scale[1]      = agcal.gyro_scale.Y;
-    gyro_scale[2]      = agcal.gyro_scale.Z;
-    gyro_temp_coeff[0] = agcal.gyro_temp_coeff.X;
-    gyro_temp_coeff[1] = agcal.gyro_temp_coeff.Y;
-    gyro_temp_coeff[2] = agcal.gyro_temp_coeff.Z;
-    gyro_temp_coeff[3] = agcal.gyro_temp_coeff.Z2;
+    mag_bias[0]         = cal.mag_bias.X;
+    mag_bias[1]         = cal.mag_bias.Y;
+    mag_bias[2]         = cal.mag_bias.Z;
+    mag_scale[0]        = cal.mag_scale.X;
+    mag_scale[1]        = cal.mag_scale.Y;
+    mag_scale[2]        = cal.mag_scale.Z;
+    accel_bias[0]       = agcal.accel_bias.X;
+    accel_bias[1]       = agcal.accel_bias.Y;
+    accel_bias[2]       = agcal.accel_bias.Z;
+    accel_scale[0]      = agcal.accel_scale.X;
+    accel_scale[1]      = agcal.accel_scale.Y;
+    accel_scale[2]      = agcal.accel_scale.Z;
+    gyro_staticbias[0]  = agcal.gyro_bias.X;
+    gyro_staticbias[1]  = agcal.gyro_bias.Y;
+    gyro_staticbias[2]  = agcal.gyro_bias.Z;
+    gyro_scale[0]       = agcal.gyro_scale.X;
+    gyro_scale[1]       = agcal.gyro_scale.Y;
+    gyro_scale[2]       = agcal.gyro_scale.Z;
+    gyro_temp_coeff[0]  = agcal.gyro_temp_coeff.X;
+    gyro_temp_coeff[1]  = agcal.gyro_temp_coeff.Y;
+    gyro_temp_coeff[2]  = agcal.gyro_temp_coeff.Z;
+    gyro_temp_coeff[3]  = agcal.gyro_temp_coeff.Z2;
     accel_temp_coeff[0] = agcal.accel_temp_coeff.X;
     accel_temp_coeff[1] = agcal.accel_temp_coeff.Y;
     accel_temp_coeff[2] = agcal.accel_temp_coeff.Z;

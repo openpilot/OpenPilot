@@ -146,6 +146,10 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization2Settings", ui->fmsSsPos2Yaw, "Yaw", 1, true);
     addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization3Settings", ui->fmsSsPos3Yaw, "Yaw", 1, true);
 
+    addUAVObjectToWidgetRelation("StabilizationSettings", "FlightModeMap", ui->pidBankSs1, "Stabilized1", 1, true);
+    addUAVObjectToWidgetRelation("StabilizationSettings", "FlightModeMap", ui->pidBankSs2, "Stabilized2", 1, true);
+    addUAVObjectToWidgetRelation("StabilizationSettings", "FlightModeMap", ui->pidBankSs3, "Stabilized3", 1, true);
+
     addUAVObjectToWidgetRelation("ManualControlSettings", "Arming", ui->armControl);
     addUAVObjectToWidgetRelation("ManualControlSettings", "ArmedTimeout", ui->armTimeout, 0, 1000);
     connect(ManualControlCommand::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveFMSlider()));

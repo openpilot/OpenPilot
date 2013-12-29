@@ -1,10 +1,7 @@
 <xml>
     <object name="AttitudeSettings" singleinstance="true" settings="true" category="State">
         <description>Settings for the @ref Attitude module used on CopterControl</description>
-        <field name="AccelBias" units="lsb" type="int16" elementnames="X,Y,Z" defaultvalue="0"/>
-        <field name="GyroBias" units="deg/s * 100" type="int16" elementnames="X,Y,Z" defaultvalue="0"/>
         <field name="BoardRotation" units="deg" type="int16" elementnames="Roll,Pitch,Yaw" defaultvalue="0,0,0"/>
-        <field name="GyroGain" units="(rad/s)/lsb" type="float" elements="1" defaultvalue="0.42"/>
         <field name="AccelKp" units="channel" type="float" elements="1" defaultvalue="0.05"/>
         <field name="AccelKi" units="channel" type="float" elements="1" defaultvalue="0.0001"/>
         <field name="MagKi" units="" type="float" elements="1" defaultvalue="0"/>

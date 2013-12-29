@@ -104,8 +104,8 @@ static bool zero_during_arming = false;
 static bool bias_correct_gyro  = true;
 
 // temp coefficient to calculate gyro bias
-bool apply_gyro_temp = false;
-bool apply_accel_temp = false;
+static bool apply_gyro_temp = false;
+static bool apply_accel_temp = false;
 static float gyro_temp_coeff[4] = {0};
 static float accel_temp_coeff[4] = {0};
 
@@ -400,7 +400,7 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
  * @param[in] attitudeRaw Populate the UAVO instead of saving right here
  * @return 0 if successfull, -1 if not
  */
-struct pios_mpu6000_data mpu6000_data;
+static struct pios_mpu6000_data mpu6000_data;
 static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *gyrosData)
 {
     float accels[3], gyros[3];
@@ -416,7 +416,6 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     if (GyroStateReadOnly() || AccelStateReadOnly()) {
         return 0;
     }
-
     gyros[0]  = mpu6000_data.gyro_x * gyro_scale[0];
     gyros[1]  = mpu6000_data.gyro_y * gyro_scale[1];
     gyros[2]  = mpu6000_data.gyro_z * gyro_scale[2];
@@ -425,6 +424,17 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     accels[1] = mpu6000_data.accel_y * accel_scale[1];
     accels[2] = mpu6000_data.accel_z * accel_scale[2];
 
+    if(apply_gyro_temp) {
+        gyros[0]  -= gyro_temp_coeff[0] * mpu6000_data.temperature;
+        gyros[1]  -= gyro_temp_coeff[1] * mpu6000_data.temperature;
+        gyros[2]  -= (gyro_temp_coeff[2] + gyro_temp_coeff[3] * mpu6000_data.temperature) * mpu6000_data.temperature;
+    }
+
+    if(apply_accel_temp){
+        accels[0] -= accel_temp_coeff[0] * mpu6000_data.temperature;
+        accels[1] -= accel_temp_coeff[1] * mpu6000_data.temperature;
+        accels[2] -= accel_temp_coeff[2] * mpu6000_data.temperature;
+    }
     // gyrosData->temperature  = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
     // accelsData->temperature = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
 #endif /* if defined(PIOS_INCLUDE_MPU6000) */

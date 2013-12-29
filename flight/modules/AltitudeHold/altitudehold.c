@@ -149,10 +149,25 @@ static void altitudeHoldTask(void)
     // altitude control loop
     altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, 1.0f, altitudeHoldDesired.Altitude, positionStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
 
+    AltitudeHoldStatusSet(&altitudeHoldStatus);
+
     // velocity control loop
     float throttle = startThrottle - pid_apply_setpoint(&pid1, 1.0f, altitudeHoldStatus.VelocityDesired, velocityStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
 
-    AltitudeHoldStatusSet(&altitudeHoldStatus);
+    // compensate throttle for current attitude
+    // Rbe[2][2] in the rotation matrix is the rotated down component of a
+    // 0,0,1 vector
+    // it is used to scale the throttle, but only up to 4 times the regular
+    // throttle
+    AttitudeStateData attitudeState;
+    AttitudeStateGet(&attitudeState);
+    float Rbe[3][3];
+    Quaternion2R(&attitudeState.q1, Rbe);
+    if (fabsf(Rbe[2][2]) > 0.25f) {
+        throttle /= Rbe[2][2];
+    } else {
+        throttle /= 0.25f;
+    }
 
     if (throttle >= 1.0f) {
         throttle = 1.0f;

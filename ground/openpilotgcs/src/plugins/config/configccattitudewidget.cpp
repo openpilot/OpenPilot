@@ -34,6 +34,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include "accelstate.h"
+#include "accelgyrosettings.h"
 #include "gyrostate.h"
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
@@ -54,6 +55,7 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
 
     addApplySaveButtons(ui->applyButton, ui->saveButton);
     addUAVObject("AttitudeSettings");
+    addUAVObject("AccelGyroSettings");
 
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
@@ -115,22 +117,24 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject *obj)
         float y_bias = listMean(y_accum) / ACCEL_SCALE;
         float z_bias = (listMean(z_accum) + 9.81) / ACCEL_SCALE;
 
-        float x_gyro_bias = listMean(x_gyro_accum) * 100.0f;
-        float y_gyro_bias = listMean(y_gyro_accum) * 100.0f;
-        float z_gyro_bias = listMean(z_gyro_accum) * 100.0f;
+        float x_gyro_bias = listMean(x_gyro_accum);
+        float y_gyro_bias = listMean(y_gyro_accum);
+        float z_gyro_bias = listMean(z_gyro_accum);
         accelState->setMetadata(initialAccelStateMdata);
         gyroState->setMetadata(initialGyroStateMdata);
 
-        AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
+        AccelGyroSettings::DataFields accelGyroSettingsData = AccelGyroSettings::GetInstance(getObjectManager())->getData();
+        AttitudeSettings::DataFields attitudeSettingsData   = AttitudeSettings::GetInstance(getObjectManager())->getData();
         // We offset the gyro bias by current bias to help precision
-        attitudeSettingsData.AccelBias[0]   += x_bias;
-        attitudeSettingsData.AccelBias[1]   += y_bias;
-        attitudeSettingsData.AccelBias[2]   += z_bias;
-        attitudeSettingsData.GyroBias[0]     = -x_gyro_bias;
-        attitudeSettingsData.GyroBias[1]     = -y_gyro_bias;
-        attitudeSettingsData.GyroBias[2]     = -z_gyro_bias;
+        accelGyroSettingsData.accel_bias[0] += x_bias;
+        accelGyroSettingsData.accel_bias[1] += y_bias;
+        accelGyroSettingsData.accel_bias[2] += z_bias;
+        accelGyroSettingsData.gyro_bias[0]   = -x_gyro_bias;
+        accelGyroSettingsData.gyro_bias[1]   = -y_gyro_bias;
+        accelGyroSettingsData.gyro_bias[2]   = -z_gyro_bias;
         attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
+        AccelGyroSettings::GetInstance(getObjectManager())->setData(accelGyroSettingsData);
         this->setDirty(true);
 
         // reenable controls

@@ -375,13 +375,13 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
 
         m_ui->accelBiasStart->setEnabled(true);
 
-        RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+        RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
         Q_ASSERT(revoCalibration);
         AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
         Q_ASSERT(accelGyroSettings);
 
 
-        RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+        RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
         AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
 
         revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
@@ -524,13 +524,13 @@ void ConfigRevoWidget::doStartSixPointCalibration()
     isBoardRotationStored = false;
     storeAndClearBoardRotation();
 
-    RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+    RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
     HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
     AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
 
     Q_ASSERT(revoCalibration);
     Q_ASSERT(homeLocation);
-    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+    RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
     AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
 
@@ -752,13 +752,13 @@ void ConfigRevoWidget::computeScaleBias()
     double S[3], b[3];
     double Be_length;
     AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
-    RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+    RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
     HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
 
     Q_ASSERT(revoCalibration);
     Q_ASSERT(homeLocation);
     AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
-    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+    RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
 #ifdef SIX_POINT_CAL_ACCEL
@@ -822,7 +822,7 @@ void ConfigRevoWidget::computeScaleBias()
         accelGyroSettings->setData(accelGyroSettingsData);
         m_ui->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
     } else {
-        revoCalibrationData = revoCalibration->getData();
+        revoCalibrationData   = revoCalibration->getData();
         accelGyroSettingsData = accelGyroSettings->getData();
         m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
     }
@@ -845,7 +845,7 @@ void ConfigRevoWidget::computeScaleBias()
         accelGyroSettings->setData(accelGyroSettingsData);
         m_ui->sixPointCalibInstructions->append("Computed mag scale and bias...");
     } else {
-        revoCalibrationData = revoCalibration->getData();
+        revoCalibrationData   = revoCalibration->getData();
         accelGyroSettingsData = accelGyroSettings->getData();
         m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
     }

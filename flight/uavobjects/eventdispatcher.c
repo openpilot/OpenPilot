@@ -104,6 +104,7 @@ int32_t EventDispatcherInitialize()
 
     // Create callback
     eventSchedulerCallback = DelayedCallbackCreate(&eventTask, CALLBACK_PRIORITY, TASK_PRIORITY, STACK_SIZE * 4);
+    DelayedCallbackDispatch(eventSchedulerCallback);
 
     // Done
     return 0;

@@ -954,7 +954,7 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget *widget, const char *f
     } else if (QPushButton * cb = qobject_cast<QPushButton *>(widget)) {
         connect(cb, SIGNAL(clicked()), this, function);
     } else {
-        qDebug() << __FUNCTION__ << "widget to uavobject relation not implemented" << widget->metaObject()->className();
+        qDebug() << __FUNCTION__ << "widget binding not implemented" << widget->metaObject()->className();
     }
 }
 
@@ -983,7 +983,7 @@ void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget *widget, const char
     } else if (QPushButton * cb = qobject_cast<QPushButton *>(widget)) {
         disconnect(cb, SIGNAL(clicked()), this, function);
     } else {
-        qDebug() << __FUNCTION__ << "widget to uavobject relation not implemented" << widget->metaObject()->className();
+        qDebug() << __FUNCTION__ << "widget binding not implemented" << widget->metaObject()->className();
     }
 }
 
@@ -1265,10 +1265,6 @@ bool ConfigTaskWidget::eventFilter(QObject *obj, QEvent *evt)
     }
     return QWidget::eventFilter(obj, evt);
 }
-/**
-   @}
-   @}
- */
 
 WidgetBinding::WidgetBinding(QWidget *widget, UAVObject *object, UAVObjectField *field, int index, double scale, bool isLimited) :
     ShadowWidgetBinding(widget, scale, isLimited)
@@ -1280,7 +1276,6 @@ WidgetBinding::WidgetBinding(QWidget *widget, UAVObject *object, UAVObjectField 
 
 WidgetBinding::~WidgetBinding()
 {
-
 }
 
 QString WidgetBinding::units() const
@@ -1337,7 +1332,6 @@ ShadowWidgetBinding::ShadowWidgetBinding(QWidget *widget, double scale, bool isL
 
 ShadowWidgetBinding::~ShadowWidgetBinding()
 {
-
 }
 
 QWidget *ShadowWidgetBinding::widget() const

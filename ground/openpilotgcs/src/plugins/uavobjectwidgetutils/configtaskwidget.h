@@ -137,7 +137,7 @@ public:
     void addReloadButton(QPushButton *button, int buttonGroup);
     void addDefaultButton(QPushButton *button, int buttonGroup);
 
-    void addWidgetToDefaultReloadGroups(QWidget *widget, QList<int> *groups);
+    void addWidgetToReloadGroups(QWidget *widget, QList<int> *groups);
 
     bool addShadowWidgetBinding(QWidget *masterWidget, QWidget *shadowWidget, double shadowScale = 1, bool shadowIsLimited = false);
     bool addShadowWidgetBinding(QString object, QString field, QWidget *widget, int index = 0, double scale = 1, bool isLimited = false,

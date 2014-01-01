@@ -627,7 +627,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>778</width>
+            <width>796</width>
             <height>659</height>
            </rect>
           </property>
@@ -8753,6 +8753,35 @@ border-radius: 5;</string>
             </layout>
            </item>
            <item>
+            <widget class="QTabWidget" name="tabWidget_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>22</height>
+              </size>
+             </property>
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="tab">
+              <attribute name="title">
+               <string>Tab 1</string>
+              </attribute>
+             </widget>
+             <widget class="QWidget" name="tab_2">
+              <attribute name="title">
+               <string>Tab 2</string>
+              </attribute>
+             </widget>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -8867,9 +8896,9 @@ border-radius: 5;</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-117</y>
-            <width>778</width>
-            <height>762</height>
+            <y>0</y>
+            <width>779</width>
+            <height>684</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -18908,8 +18937,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>792</width>
-            <height>645</height>
+            <width>796</width>
+            <height>659</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -27021,8 +27050,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>792</width>
-            <height>645</height>
+            <width>796</width>
+            <height>659</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_23">

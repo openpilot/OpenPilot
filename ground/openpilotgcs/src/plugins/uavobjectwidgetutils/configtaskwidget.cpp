@@ -213,7 +213,7 @@ void ConfigTaskWidget::addWidgetBinding(QString object, QString field, QWidget *
     } else {
         connectWidgetUpdatesToSlot(widget, SLOT(widgetsContentsChanged()));
         if (defaultReloadGroups) {
-            addWidgetToDefaultReloadGroups(widget, defaultReloadGroups);
+            addWidgetToReloadGroups(widget, defaultReloadGroups);
         }
         m_shadowBindings.insert(widget, binding);
         loadWidgetLimits(widget, _field, index, isLimited, scale);
@@ -669,7 +669,7 @@ bool ConfigTaskWidget::addShadowWidgetBinding(QString object, QString field, QWi
             m_shadowBindings.insert(widget, binding);
             connectWidgetUpdatesToSlot(widget, SLOT(widgetsContentsChanged()));
             if (defaultReloadGroups) {
-                addWidgetToDefaultReloadGroups(widget, defaultReloadGroups);
+                addWidgetToReloadGroups(widget, defaultReloadGroups);
             }
             loadWidgetLimits(widget, binding->field(), binding->index(), isLimited, scale);
             return true;
@@ -691,7 +691,7 @@ void ConfigTaskWidget::autoLoadWidgets()
         QVariant info = widget->property("objrelation");
 
         if (info.isValid()) {
-            uiRelationAutomation uiRelation;
+            bindingStruct uiRelation;
             uiRelation.buttonType = none;
             uiRelation.scale = 1;
             uiRelation.element    = QString();
@@ -803,7 +803,7 @@ void ConfigTaskWidget::autoLoadWidgets()
  * @param widget pointer to the widget to be added to the groups
  * @param groups list of the groups on which to add the widget
  */
-void ConfigTaskWidget::addWidgetToDefaultReloadGroups(QWidget *widget, QList<int> *groups)
+void ConfigTaskWidget::addWidgetToReloadGroups(QWidget *widget, QList<int> *groups)
 {
     foreach(WidgetBinding *binding, m_widgetBindings) {
         bool addBinding = false;
@@ -890,10 +890,10 @@ void ConfigTaskWidget::reloadButtonClicked()
     connect(m_realtimeUpdateTimer, SIGNAL(timeout()), eventLoop, SLOT(quit()));
     connect(objper, SIGNAL(objectUpdated(UAVObject *)), eventLoop, SLOT(quit()));
 
-    QList<temphelper> temp;
+    QList<objectComparator> temp;
     foreach(WidgetBinding *binding, *bindings) {
         if (binding->object() != NULL) {
-            temphelper value;
+            objectComparator value;
             value.objid     = binding->object()->getObjID();
             value.objinstid = binding->object()->getInstID();
             if (temp.contains(value)) {

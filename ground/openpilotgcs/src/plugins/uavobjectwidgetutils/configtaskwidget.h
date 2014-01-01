@@ -87,27 +87,6 @@ class UAVOBJECTWIDGETUTILS_EXPORT ConfigTaskWidget : public QWidget {
     Q_OBJECT
 
 public:
-    struct temphelper {
-        quint32 objid;
-        quint32 objinstid;
-        bool operator==(const temphelper & lhs)
-        {
-            return lhs.objid == this->objid && lhs.objinstid == this->objinstid;
-        }
-    };
-
-    enum buttonTypeEnum { none, save_button, apply_button, reload_button, default_button, help_button };
-    struct uiRelationAutomation {
-        QString objname;
-        QString fieldname;
-        QString element;
-        QString url;
-        buttonTypeEnum buttonType;
-        QList<int>     buttonGroup;
-        double  scale;
-        bool    haslimits;
-    };
-
     ConfigTaskWidget(QWidget *parent = 0);
     virtual ~ConfigTaskWidget();
 
@@ -186,6 +165,27 @@ private slots:
     void reloadButtonClicked();
 
 private:
+    struct objectComparator {
+        quint32 objid;
+        quint32 objinstid;
+        bool operator==(const objectComparator & lhs)
+        {
+            return lhs.objid == this->objid && lhs.objinstid == this->objinstid;
+        }
+    };
+
+    enum buttonTypeEnum { none, save_button, apply_button, reload_button, default_button, help_button };
+    struct bindingStruct {
+        QString objname;
+        QString fieldname;
+        QString element;
+        QString url;
+        buttonTypeEnum buttonType;
+        QList<int>     buttonGroup;
+        double  scale;
+        bool    haslimits;
+    };
+
     int m_currentBoardId;
     bool m_isConnected;
     bool m_isWidgetUpdatesAllowed;

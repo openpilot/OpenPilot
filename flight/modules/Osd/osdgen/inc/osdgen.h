@@ -123,6 +123,7 @@ typedef struct {					//	from		metric			imperial
 	float		ms_to_ms_fts;		//	m/s			m/s		1.0		ft/s	3.280840
 	float		ms_to_kmh_mph;		//	m/s			km/h	3.6		mph		2.236936
 	uint8_t		char_m_feet;		//	char		'm'				'f'
+	uint8_t		char_ms_fts;		//	char		'm/s'			'ft/s'
 } Unit;
 
 // Home position for calculations

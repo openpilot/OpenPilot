@@ -31,6 +31,8 @@
 // ****************
 
 //#define DEBUG_TIMING
+//#define DEBUG_ALARMS
+//#define DEBUG_TELEMETRY
 //#define DEBUG_STUFF
 //#define SIMULATE_DATA
 #define TEMP_GPS_STATUS_WORKAROUND
@@ -51,6 +53,10 @@
 #include "flightstatus.h"
 #include "manualcontrolcommand.h"
 #include "gpsvelocitysensor.h"
+#ifdef DEBUG_TELEMETRY
+#include "flighttelemetrystats.h"
+#include "gcstelemetrystats.h"
+#endif
 
 #include "fonts.h"
 #include "font12x18.h"
@@ -1166,13 +1172,10 @@ int fetch_font_info(uint8_t ch, int font, struct FontEntry *font_info, char *loo
 
 /**
  * write_char16: Draw a character on the current draw buffer.
- * Currently supports outlined characters and characters with
- * a width of up to 8 pixels.
  *
- * @param       ch              character to write
- * @param       x               x coordinate (left)
- * @param       y               y coordinate (top)
- * @param       flags   flags to write with (see gfx.h)
+ * @param       ch      character to write
+ * @param       x       x coordinate (left)
+ * @param       y       y coordinate (top)
  * @param       font    font to use
  */
 void write_char16(char ch, unsigned int x, unsigned int y, int font)
@@ -1246,10 +1249,10 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
  * Currently supports outlined characters and characters with
  * a width of up to 8 pixels.
  *
- * @param       ch              character to write
- * @param       x               x coordinate (left)
- * @param       y               y coordinate (top)
- * @param       flags   flags to write with (see gfx.h)
+ * @param       ch      character to write
+ * @param       x       x coordinate (left)
+ * @param       y       y coordinate (top)
+ * @param       flags   flags to write with
  * @param       font    font to use
  */
 void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
@@ -2556,6 +2559,12 @@ void updateGraphics()
     FlightStatusGet(&status);
     ManualControlCommandData mcc;
     ManualControlCommandGet(&mcc);
+#ifdef DEBUG_TELEMETRY
+    FlightTelemetryStatsData f_telemetry;
+    FlightTelemetryStatsGet(&f_telemetry);
+    GCSTelemetryStatsData g_telemetry;
+    GCSTelemetryStatsGet(&g_telemetry);
+#endif
 
     switch (OsdSettings.Screen) {
     // show main flight screen
@@ -2626,7 +2635,14 @@ void updateGraphics()
         // Draw AH first so that it is underneath everything else
 		// Artificial horizon in HUD design (centered relative to x, y)
         if (check_enable_and_srceen(OsdSettings.ArtificialHorizon, (OsdSettingsWarningsSetupData*)&OsdSettings.ArtificialHorizonSetup, screen, &x, &y)) {
+#if 1
         	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, x, y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
+#else
+            sprintf(temp, "Roll: %7.2f", (double)attitude.Roll);
+            write_string(temp, 200, 100, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 3);
+            sprintf(temp, "Pitch:%7.2f", (double)attitude.Pitch);
+            write_string(temp, 200, 120, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 3);
+#endif
         }
 		// GPS coordinates
         if (check_enable_and_srceen(OsdSettings.GPSLatitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLatitudeSetup, screen, &x, &y)) {
@@ -2652,7 +2668,7 @@ void updateGraphics()
             hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, +1, x, y, 100, 10, 20, 7, 12, 15, 100, 0);
         }
 		// Heading in HUD design (centered relative to x)
-        // JR_HINT TODO test both in-flight
+        // JR_HINT TODO use and test mag heading in-flight
         if (check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData*)&OsdSettings.HeadingSetup, screen, &x, &y)) {
         	int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
     		hud_draw_linear_compass(heading < 0 ? heading + 360: heading, 150, 120, x, y, 15, 30, 7, 12, 0);
@@ -2673,8 +2689,8 @@ void updateGraphics()
         }
         // Vertical speed
         if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData*)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
-            sprintf(temp, "VS%5.1f", (double)-gpsVelocityData.Down);										// TODO currently m/s for both
-            //sprintf(temp, "VS%5.1f", (double)(-gpsVelocityData.Down * convert->ms_to_ms_fts));			// TODO is ft/s or ft/m the common unit for imperial?
+            sprintf(temp, "VS%5.1f%c", (double)-gpsVelocityData.Down, 0x88);												// TODO currently m/s for both
+            //sprintf(temp, "VS%5.1f%c", (double)(-gpsVelocityData.Down * convert->ms_to_ms_fts), convert->char_ms_fts);	// TODO is ft/s or ft/m the common unit for imperial?
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.VerticalSpeedSetup.CharSize);
         }
 		// Flight mode
@@ -2794,25 +2810,87 @@ void updateGraphics()
 #ifdef DEBUG_TIMING
         // show in time
         sprintf(temp, "T.in: %3dms", in_time);
-        write_string(temp, 200, 20, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 50, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         // show out time
         sprintf(temp, "T.out:%3dms", out_time);
-        write_string(temp, 200, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 50, 40, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+#endif
+
+#ifdef DEBUG_ALARMS
+        // show alarms
+        int k;
+        for (k=0; k<=17; k++) {
+        	SystemAlarmsAlarmOptions alarm = AlarmsGet(k);
+        	if (alarm > SYSTEMALARMS_ALARM_OK) {
+                sprintf(temp, "A%2d:%d", k, alarm);
+                write_string(temp, 50, 50 + 10 * k, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        	}
+        }
+#endif
+
+#ifdef DEBUG_TELEMETRY
+#define DEBUG_TELEMETRY_ON_TIME		10000
+#define DEBUG_TELEMETRY_CALL_TIME	40
+    	static uint16_t on_cnt = 0;
+        static uint8_t fts = 10;
+        static uint8_t gts = 10;
+        static uint32_t frxf = 0;
+        static uint32_t ftxf = 0;
+        static uint32_t grxf = 0;
+        static uint32_t gtxf = 0;
+
+    	if (
+    				fts != f_telemetry.Status
+        		||	gts != g_telemetry.Status
+        		||	frxf != f_telemetry.RxFailures
+        		||	ftxf != f_telemetry.TxFailures
+        		||	grxf != g_telemetry.RxFailures
+        		||	gtxf != g_telemetry.TxFailures
+    		)
+    	{
+    		on_cnt = 0;
+			fts = f_telemetry.Status;
+			gts = g_telemetry.Status;
+    		frxf = f_telemetry.RxFailures;
+    		ftxf = f_telemetry.TxFailures;
+    		grxf = g_telemetry.RxFailures;
+    		gtxf = g_telemetry.TxFailures;
+    	}
+
+    	if (on_cnt++ < (DEBUG_TELEMETRY_ON_TIME) / DEBUG_TELEMETRY_CALL_TIME) {
+            sprintf(temp, "FTS: %6d", f_telemetry.Status);
+            write_string(temp, 270, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+
+            sprintf(temp, "GTS: %6d", g_telemetry.Status);
+            write_string(temp, 270, 40, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+
+            sprintf(temp, "FRXF:%6d", (int)f_telemetry.RxFailures);
+            write_string(temp, 270, 50, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+
+            sprintf(temp, "FTXF:%6d", (int)f_telemetry.TxFailures);
+            write_string(temp, 270, 60, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+
+            sprintf(temp, "GRXF:%6d", (int)g_telemetry.RxFailures);
+            write_string(temp, 270, 70, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+
+            sprintf(temp, "GTXF:%6d", (int)g_telemetry.TxFailures);
+            write_string(temp, 270, 80, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+    	}
 #endif
 
 #ifdef DEBUG_STUFF
         // show heap
         sprintf(temp, "Heap:%6d", xPortGetFreeHeapSize());
-        write_string(temp, 200, 40, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 250, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         // show detected video type
         sprintf(temp, "V.type:%4s", PIOS_Video_GetType() == VIDEO_TYPE_NTSC ? "NTSC" : "PAL");
-        write_string(temp, 200, 50, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 250, 40, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         // show number of video columns
         sprintf(temp, "Columns:%3d", GRAPHICS_WIDTH_REAL);
-        write_string(temp, 200, 60, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 250, 50, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         // show number of detected video lines
         sprintf(temp, "Lines:%5d", PIOS_Video_GetLines());
-        write_string(temp, 200, 70, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        write_string(temp, 250, 60, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 #endif
     }
     break;
@@ -2889,22 +2967,59 @@ int32_t osdgenStart(void)
 int32_t osdgenInitialize(void)
 {
     AttitudeStateInitialize();
-#ifdef PIOS_INCLUDE_GPS
     GPSPositionSensorInitialize();
     GPSVelocitySensorInitialize();
-#if !defined(PIOS_GPS_MINIMAL)
     GPSTimeInitialize();
     GPSSatellitesInitialize();
-#endif
-#ifdef PIOS_GPS_SETS_HOMELOCATION
     HomeLocationInitialize();
-#endif
-#endif
     OsdSettingsInitialize();
     OsdSettings2Initialize();
     BaroSensorInitialize();
     FlightStatusInitialize();
     ManualControlCommandInitialize();
+    TaskInfoInitialize();
+
+#if 0	// JR_HINT an idea
+    UAVObjMetadata metadata;
+    metadata.flags =
+        ACCESS_READWRITE << UAVOBJ_ACCESS_SHIFT |
+        ACCESS_READWRITE << UAVOBJ_GCS_ACCESS_SHIFT |
+        0 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+        0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+        UPDATEMODE_MANUAL << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+        UPDATEMODE_MANUAL << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    metadata.telemetryUpdatePeriod = 0;
+    metadata.gcsTelemetryUpdatePeriod = 0;
+    metadata.loggingUpdatePeriod = 0;
+
+    // OSD listen only mode
+    FlightStatusSetMetadata(&metadata);
+    AttitudeStateSetMetadata(&metadata);
+    GPSPositionSensorSetMetadata(&metadata);
+    GPSVelocitySensorSetMetadata(&metadata);
+    GPSTimeSetMetadata(&metadata);
+    GPSSatellitesSetMetadata(&metadata);
+    HomeLocationSetMetadata(&metadata);
+    BaroSensorSetMetadata(&metadata);
+    ManualControlCommandSetMetadata(&metadata);
+    TaskInfoSetMetadata(&metadata);
+#endif
+
+#if 0	// JR_HINT an idea
+    UAVObjMetadata metadata;
+    metadata.flags =
+        ACCESS_READWRITE << UAVOBJ_ACCESS_SHIFT |
+        ACCESS_READWRITE << UAVOBJ_GCS_ACCESS_SHIFT |
+        0 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+        0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+        UPDATEMODE_MANUAL << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+        UPDATEMODE_PERIODIC << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+    metadata.telemetryUpdatePeriod = 0;
+    metadata.gcsTelemetryUpdatePeriod = 5000;
+    metadata.loggingUpdatePeriod = 0;
+
+    GCSTelemetryStatsSetMetadata(&metadata);
+#endif
 
     return 0;
 }
@@ -2931,11 +3046,13 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
     Convert[0].ms_to_ms_fts		= 1.0f;
     Convert[0].ms_to_kmh_mph	= 3.6f;
     Convert[0].char_m_feet		= 'm';
+    Convert[0].char_ms_fts		= 0x88;
 
     Convert[1].m_to_m_feet		= 3.280840f;
     Convert[1].ms_to_ms_fts		= 3.280840f;
     Convert[1].ms_to_kmh_mph	= 2.236936f;
     Convert[1].char_m_feet		= 'f';
+    Convert[1].char_ms_fts		= ' ';			// TODO design a char for font 2 and 3
 
     // intro
     while (xTaskGetTickCount() <= INTRO_TIME) {

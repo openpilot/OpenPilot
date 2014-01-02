@@ -29,9 +29,6 @@
 #include <QLineEdit>
 #include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
-/**
- * Constructor
- */
 ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent), m_isConnected(false), m_isWidgetUpdatesAllowed(true),
     m_saveButton(NULL), m_isDirty(false), m_outOfLimitsStyle("background-color: rgb(255, 0, 0);"), m_realtimeUpdateTimer(NULL)
 {
@@ -46,19 +43,11 @@ ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent), m_isConne
     connect(importexportplugin, SIGNAL(importAboutToBegin()), this, SLOT(invalidateObjects()));
 }
 
-/**
- * Add a widget to the dirty detection pool
- * @param widget to add to the detection pool
- */
 void ConfigTaskWidget::addWidget(QWidget *widget)
 {
     addWidgetBinding("", "", widget);
 }
 
-/**
- * Add an object to the management system
- * @param objectName name of the object to add to the management system
- */
 void ConfigTaskWidget::addUAVObject(QString objectName, QList<int> *reloadGroups)
 {
     addWidgetBinding(objectName, "", NULL, 0, 1, false, reloadGroups);
@@ -66,142 +55,86 @@ void ConfigTaskWidget::addUAVObject(QString objectName, QList<int> *reloadGroups
 
 void ConfigTaskWidget::addUAVObject(UAVObject *objectName, QList<int> *reloadGroups)
 {
-    QString objstr;
-
-    if (objectName) {
-        objstr = objectName->getName();
-    }
-    addUAVObject(objstr, reloadGroups);
+    addUAVObject(objectName ? objectName->getName() : QString(""), reloadGroups);
 }
 
-/**
- * Add an UAVObject field to widget relation to the management system
- * @param object name of the object to add
- * @param field name of the field to add
- * @param widget pointer to the widget whitch will display/define the field value
- * @param index index of the field element to add to this relation
- */
-void ConfigTaskWidget::addWidgetBinding(QString object, QString field, QWidget *widget, QString index)
-{
-    UAVObject *obj = NULL;
-    UAVObjectField *_field = NULL;
+int ConfigTaskWidget::fieldIndexFromElementName(QString objectName, QString fieldName, QString elementName) {
 
-    obj    = getObject(QString(object));
-    Q_ASSERT(obj);
-    _field = obj->getField(QString(field));
-    Q_ASSERT(_field);
-    addWidgetBinding(object, field, widget, _field->getElementNames().indexOf(index));
+    if(elementName.isEmpty()) {
+        return 0;
+    }
+
+    UAVObject *object = getObject(objectName);
+    Q_ASSERT(object);
+
+    UAVObjectField *field = object->getField(fieldName);
+    Q_ASSERT(field);
+
+    return field->getElementNames().indexOf(elementName);
 }
 
-void ConfigTaskWidget::addWidgetBinding(UAVObject *obj, UAVObjectField *field, QWidget *widget, QString index)
+void ConfigTaskWidget::addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, QString elementName)
 {
-    QString objstr;
-    QString fieldstr;
-
-    if (obj) {
-        objstr = obj->getName();
-    }
-    if (field) {
-        fieldstr = field->getName();
-    }
-    addWidgetBinding(objstr, fieldstr, widget, index);
-}
-/**
- * Add a UAVObject field to widget relation to the management system
- * @param object name of the object to add
- * @param field name of the field to add
- * @param widget pointer to the widget whitch will display/define the field value
- * @param element name of the element of the field element to add to this relation
- * @param scale scale value of this relation
- * @param isLimited bool to signal if this widget contents is limited in value
- * @param defaultReloadGroups default and reload groups this relation belongs to
- * @param instID instance ID of the object used on this relation
- */
-void ConfigTaskWidget::addWidgetBinding(QString object, QString field, QWidget *widget, QString element, double scale, bool isLimited, QList<int> *defaultReloadGroups, quint32 instID)
-{
-    UAVObject *obj = getObject(QString(object), instID);
-
-    Q_ASSERT(obj);
-    UAVObjectField *_field;
-    int index = 0;
-    if (!field.isEmpty() && obj) {
-        _field = obj->getField(QString(field));
-        if (!element.isEmpty()) {
-            index = _field->getElementNames().indexOf(QString(element));
-        }
-    }
-    addWidgetBinding(object, field, widget, index, scale, isLimited, defaultReloadGroups, instID);
+    addWidgetBinding(objectName, fieldName, widget, fieldIndexFromElementName(objectName, fieldName, elementName));
 }
 
-void ConfigTaskWidget::addWidgetBinding(UAVObject *obj, UAVObjectField *field, QWidget *widget, QString element, double scale, bool isLimited, QList<int> *defaultReloadGroups, quint32 instID)
+void ConfigTaskWidget::addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, QString elementName)
 {
-    QString objstr;
-    QString fieldstr;
-
-    if (obj) {
-        objstr = obj->getName();
-    }
-    if (field) {
-        fieldstr = field->getName();
-    }
-    addWidgetBinding(objstr, fieldstr, widget, element, scale, isLimited, defaultReloadGroups, instID);
+    addWidgetBinding(object ? object->getName() : QString(""), field ? field->getName() : QString(""), widget, elementName);
 }
 
-void ConfigTaskWidget::addWidgetBinding(UAVObject *obj, UAVObjectField *field, QWidget *widget, int index, double scale, bool isLimited, QList<int> *defaultReloadGroups, quint32 instID)
+void ConfigTaskWidget::addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, QString elementName, double scale,
+                                        bool isLimited, QList<int> *reloadGroups, quint32 instID)
 {
-    QString objstr;
-    QString fieldstr;
-
-    if (obj) {
-        objstr = obj->getName();
-    }
-    if (field) {
-        fieldstr = field->getName();
-    }
-    addWidgetBinding(objstr, fieldstr, widget, index, scale, isLimited, defaultReloadGroups, instID);
+    addWidgetBinding(objectName, fieldName, widget, fieldIndexFromElementName(objectName, fieldName, elementName),
+                     scale, isLimited, reloadGroups, instID);
 }
 
-/**
- * Add an UAVObject field to widget relation to the management system
- * @param object name of the object to add
- * @param field name of the field to add
- * @param widget pointer to the widget whitch will display/define the field value
- * @param index index of the element of the field to add to this relation
- * @param scale scale value of this relation
- * @param isLimited bool to signal if this widget contents is limited in value
- * @param defaultReloadGroups default and reload groups this relation belongs to
- * @param instID instance ID of the object used on this relation
- */
-void ConfigTaskWidget::addWidgetBinding(QString object, QString field, QWidget *widget, int index, double scale, bool isLimited, QList<int> *defaultReloadGroups, quint32 instID)
+void ConfigTaskWidget::addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, QString elementName, double scale,
+                                        bool isLimited, QList<int> *reloadGroups, quint32 instID)
 {
-    if (addShadowWidgetBinding(object, field, widget, index, scale, isLimited, defaultReloadGroups, instID)) {
+    addWidgetBinding(object ? object->getName() : QString(""), field ? field->getName() : QString(""), widget, elementName, scale,
+                     isLimited, reloadGroups, instID);
+}
+
+void ConfigTaskWidget::addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, int index, double scale,
+                                        bool isLimited, QList<int> *reloadGroups, quint32 instID)
+{
+    addWidgetBinding(object ? object->getName() : QString(""), field ? field->getName() : QString(""), widget, index, scale,
+                     isLimited, reloadGroups, instID);
+}
+
+void ConfigTaskWidget::addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index, double scale,
+                                        bool isLimited, QList<int> *reloadGroups, quint32 instID)
+{
+    if (addShadowWidgetBinding(objectName, fieldName, widget, index, scale, isLimited, reloadGroups, instID)) {
         return;
     }
 
-    UAVObject *obj = NULL;
-    UAVObjectField *_field = NULL;
-    if (!object.isEmpty()) {
-        obj = getObject(QString(object), instID);
-        Q_ASSERT(obj);
-        m_updatedObjects.insert(obj, true);
-        connect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(objectUpdated(UAVObject *)));
-        connect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshWidgetsValues(UAVObject *)), Qt::UniqueConnection);
+    UAVObject *object = NULL;
+    UAVObjectField *field = NULL;
+    if (!objectName.isEmpty()) {
+        object = getObject(QString(objectName), instID);
+        Q_ASSERT(object);
+        m_updatedObjects.insert(object, true);
+        connect(object, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(objectUpdated(UAVObject *)));
+        connect(object, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshWidgetsValues(UAVObject *)), Qt::UniqueConnection);
     }
 
-    if (!field.isEmpty() && obj) {
-        _field = obj->getField(QString(field));
+    if (!fieldName.isEmpty() && object) {
+        field = object->getField(QString(fieldName));
     }
 
-    WidgetBinding *binding = new WidgetBinding(widget, obj, _field, index, scale, isLimited);
+    WidgetBinding *binding = new WidgetBinding(widget, object, field, index, scale, isLimited);
     m_widgetBindings.append(binding);
 
-    if (obj && m_saveButton) {
-        m_saveButton->addObject((UAVDataObject *)obj);
+    if (object && m_saveButton) {
+        m_saveButton->addObject((UAVDataObject *)object);
     }
 
     if (!widget) {
-        if (defaultReloadGroups && obj) {
-            foreach(int i, *defaultReloadGroups) {
+        if (reloadGroups && object) {
+            foreach(int i, *reloadGroups) {
                 if (this->m_reloadGroups.contains(i)) {
                     this->m_reloadGroups.value(i)->append(binding);
                 } else {
@@ -212,17 +145,14 @@ void ConfigTaskWidget::addWidgetBinding(QString object, QString field, QWidget *
         }
     } else {
         connectWidgetUpdatesToSlot(widget, SLOT(widgetsContentsChanged()));
-        if (defaultReloadGroups) {
-            addWidgetToReloadGroups(widget, defaultReloadGroups);
+        if (reloadGroups) {
+            addWidgetToReloadGroups(widget, reloadGroups);
         }
         m_shadowBindings.insert(widget, binding);
-        loadWidgetLimits(widget, _field, index, isLimited, scale);
+        loadWidgetLimits(widget, field, index, isLimited, scale);
     }
 }
 
-/**
- * destructor
- */
 ConfigTaskWidget::~ConfigTaskWidget()
 {
     if (m_saveButton) {
@@ -254,10 +184,6 @@ void ConfigTaskWidget::saveObjectToSD(UAVObject *obj)
     utilMngr->saveObjectToSD(obj);
 }
 
-/**
- * Util function to get a pointer to the object manager
- * @return pointer to the UAVObjectManager
- */
 UAVObjectManager *ConfigTaskWidget::getObjectManager()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -266,11 +192,7 @@ UAVObjectManager *ConfigTaskWidget::getObjectManager()
     Q_ASSERT(objMngr);
     return objMngr;
 }
-/**
- * Utility function which calculates the Mean value of a list of values
- * @param list list of double values
- * @returns Mean value of the list of parameter values
- */
+
 double ConfigTaskWidget::listMean(QList<double> list)
 {
     double accum = 0;
@@ -281,11 +203,6 @@ double ConfigTaskWidget::listMean(QList<double> list)
     return accum / list.size();
 }
 
-/**
- * Utility function which calculates the Variance value of a list of values
- * @param list list of double values
- * @returns Variance of the list of parameter values
- */
 double ConfigTaskWidget::listVar(QList<double> list)
 {
     double mean_accum = 0;
@@ -304,9 +221,6 @@ double ConfigTaskWidget::listVar(QList<double> list)
     // Use unbiased estimator
     return var_accum / (list.size() - 1);
 }
-
-// ************************************
-// telemetry start/stop connect/disconnect signals
 
 void ConfigTaskWidget::onAutopilotDisconnect()
 {
@@ -335,10 +249,7 @@ void ConfigTaskWidget::onAutopilotConnect()
     enableControls(true);
     refreshWidgetsValues();
 }
-/**
- * SLOT Function used to populate the widgets with the initial values
- * Overwrite this if you need to change the default behavior
- */
+
 void ConfigTaskWidget::populateWidgets()
 {
     bool dirtyBack = m_isDirty;
@@ -351,11 +262,7 @@ void ConfigTaskWidget::populateWidgets()
     }
     setDirty(dirtyBack);
 }
-/**
- * SLOT function used to refresh the widgets contents of the widgets with relation to
- * object field added to the framework pool
- * Overwrite this if you need to change the default behavior
- */
+
 void ConfigTaskWidget::refreshWidgetsValues(UAVObject *obj)
 {
     if (!m_isWidgetUpdatesAllowed) {
@@ -372,11 +279,6 @@ void ConfigTaskWidget::refreshWidgetsValues(UAVObject *obj)
     setDirty(dirtyBack);
 }
 
-/**
- * SLOT function used to update the uavobject fields from widgets with relation to
- * object field added to the framework pool
- * Overwrite this if you need to change the default behavior
- */
 void ConfigTaskWidget::updateObjectsFromWidgets()
 {
     emit updateObjectsFromWidgetsRequested();
@@ -388,10 +290,6 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
     }
 }
 
-/**
- * SLOT function used handle help button presses
- * Overwrite this if you need to change the default behavior
- */
 void ConfigTaskWidget::helpButtonPressed()
 {
     QString url = m_helpButtons.value((QPushButton *)sender(), QString());
@@ -401,12 +299,6 @@ void ConfigTaskWidget::helpButtonPressed()
     }
 }
 
-/**
- * Add update and save buttons to the form
- * multiple buttons can be added for the same function
- * @param update pointer to the update button
- * @param save pointer to the save button
- */
 void ConfigTaskWidget::addApplySaveButtons(QPushButton *update, QPushButton *save)
 {
     if (!m_saveButton) {
@@ -431,11 +323,6 @@ void ConfigTaskWidget::addApplySaveButtons(QPushButton *update, QPushButton *sav
     updateEnableControls();
 }
 
-/**
- * SLOT function used the enable or disable the SAVE, UPLOAD and RELOAD buttons
- * @param enable set to true to enable the buttons or false to disable them
- * @param field name of the field to add
- */
 void ConfigTaskWidget::enableControls(bool enable)
 {
     if (m_saveButton) {
@@ -462,17 +349,17 @@ bool ConfigTaskWidget::shouldObjectBeSaved(UAVObject *object)
     return true;
 }
 
-/**
- * SLOT function called when on of the widgets contents added to the framework changes
- */
 void ConfigTaskWidget::forceShadowUpdates()
 {
     foreach(WidgetBinding * binding, m_widgetBindings) {
+        QVariant widgetValue = getVariantFromWidget(binding->widget(), binding->scale(), binding->units());
+
         foreach(ShadowWidgetBinding * shadow, binding->shadows()) {
             disconnectWidgetUpdatesToSlot(shadow->widget(), SLOT(widgetsContentsChanged()));
-            checkWidgetsLimits(shadow->widget(), binding->field(), binding->index(), shadow->isLimited(),
-                               getVariantFromWidget(binding->widget(), binding->scale(), binding->units()), shadow->scale());
-            setWidgetFromVariant(shadow->widget(), getVariantFromWidget(binding->widget(), binding->scale(), binding->units()), shadow->scale());
+
+            checkWidgetsLimits(shadow->widget(), binding->field(), binding->index(), shadow->isLimited(), widgetValue, shadow->scale());
+            setWidgetFromVariant(shadow->widget(), widgetValue, shadow->scale());
+
             emit widgetContentsChanged(shadow->widget());
             connectWidgetUpdatesToSlot(shadow->widget(), SLOT(widgetsContentsChanged()));
         }
@@ -480,9 +367,6 @@ void ConfigTaskWidget::forceShadowUpdates()
     setDirty(true);
 }
 
-/**
- * SLOT function called when one of the widgets contents added to the framework changes
- */
 void ConfigTaskWidget::widgetsContentsChanged()
 {
     QWidget *emitter = ((QWidget *)sender());
@@ -500,7 +384,7 @@ void ConfigTaskWidget::widgetsContentsChanged()
                 if (shadow->widget() == emitter) {
                     scale = shadow->scale();
                     checkWidgetsLimits(emitter, binding->field(), binding->index(), shadow->isLimited(),
-                                       getVariantFromWidget(emitter, scale, binding->units()), scale);
+                                       getVariantFromWidget(emitter, shadow->scale(), binding->units()), scale);
                 }
             }
         }
@@ -533,25 +417,16 @@ void ConfigTaskWidget::widgetsContentsChanged()
     setDirty(true);
 }
 
-/**
- * SLOT function used clear the forms dirty status flag
- */
 void ConfigTaskWidget::clearDirty()
 {
     setDirty(false);
 }
-/**
- * Sets the form's dirty status flag
- * @param value
- */
+
 void ConfigTaskWidget::setDirty(bool value)
 {
     m_isDirty = value;
 }
-/**
- * Checks if the form is dirty (unsaved changes)
- * @return true if the form has unsaved changes
- */
+
 bool ConfigTaskWidget::isDirty()
 {
     if (m_isConnected) {
@@ -560,9 +435,7 @@ bool ConfigTaskWidget::isDirty()
         return false;
     }
 }
-/**
- * SLOT function used to disable widget contents changes when related object field changes
- */
+
 void ConfigTaskWidget::disableObjectUpdates()
 {
     m_isWidgetUpdatesAllowed = false;
@@ -573,9 +446,6 @@ void ConfigTaskWidget::disableObjectUpdates()
     }
 }
 
-/**
- * SLOT function used to enable widget contents changes when related object field changes
- */
 void ConfigTaskWidget::enableObjectUpdates()
 {
     m_isWidgetUpdatesAllowed = true;
@@ -586,19 +456,11 @@ void ConfigTaskWidget::enableObjectUpdates()
     }
 }
 
-/**
- * Called when an uav object is updated
- * @param obj pointer to the object whitch has just been updated
- */
 void ConfigTaskWidget::objectUpdated(UAVObject *object)
 {
     m_updatedObjects[object] = true;
 }
 
-/**
- * Checks if all objects added to the pool have already been updated
- * @return true if all objects added to the pool have already been updated
- */
 bool ConfigTaskWidget::allObjectsUpdated()
 {
     bool result = true;
@@ -609,61 +471,44 @@ bool ConfigTaskWidget::allObjectsUpdated()
     return result;
 }
 
-/**
- * Adds a new help button
- * @param button pointer to the help button
- * @param url url to open in the browser when the help button is pressed
- */
 void ConfigTaskWidget::addHelpButton(QPushButton *button, QString url)
 {
     m_helpButtons.insert(button, url);
     connect(button, SIGNAL(clicked()), this, SLOT(helpButtonPressed()));
 }
-/**
- * Invalidates all the uav objects "is updated" flag
- */
+
 void ConfigTaskWidget::invalidateObjects()
 {
     foreach(UAVObject * obj, m_updatedObjects.keys()) {
         m_updatedObjects[obj] = false;
     }
 }
-/**
- * SLOT call this to apply changes to uav objects
- */
+
 void ConfigTaskWidget::apply()
 {
     if (m_saveButton) {
         m_saveButton->apply();
     }
 }
-/**
- * SLOT call this to save changes to uav objects
- */
+
 void ConfigTaskWidget::save()
 {
     if (m_saveButton) {
         m_saveButton->save();
     }
 }
-/**
- * Adds a new shadow widget
- * shadow widgets are widgets whitch have a relation to an object already present on the framework pool i.e. already added trough addUAVObjectToWidgetRelation
- * This function doesn't have to be used directly, addUAVObjectToWidgetRelation will call it if a previous relation exhists.
- * @return returns false if the shadow widget relation failed to be added (no previous relation exhisted)
- */
-bool ConfigTaskWidget::addShadowWidgetBinding(QString object, QString field, QWidget *widget, int index, double scale, bool isLimited,
-                                       QList<int> *defaultReloadGroups, quint32 instID)
+
+bool ConfigTaskWidget::addShadowWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index, double scale, bool isLimited,
+                                              QList<int> *defaultReloadGroups, quint32 instID)
 {
     foreach(WidgetBinding * binding, m_widgetBindings) {
         if (!binding->object() || !binding->widget() || !binding->field()) {
             continue;
         }
-        if (binding->object()->getName() == object &&
-                binding->field()->getName() == field &&
-                binding->index() == index &&
-                binding->object()->getInstID() == instID) {
-
+        if (binding->object()->getName() == objectName &&
+            binding->field()->getName() == fieldName &&
+            binding->index() == index &&
+            binding->object()->getInstID() == instID) {
             binding->addShadow(widget, scale, isLimited);
 
             m_shadowBindings.insert(widget, binding);
@@ -678,10 +523,6 @@ bool ConfigTaskWidget::addShadowWidgetBinding(QString object, QString field, QWi
     return false;
 }
 
-/**
- * Auto loads widgets based on the Dynamic property named "objrelation"
- * Check the wiki for more information
- */
 void ConfigTaskWidget::autoLoadWidgets()
 {
     QPushButton *saveButtonWidget  = NULL;
@@ -785,33 +626,31 @@ void ConfigTaskWidget::autoLoadWidgets()
     }
     refreshWidgetsValues();
     forceShadowUpdates();
-    foreach(WidgetBinding *binding, m_widgetBindings) {
+    foreach(WidgetBinding * binding, m_widgetBindings) {
         if (binding->widget()) {
-            qDebug() << "Binding:" << binding->widget()->objectName();
+            qDebug() << "Binding :" << binding->widget()->objectName();
+            qDebug() << "  Object:" << binding->object()->getName();
+            qDebug() << "  Field :" << binding->field()->getName();
+            qDebug() << "  Scale :" << binding->scale();
         }
-        foreach(ShadowWidgetBinding *shadow, binding->shadows()) {
+        foreach(ShadowWidgetBinding * shadow, binding->shadows()) {
             if (shadow->widget()) {
-                qDebug() << "  Shadow" << shadow->widget()->objectName();
+                qDebug() << "  Shadow:" << shadow->widget()->objectName();
+                qDebug() << "  Scale :" << shadow->scale();
             }
         }
     }
 }
 
-/**
- * Adds a widget to a list of default/reload groups
- * default/reload groups are groups of widgets to be set with default or reloaded (values from persistent memory) when a defined button is pressed
- * @param widget pointer to the widget to be added to the groups
- * @param groups list of the groups on which to add the widget
- */
 void ConfigTaskWidget::addWidgetToReloadGroups(QWidget *widget, QList<int> *groups)
 {
-    foreach(WidgetBinding *binding, m_widgetBindings) {
+    foreach(WidgetBinding * binding, m_widgetBindings) {
         bool addBinding = false;
 
         if (binding->widget() == widget) {
             addBinding = true;
         } else {
-            foreach(ShadowWidgetBinding *shadow, binding->shadows()) {
+            foreach(ShadowWidgetBinding * shadow, binding->shadows()) {
                 if (shadow->widget() == widget) {
                     addBinding = true;
                 }
@@ -830,22 +669,12 @@ void ConfigTaskWidget::addWidgetToReloadGroups(QWidget *widget, QList<int> *grou
     }
 }
 
-/**
- * Adds a button to a default group
- * @param button pointer to the default button
- * @param buttongroup number of the group
- */
 void ConfigTaskWidget::addDefaultButton(QPushButton *button, int buttonGroup)
 {
     button->setProperty("group", buttonGroup);
     connect(button, SIGNAL(clicked()), this, SLOT(defaultButtonClicked()));
 }
 
-/**
- * Adds a button to a reload group
- * @param button pointer to the reload button
- * @param buttongroup number of the group
- */
 void ConfigTaskWidget::addReloadButton(QPushButton *button, int buttonGroup)
 {
     button->setProperty("group", buttonGroup);
@@ -853,9 +682,6 @@ void ConfigTaskWidget::addReloadButton(QPushButton *button, int buttonGroup)
     connect(button, SIGNAL(clicked()), this, SLOT(reloadButtonClicked()));
 }
 
-/**
- * Called when a default button is clicked
- */
 void ConfigTaskWidget::defaultButtonClicked()
 {
     int group = sender()->property("group").toInt();
@@ -871,9 +697,6 @@ void ConfigTaskWidget::defaultButtonClicked()
     }
 }
 
-/**
- * Called when a reload button is clicked
- */
 void ConfigTaskWidget::reloadButtonClicked()
 {
     if (m_realtimeUpdateTimer) {
@@ -891,7 +714,7 @@ void ConfigTaskWidget::reloadButtonClicked()
     connect(objper, SIGNAL(objectUpdated(UAVObject *)), eventLoop, SLOT(quit()));
 
     QList<objectComparator> temp;
-    foreach(WidgetBinding *binding, *bindings) {
+    foreach(WidgetBinding * binding, *bindings) {
         if (binding->object() != NULL) {
             objectComparator value;
             value.objid     = binding->object()->getObjID();
@@ -929,9 +752,6 @@ void ConfigTaskWidget::reloadButtonClicked()
     }
 }
 
-/**
- * Connects widgets "contents changed" signals to a slot
- */
 void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget *widget, const char *function)
 {
     if (!widget) {
@@ -958,9 +778,6 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget *widget, const char *f
     }
 }
 
-/**
- * Disconnects widgets "contents changed" signals to a slot
- */
 void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function)
 {
     if (!widget) {
@@ -987,14 +804,6 @@ void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget *widget, const char
     }
 }
 
-/**
- * Sets a widget value from an UAVObject field
- * @param widget pointer for the widget to set
- * @param field pointer to the UAVObject field to use
- * @param index index of the element to use
- * @param scale scale to be used on the assignement
- * @return returns true if the assignement was successfull
- */
 bool ConfigTaskWidget::setFieldFromWidget(QWidget *widget, UAVObjectField *field, int index, double scale)
 {
     if (!widget || !field) {
@@ -1011,12 +820,6 @@ bool ConfigTaskWidget::setFieldFromWidget(QWidget *widget, UAVObjectField *field
     }
 }
 
-/**
- * Gets a variant from a widget
- * @param widget pointer to the widget from where to get the value
- * @param scale scale to be used on the assignement
- * @return returns the value of the widget times the scale
- */
 QVariant ConfigTaskWidget::getVariantFromWidget(QWidget *widget, double scale, QString units)
 {
     if (QComboBox * cb = qobject_cast<QComboBox *>(widget)) {
@@ -1042,16 +845,9 @@ QVariant ConfigTaskWidget::getVariantFromWidget(QWidget *widget, double scale, Q
     }
 }
 
-/**
- * Sets a widget from a variant
- * @param widget pointer for the widget to set
- * @param value value to be used on the assignement
- * @param scale scale to be used on the assignement
- * @param units the units for the value
- * @return returns true if the assignement was successfull
- */
 bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, double scale, QString units)
 {
+    qDebug() << widget->objectName() << "=" << value;
     if (QComboBox * cb = qobject_cast<QComboBox *>(widget)) {
         cb->setCurrentIndex(cb->findText(value.toString()));
         return true;
@@ -1091,27 +887,11 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, dou
     }
 }
 
-/**
- * Sets a widget from a variant
- * @param widget pointer for the widget to set
- * @param value value to be used on the assignement
- * @param scale scale to be used on the assignement
- * @return returns true if the assignement was successfull
- */
 bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, double scale)
 {
     return setWidgetFromVariant(widget, value, scale, QString(""));
 }
 
-/**
- * Sets a widget from a UAVObject field
- * @param widget pointer to the widget to set
- * @param field pointer to the field from where to get the value from
- * @param index index of the element to use
- * @param scale scale to be used on the assignement
- * @param hasLimits set to true if you want to limit the values (check wiki)
- * @return returns true if the assignement was successfull
- */
 bool ConfigTaskWidget::setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, double scale, bool hasLimits)
 {
     if (!widget || !field) {
@@ -1122,10 +902,11 @@ bool ConfigTaskWidget::setWidgetFromField(QWidget *widget, UAVObjectField *field
             loadWidgetLimits(cb, field, index, hasLimits, scale);
         }
     }
-    QVariant var = field->getValue(index);
-    checkWidgetsLimits(widget, field, index, hasLimits, var, scale);
-    bool ret     = setWidgetFromVariant(widget, var, scale, field->getUnits());
-    if (ret) {
+    qDebug() << field->getName() << ":" << index;
+    QVariant value = field->getValue(index);
+    checkWidgetsLimits(widget, field, index, hasLimits, value, scale);
+    bool result     = setWidgetFromVariant(widget, value, scale, field->getUnits());
+    if (result) {
         return true;
     } else {
         qDebug() << __FUNCTION__ << "widget to uavobject relation not implemented" << widget->metaObject()->className();
@@ -1275,12 +1056,11 @@ WidgetBinding::WidgetBinding(QWidget *widget, UAVObject *object, UAVObjectField 
 }
 
 WidgetBinding::~WidgetBinding()
-{
-}
+{}
 
 QString WidgetBinding::units() const
 {
-    if(m_field) {
+    if (m_field) {
         return m_field->getUnits();
     }
     return QString("");
@@ -1306,7 +1086,7 @@ QList<ShadowWidgetBinding *> WidgetBinding::shadows() const
     return m_shadows;
 }
 
-void WidgetBinding::addShadow(QWidget *widget, int scale, bool isLimited)
+void WidgetBinding::addShadow(QWidget *widget, double scale, bool isLimited)
 {
     ShadowWidgetBinding *shadow = NULL;
 
@@ -1331,8 +1111,7 @@ ShadowWidgetBinding::ShadowWidgetBinding(QWidget *widget, double scale, bool isL
 }
 
 ShadowWidgetBinding::~ShadowWidgetBinding()
-{
-}
+{}
 
 QWidget *ShadowWidgetBinding::widget() const
 {

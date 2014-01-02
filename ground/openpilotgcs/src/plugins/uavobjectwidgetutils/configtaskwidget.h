@@ -50,7 +50,7 @@
 class ShadowWidgetBinding : public QObject {
     Q_OBJECT
 public:
-    ShadowWidgetBinding(QWidget* widget, double scale, bool isLimited);
+    ShadowWidgetBinding(QWidget *widget, double scale, bool isLimited);
     ~ShadowWidgetBinding();
     QWidget *widget() const;
     double scale() const;
@@ -58,23 +58,23 @@ public:
 
 protected:
     QWidget *m_widget;
-    double  m_scale;
-    bool    m_isLimited;
+    double m_scale;
+    bool m_isLimited;
 };
 
 class WidgetBinding : public ShadowWidgetBinding {
     Q_OBJECT
 public:
-    WidgetBinding(QWidget* widget, UAVObject* object, UAVObjectField* field, int index, double scale, bool isLimited);
+    WidgetBinding(QWidget *widget, UAVObject *object, UAVObjectField *field, int index, double scale, bool isLimited);
     ~WidgetBinding();
 
     QString units() const;
-    UAVObject *object() const;    
+    UAVObject *object() const;
     UAVObjectField *field() const;
-    int index() const;    
+    int index() const;
     QList<ShadowWidgetBinding *> shadows() const;
 
-    void addShadow(QWidget* widget, int scale, bool isLimited);
+    void addShadow(QWidget *widget, double scale, bool isLimited);
 
 private:
     UAVObject *m_object;
@@ -103,14 +103,18 @@ public:
 
     void addWidget(QWidget *widget);
 
-    void addWidgetBinding(QString object, QString field, QWidget *widget, int index = 0, double scale = 1, bool isLimited = false, QList<int> *m_reloadGroups = 0, quint32 instID = 0);
-    void addWidgetBinding(UAVObject *obj, UAVObjectField *field, QWidget *widget, int index = 0, double scale = 1, bool isLimited = false, QList<int> *m_reloadGroups = 0, quint32 instID = 0);
+    void addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index = 0, double scale = 1,
+                          bool isLimited = false, QList<int> *reloadGroups = 0, quint32 instID = 0);
+    void addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, int index = 0, double scale = 1,
+                          bool isLimited = false, QList<int> *reloadGroups = 0, quint32 instID = 0);
 
-    void addWidgetBinding(QString object, QString field, QWidget *widget, QString element, double scale, bool isLimited = false, QList<int> *m_reloadGroups = 0, quint32 instID = 0);
-    void addWidgetBinding(UAVObject *obj, UAVObjectField *field, QWidget *widget, QString element, double scale, bool isLimited = false, QList<int> *m_reloadGroups = 0, quint32 instID = 0);
+    void addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, QString elementName, double scale,
+                          bool isLimited = false, QList<int> *reloadGroups = 0, quint32 instID = 0);
+    void addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, QString elementName, double scale,
+                          bool isLimited = false, QList<int> *reloadGroups = 0, quint32 instID = 0);
 
-    void addWidgetBinding(QString object, QString field, QWidget *widget, QString index);
-    void addWidgetBinding(UAVObject *obj, UAVObjectField *field, QWidget *widget, QString index);
+    void addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, QString elementName);
+    void addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, QString elementName);
 
     void addApplySaveButtons(QPushButton *update, QPushButton *save);
     void addReloadButton(QPushButton *button, int buttonGroup);
@@ -118,9 +122,8 @@ public:
 
     void addWidgetToReloadGroups(QWidget *widget, QList<int> *groups);
 
-    bool addShadowWidgetBinding(QWidget *masterWidget, QWidget *shadowWidget, double shadowScale = 1, bool shadowIsLimited = false);
-    bool addShadowWidgetBinding(QString object, QString field, QWidget *widget, int index = 0, double scale = 1, bool isLimited = false,
-                         QList<int> *m_reloadGroups = NULL, quint32 instID = 0);
+    bool addShadowWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index = 0, double scale = 1,
+                                bool isLimited = false, QList<int> *m_reloadGroups = NULL, quint32 instID = 0);
 
     void autoLoadWidgets();
 
@@ -214,8 +217,9 @@ private:
     void disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function);
 
     void loadWidgetLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, double sclale);
-    virtual UAVObject* getObject(const QString name, quint32 instId = 0);
+    virtual UAVObject *getObject(const QString name, quint32 instId = 0);
 
+    int fieldIndexFromElementName(QString objectName, QString fieldName, QString elementName);
 protected slots:
     virtual void disableObjectUpdates();
     virtual void enableObjectUpdates();

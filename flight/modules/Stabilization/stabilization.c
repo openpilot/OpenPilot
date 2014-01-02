@@ -460,7 +460,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                     // At magnitudes close to zero, the Rate accumulator gets zeroed
                     if (pids[PID_RATE_ROLL+i].i > 0.0f) {
-                        factor = 1.0f - powf(magnitude, 37.8387f - (37.8387f/255.0f) * rattitude_anti_windup
+                        factor = 1.0f - powf(1.0f-magnitude, 37.8387f - (37.8387f/255.0f) * rattitude_anti_windup
                                                         - 17.668f - stab_log2f(dT * pids[PID_RATE_ROLL+i].i));
                         pids[PID_RATE_ROLL+i].iAccumulator *= factor;
                     }

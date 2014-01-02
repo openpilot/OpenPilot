@@ -28,10 +28,10 @@ override USE_DSP_LIB := NO
 
 # List of mandatory modules to include
 MODULES += Osd/osdgen
-MODULES += Osd/osdinput
-MODULES += Osd/WavPlayer
-MODULES += GPS
-MODULES += Extensions/MagBaro
+#MODULES += Osd/osdinput
+#MODULES += Osd/WavPlayer
+#MODULES += GPS
+#MODULES += Extensions/MagBaro
 MODULES += FirmwareIAP
 MODULES += Telemetry
 
@@ -69,7 +69,7 @@ ifndef TESTAPP
 
     ## Misc library functions
     SRC += $(FLIGHTLIB)/printf2.c
-    SRC += $(FLIGHTLIB)/WorldMagModel.c
+#    SRC += $(FLIGHTLIB)/WorldMagModel.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
@@ -104,7 +104,7 @@ else
 endif
 	
 # Optional component libraries
-include $(PIOS)/common/libraries/dosfs/library.mk
+#include $(PIOS)/common/libraries/dosfs/library.mk
 
 include $(ROOT_DIR)/make/apps-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk

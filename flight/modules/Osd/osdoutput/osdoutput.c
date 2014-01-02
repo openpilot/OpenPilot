@@ -286,7 +286,7 @@ static int32_t osdoutputInitialize(void)
 #endif
     return 0;
 }
-MODULE_INITCALL(osdoutputInitialize, osdoutputStart);
+//MODULE_INITCALL(osdoutputInitialize, osdoutputStart);
 
 /**
  * @}

@@ -40,6 +40,8 @@
 #include "taskinfo.h"
 
 // Private constants
+#define TELEMETRY_FLIGHT       0
+#define TELEMETRY_OSDGCS       1
 #define MAX_QUEUE_SIZE         TELEM_QUEUE_SIZE
 #define STACK_SIZE_BYTES       PIOS_TELEM_STACK_SIZE
 #define TASK_PRIORITY_RX       (tskIDLE_PRIORITY + 2)
@@ -54,6 +56,7 @@
 // Private types
 
 // Private variables
+static uint8_t role = TELEMETRY_FLIGHT;
 static uint32_t telemetryPort;
 static xQueueHandle queue;
 
@@ -90,6 +93,8 @@ static void updateObject(UAVObjHandle obj, int32_t eventType);
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 static void processObjEvent(UAVObjEvent *ev);
 static void updateTelemetryStats();
+static void updateFlightTelemetryStats();
+static void updateGCSTelemetryStats();
 static void gcsTelemetryStatsUpdated();
 static void updateSettings();
 static uint32_t getComPort(bool input);
@@ -222,7 +227,7 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
 
     // Get metadata
     UAVObjGetMetadata(obj, &metadata);
-    updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
+    updateMode = role == TELEMETRY_FLIGHT ? UAVObjGetTelemetryUpdateMode(&metadata): UAVObjGetGcsTelemetryUpdateMode(&metadata);
 
     // Setup object depending on update mode
     switch (updateMode) {
@@ -275,15 +280,29 @@ static void processObjEvent(UAVObjEvent *ev)
     int32_t retries;
     int32_t success;
 
+#ifdef OP_OSD
+    if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
+        role = TELEMETRY_FLIGHT;					// if connected via USB then behave like flight
+    } else {
+        role = TELEMETRY_OSDGCS;					// else behave like GCS
+    }
+#else
+    role = TELEMETRY_FLIGHT;
+#endif
+
     if (ev->obj == 0) {
         updateTelemetryStats();
-    } else if (ev->obj == GCSTelemetryStatsHandle()) {
+    } else if (role == TELEMETRY_FLIGHT && ev->obj == GCSTelemetryStatsHandle()) {		// role is flight and we have normal behavior
         gcsTelemetryStatsUpdated();
+    } else if (role == TELEMETRY_OSDGCS && ev->obj == FlightTelemetryStatsHandle()) {	// role is osdgcs and we only send ...
+        gcsTelemetryStatsUpdated();
+    } else if (role == TELEMETRY_OSDGCS && ev->obj != GCSTelemetryStatsHandle()) {		// ... GCSTelemetryStats packets for connection handling
+        return;
     } else {
         FlightTelemetryStatsGet(&flightStats);
         // Get object metadata
         UAVObjGetMetadata(ev->obj, &metadata);
-        updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
+        updateMode = role == TELEMETRY_FLIGHT ? UAVObjGetTelemetryUpdateMode(&metadata): UAVObjGetGcsTelemetryUpdateMode(&metadata);
 
         // Act on event
         retries    = 0;
@@ -469,6 +488,18 @@ static void gcsTelemetryStatsUpdated()
  */
 static void updateTelemetryStats()
 {
+	if (role == TELEMETRY_FLIGHT) {		// role is flight and we have normal behavior
+		updateFlightTelemetryStats();
+	} else {							// role is osdgcs and we behave like GCS
+		updateGCSTelemetryStats();
+	}
+}
+
+/**
+ * Update telemetry statistics and handle connection handshake
+ */
+static void updateFlightTelemetryStats()
+{
     UAVTalkStats utalkStats;
     FlightTelemetryStatsData flightStats;
     GCSTelemetryStatsData gcsStats;
@@ -555,6 +586,95 @@ static void updateTelemetryStats()
     // Force telemetry update if not connected
     if (forceUpdate) {
         FlightTelemetryStatsUpdated();
+    }
+}
+
+/**
+ * Update telemetry statistics and handle connection handshake
+ */
+static void updateGCSTelemetryStats()
+{
+    UAVTalkStats utalkStats;
+    FlightTelemetryStatsData flightStats;
+    GCSTelemetryStatsData gcsStats;
+    uint8_t forceUpdate;
+    uint8_t connectionTimeout;
+    uint32_t timeNow;
+
+    // Get stats
+    UAVTalkGetStats(uavTalkCon, &utalkStats);
+#ifdef PIOS_INCLUDE_RFM22B
+    UAVTalkAddStats(radioUavTalkCon, &utalkStats);
+    UAVTalkResetStats(radioUavTalkCon);
+#endif
+    UAVTalkResetStats(uavTalkCon);
+
+    // Get object data
+    FlightTelemetryStatsGet(&flightStats);
+    GCSTelemetryStatsGet(&gcsStats);
+
+    // Update stats object
+    if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED) {
+    	gcsStats.RxDataRate  = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+    	gcsStats.TxDataRate  = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+    	gcsStats.RxFailures += utalkStats.rxErrors;
+    	gcsStats.TxFailures += txErrors;
+    	gcsStats.TxRetries  += txRetries;
+        txErrors = 0;
+        txRetries = 0;
+    } else {
+    	gcsStats.RxDataRate = 0;
+    	gcsStats.TxDataRate = 0;
+    	gcsStats.RxFailures = 0;
+    	gcsStats.TxFailures = 0;
+    	gcsStats.TxRetries  = 0;
+        txErrors = 0;
+        txRetries = 0;
+    }
+
+    // Check for connection timeout
+    timeNow = xTaskGetTickCount() * portTICK_RATE_MS;
+    if (utalkStats.rxObjects > 0) {
+        timeOfLastObjectUpdate = timeNow;
+    }
+    if ((timeNow - timeOfLastObjectUpdate) > CONNECTION_TIMEOUT_MS) {
+        connectionTimeout = 1;
+    } else {
+        connectionTimeout = 0;
+    }
+
+    // Update connection state
+    forceUpdate = 1;
+    if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_DISCONNECTED) {
+        // Request connection
+        gcsStats.Status = GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ;
+    } else if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ) {
+        // Check for connection acknowledge
+        if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK) {
+        	gcsStats.Status = GCSTELEMETRYSTATS_STATUS_CONNECTED;
+        }
+    } else if (gcsStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
+        // Check if the connection is still active and the autopilot is still connected
+        if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED || connectionTimeout) {
+        	gcsStats.Status = GCSTELEMETRYSTATS_STATUS_DISCONNECTED;
+        } else {
+            forceUpdate = 0;
+        }
+    }
+
+    // Update the telemetry alarm
+    if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED) {
+        AlarmsClear(SYSTEMALARMS_ALARM_TELEMETRY);
+    } else {
+        AlarmsSet(SYSTEMALARMS_ALARM_TELEMETRY, SYSTEMALARMS_ALARM_ERROR);
+    }
+
+    // Update object
+    GCSTelemetryStatsSet(&gcsStats);
+
+    // Force telemetry update if not connected
+    if (forceUpdate) {
+        GCSTelemetryStatsUpdated();
     }
 }
 

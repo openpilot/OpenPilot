@@ -62,6 +62,7 @@ extern TTime timex;
 extern bool PIOS_Vsync_ISR();
 extern bool PIOS_Hsync_ISR();
 extern void PIOS_Video_Init(const struct pios_video_cfg *cfg);
+extern void PIOS_Pixel_Init(void);
 uint16_t PIOS_Video_GetLines(void);
 uint16_t PIOS_Video_GetType(void);
 

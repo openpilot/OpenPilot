@@ -48,6 +48,8 @@ void PIOS_Board_Init()
     /* Delay system */
     PIOS_DELAY_Init();
 
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
+
 #if defined(PIOS_INCLUDE_LED)
     PIOS_LED_Init(&pios_led_cfg);
 #endif /* PIOS_INCLUDE_LED */
@@ -60,7 +62,7 @@ void PIOS_Board_Init()
     PIOS_USB_DESC_HID_ONLY_Init();
 
     uint32_t pios_usb_id;
-    PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
+    PIOS_USB_Init(&pios_usb_id, PIOS_BOARD_HW_DEFS_GetUsbCfg(bdinfo->board_rev));
 
 #if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM_MSG)
     uint32_t pios_usb_hid_id;

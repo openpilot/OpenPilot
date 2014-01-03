@@ -370,12 +370,45 @@ void PIOS_Video_Init(const struct pios_video_cfg *cfg)
     PIOS_EXTI_Init(cfg->hsync);
     PIOS_EXTI_Init(cfg->vsync);
 
-    // set pixel levels to zero
-    PIOS_Servo_Set(0, 0);
-    PIOS_Servo_Set(1, 0);
-
     // weird
     weird_timer_stuff();
+}
+
+
+void PIOS_Pixel_Init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	DAC_InitTypeDef DAC_InitStructure;
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	// GPIO Configuration
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	// DAC Configuration
+	DAC_InitStructure.DAC_Trigger = DAC_Trigger_None;
+	DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
+	DAC_InitStructure.DAC_LFSRUnmask_TriangleAmplitude = DAC_LFSRUnmask_Bit0;
+	DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;				// JR_HINT check DAC_OutputBuffer_Disable; for full range of 0.0 ... 3.3 V !!!
+	DAC_Init(DAC_Channel_1, &DAC_InitStructure);
+	DAC_Init(DAC_Channel_2, &DAC_InitStructure);
+
+#if 1	// JR_HINT remove after test
+	DAC_SetChannel1Data(DAC_Align_12b_R, 706);
+	DAC_SetChannel2Data(DAC_Align_12b_R,   0);
+#endif
+
+	// Enable DAC Channel1: Once the DAC channel1 is enabled, PA.04 is automatically connected to the DAC converter.
+	DAC_Cmd(DAC_Channel_1, ENABLE);
+	// Enable DAC Channel2: Once the DAC channel2 is enabled, PA.05 is automatically connected to the DAC converter.
+	DAC_Cmd(DAC_Channel_2, ENABLE);
 }
 
 

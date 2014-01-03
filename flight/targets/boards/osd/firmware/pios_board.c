@@ -124,6 +124,8 @@ void PIOS_Board_Init(void)
     // Delay system
     PIOS_DELAY_Init();
 
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
+
     PIOS_LED_Init(&pios_led_cfg);
 
 #if defined(PIOS_INCLUDE_SPI)
@@ -212,7 +214,7 @@ void PIOS_Board_Init(void)
 #endif
 
     uint32_t pios_usb_id;
-    PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
+    PIOS_USB_Init(&pios_usb_id, PIOS_BOARD_HW_DEFS_GetUsbCfg(bdinfo->board_rev));
 
 #if defined(PIOS_INCLUDE_USB_CDC)
 
@@ -437,13 +439,30 @@ void PIOS_Board_Init(void)
 #endif
 
 #if defined(PIOS_INCLUDE_VIDEO)
-    PIOS_TIM_InitClock(&tim_8_cfg);
-    PIOS_Servo_Init(&pios_servo_cfg);
+    switch (bdinfo->board_rev) {
+    case 1:
+        PIOS_TIM_InitClock(&tim_8_cfg);
+        PIOS_Servo_Init(&pios_servo_cfg);
+        break;
+    case 2:
+        PIOS_Pixel_Init();
+        break;
+    default:
+        PIOS_DEBUG_Assert(0);
+    }
     // Start the pixel and line clock counter
     // PIOS_TIM_InitClock(&pios_tim4_cfg);
     PIOS_Video_Init(&pios_video_cfg);
 #endif
 }
+
+
+uint8_t PIOS_Board_Revision(void)
+{
+	const struct pios_board_info *bdinfo = &pios_board_info_blob;
+    return bdinfo->board_rev;
+}
+
 
 uint16_t supv_timer = 0;
 

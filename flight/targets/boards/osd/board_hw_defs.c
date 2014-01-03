@@ -487,7 +487,7 @@ void PIOS_RTC_IRQ_Handler(void)
 #if defined(PIOS_INCLUDE_USB)
 #include "pios_usb_priv.h"
 
-static const struct pios_usb_cfg pios_usb_main_cfg = {
+static const struct pios_usb_cfg pios_usb_main_osd_r1_cfg = {
     .irq                                       = {
         .init                                  = {
             .NVIC_IRQChannel    = OTG_FS_IRQn,
@@ -507,6 +507,42 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
     },
     .vsense_active_low                         = false
 };
+
+static const struct pios_usb_cfg pios_usb_main_osd_r2_cfg = {
+    .irq                                       = {
+        .init                                  = {
+            .NVIC_IRQChannel    = OTG_FS_IRQn,
+            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannelCmd = ENABLE,
+        },
+    },
+    .vsense                                    = {
+        .gpio = GPIOA,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_9,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_IN,
+            .GPIO_OType = GPIO_OType_OD,
+        },
+    },
+    .vsense_active_low                         = false
+};
+
+const struct pios_usb_cfg *PIOS_BOARD_HW_DEFS_GetUsbCfg(uint32_t board_revision)
+{
+    switch (board_revision) {
+    case 1:
+        return &pios_usb_main_osd_r1_cfg;
+        break;
+    case 2:
+        return &pios_usb_main_osd_r2_cfg;
+        break;
+    default:
+        PIOS_DEBUG_Assert(0);
+    }
+    return NULL;
+}
 
 #include "pios_usb_board_data_priv.h"
 #include "pios_usb_desc_hid_cdc_priv.h"

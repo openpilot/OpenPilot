@@ -41,6 +41,8 @@
 
 #include "osdgen.h"
 
+#include "stm32f4xx_dac.h"
+
 #include "attitudestate.h"
 #include "gpspositionsensor.h"
 #include "homelocation.h"
@@ -64,6 +66,8 @@
 #include "WMMInternal.h"
 
 #include "splash.h"
+
+extern uint8_t PIOS_Board_Revision(void);
 
 extern uint8_t *draw_buffer_level;
 extern uint8_t *draw_buffer_mask;
@@ -3039,8 +3043,30 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
     OsdSettingsData OsdSettings;
     OsdSettingsGet(&OsdSettings);
 
-    PIOS_Servo_Set(0, OsdSettings.White);
-    PIOS_Servo_Set(1, OsdSettings.Black);
+    switch (PIOS_Board_Revision()) {
+    case 1:
+        PIOS_Servo_Set(0, OsdSettings.White);
+        PIOS_Servo_Set(1, OsdSettings.Black);
+        break;
+    case 2:
+#if 1	// JR_HINT change after test
+    	DAC_SetChannel1Data(DAC_Align_12b_R, 706);		// 0.7 V buffer enabled
+    	DAC_SetChannel2Data(DAC_Align_12b_R,   0);		// 0.2 V buffer enabled
+#else
+#if 1
+    	// buffer enabled:  0.2 V ... 3.1 V		Vout = DAC_value / 4095 * 2.9 + 0.2		DAC_value = (Vout - 0.2) / 2.9 * 4095
+    	DAC_SetChannel1Data(DAC_Align_12b_R, (OsdSettings.White - 200) * 4095 / 2900);	// change to int16 in xml for setting value in [mV]
+    	DAC_SetChannel2Data(DAC_Align_12b_R, (OsdSettings.Black - 200) * 4095 / 2900);	// change to int16 in xml for setting value in [mV]
+#else
+    	// buffer disabled: 0.0 V ... 3.3 V		Vout = DAC_value / 4095 * 3.3			DAC_value = Vout / 3.3 * 4095
+    	DAC_SetChannel1Data(DAC_Align_12b_R, OsdSettings.White * 4095 / 3300);			// change to int16 in xml for setting value in [mV]
+    	DAC_SetChannel2Data(DAC_Align_12b_R, OsdSettings.Black * 4095 / 3300);			// change to int16 in xml for setting value in [mV]
+#endif
+#endif
+        break;
+    default:
+        PIOS_DEBUG_Assert(0);
+    }
 
     Convert[0].m_to_m_feet		= 1.0f;
     Convert[0].ms_to_ms_fts		= 1.0f;

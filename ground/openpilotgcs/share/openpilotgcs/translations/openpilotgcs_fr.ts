@@ -245,7 +245,7 @@
     <message>
         <location line="+3"/>
         <source>Split</source>
-        <translation type="unfinished">Scinder</translation>
+        <translation>Scinder</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -301,7 +301,7 @@
         <location line="+27"/>
         <source>About &amp;Plugins...</source>
         <translatorcomment>[Platypus]Trop long ?</translatorcomment>
-        <translation type="unfinished">À propos des &amp;Modules complémentaires...</translation>
+        <translation>À propos des &amp;Modules complémentaires...</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1060,23 +1060,23 @@ Raison : %3</translation>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+274"/>
         <source>MainWindow</source>
-        <translation type="unfinished">Fenêtre Principale</translation>
+        <translation>Fenêtre Principale</translation>
     </message>
     <message>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <source>Go</source>
         <translatorcomment>[Platypus]Féminin peut-être ?</translatorcomment>
-        <translation type="unfinished">Y aller</translation>
+        <translation>Y aller</translation>
     </message>
     <message>
         <location/>
         <source>Current File:</source>
-        <translation type="unfinished">Fichier en cours :</translation>
+        <translation>Fichier en cours :</translation>
     </message>
     <message>
         <location/>
         <source>Current Path:</source>
-        <translation type="unfinished">Emplacement en cours :</translation>
+        <translation>Emplacement en cours :</translation>
     </message>
     <message>
         <location/>
@@ -1265,17 +1265,17 @@ Raison : %3</translation>
     <message>
         <location line="+7"/>
         <source>Installed Plugins</source>
-        <translation>Plugins installés</translation>
+        <translation>Modules complémentaires installés</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Plugin Details of %1</source>
-        <translation>Détail sur plugin %1</translation>
+        <translation>Détail sur le module complémentaire %1</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Plugin Errors of %1</source>
-        <translation>Erreurs du plugins %1</translation>
+        <translation>Erreurs du module complémentaire %1</translation>
     </message>
 </context>
 <context>
@@ -1788,7 +1788,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Spatial Data</source>
-        <translation type="unfinished">Données Spatiales</translation>
+        <translation>Données Spatiales</translation>
     </message>
     <message>
         <location/>
@@ -3427,12 +3427,12 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+3"/>
         <source>Data Objects</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Objets Données</translation>
     </message>
     <message>
         <location line="+74"/>
         <source>Meta Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Métadonnées</translation>
     </message>
     <message>
         <location line="+24"/>
@@ -3853,7 +3853,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_edit_waypoint_dialog.ui"/>
         <source>OpenPilot GCS Edit Waypoint</source>
-        <translation>Editeur Waypoint OpenPilot GCS</translation>
+        <translation>Éditeur Waypoint OpenPilot GCS</translation>
     </message>
     <message>
         <location/>
@@ -3913,7 +3913,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Relative to Home </source>
-        <translation>Relatif à Home </translation>
+        <translation>Relatif au Home </translation>
     </message>
     <message>
         <location/>
@@ -3989,13 +3989,13 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
         <location/>
         <source>Jump Destination</source>
         <translatorcomment>Va à la Destination ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>Aller à la Destination</translation>
     </message>
     <message>
         <location/>
         <source>Error Destination</source>
         <translatorcomment>Destination d&apos;Erreur ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Destination d&apos;Erreur</translation>
     </message>
     <message>
         <location/>
@@ -4266,7 +4266,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>GCS Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle GCS</translation>
     </message>
     <message>
         <location/>
@@ -4373,7 +4373,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
         <source>Plugins</source>
-        <translation></translation>
+        <translation>Modules Complémentaires</translation>
     </message>
     <message>
         <location/>
@@ -5058,7 +5058,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
         <location/>
         <source>fieldname:StabilizationMode</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5186,7 +5186,7 @@ Apply or Save button afterwards.</source>
         <location/>
         <source>button:default</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5700,7 +5700,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Tail Rotor</source>
-        <translation>Rotor queue</translation>
+        <translation>Rotor Queue</translation>
     </message>
     <message>
         <location/>
@@ -5795,7 +5795,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Link Roll/Pitch</source>
-        <translation type="unfinished">Lier Roll/Pitch</translation>
+        <translation>Lier Roll/Pitch</translation>
     </message>
     <message>
         <location/>
@@ -5950,12 +5950,12 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Motor outputs</source>
-        <translation type="unfinished">Sorties moteurs</translation>
+        <translation>Sorties moteurs</translation>
     </message>
     <message>
         <location/>
         <source>Swashplate outputs</source>
-        <translation type="unfinished">Sorties plateau cyclique</translation>
+        <translation>Sorties plateau cyclique</translation>
     </message>
 </context>
 <context>
@@ -9159,7 +9159,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Sommaire de configuration OpenPilot&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La première partie de cet assistant est maintenant terminée. Toutes les informations nécessaires à la création d&apos;une configuration de base du contrôleur OpenPilot pour un céhicule particulier ont été collectées.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La première partie de cet assistant est maintenant terminée. Toutes les informations nécessaires à la création d&apos;une configuration de base du contrôleur OpenPilot pour un véhicule particulier ont été collectées.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Vous trouverez ci-dessous un résumé de la configuration et un bouton vous renvoyant vers un diagramme décrivant comment brancher le matériel nécessaire avec le Contrôleur OpenPilot dans la configuration actuelle.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour continuer l&apos;assistant et passer par quelques étapes de configuration de base, veuillez passez à l&apos;étape suivante de l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
@@ -9279,7 +9279,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Show MetaData</source>
-        <translation>Afficher Metadata</translation>
+        <translation>Afficher Métadonnées</translation>
     </message>
     <message>
         <location/>
@@ -9826,7 +9826,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+0"/>
         <source>The tab you are leaving has unsaved changes,if you proceed they will be lost.Do you still want to proceed?</source>
-        <translatorcomment>L&apos;onglet que vous quittez contient des modifications non-sauvegardées, si  vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translatorcomment>
+        <translatorcomment>L&apos;onglet que vous quittez contient des modifications non-sauvegardées, si vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translatorcomment>
         <translation></translation>
     </message>
 </context>
@@ -10596,12 +10596,12 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/uavobjects/uavobjectfield.cpp" line="+89"/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>1</source>
-        <translation type="unfinished">1</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11159,17 +11159,20 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Tech : laisser tel quel?</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Tech : laisser tel quel?</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Tech : laisser tel quel?</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12194,7 +12197,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Procédure calibration capteurs sur carte OpenPilot Revolution&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La procédure de calibration pour le contrôleur OpenPilot Revolution n&apos;est pas encore implémentée dans cet assistant  de configuration.Pour calibrer votre contrôleur OpenPilot Revolution veuillez utiliser l&apos;utilitaire de calibration que vous trouverez dans l&apos;onglet Configuration à la fin de cet assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La procédure de calibration pour le contrôleur OpenPilot Revolution n&apos;est pas encore implémentée dans cet assistant  de configuration. Pour calibrer votre contrôleur OpenPilot Revolution veuillez utiliser l&apos;utilitaire de calibration que vous trouverez dans l&apos;onglet Configuration à la fin de cet assistant.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les futures versions de cet assistant possèderont une procédure de calibration simplifiée.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -12722,27 +12725,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/flightlog/FlightLogDialog.qml" line="+27"/>
         <source>Log entries</source>
-        <translation type="unfinished">Entrées log</translation>
+        <translation>Entrées log</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Flight</source>
-        <translation type="unfinished">Vol</translation>
+        <translation>Vol</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Time</source>
-        <translation type="unfinished">Temps</translation>
+        <translation>Temps</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Empty</source>
-        <translation type="unfinished">Vide</translation>
+        <translation>Vide</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Text</source>
-        <translation type="unfinished">Texte</translation>
+        <translation>Texte</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -12757,12 +12760,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+6"/>
         <source>Data</source>
-        <translation type="unfinished">Données</translation>
+        <translation>Données</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Flights recorded: </source>
-        <translation type="unfinished">Vols enregistrés : </translation>
+        <translation>Vols enregistrés : </translation>
     </message>
     <message>
         <location line="+5"/>
@@ -12777,37 +12780,37 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+16"/>
         <source>Download logs</source>
-        <translation type="unfinished">Télécharger logs</translation>
+        <translation>Télécharger logs</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Export...</source>
-        <translation type="unfinished">Exporter...</translation>
+        <translation>Exporter...</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Adjust timestamps</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ajuster horodatage</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Clear all logs</source>
-        <translation type="unfinished">Effacer tous les logs</translation>
+        <translation>Effacer tous les logs</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/flightlog/flightlogdialog.cpp" line="+45"/>
         <source>Manage flight side logs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gérer les logs de vol</translation>
     </message>
 </context>
 <context>
@@ -12815,7 +12818,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/flightlog/flightlogmanager.cpp" line="+205"/>
         <source>Save Log</source>
-        <translation type="unfinished">Enregistrer Log</translation>
+        <translation>Enregistrer Log</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -12830,12 +12833,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+20"/>
         <source>_flight-%1</source>
-        <translation type="unfinished">_vol-%1</translation>
+        <translation>_vol-%1</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>All</source>
-        <translation type="unfinished">Tout</translation>
+        <translation>Tout</translation>
     </message>
 </context>
 <context>

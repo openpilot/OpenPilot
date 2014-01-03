@@ -250,23 +250,18 @@ static void PIOS_SBus_UpdateState(struct pios_sbus_state *state, uint8_t b)
         state->received_data[state->byte_count - 1] = b;
         state->byte_count++;
     } else {
-        if (b == SBUS_EOF_BYTE) {
-            /* full frame received */
-            uint8_t flags = state->received_data[SBUS_FRAME_LENGTH - 3];
-            if (flags & SBUS_FLAG_FL) {
-                /* frame lost, do not update */
-            } else if (flags & SBUS_FLAG_FS) {
-                /* failsafe flag active */
-                PIOS_SBus_ResetChannels(state);
-            } else {
-                /* data looking good */
-                PIOS_SBus_UnrollChannels(state);
-                state->failsafe_timer = 0;
-            }
+        /* full frame received */
+        uint8_t flags = state->received_data[SBUS_FRAME_LENGTH - 3];
+        if (flags & SBUS_FLAG_FL) {
+            /* frame lost, do not update */
+        } else if (flags & SBUS_FLAG_FS) {
+            /* failsafe flag active */
+            PIOS_SBus_ResetChannels(state);
         } else {
-            /* discard whole frame */
+            /* data looking good */
+            PIOS_SBus_UnrollChannels(state);
+            state->failsafe_timer = 0;
         }
-
         /* prepare for the next frame */
         state->frame_found = 0;
     }

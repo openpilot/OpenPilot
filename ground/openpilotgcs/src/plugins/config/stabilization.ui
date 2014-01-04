@@ -21672,10 +21672,10 @@ border-radius: 5;</string>
                     <double>0.000000000000000</double>
                    </property>
                    <property name="maximum">
-                    <double>255.000000000000000</double>
+                    <double>31.000000000000000</double>
                    </property>
                    <property name="value">
-                    <double>100.000000000000000</double>
+                    <double>10.000000000000000</double>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>

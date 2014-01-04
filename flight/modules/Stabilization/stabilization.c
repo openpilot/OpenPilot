@@ -91,17 +91,15 @@ bool lowThrottleZeroIntegral;
 bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay = 0.991f;
 struct pid pids[PID_MAX];
-float rattitude_anti_windup;
+static uint8_t rattitude_anti_windup;
 
 // Private functions
 static void stabilizationTask(void *parameters);
 static float bound(float val, float range);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
-
-// temp log2f() because of
-// error: unsuffixed float constant
 static float stab_log2f(float x);
+static float stab_powf(float x, uint8_t p);
 
 /**
  * Module initialization
@@ -335,7 +333,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 }
 
                 // Compute what Rate mode would give for this stick angle's rate
-                // Save in a Rate's rate in a temp for later merging with Attitude's rate
+                // Save Rate's rate in a temp for later merging with Attitude's rate
                 float rateDesiredAxisRate;
                 rateDesiredAxisRate = bound(stabDesiredAxis[i], 1.0f)
                     * cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i];
@@ -393,54 +391,26 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 // the bigger the dT      the more anti windup needed
                 // the bigger the PID[].i the more anti windup needed
                 // more anti windup is achieved with a lower powf() power
-                // a doubling of e.g. PID[].i should cause the anti windup factor
+                // a doubling of e.g. PID[].i should cause the runtime anti windup factor
                 // to get twice as far away from 1.0 (towards zero)
                 // e.g. from .90 to .80
 
-                // some quick napkin calculations say that 1/10th second, 50 cycles
-                // to reduce an iAcc by half we should have a factor of about .986
-                // this is so that at half stick, iAcc gets reduced to half in .1 second
-                // this sounds in the ballpark for a default anti windup
-                // so powf(.5, x) = .014
-                // .5^x = .014
-                // x about 6
-                // for rate     6 = 1 / (aw * .002 * .003), aw = 1 / (6 * .002 * .003) = 27777
-                // for attitude 6 = 1 / (aw * .002 * 1)   , aw = 1 / (6 * .002 * 2.5)  = 33
-                // multiply by 833 for rate, use aw as is for attitude
-                // hand testing showed that aw=10 reduced the windup slightly
-
-                // make Ki a multiplicative factor, not a power factor
-                // given magnitude=.5, to jump from a factor of .75 (pow()=.25)
-                // to a factor of .92 (~3x) (pow()=.08)
-                // we need to multiply by 1/3 (factor of 3)
-                // log(a+b) = log(a) * log(b)
-                // powf(.5, x) = .33, .5^x=.333, x=log.5(.333)=-log2(.333)
-
-                // logb(x) = loga(x)/loga(b)
-                
-		// assume a loop rate of 625 iterations per second
-		// I see about 15x 1.5ms updates and then a 3.0ms update on the average
-                // assuming dT averages about 0.0016
-
                 // magic numbers
-		// 255 comes from uint_8 scaling
-		// 37.8387 is so that if the uavo is 100, the power is 23
-		// these calculations are for magnitude = 0.5 so 23 corresponds to the number of bits
-		// used in the mantissa of the float
-		// i.e. 1.0-(0.5^23) almost underflows
-                // the 17.668f and 7.966f cancel the default value of the log2() that follow them
-
                 // these generate the inverted parabola like curves that go through [0,1] and [1,0]
-		// powf(magnitude, 37.8387f - (37.8387f/255.0f) * rattitude_anti_windup - 17.668f - log2f(dT * pids[PID_RATE_ROLL+i].i));
-		// powf(magnitude, 37.8387f - (37.8387f/255.0f) * rattitude_anti_windup - 7.966f - log2f(dT * pids[PID_ROLL+i].i));
-		// for uavo 255 the power is  0     the factor is constant 0 and anti windup erases all of iAcc
-                // for uavo 248 the power is  1     (approx) the curve is a line
-                // for uavo 242 the power is  2     (approx) the curve is a parabola
-                // for uavo 235 the power is  3     (approx) the curve is a cubic
-                // for higher powers the curve becomes more like a pair of straight lines
-		// for uavo 100 the power is 23
-		// for uavo   1 the power is 37.7
-		// for uavo   0 disable anti windup
+                // the higher the power, the closer the curve is to a straight line
+                // from [0,1] to [1,1] to [1,0] and the less anti windup is applied
+
+                // the UAVO RattitudeAntiWindup varies from 0 to 31
+                // 0 turns off anti windup
+                // 1 gives very little anti-windup because the power given to powf() is 31
+                // 31 gives a lot of anti-windup because the power given to powf() is 1
+                // the 32.1 is what does this
+                // the 7.966 and 17.668 cancel the default PID value and dT given to log2f()
+                // if these are non-default, tweaking is thus done so the user doesn't have to readjust
+                // the default value of 10 for UAVO RattitudeAntiWindup gives a power of 22
+		// these calculations are for magnitude = 0.5, so 22 corresponds to the number of bits
+		// used in the mantissa of the float
+		// i.e. 1.0-(0.5^22) almost underflows
 
                 // This may only be useful for aircraft with large Ki values and limits
                 if (dT > 0.0f && rattitude_anti_windup > 0.0f) {
@@ -448,20 +418,17 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                     // At magnitudes close to one, the Attitude accumulators gets zeroed
                     if (pids[PID_ROLL+i].i > 0.0f) {
-                        factor = 1.0f - powf(magnitude, 37.8387f - (37.8387f/255.0f) * rattitude_anti_windup
-                                                        - 7.966f - stab_log2f(dT * pids[PID_ROLL+i].i));
+                        factor = 1.0f - stab_powf(magnitude, ((uint8_t) (32.1f - 7.966f - stab_log2f(dT * pids[PID_ROLL+i].i))) - rattitude_anti_windup);
                         pids[PID_ROLL+i].iAccumulator *= factor;
                     }
                     if (pids[PID_RATEA_ROLL+i].i > 0.0f) {
-                        factor = 1.0f - powf(magnitude, 37.8387f - (37.8387f/255.0f) * rattitude_anti_windup
-                                                        - 17.668f - stab_log2f(dT * pids[PID_RATEA_ROLL+i].i));
+                        factor = 1.0f - stab_powf(magnitude, ((uint8_t) (32.1f - 17.668f - stab_log2f(dT * pids[PID_RATEA_ROLL+i].i))) - rattitude_anti_windup);
                         pids[PID_RATEA_ROLL+i].iAccumulator *= factor;
                     }
 
                     // At magnitudes close to zero, the Rate accumulator gets zeroed
                     if (pids[PID_RATE_ROLL+i].i > 0.0f) {
-                        factor = 1.0f - powf(1.0f-magnitude, 37.8387f - (37.8387f/255.0f) * rattitude_anti_windup
-                                                        - 17.668f - stab_log2f(dT * pids[PID_RATE_ROLL+i].i));
+                        factor = 1.0f - stab_powf(1.0f-magnitude, ((uint8_t) (32.1f - 17.668f - stab_log2f(dT * pids[PID_RATE_ROLL+i].i))) - rattitude_anti_windup);
                         pids[PID_RATE_ROLL+i].iAccumulator *= factor;
                     }
                 }
@@ -646,16 +613,44 @@ static float bound(float val, float range)
     return val;
 }
 
-// because of
-// error: unsuffixed float constant
+
+// x small (0.0 < x < .01) so interpolation of fractional part is reasonable
 static float stab_log2f(float x)
 {
-    static float factor = 0.0f;
-    if (factor <= 0.0f) {
-        factor = logf(2.0f);
-    }
-    return (logf(x) / factor);
+  union
+  {
+    volatile float f;
+    volatile uint32_t i;
+    volatile unsigned char c[4];
+  } __attribute__((packed)) u1, u2;
+
+  u2.f = u1.f = x;
+  u1.i <<= 1;
+  u2.i &= 0xff800000;
+
+  // get and unbias the exponent, add in a linear interpolation of the fractional part
+  return (float) (u1.c[3] - 127) + (x / u2.f) - 1.0f;
 }
+
+
+// 0<=x<=1, 0<=p<=31
+static float stab_powf(float x, uint8_t p)
+{
+  float retval = 1.0f;
+
+  while (p)
+  {
+    if (p&1)
+    {
+      retval *= x;
+    }
+    x *= x;
+    p >>= 1;
+  }
+
+  return retval;
+}
+
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
@@ -759,7 +754,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     vbar_decay = expf(-fakeDt / settings.VbarTau);
 
     // Rattitude flight mode anti-windup factor
-    rattitude_anti_windup = (float) settings.RattitudeAntiWindup;
+    rattitude_anti_windup = settings.RattitudeAntiWindup;
 }
 
 

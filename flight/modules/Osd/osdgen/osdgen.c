@@ -2833,7 +2833,7 @@ void updateGraphics()
 #endif
 
 #ifdef DEBUG_TELEMETRY
-#define DEBUG_TELEMETRY_ON_TIME		10000
+#define DEBUG_TELEMETRY_ON_TIME		5000
 #define DEBUG_TELEMETRY_CALL_TIME	40
     	static uint16_t on_cnt = 0;
         static uint8_t fts = 10;
@@ -2890,7 +2890,7 @@ void updateGraphics()
         sprintf(temp, "V.type:%4s", PIOS_Video_GetType() == VIDEO_TYPE_NTSC ? "NTSC" : "PAL");
         write_string(temp, 250, 40, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         // show number of video columns
-        sprintf(temp, "Columns:%3d", GRAPHICS_WIDTH_REAL);
+        sprintf(temp, "Columns:%3d", GRAPHICS_RIGHT + 1);
         write_string(temp, 250, 50, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         // show number of detected video lines
         sprintf(temp, "Lines:%5d", PIOS_Video_GetLines());
@@ -3087,9 +3087,15 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
             PIOS_WDG_UpdateFlag(PIOS_WDG_OSDGEN);
 #endif
             clearGraphics();
-            introGraphics	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM / 2 - 30);
-            introText		(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 90);
-            showVideoType	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 60);
+            if (PIOS_Video_GetType() == VIDEO_TYPE_NTSC) {
+                introGraphics	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM / 2 - 20);
+                introText		(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 70);
+                showVideoType	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 45);
+            } else {
+                introGraphics	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM / 2 - 30);
+                introText		(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 90);
+                showVideoType	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 60);
+            }
         }
     }
 

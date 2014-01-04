@@ -45,13 +45,39 @@
 
 extern xSemaphoreHandle osdSemaphore;
 
-#ifdef PAL
-const uint32_t period = 10;
-const uint32_t dc     = (10 / 2);
-#else
-const uint32_t period = 11;
-const uint32_t dc     = (11 / 2);
-#endif
+static const struct pios_video_type_boundary pios_video_type_boundary_ntsc = {
+		.graphics_left			= 0,
+		.graphics_top			= 0,
+		.graphics_right			= 367,			// must be: graphics_width_real - 1
+		.graphics_bottom		= 240,			// must be: graphics_hight_real - 1
+};
+
+static const struct pios_video_type_boundary pios_video_type_boundary_pal = {
+		.graphics_left			= 0,
+		.graphics_top			= 0,
+		.graphics_right			= 399,			// must be: graphics_width_real - 1
+		.graphics_bottom		= 287,			// must be: graphics_hight_real - 1
+};
+
+static const struct pios_video_type_cfg pios_video_type_cfg_ntsc = {
+		.graphics_width_real	= 368,			// Real visible columns		currently unused, just for info
+		.graphics_hight_real	= 241,			// Real visible lines
+		.graphics_column_start	= 60,			// First visible OSD column (after Hsync)
+		.graphics_line_start	= 13,			// First visible OSD line
+		.dma_buffer_length		= 47,			// DMA buffer byte length	must be: graphics_width_real / 8 + 1
+		.period					= 11,
+		.dc						= (11 / 2),
+};
+
+static const struct pios_video_type_cfg pios_video_type_cfg_pal = {
+		.graphics_width_real	= 400,			// Real visible columns		currently unused, just for info
+		.graphics_hight_real	= 288,			// Real visible lines
+		.graphics_column_start	= 70,			// First visible OSD column (after Hsync)
+		.graphics_line_start	= 17,			// First visible OSD line
+		.dma_buffer_length		= 51,			// DMA buffer byte length	must be: graphics_width_real / 8 + 1
+		.period					= 10,
+		.dc						= (10 / 2),
+};
 
 // Allocate buffers.
 // Must be allocated in one block, so it is in a struct.
@@ -77,13 +103,14 @@ uint8_t *disp_buffer_mask;
 volatile uint16_t gActiveLine  = 0;
 volatile uint16_t Hsync_update = 0;
 
-// Private const
-static const struct pios_video_cfg *dev_cfg;
+const struct pios_video_type_boundary *pios_video_type_boundary_act = &pios_video_type_boundary_ntsc;
 
 // Private variables
+static const struct pios_video_cfg *dev_cfg;
 static int16_t m_osdLines = 0;
 static int8_t video_type_tmp = VIDEO_TYPE_NTSC;
 static int8_t video_type_act = VIDEO_TYPE_NTSC;
+static const struct pios_video_type_cfg *pios_video_type_cfg_act = &pios_video_type_cfg_ntsc;
 
 // Private functions
 static void swap_buffers();
@@ -108,7 +135,19 @@ bool PIOS_Vsync_ISR()
     gActiveLine = 0;
     Hsync_update = 0;
     Vsync_update++;
-    video_type_act = video_type_tmp;
+    // if video type has changed set new active values
+    if (video_type_act != video_type_tmp) {
+        video_type_act = video_type_tmp;
+    	if (video_type_act == VIDEO_TYPE_NTSC) {
+        	pios_video_type_boundary_act = &pios_video_type_boundary_ntsc;
+        	pios_video_type_cfg_act = &pios_video_type_cfg_ntsc;
+    	} else {
+        	pios_video_type_boundary_act = &pios_video_type_boundary_pal;
+        	pios_video_type_cfg_act = &pios_video_type_cfg_pal;
+    	}
+    	dev_cfg->pixel_timer.timer->CCR1 = pios_video_type_cfg_act->dc;
+    	dev_cfg->pixel_timer.timer->ARR = pios_video_type_cfg_act->period;
+    }
     video_type_tmp = VIDEO_TYPE_NTSC;
     if (Vsync_update >= 2) {		// every second field: swap buffers and trigger redraw
         Vsync_update = 0;
@@ -126,8 +165,8 @@ bool PIOS_Vsync_ISR()
  */
 bool PIOS_Hsync_ISR()
 {
-    // prepare data which will start clocking out on GRAPHICS_LINE+1
-    if (Hsync_update++ == GRAPHICS_LINE) {
+    // prepare data which will start clocking out on pios_video_type_cfg_act->graphics_line_start + 1
+    if (Hsync_update++ == pios_video_type_cfg_act->graphics_line_start) {
         prepare_line(0);
     }
     // check video type
@@ -159,7 +198,7 @@ void PIOS_VIDEO_DMA_Handler(void)
         dev_cfg->pixel_timer.timer->CR1 &= (uint16_t)~TIM_CR1_CEN;
         // Disable the pixel timer slave mode configuration
         dev_cfg->pixel_timer.timer->SMCR &= (uint16_t)~TIM_SMCR_SMS;
-        if (gActiveLine < BUFFER_HEIGHT) {	// lines existing
+        if (gActiveLine < pios_video_type_cfg_act->graphics_hight_real) {	// lines existing
             prepare_line(gActiveLine);
         } else {								// last line completed
             // Stop DMA
@@ -174,7 +213,7 @@ void PIOS_VIDEO_DMA_Handler(void)
         DMA_ClearFlag(dev_cfg->level.dma.tx.channel, DMA_FLAG_TCIF5);
         flush_spi();
         stop_pixel_timer();
-        if (gActiveLine < BUFFER_HEIGHT) {	// lines existing
+        if (gActiveLine < pios_video_type_cfg_act->graphics_hight_real) {	// lines existing
             prepare_line(gActiveLine);
         } else {								// last line completed
             // Stop DMA
@@ -204,8 +243,8 @@ static void prepare_line(uint32_t line_num)
     dev_cfg->mask.dma.tx.channel->M0AR = (uint32_t)&disp_buffer_mask[buf_offset];
     dev_cfg->level.dma.tx.channel->M0AR = (uint32_t)&disp_buffer_level[buf_offset];
     // Set length
-    dev_cfg->mask.dma.tx.channel->NDTR = (uint16_t)BUFFER_WIDTH;
-    dev_cfg->level.dma.tx.channel->NDTR = (uint16_t)BUFFER_WIDTH;
+    dev_cfg->mask.dma.tx.channel->NDTR = (uint16_t)pios_video_type_cfg_act->dma_buffer_length;
+    dev_cfg->level.dma.tx.channel->NDTR = (uint16_t)pios_video_type_cfg_act->dma_buffer_length;
     // Enable SPI
     dev_cfg->mask.regs->CR1 |= SPI_CR1_SPE;
     dev_cfg->level.regs->CR1 |= SPI_CR1_SPE;
@@ -221,7 +260,7 @@ static void prepare_line(uint32_t line_num)
 	// Set to immediate
 	dev_cfg->pixel_timer.timer->EGR = TIM_PSCReloadMode_Immediate;
 	// Set initial line offset
-    dev_cfg->pixel_timer.timer->CNT = 0xffff - dc * GRAPHICS_COLUMN;			// JR_HINT put to struct for PAL/NTSC auto detect
+    dev_cfg->pixel_timer.timer->CNT = 0xffff - pios_video_type_cfg_act->dc * pios_video_type_cfg_act->graphics_column_start;
     // Reset the SMS bits
     dev_cfg->pixel_timer.timer->SMCR &= (uint16_t)~TIM_SMCR_SMS;
     // Select the slave mode waiting for Hsync
@@ -239,8 +278,8 @@ static void prepare_line(uint32_t line_num)
     DMA_MemoryTargetConfig(dev_cfg->mask.dma.tx.channel, (uint32_t)&disp_buffer_mask[buf_offset], DMA_Memory_0);
     DMA_MemoryTargetConfig(dev_cfg->level.dma.tx.channel, (uint32_t)&disp_buffer_level[buf_offset], DMA_Memory_0);
     // Set length
-    DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel, BUFFER_WIDTH);
-    DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel, BUFFER_WIDTH);
+    DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel, pios_video_type_cfg_act->dma_buffer_length);
+    DMA_SetCurrDataCounter(dev_cfg->level.dma.tx.channel, pios_video_type_cfg_act->dma_buffer_length);
     // Enable SPI
     SPI_Cmd(dev_cfg->mask.regs, ENABLE);
     SPI_Cmd(dev_cfg->level.regs, ENABLE);
@@ -254,7 +293,7 @@ static void prepare_line(uint32_t line_num)
     // Set prescaler
 	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
 	// Set initial line offset
-    dev_cfg->pixel_timer.timer->CNT = 0xffff - dc * GRAPHICS_COLUMN;			// JR_HINT put to struct for PAL/NTSC auto detect
+    dev_cfg->pixel_timer.timer->CNT = 0xffff - pios_video_type_cfg_act->dc * pios_video_type_cfg_act->graphics_column_start;
     // Set timer slave mode waiting for Hsync
     TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
 #endif
@@ -330,8 +369,8 @@ void PIOS_Video_Init(const struct pios_video_cfg *cfg)
     TIM_OC1PreloadConfig(cfg->pixel_timer.timer, TIM_OCPreload_Enable);
     TIM_SelectInputTrigger(cfg->pixel_timer.timer, TIM_TS_TI2FP2);
 
-    TIM_SetCompare1(cfg->pixel_timer.timer, dc);								// JR_HINT put to struct for PAL/NTSC auto detect
-    TIM_SetAutoreload(cfg->pixel_timer.timer, period);							// JR_HINT put to struct for PAL/NTSC auto detect
+    TIM_SetCompare1(cfg->pixel_timer.timer, pios_video_type_cfg_act->dc);
+    TIM_SetAutoreload(cfg->pixel_timer.timer, pios_video_type_cfg_act->period);
 
     TIM_ARRPreloadConfig(cfg->pixel_timer.timer, ENABLE);
     TIM_CtrlPWMOutputs(cfg->pixel_timer.timer, ENABLE);

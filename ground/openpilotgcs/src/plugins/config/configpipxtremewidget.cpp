@@ -168,8 +168,9 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     }
 
     // Update the Description field
+    // TODO use  UAVObjectUtilManager::descriptionToStructure()
     UAVObjectField *descField = object->getField("Description");
-    if (descField) {
+    if (descField && descField->getValue(0) != QChar(255)) {
         /*
          * This looks like a binary with a description at the end:
          *   4 bytes: header: "OpFw".
@@ -196,6 +197,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
         m_oplink->FirmwareVersion->setText(descstr + " " + date);
     } else {
         qDebug() << "PipXtremeGadgetWidget: Count not read Description field.";
+        m_oplink->FirmwareVersion->setText(tr("Unknown"));
     }
 
     // Update the serial number field

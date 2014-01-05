@@ -342,8 +342,9 @@ QString DFUObject::DownloadDescription(int const & numberOfChars)
     QByteArray arr;
 
     StartDownloadT(&arr, numberOfChars, OP_DFU::Descript);
-    QString str(arr);
-    return str;
+
+    int index = arr.indexOf(255);
+    return QString((index == -1) ? arr : arr.left(index));
 }
 
 QByteArray DFUObject::DownloadDescriptionAsBA(int const & numberOfChars)
@@ -351,6 +352,7 @@ QByteArray DFUObject::DownloadDescriptionAsBA(int const & numberOfChars)
     QByteArray arr;
 
     StartDownloadT(&arr, numberOfChars, OP_DFU::Descript);
+
     return arr;
 }
 

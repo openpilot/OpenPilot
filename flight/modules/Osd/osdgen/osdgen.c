@@ -30,9 +30,9 @@
 
 // ****************
 
-#define DEBUG_TIMING
-#define DEBUG_ALARMS
-#define DEBUG_TELEMETRY
+//#define DEBUG_TIMING
+//#define DEBUG_ALARMS
+//#define DEBUG_TELEMETRY
 //#define DEBUG_STUFF
 //#define SIMULATE_DATA
 #define TEMP_GPS_STATUS_WORKAROUND

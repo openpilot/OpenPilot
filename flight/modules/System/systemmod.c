@@ -532,6 +532,7 @@ static void updateStats()
     // Get Irq stack status
     stats.IRQStackRemaining = GetFreeIrqStackSize();
 
+    stats.SystemModStackRemaining = uxTaskGetStackHighWaterMark( NULL ) * 4;
     // When idleCounterClear was not reset by the idle-task, it means the idle-task did not run
     if (idleCounterClear) {
         idleCounter = 0;

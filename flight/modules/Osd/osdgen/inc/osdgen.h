@@ -164,9 +164,6 @@ typedef struct {
 // Check if coordinates are valid. If not, return. Assumes signed coordinate
 #define CHECK_COORDS_TRUNCATED(x, y)   if (x < GRAPHICS_LEFT || y < GRAPHICS_TOP || x > GRAPHICS_RIGHT || y > GRAPHICS_BOTTOM) { return; }
 
-// Test if coordinates are inside a boundary. false if not, true else. Assumes signed coordinate
-#define TEST_COORDS_BOUNDARY(x, y, bx, by)   (x < GRAPHICS_LEFT + bx || y < GRAPHICS_TOP + by || x > GRAPHICS_RIGHT - bx || y > GRAPHICS_BOTTOM - by) ? 0 : 1
-
 // Macro to swap two variables using XOR swap.
 #define SWAP(a, b)           { a ^= b; b ^= a; a ^= b; }
 
@@ -182,7 +179,6 @@ void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size);
 void drawAttitude(uint16_t x, uint16_t y, int16_t pitch, int16_t roll, uint16_t size);
 
-void write_char16(char ch, unsigned int x, unsigned int y, int font);
 void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode);
 void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode);
 void write_pixel_lm_truncated(int x, int y, int mmode, int lmode);
@@ -206,10 +202,9 @@ void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsi
 void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
 void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
 void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr, unsigned int xoff, int lmode, int mmode);
-// int fetch_font_info(char ch, int font, struct FontEntry *font_info, char *lookup);
-void write_char(char ch, unsigned int x, unsigned int y, int flags, int font);
-// void calc_text_dimensions(char *str, struct FontEntry font, int xs, int ys, struct FontDimensions *dim);
-void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags, int font);
-void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags);
+void write_char16(char ch, int x, int y, int font);
+void write_char(char ch, int x, int y, int flags, int font);
+void write_string(char *str, int x, int y, int xs, int ys, int va, int ha, int flags, int font);
+void write_string_formatted(char *str, int x, int y, int xs, int ys, int va, int ha, int flags);
 
 #endif /* OSDGEN_H_ */

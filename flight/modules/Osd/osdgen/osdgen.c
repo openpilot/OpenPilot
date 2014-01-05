@@ -30,9 +30,9 @@
 
 // ****************
 
-//#define DEBUG_TIMING
-//#define DEBUG_ALARMS
-//#define DEBUG_TELEMETRY
+#define DEBUG_TIMING
+#define DEBUG_ALARMS
+#define DEBUG_TELEMETRY
 //#define DEBUG_STUFF
 //#define SIMULATE_DATA
 #define TEMP_GPS_STATUS_WORKAROUND
@@ -1182,66 +1182,61 @@ int fetch_font_info(uint8_t ch, int font, struct FontEntry *font_info, char *loo
  * @param       y       y coordinate (top)
  * @param       font    font to use
  */
-void write_char16(char ch, unsigned int x, unsigned int y, int font)
+void write_char16(char ch, int x, int y, int font)
 {
-    unsigned int yy, addr_temp, row, row_temp, xshift;
+    int yy, row, xshift;
     uint16_t and_mask, or_mask, levels;
     struct FontEntry font_info;
 
-    // char lookup = 0;
     fetch_font_info(0, font, &font_info, NULL);
 
-    // Compute starting address (for x,y) of character.
+	// check if char is partly out of boundary
+    uint8_t partly_out = (x < GRAPHICS_LEFT) || (x + font_info.width > GRAPHICS_RIGHT) || (y < GRAPHICS_TOP) || (y + font_info.height > GRAPHICS_BOTTOM);
+	// check if char is totally out of boundary, if so return
+    if (partly_out && ((x + font_info.width < GRAPHICS_LEFT) || (x > GRAPHICS_RIGHT) || (y + font_info.height < GRAPHICS_TOP) || (y > GRAPHICS_BOTTOM))) return;
+
+    // Compute starting address of character
     int addr = CALC_BUFF_ADDR(x, y);
     int wbit = CALC_BIT_IN_WORD(x);
-    // If font only supports lowercase or uppercase, make the letter
-    // lowercase or uppercase.
-    // How big is the character? We handle characters up to 8 pixels
-    // wide for now. Support for large characters may be added in future.
-    {
-        // Ensure we don't overflow.
-        if (x + wbit > GRAPHICS_WIDTH_REAL) {
-            return;
-        }
+
+    // If font only supports lowercase or uppercase, make the letter lowercase or uppercase
+    //if (font_info.flags & FONT_LOWERCASE_ONLY) ch = tolower(ch);
+    //if (font_info.flags & FONT_UPPERCASE_ONLY) ch = toupper(ch);
+
+    // How wide is the character? We handle characters from 8 pixels up in this function
+    if (font_info.width >= 8) {
         // Load data pointer.
         row       = ch * font_info.height;
-        row_temp  = row;
-        addr_temp = addr;
         xshift    = 16 - font_info.width;
         // We can write mask words easily.
+        // Level bits are more complicated. We need to set or clear level bits, but only where the mask bit is set; otherwise, we need to leave them alone.
+        // To do this, for each word, we construct an AND mask and an OR mask, and apply each individually.
         for (yy = y; yy < y + font_info.height; yy++) {
-            if (font == 3) {
-                write_word_misaligned_OR(draw_buffer_mask, font_mask12x18[row] << xshift, addr, wbit);
-            } else {
-                write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, wbit);
-            }
-            addr += BUFFER_WIDTH;
-            row++;
-        }
-        // Level bits are more complicated. We need to set or clear
-        // level bits, but only where the mask bit is set; otherwise,
-        // we need to leave them alone. To do this, for each word, we
-        // construct an AND mask and an OR mask, and apply each individually.
-        row  = row_temp;
-        addr = addr_temp;
-        for (yy = y; yy < y + font_info.height; yy++) {
-            if (font == 3) {
-                levels   = font_frame12x18[row];
-                // if(!(flags & FONT_INVERT)) // data is normally inverted
-                levels   = ~levels;
-                or_mask  = font_mask12x18[row] << xshift;
-                and_mask = (font_mask12x18[row] & levels) << xshift;
-            } else {
-                levels   = font_frame8x10[row];
-                // if(!(flags & FONT_INVERT)) // data is normally inverted
-                levels   = ~levels;
-                or_mask  = font_mask8x10[row] << xshift;
-                and_mask = (font_mask8x10[row] & levels) << xshift;
-            }
-            write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
-            // If we're not bold write the AND mask.
-            // if(!(flags & FONT_BOLD))
-            write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
+        	if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
+                if (font == 3) {
+                	// mask
+                    write_word_misaligned_OR(draw_buffer_mask, font_mask12x18[row] << xshift, addr, wbit);
+                    // level
+                    levels   = font_frame12x18[row];
+                    // if (!(flags & FONT_INVERT)) // data is normally inverted
+                    levels   = ~levels;
+                    or_mask  = font_mask12x18[row] << xshift;
+                    and_mask = (font_mask12x18[row] & levels) << xshift;
+                } else {
+                	// mask
+                    write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, wbit);
+                    // level
+                    levels   = font_frame8x10[row];
+                    // if (!(flags & FONT_INVERT)) // data is normally inverted
+                    levels   = ~levels;
+                    or_mask  = font_mask8x10[row] << xshift;
+                    and_mask = (font_mask8x10[row] & levels) << xshift;
+                }
+                write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
+                // If we're not bold write the AND mask.
+                // if (!(flags & FONT_BOLD))
+                write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
+        	}
             addr += BUFFER_WIDTH;
             row++;
         }
@@ -1250,8 +1245,7 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
 
 /**
  * write_char: Draw a character on the current draw buffer.
- * Currently supports outlined characters and characters with
- * a width of up to 8 pixels.
+ * Currently supports outlined characters and characters with a width of up to 8 pixels.
  *
  * @param       ch      character to write
  * @param       x       x coordinate (left)
@@ -1259,60 +1253,51 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
  * @param       flags   flags to write with
  * @param       font    font to use
  */
-void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
+void write_char(char ch, int x, int y, int flags, int font)
 {
-    unsigned int yy, addr_temp, row, row_temp, xshift;
+    int yy, row, xshift;
     uint16_t and_mask, or_mask, levels;
     struct FontEntry font_info;
     char lookup = 0;
 
     fetch_font_info(ch, font, &font_info, &lookup);
-    // Compute starting address (for x,y) of character.
+
+	// check if char is partly out of boundary
+    uint8_t partly_out = (x < GRAPHICS_LEFT) || (x + font_info.width > GRAPHICS_RIGHT) || (y < GRAPHICS_TOP) || (y + font_info.height > GRAPHICS_BOTTOM);
+	// check if char is totally out of boundary, if so return
+    if (partly_out && ((x + font_info.width < GRAPHICS_LEFT) || (x > GRAPHICS_RIGHT) || (y + font_info.height < GRAPHICS_TOP) || (y > GRAPHICS_BOTTOM))) return;
+
+    // Compute starting address of character
     unsigned int addr = CALC_BUFF_ADDR(x, y);
     unsigned int wbit = CALC_BIT_IN_WORD(x);
-    // If font only supports lowercase or uppercase, make the letter
-    // lowercase or uppercase.
-    /*if(font_info.flags & FONT_LOWERCASE_ONLY)
-       ch = tolower(ch);
-       if(font_info.flags & FONT_UPPERCASE_ONLY)
-       ch = toupper(ch);*/
-    fetch_font_info(ch, font, &font_info, &lookup);
-    // How big is the character? We handle characters up to 8 pixels
-    // wide for now. Support for large characters may be added in future.
+
+    // If font only supports lowercase or uppercase, make the letter lowercase or uppercase
+    //if (font_info.flags & FONT_LOWERCASE_ONLY) ch = tolower(ch);
+    //if (font_info.flags & FONT_UPPERCASE_ONLY) ch = toupper(ch);
+
+    // How wide is the character? We handle characters up to 8 pixels in this function
     if (font_info.width <= 8) {
-        // Ensure we don't overflow.
-        if (x + wbit > GRAPHICS_WIDTH_REAL) {
-            return;
-        }
         // Load data pointer.
         row       = lookup * font_info.height * 2;
-        row_temp  = row;
-        addr_temp = addr;
         xshift    = 16 - font_info.width;
         // We can write mask words easily.
+        // Level bits are more complicated. We need to set or clear level bits, but only where the mask bit is set; otherwise, we need to leave them alone.
+        // To do this, for each word, we construct an AND mask and an OR mask, and apply each individually.
         for (yy = y; yy < y + font_info.height; yy++) {
-            write_word_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, wbit);
-            addr += BUFFER_WIDTH;
-            row++;
-        }
-        // Level bits are more complicated. We need to set or clear
-        // level bits, but only where the mask bit is set; otherwise,
-        // we need to leave them alone. To do this, for each word, we
-        // construct an AND mask and an OR mask, and apply each individually.
-        row  = row_temp;
-        addr = addr_temp;
-        for (yy = y; yy < y + font_info.height; yy++) {
-            levels = font_info.data[row + font_info.height];
-            if (!(flags & FONT_INVERT)) {
-                // data is normally inverted
-                levels = ~levels;
-            }
-            or_mask  = font_info.data[row] << xshift;
-            and_mask = (font_info.data[row] & levels) << xshift;
-            write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
-            // If we're not bold write the AND mask.
-            // if(!(flags & FONT_BOLD))
-            write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
+        	if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
+            	// mask
+                write_word_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, wbit);
+            	// level
+                levels = font_info.data[row + font_info.height];
+                if (!(flags & FONT_INVERT)) // data is normally inverted
+                	levels   = ~levels;
+                or_mask  = font_info.data[row] << xshift;
+                and_mask = (font_info.data[row] & levels) << xshift;
+                write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
+                // If we're not bold write the AND mask.
+                // if (!(flags & FONT_BOLD))
+                write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
+        	}
             addr += BUFFER_WIDTH;
             row++;
         }
@@ -1366,7 +1351,7 @@ void calc_text_dimensions(char *str, struct FontEntry font, int xs, int ys, stru
  * @param       flags   flags (passed to write_char)
  * @param       font    font
  */
-void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags, int font)
+void write_string(char *str, int x, int y, int xs, int ys, int va, int ha, int flags, int font)
 {
     int xx = 0, yy = 0, xx_original = 0;
     struct FontEntry font_info;
@@ -1430,7 +1415,7 @@ void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, un
  * @param       ha              horizontal align
  * @param       flags   flags (passed to write_char)
  */
-void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys,
+void write_string_formatted(char *str, int x, int y, int xs, int ys,
                             __attribute__((unused)) int va, __attribute__((unused)) int ha, int flags)
 {
     int fcode = 0, fptr = 0, font = 0, fwidth = 0, fheight = 0, xx = x, yy = y, max_xx = 0, max_height = 0;
@@ -2180,18 +2165,14 @@ void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)
     	// positive sub horizon numbers
     	s_x = pp_x - mp_x;
     	s_y = pp_y - mp_y;
-        if (TEST_COORDS_BOUNDARY(s_x - d_x, s_y + d_y, 8, 4))
-        	write_string(temp,   s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
-        if (TEST_COORDS_BOUNDARY(s_x + d_x, s_y - d_y, 8, 4))
-        	write_string(temp,   s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        write_string(temp,   s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        write_string(temp,   s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
 
     	// negative sub horizon numbers
     	s_x = pp_x + mp_x;
     	s_y = pp_y + mp_y;
-        if (TEST_COORDS_BOUNDARY(s_x - d_x, s_y + d_y, 8, 4))
-        	write_string(temp,   s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
-        if (TEST_COORDS_BOUNDARY(s_x + d_x, s_y - d_y, 8, 4))
-        	write_string(temp,   s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        write_string(temp,   s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        write_string(temp,   s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
     }
 
 	// center mark
@@ -2310,23 +2291,22 @@ void calcHomeArrow(int16_t m_yaw)
 // criteria for a stable home position:
 //  - GPS status > GPSPOSITIONSENSOR_STATUS_FIX2D
 //  - with at least CHECK_HOME_MIN_SATS satellites
-//  - osd_alt stable for CHECK_HOME_STABLE ms
-//  - osd_alt stable means the delta is lower CHECK_HOME_MAX_DEV m
-#define CHECK_HOME_CALL_TIME	40			// [ms]
-#define CHECK_HOME_STABLE		3000		// [ms]
+//  - and gpsData->Altitude delta is lower CHECK_HOME_MAX_DEV m for CHECK_HOME_STABLE ms
 #define CHECK_HOME_MIN_SATS		5
 #define CHECK_HOME_MAX_DEV		0.5f		// [m]
+#define CHECK_HOME_STABLE		3000		// [ms]
 void check_gps_home(HomePosition *homePos, GPSPositionSensorData *gpsData)
 {
-	static int16_t call_cnt = 0;
+	static portTickType stable_time = 0;
+	portTickType current_time = xTaskGetTickCount();
 	static float alt_prev = 0.0f;
 
-	if (gpsData->Status > GPSPOSITIONSENSOR_STATUS_FIX2D && gpsData->Satellites >= CHECK_HOME_MIN_SATS && call_cnt < (CHECK_HOME_STABLE / CHECK_HOME_CALL_TIME)) {
+	if (!homePos->GotHome && gpsData->Status > GPSPOSITIONSENSOR_STATUS_FIX2D && gpsData->Satellites >= CHECK_HOME_MIN_SATS) {
 		if (fabsf(alt_prev - gpsData->Altitude) > CHECK_HOME_MAX_DEV) {
-			call_cnt = 0;
+			stable_time = current_time;
 			alt_prev = gpsData->Altitude;
 		} else {
-			if (++call_cnt >= (CHECK_HOME_STABLE / CHECK_HOME_CALL_TIME)) {
+			if (current_time - stable_time > CHECK_HOME_STABLE) {
 				homePos->Latitude = gpsData->Latitude;		// take this Latitude as home Latitude
 				homePos->Longitude = gpsData->Longitude;	// take this Longitude as home Longitude
 				homePos->Altitude = gpsData->Altitude;		// take this stable Altitude as home Altitude
@@ -2421,7 +2401,6 @@ void accumulate_current(double current_amp, double *current_total)
 
 #define WARN_ON_TIME			 500			// [ms]
 #define WARN_OFF_TIME			 250			// [ms]
-#define WARN_CALL_TIME			  40			// [ms]
 #define WARN_DO_NOT_MOVE		0x0001
 #define WARN_NO_SAT_FIX			0x0002
 #define WARN_HOME_NOT_SET		0x0004
@@ -2433,15 +2412,16 @@ void accumulate_current(double current_amp, double *current_total)
 #define WARN_BATT_SVOLT_LOW		0x0100
 void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, int8_t char_size)
 {
-	static uint16_t on_off_cnt = 0;
+	static portTickType on_off_time = 0;
+	portTickType current_time = xTaskGetTickCount();
     char temp[20] = { 0 };
 	int d_y = 0;
 
-	if (!WarnMask || (on_off_cnt > (WARN_ON_TIME + WARN_OFF_TIME) / WARN_CALL_TIME)) {
-		on_off_cnt = 0;
+	if (!WarnMask || current_time - on_off_time > WARN_ON_TIME + WARN_OFF_TIME) {
+		on_off_time = current_time;
 	}
 
-	if (WarnMask && (on_off_cnt++ < WARN_ON_TIME / WARN_CALL_TIME)) {
+	if (WarnMask && current_time - on_off_time < WARN_ON_TIME) {
 		if (WarnMask & WARN_DO_NOT_MOVE) {
 	        sprintf(temp,  "DO NOT MOVE");
 	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
@@ -2833,9 +2813,9 @@ void updateGraphics()
 #endif
 
 #ifdef DEBUG_TELEMETRY
-#define DEBUG_TELEMETRY_ON_TIME		5000
-#define DEBUG_TELEMETRY_CALL_TIME	40
-    	static uint16_t on_cnt = 0;
+#define DEBUG_TELEMETRY_ON_TIME		5000		// [ms]
+    	static portTickType on_time = 0;
+    	portTickType current_time = xTaskGetTickCount();
         static uint8_t fts = 10;
         static uint8_t gts = 10;
         static uint32_t frxf = 0;
@@ -2852,7 +2832,7 @@ void updateGraphics()
         		||	gtxf != g_telemetry.TxFailures
     		)
     	{
-    		on_cnt = 0;
+    		on_time = current_time;
 			fts = f_telemetry.Status;
 			gts = g_telemetry.Status;
     		frxf = f_telemetry.RxFailures;
@@ -2861,7 +2841,7 @@ void updateGraphics()
     		gtxf = g_telemetry.TxFailures;
     	}
 
-    	if (on_cnt++ < (DEBUG_TELEMETRY_ON_TIME) / DEBUG_TELEMETRY_CALL_TIME) {
+    	if (current_time - on_time < DEBUG_TELEMETRY_ON_TIME) {
             sprintf(temp, "FTS: %6d", f_telemetry.Status);
             write_string(temp, 270, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 

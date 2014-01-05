@@ -151,7 +151,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
         m_oplink->PairID4->setEnabled(false);
         m_oplink->Bind4->setEnabled(pairid4);
     } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
+        qDebug() << "ConfigPipXtremeWidget: Count not read PairID field.";
     }
     UAVObjectField *pairRssiField = object->getField("PairSignalStrengths");
     if (pairRssiField) {
@@ -164,40 +164,44 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
         m_oplink->PairSignalStrengthLabel3->setText(QString("%1dB").arg(pairRssiField->getValue(2).toInt()));
         m_oplink->PairSignalStrengthLabel4->setText(QString("%1dB").arg(pairRssiField->getValue(3).toInt()));
     } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
+        qDebug() << "ConfigPipXtremeWidget: Count not read PairID field.";
     }
 
     // Update the Description field
     // TODO use  UAVObjectUtilManager::descriptionToStructure()
     UAVObjectField *descField = object->getField("Description");
-    if (descField && descField->getValue(0) != QChar(255)) {
-        /*
-         * This looks like a binary with a description at the end:
-         *   4 bytes: header: "OpFw".
-         *   4 bytes: GIT commit tag (short version of SHA1).
-         *   4 bytes: Unix timestamp of compile time.
-         *   2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
-         *  26 bytes: commit tag if it is there, otherwise branch name. '-dirty' may be added if needed. Zero-padded.
-         *  20 bytes: SHA1 sum of the firmware.
-         *  20 bytes: SHA1 sum of the uavo definitions.
-         *  20 bytes: free for now.
-         */
-        char buf[OPLinkStatus::DESCRIPTION_NUMELEM];
-        for (unsigned int i = 0; i < 26; ++i) {
-            buf[i] = descField->getValue(i + 14).toChar().toLatin1();
+    if (descField) {
+        if (descField->getValue(0) != QChar(255)) {
+            /*
+             * This looks like a binary with a description at the end:
+             *   4 bytes: header: "OpFw".
+             *   4 bytes: GIT commit tag (short version of SHA1).
+             *   4 bytes: Unix timestamp of compile time.
+             *   2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+             *  26 bytes: commit tag if it is there, otherwise branch name. '-dirty' may be added if needed. Zero-padded.
+             *  20 bytes: SHA1 sum of the firmware.
+             *  20 bytes: SHA1 sum of the uavo definitions.
+             *  20 bytes: free for now.
+             */
+            char buf[OPLinkStatus::DESCRIPTION_NUMELEM];
+            for (unsigned int i = 0; i < 26; ++i) {
+                buf[i] = descField->getValue(i + 14).toChar().toLatin1();
+            }
+            buf[26] = '\0';
+            QString descstr(buf);
+            quint32 gitDate = descField->getValue(11).toChar().toLatin1() & 0xFF;
+            for (int i = 1; i < 4; i++) {
+                gitDate  = gitDate << 8;
+                gitDate += descField->getValue(11 - i).toChar().toLatin1() & 0xFF;
+            }
+            QString date = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyy-MM-dd HH:mm");
+            m_oplink->FirmwareVersion->setText(descstr + " " + date);
+        } else {
+            m_oplink->FirmwareVersion->setText(tr("Unknown"));
         }
-        buf[26] = '\0';
-        QString descstr(buf);
-        quint32 gitDate = descField->getValue(11).toChar().toLatin1() & 0xFF;
-        for (int i = 1; i < 4; i++) {
-            gitDate  = gitDate << 8;
-            gitDate += descField->getValue(11 - i).toChar().toLatin1() & 0xFF;
-        }
-        QString date = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyy-MM-dd HH:mm");
-        m_oplink->FirmwareVersion->setText(descstr + " " + date);
-    } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read Description field.";
-        m_oplink->FirmwareVersion->setText(tr("Unknown"));
+    }
+    else {
+        qDebug() << "ConfigPipXtremeWidget: Failed to read Description field.";
     }
 
     // Update the serial number field
@@ -213,7 +217,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
         buf[OPLinkStatus::CPUSERIAL_NUMELEM * 2] = '\0';
         m_oplink->SerialNumber->setText(buf);
     } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read Description field.";
+        qDebug() << "ConfigPipXtremeWidget: Failed to read CPUSerial field.";
     }
 
     // Update the link state
@@ -221,7 +225,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     if (linkField) {
         m_oplink->LinkState->setText(linkField->getValue().toString());
     } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read link state field.";
+        qDebug() << "ConfigPipXtremeWidget: Failed to read LinkState field.";
     }
 }
 

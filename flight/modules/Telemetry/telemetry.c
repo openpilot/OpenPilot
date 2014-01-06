@@ -158,6 +158,7 @@ int32_t TelemetryInitialize(void)
 #endif
 
     // Create periodic event that will be used to update the telemetry stats
+    // FIXME STATS_UPDATE_PERIOD_MS is 4000ms while FlighTelemetryStats update period is 5000ms...
     txErrors  = 0;
     txRetries = 0;
     UAVObjEvent ev;
@@ -177,18 +178,18 @@ MODULE_INITCALL(TelemetryInitialize, TelemetryStart);
 static void registerObject(UAVObjHandle obj)
 {
     if (UAVObjIsMetaobject(obj)) {
-        /* Only connect change notifications for meta objects.  No periodic updates */
+        // Only connect change notifications for meta objects.  No periodic updates
         UAVObjConnectQueue(obj, priorityQueue, EV_MASK_ALL_UPDATES);
     } else {
         // Setup object for periodic updates
-        UAVObjEvent ev = {
-            .obj    = obj,
-            .instId = UAVOBJ_ALL_INSTANCES,
-            .event  = EV_UPDATED_PERIODIC,
-        };
-        EventPeriodicQueueCreate(&ev, queue, 0);
-        ev.event = EV_LOGGING_PERIODIC;
-        EventPeriodicQueueCreate(&ev, queue, 0);
+//        UAVObjEvent ev = {
+//            .obj    = obj,
+//            .instId = UAVOBJ_ALL_INSTANCES,
+//            .event  = EV_UPDATED_PERIODIC,
+//        };
+//        EventPeriodicQueueCreate(&ev, queue, 0);
+//        ev.event = EV_LOGGING_PERIODIC;
+//        EventPeriodicQueueCreate(&ev, queue, 0);
 
         // Setup object for telemetry updates
         updateObject(obj, EV_NONE);
@@ -295,7 +296,6 @@ static void processObjEvent(UAVObjEvent *ev)
 {
     UAVObjMetadata metadata;
     UAVObjUpdateMode updateMode;
-    FlightTelemetryStatsData flightStats;
     int32_t retries;
     int32_t success;
 
@@ -304,7 +304,6 @@ static void processObjEvent(UAVObjEvent *ev)
     } else if (ev->obj == GCSTelemetryStatsHandle()) {
         gcsTelemetryStatsUpdated();
     } else {
-        FlightTelemetryStatsGet(&flightStats);
         // Get object metadata
         UAVObjGetMetadata(ev->obj, &metadata);
         updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
@@ -312,7 +311,9 @@ static void processObjEvent(UAVObjEvent *ev)
         // Act on event
         retries    = 0;
         success    = -1;
-        if ((ev->event == EV_UPDATED && (updateMode == UPDATEMODE_ONCHANGE || updateMode == UPDATEMODE_THROTTLED)) || ev->event == EV_UPDATED_MANUAL || ((ev->event == EV_UPDATED_PERIODIC) && (updateMode != UPDATEMODE_THROTTLED))) {
+        if ((ev->event == EV_UPDATED && (updateMode == UPDATEMODE_ONCHANGE || updateMode == UPDATEMODE_THROTTLED))
+                || ev->event == EV_UPDATED_MANUAL
+                || (ev->event == EV_UPDATED_PERIODIC && updateMode != UPDATEMODE_THROTTLED)) {
             // Send update to GCS (with retries)
             while (retries < MAX_RETRIES && success == -1) {
                 // call blocks until ack is received or timeout
@@ -355,7 +356,9 @@ static void processObjEvent(UAVObjEvent *ev)
     // Log UAVObject if necessary
     if (ev->obj) {
         updateMode = UAVObjGetLoggingUpdateMode(&metadata);
-        if ((ev->event == EV_UPDATED && (updateMode == UPDATEMODE_ONCHANGE || updateMode == UPDATEMODE_THROTTLED)) || ev->event == EV_LOGGING_MANUAL || ((ev->event == EV_LOGGING_PERIODIC) && (updateMode != UPDATEMODE_THROTTLED))) {
+        if ((ev->event == EV_UPDATED && (updateMode == UPDATEMODE_ONCHANGE || updateMode == UPDATEMODE_THROTTLED))
+                || ev->event == EV_LOGGING_MANUAL
+                || (ev->event == EV_LOGGING_PERIODIC && updateMode != UPDATEMODE_THROTTLED)) {
             if (ev->instId == UAVOBJ_ALL_INSTANCES) {
                 success = UAVObjGetNumInstances(ev->obj);
                 for (retries = 0; retries < success; retries++) {
@@ -488,12 +491,18 @@ static int32_t transmitData(uint8_t *data, int32_t length)
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
 {
     UAVObjEvent ev;
+    int32_t ret;
 
-    // Add object for periodic updates
+    // Add or update object for periodic updates
     ev.obj    = obj;
     ev.instId = UAVOBJ_ALL_INSTANCES;
     ev.event  = EV_UPDATED_PERIODIC;
-    return EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
+
+    ret = EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
+    if (ret == -1) {
+        ret = EventPeriodicQueueCreate(&ev, queue, updatePeriodMs);
+    }
+    return ret;
 }
 
 /**
@@ -506,12 +515,18 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
 static int32_t setLoggingPeriod(UAVObjHandle obj, int32_t updatePeriodMs)
 {
     UAVObjEvent ev;
+    int32_t ret;
 
-    // Add object for periodic updates
+    // Add or update object for periodic updates
     ev.obj    = obj;
     ev.instId = UAVOBJ_ALL_INSTANCES;
     ev.event  = EV_LOGGING_PERIODIC;
-    return EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
+
+    ret = EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
+    if (ret == -1) {
+        ret = EventPeriodicQueueCreate(&ev, queue, updatePeriodMs);
+    }
+    return ret;
 }
 
 /**

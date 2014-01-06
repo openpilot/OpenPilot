@@ -34,7 +34,7 @@
 
 //#define UAV_DEBUGLOG 1
 
-#if defined UAV_DEBUGLOG && defined(FLASH_FREETOS)
+#if defined UAV_DEBUGLOG && defined FLASH_FREERTOS
 #define UAVT_DEBUGLOG_PRINTF(...) PIOS_DEBUGLOG_Printf(__VA_ARGS__)
 #define UAVT_DEBUGLOG_CPRINTF(objId, ...) if (objId == 0x5E5903CC) { UAVT_DEBUGLOG_PRINTF(__VA_ARGS__); }
 #else
@@ -678,9 +678,7 @@ int32_t UAVTalkReceiveObject(UAVTalkConnection connectionHandle)
         return -1;
     }
 
-    receiveObject(connection, iproc->type, iproc->objId, iproc->instId, connection->rxBuffer);
-
-    return 0;
+    return receiveObject(connection, iproc->type, iproc->objId, iproc->instId, connection->rxBuffer);
 }
 
 /**

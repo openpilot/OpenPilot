@@ -75,11 +75,16 @@ public:
     QList<ShadowWidgetBinding *> shadows() const;
 
     void addShadow(QWidget *widget, double scale, bool isLimited);
+    bool matches(QString objectName, QString fieldName, int index, quint32 instanceId);
+
+    bool isEnabled() const;
+    void setIsEnabled(bool isEnabled);
 
 private:
     UAVObject *m_object;
     UAVObjectField *m_field;
     int m_index;
+    bool m_isEnabled;
     QList<ShadowWidgetBinding *> m_shadows;
 };
 
@@ -104,14 +109,14 @@ public:
     void addWidget(QWidget *widget);
 
     void addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index = 0, double scale = 1,
-                          bool isLimited = false, QList<int> *reloadGroups = 0, quint32 instID = 0);
+                          bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
     void addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, int index = 0, double scale = 1,
-                          bool isLimited = false, QList<int> *reloadGroups = 0, quint32 instID = 0);
+                          bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
 
     void addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, QString elementName, double scale,
-                          bool isLimited = false, QList<int> *reloadGroups = 0, quint32 instID = 0);
+                          bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
     void addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, QString elementName, double scale,
-                          bool isLimited = false, QList<int> *reloadGroups = 0, quint32 instID = 0);
+                          bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
 
     void addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, QString elementName);
     void addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, QString elementName);
@@ -120,7 +125,7 @@ public:
     void addReloadButton(QPushButton *button, int buttonGroup);
     void addDefaultButton(QPushButton *button, int buttonGroup);
 
-    void addWidgetToReloadGroups(QWidget *widget, QList<int> *groups);
+    void addWidgetToReloadGroups(QWidget *widget, QList<int> *reloadGroupIDs);
 
     bool addShadowWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index = 0, double scale = 1,
                                 bool isLimited = false, QList<int> *m_reloadGroups = NULL, quint32 instID = 0);
@@ -193,14 +198,16 @@ private:
     bool m_isConnected;
     bool m_isWidgetUpdatesAllowed;
     QStringList m_objects;
-    QList <WidgetBinding *> m_widgetBindings;
+
+    QMultiHash<int, WidgetBinding *> m_reloadGroups;
+    QMultiHash<QWidget *, WidgetBinding *> m_widgetBindingsPerWidget;
+    QMultiHash<UAVObject *, WidgetBinding *> m_widgetBindingsPerObject;
+
     ExtensionSystem::PluginManager *m_pluginManager;
     UAVObjectUtilManager *m_objectUtilManager;
     SmartSaveButton *m_saveButton;
-    QMap<UAVObject *, bool> m_updatedObjects;
-    QMap<int, QList<WidgetBinding *> *> m_reloadGroups;
-    QMap<QWidget *, WidgetBinding *> m_shadowBindings;
-    QMap<QPushButton *, QString> m_helpButtons;
+    QHash<UAVObject *, bool> m_updatedObjects;
+    QHash<QPushButton *, QString> m_helpButtons;
     QList<QPushButton *> m_reloadButtons;
     bool m_isDirty;
     QString m_outOfLimitsStyle;

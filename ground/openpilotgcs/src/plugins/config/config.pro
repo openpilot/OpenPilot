@@ -2,7 +2,9 @@ TEMPLATE = lib
 TARGET = Config
 DEFINES += CONFIG_LIBRARY
 QT += svg
+
 include(config_dependencies.pri)
+
 INCLUDEPATH += ../../libs/eigen
 
 OTHER_FILES += Config.pluginspec
@@ -20,6 +22,7 @@ HEADERS += configplugin.h \
     configpipxtremewidget.h \
     configstabilizationwidget.h \
     assertions.h \
+#    calibration.h \
     defaultattitudewidget.h \
     defaulthwsettingswidget.h \
     inputchannelform.h \
@@ -50,7 +53,10 @@ SOURCES += configplugin.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
     configpipxtremewidget.cpp \
-    legacy-calibration.cpp \
+#    twostep.cpp \
+#    legacy-calibration.cpp \
+#    gyro-calibration.cpp \
+#    alignment-calibration.cpp \
     defaultattitudewidget.cpp \
     defaulthwsettingswidget.cpp \
     inputchannelform.cpp \

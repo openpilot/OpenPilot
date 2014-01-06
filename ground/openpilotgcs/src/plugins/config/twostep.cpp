@@ -28,10 +28,8 @@
 
 #include <calibration.h>
 #include <assertions.h>
+#include <Eigen/Eigen2Support>
 
-#include <Eigen/Cholesky>
-#include <Eigen/QR>
-#include <Eigen/LU>
 #include <cstdlib>
 
 #undef PRINTF_DEBUGGING

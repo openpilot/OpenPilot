@@ -105,6 +105,15 @@ void ConfigTaskWidget::addWidgetBinding(UAVObject *object, UAVObjectField *field
 }
 
 void ConfigTaskWidget::addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index, double scale,
+                                        bool isLimited, QList<int> *reloadGroupIDs, quint32 instID) {
+
+    // If object name is comma separated list of objects, call one time per objectName
+    foreach(QString singleObjectName, objectName.split(",")) {
+        doAddWidgetBinding(singleObjectName, fieldName, widget, index, scale, isLimited, reloadGroupIDs, instID);
+    }
+}
+
+void ConfigTaskWidget::doAddWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index, double scale,
                                         bool isLimited, QList<int> *reloadGroupIDs, quint32 instID)
 {
     if (addShadowWidgetBinding(objectName, fieldName, widget, index, scale, isLimited, reloadGroupIDs, instID)) {
@@ -126,12 +135,14 @@ void ConfigTaskWidget::addWidgetBinding(QString objectName, QString fieldName, Q
     }
 
     WidgetBinding *binding = new WidgetBinding(widget, object, field, index, scale, isLimited);
+    // Only the first binding per widget can be enabled.
+    binding->setIsEnabled(m_widgetBindingsPerWidget.count(widget) == 0);
     m_widgetBindingsPerWidget.insert(widget, binding);
 
 
     if (object) {
         m_widgetBindingsPerObject.insert(object, binding);
-        if(m_saveButton) {
+        if (m_saveButton) {
             m_saveButton->addObject((UAVDataObject *)object);
         }
     }
@@ -236,7 +247,7 @@ void ConfigTaskWidget::onAutopilotConnect()
     invalidateObjects();
     m_isConnected = true;
     foreach(WidgetBinding * binding, m_widgetBindingsPerWidget) {
-        if(!binding->isEnabled()) {
+        if (!binding->isEnabled()) {
             continue;
         }
         loadWidgetLimits(binding->widget(), binding->field(), binding->index(), binding->isLimited(), binding->scale());
@@ -617,6 +628,7 @@ void ConfigTaskWidget::autoLoadWidgets()
     }
     refreshWidgetsValues();
     forceShadowUpdates();
+
     foreach(WidgetBinding * binding, m_widgetBindingsPerWidget) {
         if (binding->widget()) {
             qDebug() << "Binding  :" << binding->widget()->objectName();

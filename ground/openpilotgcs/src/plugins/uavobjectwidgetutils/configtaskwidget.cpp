@@ -390,13 +390,13 @@ void ConfigTaskWidget::widgetsContentsChanged()
             if (binding->widget() == emitter) {
                 scale = binding->scale();
                 checkWidgetsLimits(emitter, binding->field(), binding->index(), binding->isLimited(),
-                                   getVariantFromWidget(emitter, binding->scale(), binding->units()), binding->scale());
+                                   getVariantFromWidget(emitter, scale, binding->units()), scale);
             } else {
                 foreach(ShadowWidgetBinding * shadow, binding->shadows()) {
                     if (shadow->widget() == emitter) {
                         scale = shadow->scale();
                         checkWidgetsLimits(emitter, binding->field(), binding->index(), shadow->isLimited(),
-                                           getVariantFromWidget(emitter, shadow->scale(), binding->units()), scale);
+                                           getVariantFromWidget(emitter, scale, binding->units()), scale);
                     }
                 }
             }

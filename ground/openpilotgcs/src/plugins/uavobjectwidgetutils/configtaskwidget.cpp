@@ -167,7 +167,8 @@ ConfigTaskWidget::~ConfigTaskWidget()
     if (m_saveButton) {
         delete m_saveButton;
     }
-    foreach(WidgetBinding * binding, m_widgetBindingsPerWidget) {
+    QSet<WidgetBinding *> deleteSet = m_widgetBindingsPerWidget.values().toSet();
+    foreach(WidgetBinding * binding, deleteSet) {
         if (binding) {
             delete binding;
         }

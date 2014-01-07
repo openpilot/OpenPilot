@@ -4,7 +4,7 @@
  * @file       calibrationutils.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  *
- * @brief      Utilities for calibration using ellipsoid fit algorithm
+ * @brief      Utilities for calibration. Ellipsoid and polynomial fit algorithms
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup
  * @{
@@ -31,6 +31,7 @@
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
 #include <Eigen/Dense>
+#include <Eigen/LU>
 #include <iostream>
 
 namespace OpenPilot{
@@ -38,20 +39,21 @@ namespace OpenPilot{
 class CalibrationUtils
 {
 public:
-    CalibrationUtils();
-    bool Calibrate();
-    Eigen::VectorXf samples_x;
-    Eigen::VectorXf samples_y;
-    Eigen::VectorXf samples_z;
-    Eigen::Matrix3f CalibrationMatrix;
-    Eigen::Vector3f Scale;
-    Eigen::Vector3f Bias;
-    float NominalRange;
+    struct EllipsoidCalibrationResult{
+        Eigen::Matrix3f CalibrationMatrix;
+        Eigen::Vector3f Scale;
+        Eigen::Vector3f Bias;
+    };
+
+    static bool EllipsoidCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, float nominalRange, EllipsoidCalibrationResult *result);
+    static bool PolynomialCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, int degree, Eigen::Ref<Eigen::VectorXf> result);
+
 private:
-    void EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
+    static void EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
                       Eigen::Vector3f *center,
                       Eigen::VectorXf *radii,
                       Eigen::MatrixXf *evecs);
+
 };
 
 }

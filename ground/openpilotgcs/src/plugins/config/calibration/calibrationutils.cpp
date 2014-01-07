@@ -4,7 +4,7 @@
  * @file       calibrationutils.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  *
- * @brief      Utilities for calibration using ellipsoid fit algorithm
+ * @brief      Utilities for calibration. Ellipsoid and polynomial fit algorithms
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup
  * @{
@@ -29,40 +29,57 @@
 #include "calibrationutils.h"
 using namespace Eigen;
 namespace OpenPilot{
-CalibrationUtils::CalibrationUtils()
-{
-    NominalRange = 1.0f;
-}
-
 /*
- * The following code is based on RazorImu calibration samples that can be found here:
+ * The following ellipsoid calibration code is based on RazorImu calibration samples that can be found here:
  * https://github.com/ptrbrtz/razor-9dof-ahrs/tree/master/Matlab/magnetometer_calibration
  */
-
-bool CalibrationUtils::Calibrate(){
-    Eigen::VectorXf samplesX = Eigen::VectorXf(samples_x);
-    Eigen::VectorXf samplesY = Eigen::VectorXf(samples_y);
-    Eigen::VectorXf samplesZ = Eigen::VectorXf(samples_z);
+bool CalibrationUtils::EllipsoidCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, float nominalRange, EllipsoidCalibrationResult *result){
     Eigen::VectorXf radii;
     Eigen::Vector3f center;
     Eigen::MatrixXf evecs;
 
-    this->EllipsoidFit(&samplesX, &samplesY, &samplesZ, &center, &radii, &evecs);
+    EllipsoidFit(&samplesX, &samplesY, &samplesZ, &center, &radii, &evecs);
 
-    Scale.setZero();
+    result->Scale.setZero();
 
-    Scale << NominalRange / radii.coeff(0),
-            NominalRange / radii.coeff(1),
-            NominalRange / radii.coeff(2);
+    result->Scale << nominalRange / radii.coeff(0),
+            nominalRange / radii.coeff(1),
+            nominalRange / radii.coeff(2);
 
     Eigen::Matrix3f tmp;
-    tmp << Scale.coeff(0), 0, 0,
-            0, Scale.coeff(1), 0,
-            0, 0, Scale.coeff(2);
+    tmp << result->Scale.coeff(0), 0, 0,
+            0, result->Scale.coeff(1), 0,
+            0, 0, result->Scale.coeff(2);
 
-    CalibrationMatrix = evecs * tmp * evecs.transpose();
-    Bias.setZero();
-    Bias << center.coeff(0), center.coeff(1), center.coeff(2);
+    result->CalibrationMatrix = evecs * tmp * evecs.transpose();
+    result->Bias.setZero();
+    result->Bias << center.coeff(0), center.coeff(1), center.coeff(2);
+    return true;
+}
+
+bool CalibrationUtils::PolynomialCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, int degree, Eigen::Ref<Eigen::VectorXf> result){
+
+    int samples = samplesX.rows();
+    // perform internal calculation using doubles
+    VectorXd doubleX = samplesX.cast<double>();
+    VectorXd doubleY = samplesY.cast<double>();
+    Eigen::MatrixXd x(samples, degree + 1);
+
+    x.setOnes(samples, degree + 1);
+
+    for(int i = 1; i < degree + 1; i++){
+        Eigen::MatrixXd tmp = Eigen::MatrixXd(x.col(i-1));
+        Eigen::MatrixXd tmp2 = tmp.cwiseProduct(doubleX);
+
+        x.col(i) =  tmp2;
+    }
+    Eigen::MatrixXd xt = x.transpose();
+
+    Eigen::MatrixXd xtx = xt * x;
+
+    Eigen::VectorXd xty = xt * doubleY;
+    std::cout << xty << std::endl;
+    result = xtx.fullPivHouseholderQr().solve(xty).cast<float>();
     return true;
 }
 

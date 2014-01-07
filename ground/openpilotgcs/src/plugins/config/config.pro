@@ -41,6 +41,7 @@ HEADERS += configplugin.h \
     dblspindelegate.h \
     configrevohwwidget.h \
     calibration/calibrationutils.h \
+    calibration/thermalcalibration.h
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \
@@ -75,6 +76,7 @@ SOURCES += configplugin.cpp \
     dblspindelegate.cpp \
     configrevohwwidget.cpp \
     calibration/calibrationutils.cpp \
+    calibration/thermalcalibration.cpp
 
 FORMS += airframe.ui \
     airframe_ccpm.ui \

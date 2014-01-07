@@ -35,6 +35,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QList>
+#include <QTabBar>
 
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
@@ -46,6 +47,16 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
 
+    m_pidTabBars.append(ui->basicPIDBankTabBar);
+    m_pidTabBars.append(ui->advancedPIDBankTabBar);
+    m_pidTabBars.append(ui->expertPIDBankTabBar);
+    foreach(QTabBar * tabBar, m_pidTabBars) {
+        for (int i = 1; i <= PID_BANKS; i++) {
+            tabBar->addTab(tr("PID Bank %1").arg(i));
+        }
+        tabBar->setExpanding(false);
+        connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
+    }
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
@@ -203,6 +214,13 @@ void ConfigStabilizationWidget::onBoardConnected()
     boardModel = utilMngr->getBoardModel();
     // If Revolution board enable misc tab, otherwise disable it
     ui->AltitudeHold->setEnabled((boardModel & 0xff00) == 0x0900);
+}
+
+void ConfigStabilizationWidget::pidBankChanged(int index)
+{
+    foreach(QTabBar * tabBar, m_pidTabBars) {
+        tabBar->setCurrentIndex(index);
+    }
 }
 
 bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)

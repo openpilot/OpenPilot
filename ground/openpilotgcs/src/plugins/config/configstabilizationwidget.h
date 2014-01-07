@@ -48,9 +48,12 @@ public:
 private:
     Ui_StabilizationWidget *ui;
     QTimer *realtimeUpdates;
+    QList<QTabBar*> m_pidTabBars;
 
     // Milliseconds between automatic 'Instant Updates'
     static const int AUTOMATIC_UPDATE_RATE = 500;
+
+    static const int PID_BANKS = 3;
 
     int boardModel;
 
@@ -62,6 +65,7 @@ private slots:
     void linkCheckBoxes(bool value);
     void processLinkedWidgets(QWidget *);
     void onBoardConnected();
+    void pidBankChanged(int index);
 };
 
 #endif // ConfigStabilizationWidget_H

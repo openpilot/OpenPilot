@@ -473,9 +473,10 @@ QString UAVObject::toStringBrief()
 {
     QString sout;
 
+    // object Id is converted to uppercase hexadecimal
     sout.append(QString("%1 (ID: %2-%3, %4 bytes, %5)")
                 .arg(getName())
-                .arg(getObjID())
+                .arg(getObjID(), 1, 16).toUpper()
                 .arg(getInstID())
                 .arg(getNumBytes())
                 .arg(isSingleInstance() ? "single" : "multiple"));

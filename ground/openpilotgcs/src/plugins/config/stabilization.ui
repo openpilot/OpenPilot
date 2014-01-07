@@ -1336,7 +1336,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollMax</string>
                         <string>haslimits:no</string>
                         <string>scale:1</string>
@@ -1370,7 +1370,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:ManualRate</string>
                         <string>element:Roll</string>
                         <string>haslimits:no</string>
@@ -1418,7 +1418,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:ManualRate</string>
                         <string>element:Roll</string>
                         <string>haslimits:no</string>
@@ -2607,7 +2607,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollMax</string>
                         <string>haslimits:no</string>
                         <string>scale:1</string>
@@ -2641,7 +2641,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:ManualRate</string>
                         <string>element:Yaw</string>
                         <string>haslimits:no</string>
@@ -2692,7 +2692,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:ManualRate</string>
                         <string>element:Yaw</string>
                         <string>haslimits:no</string>
@@ -4394,7 +4394,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollRatePID</string>
                         <string>element:Kp</string>
                         <string>haslimits:yes</string>
@@ -4433,7 +4433,7 @@ Then lower the value by 5 or so.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollRatePID</string>
                         <string>element:Kp</string>
                         <string>haslimits:yes</string>
@@ -4508,7 +4508,7 @@ Then lower the value by 5 or so.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawRatePID</string>
                         <string>element:Kp</string>
                         <string>haslimits:yes</string>
@@ -4558,7 +4558,7 @@ Then lower the value by 5 or so.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchRatePID</string>
                         <string>element:Kp</string>
                         <string>haslimits:yes</string>
@@ -4597,7 +4597,7 @@ Then lower the value by 5 or so.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchRatePID</string>
                         <string>element:Kp</string>
                         <string>haslimits:yes</string>
@@ -4636,7 +4636,7 @@ Then lower the value by 5 or so.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawRatePID</string>
                         <string>element:Kp</string>
                         <string>haslimits:yes</string>
@@ -4686,7 +4686,7 @@ Then lower the value by 5 or so.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollRatePID</string>
                         <string>element:Ki</string>
                         <string>haslimits:yes</string>
@@ -4744,7 +4744,7 @@ value as the Kp.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollRatePID</string>
                         <string>element:Ki</string>
                         <string>haslimits:yes</string>
@@ -4783,7 +4783,7 @@ value as the Kp.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawRatePID</string>
                         <string>element:Ki</string>
                         <string>haslimits:yes</string>
@@ -4833,7 +4833,7 @@ value as the Kp.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawRatePID</string>
                         <string>element:Ki</string>
                         <string>haslimits:yes</string>
@@ -4883,7 +4883,7 @@ value as the Kp.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchRatePID</string>
                         <string>element:Ki</string>
                         <string>haslimits:yes</string>
@@ -4922,7 +4922,7 @@ value as the Kp.</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchRatePID</string>
                         <string>element:Ki</string>
                         <string>haslimits:yes</string>
@@ -8373,7 +8373,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollPI</string>
                         <string>element:Kp</string>
                         <string>scale:0.1</string>
@@ -8408,7 +8408,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollPI</string>
                         <string>element:Kp</string>
                         <string>scale:0.1</string>
@@ -8458,7 +8458,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchPI</string>
                         <string>element:Kp</string>
                         <string>scale:0.1</string>
@@ -8493,7 +8493,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchPI</string>
                         <string>element:Kp</string>
                         <string>scale:0.1</string>
@@ -8543,7 +8543,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawPI</string>
                         <string>element:Kp</string>
                         <string>scale:0.1</string>
@@ -8578,7 +8578,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawPI</string>
                         <string>element:Kp</string>
                         <string>scale:0.1</string>
@@ -10055,7 +10055,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchRatePID</string>
                         <string>element:Kd</string>
                         <string>haslimits:no</string>
@@ -10674,7 +10674,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawRatePID</string>
                         <string>element:Ki</string>
                         <string>haslimits:no</string>
@@ -10724,7 +10724,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchRatePID</string>
                         <string>element:Ki</string>
                         <string>haslimits:no</string>
@@ -10774,7 +10774,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawRatePID</string>
                         <string>element:Kp</string>
                         <string>haslimits:no</string>
@@ -10824,7 +10824,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawRatePID</string>
                         <string>element:Kd</string>
                         <string>haslimits:no</string>
@@ -12031,7 +12031,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollRatePID</string>
                         <string>element:Kp</string>
                         <string>haslimits:no</string>
@@ -12097,7 +12097,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollRatePID</string>
                         <string>element:Ki</string>
                         <string>haslimits:no</string>
@@ -12178,7 +12178,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchRatePID</string>
                         <string>element:Kp</string>
                         <string>haslimits:no</string>
@@ -12228,7 +12228,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollRatePID</string>
                         <string>element:Kd</string>
                         <string>haslimits:no</string>
@@ -13386,7 +13386,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchMax</string>
                         <string>haslimits:no</string>
                         <string>scale:1</string>
@@ -13469,7 +13469,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:MaximumRate</string>
                         <string>element:Roll</string>
                         <string>haslimits:no</string>
@@ -13538,7 +13538,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:ManualRate</string>
                         <string>element:Yaw</string>
                         <string>haslimits:no</string>
@@ -13591,7 +13591,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawMax</string>
                         <string>haslimits:no</string>
                         <string>scale:1</string>
@@ -13643,7 +13643,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:MaximumRate</string>
                         <string>element:Pitch</string>
                         <string>haslimits:no</string>
@@ -14853,7 +14853,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:ManualRate</string>
                         <string>element:Pitch</string>
                         <string>haslimits:no</string>
@@ -15472,7 +15472,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:ManualRate</string>
                         <string>element:Roll</string>
                         <string>haslimits:no</string>
@@ -15528,7 +15528,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollMax</string>
                         <string>haslimits:no</string>
                         <string>scale:1</string>
@@ -15580,7 +15580,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:MaximumRate</string>
                         <string>element:Yaw</string>
                         <string>haslimits:no</string>
@@ -18442,7 +18442,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollPI</string>
                         <string>element:Kp</string>
                         <string>haslimits:no</string>
@@ -18492,7 +18492,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchPI</string>
                         <string>element:Kp</string>
                         <string>haslimits:no</string>
@@ -18542,7 +18542,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawPI</string>
                         <string>element:Kp</string>
                         <string>haslimits:no</string>
@@ -18627,7 +18627,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollPI</string>
                         <string>element:Ki</string>
                         <string>haslimits:no</string>
@@ -18693,7 +18693,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchPI</string>
                         <string>element:Ki</string>
                         <string>haslimits:no</string>
@@ -18759,7 +18759,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawPI</string>
                         <string>element:Ki</string>
                         <string>haslimits:no</string>
@@ -19364,7 +19364,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchRatePID</string>
                         <string>element:ILimit</string>
                         <string>haslimits:no</string>
@@ -19417,7 +19417,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollRatePID</string>
                         <string>element:ILimit</string>
                         <string>haslimits:no</string>
@@ -20567,7 +20567,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawPI</string>
                         <string>element:ILimit</string>
                         <string>haslimits:no</string>
@@ -20648,7 +20648,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:PitchPI</string>
                         <string>element:ILimit</string>
                         <string>haslimits:no</string>
@@ -20758,7 +20758,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:RollPI</string>
                         <string>element:ILimit</string>
                         <string>haslimits:no</string>
@@ -21374,7 +21374,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="objrelation" stdset="0">
                        <stringlist>
-                        <string>objname:StabilizationSettingsBank1,StabilizationSettingsBank2,StabilizationSettingsBank3</string>
+                        <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:YawRatePID</string>
                         <string>element:ILimit</string>
                         <string>haslimits:no</string>

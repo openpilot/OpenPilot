@@ -151,6 +151,7 @@ public slots:
     void invalidateObjects();
     void apply();
     void save();
+    void setWidgetBindingObjectEnabled(QString objectName, bool enabled);
 
 signals:
     // fired when a widgets contents changes
@@ -243,6 +244,7 @@ protected slots:
 
 protected:
     virtual void enableControls(bool enable);
+    virtual QString mapObjectName(const QString objectName);
 
     void checkWidgetsLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, QVariant value, double scale);
     void updateEnableControls();

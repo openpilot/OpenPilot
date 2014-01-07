@@ -47,15 +47,24 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
 
+    // Set up fake tab widget stuff for pid banks support
     m_pidTabBars.append(ui->basicPIDBankTabBar);
     m_pidTabBars.append(ui->advancedPIDBankTabBar);
     m_pidTabBars.append(ui->expertPIDBankTabBar);
     foreach(QTabBar * tabBar, m_pidTabBars) {
-        for (int i = 1; i <= PID_BANKS; i++) {
-            tabBar->addTab(tr("PID Bank %1").arg(i));
+        for (int i = 0; i < PID_BANKS; i++) {
+            tabBar->addTab(tr("PID Bank %1").arg(i + 1));
+            tabBar->setTabData(i, QString("StabilizationSettingsBank%1").arg(i + 1));
         }
         tabBar->setExpanding(false);
         connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
+    }
+
+    for (int i = 0; i < PID_BANKS; i++) {
+        if(i > 0) {
+            m_stabilizationObjectsString.append(",");
+        }
+        m_stabilizationObjectsString.append(m_pidTabBars.at(0)->tabData(i).toString());
     }
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -221,6 +230,10 @@ void ConfigStabilizationWidget::pidBankChanged(int index)
     foreach(QTabBar * tabBar, m_pidTabBars) {
         tabBar->setCurrentIndex(index);
     }
+
+    for(int i = 0; i < m_pidTabBars.at(0)->count(); i++) {
+        setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(i).toString(), index == i);
+    }
 }
 
 bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
@@ -231,4 +244,12 @@ bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
     } else {
         return true;
     }
+}
+
+QString ConfigStabilizationWidget::mapObjectName(const QString objectName)
+{
+    if(objectName == "StabilizationSettingsBankX") {
+        return m_stabilizationObjectsString;
+    }
+    return ConfigTaskWidget::mapObjectName(objectName);
 }

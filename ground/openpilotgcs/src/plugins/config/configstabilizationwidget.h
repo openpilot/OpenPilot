@@ -49,6 +49,7 @@ private:
     Ui_StabilizationWidget *ui;
     QTimer *realtimeUpdates;
     QList<QTabBar*> m_pidTabBars;
+    QString m_stabilizationObjectsString;
 
     // Milliseconds between automatic 'Instant Updates'
     static const int AUTOMATIC_UPDATE_RATE = 500;
@@ -56,6 +57,8 @@ private:
     static const int PID_BANKS = 3;
 
     int boardModel;
+protected:
+    QString mapObjectName(const QString objectName);
 
 protected slots:
     void refreshWidgetsValues(UAVObject *o = NULL);

@@ -64,7 +64,7 @@ int ConfigTaskWidget::fieldIndexFromElementName(QString objectName, QString fiel
         return 0;
     }
 
-    QString singleObjectName = objectName.split(",").at(0);
+    QString singleObjectName = mapObjectName(objectName).split(",").at(0);
     UAVObject *object     = getObject(singleObjectName);
     Q_ASSERT(object);
 
@@ -108,8 +108,10 @@ void ConfigTaskWidget::addWidgetBinding(UAVObject *object, UAVObjectField *field
 void ConfigTaskWidget::addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index, double scale,
                                         bool isLimited, QList<int> *reloadGroupIDs, quint32 instID) {
 
+    QString mappedObjectName = mapObjectName(objectName);
+
     // If object name is comma separated list of objects, call one time per objectName
-    foreach(QString singleObjectName, objectName.split(",")) {
+    foreach(QString singleObjectName, mappedObjectName.split(",")) {
         doAddWidgetBinding(singleObjectName, fieldName, widget, index, scale, isLimited, reloadGroupIDs, instID);
     }
 }
@@ -161,6 +163,19 @@ void ConfigTaskWidget::doAddWidgetBinding(QString objectName, QString fieldName,
         }
         if(binding->isEnabled()) {
             loadWidgetLimits(widget, field, index, isLimited, scale);
+        }
+    }
+}
+
+void ConfigTaskWidget::setWidgetBindingObjectEnabled(QString objectName, bool enabled)
+{
+    UAVObject* object = getObject(objectName);
+    Q_ASSERT(object);
+
+    foreach(WidgetBinding* binding, m_widgetBindingsPerObject.values(object)) {
+        binding->setIsEnabled(enabled);
+        if(enabled) {
+            setWidgetFromField(binding->widget(), binding->field(), binding->index(), binding->scale(), binding->isLimited());
         }
     }
 }
@@ -1014,6 +1029,11 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget *widget, UAVObjectField *field, 
 UAVObject *ConfigTaskWidget::getObject(const QString name, quint32 instId)
 {
     return m_pluginManager->getObject<UAVObjectManager>()->getObject(name, instId);
+}
+
+QString ConfigTaskWidget::mapObjectName(const QString objectName)
+{
+    return objectName;
 }
 
 void ConfigTaskWidget::updateEnableControls()

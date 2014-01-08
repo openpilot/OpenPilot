@@ -109,7 +109,7 @@ private:
 
     // Types
     typedef enum {
-        STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS
+        STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS, STATE_COMPLETE, STATE_ERROR
     } RxStateType;
 
     // Variables
@@ -123,8 +123,6 @@ private:
 
     QMap<quint32, QMap<quint32, Transaction *> *> transMap;
 
-//    quint16 rxReadOffset;
-//    quint16 rxSyncOffset;
     quint8 rxBuffer[MAX_PACKET_LENGTH];
 
     quint8 txBuffer[MAX_PACKET_LENGTH];

@@ -89,7 +89,6 @@ UAVTalk::~UAVTalk()
     closeAllTransactions();
 }
 
-
 /**
  * Reset the statistics counters
  */
@@ -226,8 +225,31 @@ void UAVTalk::processInputStream()
 
     if (io && io->isReadable()) {
         while (io->bytesAvailable() > 0) {
-            io->read((char *)&tmp, 1);
-            processInputByte(tmp);
+            int ret = io->read((char *)&tmp, 1);
+            if (ret != -1) {
+                processInputByte(tmp);
+            }
+            else {
+                // TODOD
+            }
+            if (rxState == STATE_COMPLETE) {
+                mutex.lock();
+                if (receiveObject(rxType, rxObjId, rxInstId, rxBuffer, rxLength)) {
+                    stats.rxObjectBytes += rxLength;
+                    stats.rxObjects++;
+                }
+                else {
+                    // TODO...
+                }
+                mutex.unlock();
+
+                if (useUDPMirror) {
+                    // it is safe to do this outside of the above critical section as the rxDataArray is
+                    // accessed from this thread only
+                    udpSocketTx->writeDatagram(rxDataArray, QHostAddress::LocalHost, udpSocketRx->localPort());
+                }
+
+            }
         }
     }
 }
@@ -239,6 +261,14 @@ void UAVTalk::processInputStream()
  */
 bool UAVTalk::processInputByte(quint8 rxbyte)
 {
+    if (rxState == STATE_COMPLETE || rxState == STATE_ERROR) {
+        rxState = STATE_SYNC;
+
+        if (useUDPMirror) {
+            rxDataArray.clear();
+        }
+    }
+
     // Update stats
     stats.rxBytes++;
 
@@ -267,11 +297,6 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         // case local byte counter, don't forget to zero it after use.
         rxCount = 0;
 
-        if (useUDPMirror) {
-            rxDataArray.clear();
-            rxDataArray.append(rxbyte);
-        }
-
         rxState = STATE_TYPE;
         break;
 
@@ -283,7 +308,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         if ((rxbyte & TYPE_MASK) != TYPE_VER) {
             qWarning() << "UAVTalk - error : bad type";
             stats.rxErrors++;
-            rxState = STATE_SYNC;
+            rxState = STATE_ERROR;
             break;
         }
 
@@ -312,7 +337,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             // incorrect packet size
             qWarning() << "UAVTalk - error : incorrect packet size";
             stats.rxErrors++;
-            rxState = STATE_SYNC;
+            rxState = STATE_ERROR;
             break;
         }
 
@@ -356,7 +381,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             if (rxObj == NULL && rxType != TYPE_OBJ_REQ) {
                 qWarning() << "UAVTalk - error : unknown object" << rxObjId;
                 stats.rxErrors++;
-                rxState = STATE_SYNC;
+                rxState = STATE_ERROR;
                 break;
             }
 
@@ -376,7 +401,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 // packet error - exceeded payload max length
                 qWarning() << "UAVTalk - error : exceeded payload max length" << rxObjId;
                 stats.rxErrors++;
-                rxState = STATE_SYNC;
+                rxState = STATE_ERROR;
                 break;
             }
 
@@ -385,7 +410,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 // packet error - mismatched packet size
                 qWarning() << "UAVTalk - error : mismatched packet size" << rxObjId;
                 stats.rxErrors++;
-                rxState = STATE_SYNC;
+                rxState = STATE_ERROR;
                 break;
             }
 
@@ -422,7 +447,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             // packet error - faulty CRC
             qWarning() << "UAVTalk - error : failed CRC check" << rxObjId;
             stats.rxCrcErrors++;
-            rxState = STATE_SYNC;
+            rxState = STATE_ERROR;
             break;
         }
 
@@ -430,30 +455,17 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             // packet error - mismatched packet size
             qWarning() << "UAVTalk - error : mismatched packet size" << rxObjId;
             stats.rxErrors++;
-            rxState = STATE_SYNC;
+            rxState = STATE_ERROR;
             break;
         }
 
-        mutex.lock();
-
-        receiveObject(rxType, rxObjId, rxInstId, rxBuffer, rxLength);
-
-        stats.rxObjectBytes += rxLength;
-        stats.rxObjects++;
-
-        mutex.unlock();
-
-        if (useUDPMirror) {
-            udpSocketTx->writeDatagram(rxDataArray, QHostAddress::LocalHost, udpSocketRx->localPort());
-        }
-
-        rxState = STATE_SYNC;
+        rxState = STATE_COMPLETE;
         break;
 
     default:
 
         qWarning() << "UAVTalk - error : bad state";
-        rxState = STATE_SYNC;
+        rxState = STATE_ERROR;
         break;
     }
 

@@ -26,6 +26,7 @@
  */
 #include "modeluavoproxy.h"
 #include "extensionsystem/pluginmanager.h"
+
 #include <math.h>
 
 ModelUavoProxy::ModelUavoProxy(QObject *parent, flightDataModel *model) : QObject(parent), myModel(model)
@@ -33,28 +34,32 @@ ModelUavoProxy::ModelUavoProxy(QObject *parent, flightDataModel *model) : QObjec
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm != NULL);
 
-    objManager    = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(objManager != NULL);
+    objMngr    = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objMngr != NULL);
 }
 
 void ModelUavoProxy::sendFlightPlan()
 {
     modelToObjects();
 
-    Waypoint *waypoint = Waypoint::GetInstance(objManager, 0);
-    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanSent(UAVObject *, bool)));
+    FlightPlanInfo *flightPlan = FlightPlanInfo::GetInstance(objMngr, 0);
+    connect(flightPlan, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementSent(UAVObject *, bool)));
 
-    PathAction *action = PathAction::GetInstance(objManager, 0);
-    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanSent(UAVObject *, bool)));
+    Waypoint *waypoint = Waypoint::GetInstance(objMngr, 0);
+    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementSent(UAVObject *, bool)));
+
+    PathAction *action = PathAction::GetInstance(objMngr, 0);
+    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementSent(UAVObject *, bool)));
 
     completionCount = 0;
     completionSuccessCount = 0;
 
+    flightPlan->updated();
     waypoint->updatedAll();
     action->updatedAll();
 }
 
-void ModelUavoProxy::flightPlanSent(UAVObject *obj, bool success)
+void ModelUavoProxy::flightPlanElementSent(UAVObject *obj, bool success)
 {
     obj->disconnect(this);
 
@@ -63,9 +68,9 @@ void ModelUavoProxy::flightPlanSent(UAVObject *obj, bool success)
         completionSuccessCount++;
     }
 
-    if (completionCount == 2) {
-        qDebug() << "ModelUavoProxy::flightPlanSent - success" << (completionSuccessCount == 2);
-        if (completionSuccessCount == 2) {
+    if (completionCount == 3) {
+        qDebug() << "ModelUavoProxy::flightPlanSent - completed" << (completionSuccessCount == 3);
+        if (completionSuccessCount == 3) {
             QMessageBox::information(NULL, tr("Flight Plan Upload Successful"), tr("Flight plan upload was successful."));
         }
         else {
@@ -76,20 +81,24 @@ void ModelUavoProxy::flightPlanSent(UAVObject *obj, bool success)
 
 void ModelUavoProxy::receiveFlightPlan()
 {
-    Waypoint *waypoint = Waypoint::GetInstance(objManager, 0);
-    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanReceived(UAVObject *, bool)));
+    FlightPlanInfo *flightPlan = FlightPlanInfo::GetInstance(objMngr, 0);
+    connect(flightPlan, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementReceived(UAVObject *, bool)));
 
-    PathAction *action = PathAction::GetInstance(objManager, 0);
-    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanReceived(UAVObject *, bool)));
+    Waypoint *waypoint = Waypoint::GetInstance(objMngr, 0);
+    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementReceived(UAVObject *, bool)));
+
+    PathAction *action = PathAction::GetInstance(objMngr, 0);
+    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementReceived(UAVObject *, bool)));
 
     completionCount = 0;
     completionSuccessCount = 0;
 
+    flightPlan->requestUpdate();
     waypoint->requestUpdateAll();
     action->requestUpdateAll();
 }
 
-void ModelUavoProxy::flightPlanReceived(UAVObject *obj, bool success)
+void ModelUavoProxy::flightPlanElementReceived(UAVObject *obj, bool success)
 {
     obj->disconnect(this);
 
@@ -98,9 +107,9 @@ void ModelUavoProxy::flightPlanReceived(UAVObject *obj, bool success)
         completionSuccessCount++;
     }
 
-    if (completionCount == 2) {
-        qDebug() << "ModelUavoProxy::flightPlanReceived - success" << (completionSuccessCount == 2);
-        if (completionSuccessCount == 2) {
+    if (completionCount == 3) {
+        qDebug() << "ModelUavoProxy::flightPlanReceived - completed" << (completionSuccessCount == 3);
+        if (completionSuccessCount == 3) {
             objectsToModel();
             QMessageBox::information(NULL, tr("Flight Plan Download Successful"), tr("Flight plan download was successful."));
         }
@@ -110,23 +119,26 @@ void ModelUavoProxy::flightPlanReceived(UAVObject *obj, bool success)
     }
 }
 
+// update waypoint and path actions UAV objects
+//
+// waypoints are unique and each waypoint has an entry in the UAV waypoint list
+//
+// a path action can be referenced by multiple waypoints
+// waypoints reference path action by their index in the UAV path action list
+// the compression of path actions happens here.
+// (compression consists in keeping only one instance of similar path actions)
+//
+// the UAV waypoint list and path action list are probably not empty, so we try to reuse existing instances
 void ModelUavoProxy::modelToObjects()
 {
     qDebug() << "ModelUAVProxy::modelToObjects";
-    // update waypoint and path actions UAV objects
-    // waypoints are unique and each waypoint has an entry in the UAV waypoint list
-    // a path action can be referenced by multiple waypoints
-    // waypoints reference path action by their index in the UAV path action list
-    // the factoring of path actions (to remove duplicates) happens here...
-
-    // the UAV waypoint list and path action list are probably not empty
-    // so we try to reuse existing instances
 
     // track number of path actions
     int actionCount = 0;
 
     // iterate over waypoints
-    for (int i = 0; i < myModel->rowCount(); ++i) {
+    int waypointCount = myModel->rowCount();
+    for (int i = 0; i < waypointCount; ++i) {
 
         // Path Actions
 
@@ -174,15 +186,38 @@ void ModelUavoProxy::modelToObjects()
         // update UAVObject
         waypoint->setData(waypointData);
     }
+    // Put "safe" values in unused waypoint objects
+    if (waypointCount < objMngr->getNumInstances(Waypoint::OBJID)) {
+        for (int i = waypointCount; i < objMngr->getNumInstances(Waypoint::OBJID); ++i) {
+            // TODO
+        }
+    }
+    // Put "safe" values in unused path action objects
+    if (actionCount < objMngr->getNumInstances(PathAction::OBJID)) {
+        for (int i = actionCount; i < objMngr->getNumInstances(PathAction::OBJID); ++i) {
+            // TODO
+        }
+    }
+
+    // Update FlightPlanInfo
+    FlightPlanInfo *flightPlan = FlightPlanInfo::GetInstance(objMngr);
+    FlightPlanInfo::DataFields flightPlanData = flightPlan->getData();
+
+    flightPlanData.WaypointCount = waypointCount;
+    flightPlanData.PathActionCount = actionCount;
+    // TODO
+    flightPlanData.Crc = 0;
+
+    flightPlan->setData(flightPlanData);
 }
 
 Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
     Waypoint *waypoint = NULL;
-    int count = objManager->getNumInstances(Waypoint::OBJID);
+    int count = objMngr->getNumInstances(Waypoint::OBJID);
     if (index < count) {
         // reuse object
         qDebug() << "ModelUAVProxy::createWaypoint - reused waypoint instance :" << index << "/" << count;
-        waypoint = Waypoint::GetInstance(objManager, index);
+        waypoint = Waypoint::GetInstance(objMngr, index);
         if (newWaypoint) {
             newWaypoint->deleteLater();
         }
@@ -192,7 +227,7 @@ Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
         // TODO is there a limit to the number of wp?
         waypoint = newWaypoint ? newWaypoint : new Waypoint;
         waypoint->initialize(index, waypoint->getMetaObject());
-        objManager->registerObject(waypoint);
+        objMngr->registerObject(waypoint);
     }
     else {
         // we can only create the "next" object
@@ -203,11 +238,11 @@ Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
 
 PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
     PathAction *action = NULL;
-    int count = objManager->getNumInstances(PathAction::OBJID);
+    int count = objMngr->getNumInstances(PathAction::OBJID);
     if (index < count) {
         // reuse object
         qDebug() << "ModelUAVProxy::createPathAction - reused action instance :" << index << "/" << count;
-        action = PathAction::GetInstance(objManager, index);
+        action = PathAction::GetInstance(objMngr, index);
         if (newAction) {
             newAction->deleteLater();
         }
@@ -217,7 +252,7 @@ PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
         // TODO is there a limit to the number of path actions?
         action = newAction ? newAction : new PathAction;
         action->initialize(index, action->getMetaObject());
-        objManager->registerObject(action);
+        objMngr->registerObject(action);
     }
     else {
         // we can only create the "next" object
@@ -227,10 +262,10 @@ PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
 }
 
 PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields &actionData, int actionCount) {
-    int instancesCount = objManager->getNumInstances(PathAction::OBJID);
+    int instancesCount = objMngr->getNumInstances(PathAction::OBJID);
     int count = actionCount <= instancesCount ? actionCount : instancesCount;
     for (int i = 0; i < count; ++i) {
-        PathAction *action = PathAction::GetInstance(objManager, i);
+        PathAction *action = PathAction::GetInstance(objMngr, i);
         Q_ASSERT(action);
         if (!action) {
             continue;
@@ -258,18 +293,24 @@ void ModelUavoProxy::objectsToModel()
     // the list of objects can end with "garbage" instances due to previous flightpath
     // they need to be ignored
 
-    int instanceCount = objManager->getNumInstances(Waypoint::OBJID);
+    FlightPlanInfo *flightPlan = FlightPlanInfo::GetInstance(objMngr);
+    FlightPlanInfo::DataFields flightPlanData = flightPlan->getData();
+
+    int waypointCount = flightPlanData.WaypointCount;
+
+    // TODO consistency checks
+    // objMngr->getNumInstances(Waypoint::OBJID);
 
     int rowCount = myModel->rowCount();
-    if (instanceCount < rowCount) {
-        myModel->removeRows(instanceCount, rowCount - instanceCount);
+    if (waypointCount < rowCount) {
+        myModel->removeRows(waypointCount, rowCount - waypointCount);
     }
-    else if (instanceCount > rowCount) {
-        myModel->insertRows(rowCount, instanceCount - rowCount);
+    else if (waypointCount > rowCount) {
+        myModel->insertRows(rowCount, waypointCount - rowCount);
     }
 
-    for (int i = 0; i < instanceCount; ++i) {
-        Waypoint *waypoint = Waypoint::GetInstance(objManager, i);
+    for (int i = 0; i < waypointCount; ++i) {
+        Waypoint *waypoint = Waypoint::GetInstance(objMngr, i);
         Q_ASSERT(waypoint);
         if (!waypoint) {
             continue;
@@ -278,7 +319,7 @@ void ModelUavoProxy::objectsToModel()
         Waypoint::DataFields waypointData = waypoint->getData();
         waypointToModel(i, waypointData);
 
-        PathAction *action = PathAction::GetInstance(objManager, waypoint->getAction());
+        PathAction *action = PathAction::GetInstance(objMngr, waypoint->getAction());
         Q_ASSERT(action);
         if (!action) {
             continue;

@@ -31,6 +31,7 @@
 
 #include "openpilot.h"
 
+#include "flightplaninfo.h"
 #include "flightstatus.h"
 #include "airspeedstate.h"
 #include "pathaction.h"
@@ -99,6 +100,7 @@ int32_t PathPlannerInitialize()
 {
     taskHandle = NULL;
 
+    FlightPlanInfoInitialize();
     PathActionInitialize();
     PathStatusInitialize();
     PathDesiredInitialize();

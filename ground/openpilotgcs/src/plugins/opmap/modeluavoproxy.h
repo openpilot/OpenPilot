@@ -27,10 +27,13 @@
 #ifndef MODELUAVOPROXY_H
 #define MODELUAVOPROXY_H
 
-#include <QObject>
 #include "flightdatamodel.h"
+
+#include "flightplaninfo.h"
 #include "pathaction.h"
 #include "waypoint.h"
+
+#include <QObject>
 
 class ModelUavoProxy : public QObject {
     Q_OBJECT
@@ -43,8 +46,9 @@ public slots:
     void receiveFlightPlan();
 
 private:
-    UAVObjectManager *objManager;
+    UAVObjectManager *objMngr;
     flightDataModel *myModel;
+
     uint completionCount;
     uint completionSuccessCount;
 
@@ -63,8 +67,8 @@ private:
     void pathActionToModel(int i, PathAction::DataFields &data);
 
 private slots:
-    void flightPlanSent(UAVObject *, bool success);
-    void flightPlanReceived(UAVObject *, bool success);
+    void flightPlanElementSent(UAVObject *, bool success);
+    void flightPlanElementReceived(UAVObject *, bool success);
 
 };
 

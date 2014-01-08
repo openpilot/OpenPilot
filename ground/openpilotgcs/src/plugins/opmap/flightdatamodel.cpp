@@ -28,8 +28,10 @@
 #include "flightdatamodel.h"
 #include <QMessageBox>
 #include <QDomDocument>
+
 flightDataModel::flightDataModel(QObject *parent) : QAbstractTableModel(parent)
-{}
+{
+}
 
 int flightDataModel::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -72,332 +74,270 @@ QVariant flightDataModel::data(const QModelIndex &index, int role) const
 
 bool flightDataModel::setColumnByIndex(pathPlanData *row, const int index, const QVariant value)
 {
+    bool b;
     switch (index) {
     case WPDESCRITPTION:
         row->wpDescritption = value.toString();
-        return true;
-
+        b = true;
         break;
     case LATPOSITION:
         row->latPosition = value.toDouble();
-        return true;
-
+        b = true;
         break;
     case LNGPOSITION:
         row->lngPosition = value.toDouble();
-        return true;
-
+        b = true;
         break;
     case DISRELATIVE:
         row->disRelative = value.toDouble();
-        return true;
-
+        b = true;
         break;
     case BEARELATIVE:
         row->beaRelative = value.toDouble();
-        return true;
-
+        b = true;
         break;
     case ALTITUDERELATIVE:
         row->altitudeRelative = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case ISRELATIVE:
         row->isRelative = value.toBool();
-        return true;
-
+        b = true;
         break;
     case ALTITUDE:
         row->altitude = value.toDouble();
-        return true;
-
+        b = true;
         break;
     case VELOCITY:
         row->velocity = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case MODE:
         row->mode = value.toInt();
-        return true;
-
+        b = true;
         break;
     case MODE_PARAMS0:
         row->mode_params[0] = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case MODE_PARAMS1:
         row->mode_params[1] = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case MODE_PARAMS2:
         row->mode_params[2] = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case MODE_PARAMS3:
         row->mode_params[3] = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case CONDITION:
         row->condition = value.toInt();
-        return true;
-
+        b = true;
         break;
     case CONDITION_PARAMS0:
         row->condition_params[0] = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case CONDITION_PARAMS1:
         row->condition_params[1] = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case CONDITION_PARAMS2:
         row->condition_params[2] = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case CONDITION_PARAMS3:
         row->condition_params[3] = value.toFloat();
-        return true;
-
+        b = true;
         break;
     case COMMAND:
         row->command = value.toInt();
+        b = true;
         break;
     case JUMPDESTINATION:
         row->jumpdestination = value.toInt();
-        return true;
-
+        b = true;
         break;
     case ERRORDESTINATION:
         row->errordestination = value.toInt();
-        return true;
-
+        b = true;
         break;
     case LOCKED:
         row->locked = value.toBool();
-        return true;
-
+        b = true;
         break;
     default:
-        return false;
+        b = false;
+        break;
     }
-    return false;
+    return b;
 }
 
 QVariant flightDataModel::getColumnByIndex(const pathPlanData *row, const int index) const
 {
+    QVariant value;
     switch (index) {
     case WPDESCRITPTION:
-        return row->wpDescritption;
-
+        value = row->wpDescritption;
         break;
     case LATPOSITION:
-        return row->latPosition;
-
+        value = row->latPosition;
         break;
     case LNGPOSITION:
-        return row->lngPosition;
-
+        value = row->lngPosition;
         break;
     case DISRELATIVE:
-        return row->disRelative;
-
+        value = row->disRelative;
         break;
     case BEARELATIVE:
-        return row->beaRelative;
-
+        value = row->beaRelative;
         break;
     case ALTITUDERELATIVE:
-        return row->altitudeRelative;
-
+        value = row->altitudeRelative;
         break;
     case ISRELATIVE:
-        return row->isRelative;
-
+        value = row->isRelative;
         break;
     case ALTITUDE:
-        return row->altitude;
-
+        value = row->altitude;
         break;
     case VELOCITY:
-        return row->velocity;
-
+        value = row->velocity;
         break;
     case MODE:
-        return row->mode;
-
+        value = row->mode;
         break;
     case MODE_PARAMS0:
-        return row->mode_params[0];
-
+        value = row->mode_params[0];
         break;
     case MODE_PARAMS1:
-        return row->mode_params[1];
-
+        value = row->mode_params[1];
         break;
     case MODE_PARAMS2:
-        return row->mode_params[2];
-
+        value = row->mode_params[2];
         break;
     case MODE_PARAMS3:
-        return row->mode_params[3];
-
+        value = row->mode_params[3];
         break;
     case CONDITION:
-        return row->condition;
-
+        value = row->condition;
         break;
     case CONDITION_PARAMS0:
-        return row->condition_params[0];
-
+        value = row->condition_params[0];
         break;
     case CONDITION_PARAMS1:
-        return row->condition_params[1];
-
+        value = row->condition_params[1];
         break;
     case CONDITION_PARAMS2:
-        return row->condition_params[2];
-
+        value = row->condition_params[2];
         break;
     case CONDITION_PARAMS3:
-        return row->condition_params[3];
-
+        value = row->condition_params[3];
         break;
     case COMMAND:
-        return row->command;
-
+        value = row->command;
         break;
     case JUMPDESTINATION:
-        return row->jumpdestination;
-
+        value = row->jumpdestination;
         break;
     case ERRORDESTINATION:
-        return row->errordestination;
-
+        value = row->errordestination;
         break;
     case LOCKED:
-        return row->locked;
+        value = row->locked;
+        break;
     }
-    return NULL;
+    return value;
 }
 
 QVariant flightDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+    QVariant value;
     if (role == Qt::DisplayRole) {
         if (orientation == Qt::Vertical) {
-            return QString::number(section + 1);
+            value = QString::number(section + 1);
         } else if (orientation == Qt::Horizontal) {
             switch (section) {
             case WPDESCRITPTION:
-                return QString("Description");
-
+                value = QString("Description");
                 break;
             case LATPOSITION:
-                return QString("Latitude");
-
+                value = QString("Latitude");
                 break;
             case LNGPOSITION:
-                return QString("Longitude");
-
+                value = QString("Longitude");
                 break;
             case DISRELATIVE:
-                return QString("Distance to home");
-
+                value = QString("Distance to home");
                 break;
             case BEARELATIVE:
-                return QString("Bearing from home");
-
+                value = QString("Bearing from home");
                 break;
             case ALTITUDERELATIVE:
-                return QString("Altitude above home");
-
+                value = QString("Altitude above home");
                 break;
             case ISRELATIVE:
-                return QString("Relative to home");
-
+                value = QString("Relative to home");
                 break;
             case ALTITUDE:
-                return QString("Altitude");
-
+                value = QString("Altitude");
                 break;
             case VELOCITY:
-                return QString("Velocity");
-
+                value = QString("Velocity");
                 break;
             case MODE:
-                return QString("Mode");
-
+                value = QString("Mode");
                 break;
             case MODE_PARAMS0:
-                return QString("Mode parameter 0");
-
+                value = QString("Mode parameter 0");
                 break;
             case MODE_PARAMS1:
-                return QString("Mode parameter 1");
-
+                value = QString("Mode parameter 1");
                 break;
             case MODE_PARAMS2:
-                return QString("Mode parameter 2");
-
+                value = QString("Mode parameter 2");
                 break;
             case MODE_PARAMS3:
-                return QString("Mode parameter 3");
-
+                value = QString("Mode parameter 3");
                 break;
             case CONDITION:
-                return QString("Condition");
-
+                value = QString("Condition");
                 break;
             case CONDITION_PARAMS0:
-                return QString("Condition parameter 0");
-
+                value = QString("Condition parameter 0");
                 break;
             case CONDITION_PARAMS1:
-                return QString("Condition parameter 1");
-
+                value = QString("Condition parameter 1");
                 break;
             case CONDITION_PARAMS2:
-                return QString("Condition parameter 2");
-
+                value = QString("Condition parameter 2");
                 break;
             case CONDITION_PARAMS3:
-                return QString("Condition parameter 3");
-
+                value = QString("Condition parameter 3");
                 break;
             case COMMAND:
-                return QString("Command");
-
+                value = QString("Command");
                 break;
             case JUMPDESTINATION:
-                return QString("Jump Destination");
-
+                value = QString("Jump Destination");
                 break;
             case ERRORDESTINATION:
-                return QString("Error Destination");
-
+                value = QString("Error Destination");
                 break;
             case LOCKED:
-                return QString("Locked");
-
+                value = QString("Locked");
                 break;
             default:
-                return QString();
-
+                value = QString();
                 break;
             }
         }
     } else {
-        return QAbstractTableModel::headerData(section, orientation, role);
+        value = QAbstractTableModel::headerData(section, orientation, role);
     }
-    return NULL;
+    return value;
 }
 
 bool flightDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -665,54 +605,56 @@ void flightDataModel::readFromFile(QString fileName)
             while (!fieldNode.isNull()) {
                 QDomElement field = fieldNode.toElement();
                 if (field.tagName() == "field") {
-                    if (field.attribute("name") == "altitude") {
-                        data->altitude = field.attribute("value").toDouble();
-                    } else if (field.attribute("name") == "description") {
-                        data->wpDescritption = field.attribute("value");
-                    } else if (field.attribute("name") == "latitude") {
-                        data->latPosition = field.attribute("value").toDouble();
-                    } else if (field.attribute("name") == "longitude") {
-                        data->lngPosition = field.attribute("value").toDouble();
-                    } else if (field.attribute("name") == "distance_to_home") {
-                        data->disRelative = field.attribute("value").toDouble();
-                    } else if (field.attribute("name") == "bearing_from_home") {
-                        data->beaRelative = field.attribute("value").toDouble();
-                    } else if (field.attribute("name") == "altitude_above_home") {
-                        data->altitudeRelative = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "is_relative_to_home") {
-                        data->isRelative = field.attribute("value").toInt();
-                    } else if (field.attribute("name") == "altitude") {
-                        data->altitude = field.attribute("value").toDouble();
-                    } else if (field.attribute("name") == "velocity") {
-                        data->velocity = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "mode") {
-                        data->mode = field.attribute("value").toInt();
-                    } else if (field.attribute("name") == "mode_param0") {
-                        data->mode_params[0] = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "mode_param1") {
-                        data->mode_params[1] = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "mode_param2") {
-                        data->mode_params[2] = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "mode_param3") {
-                        data->mode_params[3] = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "condition") {
-                        data->condition = field.attribute("value").toDouble();
-                    } else if (field.attribute("name") == "condition_param0") {
-                        data->condition_params[0] = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "condition_param1") {
-                        data->condition_params[1] = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "condition_param2") {
-                        data->condition_params[2] = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "condition_param3") {
-                        data->condition_params[3] = field.attribute("value").toFloat();
-                    } else if (field.attribute("name") == "command") {
-                        data->command = field.attribute("value").toInt();
-                    } else if (field.attribute("name") == "jumpdestination") {
-                        data->jumpdestination = field.attribute("value").toInt();
-                    } else if (field.attribute("name") == "errordestination") {
-                        data->errordestination = field.attribute("value").toInt();
-                    } else if (field.attribute("name") == "is_locked") {
-                        data->locked = field.attribute("value").toInt();
+                    QString name = field.attribute("name");
+                    QString value = field.attribute("value");
+                    if (name == "altitude") {
+                        data->altitude = value.toDouble();
+                    } else if (name == "description") {
+                        data->wpDescritption = value;
+                    } else if (name == "latitude") {
+                        data->latPosition = value.toDouble();
+                    } else if (name == "longitude") {
+                        data->lngPosition = value.toDouble();
+                    } else if (name == "distance_to_home") {
+                        data->disRelative = value.toDouble();
+                    } else if (name == "bearing_from_home") {
+                        data->beaRelative = value.toDouble();
+                    } else if (name == "altitude_above_home") {
+                        data->altitudeRelative = value.toFloat();
+                    } else if (name == "is_relative_to_home") {
+                        data->isRelative = value.toInt();
+                    } else if (name == "altitude") {
+                        data->altitude = value.toDouble();
+                    } else if (name == "velocity") {
+                        data->velocity = value.toFloat();
+                    } else if (name == "mode") {
+                        data->mode = value.toInt();
+                    } else if (name == "mode_param0") {
+                        data->mode_params[0] = value.toFloat();
+                    } else if (name == "mode_param1") {
+                        data->mode_params[1] = value.toFloat();
+                    } else if (name == "mode_param2") {
+                        data->mode_params[2] = value.toFloat();
+                    } else if (name == "mode_param3") {
+                        data->mode_params[3] = value.toFloat();
+                    } else if (name == "condition") {
+                        data->condition = value.toDouble();
+                    } else if (name == "condition_param0") {
+                        data->condition_params[0] = value.toFloat();
+                    } else if (name == "condition_param1") {
+                        data->condition_params[1] = value.toFloat();
+                    } else if (name == "condition_param2") {
+                        data->condition_params[2] = value.toFloat();
+                    } else if (name == "condition_param3") {
+                        data->condition_params[3] = value.toFloat();
+                    } else if (name == "command") {
+                        data->command = value.toInt();
+                    } else if (name == "jumpdestination") {
+                        data->jumpdestination = value.toInt();
+                    } else if (name == "errordestination") {
+                        data->errordestination = value.toInt();
+                    } else if (name == "is_locked") {
+                        data->locked = value.toInt();
                     }
                 }
                 fieldNode = fieldNode.nextSibling();

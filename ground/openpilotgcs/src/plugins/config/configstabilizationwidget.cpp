@@ -242,8 +242,11 @@ void ConfigStabilizationWidget::pidBankChanged(int index)
     }
 
     for(int i = 0; i < m_pidTabBars.at(0)->count(); i++) {
-        setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(i).toString(), index == i);
+        setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(i).toString(), false);
     }
+
+    setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(index).toString(), true);
+
     m_currentPIDBank = index;
 }
 

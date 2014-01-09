@@ -106,8 +106,8 @@ void ConfigTaskWidget::addWidgetBinding(UAVObject *object, UAVObjectField *field
 }
 
 void ConfigTaskWidget::addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index, double scale,
-                                        bool isLimited, QList<int> *reloadGroupIDs, quint32 instID) {
-
+                                        bool isLimited, QList<int> *reloadGroupIDs, quint32 instID)
+{
     QString mappedObjectName = mapObjectName(objectName);
 
     // If object name is comma separated list of objects, call one time per objectName
@@ -117,7 +117,7 @@ void ConfigTaskWidget::addWidgetBinding(QString objectName, QString fieldName, Q
 }
 
 void ConfigTaskWidget::doAddWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index, double scale,
-                                        bool isLimited, QList<int> *reloadGroupIDs, quint32 instID)
+                                          bool isLimited, QList<int> *reloadGroupIDs, quint32 instID)
 {
     if (addShadowWidgetBinding(objectName, fieldName, widget, index, scale, isLimited, reloadGroupIDs, instID)) {
         return;
@@ -156,12 +156,12 @@ void ConfigTaskWidget::doAddWidgetBinding(QString objectName, QString fieldName,
                 m_reloadGroups.insert(groupId, binding);
             }
         }
-    } else  {
+    } else {
         connectWidgetUpdatesToSlot(widget, SLOT(widgetsContentsChanged()));
         if (reloadGroupIDs) {
             addWidgetToReloadGroups(widget, reloadGroupIDs);
         }
-        if(binding->isEnabled()) {
+        if (binding->isEnabled()) {
             loadWidgetLimits(widget, field, index, isLimited, scale);
         }
     }
@@ -169,13 +169,20 @@ void ConfigTaskWidget::doAddWidgetBinding(QString objectName, QString fieldName,
 
 void ConfigTaskWidget::setWidgetBindingObjectEnabled(QString objectName, bool enabled)
 {
-    UAVObject* object = getObject(objectName);
+    UAVObject *object = getObject(objectName);
+
     Q_ASSERT(object);
 
-    foreach(WidgetBinding* binding, m_widgetBindingsPerObject.values(object)) {
+    foreach(WidgetBinding * binding, m_widgetBindingsPerObject.values(object)) {
         binding->setIsEnabled(enabled);
-        if(enabled) {
-            setWidgetFromField(binding->widget(), binding->field(), binding->index(), binding->scale(), binding->isLimited());
+        if (enabled) {
+            //disconnectWidgetUpdatesToSlot(binding->widget(), SLOT(widgetsContentsChanged()));
+            if (binding->value().isValid() && !binding->value().isNull()) {
+                setWidgetFromVariant(binding->widget(), binding->value(), binding->scale());
+            } else {
+                setWidgetFromField(binding->widget(), binding->field(), binding->index(), binding->scale(), binding->isLimited());
+            }
+            //connectWidgetUpdatesToSlot(binding->widget(), SLOT(widgetsContentsChanged()));
         }
     }
 }
@@ -312,7 +319,6 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
     foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
         if (binding->object() != NULL && binding->field() != NULL) {
             binding->updateObjectFieldFromValue();
-            //setFieldFromWidget(binding->widget(), binding->field(), binding->index(), binding->scale());
         }
     }
 }
@@ -377,7 +383,7 @@ bool ConfigTaskWidget::shouldObjectBeSaved(UAVObject *object)
 void ConfigTaskWidget::forceShadowUpdates()
 {
     foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
-        if(!binding->isEnabled()) {
+        if (!binding->isEnabled()) {
             continue;
         }
         QVariant widgetValue = getVariantFromWidget(binding->widget(), binding->scale(), binding->units());
@@ -401,8 +407,8 @@ void ConfigTaskWidget::widgetsContentsChanged()
     emit widgetContentsChanged(emitter);
     double scale;
     QVariant value;
-    foreach(WidgetBinding *binding ,m_widgetBindingsPerWidget.values(emitter)) {
 
+    foreach(WidgetBinding * binding, m_widgetBindingsPerWidget.values(emitter)) {
         if (binding && binding->isEnabled()) {
             if (binding->widget() == emitter) {
                 scale = binding->scale();
@@ -546,7 +552,7 @@ bool ConfigTaskWidget::addShadowWidgetBinding(QString objectName, QString fieldN
             if (defaultReloadGroups) {
                 addWidgetToReloadGroups(widget, defaultReloadGroups);
             }
-            if(!binding->isEnabled()) {
+            if (!binding->isEnabled()) {
                 loadWidgetLimits(widget, binding->field(), binding->index(), isLimited, scale);
             }
             return true;
@@ -1147,7 +1153,7 @@ QVariant WidgetBinding::value() const
 void WidgetBinding::setValue(const QVariant &value)
 {
     m_value = value;
-    if(m_object && m_field) {
+    if (m_object && m_field) {
         qDebug() << "WidgetBinding" << m_object->getName() << ":" << m_field->getName() << "value =" << value.toString();
     }
 }

@@ -278,7 +278,7 @@ void ConfigTaskWidget::onAutopilotConnect()
 
 void ConfigTaskWidget::populateWidgets()
 {
-    bool dirtyBack = m_isDirty;
+    bool dirtyBack = isDirty();
     emit populateWidgetsRequested();
 
     foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
@@ -295,7 +295,7 @@ void ConfigTaskWidget::refreshWidgetsValues(UAVObject *obj)
         return;
     }
 
-    bool dirtyBack = m_isDirty;
+    bool dirtyBack = isDirty();
     emit refreshWidgetsValuesRequested();
     foreach(WidgetBinding * binding, m_widgetBindingsPerObject.values(obj)) {
         if (binding->isEnabled() && binding->field() != NULL && binding->widget() != NULL) {
@@ -310,8 +310,9 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
     emit updateObjectsFromWidgetsRequested();
 
     foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
-        if (binding->isEnabled() && binding->object() != NULL && binding->field() != NULL) {
-            setFieldFromWidget(binding->widget(), binding->field(), binding->index(), binding->scale());
+        if (binding->object() != NULL && binding->field() != NULL) {
+            binding->updateObjectFieldFromValue();
+            //setFieldFromWidget(binding->widget(), binding->field(), binding->index(), binding->scale());
         }
     }
 }
@@ -399,6 +400,7 @@ void ConfigTaskWidget::widgetsContentsChanged()
     QWidget *emitter = ((QWidget *)sender());
     emit widgetContentsChanged(emitter);
     double scale;
+    QVariant value;
     foreach(WidgetBinding *binding ,m_widgetBindingsPerWidget.values(emitter)) {
 
         if (binding && binding->isEnabled()) {
@@ -415,12 +417,15 @@ void ConfigTaskWidget::widgetsContentsChanged()
                     }
                 }
             }
+            value = getVariantFromWidget(emitter, scale, binding->units());
+            binding->setValue(value);
+
             if (binding->widget() != emitter) {
                 disconnectWidgetUpdatesToSlot(binding->widget(), SLOT(widgetsContentsChanged()));
 
                 checkWidgetsLimits(binding->widget(), binding->field(), binding->index(), binding->isLimited(),
-                                   getVariantFromWidget(emitter, scale, binding->units()), binding->scale());
-                setWidgetFromVariant(binding->widget(), getVariantFromWidget(emitter, scale, binding->units()), binding->scale());
+                                   value, binding->scale());
+                setWidgetFromVariant(binding->widget(), value, binding->scale());
                 emit widgetContentsChanged(binding->widget());
 
                 connectWidgetUpdatesToSlot(binding->widget(), SLOT(widgetsContentsChanged()));
@@ -430,8 +435,8 @@ void ConfigTaskWidget::widgetsContentsChanged()
                     disconnectWidgetUpdatesToSlot(shadow->widget(), SLOT(widgetsContentsChanged()));
 
                     checkWidgetsLimits(shadow->widget(), binding->field(), binding->index(), shadow->isLimited(),
-                                       getVariantFromWidget(emitter, scale, binding->units()), shadow->scale());
-                    setWidgetFromVariant(shadow->widget(), getVariantFromWidget(emitter, scale, binding->units()), shadow->scale());
+                                       value, shadow->scale());
+                    setWidgetFromVariant(shadow->widget(), value, shadow->scale());
                     emit widgetContentsChanged(shadow->widget());
 
                     connectWidgetUpdatesToSlot(shadow->widget(), SLOT(widgetsContentsChanged()));
@@ -828,22 +833,6 @@ void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget *widget, const char
     }
 }
 
-bool ConfigTaskWidget::setFieldFromWidget(QWidget *widget, UAVObjectField *field, int index, double scale)
-{
-    if (!widget || !field) {
-        return false;
-    }
-    QVariant ret = getVariantFromWidget(widget, scale, field->getUnits());
-    if (ret.isValid()) {
-        field->setValue(ret, index);
-        return true;
-    }
-    {
-        qDebug() << __FUNCTION__ << "widget to uavobject relation not implemented" << widget->metaObject()->className();
-        return false;
-    }
-}
-
 QVariant ConfigTaskWidget::getVariantFromWidget(QWidget *widget, double scale, QString units)
 {
     if (QComboBox * cb = qobject_cast<QComboBox *>(widget)) {
@@ -1139,6 +1128,7 @@ bool WidgetBinding::matches(QString objectName, QString fieldName, int index, qu
         return false;
     }
 }
+
 bool WidgetBinding::isEnabled() const
 {
     return m_isEnabled;
@@ -1149,6 +1139,25 @@ void WidgetBinding::setIsEnabled(bool isEnabled)
     m_isEnabled = isEnabled;
 }
 
+QVariant WidgetBinding::value() const
+{
+    return m_value;
+}
+
+void WidgetBinding::setValue(const QVariant &value)
+{
+    m_value = value;
+    if(m_object && m_field) {
+        qDebug() << "WidgetBinding" << m_object->getName() << ":" << m_field->getName() << "value =" << value.toString();
+    }
+}
+
+void WidgetBinding::updateObjectFieldFromValue()
+{
+    if (m_value.isValid()) {
+        m_field->setValue(m_value, m_index);
+    }
+}
 
 ShadowWidgetBinding::ShadowWidgetBinding(QWidget *widget, double scale, bool isLimited)
 {

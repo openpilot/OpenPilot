@@ -41,19 +41,25 @@
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
 #include "altitudeholdsettings.h"
+#include "stabilizationsettings.h"
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
-    boardModel(0), m_currentPIDBank(0)
+    boardModel(0), m_pidBankCount(0), m_currentPIDBank(0)
 {
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
+
+    StabilizationSettings* stabSettings = qobject_cast<StabilizationSettings*>(getObject("StabilizationSettings"));
+    Q_ASSERT(stabSettings);
+
+    m_pidBankCount = stabSettings->getField("FlightModeMap")->getOptions().count();
 
     // Set up fake tab widget stuff for pid banks support
     m_pidTabBars.append(ui->basicPIDBankTabBar);
     m_pidTabBars.append(ui->advancedPIDBankTabBar);
     m_pidTabBars.append(ui->expertPIDBankTabBar);
     foreach(QTabBar * tabBar, m_pidTabBars) {
-        for (int i = 0; i < PID_BANKS; i++) {
+        for (int i = 0; i < m_pidBankCount; i++) {
             tabBar->addTab(tr("PID Bank %1").arg(i + 1));
             tabBar->setTabData(i, QString("StabilizationSettingsBank%1").arg(i + 1));
         }
@@ -61,7 +67,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
         connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
     }
 
-    for (int i = 0; i < PID_BANKS; i++) {
+    for (int i = 0; i < m_pidBankCount; i++) {
         if(i > 0) {
             m_stabilizationObjectsString.append(",");
         }

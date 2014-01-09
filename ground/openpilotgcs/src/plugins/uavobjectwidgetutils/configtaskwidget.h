@@ -80,12 +80,18 @@ public:
     bool isEnabled() const;
     void setIsEnabled(bool isEnabled);
 
+    QVariant value() const;
+    void setValue(const QVariant &value);
+
+    void updateObjectFieldFromValue();
+
 private:
     UAVObject *m_object;
     UAVObjectField *m_field;
     int m_index;
     bool m_isEnabled;
     QList<ShadowWidgetBinding *> m_shadows;
+    QVariant m_value;
 };
 
 class UAVOBJECTWIDGETUTILS_EXPORT ConfigTaskWidget : public QWidget {
@@ -214,7 +220,6 @@ private:
     QString m_outOfLimitsStyle;
     QTimer *m_realtimeUpdateTimer;
 
-    bool setFieldFromWidget(QWidget *widget, UAVObjectField *field, int index, double scale);
     bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, double scale, bool hasLimits);
 
     QVariant getVariantFromWidget(QWidget *widget, double scale, const QString units);
@@ -225,7 +230,6 @@ private:
     void disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function);
 
     void loadWidgetLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, double sclale);
-    virtual UAVObject *getObject(const QString name, quint32 instId = 0);
 
     int fieldIndexFromElementName(QString objectName, QString fieldName, QString elementName);
 
@@ -245,7 +249,7 @@ protected slots:
 protected:
     virtual void enableControls(bool enable);
     virtual QString mapObjectName(const QString objectName);
-
+    virtual UAVObject *getObject(const QString name, quint32 instId = 0);
     void checkWidgetsLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, QVariant value, double scale);
     void updateEnableControls();
 };

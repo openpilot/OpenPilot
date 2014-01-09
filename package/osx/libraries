@@ -23,9 +23,9 @@ fi
 
 echo "Qt library directory is \"${QT_DIR}\""
 
-echo "Running macdeployqt"
-macdeployqt "${APP}" -no-strip 
+echo "Running macdeployqt from ${QT_DIR}../bin/macdeployqt"
 
+"${QT_DIR}../bin/macdeployqt" "${APP}" -no-strip
 echo "Processing Qt libraries in ${APP}"
 for f in "${PLUGINS}/"*.dylib "${OP_PLUGINS}/"*.dylib
 do

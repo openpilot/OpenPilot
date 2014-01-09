@@ -435,14 +435,9 @@ void PIOS_Pixel_Init(void)
 	DAC_InitStructure.DAC_Trigger = DAC_Trigger_None;
 	DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
 	DAC_InitStructure.DAC_LFSRUnmask_TriangleAmplitude = DAC_LFSRUnmask_Bit0;
-	DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;				// JR_HINT check DAC_OutputBuffer_Disable; for full range of 0.0 ... 3.3 V !!!
+	DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Disable;
 	DAC_Init(DAC_Channel_1, &DAC_InitStructure);
 	DAC_Init(DAC_Channel_2, &DAC_InitStructure);
-
-#if 1	// JR_HINT remove after test
-	DAC_SetChannel1Data(DAC_Align_12b_R, 706);
-	DAC_SetChannel2Data(DAC_Align_12b_R,   0);
-#endif
 
 	// Enable DAC Channel1: Once the DAC channel1 is enabled, PA.04 is automatically connected to the DAC converter.
 	DAC_Cmd(DAC_Channel_1, ENABLE);

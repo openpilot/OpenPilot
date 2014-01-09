@@ -28,8 +28,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-// ****************
-
+#if 0
 #include <openpilot.h>
 
 #include "osdinput.h"
@@ -107,7 +106,7 @@ int32_t osdinputInitialize(void)
 
     return 0;
 }
-//MODULE_INITCALL(osdinputInitialize, osdinputStart);
+MODULE_INITCALL(osdinputInitialize, osdinputStart);
 
 // ****************
 /**
@@ -180,3 +179,4 @@ static void osdinputTask(__attribute__((unused)) void *parameters)
  * @}
  * @}
  */
+#endif

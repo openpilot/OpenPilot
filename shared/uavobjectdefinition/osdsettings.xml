@@ -50,8 +50,8 @@
 		<field name="HomeSource" units="" type="enum" elements="1" options="GPS,Config" defaultvalue="GPS"/>
 		<field name="AltitudeSource" units="" type="enum" elements="1" options="GPS,Baro" defaultvalue="GPS"/>
 		<field name="HeadingSource" units="" type="enum" elements="1" options="GPS,Mag" defaultvalue="GPS"/>
-		<field name="White" units=""  type="uint8"  elements="1" defaultvalue="6"/>
-		<field name="Black" units=""  type="uint8"  elements="1" defaultvalue="3"/>
+		<field name="White" units=""  type="uint16"  elements="1" defaultvalue="4095"/>
+		<field name="Black" units=""  type="uint16"  elements="1" defaultvalue="0"/>
 		<field name="Screen" units=""  type="uint8"  elements="1" defaultvalue="0"/>
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

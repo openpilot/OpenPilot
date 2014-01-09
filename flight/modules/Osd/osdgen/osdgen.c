@@ -33,6 +33,7 @@
 //#define DEBUG_TIMING
 //#define DEBUG_ALARMS
 //#define DEBUG_TELEMETRY
+//#define DEBUG_BLACK_WHITE
 //#define DEBUG_STUFF
 //#define SIMULATE_DATA
 #define TEMP_GPS_STATUS_WORKAROUND
@@ -1691,6 +1692,7 @@ void drawBattery(uint16_t x, uint16_t y, uint8_t battery, uint16_t size)
  * @param       flags                   special flags (see hud.h.)
  */
 //#define VERTICAL_SCALE_BRUTE_FORCE_BLANK_OUT
+//#define VERTICAL_SCALE_FILLED_NUMBER
 void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int height, int mintick_step, int majtick_step, int mintick_len, int majtick_len,
                              int boundtick_len, __attribute__((unused)) int max_val, int flags)
 {
@@ -1787,13 +1789,17 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
         if (halign == -1) {
             write_pixel_lm(xx - arrow_len + i, y - i - 1, 1, 1);
             write_pixel_lm(xx - arrow_len + i, y + i - 1, 1, 1);
+#ifdef VERTICAL_SCALE_FILLED_NUMBER
             write_hline_lm(xx + dim.width - 1, xx - arrow_len + i + 1, y - i - 1, 0, 1);
             write_hline_lm(xx + dim.width - 1, xx - arrow_len + i + 1, y + i - 1, 0, 1);
+#endif
         } else {
             write_pixel_lm(xx + arrow_len - i, y - i - 1, 1, 1);
             write_pixel_lm(xx + arrow_len - i, y + i - 1, 1, 1);
+#ifdef VERTICAL_SCALE_FILLED_NUMBER
             write_hline_lm(xx - dim.width - 1, xx + arrow_len - i - 1, y - i - 1, 0, 1);
             write_hline_lm(xx - dim.width - 1, xx + arrow_len - i - 1, y + i - 1, 0, 1);
+#endif
         }
         // FIXME
         // write_hline_lm(xx - dim.width - 1, xx + (arrow_len - i), y - i - 1, 1, 1);
@@ -1847,6 +1853,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
  * @param       flags                   special flags (see hud.h.)
  */
 #define COMPASS_SMALL_NUMBER
+//#define COMPASS_FILLED_NUMBER
 void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mintick_step, int majtick_step, int mintick_len, int majtick_len, __attribute__((unused)) int flags)
 {
     v %= 360; // wrap, just in case.
@@ -1920,12 +1927,16 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
     fetch_font_info(0, 3, &font_info, NULL);
 #ifdef COMPASS_SMALL_NUMBER
     int rect_width = font_info.width * 3;
+#ifdef COMPASS_FILLED_NUMBER
     write_filled_rectangle_lm(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 1);
+#endif
     write_rectangle_outlined(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 1);
     write_string(headingstr, x + 1, majtick_start + textoffset - 4, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 0);
 #else
     int rect_width = (font_info.width + 1) * 3 + 2;
+#ifdef COMPASS_FILLED_NUMBER
     write_filled_rectangle_lm(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 1);
+#endif
     write_rectangle_outlined(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 1);
     write_string(headingstr, x + 1, majtick_start + textoffset + 2, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 3);
 #endif
@@ -2862,6 +2873,14 @@ void updateGraphics()
     	}
 #endif
 
+#ifdef DEBUG_BLACK_WHITE
+        int bw;
+        for (bw=0; bw<20; bw++) {
+        	write_hline_lm(140, 259, 30 + bw, 1, 1);
+        	write_hline_lm(140, 259, 50 + bw, 0, 1);
+        }
+#endif
+
 #ifdef DEBUG_STUFF
         // show heap
         sprintf(temp, "Heap:%6d", xPortGetFreeHeapSize());
@@ -3029,20 +3048,10 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
         PIOS_Servo_Set(1, OsdSettings.Black);
         break;
     case 2:
-#if 1	// JR_HINT change after test
-    	DAC_SetChannel1Data(DAC_Align_12b_R, 706);		// 0.7 V buffer enabled
-    	DAC_SetChannel2Data(DAC_Align_12b_R,   0);		// 0.2 V buffer enabled
-#else
-#if 1
-    	// buffer enabled:  0.2 V ... 3.1 V		Vout = DAC_value / 4095 * 2.9 + 0.2		DAC_value = (Vout - 0.2) / 2.9 * 4095
-    	DAC_SetChannel1Data(DAC_Align_12b_R, (OsdSettings.White - 200) * 4095 / 2900);	// change to int16 in xml for setting value in [mV]
-    	DAC_SetChannel2Data(DAC_Align_12b_R, (OsdSettings.Black - 200) * 4095 / 2900);	// change to int16 in xml for setting value in [mV]
-#else
-    	// buffer disabled: 0.0 V ... 3.3 V		Vout = DAC_value / 4095 * 3.3			DAC_value = Vout / 3.3 * 4095
-    	DAC_SetChannel1Data(DAC_Align_12b_R, OsdSettings.White * 4095 / 3300);			// change to int16 in xml for setting value in [mV]
-    	DAC_SetChannel2Data(DAC_Align_12b_R, OsdSettings.Black * 4095 / 3300);			// change to int16 in xml for setting value in [mV]
-#endif
-#endif
+    	// DAC buffer enabled:  0.2 V ... 3.1 V		Vout = DAC_value / 4095 * 2.9 + 0.2		DAC_value = (Vout - 0.2) / 2.9 * 4095
+    	// DAC buffer disabled: 0.0 V ... 3.3 V		Vout = DAC_value / 4095 * 3.3			DAC_value = Vout / 3.3 * 4095
+    	DAC_SetChannel1Data(DAC_Align_12b_R, OsdSettings.Black);
+    	DAC_SetChannel2Data(DAC_Align_12b_R, OsdSettings.White);
         break;
     default:
         PIOS_DEBUG_Assert(0);
@@ -3089,6 +3098,27 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
             in_ticks = xTaskGetTickCount();
             out_time = in_ticks - out_ticks;
 #endif
+
+
+#if 1
+            OsdSettingsGet(&OsdSettings);
+            switch (PIOS_Board_Revision()) {
+            case 1:
+                PIOS_Servo_Set(0, OsdSettings.White);
+                PIOS_Servo_Set(1, OsdSettings.Black);
+                break;
+            case 2:
+            	// DAC buffer enabled:  0.2 V ... 3.1 V		Vout = DAC_value / 4095 * 2.9 + 0.2		DAC_value = (Vout - 0.2) / 2.9 * 4095
+            	// DAC buffer disabled: 0.0 V ... 3.3 V		Vout = DAC_value / 4095 * 3.3			DAC_value = Vout / 3.3 * 4095
+            	DAC_SetChannel1Data(DAC_Align_12b_R, OsdSettings.Black);
+            	DAC_SetChannel2Data(DAC_Align_12b_R, OsdSettings.White);
+                break;
+            default:
+                PIOS_DEBUG_Assert(0);
+            }
+#endif
+
+
             clearGraphics();
             updateGraphics();
 #ifdef DEBUG_TIMING

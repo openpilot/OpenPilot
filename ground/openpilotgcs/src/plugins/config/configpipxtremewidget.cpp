@@ -199,8 +199,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
         } else {
             m_oplink->FirmwareVersion->setText(tr("Unknown"));
         }
-    }
-    else {
+    } else {
         qDebug() << "ConfigPipXtremeWidget: Failed to read Description field.";
     }
 

@@ -156,8 +156,6 @@ private:
     void updateNack(quint32 objId, quint16 instId, UAVObject *obj);
     bool transmitObject(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
     bool transmitSingleObject(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);
-    quint8 updateCRC(quint8 crc, const quint8 data);
-    quint8 updateCRC(quint8 crc, const quint8 *data, qint32 length);
 
     Transaction *findTransaction(quint32 objId, quint16 instId);
     void openTransaction(quint8 type, quint32 objId, quint16 instId);

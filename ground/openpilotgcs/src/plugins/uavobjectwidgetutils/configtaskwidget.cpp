@@ -176,13 +176,13 @@ void ConfigTaskWidget::setWidgetBindingObjectEnabled(QString objectName, bool en
     foreach(WidgetBinding * binding, m_widgetBindingsPerObject.values(object)) {
         binding->setIsEnabled(enabled);
         if (enabled) {
-            //disconnectWidgetUpdatesToSlot(binding->widget(), SLOT(widgetsContentsChanged()));
+            // disconnectWidgetUpdatesToSlot(binding->widget(), SLOT(widgetsContentsChanged()));
             if (binding->value().isValid() && !binding->value().isNull()) {
                 setWidgetFromVariant(binding->widget(), binding->value(), binding->scale());
             } else {
                 setWidgetFromField(binding->widget(), binding->field(), binding->index(), binding->scale(), binding->isLimited());
             }
-            //connectWidgetUpdatesToSlot(binding->widget(), SLOT(widgetsContentsChanged()));
+            // connectWidgetUpdatesToSlot(binding->widget(), SLOT(widgetsContentsChanged()));
         }
     }
 }

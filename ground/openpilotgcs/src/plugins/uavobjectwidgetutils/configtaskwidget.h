@@ -234,7 +234,7 @@ private:
     int fieldIndexFromElementName(QString objectName, QString fieldName, QString elementName);
 
     void doAddWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index = 0, double scale = 1,
-                          bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
+                            bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
 
 protected slots:
     virtual void disableObjectUpdates();

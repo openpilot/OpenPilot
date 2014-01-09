@@ -48,7 +48,7 @@ public:
 private:
     Ui_StabilizationWidget *ui;
     QTimer *realtimeUpdates;
-    QList<QTabBar*> m_pidTabBars;
+    QList<QTabBar *> m_pidTabBars;
     QString m_stabilizationObjectsString;
 
     // Milliseconds between automatic 'Instant Updates'

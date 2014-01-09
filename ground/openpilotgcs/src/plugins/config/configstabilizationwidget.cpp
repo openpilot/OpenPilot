@@ -49,7 +49,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
 
-    StabilizationSettings* stabSettings = qobject_cast<StabilizationSettings*>(getObject("StabilizationSettings"));
+    StabilizationSettings *stabSettings = qobject_cast<StabilizationSettings *>(getObject("StabilizationSettings"));
     Q_ASSERT(stabSettings);
 
     m_pidBankCount = stabSettings->getField("FlightModeMap")->getOptions().count();
@@ -68,7 +68,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     }
 
     for (int i = 0; i < m_pidBankCount; i++) {
-        if(i > 0) {
+        if (i > 0) {
             m_stabilizationObjectsString.append(",");
         }
         m_stabilizationObjectsString.append(m_pidTabBars.at(0)->tabData(i).toString());
@@ -234,14 +234,13 @@ void ConfigStabilizationWidget::onBoardConnected()
 
 void ConfigStabilizationWidget::pidBankChanged(int index)
 {
-
     foreach(QTabBar * tabBar, m_pidTabBars) {
         disconnect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
         tabBar->setCurrentIndex(index);
         connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
     }
 
-    for(int i = 0; i < m_pidTabBars.at(0)->count(); i++) {
+    for (int i = 0; i < m_pidTabBars.at(0)->count(); i++) {
         setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(i).toString(), false);
     }
 
@@ -262,7 +261,7 @@ bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
 
 QString ConfigStabilizationWidget::mapObjectName(const QString objectName)
 {
-    if(objectName == "StabilizationSettingsBankX") {
+    if (objectName == "StabilizationSettingsBankX") {
         return m_stabilizationObjectsString;
     }
     return ConfigTaskWidget::mapObjectName(objectName);

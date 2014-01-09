@@ -38,7 +38,6 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
 {
     m_listWidget  = new QListWidget();
     m_stackWidget = new QStackedWidget();
-    m_stackWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     QBoxLayout *toplevelLayout;
     if (m_vertical) {
@@ -62,12 +61,18 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
         m_listWidget->setWrapping(false);
     }
 
-    toplevelLayout->setSpacing(0);
-    toplevelLayout->setContentsMargins(0, 0, 0, 0);
     m_listWidget->setContentsMargins(0, 0, 0, 0);
     m_listWidget->setSpacing(0);
     m_listWidget->setViewMode(QListView::IconMode);
+    m_listWidget->setMovement(QListView::Static);
+    m_listWidget->setUniformItemSizes(true);
+    m_listWidget->setStyleSheet("border: 0px; margin: 9px; margin-right: 0px; background-color: transparent; ");
+
+    m_stackWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
     m_stackWidget->setContentsMargins(0, 0, 0, 0);
+
+    toplevelLayout->setSpacing(0);
+    toplevelLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(toplevelLayout);
 
     connect(m_listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(showWidget(int)), Qt::QueuedConnection);

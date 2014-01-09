@@ -44,6 +44,7 @@ UAVOBJSRCFILENAMES += airspeedstate
 UAVOBJSRCFILENAMES += flightbatterysettings
 UAVOBJSRCFILENAMES += firmwareiapobj
 UAVOBJSRCFILENAMES += flightbatterystate
+UAVOBJSRCFILENAMES += flightplaninfo
 UAVOBJSRCFILENAMES += flightplancontrol
 UAVOBJSRCFILENAMES += flightplansettings
 UAVOBJSRCFILENAMES += flightplanstatus

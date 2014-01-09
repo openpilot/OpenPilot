@@ -36,13 +36,14 @@
 #include <QUrl>
 #include <QList>
 #include <QTabBar>
+#include <QMessageBox>
 
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
 #include "altitudeholdsettings.h"
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
-    boardModel(0)
+    boardModel(0), m_currentPIDBank(0)
 {
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
@@ -227,13 +228,17 @@ void ConfigStabilizationWidget::onBoardConnected()
 
 void ConfigStabilizationWidget::pidBankChanged(int index)
 {
+
     foreach(QTabBar * tabBar, m_pidTabBars) {
+        disconnect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
         tabBar->setCurrentIndex(index);
+        connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
     }
 
     for(int i = 0; i < m_pidTabBars.at(0)->count(); i++) {
         setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(i).toString(), index == i);
     }
+    m_currentPIDBank = index;
 }
 
 bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)

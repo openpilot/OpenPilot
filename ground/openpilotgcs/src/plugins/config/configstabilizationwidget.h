@@ -57,6 +57,7 @@ private:
     static const int PID_BANKS = 3;
 
     int boardModel;
+    int m_currentPIDBank;
 protected:
     QString mapObjectName(const QString objectName);
 

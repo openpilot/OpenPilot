@@ -41,6 +41,8 @@ done
 
 echo "Copying SDL"
 cp -a "/Library/Frameworks/SDL.framework" "${APP}/Contents/Frameworks/"
+chmod +w "${APP}/Contents/Plugins/libsdlgamepad.1.dylib"
+chmod +w "${APP}/Contents/Frameworks/SDL.framework/SDL"
 
 echo "Changing package identification of SDL"
 install_name_tool -id \
@@ -50,6 +52,8 @@ install_name_tool -change \
     @rpath/SDL.framework/Versions/A/SDL \
     "@executable_path/../Frameworks/SDL.framework/SDL" \
     "${APP}/Contents/Plugins/libsdlgamepad.1.dylib"
+chmod -w "${APP}/Contents/Plugins/libsdlgamepad.1.dylib"
+chmod -w "${APP}/Contents/Frameworks/SDL.framework/SDL"
 
 # deleting unnecessary files
 echo "Deleting unnecessary files"

@@ -26,16 +26,19 @@ echo "Qt library directory is \"${QT_DIR}\""
 echo "Running macdeployqt from ${QT_DIR}../bin/macdeployqt"
 
 "${QT_DIR}../bin/macdeployqt" "${APP}" -no-strip
-echo "Processing Qt libraries in ${APP}"
+
+echo "Processing Qt libraries paths in ${APP}"
 for f in "${PLUGINS}/"*.dylib "${OP_PLUGINS}/"*.dylib
 do
     # Only process plain files
-    [ ! -L "${f}" ] && for g in $QT_LIBS
+    [ ! -L "${f}" ] && echo "* ${f}" && for g in $QT_LIBS
     do
+        chmod +w "${f}"
         install_name_tool -change \
             "${QT_DIR}${g}.framework/Versions/5/${g}" \
             @executable_path/../Frameworks/${g}.framework/Versions/5/${g} \
             "${f}"
+        chmod -w "${f}"
     done
 done
 
@@ -43,7 +46,6 @@ echo "Copying SDL"
 cp -a "/Library/Frameworks/SDL.framework" "${APP}/Contents/Frameworks/"
 chmod +w "${APP}/Contents/Plugins/libsdlgamepad.1.dylib"
 chmod +w "${APP}/Contents/Frameworks/SDL.framework/SDL"
-
 echo "Changing package identification of SDL"
 install_name_tool -id \
     @executable_path/../Frameworks/SDL.framework/SDL \

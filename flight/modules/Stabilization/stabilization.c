@@ -684,38 +684,6 @@ static float stab_powf(float x, uint8_t p)
 }
 
 
-static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
-{
-    StabilizationBankData bank, oldBank;
-    StabilizationBankGet(&oldBank);
-
-    if(flight_mode < 0) return;
-
-    switch(cast_struct_to_array(settings.FlightModeMap, settings.FlightModeMap.Stabilized1)[flight_mode])
-    {
-    case 0:
-        StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *) &bank);
-        break;
-
-    case 1:
-        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *) &bank);
-        break;
-
-    case 2:
-        StabilizationSettingsBank3Get((StabilizationSettingsBank3Data *) &bank);
-        break;
-
-    default:
-        memset(&bank, 0, sizeof(StabilizationBankDataPacked));
-//        return; //bank number is invalid. All we can do is ignore it.
-    }
-
-//Need to do this to prevent an infinite loop
-    if(memcmp(&oldBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
-    {
-        StabilizationBankSet(&bank);
-    }
-}
 
 static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
@@ -743,7 +711,7 @@ static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 //        return; //bank number is invalid. All we can do is ignore it.
     }
 
-//Need to do this to prevent an infinite loop
+	//Need to do this to prevent an infinite loop
     if(memcmp(&oldBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
     {
         StabilizationBankSet(&bank);
@@ -848,6 +816,12 @@ static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
                   bank.YawRatePID.Ki,
                   bank.YawRatePID.Kd,
                   bank.YawRatePID.ILimit);
+}
+
+
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    StabilizationSettingsGet(&settings);
 
     // Set up the derivative term
     pid_configure_derivative(settings.DerivativeCutoff, settings.DerivativeGamma);
@@ -882,12 +856,13 @@ static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     // Compute time constant for vbar decay term based on a tau
     vbar_decay = expf(-fakeDt / settings.VbarTau);
-    flight_mode = -1; //force flight mode update
+
+    //force flight mode update
+    flight_mode = -1;
 
     // Rattitude flight mode anti-windup factor
     rattitude_anti_windup = settings.RattitudeAntiWindup;
 }
-
 
 /**
  * @}

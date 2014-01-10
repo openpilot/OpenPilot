@@ -35,7 +35,7 @@ Item {
             Rotation {
                 angle: -AttitudeState.Roll
                 origin.x : world.parent.width/2
-                origin.y : world.parent.height/2
+                origin.y : horizontCenter
             }
         ]
 

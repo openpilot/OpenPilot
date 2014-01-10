@@ -35,6 +35,10 @@
 #include <pios_struct_helper.h>
 #include "stabilization.h"
 #include "stabilizationsettings.h"
+#include "stabilizationbank.h"
+#include "stabilizationsettingsbank1.h"
+#include "stabilizationsettingsbank2.h"
+#include "stabilizationsettingsbank3.h"
 #include "actuatordesired.h"
 #include "ratedesired.h"
 #include "relaytuning.h"
@@ -65,13 +69,15 @@
 #if defined(PIOS_STABILIZATION_STACK_SIZE)
 #define STACK_SIZE_BYTES    PIOS_STABILIZATION_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES    724
+#define STACK_SIZE_BYTES    790
 #endif
 
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 4)
 #define FAILSAFE_TIMEOUT_MS 30
 
 enum { PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_MAX };
+enum{RATE_P, RATE_I, RATE_D, RATE_LIMIT, RATE_OFFSET};
+enum{ATT_P, ATT_I, ATT_LIMIT, ATT_OFFSET};
 
 
 // Private variables
@@ -88,12 +94,15 @@ bool lowThrottleZeroIntegral;
 bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay = 0.991f;
 struct pid pids[PID_MAX];
+int flight_mode = -1;
 
 // Private functions
 static void stabilizationTask(void *parameters);
 static float bound(float val, float range);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
+static void BankUpdatedCb(UAVObjEvent *ev);
+static void SettingsBankUpdatedCb(UAVObjEvent *ev);
 
 /**
  * Module initialization
@@ -111,6 +120,13 @@ int32_t StabilizationStart()
     StabilizationSettingsConnectCallback(SettingsUpdatedCb);
     SettingsUpdatedCb(StabilizationSettingsHandle());
 
+    StabilizationBankConnectCallback(BankUpdatedCb);
+
+    StabilizationSettingsBank1ConnectCallback(SettingsBankUpdatedCb);
+    StabilizationSettingsBank2ConnectCallback(SettingsBankUpdatedCb);
+    StabilizationSettingsBank3ConnectCallback(SettingsBankUpdatedCb);
+
+
     // Start main task
     xTaskCreate(stabilizationTask, (signed char *)"Stabilization", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_STABILIZATION, taskHandle);
@@ -127,6 +143,10 @@ int32_t StabilizationInitialize()
 {
     // Initialize variables
     StabilizationSettingsInitialize();
+    StabilizationBankInitialize();
+    StabilizationSettingsBank1Initialize();
+    StabilizationSettingsBank2Initialize();
+    StabilizationSettingsBank3Initialize();
     ActuatorDesiredInitialize();
 #ifdef DIAG_RATEDESIRED
     RateDesiredInitialize();
@@ -159,6 +179,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
     AttitudeStateData attitudeState;
     GyroStateData gyroStateData;
     FlightStatusData flightStatus;
+    StabilizationBankData stabBank;
+
 
 #ifdef REVOLUTION
     AirspeedStateData airspeedState;
@@ -188,9 +210,16 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         StabilizationDesiredGet(&stabDesired);
         AttitudeStateGet(&attitudeState);
         GyroStateGet(&gyroStateData);
+        StabilizationBankGet(&stabBank);
 #ifdef DIAG_RATEDESIRED
         RateDesiredGet(&rateDesired);
 #endif
+
+        if(flight_mode != flightStatus.FlightMode){
+            flight_mode = flightStatus.FlightMode;
+            SettingsBankUpdatedCb(NULL);
+        }
+
 #ifdef REVOLUTION
         float speedScaleFactor;
         // Scale PID coefficients based on current airspeed estimation - needed for fixed wing planes
@@ -288,7 +317,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                 // Store to rate desired variable for storing to UAVO
                 rateDesiredAxis[i] =
-                    bound(attitudeDesiredAxis[i], cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
+                    bound(attitudeDesiredAxis[i], cast_struct_to_array(stabBank.ManualRate, stabBank.ManualRate.Roll)[i]);
 
                 // Compute the inner loop
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
@@ -305,7 +334,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 // Compute the outer loop
                 rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], local_error[i], dT);
                 rateDesiredAxis[i] = bound(rateDesiredAxis[i],
-                                           cast_struct_to_array(settings.MaximumRate, settings.MaximumRate.Roll)[i]);
+                                           cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[i]);
 
                 // Compute the inner loop
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
@@ -357,7 +386,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 }
 
                 rateDesiredAxis[i]     = bound(rateDesiredAxis[i],
-                                               cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
+                                               cast_struct_to_array(stabBank.ManualRate, stabBank.ManualRate.Roll)[i]);
 
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
                 actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
@@ -367,7 +396,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
             case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE:
                 // Store to rate desired variable for storing to UAVO
                 rateDesiredAxis[i] = bound(attitudeDesiredAxis[i],
-                                           cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
+                                           cast_struct_to_array(stabBank.ManualRate, stabBank.ManualRate.Roll)[i]);
 
                 // Run the relay controller which also estimates the oscillation parameters
                 stabilization_relay_rate(rateDesiredAxis[i] - gyro_filtered[i], &actuatorDesiredAxis[i], i, reinit);
@@ -383,7 +412,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 // Compute the outer loop like attitude mode
                 rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], local_error[i], dT);
                 rateDesiredAxis[i] = bound(rateDesiredAxis[i],
-                                           cast_struct_to_array(settings.MaximumRate, settings.MaximumRate.Roll)[i]);
+                                           cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[i]);
 
                 // Run the relay controller which also estimates the oscillation parameters
                 stabilization_relay_rate(rateDesiredAxis[i] - gyro_filtered[i], &actuatorDesiredAxis[i], i, reinit);
@@ -484,42 +513,124 @@ static float bound(float val, float range)
     return val;
 }
 
+
+
+static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    StabilizationBankData bank, oldBank;
+    StabilizationBankGet(&oldBank);
+
+    if(flight_mode < 0) return;
+
+    switch(cast_struct_to_array(settings.FlightModeMap, settings.FlightModeMap.Stabilized1)[flight_mode])
+    {
+    case 0:
+        StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *) &bank);
+        break;
+
+    case 1:
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *) &bank);
+        break;
+
+    case 2:
+        StabilizationSettingsBank3Get((StabilizationSettingsBank3Data *) &bank);
+        break;
+
+    default:
+        memset(&bank, 0, sizeof(StabilizationBankDataPacked));
+//        return; //bank number is invalid. All we can do is ignore it.
+    }
+
+//Need to do this to prevent an infinite loop
+    if(memcmp(&oldBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
+    {
+        StabilizationBankSet(&bank);
+    }
+}
+
+static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    StabilizationBankData bank;
+    StabilizationBankGet(&bank);
+
+//this code will be needed if any other modules alter stabilizationbank
+/*
+    StabilizationBankData curBank;
+    if(flight_mode < 0) return;
+
+    switch(cast_struct_to_array(settings.FlightModeMap, settings.FlightModeMap.Stabilized1)[flight_mode])
+    {
+    case 0:
+        StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *) &curBank);
+        if(memcmp(&curBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
+        {
+            StabilizationSettingsBank1Set((StabilizationSettingsBank1Data *) &bank);
+        }
+        break;
+
+    case 1:
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *) &curBank);
+        if(memcmp(&curBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
+        {
+            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *) &bank);
+        }
+        break;
+
+    case 2:
+        StabilizationSettingsBank3Get((StabilizationSettingsBank3Data *) &curBank);
+        if(memcmp(&curBank, &bank, sizeof(StabilizationBankDataPacked)) != 0)
+        {
+            StabilizationSettingsBank3Set((StabilizationSettingsBank3Data *) &bank);
+        }
+        break;
+
+    default:
+        return; //invalid bank number
+    }
+*/
+
+
+    // Set the roll rate PID constants
+    pid_configure(&pids[PID_RATE_ROLL], bank.RollRatePID.Kp,
+                  bank.RollRatePID.Ki,
+                  bank.RollRatePID.Kd,
+                  bank.RollRatePID.ILimit);
+
+    // Set the pitch rate PID constants
+    pid_configure(&pids[PID_RATE_PITCH], bank.PitchRatePID.Kp,
+                  bank.PitchRatePID.Ki,
+                  bank.PitchRatePID.Kd,
+                  bank.PitchRatePID.ILimit);
+
+    // Set the yaw rate PID constants
+    pid_configure(&pids[PID_RATE_YAW], bank.YawRatePID.Kp,
+                  bank.YawRatePID.Ki,
+                  bank.YawRatePID.Kd,
+                  bank.YawRatePID.ILimit);
+
+    // Set the roll attitude PI constants
+    pid_configure(&pids[PID_ROLL], bank.RollPI.Kp,
+                  bank.RollPI.Ki,
+                  0,
+                  bank.RollPI.ILimit);
+
+    // Set the pitch attitude PI constants
+    pid_configure(&pids[PID_PITCH], bank.PitchPI.Kp,
+                  bank.PitchPI.Ki,
+                  0,
+                  bank.PitchPI.ILimit);
+
+    // Set the yaw attitude PI constants
+    pid_configure(&pids[PID_YAW], bank.YawPI.Kp,
+                  bank.YawPI.Ki,
+                  0,
+                  bank.YawPI.ILimit);
+}
+
+
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     StabilizationSettingsGet(&settings);
-
-    // Set the roll rate PID constants
-    pid_configure(&pids[PID_RATE_ROLL], settings.RollRatePID.Kp,
-                  settings.RollRatePID.Ki,
-                  pids[PID_RATE_ROLL].d = settings.RollRatePID.Kd,
-                  pids[PID_RATE_ROLL].iLim = settings.RollRatePID.ILimit);
-
-    // Set the pitch rate PID constants
-    pid_configure(&pids[PID_RATE_PITCH], settings.PitchRatePID.Kp,
-                  pids[PID_RATE_PITCH].i = settings.PitchRatePID.Ki,
-                  pids[PID_RATE_PITCH].d = settings.PitchRatePID.Kd,
-                  pids[PID_RATE_PITCH].iLim = settings.PitchRatePID.ILimit);
-
-    // Set the yaw rate PID constants
-    pid_configure(&pids[PID_RATE_YAW], settings.YawRatePID.Kp,
-                  pids[PID_RATE_YAW].i = settings.YawRatePID.Ki,
-                  pids[PID_RATE_YAW].d = settings.YawRatePID.Kd,
-                  pids[PID_RATE_YAW].iLim = settings.YawRatePID.ILimit);
-
-    // Set the roll attitude PI constants
-    pid_configure(&pids[PID_ROLL], settings.RollPI.Kp,
-                  settings.RollPI.Ki, 0,
-                  pids[PID_ROLL].iLim = settings.RollPI.ILimit);
-
-    // Set the pitch attitude PI constants
-    pid_configure(&pids[PID_PITCH], settings.PitchPI.Kp,
-                  pids[PID_PITCH].i = settings.PitchPI.Ki, 0,
-                  settings.PitchPI.ILimit);
-
-    // Set the yaw attitude PI constants
-    pid_configure(&pids[PID_YAW], settings.YawPI.Kp,
-                  settings.YawPI.Ki, 0,
-                  settings.YawPI.ILimit);
 
     // Set up the derivative term
     pid_configure_derivative(settings.DerivativeCutoff, settings.DerivativeGamma);
@@ -554,6 +665,8 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     // Compute time constant for vbar decay term based on a tau
     vbar_decay = expf(-fakeDt / settings.VbarTau);
+
+    flight_mode = -1; //force flight mode update
 }
 
 

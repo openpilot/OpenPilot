@@ -65,6 +65,7 @@
 #include "nedaccel.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
+#include "stabilizationbank.h"
 #include "systemsettings.h"
 #include "velocitydesired.h"
 #include "velocitystate.h"
@@ -575,7 +576,7 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
     StabilizationDesiredData stabDesired;
     AttitudeStateData attitudeState;
     NedAccelData nedAccel;
-    StabilizationSettingsData stabSettings;
+    StabilizationBankData stabSettings;
     SystemSettingsData systemSettings;
 
     float northError;
@@ -593,7 +594,7 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
     StabilizationDesiredGet(&stabDesired);
     VelocityDesiredGet(&velocityDesired);
     AttitudeStateGet(&attitudeState);
-    StabilizationSettingsGet(&stabSettings);
+    StabilizationBankGet(&stabSettings);
     NedAccelGet(&nedAccel);
 
     float northVel = 0, eastVel = 0, downVel = 0;

@@ -31,7 +31,7 @@ echo "Running macdeployqt from ${QT_DIR}../bin/macdeployqt"
 echo "Qml2Imports = Imports" >> "${APP}/"Contents/Resources/qt.conf
 
 echo "Processing Qt libraries paths in ${APP}"
-for f in "${PLUGINS}/"*.dylib "${OP_PLUGINS}/"*.dylib "${APP}/"Contents/MacOS/QtQuick.2/*.dylib "${APP}/"Contents/MacOS/QtQuick/*/*.dylib
+for f in "${PLUGINS}/"*.dylib "${OP_PLUGINS}/"*.dylib "${APP}/"Contents/Imports/QtQuick.2/*.dylib "${APP}/"Contents/Imports/QtQuick/*/*.dylib
 do
     if [ -f "${f}" ] && [ ! -L "${f}" ]
     then

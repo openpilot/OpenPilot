@@ -77,6 +77,7 @@ macx {
     GCS_APP_TARGET   = "OpenPilot GCS"
     GCS_LIBRARY_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Plugins
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH
+    GCS_QT_QML_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Imports
     GCS_LIBEXEC_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_PATH    = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_BASENAME = Resources

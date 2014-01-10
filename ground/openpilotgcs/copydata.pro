@@ -271,4 +271,30 @@ GCS_LIBRARY_PATH
         QMAKE_EXTRA_TARGETS += data_copy
     }
 
+
+    macx{
+        #NOTE: debug dylib can be copied as they will be cleaned out with packaging scripts
+        #standard plugins directory (will copy just dylib, plugins.qmltypes and qmldir
+        QT_QUICK2_PLUGINS = QtQuick.2 QtQuick/Layouts QtQuick/LocalStorage QtQuick/Particles.2 QtQuick/PrivateWidgets QtQuick/Window.2 QtQuick/XmlListModel
+        #those directories will be fully copied to dest
+        QT_QUICK2_FULL_DIRS = QtQuick/Controls QtQuick/Dialogs
+
+        #create QtQuick dir (that will host all subdirs)
+        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_QML_PATH/QtQuick\") $$addNewline()
+
+        for(dir, QT_QUICK2_FULL_DIRS) {
+            #data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
+            data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
+        }
+
+        for(lib, QT_QUICK2_PLUGINS) {
+            data_copy.commands += $(MKDIR) $$targetPath(\"$$GCS_QT_QML_PATH/$$lib\") $$addNewline()
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_QML]/$$lib/\"*.dylib) $$targetPath(\"$$GCS_QT_QML_PATH/$$lib/\") $$addNewline()
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_QML]/$$lib/plugins.qmltypes\") $$targetPath(\"$$GCS_QT_QML_PATH/$$lib/plugins.qmltypes\") $$addNewline()
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_QML]/$$lib/qmldir\") $$targetPath(\"$$GCS_QT_QML_PATH/$$lib/qmldir\") $$addNewline()
+        }
+
+        data_copy.target = FORCE
+        QMAKE_EXTRA_TARGETS += data_copy
+    }
 }

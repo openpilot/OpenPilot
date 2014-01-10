@@ -332,7 +332,7 @@
     <message>
         <location line="+1"/>
         <source>Error Details</source>
-        <translation>Détails de l&apos;erreur</translation>
+        <translation>Détails de l&apos;Erreur</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -342,18 +342,18 @@
     <message>
         <location line="+15"/>
         <source>Installed Plugins</source>
-        <translation>Modules complémentaires installés</translation>
+        <translation>Modules Complémentaires Installés</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Plugin Details of %1</source>
         <translatorcomment>Détail sur le plugin %1 ?</translatorcomment>
-        <translation>Détails du module complémentaire %1</translation>
+        <translation>Détails du Module Complémentaire %1</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Plugin Errors of %1</source>
-        <translation>Erreurs du module complémentaire %1</translation>
+        <translation>Erreurs du Module Complémentaire %1</translation>
     </message>
 </context>
 <context>
@@ -626,7 +626,7 @@
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.ui"/>
         <source>Inherits QObject</source>
-        <translation>hérite de QObject</translation>
+        <translation>Hérite de QObject</translation>
     </message>
     <message>
         <location/>
@@ -1492,7 +1492,7 @@ Raison : %3</translation>
     <message>
         <location filename="../../../src/libs/utils/detailsbutton.cpp" line="+47"/>
         <source>Show Details</source>
-        <translation>Afficher les détails</translation>
+        <translation>Afficher les Détails</translation>
     </message>
 </context>
 <context>
@@ -1693,7 +1693,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>AttitudeRaw (gyro, accels)</source>
-        <translation type="unfinished"></translation>
+        <translation>AttitudeRaw (gyroscopes, accéléromètres)</translation>
     </message>
     <message>
         <location/>
@@ -3399,7 +3399,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowserfactory.cpp" line="+35"/>
         <source>UAVObject Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Explorateur UAVObject</translation>
     </message>
 </context>
 <context>
@@ -3407,37 +3407,37 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjecttreemodel.cpp" line="+70"/>
         <source>Property</source>
-        <translation type="unfinished">Propriété</translation>
+        <translation>Propriété</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Value</source>
-        <translation type="unfinished">Valeur</translation>
+        <translation>Valeur</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Unit</source>
-        <translation type="unfinished">Unité</translation>
+        <translation>Unité</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Settings</source>
-        <translation type="unfinished">Paramètres</translation>
+        <translation>Paramètres</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Data Objects</source>
-        <translation type="unfinished">Objets Données</translation>
+        <translation>Objets Données</translation>
     </message>
     <message>
         <location line="+74"/>
         <source>Meta Data</source>
-        <translation type="unfinished">Métadonnées</translation>
+        <translation>Métadonnées</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Instance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Exemple</translation>
     </message>
 </context>
 <context>
@@ -3512,7 +3512,7 @@ uniquement lorsque les valeurs changent</translation>
         <location line="+1"/>
         <location line="+1"/>
         <source>ms</source>
-        <translation type="unfinished">ms</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-1"/>
@@ -3551,7 +3551,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location/>
         <source>Dial SVG: </source>
-        <translation>Cadran SVG :</translation>
+        <translation>Cadran SVG : </translation>
     </message>
     <message>
         <location/>
@@ -4312,7 +4312,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>General (Workspace, Key-Bindings)</source>
-        <translation>Général (Espace de Travail, Raccourcis Clavier)</translation>
+        <translation>Généraux (Espace de Travail, Raccourcis Clavier)</translation>
     </message>
     <message>
         <location/>
@@ -4464,7 +4464,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+13"/>
         <source>Unknown compatibility level: </source>
-        <translation>Niveau de compatibilité inconnu :</translation>
+        <translation>Niveau de compatibilité inconnu : </translation>
     </message>
 </context>
 <context>
@@ -5979,7 +5979,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Attitude Calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Calibration Attitude&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Ce panneau sera mis à jour pour vous fournir les contrôles pertinents afin de vous permettre de calibrer votre appareil OpenPilot, en fonction de la carte détectée, une fois que la télémétrie est connectée et en cours d&apos;exécution.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
@@ -8381,7 +8381,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Use actual location</source>
-        <translation>Utiliser position actuelle</translation>
+        <translation>Utiliser la position actuelle</translation>
     </message>
     <message>
         <location/>
@@ -9820,14 +9820,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+250"/>
         <source>Unsaved changes</source>
-        <translatorcomment>Modifications non-sauvegardées</translatorcomment>
-        <translation></translation>
+        <translation>Modifications non-sauvegardées</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The tab you are leaving has unsaved changes,if you proceed they will be lost.Do you still want to proceed?</source>
-        <translatorcomment>L&apos;onglet que vous quittez contient des modifications non-sauvegardées, si vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translatorcomment>
-        <translation></translation>
+        <translation>L&apos;onglet que vous quittez contient des modifications non-sauvegardées, si vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translation>
     </message>
 </context>
 <context>
@@ -10310,7 +10308,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/qmlview/qmlviewgadgetfactory.cpp" line="+36"/>
         <source>QML Viewer, QML</source>
-        <translation type="unfinished">Visionneur QML, QML</translation>
+        <translation>Visionneur QML, QML</translation>
     </message>
 </context>
 <context>
@@ -10632,7 +10630,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+10"/>
         <source>UAVObjects XML files (*.uav);; XML files (*.xml)</source>
-        <translation>Fichiers XML UAVObjects (*.uav;; Fichiers XML (*.xml)</translation>
+        <translation>Fichiers XML UAVObjects (*.uav);; Fichiers XML (*.xml)</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -10678,7 +10676,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+1"/>
         <source>Unable to save settings: </source>
-        <translation>Impossible d&apos;enregistrer les paramètres :</translation>
+        <translation>Impossible d&apos;enregistrer les paramètres : </translation>
     </message>
     <message>
         <location line="+6"/>
@@ -12070,7 +12068,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>PFD SVG: </source>
-        <translation>SVG PFD :</translation>
+        <translation>SVG PFD : </translation>
     </message>
     <message>
         <location/>
@@ -12698,7 +12696,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+2"/>
         <source>Reset to Default Layout</source>
-        <translation>Retour à l&apos;agencement par défaut</translation>
+        <translation>Retour à l&apos;Agencement par Défaut</translation>
     </message>
 </context>
 <context>
@@ -12790,7 +12788,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+7"/>
         <source>Adjust timestamps</source>
-        <translation type="unfinished">Ajuster horodatage</translation>
+        <translation>Ajuster horodatage</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -12810,7 +12808,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/flightlog/flightlogdialog.cpp" line="+45"/>
         <source>Manage flight side logs</source>
-        <translation type="unfinished">Gérer les logs de vol</translation>
+        <translation>Gérer les logs de vol</translation>
     </message>
 </context>
 <context>
@@ -12846,7 +12844,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/flightlog/flightlogplugin.cpp" line="+60"/>
         <source>Manage flight side logs...</source>
-        <translation type="unfinished">Gérer les logs de vol...</translation>
+        <translation>Gérer les logs de vol...</translation>
     </message>
 </context>
 <context>

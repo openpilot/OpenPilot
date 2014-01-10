@@ -25,21 +25,25 @@ echo "Qt library directory is \"${QT_DIR}\""
 
 echo "Running macdeployqt from ${QT_DIR}../bin/macdeployqt"
 
-"${QT_DIR}../bin/macdeployqt" "${APP}" -no-strip
+"${QT_DIR}../bin/macdeployqt" "${APP}" -no-strip -verbose=2
 
 echo "Processing Qt libraries paths in ${APP}"
-for f in "${PLUGINS}/"*.dylib "${OP_PLUGINS}/"*.dylib
+for f in "${PLUGINS}/"*.dylib "${OP_PLUGINS}/"*.dylib "${APP}/"Contents/MacOS/QtQuick.2/*.dylib "${APP}/"Contents/MacOS/QtQuick/*/*.dylib
 do
-    # Only process plain files
-    [ ! -L "${f}" ] && echo "* ${f}" && for g in $QT_LIBS
-    do
+    if [ -f "${f}" ] && [ ! -L "${f}" ]
+    then
+        # Only process plain files
         chmod +w "${f}"
-        install_name_tool -change \
-            "${QT_DIR}${g}.framework/Versions/5/${g}" \
-            @executable_path/../Frameworks/${g}.framework/Versions/5/${g} \
-            "${f}"
+        echo "* ${f}"
+        for g in $QT_LIBS
+        do
+            install_name_tool -change \
+                "${QT_DIR}${g}.framework/Versions/5/${g}" \
+                @executable_path/../Frameworks/${g}.framework/Versions/5/${g} \
+                "${f}"
+        done
         chmod -w "${f}"
-    done
+    fi
 done
 
 echo "Copying SDL"

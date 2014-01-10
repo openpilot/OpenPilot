@@ -40,6 +40,8 @@
 // we have from SPI out of the last line pixel to the next Hsync.
 #define DIRECT_REGISTER_ACCESS
 
+#define VSYNC_REDRAW_CNT 			2
+
 
 #ifdef PIOS_INCLUDE_VIDEO
 
@@ -134,7 +136,6 @@ bool PIOS_Vsync_ISR()
     m_osdLines = gActiveLine;
     gActiveLine = 0;
     Hsync_update = 0;
-    Vsync_update++;
     // if video type has changed set new active values
     if (video_type_act != video_type_tmp) {
         video_type_act = video_type_tmp;
@@ -149,7 +150,8 @@ bool PIOS_Vsync_ISR()
     	dev_cfg->pixel_timer.timer->ARR = pios_video_type_cfg_act->period;
     }
     video_type_tmp = VIDEO_TYPE_NTSC;
-    if (Vsync_update >= 2) {		// every second field: swap buffers and trigger redraw
+    // every VSYNC_REDRAW_CNT field: swap buffers and trigger redraw
+    if (++Vsync_update >= VSYNC_REDRAW_CNT) {
         Vsync_update = 0;
         swap_buffers();
         xHigherPriorityTaskWoken = xSemaphoreGiveFromISR(osdSemaphore, &xHigherPriorityTaskWoken);

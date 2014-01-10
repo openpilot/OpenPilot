@@ -1792,6 +1792,9 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
 #ifdef VERTICAL_SCALE_FILLED_NUMBER
             write_hline_lm(xx + dim.width - 1, xx - arrow_len + i + 1, y - i - 1, 0, 1);
             write_hline_lm(xx + dim.width - 1, xx - arrow_len + i + 1, y + i - 1, 0, 1);
+#else
+            write_hline_lm(xx + dim.width - 1, xx - arrow_len + i + 1, y - i - 1, 0, 0);
+            write_hline_lm(xx + dim.width - 1, xx - arrow_len + i + 1, y + i - 1, 0, 0);
 #endif
         } else {
             write_pixel_lm(xx + arrow_len - i, y - i - 1, 1, 1);
@@ -1799,6 +1802,9 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
 #ifdef VERTICAL_SCALE_FILLED_NUMBER
             write_hline_lm(xx - dim.width - 1, xx + arrow_len - i - 1, y - i - 1, 0, 1);
             write_hline_lm(xx - dim.width - 1, xx + arrow_len - i - 1, y + i - 1, 0, 1);
+#else
+            write_hline_lm(xx - dim.width - 1, xx + arrow_len - i - 1, y - i - 1, 0, 0);
+            write_hline_lm(xx - dim.width - 1, xx + arrow_len - i - 1, y + i - 1, 0, 0);
 #endif
         }
         // FIXME
@@ -1929,6 +1935,8 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
     int rect_width = font_info.width * 3;
 #ifdef COMPASS_FILLED_NUMBER
     write_filled_rectangle_lm(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 1);
+#else
+    write_filled_rectangle_lm(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 0);
 #endif
     write_rectangle_outlined(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 1);
     write_string(headingstr, x + 1, majtick_start + textoffset - 4, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 0);
@@ -1936,6 +1944,8 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
     int rect_width = (font_info.width + 1) * 3 + 2;
 #ifdef COMPASS_FILLED_NUMBER
     write_filled_rectangle_lm(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 1);
+#else
+    write_filled_rectangle_lm(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 0);
 #endif
     write_rectangle_outlined(x - (rect_width / 2), majtick_start + 2, rect_width, font_info.height + 2, 0, 1);
     write_string(headingstr, x + 1, majtick_start + textoffset + 2, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 3);

@@ -55,7 +55,8 @@ endif
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/mapicons/mapicons
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/dials/dials
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/diagrams/diagrams
-
+# Removing leaked files from the dist
+	find debian/openpilot -name Makefile -exec rm -f {} \;
 
 # Build architecture-independent files here.
 binary-indep: install

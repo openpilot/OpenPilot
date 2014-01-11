@@ -76,6 +76,7 @@ private:
     QStackedWidget *m_stackWidget;
     bool m_vertical;
     bool m_iconAbove;
+    static const int LIST_VIEW_WIDTH = 80;
 
 protected:
     void resizeEvent(QResizeEvent * event);

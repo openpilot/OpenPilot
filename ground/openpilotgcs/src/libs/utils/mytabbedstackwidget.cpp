@@ -59,7 +59,7 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
     }
 
     if (m_iconAbove && m_vertical) {
-        m_listWidget->setFixedWidth(80); // this should be computed instead
+        m_listWidget->setFixedWidth(LIST_VIEW_WIDTH); // this should be computed instead
         m_listWidget->setWrapping(false);
     }
 
@@ -137,7 +137,7 @@ void MyTabbedStackWidget::showWidget(int index)
 void MyTabbedStackWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    m_listWidget->setFixedWidth(m_listWidget->verticalScrollBar()->isVisible() ? 100 : 80);
+    m_listWidget->setFixedWidth(m_listWidget->verticalScrollBar()->isVisible() ? LIST_VIEW_WIDTH + 20 : LIST_VIEW_WIDTH);
 }
 
 void MyTabbedStackWidget::insertCornerWidget(int index, QWidget *widget)

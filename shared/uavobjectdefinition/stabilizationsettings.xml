@@ -35,6 +35,14 @@
 
 	<field name="RattitudeAntiWindup" units="" type="uint8" elements="1" defaultvalue="10"/>
 
+	<field name="CruiseControlMinThrottle"         units="%"   type="uint8" elements="1" defaultvalue="5"/>
+	<field name="CruiseControlMaxThrottle"         units="%"   type="uint8" elements="1" defaultvalue="90"/>
+	<field name="CruiseControlMaxAngle"            units="deg" type="uint8" elements="1" defaultvalue="105"/>
+	<field name="CruiseControlMaxPowerFactor"      units="x"   type="float" elements="1" defaultvalue="3.0"/>
+	<field name="CruiseControlPowerTrim"           units="%"   type="float" elements="1" defaultvalue="100.0"/>
+	<field name="CruiseControlInvertedPowerSwitch" units=""    type="int8"  elements="1" defaultvalue="0"/>
+	<field name="CruiseControlNeutralThrust"       units="%"   type="uint8" elements="1" defaultvalue="0"/>
+
 	<field name="LowThrottleZeroIntegral" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
 
 	<field name="LowThrottleZeroAxis" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="FALSE,TRUE" defaultvalue="FALSE,FALSE,FALSE"/>

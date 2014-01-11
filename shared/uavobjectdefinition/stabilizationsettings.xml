@@ -28,6 +28,8 @@
 	<field name="WeakLevelingKp" units="(deg/s)/deg" type="float" elements="1" defaultvalue="0.1"/>
 	<field name="MaxWeakLevelingRate" units="deg/s" type="uint8" elements="1" defaultvalue="5"/>
 
+	<field name="RattitudeAntiWindup" units="" type="uint8" elements="1" defaultvalue="10"/>
+
 	<field name="LowThrottleZeroIntegral" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
 
 	<field name="LowThrottleZeroAxis" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="FALSE,TRUE" defaultvalue="FALSE,FALSE,FALSE"/>

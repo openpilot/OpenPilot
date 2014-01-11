@@ -76,6 +76,9 @@ private:
     QStackedWidget *m_stackWidget;
     bool m_vertical;
     bool m_iconAbove;
+
+protected:
+    void resizeEvent(QResizeEvent * event);
 };
 
 #endif // MYTABBEDSTACKWIDGET_H

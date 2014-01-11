@@ -146,35 +146,54 @@ static void altitudeHoldTask(void)
     float velocityStateDown;
     VelocityStateDownGet(&velocityStateDown);
 
-    // altitude control loop
-    altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, 1.0f, altitudeHoldDesired.Altitude, positionStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
+    switch (altitudeHoldDesired.ThrottleMode) {
+    case ALTITUDEHOLDDESIRED_THROTTLEMODE_ALTITUDE:
+        // altitude control loop
+        altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, 1.0f, altitudeHoldDesired.ThrottleCommand, positionStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
+        break;
+    case ALTITUDEHOLDDESIRED_THROTTLEMODE_VELOCITY:
+        altitudeHoldStatus.VelocityDesired = altitudeHoldDesired.ThrottleCommand;
+        break;
+    default:
+        altitudeHoldStatus.VelocityDesired = 0;
+        break;
+    }
 
     AltitudeHoldStatusSet(&altitudeHoldStatus);
 
-    // velocity control loop
-    float throttle = startThrottle - pid_apply_setpoint(&pid1, 1.0f, altitudeHoldStatus.VelocityDesired, velocityStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
+    float throttle;
+    switch (altitudeHoldDesired.ThrottleMode) {
+    case ALTITUDEHOLDDESIRED_THROTTLEMODE_THROTTLE:
+        throttle = altitudeHoldDesired.ThrottleCommand;
+        break;
+    default:
+        // velocity control loop
+        throttle = startThrottle - pid_apply_setpoint(&pid1, 1.0f, altitudeHoldStatus.VelocityDesired, velocityStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
 
-    // compensate throttle for current attitude
-    // Rbe[2][2] in the rotation matrix is the rotated down component of a
-    // 0,0,1 vector
-    // it is used to scale the throttle, but only up to 4 times the regular
-    // throttle
-    AttitudeStateData attitudeState;
-    AttitudeStateGet(&attitudeState);
-    float Rbe[3][3];
-    Quaternion2R(&attitudeState.q1, Rbe);
-    if (fabsf(Rbe[2][2]) > 0.25f) {
-        throttle /= Rbe[2][2];
-    } else {
-        throttle /= 0.25f;
+        // compensate throttle for current attitude
+        // Rbe[2][2] in the rotation matrix is the rotated down component of a
+        // 0,0,1 vector
+        // it is used to scale the throttle, but only up to 4 times the regular
+        // throttle
+        AttitudeStateData attitudeState;
+        AttitudeStateGet(&attitudeState);
+        float Rbe[3][3];
+        Quaternion2R(&attitudeState.q1, Rbe);
+        if (fabsf(Rbe[2][2]) > 0.25f) {
+            throttle /= Rbe[2][2];
+        } else {
+            throttle /= 0.25f;
+        }
+
+        if (throttle >= 1.0f) {
+            throttle = 1.0f;
+        }
+        if (throttle <= 0.0f) {
+            throttle = 0.0f;
+        }
+        break;
     }
 
-    if (throttle >= 1.0f) {
-        throttle = 1.0f;
-    }
-    if (throttle <= 0.0f) {
-        throttle = 0.0f;
-    }
     StabilizationDesiredData stab;
     StabilizationDesiredGet(&stab);
     stab.Roll     = altitudeHoldDesired.Roll;

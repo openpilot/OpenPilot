@@ -691,26 +691,26 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
     }
 
     stabilization.Roll =
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)          ? cmd->Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)          ? cmd->Roll * stabSettings.ManualRate.Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING)  ? cmd->Roll * stabSettings.ManualRate.Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      ? cmd->Roll * stabSettings.RollMax :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK)      ? cmd->Roll * stabSettings.ManualRate.Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR)    ? cmd->Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE)     ? cmd->Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE)     ? cmd->Roll * stabSettings.ManualRate.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Roll * stabSettings.ManualRate.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ? cmd->Roll * stabSettings.ManualRate.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Roll * stabSettings.ManualRate.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) ? cmd->Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Roll * stabSettings.RollMax :
         0; // this is an invalid mode
 
     stabilization.Pitch =
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)          ? cmd->Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)          ? cmd->Pitch * stabSettings.ManualRate.Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING)  ? cmd->Pitch * stabSettings.ManualRate.Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      ? cmd->Pitch * stabSettings.PitchMax :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK)      ? cmd->Pitch * stabSettings.ManualRate.Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR)    ? cmd->Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE)     ? cmd->Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE)     ? cmd->Pitch * stabSettings.ManualRate.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Pitch * stabSettings.ManualRate.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ? cmd->Pitch * stabSettings.ManualRate.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Pitch * stabSettings.ManualRate.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) ? cmd->Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
         0; // this is an invalid mode
 
@@ -722,18 +722,17 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
     if (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) {
         stabilization.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
         stabilization.Yaw = cmd->Yaw * stabSettings.ManualRate.Yaw;
-    }
-    else {
+    } else {
         stabilization.StabilizationMode.Yaw = stab_settings[2];
         stabilization.Yaw =
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)          ? cmd->Yaw :
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)          ? cmd->Yaw * stabSettings.ManualRate.Yaw :
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING)  ? cmd->Yaw * stabSettings.ManualRate.Yaw :
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      ? cmd->Yaw * stabSettings.YawMax :
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK)      ? cmd->Yaw * stabSettings.ManualRate.Yaw :
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR)    ? cmd->Yaw :
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE)     ? cmd->Yaw :
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE)     ? cmd->Yaw * stabSettings.ManualRate.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Yaw * stabSettings.YawMax :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) ? cmd->Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Yaw * stabSettings.YawMax :
             0; // this is an invalid mode
     }
@@ -850,30 +849,20 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     const float DEADBAND_HIGH = 1.0f / 2 + DEADBAND / 2;
     const float DEADBAND_LOW  = 1.0f / 2 - DEADBAND / 2;
 
-    // Stop updating AltitudeHoldDesired triggering a failsafe condition.
-    if (cmd->Throttle < 0) {
-        return;
-    }
-
     // this is the max speed in m/s at the extents of throttle
     uint8_t throttleRate;
     uint8_t throttleExp;
 
     static uint8_t flightMode;
-    static bool zeroed = false;
+    static bool newaltitude = true;
 
     FlightStatusFlightModeGet(&flightMode);
 
     AltitudeHoldDesiredData altitudeHoldDesiredData;
     AltitudeHoldDesiredGet(&altitudeHoldDesiredData);
 
-    if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
-        throttleExp  = 128;
-        throttleRate = 0;
-    } else {
-        AltitudeHoldSettingsThrottleExpGet(&throttleExp);
-        AltitudeHoldSettingsThrottleRateGet(&throttleRate);
-    }
+    AltitudeHoldSettingsThrottleExpGet(&throttleExp);
+    AltitudeHoldSettingsThrottleRateGet(&throttleRate);
 
     StabilizationSettingsData stabSettings;
     StabilizationSettingsGet(&stabSettings);
@@ -881,33 +870,35 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     PositionStateData posState;
     PositionStateGet(&posState);
 
-
     altitudeHoldDesiredData.Roll  = cmd->Roll * stabSettings.RollMax;
     altitudeHoldDesiredData.Pitch = cmd->Pitch * stabSettings.PitchMax;
     altitudeHoldDesiredData.Yaw   = cmd->Yaw * stabSettings.ManualRate.Yaw;
 
     if (changed) {
-        // After not being in this mode for a while init at current height
-        altitudeHoldDesiredData.Velocity = 0;
-        altitudeHoldDesiredData.Altitude = posState.Down;
-        zeroed = false;
-    } else if (cmd->Throttle > DEADBAND_HIGH && zeroed) {
+        newaltitude = true;
+    }
+
+    uint8_t cutOff;
+    AltitudeHoldSettingsCutThrottleWhenZeroGet(&cutOff);
+    if (cutOff && cmd->Throttle < 0) {
+        // Cut throttle if desired
+        altitudeHoldDesiredData.ThrottleCommand = cmd->Throttle;
+        altitudeHoldDesiredData.ThrottleMode    = ALTITUDEHOLDDESIRED_THROTTLEMODE_THROTTLE;
+        newaltitude = true;
+    } else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO && cmd->Throttle > DEADBAND_HIGH) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
         // then apply an "exp" f(x,k) = (k*x*x*x + (255-k)*x) / 255
-        altitudeHoldDesiredData.Velocity = -((throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - throttleExp) * (cmd->Throttle - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * throttleRate);
-        altitudeHoldDesiredData.Altitude = posState.Down;
-    } else if (cmd->Throttle < DEADBAND_LOW && zeroed) {
-        altitudeHoldDesiredData.Velocity = -(-(throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (255 - throttleExp) * (DEADBAND_LOW - cmd->Throttle) / DEADBAND_LOW) / 255 * throttleRate);
-        altitudeHoldDesiredData.Altitude = posState.Down;
-    } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH && (throttleRate != 0)) {
-        // Require the stick to enter the dead band before they can move height
-        // Vario is not "engaged" when throttleRate == 0
-        if (fabsf(altitudeHoldDesiredData.Velocity) > 1e-3f) {
-            ;
-            altitudeHoldDesiredData.Velocity = 0;
-            altitudeHoldDesiredData.Altitude = posState.Down;
-        }
-        zeroed = true;
+        altitudeHoldDesiredData.ThrottleCommand = -((throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - throttleExp) * (cmd->Throttle - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * throttleRate);
+        altitudeHoldDesiredData.ThrottleMode    = ALTITUDEHOLDDESIRED_THROTTLEMODE_VELOCITY;
+        newaltitude = true;
+    } else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO && cmd->Throttle < DEADBAND_LOW) {
+        altitudeHoldDesiredData.ThrottleCommand = -(-(throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (255 - throttleExp) * (DEADBAND_LOW - cmd->Throttle) / DEADBAND_LOW) / 255 * throttleRate);
+        altitudeHoldDesiredData.ThrottleMode    = ALTITUDEHOLDDESIRED_THROTTLEMODE_VELOCITY;
+        newaltitude = true;
+    } else if (newaltitude == true) {
+        altitudeHoldDesiredData.ThrottleCommand = posState.Down;
+        altitudeHoldDesiredData.ThrottleMode    = ALTITUDEHOLDDESIRED_THROTTLEMODE_ALTITUDE;
+        newaltitude = false;
     }
 
     AltitudeHoldDesiredSet(&altitudeHoldDesiredData);

@@ -47,15 +47,17 @@
 
 // Private constants
 #define STACK_SIZE_BYTES            1024
-#define TASK_PRIORITY               (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY               CALLBACK_TASK_NAVIGATION
 #define MAX_QUEUE_SIZE              2
-#define PATH_PLANNER_UPDATE_RATE_MS 20
+#define PATH_PLANNER_UPDATE_RATE_MS 100 // can be slow, since we listen to status updates as well
 
 // Private types
 
 // Private functions
-static void pathPlannerTask(void *parameters);
-static void updatePathDesired(UAVObjEvent *ev);
+static void pathPlannerTask();
+static void commandUpdated(UAVObjEvent *ev);
+static void statusUpdated(UAVObjEvent *ev);
+static void updatePathDesired();
 static void setWaypoint(uint16_t num);
 
 static uint8_t pathConditionCheck();
@@ -72,7 +74,8 @@ static uint8_t conditionImmediate();
 
 
 // Private variables
-static xTaskHandle taskHandle;
+static DelayedCallbackInfo *pathPlannerHandle;
+static DelayedCallbackInfo *pathDesiredUpdaterHandle;
 static WaypointActiveData waypointActive;
 static WaypointData waypoint;
 static PathActionData pathAction;
@@ -84,11 +87,14 @@ static bool pathplanner_active = false;
  */
 int32_t PathPlannerStart()
 {
-    taskHandle = NULL;
+    // when the active waypoint changes, update pathDesired
+    WaypointConnectCallback(commandUpdated);
+    WaypointActiveConnectCallback(commandUpdated);
+    PathActionConnectCallback(commandUpdated);
+    PathStatusConnectCallback(statusUpdated);
 
-    // Start VM thread
-    xTaskCreate(pathPlannerTask, (signed char *)"PathPlanner", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_PATHPLANNER, taskHandle);
+    // Start main task callback
+    DelayedCallbackDispatch(pathPlannerHandle);
 
     return 0;
 }
@@ -98,8 +104,6 @@ int32_t PathPlannerStart()
  */
 int32_t PathPlannerInitialize()
 {
-    taskHandle = NULL;
-
     FlightPlanInitialize();
     PathActionInitialize();
     PathStatusInitialize();
@@ -110,6 +114,9 @@ int32_t PathPlannerInitialize()
     WaypointInitialize();
     WaypointActiveInitialize();
 
+    pathPlannerHandle = DelayedCallbackCreate(&pathPlannerTask, CALLBACK_PRIORITY_REGULAR, TASK_PRIORITY, STACK_SIZE_BYTES);
+    pathDesiredUpdaterHandle = DelayedCallbackCreate(&updatePathDesired, CALLBACK_PRIORITY_CRITICAL, TASK_PRIORITY, STACK_SIZE_BYTES);
+
     return 0;
 }
 
@@ -118,129 +125,129 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart);
 /**
  * Module task
  */
-static void pathPlannerTask(__attribute__((unused)) void *parameters)
+static void pathPlannerTask()
 {
-    // when the active waypoint changes, update pathDesired
-    WaypointConnectCallback(updatePathDesired);
-    WaypointActiveConnectCallback(updatePathDesired);
-    PathActionConnectCallback(updatePathDesired);
+    DelayedCallbackSchedule(pathPlannerHandle, PATH_PLANNER_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+
+    bool endCondition = false;
 
     FlightStatusData flightStatus;
-    PathDesiredData pathDesired;
+    FlightStatusGet(&flightStatus);
+    if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
+        pathplanner_active = false;
+
+        return;
+    }
+
+    WaypointActiveGet(&waypointActive);
+
+    if (pathplanner_active == false) {
+        pathplanner_active   = true;
+
+        // This triggers callback to update variable
+        waypointActive.Index = 0;
+        WaypointActiveSet(&waypointActive);
+
+        return;
+    }
+
+    WaypointInstGet(waypointActive.Index, &waypoint);
+    PathActionInstGet(waypoint.Action, &pathAction);
     PathStatusData pathStatus;
+    PathStatusGet(&pathStatus);
+    PathDesiredData pathDesired;
+    PathDesiredGet(&pathDesired);
 
-    // Main thread loop
-    bool endCondition = false;
-    while (1) {
-        vTaskDelay(PATH_PLANNER_UPDATE_RATE_MS);
+    // delay next step until path follower has acknowledged the path mode
+    if (pathStatus.UID != pathDesired.UID) {
+        return;
+    }
 
-        FlightStatusGet(&flightStatus);
-        if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
-            pathplanner_active = false;
-            continue;
+    // negative destinations DISABLE this feature
+    if (pathStatus.Status == PATHSTATUS_STATUS_CRITICAL && waypointActive.Index != pathAction.ErrorDestination && pathAction.ErrorDestination >= 0) {
+        setWaypoint(pathAction.ErrorDestination);
+        return;
+    }
+
+    // check if condition has been met
+    endCondition = pathConditionCheck();
+    // decide what to do
+    switch (pathAction.Command) {
+    case PATHACTION_COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
+        endCondition = !endCondition;
+    case PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT:
+        if (endCondition) {
+            setWaypoint(waypointActive.Index + 1);
         }
-
-        WaypointActiveGet(&waypointActive);
-
-        if (pathplanner_active == false) {
-            pathplanner_active   = true;
-
-            // This triggers callback to update variable
-            waypointActive.Index = 0;
-            WaypointActiveSet(&waypointActive);
-
-            continue;
-        }
-
-        WaypointInstGet(waypointActive.Index, &waypoint);
-        PathActionInstGet(waypoint.Action, &pathAction);
-        PathStatusGet(&pathStatus);
-        PathDesiredGet(&pathDesired);
-
-        // delay next step until path follower has acknowledged the path mode
-        if (pathStatus.UID != pathDesired.UID) {
-            continue;
-        }
-
-        // negative destinations DISABLE this feature
-        if (pathStatus.Status == PATHSTATUS_STATUS_CRITICAL && waypointActive.Index != pathAction.ErrorDestination && pathAction.ErrorDestination >= 0) {
-            setWaypoint(pathAction.ErrorDestination);
-            continue;
-        }
-
-        // check if condition has been met
-        endCondition = pathConditionCheck();
-
-        // decide what to do
-        switch (pathAction.Command) {
-        case PATHACTION_COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
-            endCondition = !endCondition;
-        case PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT:
-            if (endCondition) {
-                setWaypoint(waypointActive.Index + 1);
-            }
-            break;
-        case PATHACTION_COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
-            endCondition = !endCondition;
-        case PATHACTION_COMMAND_ONCONDITIONJUMPWAYPOINT:
-            if (endCondition) {
-                if (pathAction.JumpDestination < 0) {
-                    // waypoint ids <0 code relative jumps
-                    setWaypoint(waypointActive.Index - pathAction.JumpDestination);
-                } else {
-                    setWaypoint(pathAction.JumpDestination);
-                }
-            }
-            break;
-        case PATHACTION_COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
-            if (endCondition) {
-                if (pathAction.JumpDestination < 0) {
-                    // waypoint ids <0 code relative jumps
-                    setWaypoint(waypointActive.Index - pathAction.JumpDestination);
-                } else {
-                    setWaypoint(pathAction.JumpDestination);
-                }
+        break;
+    case PATHACTION_COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
+        endCondition = !endCondition;
+    case PATHACTION_COMMAND_ONCONDITIONJUMPWAYPOINT:
+        if (endCondition) {
+            if (pathAction.JumpDestination < 0) {
+                // waypoint ids <0 code relative jumps
+                setWaypoint(waypointActive.Index - pathAction.JumpDestination);
             } else {
-                setWaypoint(waypointActive.Index + 1);
+                setWaypoint(pathAction.JumpDestination);
             }
-            break;
         }
+        break;
+    case PATHACTION_COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
+        if (endCondition) {
+            if (pathAction.JumpDestination < 0) {
+                // waypoint ids <0 code relative jumps
+                setWaypoint(waypointActive.Index - pathAction.JumpDestination);
+            } else {
+                setWaypoint(pathAction.JumpDestination);
+            }
+        } else {
+            setWaypoint(waypointActive.Index + 1);
+        }
+        break;
     }
 }
 
+// callback function when status changed, issue execution of state machine
+void commandUpdated(__attribute__((unused)) UAVObjEvent *ev)
+{
+    DelayedCallbackDispatch(pathDesiredUpdaterHandle);
+}
+
 // callback function when waypoints changed in any way, update pathDesired
-void updatePathDesired(__attribute__((unused)) UAVObjEvent *ev)
+void statusUpdated(__attribute__((unused)) UAVObjEvent *ev)
+{
+    DelayedCallbackDispatch(pathPlannerHandle);
+}
+
+
+// callback function when waypoints changed in any way, update pathDesired
+void updatePathDesired()
 {
     // only ever touch pathDesired if pathplanner is enabled
     if (!pathplanner_active) {
         return;
     }
 
-    // use local variables, dont use stack since this is huge and a callback,
-    // dont use the globals because we cant use mutexes here
-    static WaypointActiveData waypointActiveData;
-    static PathActionData pathActionData;
-    static WaypointData waypointData;
-    static PathDesiredData pathDesired;
+    PathDesiredData pathDesired;
 
     // find out current waypoint
-    WaypointActiveGet(&waypointActiveData);
+    WaypointActiveGet(&waypointActive);
 
-    WaypointInstGet(waypointActiveData.Index, &waypointData);
-    PathActionInstGet(waypointData.Action, &pathActionData);
+    WaypointInstGet(waypointActive.Index, &waypoint);
+    PathActionInstGet(waypoint.Action, &pathAction);
 
-    pathDesired.End.North = waypointData.Position.North;
-    pathDesired.End.East  = waypointData.Position.East;
-    pathDesired.End.Down  = waypointData.Position.Down;
-    pathDesired.EndingVelocity    = waypointData.Velocity;
-    pathDesired.Mode = pathActionData.Mode;
-    pathDesired.ModeParameters[0] = pathActionData.ModeParameters[0];
-    pathDesired.ModeParameters[1] = pathActionData.ModeParameters[1];
-    pathDesired.ModeParameters[2] = pathActionData.ModeParameters[2];
-    pathDesired.ModeParameters[3] = pathActionData.ModeParameters[3];
-    pathDesired.UID = waypointActiveData.Index;
+    pathDesired.End.North = waypoint.Position.North;
+    pathDesired.End.East  = waypoint.Position.East;
+    pathDesired.End.Down  = waypoint.Position.Down;
+    pathDesired.EndingVelocity    = waypoint.Velocity;
+    pathDesired.Mode = pathAction.Mode;
+    pathDesired.ModeParameters[0] = pathAction.ModeParameters[0];
+    pathDesired.ModeParameters[1] = pathAction.ModeParameters[1];
+    pathDesired.ModeParameters[2] = pathAction.ModeParameters[2];
+    pathDesired.ModeParameters[3] = pathAction.ModeParameters[3];
+    pathDesired.UID = waypointActive.Index;
 
-    if (waypointActiveData.Index == 0) {
+    if (waypointActive.Index == 0) {
         PositionStateData positionState;
         PositionStateGet(&positionState);
         // First waypoint has itself as start point (used to be home position but that proved dangerous when looping)

@@ -690,46 +690,53 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
         return;
     }
 
+    stabilization.Roll =
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)          ? cmd->Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)          ? cmd->Roll * stabSettings.ManualRate.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING)  ? cmd->Roll * stabSettings.ManualRate.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      ? cmd->Roll * stabSettings.RollMax :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK)      ? cmd->Roll * stabSettings.ManualRate.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR)    ? cmd->Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE)     ? cmd->Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE)     ? cmd->Roll * stabSettings.ManualRate.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Roll * stabSettings.RollMax :
+        0; // this is an invalid mode
+
+    stabilization.Pitch =
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)          ? cmd->Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)          ? cmd->Pitch * stabSettings.ManualRate.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING)  ? cmd->Pitch * stabSettings.ManualRate.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      ? cmd->Pitch * stabSettings.PitchMax :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK)      ? cmd->Pitch * stabSettings.ManualRate.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR)    ? cmd->Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE)     ? cmd->Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE)     ? cmd->Pitch * stabSettings.ManualRate.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
+        0; // this is an invalid mode
+
     // TOOD: Add assumption about order of stabilization desired and manual control stabilization mode fields having same order
     stabilization.StabilizationMode.Roll  = stab_settings[0];
     stabilization.StabilizationMode.Pitch = stab_settings[1];
-    stabilization.StabilizationMode.Yaw   = stab_settings[2];
-
-    stabilization.Roll =
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Roll * stabSettings.ManualRate.Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ?
-        cmd->Roll * stabSettings.ManualRate.Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Roll * stabSettings.ManualRate.Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ?
-        cmd->Roll * stabSettings.ManualRate.Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Roll * stabSettings.RollMax : 0; // this is an invalid mode
-    ;
-    stabilization.Pitch =
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Pitch * stabSettings.ManualRate.Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ?
-        cmd->Pitch * stabSettings.ManualRate.Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ?
-        cmd->Pitch * stabSettings.ManualRate.Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ?
-        cmd->Pitch * stabSettings.ManualRate.Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Pitch * stabSettings.PitchMax : 0; // this is an invalid mode
-
-    stabilization.Yaw =
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Yaw :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ?
-        cmd->Yaw * stabSettings.ManualRate.Yaw :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Yaw * stabSettings.YawMax :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Yaw :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd->Yaw * stabSettings.ManualRate.Yaw :
-        (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Yaw * stabSettings.YawMax : 0; // this is an invalid mode
+    // Other axes (yaw) cannot be Rattitude, so use Rate
+    // Should really do this for Attitude mode as well?
+    if (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) {
+        stabilization.StabilizationMode.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
+        stabilization.Yaw = cmd->Yaw * stabSettings.ManualRate.Yaw;
+    }
+    else {
+        stabilization.StabilizationMode.Yaw = stab_settings[2];
+        stabilization.Yaw =
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)          ? cmd->Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)          ? cmd->Yaw * stabSettings.ManualRate.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING)  ? cmd->Yaw * stabSettings.ManualRate.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      ? cmd->Yaw * stabSettings.YawMax :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK)      ? cmd->Yaw * stabSettings.ManualRate.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR)    ? cmd->Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE)     ? cmd->Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE)     ? cmd->Yaw * stabSettings.ManualRate.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd->Yaw * stabSettings.YawMax :
+            0; // this is an invalid mode
+    }
 
     stabilization.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle;
     StabilizationDesiredSet(&stabilization);

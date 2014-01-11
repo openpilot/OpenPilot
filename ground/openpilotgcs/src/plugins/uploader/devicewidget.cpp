@@ -41,8 +41,7 @@ DeviceWidget::DeviceWidget(QWidget *parent) :
     connect(myDevice->updateButton, SIGNAL(clicked()), this, SLOT(uploadFirmware()));
     connect(myDevice->pbLoad, SIGNAL(clicked()), this, SLOT(loadFirmware()));
     connect(myDevice->confirmCheckBox, SIGNAL(stateChanged(int)), this, SLOT(confirmCB(int)));
-    QPixmap pix = QPixmap(QString(":uploader/images/view-refresh.svg"));
-    myDevice->statusIcon->setPixmap(pix);
+    myDevice->statusIcon->setPixmap(QPixmap(":uploader/images/view-refresh.svg"));
 
     myDevice->lblCertified->setText("");
 }
@@ -79,12 +78,12 @@ void DeviceWidget::populate()
 {
     int id = m_dfu->devices[deviceID].ID;
 
-    myDevice->lbldevID->setText(QString("Device ID: ") + QString::number(id, 16));
+    myDevice->lbldevID->setText(tr("Device ID: ") + QString::number(id, 16));
     // DeviceID tells us what sort of HW we have detected:
     // display a nice icon:
     myDevice->gVDevice->scene()->clear();
     myDevice->lblDevName->setText(deviceDescriptorStruct::idToBoardName(id));
-    myDevice->lblHWRev->setText(QString(tr("HW Revision: ")) + QString::number(id & 0x00FF, 16));
+    myDevice->lblHWRev->setText(tr("HW Revision: ") + QString::number(id & 0x00FF, 16));
 
     switch (id) {
     case 0x0101:
@@ -115,25 +114,23 @@ void DeviceWidget::populate()
     bool r = m_dfu->devices[deviceID].Readable;
     bool w = m_dfu->devices[deviceID].Writable;
 
-    myDevice->lblAccess->setText(QString("Flash access: ") + QString(r ? "R" : "-") + QString(w ? "W" : "-"));
-    myDevice->lblMaxCode->setText(QString("Max code size: ") + QString::number(m_dfu->devices[deviceID].SizeOfCode));
+    myDevice->lblAccess->setText(tr("Flash access: ") + QString(r ? "R" : "-") + QString(w ? "W" : "-"));
+    myDevice->lblMaxCode->setText(tr("Max code size: ") + QString::number(m_dfu->devices[deviceID].SizeOfCode));
     myDevice->lblCRC->setText(QString::number(m_dfu->devices[deviceID].FW_CRC));
-    myDevice->lblBLVer->setText(QString("BL version: ") + QString::number(m_dfu->devices[deviceID].BL_Version));
+    myDevice->lblBLVer->setText(tr("BL version: ") + QString::number(m_dfu->devices[deviceID].BL_Version));
     int size = ((OP_DFU::device)m_dfu->devices[deviceID]).SizeOfDesc;
     m_dfu->enterDFU(deviceID);
     QByteArray desc = m_dfu->DownloadDescriptionAsBA(size);
 
     if (!populateBoardStructuredDescription(desc)) {
-        // TODO
         // desc was not a structured description
         QString str = m_dfu->DownloadDescription(size);
-        myDevice->lblDescription->setText(QString("Firmware custom description: ") + str.left(str.indexOf(QChar(255))));
-        QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
-        myDevice->lblCertified->setPixmap(pix);
+        myDevice->lblDescription->setText((!str.isEmpty()) ? str : tr("Unknown"));
+        myDevice->lblCertified->setPixmap(QPixmap(":uploader/images/warning.svg"));
         myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
-        myDevice->lblBuildDate->setText("Warning: development firmware");
-        myDevice->lblGitTag->setText("");
-        myDevice->lblBrdName->setText("");
+        myDevice->lblBuildDate->setText(tr("Unknown"));
+        myDevice->lblGitTag->setText(tr("Unknown"));
+        myDevice->lblBrdName->setText(tr("Unknown"));
     }
 
     status("Ready...", STATUSICON_INFO);
@@ -179,13 +176,11 @@ bool DeviceWidget::populateBoardStructuredDescription(QByteArray desc)
         myDevice->lblBuildDate->setText(onBoardDescription.gitDate.insert(4, "-").insert(7, "-"));
         if (onBoardDescription.gitTag.startsWith("RELEASE", Qt::CaseSensitive)) {
             myDevice->lblDescription->setText(onBoardDescription.gitTag);
-            QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
-            myDevice->lblCertified->setPixmap(pix);
+            myDevice->lblCertified->setPixmap(QPixmap(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
         } else {
             myDevice->lblDescription->setText(onBoardDescription.gitTag);
-            QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
-            myDevice->lblCertified->setPixmap(pix);
+            myDevice->lblCertified->setPixmap(QPixmap(":uploader/images/warning.svg"));
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
 
@@ -205,14 +200,12 @@ bool DeviceWidget::populateLoadedStructuredDescription(QByteArray desc)
         if (LoadedDescription.gitTag.startsWith("RELEASE", Qt::CaseSensitive)) {
             myDevice->lblDescritpionL->setText(LoadedDescription.gitTag);
             myDevice->description->setText(LoadedDescription.gitTag);
-            QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
-            myDevice->lblCertifiedL->setPixmap(pix);
+            myDevice->lblCertifiedL->setPixmap(QPixmap(":uploader/images/application-certificate.svg"));
             myDevice->lblCertifiedL->setToolTip(tr("Tagged officially released firmware build"));
         } else {
             myDevice->lblDescritpionL->setText(LoadedDescription.gitTag);
             myDevice->description->setText(LoadedDescription.gitTag);
-            QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
-            myDevice->lblCertifiedL->setPixmap(pix);
+            myDevice->lblCertifiedL->setPixmap(QPixmap(":uploader/images/warning.svg"));
             myDevice->lblCertifiedL->setToolTip(tr("Untagged or custom firmware build"));
         }
         myDevice->lblBrdNameL->setText(deviceDescriptorStruct::idToBoardName(LoadedDescription.boardType << 8 | LoadedDescription.boardRevision));

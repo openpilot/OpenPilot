@@ -301,6 +301,14 @@ QByteArray UAVObjectUtilManager::getBoardDescription()
     return ret;
 }
 
+QString UAVObjectUtilManager::getBoardDescriptionString()
+{
+    QByteArray arr = getBoardDescription();
+
+    int index = arr.indexOf(255);
+
+    return QString((index == -1) ? arr : arr.left(index));
+}
 
 // ******************************
 // HomeLocation
@@ -474,5 +482,3 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
     }
     return false;
 }
-
-// ******************************

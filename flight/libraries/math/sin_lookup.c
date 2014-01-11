@@ -105,8 +105,12 @@ float sin_lookup_deg(float angle)
         return 0;
     }
 
-    int i_ang = ((int32_t)angle) % 360;
-    if (i_ang >= 180) { // for 180 to 360 deg
+    // 1073741760 is a multiple of 360 that is close to 0x3fffffff
+    // so angle can be a very large number of positive or negative rotations
+    // we could halve the lookup table size
+    // we could interpolate for greater accuracy
+    int i_ang = ((int32_t)(angle + 0.5f) + (int32_t)1073741760) % 360;
+    if (i_ang >= 180) { // for 180 to 359 deg
         return -sin_table[i_ang - 180];
     } else { // for 0 to 179 deg
         return sin_table[i_ang];

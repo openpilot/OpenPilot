@@ -41,7 +41,7 @@
 #include "velocitystate.h"
 #include "waypoint.h"
 #include "waypointactive.h"
-#include "taskinfo.h"
+#include "manualcontrolsettings.h"
 #include <pios_struct_helper.h>
 #include "paths.h"
 
@@ -60,6 +60,7 @@ static void statusUpdated(UAVObjEvent *ev);
 static void updatePathDesired();
 static void setWaypoint(uint16_t num);
 
+static uint8_t checkFlightPlan();
 static uint8_t pathConditionCheck();
 static uint8_t conditionNone();
 static uint8_t conditionTimeOut();
@@ -131,6 +132,15 @@ static void pathPlannerTask()
 
     bool endCondition = false;
 
+    // check flight plan validity early to raise alarm
+    // even if not in guided mode
+    uint8_t validFlightPlan = checkFlightPlan();
+    if (!validFlightPlan) {
+        AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_ERROR);
+    } else {
+        AlarmsClear(SYSTEMALARMS_ALARM_PATHPLAN);
+    }
+
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);
     if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
@@ -138,6 +148,38 @@ static void pathPlannerTask()
 
         return;
     }
+
+    PathDesiredData pathDesired;
+    PathDesiredGet(&pathDesired);
+
+    static uint8_t failsafeRTHset = 0;
+    if (!validFlightPlan) {
+        // At this point the craft is in PathPlanner mode, so pilot has no manual control capability.
+        // Failsafe: behave as if in return to base mode
+        // what to do in this case is debatable, it might be better to just make a forced disarming but rth has a higher chance of survival when in flight.
+        pathplanner_active = false;
+
+        if (!failsafeRTHset) {
+            failsafeRTHset = 1;
+            // copy pasta: same calculation as in manualcontrol, set return to home coordinates
+            PositionStateData positionState;
+            PositionStateGet(&positionState);
+            ManualControlSettingsData settings;
+            ManualControlSettingsGet(&settings);
+
+            pathDesired.Start.North      = 0;
+            pathDesired.Start.East       = 0;
+            pathDesired.Start.Down       = positionState.Down - settings.ReturnToHomeAltitudeOffset;
+            pathDesired.End.North        = 0;
+            pathDesired.End.East         = 0;
+            pathDesired.End.Down         = positionState.Down - settings.ReturnToHomeAltitudeOffset;
+            pathDesired.StartingVelocity = 1;
+            pathDesired.EndingVelocity   = 0;
+            pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+            PathDesiredSet(&pathDesired);
+        }
+    }
+    failsafeRTHset = 0;
 
     WaypointActiveGet(&waypointActive);
 
@@ -155,8 +197,6 @@ static void pathPlannerTask()
     PathActionInstGet(waypoint.Action, &pathAction);
     PathStatusData pathStatus;
     PathStatusGet(&pathStatus);
-    PathDesiredData pathDesired;
-    PathDesiredGet(&pathDesired);
 
     // delay next step until path follower has acknowledged the path mode
     if (pathStatus.UID != pathDesired.UID) {
@@ -205,6 +245,49 @@ static void pathPlannerTask()
         }
         break;
     }
+}
+
+// safety check for path plan integrity
+static uint8_t checkFlightPlan()
+{
+    uint16_t i;
+    uint16_t waypointCount;
+    uint16_t actionCount;
+    uint8_t flightCrc;
+    FlightPlanData flightPlan;
+
+    FlightPlanGet(&flightPlan);
+
+    waypointCount = flightPlan.WaypointCount;
+    actionCount   = flightPlan.PathActionCount;
+
+    // check count consistency
+    if (waypointCount > UAVObjGetNumInstances(WaypointHandle())) {
+        PIOS_DEBUGLOG_Printf("FlighPlan : waypoint count error!");
+        return false;
+    }
+    if (actionCount > UAVObjGetNumInstances(PathActionHandle())) {
+        PIOS_DEBUGLOG_Printf("FlighPlan : path action count error!");
+        return false;
+    }
+
+    // check CRC
+    flightCrc = 0;
+    for (i = 0; i < waypointCount; i++) {
+        flightCrc = UAVObjUpdateCRC(WaypointHandle(), i, flightCrc);
+    }
+    for (i = 0; i < actionCount; i++) {
+        flightCrc = UAVObjUpdateCRC(PathActionHandle(), i, flightCrc);
+    }
+    if (flightCrc != flightPlan.Crc) {
+        PIOS_DEBUGLOG_Printf("FlighPlan : bad CRC (%d / %d)!", flightCrc, flightPlan.Crc);
+        return false;
+    }
+
+    // everything ok (hopefully...)
+    PIOS_DEBUGLOG_Printf("FlighPlan : passed consistency check.", flightCrc, flightPlan.Crc);
+
+    return true;
 }
 
 // callback function when status changed, issue execution of state machine

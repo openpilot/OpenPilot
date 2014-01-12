@@ -42,7 +42,7 @@ void ModelUavoProxy::sendFlightPlan()
 {
     modelToObjects();
 
-    FlightPlanInfo *flightPlan = FlightPlanInfo::GetInstance(objMngr, 0);
+    FlightPlan *flightPlan = FlightPlan::GetInstance(objMngr, 0);
     connect(flightPlan, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementSent(UAVObject *, bool)));
 
     Waypoint *waypoint = Waypoint::GetInstance(objMngr, 0);
@@ -81,7 +81,7 @@ void ModelUavoProxy::flightPlanElementSent(UAVObject *obj, bool success)
 
 void ModelUavoProxy::receiveFlightPlan()
 {
-    FlightPlanInfo *flightPlan = FlightPlanInfo::GetInstance(objMngr, 0);
+    FlightPlan *flightPlan = FlightPlan::GetInstance(objMngr, 0);
     connect(flightPlan, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementReceived(UAVObject *, bool)));
 
     Waypoint *waypoint = Waypoint::GetInstance(objMngr, 0);
@@ -199,9 +199,9 @@ void ModelUavoProxy::modelToObjects()
         }
     }
 
-    // Update FlightPlanInfo
-    FlightPlanInfo *flightPlan = FlightPlanInfo::GetInstance(objMngr);
-    FlightPlanInfo::DataFields flightPlanData = flightPlan->getData();
+    // Update FlightPlan
+    FlightPlan *flightPlan = FlightPlan::GetInstance(objMngr);
+    FlightPlan::DataFields flightPlanData = flightPlan->getData();
 
     flightPlanData.WaypointCount = waypointCount;
     flightPlanData.PathActionCount = actionCount;
@@ -293,8 +293,8 @@ void ModelUavoProxy::objectsToModel()
     // the list of objects can end with "garbage" instances due to previous flightpath
     // they need to be ignored
 
-    FlightPlanInfo *flightPlan = FlightPlanInfo::GetInstance(objMngr);
-    FlightPlanInfo::DataFields flightPlanData = flightPlan->getData();
+    FlightPlan *flightPlan = FlightPlan::GetInstance(objMngr);
+    FlightPlan::DataFields flightPlanData = flightPlan->getData();
 
     int waypointCount = flightPlanData.WaypointCount;
 

@@ -31,7 +31,7 @@
 
 #include "openpilot.h"
 
-#include "flightplaninfo.h"
+#include "flightplan.h"
 #include "flightstatus.h"
 #include "airspeedstate.h"
 #include "pathaction.h"
@@ -100,7 +100,7 @@ int32_t PathPlannerInitialize()
 {
     taskHandle = NULL;
 
-    FlightPlanInfoInitialize();
+    FlightPlanInitialize();
     PathActionInitialize();
     PathStatusInitialize();
     PathDesiredInitialize();
@@ -269,6 +269,8 @@ void updatePathDesired(__attribute__((unused)) UAVObjEvent *ev)
 static void setWaypoint(uint16_t num)
 {
     // path plans wrap around
+
+    // TODO change to FlightPlan.WaypointCount
     if (num >= UAVObjGetNumInstances(WaypointHandle())) {
         num = 0;
     }
@@ -277,10 +279,10 @@ static void setWaypoint(uint16_t num)
     WaypointActiveSet(&waypointActive);
 }
 
-// execute the apropriate condition and report result
+// execute the appropriate condition and report result
 static uint8_t pathConditionCheck()
 {
-    // i thought about a lookup table, but a switch is saver considering there could be invalid EndCondition ID's
+    // i thought about a lookup table, but a switch is safer considering there could be invalid EndCondition ID's
     switch (pathAction.EndCondition) {
     case PATHACTION_ENDCONDITION_NONE:
         return conditionNone();

@@ -1,10 +1,13 @@
 TEMPLATE = lib
 TARGET = UAVObjects
+
 DEFINES += UAVOBJECTS_LIBRARY
+
 include(../../openpilotgcsplugin.pri)
 include(uavobjects_dependencies.pri)
 
-HEADERS += uavobjects_global.h \
+HEADERS += \
+    uavobjects_global.h \
     uavobject.h \
     uavmetaobject.h \
     uavobjectmanager.h \
@@ -14,7 +17,8 @@ HEADERS += uavobjects_global.h \
     uavobjectsplugin.h \
     uavobjecthelper.h
 
-SOURCES += uavobject.cpp \
+SOURCES += \
+    uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
     uavdataobject.cpp \
@@ -25,7 +29,8 @@ SOURCES += uavobject.cpp \
 OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
-HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
+HEADERS += \
+    $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/barosensor.h \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.h \
     $$UAVOBJECT_SYNTHETICS/airspeedsettings.h \
@@ -92,7 +97,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/i2cstats.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterysettings.h \
     $$UAVOBJECT_SYNTHETICS/taskinfo.h \
-    $$UAVOBJECT_SYNTHETICS/flightplaninfo.h \
+    $$UAVOBJECT_SYNTHETICS/flightplan.h \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.h \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.h \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.h \
@@ -118,7 +123,8 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/waypointactive.h \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h
 
-SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
+SOURCES += \
+    $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/barosensor.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedsettings.cpp \
@@ -185,7 +191,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/i2cstats.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterysettings.cpp \
     $$UAVOBJECT_SYNTHETICS/taskinfo.cpp \
-    $$UAVOBJECT_SYNTHETICS/flightplaninfo.cpp \
+    $$UAVOBJECT_SYNTHETICS/flightplan.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.cpp \

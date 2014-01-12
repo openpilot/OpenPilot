@@ -29,7 +29,7 @@
 
 #include "flightdatamodel.h"
 
-#include "flightplaninfo.h"
+#include "flightplan.h"
 #include "pathaction.h"
 #include "waypoint.h"
 

@@ -171,17 +171,14 @@ struct UAVOMulti {
 /** all information about instances are dependant on object type **/
 #define ObjSingleInstanceDataOffset(obj) ((void *)(&(((struct UAVOSingle *)obj)->instance0)))
 #define InstanceDataOffset(inst)         ((void *)&(((struct UAVOMultiInst *)inst)->instance))
-#define InstanceData(instance)           (void *)instance
+#define InstanceData(instance)           ((void *)instance)
 
 // Private functions
-static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId,
-                         UAVObjEventType event);
+static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType event);
 static InstanceHandle createInstance(struct UAVOData *obj, uint16_t instId);
 static InstanceHandle getInstance(struct UAVOData *obj, uint16_t instId);
-static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue,
-                          UAVObjEventCallback cb, uint8_t eventMask);
-static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue,
-                             UAVObjEventCallback cb);
+static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue, UAVObjEventCallback cb, uint8_t eventMask);
+static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue, UAVObjEventCallback cb);
 static void instanceAutoUpdated(UAVObjHandle obj_handle, uint16_t instId);
 
 // Private variables
@@ -615,8 +612,7 @@ bool UAVObjIsSettings(UAVObjHandle obj_handle)
  * \param[in] dataIn The byte array
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjUnpack(UAVObjHandle obj_handle, uint16_t instId,
-                     const uint8_t *dataIn)
+int32_t UAVObjUnpack(UAVObjHandle obj_handle, uint16_t instId, const uint8_t *dataIn)
 {
     PIOS_Assert(obj_handle);
 
@@ -704,6 +700,45 @@ unlock_exit:
     return rc;
 }
 
+/**
+ * Update a CRC with an object data
+ * \param[in] obj The object handle
+ * \param[in] instId The instance ID
+ * \param[in] crc The crc to update
+ * \return the updated crc
+ */
+uint8_t UAVObjUpdateCRC(UAVObjHandle obj_handle, uint16_t instId, uint8_t crc)
+{
+    PIOS_Assert(obj_handle);
+
+    // Lock
+    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+    if (UAVObjIsMetaobject(obj_handle)) {
+        if (instId != 0) {
+            goto unlock_exit;
+        }
+        // TODO
+    } else {
+        struct UAVOData *obj;
+        InstanceHandle instEntry;
+
+        // Cast handle to object
+        obj = (struct UAVOData *)obj_handle;
+
+        // Get the instance
+        instEntry = getInstance(obj, instId);
+        if (instEntry == NULL) {
+            goto unlock_exit;
+        }
+        // Update crc
+        crc = PIOS_CRC_updateCRC(crc, (uint8_t *) InstanceData(instEntry), (int32_t) obj->instance_size);
+    }
+
+unlock_exit:
+    xSemaphoreGiveRecursive(mutex);
+    return crc;
+}
 
 /**
  * Actually write the object's data to the logfile

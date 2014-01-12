@@ -160,6 +160,7 @@ bool UAVObjIsMetaobject(UAVObjHandle obj);
 bool UAVObjIsSettings(UAVObjHandle obj);
 int32_t UAVObjUnpack(UAVObjHandle obj_handle, uint16_t instId, const uint8_t *dataIn);
 int32_t UAVObjPack(UAVObjHandle obj_handle, uint16_t instId, uint8_t *dataOut);
+uint8_t UAVObjUpdateCRC(UAVObjHandle obj_handle, uint16_t instId, uint8_t crc);
 int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId);

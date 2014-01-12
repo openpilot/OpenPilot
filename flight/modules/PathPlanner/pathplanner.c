@@ -268,10 +268,13 @@ void updatePathDesired(__attribute__((unused)) UAVObjEvent *ev)
 // helper function to go to a specific waypoint
 static void setWaypoint(uint16_t num)
 {
-    // path plans wrap around
+    FlightPlanData flightPlan;
 
-    // TODO change to FlightPlan.WaypointCount
-    if (num >= UAVObjGetNumInstances(WaypointHandle())) {
+    FlightPlanGet(&flightPlan);
+
+    // here it is assumed that the flight plan has been validated (waypoint count is consistent)
+    if (num >= flightPlan.WaypointCount) {
+        // path plans wrap around
         num = 0;
     }
 

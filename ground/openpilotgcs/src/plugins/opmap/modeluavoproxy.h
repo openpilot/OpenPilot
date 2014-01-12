@@ -49,11 +49,11 @@ private:
     UAVObjectManager *objMngr;
     flightDataModel *myModel;
 
-    uint completionCount;
-    uint completionSuccessCount;
+    uint completionCountdown;
+    uint successCountdown;
 
-    void modelToObjects();
-    void objectsToModel();
+    bool modelToObjects();
+    bool objectsToModel();
 
     Waypoint *createWaypoint(int index, Waypoint *newWaypoint);
     PathAction *createPathAction(int index, PathAction *newAction);
@@ -66,10 +66,11 @@ private:
     void waypointToModel(int i, Waypoint::DataFields &data);
     void pathActionToModel(int i, PathAction::DataFields &data);
 
+    quint8 computeFlightPlanCrc(int waypointCount, int actionCount);
+
 private slots:
     void flightPlanElementSent(UAVObject *, bool success);
     void flightPlanElementReceived(UAVObject *, bool success);
-
 };
 
 #endif // MODELUAVOPROXY_H

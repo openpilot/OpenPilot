@@ -36,6 +36,9 @@ ModelUavoProxy::ModelUavoProxy(QObject *parent, flightDataModel *model) : QObjec
 
     objMngr    = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objMngr != NULL);
+
+    completionCountdown = 0;
+    successCountdown = 0;
 }
 
 void ModelUavoProxy::sendFlightPlan()
@@ -43,16 +46,20 @@ void ModelUavoProxy::sendFlightPlan()
     modelToObjects();
 
     FlightPlan *flightPlan = FlightPlan::GetInstance(objMngr, 0);
-    connect(flightPlan, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementSent(UAVObject *, bool)));
+    connect(flightPlan, SIGNAL(transactionCompleted(UAVObject *, bool)),
+            this, SLOT(flightPlanElementSent(UAVObject *, bool)), Qt::UniqueConnection);
 
     Waypoint *waypoint = Waypoint::GetInstance(objMngr, 0);
-    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementSent(UAVObject *, bool)));
+    connect(waypoint, SIGNAL(transactionCompleted(UAVObject *, bool)),
+            this, SLOT(flightPlanElementSent(UAVObject *, bool)), Qt::UniqueConnection);
 
     PathAction *action = PathAction::GetInstance(objMngr, 0);
-    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementSent(UAVObject *, bool)));
+    connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)),
+            this, SLOT(flightPlanElementSent(UAVObject *, bool)), Qt::UniqueConnection);
 
-    completionCount = 0;
-    completionSuccessCount = 0;
+    // we will start 3 update all
+    completionCountdown = 3;
+    successCountdown = completionCountdown;
 
     flightPlan->updated();
     waypoint->updatedAll();
@@ -63,18 +70,16 @@ void ModelUavoProxy::flightPlanElementSent(UAVObject *obj, bool success)
 {
     obj->disconnect(this);
 
-    completionCount++;
-    if (success) {
-        completionSuccessCount++;
-    }
+    completionCountdown--;
+    successCountdown -= success ? 1 : 0;
 
-    if (completionCount == 3) {
-        qDebug() << "ModelUavoProxy::flightPlanSent - completed" << (completionSuccessCount == 3);
-        if (completionSuccessCount == 3) {
+    if (completionCountdown == 0) {
+        qDebug() << "ModelUavoProxy::flightPlanSent - completed" << (successCountdown == 0);
+        if (successCountdown == 0) {
             QMessageBox::information(NULL, tr("Flight Plan Upload Successful"), tr("Flight plan upload was successful."));
         }
         else {
-            QMessageBox::critical(NULL, tr("Flight Plan Upload Failed !"), tr("Failed to upload the flight plan !"));
+            QMessageBox::critical(NULL, tr("Flight Plan Upload Failed"), tr("Failed to upload the flight plan !"));
         }
     }
 }
@@ -90,8 +95,9 @@ void ModelUavoProxy::receiveFlightPlan()
     PathAction *action = PathAction::GetInstance(objMngr, 0);
     connect(action, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(flightPlanElementReceived(UAVObject *, bool)));
 
-    completionCount = 0;
-    completionSuccessCount = 0;
+    // we will start 3 update requests
+    completionCountdown = 3;
+    successCountdown = completionCountdown;
 
     flightPlan->requestUpdate();
     waypoint->requestUpdateAll();
@@ -102,19 +108,18 @@ void ModelUavoProxy::flightPlanElementReceived(UAVObject *obj, bool success)
 {
     obj->disconnect(this);
 
-    completionCount++;
-    if (success) {
-        completionSuccessCount++;
-    }
+    completionCountdown--;
+    successCountdown -= success ? 1 : 0;
 
-    if (completionCount == 3) {
-        qDebug() << "ModelUavoProxy::flightPlanReceived - completed" << (completionSuccessCount == 3);
-        if (completionSuccessCount == 3) {
-            objectsToModel();
-            QMessageBox::information(NULL, tr("Flight Plan Download Successful"), tr("Flight plan download was successful."));
+    if (completionCountdown == 0) {
+        qDebug() << "ModelUavoProxy::flightPlanReceived - completed" << (successCountdown == 0);
+        if (successCountdown == 0) {
+            if (objectsToModel()) {
+                QMessageBox::information(NULL, tr("Flight Plan Download Successful"), tr("Flight plan download was successful."));
+            }
         }
         else {
-            QMessageBox::critical(NULL, tr("Flight Plan Download Failed !"), tr("Failed to download the flight plan !"));
+            QMessageBox::critical(NULL, tr("Flight Plan Download Failed"), tr("Failed to download the flight plan !"));
         }
     }
 }
@@ -129,7 +134,7 @@ void ModelUavoProxy::flightPlanElementReceived(UAVObject *obj, bool success)
 // (compression consists in keeping only one instance of similar path actions)
 //
 // the UAV waypoint list and path action list are probably not empty, so we try to reuse existing instances
-void ModelUavoProxy::modelToObjects()
+bool ModelUavoProxy::modelToObjects()
 {
     qDebug() << "ModelUAVProxy::modelToObjects";
 
@@ -186,13 +191,13 @@ void ModelUavoProxy::modelToObjects()
         // update UAVObject
         waypoint->setData(waypointData);
     }
-    // Put "safe" values in unused waypoint objects
+
+    // Put "safe" values in unused waypoint and path action objects
     if (waypointCount < objMngr->getNumInstances(Waypoint::OBJID)) {
         for (int i = waypointCount; i < objMngr->getNumInstances(Waypoint::OBJID); ++i) {
             // TODO
         }
     }
-    // Put "safe" values in unused path action objects
     if (actionCount < objMngr->getNumInstances(PathAction::OBJID)) {
         for (int i = actionCount; i < objMngr->getNumInstances(PathAction::OBJID); ++i) {
             // TODO
@@ -205,10 +210,11 @@ void ModelUavoProxy::modelToObjects()
 
     flightPlanData.WaypointCount = waypointCount;
     flightPlanData.PathActionCount = actionCount;
-    // TODO
-    flightPlanData.Crc = 0;
+    flightPlanData.Crc = computeFlightPlanCrc(waypointCount, actionCount);
 
     flightPlan->setData(flightPlanData);
+
+    return true;
 }
 
 Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
@@ -287,7 +293,7 @@ PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields &actionD
     return NULL;
 }
 
-void ModelUavoProxy::objectsToModel()
+bool ModelUavoProxy::objectsToModel()
 {
     // build model from uav objects
     // the list of objects can end with "garbage" instances due to previous flightpath
@@ -297,9 +303,21 @@ void ModelUavoProxy::objectsToModel()
     FlightPlan::DataFields flightPlanData = flightPlan->getData();
 
     int waypointCount = flightPlanData.WaypointCount;
+    int actionCount = flightPlanData.PathActionCount;
 
-    // TODO consistency checks
-    // objMngr->getNumInstances(Waypoint::OBJID);
+    // consistency check
+    if (waypointCount > objMngr->getNumInstances(Waypoint::OBJID)) {
+        QMessageBox::critical(NULL, tr("Flight Plan Download Failed"), tr("Flight plan way point count error !"));
+        return false;
+    }
+    if (actionCount > objMngr->getNumInstances(PathAction::OBJID)) {
+        QMessageBox::critical(NULL, tr("Flight Plan Download Failed"), tr("Flight plan path action count error !"));
+        return false;
+    }
+    if (flightPlanData.Crc != computeFlightPlanCrc(waypointCount, actionCount)) {
+        QMessageBox::critical(NULL, tr("Flight Plan Upload Failed"), tr("Flight plan CRC error !"));
+        return false;
+    }
 
     int rowCount = myModel->rowCount();
     if (waypointCount < rowCount) {
@@ -328,6 +346,7 @@ void ModelUavoProxy::objectsToModel()
         PathAction::DataFields actionData = action->getData();
         pathActionToModel(i, actionData);
     }
+    return true;
 }
 
 void ModelUavoProxy::modelToWaypoint(int i, Waypoint::DataFields &data) {
@@ -436,3 +455,17 @@ void ModelUavoProxy::pathActionToModel(int i, PathAction::DataFields &data) {
     index = myModel->index(i, flightDataModel::MODE_PARAMS3);
     myModel->setData(index, data.ModeParameters[3]);
 }
+
+quint8 ModelUavoProxy::computeFlightPlanCrc(int waypointCount, int actionCount) {
+    quint8 crc = 0;
+    for (int i = 0; i < waypointCount; ++i) {
+        Waypoint* waypoint = Waypoint::GetInstance(objMngr, i);
+        crc = waypoint->updateCRC(crc);
+    }
+    for (int i = 0; i < actionCount; ++i) {
+        PathAction* action = PathAction::GetInstance(objMngr, i);
+        crc = action->updateCRC(crc);
+    }
+    return crc;
+}
+

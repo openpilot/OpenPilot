@@ -45,7 +45,13 @@
 
 #include <openpilot.h>
 
+#include <pios_struct_helper.h>
+#include <uavobjectmanager.h>
+
 #include "hwsettings.h"
+#include "flightplan.h"
+#include "waypoint.h"
+#include "pathaction.h"
 #include "attitudestate.h"
 #include "pathdesired.h" // object that will be updated by the module
 #include "positionstate.h"
@@ -62,7 +68,6 @@
 #include "velocitydesired.h"
 #include "velocitystate.h"
 #include "taskinfo.h"
-#include <pios_struct_helper.h>
 
 #include "paths.h"
 #include "CoordinateConversions.h"
@@ -80,6 +85,7 @@ static PathStatusData pathStatus;
 static FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings;
 
 // Private functions
+static bool checkFlightPlan();
 static void pathfollowerTask(void *parameters);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
 static void updatePathVelocity();
@@ -163,6 +169,7 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
         // 1. Must have FixedWing type airframe
         // 2. Flight mode is PositionHold and PathDesired.Mode is Endpoint  OR
         // FlightMode is PathPlanner and PathDesired.Mode is Endpoint or Path
+        // 3. FlightPlan must be valid
 
         SystemSettingsGet(&systemSettings);
         if ((systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING) &&
@@ -172,10 +179,14 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
             vTaskDelay(1000);
             continue;
         }
+        if (!checkFlightPlan()) {
+            AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+            vTaskDelay(1000);
+            continue;
+        }
 
         // Continue collecting data if not enough time
         vTaskDelayUntil(&lastUpdateTime, fixedwingpathfollowerSettings.UpdatePeriod / portTICK_RATE_MS);
-
 
         FlightStatusGet(&flightStatus);
         PathStatusGet(&pathStatus);
@@ -240,6 +251,48 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
         }
         PathStatusSet(&pathStatus);
     }
+}
+
+static bool checkFlightPlan()
+{
+    uint16_t i;
+    uint16_t waypointCount;
+    uint16_t actionCount;
+    uint8_t flightCrc;
+    FlightPlanData flightPlan;
+
+    FlightPlanGet(&flightPlan);
+
+    waypointCount = flightPlan.WaypointCount;
+    actionCount = flightPlan.PathActionCount;
+
+    // check count consistency
+    if (waypointCount > UAVObjGetNumInstances(WaypointHandle())) {
+        PIOS_DEBUGLOG_Printf("FlighPlan : waypoint count error!");
+        return false;
+    }
+    if (actionCount > UAVObjGetNumInstances(PathActionHandle())) {
+        PIOS_DEBUGLOG_Printf("FlighPlan : path action count error!");
+        return false;
+    }
+
+    // check CRC
+    flightCrc = 0;
+    for(i = 0; i < waypointCount; i++) {
+        flightCrc = UAVObjUpdateCRC(WaypointHandle(), i, flightCrc);
+    }
+    for(i = 0; i < actionCount; i++) {
+        flightCrc = UAVObjUpdateCRC(PathActionHandle(), i, flightCrc);
+    }
+    if (flightCrc != flightPlan.Crc) {
+        PIOS_DEBUGLOG_Printf("FlighPlan : bad CRC (%d / %d)!", flightCrc, flightPlan.Crc);
+        return false;
+    }
+
+    // everything ok (hopefully...)
+    PIOS_DEBUGLOG_Printf("FlighPlan : passed consistency check.", flightCrc, flightPlan.Crc);
+
+    return true;
 }
 
 /**

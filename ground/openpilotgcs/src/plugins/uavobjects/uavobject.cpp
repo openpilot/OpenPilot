@@ -26,8 +26,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uavobject.h"
+
+#include <utils/crc.h>
+
 #include <QtEndian>
 #include <QDebug>
+
+using namespace Utils;
 
 // Constants
 #define UAVOBJ_ACCESS_SHIFT                    0
@@ -54,6 +59,8 @@ UAVObject::UAVObject(quint32 objID, bool isSingleInst, const QString & name)
     this->instID = 0;
     this->isSingleInst = isSingleInst;
     this->name   = name;
+    this->data   = 0;
+    this->numBytes = 0;
     this->mutex  = new QMutex(QMutex::Recursive);
 }
 
@@ -162,7 +169,6 @@ void UAVObject::setCategory(const QString & category)
 {
     this->category = category;
 }
-
 
 /**
  * Get the total number of bytes of the object's data
@@ -280,7 +286,8 @@ UAVObjectField *UAVObject::getField(const QString & name)
         }
     }
     // If this point is reached then the field was not found
-    qWarning() << "UAVObject::getField Non existant field" << name << "requested. This indicates a bug. Make sure you also have null checking for non-debug code.";
+    qWarning() << "UAVObject::getField Non existant field" << name << "requested."
+            << "This indicates a bug. Make sure you also have null checking for non-debug code.";
     return NULL;
 }
 
@@ -317,6 +324,21 @@ qint32 UAVObject::unpack(const quint8 *dataIn)
     emit objectUpdated(this);
 
     return numBytes;
+}
+
+/**
+ * Update a CRC with the object data
+ * @returns The updated CRC
+ */
+quint8 UAVObject::updateCRC(quint8 crc)
+{
+    QMutexLocker locker(mutex);
+
+    //crc = Crc::updateCRC(crc, (quint8 *) &objID, sizeof(objID));
+    //crc = Crc::updateCRC(crc, (quint8 *) &instID, sizeof(instID));
+    crc = Crc::updateCRC(crc, data, numBytes);
+
+    return crc;
 }
 
 /**

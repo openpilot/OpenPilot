@@ -109,6 +109,7 @@ public:
     quint32 getNumBytes();
     qint32 pack(quint8 *dataOut);
     qint32 unpack(const quint8 *dataIn);
+    quint8 updateCRC(quint8 crc = 0);
     bool save();
     bool save(QFile & file);
     bool load();

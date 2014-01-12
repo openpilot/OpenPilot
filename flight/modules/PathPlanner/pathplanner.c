@@ -135,16 +135,20 @@ static void pathPlannerTask()
     // check flight plan validity early to raise alarm
     // even if not in guided mode
     uint8_t validFlightPlan = checkFlightPlan();
-    if (!validFlightPlan) {
-        AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_ERROR);
-    } else {
-        AlarmsClear(SYSTEMALARMS_ALARM_PATHPLAN);
-    }
 
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);
     if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
         pathplanner_active = false;
+        if (!validFlightPlan) {
+            // unverified flight plans are only a warning while we are not in pathplanner mode
+            // so it does not prevent arming. However manualcontrols safety check
+            // shall test for this warning when pathplan is on the flight mode selector
+            // thus a valid flight plan is a prerequirement for arming
+            AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_WARNING);
+        } else {
+            AlarmsClear(SYSTEMALARMS_ALARM_PATHPLAN);
+        }
 
         return;
     }
@@ -156,7 +160,9 @@ static void pathPlannerTask()
     if (!validFlightPlan) {
         // At this point the craft is in PathPlanner mode, so pilot has no manual control capability.
         // Failsafe: behave as if in return to base mode
-        // what to do in this case is debatable, it might be better to just make a forced disarming but rth has a higher chance of survival when in flight.
+        // what to do in this case is debatable, it might be better to just
+        // make a forced disarming but rth has a higher chance of survival when
+        // in flight.
         pathplanner_active = false;
 
         if (!failsafeRTHset) {
@@ -178,8 +184,12 @@ static void pathPlannerTask()
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
             PathDesiredSet(&pathDesired);
         }
+        AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_ERROR);
+
+        return;
     }
     failsafeRTHset = 0;
+    AlarmsClear(SYSTEMALARMS_ALARM_PATHPLAN);
 
     WaypointActiveGet(&waypointActive);
 

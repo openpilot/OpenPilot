@@ -49,6 +49,7 @@ UAVOBJSRCFILENAMES += debuglogentry
 UAVOBJSRCFILENAMES += flightbatterysettings
 UAVOBJSRCFILENAMES += firmwareiapobj
 UAVOBJSRCFILENAMES += flightbatterystate
+UAVOBJSRCFILENAMES += flightplan
 UAVOBJSRCFILENAMES += flightplancontrol
 UAVOBJSRCFILENAMES += flightplansettings
 UAVOBJSRCFILENAMES += flightplanstatus

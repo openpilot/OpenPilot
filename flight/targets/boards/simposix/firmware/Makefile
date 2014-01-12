@@ -68,7 +68,7 @@ UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
 include $(PIOS)/common/libraries/FreeRTOS/library.mk
-include $(FLIGHTLIB)/PyMite/pymite.mk
+#include $(FLIGHTLIB)/PyMite/pymite.mk
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files

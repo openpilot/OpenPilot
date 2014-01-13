@@ -952,7 +952,7 @@ android_sdk_update:
 		
 prepare:
 	$(V0) @echo " Installing GIT hooks under $(ROOT_DIR)/.git/hooks"
-	$(V1) $(CP) "$(ROOT_DIR)/make/git-hooks"/* "$(ROOT_DIR)/.git/hooks/"
+	$(V1) $(CP) --remove-destination "$(ROOT_DIR)/make/git-hooks"/* "$(ROOT_DIR)/.git/hooks/"
 
 
 ##############################

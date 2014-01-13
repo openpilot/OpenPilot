@@ -77,6 +77,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/gpssettings.h \
     $$UAVOBJECT_SYNTHETICS/pathaction.h \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
+    $$UAVOBJECT_SYNTHETICS/pathplan.h \
     $$UAVOBJECT_SYNTHETICS/pathstatus.h \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.h \
     $$UAVOBJECT_SYNTHETICS/positionstate.h \
@@ -97,7 +98,6 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/i2cstats.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterysettings.h \
     $$UAVOBJECT_SYNTHETICS/taskinfo.h \
-    $$UAVOBJECT_SYNTHETICS/flightplan.h \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.h \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.h \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.h \
@@ -171,6 +171,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/gpssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/pathaction.cpp \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathplan.cpp \
     $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.cpp \
     $$UAVOBJECT_SYNTHETICS/positionstate.cpp \
@@ -191,7 +192,6 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/i2cstats.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterysettings.cpp \
     $$UAVOBJECT_SYNTHETICS/taskinfo.cpp \
-    $$UAVOBJECT_SYNTHETICS/flightplan.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.cpp \

@@ -31,7 +31,7 @@
 
 #include "openpilot.h"
 
-#include "flightplan.h"
+#include "pathplan.h"
 #include "flightstatus.h"
 #include "airspeedstate.h"
 #include "pathaction.h"
@@ -60,7 +60,7 @@ static void statusUpdated(UAVObjEvent *ev);
 static void updatePathDesired();
 static void setWaypoint(uint16_t num);
 
-static uint8_t checkFlightPlan();
+static uint8_t checkPathPlan();
 static uint8_t pathConditionCheck();
 static uint8_t conditionNone();
 static uint8_t conditionTimeOut();
@@ -105,7 +105,7 @@ int32_t PathPlannerStart()
  */
 int32_t PathPlannerInitialize()
 {
-    FlightPlanInitialize();
+    PathPlanInitialize();
     PathActionInitialize();
     PathStatusInitialize();
     PathDesiredInitialize();
@@ -132,16 +132,16 @@ static void pathPlannerTask()
 
     bool endCondition = false;
 
-    // check flight plan validity early to raise alarm
+    // check path plan validity early to raise alarm
     // even if not in guided mode
-    uint8_t validFlightPlan = checkFlightPlan();
+    uint8_t validPathPlan = checkPathPlan();
 
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);
     if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
         pathplanner_active = false;
-        if (!validFlightPlan) {
-            // unverified flight plans are only a warning while we are not in pathplanner mode
+        if (!validPathPlan) {
+            // unverified path plans are only a warning while we are not in pathplanner mode
             // so it does not prevent arming. However manualcontrols safety check
             // shall test for this warning when pathplan is on the flight mode selector
             // thus a valid flight plan is a prerequirement for arming
@@ -157,7 +157,7 @@ static void pathPlannerTask()
     PathDesiredGet(&pathDesired);
 
     static uint8_t failsafeRTHset = 0;
-    if (!validFlightPlan) {
+    if (!validPathPlan) {
         // At this point the craft is in PathPlanner mode, so pilot has no manual control capability.
         // Failsafe: behave as if in return to base mode
         // what to do in this case is debatable, it might be better to just
@@ -258,18 +258,18 @@ static void pathPlannerTask()
 }
 
 // safety check for path plan integrity
-static uint8_t checkFlightPlan()
+static uint8_t checkPathPlan()
 {
     uint16_t i;
     uint16_t waypointCount;
     uint16_t actionCount;
-    uint8_t flightCrc;
-    FlightPlanData flightPlan;
+    uint8_t pathCrc;
+    PathPlanData pathPlan;
 
-    FlightPlanGet(&flightPlan);
+    PathPlanGet(&pathPlan);
 
-    waypointCount = flightPlan.WaypointCount;
-    actionCount   = flightPlan.PathActionCount;
+    waypointCount = pathPlan.WaypointCount;
+    actionCount   = pathPlan.PathActionCount;
 
     // check count consistency
     if (waypointCount > UAVObjGetNumInstances(WaypointHandle())) {
@@ -282,20 +282,20 @@ static uint8_t checkFlightPlan()
     }
 
     // check CRC
-    flightCrc = 0;
+    pathCrc = 0;
     for (i = 0; i < waypointCount; i++) {
-        flightCrc = UAVObjUpdateCRC(WaypointHandle(), i, flightCrc);
+        pathCrc = UAVObjUpdateCRC(WaypointHandle(), i, pathCrc);
     }
     for (i = 0; i < actionCount; i++) {
-        flightCrc = UAVObjUpdateCRC(PathActionHandle(), i, flightCrc);
+        pathCrc = UAVObjUpdateCRC(PathActionHandle(), i, pathCrc);
     }
-    if (flightCrc != flightPlan.Crc) {
-        PIOS_DEBUGLOG_Printf("FlighPlan : bad CRC (%d / %d)!", flightCrc, flightPlan.Crc);
+    if (pathCrc != pathPlan.Crc) {
+        PIOS_DEBUGLOG_Printf("FlighPlan : bad CRC (%d / %d)!", pathCrc, pathPlan.Crc);
         return false;
     }
 
     // everything ok (hopefully...)
-    PIOS_DEBUGLOG_Printf("FlighPlan : passed consistency check.", flightCrc, flightPlan.Crc);
+    PIOS_DEBUGLOG_Printf("FlighPlan : passed consistency check.", pathCrc, pathPlan.Crc);
 
     return true;
 }
@@ -368,12 +368,12 @@ void updatePathDesired()
 // helper function to go to a specific waypoint
 static void setWaypoint(uint16_t num)
 {
-    FlightPlanData flightPlan;
+    PathPlanData pathPlan;
 
-    FlightPlanGet(&flightPlan);
+    PathPlanGet(&pathPlan);
 
-    // here it is assumed that the flight plan has been validated (waypoint count is consistent)
-    if (num >= flightPlan.WaypointCount) {
+    // here it is assumed that the path plan has been validated (waypoint count is consistent)
+    if (num >= pathPlan.WaypointCount) {
         // path plans wrap around
         num = 0;
     }

@@ -29,7 +29,7 @@
 
 #include "flightdatamodel.h"
 
-#include "flightplan.h"
+#include "pathplan.h"
 #include "pathaction.h"
 #include "waypoint.h"
 
@@ -42,8 +42,8 @@ public:
     explicit ModelUavoProxy(QObject *parent, flightDataModel *model);
 
 public slots:
-    void sendFlightPlan();
-    void receiveFlightPlan();
+    void sendPathPlan();
+    void receivePathPlan();
 
 private:
     UAVObjectManager *objMngr;
@@ -66,11 +66,11 @@ private:
     void waypointToModel(int i, Waypoint::DataFields &data);
     void pathActionToModel(int i, PathAction::DataFields &data);
 
-    quint8 computeFlightPlanCrc(int waypointCount, int actionCount);
+    quint8 computePathPlanCrc(int waypointCount, int actionCount);
 
 private slots:
-    void flightPlanElementSent(UAVObject *, bool success);
-    void flightPlanElementReceived(UAVObject *, bool success);
+    void pathPlanElementSent(UAVObject *, bool success);
+    void pathPlanElementReceived(UAVObject *, bool success);
 };
 
 #endif // MODELUAVOPROXY_H

@@ -34,7 +34,12 @@
 #include <QEventLoop>
 
 #ifdef VERBOSE_UAVTALK
-#define VERBOSE_FILTER(objId) if (objId == 0x173E3850 || objId == 0x99C63292)
+// uncomment and adapt the following lines to filter verbose logging to include specific object(s) only
+//#include "flighttelemetrystats.h"
+//#define VERBOSE_FILTER(objId) if (objId == FlightTelemetryStats::OBJID)
+#endif
+#ifndef VERBOSE_FILTER
+#define VERBOSE_FILTER(objId)
 #endif
 
 #define SYNC_VAL 0x3C

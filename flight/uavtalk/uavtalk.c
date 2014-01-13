@@ -36,9 +36,14 @@
 
 #if defined UAV_DEBUGLOG && defined FLASH_FREERTOS
 #define UAVT_DEBUGLOG_PRINTF(...) PIOS_DEBUGLOG_Printf(__VA_ARGS__)
-#define UAVT_DEBUGLOG_CPRINTF(objId, ...) if (objId == 0x5E5903CC) { UAVT_DEBUGLOG_PRINTF(__VA_ARGS__); }
-#else
+// uncomment and adapt the following lines to filter verbose logging to include specific object(s) only
+//#include "flighttelemetrystats.h"
+//#define UAVT_DEBUGLOG_CPRINTF(objId, ...) if (objId == FLIGHTTELEMETRYSTATS_OBJID) { UAVT_DEBUGLOG_PRINTF(__VA_ARGS__); }
+#endif
+#ifndef UAVT_DEBUGLOG_PRINTF
 #define UAVT_DEBUGLOG_PRINTF(...)
+#endif
+#ifndef UAVT_DEBUGLOG_CPRINTF
 #define UAVT_DEBUGLOG_CPRINTF(objId, ...)
 #endif
 

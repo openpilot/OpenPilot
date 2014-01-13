@@ -1,2 +1,2 @@
-shlibs:Depends=libc6 (>= 2.3.6-6~), libc6 (>= 2.4), libgcc1 (>= 1:4.1.1), libgl1-mesa-glx | libgl1, libglu1-mesa | libglu1, libphonon4 (>= 4:4.3.0), libsdl1.2debian (>= 1.2.10-1), libstdc++6 (>= 4.1.1), libudev0 | libudev1, libusb-0.1-4 (>= 2:0.1.12), phonon
+shlibs:Depends=libc6, libgcc1, libgl1-mesa-glx | libgl1, libglu1-mesa | libglu1, libsdl1.2debian, libstdc++6, libudev0 | libudev1, libusb-1.0-0
 misc:Depends=

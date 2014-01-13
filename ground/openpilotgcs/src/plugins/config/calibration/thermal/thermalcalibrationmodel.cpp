@@ -89,7 +89,7 @@ void ThermalCalibrationModel::setTransitions()
     //m_acquisitionState->addTransition(new BoardStatusRestoreTransition(m_helper, m_acquisitionState, m_calculateState));
     m_acquisitionState->addTransition(this,SIGNAL(next()), m_calculateState);
 
-    m_calculateState>addTransition(new BoardStatusRestoreTransition(m_helper,m_calculateState,m_finalizeState);
+    m_calculateState->addTransition(new BoardStatusRestoreTransition(m_helper,m_calculateState,m_finalizeState));
 
     m_finalizeState->addTransition(this,SIGNAL(next()),m_readyState);
     // Ready

@@ -176,7 +176,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam2->setVisible(false);
         ui->dsb_condParam3->setVisible(false);
         ui->dsb_condParam4->setVisible(false);
-        ui->condParam1->setText("Timeout(ms)");
+        ui->condParam1->setText("Timeout(s)");
         break;
     case MapDataDelegate::ENDCONDITION_DISTANCETOTARGET:
         ui->condParam1->setVisible(true);

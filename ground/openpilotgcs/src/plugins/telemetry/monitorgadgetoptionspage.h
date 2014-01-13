@@ -1,14 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       authors.h
+ * @file       monitorgadgetoptionspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @addtogroup GCSPlugins GCS Plugins
+ * @brief      Telemetry Gadget options page header
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   telemetry
  * @{
- * @addtogroup CorePlugin Core Plugin
- * @{
- * @brief The Core GCS plugin
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -26,19 +25,37 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef AUTHORSDIALOG_H
-#define AUTHORSDIALOG_H
+#ifndef MONITORGADGETOPTIONSPAGE_H
+#define MONITORGADGETOPTIONSPAGE_H
 
-#include <QDialog>
+#include "coreplugin/dialogs/ioptionspage.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
 
-namespace Core {
-namespace Internal {
-class AuthorsDialog : public QDialog {
-    Q_OBJECT
-public:
-    explicit AuthorsDialog(QWidget *parent);
+#include "QString"
+#include <QDebug>
+#include <QtCore/QSettings>
+
+namespace Ui {
+class MonitorGadgetOptionsPage;
 };
-} // namespace Internal
-} // namespace Core
 
-#endif // AUTHORSDIALOG_H
+class MonitorGadgetConfiguration;
+
+using namespace Core;
+
+class MonitorGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
+
+public:
+    MonitorGadgetOptionsPage(MonitorGadgetConfiguration *config, QObject *parent = 0);
+    ~MonitorGadgetOptionsPage();
+
+    QWidget *createPage(QWidget *parent);
+    void apply();
+    void finish();
+
+private:
+};
+
+#endif // MONITORGADGETOPTIONSPAGE_H

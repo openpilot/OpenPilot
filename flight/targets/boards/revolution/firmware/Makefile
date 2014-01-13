@@ -47,6 +47,7 @@ MODULES += Radio
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
 MODULES += Osd/osdoutout
+MODULES += Logging
 MODULES += Telemetry
 
 OPTMODULES += ComUsbBridge
@@ -83,6 +84,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/paths.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
+    SRC += $(FLIGHTLIB)/printf-stdarg.c
 
     ## UAVObjects
     include ./UAVObjects.inc

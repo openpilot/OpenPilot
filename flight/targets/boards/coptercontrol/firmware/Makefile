@@ -120,5 +120,8 @@ else
     SRC += $(OPTESTS)/$(TESTAPP).c
 endif
 
+    ## Misc library functions
+    SRC += $(FLIGHTLIB)/printf-stdarg.c
+
 include $(ROOT_DIR)/make/apps-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk

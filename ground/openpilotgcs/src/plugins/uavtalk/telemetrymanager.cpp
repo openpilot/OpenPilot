@@ -64,8 +64,8 @@ void TelemetryManager::onStart()
     telemetryMon = new TelemetryMonitor(objMngr, telemetry);
     connect(telemetryMon, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(telemetryMon, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
+    connect(telemetryMon, SIGNAL(telemetryUpdated(double, double)), this, SLOT(onTelemetryUpdate(double, double)));
 }
-
 
 void TelemetryManager::stop()
 {
@@ -91,4 +91,9 @@ void TelemetryManager::onDisconnect()
 {
     autopilotConnected = false;
     emit disconnected();
+}
+
+void TelemetryManager::onTelemetryUpdate(double txRate, double rxRate)
+{
+    emit telemetryUpdated(txRate, rxRate);
 }

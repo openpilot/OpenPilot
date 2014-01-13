@@ -64,7 +64,13 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const *cfg);
 static int32_t PIOS_MPU6000_SetReg(uint8_t address, uint8_t buffer);
 static int32_t PIOS_MPU6000_GetReg(uint8_t address);
 
-#define GRAV 9.81f
+#define GRAV                       9.81f
+
+#ifdef PIOS_MPU6000_ACCEL
+#define PIOS_MPU6000_SAMPLES_BYTES 14
+#else
+#define PIOS_MPU6000_SAMPLES_BYTES 8
+#endif
 
 /**
  * @brief Allocate a new device
@@ -490,6 +496,62 @@ int32_t PIOS_MPU6000_Test(void)
 }
 
 /**
+ * @brief Reads the contents of the MPU6000 Interrupt Status register from an ISR
+ * @return The register value or -1 on failure to claim the bus
+ */
+static int32_t PIOS_MPU6000_GetInterruptStatusRegISR(bool *woken)
+{
+    /* Interrupt Status register can be read at high SPI clock speed */
+    uint8_t data;
+
+    if (PIOS_MPU6000_ClaimBusISR(woken) != 0) {
+        return -1;
+    }
+    PIOS_SPI_TransferByte(dev->spi_id, (0x80 | PIOS_MPU6000_INT_STATUS_REG));
+    data = PIOS_SPI_TransferByte(dev->spi_id, 0);
+    PIOS_MPU6000_ReleaseBusISR(woken);
+    return data;
+}
+
+/**
+ * @brief Resets the MPU6000 FIFO from an ISR
+ * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
+ * @return  0 if operation was successful
+ * @return -1 if unable to claim SPI bus
+ * @return -2 if write to the device failed
+ */
+static int32_t PIOS_MPU6000_ResetFifoISR(bool *woken)
+{
+    int32_t result = 0;
+
+    /* Register writes must be at < 1MHz SPI clock.
+     * Speed can only be changed when SPI bus semaphore is held, but
+     * device chip select must not be enabled, so we use the direct
+     * SPI bus claim call here */
+    if (PIOS_SPI_ClaimBusISR(dev->spi_id, woken) != 0) {
+        return -1;
+    }
+    /* Reduce SPI clock speed. */
+    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_256);
+    /* Enable chip select */
+    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
+    /* Reset FIFO. */
+    if (PIOS_SPI_TransferByte(dev->spi_id, 0x7f & PIOS_MPU6000_USER_CTRL_REG) != 0) {
+        result = -2;
+    } else if (PIOS_SPI_TransferByte(dev->spi_id, (dev->cfg->User_ctl | PIOS_MPU6000_USERCTL_FIFO_RST)) != 0) {
+        result = -2;
+    }
+    /* Disable chip select. */
+    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
+    /* Increase SPI clock speed. */
+    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_16);
+    /* Release the SPI bus semaphore. */
+    PIOS_SPI_ReleaseBusISR(dev->spi_id, woken);
+    return result;
+}
+
+/**
  * @brief Obtains the number of bytes in the FIFO. Call from ISR only.
  * @return the number of bytes in the FIFO
  * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
@@ -542,8 +604,29 @@ bool PIOS_MPU6000_IRQHandler(void)
         return false;
     }
 
+    /* Temporary fix for OP-1049. Expected to be superceded for next major release
+     * by code changes for OP-1039.
+     * Read interrupt status register to check for FIFO overflow. Must be the
+     * first read after interrupt, in case the device is configured so that
+     * any read clears in the status register (PIOS_MPU6000_INT_CLR_ANYRD set in
+     * interrupt config register) */
+    int32_t result;
+    if ((result = PIOS_MPU6000_GetInterruptStatusRegISR(&woken)) < 0) {
+        return woken;
+    }
+    if (result & PIOS_MPU6000_INT_STATUS_FIFO_OVERFLOW) {
+        /* The FIFO has overflowed, so reset it,
+         * to enable sample sync to be recovered.
+         * If the reset fails, we are in trouble, but
+         * we keep trying on subsequent interrupts. */
+        PIOS_MPU6000_ResetFifoISR(&woken);
+        /* Return and wait for the next new sample. */
+        return woken;
+    }
+
+    /* Usual case - FIFO has not overflowed. */
     mpu6000_count = PIOS_MPU6000_FifoDepthISR(&woken);
-    if (mpu6000_count < (int32_t)sizeof(struct pios_mpu6000_data)) {
+    if (mpu6000_count < PIOS_MPU6000_SAMPLES_BYTES) {
         return woken;
     }
 
@@ -551,8 +634,8 @@ bool PIOS_MPU6000_IRQHandler(void)
         return woken;
     }
 
-    static uint8_t mpu6000_send_buf[1 + sizeof(struct pios_mpu6000_data)] = { PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0 };
-    static uint8_t mpu6000_rec_buf[1 + sizeof(struct pios_mpu6000_data)];
+    static uint8_t mpu6000_send_buf[1 + PIOS_MPU6000_SAMPLES_BYTES] = { PIOS_MPU6000_FIFO_REG | 0x80 };
+    static uint8_t mpu6000_rec_buf[1 + PIOS_MPU6000_SAMPLES_BYTES];
 
     if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
         PIOS_MPU6000_ReleaseBusISR(&woken);
@@ -565,7 +648,7 @@ bool PIOS_MPU6000_IRQHandler(void)
     static struct pios_mpu6000_data data;
 
     // In the case where extras samples backed up grabbed an extra
-    if (mpu6000_count >= (int32_t)(sizeof(data) * 2)) {
+    if (mpu6000_count >= PIOS_MPU6000_SAMPLES_BYTES * 2) {
         mpu6000_fifo_backup++;
         if (PIOS_MPU6000_ClaimBusISR(&woken) != 0) {
             return woken;

@@ -105,6 +105,9 @@ void PIOS_Board_Init(void)
         PIOS_Assert(0);
     }
 
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -124,6 +127,10 @@ void PIOS_Board_Init(void)
     PIOS_RTC_Init(&pios_rtc_main_cfg);
 #endif /* PIOS_INCLUDE_RTC */
 
+#if defined(PIOS_INCLUDE_LED)
+    PIOS_LED_Init(&pios_led_cfg);
+#endif /* PIOS_INCLUDE_LED */
+
     /* IAP System Setup */
     PIOS_IAP_Init();
     // check for safe mode commands from gcs
@@ -141,12 +148,6 @@ void PIOS_Board_Init(void)
     OPLinkStatusInitialize();
 #endif /* PIOS_INCLUDE_RFM22B */
 
-#if defined(PIOS_INCLUDE_LED)
-    PIOS_LED_Init(&pios_led_cfg);
-#endif /* PIOS_INCLUDE_LED */
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
 #if defined(PIOS_INCLUDE_TIM)
     /* Set up pulse timers */

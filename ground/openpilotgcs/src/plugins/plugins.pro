@@ -49,6 +49,12 @@ plugin_uavtalk.subdir = uavtalk
 plugin_uavtalk.depends = plugin_uavobjects
 plugin_uavtalk.depends += plugin_coreplugin
 
+# Telemetry plugin
+SUBDIRS += plugin_telemetry
+plugin_telemetry.subdir = telemetry
+plugin_telemetry.depends += plugin_uavtalk
+plugin_telemetry.depends += plugin_coreplugin
+
 # OPMap UAVGadget
 plugin_opmap.subdir = opmap
 plugin_opmap.depends = plugin_coreplugin
@@ -237,4 +243,11 @@ plugin_setupwizard.depends += plugin_uavobjectutil
 plugin_setupwizard.depends += plugin_config
 plugin_setupwizard.depends += plugin_uploader
 SUBDIRS += plugin_setupwizard
+
+# Flight Logs plugin
+plugin_flightlog.subdir = flightlog
+plugin_flightlog.depends = plugin_coreplugin
+plugin_flightlog.depends += plugin_uavobjects
+plugin_flightlog.depends += plugin_uavtalk
+SUBDIRS += plugin_flightlog
 

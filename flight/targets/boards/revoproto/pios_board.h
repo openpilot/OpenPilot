@@ -139,7 +139,7 @@ extern uint32_t pios_com_hkosd_id;
 // TELEMETRY
 // ------------------------
 #define TELEM_QUEUE_SIZE      80
-#define PIOS_TELEM_STACK_SIZE 624
+#define PIOS_TELEM_STACK_SIZE 800
 
 // -------------------------
 // System Settings

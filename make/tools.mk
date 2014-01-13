@@ -12,6 +12,7 @@
 #    mingw_install (Windows only - NOT USED for Qt-5.1.x)
 #    python_install (Windows only - NOT USED for Qt-5.1.x)
 #    nsis_install (Windows only)
+#    openssl_install (Windows only)
 #    uncrustify_install
 #    doxygen_install
 #    gtest_install
@@ -77,6 +78,7 @@ else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
     QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-5.1.1-windows.tar.bz2
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
+    OPENSSL_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
 endif
@@ -89,11 +91,13 @@ QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.1.1
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
 PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin
 NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
+OPENSSL_DIR     := $(TOOLS_DIR)/openssl-1.0.1e-win32
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
+
 ##############################
 #
 # Build only and all toolchains available for the platform
@@ -102,7 +106,7 @@ QT_SDK_PREFIX := $(QT_SDK_DIR)
 
 BUILD_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
-    BUILD_SDK_TARGETS += mingw python nsis
+    BUILD_SDK_TARGETS += mingw python nsis openssl
 endif
 ALL_SDK_TARGETS := $(BUILD_SDK_TARGETS) gtest uncrustify doxygen
 
@@ -223,6 +227,7 @@ endif
 #  $(2) = string compare operator, e.g. = or !=
 #
 ##############################
+
 define MD5_CHECK_TEMPLATE
 "`test -f \"$(1)\" && $(OPENSSL) dgst -md5 \"$(1)\" | $(CUT) -f2 -d' '`" $(2) "`$(CUT) -f1 -d' ' < \"$(1).md5\"`"
 endef
@@ -526,7 +531,7 @@ python_version:
 
 ##############################
 #
-# NSIS Unicode
+# NSIS Unicode (Windows only)
 #
 ##############################
 
@@ -545,6 +550,25 @@ endif
 .PHONY: nsis_version
 nsis_version:
 	-$(V1) $(NSIS) | head -n1
+
+endif
+
+##############################
+#
+# OpenSSL (Windows only)
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,openssl,$(OPENSSL_DIR),$(OPENSSL_URL),$(notdir $(OPENSSL_URL))))
+
+ifeq ($(shell [ -d "$(OPENSSL_DIR)" ] && $(ECHO) "exists"), exists)
+    export OPENSSL := $(OPENSSL_DIR)
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(OPENSSL_DIR)) not found (make openssl_install), using system PATH)
+endif
 
 endif
 

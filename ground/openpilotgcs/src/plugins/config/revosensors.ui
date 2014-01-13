@@ -463,6 +463,19 @@ Hint: run this with engines at cruising speed.</string>
                </layout>
               </item>
               <item>
+               <widget class="QLabel" name="label_thermalDescription">
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>this contains the current status of the thermal calibration wizard</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <layout class="QHBoxLayout" name="horizontalLayout_thermalbias2">
                 <item>
                  <widget class="QPushButton" name="ThermalBiasStart">

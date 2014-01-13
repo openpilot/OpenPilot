@@ -293,4 +293,4 @@ MODULE_INITCALL(osdoutputInitialize, osdoutputStart);
  * @}
  * @}
  */
-#endif
+#endif /* if 0 */

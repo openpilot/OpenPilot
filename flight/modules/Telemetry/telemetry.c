@@ -222,7 +222,7 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
 
     // Get metadata
     UAVObjGetMetadata(obj, &metadata);
-    updateMode = role == TELEMETRY_FLIGHT ? UAVObjGetTelemetryUpdateMode(&metadata): UAVObjGetGcsTelemetryUpdateMode(&metadata);
+    updateMode  = role == TELEMETRY_FLIGHT ? UAVObjGetTelemetryUpdateMode(&metadata) : UAVObjGetGcsTelemetryUpdateMode(&metadata);
     loggingMode = UAVObjGetLoggingUpdateMode(&metadata);
 
     // Setup object depending on update mode
@@ -309,9 +309,9 @@ static void processObjEvent(UAVObjEvent *ev)
 
 #ifdef OP_OSD
     if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
-        role = TELEMETRY_FLIGHT;					// if connected via USB then behave like flight
+        role = TELEMETRY_FLIGHT; // if connected via USB then behave like flight
     } else {
-        role = TELEMETRY_OSDGCS;					// else behave like GCS
+        role = TELEMETRY_OSDGCS; // else behave like GCS
     }
 #else
     role = TELEMETRY_FLIGHT;
@@ -319,17 +319,17 @@ static void processObjEvent(UAVObjEvent *ev)
 
     if (ev->obj == 0) {
         updateTelemetryStats();
-    } else if (role == TELEMETRY_FLIGHT && ev->obj == GCSTelemetryStatsHandle()) {		// role is flight and we have normal behavior
+    } else if (role == TELEMETRY_FLIGHT && ev->obj == GCSTelemetryStatsHandle()) { // role is flight and we have normal behavior
         gcsTelemetryStatsUpdated();
-    } else if (role == TELEMETRY_OSDGCS && ev->obj == FlightTelemetryStatsHandle()) {	// role is osdgcs and we only send ...
+    } else if (role == TELEMETRY_OSDGCS && ev->obj == FlightTelemetryStatsHandle()) { // role is osdgcs and we only send ...
         gcsTelemetryStatsUpdated();
-    } else if (role == TELEMETRY_OSDGCS && ev->obj != GCSTelemetryStatsHandle()) {		// ... GCSTelemetryStats packets for connection handling
+    } else if (role == TELEMETRY_OSDGCS && ev->obj != GCSTelemetryStatsHandle()) { // ... GCSTelemetryStats packets for connection handling
         return;
     } else {
         FlightTelemetryStatsGet(&flightStats);
         // Get object metadata
         UAVObjGetMetadata(ev->obj, &metadata);
-        updateMode = role == TELEMETRY_FLIGHT ? UAVObjGetTelemetryUpdateMode(&metadata): UAVObjGetGcsTelemetryUpdateMode(&metadata);
+        updateMode = role == TELEMETRY_FLIGHT ? UAVObjGetTelemetryUpdateMode(&metadata) : UAVObjGetGcsTelemetryUpdateMode(&metadata);
 
         // Act on event
         retries    = 0;
@@ -551,11 +551,11 @@ static void gcsTelemetryStatsUpdated()
  */
 static void updateTelemetryStats()
 {
-	if (role == TELEMETRY_FLIGHT) {		// role is flight and we have normal behavior
-		updateFlightTelemetryStats();
-	} else {							// role is osdgcs and we behave like GCS
-		updateGCSTelemetryStats();
-	}
+    if (role == TELEMETRY_FLIGHT) { // role is flight and we have normal behavior
+        updateFlightTelemetryStats();
+    } else { // role is osdgcs and we behave like GCS
+        updateGCSTelemetryStats();
+    }
 }
 
 /**
@@ -678,19 +678,19 @@ static void updateGCSTelemetryStats()
 
     // Update stats object
     if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED) {
-    	gcsStats.RxDataRate  = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
-    	gcsStats.TxDataRate  = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
-    	gcsStats.RxFailures += utalkStats.rxErrors;
-    	gcsStats.TxFailures += txErrors;
-    	gcsStats.TxRetries  += txRetries;
+        gcsStats.RxDataRate  = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        gcsStats.TxDataRate  = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        gcsStats.RxFailures += utalkStats.rxErrors;
+        gcsStats.TxFailures += txErrors;
+        gcsStats.TxRetries  += txRetries;
         txErrors = 0;
         txRetries = 0;
     } else {
-    	gcsStats.RxDataRate = 0;
-    	gcsStats.TxDataRate = 0;
-    	gcsStats.RxFailures = 0;
-    	gcsStats.TxFailures = 0;
-    	gcsStats.TxRetries  = 0;
+        gcsStats.RxDataRate = 0;
+        gcsStats.TxDataRate = 0;
+        gcsStats.RxFailures = 0;
+        gcsStats.TxFailures = 0;
+        gcsStats.TxRetries  = 0;
         txErrors = 0;
         txRetries = 0;
     }
@@ -714,12 +714,12 @@ static void updateGCSTelemetryStats()
     } else if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ) {
         // Check for connection acknowledge
         if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK) {
-        	gcsStats.Status = GCSTELEMETRYSTATS_STATUS_CONNECTED;
+            gcsStats.Status = GCSTELEMETRYSTATS_STATUS_CONNECTED;
         }
     } else if (gcsStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
         // Check if the connection is still active and the autopilot is still connected
         if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED || connectionTimeout) {
-        	gcsStats.Status = GCSTELEMETRYSTATS_STATUS_DISCONNECTED;
+            gcsStats.Status = GCSTELEMETRYSTATS_STATUS_DISCONNECTED;
         } else {
             forceUpdate = 0;
         }

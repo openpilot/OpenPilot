@@ -40,7 +40,7 @@
 // we have from SPI out of the last line pixel to the next Hsync.
 #define DIRECT_REGISTER_ACCESS
 
-#define VSYNC_REDRAW_CNT 			2
+#define VSYNC_REDRAW_CNT 2
 
 
 #ifdef PIOS_INCLUDE_VIDEO
@@ -48,37 +48,37 @@
 extern xSemaphoreHandle osdSemaphore;
 
 static const struct pios_video_type_boundary pios_video_type_boundary_ntsc = {
-		.graphics_left			= 0,
-		.graphics_top			= 0,
-		.graphics_right			= 367,			// must be: graphics_width_real - 1
-		.graphics_bottom		= 240,			// must be: graphics_hight_real - 1
+    .graphics_left   = 0,
+    .graphics_top    = 0,
+    .graphics_right  = 367,                  // must be: graphics_width_real - 1
+    .graphics_bottom = 240, // must be: graphics_hight_real - 1
 };
 
 static const struct pios_video_type_boundary pios_video_type_boundary_pal = {
-		.graphics_left			= 0,
-		.graphics_top			= 0,
-		.graphics_right			= 399,			// must be: graphics_width_real - 1
-		.graphics_bottom		= 287,			// must be: graphics_hight_real - 1
+    .graphics_left   = 0,
+    .graphics_top    = 0,
+    .graphics_right  = 399,                  // must be: graphics_width_real - 1
+    .graphics_bottom = 287, // must be: graphics_hight_real - 1
 };
 
 static const struct pios_video_type_cfg pios_video_type_cfg_ntsc = {
-		.graphics_width_real	= 368,			// Real visible columns		currently unused, just for info
-		.graphics_hight_real	= 241,			// Real visible lines
-		.graphics_column_start	= 60,			// First visible OSD column (after Hsync)
-		.graphics_line_start	= 13,			// First visible OSD line
-		.dma_buffer_length		= 47,			// DMA buffer byte length	must be: graphics_width_real / 8 + 1
-		.period					= 11,
-		.dc						= (11 / 2),
+    .graphics_width_real   = 368,                  // Real visible columns		currently unused, just for info
+    .graphics_hight_real   = 241,                  // Real visible lines
+    .graphics_column_start = 60,      // First visible OSD column (after Hsync)
+    .graphics_line_start   = 13,                   // First visible OSD line
+    .dma_buffer_length     = 47,                   // DMA buffer byte length	must be: graphics_width_real / 8 + 1
+    .period = 11,
+    .dc     = (11 / 2),
 };
 
 static const struct pios_video_type_cfg pios_video_type_cfg_pal = {
-		.graphics_width_real	= 400,			// Real visible columns		currently unused, just for info
-		.graphics_hight_real	= 288,			// Real visible lines
-		.graphics_column_start	= 70,			// First visible OSD column (after Hsync)
-		.graphics_line_start	= 17,			// First visible OSD line
-		.dma_buffer_length		= 51,			// DMA buffer byte length	must be: graphics_width_real / 8 + 1
-		.period					= 10,
-		.dc						= (10 / 2),
+    .graphics_width_real   = 400,                  // Real visible columns		currently unused, just for info
+    .graphics_hight_real   = 288,                  // Real visible lines
+    .graphics_column_start = 70,      // First visible OSD column (after Hsync)
+    .graphics_line_start   = 17,                   // First visible OSD line
+    .dma_buffer_length     = 51,                   // DMA buffer byte length	must be: graphics_width_real / 8 + 1
+    .period = 10,
+    .dc     = (10 / 2),
 };
 
 // Allocate buffers.
@@ -109,7 +109,7 @@ const struct pios_video_type_boundary *pios_video_type_boundary_act = &pios_vide
 
 // Private variables
 static const struct pios_video_cfg *dev_cfg;
-static int16_t m_osdLines = 0;
+static int16_t m_osdLines    = 0;
 static int8_t video_type_tmp = VIDEO_TYPE_NTSC;
 static int8_t video_type_act = VIDEO_TYPE_NTSC;
 static const struct pios_video_type_cfg *pios_video_type_cfg_act = &pios_video_type_cfg_ntsc;
@@ -133,21 +133,21 @@ bool PIOS_Vsync_ISR()
     static uint16_t Vsync_update = 0;
 
     xHigherPriorityTaskWoken = pdFALSE;
-    m_osdLines = gActiveLine;
-    gActiveLine = 0;
+    m_osdLines   = gActiveLine;
+    gActiveLine  = 0;
     Hsync_update = 0;
     // if video type has changed set new active values
     if (video_type_act != video_type_tmp) {
         video_type_act = video_type_tmp;
-    	if (video_type_act == VIDEO_TYPE_NTSC) {
-        	pios_video_type_boundary_act = &pios_video_type_boundary_ntsc;
-        	pios_video_type_cfg_act = &pios_video_type_cfg_ntsc;
-    	} else {
-        	pios_video_type_boundary_act = &pios_video_type_boundary_pal;
-        	pios_video_type_cfg_act = &pios_video_type_cfg_pal;
-    	}
-    	dev_cfg->pixel_timer.timer->CCR1 = pios_video_type_cfg_act->dc;
-    	dev_cfg->pixel_timer.timer->ARR = pios_video_type_cfg_act->period;
+        if (video_type_act == VIDEO_TYPE_NTSC) {
+            pios_video_type_boundary_act = &pios_video_type_boundary_ntsc;
+            pios_video_type_cfg_act = &pios_video_type_cfg_ntsc;
+        } else {
+            pios_video_type_boundary_act = &pios_video_type_boundary_pal;
+            pios_video_type_cfg_act = &pios_video_type_cfg_pal;
+        }
+        dev_cfg->pixel_timer.timer->CCR1 = pios_video_type_cfg_act->dc;
+        dev_cfg->pixel_timer.timer->ARR  = pios_video_type_cfg_act->period;
     }
     video_type_tmp = VIDEO_TYPE_NTSC;
     // every VSYNC_REDRAW_CNT field: swap buffers and trigger redraw
@@ -173,7 +173,7 @@ bool PIOS_Hsync_ISR()
     }
     // check video type
     if (Hsync_update > VIDEO_TYPE_PAL_ROWS) {
-    	video_type_tmp = VIDEO_TYPE_PAL;
+        video_type_tmp = VIDEO_TYPE_PAL;
     }
 
     return true;
@@ -192,38 +192,40 @@ void PIOS_VIDEO_DMA_Handler(void)
 #ifdef DIRECT_REGISTER_ACCESS
     // Handle flags from DMA stream channel
     if ((dev_cfg->mask_dma->HISR & DMA_FLAG_TCIF7) && (dev_cfg->level_dma->HISR & DMA_FLAG_TCIF5)) {
-        dev_cfg->mask_dma->HIFCR |= DMA_FLAG_TCIF7;
+        dev_cfg->mask_dma->HIFCR  |= DMA_FLAG_TCIF7;
         dev_cfg->level_dma->HIFCR |= DMA_FLAG_TCIF5;
         // Flush SPI, short version
-        while (dev_cfg->level.regs->SR & SPI_I2S_FLAG_BSY);
+        while (dev_cfg->level.regs->SR & SPI_I2S_FLAG_BSY) {
+            ;
+        }
         // Stop pixel timer
-        dev_cfg->pixel_timer.timer->CR1 &= (uint16_t)~TIM_CR1_CEN;
+        dev_cfg->pixel_timer.timer->CR1  &= (uint16_t) ~TIM_CR1_CEN;
         // Disable the pixel timer slave mode configuration
-        dev_cfg->pixel_timer.timer->SMCR &= (uint16_t)~TIM_SMCR_SMS;
-        if (gActiveLine < pios_video_type_cfg_act->graphics_hight_real) {	// lines existing
+        dev_cfg->pixel_timer.timer->SMCR &= (uint16_t) ~TIM_SMCR_SMS;
+        if (gActiveLine < pios_video_type_cfg_act->graphics_hight_real) { // lines existing
             prepare_line(gActiveLine);
-        } else {								// last line completed
+        } else { // last line completed
             // Stop DMA
-            dev_cfg->mask.dma.tx.channel->CR &= ~(uint32_t)DMA_SxCR_EN;
+            dev_cfg->mask.dma.tx.channel->CR  &= ~(uint32_t)DMA_SxCR_EN;
             dev_cfg->level.dma.tx.channel->CR &= ~(uint32_t)DMA_SxCR_EN;
         }
     }
-#else
-    // Handle flags from DMA stream channel
+#else /* ifdef DIRECT_REGISTER_ACCESS */
+      // Handle flags from DMA stream channel
     if (DMA_GetFlagStatus(dev_cfg->mask.dma.tx.channel, DMA_FLAG_TCIF7) && DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel, DMA_FLAG_TCIF5)) {
         DMA_ClearFlag(dev_cfg->mask.dma.tx.channel, DMA_FLAG_TCIF7);
         DMA_ClearFlag(dev_cfg->level.dma.tx.channel, DMA_FLAG_TCIF5);
         flush_spi();
         stop_pixel_timer();
-        if (gActiveLine < pios_video_type_cfg_act->graphics_hight_real) {	// lines existing
+        if (gActiveLine < pios_video_type_cfg_act->graphics_hight_real) { // lines existing
             prepare_line(gActiveLine);
-        } else {								// last line completed
+        } else { // last line completed
             // Stop DMA
             DMA_Cmd(dev_cfg->mask.dma.tx.channel, DISABLE);
             DMA_Cmd(dev_cfg->level.dma.tx.channel, DISABLE);
         }
     }
-#endif
+#endif /* ifdef DIRECT_REGISTER_ACCESS */
 }
 
 
@@ -239,35 +241,35 @@ static void prepare_line(uint32_t line_num)
 
     // Prepare next line DMA:
     // Clear DMA flags
-    dev_cfg->mask_dma->HIFCR |= DMA_FLAG_TCIF7 | DMA_FLAG_HTIF7 | DMA_FLAG_FEIF7 | DMA_FLAG_TEIF7 | DMA_FLAG_DMEIF7;
+    dev_cfg->mask_dma->HIFCR  |= DMA_FLAG_TCIF7 | DMA_FLAG_HTIF7 | DMA_FLAG_FEIF7 | DMA_FLAG_TEIF7 | DMA_FLAG_DMEIF7;
     dev_cfg->level_dma->HIFCR |= DMA_FLAG_TCIF5 | DMA_FLAG_HTIF5 | DMA_FLAG_FEIF5 | DMA_FLAG_TEIF5 | DMA_FLAG_DMEIF5;
     // Load new line
-    dev_cfg->mask.dma.tx.channel->M0AR = (uint32_t)&disp_buffer_mask[buf_offset];
+    dev_cfg->mask.dma.tx.channel->M0AR  = (uint32_t)&disp_buffer_mask[buf_offset];
     dev_cfg->level.dma.tx.channel->M0AR = (uint32_t)&disp_buffer_level[buf_offset];
     // Set length
-    dev_cfg->mask.dma.tx.channel->NDTR = (uint16_t)pios_video_type_cfg_act->dma_buffer_length;
+    dev_cfg->mask.dma.tx.channel->NDTR  = (uint16_t)pios_video_type_cfg_act->dma_buffer_length;
     dev_cfg->level.dma.tx.channel->NDTR = (uint16_t)pios_video_type_cfg_act->dma_buffer_length;
     // Enable SPI
-    dev_cfg->mask.regs->CR1 |= SPI_CR1_SPE;
+    dev_cfg->mask.regs->CR1  |= SPI_CR1_SPE;
     dev_cfg->level.regs->CR1 |= SPI_CR1_SPE;
     // Enable DMA
-    dev_cfg->mask.dma.tx.channel->CR |= (uint32_t)DMA_SxCR_EN;
+    dev_cfg->mask.dma.tx.channel->CR  |= (uint32_t)DMA_SxCR_EN;
     dev_cfg->level.dma.tx.channel->CR |= (uint32_t)DMA_SxCR_EN;
 
     // Stop and recharge pixel timer for next Hsync:
     // Stop pixel timer
-    dev_cfg->pixel_timer.timer->CR1 &= (uint16_t)~TIM_CR1_CEN;
-	// Set the prescaler value
-	dev_cfg->pixel_timer.timer->PSC = 0;
-	// Set to immediate
-	dev_cfg->pixel_timer.timer->EGR = TIM_PSCReloadMode_Immediate;
-	// Set initial line offset
-    dev_cfg->pixel_timer.timer->CNT = 0xffff - pios_video_type_cfg_act->dc * pios_video_type_cfg_act->graphics_column_start;
+    dev_cfg->pixel_timer.timer->CR1  &= (uint16_t) ~TIM_CR1_CEN;
+    // Set the prescaler value
+    dev_cfg->pixel_timer.timer->PSC   = 0;
+    // Set to immediate
+    dev_cfg->pixel_timer.timer->EGR   = TIM_PSCReloadMode_Immediate;
+    // Set initial line offset
+    dev_cfg->pixel_timer.timer->CNT   = 0xffff - pios_video_type_cfg_act->dc * pios_video_type_cfg_act->graphics_column_start;
     // Reset the SMS bits
-    dev_cfg->pixel_timer.timer->SMCR &= (uint16_t)~TIM_SMCR_SMS;
+    dev_cfg->pixel_timer.timer->SMCR &= (uint16_t) ~TIM_SMCR_SMS;
     // Select the slave mode waiting for Hsync
     dev_cfg->pixel_timer.timer->SMCR |= TIM_SlaveMode_Trigger;
-#else
+#else /* ifdef DIRECT_REGISTER_ACCESS */
     uint32_t buf_offset = line_num * BUFFER_WIDTH;
 
     gActiveLine++;
@@ -293,12 +295,12 @@ static void prepare_line(uint32_t line_num)
     // Stop timer
     TIM_Cmd(dev_cfg->pixel_timer.timer, DISABLE);
     // Set prescaler
-	TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
-	// Set initial line offset
+    TIM_PrescalerConfig(dev_cfg->pixel_timer.timer, 0, TIM_PSCReloadMode_Immediate);
+    // Set initial line offset
     dev_cfg->pixel_timer.timer->CNT = 0xffff - pios_video_type_cfg_act->dc * pios_video_type_cfg_act->graphics_column_start;
     // Set timer slave mode waiting for Hsync
     TIM_SelectSlaveMode(dev_cfg->pixel_timer.timer, TIM_SlaveMode_Trigger);
-#endif
+#endif /* ifdef DIRECT_REGISTER_ACCESS */
 }
 
 
@@ -328,9 +330,12 @@ static void swap_buffers()
 static void weird_timer_stuff()
 {
     uint32_t tim_id;
-    const struct pios_tim_channel *channels = &dev_cfg->hsync_capture;
-    const struct pios_tim_callbacks px_callback = {.overflow = NULL, .edge = NULL};
-    while (PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0) >= 0);
+    const struct pios_tim_channel *channels     = &dev_cfg->hsync_capture;
+    const struct pios_tim_callbacks px_callback = { .overflow = NULL, .edge = NULL };
+
+    while (PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0) >= 0) {
+        ;
+    }
 }
 
 
@@ -418,33 +423,33 @@ void PIOS_Video_Init(const struct pios_video_cfg *cfg)
 
 void PIOS_Pixel_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	DAC_InitTypeDef DAC_InitStructure;
+    GPIO_InitTypeDef GPIO_InitStructure;
+    DAC_InitTypeDef DAC_InitStructure;
 
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 
-	// GPIO Configuration
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
+    // GPIO Configuration
+    GPIO_StructInit(&GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_4 | GPIO_Pin_5;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AN;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-	// DAC Configuration
-	DAC_InitStructure.DAC_Trigger = DAC_Trigger_None;
-	DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
-	DAC_InitStructure.DAC_LFSRUnmask_TriangleAmplitude = DAC_LFSRUnmask_Bit0;
-	DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Disable;
-	DAC_Init(DAC_Channel_1, &DAC_InitStructure);
-	DAC_Init(DAC_Channel_2, &DAC_InitStructure);
+    // DAC Configuration
+    DAC_InitStructure.DAC_Trigger = DAC_Trigger_None;
+    DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
+    DAC_InitStructure.DAC_LFSRUnmask_TriangleAmplitude = DAC_LFSRUnmask_Bit0;
+    DAC_InitStructure.DAC_OutputBuffer   = DAC_OutputBuffer_Disable;
+    DAC_Init(DAC_Channel_1, &DAC_InitStructure);
+    DAC_Init(DAC_Channel_2, &DAC_InitStructure);
 
-	// Enable DAC Channel1: Once the DAC channel1 is enabled, PA.04 is automatically connected to the DAC converter.
-	DAC_Cmd(DAC_Channel_1, ENABLE);
-	// Enable DAC Channel2: Once the DAC channel2 is enabled, PA.05 is automatically connected to the DAC converter.
-	DAC_Cmd(DAC_Channel_2, ENABLE);
+    // Enable DAC Channel1: Once the DAC channel1 is enabled, PA.04 is automatically connected to the DAC converter.
+    DAC_Cmd(DAC_Channel_1, ENABLE);
+    // Enable DAC Channel2: Once the DAC channel2 is enabled, PA.05 is automatically connected to the DAC converter.
+    DAC_Cmd(DAC_Channel_2, ENABLE);
 }
 
 
@@ -507,7 +512,7 @@ static void stop_pixel_timer()
     // This removes the slave mode configuration
     TIM_InternalClockConfig(dev_cfg->pixel_timer.timer);
 }
-#endif
+#endif /* ifndef DIRECT_REGISTER_ACCESS */
 
 
 #endif /* PIOS_INCLUDE_VIDEO */

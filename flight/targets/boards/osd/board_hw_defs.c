@@ -534,9 +534,11 @@ const struct pios_usb_cfg *PIOS_BOARD_HW_DEFS_GetUsbCfg(uint32_t board_revision)
     switch (board_revision) {
     case 1:
         return &pios_usb_main_osd_r1_cfg;
+
         break;
     case 2:
         return &pios_usb_main_osd_r2_cfg;
+
         break;
     default:
         PIOS_DEBUG_Assert(0);
@@ -731,14 +733,14 @@ static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
 
 static const struct pios_video_cfg pios_video_cfg = {
     .mask_dma = DMA1,
-    .mask                                              = {
+    .mask     = {
         .regs  = SPI3,
         .remap = GPIO_AF_SPI3,
         .init  = {
             .SPI_Mode              = SPI_Mode_Slave,
             .SPI_Direction         = SPI_Direction_1Line_Tx,
             .SPI_DataSize          = SPI_DataSize_8b,
-            .SPI_NSS               = SPI_NSS_Soft,
+            .SPI_NSS                                   = SPI_NSS_Soft,
             .SPI_FirstBit          = SPI_FirstBit_MSB,
             .SPI_CRCPolynomial     = 7,
             .SPI_CPOL              = SPI_CPOL_Low,
@@ -785,7 +787,7 @@ static const struct pios_video_cfg pios_video_cfg = {
                 .GPIO_Speed = GPIO_Speed_100MHz,
                 .GPIO_Mode  = GPIO_Mode_AF,
                 .GPIO_OType = GPIO_OType_PP,
-                .GPIO_PuPd  = GPIO_PuPd_NOPULL		// JR_HINT or GPIO_PuPd_UP ?
+                .GPIO_PuPd  = GPIO_PuPd_NOPULL          // JR_HINT or GPIO_PuPd_UP ?
             },
         },
         .miso                                          = {
@@ -802,14 +804,14 @@ static const struct pios_video_cfg pios_video_cfg = {
         .slave_count                                   = 1,
     },
     .level_dma = DMA2,
-    .level                                             = {
+    .level     = {
         .regs  = SPI1,
         .remap = GPIO_AF_SPI1,
         .init  = {
             .SPI_Mode              = SPI_Mode_Slave,
             .SPI_Direction         = SPI_Direction_1Line_Tx,
             .SPI_DataSize          = SPI_DataSize_8b,
-            .SPI_NSS               = SPI_NSS_Soft,
+            .SPI_NSS                                   = SPI_NSS_Soft,
             .SPI_FirstBit          = SPI_FirstBit_MSB,
             .SPI_CRCPolynomial     = 7,
             .SPI_CPOL              = SPI_CPOL_Low,
@@ -822,7 +824,7 @@ static const struct pios_video_cfg pios_video_cfg = {
                 .flags = (DMA_IT_TCIF5),
                 .init  = {
                     .NVIC_IRQChannel    = DMA2_Stream5_IRQn,
-                    .NVIC_IRQChannelPreemptionPriority = 0,		// JR_HINT or PIOS_IRQ_PRIO_HIGH ?
+                    .NVIC_IRQChannelPreemptionPriority = 0,                // JR_HINT or PIOS_IRQ_PRIO_HIGH ?
                     .NVIC_IRQChannelSubPriority        = 0,
                     .NVIC_IRQChannelCmd = ENABLE,
                 },
@@ -855,7 +857,7 @@ static const struct pios_video_cfg pios_video_cfg = {
                 .GPIO_Speed = GPIO_Speed_100MHz,
                 .GPIO_Mode  = GPIO_Mode_AF,
                 .GPIO_OType = GPIO_OType_PP,
-                .GPIO_PuPd  = GPIO_PuPd_UP			// JR_HINT or GPIO_PuPd_NOPULL ?
+                .GPIO_PuPd  = GPIO_PuPd_UP                      // JR_HINT or GPIO_PuPd_NOPULL ?
             },
         },
         .miso                                          = {

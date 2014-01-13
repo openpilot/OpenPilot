@@ -179,4 +179,4 @@ static void osdinputTask(__attribute__((unused)) void *parameters)
  * @}
  * @}
  */
-#endif
+#endif /* if 0 */

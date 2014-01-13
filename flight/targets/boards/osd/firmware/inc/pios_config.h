@@ -98,14 +98,14 @@
 /* PIOS abstract receiver interface */
 /* #define PIOS_INCLUDE_RCVR */
 
-/* PIOS common peripherals */						//JR_HINT clean up
+/* PIOS common peripherals */ // JR_HINT clean up
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
 #define PIOS_INCLUDE_SERVO
 /* #define PIOS_INCLUDE_I2C_ESC */
 /* #define PIOS_INCLUDE_OVERO */
 /* #define PIOS_OVERO_SPI */
-//#define PIOS_INCLUDE_SDCARD
+// #define PIOS_INCLUDE_SDCARD
 /* #define PIOS_USE_SETTINGS_ON_SDCARD */
 #define LOG_FILENAME "startup.log"
 #define PIOS_INCLUDE_FLASH
@@ -132,14 +132,14 @@
 /* #define PIOS_INCLUDE_COM_FLEXI */
 #define PIOS_INCLUDE_COM_AUX
 #define PIOS_TELEM_PRIORITY_QUEUE
-//#define PIOS_INCLUDE_GPS
+// #define PIOS_INCLUDE_GPS
 /* #define PIOS_GPS_MINIMAL */
-//#define PIOS_INCLUDE_GPS_NMEA_PARSER
-//#define PIOS_INCLUDE_GPS_UBX_PARSER
-//#define PIOS_GPS_SETS_HOMELOCATION
+// #define PIOS_INCLUDE_GPS_NMEA_PARSER
+// #define PIOS_INCLUDE_GPS_UBX_PARSER
+// #define PIOS_GPS_SETS_HOMELOCATION
 
 /* Stabilization options */
-//#define PIOS_QUATERNION_STABILIZATION
+// #define PIOS_QUATERNION_STABILIZATION
 
 /* Performance counters */
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 8379692

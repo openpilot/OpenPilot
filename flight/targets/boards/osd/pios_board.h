@@ -86,7 +86,7 @@
 
 // Calculated as SYSCLK / APBPresc * (APBPre == 1 ? 1 : 2)
 // Default APB1 Prescaler = 4
-#define PIOS_PERIPHERAL_APB1_CLOCK (PIOS_SYSCLK / 2)				// JR_HINT check
+#define PIOS_PERIPHERAL_APB1_CLOCK (PIOS_SYSCLK / 2) // JR_HINT check
 
 // Peripherals belonging to APB2
 // SDIO			|EXTI				|SYSCFG			|SPI1
@@ -96,7 +96,7 @@
 //
 // Default APB2 Prescaler = 2
 //
-#define PIOS_PERIPHERAL_APB2_CLOCK PIOS_SYSCLK						// JR_HINT check
+#define PIOS_PERIPHERAL_APB2_CLOCK PIOS_SYSCLK // JR_HINT check
 
 // ------------------------
 // TELEMETRY
@@ -134,8 +134,8 @@
 // #define PIOS_DELAY_TIMER				TIM2
 // #define PIOS_DELAY_TIMER_RCC_FUNC	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
 
-// #define PIOS_DELAY_TIMER          	TIM1
-// #define PIOS_DELAY_TIMER_RCC_FUNC 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE)
+// #define PIOS_DELAY_TIMER             TIM1
+// #define PIOS_DELAY_TIMER_RCC_FUNC    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE)
 
 // *****************************************************************
 // Timer interrupt

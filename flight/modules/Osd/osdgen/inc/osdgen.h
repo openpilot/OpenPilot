@@ -118,20 +118,20 @@ struct FontDimensions {
 
 // to convert metric -> imperial
 // for speeds see http://en.wikipedia.org/wiki/Miles_per_hour
-typedef struct {					//	from		metric			imperial
-	float		m_to_m_feet;		//	m			m		1.0		feet	3.280840
-	float		ms_to_ms_fts;		//	m/s			m/s		1.0		ft/s	3.280840
-	float		ms_to_kmh_mph;		//	m/s			km/h	3.6		mph		2.236936
-	uint8_t		char_m_feet;		//	char		'm'				'f'
-	uint8_t		char_ms_fts;		//	char		'm/s'			'ft/s'
+typedef struct {                    // from		metric			imperial
+    float   m_to_m_feet;            // m		m		1.0		feet	3.280840
+    float   ms_to_ms_fts;           // m/s		m/s		1.0		ft/s	3.280840
+    float   ms_to_kmh_mph;          // m/s		km/h	3.6		mph		2.236936
+    uint8_t char_m_feet;            // char		'm'				'f'
+    uint8_t char_ms_fts;            // char		'm/s'			'ft/s'
 } Unit;
 
 // Home position for calculations
 typedef struct {
-    int32_t Latitude;
-    int32_t Longitude;
-    float Altitude;
-	uint8_t GotHome;
+    int32_t  Latitude;
+    int32_t  Longitude;
+    float    Altitude;
+    uint8_t  GotHome;
     uint32_t Distance;
     uint16_t Direction;
 } HomePosition;
@@ -146,26 +146,26 @@ typedef struct {
 } ADCfiltered;
 
 // Max/Min macros.
-#define MAX(a, b)            ((a) > (b) ? (a) : (b))
-#define MIN(a, b)            ((a) < (b) ? (a) : (b))
-#define MAX3(a, b, c)        MAX(a, MAX(b, c))
-#define MIN3(a, b, c)        MIN(a, MIN(b, c))
+#define MAX(a, b)                    ((a) > (b) ? (a) : (b))
+#define MIN(a, b)                    ((a) < (b) ? (a) : (b))
+#define MAX3(a, b, c)                MAX(a, MAX(b, c))
+#define MIN3(a, b, c)                MIN(a, MIN(b, c))
 
 // Check if coordinates are valid. If not, return. Assumes unsigned coordinate
-#define CHECK_COORDS(x, y)   if (x >= GRAPHICS_WIDTH_REAL || y >= GRAPHICS_HEIGHT_REAL) { return; }
-#define CHECK_COORD_X(x)     if (x >= GRAPHICS_WIDTH_REAL) { return; }
-#define CHECK_COORD_Y(y)     if (y >= GRAPHICS_HEIGHT_REAL) { return; }
+#define CHECK_COORDS(x, y)           if (x >= GRAPHICS_WIDTH_REAL || y >= GRAPHICS_HEIGHT_REAL) { return; }
+#define CHECK_COORD_X(x)             if (x >= GRAPHICS_WIDTH_REAL) { return; }
+#define CHECK_COORD_Y(y)             if (y >= GRAPHICS_HEIGHT_REAL) { return; }
 
 // Clip coordinates out of range - assumes unsigned coordinate
-#define CLIP_COORD_X(x)      { x = MIN(x, GRAPHICS_WIDTH_REAL); }
-#define CLIP_COORD_Y(y)      { y = MIN(y, GRAPHICS_HEIGHT_REAL); }
-#define CLIP_COORDS(x, y)    { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
+#define CLIP_COORD_X(x)              { x = MIN(x, GRAPHICS_WIDTH_REAL); }
+#define CLIP_COORD_Y(y)              { y = MIN(y, GRAPHICS_HEIGHT_REAL); }
+#define CLIP_COORDS(x, y)            { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
 
 // Check if coordinates are valid. If not, return. Assumes signed coordinate
-#define CHECK_COORDS_TRUNCATED(x, y)   if (x < GRAPHICS_LEFT || y < GRAPHICS_TOP || x > GRAPHICS_RIGHT || y > GRAPHICS_BOTTOM) { return; }
+#define CHECK_COORDS_TRUNCATED(x, y) if (x < GRAPHICS_LEFT || y < GRAPHICS_TOP || x > GRAPHICS_RIGHT || y > GRAPHICS_BOTTOM) { return; }
 
 // Macro to swap two variables using XOR swap.
-#define SWAP(a, b)           { a ^= b; b ^= a; a ^= b; }
+#define SWAP(a, b)                   { a ^= b; b ^= a; a ^= b; }
 
 uint8_t getCharData(uint16_t charPos);
 

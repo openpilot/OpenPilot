@@ -30,12 +30,12 @@
 
 // ****************
 
-//#define DEBUG_TIMING
-//#define DEBUG_ALARMS
-//#define DEBUG_TELEMETRY
-//#define DEBUG_BLACK_WHITE
-//#define DEBUG_STUFF
-//#define SIMULATE_DATA
+// #define DEBUG_TIMING
+// #define DEBUG_ALARMS
+// #define DEBUG_TELEMETRY
+// #define DEBUG_BLACK_WHITE
+// #define DEBUG_STUFF
+// #define SIMULATE_DATA
 #define TEMP_GPS_STATUS_WORKAROUND
 
 #include <openpilot.h>
@@ -94,9 +94,9 @@ TTime timex;
 Unit Convert[2];
 
 #ifdef DEBUG_TIMING
-static portTickType in_ticks = 0;
+static portTickType in_ticks  = 0;
 static portTickType out_ticks = 0;
-static uint16_t in_time = 0;
+static uint16_t in_time  = 0;
 static uint16_t out_time = 0;
 #endif
 
@@ -319,17 +319,17 @@ void ellipse(int centerX, int centerY, int horizontalRadius, int verticalRadius)
 
 void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size_quarter)
 {
-	float sin_angle = sinf(DEG2RAD(angle));
-	float cos_angle = cosf(DEG2RAD(angle));
-	int16_t peak_x  = (int16_t)(sin_angle * size_quarter * 2);
-	int16_t peak_y  = (int16_t)(cos_angle * size_quarter * 2);
-	int16_t d_end_x = (int16_t)(cos_angle * size_quarter);
-	int16_t d_end_y = (int16_t)(sin_angle * size_quarter);
+    float sin_angle = sinf(DEG2RAD(angle));
+    float cos_angle = cosf(DEG2RAD(angle));
+    int16_t peak_x  = (int16_t)(sin_angle * size_quarter * 2);
+    int16_t peak_y  = (int16_t)(cos_angle * size_quarter * 2);
+    int16_t d_end_x = (int16_t)(cos_angle * size_quarter);
+    int16_t d_end_y = (int16_t)(sin_angle * size_quarter);
 
-	write_line_lm(x + peak_x, y - peak_y, x - peak_x - d_end_x, y + peak_y - d_end_y, 1, 1);
-	write_line_lm(x + peak_x, y - peak_y, x - peak_x + d_end_x, y + peak_y + d_end_y, 1, 1);
-	write_line_lm(x,          y,          x - peak_x - d_end_x, y + peak_y - d_end_y, 1, 1);
-	write_line_lm(x,          y,          x - peak_x + d_end_x, y + peak_y + d_end_y, 1, 1);
+    write_line_lm(x + peak_x, y - peak_y, x - peak_x - d_end_x, y + peak_y - d_end_y, 1, 1);
+    write_line_lm(x + peak_x, y - peak_y, x - peak_x + d_end_x, y + peak_y + d_end_y, 1, 1);
+    write_line_lm(x, y, x - peak_x - d_end_x, y + peak_y - d_end_y, 1, 1);
+    write_line_lm(x, y, x - peak_x + d_end_x, y + peak_y + d_end_y, 1, 1);
 }
 
 void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
@@ -978,8 +978,8 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
  * @param       dots			0 = not dashed, > 0 = # of set/unset dots for the dashed innards
  */
 void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1,
-                         __attribute__((unused)) int endcap0, __attribute__((unused)) int endcap1,
-                         int mode, int mmode, int dots)
+                                          __attribute__((unused)) int endcap0, __attribute__((unused)) int endcap1,
+                                          int mode, int mmode, int dots)
 {
     // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     // This could be improved for speed.
@@ -1001,9 +1001,9 @@ void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1,
         SWAP(x0, x1);
         SWAP(y0, y1);
     }
-    int deltax     = x1 - x0;
+    int deltax = x1 - x0;
     unsigned int deltay = abs(y1 - y0);
-    int error      = deltax / 2;
+    int error  = deltax / 2;
     int ystep;
     int y = y0;
     int x;
@@ -1035,18 +1035,18 @@ void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1,
     error = deltax / 2;
     y     = y0;
     int dot_cnt = 0;
-    int draw = 1;
+    int draw    = 1;
     for (x = x0; x < x1; x++) {
-    	if (dots && !(dot_cnt++ % dots)) {
-    		draw++;
-    	}
-    	if (draw % 2) {
+        if (dots && !(dot_cnt++ % dots)) {
+            draw++;
+        }
+        if (draw % 2) {
             if (steep) {
                 write_pixel_lm_truncated(y, x, mmode, imode);
             } else {
                 write_pixel_lm_truncated(x, y, mmode, imode);
             }
-    	}
+        }
         error -= deltay;
         if (error < 0) {
             y     += ystep;
@@ -1191,31 +1191,33 @@ void write_char16(char ch, int x, int y, int font)
 
     fetch_font_info(0, font, &font_info, NULL);
 
-	// check if char is partly out of boundary
+    // check if char is partly out of boundary
     uint8_t partly_out = (x < GRAPHICS_LEFT) || (x + font_info.width > GRAPHICS_RIGHT) || (y < GRAPHICS_TOP) || (y + font_info.height > GRAPHICS_BOTTOM);
-	// check if char is totally out of boundary, if so return
-    if (partly_out && ((x + font_info.width < GRAPHICS_LEFT) || (x > GRAPHICS_RIGHT) || (y + font_info.height < GRAPHICS_TOP) || (y > GRAPHICS_BOTTOM))) return;
+    // check if char is totally out of boundary, if so return
+    if (partly_out && ((x + font_info.width < GRAPHICS_LEFT) || (x > GRAPHICS_RIGHT) || (y + font_info.height < GRAPHICS_TOP) || (y > GRAPHICS_BOTTOM))) {
+        return;
+    }
 
     // Compute starting address of character
     int addr = CALC_BUFF_ADDR(x, y);
     int wbit = CALC_BIT_IN_WORD(x);
 
     // If font only supports lowercase or uppercase, make the letter lowercase or uppercase
-    //if (font_info.flags & FONT_LOWERCASE_ONLY) ch = tolower(ch);
-    //if (font_info.flags & FONT_UPPERCASE_ONLY) ch = toupper(ch);
+    // if (font_info.flags & FONT_LOWERCASE_ONLY) ch = tolower(ch);
+    // if (font_info.flags & FONT_UPPERCASE_ONLY) ch = toupper(ch);
 
     // How wide is the character? We handle characters from 8 pixels up in this function
     if (font_info.width >= 8) {
         // Load data pointer.
-        row       = ch * font_info.height;
-        xshift    = 16 - font_info.width;
+        row    = ch * font_info.height;
+        xshift = 16 - font_info.width;
         // We can write mask words easily.
         // Level bits are more complicated. We need to set or clear level bits, but only where the mask bit is set; otherwise, we need to leave them alone.
         // To do this, for each word, we construct an AND mask and an OR mask, and apply each individually.
         for (yy = y; yy < y + font_info.height; yy++) {
-        	if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
+            if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
                 if (font == 3) {
-                	// mask
+                    // mask
                     write_word_misaligned_OR(draw_buffer_mask, font_mask12x18[row] << xshift, addr, wbit);
                     // level
                     levels   = font_frame12x18[row];
@@ -1224,7 +1226,7 @@ void write_char16(char ch, int x, int y, int font)
                     or_mask  = font_mask12x18[row] << xshift;
                     and_mask = (font_mask12x18[row] & levels) << xshift;
                 } else {
-                	// mask
+                    // mask
                     write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, wbit);
                     // level
                     levels   = font_frame8x10[row];
@@ -1237,7 +1239,7 @@ void write_char16(char ch, int x, int y, int font)
                 // If we're not bold write the AND mask.
                 // if (!(flags & FONT_BOLD))
                 write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
-        	}
+            }
             addr += BUFFER_WIDTH;
             row++;
         }
@@ -1263,42 +1265,45 @@ void write_char(char ch, int x, int y, int flags, int font)
 
     fetch_font_info(ch, font, &font_info, &lookup);
 
-	// check if char is partly out of boundary
+    // check if char is partly out of boundary
     uint8_t partly_out = (x < GRAPHICS_LEFT) || (x + font_info.width > GRAPHICS_RIGHT) || (y < GRAPHICS_TOP) || (y + font_info.height > GRAPHICS_BOTTOM);
-	// check if char is totally out of boundary, if so return
-    if (partly_out && ((x + font_info.width < GRAPHICS_LEFT) || (x > GRAPHICS_RIGHT) || (y + font_info.height < GRAPHICS_TOP) || (y > GRAPHICS_BOTTOM))) return;
+    // check if char is totally out of boundary, if so return
+    if (partly_out && ((x + font_info.width < GRAPHICS_LEFT) || (x > GRAPHICS_RIGHT) || (y + font_info.height < GRAPHICS_TOP) || (y > GRAPHICS_BOTTOM))) {
+        return;
+    }
 
     // Compute starting address of character
     unsigned int addr = CALC_BUFF_ADDR(x, y);
     unsigned int wbit = CALC_BIT_IN_WORD(x);
 
     // If font only supports lowercase or uppercase, make the letter lowercase or uppercase
-    //if (font_info.flags & FONT_LOWERCASE_ONLY) ch = tolower(ch);
-    //if (font_info.flags & FONT_UPPERCASE_ONLY) ch = toupper(ch);
+    // if (font_info.flags & FONT_LOWERCASE_ONLY) ch = tolower(ch);
+    // if (font_info.flags & FONT_UPPERCASE_ONLY) ch = toupper(ch);
 
     // How wide is the character? We handle characters up to 8 pixels in this function
     if (font_info.width <= 8) {
         // Load data pointer.
-        row       = lookup * font_info.height * 2;
-        xshift    = 16 - font_info.width;
+        row    = lookup * font_info.height * 2;
+        xshift = 16 - font_info.width;
         // We can write mask words easily.
         // Level bits are more complicated. We need to set or clear level bits, but only where the mask bit is set; otherwise, we need to leave them alone.
         // To do this, for each word, we construct an AND mask and an OR mask, and apply each individually.
         for (yy = y; yy < y + font_info.height; yy++) {
-        	if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
-            	// mask
+            if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
+                // mask
                 write_word_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, wbit);
-            	// level
-                levels = font_info.data[row + font_info.height];
-                if (!(flags & FONT_INVERT)) // data is normally inverted
-                	levels   = ~levels;
+                // level
+                levels   = font_info.data[row + font_info.height];
+                if (!(flags & FONT_INVERT)) { // data is normally inverted
+                    levels = ~levels;
+                }
                 or_mask  = font_info.data[row] << xshift;
                 and_mask = (font_info.data[row] & levels) << xshift;
                 write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
                 // If we're not bold write the AND mask.
                 // if (!(flags & FONT_BOLD))
                 write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
-        	}
+            }
             addr += BUFFER_WIDTH;
             row++;
         }
@@ -1691,8 +1696,8 @@ void drawBattery(uint16_t x, uint16_t y, uint8_t battery, uint16_t size)
  * @param       max_val                 maximum expected value (used to compute size of arrow ticker)
  * @param       flags                   special flags (see hud.h.)
  */
-//#define VERTICAL_SCALE_BRUTE_FORCE_BLANK_OUT
-//#define VERTICAL_SCALE_FILLED_NUMBER
+// #define VERTICAL_SCALE_BRUTE_FORCE_BLANK_OUT
+// #define VERTICAL_SCALE_FILLED_NUMBER
 void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int height, int mintick_step, int majtick_step, int mintick_len, int majtick_len,
                              int boundtick_len, __attribute__((unused)) int max_val, int flags)
 {
@@ -1859,7 +1864,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
  * @param       flags                   special flags (see hud.h.)
  */
 #define COMPASS_SMALL_NUMBER
-//#define COMPASS_FILLED_NUMBER
+// #define COMPASS_FILLED_NUMBER
 void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mintick_step, int majtick_step, int mintick_len, int majtick_len, __attribute__((unused)) int flags)
 {
     v %= 360; // wrap, just in case.
@@ -2104,100 +2109,101 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 
 // JR_HINT work in progress
 // artificial horizon in HUD design
-//#define DEBUG_HUD_AH
-#define SUB_HORIZON_WIDTH		70
-#define SUB_NUMBERS_WIDTH		85
-#define SUB_HORIZON_GAP			20
-#define UP_DOWN_LENGTH			8
-#define CENTER_BODY				3
-#define CENTER_WING				7
-#define CENTER_RUDDER			5
+// #define DEBUG_HUD_AH
+#define SUB_HORIZON_WIDTH 70
+#define SUB_NUMBERS_WIDTH 85
+#define SUB_HORIZON_GAP   20
+#define UP_DOWN_LENGTH    8
+#define CENTER_BODY       3
+#define CENTER_WING       7
+#define CENTER_RUDDER     5
 void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)) float yaw, int16_t x, int16_t y, int8_t max_pitch_visible, int8_t delta_degree, int16_t main_line_width, int16_t size)
 {
     char temp[20] = { 0 };
     float sin_roll;
     float cos_roll;
     int8_t i;
-    int16_t pp_x;			// pitch point x
-    int16_t pp_y;			// pitch point y
-	int16_t mp_x;			// middle point x
-	int16_t mp_y;			// middle point y
-	int16_t s_x;			// sum x
-	int16_t s_y;			// sum y
-	int16_t d_x;			// delta x
-	int16_t d_y;			// delta y
-	int16_t side_length;
+    int16_t pp_x; // pitch point x
+    int16_t pp_y; // pitch point y
+    int16_t mp_x; // middle point x
+    int16_t mp_y; // middle point y
+    int16_t s_x; // sum x
+    int16_t s_y; // sum y
+    int16_t d_x; // delta x
+    int16_t d_y; // delta y
+    int16_t side_length;
     int16_t pitch_delta;
-//	int16_t gap_length;													// JR_HINT gap umsetzen
-//	int16_t ud_length;													// JR_HINT up/down umsetzen
+
+// int16_t gap_length;													// JR_HINT gap umsetzen
+// int16_t ud_length;													// JR_HINT up/down umsetzen
 
 #ifdef DEBUG_HUD_AH
-    sprintf(temp, "Roll: %4d", (int) roll);
+    sprintf(temp, "Roll: %4d", (int)roll);
     write_string(temp, GRAPHICS_LEFT + 8, 55, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-    sprintf(temp, "Pitch:%4d", (int) pitch);
+    sprintf(temp, "Pitch:%4d", (int)pitch);
     write_string(temp, GRAPHICS_LEFT + 8, 65, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-    sprintf(temp, "Yaw:  %4d", (int) yaw);
+    sprintf(temp, "Yaw:  %4d", (int)yaw);
     write_string(temp, GRAPHICS_LEFT + 8, 75, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 #endif
 
-    sin_roll = sinf(DEG2RAD(roll));
-    cos_roll = cosf(DEG2RAD(roll));
+    sin_roll    = sinf(DEG2RAD(roll));
+    cos_roll    = cosf(DEG2RAD(roll));
 
-	// roll to pitch transformation
-	pp_x = x * (1 + (sin_roll * pitch) / (float)max_pitch_visible);
-	pp_y = y * (1 + (cos_roll * pitch) / (float)max_pitch_visible);
+    // roll to pitch transformation
+    pp_x        = x * (1 + (sin_roll * pitch) / (float)max_pitch_visible);
+    pp_y        = y * (1 + (cos_roll * pitch) / (float)max_pitch_visible);
 
     // main horizon
-	side_length = main_line_width * size / 200;
-	d_x = cos_roll * side_length;
-	d_y = sin_roll * side_length;
-	write_line_outlined_dashed_truncated(pp_x - d_x,   pp_y + d_y,   pp_x + d_x,   pp_y - d_y,   2, 2, 0, 1, 0);
+    side_length = main_line_width * size / 200;
+    d_x = cos_roll * side_length;
+    d_y = sin_roll * side_length;
+    write_line_outlined_dashed_truncated(pp_x - d_x, pp_y + d_y, pp_x + d_x, pp_y - d_y, 2, 2, 0, 1, 0);
 
     // sub horizons
-	pitch_delta = GRAPHICS_BOTTOM / (2 * (float)max_pitch_visible / (float)delta_degree) + 2;
-//	gap_length = SUB_HORIZON_GAP * size / 200;
-//	ud_length = UP_DOWN_LENGTH * size / 100;
+    pitch_delta = GRAPHICS_BOTTOM / (2 * (float)max_pitch_visible / (float)delta_degree) + 2;
+// gap_length = SUB_HORIZON_GAP * size / 200;
+// ud_length = UP_DOWN_LENGTH * size / 100;
 
     for (i = 1; i <= 180 / delta_degree; i++) {
-        sprintf(temp, "%2d", delta_degree * i);	// string for the sub horizon numbers
-    	mp_x = sin_roll * pitch_delta * i;		// x middle point of the current sub horizon
-    	mp_y = cos_roll * pitch_delta * i;		// y middle point of the current sub horizon
+        sprintf(temp, "%2d", delta_degree * i); // string for the sub horizon numbers
+        mp_x = sin_roll * pitch_delta * i; // x middle point of the current sub horizon
+        mp_y = cos_roll * pitch_delta * i; // y middle point of the current sub horizon
 
-    	// deltas for the sub horizon lines
-    	side_length = SUB_HORIZON_WIDTH * size / 200;
-    	d_x = cos_roll * side_length;
-    	d_y = sin_roll * side_length;
+        // deltas for the sub horizon lines
+        side_length = SUB_HORIZON_WIDTH * size / 200;
+        d_x = cos_roll * side_length;
+        d_y = sin_roll * side_length;
 
-    	// positive sub horizon line (solid)
-    	s_x = pp_x - mp_x;
-    	s_y = pp_y - mp_y;
-    	write_line_outlined_dashed_truncated(s_x - d_x,   s_y + d_y,   s_x + d_x,   s_y - d_y,   2, 2, 0, 1, 0);
+        // positive sub horizon line (solid)
+        s_x = pp_x - mp_x;
+        s_y = pp_y - mp_y;
+        write_line_outlined_dashed_truncated(s_x - d_x, s_y + d_y, s_x + d_x, s_y - d_y, 2, 2, 0, 1, 0);
 
-    	// negative sub horizon line (dashed)
-    	s_x = pp_x + mp_x;
-    	s_y = pp_y + mp_y;
-    	write_line_outlined_dashed_truncated(s_x - d_x,   s_y + d_y,   s_x + d_x,   s_y - d_y,   2, 2, 0, 1, 4);
+        // negative sub horizon line (dashed)
+        s_x = pp_x + mp_x;
+        s_y = pp_y + mp_y;
+        write_line_outlined_dashed_truncated(s_x - d_x, s_y + d_y, s_x + d_x, s_y - d_y, 2, 2, 0, 1, 4);
 
-    	// deltas for the sub horizon numbers
-    	side_length = SUB_NUMBERS_WIDTH * size / 200;
-    	d_x = cos_roll * side_length;
-    	d_y = sin_roll * side_length;
+        // deltas for the sub horizon numbers
+        side_length = SUB_NUMBERS_WIDTH * size / 200;
+        d_x = cos_roll * side_length;
+        d_y = sin_roll * side_length;
 
-    	// positive sub horizon numbers
-    	s_x = pp_x - mp_x;
-    	s_y = pp_y - mp_y;
-        write_string(temp,   s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
-        write_string(temp,   s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        // positive sub horizon numbers
+        s_x = pp_x - mp_x;
+        s_y = pp_y - mp_y;
+        write_string(temp, s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        write_string(temp, s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
 
-    	// negative sub horizon numbers
-    	s_x = pp_x + mp_x;
-    	s_y = pp_y + mp_y;
-        write_string(temp,   s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
-        write_string(temp,   s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        // negative sub horizon numbers
+        s_x = pp_x + mp_x;
+        s_y = pp_y + mp_y;
+        write_string(temp, s_x - d_x, s_y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
+        write_string(temp, s_x + d_x, s_y - d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 2);
     }
 
-	// center mark
-	write_circle_outlined(x, y, CENTER_BODY, 0, 0, 0, 1);
+    // center mark
+    write_circle_outlined(x, y, CENTER_BODY, 0, 0, 0, 1);
     write_line_outlined(x - CENTER_WING - CENTER_BODY, y, x - CENTER_BODY, y, 2, 0, 0, 1);
     write_line_outlined(x + 1 + CENTER_BODY, y, x + 1 + CENTER_BODY + CENTER_WING, y, 0, 2, 0, 1);
     write_line_outlined(x, y - CENTER_RUDDER - CENTER_BODY, x, y - CENTER_BODY, 2, 0, 0, 1);
@@ -2211,8 +2217,9 @@ void introGraphics(int16_t x, int16_t y)
     copyimage(x - splash[0].width / 2, y - splash[0].height / 2, 0);
 
     /* frame */
-    for (i = 0; i <= 20; i += 10)
-    	drawBox(i, i, GRAPHICS_RIGHT - i, GRAPHICS_BOTTOM - i);
+    for (i = 0; i <= 20; i += 10) {
+        drawBox(i, i, GRAPHICS_RIGHT - i, GRAPHICS_BOTTOM - i);
+    }
 }
 
 void introText(int16_t x, int16_t y)
@@ -2222,10 +2229,11 @@ void introText(int16_t x, int16_t y)
 
 void showVideoType(int16_t x, int16_t y)
 {
-	if (PIOS_Video_GetType() == VIDEO_TYPE_NTSC)
-		write_string("NTSC", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
-	else
-		write_string("PAL", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+    if (PIOS_Video_GetType() == VIDEO_TYPE_NTSC) {
+        write_string("NTSC", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+    } else {
+        write_string("PAL", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+    }
 }
 
 void calcHomeArrow(int16_t m_yaw)
@@ -2310,31 +2318,31 @@ void calcHomeArrow(int16_t m_yaw)
 
 // check for stable gps as home position
 // criteria for a stable home position:
-//  - GPS status > GPSPOSITIONSENSOR_STATUS_FIX2D
-//  - with at least CHECK_HOME_MIN_SATS satellites
-//  - and gpsData->Altitude delta is lower CHECK_HOME_MAX_DEV m for CHECK_HOME_STABLE ms
-#define CHECK_HOME_MIN_SATS		5
-#define CHECK_HOME_MAX_DEV		0.5f		// [m]
-#define CHECK_HOME_STABLE		3000		// [ms]
+// - GPS status > GPSPOSITIONSENSOR_STATUS_FIX2D
+// - with at least CHECK_HOME_MIN_SATS satellites
+// - and gpsData->Altitude delta is lower CHECK_HOME_MAX_DEV m for CHECK_HOME_STABLE ms
+#define CHECK_HOME_MIN_SATS 5
+#define CHECK_HOME_MAX_DEV  0.5f            // [m]
+#define CHECK_HOME_STABLE   3000            // [ms]
 void check_gps_home(HomePosition *homePos, GPSPositionSensorData *gpsData)
 {
-	static portTickType stable_time = 0;
-	portTickType current_time = xTaskGetTickCount();
-	static float alt_prev = 0.0f;
+    static portTickType stable_time = 0;
+    portTickType current_time = xTaskGetTickCount();
+    static float alt_prev     = 0.0f;
 
-	if (!homePos->GotHome && gpsData->Status > GPSPOSITIONSENSOR_STATUS_FIX2D && gpsData->Satellites >= CHECK_HOME_MIN_SATS) {
-		if (fabsf(alt_prev - gpsData->Altitude) > CHECK_HOME_MAX_DEV) {
-			stable_time = current_time;
-			alt_prev = gpsData->Altitude;
-		} else {
-			if (current_time - stable_time > CHECK_HOME_STABLE) {
-				homePos->Latitude = gpsData->Latitude;		// take this Latitude as home Latitude
-				homePos->Longitude = gpsData->Longitude;	// take this Longitude as home Longitude
-				homePos->Altitude = gpsData->Altitude;		// take this stable Altitude as home Altitude
-				homePos->GotHome = TRUE;					// we got home
-			}
-		}
-	}
+    if (!homePos->GotHome && gpsData->Status > GPSPOSITIONSENSOR_STATUS_FIX2D && gpsData->Satellites >= CHECK_HOME_MIN_SATS) {
+        if (fabsf(alt_prev - gpsData->Altitude) > CHECK_HOME_MAX_DEV) {
+            stable_time = current_time;
+            alt_prev    = gpsData->Altitude;
+        } else {
+            if (current_time - stable_time > CHECK_HOME_STABLE) {
+                homePos->Latitude  = gpsData->Latitude;          // take this Latitude as home Latitude
+                homePos->Longitude = gpsData->Longitude; // take this Longitude as home Longitude
+                homePos->Altitude  = gpsData->Altitude;          // take this stable Altitude as home Altitude
+                homePos->GotHome   = TRUE;                                        // we got home
+            }
+        }
+    }
 }
 
 
@@ -2342,153 +2350,163 @@ void check_gps_home(HomePosition *homePos, GPSPositionSensorData *gpsData)
 void calc_home_data(HomePosition *homePos, GPSPositionSensorData *gpsData)
 {
     // shrinking factor for longitude going to poles direction
-	float rad = DEG2RAD(fabsf((float)homePos->Latitude / 10000000.0f));
+    float rad = DEG2RAD(fabsf((float)homePos->Latitude / 10000000.0f));
     float scaleLongDown = cosf(rad);
-    float scaleLongUp = 1.0f / scaleLongDown;
+    float scaleLongUp   = 1.0f / scaleLongDown;
 
     // deltas
-    float dLat = (float)(homePos->Latitude - gpsData->Latitude) / 10000000.0f;
-    float dLon = (float)(homePos->Longitude - gpsData->Longitude) / 10000000.0f;
+    float dLat   = (float)(homePos->Latitude - gpsData->Latitude) / 10000000.0f;
+    float dLon   = (float)(homePos->Longitude - gpsData->Longitude) / 10000000.0f;
 
     // distance to home
     float dstlat = fabsf(dLat) * 111319.5f;
     float dstlon = fabsf(dLon) * 111319.5f * scaleLongDown;
+
     homePos->Distance = (uint32_t)sqrtf(dstlat * dstlat + dstlon * dstlon);
 
     // direction to home
     dstlat = dLat * scaleLongUp;
     dstlon = dLon;
-    int16_t direction = (int16_t)(90.0f + RAD2DEG(atan2f(dstlat, -dstlon)));	// absolut home direction
-    if (direction < 0) direction += 360;										// normalization
-    direction = direction - 180;												// absolut return direction
-    if (direction < 0) direction += 360;										// normalization
-    direction = direction - (int16_t)gpsData->Heading;							// relative home direction
-    if (direction < 0) direction += 360;										// normalization
+    int16_t direction = (int16_t)(90.0f + RAD2DEG(atan2f(dstlat, -dstlon))); // absolut home direction
+    if (direction < 0) {
+        direction += 360; // normalization
+    }
+    direction = direction - 180; // absolut return direction
+    if (direction < 0) {
+        direction += 360; // normalization
+    }
+    direction = direction - (int16_t)gpsData->Heading; // relative home direction
+    if (direction < 0) {
+        direction += 360; // normalization
+    }
     homePos->Direction = (uint16_t)direction;
 }
 
 
 uint8_t check_enable_and_srceen(uint8_t info, OsdSettingsWarningsSetupData *setup, uint8_t screen, int16_t *x, int16_t *y)
 {
-	if (!info) return 0;
+    if (!info) {
+        return 0;
+    }
 
     switch (screen) {
     case 1:
-    	if (setup->X1 || setup->Y1) {
-    		*x = setup->X1;
-    		*y = setup->Y1;
-    		return info;
-    	}
+        if (setup->X1 || setup->Y1) {
+            *x = setup->X1;
+            *y = setup->Y1;
+            return info;
+        }
         break;
     case 2:
-    	if (setup->X2 || setup->Y2) {
-    		*x = setup->X2;
-    		*y = setup->Y2;
-    		return info;
-    	}
+        if (setup->X2 || setup->Y2) {
+            *x = setup->X2;
+            *y = setup->Y2;
+            return info;
+        }
         break;
     case 3:
-    	if (setup->X3 || setup->Y3) {
-    		*x = setup->X3;
-    		*y = setup->Y3;
-    		return info;
-    	}
+        if (setup->X3 || setup->Y3) {
+            *x = setup->X3;
+            *y = setup->Y3;
+            return info;
+        }
         break;
     default:
-    	return 0;
+        return 0;
+
         break;
     }
 
-	return 0;
+    return 0;
 }
 
 
-#define ACCUMULATE_MIN_PERIOD		35
+#define ACCUMULATE_MIN_PERIOD 35
 void accumulate_current(double current_amp, double *current_total)
 {
-	static portTickType callTimer = 0;
-	portTickType current_ms;
-	portTickType delta_ms;
+    static portTickType callTimer = 0;
+    portTickType current_ms;
+    portTickType delta_ms;
 
-	current_ms = xTaskGetTickCount();
+    current_ms = xTaskGetTickCount();
 
-	if (callTimer + ACCUMULATE_MIN_PERIOD <= current_ms) {
-		delta_ms	= current_ms - callTimer;
-		callTimer	= current_ms;
-		*current_total += current_amp * (double) delta_ms * 0.0002778d;		// .0002778 is 1/3600 (conversion to hours)
-	}
+    if (callTimer + ACCUMULATE_MIN_PERIOD <= current_ms) {
+        delta_ms  = current_ms - callTimer;
+        callTimer = current_ms;
+        *current_total += current_amp * (double)delta_ms * 0.0002778d; // .0002778 is 1/3600 (conversion to hours)
+    }
 }
 
 
-#define WARN_ON_TIME			 500			// [ms]
-#define WARN_OFF_TIME			 250			// [ms]
-#define WARN_DO_NOT_MOVE		0x0001
-#define WARN_NO_SAT_FIX			0x0002
-#define WARN_HOME_NOT_SET		0x0004
-#define WARN_DISARMED			0x0008
-#define WARN_RSSI_LOW			0x0010
-#define WARN_BATT_FLIGHT_LOW	0x0020
-#define WARN_BATT_VIDEO_LOW		0x0040
-#define WARN_BATT_SCURR_HIGH	0x0080
-#define WARN_BATT_SVOLT_LOW		0x0100
+#define WARN_ON_TIME         500                    // [ms]
+#define WARN_OFF_TIME        250                    // [ms]
+#define WARN_DO_NOT_MOVE     0x0001
+#define WARN_NO_SAT_FIX      0x0002
+#define WARN_HOME_NOT_SET    0x0004
+#define WARN_DISARMED        0x0008
+#define WARN_RSSI_LOW        0x0010
+#define WARN_BATT_FLIGHT_LOW 0x0020
+#define WARN_BATT_VIDEO_LOW  0x0040
+#define WARN_BATT_SCURR_HIGH 0x0080
+#define WARN_BATT_SVOLT_LOW  0x0100
 void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, int8_t char_size)
 {
-	static portTickType on_off_time = 0;
-	portTickType current_time = xTaskGetTickCount();
+    static portTickType on_off_time = 0;
+    portTickType current_time = xTaskGetTickCount();
     char temp[20] = { 0 };
-	int d_y = 0;
+    int d_y = 0;
 
-	if (!WarnMask || current_time - on_off_time > WARN_ON_TIME + WARN_OFF_TIME) {
-		on_off_time = current_time;
-	}
+    if (!WarnMask || current_time - on_off_time > WARN_ON_TIME + WARN_OFF_TIME) {
+        on_off_time = current_time;
+    }
 
-	if (WarnMask && current_time - on_off_time < WARN_ON_TIME) {
-		if (WarnMask & WARN_DO_NOT_MOVE) {
-	        sprintf(temp,  "DO NOT MOVE");
-	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-	        d_y += v_spacing;
-		}
-		if (WarnMask & WARN_NO_SAT_FIX) {
-	        sprintf(temp,  "NO SAT FIX");
-	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-	        d_y += v_spacing;
-		}
-		if (WarnMask & WARN_HOME_NOT_SET) {
-	        sprintf(temp,  "HOME NOT SET");
-	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-	        d_y += v_spacing;
-		}
-		if (WarnMask & WARN_DISARMED) {
-	        sprintf(temp,  "DISARMED");
-	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-	        d_y += v_spacing;
-		}
-		if (WarnMask & WARN_RSSI_LOW) {
-	        sprintf(temp,  "RSSI LOW");
-	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-	        d_y += v_spacing;
-		}
-		if (WarnMask & WARN_BATT_FLIGHT_LOW) {
-	        sprintf(temp,  "FLIGHT BATT LOW");
-	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-	        d_y += v_spacing;
-		}
-		if (WarnMask & WARN_BATT_VIDEO_LOW) {
-	        sprintf(temp,  "VIDEO BATT LOW");
-	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-	        d_y += v_spacing;
-		}
-		if (WarnMask & WARN_BATT_SCURR_HIGH) {
-	        sprintf(temp,  "CURRENT HIGH");
-	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-	        d_y += v_spacing;
-		}
-		if (WarnMask & WARN_BATT_SVOLT_LOW) {
-	        sprintf(temp,  "VOLTAGE LOW");
-	        write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-	        d_y += v_spacing;
-		}
-	}
+    if (WarnMask && current_time - on_off_time < WARN_ON_TIME) {
+        if (WarnMask & WARN_DO_NOT_MOVE) {
+            sprintf(temp, "DO NOT MOVE");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+        if (WarnMask & WARN_NO_SAT_FIX) {
+            sprintf(temp, "NO SAT FIX");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+        if (WarnMask & WARN_HOME_NOT_SET) {
+            sprintf(temp, "HOME NOT SET");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+        if (WarnMask & WARN_DISARMED) {
+            sprintf(temp, "DISARMED");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+        if (WarnMask & WARN_RSSI_LOW) {
+            sprintf(temp, "RSSI LOW");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+        if (WarnMask & WARN_BATT_FLIGHT_LOW) {
+            sprintf(temp, "FLIGHT BATT LOW");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+        if (WarnMask & WARN_BATT_VIDEO_LOW) {
+            sprintf(temp, "VIDEO BATT LOW");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+        if (WarnMask & WARN_BATT_SCURR_HIGH) {
+            sprintf(temp, "CURRENT HIGH");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+        if (WarnMask & WARN_BATT_SVOLT_LOW) {
+            sprintf(temp, "VOLTAGE LOW");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+    }
 }
 
 
@@ -2547,6 +2565,7 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
 void updateGraphics()
 {
     OsdSettingsData OsdSettings;
+
     OsdSettingsGet(&OsdSettings);
     OsdSettings2Data OsdSettings2;
     OsdSettings2Get(&OsdSettings2);
@@ -2577,47 +2596,49 @@ void updateGraphics()
     {
 #ifdef SIMULATE_DATA
         static int alt = 0;
-        gpsData.Altitude = alt++;
+        gpsData.Altitude    = alt++;
         static int spd = 0;
         gpsData.Groundspeed = spd++;
 #endif
 
         static uint8_t power_on_time = 0;
         static uint8_t airborne = FALSE;
-        static double current_total = 0;		// accumulated sensor current [mAh]
+        static double current_total  = 0;                // accumulated sensor current [mAh]
         static HomePosition homePos;
         static ADCfiltered filteredADC;
-        char temp[50] = { 0 };
-        int8_t screen = 2;
+        char temp[50]     = { 0 };
+        int8_t screen     = 2;
         int8_t check;
         int16_t x, y;
-    	uint32_t WarnMask = 0;
+        uint32_t WarnMask = 0;
         Unit *convert;
 
 #ifdef TEMP_GPS_STATUS_WORKAROUND
         static uint8_t gps_status = 0;
         if (gpsData.Status == GPSPOSITIONSENSOR_STATUS_FIX3D && gpsData.Satellites >= 5) {
-        	gps_status = GPSPOSITIONSENSOR_STATUS_FIX3D;
+            gps_status = GPSPOSITIONSENSOR_STATUS_FIX3D;
         }
         if (gps_status == GPSPOSITIONSENSOR_STATUS_FIX3D && gpsData.Satellites >= 3) {
-        	gpsData.Status = GPSPOSITIONSENSOR_STATUS_FIX3D;
+            gpsData.Status = GPSPOSITIONSENSOR_STATUS_FIX3D;
         }
 #endif
 
         // JR_HINT TODO
-        //		RSSI version PacketRxOk
-        //		RSSI version Scherrer digital
-        //		use nice icons for some of the displayed values
-        //		use homePos.Altitude for baro.Altitude correction?
+        // RSSI version PacketRxOk
+        // RSSI version Scherrer digital
+        // use nice icons for some of the displayed values
+        // use homePos.Altitude for baro.Altitude correction?
 
         // Screen switching via RC-RX or GCS
         if (mcc.Connected) {
-            if (mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] < OsdSettings.ScreenSwitching.Switch1Pulse)
-            	screen = 1;
-            if (mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] > OsdSettings.ScreenSwitching.Switch3Pulse)
-            	screen = 3;
+            if (mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] < OsdSettings.ScreenSwitching.Switch1Pulse) {
+                screen = 1;
+            }
+            if (mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] > OsdSettings.ScreenSwitching.Switch3Pulse) {
+                screen = 3;
+            }
         } else {
-        	screen = OsdSettings.ScreenSwitching.UnconnectedScreen;
+            screen = OsdSettings.ScreenSwitching.UnconnectedScreen;
         }
 
         // Set the units to metric or imperial
@@ -2625,23 +2646,23 @@ void updateGraphics()
 
         // Home position calculations
         if (homePos.GotHome) {
-        	calc_home_data(&homePos, &gpsData);
+            calc_home_data(&homePos, &gpsData);
         } else {
-        	if (OsdSettings.HomeSource == OSDSETTINGS_HOMESOURCE_CONFIG && home.Set == HOMELOCATION_SET_TRUE) {
-        		homePos.Latitude = home.Latitude;
+            if (OsdSettings.HomeSource == OSDSETTINGS_HOMESOURCE_CONFIG && home.Set == HOMELOCATION_SET_TRUE) {
+                homePos.Latitude  = home.Latitude;
                 homePos.Longitude = home.Longitude;
-                homePos.Altitude = home.Altitude;
-                homePos.GotHome = TRUE;
-        	} else {
-            	check_gps_home(&homePos, &gpsData);
-        	}
+                homePos.Altitude  = home.Altitude;
+                homePos.GotHome   = TRUE;
+            } else {
+                check_gps_home(&homePos, &gpsData);
+            }
         }
 
         // Draw AH first so that it is underneath everything else
-		// Artificial horizon in HUD design (centered relative to x, y)
-        if (check_enable_and_srceen(OsdSettings.ArtificialHorizon, (OsdSettingsWarningsSetupData*)&OsdSettings.ArtificialHorizonSetup, screen, &x, &y)) {
+        // Artificial horizon in HUD design (centered relative to x, y)
+        if (check_enable_and_srceen(OsdSettings.ArtificialHorizon, (OsdSettingsWarningsSetupData *)&OsdSettings.ArtificialHorizonSetup, screen, &x, &y)) {
 #if 1
-        	hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, x, y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
+            hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, x, y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
 #else
             sprintf(temp, "Roll: %7.2f", (double)attitude.Roll);
             write_string(temp, 200, 100, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 3);
@@ -2649,67 +2670,67 @@ void updateGraphics()
             write_string(temp, 200, 120, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 3);
 #endif
         }
-		// GPS coordinates
-        if (check_enable_and_srceen(OsdSettings.GPSLatitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLatitudeSetup, screen, &x, &y)) {
+        // GPS coordinates
+        if (check_enable_and_srceen(OsdSettings.GPSLatitude, (OsdSettingsWarningsSetupData *)&OsdSettings.GPSLatitudeSetup, screen, &x, &y)) {
             sprintf(temp, "Lat%11.6f", homePos.GotHome ? (double)(gpsData.Latitude / 10000000.0f + OsdSettings2.PositionStealth) : (double)0.0f);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLatitudeSetup.CharSize);
         }
-        if (check_enable_and_srceen(OsdSettings.GPSLongitude, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSLongitudeSetup, screen, &x, &y)) {
+        if (check_enable_and_srceen(OsdSettings.GPSLongitude, (OsdSettingsWarningsSetupData *)&OsdSettings.GPSLongitudeSetup, screen, &x, &y)) {
             sprintf(temp, "Lon%11.6f", homePos.GotHome ? (double)(gpsData.Longitude / 10000000.0f + OsdSettings2.PositionStealth) : (double)0.0f);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLongitudeSetup.CharSize);
         }
-		// GPS satellite info
-        if (check_enable_and_srceen(OsdSettings.GPSSatInfo, (OsdSettingsWarningsSetupData*)&OsdSettings.GPSSatInfoSetup, screen, &x, &y)) {
-        	uint8_t fix = gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX2D ? '-' : gpsData.Status - 1;
+        // GPS satellite info
+        if (check_enable_and_srceen(OsdSettings.GPSSatInfo, (OsdSettingsWarningsSetupData *)&OsdSettings.GPSSatInfoSetup, screen, &x, &y)) {
+            uint8_t fix = gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX2D ? '-' : gpsData.Status - 1;
             sprintf(temp, "Sat%4d%c", gpsData.Satellites, fix);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSSatInfoSetup.CharSize);
         }
-		// Ground speed in HUD design as vertical scale left side (centered relative to y)
-        if (check_enable_and_srceen(OsdSettings.Speed, (OsdSettingsWarningsSetupData*)&OsdSettings.SpeedSetup, screen, &x, &y)) {
+        // Ground speed in HUD design as vertical scale left side (centered relative to y)
+        if (check_enable_and_srceen(OsdSettings.Speed, (OsdSettingsWarningsSetupData *)&OsdSettings.SpeedSetup, screen, &x, &y)) {
             hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, -1, x, y, 100, 10, 20, 7, 12, 15, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
-		// Home altitude in HUD design as vertical scale right side (centered relative to y)
-        if (check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData*)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
+        // Home altitude in HUD design as vertical scale right side (centered relative to y)
+        if (check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData *)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
             hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, +1, x, y, 100, 10, 20, 7, 12, 15, 100, 0);
         }
-		// Heading in HUD design (centered relative to x)
+        // Heading in HUD design (centered relative to x)
         // JR_HINT TODO use and test mag heading in-flight
-        if (check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData*)&OsdSettings.HeadingSetup, screen, &x, &y)) {
-        	int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
-    		hud_draw_linear_compass(heading < 0 ? heading + 360: heading, 150, 120, x, y, 15, 30, 7, 12, 0);
+        if (check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData *)&OsdSettings.HeadingSetup, screen, &x, &y)) {
+            int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
+            hud_draw_linear_compass(heading < 0 ? heading + 360 : heading, 150, 120, x, y, 15, 30, 7, 12, 0);
         }
         // Home direction visualization
-        if (check_enable_and_srceen(OsdSettings.HomeArrow, (OsdSettingsWarningsSetupData*)&OsdSettings.HomeArrowSetup, screen, &x, &y)) {
-        	drawArrow(x, y, homePos.Direction, OsdSettings.HomeArrowSetup.Size);
+        if (check_enable_and_srceen(OsdSettings.HomeArrow, (OsdSettingsWarningsSetupData *)&OsdSettings.HomeArrowSetup, screen, &x, &y)) {
+            drawArrow(x, y, homePos.Direction, OsdSettings.HomeArrowSetup.Size);
         }
         // Home distance
-        if (check_enable_and_srceen(OsdSettings.HomeDistance, (OsdSettingsWarningsSetupData*)&OsdSettings.HomeDistanceSetup, screen, &x, &y)) {
-        	int d = (int)(homePos.Distance * convert->m_to_m_feet);
-        	if (homePos.GotHome) {
+        if (check_enable_and_srceen(OsdSettings.HomeDistance, (OsdSettingsWarningsSetupData *)&OsdSettings.HomeDistanceSetup, screen, &x, &y)) {
+            int d = (int)(homePos.Distance * convert->m_to_m_feet);
+            if (homePos.GotHome) {
                 sprintf(temp, "HD%5d%c", d <= 99999 ? d : 99999, convert->char_m_feet);
-        	} else {
+            } else {
                 sprintf(temp, "HD  ---%c", convert->char_m_feet);
-        	}
+            }
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.HomeDistanceSetup.CharSize);
         }
         // Vertical speed
-        if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData*)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
-            sprintf(temp, "VS%5.1f%c", (double)-gpsVelocityData.Down, 0x88);												// TODO currently m/s for both
-            //sprintf(temp, "VS%5.1f%c", (double)(-gpsVelocityData.Down * convert->ms_to_ms_fts), convert->char_ms_fts);	// TODO is ft/s or ft/m the common unit for imperial?
+        if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData *)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
+            sprintf(temp, "VS%5.1f%c", (double)-gpsVelocityData.Down, 0x88); // TODO currently m/s for both
+            // sprintf(temp, "VS%5.1f%c", (double)(-gpsVelocityData.Down * convert->ms_to_ms_fts), convert->char_ms_fts);	// TODO is ft/s or ft/m the common unit for imperial?
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.VerticalSpeedSetup.CharSize);
         }
-		// Flight mode
-        if (check_enable_and_srceen(OsdSettings.FlightMode, (OsdSettingsWarningsSetupData*)&OsdSettings.FlightModeSetup, screen, &x, &y)) {
-        	draw_flight_mode(status.FlightMode, x, y, OsdSettings.FlightModeSetup.CharSize);
+        // Flight mode
+        if (check_enable_and_srceen(OsdSettings.FlightMode, (OsdSettingsWarningsSetupData *)&OsdSettings.FlightModeSetup, screen, &x, &y)) {
+            draw_flight_mode(status.FlightMode, x, y, OsdSettings.FlightModeSetup.CharSize);
         }
-		// Throttle
-        if (check_enable_and_srceen(OsdSettings.Throttle, (OsdSettingsWarningsSetupData*)&OsdSettings.ThrottleSetup, screen, &x, &y)) {
-        	int throttle = (int)(mcc.Throttle * 100.0f);
+        // Throttle
+        if (check_enable_and_srceen(OsdSettings.Throttle, (OsdSettingsWarningsSetupData *)&OsdSettings.ThrottleSetup, screen, &x, &y)) {
+            int throttle = (int)(mcc.Throttle * 100.0f);
             sprintf(temp, "Thr%4d%c", throttle < 0 ? 0 : throttle, '%');
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.ThrottleSetup.CharSize);
         }
-		// Flight time
-        check = check_enable_and_srceen(OsdSettings.Time, (OsdSettingsWarningsSetupData*)&OsdSettings.TimeSetup, screen, &x, &y);
+        // Flight time
+        check = check_enable_and_srceen(OsdSettings.Time, (OsdSettingsWarningsSetupData *)&OsdSettings.TimeSetup, screen, &x, &y);
         if (check == OSDSETTINGS_TIME_HOURMINSEC) {
             sprintf(temp, "%02d:%02d:%02d", timex.hour, timex.min, timex.sec);
         }
@@ -2720,66 +2741,66 @@ void updateGraphics()
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.TimeSetup.CharSize);
         }
 
-#define ADC_FILTER			(double)0.1f
-#define ADC_REFERENCE		3.0f
-#define	ADC_RESOLUTION		4096.0f
-#define ADC_VOLT			0
-#define ADC_CURR			1
-#define ADC_FLIGHT			2
-#define ADC_TEMP			3
-#define ADC_VIDEO			4
-#define ADC_RSSI			5
-#define ADC_VREF			6
+#define ADC_FILTER     (double)0.1f
+#define ADC_REFERENCE  3.0f
+#define ADC_RESOLUTION 4096.0f
+#define ADC_VOLT       0
+#define ADC_CURR       1
+#define ADC_FLIGHT     2
+#define ADC_TEMP       3
+#define ADC_VIDEO      4
+#define ADC_RSSI       5
+#define ADC_VREF       6
         // ADC RSSI
         if (OsdSettings2.RSSI) {
-        	filteredADC.rssi = filteredADC.rssi * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_RSSI) * ADC_REFERENCE * OsdSettings2.RSSICalibration.Factor / ADC_RESOLUTION + OsdSettings2.RSSICalibration.Offset) * ADC_FILTER;
-        	WarnMask |= filteredADC.rssi < (double)OsdSettings2.RSSICalibration.Warning ? WARN_RSSI_LOW : 0x00;
-            check = check_enable_and_srceen(OsdSettings2.RSSI, (OsdSettingsWarningsSetupData*)&OsdSettings2.RSSISetup, screen, &x, &y);
+            filteredADC.rssi = filteredADC.rssi * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_RSSI) * ADC_REFERENCE * OsdSettings2.RSSICalibration.Factor / ADC_RESOLUTION + OsdSettings2.RSSICalibration.Offset) * ADC_FILTER;
+            WarnMask |= filteredADC.rssi < (double)OsdSettings2.RSSICalibration.Warning ? WARN_RSSI_LOW : 0x00;
+            check     = check_enable_and_srceen(OsdSettings2.RSSI, (OsdSettingsWarningsSetupData *)&OsdSettings2.RSSISetup, screen, &x, &y);
             if (check == OSDSETTINGS2_RSSI_ANALOG) {
                 sprintf(temp, "RI%5.2f%%", filteredADC.rssi);
             }
-        	if (check == OSDSETTINGS2_RSSI_PWM) {
-        		sprintf(temp, "RI ----%%"); 						// JR_HINT TODO
-        	}
+            if (check == OSDSETTINGS2_RSSI_PWM) {
+                sprintf(temp, "RI ----%%"); // JR_HINT TODO
+            }
             if (check != OSDSETTINGS2_RSSI_DISABLED) {
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.RSSISetup.CharSize);
             }
         }
         // ADC Flight
         if (OsdSettings2.FlightVoltage) {
-        	filteredADC.flight = filteredADC.flight * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_FLIGHT) * ADC_REFERENCE * OsdSettings2.FlightVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.FlightVoltageCalibration.Offset) * ADC_FILTER;
-        	WarnMask |= filteredADC.flight < (double)OsdSettings2.FlightVoltageCalibration.Warning ? WARN_BATT_FLIGHT_LOW : 0x00;
-            if (check_enable_and_srceen(OsdSettings2.FlightVoltage, (OsdSettingsWarningsSetupData*)&OsdSettings2.FlightVoltageSetup, screen, &x, &y)) {
+            filteredADC.flight = filteredADC.flight * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_FLIGHT) * ADC_REFERENCE * OsdSettings2.FlightVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.FlightVoltageCalibration.Offset) * ADC_FILTER;
+            WarnMask |= filteredADC.flight < (double)OsdSettings2.FlightVoltageCalibration.Warning ? WARN_BATT_FLIGHT_LOW : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.FlightVoltage, (OsdSettingsWarningsSetupData *)&OsdSettings2.FlightVoltageSetup, screen, &x, &y)) {
                 sprintf(temp, "FV%5.2fV", filteredADC.flight);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.FlightVoltageSetup.CharSize);
             }
         }
         // ADC Video
         if (OsdSettings2.VideoVoltage) {
-        	filteredADC.video = filteredADC.video * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_VIDEO) * ADC_REFERENCE * OsdSettings2.VideoVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.VideoVoltageCalibration.Offset) * ADC_FILTER;
-        	WarnMask |= filteredADC.video < (double)OsdSettings2.VideoVoltageCalibration.Warning ? WARN_BATT_VIDEO_LOW : 0x00;
-            if (check_enable_and_srceen(OsdSettings2.VideoVoltage, (OsdSettingsWarningsSetupData*)&OsdSettings2.VideoVoltageSetup, screen, &x, &y)) {
+            filteredADC.video = filteredADC.video * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_VIDEO) * ADC_REFERENCE * OsdSettings2.VideoVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.VideoVoltageCalibration.Offset) * ADC_FILTER;
+            WarnMask |= filteredADC.video < (double)OsdSettings2.VideoVoltageCalibration.Warning ? WARN_BATT_VIDEO_LOW : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.VideoVoltage, (OsdSettingsWarningsSetupData *)&OsdSettings2.VideoVoltageSetup, screen, &x, &y)) {
                 sprintf(temp, "VV%5.2fV", filteredADC.video);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.VideoVoltageSetup.CharSize);
             }
         }
         // ADC Sensor voltage
         if (OsdSettings2.SensorVoltage) {
-        	filteredADC.volt = filteredADC.volt * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_VOLT) * ADC_REFERENCE * OsdSettings2.SensorVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorVoltageCalibration.Offset) * ADC_FILTER;
-        	WarnMask |= filteredADC.volt < (double)OsdSettings2.SensorVoltageCalibration.Warning ? WARN_BATT_SVOLT_LOW : 0x00;
-            if (check_enable_and_srceen(OsdSettings2.SensorVoltage, (OsdSettingsWarningsSetupData*)&OsdSettings2.SensorVoltageSetup, screen, &x, &y)) {
+            filteredADC.volt = filteredADC.volt * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_VOLT) * ADC_REFERENCE * OsdSettings2.SensorVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorVoltageCalibration.Offset) * ADC_FILTER;
+            WarnMask |= filteredADC.volt < (double)OsdSettings2.SensorVoltageCalibration.Warning ? WARN_BATT_SVOLT_LOW : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.SensorVoltage, (OsdSettingsWarningsSetupData *)&OsdSettings2.SensorVoltageSetup, screen, &x, &y)) {
                 sprintf(temp, "SV%5.2fV", filteredADC.volt);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorVoltageSetup.CharSize);
             }
         }
         // ADC Sensor current or ADC Sensor current consumed
         if (OsdSettings2.SensorCurrent || OsdSettings2.SensorCurrentConsumed || OsdSettings2.AirborneResetTime) {
-        	filteredADC.curr = filteredADC.curr * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_CURR) * ADC_REFERENCE * OsdSettings2.SensorCurrentCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorCurrentCalibration.Offset) * ADC_FILTER;
+            filteredADC.curr = filteredADC.curr * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_CURR) * ADC_REFERENCE * OsdSettings2.SensorCurrentCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorCurrentCalibration.Offset) * ADC_FILTER;
         }
         // ADC Sensor current
         if (OsdSettings2.SensorCurrent) {
-        	WarnMask |= filteredADC.curr > (double)OsdSettings2.SensorCurrentCalibration.Warning ? WARN_BATT_SCURR_HIGH : 0x00;
-            if (check_enable_and_srceen(OsdSettings2.SensorCurrent, (OsdSettingsWarningsSetupData*)&OsdSettings2.SensorCurrentSetup, screen, &x, &y)) {
+            WarnMask |= filteredADC.curr > (double)OsdSettings2.SensorCurrentCalibration.Warning ? WARN_BATT_SCURR_HIGH : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.SensorCurrent, (OsdSettingsWarningsSetupData *)&OsdSettings2.SensorCurrentSetup, screen, &x, &y)) {
                 sprintf(temp, "SC%5.2fA", filteredADC.curr);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorCurrentSetup.CharSize);
             }
@@ -2787,29 +2808,29 @@ void updateGraphics()
         // ADC Sensor current consumed
         if (OsdSettings2.SensorCurrentConsumed) {
             accumulate_current(filteredADC.curr, &current_total);
-            if (check_enable_and_srceen(OsdSettings2.SensorCurrentConsumed, (OsdSettingsWarningsSetupData*)&OsdSettings2.SensorCurrentConsumedSetup, screen, &x, &y)) {
+            if (check_enable_and_srceen(OsdSettings2.SensorCurrentConsumed, (OsdSettingsWarningsSetupData *)&OsdSettings2.SensorCurrentConsumedSetup, screen, &x, &y)) {
                 sprintf(temp, "T%4dmAh", (int)current_total);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorCurrentConsumedSetup.CharSize);
             }
         }
         // Airborne reset time
-		if (OsdSettings2.AirborneResetTime && !airborne && filteredADC.curr >= (double)OsdSettings2.AirborneResetTimeCurrent) {
-			airborne = TRUE;
-			timex.sec = 0;
-			timex.min = 0;
-			timex.hour = 0;
+        if (OsdSettings2.AirborneResetTime && !airborne && filteredADC.curr >= (double)OsdSettings2.AirborneResetTimeCurrent) {
+            airborne   = TRUE;
+            timex.sec  = 0;
+            timex.min  = 0;
+            timex.hour = 0;
         }
 
-#define DO_NOT_MOVE_SECONDS	10
+#define DO_NOT_MOVE_SECONDS 10
         // Draw warnings last so that they are above everything else
         // Warnings (centered relative to x)
-        if (check_enable_and_srceen(OsdSettings.Warnings, (OsdSettingsWarningsSetupData*)&OsdSettings.WarningsSetup, screen, &x, &y)) {
-        	power_on_time = power_on_time < DO_NOT_MOVE_SECONDS ? timex.sec : DO_NOT_MOVE_SECONDS;
-        	WarnMask |= power_on_time < DO_NOT_MOVE_SECONDS						? WARN_DO_NOT_MOVE		: 0x00;
-        	WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D			? WARN_NO_SAT_FIX		: 0x00;
-        	WarnMask |= !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE	? WARN_HOME_NOT_SET		: 0x00;
-        	WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED					? WARN_DISARMED			: 0x00;
-        	draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, x, y, OsdSettings.WarningsSetup.VerticalSpacing, OsdSettings.WarningsSetup.CharSize);
+        if (check_enable_and_srceen(OsdSettings.Warnings, (OsdSettingsWarningsSetupData *)&OsdSettings.WarningsSetup, screen, &x, &y)) {
+            power_on_time = power_on_time < DO_NOT_MOVE_SECONDS ? timex.sec : DO_NOT_MOVE_SECONDS;
+            WarnMask |= power_on_time < DO_NOT_MOVE_SECONDS ? WARN_DO_NOT_MOVE : 0x00;
+            WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D ? WARN_NO_SAT_FIX : 0x00;
+            WarnMask |= !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE ? WARN_HOME_NOT_SET : 0x00;
+            WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED ? WARN_DISARMED : 0x00;
+            draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, x, y, OsdSettings.WarningsSetup.VerticalSpacing, OsdSettings.WarningsSetup.CharSize);
         }
 
 #ifdef DEBUG_TIMING
@@ -2824,45 +2845,44 @@ void updateGraphics()
 #ifdef DEBUG_ALARMS
         // show alarms
         int k;
-        for (k=0; k<=17; k++) {
-        	SystemAlarmsAlarmOptions alarm = AlarmsGet(k);
-        	if (alarm > SYSTEMALARMS_ALARM_OK) {
+        for (k = 0; k <= 17; k++) {
+            SystemAlarmsAlarmOptions alarm = AlarmsGet(k);
+            if (alarm > SYSTEMALARMS_ALARM_OK) {
                 sprintf(temp, "A%2d:%d", k, alarm);
                 write_string(temp, 50, 50 + 10 * k, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-        	}
+            }
         }
 #endif
 
 #ifdef DEBUG_TELEMETRY
-#define DEBUG_TELEMETRY_ON_TIME		5000		// [ms]
-    	static portTickType on_time = 0;
-    	portTickType current_time = xTaskGetTickCount();
-        static uint8_t fts = 10;
-        static uint8_t gts = 10;
+#define DEBUG_TELEMETRY_ON_TIME 5000 // [ms]
+        static portTickType on_time = 0;
+        portTickType current_time   = xTaskGetTickCount();
+        static uint8_t fts   = 10;
+        static uint8_t gts   = 10;
         static uint32_t frxf = 0;
         static uint32_t ftxf = 0;
         static uint32_t grxf = 0;
         static uint32_t gtxf = 0;
 
-    	if (
-    				fts != f_telemetry.Status
-        		||	gts != g_telemetry.Status
-        		||	frxf != f_telemetry.RxFailures
-        		||	ftxf != f_telemetry.TxFailures
-        		||	grxf != g_telemetry.RxFailures
-        		||	gtxf != g_telemetry.TxFailures
-    		)
-    	{
-    		on_time = current_time;
-			fts = f_telemetry.Status;
-			gts = g_telemetry.Status;
-    		frxf = f_telemetry.RxFailures;
-    		ftxf = f_telemetry.TxFailures;
-    		grxf = g_telemetry.RxFailures;
-    		gtxf = g_telemetry.TxFailures;
-    	}
+        if (
+            fts != f_telemetry.Status
+            || gts != g_telemetry.Status
+            || frxf != f_telemetry.RxFailures
+            || ftxf != f_telemetry.TxFailures
+            || grxf != g_telemetry.RxFailures
+            || gtxf != g_telemetry.TxFailures
+            ) {
+            on_time = current_time;
+            fts     = f_telemetry.Status;
+            gts     = g_telemetry.Status;
+            frxf    = f_telemetry.RxFailures;
+            ftxf    = f_telemetry.TxFailures;
+            grxf    = g_telemetry.RxFailures;
+            gtxf    = g_telemetry.TxFailures;
+        }
 
-    	if (current_time - on_time < DEBUG_TELEMETRY_ON_TIME) {
+        if (current_time - on_time < DEBUG_TELEMETRY_ON_TIME) {
             sprintf(temp, "FTS: %6d", f_telemetry.Status);
             write_string(temp, 270, 30, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
 
@@ -2880,14 +2900,14 @@ void updateGraphics()
 
             sprintf(temp, "GTXF:%6d", (int)g_telemetry.TxFailures);
             write_string(temp, 270, 80, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-    	}
-#endif
+        }
+#endif /* ifdef DEBUG_TELEMETRY */
 
 #ifdef DEBUG_BLACK_WHITE
         int bw;
-        for (bw=0; bw<20; bw++) {
-        	write_hline_lm(140, 259, 30 + bw, 1, 1);
-        	write_hline_lm(140, 259, 50 + bw, 0, 1);
+        for (bw = 0; bw < 20; bw++) {
+            write_hline_lm(140, 259, 30 + bw, 1, 1);
+            write_hline_lm(140, 259, 50 + bw, 0, 1);
         }
 #endif
 
@@ -2914,14 +2934,14 @@ void updateGraphics()
     case 4:
     {
         char temp[10] = { 0 };
-    	int f, i, j;
-    	f = OsdSettings.Screen - 1;
+        int f, i, j;
+        f = OsdSettings.Screen - 1;
         sprintf(temp, "Font: %d", f);
         write_string(temp, 10, 0, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-        for (i=0; i<16; i++) {
+        for (i = 0; i < 16; i++) {
             sprintf(temp, "%03d:", i * 16);
             write_string(temp, 10, 15 + i * 17, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, f);
-            for (j=0; j<16; j++) {
+            for (j = 0; j < 16; j++) {
                 sprintf(temp, "%c", j + i * 16);
                 write_string(temp, 60 + j * 20, 15 + i * 17, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, f);
             }
@@ -2942,12 +2962,12 @@ void updateGraphics()
     // show grid
     default:
     {
-    	int i;
-        for (i=0; i<GRAPHICS_RIGHT / 2; i+=16) {
+        int i;
+        for (i = 0; i < GRAPHICS_RIGHT / 2; i += 16) {
             write_vline_lm(GRAPHICS_RIGHT / 2 + i, 0, GRAPHICS_BOTTOM, 1, 1);
             write_vline_lm(GRAPHICS_RIGHT / 2 - i, 0, GRAPHICS_BOTTOM, 1, 1);
         }
-        for (i=0; i<GRAPHICS_BOTTOM / 2; i+=16) {
+        for (i = 0; i < GRAPHICS_BOTTOM / 2; i += 16) {
             write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 + i, 1, 1);
             write_hline_lm(0, GRAPHICS_RIGHT, GRAPHICS_BOTTOM / 2 - i, 1, 1);
         }
@@ -2992,7 +3012,7 @@ int32_t osdgenInitialize(void)
     ManualControlCommandInitialize();
     TaskInfoInitialize();
 
-#if 0	// JR_HINT an idea
+#if 0 // JR_HINT an idea
     UAVObjMetadata metadata;
     metadata.flags =
         ACCESS_READWRITE << UAVOBJ_ACCESS_SHIFT |
@@ -3001,7 +3021,7 @@ int32_t osdgenInitialize(void)
         0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
         UPDATEMODE_MANUAL << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
         UPDATEMODE_MANUAL << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
-    metadata.telemetryUpdatePeriod = 0;
+    metadata.telemetryUpdatePeriod    = 0;
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.loggingUpdatePeriod = 0;
 
@@ -3016,9 +3036,9 @@ int32_t osdgenInitialize(void)
     BaroSensorSetMetadata(&metadata);
     ManualControlCommandSetMetadata(&metadata);
     TaskInfoSetMetadata(&metadata);
-#endif
+#endif /* if 0 */
 
-#if 0	// JR_HINT an idea
+#if 0 // JR_HINT an idea
     UAVObjMetadata metadata;
     metadata.flags =
         ACCESS_READWRITE << UAVOBJ_ACCESS_SHIFT |
@@ -3027,7 +3047,7 @@ int32_t osdgenInitialize(void)
         0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
         UPDATEMODE_MANUAL << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
         UPDATEMODE_PERIODIC << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
-    metadata.telemetryUpdatePeriod = 0;
+    metadata.telemetryUpdatePeriod    = 0;
     metadata.gcsTelemetryUpdatePeriod = 5000;
     metadata.loggingUpdatePeriod = 0;
 
@@ -3043,13 +3063,14 @@ MODULE_INITCALL(osdgenInitialize, osdgenStart);
 /**
  * Main osd task. It does not return.
  */
-#define INTRO_TIME	4000
+#define INTRO_TIME 4000
 static void osdgenTask(__attribute__((unused)) void *parameters)
 {
     // portTickType lastSysTime;
     // Loop forever
     // lastSysTime = xTaskGetTickCount();
     OsdSettingsData OsdSettings;
+
     OsdSettingsGet(&OsdSettings);
 
     switch (PIOS_Board_Revision()) {
@@ -3058,26 +3079,26 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
         PIOS_Servo_Set(1, OsdSettings.Black);
         break;
     case 2:
-    	// DAC buffer enabled:  0.2 V ... 3.1 V		Vout = DAC_value / 4095 * 2.9 + 0.2		DAC_value = (Vout - 0.2) / 2.9 * 4095
-    	// DAC buffer disabled: 0.0 V ... 3.3 V		Vout = DAC_value / 4095 * 3.3			DAC_value = Vout / 3.3 * 4095
-    	DAC_SetChannel1Data(DAC_Align_12b_R, OsdSettings.Black);
-    	DAC_SetChannel2Data(DAC_Align_12b_R, OsdSettings.White);
+        // DAC buffer enabled:  0.2 V ... 3.1 V		Vout = DAC_value / 4095 * 2.9 + 0.2		DAC_value = (Vout - 0.2) / 2.9 * 4095
+        // DAC buffer disabled: 0.0 V ... 3.3 V		Vout = DAC_value / 4095 * 3.3			DAC_value = Vout / 3.3 * 4095
+        DAC_SetChannel1Data(DAC_Align_12b_R, OsdSettings.Black);
+        DAC_SetChannel2Data(DAC_Align_12b_R, OsdSettings.White);
         break;
     default:
         PIOS_DEBUG_Assert(0);
     }
 
-    Convert[0].m_to_m_feet		= 1.0f;
-    Convert[0].ms_to_ms_fts		= 1.0f;
-    Convert[0].ms_to_kmh_mph	= 3.6f;
-    Convert[0].char_m_feet		= 'm';
-    Convert[0].char_ms_fts		= 0x88;
+    Convert[0].m_to_m_feet   = 1.0f;
+    Convert[0].ms_to_ms_fts  = 1.0f;
+    Convert[0].ms_to_kmh_mph = 3.6f;
+    Convert[0].char_m_feet   = 'm';
+    Convert[0].char_ms_fts   = 0x88;
 
-    Convert[1].m_to_m_feet		= 3.280840f;
-    Convert[1].ms_to_ms_fts		= 3.280840f;
-    Convert[1].ms_to_kmh_mph	= 2.236936f;
-    Convert[1].char_m_feet		= 'f';
-    Convert[1].char_ms_fts		= ' ';			// TODO design a char for font 2 and 3
+    Convert[1].m_to_m_feet   = 3.280840f;
+    Convert[1].ms_to_ms_fts  = 3.280840f;
+    Convert[1].ms_to_kmh_mph = 2.236936f;
+    Convert[1].char_m_feet   = 'f';
+    Convert[1].char_ms_fts   = ' ';                  // TODO design a char for font 2 and 3
 
     // intro
     while (xTaskGetTickCount() <= INTRO_TIME) {
@@ -3087,13 +3108,13 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
 #endif
             clearGraphics();
             if (PIOS_Video_GetType() == VIDEO_TYPE_NTSC) {
-                introGraphics	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM / 2 - 20);
-                introText		(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 70);
-                showVideoType	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 45);
+                introGraphics(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM / 2 - 20);
+                introText(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 70);
+                showVideoType(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 45);
             } else {
-                introGraphics	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM / 2 - 30);
-                introText		(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 90);
-                showVideoType	(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 60);
+                introGraphics(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM / 2 - 30);
+                introText(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 90);
+                showVideoType(GRAPHICS_RIGHT / 2, GRAPHICS_BOTTOM - 60);
             }
         }
     }
@@ -3118,10 +3139,10 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
                 PIOS_Servo_Set(1, OsdSettings.Black);
                 break;
             case 2:
-            	// DAC buffer enabled:  0.2 V ... 3.1 V		Vout = DAC_value / 4095 * 2.9 + 0.2		DAC_value = (Vout - 0.2) / 2.9 * 4095
-            	// DAC buffer disabled: 0.0 V ... 3.3 V		Vout = DAC_value / 4095 * 3.3			DAC_value = Vout / 3.3 * 4095
-            	DAC_SetChannel1Data(DAC_Align_12b_R, OsdSettings.Black);
-            	DAC_SetChannel2Data(DAC_Align_12b_R, OsdSettings.White);
+                // DAC buffer enabled:  0.2 V ... 3.1 V		Vout = DAC_value / 4095 * 2.9 + 0.2		DAC_value = (Vout - 0.2) / 2.9 * 4095
+                // DAC buffer disabled: 0.0 V ... 3.3 V		Vout = DAC_value / 4095 * 3.3			DAC_value = Vout / 3.3 * 4095
+                DAC_SetChannel1Data(DAC_Align_12b_R, OsdSettings.Black);
+                DAC_SetChannel2Data(DAC_Align_12b_R, OsdSettings.White);
                 break;
             default:
                 PIOS_DEBUG_Assert(0);
@@ -3133,7 +3154,7 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
             updateGraphics();
 #ifdef DEBUG_TIMING
             out_ticks = xTaskGetTickCount();
-            in_time = out_ticks - in_ticks;
+            in_time   = out_ticks - in_ticks;
 #endif
         }
         // xSemaphoreTake(osdSemaphore, portMAX_DELAY);

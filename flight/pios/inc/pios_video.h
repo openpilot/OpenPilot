@@ -37,26 +37,26 @@
 
 // PAL/NTSC specific boundary values
 struct pios_video_type_boundary {
-	uint16_t	graphics_left;
-	uint16_t	graphics_top;
-	uint16_t	graphics_right;
-	uint16_t	graphics_bottom;
+    uint16_t graphics_left;
+    uint16_t graphics_top;
+    uint16_t graphics_right;
+    uint16_t graphics_bottom;
 };
 
 // PAL/NTSC specific config values
 struct pios_video_type_cfg {
-	uint16_t	graphics_width_real;
-	uint16_t	graphics_hight_real;
-	uint8_t		graphics_column_start;
-	uint8_t		graphics_line_start;
-	uint8_t		dma_buffer_length;
-	uint8_t		period;
-	uint8_t		dc;
+    uint16_t graphics_width_real;
+    uint16_t graphics_hight_real;
+    uint8_t  graphics_column_start;
+    uint8_t  graphics_line_start;
+    uint8_t  dma_buffer_length;
+    uint8_t  period;
+    uint8_t  dc;
 };
 
 struct pios_video_cfg {
     DMA_TypeDef *mask_dma;
-    const struct pios_spi_cfg  mask;
+    const struct pios_spi_cfg mask;
     DMA_TypeDef *level_dma;
     const struct pios_spi_cfg  level;
 
@@ -88,23 +88,23 @@ uint16_t PIOS_Video_GetType(void);
 
 // video boundary values
 extern const struct pios_video_type_boundary *pios_video_type_boundary_act;
-#define GRAPHICS_LEFT			pios_video_type_boundary_act->graphics_left
-#define GRAPHICS_TOP			pios_video_type_boundary_act->graphics_top
-#define GRAPHICS_RIGHT			pios_video_type_boundary_act->graphics_right
-#define GRAPHICS_BOTTOM			pios_video_type_boundary_act->graphics_bottom
+#define GRAPHICS_LEFT        pios_video_type_boundary_act->graphics_left
+#define GRAPHICS_TOP         pios_video_type_boundary_act->graphics_top
+#define GRAPHICS_RIGHT       pios_video_type_boundary_act->graphics_right
+#define GRAPHICS_BOTTOM      pios_video_type_boundary_act->graphics_bottom
 
 
 // video type defs for autodetect
-#define VIDEO_TYPE_NTSC			0
-#define VIDEO_TYPE_PAL			1
-#define VIDEO_TYPE_PAL_ROWS		300
+#define VIDEO_TYPE_NTSC      0
+#define VIDEO_TYPE_PAL       1
+#define VIDEO_TYPE_PAL_ROWS  300
 
 
 // draw area buffer values, for memory allocation, access and calculations we suppose the larger values for PAL, this also works for NTSC
-#define GRAPHICS_WIDTH_REAL		400								// max columns
-#define GRAPHICS_HEIGHT_REAL	288								// max lines
-#define BUFFER_WIDTH			(GRAPHICS_WIDTH_REAL / 8 + 1)	// Bytes plus one byte for SPI
-#define BUFFER_HEIGHT			(GRAPHICS_HEIGHT_REAL)
+#define GRAPHICS_WIDTH_REAL  400                                                             // max columns
+#define GRAPHICS_HEIGHT_REAL 288 // max lines
+#define BUFFER_WIDTH         (GRAPHICS_WIDTH_REAL / 8 + 1)   // Bytes plus one byte for SPI
+#define BUFFER_HEIGHT        (GRAPHICS_HEIGHT_REAL)
 
 
 // Macro to swap buffers given a temporary pointer.

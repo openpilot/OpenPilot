@@ -459,7 +459,8 @@ void PIOS_Board_Init(void)
 
 uint8_t PIOS_Board_Revision(void)
 {
-	const struct pios_board_info *bdinfo = &pios_board_info_blob;
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
+
     return bdinfo->board_rev;
 }
 

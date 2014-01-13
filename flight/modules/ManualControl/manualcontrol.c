@@ -850,7 +850,7 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     const float DEADBAND_LOW  = 1.0f / 2 - DEADBAND / 2;
 
     // this is the max speed in m/s at the extents of throttle
-    uint8_t throttleRate;
+    float throttleRate;
     uint8_t throttleExp;
 
     static uint8_t flightMode;

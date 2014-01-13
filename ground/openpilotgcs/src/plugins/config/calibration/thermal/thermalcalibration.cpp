@@ -32,14 +32,15 @@ bool ThermalCalibration::BarometerCalibration(Eigen::VectorXf pressure, Eigen::V
 {
     // assume the nearest reading to 20°C as the "zero bias" point
     int index20deg = searchReferenceValue(20.0f, temperature);
+
     qDebug() << "Ref zero is " << index20deg << " T: " << temperature[index20deg] << " P:" << pressure[index20deg];
-    float refZero = pressure[index20deg];
+    float refZero  = pressure[index20deg];
     pressure.array() -= refZero;
     qDebug() << "Rebased zero is " << pressure[index20deg];
 
 
     Eigen::VectorXf solution(BARO_PRESSURE_POLY_DEGREE + 1);
-    if(!CalibrationUtils::PolynomialCalibration(temperature, pressure, BARO_PRESSURE_POLY_DEGREE, solution)){
+    if (!CalibrationUtils::PolynomialCalibration(temperature, pressure, BARO_PRESSURE_POLY_DEGREE, solution)) {
         return false;
     }
 
@@ -50,19 +51,20 @@ bool ThermalCalibration::BarometerCalibration(Eigen::VectorXf pressure, Eigen::V
 bool ThermalCalibration::AccelerometerCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, Eigen::VectorXf temperature, float *result)
 {
     Eigen::VectorXf solution(ACCEL_X_POLY_DEGREE + 1);
-    if(!CalibrationUtils::PolynomialCalibration(temperature, samplesX, ACCEL_X_POLY_DEGREE, solution)){
+
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesX, ACCEL_X_POLY_DEGREE, solution)) {
         return false;
     }
     result[0] = solution[1];
 
     solution.resize(ACCEL_Y_POLY_DEGREE + 1);
-    if(!CalibrationUtils::PolynomialCalibration(temperature, samplesY, ACCEL_Y_POLY_DEGREE, solution)){
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesY, ACCEL_Y_POLY_DEGREE, solution)) {
         return false;
     }
     result[1] = solution[1];
 
     solution.resize(ACCEL_Z_POLY_DEGREE + 1);
-    if(!CalibrationUtils::PolynomialCalibration(temperature, samplesZ, ACCEL_Z_POLY_DEGREE, solution)){
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesZ, ACCEL_Z_POLY_DEGREE, solution)) {
         return false;
     }
     result[2] = solution[1];
@@ -73,21 +75,22 @@ bool ThermalCalibration::AccelerometerCalibration(Eigen::VectorXf samplesX, Eige
 bool ThermalCalibration::GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, Eigen::VectorXf temperature, float *result)
 {
     Eigen::VectorXf solution(GYRO_X_POLY_DEGREE + 1);
-    if(!CalibrationUtils::PolynomialCalibration(temperature, samplesX, GYRO_X_POLY_DEGREE, solution)){
+
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesX, GYRO_X_POLY_DEGREE, solution)) {
         return false;
     }
     result[0] = solution[1];
     std::cout << solution << std::endl << std::endl;
 
     solution.resize(GYRO_Y_POLY_DEGREE + 1);
-    if(!CalibrationUtils::PolynomialCalibration(temperature, samplesY, GYRO_Y_POLY_DEGREE, solution)){
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesY, GYRO_Y_POLY_DEGREE, solution)) {
         return false;
     }
     result[1] = solution[1];
     std::cout << solution << std::endl << std::endl;
 
     solution.resize(GYRO_Z_POLY_DEGREE + 1);
-    if(!CalibrationUtils::PolynomialCalibration(temperature, samplesZ, GYRO_Z_POLY_DEGREE, solution)){
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesZ, GYRO_Z_POLY_DEGREE, solution)) {
         return false;
     }
     result[2] = solution[1];
@@ -99,14 +102,15 @@ bool ThermalCalibration::GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::V
 
 void ThermalCalibration::copyToArray(float *result, Eigen::VectorXf solution, int elements)
 {
-    for(int i = 0; i < elements; i++){
+    for (int i = 0; i < elements; i++) {
         result[i] = solution[i];
     }
 }
 
-int ThermalCalibration::searchReferenceValue(float value, Eigen::VectorXf values){
-    for(int i = 0; i < values.size(); i++){
-        if(!(values[i] < value)){
+int ThermalCalibration::searchReferenceValue(float value, Eigen::VectorXf values)
+{
+    for (int i = 0; i < values.size(); i++) {
+        if (!(values[i] < value)) {
             return i;
         }
     }
@@ -114,5 +118,4 @@ int ThermalCalibration::searchReferenceValue(float value, Eigen::VectorXf values
 }
 
 ThermalCalibration::ThermalCalibration()
-{
-}
+{}

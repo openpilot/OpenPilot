@@ -33,28 +33,29 @@
 
 #include "thermalcalibrationhelper.h"
 
-class BoardStatusSaveTransition : public QSignalTransition
-{
+class BoardStatusSaveTransition : public QSignalTransition {
     Q_OBJECT
 public:
     BoardStatusSaveTransition(ThermalCalibrationHelper *helper, QState *currentState, QState *targetState)
         : QSignalTransition(helper, SIGNAL(statusSaveCompleted(bool))),
-          m_helper(helper)
+        m_helper(helper)
     {
         QObject::connect(currentState, SIGNAL(entered()), this, SLOT(enterState()));
+
         setTargetState(targetState);
     }
 
     virtual bool eventTest(QEvent *e)
     {
         qDebug() << "BoardStatusSaveTransition::eventTest";
-        if (!QSignalTransition::eventTest(e))
+        if (!QSignalTransition::eventTest(e)) {
             return false;
-        QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent*>(e);
+        }
+        QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent *>(e);
 
         // check wether status stave was successful and retry if not
         qDebug() << "BoardStatusSavedTransition::eventTest - " << se->arguments().at(0).toBool();
-        if(se->arguments().at(0).toBool()){
+        if (se->arguments().at(0).toBool()) {
             return true;
         } else {
             m_helper->statusSave();
@@ -64,11 +65,13 @@ public:
 
     virtual void onTransition(QEvent *e)
     {
-        QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent*>(e);
+        QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent *>(e);
+
         qDebug() << "BoardStatusSaveTransition :" << se->arguments().at(0).toBool();
     }
 public slots:
-    void enterState(){
+    void enterState()
+    {
         m_helper->statusSave();
     }
 private:
@@ -76,26 +79,27 @@ private:
 };
 
 
-class BoardStatusRestoreTransition : public QSignalTransition
-{
+class BoardStatusRestoreTransition : public QSignalTransition {
     Q_OBJECT
 public:
     BoardStatusRestoreTransition(ThermalCalibrationHelper *helper, QState *currentState, QState *targetState)
         : QSignalTransition(helper, SIGNAL(statusRestoreCompleted(bool))),
-          m_helper(helper)
+        m_helper(helper)
     {
         QObject::connect(currentState, SIGNAL(entered()), this, SLOT(enterState()));
+
         setTargetState(targetState);
     }
 
     virtual bool eventTest(QEvent *e)
     {
-        if (!QSignalTransition::eventTest(e))
+        if (!QSignalTransition::eventTest(e)) {
             return false;
-        QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent*>(e);
+        }
+        QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent *>(e);
 
         // check wether status stave was successful and retry if not
-        if(se->arguments().at(0).toBool()){
+        if (se->arguments().at(0).toBool()) {
             return true;
         } else {
             qDebug() << "BoardStatusRestoreTransition::eventTest - statusRestore() ";
@@ -104,7 +108,8 @@ public:
         return false;
     }
 public slots:
-    void enterState(){
+    void enterState()
+    {
         m_helper->statusRestore();
     }
 private:

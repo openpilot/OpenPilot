@@ -34,12 +34,10 @@
 #include <Eigen/LU>
 #include <iostream>
 
-namespace OpenPilot{
-
-class CalibrationUtils
-{
+namespace OpenPilot {
+class CalibrationUtils {
 public:
-    struct EllipsoidCalibrationResult{
+    struct EllipsoidCalibrationResult {
         Eigen::Matrix3f CalibrationMatrix;
         Eigen::Vector3f Scale;
         Eigen::Vector3f Bias;
@@ -50,11 +48,9 @@ public:
 
 private:
     static void EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
-                      Eigen::Vector3f *center,
-                      Eigen::VectorXf *radii,
-                      Eigen::MatrixXf *evecs);
-
+                             Eigen::Vector3f *center,
+                             Eigen::VectorXf *radii,
+                             Eigen::MatrixXf *evecs);
 };
-
 }
 #endif // CALIBRATIONUTILS_H

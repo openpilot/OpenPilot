@@ -38,8 +38,7 @@
 #include "../wizardstate.h"
 #include "../wizardmodel.h"
 
-class ThermalCalibrationModel : public WizardModel
-{
+class ThermalCalibrationModel : public WizardModel {
     Q_PROPERTY(bool startEnable READ startEnabled NOTIFY startEnabledChanged)
     Q_PROPERTY(bool endEnable READ endEnabled NOTIFY endEnabledChanged)
     Q_PROPERTY(bool cancelEnable READ cancelEnabled NOTIFY cancelEnabledChanged)
@@ -51,53 +50,63 @@ class ThermalCalibrationModel : public WizardModel
 public:
     explicit ThermalCalibrationModel(QObject *parent = 0);
 
-    bool startEnabled(){
+    bool startEnabled()
+    {
         return m_startEnabled;
     }
-    bool endEnabled(){
+    bool endEnabled()
+    {
         return m_endEnabled;
     }
-    bool cancelEnabled(){
+    bool cancelEnabled()
+    {
         return m_cancelEnabled;
     }
 
-    void setStartEnabled(bool status){
-        if(m_startEnabled != status){
+    void setStartEnabled(bool status)
+    {
+        if (m_startEnabled != status) {
             m_startEnabled = status;
             emit startEnabledChanged(status);
         }
     }
 
-    void setEndEnabled(bool status){
-        if(m_endEnabled != status){
+    void setEndEnabled(bool status)
+    {
+        if (m_endEnabled != status) {
             m_endEnabled = status;
             emit endEnabledChanged(status);
         }
     }
-    void setCancelEnabled(bool status) {
-        if(m_cancelEnabled != status) {
+    void setCancelEnabled(bool status)
+    {
+        if (m_cancelEnabled != status) {
             m_cancelEnabled = status;
             emit cancelEnabledChanged(status);
         }
     }
 
 
-    QString temperature(){
+    QString temperature()
+    {
         return m_temperature;
     }
 
-    QString temperatureGradient(){
+    QString temperatureGradient()
+    {
         return m_temperatureGradient;
     }
 
-    void setTemperature(QString status) {
-        if(m_temperature != status) {
+    void setTemperature(QString status)
+    {
+        if (m_temperature != status) {
             m_temperature = status;
             emit temperatureChanged(status);
         }
     }
-    void setTemperatureGradient(QString status) {
-        if(m_temperatureGradient != status) {
+    void setTemperatureGradient(QString status)
+    {
+        if (m_temperatureGradient != status) {
             m_temperatureGradient = status;
             emit temperatureGradientChanged(status);
         }
@@ -118,7 +127,7 @@ private:
     // this act as top level container for calibration state
     // to share common exit signals to abortState
     WizardState *m_workingState;
-    //Save settings
+    // Save settings
     WizardState *m_saveSettingState;
     // Setup board for calibration
     WizardState *m_setupState;
@@ -148,15 +157,18 @@ signals:
 public slots:
     void stepChanged(WizardState *state);
     void init();
-    void btnStart() {
+    void btnStart()
+    {
         emit next();
     }
 
-    void btnEnd() {
+    void btnEnd()
+    {
         emit previous();
     }
 
-    void btnAbort(){
+    void btnAbort()
+    {
         emit abort();
     }
 };

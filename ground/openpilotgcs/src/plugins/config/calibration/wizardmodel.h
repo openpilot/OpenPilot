@@ -33,37 +33,37 @@
 #include "wizardstate.h"
 #include <accelsensor.h>
 
-class WizardModel : public QStateMachine
-{
-    Q_OBJECT
-    Q_PROPERTY(QQmlListProperty<QObject> steps READ steps CONSTANT)
+class WizardModel : public QStateMachine {
+    Q_OBJECT Q_PROPERTY(QQmlListProperty<QObject> steps READ steps CONSTANT)
     Q_PROPERTY(QString instructions READ instructions NOTIFY instructionsChanged)
-    Q_PROPERTY(WizardState* currentState READ currentState NOTIFY currentStateChanged)
+    Q_PROPERTY(WizardState * currentState READ currentState NOTIFY currentStateChanged)
 public:
     explicit WizardModel(QObject *parent = 0);
 
-    QQmlListProperty<QObject> steps() {
+    QQmlListProperty<QObject> steps()
+    {
         return QQmlListProperty<QObject>(this, m_steps);
     }
 
-    QString instructions(){
+    QString instructions()
+    {
         return m_instructions;
     }
 
-    void setInstructions(QString instructions){
+    void setInstructions(QString instructions)
+    {
         m_instructions = instructions;
         emit instructionsChanged(instructions);
     }
     WizardState *currentState();
 protected:
-    QList<QObject*> m_steps;
+    QList<QObject *> m_steps;
 private:
     QString m_instructions;
 signals:
     void instructionsChanged(QString status);
     void currentStateChanged(WizardState *status);
 public slots:
-
 };
 
 #endif // WIZARDMODEL_H

@@ -50,7 +50,6 @@
 #include <revosettings.h>
 
 
-
 typedef struct {
     // this is not needed for revo, but should for CC/CC3D
     // AccelGyroSettings::DataFields accelGyroSettings;
@@ -61,8 +60,7 @@ typedef struct {
     bool statusSaved = false;
 } thermalCalibrationBoardSettings;
 
-class ThermalCalibrationHelper : public QObject
-{
+class ThermalCalibrationHelper : public QObject {
     Q_OBJECT
 public:
     explicit ThermalCalibrationHelper(QObject *parent = 0);
@@ -70,12 +68,14 @@ public:
     /* board settings save/restore */
     bool saveBoardInitialSettings();
     bool restoreInitialSettings();
-    bool isBoardInitialSettingsSaved(){
+    bool isBoardInitialSettingsSaved()
+    {
         return m_boardInitialSettings.statusSaved;
     }
 private:
     void setMetadataForCalibration(UAVDataObject *uavo);
-    void clearBoardInitialSettingsSaved(){
+    void clearBoardInitialSettingsSaved()
+    {
         m_boardInitialSettings.statusSaved = false;
     }
 signals:

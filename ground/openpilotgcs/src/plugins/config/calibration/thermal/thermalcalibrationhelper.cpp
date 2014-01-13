@@ -38,7 +38,8 @@ ThermalCalibrationHelper::ThermalCalibrationHelper(QObject *parent) :
  * @return
  */
 
-bool ThermalCalibrationHelper::setupBoardForCalibration(){
+bool ThermalCalibrationHelper::setupBoardForCalibration()
+{
     qDebug() << "setupBoardForCalibration";
 
     UAVObjectManager *objManager = getObjectManager();
@@ -63,7 +64,7 @@ bool ThermalCalibrationHelper::setupBoardForCalibration(){
     RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);
     Q_ASSERT(revoSettings);
     RevoSettings::DataFields revoSettingsData = revoSettings->getData();
-    for (int i = 0; i < RevoSettings::BAROTEMPCORRECTIONPOLYNOMIAL_NUMELEM; i++){
+    for (int i = 0; i < RevoSettings::BAROTEMPCORRECTIONPOLYNOMIAL_NUMELEM; i++) {
         revoSettingsData.BaroTempCorrectionPolynomial[i] = 0.0f;
     }
     revoSettings->setData(revoSettingsData);
@@ -72,19 +73,19 @@ bool ThermalCalibrationHelper::setupBoardForCalibration(){
 }
 
 
-
 /**
  * @brief Save board status to be later restored using restoreBoardStatus
  * @return
  */
-bool ThermalCalibrationHelper::saveBoardInitialSettings(){
+bool ThermalCalibrationHelper::saveBoardInitialSettings()
+{
     // Store current board status:
     qDebug() << "Save initial settings";
 
     UAVObjectManager *objManager = getObjectManager();
     Q_ASSERT(objManager);
     // accelSensor Meta
-    AccelSensor *accelSensor = AccelSensor::GetInstance(objManager);
+    AccelSensor *accelSensor     = AccelSensor::GetInstance(objManager);
     Q_ASSERT(accelSensor);
     m_boardInitialSettings.accelSensorMeta = accelSensor->getMetadata();
     // gyroSensor Meta
@@ -106,24 +107,26 @@ bool ThermalCalibrationHelper::saveBoardInitialSettings(){
     /*
      * Note: for revolution it is not neede but in case of CC we would prevent having
      * a new set of xxxSensor UAVOs beside actual xxxState so it may be needed to reset the following
-    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
-    Q_ASSERT(accelGyroSettings);
-    m_boardInitialSettings.accelGyroSettings = accelGyroSettings->getData();
-    */
+       AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
+       Q_ASSERT(accelGyroSettings);
+       m_boardInitialSettings.accelGyroSettings = accelGyroSettings->getData();
+     */
     m_boardInitialSettings.statusSaved = true;
     return true;
 }
 
-void ThermalCalibrationHelper::setupBoard(){
-    if(setupBoardForCalibration()){
+void ThermalCalibrationHelper::setupBoard()
+{
+    if (setupBoardForCalibration()) {
         emit setupBoardCompleted(true);
     } else {
         emit setupBoardCompleted(false);
     }
 }
 
-void ThermalCalibrationHelper::statusRestore(){
-    if(isBoardInitialSettingsSaved() && restoreInitialSettings()){
+void ThermalCalibrationHelper::statusRestore()
+{
+    if (isBoardInitialSettingsSaved() && restoreInitialSettings()) {
         clearBoardInitialSettingsSaved();
         emit statusRestoreCompleted(true);
     } else {
@@ -131,9 +134,10 @@ void ThermalCalibrationHelper::statusRestore(){
     }
 }
 
-void ThermalCalibrationHelper::statusSave(){
-    //prevent saving multiple times
-    if(!isBoardInitialSettingsSaved() && saveBoardInitialSettings()){
+void ThermalCalibrationHelper::statusSave()
+{
+    // prevent saving multiple times
+    if (!isBoardInitialSettingsSaved() && saveBoardInitialSettings()) {
         emit statusSaveCompleted(true);
     } else {
         emit statusSaveCompleted(false);
@@ -144,8 +148,9 @@ void ThermalCalibrationHelper::statusSave(){
  * @brief restore board settings from status saved calling saveBoardStatus
  * @return true if success
  */
-bool ThermalCalibrationHelper::restoreInitialSettings(){
-    if(!m_boardInitialSettings.statusSaved) {
+bool ThermalCalibrationHelper::restoreInitialSettings()
+{
+    if (!m_boardInitialSettings.statusSaved) {
         return false;
     }
     // restore initial board status
@@ -189,7 +194,8 @@ void ThermalCalibrationHelper::setMetadataForCalibration(UAVDataObject *uavo)
  * Util function to get a pointer to the object manager
  * @return pointer to the UAVObjectManager
  */
-UAVObjectManager *ThermalCalibrationHelper::getObjectManager(){
+UAVObjectManager *ThermalCalibrationHelper::getObjectManager()
+{
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objMngr = pm->getObject<UAVObjectManager>();
 

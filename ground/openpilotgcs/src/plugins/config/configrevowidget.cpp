@@ -224,17 +224,17 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // connect the thermalCalibration model to UI
     m_thermalCalibrationModel = new ThermalCalibrationModel(this);
 
-    connect(m_ui->ThermalBiasStart, SIGNAL(clicked()),m_thermalCalibrationModel, SLOT(btnStart()));
-    connect(m_ui->ThermalBiasEnd, SIGNAL(clicked()),m_thermalCalibrationModel, SLOT(btnEnd()));
-    connect(m_ui->ThermalBiasCancel, SIGNAL(clicked()),m_thermalCalibrationModel, SLOT(btnAbort()));
+    connect(m_ui->ThermalBiasStart, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnStart()));
+    connect(m_ui->ThermalBiasEnd, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnEnd()));
+    connect(m_ui->ThermalBiasCancel, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnAbort()));
 
-    connect(m_thermalCalibrationModel, SIGNAL(startEnabledChanged(bool)),m_ui->ThermalBiasStart, SLOT(setEnabled(bool)));
-    connect(m_thermalCalibrationModel, SIGNAL(endEnabledChanged(bool)),m_ui->ThermalBiasEnd, SLOT(setEnabled(bool)));
-    connect(m_thermalCalibrationModel, SIGNAL(cancelEnabledChanged(bool)),m_ui->ThermalBiasCancel, SLOT(setEnabled(bool)));
+    connect(m_thermalCalibrationModel, SIGNAL(startEnabledChanged(bool)), m_ui->ThermalBiasStart, SLOT(setEnabled(bool)));
+    connect(m_thermalCalibrationModel, SIGNAL(endEnabledChanged(bool)), m_ui->ThermalBiasEnd, SLOT(setEnabled(bool)));
+    connect(m_thermalCalibrationModel, SIGNAL(cancelEnabledChanged(bool)), m_ui->ThermalBiasCancel, SLOT(setEnabled(bool)));
 
-    connect(m_thermalCalibrationModel, SIGNAL(instructionsChanged(QString)),m_ui->label_thermalDescription, SLOT(setText(QString)));
-    connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(QString)),m_ui->label_thermalGradient, SLOT(setText(QString)));
-    connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(QString)),m_ui->label_thermalGradient1, SLOT(setText(QString)));
+    connect(m_thermalCalibrationModel, SIGNAL(instructionsChanged(QString)), m_ui->label_thermalDescription, SLOT(setText(QString)));
+    connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(QString)), m_ui->label_thermalGradient, SLOT(setText(QString)));
+    connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(QString)), m_ui->label_thermalGradient1, SLOT(setText(QString)));
     m_thermalCalibrationModel->init();
 
 

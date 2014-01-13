@@ -31,11 +31,12 @@ WizardState::WizardState(QString name, QState *parent) :
     QState(parent)
 {
     m_stepName = name;
-    m_done = false;
-    m_active = false;
+    m_done     = false;
+    m_active   = false;
 }
 
-void WizardState::setCompletion(qint8 completion){
+void WizardState::setCompletion(qint8 completion)
+{
     m_completion = completion;
     emit completionChanged();
 }

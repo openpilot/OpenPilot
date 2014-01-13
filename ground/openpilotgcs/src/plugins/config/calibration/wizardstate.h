@@ -30,28 +30,30 @@
 
 #include <QState>
 
-class WizardState : public QState
-{
-    Q_OBJECT
-    Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
+class WizardState : public QState {
+    Q_OBJECT Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
     Q_PROPERTY(bool isDone READ isDone NOTIFY isDoneChanged)
     Q_PROPERTY(qint8 completion READ completion NOTIFY completionChanged)
     Q_PROPERTY(QString stepName READ stepName NOTIFY stepNameChanged)
 public:
     explicit WizardState(QString name, QState *parent = 0);
-    bool isActive(){
+    bool isActive()
+    {
         return m_active;
     }
 
-    bool isDone(){
+    bool isDone()
+    {
         return m_done;
     }
 
-    qint8 completion(){
+    qint8 completion()
+    {
         return m_completion;
     }
 
-    QString stepName(){
+    QString stepName()
+    {
         return m_stepName;
     }
 

@@ -31,10 +31,9 @@
 
 namespace OpenPilot {
 class ThermalCalibration {
-
-    static const int GYRO_X_POLY_DEGREE = 1;
-    static const int GYRO_Y_POLY_DEGREE = 1;
-    static const int GYRO_Z_POLY_DEGREE = 2;
+    static const int GYRO_X_POLY_DEGREE  = 1;
+    static const int GYRO_Y_POLY_DEGREE  = 1;
+    static const int GYRO_Z_POLY_DEGREE  = 2;
 
     static const int ACCEL_X_POLY_DEGREE = 1;
     static const int ACCEL_Y_POLY_DEGREE = 1;
@@ -70,7 +69,6 @@ public:
      * @return
      */
     static bool GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, Eigen::VectorXf temperature, float *result);
-
 
 
 private:

@@ -49,6 +49,7 @@ HEADERS += configplugin.h \
     calibration/thermal/thermalcalibrationtransitions.h \
     calibration/thermal/thermalcalibration.h \
     calibration/thermal/thermalcalibrationhelper.h \
+    calibration/thermal/thermalcalibrationmodel.h \
     calibration/thermal/settinghandlingtransitions.h
 
 SOURCES += configplugin.cpp \
@@ -84,6 +85,7 @@ SOURCES += configplugin.cpp \
     calibration/wizardmodel.cpp \
     calibration/thermal/thermalcalibration.cpp \
     calibration/thermal/thermalcalibrationhelper.cpp \
+    calibration/thermal/thermalcalibrationmodel.cpp
 
 FORMS += airframe.ui \
     airframe_ccpm.ui \

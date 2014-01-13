@@ -27,7 +27,7 @@
  */
 #ifndef THERMALCALIBRATION_H
 #define THERMALCALIBRATION_H
-#include "calibrationutils.h"
+#include "../calibrationutils.h"
 
 namespace OpenPilot {
 class ThermalCalibration {

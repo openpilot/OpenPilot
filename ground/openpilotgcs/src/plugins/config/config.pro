@@ -26,7 +26,6 @@ HEADERS += configplugin.h \
     configpipxtremewidget.h \
     configstabilizationwidget.h \
     assertions.h \
-#    calibration.h \
     defaultattitudewidget.h \
     defaulthwsettingswidget.h \
     inputchannelform.h \
@@ -45,9 +44,9 @@ HEADERS += configplugin.h \
     dblspindelegate.h \
     configrevohwwidget.h \
     calibration/calibrationutils.h \
-    calibration/thermalcalibration.h \
     calibration/wizardstate.h \
-    calibration/wizardmodel.h
+    calibration/wizardmodel.h \
+    calibration/thermal/thermalcalibration.h \
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \
@@ -61,10 +60,6 @@ SOURCES += configplugin.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
     configpipxtremewidget.cpp \
-#    twostep.cpp \
-#    legacy-calibration.cpp \
-#    gyro-calibration.cpp \
-#    alignment-calibration.cpp \
     defaultattitudewidget.cpp \
     defaulthwsettingswidget.cpp \
     inputchannelform.cpp \
@@ -82,9 +77,9 @@ SOURCES += configplugin.cpp \
     dblspindelegate.cpp \
     configrevohwwidget.cpp \
     calibration/calibrationutils.cpp \
-    calibration/thermalcalibration.cpp \
     calibration/wizardstate.cpp \
-    calibration/wizardmodel.cpp
+    calibration/wizardmodel.cpp \
+    calibration/thermal/thermalcalibration.cpp \
 
 FORMS += airframe.ui \
     airframe_ccpm.ui \

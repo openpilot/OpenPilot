@@ -25,8 +25,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "thermalcalibration.h"
 #include "QDebug"
+#include "thermalcalibration.h"
 using namespace OpenPilot;
 bool ThermalCalibration::BarometerCalibration(Eigen::VectorXf pressure, Eigen::VectorXf temperature, float *result)
 {

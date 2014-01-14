@@ -948,12 +948,18 @@ android_sdk_update:
 	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
 
 		#Install git hooks under the right folder
-.PHONY: prepare
-		
-prepare:
-	$(V0) @echo " Installing GIT hooks under $(ROOT_DIR)/.git/hooks"
-	$(V1) $(CP) --remove-destination "$(ROOT_DIR)/make/git-hooks"/* "$(ROOT_DIR)/.git/hooks/"
 
+.PHONY: prepare
+prepare:
+	$(V0) @echo " Configuring GIT commit template"
+	$(V1) $(CD) "$(ROOT_DIR)"
+	$(V1) $(GIT) config commit.template .commit-template
+
+.PHONY: prepare_clean
+prepare_clean:
+	$(V0) @echo " Cleanup GIT commit template configuration"
+	$(V1) $(CD) "$(ROOT_DIR)"
+	$(V1) $(GIT) config --unset commit.template 
 
 ##############################
 #

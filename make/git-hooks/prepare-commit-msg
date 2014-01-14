@@ -1,4 +1,0 @@
-#!/bin/sh
-# Append instructions on how to format a commit message
-cat "$GIT_DIR/hooks/msg_template.txt" >> $1
-#

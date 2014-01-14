@@ -860,7 +860,7 @@ help:
 	@$(ECHO) "   Here is a summary of the available targets:"
 	@$(ECHO)
 	@$(ECHO) "   [Source tree preparation]"
-	@$(ECHO) "     prepare              - Install GIT hooks under the right .git/hooks"
+	@$(ECHO) "     prepare              - Install GIT commit message templates"
 	@$(ECHO) "   [Tool Installers]"
 	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"

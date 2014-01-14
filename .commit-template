@@ -1,3 +1,5 @@
+
+
 # *************** OpenPilot commits guidelines ***************
 # Each commit needs to have a message like the following sample:
 #  OP-1150 UI for thermal calibration: Connect State machine to UI

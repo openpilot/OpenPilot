@@ -33,6 +33,7 @@
 #include "inc/stateestimation.h"
 #include <attitudestate.h>
 #include <revocalibration.h>
+#include <systemalarms.h>
 #include <homelocation.h>
 
 #include <CoordinateConversions.h>
@@ -81,8 +82,14 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     struct data *this = (struct data *)self->localdata;
 
     if (IS_SET(state->updated, SENSORUPDATES_mag)) {
-        if (this->revoCalibration.MagBiasNullingRate > 0) {
-            magOffsetEstimation(this, state->mag);
+        SystemAlarmsAlarmData alarms;
+        SystemAlarmsAlarGet(&alarms);
+        if (alarms.Magnetometer != SYSTEMALARMS_ALARM_OK) {
+            UNSET_MASK(state->updated, SENSORUPDATES_mag);
+        } else {
+            if (this->revoCalibration.MagBiasNullingRate > 0) {
+                magOffsetEstimation(this, state->mag);
+            }
         }
     }
 

@@ -50,33 +50,33 @@ extern xSemaphoreHandle osdSemaphore;
 static const struct pios_video_type_boundary pios_video_type_boundary_ntsc = {
     .graphics_left   = 0,
     .graphics_top    = 0,
-    .graphics_right  = 367,                  // must be: graphics_width_real - 1
-    .graphics_bottom = 240, // must be: graphics_hight_real - 1
+    .graphics_right  = 367,         // must be: graphics_width_real - 1
+    .graphics_bottom = 240,         // must be: graphics_hight_real - 1
 };
 
 static const struct pios_video_type_boundary pios_video_type_boundary_pal = {
     .graphics_left   = 0,
     .graphics_top    = 0,
-    .graphics_right  = 399,                  // must be: graphics_width_real - 1
-    .graphics_bottom = 287, // must be: graphics_hight_real - 1
+    .graphics_right  = 399,         // must be: graphics_width_real - 1
+    .graphics_bottom = 287,         // must be: graphics_hight_real - 1
 };
 
 static const struct pios_video_type_cfg pios_video_type_cfg_ntsc = {
-    .graphics_width_real   = 368,                  // Real visible columns		currently unused, just for info
-    .graphics_hight_real   = 241,                  // Real visible lines
-    .graphics_column_start = 60,      // First visible OSD column (after Hsync)
-    .graphics_line_start   = 13,                   // First visible OSD line
-    .dma_buffer_length     = 47,                   // DMA buffer byte length	must be: graphics_width_real / 8 + 1
+    .graphics_width_real   = 368,   // Real visible columns		currently unused, just for info
+    .graphics_hight_real   = 241,   // Real visible lines
+    .graphics_column_start = 60,    // First visible OSD column (after Hsync)
+    .graphics_line_start   = 13,    // First visible OSD line
+    .dma_buffer_length     = 47,    // DMA buffer byte length	must be: graphics_width_real / 8 + 1
     .period = 11,
     .dc     = (11 / 2),
 };
 
 static const struct pios_video_type_cfg pios_video_type_cfg_pal = {
-    .graphics_width_real   = 400,                  // Real visible columns		currently unused, just for info
-    .graphics_hight_real   = 288,                  // Real visible lines
-    .graphics_column_start = 70,      // First visible OSD column (after Hsync)
-    .graphics_line_start   = 17,                   // First visible OSD line
-    .dma_buffer_length     = 51,                   // DMA buffer byte length	must be: graphics_width_real / 8 + 1
+    .graphics_width_real   = 400,   // Real visible columns		currently unused, just for info
+    .graphics_hight_real   = 288,   // Real visible lines
+    .graphics_column_start = 70,    // First visible OSD column (after Hsync)
+    .graphics_line_start   = 17,    // First visible OSD line
+    .dma_buffer_length     = 51,    // DMA buffer byte length	must be: graphics_width_real / 8 + 1
     .period = 10,
     .dc     = (10 / 2),
 };
@@ -211,7 +211,7 @@ void PIOS_VIDEO_DMA_Handler(void)
         }
     }
 #else /* ifdef DIRECT_REGISTER_ACCESS */
-      // Handle flags from DMA stream channel
+    // Handle flags from DMA stream channel
     if (DMA_GetFlagStatus(dev_cfg->mask.dma.tx.channel, DMA_FLAG_TCIF7) && DMA_GetFlagStatus(dev_cfg->level.dma.tx.channel, DMA_FLAG_TCIF5)) {
         DMA_ClearFlag(dev_cfg->mask.dma.tx.channel, DMA_FLAG_TCIF7);
         DMA_ClearFlag(dev_cfg->level.dma.tx.channel, DMA_FLAG_TCIF5);

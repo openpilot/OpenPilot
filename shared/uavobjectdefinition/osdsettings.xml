@@ -5,46 +5,46 @@
         <field name="ScreenSwitching" units="" type="int16" elements="4" elementnames="UnconnectedScreen,SwitchChannel,Switch1Pulse,Switch3Pulse" defaultvalue="1,6,1300,1700"/>
         
         <field name="Warnings" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="WarningsSetup" units="" type="int16" elements="9" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize,VerticalSpacing,Mask" defaultvalue="200,80,200,80,200,80,3,25,4095"/>
+        <field name="WarningsSetup" units="" type="int16" elements="9" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3,CharSize,VerticalSpacing,Mask" defaultvalue="0,-60,0,-60,0,-60,3,25,4095"/>
         
         <field name="ArtificialHorizon" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="ArtificialHorizonSetup" units="" type="int16" elements="9" elementnames="X1,Y1,X2,Y2,X3,Y3,MaxPitchVisible,DeltaDegree,MainLineWidth" defaultvalue="200,144,200,144,0,0,35,15,500"/>
+        <field name="ArtificialHorizonSetup" units="" type="int16" elements="9" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3,MaxPitchVisible,DeltaDegree,MainLineWidth" defaultvalue="0,0,0,0,-1000,-1000,35,15,500"/>
         
         <field name="Speed" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="SpeedSetup" units="" type="int16" elements="6" elementnames="X1,Y1,X2,Y2,X3,Y3" defaultvalue="2,144,2,144,0,0"/>
+        <field name="SpeedSetup" units="" type="int16" elements="6" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3" defaultvalue="-160,0,-160,0,-1000,-1000"/>
         
         <field name="Altitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="AltitudeSetup" units="" type="int16" elements="6" elementnames="X1,Y1,X2,Y2,X3,Y3" defaultvalue="2,144,2,144,0,0"/>
+        <field name="AltitudeSetup" units="" type="int16" elements="6" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3" defaultvalue="160,0,160,0,-1000,-1000"/>
         
         <field name="Heading" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="HeadingSetup" units="" type="int16" elements="6" elementnames="X1,Y1,X2,Y2,X3,Y3" defaultvalue="200,270,200,270,0,0"/>
+        <field name="HeadingSetup" units="" type="int16" elements="6" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3" defaultvalue="0,100,0,100,-1000,-1000"/>
         
         <field name="HomeArrow" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="HomeArrowSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,Size" defaultvalue="200,230,200,230,0,0,10"/>
+        <field name="HomeArrowSetup" units="" type="int16" elements="7" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3,Size" defaultvalue="0,60,0,60,-1000,-1000,10"/>
         
         <field name="GPSLatitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="GPSLatitudeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,2,2,2,2,2,3"/>
+        <field name="GPSLatitudeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="35,20,35,20,35,20,2"/>
         
         <field name="GPSLongitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="GPSLongitudeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="226,2,226,2,226,2,3"/>
+        <field name="GPSLongitudeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="252,20,252,20,252,20,2"/>
         
         <field name="GPSSatInfo" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="GPSSatInfoSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,227,2,227,0,0,3"/>
+        <field name="GPSSatInfoSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="35,205,35,205,-1000,-1000,2"/>
         
         <field name="Throttle" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="ThrottleSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,247,2,247,0,0,3"/>
+        <field name="ThrottleSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="35,215,35,215,-1000,-1000,2"/>
         
         <field name="FlightMode" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="FlightModeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,267,2,267,0,0,3"/>
+        <field name="FlightModeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="35,225,35,225,-1000,-1000,2"/>
         
         <field name="HomeDistance" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="HomeDistanceSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="298,227,298,227,0,0,3"/>
+        <field name="HomeDistanceSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="300,205,300,205,-1000,-1000,2"/>
         
         <field name="VerticalSpeed" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="VerticalSpeedSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="298,247,298,247,0,0,3"/>
+        <field name="VerticalSpeedSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="300,215,300,215,-1000,-1000,2"/>
         
         <field name="Time" units="" type="enum" elements="1" options="Disabled,HourMinSec,MinSec" defaultvalue="MinSec"/>
-        <field name="TimeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="298,267,298,267,0,0,3"/>
+        <field name="TimeSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="300,225,300,225,-1000,-1000,2"/>
         
 		<field name="Units" units="" type="enum" elements="1" options="Metric,Imperial" defaultvalue="Metric"/>
 		<field name="HomeSource" units="" type="enum" elements="1" options="GPS,Config" defaultvalue="GPS"/>

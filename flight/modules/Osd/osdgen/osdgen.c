@@ -1293,7 +1293,7 @@ void write_char(char ch, int x, int y, int flags, int font)
                 // mask
                 write_word_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, wbit);
                 // level
-                levels   = font_info.data[row + font_info.height];
+                levels = font_info.data[row + font_info.height];
                 if (!(flags & FONT_INVERT)) { // data is normally inverted
                     levels = ~levels;
                 }
@@ -1709,20 +1709,17 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     // Compute the position of the elements.
     int majtick_start = 0, majtick_end = 0, mintick_start = 0, mintick_end = 0, boundtick_start = 0, boundtick_end = 0;
 
+    majtick_start   = x;
+    mintick_start   = x;
+    boundtick_start = x;
     if (halign == -1) {
-        majtick_start   = x;
         majtick_end     = x + majtick_len;
-        mintick_start   = x;
         mintick_end     = x + mintick_len;
-        boundtick_start = x;
         boundtick_end   = x + boundtick_len;
     } else if (halign == +1) {
-        majtick_start   = GRAPHICS_WIDTH_REAL - x - 1;
-        majtick_end     = GRAPHICS_WIDTH_REAL - x - majtick_len - 1;
-        mintick_start   = GRAPHICS_WIDTH_REAL - x - 1;
-        mintick_end     = GRAPHICS_WIDTH_REAL - x - mintick_len - 1;
-        boundtick_start = GRAPHICS_WIDTH_REAL - x - 1;
-        boundtick_end   = GRAPHICS_WIDTH_REAL - x - boundtick_len - 1;
+        majtick_end     = x - majtick_len;
+        mintick_end     = x - mintick_len;
+        boundtick_end   = x - boundtick_len;
     }
     // Retrieve width of large font (font #0); from this calculate the x spacing.
     fetch_font_info(0, 0, &font_info, NULL);
@@ -1769,7 +1766,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
                 if (halign == -1) {
                     write_string(temp, majtick_end + text_x_spacing, ys, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_LEFT, 0, 1);
                 } else {
-                    write_string(temp, majtick_end - text_x_spacing + 1, ys, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_RIGHT, 0, 1);
+                    write_string(temp, majtick_end - text_x_spacing, ys, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_RIGHT, 0, 1);
                 }
             } else if (style == 2) {
                 write_hline_outlined(mintick_start, mintick_end, ys, 2, 2, 0, 1);
@@ -2391,23 +2388,23 @@ uint8_t check_enable_and_srceen(uint8_t info, OsdSettingsWarningsSetupData *setu
 
     switch (screen) {
     case 1:
-        if (setup->X1 || setup->Y1) {
-            *x = setup->X1;
-            *y = setup->Y1;
+        if (setup->XOffset1 > -1000 && setup->YOffset1 > -1000) {
+            *x = setup->XOffset1;
+            *y = setup->YOffset1;
             return info;
         }
         break;
     case 2:
-        if (setup->X2 || setup->Y2) {
-            *x = setup->X2;
-            *y = setup->Y2;
+        if (setup->XOffset2 > -1000 && setup->YOffset2 > -1000) {
+            *x = setup->XOffset2;
+            *y = setup->YOffset2;
             return info;
         }
         break;
     case 3:
-        if (setup->X3 || setup->Y3) {
-            *x = setup->X3;
-            *y = setup->Y3;
+        if (setup->XOffset3 > -1000 && setup->YOffset3 > -1000) {
+            *x = setup->XOffset3;
+            *y = setup->YOffset3;
             return info;
         }
         break;
@@ -2662,7 +2659,7 @@ void updateGraphics()
         // Artificial horizon in HUD design (centered relative to x, y)
         if (check_enable_and_srceen(OsdSettings.ArtificialHorizon, (OsdSettingsWarningsSetupData *)&OsdSettings.ArtificialHorizonSetup, screen, &x, &y)) {
 #if 1
-            hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, x, y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
+            hud_draw_artificial_horizon(attitude.Roll, attitude.Pitch, attitude.Yaw, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, OsdSettings.ArtificialHorizonSetup.MaxPitchVisible, OsdSettings.ArtificialHorizonSetup.DeltaDegree, OsdSettings.ArtificialHorizonSetup.MainLineWidth, 100);
 #else
             sprintf(temp, "Roll: %7.2f", (double)attitude.Roll);
             write_string(temp, 200, 100, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, 3);
@@ -2687,21 +2684,21 @@ void updateGraphics()
         }
         // Ground speed in HUD design as vertical scale left side (centered relative to y)
         if (check_enable_and_srceen(OsdSettings.Speed, (OsdSettingsWarningsSetupData *)&OsdSettings.SpeedSetup, screen, &x, &y)) {
-            hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, -1, x, y, 100, 10, 20, 7, 12, 15, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
+            hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, -1, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 7, 12, 15, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
         // Home altitude in HUD design as vertical scale right side (centered relative to y)
         if (check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData *)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
-            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, +1, x, y, 100, 10, 20, 7, 12, 15, 100, 0);
+            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, +1, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 7, 12, 15, 100, 0);
         }
         // Heading in HUD design (centered relative to x)
         // JR_HINT TODO use and test mag heading in-flight
         if (check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData *)&OsdSettings.HeadingSetup, screen, &x, &y)) {
             int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
-            hud_draw_linear_compass(heading < 0 ? heading + 360 : heading, 150, 120, x, y, 15, 30, 7, 12, 0);
+            hud_draw_linear_compass(heading < 0 ? heading + 360 : heading, 150, 120, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 15, 30, 7, 12, 0);
         }
         // Home direction visualization
         if (check_enable_and_srceen(OsdSettings.HomeArrow, (OsdSettingsWarningsSetupData *)&OsdSettings.HomeArrowSetup, screen, &x, &y)) {
-            drawArrow(x, y, homePos.Direction, OsdSettings.HomeArrowSetup.Size);
+            drawArrow(GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, homePos.Direction, OsdSettings.HomeArrowSetup.Size);
         }
         // Home distance
         if (check_enable_and_srceen(OsdSettings.HomeDistance, (OsdSettingsWarningsSetupData *)&OsdSettings.HomeDistanceSetup, screen, &x, &y)) {
@@ -2830,7 +2827,7 @@ void updateGraphics()
             WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D ? WARN_NO_SAT_FIX : 0x00;
             WarnMask |= !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE ? WARN_HOME_NOT_SET : 0x00;
             WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED ? WARN_DISARMED : 0x00;
-            draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, x, y, OsdSettings.WarningsSetup.VerticalSpacing, OsdSettings.WarningsSetup.CharSize);
+            draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, OsdSettings.WarningsSetup.VerticalSpacing, OsdSettings.WarningsSetup.CharSize);
         }
 
 #ifdef DEBUG_TIMING

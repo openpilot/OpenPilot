@@ -93,6 +93,9 @@ extern const struct pios_video_type_boundary *pios_video_type_boundary_act;
 #define GRAPHICS_RIGHT       pios_video_type_boundary_act->graphics_right
 #define GRAPHICS_BOTTOM      pios_video_type_boundary_act->graphics_bottom
 
+#define GRAPHICS_X_MIDDLE	((GRAPHICS_RIGHT + 1) / 2)
+#define GRAPHICS_Y_MIDDLE	((GRAPHICS_BOTTOM + 1) / 2)
+
 
 // video type defs for autodetect
 #define VIDEO_TYPE_NTSC      0

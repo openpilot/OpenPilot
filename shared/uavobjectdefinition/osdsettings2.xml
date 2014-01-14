@@ -8,27 +8,27 @@
 		<field name="AirborneResetTimeCurrent" units=""  type="float"  elements="1" defaultvalue="4.0"/>
         
         <field name="RSSI" units="" type="enum" elements="1" options="Disabled,Analog,PWM" defaultvalue="Disabled"/>
-        <field name="RSSISetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,25,2,25,0,0,2"/>
+        <field name="RSSISetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="35,40,35,40,-1000,-1000,2"/>
         <field name="RSSICalibration" units="" type="float" elementnames="Factor, Offset, Warning" defaultvalue="1.0, 0.0, 2.0"/>
         
         <field name="FlightVoltage" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Disabled"/>
-        <field name="FlightVoltageSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,35,2,35,0,0,2"/>
+        <field name="FlightVoltageSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="35,50,35,50,-1000,-1000,2"/>
         <field name="FlightVoltageCalibration" units="" type="float" elementnames="Factor, Offset, Warning" defaultvalue="6.1, 0.0, 10.5"/>
         
         <field name="VideoVoltage" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Disabled"/>
-        <field name="VideoVoltageSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,45,2,45,0,0,2"/>
+        <field name="VideoVoltageSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="35,60,35,60,-1000,-1000,2"/>
         <field name="VideoVoltageCalibration" units="" type="float" elementnames="Factor, Offset, Warning" defaultvalue="6.1, 0.0, 10.5"/>
         
         <field name="SensorVoltage" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Disabled"/>
-        <field name="SensorVoltageSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,55,2,55,0,0,2"/>
+        <field name="SensorVoltageSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="300,40,300,40,-1000,-1000,2"/>
         <field name="SensorVoltageCalibration" units="" type="float" elementnames="Factor, Offset, Warning" defaultvalue="1.0, 0.0, 10.5"/>
         
         <field name="SensorCurrent" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Disabled"/>
-        <field name="SensorCurrentSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,65,2,65,0,0,2"/>
+        <field name="SensorCurrentSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="300,50,300,50,-1000,-1000,2"/>
         <field name="SensorCurrentCalibration" units="" type="float" elementnames="Factor, Offset, Warning" defaultvalue="1.0, 0.0, 40.0"/>
         
         <field name="SensorCurrentConsumed" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Disabled"/>
-        <field name="SensorCurrentConsumedSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="2,75,2,75,0,0,2"/>
+        <field name="SensorCurrentConsumedSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="300,60,300,60,-1000,-1000,2"/>
         
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

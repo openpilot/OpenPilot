@@ -3060,6 +3060,7 @@ MODULE_INITCALL(osdgenInitialize, osdgenStart);
 /**
  * Main osd task. It does not return.
  */
+#define BLANK_TIME 1000
 #define INTRO_TIME 4000
 static void osdgenTask(__attribute__((unused)) void *parameters)
 {
@@ -3097,8 +3098,18 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
     Convert[1].char_m_feet   = 'f';
     Convert[1].char_ms_fts   = ' ';                  // TODO design a char for font 2 and 3
 
+    // blank
+    while (xTaskGetTickCount() <= BLANK_TIME) {
+        if (xSemaphoreTake(osdSemaphore, LONG_TIME) == pdTRUE) {
+#ifdef PIOS_INCLUDE_WDG
+            PIOS_WDG_UpdateFlag(PIOS_WDG_OSDGEN);
+#endif
+            clearGraphics();
+        }
+    }
+
     // intro
-    while (xTaskGetTickCount() <= INTRO_TIME) {
+    while (xTaskGetTickCount() <= BLANK_TIME + INTRO_TIME) {
         if (xSemaphoreTake(osdSemaphore, LONG_TIME) == pdTRUE) {
 #ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_UpdateFlag(PIOS_WDG_OSDGEN);

@@ -168,18 +168,17 @@ static void updatePIDs(UAVObjEvent *ev)
     }
 
     StabilizationBankData bank;
-    switch(inst.BankNumber)
-    {
+    switch (inst.BankNumber) {
     case 0:
-        StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *) &bank);
+        StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *)&bank);
         break;
 
     case 1:
-        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *) &bank);
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *)&bank);
         break;
 
     case 2:
-        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *) &bank);
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *)&bank);
         break;
 
     default:
@@ -317,18 +316,17 @@ static void updatePIDs(UAVObjEvent *ev)
         StabilizationSettingsSet(&stab);
     }
     if (needsUpdateBank) {
-        switch(inst.BankNumber)
-        {
+        switch (inst.BankNumber) {
         case 0:
-            StabilizationSettingsBank1Set((StabilizationSettingsBank1Data *) &bank);
+            StabilizationSettingsBank1Set((StabilizationSettingsBank1Data *)&bank);
             break;
 
         case 1:
-            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *) &bank);
+            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *)&bank);
             break;
 
         case 2:
-            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *) &bank);
+            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *)&bank);
             break;
 
         default:

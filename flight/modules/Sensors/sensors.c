@@ -55,8 +55,6 @@
 #include <attitudestate.h>
 #include <attitudesettings.h>
 #include <revocalibration.h>
-#include <revosettings.h>
-#include <homelocation.h>
 #include <flightstatus.h>
 #include <taskinfo.h>
 
@@ -75,7 +73,6 @@
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
-static void checkMagValidity(MagSensorData *mag);
 // static void magOffsetEstimation(MagSensorData *mag);
 
 // Private variables
@@ -95,8 +92,6 @@ static float R[3][3] = {
     { 0 }
 };
 static int8_t rotate = 0;
-static RevoSettingsMagnetometerMaxDeviationData magMaxDev;
-static float Be[3]   = { 0 };
 
 /**
  * API for sensor fusion algorithms:
@@ -117,17 +112,12 @@ int32_t SensorsInitialize(void)
     AccelSensorInitialize();
     MagSensorInitialize();
     RevoCalibrationInitialize();
-    RevoSettingsInitialize();
     AttitudeSettingsInitialize();
-    AttitudeStateInitialize();
-    HomeLocationInitialize();
 
     rotate = 0;
 
     RevoCalibrationConnectCallback(&settingsUpdatedCb);
     AttitudeSettingsConnectCallback(&settingsUpdatedCb);
-    RevoSettingsConnectCallback(&settingsUpdatedCb);
-    HomeLocationConnectCallback(&settingsUpdatedCb);
 
     return 0;
 }
@@ -414,7 +404,6 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 
             MagSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();
-            checkMagValidity(&mag);
         }
 #endif /* if defined(PIOS_INCLUDE_HMC5883) */
 
@@ -425,57 +414,6 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         lastSysTime = xTaskGetTickCount();
     }
 }
-
-/**
- * check validity of magnetometers
- */
-static void checkMagValidity(MagSensorData *mag)
-{
-        #define lowPassAlpha 0.01f
-        #define idleCount    100
-    static float average[3]     = { 0 };
-    static uint8_t noteverytime = idleCount;
-
-    // low pass filter sensor to not give warnings due to noise
-    average[0] = (1.0f - lowPassAlpha) * average[0] + lowPassAlpha * mag->x;
-    average[1] = (1.0f - lowPassAlpha) * average[1] + lowPassAlpha * mag->y;
-    average[2] = (1.0f - lowPassAlpha) * average[2] + lowPassAlpha * mag->z;
-
-    // throttle this check, thanks to low pass filter it is not necessary every iteration
-    if (!noteverytime--) {
-        noteverytime = idleCount;
-
-        // calculate expected Be vector
-        AttitudeStateData attitudeState;
-        AttitudeStateGet(&attitudeState);
-        float Rot[3][3];
-        float expected[3];
-        Quaternion2R(&attitudeState.q1, Rot);
-        rot_mult(Rot, Be, expected);
-
-        // calculate maximum allowed deviation
-        float warning = expected[0] * expected[0] + expected[1] * expected[1] + expected[2] * expected[2];
-        float error   = magMaxDev.Error * magMaxDev.Error * warning;
-        warning = magMaxDev.Warning * magMaxDev.Warning * warning;
-
-
-        // calculate difference
-        expected[0] = expected[0] - average[0];
-        expected[1] = expected[1] - average[1];
-        expected[2] = expected[2] - average[2];
-        float deviation = expected[0] * expected[0] + expected[1] * expected[1] + expected[2] * expected[2];
-
-        // set errors
-        if (deviation < warning) {
-            AlarmsClear(SYSTEMALARMS_ALARM_MAGNETOMETER);
-        } else if (deviation < error) {
-            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_WARNING);
-        } else {
-            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_ERROR);
-        }
-    }
-}
-
 
 /**
  * Locally cache some variables from the AtttitudeSettings object
@@ -520,9 +458,6 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         Quaternion2R(rotationQuat, R);
         rotate = 1;
     }
-
-    RevoSettingsMagnetometerMaxDeviationGet(&magMaxDev);
-    HomeLocationBeGet(Be);
 }
 /**
  * @}

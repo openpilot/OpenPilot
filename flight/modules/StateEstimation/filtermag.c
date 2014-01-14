@@ -33,6 +33,7 @@
 #include "inc/stateestimation.h"
 #include <attitudestate.h>
 #include <revocalibration.h>
+#include <revosettings.h>
 #include <systemalarms.h>
 #include <homelocation.h>
 
@@ -46,7 +47,11 @@
 struct data {
     HomeLocationData    homeLocation;
     RevoCalibrationData revoCalibration;
-    float magBias[3];
+    RevoSettingsData    revoSettings;
+    uint16_t counter;
+    bool     validity;
+    float    magAverage[3];
+    float    magBias[3];
 };
 
 // Private variables
@@ -55,6 +60,7 @@ struct data {
 
 static int32_t init(stateFilter *self);
 static int32_t filter(stateFilter *self, stateEstimation *state);
+static bool checkMagValidity(struct data *this, float mag[3]);
 static void magOffsetEstimation(struct data *this, float mag[3]);
 
 
@@ -71,9 +77,13 @@ static int32_t init(stateFilter *self)
 {
     struct data *this = (struct data *)self->localdata;
 
-    this->magBias[0] = this->magBias[1] = this->magBias[2] = 0.0f;
+    this->magBias[0]    = this->magBias[1] = this->magBias[2] = 0.0f;
+    this->magAverage[0] = this->magAverage[1] = this->magAverage[2] = 0.0f;
+    this->counter  = 0;
+    this->validity = true;
     HomeLocationGet(&this->homeLocation);
     RevoCalibrationGet(&this->revoCalibration);
+    RevoSettingsGet(&this->revoSettings);
     return 0;
 }
 
@@ -82,9 +92,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     struct data *this = (struct data *)self->localdata;
 
     if (IS_SET(state->updated, SENSORUPDATES_mag)) {
-        SystemAlarmsAlarmData alarms;
-        SystemAlarmsAlarGet(&alarms);
-        if (alarms.Magnetometer != SYSTEMALARMS_ALARM_OK) {
+        if (!checkMagValidity(this, state->mag)) {
             UNSET_MASK(state->updated, SENSORUPDATES_mag);
         } else {
             if (this->revoCalibration.MagBiasNullingRate > 0) {
@@ -95,6 +103,58 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
     return 0;
 }
+
+/**
+ * check validity of magnetometers
+ */
+static bool checkMagValidity(struct data *this, float mag[3])
+{
+        #define MAG_LOW_PASS_ALPHA 0.05f
+        #define IDLE_COUNT         20
+
+    // low pass filter sensor to not give warnings due to noise
+    this->magAverage[0] = (1.0f - MAG_LOW_PASS_ALPHA) * this->magAverage[0] + MAG_LOW_PASS_ALPHA * mag[0];
+    this->magAverage[1] = (1.0f - MAG_LOW_PASS_ALPHA) * this->magAverage[1] + MAG_LOW_PASS_ALPHA * mag[0];
+    this->magAverage[2] = (1.0f - MAG_LOW_PASS_ALPHA) * this->magAverage[2] + MAG_LOW_PASS_ALPHA * mag[0];
+
+    // throttle this check, thanks to low pass filter it is not necessary every iteration
+    if (!this->counter--) {
+        this->counter = IDLE_COUNT;
+
+        // calculate expected Be vector
+        AttitudeStateData attitudeState;
+        AttitudeStateGet(&attitudeState);
+        float Rot[3][3];
+        float expected[3];
+        Quaternion2R(&attitudeState.q1, Rot);
+        rot_mult(Rot, this->homeLocation.Be, expected);
+
+        // calculate maximum allowed deviation
+        float warning2 = expected[0] * expected[0] + expected[1] * expected[1] + expected[2] * expected[2];
+        float error2   = this->revoSettings.MagnetometerMaxDeviation.Error * this->revoSettings.MagnetometerMaxDeviation.Error * warning2;
+        warning2    = this->revoSettings.MagnetometerMaxDeviation.Warning * this->revoSettings.MagnetometerMaxDeviation.Warning * warning2;
+
+        // calculate difference
+        expected[0] = expected[0] - this->magAverage[0];
+        expected[1] = expected[1] - this->magAverage[1];
+        expected[2] = expected[2] - this->magAverage[2];
+        float deviation2 = expected[0] * expected[0] + expected[1] * expected[1] + expected[2] * expected[2];
+
+        // set errors
+        if (deviation2 < warning2) {
+            AlarmsClear(SYSTEMALARMS_ALARM_MAGNETOMETER);
+            this->validity = true;
+        } else if (deviation2 < error2) {
+            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_WARNING);
+            this->validity = false;
+        } else {
+            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_ERROR);
+            this->validity = false;
+        }
+    }
+    return this->validity;
+}
+
 
 /**
  * Perform an update of the @ref MagBias based on

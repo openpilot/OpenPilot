@@ -1682,30 +1682,28 @@ void drawBattery(uint16_t x, uint16_t y, uint8_t battery, uint16_t size)
 /**
  * hud_draw_vertical_scale: Draw a vertical scale.
  *
- * @param       v                               value to display as an integer
- * @param       range                   range about value to display (+/- range/2 each direction)
- * @param       halign                  horizontal alignment: -1 = left, +1 = right.
- * @param       x                       x displacement (typ. 0)
- * @param       y                       y displacement (typ. half display height)
- * @param       height                  height of scale
- * @param       mintick_step                    how often a minor tick is shown
- * @param       majtick_step                    how often a major tick is shown
- * @param       mintick_len             minor tick length
- * @param       majtick_len             major tick length
- * @param       boundtick_len           boundary tick length
- * @param       max_val                 maximum expected value (used to compute size of arrow ticker)
- * @param       flags                   special flags (see hud.h.)
+ * @param       v                   value to display as an integer
+ * @param       range               range about value to display (+/- range/2 each direction)
+ * @param       halign              horizontal alignment: -1 = left, +1 = right.
+ * @param       x                   x displacement
+ * @param       y                   y displacement
+ * @param       height              height of scale
+ * @param       mintick_step        how often a minor tick is shown
+ * @param       majtick_step        how often a major tick is shown
+ * @param       mintick_len         minor tick length
+ * @param       majtick_len         major tick length
+ * @param       boundtick_len       boundary tick length
+ * @param       max_val             maximum expected value (used to compute size of arrow ticker)
+ * @param       flags               special flags (see hud.h.)
  */
 // #define VERTICAL_SCALE_BRUTE_FORCE_BLANK_OUT
 // #define VERTICAL_SCALE_FILLED_NUMBER
 void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int height, int mintick_step, int majtick_step, int mintick_len, int majtick_len,
                              int boundtick_len, __attribute__((unused)) int max_val, int flags)
 {
-    char temp[15]; // , temp2[15];
+    char temp[15];
     struct FontEntry font_info;
     struct FontDimensions dim;
-    // Halign should be in a small span.
-    // MY_ASSERT(halign >= -1 && halign <= 1);
     // Compute the position of the elements.
     int majtick_start = 0, majtick_end = 0, mintick_start = 0, mintick_end = 0, boundtick_start = 0, boundtick_end = 0;
 
@@ -1723,8 +1721,8 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     }
     // Retrieve width of large font (font #0); from this calculate the x spacing.
     fetch_font_info(0, 0, &font_info, NULL);
-    int arrow_len      = (font_info.height / 2) + 1;             // FIXME, font info being loaded correctly??
-    int text_x_spacing = arrow_len;
+    int arrow_len      = (font_info.height / 2) + 1;
+    int text_x_spacing = (font_info.width / 2);
     int max_text_y     = 0, text_length = 0;
     int small_font_char_width = font_info.width + 1; // +1 for horizontal spacing = 1
     // For -(range / 2) to +(range / 2), draw the scale.
@@ -1751,22 +1749,19 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
         if (style) {
             // Calculate y position.
             ys = ((long int)(r * height) / (long int)range) + y;
-            // sprintf(temp, "ys=%d", ys);
-            // con_puts(temp, 0);
             // Depending on style, draw a minor or a major tick.
             if (style == 1) {
                 write_hline_outlined(majtick_start, majtick_end, ys, 2, 2, 0, 1);
                 memset(temp, ' ', 10);
-                // my_itoa(rv, temp);
                 sprintf(temp, "%d", rv);
                 text_length = (strlen(temp) + 1) * small_font_char_width; // add 1 for margin
                 if (text_length > max_text_y) {
                     max_text_y = text_length;
                 }
                 if (halign == -1) {
-                    write_string(temp, majtick_end + text_x_spacing, ys, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_LEFT, 0, 1);
+                    write_string(temp, majtick_end + text_x_spacing + 1, ys, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_LEFT, 0, 1);
                 } else {
-                    write_string(temp, majtick_end - text_x_spacing, ys, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_RIGHT, 0, 1);
+                    write_string(temp, majtick_end - text_x_spacing + 1, ys, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_RIGHT, 0, 1);
                 }
             } else if (style == 2) {
                 write_hline_outlined(mintick_start, mintick_end, ys, 2, 2, 0, 1);
@@ -1809,9 +1804,6 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
             write_hline_lm(xx - dim.width - 1, xx + arrow_len - i - 1, y + i - 1, 0, 0);
 #endif
         }
-        // FIXME
-        // write_hline_lm(xx - dim.width - 1, xx + (arrow_len - i), y - i - 1, 1, 1);
-        // write_hline_lm(xx - dim.width - 1, xx + (arrow_len - i), y + i - 1, 1, 1);
     }
     if (halign == -1) {
         write_hline_lm(xx, xx + dim.width - 1, y - arrow_len, 1, 1);
@@ -1849,16 +1841,16 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
 /**
  * hud_draw_compass: Draw a compass.
  *
- * @param       v                               value for the compass
- * @param       range                   range about value to display (+/- range/2 each direction)
- * @param       width                   length in pixels
- * @param       x                               x displacement (typ. half display width)
- * @param       y                               y displacement (typ. bottom of display)
+ * @param       v               value for the compass
+ * @param       range           range about value to display (+/- range/2 each direction)
+ * @param       width           length in pixels
+ * @param       x               x displacement
+ * @param       y               y displacement
  * @param       mintick_step    how often a minor tick is shown
  * @param       majtick_step    how often a major tick (heading "xx") is shown
- * @param       mintick_len             minor tick length
- * @param       majtick_len             major tick length
- * @param       flags                   special flags (see hud.h.)
+ * @param       mintick_len     minor tick length
+ * @param       majtick_len     major tick length
+ * @param       flags           special flags (see hud.h.)
  */
 #define COMPASS_SMALL_NUMBER
 // #define COMPASS_FILLED_NUMBER
@@ -1936,12 +1928,12 @@ void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mint
 #ifdef COMPASS_SMALL_NUMBER
     int rect_width = font_info.width * 3;
 #ifdef COMPASS_FILLED_NUMBER
-    write_filled_rectangle_lm(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 1);
+    write_filled_rectangle_lm(x - (rect_width / 2), majtick_start - 7, rect_width, font_info.height, 0, 1);
 #else
-    write_filled_rectangle_lm(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 0);
+    write_filled_rectangle_lm(x - (rect_width / 2), majtick_start - 7, rect_width, font_info.height, 0, 0);
 #endif
-    write_rectangle_outlined(x - (rect_width / 2), majtick_start - 6, rect_width, font_info.height, 0, 1);
-    write_string(headingstr, x + 1, majtick_start + textoffset - 4, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 0);
+    write_rectangle_outlined(x - (rect_width / 2), majtick_start - 7, rect_width, font_info.height, 0, 1);
+    write_string(headingstr, x + 1, majtick_start + textoffset - 5, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 1, 0);
 #else
     int rect_width = (font_info.width + 1) * 3 + 2;
 #ifdef COMPASS_FILLED_NUMBER
@@ -2684,17 +2676,17 @@ void updateGraphics()
         }
         // Ground speed in HUD design as vertical scale left side (centered relative to y)
         if (check_enable_and_srceen(OsdSettings.Speed, (OsdSettingsWarningsSetupData *)&OsdSettings.SpeedSetup, screen, &x, &y)) {
-            hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, -1, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 7, 12, 15, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
+            hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, OsdSettings.SpeedSetup.Orientation, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 5, 8, 11, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
         // Home altitude in HUD design as vertical scale right side (centered relative to y)
         if (check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData *)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
-            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, +1, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 7, 12, 15, 100, 0);
+            hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, OsdSettings.AltitudeSetup.Orientation, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 5, 8, 11, 100, 0);
         }
         // Heading in HUD design (centered relative to x)
         // JR_HINT TODO use and test mag heading in-flight
         if (check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData *)&OsdSettings.HeadingSetup, screen, &x, &y)) {
             int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
-            hud_draw_linear_compass(heading < 0 ? heading + 360 : heading, 150, 120, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 15, 30, 7, 12, 0);
+            hud_draw_linear_compass(heading < 0 ? heading + 360 : heading, 150, 120, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 15, 30, 5, 8, 0);
         }
         // Home direction visualization
         if (check_enable_and_srceen(OsdSettings.HomeArrow, (OsdSettingsWarningsSetupData *)&OsdSettings.HomeArrowSetup, screen, &x, &y)) {

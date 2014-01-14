@@ -11,10 +11,10 @@
         <field name="ArtificialHorizonSetup" units="" type="int16" elements="9" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3,MaxPitchVisible,DeltaDegree,MainLineWidth" defaultvalue="0,0,0,0,-1000,-1000,35,15,500"/>
         
         <field name="Speed" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="SpeedSetup" units="" type="int16" elements="6" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3" defaultvalue="-160,0,-160,0,-1000,-1000"/>
+        <field name="SpeedSetup" units="" type="int16" elements="6" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3,Orientation" defaultvalue="-160,0,-160,0,-1000,-1000,-1"/>
         
         <field name="Altitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
-        <field name="AltitudeSetup" units="" type="int16" elements="6" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3" defaultvalue="160,0,160,0,-1000,-1000"/>
+        <field name="AltitudeSetup" units="" type="int16" elements="6" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3,Orientation" defaultvalue="160,0,160,0,-1000,-1000,1"/>
         
         <field name="Heading" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="HeadingSetup" units="" type="int16" elements="6" elementnames="XOffset1,YOffset1,XOffset2,YOffset2,XOffset3,YOffset3" defaultvalue="0,100,0,100,-1000,-1000"/>

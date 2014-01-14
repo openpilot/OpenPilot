@@ -571,6 +571,9 @@ else
     # $(info $(EMPTY) WARNING     $(call toprel, $(OPENSSL_DIR)) not found (make openssl_install), using system PATH)
 endif
 
+.PHONY: openssl_version
+openssl_version:
+	-$(V1) $(ECHO) "OpenSSL `$(OPENSSL) version`"
 endif
 
 ##############################

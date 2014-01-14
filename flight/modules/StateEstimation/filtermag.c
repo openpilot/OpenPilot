@@ -48,8 +48,9 @@ struct data {
     HomeLocationData    homeLocation;
     RevoCalibrationData revoCalibration;
     RevoSettingsData    revoSettings;
-    uint16_t counter;
-    bool     validity;
+    uint16_t idlecounter;
+    uint8_t  warningcount;
+    uint8_t  errorcount;
     float    magAverage[3];
     float    magBias[3];
 };
@@ -60,7 +61,7 @@ struct data {
 
 static int32_t init(stateFilter *self);
 static int32_t filter(stateFilter *self, stateEstimation *state);
-static bool checkMagValidity(struct data *this, float mag[3]);
+static void checkMagValidity(struct data *this, float mag[3]);
 static void magOffsetEstimation(struct data *this, float mag[3]);
 
 
@@ -79,8 +80,7 @@ static int32_t init(stateFilter *self)
 
     this->magBias[0]    = this->magBias[1] = this->magBias[2] = 0.0f;
     this->magAverage[0] = this->magAverage[1] = this->magAverage[2] = 0.0f;
-    this->counter  = 0;
-    this->validity = true;
+    this->idlecounter   = this->warningcount = this->errorcount = 0;
     HomeLocationGet(&this->homeLocation);
     RevoCalibrationGet(&this->revoCalibration);
     RevoSettingsGet(&this->revoSettings);
@@ -92,12 +92,9 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     struct data *this = (struct data *)self->localdata;
 
     if (IS_SET(state->updated, SENSORUPDATES_mag)) {
-        if (!checkMagValidity(this, state->mag)) {
-            UNSET_MASK(state->updated, SENSORUPDATES_mag);
-        } else {
-            if (this->revoCalibration.MagBiasNullingRate > 0) {
-                magOffsetEstimation(this, state->mag);
-            }
+        checkMagValidity(this, state->mag);
+        if (this->revoCalibration.MagBiasNullingRate > 0) {
+            magOffsetEstimation(this, state->mag);
         }
     }
 
@@ -107,19 +104,20 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 /**
  * check validity of magnetometers
  */
-static bool checkMagValidity(struct data *this, float mag[3])
+static void checkMagValidity(struct data *this, float mag[3])
 {
-        #define MAG_LOW_PASS_ALPHA 0.05f
-        #define IDLE_COUNT         20
+        #define MAG_LOW_PASS_ALPHA 0.2f
+        #define IDLE_COUNT         10
+        #define ALARM_THRESHOLD    3
 
     // low pass filter sensor to not give warnings due to noise
     this->magAverage[0] = (1.0f - MAG_LOW_PASS_ALPHA) * this->magAverage[0] + MAG_LOW_PASS_ALPHA * mag[0];
-    this->magAverage[1] = (1.0f - MAG_LOW_PASS_ALPHA) * this->magAverage[1] + MAG_LOW_PASS_ALPHA * mag[0];
-    this->magAverage[2] = (1.0f - MAG_LOW_PASS_ALPHA) * this->magAverage[2] + MAG_LOW_PASS_ALPHA * mag[0];
+    this->magAverage[1] = (1.0f - MAG_LOW_PASS_ALPHA) * this->magAverage[1] + MAG_LOW_PASS_ALPHA * mag[1];
+    this->magAverage[2] = (1.0f - MAG_LOW_PASS_ALPHA) * this->magAverage[2] + MAG_LOW_PASS_ALPHA * mag[2];
 
     // throttle this check, thanks to low pass filter it is not necessary every iteration
-    if (!this->counter--) {
-        this->counter = IDLE_COUNT;
+    if (!this->idlecounter--) {
+        this->idlecounter = IDLE_COUNT;
 
         // calculate expected Be vector
         AttitudeStateData attitudeState;
@@ -142,17 +140,24 @@ static bool checkMagValidity(struct data *this, float mag[3])
 
         // set errors
         if (deviation2 < warning2) {
+            this->warningcount = 0;
+            this->errorcount   = 0;
             AlarmsClear(SYSTEMALARMS_ALARM_MAGNETOMETER);
-            this->validity = true;
         } else if (deviation2 < error2) {
-            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_WARNING);
-            this->validity = false;
+            this->errorcount = 0;
+            if (this->warningcount > ALARM_THRESHOLD) {
+                AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_WARNING);
+            } else {
+                this->warningcount++;
+            }
         } else {
-            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_ERROR);
-            this->validity = false;
+            if (this->errorcount > ALARM_THRESHOLD) {
+                AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_ERROR);
+            } else {
+                this->errorcount++;
+            }
         }
     }
-    return this->validity;
 }
 
 

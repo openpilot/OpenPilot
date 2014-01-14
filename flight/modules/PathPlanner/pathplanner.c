@@ -265,10 +265,16 @@ static uint8_t checkPathPlan()
     uint16_t actionCount;
     uint8_t pathCrc;
     PathPlanData pathPlan;
+    //WaypointData waypoint; // using global instead (?)
+    //PathActionData action; // using global instead (?)
 
     PathPlanGet(&pathPlan);
 
     waypointCount = pathPlan.WaypointCount;
+    if (waypointCount == 0) {
+        // an empty path plan is invalid
+        return false;
+    }
     actionCount   = pathPlan.PathActionCount;
 
     // check count consistency
@@ -293,6 +299,28 @@ static uint8_t checkPathPlan()
         // failed crc check
         //PIOS_DEBUGLOG_Printf("PathPlan : bad CRC (%d / %d)!", pathCrc, pathPlan.Crc);
         return false;
+    }
+
+    // waypoint consistency
+    for (i = 0; i < waypointCount; i++) {
+        WaypointInstGet(i, &waypoint);
+        if (waypoint.Action >= actionCount) {
+            // path action id is out of range
+            return false;
+        }
+    }
+
+    // path action consistency
+    for (i = 0; i < actionCount; i++) {
+        PathActionInstGet(i, &pathAction);
+        if (pathAction.ErrorDestination >= waypointCount) {
+            // waypoint id is out of range
+            return false;
+        }
+        if (pathAction.JumpDestination >= waypointCount) {
+            // waypoint id is out of range
+            return false;
+        }
     }
 
     // path plan passed checks

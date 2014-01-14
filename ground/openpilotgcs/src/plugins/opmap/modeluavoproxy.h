@@ -58,7 +58,7 @@ private:
     Waypoint *createWaypoint(int index, Waypoint *newWaypoint);
     PathAction *createPathAction(int index, PathAction *newAction);
 
-    PathAction *findPathAction(const PathAction::DataFields& actionFields, int actionCount);
+    PathAction *findPathAction(const PathAction::DataFields & actionFields, int actionCount);
 
     void modelToWaypoint(int i, Waypoint::DataFields &data);
     void modelToPathAction(int i, PathAction::DataFields &data);

@@ -44,7 +44,7 @@ class UAVTALK_EXPORT UAVTalk : public QObject {
     friend class IODeviceReader;
 
 public:
-    static const quint16 ALL_INSTANCES  = 0xFFFF;
+    static const quint16 ALL_INSTANCES = 0xFFFF;
 
     typedef struct {
         quint32 txBytes;
@@ -80,22 +80,22 @@ private slots:
 private:
 
     typedef struct {
-        quint8 respType;
+        quint8  respType;
         quint32 respObjId;
         quint16 respInstId;
     } Transaction;
 
     // Constants
-    static const int TYPE_MASK    = 0xF8;
-    static const int TYPE_VER     = 0x20;
-    static const int TYPE_OBJ     = (TYPE_VER | 0x00);
-    static const int TYPE_OBJ_REQ = (TYPE_VER | 0x01);
-    static const int TYPE_OBJ_ACK = (TYPE_VER | 0x02);
-    static const int TYPE_ACK     = (TYPE_VER | 0x03);
-    static const int TYPE_NACK    = (TYPE_VER | 0x04);
+    static const int TYPE_MASK     = 0xF8;
+    static const int TYPE_VER      = 0x20;
+    static const int TYPE_OBJ      = (TYPE_VER | 0x00);
+    static const int TYPE_OBJ_REQ  = (TYPE_VER | 0x01);
+    static const int TYPE_OBJ_ACK  = (TYPE_VER | 0x02);
+    static const int TYPE_ACK      = (TYPE_VER | 0x03);
+    static const int TYPE_NACK     = (TYPE_VER | 0x04);
 
     // header : sync(1), type (1), size(2), object ID(4), instance ID(2)
-    static const int HEADER_LENGTH  = 10;
+    static const int HEADER_LENGTH = 10;
 
     static const int MAX_PAYLOAD_LENGTH = 256;
 

@@ -32,9 +32,7 @@
 #include "utils_global.h"
 
 namespace Utils {
-
 class QTCREATOR_UTILS_EXPORT Crc {
-
 public:
     /**
      * Update the crc value with new data.
@@ -54,9 +52,7 @@ public:
      * \return         The updated crc value.
      */
     static quint8 updateCRC(quint8 crc, const quint8 *data, qint32 length);
-
 };
-
 } // namespace Utils
 
 #endif // CRC_H

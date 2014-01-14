@@ -199,16 +199,16 @@ void TelemetryMonitor::processStatsUpdates()
     tel->resetStats();
 
     // Update stats object
-    gcsStats.TxDataRate  = (float)telStats.txBytes / ((float)statsTimer->interval() / 1000.0);
-    gcsStats.TxBytes  += telStats.txBytes;
-    gcsStats.TxFailures += telStats.txErrors;
-    gcsStats.TxRetries  += telStats.txRetries;
+    gcsStats.TxDataRate    = (float)telStats.txBytes / ((float)statsTimer->interval() / 1000.0);
+    gcsStats.TxBytes      += telStats.txBytes;
+    gcsStats.TxFailures   += telStats.txErrors;
+    gcsStats.TxRetries    += telStats.txRetries;
 
-    gcsStats.RxDataRate  = (float)telStats.rxBytes / ((float)statsTimer->interval() / 1000.0);
-    gcsStats.RxBytes  += telStats.rxBytes;
-    gcsStats.RxFailures += telStats.rxErrors;
+    gcsStats.RxDataRate    = (float)telStats.rxBytes / ((float)statsTimer->interval() / 1000.0);
+    gcsStats.RxBytes      += telStats.rxBytes;
+    gcsStats.RxFailures   += telStats.rxErrors;
     gcsStats.RxSyncErrors += telStats.rxSyncErrors;
-    gcsStats.RxCrcErrors += telStats.rxCrcErrors;
+    gcsStats.RxCrcErrors  += telStats.rxCrcErrors;
 
     // Check for a connection timeout
     bool connectionTimeout;

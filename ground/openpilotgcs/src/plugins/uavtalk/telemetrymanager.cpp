@@ -43,8 +43,7 @@ TelemetryManager::TelemetryManager() : autopilotConnected(false)
 }
 
 TelemetryManager::~TelemetryManager()
-{
-}
+{}
 
 bool TelemetryManager::isConnected()
 {
@@ -76,8 +75,7 @@ void TelemetryManager::onStart()
         connect(device, SIGNAL(readyRead()), reader, SLOT(read()));
         // start the reader thread
         readerThread.start();
-    }
-    else {
+    } else {
         // Connect IO device to reader
         connect(device, SIGNAL(readyRead()), utalk, SLOT(processInputStream()));
     }
@@ -127,8 +125,7 @@ void TelemetryManager::onTelemetryUpdate(double txRate, double rxRate)
 }
 
 IODeviceReader::IODeviceReader(UAVTalk *uavTalk) : uavTalk(uavTalk)
-{
-}
+{}
 
 void IODeviceReader::read()
 {

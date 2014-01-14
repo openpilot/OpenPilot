@@ -1,5 +1,6 @@
 /**
  ******************************************************************************
+
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup RadioComBridgeModule Com Port to Radio Bridge Module
@@ -133,9 +134,9 @@ static int32_t RadioComBridgeStart(void)
         data->isCoordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
 
         // We will not parse/send UAVTalk if any ports are configured as Serial (except for over the USB HID port).
-        data->parseUAVTalk = ((oplinkSettings.MainPort != OPLINKSETTINGS_MAINPORT_SERIAL) &&
-                              (oplinkSettings.FlexiPort != OPLINKSETTINGS_FLEXIPORT_SERIAL) &&
-                              (oplinkSettings.VCPPort != OPLINKSETTINGS_VCPPORT_SERIAL));
+        data->parseUAVTalk  = ((oplinkSettings.MainPort != OPLINKSETTINGS_MAINPORT_SERIAL) &&
+                               (oplinkSettings.FlexiPort != OPLINKSETTINGS_FLEXIPORT_SERIAL) &&
+                               (oplinkSettings.VCPPort != OPLINKSETTINGS_VCPPORT_SERIAL));
 
         // Set the maximum radio RF power.
         switch (oplinkSettings.MaxRFPower) {
@@ -236,20 +237,20 @@ static int32_t RadioComBridgeInitialize(void)
     RadioComBridgeStatsInitialize();
 
     // Initialise UAVTalk
-    data->telemUAVTalkCon   = UAVTalkInitialize(&UAVTalkSendHandler);
-    data->radioUAVTalkCon   = UAVTalkInitialize(&RadioSendHandler);
+    data->telemUAVTalkCon    = UAVTalkInitialize(&UAVTalkSendHandler);
+    data->radioUAVTalkCon    = UAVTalkInitialize(&RadioSendHandler);
 
     // Initialize the queues.
-    data->uavtalkEventQueue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
-    data->radioEventQueue   = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
+    data->uavtalkEventQueue  = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
+    data->radioEventQueue    = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
 
     // Initialize the statistics.
-    data->telemetryTxRetries  = 0;
-    data->radioTxRetries  = 0;
+    data->telemetryTxRetries = 0;
+    data->radioTxRetries     = 0;
 
-    data->parseUAVTalk  = true;
-    data->comSpeed = OPLINKSETTINGS_COMSPEED_9600;
-    PIOS_COM_RADIO = PIOS_COM_RFM22B;
+    data->parseUAVTalk = true;
+    data->comSpeed     = OPLINKSETTINGS_COMSPEED_9600;
+    PIOS_COM_RADIO     = PIOS_COM_RFM22B;
 
     return 0;
 }
@@ -264,13 +265,14 @@ static void registerObject(UAVObjHandle obj)
 {
     // Setup object for periodic updates
     UAVObjEvent ev = {
-            .obj    = obj,
-            .instId = UAVOBJ_ALL_INSTANCES,
-            .event  = EV_UPDATED_PERIODIC,
+        .obj    = obj,
+        .instId = UAVOBJ_ALL_INSTANCES,
+        .event  = EV_UPDATED_PERIODIC,
     };
 
     // Get metadata
     UAVObjMetadata metadata;
+
     UAVObjGetMetadata(obj, &metadata);
 
     EventPeriodicQueueCreate(&ev, data->uavtalkEventQueue, metadata.telemetryUpdatePeriod);
@@ -298,23 +300,23 @@ static void updateRadioComBridgeStats()
     RadioComBridgeStatsGet(&radioComBridgeStats);
 
     // Update stats object
-    radioComBridgeStats.TelemetryTxBytes += telemetryUAVTalkStats.txBytes;
-    radioComBridgeStats.TelemetryTxFailures += telemetryUAVTalkStats.txErrors;
-    radioComBridgeStats.TelemetryTxRetries  += data->telemetryTxRetries;
+    radioComBridgeStats.TelemetryTxBytes      += telemetryUAVTalkStats.txBytes;
+    radioComBridgeStats.TelemetryTxFailures   += telemetryUAVTalkStats.txErrors;
+    radioComBridgeStats.TelemetryTxRetries    += data->telemetryTxRetries;
 
-    radioComBridgeStats.TelemetryRxBytes += telemetryUAVTalkStats.rxBytes;
-    radioComBridgeStats.TelemetryRxFailures += telemetryUAVTalkStats.rxErrors;
+    radioComBridgeStats.TelemetryRxBytes      += telemetryUAVTalkStats.rxBytes;
+    radioComBridgeStats.TelemetryRxFailures   += telemetryUAVTalkStats.rxErrors;
     radioComBridgeStats.TelemetryRxSyncErrors += telemetryUAVTalkStats.rxSyncErrors;
-    radioComBridgeStats.TelemetryRxCrcErrors += telemetryUAVTalkStats.rxCrcErrors;
+    radioComBridgeStats.TelemetryRxCrcErrors  += telemetryUAVTalkStats.rxCrcErrors;
 
-    radioComBridgeStats.RadioTxBytes += radioUAVTalkStats.txBytes;
-    radioComBridgeStats.RadioTxFailures += radioUAVTalkStats.txErrors;
-    radioComBridgeStats.RadioTxRetries  += data->radioTxRetries;
+    radioComBridgeStats.RadioTxBytes      += radioUAVTalkStats.txBytes;
+    radioComBridgeStats.RadioTxFailures   += radioUAVTalkStats.txErrors;
+    radioComBridgeStats.RadioTxRetries    += data->radioTxRetries;
 
-    radioComBridgeStats.RadioRxBytes += radioUAVTalkStats.rxBytes;
-    radioComBridgeStats.RadioRxFailures += radioUAVTalkStats.rxErrors;
+    radioComBridgeStats.RadioRxBytes      += radioUAVTalkStats.rxBytes;
+    radioComBridgeStats.RadioRxFailures   += radioUAVTalkStats.rxErrors;
     radioComBridgeStats.RadioRxSyncErrors += radioUAVTalkStats.rxSyncErrors;
-    radioComBridgeStats.RadioRxCrcErrors += radioUAVTalkStats.rxCrcErrors;
+    radioComBridgeStats.RadioRxCrcErrors  += radioUAVTalkStats.rxCrcErrors;
 
     // Update stats object data
     RadioComBridgeStatsSet(&radioComBridgeStats);

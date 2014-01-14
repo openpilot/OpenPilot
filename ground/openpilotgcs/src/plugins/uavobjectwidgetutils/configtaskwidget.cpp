@@ -1230,6 +1230,7 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget *widget, UAVObjectField *field, 
 void ConfigTaskWidget::updateEnableControls()
 {
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
+
     Q_ASSERT(telMngr);
 
     enableControls(telMngr->isConnected());

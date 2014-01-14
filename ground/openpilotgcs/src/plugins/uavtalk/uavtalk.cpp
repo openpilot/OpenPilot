@@ -35,8 +35,8 @@
 
 #ifdef VERBOSE_UAVTALK
 // uncomment and adapt the following lines to filter verbose logging to include specific object(s) only
-//#include "flighttelemetrystats.h"
-//#define VERBOSE_FILTER(objId) if (objId == FlightTelemetryStats::OBJID)
+// #include "flighttelemetrystats.h"
+// #define VERBOSE_FILTER(objId) if (objId == FlightTelemetryStats::OBJID)
 #endif
 #ifndef VERBOSE_FILTER
 #define VERBOSE_FILTER(objId)
@@ -124,9 +124,8 @@ bool UAVTalk::sendObject(UAVObject *obj, bool acked, bool allInstances)
 
     if (allInstances) {
         instId = ALL_INSTANCES;
-    }
-    else if (obj) {
-       instId = obj->getInstID();
+    } else if (obj) {
+        instId = obj->getInstID();
     }
     bool success = false;
     if (acked) {
@@ -153,9 +152,8 @@ bool UAVTalk::sendObjectRequest(UAVObject *obj, bool allInstances)
 
     if (allInstances) {
         instId = ALL_INSTANCES;
-    }
-    else if (obj) {
-       instId = obj->getInstID();
+    } else if (obj) {
+        instId = obj->getInstID();
     }
     return objectTransaction(TYPE_OBJ_REQ, obj->getObjID(), instId, obj);
 }
@@ -188,7 +186,7 @@ void UAVTalk::cancelTransaction(UAVObject *obj)
  */
 bool UAVTalk::objectTransaction(quint8 type, quint32 objId, quint16 instId, UAVObject *obj)
 {
-	Q_ASSERT(obj);
+    Q_ASSERT(obj);
     // Send object depending on if a response is needed
     // transactions of TYPE_OBJ_REQ are acked by the response
     if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ) {
@@ -217,8 +215,7 @@ void UAVTalk::processInputStream()
             int ret = io->read((char *)&tmp, 1);
             if (ret != -1) {
                 processInputByte(tmp);
-            }
-            else {
+            } else {
                 // TODOD
             }
             if (rxState == STATE_COMPLETE) {
@@ -226,8 +223,7 @@ void UAVTalk::processInputStream()
                 if (receiveObject(rxType, rxObjId, rxInstId, rxBuffer, rxLength)) {
                     stats.rxObjectBytes += rxLength;
                     stats.rxObjects++;
-                }
-                else {
+                } else {
                     // TODO...
                 }
                 mutex.unlock();
@@ -237,7 +233,6 @@ void UAVTalk::processInputStream()
                     // accessed from this thread only
                     udpSocketTx->writeDatagram(rxDataArray, QHostAddress::LocalHost, udpSocketRx->localPort());
                 }
-
             }
         }
     }
@@ -319,7 +314,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             break;
         }
         packetSize += (quint32)rxbyte << 8;
-        rxCount = 0;
+        rxCount     = 0;
 
 
         if (packetSize < HEADER_LENGTH || packetSize > HEADER_LENGTH + MAX_PAYLOAD_LENGTH) {
@@ -342,13 +337,13 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         if (rxCount < 4) {
             break;
         }
-        rxCount = 0;
+        rxCount  = 0;
 
-        rxObjId = (qint32)qFromLittleEndian<quint32>(rxTmpBuffer);
+        rxObjId  = (qint32)qFromLittleEndian<quint32>(rxTmpBuffer);
 
         // Message always contain an instance ID
         rxInstId = 0;
-        rxState = STATE_INSTID;
+        rxState  = STATE_INSTID;
         break;
 
     case STATE_INSTID:
@@ -402,7 +397,6 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 rxState = STATE_ERROR;
                 break;
             }
-
         }
 
         // If there is a payload get it, otherwise receive checksum
@@ -651,15 +645,13 @@ void UAVTalk::updateAck(quint8 type, quint32 objId, quint16 instId, UAVObject *o
     if (trans && trans->respType == type) {
         if (trans->respInstId == ALL_INSTANCES) {
             if (instId == 0) {
-            	// last instance received, complete transaction
+                // last instance received, complete transaction
                 closeTransaction(trans);
                 emit transactionCompleted(obj, true);
+            } else {
+                // TODO extend timeout?
             }
-            else {
-            	// TODO extend timeout?
-            }
-        }
-        else {
+        } else {
             closeTransaction(trans);
             emit transactionCompleted(obj, true);
         }
@@ -713,7 +705,7 @@ bool UAVTalk::transmitObject(quint8 type, quint32 objId, quint16 instId, UAVObje
             ret = true;
             quint32 numInst = objMngr->getNumInstances(objId);
             for (quint32 n = 0; n < numInst; ++n) {
-                quint32 i = numInst - n - 1;
+                quint32 i    = numInst - n - 1;
                 UAVObject *o = objMngr->getObject(objId, i);
                 if (!transmitSingleObject(type, objId, i, o)) {
                     ret = false;
@@ -800,13 +792,11 @@ bool UAVTalk::transmitSingleObject(quint8 type, quint32 objId, quint16 instId, U
             if (useUDPMirror) {
                 udpSocketRx->writeDatagram((const char *)txBuffer, HEADER_LENGTH + length + CHECKSUM_LENGTH, QHostAddress::LocalHost, udpSocketTx->localPort());
             }
-        }
-        else {
+        } else {
             qWarning() << "UAVTalk - error transmitting : io device full";
             ++stats.txErrors;
             return false;
         }
-
     } else {
         qWarning() << "UAVTalk - error transmitting : io device not writable";
         ++stats.txErrors;
@@ -840,8 +830,9 @@ UAVTalk::Transaction *UAVTalk::findTransaction(quint32 objId, quint16 instId)
 void UAVTalk::openTransaction(quint8 type, quint32 objId, quint16 instId)
 {
     Transaction *trans = new Transaction();
-    trans->respType = (type == TYPE_OBJ_REQ) ? TYPE_OBJ : TYPE_ACK;
-    trans->respObjId = objId;
+
+    trans->respType   = (type == TYPE_OBJ_REQ) ? TYPE_OBJ : TYPE_ACK;
+    trans->respObjId  = objId;
     trans->respInstId = instId;
 
     QMap<quint32, Transaction *> *objTransactions = transMap.value(trans->respObjId);
@@ -869,6 +860,7 @@ void UAVTalk::closeAllTransactions()
         QMap<quint32, Transaction *> *objTransactions = transMap.value(objId);
         foreach(quint32 instId, objTransactions->keys()) {
             Transaction *trans = objTransactions->value(instId);
+
             qWarning() << "UAVTalk - closing active transaction for object" << trans->respObjId;
             objTransactions->remove(instId);
             delete trans;
@@ -878,29 +870,33 @@ void UAVTalk::closeAllTransactions()
     }
 }
 
-const char* UAVTalk::typeToString(quint8 type)
+const char *UAVTalk::typeToString(quint8 type)
 {
     switch (type) {
     case TYPE_OBJ:
         return "object";
+
         break;
 
     case TYPE_OBJ_ACK:
         return "object (acked)";
+
         break;
 
     case TYPE_OBJ_REQ:
         return "object request";
+
         break;
 
     case TYPE_ACK:
         return "ack";
+
         break;
 
     case TYPE_NACK:
         return "nack";
-        break;
 
+        break;
     }
     return "<error>";
 }

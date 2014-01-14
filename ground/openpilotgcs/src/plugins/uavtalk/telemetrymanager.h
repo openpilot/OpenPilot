@@ -72,8 +72,7 @@ private:
 };
 
 
-class IODeviceReader : public QObject
-{
+class IODeviceReader : public QObject {
     Q_OBJECT
 public:
     IODeviceReader(UAVTalk *uavTalk);

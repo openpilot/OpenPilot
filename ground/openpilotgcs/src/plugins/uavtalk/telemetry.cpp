@@ -230,6 +230,7 @@ void Telemetry::transactionCompleted(UAVObject *obj, bool success)
 {
     // Lookup the transaction in the transaction map.
     ObjectTransactionInfo *transInfo = findTransaction(obj);
+
     if (transInfo) {
         if (success) {
 #ifdef VERBOSE_TELEMETRY
@@ -264,17 +265,17 @@ void Telemetry::transactionTimeout(ObjectTransactionInfo *transInfo)
 #endif
         ++txRetries;
         --transInfo->retriesRemaining;
-		
+
         // Retry the transaction
         processObjectTransaction(transInfo);
     } else {
         qWarning().nospace() << "Telemetry - !!! transaction timed out for object " << transInfo->obj->toStringBrief();
 
         ++txErrors;
-        
+
         // Terminate transaction
         utalk->cancelTransaction(transInfo->obj);
-        
+
         // Remove this transaction as it's complete.
         UAVObject *obj = transInfo->obj;
         closeTransaction(transInfo);
@@ -294,6 +295,7 @@ void Telemetry::processObjectTransaction(ObjectTransactionInfo *transInfo)
 {
     // Initiate transaction
     bool sent = false;
+
     if (transInfo->objRequest) {
 #ifdef VERBOSE_TELEMETRY
         qDebug().nospace() << "Telemetry - sending request for object " << transInfo->obj->toStringBrief() << ", " << (transInfo->allInstances ? "all" : "single") << " " << (transInfo->acked ? "acked" : "");
@@ -310,14 +312,12 @@ void Telemetry::processObjectTransaction(ObjectTransactionInfo *transInfo)
         if (sent) {
             // Start timer if a response is expected
             transInfo->timer->start(REQ_TIMEOUT_MS);
-        }
-        else {
+        } else {
             // message was not sent, the transaction will not complete and will timeout
             // there is no need to wait to close the transaction and notify of completion failure
-            //transactionCompleted(transInfo->obj, false);
+            // transactionCompleted(transInfo->obj, false);
         }
-    }
-    else {
+    } else {
         // not transacted, so just close the transaction with no notification of completion
         closeTransaction(transInfo);
     }
@@ -378,8 +378,8 @@ void Telemetry::processObjectQueue()
     if (gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED) {
         objQueue.clear();
         if ((objInfo.obj->getObjID() != GCSTelemetryStats::OBJID) &&
-                (objInfo.obj->getObjID() != OPLinkSettings::OBJID) &&
-                (objInfo.obj->getObjID() != ObjectPersistence::OBJID)) {
+            (objInfo.obj->getObjID() != OPLinkSettings::OBJID) &&
+            (objInfo.obj->getObjID() != ObjectPersistence::OBJID)) {
             objInfo.obj->emitTransactionCompleted(false);
             return;
         }
@@ -396,7 +396,7 @@ void Telemetry::processObjectQueue()
         // TODO make the above logic a reality...
         if (findTransaction(objInfo.obj)) {
             qWarning().nospace() << "Telemetry - !!! Making request for an object " << objInfo.obj->toStringBrief() << " for which a request is already in progress";
-            //objInfo.obj->emitTransactionCompleted(false);
+            // objInfo.obj->emitTransactionCompleted(false);
             return;
         }
         UAVObject::Metadata metadata     = objInfo.obj->getMetadata();
@@ -466,7 +466,7 @@ void Telemetry::processPeriodicUpdates()
                 time.start();
                 allInstances = !objinfo->obj->isSingleInstance();
                 processObjectUpdates(objinfo->obj, EV_UPDATED_PERIODIC, allInstances, false);
-                elapsedMs = time.elapsed();
+                elapsedMs    = time.elapsed();
                 // Update timeToNextUpdateMs with the elapsed delay of sending the object;
                 timeToNextUpdateMs += elapsedMs;
             }
@@ -537,6 +537,7 @@ void Telemetry::objectUpdatedManual(UAVObject *obj, bool all)
     QMutexLocker locker(mutex);
 
     bool allInstances = obj->isSingleInstance() ? false : all;
+
     processObjectUpdates(obj, EV_UPDATED_MANUAL, allInstances, true);
 }
 
@@ -559,6 +560,7 @@ void Telemetry::updateRequested(UAVObject *obj, bool all)
     QMutexLocker locker(mutex);
 
     bool allInstances = obj->isSingleInstance() ? false : all;
+
     processObjectUpdates(obj, EV_UPDATE_REQ, allInstances, true);
 }
 
@@ -578,7 +580,7 @@ void Telemetry::newInstance(UAVObject *obj)
 
 ObjectTransactionInfo *Telemetry::findTransaction(UAVObject *obj)
 {
-    quint32 objId = obj->getObjID();
+    quint32 objId  = obj->getObjID();
     quint16 instId = obj->getInstID();
 
     // Lookup the transaction in the transaction map
@@ -596,7 +598,7 @@ ObjectTransactionInfo *Telemetry::findTransaction(UAVObject *obj)
 
 void Telemetry::openTransaction(ObjectTransactionInfo *trans)
 {
-    quint32 objId = trans->obj->getObjID();
+    quint32 objId  = trans->obj->getObjID();
     quint16 instId = trans->allInstances ? UAVTalk::ALL_INSTANCES : trans->obj->getInstID();
 
     QMap<quint32, ObjectTransactionInfo *> *objTransactions = transMap.value(objId);
@@ -609,7 +611,7 @@ void Telemetry::openTransaction(ObjectTransactionInfo *trans)
 
 void Telemetry::closeTransaction(ObjectTransactionInfo *trans)
 {
-    quint32 objId = trans->obj->getObjID();
+    quint32 objId  = trans->obj->getObjID();
     quint16 instId = trans->allInstances ? UAVTalk::ALL_INSTANCES : trans->obj->getInstID();
 
     QMap<quint32, ObjectTransactionInfo *> *objTransactions = transMap.value(objId);
@@ -627,6 +629,7 @@ void Telemetry::closeAllTransactions()
         QMap<quint32, ObjectTransactionInfo *> *objTransactions = transMap.value(objId);
         foreach(quint32 instId, objTransactions->keys()) {
             ObjectTransactionInfo *trans = objTransactions->value(instId);
+
             qWarning() << "Telemetry - closing active transaction for object" << trans->obj->toStringBrief();
             objTransactions->remove(instId);
             delete trans;

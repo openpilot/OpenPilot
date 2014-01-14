@@ -55,13 +55,13 @@ using namespace Utils;
  */
 UAVObject::UAVObject(quint32 objID, bool isSingleInst, const QString & name)
 {
-    this->objID  = objID;
-    this->instID = 0;
+    this->objID        = objID;
+    this->instID       = 0;
     this->isSingleInst = isSingleInst;
-    this->name   = name;
-    this->data   = 0;
-    this->numBytes = 0;
-    this->mutex  = new QMutex(QMutex::Recursive);
+    this->name         = name;
+    this->data         = 0;
+    this->numBytes     = 0;
+    this->mutex        = new QMutex(QMutex::Recursive);
 }
 
 /**
@@ -215,7 +215,7 @@ void UAVObject::updatedAll()
     if (instID == 0) {
         emit objectUpdatedManual(this, true);
         // TODO call objectUpdated() for all instances?
-        //emit objectUpdated(this);
+        // emit objectUpdated(this);
     }
 }
 
@@ -287,7 +287,7 @@ UAVObjectField *UAVObject::getField(const QString & name)
     }
     // If this point is reached then the field was not found
     qWarning() << "UAVObject::getField Non existant field" << name << "requested."
-            << "This indicates a bug. Make sure you also have null checking for non-debug code.";
+               << "This indicates a bug. Make sure you also have null checking for non-debug code.";
     return NULL;
 }
 
@@ -334,8 +334,8 @@ quint8 UAVObject::updateCRC(quint8 crc)
 {
     QMutexLocker locker(mutex);
 
-    //crc = Crc::updateCRC(crc, (quint8 *) &objID, sizeof(objID));
-    //crc = Crc::updateCRC(crc, (quint8 *) &instID, sizeof(instID));
+    // crc = Crc::updateCRC(crc, (quint8 *) &objID, sizeof(objID));
+    // crc = Crc::updateCRC(crc, (quint8 *) &instID, sizeof(instID));
     crc = Crc::updateCRC(crc, data, numBytes);
 
     return crc;

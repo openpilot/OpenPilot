@@ -30,8 +30,7 @@
 #include <QDomDocument>
 
 flightDataModel::flightDataModel(QObject *parent) : QAbstractTableModel(parent)
-{
-}
+{}
 
 int flightDataModel::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -75,6 +74,7 @@ QVariant flightDataModel::data(const QModelIndex &index, int role) const
 bool flightDataModel::setColumnByIndex(pathPlanData *row, const int index, const QVariant value)
 {
     bool b;
+
     switch (index) {
     case WPDESCRITPTION:
         row->wpDescritption = value.toString();
@@ -178,6 +178,7 @@ bool flightDataModel::setColumnByIndex(pathPlanData *row, const int index, const
 QVariant flightDataModel::getColumnByIndex(const pathPlanData *row, const int index) const
 {
     QVariant value;
+
     switch (index) {
     case WPDESCRITPTION:
         value = row->wpDescritption;
@@ -255,6 +256,7 @@ QVariant flightDataModel::getColumnByIndex(const pathPlanData *row, const int in
 QVariant flightDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     QVariant value;
+
     if (role == Qt::DisplayRole) {
         if (orientation == Qt::Vertical) {
             value = QString::number(section + 1);
@@ -605,7 +607,7 @@ void flightDataModel::readFromFile(QString fileName)
             while (!fieldNode.isNull()) {
                 QDomElement field = fieldNode.toElement();
                 if (field.tagName() == "field") {
-                    QString name = field.attribute("name");
+                    QString name  = field.attribute("name");
                     QString value = field.attribute("value");
                     if (name == "altitude") {
                         data->altitude = value.toDouble();

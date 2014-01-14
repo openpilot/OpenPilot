@@ -44,7 +44,6 @@ typedef struct {
     uint32_t rxErrors;
     uint32_t rxSyncErrors;
     uint32_t rxCrcErrors;
-
 } UAVTalkStats;
 
 typedef void *UAVTalkConnection;

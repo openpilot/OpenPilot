@@ -182,16 +182,6 @@ static void registerObject(UAVObjHandle obj)
         UAVObjConnectQueue(obj, priorityQueue, EV_MASK_ALL_UPDATES);
     } else {
         // Setup object for periodic updates
-//        UAVObjEvent ev = {
-//            .obj    = obj,
-//            .instId = UAVOBJ_ALL_INSTANCES,
-//            .event  = EV_UPDATED_PERIODIC,
-//        };
-//        EventPeriodicQueueCreate(&ev, queue, 0);
-//        ev.event = EV_LOGGING_PERIODIC;
-//        EventPeriodicQueueCreate(&ev, queue, 0);
-
-        // Setup object for telemetry updates
         updateObject(obj, EV_NONE);
     }
 }
@@ -312,8 +302,8 @@ static void processObjEvent(UAVObjEvent *ev)
         retries    = 0;
         success    = -1;
         if ((ev->event == EV_UPDATED && (updateMode == UPDATEMODE_ONCHANGE || updateMode == UPDATEMODE_THROTTLED))
-                || ev->event == EV_UPDATED_MANUAL
-                || (ev->event == EV_UPDATED_PERIODIC && updateMode != UPDATEMODE_THROTTLED)) {
+            || ev->event == EV_UPDATED_MANUAL
+            || (ev->event == EV_UPDATED_PERIODIC && updateMode != UPDATEMODE_THROTTLED)) {
             // Send update to GCS (with retries)
             while (retries < MAX_RETRIES && success == -1) {
                 // call blocks until ack is received or timeout
@@ -357,8 +347,8 @@ static void processObjEvent(UAVObjEvent *ev)
     if (ev->obj) {
         updateMode = UAVObjGetLoggingUpdateMode(&metadata);
         if ((ev->event == EV_UPDATED && (updateMode == UPDATEMODE_ONCHANGE || updateMode == UPDATEMODE_THROTTLED))
-                || ev->event == EV_LOGGING_MANUAL
-                || (ev->event == EV_LOGGING_PERIODIC && updateMode != UPDATEMODE_THROTTLED)) {
+            || ev->event == EV_LOGGING_MANUAL
+            || (ev->event == EV_LOGGING_PERIODIC && updateMode != UPDATEMODE_THROTTLED)) {
             if (ev->instId == UAVOBJ_ALL_INSTANCES) {
                 success = UAVObjGetNumInstances(ev->obj);
                 for (retries = 0; retries < success; retries++) {
@@ -572,33 +562,33 @@ static void updateTelemetryStats()
 
     // Update stats object
     if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
-        flightStats.TxDataRate  = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
-        flightStats.TxBytes += utalkStats.txBytes;
-        flightStats.TxFailures += txErrors;
-        flightStats.TxRetries  += txRetries;
+        flightStats.TxDataRate    = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        flightStats.TxBytes      += utalkStats.txBytes;
+        flightStats.TxFailures   += txErrors;
+        flightStats.TxRetries    += txRetries;
 
-        flightStats.RxDataRate  = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
-        flightStats.RxBytes += utalkStats.rxBytes;
-        flightStats.RxFailures += utalkStats.rxErrors;
+        flightStats.RxDataRate    = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        flightStats.RxBytes      += utalkStats.rxBytes;
+        flightStats.RxFailures   += utalkStats.rxErrors;
         flightStats.RxSyncErrors += utalkStats.rxSyncErrors;
-        flightStats.RxCrcErrors += utalkStats.rxCrcErrors;
+        flightStats.RxCrcErrors  += utalkStats.rxCrcErrors;
     } else {
-        flightStats.TxDataRate = 0;
-        flightStats.TxBytes = 0;
-        flightStats.TxFailures = 0;
-        flightStats.TxRetries  = 0;
+        flightStats.TxDataRate   = 0;
+        flightStats.TxBytes      = 0;
+        flightStats.TxFailures   = 0;
+        flightStats.TxRetries    = 0;
 
-        flightStats.RxDataRate = 0;
-        flightStats.RxBytes = 0;
-        flightStats.RxFailures = 0;
+        flightStats.RxDataRate   = 0;
+        flightStats.RxBytes      = 0;
+        flightStats.RxFailures   = 0;
         flightStats.RxSyncErrors = 0;
-        flightStats.RxCrcErrors = 0;
+        flightStats.RxCrcErrors  = 0;
     }
-    txErrors = 0;
+    txErrors  = 0;
     txRetries = 0;
 
     // Check for connection timeout
-    timeNow = xTaskGetTickCount() * portTICK_RATE_MS;
+    timeNow   = xTaskGetTickCount() * portTICK_RATE_MS;
     if (utalkStats.rxObjects > 0) {
         timeOfLastObjectUpdate = timeNow;
     }

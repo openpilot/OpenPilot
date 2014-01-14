@@ -732,7 +732,7 @@ uint8_t UAVObjUpdateCRC(UAVObjHandle obj_handle, uint16_t instId, uint8_t crc)
             goto unlock_exit;
         }
         // Update crc
-        crc = PIOS_CRC_updateCRC(crc, (uint8_t *) InstanceData(instEntry), (int32_t) obj->instance_size);
+        crc = PIOS_CRC_updateCRC(crc, (uint8_t *)InstanceData(instEntry), (int32_t)obj->instance_size);
     }
 
 unlock_exit:

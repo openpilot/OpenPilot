@@ -265,8 +265,9 @@ static uint8_t checkPathPlan()
     uint16_t actionCount;
     uint8_t pathCrc;
     PathPlanData pathPlan;
-    //WaypointData waypoint; // using global instead (?)
-    //PathActionData action; // using global instead (?)
+
+    // WaypointData waypoint; // using global instead (?)
+    // PathActionData action; // using global instead (?)
 
     PathPlanGet(&pathPlan);
 
@@ -275,15 +276,15 @@ static uint8_t checkPathPlan()
         // an empty path plan is invalid
         return false;
     }
-    actionCount   = pathPlan.PathActionCount;
+    actionCount = pathPlan.PathActionCount;
 
     // check count consistency
     if (waypointCount > UAVObjGetNumInstances(WaypointHandle())) {
-        //PIOS_DEBUGLOG_Printf("PathPlan : waypoint count error!");
+        // PIOS_DEBUGLOG_Printf("PathPlan : waypoint count error!");
         return false;
     }
     if (actionCount > UAVObjGetNumInstances(PathActionHandle())) {
-        //PIOS_DEBUGLOG_Printf("PathPlan : path action count error!");
+        // PIOS_DEBUGLOG_Printf("PathPlan : path action count error!");
         return false;
     }
 
@@ -297,7 +298,7 @@ static uint8_t checkPathPlan()
     }
     if (pathCrc != pathPlan.Crc) {
         // failed crc check
-        //PIOS_DEBUGLOG_Printf("PathPlan : bad CRC (%d / %d)!", pathCrc, pathPlan.Crc);
+        // PIOS_DEBUGLOG_Printf("PathPlan : bad CRC (%d / %d)!", pathCrc, pathPlan.Crc);
         return false;
     }
 

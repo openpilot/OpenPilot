@@ -32,13 +32,13 @@
 #include "openpilot.h"
 #include "uavtalk_priv.h"
 
-//#define UAV_DEBUGLOG 1
+// #define UAV_DEBUGLOG 1
 
 #if defined UAV_DEBUGLOG && defined FLASH_FREERTOS
 #define UAVT_DEBUGLOG_PRINTF(...) PIOS_DEBUGLOG_Printf(__VA_ARGS__)
 // uncomment and adapt the following lines to filter verbose logging to include specific object(s) only
-//#include "flighttelemetrystats.h"
-//#define UAVT_DEBUGLOG_CPRINTF(objId, ...) if (objId == FLIGHTTELEMETRYSTATS_OBJID) { UAVT_DEBUGLOG_PRINTF(__VA_ARGS__); }
+// #include "flighttelemetrystats.h"
+// #define UAVT_DEBUGLOG_CPRINTF(objId, ...) if (objId == FLIGHTTELEMETRYSTATS_OBJID) { UAVT_DEBUGLOG_PRINTF(__VA_ARGS__); }
 #endif
 #ifndef UAVT_DEBUGLOG_PRINTF
 #define UAVT_DEBUGLOG_PRINTF(...)
@@ -296,6 +296,7 @@ static int32_t objectTransaction(UAVTalkConnectionData *connection, uint8_t type
 {
     int32_t respReceived;
     int32_t ret = -1;
+
     // Send object depending on if a response is needed
     if (type == UAVTALK_TYPE_OBJ_ACK || type == UAVTALK_TYPE_OBJ_ACK_TS || type == UAVTALK_TYPE_OBJ_REQ) {
         // Get transaction lock (will block if a transaction is pending)
@@ -304,7 +305,7 @@ static int32_t objectTransaction(UAVTalkConnectionData *connection, uint8_t type
         xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
         // expected response type
         connection->respType   = (type == UAVTALK_TYPE_OBJ_REQ) ? UAVTALK_TYPE_OBJ : UAVTALK_TYPE_ACK;
-        connection->respObjId  =  UAVObjGetID(obj);
+        connection->respObjId  = UAVObjGetID(obj);
         connection->respInstId = instId;
         ret = sendObject(connection, type, UAVObjGetID(obj), instId, obj);
         xSemaphoreGiveRecursive(connection->lock);
@@ -376,8 +377,8 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
         iproc->rxPacketLength = 1;
         iproc->rxCount = 0;
 
-        iproc->type = 0;
-        iproc->state = UAVTALK_STATE_TYPE;
+        iproc->type    = 0;
+        iproc->state   = UAVTALK_STATE_TYPE;
         break;
 
     case UAVTALK_STATE_TYPE:
@@ -389,9 +390,9 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
         }
 
         // update the CRC
-        iproc->cs = PIOS_CRC_updateByte(iproc->cs, rxbyte);
+        iproc->cs    = PIOS_CRC_updateByte(iproc->cs, rxbyte);
 
-        iproc->type = rxbyte;
+        iproc->type  = rxbyte;
 
         iproc->packet_size = 0;
         iproc->state = UAVTALK_STATE_SIZE;
@@ -408,7 +409,7 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
             break;
         }
         iproc->packet_size += rxbyte << 8;
-        iproc->rxCount = 0;
+        iproc->rxCount      = 0;
 
         if (iproc->packet_size < UAVTALK_MIN_HEADER_LENGTH || iproc->packet_size > UAVTALK_MAX_HEADER_LENGTH + UAVTALK_MAX_PAYLOAD_LENGTH) {
             // incorrect packet size
@@ -417,8 +418,8 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
             break;
         }
 
-        iproc->objId   = 0;
-        iproc->state   = UAVTALK_STATE_OBJID;
+        iproc->objId = 0;
+        iproc->state = UAVTALK_STATE_OBJID;
         break;
 
     case UAVTALK_STATE_OBJID:
@@ -432,8 +433,8 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
         }
         iproc->rxCount = 0;
 
-        iproc->instId = 0;
-        iproc->state = UAVTALK_STATE_INSTID;
+        iproc->instId  = 0;
+        iproc->state   = UAVTALK_STATE_INSTID;
         break;
 
     case UAVTALK_STATE_INSTID:
@@ -482,7 +483,7 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
         if (iproc->type & UAVTALK_TIMESTAMPED) {
             // If there is a timestamp get it
             iproc->timestamp = 0;
-            iproc->state = UAVTALK_STATE_TIMESTAMP;
+            iproc->state     = UAVTALK_STATE_TIMESTAMP;
         } else {
             // If there is a payload get it, otherwise receive checksum
             if (iproc->length > 0) {
@@ -598,6 +599,7 @@ UAVTalkRxState UAVTalkRelayPacket(UAVTalkConnection inConnectionHandle, UAVTalkC
     // The input packet must be completely parsed.
     if (inIproc->state != UAVTALK_STATE_COMPLETE) {
         inConnection->stats.rxErrors++;
+
         return -1;
     }
 
@@ -606,6 +608,7 @@ UAVTalkRxState UAVTalkRelayPacket(UAVTalkConnection inConnectionHandle, UAVTalkC
 
     if (!outConnection->outStream) {
         outConnection->stats.txErrors++;
+
         return -1;
     }
 
@@ -654,7 +657,7 @@ UAVTalkRxState UAVTalkRelayPacket(UAVTalkConnection inConnectionHandle, UAVTalkC
 
     // evaluate return value before releasing the lock
     UAVTalkRxState rxState = 0;
-    if (rc != (int32_t) (headerLength + inIproc->length + UAVTALK_CHECKSUM_LENGTH)) {
+    if (rc != (int32_t)(headerLength + inIproc->length + UAVTALK_CHECKSUM_LENGTH)) {
         outConnection->stats.txErrors++;
         rxState = -1;
     }
@@ -718,7 +721,8 @@ uint32_t UAVTalkGetPacketObjId(UAVTalkConnection connectionHandle)
  * \return 0 Success
  * \return -1 Failure
  */
-static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, uint32_t objId, uint16_t instId, uint8_t *data) {
+static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, uint32_t objId, uint16_t instId, uint8_t *data)
+{
     UAVObjHandle obj;
     int32_t ret = 0;
 
@@ -744,8 +748,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, ui
                 // any OBJ message can ack a pending OBJ_REQ message
                 // even one that was not sent in response to the OBJ_REQ message
                 updateAck(connection, type, objId, instId);
-            }
-            else {
+            } else {
                 ret = -1;
             }
         } else {
@@ -838,8 +841,7 @@ static void updateAck(UAVTalkConnectionData *connection, uint8_t type, uint32_t 
             // last instance received, complete transaction
             xSemaphoreGive(connection->respSema);
             connection->respObjId = 0;
-        }
-        else if (connection->respInstId == instId) {
+        } else if (connection->respInstId == instId) {
             xSemaphoreGive(connection->respSema);
             connection->respObjId = 0;
         }
@@ -876,7 +878,7 @@ static int32_t sendObject(UAVTalkConnectionData *connection, uint8_t type, uint3
             numInst = UAVObjGetNumInstances(obj);
             // Send all instances in reverse order
             // This allows the receiver to detect when the last object has been received (i.e. when instance 0 is received)
-            ret = 0;
+            ret     = 0;
             for (n = 0; n < numInst; ++n) {
                 if (sendSingleObject(connection, type, objId, numInst - n - 1, obj) == -1) {
                     ret = -1;
@@ -903,7 +905,7 @@ static int32_t sendObject(UAVTalkConnectionData *connection, uint8_t type, uint3
  * \param[in] type Transaction type
  * \param[in] objId The object ID
  * \param[in] instId The instance ID (can NOT be UAVOBJ_ALL_INSTANCES, use
-() instead)
+   () instead)
  * \param[in] obj Object handle to send (null when type is NACK)
  * \return 0 Success
  * \return -1 Failure
@@ -978,8 +980,7 @@ static int32_t sendSingleObject(UAVTalkConnectionData *connection, uint8_t type,
         ++connection->stats.txObjects;
         connection->stats.txObjectBytes += length;
         connection->stats.txBytes += tx_msg_len;
-    }
-    else {
+    } else {
         connection->stats.txErrors++;
         // TDOD rc == -1 connection not open, -2 buffer full should retry
         connection->stats.txBytes += (rc > 0) ? rc : 0;

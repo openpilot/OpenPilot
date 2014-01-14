@@ -32,13 +32,14 @@
 ModelUavoProxy::ModelUavoProxy(QObject *parent, flightDataModel *model) : QObject(parent), myModel(model)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
     Q_ASSERT(pm != NULL);
 
-    objMngr    = pm->getObject<UAVObjectManager>();
+    objMngr = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objMngr != NULL);
 
     completionCountdown = 0;
-    successCountdown = 0;
+    successCountdown    = 0;
 }
 
 void ModelUavoProxy::sendPathPlan()
@@ -59,7 +60,7 @@ void ModelUavoProxy::sendPathPlan()
 
     // we will start 3 update all
     completionCountdown = 3;
-    successCountdown = completionCountdown;
+    successCountdown    = completionCountdown;
 
     pathPlan->updated();
     waypoint->updatedAll();
@@ -77,8 +78,7 @@ void ModelUavoProxy::pathPlanElementSent(UAVObject *obj, bool success)
         qDebug() << "ModelUavoProxy::pathPlanSent - completed" << (successCountdown == 0);
         if (successCountdown == 0) {
             QMessageBox::information(NULL, tr("Path Plan Upload Successful"), tr("Path plan upload was successful."));
-        }
-        else {
+        } else {
             QMessageBox::critical(NULL, tr("Path Plan Upload Failed"), tr("Failed to upload the path plan !"));
         }
     }
@@ -87,6 +87,7 @@ void ModelUavoProxy::pathPlanElementSent(UAVObject *obj, bool success)
 void ModelUavoProxy::receivePathPlan()
 {
     PathPlan *pathPlan = PathPlan::GetInstance(objMngr, 0);
+
     connect(pathPlan, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(pathPlanElementReceived(UAVObject *, bool)));
 
     Waypoint *waypoint = Waypoint::GetInstance(objMngr, 0);
@@ -97,7 +98,7 @@ void ModelUavoProxy::receivePathPlan()
 
     // we will start 3 update requests
     completionCountdown = 3;
-    successCountdown = completionCountdown;
+    successCountdown    = completionCountdown;
 
     pathPlan->requestUpdate();
     waypoint->requestUpdateAll();
@@ -117,8 +118,7 @@ void ModelUavoProxy::pathPlanElementReceived(UAVObject *obj, bool success)
             if (objectsToModel()) {
                 QMessageBox::information(NULL, tr("Path Plan Download Successful"), tr("Path plan download was successful."));
             }
-        }
-        else {
+        } else {
             QMessageBox::critical(NULL, tr("Path Plan Download Failed"), tr("Failed to download the path plan !"));
         }
     }
@@ -139,12 +139,11 @@ bool ModelUavoProxy::modelToObjects()
     qDebug() << "ModelUAVProxy::modelToObjects";
 
     // track number of path actions
-    int actionCount = 0;
+    int actionCount   = 0;
 
     // iterate over waypoints
     int waypointCount = myModel->rowCount();
     for (int i = 0; i < waypointCount; ++i) {
-
         // Path Actions
 
         // create action to use as a search criteria
@@ -168,8 +167,7 @@ bool ModelUavoProxy::modelToObjects()
 
             // update UAVObject
             action->setData(actionData);
-        }
-        else {
+        } else {
             action->deleteLater();
             action = foundAction;
             qDebug() << "ModelUAVProxy::modelToObjects - found action instance :" << action->getInstID();
@@ -208,7 +206,7 @@ bool ModelUavoProxy::modelToObjects()
     PathPlan *pathPlan = PathPlan::GetInstance(objMngr);
     PathPlan::DataFields pathPlanData = pathPlan->getData();
 
-    pathPlanData.WaypointCount = waypointCount;
+    pathPlanData.WaypointCount   = waypointCount;
     pathPlanData.PathActionCount = actionCount;
     pathPlanData.Crc = computePathPlanCrc(waypointCount, actionCount);
 
@@ -217,9 +215,11 @@ bool ModelUavoProxy::modelToObjects()
     return true;
 }
 
-Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
+Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint)
+{
     Waypoint *waypoint = NULL;
     int count = objMngr->getNumInstances(Waypoint::OBJID);
+
     if (index < count) {
         // reuse object
         qDebug() << "ModelUAVProxy::createWaypoint - reused waypoint instance :" << index << "/" << count;
@@ -234,17 +234,18 @@ Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
         waypoint = newWaypoint ? newWaypoint : new Waypoint;
         waypoint->initialize(index, waypoint->getMetaObject());
         objMngr->registerObject(waypoint);
-    }
-    else {
+    } else {
         // we can only create the "next" object
         // TODO fail in a clean way :(
     }
     return waypoint;
 }
 
-PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
+PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction)
+{
     PathAction *action = NULL;
     int count = objMngr->getNumInstances(PathAction::OBJID);
+
     if (index < count) {
         // reuse object
         qDebug() << "ModelUAVProxy::createPathAction - reused action instance :" << index << "/" << count;
@@ -259,17 +260,18 @@ PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
         action = newAction ? newAction : new PathAction;
         action->initialize(index, action->getMetaObject());
         objMngr->registerObject(action);
-    }
-    else {
+    } else {
         // we can only create the "next" object
         // TODO fail in a clean way :(
     }
     return action;
 }
 
-PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields &actionData, int actionCount) {
+PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields &actionData, int actionCount)
+{
     int instancesCount = objMngr->getNumInstances(PathAction::OBJID);
     int count = actionCount <= instancesCount ? actionCount : instancesCount;
+
     for (int i = 0; i < count; ++i) {
         PathAction *action = PathAction::GetInstance(objMngr, i);
         Q_ASSERT(action);
@@ -278,15 +280,15 @@ PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields &actionD
         }
         PathAction::DataFields fields = action->getData();
         if (fields.Command == actionData.Command
-                && fields.ConditionParameters[0] == actionData.ConditionParameters[0]
-                && fields.ConditionParameters[1] == actionData.ConditionParameters[1]
-                && fields.ConditionParameters[2] == actionData.ConditionParameters[2]
-                && fields.EndCondition == actionData.EndCondition
-                && fields.ErrorDestination == actionData.ErrorDestination
-                && fields.JumpDestination == actionData.JumpDestination && fields.Mode == actionData.Mode
-                && fields.ModeParameters[0] == actionData.ModeParameters[0]
-                && fields.ModeParameters[1] == actionData.ModeParameters[1]
-                && fields.ModeParameters[2] == actionData.ModeParameters[2]) {
+            && fields.ConditionParameters[0] == actionData.ConditionParameters[0]
+            && fields.ConditionParameters[1] == actionData.ConditionParameters[1]
+            && fields.ConditionParameters[2] == actionData.ConditionParameters[2]
+            && fields.EndCondition == actionData.EndCondition
+            && fields.ErrorDestination == actionData.ErrorDestination
+            && fields.JumpDestination == actionData.JumpDestination && fields.Mode == actionData.Mode
+            && fields.ModeParameters[0] == actionData.ModeParameters[0]
+            && fields.ModeParameters[1] == actionData.ModeParameters[1]
+            && fields.ModeParameters[2] == actionData.ModeParameters[2]) {
             return action;
         }
     }
@@ -302,8 +304,8 @@ bool ModelUavoProxy::objectsToModel()
     PathPlan *pathPlan = PathPlan::GetInstance(objMngr);
     PathPlan::DataFields pathPlanData = pathPlan->getData();
 
-    int waypointCount = pathPlanData.WaypointCount;
-    int actionCount = pathPlanData.PathActionCount;
+    int waypointCount  = pathPlanData.WaypointCount;
+    int actionCount    = pathPlanData.PathActionCount;
 
     // consistency check
     if (waypointCount > objMngr->getNumInstances(Waypoint::OBJID)) {
@@ -322,8 +324,7 @@ bool ModelUavoProxy::objectsToModel()
     int rowCount = myModel->rowCount();
     if (waypointCount < rowCount) {
         myModel->removeRows(waypointCount, rowCount - waypointCount);
-    }
-    else if (waypointCount > rowCount) {
+    } else if (waypointCount > rowCount) {
         myModel->insertRows(rowCount, waypointCount - rowCount);
     }
 
@@ -349,10 +350,12 @@ bool ModelUavoProxy::objectsToModel()
     return true;
 }
 
-void ModelUavoProxy::modelToWaypoint(int i, Waypoint::DataFields &data) {
+void ModelUavoProxy::modelToWaypoint(int i, Waypoint::DataFields &data)
+{
     double distance, bearing, altitude, velocity;
 
     QModelIndex index = myModel->index(i, flightDataModel::DISRELATIVE);
+
     distance = myModel->data(index).toDouble();
     index    = myModel->index(i, flightDataModel::BEARELATIVE);
     bearing  = myModel->data(index).toDouble();
@@ -367,59 +370,64 @@ void ModelUavoProxy::modelToWaypoint(int i, Waypoint::DataFields &data) {
     data.Velocity = velocity;
 }
 
-void ModelUavoProxy::waypointToModel(int i, Waypoint::DataFields &data) {
-
+void ModelUavoProxy::waypointToModel(int i, Waypoint::DataFields &data)
+{
     double distance = sqrt(data.Position[Waypoint::POSITION_NORTH] * data.Position[Waypoint::POSITION_NORTH] +
-                    data.Position[Waypoint::POSITION_EAST] * data.Position[Waypoint::POSITION_EAST]);
+                           data.Position[Waypoint::POSITION_EAST] * data.Position[Waypoint::POSITION_EAST]);
 
     double bearing  = atan2(data.Position[Waypoint::POSITION_EAST], data.Position[Waypoint::POSITION_NORTH]) * 180 / M_PI;
+
     if (bearing != bearing) {
         bearing = 0;
     }
 
-    double altitude = -data.Position[Waypoint::POSITION_DOWN];
+    double altitude   = -data.Position[Waypoint::POSITION_DOWN];
 
     QModelIndex index = myModel->index(i, flightDataModel::VELOCITY);
     myModel->setData(index, data.Velocity);
-    index  = myModel->index(i, flightDataModel::DISRELATIVE);
+    index = myModel->index(i, flightDataModel::DISRELATIVE);
     myModel->setData(index, distance);
-    index  = myModel->index(i, flightDataModel::BEARELATIVE);
+    index = myModel->index(i, flightDataModel::BEARELATIVE);
     myModel->setData(index, bearing);
-    index  = myModel->index(i, flightDataModel::ALTITUDERELATIVE);
+    index = myModel->index(i, flightDataModel::ALTITUDERELATIVE);
     myModel->setData(index, altitude);
 }
 
-void ModelUavoProxy::modelToPathAction(int i, PathAction::DataFields &data) {
+void ModelUavoProxy::modelToPathAction(int i, PathAction::DataFields &data)
+{
     QModelIndex index = myModel->index(i, flightDataModel::MODE);
-    data.Mode = myModel->data(index).toInt();
-    index = myModel->index(i, flightDataModel::MODE_PARAMS0);
+
+    data.Mode    = myModel->data(index).toInt();
+    index        = myModel->index(i, flightDataModel::MODE_PARAMS0);
     data.ModeParameters[0] = myModel->data(index).toFloat();
-    index = myModel->index(i, flightDataModel::MODE_PARAMS1);
+    index        = myModel->index(i, flightDataModel::MODE_PARAMS1);
     data.ModeParameters[1] = myModel->data(index).toFloat();
-    index = myModel->index(i, flightDataModel::MODE_PARAMS2);
+    index        = myModel->index(i, flightDataModel::MODE_PARAMS2);
     data.ModeParameters[2] = myModel->data(index).toFloat();
-    index = myModel->index(i, flightDataModel::MODE_PARAMS3);
+    index        = myModel->index(i, flightDataModel::MODE_PARAMS3);
     data.ModeParameters[3] = myModel->data(index).toFloat();
-    index = myModel->index(i, flightDataModel::CONDITION);
+    index        = myModel->index(i, flightDataModel::CONDITION);
     data.EndCondition = myModel->data(index).toInt();
-    index = myModel->index(i, flightDataModel::CONDITION_PARAMS0);
+    index        = myModel->index(i, flightDataModel::CONDITION_PARAMS0);
     data.ConditionParameters[0] = myModel->data(index).toFloat();
-    index = myModel->index(i, flightDataModel::CONDITION_PARAMS1);
+    index        = myModel->index(i, flightDataModel::CONDITION_PARAMS1);
     data.ConditionParameters[1] = myModel->data(index).toFloat();
-    index = myModel->index(i, flightDataModel::CONDITION_PARAMS2);
+    index        = myModel->index(i, flightDataModel::CONDITION_PARAMS2);
     data.ConditionParameters[2] = myModel->data(index).toFloat();
-    index = myModel->index(i, flightDataModel::CONDITION_PARAMS3);
+    index        = myModel->index(i, flightDataModel::CONDITION_PARAMS3);
     data.ConditionParameters[3] = myModel->data(index).toFloat();
-    index = myModel->index(i, flightDataModel::COMMAND);
+    index        = myModel->index(i, flightDataModel::COMMAND);
     data.Command = myModel->data(index).toInt();
-    index = myModel->index(i, flightDataModel::JUMPDESTINATION);
+    index        = myModel->index(i, flightDataModel::JUMPDESTINATION);
     data.JumpDestination = myModel->data(index).toInt() - 1;
-    index = myModel->index(i, flightDataModel::ERRORDESTINATION);
+    index        = myModel->index(i, flightDataModel::ERRORDESTINATION);
     data.ErrorDestination = myModel->data(index).toInt() - 1;
 }
 
-void ModelUavoProxy::pathActionToModel(int i, PathAction::DataFields &data) {
+void ModelUavoProxy::pathActionToModel(int i, PathAction::DataFields &data)
+{
     QModelIndex index = myModel->index(i, flightDataModel::ISRELATIVE);
+
     myModel->setData(index, true);
 
     index = myModel->index(i, flightDataModel::COMMAND);
@@ -456,16 +464,17 @@ void ModelUavoProxy::pathActionToModel(int i, PathAction::DataFields &data) {
     myModel->setData(index, data.ModeParameters[3]);
 }
 
-quint8 ModelUavoProxy::computePathPlanCrc(int waypointCount, int actionCount) {
+quint8 ModelUavoProxy::computePathPlanCrc(int waypointCount, int actionCount)
+{
     quint8 crc = 0;
+
     for (int i = 0; i < waypointCount; ++i) {
-        Waypoint* waypoint = Waypoint::GetInstance(objMngr, i);
+        Waypoint *waypoint = Waypoint::GetInstance(objMngr, i);
         crc = waypoint->updateCRC(crc);
     }
     for (int i = 0; i < actionCount; ++i) {
-        PathAction* action = PathAction::GetInstance(objMngr, i);
+        PathAction *action = PathAction::GetInstance(objMngr, i);
         crc = action->updateCRC(crc);
     }
     return crc;
 }
-

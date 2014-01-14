@@ -128,6 +128,7 @@ void SoundNotifyPlugin::readConfig(QSettings *settings, UAVConfigInfo * /* confi
 void SoundNotifyPlugin::onTelemetryManagerAdded(QObject *obj)
 {
     TelemetryManager *telMngr = qobject_cast<TelemetryManager *>(obj);
+
     if (telMngr) {
         connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
     }

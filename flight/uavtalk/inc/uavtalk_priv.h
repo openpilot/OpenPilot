@@ -34,10 +34,10 @@
 // Private types and constants
 
 // min header : sync(1), type (1), size(2), object ID(4), instance ID(2)
-#define UAVTALK_MIN_HEADER_LENGTH 10
+#define UAVTALK_MIN_HEADER_LENGTH  10
 
 // max header : sync(1), type (1), size(2), object ID(4), instance ID(2), timestamp(2)
-#define UAVTALK_MAX_HEADER_LENGTH 12
+#define UAVTALK_MAX_HEADER_LENGTH  12
 
 #define UAVTALK_CHECKSUM_LENGTH    1
 
@@ -47,11 +47,11 @@
 #define UAVTALK_MAX_PACKET_LENGTH  UAVTALK_MIN_PACKET_LENGTH + UAVTALK_MAX_PAYLOAD_LENGTH
 
 typedef struct {
-    uint8_t type;
-    uint16_t     packet_size;
-    uint32_t     objId;
-    uint16_t     instId;
-    uint32_t     length;
+    uint8_t  type;
+    uint16_t packet_size;
+    uint32_t objId;
+    uint16_t instId;
+    uint32_t length;
     uint8_t  timestampLength;
     uint8_t  cs;
     uint16_t timestamp;

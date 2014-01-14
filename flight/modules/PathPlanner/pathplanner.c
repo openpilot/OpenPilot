@@ -257,7 +257,7 @@ static void pathPlannerTask()
     }
 }
 
-// safety check for path plan integrity
+// safety checks for path plan integrity
 static uint8_t checkPathPlan()
 {
     uint16_t i;
@@ -273,11 +273,11 @@ static uint8_t checkPathPlan()
 
     // check count consistency
     if (waypointCount > UAVObjGetNumInstances(WaypointHandle())) {
-        PIOS_DEBUGLOG_Printf("FlighPlan : waypoint count error!");
+        //PIOS_DEBUGLOG_Printf("PathPlan : waypoint count error!");
         return false;
     }
     if (actionCount > UAVObjGetNumInstances(PathActionHandle())) {
-        PIOS_DEBUGLOG_Printf("FlighPlan : path action count error!");
+        //PIOS_DEBUGLOG_Printf("PathPlan : path action count error!");
         return false;
     }
 
@@ -290,12 +290,12 @@ static uint8_t checkPathPlan()
         pathCrc = UAVObjUpdateCRC(PathActionHandle(), i, pathCrc);
     }
     if (pathCrc != pathPlan.Crc) {
-        PIOS_DEBUGLOG_Printf("FlighPlan : bad CRC (%d / %d)!", pathCrc, pathPlan.Crc);
+        // failed crc check
+        //PIOS_DEBUGLOG_Printf("PathPlan : bad CRC (%d / %d)!", pathCrc, pathPlan.Crc);
         return false;
     }
 
-    // everything ok (hopefully...)
-    PIOS_DEBUGLOG_Printf("FlighPlan : passed consistency check.", pathCrc, pathPlan.Crc);
+    // path plan passed checks
 
     return true;
 }

@@ -348,7 +348,7 @@ void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
  * @param       y               y coordinate
  * @param       mode    0 = clear bit, 1 = set bit, 2 = toggle bit
  */
-void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode)
+void write_pixel(uint8_t *buff, int x, int y, int mode)
 {
     CHECK_COORDS(x, y);
     // Determine the bit in the word to be set and the word
@@ -369,31 +369,9 @@ void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode)
  * @param       mmode   0 = clear, 1 = set, 2 = toggle
  * @param       lmode   0 = black, 1 = white, 2 = toggle
  */
-void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode)
+void write_pixel_lm(int x, int y, int mmode, int lmode)
 {
     CHECK_COORDS(x, y);
-    // Determine the bit in the word to be set and the word
-    // index to set it in.
-    int bitnum    = CALC_BIT_IN_WORD(x);
-    int wordnum   = CALC_BUFF_ADDR(x, y);
-    // Apply the masks.
-    uint16_t mask = 1 << (7 - bitnum);
-    WRITE_WORD_MODE(draw_buffer_mask, wordnum, mask, mmode);
-    WRITE_WORD_MODE(draw_buffer_level, wordnum, mask, lmode);
-}
-
-/**
- * write_pixel_lm_truncated: write the pixel on both surfaces (level and mask.)
- * Uses current draw buffer.
- *
- * @param       x       x coordinate
- * @param       y       y coordinate
- * @param       mmode   0 = clear, 1 = set, 2 = toggle
- * @param       lmode   0 = black, 1 = white, 2 = toggle
- */
-void write_pixel_lm_truncated(int x, int y, int mmode, int lmode)
-{
-    CHECK_COORDS_TRUNCATED(x, y);
     // Determine the bit in the word to be set and the word
     // index to set it in.
     int bitnum    = CALC_BIT_IN_WORD(x);
@@ -408,15 +386,16 @@ void write_pixel_lm_truncated(int x, int y, int mmode, int lmode)
  * write_hline: optimised horizontal line writing algorithm
  *
  * @param       buff    pointer to buffer to write in
- * @param       x0              x0 coordinate
- * @param       x1              x1 coordinate
- * @param       y               y coordinate
+ * @param       x0      x0 coordinate
+ * @param       x1      x1 coordinate
+ * @param       y       y coordinate
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode)
+void write_hline(uint8_t *buff, int x0, int x1, int y, int mode)
 {
-    CLIP_COORDS(x0, y);
-    CLIP_COORDS(x1, y);
+    CHECK_COORD_Y(y);
+    CLIP_COORD_X(x0);
+    CLIP_COORD_X(x1);
     if (x0 > x1) {
         SWAP(x0, x1);
     }
@@ -424,7 +403,7 @@ void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y
         return;
     }
     /* This is an optimised algorithm for writing horizontal lines.
-    * We begin by finding the addresses of the x0 and x1 points. */
+     * We begin by finding the addresses of the x0 and x1 points. */
     int addr0     = CALC_BUFF_ADDR(x0, y);
     int addr1     = CALC_BUFF_ADDR(x1, y);
     int addr0_bit = CALC_BIT_IN_WORD(x0);
@@ -458,7 +437,7 @@ void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y
  * @param       lmode   0 = clear, 1 = set, 2 = toggle
  * @param       mmode   0 = clear, 1 = set, 2 = toggle
  */
-void write_hline_lm(unsigned int x0, unsigned int x1, unsigned int y, int lmode, int mmode)
+void write_hline_lm(int x0, int x1, int y, int lmode, int mmode)
 {
     // TODO: an optimisation would compute the masks and apply to
     // both buffers simultaneously.
@@ -478,7 +457,7 @@ void write_hline_lm(unsigned int x0, unsigned int x1, unsigned int y, int lmode,
  * @param       mode            0 = black outline, white body, 1 = white outline, black body
  * @param       mmode           0 = clear, 1 = set, 2 = toggle
  */
-void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int endcap0, int endcap1, int mode, int mmode)
+void write_hline_outlined(int x0, int x1, int y, int endcap0, int endcap1, int mode, int mmode)
 {
     int stroke, fill;
 
@@ -499,17 +478,16 @@ void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int 
  * write_vline: optimised vertical line writing algorithm
  *
  * @param       buff    pointer to buffer to write in
- * @param       x               x coordinate
- * @param       y0              y0 coordinate
- * @param       y1              y1 coordinate
+ * @param       x       x coordinate
+ * @param       y0      y0 coordinate
+ * @param       y1      y1 coordinate
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1, int mode)
+void write_vline(uint8_t *buff, int x, int y0, int y1, int mode)
 {
-    unsigned int a;
-
-    CLIP_COORDS(x, y0);
-    CLIP_COORDS(x, y1);
+    CHECK_COORD_X(x);
+    CLIP_COORD_Y(y0);
+    CLIP_COORD_Y(y1);
     if (y0 > y1) {
         SWAP(y0, y1);
     }
@@ -518,14 +496,14 @@ void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1
     }
     /* This is an optimised algorithm for writing vertical lines.
      * We begin by finding the addresses of the x,y0 and x,y1 points. */
-    unsigned int addr0  = CALC_BUFF_ADDR(x, y0);
-    unsigned int addr1  = CALC_BUFF_ADDR(x, y1);
+    int addr0  = CALC_BUFF_ADDR(x, y0);
+    int addr1  = CALC_BUFF_ADDR(x, y1);
     /* Then we calculate the pixel data to be written. */
-    unsigned int bitnum = CALC_BIT_IN_WORD(x);
+    int bitnum = CALC_BIT_IN_WORD(x);
     uint16_t mask = 1 << (7 - bitnum);
     /* Run from addr0 to addr1 placing pixels. Increment by the number
      * of words n each graphics line. */
-    for (a = addr0; a <= addr1; a += BUFFER_WIDTH) {
+    for (int a = addr0; a <= addr1; a += BUFFER_WIDTH) {
         WRITE_WORD_MODE(buff, a, mask, mode);
     }
 }
@@ -539,7 +517,7 @@ void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1
  * @param       lmode   0 = clear, 1 = set, 2 = toggle
  * @param       mmode   0 = clear, 1 = set, 2 = toggle
  */
-void write_vline_lm(unsigned int x, unsigned int y0, unsigned int y1, int lmode, int mmode)
+void write_vline_lm(int x, int y0, int y1, int lmode, int mmode)
 {
     // TODO: an optimisation would compute the masks and apply to
     // both buffers simultaneously.
@@ -559,7 +537,7 @@ void write_vline_lm(unsigned int x, unsigned int y0, unsigned int y1, int lmode,
  * @param       mode            0 = black outline, white body, 1 = white outline, black body
  * @param       mmode           0 = clear, 1 = set, 2 = toggle
  */
-void write_vline_outlined(unsigned int x, unsigned int y0, unsigned int y1, int endcap0, int endcap1, int mode, int mmode)
+void write_vline_outlined(int x, int y0, int y1, int endcap0, int endcap1, int mode, int mmode)
 {
     int stroke, fill;
 
@@ -590,23 +568,22 @@ void write_vline_outlined(unsigned int x, unsigned int y0, unsigned int y1, int 
  * @param       height  rectangle height
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsigned int width, unsigned int height, int mode)
+void write_filled_rectangle(uint8_t *buff, int x, int y, int width, int height, int mode)
 {
-    unsigned int yy, addr0_old, addr1_old;
+    int yy, addr0_old, addr1_old;
 
     CHECK_COORDS(x, y);
-    CHECK_COORD_X(x + width);
-    CHECK_COORD_Y(y + height);
+    CHECK_COORDS(x + width, y + height);
     if (width <= 0 || height <= 0) {
         return;
     }
     // Calculate as if the rectangle was only a horizontal line. We then
     // step these addresses through each row until we iterate `height` times.
-    unsigned int addr0     = CALC_BUFF_ADDR(x, y);
-    unsigned int addr1     = CALC_BUFF_ADDR(x + width, y);
-    unsigned int addr0_bit = CALC_BIT_IN_WORD(x);
-    unsigned int addr1_bit = CALC_BIT_IN_WORD(x + width);
-    unsigned int mask, mask_l, mask_r, i;
+    int addr0     = CALC_BUFF_ADDR(x, y);
+    int addr1     = CALC_BUFF_ADDR(x + width, y);
+    int addr0_bit = CALC_BIT_IN_WORD(x);
+    int addr1_bit = CALC_BIT_IN_WORD(x + width);
+    int mask, mask_l, mask_r, i;
     // If the addresses are equal, we need to write one word vertically.
     if (addr0 == addr1) {
         mask = COMPUTE_HLINE_ISLAND_MASK(addr0_bit, addr1_bit);
@@ -655,7 +632,7 @@ void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsig
  * @param       lmode   0 = clear, 1 = set, 2 = toggle
  * @param       mmode   0 = clear, 1 = set, 2 = toggle
  */
-void write_filled_rectangle_lm(unsigned int x, unsigned int y, unsigned int width, unsigned int height, int lmode, int mmode)
+void write_filled_rectangle_lm(int x, int y, int width, int height, int lmode, int mmode)
 {
     write_filled_rectangle(draw_buffer_mask, x, y, width, height, mmode);
     write_filled_rectangle(draw_buffer_level, x, y, width, height, lmode);
@@ -672,12 +649,8 @@ void write_filled_rectangle_lm(unsigned int x, unsigned int y, unsigned int widt
  * @param       mode    0 = black outline, white body, 1 = white outline, black body
  * @param       mmode   0 = clear, 1 = set, 2 = toggle
  */
-void write_rectangle_outlined(unsigned int x, unsigned int y, int width, int height, int mode, int mmode)
+void write_rectangle_outlined(int x, int y, int width, int height, int mode, int mmode)
 {
-    // CHECK_COORDS(x, y);
-    // CHECK_COORDS(x + width, y + height);
-    // if((x + width) > DISP_WIDTH) width = DISP_WIDTH - x;
-    // if((y + height) > DISP_HEIGHT) height = DISP_HEIGHT - y;
     write_hline_outlined(x, x + width, y, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
     write_hline_outlined(x, x + width, y + height, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
     write_vline_outlined(x, y, y + height, ENDCAP_ROUND, ENDCAP_ROUND, mode, mmode);
@@ -695,7 +668,7 @@ void write_rectangle_outlined(unsigned int x, unsigned int y, int width, int hei
  * @param       dashp   dash period (pixels) - zero for no dash
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_circle(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int mode)
+void write_circle(uint8_t *buff, int cx, int cy, int r, int dashp, int mode)
 {
     CHECK_COORDS(cx, cy);
     int error = -r, x = r, y = 0;
@@ -723,7 +696,7 @@ void write_circle(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int 
  * @param       mode    0 = black outline, white body, 1 = white outline, black body
  * @param       mmode   0 = clear, 1 = set, 2 = toggle
  */
-void write_circle_outlined(unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int bmode, int mode, int mmode)
+void write_circle_outlined(int cx, int cy, int r, int dashp, int bmode, int mode, int mmode)
 {
     int stroke, fill;
 
@@ -782,7 +755,7 @@ void write_circle_outlined(unsigned int cx, unsigned int cy, unsigned int r, uns
  * @param       r               radius
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_circle_filled(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, int mode)
+void write_circle_filled(uint8_t *buff, int cx, int cy, int r, int mode)
 {
     CHECK_COORDS(cx, cy);
     int error = -r, x = r, y = 0, xch = 0;
@@ -827,10 +800,10 @@ void write_circle_filled(uint8_t *buff, unsigned int cx, unsigned int cy, unsign
  * @param       y1              second y coordinate
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
-void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode)
+void write_line(uint8_t *buff, int x0, int y0, int x1, int y1, int mode)
 {
     // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-    unsigned int steep = abs(y1 - y0) > abs(x1 - x0);
+    int steep = abs(y1 - y0) > abs(x1 - x0);
 
     if (steep) {
         SWAP(x0, y0);
@@ -841,11 +814,11 @@ void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1
         SWAP(y0, y1);
     }
     int deltax     = x1 - x0;
-    unsigned int deltay = abs(y1 - y0);
+    int deltay = abs(y1 - y0);
     int error      = deltax / 2;
     int ystep;
-    unsigned int y = y0;
-    unsigned int x; // , lasty = y, stox = 0;
+    int y = y0;
+    int x; // , lasty = y, stox = 0;
     if (y0 < y1) {
         ystep = 1;
     } else {
@@ -875,7 +848,7 @@ void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1
  * @param       mmode   0 = clear, 1 = set, 2 = toggle
  * @param       lmode   0 = clear, 1 = set, 2 = toggle
  */
-void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mmode, int lmode)
+void write_line_lm(int x0, int y0, int x1, int y1, int mmode, int lmode)
 {
     write_line(draw_buffer_mask, x0, y0, x1, y1, mmode);
     write_line(draw_buffer_level, x0, y0, x1, y1, lmode);
@@ -893,7 +866,7 @@ void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned i
  * @param       mode            0 = black outline, white body, 1 = white outline, black body
  * @param       mmode           0 = clear, 1 = set, 2 = toggle
  */
-void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1,
+void write_line_outlined(int x0, int y0, int x1, int y1,
                          __attribute__((unused)) int endcap0, __attribute__((unused)) int endcap1,
                          int mode, int mmode)
 {
@@ -918,11 +891,11 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
         SWAP(y0, y1);
     }
     int deltax     = x1 - x0;
-    unsigned int deltay = abs(y1 - y0);
+    int deltay = abs(y1 - y0);
     int error      = deltax / 2;
     int ystep;
-    unsigned int y = y0;
-    unsigned int x;
+    int y = y0;
+    int x;
     if (y0 < y1) {
         ystep = 1;
     } else {
@@ -965,7 +938,7 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
 }
 
 /**
- * write_line_outlined_dashed_truncated: Draw a line of arbitrary angle, with an outline, potentially dashed and truncated when out of field.
+ * write_line_outlined_dashed: Draw a line of arbitrary angle, with an outline, potentially dashed.
  *
  * @param       x0              first x coordinate
  * @param       y0              first y coordinate
@@ -977,7 +950,7 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
  * @param       mmode           0 = clear, 1 = set, 2 = toggle
  * @param       dots			0 = not dashed, > 0 = # of set/unset dots for the dashed innards
  */
-void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1,
+void write_line_outlined_dashed(int x0, int y0, int x1, int y1,
                                           __attribute__((unused)) int endcap0, __attribute__((unused)) int endcap1,
                                           int mode, int mmode, int dots)
 {
@@ -1002,7 +975,7 @@ void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1,
         SWAP(y0, y1);
     }
     int deltax = x1 - x0;
-    unsigned int deltay = abs(y1 - y0);
+    int deltay = abs(y1 - y0);
     int error  = deltax / 2;
     int ystep;
     int y = y0;
@@ -1015,15 +988,15 @@ void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1,
     // Draw the outline.
     for (x = x0; x < x1; x++) {
         if (steep) {
-            write_pixel_lm_truncated(y - 1, x, mmode, omode);
-            write_pixel_lm_truncated(y + 1, x, mmode, omode);
-            write_pixel_lm_truncated(y, x - 1, mmode, omode);
-            write_pixel_lm_truncated(y, x + 1, mmode, omode);
+            write_pixel_lm(y - 1, x, mmode, omode);
+            write_pixel_lm(y + 1, x, mmode, omode);
+            write_pixel_lm(y, x - 1, mmode, omode);
+            write_pixel_lm(y, x + 1, mmode, omode);
         } else {
-            write_pixel_lm_truncated(x - 1, y, mmode, omode);
-            write_pixel_lm_truncated(x + 1, y, mmode, omode);
-            write_pixel_lm_truncated(x, y - 1, mmode, omode);
-            write_pixel_lm_truncated(x, y + 1, mmode, omode);
+            write_pixel_lm(x - 1, y, mmode, omode);
+            write_pixel_lm(x + 1, y, mmode, omode);
+            write_pixel_lm(x, y - 1, mmode, omode);
+            write_pixel_lm(x, y + 1, mmode, omode);
         }
         error -= deltay;
         if (error < 0) {
@@ -1042,9 +1015,9 @@ void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1,
         }
         if (draw % 2) {
             if (steep) {
-                write_pixel_lm_truncated(y, x, mmode, imode);
+                write_pixel_lm(y, x, mmode, imode);
             } else {
-                write_pixel_lm_truncated(x, y, mmode, imode);
+                write_pixel_lm(x, y, mmode, imode);
             }
         }
         error -= deltay;
@@ -2146,7 +2119,7 @@ void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)
     side_length = main_line_width * size / 200;
     d_x = cos_roll * side_length;
     d_y = sin_roll * side_length;
-    write_line_outlined_dashed_truncated(pp_x - d_x, pp_y + d_y, pp_x + d_x, pp_y - d_y, 2, 2, 0, 1, 0);
+    write_line_outlined_dashed(pp_x - d_x, pp_y + d_y, pp_x + d_x, pp_y - d_y, 2, 2, 0, 1, 0);
 
     // sub horizons
     pitch_delta = GRAPHICS_BOTTOM / (2 * (float)max_pitch_visible / (float)delta_degree) + 2;
@@ -2166,12 +2139,12 @@ void hud_draw_artificial_horizon(float roll, float pitch, __attribute__((unused)
         // positive sub horizon line (solid)
         s_x = pp_x - mp_x;
         s_y = pp_y - mp_y;
-        write_line_outlined_dashed_truncated(s_x - d_x, s_y + d_y, s_x + d_x, s_y - d_y, 2, 2, 0, 1, 0);
+        write_line_outlined_dashed(s_x - d_x, s_y + d_y, s_x + d_x, s_y - d_y, 2, 2, 0, 1, 0);
 
         // negative sub horizon line (dashed)
         s_x = pp_x + mp_x;
         s_y = pp_y + mp_y;
-        write_line_outlined_dashed_truncated(s_x - d_x, s_y + d_y, s_x + d_x, s_y - d_y, 2, 2, 0, 1, 4);
+        write_line_outlined_dashed(s_x - d_x, s_y + d_y, s_x + d_x, s_y - d_y, 2, 2, 0, 1, 4);
 
         // deltas for the sub horizon numbers
         side_length = SUB_NUMBERS_WIDTH * size / 200;

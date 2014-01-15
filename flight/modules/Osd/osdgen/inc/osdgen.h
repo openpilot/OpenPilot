@@ -151,18 +151,15 @@ typedef struct {
 #define MAX3(a, b, c)                MAX(a, MAX(b, c))
 #define MIN3(a, b, c)                MIN(a, MIN(b, c))
 
-// Check if coordinates are valid. If not, return. Assumes unsigned coordinate
-#define CHECK_COORDS(x, y)           if (x >= GRAPHICS_WIDTH_REAL || y >= GRAPHICS_HEIGHT_REAL) { return; }
-#define CHECK_COORD_X(x)             if (x >= GRAPHICS_WIDTH_REAL) { return; }
-#define CHECK_COORD_Y(y)             if (y >= GRAPHICS_HEIGHT_REAL) { return; }
+// Check if coordinates are valid. If not, return. Assumes signed coordinates for working correct also with values lesser than 0.
+#define CHECK_COORDS(x, y)           if (x < GRAPHICS_LEFT || x > GRAPHICS_RIGHT || y < GRAPHICS_TOP || y > GRAPHICS_BOTTOM) { return; }
+#define CHECK_COORD_X(x)             if (x < GRAPHICS_LEFT || x > GRAPHICS_RIGHT) { return; }
+#define CHECK_COORD_Y(y)             if (y < GRAPHICS_TOP  || y > GRAPHICS_BOTTOM) { return; }
 
-// Clip coordinates out of range - assumes unsigned coordinate
-#define CLIP_COORD_X(x)              { x = MIN(x, GRAPHICS_WIDTH_REAL); }
-#define CLIP_COORD_Y(y)              { y = MIN(y, GRAPHICS_HEIGHT_REAL); }
+// Clip coordinates out of range. Assumes signed coordinates for working correct also with values lesser than 0.
 #define CLIP_COORDS(x, y)            { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
-
-// Check if coordinates are valid. If not, return. Assumes signed coordinate
-#define CHECK_COORDS_TRUNCATED(x, y) if (x < GRAPHICS_LEFT || y < GRAPHICS_TOP || x > GRAPHICS_RIGHT || y > GRAPHICS_BOTTOM) { return; }
+#define CLIP_COORD_X(x)              { x = x < GRAPHICS_LEFT ? GRAPHICS_LEFT : x > GRAPHICS_RIGHT ? GRAPHICS_RIGHT : x; }
+#define CLIP_COORD_Y(y)              { y = y < GRAPHICS_TOP ? GRAPHICS_TOP : y > GRAPHICS_BOTTOM ? GRAPHICS_BOTTOM : y; }
 
 // Macro to swap two variables using XOR swap.
 #define SWAP(a, b)                   { a ^= b; b ^= a; a ^= b; }
@@ -179,31 +176,38 @@ void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size);
 void drawAttitude(uint16_t x, uint16_t y, int16_t pitch, int16_t roll, uint16_t size);
 
-void write_pixel(uint8_t *buff, unsigned int x, unsigned int y, int mode);
-void write_pixel_lm(unsigned int x, unsigned int y, int mmode, int lmode);
-void write_pixel_lm_truncated(int x, int y, int mmode, int lmode);
-void write_hline(uint8_t *buff, unsigned int x0, unsigned int x1, unsigned int y, int mode);
-void write_hline_lm(unsigned int x0, unsigned int x1, unsigned int y, int lmode, int mmode);
-void write_hline_outlined(unsigned int x0, unsigned int x1, unsigned int y, int endcap0, int endcap1, int mode, int mmode);
-void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1, int mode);
-void write_vline_lm(unsigned int x, unsigned int y0, unsigned int y1, int lmode, int mmode);
-void write_vline_outlined(unsigned int x, unsigned int y0, unsigned int y1, int endcap0, int endcap1, int mode, int mmode);
-void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsigned int width, unsigned int height, int mode);
-void write_filled_rectangle_lm(unsigned int x, unsigned int y, unsigned int width, unsigned int height, int lmode, int mmode);
-void write_rectangle_outlined(unsigned int x, unsigned int y, int width, int height, int mode, int mmode);
-void write_circle(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int mode);
-void write_circle_outlined(unsigned int cx, unsigned int cy, unsigned int r, unsigned int dashp, int bmode, int mode, int mmode);
-void write_circle_filled(uint8_t *buff, unsigned int cx, unsigned int cy, unsigned int r, int mode);
-void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode);
-void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mmode, int lmode);
-void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int endcap0, int endcap1, int mode, int mmode);
-void write_line_outlined_dashed_truncated(int x0, int y0, int x1, int y1, int endcap0, int endcap1, int mode, int mmode, int dots);
+void write_pixel(uint8_t *buff, int x, int y, int mode);
+void write_pixel_lm(int x, int y, int mmode, int lmode);
+
+void write_hline(uint8_t *buff, int x0, int x1, int y, int mode);
+void write_hline_lm(int x0, int x1, int y, int lmode, int mmode);
+void write_hline_outlined(int x0, int x1, int y, int endcap0, int endcap1, int mode, int mmode);
+
+void write_vline(uint8_t *buff, int x, int y0, int y1, int mode);
+void write_vline_lm(int x, int y0, int y1, int lmode, int mmode);
+void write_vline_outlined(int x, int y0, int y1, int endcap0, int endcap1, int mode, int mmode);
+
+void write_filled_rectangle(uint8_t *buff, int x, int y, int width, int height, int mode);
+void write_filled_rectangle_lm(int x, int y, int width, int height, int lmode, int mmode);
+void write_rectangle_outlined(int x, int y, int width, int height, int mode, int mmode);
+
+void write_circle(uint8_t *buff, int cx, int cy, int r, int dashp, int mode);
+void write_circle_outlined(int cx, int cy, int r, int dashp, int bmode, int mode, int mmode);
+void write_circle_filled(uint8_t *buff, int cx, int cy, int r, int mode);
+
+void write_line(uint8_t *buff, int x0, int y0, int x1, int y1, int mode);
+void write_line_lm(int x0, int y0, int x1, int y1, int mmode, int lmode);
+void write_line_outlined(int x0, int y0, int x1, int y1, int endcap0, int endcap1, int mode, int mmode);
+void write_line_outlined_dashed(int x0, int y0, int x1, int y1, int endcap0, int endcap1, int mode, int mmode, int dots);
+
 void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode);
 void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
 void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
 void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr, unsigned int xoff, int lmode, int mmode);
+
 void write_char16(char ch, int x, int y, int font);
 void write_char(char ch, int x, int y, int flags, int font);
+
 void write_string(char *str, int x, int y, int xs, int ys, int va, int ha, int flags, int font);
 void write_string_formatted(char *str, int x, int y, int xs, int ys, int va, int ha, int flags);
 

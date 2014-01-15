@@ -30,6 +30,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QtCore/QDebug>
+#include <QScrollBar>
 
 MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool iconAbove)
     : QWidget(parent),
@@ -37,8 +38,8 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
     m_iconAbove(iconAbove)
 {
     m_listWidget  = new QListWidget();
+    m_listWidget->setObjectName("list");
     m_stackWidget = new QStackedWidget();
-    m_stackWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     QBoxLayout *toplevelLayout;
     if (m_vertical) {
@@ -58,16 +59,22 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
     }
 
     if (m_iconAbove && m_vertical) {
-        m_listWidget->setFixedWidth(80); // this should be computed instead
+        m_listWidget->setFixedWidth(LIST_VIEW_WIDTH); // this should be computed instead
         m_listWidget->setWrapping(false);
     }
 
-    toplevelLayout->setSpacing(0);
-    toplevelLayout->setContentsMargins(0, 0, 0, 0);
     m_listWidget->setContentsMargins(0, 0, 0, 0);
     m_listWidget->setSpacing(0);
     m_listWidget->setViewMode(QListView::IconMode);
+    m_listWidget->setMovement(QListView::Static);
+    m_listWidget->setUniformItemSizes(true);
+    m_listWidget->setStyleSheet("#list {border: 0px; margin-left: 9px; margin-top: 9px; background-color: transparent; }");
+
+    m_stackWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
     m_stackWidget->setContentsMargins(0, 0, 0, 0);
+
+    toplevelLayout->setSpacing(0);
+    toplevelLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(toplevelLayout);
 
     connect(m_listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(showWidget(int)), Qt::QueuedConnection);
@@ -125,6 +132,12 @@ void MyTabbedStackWidget::showWidget(int index)
     } else {
         m_listWidget->setCurrentRow(m_stackWidget->currentIndex(), QItemSelectionModel::ClearAndSelect);
     }
+}
+
+void MyTabbedStackWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    m_listWidget->setFixedWidth(m_listWidget->verticalScrollBar()->isVisible() ? LIST_VIEW_WIDTH + 20 : LIST_VIEW_WIDTH);
 }
 
 void MyTabbedStackWidget::insertCornerWidget(int index, QWidget *widget)

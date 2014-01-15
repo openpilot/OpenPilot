@@ -46,7 +46,7 @@
 #include "manualcontrolcommand.h"
 #include "positionstate.h"
 #include "pathdesired.h"
-#include "stabilizationsettings.h"
+#include "stabilizationbank.h"
 #include "stabilizationdesired.h"
 #include "receiveractivity.h"
 #include "systemsettings.h"
@@ -668,8 +668,8 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
 
     StabilizationDesiredGet(&stabilization);
 
-    StabilizationSettingsData stabSettings;
-    StabilizationSettingsGet(&stabSettings);
+    StabilizationBankData stabSettings;
+    StabilizationBankGet(&stabSettings);
 
     uint8_t *stab_settings;
     FlightStatusData flightStatus;
@@ -864,8 +864,8 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     AltitudeHoldSettingsThrottleExpGet(&throttleExp);
     AltitudeHoldSettingsThrottleRateGet(&throttleRate);
 
-    StabilizationSettingsData stabSettings;
-    StabilizationSettingsGet(&stabSettings);
+    StabilizationBankData stabSettings;
+    StabilizationBankGet(&stabSettings);
 
     PositionStateData posState;
     PositionStateGet(&posState);

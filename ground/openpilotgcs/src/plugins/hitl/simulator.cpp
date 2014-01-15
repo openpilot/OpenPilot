@@ -27,10 +27,12 @@
 
 
 #include "simulator.h"
-#include "extensionsystem/pluginmanager.h"
-#include "coreplugin/icore.h"
-#include "coreplugin/threadmanager.h"
 #include "hitlnoisegeneration.h"
+
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/icore.h>
+#include <coreplugin/threadmanager.h>
+#include <uavtalk/telemetrymanager.h>
 
 volatile bool Simulator::isStarted = false;
 

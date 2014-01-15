@@ -70,6 +70,7 @@ UAVOBJSRCFILENAMES += overosyncstats
 UAVOBJSRCFILENAMES += overosyncsettings
 UAVOBJSRCFILENAMES += pathaction
 UAVOBJSRCFILENAMES += pathdesired
+UAVOBJSRCFILENAMES += pathplan
 UAVOBJSRCFILENAMES += pathstatus
 UAVOBJSRCFILENAMES += positionstate
 UAVOBJSRCFILENAMES += ratedesired

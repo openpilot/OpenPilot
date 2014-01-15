@@ -73,6 +73,7 @@ UAVOBJSRCFILENAMES += objectpersistence
 UAVOBJSRCFILENAMES += overosyncstats
 UAVOBJSRCFILENAMES += pathaction
 UAVOBJSRCFILENAMES += pathdesired
+UAVOBJSRCFILENAMES += pathplan
 UAVOBJSRCFILENAMES += pathstatus
 UAVOBJSRCFILENAMES += positionstate
 UAVOBJSRCFILENAMES += ratedesired

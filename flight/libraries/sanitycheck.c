@@ -35,6 +35,7 @@
 // UAVOs
 #include <manualcontrolsettings.h>
 #include <systemsettings.h>
+#include <systemalarms.h>
 #include <taskinfo.h>
 
 /****************************
@@ -151,9 +152,15 @@ int32_t configuration_check()
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
-                // Revo supports PathPlanner
-                severity = SYSTEMALARMS_ALARM_ERROR;
+            } else {
+                // Revo supports PathPlanner and that must be OK or we are not sane
+                // PathPlan alarm is uninitialized if not running
+                // PathPlan alarm is warning or error if the flightplan is invalid
+                SystemAlarmsAlarmData alarms;
+                SystemAlarmsAlarmGet(&alarms);
+                if (alarms.PathPlan != SYSTEMALARMS_ALARM_OK) {
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                }
             }
             break;
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:

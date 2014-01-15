@@ -1,10 +1,13 @@
 TEMPLATE = lib
 TARGET = UAVObjects
+
 DEFINES += UAVOBJECTS_LIBRARY
+
 include(../../openpilotgcsplugin.pri)
 include(uavobjects_dependencies.pri)
 
-HEADERS += uavobjects_global.h \
+HEADERS += \
+    uavobjects_global.h \
     uavobject.h \
     uavmetaobject.h \
     uavobjectmanager.h \
@@ -14,7 +17,8 @@ HEADERS += uavobjects_global.h \
     uavobjectsplugin.h \
     uavobjecthelper.h
 
-SOURCES += uavobject.cpp \
+SOURCES += \
+    uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
     uavdataobject.cpp \
@@ -25,7 +29,8 @@ SOURCES += uavobject.cpp \
 OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
-HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
+HEADERS += \
+    $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/barosensor.h \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.h \
     $$UAVOBJECT_SYNTHETICS/airspeedsettings.h \
@@ -76,6 +81,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/gpssettings.h \
     $$UAVOBJECT_SYNTHETICS/pathaction.h \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
+    $$UAVOBJECT_SYNTHETICS/pathplan.h \
     $$UAVOBJECT_SYNTHETICS/pathstatus.h \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.h \
     $$UAVOBJECT_SYNTHETICS/positionstate.h \
@@ -115,12 +121,14 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/oplinksettings.h \
     $$UAVOBJECT_SYNTHETICS/oplinkstatus.h \
     $$UAVOBJECT_SYNTHETICS/oplinkreceiver.h \
+    $$UAVOBJECT_SYNTHETICS/radiocombridgestats.h \
     $$UAVOBJECT_SYNTHETICS/osdsettings.h \
     $$UAVOBJECT_SYNTHETICS/waypoint.h \
     $$UAVOBJECT_SYNTHETICS/waypointactive.h \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h
 
-SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
+SOURCES += \
+    $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/barosensor.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedsettings.cpp \
@@ -171,6 +179,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/gpssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/pathaction.cpp \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathplan.cpp \
     $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.cpp \
     $$UAVOBJECT_SYNTHETICS/positionstate.cpp \
@@ -211,6 +220,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/oplinksettings.cpp \
     $$UAVOBJECT_SYNTHETICS/oplinkstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/oplinkreceiver.cpp \
+    $$UAVOBJECT_SYNTHETICS/radiocombridgestats.cpp \
     $$UAVOBJECT_SYNTHETICS/osdsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/waypoint.cpp \
     $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \

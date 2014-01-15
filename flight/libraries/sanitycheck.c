@@ -114,6 +114,8 @@ int32_t configuration_check()
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
+            // TODO: put check equivalent to TASK_MONITOR_IsRunning
+            // here as soon as available for delayed callbacks
             break;
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
             if (coptercontrol) {

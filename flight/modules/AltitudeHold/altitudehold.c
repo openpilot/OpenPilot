@@ -146,13 +146,13 @@ static void altitudeHoldTask(void)
     float velocityStateDown;
     VelocityStateDownGet(&velocityStateDown);
 
-    switch (altitudeHoldDesired.ThrottleMode) {
-    case ALTITUDEHOLDDESIRED_THROTTLEMODE_ALTITUDE:
+    switch (altitudeHoldDesired.ControlMode) {
+    case ALTITUDEHOLDDESIRED_CONTROLMODE_ALTITUDE:
         // altitude control loop
-        altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, 1.0f, altitudeHoldDesired.ThrottleCommand, positionStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
+        altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, 1.0f, altitudeHoldDesired.SetPoint, positionStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
         break;
-    case ALTITUDEHOLDDESIRED_THROTTLEMODE_VELOCITY:
-        altitudeHoldStatus.VelocityDesired = altitudeHoldDesired.ThrottleCommand;
+    case ALTITUDEHOLDDESIRED_CONTROLMODE_VELOCITY:
+        altitudeHoldStatus.VelocityDesired = altitudeHoldDesired.SetPoint;
         break;
     default:
         altitudeHoldStatus.VelocityDesired = 0;
@@ -162,9 +162,9 @@ static void altitudeHoldTask(void)
     AltitudeHoldStatusSet(&altitudeHoldStatus);
 
     float throttle;
-    switch (altitudeHoldDesired.ThrottleMode) {
-    case ALTITUDEHOLDDESIRED_THROTTLEMODE_THROTTLE:
-        throttle = altitudeHoldDesired.ThrottleCommand;
+    switch (altitudeHoldDesired.ControlMode) {
+    case ALTITUDEHOLDDESIRED_CONTROLMODE_THROTTLE:
+        throttle = altitudeHoldDesired.SetPoint;
         break;
     default:
         // velocity control loop

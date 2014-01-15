@@ -882,22 +882,22 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     AltitudeHoldSettingsCutThrottleWhenZeroGet(&cutOff);
     if (cutOff && cmd->Throttle < 0) {
         // Cut throttle if desired
-        altitudeHoldDesiredData.ThrottleCommand = cmd->Throttle;
-        altitudeHoldDesiredData.ThrottleMode    = ALTITUDEHOLDDESIRED_THROTTLEMODE_THROTTLE;
+        altitudeHoldDesiredData.SetPoint    = cmd->Throttle;
+        altitudeHoldDesiredData.ControlMode = ALTITUDEHOLDDESIRED_CONTROLMODE_THROTTLE;
         newaltitude = true;
     } else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO && cmd->Throttle > DEADBAND_HIGH) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
         // then apply an "exp" f(x,k) = (k*x*x*x + (255-k)*x) / 255
-        altitudeHoldDesiredData.ThrottleCommand = -((throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - throttleExp) * (cmd->Throttle - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * throttleRate);
-        altitudeHoldDesiredData.ThrottleMode    = ALTITUDEHOLDDESIRED_THROTTLEMODE_VELOCITY;
+        altitudeHoldDesiredData.SetPoint    = -((throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - throttleExp) * (cmd->Throttle - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * throttleRate);
+        altitudeHoldDesiredData.ControlMode = ALTITUDEHOLDDESIRED_CONTROLMODE_VELOCITY;
         newaltitude = true;
     } else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO && cmd->Throttle < DEADBAND_LOW) {
-        altitudeHoldDesiredData.ThrottleCommand = -(-(throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (255 - throttleExp) * (DEADBAND_LOW - cmd->Throttle) / DEADBAND_LOW) / 255 * throttleRate);
-        altitudeHoldDesiredData.ThrottleMode    = ALTITUDEHOLDDESIRED_THROTTLEMODE_VELOCITY;
+        altitudeHoldDesiredData.SetPoint    = -(-(throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (255 - throttleExp) * (DEADBAND_LOW - cmd->Throttle) / DEADBAND_LOW) / 255 * throttleRate);
+        altitudeHoldDesiredData.ControlMode = ALTITUDEHOLDDESIRED_CONTROLMODE_VELOCITY;
         newaltitude = true;
     } else if (newaltitude == true) {
-        altitudeHoldDesiredData.ThrottleCommand = posState.Down;
-        altitudeHoldDesiredData.ThrottleMode    = ALTITUDEHOLDDESIRED_THROTTLEMODE_ALTITUDE;
+        altitudeHoldDesiredData.SetPoint    = posState.Down;
+        altitudeHoldDesiredData.ControlMode = ALTITUDEHOLDDESIRED_CONTROLMODE_ALTITUDE;
         newaltitude = false;
     }
 

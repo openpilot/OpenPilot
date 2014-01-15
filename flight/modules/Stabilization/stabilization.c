@@ -102,7 +102,7 @@ bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay = 0.991f;
 struct pid pids[PID_MAX];
 
-int flight_mode  = -1;
+int cur_flight_mode  = -1;
 
 static uint8_t rattitude_anti_windup;
 static float   cruise_control_min_throttle;
@@ -235,9 +235,11 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 #ifdef DIAG_RATEDESIRED
         RateDesiredGet(&rateDesired);
 #endif
+        uint8_t flight_mode_switch_position;
+        ManualControlCommandFlightModeSwitchPositionGet(&flight_mode_switch_position);
 
-        if (flight_mode != flightStatus.FlightMode) {
-            flight_mode = flightStatus.FlightMode;
+        if (cur_flight_mode != flight_mode_switch_position) {
+            cur_flight_mode = flight_mode_switch_position;
             SettingsBankUpdatedCb(NULL);
         }
 
@@ -604,8 +606,6 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         // to maintain same altitdue with changing bank angle
         // but without manually adjusting throttle
         // do it here and all the various flight modes (e.g. Altitude Hold) can use it
-        uint8_t flight_mode_switch_position;
-        ManualControlCommandFlightModeSwitchPositionGet(&flight_mode_switch_position);
         if (flight_mode_switch_position < NUM_FMS_POSITIONS
             && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t) 0
             && cruise_control_max_power_factor > 0.0001f) {
@@ -759,11 +759,11 @@ static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     StabilizationBankGet(&oldBank);
 
-    if (flight_mode < 0) {
+    if (cur_flight_mode < 0 || cur_flight_mode >= NUM_FMS_POSITIONS) {
         return;
     }
 
-    switch (cast_struct_to_array(settings.FlightModeMap, settings.FlightModeMap.Stabilized1)[flight_mode]) {
+    switch (settings.FlightModeMap[cur_flight_mode]) {
     case 0:
         StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *)&bank);
         break;
@@ -928,7 +928,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     vbar_decay  = expf(-fakeDt / settings.VbarTau);
 
     // force flight mode update
-    flight_mode = -1;
+    cur_flight_mode = -1;
 
     // Rattitude flight mode anti-windup factor
     rattitude_anti_windup = settings.RattitudeAntiWindup;

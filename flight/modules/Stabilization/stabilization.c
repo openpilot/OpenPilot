@@ -44,6 +44,7 @@
 #include "airspeedstate.h"
 #include "gyrostate.h"
 #include "flightstatus.h"
+#include "manualcontrolsettings.h"
 #include "manualcontrol.h" // Just to get a macro
 #include "taskinfo.h"
 
@@ -70,6 +71,9 @@
 
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 4)
 #define FAILSAFE_TIMEOUT_MS 30
+
+// number of flight mode switch positions
+#define NUM_FMS_POSITIONS 6
 
 // The PID_RATE_ROLL set is used by Rate mode and the rate portion of Attitude mode
 // The PID_RATE set is used by the attitude portion of Attitude mode
@@ -99,6 +103,7 @@ static float   cruise_control_max_power_factor;
 static float   cruise_control_power_trim;
 static int8_t  cruise_control_inverted_power_switch;
 static float   cruise_control_neutral_thrust;
+static uint8_t cruise_control_flight_mode_switch_pos_enable[NUM_FMS_POSITIONS];
 
 // Private functions
 static void stabilizationTask(void *parameters);
@@ -567,8 +572,11 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         // to maintain same altitdue with changing bank angle
         // but without manually adjusting throttle
         // do it here and all the various flight modes (e.g. Altitude Hold) can use it
-
-        if (cruise_control_max_power_factor > 0.0001f) {
+        uint8_t flight_mode_switch_position;
+        ManualControlCommandFlightModeSwitchPositionGet(&flight_mode_switch_position);
+        if (flight_mode_switch_position < NUM_FMS_POSITIONS
+            && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t) 0
+            && cruise_control_max_power_factor > 0.0001f) {
             static uint8_t toggle;
             static float factor;
             float angle;
@@ -827,6 +835,11 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     cruise_control_power_trim            = settings.CruiseControlPowerTrim / 100.0f;
     cruise_control_inverted_power_switch = settings.CruiseControlInvertedPowerSwitch;
     cruise_control_neutral_thrust        = (float) settings.CruiseControlNeutralThrust / 100.0f;
+
+    memcpy(
+        cruise_control_flight_mode_switch_pos_enable,
+        settings.CruiseControlFlightModeSwitchPosEnable,
+        sizeof(cruise_control_flight_mode_switch_pos_enable));
 }
 
 

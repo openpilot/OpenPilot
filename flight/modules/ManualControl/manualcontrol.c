@@ -96,7 +96,7 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
 static void updateLandDesired(ManualControlCommandData *cmd, bool changed);
 static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed);
 static void updatePathDesired(ManualControlCommandData *cmd, bool changed, bool home);
-static void processFlightMode(ManualControlSettingsData *settings, float flightMode);
+static void processFlightMode(ManualControlSettingsData *settings, float flightMode, ManualControlCommandData *cmd);
 static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, int8_t armSwitch);
 static void setArmedIfChanged(uint8_t val);
 static void configurationUpdatedCb(UAVObjEvent *ev);
@@ -358,6 +358,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
                 }
+                cmd.FlightModeSwitchPosition = (uint8_t) 255;
             } else if (valid_input_detected) {
                 AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 
@@ -446,7 +447,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                     }
                 }
 
-                processFlightMode(&settings, flightMode);
+                processFlightMode(&settings, flightMode, &cmd);
             }
 
             // Process arming outside conditional so system will disarm when disconnected
@@ -1204,7 +1205,7 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
  * @param[in] settings The settings which indicate which position is which mode
  * @param[in] flightMode the value of the switch position
  */
-static void processFlightMode(ManualControlSettingsData *settings, float flightMode)
+static void processFlightMode(ManualControlSettingsData *settings, float flightMode, ManualControlCommandData *cmd)
 {
     FlightStatusData flightStatus;
 
@@ -1215,6 +1216,8 @@ static void processFlightMode(ManualControlSettingsData *settings, float flightM
     if (pos >= settings->FlightModeNumber) {
         pos = settings->FlightModeNumber - 1;
     }
+
+    cmd->FlightModeSwitchPosition = pos;
 
     uint8_t newMode = settings->FlightModePosition[pos];
 

@@ -42,6 +42,7 @@
 	<field name="CruiseControlPowerTrim"           units="%"   type="float" elements="1" defaultvalue="100.0"/>
 	<field name="CruiseControlInvertedPowerSwitch" units=""    type="int8"  elements="1" defaultvalue="0"/>
 	<field name="CruiseControlNeutralThrust"       units="%"   type="uint8" elements="1" defaultvalue="0"/>
+	<field name="CruiseControlFlightModeSwitchPosEnable" units="" type="uint8" elements="6" defaultvalue="0"/>
 
 	<field name="LowThrottleZeroIntegral" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
 

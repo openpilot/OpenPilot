@@ -79,7 +79,7 @@ private:
     static const int LIST_VIEW_WIDTH = 80;
 
 protected:
-    void resizeEvent(QResizeEvent * event);
+    void resizeEvent(QResizeEvent *event);
 };
 
 #endif // MYTABBEDSTACKWIDGET_H

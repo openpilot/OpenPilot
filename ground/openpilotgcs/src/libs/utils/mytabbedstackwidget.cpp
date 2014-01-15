@@ -137,6 +137,7 @@ void MyTabbedStackWidget::showWidget(int index)
 void MyTabbedStackWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
+
     m_listWidget->setFixedWidth(m_listWidget->verticalScrollBar()->isVisible() ? LIST_VIEW_WIDTH + 20 : LIST_VIEW_WIDTH);
 }
 

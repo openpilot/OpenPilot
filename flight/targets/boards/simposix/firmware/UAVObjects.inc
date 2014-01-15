@@ -28,7 +28,6 @@ UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired
 UAVOBJSRCFILENAMES += actuatorsettings
-UAVOBJSRCFILENAMES += altholdsmoothed
 UAVOBJSRCFILENAMES += attitudesettings
 UAVOBJSRCFILENAMES += attitudestate
 UAVOBJSRCFILENAMES += attitudesimulated
@@ -107,6 +106,7 @@ UAVOBJSRCFILENAMES += altitudeholdsettings
 UAVOBJSRCFILENAMES += altitudefiltersettings
 UAVOBJSRCFILENAMES += revosettings
 UAVOBJSRCFILENAMES += altitudeholddesired
+UAVOBJSRCFILENAMES += altitudeholdstatus
 UAVOBJSRCFILENAMES += ekfconfiguration
 UAVOBJSRCFILENAMES += ekfstatevariance
 

@@ -167,14 +167,9 @@ typedef struct {
 uint8_t getCharData(uint16_t charPos);
 
 void clearGraphics();
-uint8_t validPos(uint16_t x, uint16_t y);
-void setPixel(uint16_t x, uint16_t y, uint8_t state);
-void drawCircle(uint16_t x0, uint16_t y0, uint16_t radius);
-void swap(uint16_t *a, uint16_t *b);
-void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+
 void drawArrow(uint16_t x, uint16_t y, uint16_t angle, uint16_t size);
-void drawAttitude(uint16_t x, uint16_t y, int16_t pitch, int16_t roll, uint16_t size);
+void drawBox(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 
 void write_pixel(uint8_t *buff, int x, int y, int mode);
 void write_pixel_lm(int x, int y, int mmode, int lmode);
@@ -209,6 +204,5 @@ void write_char16(char ch, int x, int y, int font);
 void write_char(char ch, int x, int y, int flags, int font);
 
 void write_string(char *str, int x, int y, int xs, int ys, int va, int ha, int flags, int font);
-void write_string_formatted(char *str, int x, int y, int xs, int ys, int va, int ha, int flags);
 
 #endif /* OSDGEN_H_ */

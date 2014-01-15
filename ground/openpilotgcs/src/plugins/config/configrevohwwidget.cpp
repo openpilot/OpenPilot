@@ -49,21 +49,21 @@ ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     addApplySaveButtons(m_ui->saveTelemetryToRAM, m_ui->saveTelemetryToSD);
 
-    addUAVObjectToWidgetRelation("HwSettings", "RM_FlexiPort", m_ui->cbFlexi);
-    addUAVObjectToWidgetRelation("HwSettings", "RM_MainPort", m_ui->cbMain);
-    addUAVObjectToWidgetRelation("HwSettings", "RM_RcvrPort", m_ui->cbRcvr);
+    addWidgetBinding("HwSettings", "RM_FlexiPort", m_ui->cbFlexi);
+    addWidgetBinding("HwSettings", "RM_MainPort", m_ui->cbMain);
+    addWidgetBinding("HwSettings", "RM_RcvrPort", m_ui->cbRcvr);
 
-    addUAVObjectToWidgetRelation("HwSettings", "USB_HIDPort", m_ui->cbUSBHIDFunction);
-    addUAVObjectToWidgetRelation("HwSettings", "USB_VCPPort", m_ui->cbUSBVCPFunction);
-    addUAVObjectToWidgetRelation("HwSettings", "ComUsbBridgeSpeed", m_ui->cbUSBVCPSpeed);
+    addWidgetBinding("HwSettings", "USB_HIDPort", m_ui->cbUSBHIDFunction);
+    addWidgetBinding("HwSettings", "USB_VCPPort", m_ui->cbUSBVCPFunction);
+    addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_ui->cbUSBVCPSpeed);
 
-    addUAVObjectToWidgetRelation("HwSettings", "TelemetrySpeed", m_ui->cbFlexiTelemSpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "GPSSpeed", m_ui->cbFlexiGPSSpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "ComUsbBridgeSpeed", m_ui->cbFlexiComSpeed);
+    addWidgetBinding("HwSettings", "TelemetrySpeed", m_ui->cbFlexiTelemSpeed);
+    addWidgetBinding("HwSettings", "GPSSpeed", m_ui->cbFlexiGPSSpeed);
+    addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_ui->cbFlexiComSpeed);
 
-    addUAVObjectToWidgetRelation("HwSettings", "TelemetrySpeed", m_ui->cbMainTelemSpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "GPSSpeed", m_ui->cbMainGPSSpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "ComUsbBridgeSpeed", m_ui->cbMainComSpeed);
+    addWidgetBinding("HwSettings", "TelemetrySpeed", m_ui->cbMainTelemSpeed);
+    addWidgetBinding("HwSettings", "GPSSpeed", m_ui->cbMainGPSSpeed);
+    addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_ui->cbMainComSpeed);
 
     connect(m_ui->cchwHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 

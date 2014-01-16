@@ -488,7 +488,7 @@ Hint: run this with engines at cruising speed.</string>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="ProgressThermalBias">
+                 <widget class="QProgressBar" name="thermalBiasProgress">
                   <property name="value">
                    <number>0</number>
                   </property>

@@ -26,19 +26,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef THERMALCALIBRATIONTRANSITIONS_H
-#define THERMALCALIBRATIONTRANSITIONS_H
+#ifndef DATAACQUISITIONTRANSITION_H
+#define DATAACQUISITIONTRANSITION_H
 
 #include <QSignalTransition>
 #include <QEventTransition>
 
 #include "thermalcalibrationhelper.h"
 
-class BoardSetupTransition : public QSignalTransition {
+class DataAcquisitionTransition : public QSignalTransition {
     Q_OBJECT
 public:
-    BoardSetupTransition(ThermalCalibrationHelper *helper, QState *currentState, QState *targetState)
-        : QSignalTransition(helper, SIGNAL(setupBoardCompleted(bool))),
+    DataAcquisitionTransition(ThermalCalibrationHelper *helper, QState *currentState, QState *targetState)
+        : QSignalTransition(helper, SIGNAL(collectionCompleted())),
         m_helper(helper)
     {
         QObject::connect(currentState, SIGNAL(entered()), this, SLOT(enterState()));
@@ -46,38 +46,19 @@ public:
         setTargetState(targetState);
     }
 
-    virtual bool eventTest(QEvent *e)
-    {
-        qDebug() << "BoardSetupTransition::eventTest";
-        if (!QSignalTransition::eventTest(e)) {
-            return false;
-        }
-        QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent *>(e);
-
-        // check wether status stave was successful and retry if not
-        qDebug() << "BoardSetupTransition::eventTest - " << se->arguments().at(0).toBool();
-        if (se->arguments().at(0).toBool()) {
-            return true;
-        } else {
-            m_helper->setupBoard();
-        }
-        return false;
-    }
-
     virtual void onTransition(QEvent *e)
     {
-        QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent *>(e);
-
-        qDebug() << "BoardSetupTransition::onTransition" << se->arguments().at(0).toBool();
+        qDebug() << "DataAcquisitionTransition::collectionCompleted";
     }
+
 public slots:
     void enterState()
     {
-        m_helper->setupBoard();
+        qDebug() << "DataAcquisitionTransition::enterStatus";
+        m_helper->initAcquisition();
     }
 private:
     ThermalCalibrationHelper *m_helper;
 };
 
-
-#endif // THERMALCALIBRATIONTRANSITIONS_H
+#endif // DATAACQUISITIONTRANSITION_H

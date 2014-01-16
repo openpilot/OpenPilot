@@ -27,8 +27,10 @@
  */
 
 #include "thermalcalibrationmodel.h"
-#include "thermalcalibrationtransitions.h"
-#include "settinghandlingtransitions.h"
+#include "settingshandlingtransitions.h"
+#include "boardsetuptransition.h"
+#include "dataacquisitiontransition.h"
+
 #define NEXT_EVENT     "next"
 #define PREVIOUS_EVENT "previous"
 #define ABORT_EVENT    "abort"
@@ -53,6 +55,10 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
 
     setTransitions();
 
+    connect(m_helper, SIGNAL(gradientChanged(float)), this, SLOT(setTemperatureGradient(float)));
+    connect(m_helper, SIGNAL(temperatureChanged(float)), this, SLOT(setTemperature(float)));
+    connect(m_helper, SIGNAL(processPercentageChanged(int)), this, SLOT(setProgress(int)));
+
     this->setInitialState(m_readyState);
     m_steps << m_readyState
             << m_setupState
@@ -64,8 +70,8 @@ void ThermalCalibrationModel::init()
     setEndEnabled(false);
     setCancelEnabled(false);
     start();
-    setTemperature(QStringLiteral("0.01"));
-    setTemperatureGradient(QStringLiteral("0.02"));
+    setTemperature(0);
+    setTemperatureGradient(0);
     emit instructionsChanged(instructions());
 }
 
@@ -85,7 +91,7 @@ void ThermalCalibrationModel::setTransitions()
     // m_acquisitionState->addTransition(this,SIGNAL(next()),m_calculateState);
     // revert settings after acquisition is completed
     // m_acquisitionState->addTransition(new BoardStatusRestoreTransition(m_helper, m_acquisitionState, m_calculateState));
-    m_acquisitionState->addTransition(this, SIGNAL(next()), m_calculateState);
+    m_acquisitionState->addTransition(new DataAcquisitionTransition(m_helper, m_acquisitionState, m_calculateState));
 
     m_calculateState->addTransition(new BoardStatusRestoreTransition(m_helper, m_calculateState, m_finalizeState));
 

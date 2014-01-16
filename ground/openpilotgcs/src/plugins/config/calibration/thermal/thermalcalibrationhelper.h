@@ -30,7 +30,7 @@
 
 #include <QObject>
 #include <QtCore>
-
+#include <QTime>
 #include "uavobjectmanager.h"
 #include <uavobject.h>
 #include <uavobjectmanager.h>
@@ -41,6 +41,7 @@
 #include <accelsensor.h>
 #include <gyrosensor.h>
 #include <barosensor.h>
+#include <magsensor.h>
 #include "accelgyrosettings.h"
 
 
@@ -48,7 +49,6 @@
 #include <accelgyrosettings.h>
 #include <revocalibration.h>
 #include <revosettings.h>
-
 
 typedef struct {
     // this is not needed for revo, but should for CC/CC3D
@@ -64,38 +64,108 @@ class ThermalCalibrationHelper : public QObject {
     Q_OBJECT
 public:
     explicit ThermalCalibrationHelper(QObject *parent = 0);
+    float temperature()
+    {
+        return m_temperature;
+    }
+
+    float gradient()
+    {
+        return m_gradient;
+    }
+
+    int processPercentage()
+    {
+        return m_processPercentage;
+    }
+
+signals:
+    void statusRestoreCompleted(bool succesful);
+    void statusSaveCompleted(bool succesful);
+    void setupBoardCompleted(bool succesful);
+    void temperatureChanged(float value);
+    void gradientChanged(float value);
+    void processPercentageChanged(int percentage);
+    void collectionCompleted();
+    void calculationCompleted();
+
+
+public slots:
+    /**
+     * @brief statusSave save the initial board status/configuration to be restored later
+     */
+    void statusSave();
+
+    /**
+     * @brief statusRestore restore previous saved status.
+     */
+    void statusRestore();
+
+    /**
+     * @brief setupBoard prepare board settings for acquisition state
+     */
+    void setupBoard();
+
+    /**
+     * @brief initAcquisition Initialize the helper class for data acquisition/collection
+     */
+    void initAcquisition();
+
+    void calculate();
+
+    void collectSample(UAVObject *sample);
+    void endAcquisition();
+    void setProcessPercentage(int value)
+    {
+        if (m_processPercentage != value) {
+            m_processPercentage = value;
+            emit processPercentageChanged(value);
+        }
+    }
+
+private:
+    void updateTemp(float temp);
+    void connectUAVOs();
+    void disconnectUAVOs();
+
+    QMutex sensorsUpdateLock;
+
+    QList<AccelSensor::DataFields> m_accelSamples;
+    QList<GyroSensor::DataFields> m_gyroSamples;
+    QList<BaroSensor::DataFields> m_baroSamples;
+    QList<MagSensor::DataFields> m_magSamples;
+
+    QTime m_startTime;
+    // temperature checkpoints, used to calculate temp gradient
+    const int TimeBetweenCheckpoints = 10;
+    QTime m_lastCheckpointTime;
+    float m_lastCheckpointTemp;
+    float m_gradient;
+    float m_temperature;
+    float m_initialGradient;
+    const int ProcessPercentageSaveSettings    = 5;
+    const int ProcessPercentageSetupBoard      = 10;
+    const int ProcessPercentageBaseAcquisition = 15;
+    const int ProcessPercentageBaseCalculation = 85;
+    const float TargetGradient = 0.5f;
+    int m_targetduration;
+    int m_processPercentage;
 
     /* board settings save/restore */
+    bool setupBoardForCalibration();
     bool saveBoardInitialSettings();
     bool restoreInitialSettings();
     bool isBoardInitialSettingsSaved()
     {
         return m_boardInitialSettings.statusSaved;
     }
-private:
-    void setMetadataForCalibration(UAVDataObject *uavo);
     void clearBoardInitialSettingsSaved()
     {
         m_boardInitialSettings.statusSaved = false;
     }
-signals:
-    void statusRestoreCompleted(bool succesful);
-    void statusSaveCompleted(bool succesful);
-public slots:
-    void statusSave();
-    void statusRestore();
-
-    /* board configuration setup for calibration */
-public:
-    bool setupBoardForCalibration();
-signals:
-    void setupBoardCompleted(bool succesful);
-
-public slots:
-    void setupBoard();
-
-private:
     thermalCalibrationBoardSettings m_boardInitialSettings;
+
+    void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();
 };
 

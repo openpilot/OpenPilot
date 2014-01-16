@@ -46,11 +46,12 @@ HEADERS += configplugin.h \
     calibration/calibrationutils.h \
     calibration/wizardstate.h \
     calibration/wizardmodel.h \
-    calibration/thermal/thermalcalibrationtransitions.h \
     calibration/thermal/thermalcalibration.h \
     calibration/thermal/thermalcalibrationhelper.h \
     calibration/thermal/thermalcalibrationmodel.h \
-    calibration/thermal/settinghandlingtransitions.h
+    calibration/thermal/boardsetuptransition.h \
+    calibration/thermal/dataacquisitiontransition.h \
+    calibration/thermal/settingshandlingtransitions.h \
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \

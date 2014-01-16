@@ -30,7 +30,7 @@
 #define THERMALCALIBRATIONMODEL_H
 
 #include "thermalcalibrationhelper.h"
-#include "thermalcalibrationtransitions.h"
+
 
 #include <QObject>
 #include <QState>
@@ -45,7 +45,7 @@ class ThermalCalibrationModel : public WizardModel {
 
     Q_PROPERTY(QString temperature READ temperature NOTIFY temperatureChanged)
     Q_PROPERTY(QString temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
-
+    Q_PROPERTY(int progress READ progress NOTIFY progressChanged)
     Q_OBJECT
 public:
     explicit ThermalCalibrationModel(QObject *parent = 0);
@@ -87,6 +87,12 @@ public:
     }
 
 
+public slots:
+    int progress()
+    {
+        return m_progress;
+    }
+
     QString temperature()
     {
         return m_temperature;
@@ -97,26 +103,38 @@ public:
         return m_temperatureGradient;
     }
 
-    void setTemperature(QString status)
+    void setTemperature(float status)
     {
-        if (m_temperature != status) {
-            m_temperature = status;
-            emit temperatureChanged(status);
-        }
-    }
-    void setTemperatureGradient(QString status)
-    {
-        if (m_temperatureGradient != status) {
-            m_temperatureGradient = status;
-            emit temperatureGradientChanged(status);
-        }
-    }
+        QString tmp = QString("%1").arg(status, 5, 'f', 2);
 
+        if (m_temperature != tmp) {
+            m_temperature = tmp;
+            emit temperatureChanged(tmp);
+        }
+    }
+    void setTemperatureGradient(float status)
+    {
+        QString tmp = QString("%1 %2").arg(status, 5, 'f', 2);
+
+        if (m_temperatureGradient != tmp) {
+            m_temperatureGradient = tmp;
+            emit temperatureGradientChanged(tmp);
+        }
+    }
+    void setProgress(int status)
+    {
+        m_progress = status;
+        emit progressChanged(status);
+        if (this->currentState()) {
+            setInstructions(this->currentState()->stepName());
+        }
+    }
 
 private:
     bool m_startEnabled;
     bool m_cancelEnabled;
     bool m_endEnabled;
+    int m_progress;
     QString m_temperature;
     QString m_temperatureGradient;
 
@@ -150,6 +168,7 @@ signals:
 
     void temperatureChanged(QString status);
     void temperatureGradientChanged(QString status);
+    void progressChanged(int value);
 
     void next();
     void previous();
@@ -164,7 +183,8 @@ public slots:
 
     void btnEnd()
     {
-        emit previous();
+        // emit previous();
+        m_helper->endAcquisition();
     }
 
     void btnAbort()

@@ -393,6 +393,19 @@ void PIOS_Board_Init(void)
         }
     }
 #endif /* PIOS_INCLUDE_I2C */
+/*                      break;
+                case HWSETTINGS_RV_FLEXIPORT_TSLRSDEBUG:*/
+#if defined(PIOS_INCLUDE_TSLRSDEBUG)
+    uint32_t pios_usart_tslrsdebug_id;
+    if (PIOS_USART_Init(&pios_usart_tslrsdebug_id, &pios_usart_tslrsdebug_flexi_cfg)) {
+        PIOS_Assert(0);
+    }
+
+    uint32_t pios_tslrsdebug_id;
+    if (PIOS_TSLRSdebug_Init(&pios_tslrsdebug_id, &pios_tslrsdebug_flexi_cfg, &pios_usart_com_driver, pios_usart_tslrsdebug_id)) {
+        PIOS_Assert(0);
+    }
+#endif /* PIOS_INCLUDE_TSLRSDEBUG */
 /*			break;
 
                 case HWSETTINGS_RV_FLEXIPORT_DSM2:

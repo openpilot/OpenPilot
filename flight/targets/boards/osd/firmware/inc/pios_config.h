@@ -141,6 +141,9 @@
 /* Stabilization options */
 // #define PIOS_QUATERNION_STABILIZATION
 
+/* special OSD options */
+// #define PIOS_INCLUDE_TSLRSDEBUG
+
 /* Performance counters */
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 8379692
 

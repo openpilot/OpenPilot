@@ -1017,10 +1017,10 @@ static const struct pios_dac_cfg pios_dac_cfg = {
 };
 #endif /* if defined(PIOS_INCLUDE_WAVE) */
 
-#if defined(PIOS_INCLUDE_SCHERRER_RX)
-#include "pios_scherrer_rx_priv.h"
+#if defined(PIOS_INCLUDE_TSLRSDEBUG)
+#include "pios_tslrsdebug_priv.h"
 
-static const struct pios_usart_cfg pios_usart_scherrer_rx_flexi_cfg = {
+static const struct pios_usart_cfg pios_usart_tslrsdebug_flexi_cfg = {
     .regs  = USART3,
     .remap = GPIO_AF_USART3,
     .init  = {
@@ -1061,7 +1061,7 @@ static const struct pios_usart_cfg pios_usart_scherrer_rx_flexi_cfg = {
     },
 };
 
-static const struct pios_scherrer_rx_cfg pios_scherrer_rx_flexi_cfg = {
+static const struct pios_tslrsdebug_cfg pios_tslrsdebug_flexi_cfg = {
     .bind               = {
         .gpio = GPIOB,
         .init = {
@@ -1074,4 +1074,4 @@ static const struct pios_scherrer_rx_cfg pios_scherrer_rx_flexi_cfg = {
     },
 };
 
-#endif /* #if defined(PIOS_INCLUDE_SCHERRER_RX) */
+#endif /* #if defined(PIOS_INCLUDE_TSLRSDEBUG) */

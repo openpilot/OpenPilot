@@ -61,6 +61,9 @@ ifndef TESTAPP
     SRC += $(OPSYSTEM)/fonts.c
     SRC += $(OPSYSTEM)/font_outlined8x14.c
     SRC += $(OPSYSTEM)/font_outlined8x8.c
+    
+	## OSD specials 
+	SRC += $(PIOSCOMMON)/pios_tslrsdebug.c
 
     #ifeq ($(DEBUG), YES)
     SRC += $(OPSYSTEM)/dcc_stdio.c

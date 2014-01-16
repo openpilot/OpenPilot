@@ -162,6 +162,9 @@ int32_t StabilizationStart()
  */
 int32_t StabilizationInitialize()
 {
+    // stop the compile if the number of switch positions changes, but has not been changed here
+    PIOS_STATIC_ASSERT(NUM_FMS_POSITIONS == sizeof(((ManualControlSettingsData *)0)->FlightModePosition) / sizeof((((ManualControlSettingsData *)0)->FlightModePosition)[0]) );
+
     // Initialize variables
     StabilizationSettingsInitialize();
     StabilizationBankInitialize();

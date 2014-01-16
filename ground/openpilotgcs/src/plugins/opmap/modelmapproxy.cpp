@@ -345,7 +345,10 @@ void modelMapProxy::createWayPoint(internals::PointLatLng coord)
     index = model->index(model->rowCount() - 1, flightDataModel::ERRORDESTINATION, QModelIndex());
     model->setData(index, 1, Qt::EditRole);
 }
+
 void modelMapProxy::deleteAll()
 {
-    model->removeRows(0, model->rowCount(), QModelIndex());
+    if (model->rowCount() > 0) {
+        model->removeRows(0, model->rowCount(), QModelIndex());
+    }
 }

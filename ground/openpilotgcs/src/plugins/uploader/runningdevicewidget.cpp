@@ -104,24 +104,22 @@ void RunningDeviceWidget::populate()
     deviceDescriptorStruct devDesc;
     if (UAVObjectUtilManager::descriptionToStructure(description, devDesc)) {
         if (devDesc.gitTag.startsWith("RELEASE", Qt::CaseSensitive)) {
-            myDevice->lblFWTag->setText(QString("Firmware tag: ") + devDesc.gitTag);
-            QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
-            myDevice->lblCertified->setPixmap(pix);
+            myDevice->lblFWTag->setText(tr("Firmware tag: ") + devDesc.gitTag);
+            myDevice->lblCertified->setPixmap(QPixmap(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
         } else {
-            myDevice->lblFWTag->setText(QString("Firmware tag: ") + devDesc.gitTag);
-            QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
-            myDevice->lblCertified->setPixmap(pix);
+            myDevice->lblFWTag->setText(tr("Firmware tag: ") + devDesc.gitTag);
+            myDevice->lblCertified->setPixmap(QPixmap(":uploader/images/warning.svg"));
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
-        myDevice->lblGitCommitTag->setText("Git commit hash: " + devDesc.gitHash);
-        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.gitDate.insert(4, "-").insert(7, "-"));
+        myDevice->lblGitCommitTag->setText(tr("Git commit hash: ") + devDesc.gitHash);
+        myDevice->lblFWDate->setText(tr("Firmware date: ") + devDesc.gitDate.insert(4, "-").insert(7, "-"));
     } else {
-        myDevice->lblFWTag->setText(QString("Firmware tag: ") + QString(description).left(QString(description).indexOf(QChar(255))));
-        myDevice->lblGitCommitTag->setText("Git commit tag: Unknown");
-        myDevice->lblFWDate->setText(QString("Firmware date: Unknown"));
-        QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
-        myDevice->lblCertified->setPixmap(pix);
+        QString desc = utilMngr->getBoardDescriptionString();
+        myDevice->lblFWTag->setText(tr("Firmware tag: ") + (!desc.isEmpty() ? desc : tr("Unknown")));
+        myDevice->lblCertified->setPixmap(QPixmap(":uploader/images/warning.svg"));
         myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
+        myDevice->lblGitCommitTag->setText(tr("Git commit hash: ") + tr("Unknown"));
+        myDevice->lblFWDate->setText(tr("Firmware date: ") + tr("Unknown"));
     }
 }

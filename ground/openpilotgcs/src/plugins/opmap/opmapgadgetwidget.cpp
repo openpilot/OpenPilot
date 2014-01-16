@@ -225,9 +225,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     mapProxy = new modelMapProxy(this, m_map, model, selectionModel);
     table->setModel(model, selectionModel);
     waypoint_edit_dialog = new opmap_edit_waypoint_dialog(this, model, selectionModel);
-    UAVProxy = new modelUavoProxy(this, model);
-    connect(table, SIGNAL(sendPathPlanToUAV()), UAVProxy, SLOT(modelToObjects()));
-    connect(table, SIGNAL(receivePathPlanFromUAV()), UAVProxy, SLOT(objectsToModel()));
+    UAVProxy = new ModelUavoProxy(this, model);
+    // sending and receiving is asynchronous
+    // TODO : buttons should be disabled while a send or receive is in progress
+    connect(table, SIGNAL(sendPathPlanToUAV()), UAVProxy, SLOT(sendPathPlan()));
+    connect(table, SIGNAL(receivePathPlanFromUAV()), UAVProxy, SLOT(receivePathPlan()));
 #endif
     magicWayPoint = m_map->magicWPCreate();
     magicWayPoint->setVisible(false);
@@ -500,7 +502,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
         contextMenu.addAction(wayPointEditorAct);
         contextMenu.addAction(addWayPointActFromContextMenu);
 
-        if (m_mouse_waypoint) { // we have a waypoint under the mouse
+        if (m_mouse_waypoint) {
+            // we have a waypoint under the mouse
             contextMenu.addAction(editWayPointAct);
 
             lockWayPointAct->setChecked(waypoint_locked);
@@ -1868,8 +1871,12 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
 
 void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
+    // open dialog
     table->show();
+    // bring dialog to the front in case it was already open and hidden away
+    table->raise();
 }
+
 void OPMapGadgetWidget::onAddWayPointAct_triggeredFromContextMenu()
 {
     onAddWayPointAct_triggered(m_context_menu_lat_lon);

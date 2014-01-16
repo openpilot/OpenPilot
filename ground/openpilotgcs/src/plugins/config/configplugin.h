@@ -31,7 +31,6 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/actionmanager/actionmanager.h>
-#include "uavtalk/telemetrymanager.h"
 #include "objectpersistence.h"
 
 #include <QMessageBox>

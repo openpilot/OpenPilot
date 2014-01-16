@@ -6,7 +6,7 @@
     <message>
         <location filename="../../../src/app/main.cpp" line="+203"/>
         <source>Failed to load core plug-in, reason is: %1</source>
-        <translation>Echec du chargement du module complémentaire core, la raison est : %1</translation>
+        <translation>Échec du chargement du module complémentaire core, la raison est : %1</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2055,7 +2055,7 @@ Cela améliore les performances, mais c&apos;est à utiliser à vos risques et p
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+64"/>
         <source>Equal to</source>
-        <translation>Egal à</translation>
+        <translation>Égal à</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6182,7 +6182,7 @@ du canal de sortie pour chaque mode de vol.</translation>
     <message>
         <location/>
         <source>Avoid &quot;Manual&quot; for multirotors!</source>
-        <translation>Eviter &quot;Manuel&quot; pour les Multirotors !</translation>
+        <translation>Éviter &quot;Manuel&quot; pour les Multirotors !</translation>
     </message>
     <message>
         <location/>
@@ -6893,7 +6893,7 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>Attitude Estimation Algorithm</source>
-        <translation>Algorithme d&apos;Evaluation de l&apos;Attitude</translation>
+        <translation>Algorithme d&apos;Évaluation de l&apos;Attitude</translation>
     </message>
     <message>
         <location/>
@@ -8357,7 +8357,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Scale:</source>
-        <translation>Echelle :</translation>
+        <translation type="unfinished">Échelle :</translation>
     </message>
 </context>
 <context>
@@ -9478,7 +9478,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>Write loaded firmware image to the board</source>
-        <translation>Ecrire l&apos;image du firmware chargé sur la carte</translation>
+        <translation>Écrire l&apos;image du firmware chargé sur la carte</translation>
     </message>
     <message>
         <location/>
@@ -10349,7 +10349,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+144"/>
         <source>File Parsing Failed.</source>
-        <translation>Echec Analyse Fichier.</translation>
+        <translation>Échec Analyse Fichier.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -10725,7 +10725,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+11"/>
         <source>File Parsing Failed.</source>
-        <translation type="unfinished">Échec Parsing Fichier.</translation>
+        <translation>Échec Analyse Fichier.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -11843,7 +11843,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Link State</source>
-        <translation>Etat Liaison</translation>
+        <translation type="unfinished">État Liaison</translation>
     </message>
     <message>
         <location/>

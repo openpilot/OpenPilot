@@ -120,7 +120,7 @@
 <context>
     <name>Core::Internal::MainWindow</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+438"/>
+        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+442"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
@@ -145,12 +145,12 @@
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location line="-344"/>
+        <location line="-348"/>
         <source>OpenPilot GCS</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+461"/>
+        <location line="+465"/>
         <source>Ctrl+Shift+S</source>
         <translation type="unfinished">Ctrl+Maj+S</translation>
     </message>
@@ -2622,6 +2622,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Math window size</source>
+        <translatorcomment>Should be fixed in code (add &quot;:&quot;)</translatorcomment>
         <translation type="unfinished">Plage calcul :</translation>
     </message>
     <message>
@@ -2910,7 +2911,7 @@ uniquement lorsque les valeurs changent</translation>
 <context>
     <name>OPMapGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+438"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+440"/>
         <source>&amp;Zoom </source>
         <translation>&amp;Zoom</translation>
     </message>
@@ -2926,7 +2927,7 @@ uniquement lorsque les valeurs changent</translation>
     </message>
     <message>
         <location line="+93"/>
-        <location line="+22"/>
+        <location line="+23"/>
         <source>Waypoints</source>
         <translation>Waypoints</translation>
     </message>
@@ -3059,7 +3060,7 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Centrer la carte à l&apos;endroit où vous avez fait un clic droit de souris</translation>
     </message>
     <message>
-        <location line="-926"/>
+        <location line="-927"/>
         <source>HOME</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3070,7 +3071,7 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Appareil</translation>
     </message>
     <message>
-        <location line="+843"/>
+        <location line="+844"/>
         <source>Show/Hide the compass</source>
         <translation>Affiche/Cache la boussole</translation>
     </message>
@@ -3135,7 +3136,7 @@ uniquement lorsque les valeurs changent</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-1039"/>
+        <location line="-1040"/>
         <source>&amp;Max Update Rate </source>
         <translation>Fréquence d&apos;Actualisation &amp;Max</translation>
     </message>
@@ -3190,7 +3191,7 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Distance de parcours UAV</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+57"/>
         <source>&amp;Overlay Opacity </source>
         <translation>&amp;Opacité Recouvrement</translation>
     </message>
@@ -3326,7 +3327,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+13"/>
         <source>Home magic waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Waypoint magique Home</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3384,9 +3385,9 @@ uniquement lorsque les valeurs changent</translation>
         <translation>En [m], référencé par WGS84 :</translation>
     </message>
     <message>
-        <location line="+210"/>
+        <location line="+214"/>
         <source>Are you sure you want to clear waypoints?</source>
-        <translation>Êtes-vous certain de supprimer tous les waypoints ?</translation>
+        <translation>Êtes-vous certain de vouloir supprimer tous les waypoints ?</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3512,7 +3513,7 @@ uniquement lorsque les valeurs changent</translation>
         <location line="+1"/>
         <location line="+1"/>
         <source>ms</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ms</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -3528,9 +3529,8 @@ uniquement lorsque les valeurs changent</translation>
 <context>
     <name>Telemetry</name>
     <message>
-        <location filename="../../../src/plugins/uavtalk/telemetry.cpp" line="+297"/>
         <source>Telemetry: priority event queue is full, event lost (%1)</source>
-        <translation>Télémétrie : la file d&apos;attente d&apos;événements prioritaires est pleine, événement perdu (%1)</translation>
+        <translation type="obsolete">Télémétrie : la file d&apos;attente d&apos;événements prioritaires est pleine, événement perdu (%1)</translation>
     </message>
 </context>
 <context>
@@ -5780,12 +5780,12 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Correction Angle</source>
-        <translation type="unfinished">Correction Angle</translation>
+        <translation type="unfinished">Angle Correction</translation>
     </message>
     <message>
         <location/>
         <source>CCPM Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Options CCPM</translation>
     </message>
     <message>
         <location/>
@@ -6070,9 +6070,8 @@ p, li { white-space: pre-wrap; }
         <translation>Inter. Mode Vol</translation>
     </message>
     <message>
-        <location/>
         <source>Configure each stabilization mode for each axis</source>
-        <translation>Configurer chaque mode de stabilisation, sur chaque axe</translation>
+        <translation type="obsolete">Configurer chaque mode de stabilisation, sur chaque axe</translation>
     </message>
     <message>
         <location/>
@@ -6081,14 +6080,12 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>Stabilized1</source>
-        <translation>Stabilisé 1</translation>
+        <translation type="obsolete">Stabilisé 1</translation>
     </message>
     <message>
-        <location/>
         <source>Stabilized2</source>
-        <translation>Stabilisé 2</translation>
+        <translation type="obsolete">Stabilisé 2</translation>
     </message>
     <message>
         <location/>
@@ -6103,9 +6100,8 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>Stabilized3</source>
-        <translation>Stabilisé 3</translation>
+        <translation type="obsolete">Stabilisé 3</translation>
     </message>
     <message>
         <location/>
@@ -6254,6 +6250,31 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Save</source>
         <translation>Enregistrer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilization Modes Configuration</source>
+        <translation type="unfinished">Configuration des Modes de Stabilisation</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilized 1</source>
+        <translation type="unfinished">Stabilisation 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilized 2</source>
+        <translation type="unfinished">Stabilisation 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilized 3</source>
+        <translation type="unfinished">Stabilisation 3</translation>
+    </message>
+    <message>
+        <location/>
+        <source>PID Bank</source>
+        <translation type="unfinished">Banque PID</translation>
     </message>
 </context>
 <context>
@@ -7670,33 +7691,8 @@ Useful if you have accidentally changed some settings.</source>
         <translation></translation>
     </message>
     <message>
-        <location/>
-        <source>fieldname:Kp</source>
-        <translatorcomment>Pas toucher</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>scale:0.001</source>
-        <translatorcomment>Pas toucher</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>fieldname:Ki</source>
-        <translatorcomment>Pas toucher</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>fieldname:Kd</source>
-        <translatorcomment>Pas toucher</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Altitude</source>
-        <translation>Altitude</translation>
+        <translation type="obsolete">Altitude</translation>
     </message>
     <message>
         <location/>
@@ -7706,12 +7702,6 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>fieldname:ThrottleRate</source>
-        <translatorcomment>Pas toucher</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>scale:0.5</source>
         <translatorcomment>Pas toucher</translatorcomment>
         <translation></translation>
     </message>
@@ -7811,6 +7801,95 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KP) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:StabilizationSettingsBankX</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Misc</source>
+        <translation type="unfinished">Divers</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rattitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:15</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Higher values will keep larger Ki terms and limits from winding up at partial stick.  Consider increasing this if you have high Ki values and limits and a sudden stick motion from one aircraft bank angle to another causes the aircraft to rotate and then slowly change rotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:RattitudeAntiWindup</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Anti-Windup</source>
+        <translatorcomment>Traduction Windup ?</translatorcomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:98</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Velocity Proportional</source>
+        <translation type="unfinished">Proportionnel Vitesse Verticale</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude Proportional</source>
+        <translation type="unfinished">Proportionnel Altitude</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Velocity Integral</source>
+        <translation type="unfinished">Intégrale Vitesse Verticale</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:AltitudePI</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:0.01</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:VelocityPI</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:0.00001</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Control Coefficients</source>
+        <translation type="unfinished">Coefficients de Contrôle</translation>
     </message>
 </context>
 <context>
@@ -8031,6 +8110,12 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
         <location/>
         <source>Save</source>
         <translation>Enregistrer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>PID Bank</source>
+        <translatorcomment>une idée pour bank ?</translatorcomment>
+        <translation type="unfinished">Banque PID</translation>
     </message>
 </context>
 <context>
@@ -8254,7 +8339,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Armed</source>
-        <translation type="unfinished">Armé</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -9818,7 +9903,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+250"/>
+        <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+252"/>
         <source>Unsaved changes</source>
         <translation>Modifications non-sauvegardées</translation>
     </message>
@@ -9831,7 +9916,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+344"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+346"/>
         <location line="+1041"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
@@ -10257,12 +10342,12 @@ Bougez le manche %1.</translation>
 <context>
     <name>flightDataModel</name>
     <message>
-        <location filename="../../../src/plugins/opmap/flightdatamodel.cpp" line="+488"/>
+        <location filename="../../../src/plugins/opmap/flightdatamodel.cpp" line="+437"/>
         <source>Unable to open file</source>
         <translation>Impossible d&apos;ouvrir le fichier</translation>
     </message>
     <message>
-        <location line="+143"/>
+        <location line="+144"/>
         <source>File Parsing Failed.</source>
         <translation>Echec Analyse Fichier.</translation>
     </message>
@@ -10322,7 +10407,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>ScopeGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+231"/>
+        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+230"/>
         <source>Click legend to show/hide scope trace</source>
         <translation>Cliquer sur la légende pour afficher / cacher la tracé du graphique</translation>
     </message>
@@ -10584,7 +10669,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>SystemHealthGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetwidget.cpp" line="+66"/>
+        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetwidget.cpp" line="+68"/>
         <source>Displays flight system errors. Click on an alarm for more information.</source>
         <translation>Affiche les erreurs du système de vol. Cliquer sur une alarme pour plus d&apos;informations.</translation>
     </message>
@@ -10640,7 +10725,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+11"/>
         <source>File Parsing Failed.</source>
-        <translation>Echec Parsing Fichier.</translation>
+        <translation type="unfinished">Échec Parsing Fichier.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -10725,7 +10810,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>UploaderGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+388"/>
+        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+391"/>
         <source>The controller board is armed and can not be halted.
 
 Please make sure the board is not armed and then press halt again to proceed
@@ -10769,7 +10854,8 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <location line="+143"/>
         <location line="+26"/>
         <source>OpenPilot Uploader</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Téléverseur OpenPilot ?</translatorcomment>
+        <translation type="unfinished">Uploader OpenPilot</translation>
     </message>
     <message>
         <location line="-169"/>
@@ -10788,12 +10874,12 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+15"/>
         <source></source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location line="-3"/>
+        <location line="+0"/>
         <source>No board connection was detected!</source>
         <translation>Aucune connection de carte n&apos;a été détectée !</translation>
     </message>
@@ -11887,12 +11973,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Resets</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réinitialisations</translation>
     </message>
     <message>
         <location/>
         <source>Timeouts</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temps Dépassé</translation>
     </message>
     <message>
         <location/>
@@ -12229,7 +12315,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigOutputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+139"/>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+138"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
         <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuiller corriger cela avant de tester les sorties.</translation>
     </message>
@@ -12344,24 +12430,52 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>DeviceWidget</name>
     <message>
-        <location filename="../../../src/plugins/uploader/devicewidget.cpp" line="+87"/>
+        <location filename="../../../src/plugins/uploader/devicewidget.cpp" line="+81"/>
+        <source>Device ID: </source>
+        <translation type="unfinished">ID Périphérique : </translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>HW Revision: </source>
         <translation>Révision Matériel :</translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+31"/>
+        <source>Flash access: </source>
+        <translation type="unfinished">Accès flash : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Max code size: </source>
+        <translation type="unfinished">Taille maxi code : </translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>BL version: </source>
+        <translation type="unfinished">Version BL : </translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+3"/>
+        <location line="+1"/>
+        <location line="+1"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Inconnu</translation>
+    </message>
+    <message>
+        <location line="-3"/>
         <source>Custom Firmware Build</source>
         <translation>Version Firmware Personnelle</translation>
     </message>
     <message>
-        <location line="+51"/>
-        <location line="+26"/>
+        <location line="+50"/>
+        <location line="+24"/>
         <source>Tagged officially released firmware build</source>
         <translation>Firmware certifié OpenPilot, publié officiellement</translation>
     </message>
     <message>
-        <location line="-21"/>
-        <location line="+27"/>
+        <location line="-20"/>
+        <location line="+25"/>
         <source>Untagged or custom firmware build</source>
         <translation>Firmware non-certifié ou version personnelle</translation>
     </message>
@@ -12422,7 +12536,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/uploader/runningdevicewidget.cpp" line="+67"/>
         <source>HW Revision: </source>
-        <translation>Révision Matériel :</translation>
+        <translation type="unfinished">Révision Matériel : </translation>
     </message>
     <message>
         <location line="+2"/>
@@ -12430,17 +12544,43 @@ p, li { white-space: pre-wrap; }
         <translation>CRC Firmware : </translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+38"/>
+        <location line="+4"/>
+        <location line="+8"/>
+        <source>Firmware tag: </source>
+        <translation type="unfinished">Tag firmware : </translation>
+    </message>
+    <message>
+        <location line="-10"/>
         <source>Tagged officially released firmware build</source>
         <translation>Firmware certifié OpenPilot, publié officiellement</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Untagged or custom firmware build</source>
         <translation>Firmware non-certifié ou version personnelle</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+2"/>
+        <location line="+7"/>
+        <source>Git commit hash: </source>
+        <translation type="unfinished">Hash de commit GIT : </translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <location line="+7"/>
+        <source>Firmware date: </source>
+        <translation type="unfinished">Date firmware : </translation>
+    </message>
+    <message>
+        <location line="-4"/>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Inconnu</translation>
+    </message>
+    <message>
+        <location line="-2"/>
         <source>Custom Firmware Build</source>
         <translation>Version Firmware Personnelle</translation>
     </message>
@@ -12768,7 +12908,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+5"/>
         <source>Entries logged (free): </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vols enregistrés (libres) : </translation>
     </message>
     <message>
         <location line="+15"/>
@@ -12850,7 +12990,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MonitorGadgetFactory</name>
     <message>
-        <location filename="../../../src/plugins/telemetry/monitorgadgetfactory.cpp" line="+38"/>
+        <location filename="../../../src/plugins/telemetry/monitorgadgetfactory.cpp" line="+39"/>
         <source>Telemetry Monitor</source>
         <translation type="unfinished">Moniteur de Télémétrie</translation>
     </message>
@@ -12866,6 +13006,84 @@ p, li { white-space: pre-wrap; }
         <location line="+12"/>
         <source>Disconnected</source>
         <translation>Déconnecté</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigPipXtremeWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configpipxtremewidget.cpp" line="+200"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Inconnu</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigStabilizationWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configstabilizationwidget.cpp" line="+63"/>
+        <source>PID Bank %1</source>
+        <translation type="unfinished">Banque PID %1</translation>
+    </message>
+</context>
+<context>
+    <name>ModelUavoProxy</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/modeluavoproxy.cpp" line="+80"/>
+        <source>Path Plan Upload Successful</source>
+        <translation type="unfinished">Téléversement Réussi du Projet de Trajet</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Path plan upload was successful.</source>
+        <translation type="unfinished">Le téléversement du projet de trajet est réussi.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+238"/>
+        <source>Path Plan Upload Failed</source>
+        <translation type="unfinished">Échec Téléversement Projet de Trajet</translation>
+    </message>
+    <message>
+        <location line="-238"/>
+        <source>Failed to upload the path plan !</source>
+        <translation type="unfinished">Échec du téléversement du projet de trajet !</translation>
+    </message>
+    <message>
+        <location line="+37"/>
+        <source>Path Plan Download Successful</source>
+        <translation type="unfinished">Téléchargement Projet de Trajet Réussi</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Path plan download was successful.</source>
+        <translation type="unfinished">Le téléchargement du projet de trajet est réussi.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+190"/>
+        <location line="+4"/>
+        <source>Path Plan Download Failed</source>
+        <translation type="unfinished">Échec Téléchargement Projet de Trajet</translation>
+    </message>
+    <message>
+        <location line="-194"/>
+        <source>Failed to download the path plan !</source>
+        <translation type="unfinished">Échec du téléchargement du projet de trajet !</translation>
+    </message>
+    <message>
+        <location line="+190"/>
+        <source>Path plan way point count error !</source>
+        <translation type="unfinished">Erreur sur le nombre de waypoints dans le projet de trajet !</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Path plan path action count error !</source>
+        <translatorcomment>Path actions ??</translatorcomment>
+        <translation type="unfinished">Erreur sur le nombre de path actions dans le projet de trajet !</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Path plan CRC error !</source>
+        <translation type="unfinished">Erreur de CRC dans le projet de trajet !</translation>
     </message>
 </context>
 </TS>

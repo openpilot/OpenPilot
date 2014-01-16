@@ -28211,7 +28211,7 @@ border-radius: 5;</string>
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>Integral</string>
+                    <string>Velocity Proportional</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -28236,7 +28236,7 @@ border-radius: 5;</string>
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>Proportional</string>
+                    <string>Altitude Proportional</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -28267,7 +28267,7 @@ border-radius: 5;</string>
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>Derivative</string>
+                    <string>Velocity Integral</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -28291,8 +28291,9 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:Kp</string>
-                     <string>scale:0.001</string>
+                     <string>fieldname:AltitudePI</string>
+                     <string>element:Kp</string>
+                     <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -28316,8 +28317,9 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:Ki</string>
-                     <string>scale:0.001</string>
+                     <string>fieldname:VelocityPI</string>
+                     <string>element:Kp</string>
+                     <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -28327,7 +28329,7 @@ border-radius: 5;</string>
                  <item row="3" column="2">
                   <widget class="QSlider" name="AltKdSlider">
                    <property name="maximum">
-                    <number>100</number>
+                    <number>1000</number>
                    </property>
                    <property name="value">
                     <number>50</number>
@@ -28341,8 +28343,9 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:Kd</string>
-                     <string>scale:0.001</string>
+                     <string>fieldname:VelocityPI</string>
+                     <string>element:Ki</string>
+                     <string>scale:0.00001</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -28908,7 +28911,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>Altitude</string>
+                    <string>Control Coefficients</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -28953,8 +28956,9 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:Kp</string>
-                     <string>scale:0.001</string>
+                     <string>fieldname:AltitudePI</string>
+                     <string>element:Kp</string>
+                     <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -28999,8 +29003,9 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:Ki</string>
-                     <string>scale:0.001</string>
+                     <string>fieldname:VelocityPI</string>
+                     <string>element:Kp</string>
+                     <string>scale:0.01</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>
@@ -29037,7 +29042,7 @@ border-radius: 5;</string>
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="maximum">
-                    <number>100</number>
+                    <number>1000</number>
                    </property>
                    <property name="value">
                     <number>51</number>
@@ -29045,8 +29050,9 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:Kd</string>
-                     <string>scale:0.001</string>
+                     <string>fieldname:VelocityPI</string>
+                     <string>element:Ki</string>
+                     <string>scale:0.00001</string>
                      <string>haslimits:yes</string>
                      <string>buttongroup:98</string>
                     </stringlist>

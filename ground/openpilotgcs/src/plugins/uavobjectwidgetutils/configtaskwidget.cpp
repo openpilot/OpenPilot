@@ -670,7 +670,7 @@ void ConfigTaskWidget::autoLoadWidgets()
     forceShadowUpdates();
 
     /*
-    foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
+       foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
         if (binding->widget()) {
             qDebug() << "Binding  :" << binding->widget()->objectName();
             qDebug() << "  Object :" << binding->object()->getName();
@@ -684,8 +684,8 @@ void ConfigTaskWidget::autoLoadWidgets()
                 qDebug() << "  Scale :" << shadow->scale();
             }
         }
-    }
-    */
+       }
+     */
 }
 
 void ConfigTaskWidget::addWidgetToReloadGroups(QWidget *widget, QList<int> *reloadGroupIDs)
@@ -1161,10 +1161,10 @@ void WidgetBinding::setValue(const QVariant &value)
 {
     m_value = value;
     /*
-    if (m_object && m_field) {
+       if (m_object && m_field) {
         qDebug() << "WidgetBinding" << m_object->getName() << ":" << m_field->getName() << "value =" << value.toString();
-    }
-    */
+       }
+     */
 }
 
 void WidgetBinding::updateObjectFieldFromValue()

@@ -358,7 +358,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
                 }
-                cmd.FlightModeSwitchPosition = (uint8_t) 255;
+                cmd.FlightModeSwitchPosition = (uint8_t)255;
             } else if (valid_input_detected) {
                 AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 

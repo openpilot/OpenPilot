@@ -144,10 +144,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     addWidgetBinding("ManualControlSettings", "Stabilization2Settings", ui->fmsSsPos2Yaw, "Yaw", 1, true);
     addWidgetBinding("ManualControlSettings", "Stabilization3Settings", ui->fmsSsPos3Yaw, "Yaw", 1, true);
 
-    addWidgetBinding("StabilizationSettings", "FlightModeMap", ui->pidBankSs1, "Stabilized1", 1, true);
-    addWidgetBinding("StabilizationSettings", "FlightModeMap", ui->pidBankSs2, "Stabilized2", 1, true);
-    addWidgetBinding("StabilizationSettings", "FlightModeMap", ui->pidBankSs3, "Stabilized3", 1, true);
-
     addWidgetBinding("ManualControlSettings", "Arming", ui->armControl);
     addWidgetBinding("ManualControlSettings", "ArmedTimeout", ui->armTimeout, 0, 1000);
     connect(ManualControlCommand::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveFMSlider()));
@@ -155,6 +151,8 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
 
     addWidget(ui->configurationWizard);
     addWidget(ui->runCalibration);
+
+    autoLoadWidgets();
 
     populateWidgets();
     refreshWidgetsValues();
@@ -1314,21 +1312,33 @@ void ConfigInputWidget::updatePositionSlider()
     default:
     case 6:
         ui->fmsModePos6->setEnabled(true);
+        ui->cc_box_5->setEnabled(true);
+        ui->pidBankSs1_5->setEnabled(true);
     // pass through
     case 5:
         ui->fmsModePos5->setEnabled(true);
+        ui->cc_box_4->setEnabled(true);
+        ui->pidBankSs1_4->setEnabled(true);
     // pass through
     case 4:
         ui->fmsModePos4->setEnabled(true);
+        ui->cc_box_3->setEnabled(true);
+        ui->pidBankSs1_3->setEnabled(true);
     // pass through
     case 3:
         ui->fmsModePos3->setEnabled(true);
+        ui->cc_box_2->setEnabled(true);
+        ui->pidBankSs1_2->setEnabled(true);
     // pass through
     case 2:
         ui->fmsModePos2->setEnabled(true);
+        ui->cc_box_1->setEnabled(true);
+        ui->pidBankSs1_1->setEnabled(true);
     // pass through
     case 1:
         ui->fmsModePos1->setEnabled(true);
+        ui->cc_box_0->setEnabled(true);
+        ui->pidBankSs1_0->setEnabled(true);
     // pass through
     case 0:
         break;
@@ -1337,21 +1347,33 @@ void ConfigInputWidget::updatePositionSlider()
     switch (manualSettingsDataPriv.FlightModeNumber) {
     case 0:
         ui->fmsModePos1->setEnabled(false);
+        ui->cc_box_0->setEnabled(false);
+        ui->pidBankSs1_0->setEnabled(false);
     // pass through
     case 1:
         ui->fmsModePos2->setEnabled(false);
+        ui->cc_box_1->setEnabled(false);
+        ui->pidBankSs1_1->setEnabled(false);
     // pass through
     case 2:
         ui->fmsModePos3->setEnabled(false);
+        ui->cc_box_2->setEnabled(false);
+        ui->pidBankSs1_2->setEnabled(false);
     // pass through
     case 3:
         ui->fmsModePos4->setEnabled(false);
+        ui->cc_box_3->setEnabled(false);
+        ui->pidBankSs1_3->setEnabled(false);
     // pass through
     case 4:
         ui->fmsModePos5->setEnabled(false);
+        ui->cc_box_4->setEnabled(false);
+        ui->pidBankSs1_4->setEnabled(false);
     // pass through
     case 5:
         ui->fmsModePos6->setEnabled(false);
+        ui->cc_box_5->setEnabled(false);
+        ui->pidBankSs1_5->setEnabled(false);
     // pass through
     case 6:
     default:

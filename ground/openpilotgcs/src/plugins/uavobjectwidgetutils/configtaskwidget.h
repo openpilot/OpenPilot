@@ -191,9 +191,10 @@ private:
 
     enum buttonTypeEnum { none, save_button, apply_button, reload_button, default_button, help_button };
     struct bindingStruct {
-        QString objname;
-        QString fieldname;
-        QString element;
+        QString objectName;
+        QString fieldName;
+        QString elementName;
+        int index;
         QString url;
         buttonTypeEnum buttonType;
         QList<int>     buttonGroup;

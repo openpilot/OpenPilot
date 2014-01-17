@@ -189,8 +189,11 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
     // Whenever the configuration changes, make sure it is safe to fly
 
-    // Make sure unarmed on power up
     ManualControlCommandGet(&cmd);
+    cmd.FlightModeSwitchPosition = 255; // initialize to invalid switch position
+    ManualControlCommandSet(&cmd);
+
+    // Make sure unarmed on power up
     FlightStatusGet(&flightStatus);
     flightStatus.Armed = FLIGHTSTATUS_ARMED_DISARMED;
     armState = ARM_STATE_DISARMED;
@@ -240,6 +243,9 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
         if (!ManualControlCommandReadOnly()) {
             bool valid_input_detected = true;
+
+            // read old status (needed for old flight mode switch position)
+            ManualControlCommandGet(&cmd);
 
             // Read channel values in us
             for (uint8_t n = 0; n < MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM && n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM; ++n) {
@@ -328,10 +334,12 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 cmd.Yaw = 0;
                 cmd.Pitch      = 0;
                 cmd.Collective = 0;
+                // cmd.FlightModeSwitchPosition stays as it is in failsafebehaviour NONE
                 if (settings.FailsafeBehavior != MANUALCONTROLSETTINGS_FAILSAFEBEHAVIOR_NONE) {
                     FlightStatusGet(&flightStatus);
 
-                    flightStatus.FlightMode = settings.FlightModePosition[settings.FailsafeBehavior - 1];
+                    cmd.FlightModeSwitchPosition = settings.FailsafeBehavior - 1;
+                    flightStatus.FlightMode = settings.FlightModePosition[cmd.FlightModeSwitchPosition];
                     FlightStatusSet(&flightStatus);
                 }
                 AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
@@ -358,7 +366,6 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
                 }
-                cmd.FlightModeSwitchPosition = (uint8_t)255;
             } else if (valid_input_detected) {
                 AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 

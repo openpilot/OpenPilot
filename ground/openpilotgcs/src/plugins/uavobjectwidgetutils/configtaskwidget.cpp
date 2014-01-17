@@ -550,7 +550,7 @@ bool ConfigTaskWidget::addShadowWidgetBinding(QString objectName, QString fieldN
             if (defaultReloadGroups) {
                 addWidgetToReloadGroups(widget, defaultReloadGroups);
             }
-            if (!binding->isEnabled()) {
+            if (binding->isEnabled()) {
                 loadWidgetLimits(widget, binding->field(), binding->index(), isLimited, scale);
             }
             return true;

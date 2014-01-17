@@ -1,0 +1,14 @@
+<xml>
+    <object name="PathPlan" singleinstance="true" settings="false" category="Navigation">
+        <description>Flight plan informations</description>
+
+        <field name="WaypointCount" units="" type="uint16" elements="1" default="0" />
+        <field name="PathActionCount" units="" type="uint16" elements="1" default="0" />
+        <field name="Crc" units="" type="uint8" elements="1" default="0" />
+
+        <access gcs="readwrite" flight="readonly"/>
+        <telemetrygcs acked="true" updatemode="manual" period="0"/>
+        <telemetryflight acked="true" updatemode="manual" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

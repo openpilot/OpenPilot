@@ -1,12 +1,18 @@
 <xml>
     <object name="GCSTelemetryStats" singleinstance="true" settings="false" category="System">
         <description>The telemetry statistics from the ground computer</description>
+        
         <field name="Status" units="" type="enum" elements="1" options="Disconnected,HandshakeReq,HandshakeAck,Connected"/>
         <field name="TxDataRate" units="bytes/sec" type="float" elements="1"/>
-        <field name="RxDataRate" units="bytes/sec" type="float" elements="1"/>
+        <field name="TxBytes" units="bytes" type="uint32" elements="1"/>
         <field name="TxFailures" units="count" type="uint32" elements="1"/>
-        <field name="RxFailures" units="count" type="uint32" elements="1"/>
         <field name="TxRetries" units="count" type="uint32" elements="1"/>
+        <field name="RxDataRate" units="bytes/sec" type="float" elements="1"/>
+        <field name="RxBytes" units="bytes" type="uint32" elements="1"/>
+        <field name="RxFailures" units="count" type="uint32" elements="1"/>
+        <field name="RxSyncErrors" units="count" type="uint32" elements="1"/>
+        <field name="RxCrcErrors" units="count" type="uint32" elements="1"/>
+        
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="periodic" period="5000"/>
         <telemetryflight acked="false" updatemode="manual" period="0"/>

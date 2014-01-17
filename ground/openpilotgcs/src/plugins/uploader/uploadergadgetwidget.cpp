@@ -26,9 +26,12 @@
  */
 #include "uploadergadgetwidget.h"
 #include "version_info/version_info.h"
-#include <coreplugin/coreconstants.h>
-#include <QDebug>
 #include "flightstatus.h"
+
+#include <coreplugin/coreconstants.h>
+#include <uavtalk/telemetrymanager.h>
+
+#include <QDebug>
 
 #define DFU_DEBUG true
 

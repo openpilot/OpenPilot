@@ -42,6 +42,8 @@
 #include "defaulthwsettingswidget.h"
 #include "uavobjectutilmanager.h"
 
+#include <uavtalk/telemetrymanager.h>
+
 #include <QDebug>
 #include <QStringList>
 #include <QWidget>

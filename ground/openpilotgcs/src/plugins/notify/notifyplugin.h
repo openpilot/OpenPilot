@@ -29,7 +29,6 @@
 
 #include <extensionsystem/iplugin.h>
 #include <coreplugin/iconfigurableplugin.h>
-#include "uavtalk/telemetrymanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "notificationitem.h"
@@ -111,7 +110,6 @@ private:
 
     PhononObject phonon;
     NotifyPluginOptionsPage *mop;
-    TelemetryManager *telMngr;
     QMediaPlaylist *playlist;
 };
 

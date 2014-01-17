@@ -49,6 +49,7 @@
 #include <accelgyrosettings.h>
 #include <revocalibration.h>
 #include <revosettings.h>
+namespace OpenPilot {
 
 typedef struct {
     // this is not needed for revo, but should for CC/CC3D
@@ -168,5 +169,5 @@ private:
     void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();
 };
-
+}
 #endif // THERMALCALIBRATIONHELPER_H

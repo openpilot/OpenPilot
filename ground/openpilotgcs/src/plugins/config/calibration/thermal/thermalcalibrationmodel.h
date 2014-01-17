@@ -37,6 +37,7 @@
 #include <QStateMachine>
 #include "../wizardstate.h"
 #include "../wizardmodel.h"
+namespace OpenPilot {
 
 class ThermalCalibrationModel : public WizardModel {
     Q_PROPERTY(bool startEnable READ startEnabled NOTIFY startEnabledChanged)
@@ -192,6 +193,6 @@ public slots:
         emit abort();
     }
 };
-
+}
 
 #endif // THERMALCALIBRATIONMODEL_H

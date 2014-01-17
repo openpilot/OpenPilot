@@ -27,6 +27,7 @@
  */
 #include "thermalcalibrationhelper.h"
 
+namespace OpenPilot {
 ThermalCalibrationHelper::ThermalCalibrationHelper(QObject *parent) :
     QObject(parent)
 {
@@ -356,4 +357,5 @@ UAVObjectManager *ThermalCalibrationHelper::getObjectManager()
 
     Q_ASSERT(objMngr);
     return objMngr;
+}
 }

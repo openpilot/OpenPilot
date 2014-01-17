@@ -32,6 +32,7 @@
 #include <QEventTransition>
 
 #include "thermalcalibrationhelper.h"
+namespace OpenPilot {
 
 class BoardStatusSaveTransition : public QSignalTransition {
     Q_OBJECT
@@ -115,6 +116,6 @@ public slots:
 private:
     ThermalCalibrationHelper *m_helper;
 };
-
+}
 
 #endif // SETTINGSHANDLINGTRANSITIONS_H

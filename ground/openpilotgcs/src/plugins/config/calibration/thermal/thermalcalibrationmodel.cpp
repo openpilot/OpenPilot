@@ -35,6 +35,7 @@
 #define NEXT_EVENT     "next"
 #define PREVIOUS_EVENT "previous"
 #define ABORT_EVENT    "abort"
+namespace OpenPilot {
 
 ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     WizardModel(parent)
@@ -101,4 +102,5 @@ void ThermalCalibrationModel::setTransitions()
     m_abortState->addTransition(new BoardStatusRestoreTransition(m_helper, m_abortState, m_readyState));
     m_finalizeState->addTransition(this, SIGNAL(next()), m_readyState);
     // Ready
+}
 }

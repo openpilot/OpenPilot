@@ -57,7 +57,7 @@ private:
     // ! Computes the scale and bias of the mag based on collected data
     void computeScaleBias();
 
-    ThermalCalibrationModel *m_thermalCalibrationModel;
+    OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
     Ui_RevoSensorsWidget *m_ui;
     QGraphicsSvgItem *paperplane;
     QGraphicsSvgItem *sensorsBargraph;

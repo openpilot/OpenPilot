@@ -222,7 +222,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     autoLoadWidgets();
 
     // connect the thermalCalibration model to UI
-    m_thermalCalibrationModel = new ThermalCalibrationModel(this);
+    m_thermalCalibrationModel = new OpenPilot::ThermalCalibrationModel(this);
 
     connect(m_ui->ThermalBiasStart, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnStart()));
     connect(m_ui->ThermalBiasEnd, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnEnd()));

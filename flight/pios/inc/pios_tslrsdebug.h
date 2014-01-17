@@ -30,16 +30,54 @@
 #ifndef PIOS_TSLRSDEBUG_H
 #define PIOS_TSLRSDEBUG_H
 
-/* Global Types */
+#ifdef PIOS_INCLUDE_TSLRSDEBUG
 
-// TSLRS debug vars
-struct tslrs {
-    uint8_t *data;
+#define TSRX_CHANNEL_MAX            24
+
+#define DEBUG_CHAN_ACTIVE           tslrsdebug_state->ChannelCount
+
+// TSLRSdebug parse states
+typedef enum {
+  TSRX_BOOT = 0,
+  TSRX_VERSION_CHECK,
+  TSRX_IDLE_OLDER,                  // idle for older version
+  TSRX_IDLE_FROM_V25,               // idle from version 2.5 up
+  TSRX_FAILSAVE_START,              // waits for :
+  TSRX_FAILSAVE_SCAN,               // read data
+  TSRX_GOOD_START,                  // waits for :
+  TSRX_GOOD_SCAN,                   // read data
+  TSRX_BAD_START,                   // waits for :
+  TSRX_BAD_SCAN,                    // read data
+  TSRX_VALUE_START,                 // waits for d or T
+  TSRX_VALUE_READ_1,                // read data hi
+  TSRX_VALUE_NEXT,                  // waits for D
+  TSRX_VALUE_READ_2,                // read data lo
+  TSRX_VALUE_PLOT                   // waits for I
+} tsrxtalk_parse_state_t;
+
+struct pios_tslrsdebug_state {
+    uint8_t         state;
+    uint8_t         version;
+    uint8_t         scan_value_percent;
+    uint16_t        ChannelFails[TSRX_CHANNEL_MAX];
+    uint32_t        ChannelCount;
+    portTickType    BadChannelTime;
+    uint16_t        BadChannel;
+    uint16_t        BadChannelDelta;
+    uint16_t        Failsafes;
+    uint16_t        FailsafesDelta;
+    uint16_t        BadPackets;
+    uint16_t        BadPacketsDelta;
+    uint32_t        GoodPackets;
+    uint16_t        GoodPacketsDelta;
 };
 
-extern struct tslrs tslrs_debug;
+extern struct pios_tslrsdebug_state *tslrsdebug_state;
 
 /* Public Functions */
+uint8_t tslrsdebug_packet_window_percent(void);
+
+#endif /* PIOS_INCLUDE_TSLRSDEBUG */
 
 #endif /* PIOS_TSLRSDEBUG_H */
 

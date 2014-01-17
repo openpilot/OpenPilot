@@ -9,6 +9,7 @@
  * @file       pios_tslrsdebug_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
  * @brief      TSLRS debug Private structures.
+ *             TSLRS debug code from http://code.google.com/p/minrxosd/
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -37,7 +38,34 @@
 #include <pios_stm32.h>
 #include <pios_usart_priv.h>
 
-#define TSLRSDEBUG_BUFFER       10
+
+//---------------------------------
+
+#define PACKET_TIMEOUT_FACTOR       1.2f    // + 20% of frameduration
+#define PACKET_WINDOW_MAX           50
+#define PACKED_GOOD                 0
+#define PACKED_BAD                  1
+
+#define BOOT_WAIT_TIME              5000
+#define CHANNEL_DELTA_DURATION      2000    // [ms]
+
+// for older versions
+#define FIRST_CHANNEL               '"'
+#define LAST_CHANNEL                '7'
+
+// for version from 2.5 up
+#define TOKEN_FAILSAVE              'F'
+#define TOKEN_GOOD                  'G'
+#define TOKEN_BAD                   'B'
+#define TOKEN_VALUE                 '*'
+
+#define SUBTOKEN_FGB                ':'
+#define SUBTOKEN_VALUE_ZERO         'T'
+#define SUBTOKEN_VALUE_DATA_1       'd'
+#define SUBTOKEN_VALUE_DATA_2       'D'
+#define SUBTOKEN_VALUE_PLOT_GRAPH   'I'
+
+//---------------------------------
 
 
 /* TSLRSdebug instance configuration */

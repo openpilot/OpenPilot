@@ -104,9 +104,9 @@ extern const struct pios_video_type_boundary *pios_video_type_boundary_act;
 
 
 // draw area buffer values, for memory allocation, access and calculations we suppose the larger values for PAL, this also works for NTSC
-#define GRAPHICS_WIDTH_REAL  400                                                             // max columns
-#define GRAPHICS_HEIGHT_REAL 288 // max lines
-#define BUFFER_WIDTH         (GRAPHICS_WIDTH_REAL / 8 + 1)   // Bytes plus one byte for SPI
+#define GRAPHICS_WIDTH_REAL  400                            // max columns
+#define GRAPHICS_HEIGHT_REAL 288                            // max lines
+#define BUFFER_WIDTH         (GRAPHICS_WIDTH_REAL / 8 + 1)  // Bytes plus one byte for SPI
 #define BUFFER_HEIGHT        (GRAPHICS_HEIGHT_REAL)
 
 

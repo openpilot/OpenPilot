@@ -61,6 +61,10 @@
 #include "gcstelemetrystats.h"
 #endif
 
+#ifdef PIOS_INCLUDE_TSLRSDEBUG
+#include "pios_tslrsdebug.h"
+#endif
+
 #include "fonts.h"
 #include "font12x18.h"
 #include "font8x10.h"
@@ -1961,10 +1965,10 @@ void check_gps_home(HomePosition *homePos, GPSPositionSensorData *gpsData)
             alt_prev    = gpsData->Altitude;
         } else {
             if (current_time - stable_time > CHECK_HOME_STABLE) {
-                homePos->Latitude  = gpsData->Latitude;          // take this Latitude as home Latitude
-                homePos->Longitude = gpsData->Longitude; // take this Longitude as home Longitude
-                homePos->Altitude  = gpsData->Altitude;          // take this stable Altitude as home Altitude
-                homePos->GotHome   = TRUE;                                        // we got home
+                homePos->Latitude  = gpsData->Latitude;     // take this Latitude as home Latitude
+                homePos->Longitude = gpsData->Longitude;    // take this Longitude as home Longitude
+                homePos->Altitude  = gpsData->Altitude;     // take this stable Altitude as home Altitude
+                homePos->GotHome   = TRUE;                  // we got home
             }
         }
     }
@@ -2069,11 +2073,12 @@ void accumulate_current(double current_amp, double *current_total)
 #define WARN_NO_SAT_FIX      0x0002
 #define WARN_HOME_NOT_SET    0x0004
 #define WARN_DISARMED        0x0008
-#define WARN_RSSI_LOW        0x0010
-#define WARN_BATT_FLIGHT_LOW 0x0020
-#define WARN_BATT_VIDEO_LOW  0x0040
-#define WARN_BATT_SCURR_HIGH 0x0080
-#define WARN_BATT_SVOLT_LOW  0x0100
+#define WARN_BAD_PACKETS     0x0010
+#define WARN_RSSI_LOW        0x0020
+#define WARN_BATT_FLIGHT_LOW 0x0040
+#define WARN_BATT_VIDEO_LOW  0x0080
+#define WARN_BATT_SCURR_HIGH 0x0100
+#define WARN_BATT_SVOLT_LOW  0x0200
 void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, int8_t char_size)
 {
     static portTickType on_off_time = 0;
@@ -2103,6 +2108,11 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
         }
         if (WarnMask & WARN_DISARMED) {
             sprintf(temp, "DISARMED");
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+        if (WarnMask & WARN_BAD_PACKETS) {
+            sprintf(temp, "BAD PACKETS");
             write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
             d_y += v_spacing;
         }
@@ -2187,6 +2197,62 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
 }
 
 
+#ifdef PIOS_INCLUDE_TSLRSDEBUG
+// show TSLRS debug data
+#define TSLRS_ROTARY_2_CHAR             0xDC
+#define TSLRS_ROTARY_3_CHAR             0xC0
+#define TSLRS_RADIOCRC_2_CHAR           0x43        // TODO calculate different char for char_size 2 and 3
+#define TSLRS_FAILSAFES_2_CHAR          0x46        // TODO calculate different char for char_size 2 and 3
+#define TSLRS_BADCHANNEL_2_CHAR         0x42        // TODO calculate different char for char_size 2 and 3
+#define TSLRS_GOODCHANNEL_2_CHAR        0x47        // TODO calculate different char for char_size 2 and 3
+void draw_tslrsdebug_data(int16_t x, int16_t y, int8_t char_size)
+{
+    char temp[10] = { 0 };
+
+    if (tslrsdebug_state->version == TSRX_IDLE_OLDER) {
+        if (tslrsdebug_state->BadChannel) {
+            sprintf(temp, "%6u%c", tslrsdebug_state->BadChannel, TSLRS_BADCHANNEL_2_CHAR);
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+        }
+    } else {
+        if (DEBUG_CHAN_ACTIVE) {
+            char rotary = (char_size == 2 ? TSLRS_ROTARY_2_CHAR : TSLRS_ROTARY_3_CHAR) + tslrsdebug_state->ChannelCount % 12;
+            if (tslrsdebug_state->Failsafes > 9 || tslrsdebug_state->BadChannel > 999) {
+                sprintf(temp, "%5u%c%c", tslrsdebug_state->BadChannel, TSLRS_BADCHANNEL_2_CHAR, rotary);
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+                if (tslrsdebug_state->Failsafes) {
+                    sprintf(temp, "%5u%c", tslrsdebug_state->Failsafes, TSLRS_FAILSAFES_2_CHAR);
+                    write_string(temp, x, y + 10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+                }
+            } else if (tslrsdebug_state->Failsafes) {
+                sprintf(temp, "%1u%c%3u%c%c", tslrsdebug_state->Failsafes, TSLRS_FAILSAFES_2_CHAR, tslrsdebug_state->BadChannel, TSLRS_BADCHANNEL_2_CHAR, rotary);
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            } else if (tslrsdebug_state->BadChannel) {
+                sprintf(temp, "%5u%c%c", tslrsdebug_state->BadChannel, TSLRS_BADCHANNEL_2_CHAR, rotary);
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            } else {
+                sprintf(temp, "      %c", rotary);
+                write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            }
+        } else {
+            if (tslrsdebug_state->scan_value_percent < 100) {
+                sprintf(temp, " %c %3u%c", TSLRS_RADIOCRC_2_CHAR, tslrsdebug_state->scan_value_percent, '%');
+                write_string(temp, x, y     , 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            }
+            if (tslrsdebug_state->BadPackets) {
+                sprintf(temp, "%6u%c", tslrsdebug_state->BadPackets, TSLRS_BADCHANNEL_2_CHAR);
+                write_string(temp, x, y + 10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            }
+            if (tslrsdebug_state->Failsafes) {
+                sprintf(temp, "%6u%c", tslrsdebug_state->Failsafes, TSLRS_FAILSAFES_2_CHAR);
+                write_string(temp, x, y + 20, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            }
+        }
+    }
+}
+#endif /* PIOS_INCLUDE_TSLRSDEBUG */
+
+
 void updateGraphics()
 {
     OsdSettingsData OsdSettings;
@@ -2250,7 +2316,6 @@ void updateGraphics()
 
         // JR_HINT TODO
         // RSSI version PacketRxOk
-        // RSSI version Scherrer digital
         // use nice icons for some of the displayed values
         // use homePos.Altitude for baro.Altitude correction?
 
@@ -2445,6 +2510,16 @@ void updateGraphics()
             timex.min  = 0;
             timex.hour = 0;
         }
+
+#ifdef PIOS_INCLUDE_TSLRSDEBUG
+        // Show TSLRS debug data which is CRC checked good/bad packet data
+        if (OsdSettings2.TSLRSdebug) {
+            WarnMask |= (tslrsdebug_state->BadChannelDelta || tslrsdebug_state->BadPacketsDelta) ? WARN_BAD_PACKETS : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.TSLRSdebug, (OsdSettingsWarningsSetupData *)&OsdSettings2.TSLRSStatusSetup, screen, &x, &y)) {
+                draw_tslrsdebug_data(x, y, OsdSettings2.TSLRSStatusSetup.CharSize);
+            }
+        }
+#endif
 
 #define DO_NOT_MOVE_SECONDS 10
         // Draw warnings last so that they are above everything else

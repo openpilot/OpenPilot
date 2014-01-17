@@ -551,8 +551,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>798</width>
-            <height>705</height>
+            <width>796</width>
+            <height>708</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -8762,8 +8762,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>784</width>
-            <height>731</height>
+            <width>796</width>
+            <height>708</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -18775,8 +18775,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>798</width>
-            <height>705</height>
+            <width>796</width>
+            <height>708</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -26963,8 +26963,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>868</width>
-            <height>691</height>
+            <width>796</width>
+            <height>708</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_17">
@@ -27247,6 +27247,19 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="5">
+                  <spacer name="horizontalSpacer_59">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
                  <item row="1" column="2">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
                    <property name="toolTip">
@@ -27275,44 +27288,6 @@ border-radius: 5;</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
                     </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="8">
-                  <widget class="QCheckBox" name="checkBox_5">
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #3.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string>3</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="8">
-                  <widget class="QCheckBox" name="checkBox_10">
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #6.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string>6</string>
                    </property>
                   </widget>
                  </item>
@@ -27353,73 +27328,6 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="5">
-                  <spacer name="horizontalSpacer_59">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="3" column="4">
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This needs to be 0 for all copters except CP helis that are using idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="accelerated">
-                    <bool>true</bool>
-                   </property>
-                   <property name="decimals">
-                    <number>0</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlNeutralThrust</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                     <string>buttongroup:16</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="6">
-                  <widget class="QCheckBox" name="checkBox">
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string>1</string>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlFlightModeSwitchPosEnable</string>
-                     <string>element:[0]</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                     <string>buttongroup:16</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="2" column="1">
                   <widget class="QLabel" name="label_6">
                    <property name="sizePolicy">
@@ -27450,6 +27358,31 @@ border-radius: 5;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="4">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This needs to be 0 for all copters except CP helis that are using idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlNeutralThrust</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
                    </property>
                   </widget>
                  </item>
@@ -27556,39 +27489,6 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="4">
-                  <widget class="QLabel" name="label_11">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>140</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;</string>
-                   </property>
-                   <property name="text">
-                    <string>NeutralThrust</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="0" column="3">
                   <widget class="QLabel" name="label_8">
                    <property name="sizePolicy">
@@ -27622,25 +27522,6 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="7">
-                  <widget class="QCheckBox" name="checkBox_9">
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #5.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string>5</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="1" column="3">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
                    <property name="toolTip">
@@ -27669,22 +27550,36 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="6">
-                  <widget class="QCheckBox" name="checkBox_6">
+                 <item row="2" column="4">
+                  <widget class="QLabel" name="label_11">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>16</height>
+                    </size>
+                   </property>
                    <property name="font">
                     <font>
                      <weight>75</weight>
                      <bold>true</bold>
                     </font>
                    </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #4.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>4</string>
+                    <string>NeutralThrust</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -27782,25 +27677,6 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="7">
-                  <widget class="QCheckBox" name="checkBox_4">
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #2.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string>2</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="1" column="0">
                   <spacer name="horizontalSpacer_60">
                    <property name="orientation">
@@ -27816,30 +27692,6 @@ border-radius: 5;</string>
                     </size>
                    </property>
                   </spacer>
-                 </item>
-                 <item row="0" column="6" colspan="3">
-                  <widget class="QLabel" name="label_12">
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checking a box here enables Cruise Control for the corresponding Flight Mode Switch position (1 - 6).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;</string>
-                   </property>
-                   <property name="text">
-                    <string> FltModePosEnable </string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -27926,8 +27778,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>798</width>
-            <height>705</height>
+            <width>796</width>
+            <height>708</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">

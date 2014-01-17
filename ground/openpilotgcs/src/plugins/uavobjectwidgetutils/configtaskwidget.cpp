@@ -572,20 +572,23 @@ void ConfigTaskWidget::autoLoadWidgets()
 
         if (info.isValid()) {
             bindingStruct uiRelation;
-            uiRelation.buttonType = none;
+            uiRelation.buttonType  = none;
             uiRelation.scale = 1;
-            uiRelation.element    = QString();
-            uiRelation.haslimits  = false;
+            uiRelation.index = -1;
+            uiRelation.elementName = QString();
+            uiRelation.haslimits   = false;
             foreach(QString str, info.toStringList()) {
                 QString prop  = str.split(":").at(0);
                 QString value = str.split(":").at(1);
 
                 if (prop == "objname") {
-                    uiRelation.objname = value;
+                    uiRelation.objectName = value;
                 } else if (prop == "fieldname") {
-                    uiRelation.fieldname = value;
+                    uiRelation.fieldName = value;
                 } else if (prop == "element") {
-                    uiRelation.element = value;
+                    uiRelation.elementName = value;
+                } else if (prop == "index") {
+                    uiRelation.index = value.toInt();
                 } else if (prop == "scale") {
                     if (value == "null") {
                         uiRelation.scale = 1;
@@ -658,7 +661,11 @@ void ConfigTaskWidget::autoLoadWidgets()
             } else {
                 QWidget *wid = qobject_cast<QWidget *>(widget);
                 if (wid) {
-                    addWidgetBinding(uiRelation.objname, uiRelation.fieldname, wid, uiRelation.element, uiRelation.scale, uiRelation.haslimits, &uiRelation.buttonGroup);
+                    if (uiRelation.index != -1) {
+                        addWidgetBinding(uiRelation.objectName, uiRelation.fieldName, wid, uiRelation.index, uiRelation.scale, uiRelation.haslimits, &uiRelation.buttonGroup);
+                    } else {
+                        addWidgetBinding(uiRelation.objectName, uiRelation.fieldName, wid, uiRelation.elementName, uiRelation.scale, uiRelation.haslimits, &uiRelation.buttonGroup);
+                    }
                 }
             }
         }
@@ -667,7 +674,7 @@ void ConfigTaskWidget::autoLoadWidgets()
     forceShadowUpdates();
 
     /*
-    foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
+       foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
         if (binding->widget()) {
             qDebug() << "Binding  :" << binding->widget()->objectName();
             qDebug() << "  Object :" << binding->object()->getName();
@@ -681,8 +688,8 @@ void ConfigTaskWidget::autoLoadWidgets()
                 qDebug() << "  Scale :" << shadow->scale();
             }
         }
-    }
-    */
+       }
+     */
 }
 
 void ConfigTaskWidget::addWidgetToReloadGroups(QWidget *widget, QList<int> *reloadGroupIDs)
@@ -1157,10 +1164,10 @@ void WidgetBinding::setValue(const QVariant &value)
 {
     m_value = value;
     /*
-    if (m_object && m_field) {
+       if (m_object && m_field) {
         qDebug() << "WidgetBinding" << m_object->getName() << ":" << m_field->getName() << "value =" << value.toString();
-    }
-    */
+       }
+     */
 }
 
 void WidgetBinding::updateObjectFieldFromValue()

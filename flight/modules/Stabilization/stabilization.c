@@ -48,6 +48,7 @@
 #include "airspeedstate.h"
 #include "gyrostate.h"
 #include "flightstatus.h"
+#include "manualcontrolsettings.h"
 #include "manualcontrol.h" // Just to get a macro
 #include "taskinfo.h"
 
@@ -75,6 +76,9 @@
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 4)
 #define FAILSAFE_TIMEOUT_MS 30
 
+// number of flight mode switch positions
+#define NUM_FMS_POSITIONS 6
+
 // The PID_RATE_ROLL set is used by Rate mode and the rate portion of Attitude mode
 // The PID_RATE set is used by the attitude portion of Attitude mode
 // The PID_RATEA_ROLL set is used by Rattitude mode because it needs to maintain
@@ -98,9 +102,17 @@ bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay = 0.991f;
 struct pid pids[PID_MAX];
 
-int flight_mode  = -1;
+int cur_flight_mode  = -1;
 
 static uint8_t rattitude_anti_windup;
+static float   cruise_control_min_throttle;
+static float   cruise_control_max_throttle;
+static uint8_t cruise_control_max_angle;
+static float   cruise_control_max_power_factor;
+static float   cruise_control_power_trim;
+static int8_t  cruise_control_inverted_power_switch;
+static float   cruise_control_neutral_thrust;
+static uint8_t cruise_control_flight_mode_switch_pos_enable[NUM_FMS_POSITIONS];
 
 // Private functions
 static void stabilizationTask(void *parameters);
@@ -150,6 +162,9 @@ int32_t StabilizationStart()
  */
 int32_t StabilizationInitialize()
 {
+    // stop the compile if the number of switch positions changes, but has not been changed here
+    PIOS_STATIC_ASSERT(NUM_FMS_POSITIONS == sizeof(((ManualControlSettingsData *)0)->FlightModePosition) / sizeof((((ManualControlSettingsData *)0)->FlightModePosition)[0]) );
+
     // Initialize variables
     StabilizationSettingsInitialize();
     StabilizationBankInitialize();
@@ -223,9 +238,11 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 #ifdef DIAG_RATEDESIRED
         RateDesiredGet(&rateDesired);
 #endif
+        uint8_t flight_mode_switch_position;
+        ManualControlCommandFlightModeSwitchPositionGet(&flight_mode_switch_position);
 
-        if (flight_mode != flightStatus.FlightMode) {
-            flight_mode = flightStatus.FlightMode;
+        if (cur_flight_mode != flight_mode_switch_position) {
+            cur_flight_mode = flight_mode_switch_position;
             SettingsBankUpdatedCb(NULL);
         }
 
@@ -588,6 +605,64 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
             }
         }
 
+        // modify throttle according to 1/cos(bank angle)
+        // to maintain same altitdue with changing bank angle
+        // but without manually adjusting throttle
+        // do it here and all the various flight modes (e.g. Altitude Hold) can use it
+        if (flight_mode_switch_position < NUM_FMS_POSITIONS
+            && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t) 0
+            && cruise_control_max_power_factor > 0.0001f) {
+            static uint8_t toggle;
+            static float factor;
+            float angle;
+            // get attitude state and calculate angle
+            // do it every 8th iteration to save CPU
+            if ((toggle++ & 7) == 0) {
+                // spherical right triangle
+                // 0 <= acosf() <= Pi
+                angle = RAD2DEG(acosf(cos_lookup_deg(attitudeState.Roll) * cos_lookup_deg(attitudeState.Pitch)));
+                // if past the cutoff angle (60 to 180 (180 means never))
+                if (angle > cruise_control_max_angle) {
+                    // -1 reversed collective, 0 zero power, or 1 normal power
+                    // these are all unboosted
+                    factor = cruise_control_inverted_power_switch;
+                } else {
+                    // avoid singularity
+                    if (angle > 89.999f && angle < 90.001f) {
+                        factor = cruise_control_max_power_factor;
+                    } else {
+                        factor = 1.0f / fabsf(cos_lookup_deg(angle));
+                        if (factor > cruise_control_max_power_factor) {
+                            factor = cruise_control_max_power_factor;
+                        }
+                    }
+                    // factor in the power trim, no effect at 1.0, linear effect increases with factor
+                    factor = (factor - 1.0f) * cruise_control_power_trim + 1.0f;
+                    // if inverted and they want negative boost
+                    if (angle > 90.0f && cruise_control_inverted_power_switch == (int8_t) -1) {
+                        factor = -factor;
+                        // as long as throttle is getting reversed
+                        // we may as well do pitch and yaw for a complete "invert switch"
+                        actuatorDesired.Pitch = -actuatorDesired.Pitch;
+                        actuatorDesired.Yaw   = -actuatorDesired.Yaw;
+                    }
+                }
+            }
+
+            // also don't adjust throttle if <= 0, leaves neg alone and zero throttle stops motors
+            if (actuatorDesired.Throttle > cruise_control_min_throttle)
+            {
+                // quad    example factor of 2 at hover power of 40%: (0.4 - 0.0) * 2.0 + 0.0 = 0.8
+                // CP heli example factor of 2 at hover stick of 60%: (0.6 - 0.5) * 2.0 + 0.5 = 0.7
+                actuatorDesired.Throttle = (actuatorDesired.Throttle - cruise_control_neutral_thrust) * factor + cruise_control_neutral_thrust;
+                if (actuatorDesired.Throttle > cruise_control_max_throttle) {
+                    actuatorDesired.Throttle = cruise_control_max_throttle;
+                } else if (actuatorDesired.Throttle < cruise_control_min_throttle) {
+                    actuatorDesired.Throttle = cruise_control_min_throttle;
+                }
+            }
+        }
+
         if (PARSE_FLIGHT_MODE(flightStatus.FlightMode) != FLIGHTMODE_MANUAL) {
             ActuatorDesiredSet(&actuatorDesired);
         } else {
@@ -638,9 +713,9 @@ static void ZeroPids(void)
 static float bound(float val, float range)
 {
     if (val < -range) {
-        val = -range;
+        return -range;
     } else if (val > range) {
-        val = range;
+        return range;
     }
     return val;
 }
@@ -687,11 +762,11 @@ static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     StabilizationBankGet(&oldBank);
 
-    if (flight_mode < 0) {
+    if (cur_flight_mode < 0 || cur_flight_mode >= NUM_FMS_POSITIONS) {
         return;
     }
 
-    switch (cast_struct_to_array(settings.FlightModeMap, settings.FlightModeMap.Stabilized1)[flight_mode]) {
+    switch (settings.FlightModeMap[cur_flight_mode]) {
     case 0:
         StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *)&bank);
         break;
@@ -856,10 +931,23 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     vbar_decay  = expf(-fakeDt / settings.VbarTau);
 
     // force flight mode update
-    flight_mode = -1;
+    cur_flight_mode = -1;
 
     // Rattitude flight mode anti-windup factor
     rattitude_anti_windup = settings.RattitudeAntiWindup;
+
+    cruise_control_min_throttle          = (float) settings.CruiseControlMinThrottle / 100.0f;
+    cruise_control_max_throttle          = (float) settings.CruiseControlMaxThrottle / 100.0f;
+    cruise_control_max_angle             = settings.CruiseControlMaxAngle;
+    cruise_control_max_power_factor      = settings.CruiseControlMaxPowerFactor;
+    cruise_control_power_trim            = settings.CruiseControlPowerTrim / 100.0f;
+    cruise_control_inverted_power_switch = settings.CruiseControlInvertedPowerSwitch;
+    cruise_control_neutral_thrust        = (float) settings.CruiseControlNeutralThrust / 100.0f;
+
+    memcpy(
+        cruise_control_flight_mode_switch_pos_enable,
+        settings.CruiseControlFlightModeSwitchPosEnable,
+        sizeof(cruise_control_flight_mode_switch_pos_enable));
 }
 
 /**

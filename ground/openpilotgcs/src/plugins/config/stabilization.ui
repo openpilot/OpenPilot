@@ -559,9 +559,6 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="topMargin">
-            <number>9</number>
-           </property>
            <item>
             <widget class="QTabBar" name="basicPIDBankTabBar" native="true"/>
            </item>
@@ -573,7 +570,7 @@
              <property name="styleSheet">
               <string notr="true">#basicPidBankFrame{
 	color: rgb(180, 180, 180);
-margin-top: -1px
+margin-top: -1px;
 }</string>
              </property>
              <property name="frameShape">
@@ -8617,16 +8614,16 @@ border-radius: 5;</string>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_11">
                 <property name="leftMargin">
-                 <number>9</number>
+                 <number>0</number>
                 </property>
                 <property name="topMargin">
-                 <number>9</number>
+                 <number>0</number>
                 </property>
                 <property name="rightMargin">
-                 <number>9</number>
+                 <number>0</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>9</number>
+                 <number>0</number>
                 </property>
                 <item>
                  <widget class="QCheckBox" name="lowThrottleZeroIntegral_8">
@@ -8718,7 +8715,7 @@ border-radius: 5;</string>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>40</height>
+               <height>20</height>
               </size>
              </property>
             </spacer>
@@ -8766,9 +8763,6 @@ border-radius: 5;</string>
             <height>708</height>
            </rect>
           </property>
-          <property name="autoFillBackground">
-           <bool>true</bool>
-          </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
            <property name="spacing">
             <number>0</number>
@@ -8791,9 +8785,6 @@ border-radius: 5;</string>
               <enum>QFrame::Plain</enum>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_7">
-              <property name="topMargin">
-               <number>9</number>
-              </property>
               <item>
                <widget class="QGroupBox" name="advancedResponsivenessGroupBox">
                 <property name="sizePolicy">
@@ -18664,7 +18655,7 @@ border-radius: 5;</string>
            <item>
             <widget class="QGroupBox" name="groupBox_24">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -18672,16 +18663,13 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>60</height>
+               <height>0</height>
               </size>
              </property>
              <property name="title">
               <string>Instant Update</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_16">
-              <property name="topMargin">
-               <number>9</number>
-              </property>
               <item>
                <widget class="QCheckBox" name="realTimeUpdates_12">
                 <property name="sizePolicy">
@@ -18711,19 +18699,6 @@ border-radius: 5;</string>
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <spacer name="verticalSpacer_2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -18731,7 +18706,7 @@ border-radius: 5;</string>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>200</height>
+               <height>20</height>
               </size>
              </property>
             </spacer>
@@ -18775,25 +18750,13 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>796</width>
-            <height>708</height>
+            <width>752</width>
+            <height>526</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <property name="spacing">
             <number>0</number>
-           </property>
-           <property name="leftMargin">
-            <number>9</number>
-           </property>
-           <property name="topMargin">
-            <number>9</number>
-           </property>
-           <property name="rightMargin">
-            <number>9</number>
-           </property>
-           <property name="bottomMargin">
-            <number>9</number>
            </property>
            <item>
             <widget class="QTabBar" name="expertPIDBankTabBar" native="true"/>
@@ -21272,18 +21235,6 @@ border-radius: 5;</string>
            </item>
            <item>
             <widget class="QGroupBox" name="groupBox_4">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
              <property name="autoFillBackground">
               <bool>false</bool>
              </property>
@@ -21355,7 +21306,7 @@ border-radius: 5;</string>
                </widget>
               </item>
               <item row="1" column="0" colspan="2">
-               <widget class="QGroupBox" name="groupBox">
+               <widget class="QGroupBox" name="groupBox2">
                 <property name="styleSheet">
                  <string>QGroupBox{border: 0px;}</string>
                 </property>
@@ -23914,24 +23865,6 @@ border-radius: 5;</string>
            </item>
            <item>
             <widget class="QGroupBox" name="RateStabilizationGroup_23">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>16777215</height>
-              </size>
-             </property>
              <property name="palette">
               <palette>
                <active>
@@ -24451,9 +24384,6 @@ border-radius: 5;</string>
              </property>
              <property name="title">
               <string>Sensor Tuning</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
              <layout class="QGridLayout" name="gridLayout">
               <property name="leftMargin">
@@ -26859,7 +26789,7 @@ border-radius: 5;</string>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>20</width>
                <height>9</height>
               </size>
              </property>
@@ -26867,18 +26797,6 @@ border-radius: 5;</string>
            </item>
            <item>
             <widget class="QGroupBox" name="groupBox_3">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>60</height>
-              </size>
-             </property>
              <property name="title">
               <string>Instant Update</string>
              </property>
@@ -26919,7 +26837,7 @@ border-radius: 5;</string>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>149</height>
+               <height>20</height>
               </size>
              </property>
             </spacer>
@@ -26963,8 +26881,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>796</width>
-            <height>708</height>
+            <width>284</width>
+            <height>133</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_17">
@@ -27054,7 +26972,7 @@ border-radius: 5;</string>
                   </spacer>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QDoubleSpinBox" name="HorizonAntiWindup">
+                  <widget class="QDoubleSpinBox" name="RattitudeAntiWindup">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -27081,6 +26999,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
                    </property>
                    <property name="decimals">
                     <number>0</number>
@@ -27164,6 +27085,566 @@ border-radius: 5;</string>
             </widget>
            </item>
            <item>
+            <spacer name="verticalSpacer_12">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="gridGroupBox">
+             <property name="title">
+              <string>Cruise Control</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_23">
+              <property name="leftMargin">
+               <number>9</number>
+              </property>
+              <property name="topMargin">
+               <number>9</number>
+              </property>
+              <property name="rightMargin">
+               <number>9</number>
+              </property>
+              <property name="bottomMargin">
+               <number>9</number>
+              </property>
+              <item row="1" column="0" colspan="2">
+               <widget class="QGroupBox" name="gridGroupBox">
+                <layout class="QGridLayout" name="gridLayout_25">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="1" column="4">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrottle) when inverted.  1 says to use the unboosted throttle stick value.  -1 (DON'T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the throttle stick when inverted.
+&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-1.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlInvertedPowerSwitch</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="5">
+                  <spacer name="horizontalSpacer_59">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the bank angle that CruiseControl goes into inverted / power disabled mode.  The power for inverted mode is controlled by CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="maximum">
+                    <double>180.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>105.000000000000000</double>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlMaxAngle</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="decimals">
+                    <number>2</number>
+                   </property>
+                   <property name="minimum">
+                    <double>0.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>50.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.250000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>3.000000000000000</double>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlMaxPowerFactor</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLabel" name="label_6">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                   </property>
+                   <property name="text">
+                    <string>PowerTrim</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="4">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This needs to be 0 for all copters except CP helis that are using idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlNeutralThrust</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that banging the stick around a lot makes the copter climb a bit, adjust this number down a little.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="decimals">
+                    <number>2</number>
+                   </property>
+                   <property name="minimum">
+                    <double>80.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>120.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.250000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>100.000000000000000</double>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlPowerTrim</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="label_4">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                   </property>
+                   <property name="text">
+                    <string>MaxPowerFactor</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="label_7">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                   </property>
+                   <property name="text">
+                    <string>MaxAngle</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QLabel" name="label_8">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                   </property>
+                   <property name="text">
+                    <string>MinThrottle</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle stick below this disables Cruise Control.  Also, by default Cruise Control forces the use of this value for throttle when the copter is inverted.  For safety, never set this so low that the trimmed throttle stick cannot get below it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="value">
+                    <double>5.000000000000000</double>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlMinThrottle</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="4">
+                  <widget class="QLabel" name="label_11">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                   </property>
+                   <property name="text">
+                    <string>NeutralThrust</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="3">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 90% to 95% to leave some headroom for stabilization.  CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
+                   <property name="value">
+                    <double>90.000000000000000</double>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlMaxThrottle</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="3">
+                  <widget class="QLabel" name="label_9">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                   </property>
+                   <property name="text">
+                    <string>MaxThrottle</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <widget class="QLabel" name="label_10">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>140</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                   </property>
+                   <property name="text">
+                    <string>InvertedPower</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <spacer name="horizontalSpacer_60">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Fixed</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>90</width>
+                     <height>11</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QPushButton" name="pushButton_11">
+                <property name="text">
+                 <string>Default</string>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:StabilizationSettings</string>
+                  <string>button:default</string>
+                  <string>buttongroup:16</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <spacer name="horizontalSpacer_58">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer_11">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -27215,14 +27696,11 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>796</width>
-            <height>708</height>
+            <width>347</width>
+            <height>500</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">
-           <property name="spacing">
-            <number>9</number>
-           </property>
            <item>
             <widget class="QGroupBox" name="RateStabilizationGroup_11">
              <property name="sizePolicy">

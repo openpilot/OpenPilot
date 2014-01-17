@@ -2198,14 +2198,14 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
 
 
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
-// show TSLRS debug data
+// show TSLRS debug status
 #define TSLRS_ROTARY_2_CHAR             0xDC
 #define TSLRS_ROTARY_3_CHAR             0xC0
 #define TSLRS_RADIOCRC_2_CHAR           0x43        // TODO calculate different char for char_size 2 and 3
 #define TSLRS_FAILSAFES_2_CHAR          0x46        // TODO calculate different char for char_size 2 and 3
 #define TSLRS_BADCHANNEL_2_CHAR         0x42        // TODO calculate different char for char_size 2 and 3
 #define TSLRS_GOODCHANNEL_2_CHAR        0x47        // TODO calculate different char for char_size 2 and 3
-void draw_tslrsdebug_data(int16_t x, int16_t y, int8_t char_size)
+void draw_tslrsdebug_status(int16_t x, int16_t y, int8_t char_size)
 {
     char temp[10] = { 0 };
 
@@ -2247,6 +2247,25 @@ void draw_tslrsdebug_data(int16_t x, int16_t y, int8_t char_size)
                 sprintf(temp, "%6u%c", tslrsdebug_state->Failsafes, TSLRS_FAILSAFES_2_CHAR);
                 write_string(temp, x, y + 20, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             }
+        }
+    }
+}
+
+// show TSLRS debug channel
+#define TSLRS_CHANNEL_NORM_HEIGHT       15
+#define TSLRS_CHANNEL_NORM_WIDTH        TSRX_CHANNEL_MAX
+void draw_tslrsdebug_channel(int16_t x, int16_t y, int8_t size)
+{
+    write_hline_outlined(x, x + size * TSLRS_CHANNEL_NORM_WIDTH + 1, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
+    write_vline_outlined(x, y, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
+    write_vline_outlined(x + size * TSLRS_CHANNEL_NORM_WIDTH + 1, y, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
+
+    int h, xx, xxx;
+    float height_factor = (float)(TSLRS_CHANNEL_NORM_HEIGHT * size) / (float)tslrsdebug_state->ChannelFailsMax;
+    for (xx = 1; xx <= TSRX_CHANNEL_MAX; xx++) {
+        h = (int)(height_factor * tslrsdebug_state->ChannelFails[xx - 1]);
+        for (xxx = 0; xxx < size; xxx++) {
+            write_vline_lm(x + xx * size - xxx, y + size * TSLRS_CHANNEL_NORM_HEIGHT, y + size * TSLRS_CHANNEL_NORM_HEIGHT - h, 1, 1);
         }
     }
 }
@@ -2512,11 +2531,18 @@ void updateGraphics()
         }
 
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
-        // Show TSLRS debug data which is CRC checked good/bad packet data
+        // Show TSLRS status data which is CRC checked good/bad packet data
         if (OsdSettings2.TSLRSdebug) {
             WarnMask |= (tslrsdebug_state->BadChannelDelta || tslrsdebug_state->BadPacketsDelta) ? WARN_BAD_PACKETS : 0x00;
             if (check_enable_and_srceen(OsdSettings2.TSLRSdebug, (OsdSettingsWarningsSetupData *)&OsdSettings2.TSLRSStatusSetup, screen, &x, &y)) {
-                draw_tslrsdebug_data(x, y, OsdSettings2.TSLRSStatusSetup.CharSize);
+                draw_tslrsdebug_status(x, y, OsdSettings2.TSLRSStatusSetup.CharSize);
+            }
+        }
+
+        // Show TSLRS channel data which is CRC checked good/bad packet data
+        if (OsdSettings2.TSLRSdebug && ((tslrsdebug_state->BadChannelDelta || tslrsdebug_state->BadPacketsDelta))) {
+            if (check_enable_and_srceen(OsdSettings2.TSLRSdebug, (OsdSettingsWarningsSetupData *)&OsdSettings2.TSLRSChannelSetup, screen, &x, &y)) {
+                draw_tslrsdebug_channel(x, y, OsdSettings2.TSLRSChannelSetup.Size);
             }
         }
 #endif

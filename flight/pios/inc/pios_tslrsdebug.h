@@ -59,6 +59,7 @@ struct pios_tslrsdebug_state {
     uint8_t         state;
     uint8_t         version;
     uint8_t         scan_value_percent;
+    uint16_t        ChannelFailsMax;
     uint16_t        ChannelFails[TSRX_CHANNEL_MAX];
     uint32_t        ChannelCount;
     portTickType    BadChannelTime;

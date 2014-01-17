@@ -46,7 +46,7 @@
 #define PACKED_GOOD                 0
 #define PACKED_BAD                  1
 
-#define BOOT_WAIT_TIME              5000
+#define BOOT_WAIT_TIME              10000
 #define CHANNEL_DELTA_DURATION      2000    // [ms]
 
 // for older versions

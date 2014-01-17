@@ -207,6 +207,7 @@ static void tsrxtalk_parse(struct pios_tslrsdebug_state *state, uint8_t c)
             state->BadChannelDelta++;
             state->BadChannelTime = xTaskGetTickCount();
             state->ChannelFails[i]++;
+            state->ChannelFailsMax = state->ChannelFails[i] > state->ChannelFailsMax ? state->ChannelFails[i] : state->ChannelFailsMax;
         break;
         case TSRX_IDLE_FROM_V25:
             switch (c) {
@@ -290,6 +291,7 @@ static void tsrxtalk_parse(struct pios_tslrsdebug_state *state, uint8_t c)
                     state->BadChannelDelta += delta_channel_fails;
                     state->BadChannelTime = xTaskGetTickCount();
                     state->ChannelFails[channel_cnt] = new_chan_fails_val;
+                    state->ChannelFailsMax = state->ChannelFails[channel_cnt] > state->ChannelFailsMax ? state->ChannelFails[channel_cnt] : state->ChannelFailsMax;
                 } else {
                     packet_window_set(PACKED_GOOD, 1);
                 }
@@ -356,6 +358,7 @@ static void PIOS_TSLRSdebug_ResetState(struct pios_tslrsdebug_state *state)
     state->state = TSRX_BOOT;
     state->version = TSRX_IDLE_OLDER;
     state->scan_value_percent = 0;
+    state->ChannelFailsMax = 0;
     state->ChannelCount = 0;
     state->BadChannelTime = 0;
     state->BadChannel = 0;

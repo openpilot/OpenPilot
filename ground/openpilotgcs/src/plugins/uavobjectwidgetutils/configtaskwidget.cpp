@@ -273,12 +273,6 @@ void ConfigTaskWidget::onAutopilotConnect()
     }
     invalidateObjects();
     m_isConnected = true;
-    foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
-        if (!binding->isEnabled()) {
-            continue;
-        }
-        loadWidgetLimits(binding->widget(), binding->field(), binding->index(), binding->isLimited(), binding->scale());
-    }
     setDirty(false);
     enableControls(true);
     refreshWidgetsValues();

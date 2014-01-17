@@ -88,7 +88,7 @@ signals:
     void processPercentageChanged(int percentage);
     void collectionCompleted();
     void calculationCompleted();
-
+    void abort();
 
 public slots:
     /**

@@ -30,6 +30,7 @@
 #include "settingshandlingtransitions.h"
 #include "boardsetuptransition.h"
 #include "dataacquisitiontransition.h"
+#include "compensationcalculationtransition.h"
 
 #define NEXT_EVENT     "next"
 #define PREVIOUS_EVENT "previous"
@@ -40,18 +41,18 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
 {
     m_helper           = new ThermalCalibrationHelper();
     m_readyState       = new WizardState(tr("Start"), this),
-    m_workingState     = new WizardState("workingState", this);
+    m_workingState     = new WizardState(NULL, this);
 
     m_saveSettingState = new WizardState(tr("Saving initial settings"), m_workingState);
     m_workingState->setInitialState(m_saveSettingState);
 
     m_setupState       = new WizardState(tr("Setup board for calibration"), m_workingState);
 
-    m_acquisitionState = new WizardState(tr("Samples acquisition"), m_workingState);
+    m_acquisitionState = new WizardState(tr("*** Please Wait *** Samples acquisition, this can take several minutes"), m_workingState);
     m_calculateState   = new WizardState(tr("Calculate calibration matrix"), m_workingState);
     m_finalizeState    = new WizardState(tr("Completed"), m_workingState);
 
-    m_abortState       = new WizardState("abort", this);
+    m_abortState       = new WizardState("Canceled", this);
 
     setTransitions();
 
@@ -75,7 +76,9 @@ void ThermalCalibrationModel::init()
     emit instructionsChanged(instructions());
 }
 
-void ThermalCalibrationModel::stepChanged(WizardState *state) {}
+void ThermalCalibrationModel::stepChanged(WizardState *state) {
+    Q_UNUSED(state);
+}
 
 void ThermalCalibrationModel::setTransitions()
 {
@@ -92,9 +95,10 @@ void ThermalCalibrationModel::setTransitions()
     // revert settings after acquisition is completed
     // m_acquisitionState->addTransition(new BoardStatusRestoreTransition(m_helper, m_acquisitionState, m_calculateState));
     m_acquisitionState->addTransition(new DataAcquisitionTransition(m_helper, m_acquisitionState, m_calculateState));
-
+    m_workingState->addTransition(m_helper, SIGNAL(abort()), m_abortState) ;
     m_calculateState->addTransition(new BoardStatusRestoreTransition(m_helper, m_calculateState, m_finalizeState));
 
+    m_abortState->addTransition(new BoardStatusRestoreTransition(m_helper, m_abortState, m_readyState));
     m_finalizeState->addTransition(this, SIGNAL(next()), m_readyState);
     // Ready
 }

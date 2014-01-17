@@ -284,7 +284,7 @@ void ThermalCalibrationHelper::updateTemp(float temp)
             m_initialGradient = m_gradient;
         }
         if (m_gradient < TargetGradient) {
-            endAcquisition();
+            emit collectionCompleted();
         }
 
         if (m_targetduration != 0) {
@@ -302,16 +302,14 @@ void ThermalCalibrationHelper::updateTemp(float temp)
 
 void ThermalCalibrationHelper::endAcquisition()
 {
-    // this is called from the collectSample that already has the lock
-    // QMutexLocker lock(&sensorsUpdateLock);
+    QMutexLocker lock(&sensorsUpdateLock);
     disconnectUAVOs();
-    emit collectionCompleted();
+    setProcessPercentage(ProcessPercentageBaseCalculation);
 }
 
 void ThermalCalibrationHelper::connectUAVOs()
 {
     AccelSensor *accel = AccelSensor::GetInstance(getObjectManager());
-
     connect(accel, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
 
     GyroSensor *gyro = GyroSensor::GetInstance(getObjectManager());
@@ -327,7 +325,6 @@ void ThermalCalibrationHelper::connectUAVOs()
 void ThermalCalibrationHelper::disconnectUAVOs()
 {
     AccelSensor *accel = AccelSensor::GetInstance(getObjectManager());
-
     disconnect(accel, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
 
     GyroSensor *gyro = GyroSensor::GetInstance(getObjectManager());

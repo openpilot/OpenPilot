@@ -26,7 +26,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "wizardmodel.h"
-
+#include "QDebug"
 WizardModel::WizardModel(QObject *parent) :
     QStateMachine(parent)
 {}
@@ -34,8 +34,9 @@ WizardModel::WizardModel(QObject *parent) :
 WizardState *WizardModel::currentState()
 {
     foreach(QAbstractState * value, this->configuration()) {
-        if (value->parent() != 0) { \
-            return static_cast<WizardState *>(value);
+        WizardState *state = static_cast<WizardState *>(value);
+        if (state->children().count() <= 1) {
+            return state;
         }
     }
     return NULL;

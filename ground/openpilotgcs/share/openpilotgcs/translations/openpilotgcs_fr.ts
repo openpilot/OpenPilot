@@ -7601,7 +7601,7 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This function will avoid integral windup when at idle. Integral windup is an accumulation of over-correction and can make the vehicle flip during a slow takeoff.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translatorcomment>Traduction Windup ??</translatorcomment>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette fonction permet d&apos;annuler le terme intégral au ralenti. Le terme intégral est une accumulation de sur-correction et peut faire retourner l&apos;appareil lors d&apos;un décollage lent.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette fonction permet d&apos;annuler la saturation des corrections qui pourraient entrainer le retournement de l&apos;appareil lors de décollages lents.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7839,7 +7839,7 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>Anti-Windup</source>
         <translatorcomment>Traduction Windup ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anti-Saturation</translation>
     </message>
     <message>
         <location/>

@@ -128,8 +128,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>745</height>
+            <width>768</width>
+            <height>742</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -559,8 +559,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>745</height>
+            <width>768</width>
+            <height>742</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7" rowstretch="1,0,0,0">
@@ -746,18 +746,18 @@ margin:1px;</string>
                <widget class="QFrame" name="frame_3">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
+                  <width>106</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>75</width>
+                  <width>105</width>
                   <height>16777215</height>
                  </size>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
@@ -799,7 +799,7 @@ margin:1px;</string>
               <item row="1" column="3">
                <widget class="QFrame" name="frame_2">
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
@@ -850,7 +850,7 @@ margin:1px;</string>
               <item row="1" column="7">
                <widget class="QFrame" name="frame_5">
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
@@ -901,7 +901,7 @@ margin:1px;</string>
               <item row="1" column="9">
                <widget class="QFrame" name="frame_6">
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
@@ -1005,7 +1005,7 @@ margin:1px;</string>
                <widget class="QLabel" name="label_11">
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>80</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -1034,7 +1034,7 @@ margin:1px;</string>
                <widget class="QLabel" name="label_16">
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>132</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -1181,7 +1181,7 @@ channel value for each flight mode.</string>
                <widget class="QLabel" name="label_12">
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>105</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -1217,7 +1217,7 @@ margin:1px;</string>
                <widget class="QLabel" name="label_13">
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>138</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -1246,7 +1246,7 @@ margin:1px;</string>
                <widget class="QFrame" name="frame_4">
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>30</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -1299,7 +1299,7 @@ margin:1px;</string>
                     </font>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
@@ -1340,7 +1340,7 @@ margin:1px;</string>
                     </font>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #2.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #2.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
@@ -1381,7 +1381,7 @@ margin:1px;</string>
                     </font>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #3.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #3.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
@@ -1425,7 +1425,7 @@ margin:1px;</string>
                     </font>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #4.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #4.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
@@ -1469,7 +1469,7 @@ margin:1px;</string>
                     </font>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #5.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #5.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
@@ -1513,7 +1513,7 @@ margin:1px;</string>
                     </font>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this check this box will enable Cruise Control for Flight Mode Switch position #6.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #6.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
@@ -1540,18 +1540,18 @@ margin:1px;</string>
                <widget class="QFrame" name="frame">
                 <property name="minimumSize">
                  <size>
-                  <width>75</width>
+                  <width>90</width>
                   <height>0</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>75</width>
+                  <width>90</width>
                   <height>16777215</height>
                  </size>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
                  <enum>QFrame::Raised</enum>
@@ -1809,6 +1809,9 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
+                   </property>
                   </widget>
                  </item>
                  <item row="0" column="1">
@@ -1841,12 +1844,18 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
+                   </property>
                   </widget>
                  </item>
                  <item row="2" column="1">
                   <widget class="QComboBox" name="fmsModePos3">
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
                    </property>
                   </widget>
                  </item>
@@ -1868,6 +1877,9 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string>Select the stabilization mode on this position (manual/stabilized/auto)</string>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -1877,7 +1889,7 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                <widget class="QFrame" name="frame_7">
                 <property name="minimumSize">
                  <size>
-                  <width>120</width>
+                  <width>75</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -1904,12 +1916,15 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                   <widget class="QComboBox" name="pidBankSs1_0">
                    <property name="minimumSize">
                     <size>
-                     <width>102</width>
+                     <width>75</width>
                      <height>0</height>
                     </size>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -1927,12 +1942,15 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                   <widget class="QComboBox" name="pidBankSs1_1">
                    <property name="minimumSize">
                     <size>
-                     <width>102</width>
+                     <width>75</width>
                      <height>0</height>
                     </size>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -1950,12 +1968,15 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                   <widget class="QComboBox" name="pidBankSs1_2">
                    <property name="minimumSize">
                     <size>
-                     <width>102</width>
+                     <width>75</width>
                      <height>0</height>
                     </size>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -1976,12 +1997,15 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>102</width>
+                     <width>75</width>
                      <height>0</height>
                     </size>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -2002,12 +2026,15 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>102</width>
+                     <width>75</width>
                      <height>0</height>
                     </size>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -2028,12 +2055,15 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>102</width>
+                     <width>75</width>
                      <height>0</height>
                     </size>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -2153,8 +2183,8 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>745</height>
+            <width>504</width>
+            <height>156</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

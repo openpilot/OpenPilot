@@ -27,7 +27,6 @@
 #ifndef SMARTSAVEBUTTON_H
 #define SMARTSAVEBUTTON_H
 
-#include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"

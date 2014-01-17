@@ -25,9 +25,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configtaskwidget.h"
+
+#include <uavtalk/telemetrymanager.h>
+#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
+
 #include <QWidget>
 #include <QLineEdit>
-#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
 
 ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent), m_isConnected(false), m_isWidgetUpdatesAllowed(true),
     m_saveButton(NULL), m_isDirty(false), m_outOfLimitsStyle("background-color: rgb(255, 0, 0);"), m_realtimeUpdateTimer(NULL)
@@ -269,16 +272,10 @@ void ConfigTaskWidget::forceConnectedState() // dynamic widgets don't recieve th
 void ConfigTaskWidget::onAutopilotConnect()
 {
     if (m_objectUtilManager) {
-        m_currentBoardId = m_objectUtilManager->getBoardModel(); // TODO REMEMBER TO ADD THIS TO FORCE CONNECTED FUNC ON CC3D_RELEASE
+        m_currentBoardId = m_objectUtilManager->getBoardModel();
     }
     invalidateObjects();
     m_isConnected = true;
-    foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
-        if (!binding->isEnabled()) {
-            continue;
-        }
-        loadWidgetLimits(binding->widget(), binding->field(), binding->index(), binding->isLimited(), binding->scale());
-    }
     setDirty(false);
     enableControls(true);
     refreshWidgetsValues();
@@ -1046,6 +1043,7 @@ void ConfigTaskWidget::updateEnableControls()
     TelemetryManager *telMngr = m_pluginManager->getObject<TelemetryManager>();
 
     Q_ASSERT(telMngr);
+
     enableControls(telMngr->isConnected());
 }
 

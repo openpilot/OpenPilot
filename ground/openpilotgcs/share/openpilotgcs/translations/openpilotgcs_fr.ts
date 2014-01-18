@@ -1219,7 +1219,7 @@ Raison : %3</translation>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Misc</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Divers</translation>
     </message>
     <message>
         <location/>
@@ -6104,9 +6104,8 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Stabilisé 3</translation>
     </message>
     <message>
-        <location/>
         <source>FlightMode Switch Positions</source>
-        <translation>Positions Inter Mode de Vol</translation>
+        <translation type="obsolete">Positions Inter Mode de Vol</translation>
     </message>
     <message>
         <location/>
@@ -6156,9 +6155,8 @@ Configurez le canal de mode de vol dans l&apos;onglet Entrées RC si vous ne l&a
         <translation>Sélectionner le mode de stabilisation dans cette position (manuel / stabilisé / auto)</translation>
     </message>
     <message>
-        <location/>
         <source>Number of flight modes:</source>
-        <translation>Nombre de modes de vol :</translation>
+        <translation type="obsolete">Nombre de modes de vol :</translation>
     </message>
     <message>
         <location/>
@@ -6275,6 +6273,133 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>PID Bank</source>
         <translation type="unfinished">Banque PID</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flight Mode Switch Positions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flight Mode Count</source>
+        <translation type="unfinished">Nombre de modes de vol</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cruise Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flight Mode</source>
+        <translation type="unfinished">Mode de Vol</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:StabilizationSettings</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlFlightModeSwitchPosEnable</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:0</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>haslimits:no</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:1</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:16</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #2.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:1</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #3.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:2</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #4.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:3</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #5.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:4</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #6.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:5</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:FlightModeMap</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7827,7 +7952,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Higher values will keep larger Ki terms and limits from winding up at partial stick.  Consider increasing this if you have high Ki values and limits and a sudden stick motion from one aircraft bank angle to another causes the aircraft to rotate and then slowly change rotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Higher values will keep larger Ki terms and limits from winding up at partial stick.  Consider increasing this if you have high Ki values and limits and a sudden stick motion from one aircraft bank angle to another causes the aircraft to rotate and then slowly change rotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7890,6 +8015,132 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>Control Coefficients</source>
         <translation type="unfinished">Coefficients de Contrôle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cruise Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrottle) when inverted.  1 says to use the unboosted throttle stick value.  -1 (DON&apos;T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the throttle stick when inverted.
+&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, ou 1.  Cruise Control multiplie la position du manche des gaz par cette valeur si l&apos;angle d&apos;inclinaison a dépassé l&apos;AngleMaxi.&lt;/p&gt;&lt;p&gt;  La valeur par défaut 0 signifie l&apos;arrêt des moteurs (les basculer à la valeur de GazMini) lorsque l&apos;appareil est à l&apos;envers.&lt;/p&gt;
+&lt;p&gt;  La valeur 1 signifie qu&apos;il utilise la valeur du manche des gaz, non modifiée.&lt;/p&gt;&lt;p&gt;  -1 (NE PAS UTILISER, INCOMPLET, NON-TESTÉ, pour les hélicoptères CP utilisant le iddle up) signifie une inversion du manche des gaz lorsque l&apos;hélicoptère est à l&apos;envers.
+&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlInvertedPowerSwitch</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:16</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the bank angle that CruiseControl goes into inverted / power disabled mode.  The power for inverted mode is controlled by CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci correspond à l&apos;angle d&apos;inclinaison où CruiseControl passe en inversé / mode puissance désactivé. La puissance en mode inversé est contrôlée par CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMaxAngle</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Juste une limitation de sécurité. 4.0 signifie qu&apos;il n&apos;utilisera pas plus de 4 fois la puissance demandée par le manche des gaz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMaxPowerFactor</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>PowerTrim</source>
+        <translation type="unfinished">AjustPuissance</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This needs to be 0 for all copters except CP helis that are using idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci doit être à 0 pour tous les hélicoptères sauf les hélicos CP qui utilisent l&apos;idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlNeutralThrust</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that banging the stick around a lot makes the copter climb a bit, adjust this number down a little.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si vous trouvez qu&apos;un petit mouvement de manche fait légèrement monter l&apos;hélicoptère, baissez un petit peu cette valeur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlPowerTrim</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MaxPowerFactor</source>
+        <translation type="unfinished">FacteurMaxiPuissance</translation>
+    </message>
+    <message>
+        <location/>
+        <source>MaxAngle</source>
+        <translation type="unfinished">AngleMaxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>MinThrottle</source>
+        <translation type="unfinished">GazMini</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle stick below this disables Cruise Control.  Also, by default Cruise Control forces the use of this value for throttle when the copter is inverted.  For safety, never set this so low that the trimmed throttle stick cannot get below it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsque le manche des gaz est en dessous de cette valeur, cela désactive Cruize Control. En outre, Cruize Control impose l&apos;utilisation de cette valeur de manche de gaz lorsque l&apos;hélicoptère est à l&apos;envers.&lt;/p&gt;&lt;p&gt; Par mesure de sécurité, ne jamais définir une valeur trop basse pour qu&apos;un manche de gaz baissé puisse descendre en dessous de cette valeur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMinThrottle</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>NeutralThrust</source>
+        <translation type="unfinished">PousséeNeutre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 90% to 95% to leave some headroom for stabilization.  CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les multicoptères devraient probablement utiliser une valeur de 90% à 95% afin de laisser une certaine marge pour la stabilisation. Les hélicos CP peuvent définir cette valeur à 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMaxThrottle</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MaxThrottle</source>
+        <translation type="unfinished">GazMaxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>InvertedPower</source>
+        <translation type="unfinished">PuissanceRenversé</translation>
     </message>
 </context>
 <context>
@@ -8339,7 +8590,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Armed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Armé</translation>
     </message>
     <message>
         <location/>
@@ -8357,7 +8608,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Scale:</source>
-        <translation type="unfinished">Échelle :</translation>
+        <translation>Échelle :</translation>
     </message>
 </context>
 <context>
@@ -9916,14 +10167,14 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+346"/>
-        <location line="+1041"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+344"/>
+        <location line="+1065"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
         <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1040"/>
+        <location line="-1064"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
@@ -10115,7 +10366,7 @@ Bougez le manche %1.</translation>
         <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+614"/>
+        <location line="+638"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
         <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
     </message>
@@ -11055,7 +11306,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>CCPM Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Options CCPM</translation>
     </message>
     <message>
         <location/>
@@ -11843,7 +12094,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Link State</source>
-        <translation type="unfinished">État Liaison</translation>
+        <translation>État Liaison</translation>
     </message>
     <message>
         <location/>
@@ -11983,7 +12234,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>RX Failure</source>
-        <translation>Rx défaillants</translation>
+        <translation>Rx Défaillants</translation>
     </message>
     <message>
         <location/>
@@ -12432,7 +12683,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/uploader/devicewidget.cpp" line="+81"/>
         <source>Device ID: </source>
-        <translation type="unfinished">ID Périphérique : </translation>
+        <translation>ID Périphérique : </translation>
     </message>
     <message>
         <location line="+5"/>
@@ -12442,12 +12693,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+31"/>
         <source>Flash access: </source>
-        <translation type="unfinished">Accès flash : </translation>
+        <translation>Accès flash : </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Max code size: </source>
-        <translation type="unfinished">Taille maxi code : </translation>
+        <translation>Taille maxi code : </translation>
     </message>
     <message>
         <location line="+2"/>
@@ -12460,7 +12711,7 @@ p, li { white-space: pre-wrap; }
         <location line="+1"/>
         <location line="+1"/>
         <source>Unknown</source>
-        <translation type="unfinished">Inconnu</translation>
+        <translation>Inconnu</translation>
     </message>
     <message>
         <location line="-3"/>

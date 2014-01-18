@@ -48,7 +48,8 @@
     <message>
         <location/>
         <source>R</source>
-        <translation>R</translation>
+        <translatorcomment>?</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+62"/>
@@ -94,21 +95,23 @@
     <message>
         <location/>
         <source>Automatically connect an OpenPilot USB device:</source>
-        <translation>Connecter automatiquement un périphérique OpenPilot USB :</translation>
+        <translation>Connecter automatiquement un périphérique USB OpenPilot :</translation>
     </message>
     <message>
         <location/>
         <source>Automatically select an OpenPilot USB device:</source>
-        <translation>Sélectionner automatiquement un périphérique OpenPilot USB :</translation>
+        <translation>Sélectionner automatiquement un périphérique USB OpenPilot :</translation>
     </message>
     <message>
         <location/>
         <source>Use UDP Mirror</source>
+        <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
         <translation>Utiliser Miroir UDP</translation>
     </message>
     <message>
         <location/>
         <source>Expert Mode</source>
+        <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
         <translation>Mode Expert</translation>
     </message>
     <message>
@@ -882,7 +885,7 @@
     <message>
         <location/>
         <source>Error Message:</source>
-        <translation>Message d&apos;erreur :</translation>
+        <translation>Message d&apos;Erreur :</translation>
     </message>
 </context>
 <context>
@@ -1260,22 +1263,23 @@ Raison : %3</translation>
     <message>
         <location line="+1"/>
         <source>Error Details</source>
-        <translation>Détails de l&apos;erreur</translation>
+        <translatorcomment>bouton</translatorcomment>
+        <translation>Détails Erreur</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Installed Plugins</source>
-        <translation>Modules complémentaires installés</translation>
+        <translation>Modules Complémentaires Installés</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Plugin Details of %1</source>
-        <translation>Détail sur le module complémentaire %1</translation>
+        <translation>Détails sur le Module Complémentaire %1</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Plugin Errors of %1</source>
-        <translation>Erreurs du module complémentaire %1</translation>
+        <translation>Erreurs du Module Complémentaire %1</translation>
     </message>
 </context>
 <context>
@@ -1635,6 +1639,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Remember last used workspace on restart</source>
+        <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
         <translation>Se rappeler du dernier espace de travail utilisé</translation>
     </message>
 </context>
@@ -2622,7 +2627,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Math window size</source>
-        <translatorcomment>Should be fixed in code (add &quot;:&quot;)</translatorcomment>
+        <translatorcomment>Typo Should be fixed in code add &quot;:&quot; like others in form</translatorcomment>
         <translation type="unfinished">Plage calcul :</translation>
     </message>
     <message>
@@ -3513,7 +3518,7 @@ uniquement lorsque les valeurs changent</translation>
         <location line="+1"/>
         <location line="+1"/>
         <source>ms</source>
-        <translation type="unfinished">ms</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-1"/>
@@ -3719,6 +3724,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location/>
         <source>Timeout(ms):</source>
+        <translatorcomment>Typo (space missing)</translatorcomment>
         <translation>Temps de latence (ms) :</translation>
     </message>
     <message>
@@ -3762,7 +3768,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location/>
         <source>Coord:</source>
-        <translation></translation>
+        <translation>Coord :</translation>
     </message>
     <message>
         <location/>
@@ -3778,7 +3784,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location/>
         <source>H / V / P DOP:</source>
-        <translation></translation>
+        <translation>H / V / P DOP :</translation>
     </message>
     <message>
         <location/>
@@ -3807,7 +3813,7 @@ Satellite number (PRN) is displayed inside the green bar.
 Sat SNR is displayed above (in dBHz)</source>
         <translation>Affiche le SNR pour chaque satellite détecté.
 Le numéro du satellite (PRN) est affiché sur une barre verte.
-Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
+Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
     </message>
 </context>
 <context>
@@ -3835,6 +3841,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Host Name/Number</source>
+        <translatorcomment>Typo &quot;:&quot; needed, input on his right</translatorcomment>
         <translation>Nom d&apos;Hôte / Adresse IP</translation>
     </message>
     <message>
@@ -4328,7 +4335,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="-76"/>
         <source>Save GCS Settings too file ..</source>
-        <translation>Enregistre Paramètres GCS vers fichier ..</translation>
+        <translatorcomment>Typo too and ... on end without space ? Context ?</translatorcomment>
+        <translation type="unfinished">Enregistre Paramètres GCS vers fichier ..</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -4651,6 +4659,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Roll:</source>
+        <translatorcomment>Typo the only with &quot;:&quot; on end in this form ?</translatorcomment>
         <translation>Roll :</translation>
     </message>
     <message>
@@ -5595,7 +5604,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Place aircraft very flat, and then click level to compute the accelerometer and gyro bias</source>
-        <translation>Placer l&apos;appareil bien à plat et cliquer ensuite sur Niveau pour calculer les ajustements des accéléromètres et gyroscopes </translation>
+        <translation>Placer l&apos;appareil bien à plat et cliquer ensuite sur Niveau pour calculer les ajustements des accéléromètres et gyroscopes</translation>
     </message>
     <message>
         <location/>
@@ -6257,27 +6266,31 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Stabilized 1</source>
-        <translation type="unfinished">Stabilisation 1</translation>
+        <translatorcomment>Typo Need translation in selection list above</translatorcomment>
+        <translation type="unfinished">Stabilisé 1   </translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 2</source>
-        <translation type="unfinished">Stabilisation 2</translation>
+        <translatorcomment>Typo Need translation in selection list above</translatorcomment>
+        <translation type="unfinished">Stabilisé 2</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 3</source>
-        <translation type="unfinished">Stabilisation 3</translation>
+        <translatorcomment>Typo Need translation in selection list above</translatorcomment>
+        <translation type="unfinished">Stabilisé 3</translation>
     </message>
     <message>
         <location/>
         <source>PID Bank</source>
+        <translatorcomment>Typo Need translation for &quot;Bank1&quot; &quot;Bank 2&quot;... in selection list below</translatorcomment>
         <translation type="unfinished">Banque PID</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode Switch Positions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Positions Inter Mode de Vol</translation>
     </message>
     <message>
         <location/>
@@ -6297,7 +6310,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #1 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6338,7 +6351,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #2.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #2 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6349,7 +6362,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #3.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #3 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6360,7 +6373,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #4.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #4 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6371,7 +6384,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #5.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #5 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6382,7 +6395,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #6.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #6 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6393,7 +6406,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionnez quels paramètres de vitesse / angle d&apos;inclinaison / PID vous souhaitez utiliser pour cette position d&apos;interrupteur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6552,7 +6565,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location/>
         <source>Linear</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation></translation>
+        <translation type="unfinished">Linéaire</translation>
     </message>
     <message>
         <location/>
@@ -6610,7 +6623,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location/>
         <source>Output Update Speed</source>
         <translatorcomment>Bof...</translatorcomment>
-        <translation>Fréquence Mise à Jour Sortie</translation>
+        <translation>Fréquence Mise à Jour Sorties</translation>
     </message>
     <message>
         <location/>
@@ -6631,7 +6644,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location/>
         <source>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
 Leave at 50Hz for fixed wing.</source>
-        <translation>Configurer ici &quot;TurboPWM&quot;: valeur classique pour les multirotors.
+        <translation>Configurer ici &quot;TurboPWM&quot; : valeur classique pour les multirotors.
 Laisser à 50Hz pour une aile volante.</translation>
     </message>
     <message>
@@ -6902,7 +6915,7 @@ Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
 
 This does not save the calibration settings, this is done using the
 specific calibration button on top of the screen.</source>
-        <translatorcomment>Bouton en haut ou simplement bouton enregistrer à coté ?</translatorcomment>
+        <translatorcomment>Typo : context &quot;calibration button on top of the screen&quot; ? Should be the &quot;Save&quot; button just on right ? Bouton en haut ou simplement bouton enregistrer à coté ?</translatorcomment>
         <translation type="unfinished">Envoi des paramètres sur la carte (uniquement en mémoire).
 
 Cela n&apos;enregistre pas les paramètres de calibration qui seront effectifs 
@@ -8365,7 +8378,6 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>PID Bank</source>
-        <translatorcomment>une idée pour bank ?</translatorcomment>
         <translation type="unfinished">Banque PID</translation>
     </message>
 </context>
@@ -8590,7 +8602,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Armed</source>
-        <translation type="unfinished">Armé</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -11507,7 +11519,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <location/>
         <source>Yaw</source>
         <translatorcomment>Tech : laisser tel quel?</translatorcomment>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -11522,7 +11534,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Ch 3</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>

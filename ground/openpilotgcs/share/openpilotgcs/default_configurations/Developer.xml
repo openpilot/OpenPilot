@@ -1126,7 +1126,7 @@
           <dFile>%%DATAPATH%%dials/default/arm-status.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
-          <font>,12,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,12,-1,5,50,0,0,0,0,0</font>
           <greenMax>100</greenMax>
           <greenMin>66</greenMin>
           <maxValue>100</maxValue>
@@ -1149,7 +1149,7 @@
           <dFile>%%DATAPATH%%dials/default/textonly.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>0.001</factor>
-          <font>,12,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,12,-1,5,50,0,0,0,0,0</font>
           <greenMax>100</greenMax>
           <greenMin>66</greenMin>
           <maxValue>100</maxValue>
@@ -1172,7 +1172,7 @@
           <dFile>%%DATAPATH%%dials/default/flightmode-status.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
-          <font>,12,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,12,-1,5,50,0,0,0,0,0</font>
           <greenMax>100</greenMax>
           <greenMin>66</greenMin>
           <maxValue>100</maxValue>
@@ -1195,7 +1195,7 @@
           <dFile>%%DATAPATH%%dials/default/gps-signal.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
-          <font>,12,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,12,-1,5,50,0,0,0,0,0</font>
           <greenMax>0</greenMax>
           <greenMin>0</greenMin>
           <maxValue>12</maxValue>
@@ -1218,7 +1218,7 @@
           <dFile>%%DATAPATH%%dials/default/gps-status.svg</dFile>
           <decimalPlaces>0</decimalPlaces>
           <factor>1</factor>
-          <font>,12,-1,5,50,0,0,0,0,0</font>
+          <font>MS Shell Dlg 2,12,-1,5,50,0,0,0,0,0</font>
           <greenMax>100</greenMax>
           <greenMin>66</greenMin>
           <maxValue>100</maxValue>

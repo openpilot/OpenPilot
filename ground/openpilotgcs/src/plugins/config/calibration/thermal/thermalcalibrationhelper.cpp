@@ -26,12 +26,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "thermalcalibrationhelper.h"
-
+#include "thermalcalibration.h"
 namespace OpenPilot {
 ThermalCalibrationHelper::ThermalCalibrationHelper(QObject *parent) :
     QObject(parent)
 {
+
     m_boardInitialSettings = thermalCalibrationBoardSettings();
+    m_boardInitialSettings.statusSaved = false;
+    m_results = thermalCalibrationResults();
+    m_results.accelCalibrated = false;
+    m_results.baroCalibrated = false;
+    m_results.gyroCalibrated = false;
 }
 
 /**
@@ -64,7 +70,7 @@ bool ThermalCalibrationHelper::setupBoardForCalibration()
     RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);
     Q_ASSERT(revoSettings);
     RevoSettings::DataFields revoSettingsData = revoSettings->getData();
-    for (int i = 0; i < RevoSettings::BAROTEMPCORRECTIONPOLYNOMIAL_NUMELEM; i++) {
+    for (uint i = 0; i < RevoSettings::BAROTEMPCORRECTIONPOLYNOMIAL_NUMELEM; i++) {
         revoSettingsData.BaroTempCorrectionPolynomial[i] = 0.0f;
     }
     revoSettings->setData(revoSettingsData);
@@ -147,7 +153,6 @@ bool ThermalCalibrationHelper::restoreInitialSettings()
     Q_ASSERT(revoSettings);
     revoSettings->setData(m_boardInitialSettings.revoSettings);
 
-    m_boardInitialSettings.statusSaved = false;
     return true;
 }
 
@@ -192,7 +197,7 @@ void ThermalCalibrationHelper::initAcquisition()
     m_targetduration  = 0;
     m_gradient = 0.0f;
     m_initialGradient = m_gradient;
-
+    m_forceStopAcquisition = false;
     // Clear all samples
     m_accelSamples.clear();
     m_gyroSamples.clear();
@@ -208,6 +213,7 @@ void ThermalCalibrationHelper::initAcquisition()
     m_gradient = 0;
     connectUAVOs();
 }
+
 void ThermalCalibrationHelper::collectSample(UAVObject *sample)
 {
     QMutexLocker lock(&sensorsUpdateLock);
@@ -255,6 +261,56 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
 void ThermalCalibrationHelper::calculate()
 {
     setProcessPercentage(ProcessPercentageBaseCalculation);
+    int count = m_baroSamples.count();
+    Eigen::VectorXf datax(count);
+    Eigen::VectorXf datay(1);
+    Eigen::VectorXf dataz(1);
+    Eigen::VectorXf datat(count);
+
+    for(int x = 0; x < count; x++){
+        datax[x] = m_baroSamples[x].Pressure;
+        datat[x] = m_baroSamples[x].Temperature;
+    }
+
+    m_results.baroCalibrated = ThermalCalibration::BarometerCalibration(datax, datat, m_results.baro);
+
+    setProcessPercentage(processPercentage() + 2);
+    count = m_gyroSamples.count();
+    datax.resize(count);
+    datay.resize(count);
+    dataz.resize(count);
+    datat.resize(count);
+
+    for(int x = 0; x < count; x++){
+        datax[x] = m_gyroSamples[x].x;
+        datay[x] = m_gyroSamples[x].y;
+        dataz[x] = m_gyroSamples[x].z;
+        datat[x] = m_gyroSamples[x].temperature;
+    }
+
+    m_results.gyroCalibrated = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro);
+
+    //TODO: sanity checks needs to be enforced before accel calibration can be enabled and usable.
+    /*
+    setProcessPercentage(processPercentage() + 2);
+    count = m_accelSamples.count();
+    datax.resize(count);
+    datay.resize(count);
+    dataz.resize(count);
+    datat.resize(count);
+
+    for(int x = 0; x < count; x++){
+        datax[x] = m_accelSamples[x].x;
+        datay[x] = m_accelSamples[x].y;
+        dataz[x] = m_accelSamples[x].z;
+        datat[x] = m_accelSamples[x].temperature;
+    }
+
+    m_results.accelCalibrated = ThermalCalibration::AccelerometerCalibration(datax, datay, dataz, datat, m_results.accel);
+    */
+    m_results.accelCalibrated = false;
+    copyResultToSettings();
+    emit calculationCompleted();
 }
 
 
@@ -284,7 +340,7 @@ void ThermalCalibrationHelper::updateTemp(float temp)
         if (m_initialGradient < .1 && m_gradient > .1) {
             m_initialGradient = m_gradient;
         }
-        if (m_gradient < TargetGradient) {
+        if (m_gradient < TargetGradient || m_forceStopAcquisition) {
             emit collectionCompleted();
         }
 
@@ -303,7 +359,6 @@ void ThermalCalibrationHelper::updateTemp(float temp)
 
 void ThermalCalibrationHelper::endAcquisition()
 {
-    QMutexLocker lock(&sensorsUpdateLock);
     disconnectUAVOs();
     setProcessPercentage(ProcessPercentageBaseCalculation);
 }
@@ -337,6 +392,44 @@ void ThermalCalibrationHelper::disconnectUAVOs()
     MagSensor *mag   = MagSensor::GetInstance(getObjectManager());
     disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
 }
+
+void ThermalCalibrationHelper::copyResultToSettings()
+{
+    UAVObjectManager *objManager = getObjectManager();
+    Q_ASSERT(objManager);
+
+    if(m_results.baroCalibrated) {
+        RevoSettings *revosettings = RevoSettings::GetInstance(objManager);
+        Q_ASSERT(revosettings);
+        revosettings->setBaroTempCorrectionPolynomial_a(m_results.baro[0]);
+        revosettings->setBaroTempCorrectionPolynomial_b(m_results.baro[1]);
+        revosettings->setBaroTempCorrectionPolynomial_c(m_results.baro[2]);
+        revosettings->setBaroTempCorrectionPolynomial_d(m_results.baro[3]);
+        revosettings->updated();
+    }
+
+    if(m_results.gyroCalibrated || m_results.accelCalibrated){
+        AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
+        Q_ASSERT(accelGyroSettings);
+        AccelGyroSettings::DataFields data = accelGyroSettings->getData();
+
+        if(m_results.gyroCalibrated){
+            data.gyro_temp_coeff[0] = m_results.gyro[0];
+            data.gyro_temp_coeff[1] = m_results.gyro[1];
+            data.gyro_temp_coeff[2] = m_results.gyro[2];
+            data.gyro_temp_coeff[3] = m_results.gyro[3];
+        }
+
+        if(m_results.accelCalibrated){
+            data.accel_temp_coeff[0] = m_results.gyro[0];
+            data.accel_temp_coeff[1] = m_results.gyro[1];
+            data.accel_temp_coeff[2] = m_results.gyro[2];
+        }
+        accelGyroSettings->setData(data);
+        accelGyroSettings->updated();
+    }
+}
+
 void ThermalCalibrationHelper::setMetadataForCalibration(UAVDataObject *uavo)
 {
     Q_ASSERT(uavo);

@@ -58,9 +58,17 @@ typedef struct {
     UAVObject::Metadata gyroSensorMeta;
     UAVObject::Metadata accelSensorMeta;
     UAVObject::Metadata baroensorMeta;
-    bool statusSaved = false;
+    bool statusSaved;
 } thermalCalibrationBoardSettings;
 
+typedef struct {
+    bool baroCalibrated;
+    float baro[4];
+    bool accelCalibrated;
+    float accel[3];
+    bool gyroCalibrated;
+    float gyro[4];
+} thermalCalibrationResults;
 class ThermalCalibrationHelper : public QObject {
     Q_OBJECT
 public:
@@ -79,6 +87,7 @@ public:
     {
         return m_processPercentage;
     }
+    void endAcquisition();
 
 signals:
     void statusRestoreCompleted(bool succesful);
@@ -112,10 +121,14 @@ public slots:
      */
     void initAcquisition();
 
+    void stopAcquisition(){
+        QMutexLocker lock(&sensorsUpdateLock);
+        emit collectionCompleted();
+    }
+
     void calculate();
 
     void collectSample(UAVObject *sample);
-    void endAcquisition();
     void setProcessPercentage(int value)
     {
         if (m_processPercentage != value) {
@@ -129,6 +142,8 @@ private:
     void connectUAVOs();
     void disconnectUAVOs();
 
+    void copyResultToSettings();
+
     QMutex sensorsUpdateLock;
 
     QList<AccelSensor::DataFields> m_accelSamples;
@@ -138,17 +153,19 @@ private:
 
     QTime m_startTime;
     // temperature checkpoints, used to calculate temp gradient
-    const int TimeBetweenCheckpoints = 10;
+    const static int TimeBetweenCheckpoints = 10;
     QTime m_lastCheckpointTime;
+    bool m_forceStopAcquisition;
     float m_lastCheckpointTemp;
     float m_gradient;
     float m_temperature;
     float m_initialGradient;
-    const int ProcessPercentageSaveSettings    = 5;
-    const int ProcessPercentageSetupBoard      = 10;
-    const int ProcessPercentageBaseAcquisition = 15;
-    const int ProcessPercentageBaseCalculation = 85;
-    const float TargetGradient = 0.5f;
+    const static int ProcessPercentageSaveSettings    = 5;
+    const static int ProcessPercentageSetupBoard      = 10;
+    const static int ProcessPercentageBaseAcquisition = 15;
+    const static int ProcessPercentageBaseCalculation = 85;
+    const static int ProcessPercentageSaveResults = 95;
+    const static float TargetGradient = 0.35f;
     int m_targetduration;
     int m_processPercentage;
 
@@ -165,6 +182,7 @@ private:
         m_boardInitialSettings.statusSaved = false;
     }
     thermalCalibrationBoardSettings m_boardInitialSettings;
+    thermalCalibrationResults m_results;
 
     void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();

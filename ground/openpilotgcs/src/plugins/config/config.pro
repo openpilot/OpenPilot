@@ -52,6 +52,7 @@ HEADERS += configplugin.h \
     calibration/thermal/boardsetuptransition.h \
     calibration/thermal/dataacquisitiontransition.h \
     calibration/thermal/settingshandlingtransitions.h \
+    calibration/thermal/compensationcalculationtransition.h
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \

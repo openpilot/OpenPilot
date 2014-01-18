@@ -36,8 +36,7 @@ HEADERS += configplugin.h \
     config_global.h \
     mixercurve.h \
     dblspindelegate.h \
-    configrevohwwidget.h \
-    configautotunewidget.h
+    configrevohwwidget.h
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \
@@ -67,8 +66,7 @@ SOURCES += configplugin.cpp \
     outputchannelform.cpp \
     mixercurve.cpp \
     dblspindelegate.cpp \
-    configrevohwwidget.cpp \
-    configautotunewidget.cpp
+    configrevohwwidget.cpp
 
 FORMS += airframe.ui \
     airframe_ccpm.ui \
@@ -90,7 +88,6 @@ FORMS += airframe.ui \
     txpid.ui \
     pipxtreme.ui \
     mixercurve.ui \
-    configrevohwwidget.ui \
-    autotune.ui
+    configrevohwwidget.ui
 
 RESOURCES += configgadget.qrc

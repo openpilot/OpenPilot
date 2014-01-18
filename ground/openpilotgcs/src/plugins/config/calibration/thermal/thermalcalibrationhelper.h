@@ -50,7 +50,6 @@
 #include <revocalibration.h>
 #include <revosettings.h>
 namespace OpenPilot {
-
 typedef struct {
     // this is not needed for revo, but should for CC/CC3D
     // AccelGyroSettings::DataFields accelGyroSettings;
@@ -62,11 +61,11 @@ typedef struct {
 } thermalCalibrationBoardSettings;
 
 typedef struct {
-    bool baroCalibrated;
+    bool  baroCalibrated;
     float baro[4];
-    bool accelCalibrated;
+    bool  accelCalibrated;
     float accel[3];
-    bool gyroCalibrated;
+    bool  gyroCalibrated;
     float gyro[4];
 } thermalCalibrationResults;
 class ThermalCalibrationHelper : public QObject {
@@ -121,7 +120,8 @@ public slots:
      */
     void initAcquisition();
 
-    void stopAcquisition(){
+    void stopAcquisition()
+    {
         QMutexLocker lock(&sensorsUpdateLock);
         emit collectionCompleted();
     }
@@ -164,7 +164,7 @@ private:
     const static int ProcessPercentageSetupBoard      = 10;
     const static int ProcessPercentageBaseAcquisition = 15;
     const static int ProcessPercentageBaseCalculation = 85;
-    const static int ProcessPercentageSaveResults = 95;
+    const static int ProcessPercentageSaveResults     = 95;
     const static float TargetGradient = 0.35f;
     int m_targetduration;
     int m_processPercentage;

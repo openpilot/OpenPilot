@@ -74,14 +74,14 @@ bool CalibrationUtils::PolynomialCalibration(Eigen::VectorXf samplesX, Eigen::Ve
 
         x.col(i) = tmp2;
     }
-    Eigen::MatrixXd xt  = x.transpose();
+    Eigen::MatrixXd xt   = x.transpose();
 
-    Eigen::MatrixXd xtx = xt * x;
+    Eigen::MatrixXd xtx  = xt * x;
 
-    Eigen::VectorXd xty = xt * doubleY;
+    Eigen::VectorXd xty  = xt * doubleY;
     Eigen::VectorXd tmpx = xtx.fullPivHouseholderQr().solve(xty);
     result = tmpx.cast<float>();
-    double relativeError = (xtx*tmpx - xty).norm() / xty.norm();
+    double relativeError = (xtx * tmpx - xty).norm() / xty.norm();
     std::cout << "Estimated relative error " << relativeError << "; Max allowed error " << maxRelativeError << std::endl;
     return relativeError < maxRelativeError;
 }

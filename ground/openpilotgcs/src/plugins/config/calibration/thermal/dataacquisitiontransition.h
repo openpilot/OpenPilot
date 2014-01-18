@@ -34,7 +34,6 @@
 
 #include "thermalcalibrationhelper.h"
 namespace OpenPilot {
-
 class DataAcquisitionTransition : public QSignalTransition {
     Q_OBJECT
 public:

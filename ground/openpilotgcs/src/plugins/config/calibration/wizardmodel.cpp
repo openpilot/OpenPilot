@@ -35,6 +35,7 @@ WizardState *WizardModel::currentState()
 {
     foreach(QAbstractState * value, this->configuration()) {
         WizardState *state = static_cast<WizardState *>(value);
+
         if (state->children().count() <= 1) {
             return state;
         }

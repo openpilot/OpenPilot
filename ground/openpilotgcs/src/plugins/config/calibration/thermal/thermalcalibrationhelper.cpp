@@ -31,13 +31,12 @@ namespace OpenPilot {
 ThermalCalibrationHelper::ThermalCalibrationHelper(QObject *parent) :
     QObject(parent)
 {
-
-    m_boardInitialSettings = thermalCalibrationBoardSettings();
+    m_boardInitialSettings    = thermalCalibrationBoardSettings();
     m_boardInitialSettings.statusSaved = false;
     m_results = thermalCalibrationResults();
     m_results.accelCalibrated = false;
-    m_results.baroCalibrated = false;
-    m_results.gyroCalibrated = false;
+    m_results.baroCalibrated  = false;
+    m_results.gyroCalibrated  = false;
 }
 
 /**
@@ -267,7 +266,7 @@ void ThermalCalibrationHelper::calculate()
     Eigen::VectorXf dataz(1);
     Eigen::VectorXf datat(count);
 
-    for(int x = 0; x < count; x++){
+    for (int x = 0; x < count; x++) {
         datax[x] = m_baroSamples[x].Pressure;
         datat[x] = m_baroSamples[x].Temperature;
     }
@@ -281,7 +280,7 @@ void ThermalCalibrationHelper::calculate()
     dataz.resize(count);
     datat.resize(count);
 
-    for(int x = 0; x < count; x++){
+    for (int x = 0; x < count; x++) {
         datax[x] = m_gyroSamples[x].x;
         datay[x] = m_gyroSamples[x].y;
         dataz[x] = m_gyroSamples[x].z;
@@ -290,24 +289,24 @@ void ThermalCalibrationHelper::calculate()
 
     m_results.gyroCalibrated = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro);
 
-    //TODO: sanity checks needs to be enforced before accel calibration can be enabled and usable.
+    // TODO: sanity checks needs to be enforced before accel calibration can be enabled and usable.
     /*
-    setProcessPercentage(processPercentage() + 2);
-    count = m_accelSamples.count();
-    datax.resize(count);
-    datay.resize(count);
-    dataz.resize(count);
-    datat.resize(count);
+       setProcessPercentage(processPercentage() + 2);
+       count = m_accelSamples.count();
+       datax.resize(count);
+       datay.resize(count);
+       dataz.resize(count);
+       datat.resize(count);
 
-    for(int x = 0; x < count; x++){
+       for(int x = 0; x < count; x++){
         datax[x] = m_accelSamples[x].x;
         datay[x] = m_accelSamples[x].y;
         dataz[x] = m_accelSamples[x].z;
         datat[x] = m_accelSamples[x].temperature;
-    }
+       }
 
-    m_results.accelCalibrated = ThermalCalibration::AccelerometerCalibration(datax, datay, dataz, datat, m_results.accel);
-    */
+       m_results.accelCalibrated = ThermalCalibration::AccelerometerCalibration(datax, datay, dataz, datat, m_results.accel);
+     */
     m_results.accelCalibrated = false;
     copyResultToSettings();
     emit calculationCompleted();
@@ -366,6 +365,7 @@ void ThermalCalibrationHelper::endAcquisition()
 void ThermalCalibrationHelper::connectUAVOs()
 {
     AccelSensor *accel = AccelSensor::GetInstance(getObjectManager());
+
     connect(accel, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
 
     GyroSensor *gyro = GyroSensor::GetInstance(getObjectManager());
@@ -381,6 +381,7 @@ void ThermalCalibrationHelper::connectUAVOs()
 void ThermalCalibrationHelper::disconnectUAVOs()
 {
     AccelSensor *accel = AccelSensor::GetInstance(getObjectManager());
+
     disconnect(accel, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
 
     GyroSensor *gyro = GyroSensor::GetInstance(getObjectManager());
@@ -396,9 +397,10 @@ void ThermalCalibrationHelper::disconnectUAVOs()
 void ThermalCalibrationHelper::copyResultToSettings()
 {
     UAVObjectManager *objManager = getObjectManager();
+
     Q_ASSERT(objManager);
 
-    if(m_results.baroCalibrated) {
+    if (m_results.baroCalibrated) {
         RevoSettings *revosettings = RevoSettings::GetInstance(objManager);
         Q_ASSERT(revosettings);
         revosettings->setBaroTempCorrectionPolynomial_a(m_results.baro[0]);
@@ -408,19 +410,19 @@ void ThermalCalibrationHelper::copyResultToSettings()
         revosettings->updated();
     }
 
-    if(m_results.gyroCalibrated || m_results.accelCalibrated){
+    if (m_results.gyroCalibrated || m_results.accelCalibrated) {
         AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
         Q_ASSERT(accelGyroSettings);
-        AccelGyroSettings::DataFields data = accelGyroSettings->getData();
+        AccelGyroSettings::DataFields data   = accelGyroSettings->getData();
 
-        if(m_results.gyroCalibrated){
+        if (m_results.gyroCalibrated) {
             data.gyro_temp_coeff[0] = m_results.gyro[0];
             data.gyro_temp_coeff[1] = m_results.gyro[1];
             data.gyro_temp_coeff[2] = m_results.gyro[2];
             data.gyro_temp_coeff[3] = m_results.gyro[3];
         }
 
-        if(m_results.accelCalibrated){
+        if (m_results.accelCalibrated) {
             data.accel_temp_coeff[0] = m_results.gyro[0];
             data.accel_temp_coeff[1] = m_results.gyro[1];
             data.accel_temp_coeff[2] = m_results.gyro[2];

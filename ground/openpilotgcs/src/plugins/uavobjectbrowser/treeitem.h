@@ -78,11 +78,11 @@ private:
     // The timer checking highlight expiration.
     QTimer m_expirationTimer;
 
-    // The list holding all items due to be updated.
-    QLinkedList<TreeItem *> m_itemsList;
+    // The collection holding all items due to be updated.
+    QSet<TreeItem *> m_items;
 
-    // Mutex to lock when accessing list.
-    QMutex m_listMutex;
+    // Mutex to lock when accessing collection.
+    QMutex m_mutex;
 };
 
 class TreeItem : public QObject {

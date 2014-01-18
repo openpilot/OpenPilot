@@ -42,11 +42,11 @@ HighLightManager::HighLightManager(long checkingInterval)
 bool HighLightManager::add(TreeItem *itemToAdd)
 {
     // Lock to ensure thread safety
-    QMutexLocker locker(&m_listMutex);
+    QMutexLocker locker(&m_mutex);
 
     // Check so that the item isn't already in the list
-    if (!m_itemsList.contains(itemToAdd)) {
-        m_itemsList.append(itemToAdd);
+    if (!m_items.contains(itemToAdd)) {
+        m_items.insert(itemToAdd);
         return true;
     }
     return false;
@@ -59,10 +59,10 @@ bool HighLightManager::add(TreeItem *itemToAdd)
 bool HighLightManager::remove(TreeItem *itemToRemove)
 {
     // Lock to ensure thread safety
-    QMutexLocker locker(&m_listMutex);
+    QMutexLocker locker(&m_mutex);
 
     // Remove item and return result
-    return m_itemsList.removeOne(itemToRemove);
+    return m_items.remove(itemToRemove);
 }
 
 /*
@@ -74,10 +74,10 @@ bool HighLightManager::remove(TreeItem *itemToRemove)
 void HighLightManager::checkItemsExpired()
 {
     // Lock to ensure thread safety
-    QMutexLocker locker(&m_listMutex);
+    QMutexLocker locker(&m_mutex);
 
     // Get a mutable iterator for the list
-    QMutableLinkedListIterator<TreeItem *> iter(m_itemsList);
+    QMutableSetIterator<TreeItem *> iter(m_items);
 
     // This is the timestamp to compare with
     QTime now = QTime::currentTime();
@@ -211,7 +211,6 @@ void TreeItem::setHighlight(bool highlight)
 void TreeItem::removeHighlight()
 {
     m_highlight = false;
-    // update();
     emit updateHighlight(this);
 }
 

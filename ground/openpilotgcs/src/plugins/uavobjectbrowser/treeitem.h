@@ -231,8 +231,8 @@ public:
     QList<MetaObjectTreeItem *> getMetaObjectItems();
 
 private:
-    QMap<quint32, DataObjectTreeItem *> m_objectTreeItemsPerObjectIds;
-    QMap<quint32, MetaObjectTreeItem *> m_metaObjectTreeItemsPerObjectIds;
+    QHash<quint32, DataObjectTreeItem *> m_objectTreeItemsPerObjectIds;
+    QHash<quint32, MetaObjectTreeItem *> m_metaObjectTreeItemsPerObjectIds;
 };
 
 class ObjectTreeItem : public TreeItem {

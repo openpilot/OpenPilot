@@ -152,13 +152,16 @@ private:
     WizardState *m_setupState;
     // Acquire samples
     WizardState *m_acquisitionState;
+    // Restore initial settings after acquisition
+    WizardState *m_restoreState;
     // Calculate calibration parameters
     WizardState *m_calculateState;
     // Save calibration and restore board settings
     WizardState *m_finalizeState;
     // revert board settings if something goes wrong
     WizardState *m_abortState;
-
+    // just the same as readystate, but it is reached after havign completed the calibration
+    WizardState *m_completedState;
     void setTransitions();
 
 
@@ -185,12 +188,22 @@ public slots:
     void btnEnd()
     {
         // emit previous();
-        m_helper->endAcquisition();
+        m_helper->stopAcquisition();
     }
 
     void btnAbort()
     {
         emit abort();
+    }
+    void wizardReady(){
+        setStartEnabled(true);
+        setEndEnabled(false);
+        setCancelEnabled(false);
+    }
+    void wizardStarted(){
+        setStartEnabled(false);
+        setEndEnabled(true);
+        setCancelEnabled(true);
     }
 };
 }

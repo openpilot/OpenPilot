@@ -50,21 +50,24 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     m_setupState       = new WizardState(tr("Setup board for calibration"), m_workingState);
 
     m_acquisitionState = new WizardState(tr("*** Please Wait *** Samples acquisition, this can take several minutes"), m_workingState);
+    m_restoreState = new WizardState(tr("Restore board settings"), m_workingState);
     m_calculateState   = new WizardState(tr("Calculate calibration matrix"), m_workingState);
-    m_finalizeState    = new WizardState(tr("Completed"), m_workingState);
 
     m_abortState       = new WizardState("Canceled", this);
 
+    m_completedState   = new WizardState("Completed", this);
     setTransitions();
 
     connect(m_helper, SIGNAL(gradientChanged(float)), this, SLOT(setTemperatureGradient(float)));
     connect(m_helper, SIGNAL(temperatureChanged(float)), this, SLOT(setTemperature(float)));
     connect(m_helper, SIGNAL(processPercentageChanged(int)), this, SLOT(setProgress(int)));
-
+    connect(m_readyState, SIGNAL(entered()), this, SLOT(wizardReady()));
+    connect(m_readyState, SIGNAL(exited()), this, SLOT(wizardStarted()));
+    connect(m_completedState, SIGNAL(entered()), this, SLOT(wizardReady()));
+    connect(m_completedState, SIGNAL(exited()), this, SLOT(wizardStarted()));
     this->setInitialState(m_readyState);
-    m_steps << m_readyState
-            << m_setupState
-            << m_acquisitionState << m_calculateState << m_finalizeState;
+
+    m_steps << m_readyState << m_saveSettingState << m_setupState << m_acquisitionState << m_restoreState << m_calculateState;
 }
 void ThermalCalibrationModel::init()
 {
@@ -84,6 +87,7 @@ void ThermalCalibrationModel::stepChanged(WizardState *state) {
 void ThermalCalibrationModel::setTransitions()
 {
     m_readyState->addTransition(this, SIGNAL(next()), m_workingState);
+    m_completedState->addTransition(this, SIGNAL(next()), m_workingState);
     // handles board status save
     // Ready->WorkingState->saveSettings->setup
     m_saveSettingState->addTransition(new BoardStatusSaveTransition(m_helper, m_saveSettingState, m_setupState));
@@ -92,15 +96,13 @@ void ThermalCalibrationModel::setTransitions()
     m_setupState->addTransition(new BoardSetupTransition(m_helper, m_setupState, m_acquisitionState));
 
     // acquisition -revertSettings-> calculation
-    // m_acquisitionState->addTransition(this,SIGNAL(next()),m_calculateState);
     // revert settings after acquisition is completed
     // m_acquisitionState->addTransition(new BoardStatusRestoreTransition(m_helper, m_acquisitionState, m_calculateState));
-    m_acquisitionState->addTransition(new DataAcquisitionTransition(m_helper, m_acquisitionState, m_calculateState));
-    m_workingState->addTransition(m_helper, SIGNAL(abort()), m_abortState) ;
-    m_calculateState->addTransition(new BoardStatusRestoreTransition(m_helper, m_calculateState, m_finalizeState));
-
+    m_acquisitionState->addTransition(new DataAcquisitionTransition(m_helper, m_acquisitionState, m_restoreState ));
+    m_restoreState ->addTransition(new BoardStatusRestoreTransition(m_helper, m_restoreState, m_calculateState));
+    m_calculateState->addTransition(new CompensationCalculationTransition(m_helper, m_calculateState, m_completedState));
     m_abortState->addTransition(new BoardStatusRestoreTransition(m_helper, m_abortState, m_readyState));
-    m_finalizeState->addTransition(this, SIGNAL(next()), m_readyState);
+    m_workingState->addTransition(m_helper, SIGNAL(abort()), m_abortState) ;
     // Ready
 }
 }

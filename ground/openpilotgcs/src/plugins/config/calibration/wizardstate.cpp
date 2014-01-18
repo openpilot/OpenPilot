@@ -26,7 +26,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "wizardstate.h"
-
+#include "QDebug"
 WizardState::WizardState(QString name, QState *parent) :
     QState(parent)
 {

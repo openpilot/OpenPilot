@@ -109,6 +109,7 @@ public:
     quint32 getNumBytes();
     qint32 pack(quint8 *dataOut);
     qint32 unpack(const quint8 *dataIn);
+    quint8 updateCRC(quint8 crc = 0);
     bool save();
     bool save(QFile & file);
     bool load();
@@ -149,15 +150,17 @@ public:
 
 public slots:
     void requestUpdate();
+    void requestUpdateAll();
     void updated();
+    void updatedAll();
 
 signals:
     void objectUpdated(UAVObject *obj);
     void objectUpdatedAuto(UAVObject *obj);
-    void objectUpdatedManual(UAVObject *obj);
+    void objectUpdatedManual(UAVObject *obj, bool all = false);
     void objectUpdatedPeriodic(UAVObject *obj);
     void objectUnpacked(UAVObject *obj);
-    void updateRequested(UAVObject *obj);
+    void updateRequested(UAVObject *obj, bool all = false);
     void transactionCompleted(UAVObject *obj, bool success);
     void newInstance(UAVObject *obj);
 

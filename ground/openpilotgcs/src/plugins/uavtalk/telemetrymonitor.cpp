@@ -175,6 +175,7 @@ void TelemetryMonitor::firmwareIAPUpdated(UAVObject *obj)
     QMutexLocker locker(mutex);
 
     if (firmwareIAPObj->getBoardType() != 0) {
+        disconnect(firmwareIAPObj);
         emit connected();
     }
 }
@@ -194,11 +195,16 @@ void TelemetryMonitor::processStatsUpdates()
     tel->resetStats();
 
     // Update stats object
-    gcsStats.RxDataRate  = (float)telStats.rxBytes / ((float)statsTimer->interval() / 1000.0);
-    gcsStats.TxDataRate  = (float)telStats.txBytes / ((float)statsTimer->interval() / 1000.0);
-    gcsStats.RxFailures += telStats.rxErrors;
-    gcsStats.TxFailures += telStats.txErrors;
-    gcsStats.TxRetries  += telStats.txRetries;
+    gcsStats.TxDataRate    = (float)telStats.txBytes / ((float)statsTimer->interval() / 1000.0);
+    gcsStats.TxBytes      += telStats.txBytes;
+    gcsStats.TxFailures   += telStats.txErrors;
+    gcsStats.TxRetries    += telStats.txRetries;
+
+    gcsStats.RxDataRate    = (float)telStats.rxBytes / ((float)statsTimer->interval() / 1000.0);
+    gcsStats.RxBytes      += telStats.rxBytes;
+    gcsStats.RxFailures   += telStats.rxErrors;
+    gcsStats.RxSyncErrors += telStats.rxSyncErrors;
+    gcsStats.RxCrcErrors  += telStats.rxCrcErrors;
 
     // Check for a connection timeout
     bool connectionTimeout;

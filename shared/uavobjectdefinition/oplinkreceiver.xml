@@ -1,5 +1,5 @@
 <xml>
-    <object name="OPLinkReceiver" singleinstance="true" settings="false">
+    <object name="OPLinkReceiver" singleinstance="true" settings="false" category="System">
         <description>A receiver channel group carried over the OPLink radio.</description>
         <field name="Channel" units="us" type="int16" elements="8"/>
         <access gcs="readonly" flight="readwrite"/>

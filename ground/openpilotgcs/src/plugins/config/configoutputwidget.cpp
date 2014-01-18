@@ -29,7 +29,14 @@
 #include "outputchannelform.h"
 #include "configvehicletypewidget.h"
 
-#include "uavtalk/telemetrymanager.h"
+#include "mixersettings.h"
+#include "actuatorcommand.h"
+#include "actuatorsettings.h"
+#include "systemalarms.h"
+#include "systemsettings.h"
+#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 #include <QDebug>
 #include <QStringList>
@@ -40,14 +47,6 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QUrl>
-#include "mixersettings.h"
-#include "actuatorcommand.h"
-#include "actuatorsettings.h"
-#include "systemalarms.h"
-#include "systemsettings.h"
-#include "uavsettingsimportexport/uavsettingsimportexportfactory.h"
-#include <extensionsystem/pluginmanager.h>
-#include <coreplugin/generalsettings.h>
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent), wasItMe(false)
 {

@@ -30,7 +30,7 @@
 
 #include "systemhealthgadgetconfiguration.h"
 #include "uavobject.h"
-#include "uavtalk/telemetrymanager.h"
+
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>

@@ -68,6 +68,19 @@ private:
     TelemetryMonitor *telemetryMon;
     QIODevice *device;
     bool autopilotConnected;
+    QThread readerThread;
+};
+
+
+class IODeviceReader : public QObject {
+    Q_OBJECT
+public:
+    IODeviceReader(UAVTalk *uavTalk);
+
+    UAVTalk *uavTalk;
+
+public slots:
+    void read();
 };
 
 #endif // TELEMETRYMANAGER_H

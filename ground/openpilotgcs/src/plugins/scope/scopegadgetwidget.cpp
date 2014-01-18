@@ -30,7 +30,6 @@
 #include "scopegadgetwidget.h"
 #include "utils/stylehelper.h"
 
-#include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"

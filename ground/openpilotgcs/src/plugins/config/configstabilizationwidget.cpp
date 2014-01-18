@@ -35,17 +35,44 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QList>
+#include <QTabBar>
+#include <QMessageBox>
 
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
 #include "altitudeholdsettings.h"
+#include "stabilizationsettings.h"
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
-    boardModel(0)
+    boardModel(0), m_pidBankCount(0), m_currentPIDBank(0)
 {
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
 
+    StabilizationSettings *stabSettings = qobject_cast<StabilizationSettings *>(getObject("StabilizationSettings"));
+    Q_ASSERT(stabSettings);
+
+    m_pidBankCount = stabSettings->getField("FlightModeMap")->getOptions().count();
+
+    // Set up fake tab widget stuff for pid banks support
+    m_pidTabBars.append(ui->basicPIDBankTabBar);
+    m_pidTabBars.append(ui->advancedPIDBankTabBar);
+    m_pidTabBars.append(ui->expertPIDBankTabBar);
+    foreach(QTabBar * tabBar, m_pidTabBars) {
+        for (int i = 0; i < m_pidBankCount; i++) {
+            tabBar->addTab(tr("PID Bank %1").arg(i + 1));
+            tabBar->setTabData(i, QString("StabilizationSettingsBank%1").arg(i + 1));
+        }
+        tabBar->setExpanding(false);
+        connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
+    }
+
+    for (int i = 0; i < m_pidBankCount; i++) {
+        if (i > 0) {
+            m_stabilizationObjectsString.append(",");
+        }
+        m_stabilizationObjectsString.append(m_pidTabBars.at(0)->tabData(i).toString());
+    }
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
@@ -205,6 +232,23 @@ void ConfigStabilizationWidget::onBoardConnected()
     ui->AltitudeHold->setEnabled((boardModel & 0xff00) == 0x0900);
 }
 
+void ConfigStabilizationWidget::pidBankChanged(int index)
+{
+    foreach(QTabBar * tabBar, m_pidTabBars) {
+        disconnect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
+        tabBar->setCurrentIndex(index);
+        connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
+    }
+
+    for (int i = 0; i < m_pidTabBars.at(0)->count(); i++) {
+        setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(i).toString(), false);
+    }
+
+    setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(index).toString(), true);
+
+    m_currentPIDBank = index;
+}
+
 bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
 {
     // AltitudeHoldSettings should only be saved for Revolution board to avoid error.
@@ -213,4 +257,12 @@ bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
     } else {
         return true;
     }
+}
+
+QString ConfigStabilizationWidget::mapObjectName(const QString objectName)
+{
+    if (objectName == "StabilizationSettingsBankX") {
+        return m_stabilizationObjectsString;
+    }
+    return ConfigTaskWidget::mapObjectName(objectName);
 }

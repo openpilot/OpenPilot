@@ -31,7 +31,6 @@
 
 #include <openpilot.h>
 
-#include "flightplan.h"
 #include "flightplanstatus.h"
 #include "flightplancontrol.h"
 #include "flightplansettings.h"

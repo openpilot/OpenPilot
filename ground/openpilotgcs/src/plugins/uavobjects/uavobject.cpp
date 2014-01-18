@@ -26,8 +26,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uavobject.h"
+
+#include <utils/crc.h>
+
 #include <QtEndian>
 #include <QDebug>
+
+using namespace Utils;
 
 // Constants
 #define UAVOBJ_ACCESS_SHIFT                    0
@@ -51,11 +56,13 @@
 UAVObject::UAVObject(quint32 objID, bool isSingleInst, const QString & name):
     knownByFlightSide(false)
 {
-    this->objID  = objID;
-    this->instID = 0;
+    this->objID        = objID;
+    this->instID       = 0;
     this->isSingleInst = isSingleInst;
-    this->name   = name;
-    this->mutex  = new QMutex(QMutex::Recursive);
+    this->name         = name;
+    this->data         = 0;
+    this->numBytes     = 0;
+    this->mutex        = new QMutex(QMutex::Recursive);
 }
 
 /**
@@ -164,7 +171,6 @@ void UAVObject::setCategory(const QString & category)
     this->category = category;
 }
 
-
 /**
  * Get the total number of bytes of the object's data
  */
@@ -182,12 +188,36 @@ void UAVObject::requestUpdate()
 }
 
 /**
+ * Request that all instances of this object are updated with the latest values from the autopilot
+ * Must be called on instance zero
+ */
+void UAVObject::requestUpdateAll()
+{
+    if (instID == 0) {
+        emit updateRequested(this, true);
+    }
+}
+
+/**
  * Signal that the object has been updated
  */
 void UAVObject::updated()
 {
     emit objectUpdatedManual(this);
     emit objectUpdated(this);
+}
+
+/**
+ * Signal that all instance of the object have been updated
+ * Must be called on instance zero
+ */
+void UAVObject::updatedAll()
+{
+    if (instID == 0) {
+        emit objectUpdatedManual(this, true);
+        // TODO call objectUpdated() for all instances?
+        // emit objectUpdated(this);
+    }
 }
 
 /**
@@ -257,7 +287,8 @@ UAVObjectField *UAVObject::getField(const QString & name)
         }
     }
     // If this point is reached then the field was not found
-    qWarning() << "UAVObject::getField Non existant field " << name << " requested.  This indicates a bug.  Make sure you also have null checking for non-debug code.";
+    qWarning() << "UAVObject::getField Non existant field" << name << "requested."
+               << "This indicates a bug. Make sure you also have null checking for non-debug code.";
     return NULL;
 }
 
@@ -294,6 +325,21 @@ qint32 UAVObject::unpack(const quint8 *dataIn)
     emit objectUpdated(this);
 
     return numBytes;
+}
+
+/**
+ * Update a CRC with the object data
+ * @returns The updated CRC
+ */
+quint8 UAVObject::updateCRC(quint8 crc)
+{
+    QMutexLocker locker(mutex);
+
+    // crc = Crc::updateCRC(crc, (quint8 *) &objID, sizeof(objID));
+    // crc = Crc::updateCRC(crc, (quint8 *) &instID, sizeof(instID));
+    crc = Crc::updateCRC(crc, data, numBytes);
+
+    return crc;
 }
 
 /**
@@ -438,6 +484,7 @@ QString UAVObject::toString()
     QString sout;
 
     sout.append(toStringBrief());
+    sout.append('\n');
     sout.append(toStringData());
     return sout;
 }
@@ -449,12 +496,13 @@ QString UAVObject::toStringBrief()
 {
     QString sout;
 
-    sout.append(QString("%1 (ID: %2, InstID: %3, NumBytes: %4, SInst: %5)\n")
+    // object Id is converted to uppercase hexadecimal
+    sout.append(QString("%1 (ID: %2-%3, %4 bytes, %5)")
                 .arg(getName())
-                .arg(getObjID())
+                .arg(getObjID(), 1, 16).toUpper()
                 .arg(getInstID())
                 .arg(getNumBytes())
-                .arg(isSingleInstance()));
+                .arg(isSingleInstance() ? "single" : "multiple"));
     return sout;
 }
 

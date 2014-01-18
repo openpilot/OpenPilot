@@ -40,7 +40,14 @@ class ThermalCalibration {
     static const int ACCEL_Z_POLY_DEGREE = 1;
 
     static const int BARO_PRESSURE_POLY_DEGREE = 3;
-
+    //TODO: determine max allowable relative error
+    static const double BARO_PRESSURE_MAX_REL_ERROR = 1E-6f;
+    static const double ACCEL_X_MAX_REL_ERROR = 1E-6f;
+    static const double ACCEL_Y_MAX_REL_ERROR = 1E-6f;
+    static const double ACCEL_Z_MAX_REL_ERROR = 1E-6f;
+    static const double GYRO_X_MAX_REL_ERROR = 1E-6f;
+    static const double GYRO_Y_MAX_REL_ERROR = 1E-6f;
+    static const double GYRO_Z_MAX_REL_ERROR = 1E-6f;
 public:
     /**
      * @brief produce the calibration polinomial coefficients from pressure and temperature samples

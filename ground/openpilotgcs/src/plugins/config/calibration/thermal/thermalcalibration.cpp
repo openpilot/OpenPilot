@@ -36,14 +36,13 @@ bool ThermalCalibration::BarometerCalibration(Eigen::VectorXf pressure, Eigen::V
     qDebug() << "Ref zero is " << index20deg << " T: " << temperature[index20deg] << " P:" << pressure[index20deg];
     float refZero  = pressure[index20deg];
     pressure.array() -= refZero;
-    qDebug() << "Rebased zero is " << pressure[index20deg];
-
+    qDebug() << "Rebiased zero is " << pressure[index20deg];
 
     Eigen::VectorXf solution(BARO_PRESSURE_POLY_DEGREE + 1);
-    if (!CalibrationUtils::PolynomialCalibration(temperature, pressure, BARO_PRESSURE_POLY_DEGREE, solution)) {
+    if (!CalibrationUtils::PolynomialCalibration(temperature, pressure, BARO_PRESSURE_POLY_DEGREE, solution, BARO_PRESSURE_MAX_REL_ERROR)) {
         return false;
     }
-
+    std::cout << "Baro calibration " << solution << std::endl;
     copyToArray(result, solution, BARO_PRESSURE_POLY_DEGREE + 1);
     return true;
 }
@@ -52,19 +51,19 @@ bool ThermalCalibration::AccelerometerCalibration(Eigen::VectorXf samplesX, Eige
 {
     Eigen::VectorXf solution(ACCEL_X_POLY_DEGREE + 1);
 
-    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesX, ACCEL_X_POLY_DEGREE, solution)) {
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesX, ACCEL_X_POLY_DEGREE, solution, ACCEL_X_MAX_REL_ERROR)) {
         return false;
     }
     result[0] = solution[1];
 
     solution.resize(ACCEL_Y_POLY_DEGREE + 1);
-    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesY, ACCEL_Y_POLY_DEGREE, solution)) {
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesY, ACCEL_Y_POLY_DEGREE, solution, ACCEL_Y_MAX_REL_ERROR)) {
         return false;
     }
     result[1] = solution[1];
 
     solution.resize(ACCEL_Z_POLY_DEGREE + 1);
-    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesZ, ACCEL_Z_POLY_DEGREE, solution)) {
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesZ, ACCEL_Z_POLY_DEGREE, solution, ACCEL_Z_MAX_REL_ERROR)) {
         return false;
     }
     result[2] = solution[1];
@@ -76,21 +75,21 @@ bool ThermalCalibration::GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::V
 {
     Eigen::VectorXf solution(GYRO_X_POLY_DEGREE + 1);
 
-    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesX, GYRO_X_POLY_DEGREE, solution)) {
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesX, GYRO_X_POLY_DEGREE, solution, GYRO_X_MAX_REL_ERROR)) {
         return false;
     }
     result[0] = solution[1];
     std::cout << solution << std::endl << std::endl;
 
     solution.resize(GYRO_Y_POLY_DEGREE + 1);
-    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesY, GYRO_Y_POLY_DEGREE, solution)) {
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesY, GYRO_Y_POLY_DEGREE, solution, GYRO_Y_MAX_REL_ERROR)) {
         return false;
     }
     result[1] = solution[1];
     std::cout << solution << std::endl << std::endl;
 
     solution.resize(GYRO_Z_POLY_DEGREE + 1);
-    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesZ, GYRO_Z_POLY_DEGREE, solution)) {
+    if (!CalibrationUtils::PolynomialCalibration(temperature, samplesZ, GYRO_Z_POLY_DEGREE, solution, GYRO_Z_MAX_REL_ERROR)) {
         return false;
     }
     result[2] = solution[1];

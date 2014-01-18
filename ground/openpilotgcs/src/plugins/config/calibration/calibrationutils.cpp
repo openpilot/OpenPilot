@@ -58,7 +58,7 @@ bool CalibrationUtils::EllipsoidCalibration(Eigen::VectorXf samplesX, Eigen::Vec
     return true;
 }
 
-bool CalibrationUtils::PolynomialCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, int degree, Eigen::Ref<Eigen::VectorXf> result)
+bool CalibrationUtils::PolynomialCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, int degree, Eigen::Ref<Eigen::VectorXf> result, const double maxRelativeError)
 {
     int samples = samplesX.rows();
     // perform internal calculation using doubles
@@ -79,9 +79,11 @@ bool CalibrationUtils::PolynomialCalibration(Eigen::VectorXf samplesX, Eigen::Ve
     Eigen::MatrixXd xtx = xt * x;
 
     Eigen::VectorXd xty = xt * doubleY;
-    std::cout << xty << std::endl;
-    result = xtx.fullPivHouseholderQr().solve(xty).cast<float>();
-    return true;
+    Eigen::VectorXd tmpx = xtx.fullPivHouseholderQr().solve(xty);
+    result = tmpx.cast<float>();
+    double relativeError = (xtx*tmpx - xty).norm() / xty.norm();
+    std::cout << "Estimated relative error " << relativeError << "; Max allowed error " << maxRelativeError << std::endl;
+    return relativeError < maxRelativeError;
 }
 
 /* C++ Implementation of Yury Petrov's ellipsoid fit algorithm

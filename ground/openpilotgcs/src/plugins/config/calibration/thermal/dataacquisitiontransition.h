@@ -50,12 +50,8 @@ public:
     virtual void onTransition(QEvent *e)
     {
         Q_UNUSED(e);
-        qDebug() << "DataAcquisitionTransition::collectionCompleted";
-    }
-
-    virtual void exit(int __status){
-        Q_UNUSED(__status);
         m_helper->endAcquisition();
+        qDebug() << "DataAcquisitionTransition::collectionCompleted";
     }
 
 public slots:

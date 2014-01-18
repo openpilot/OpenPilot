@@ -1624,7 +1624,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Allow reordering:</source>
-        <translation>Autoriser réorganisation :</translation>
+        <translation>Autoriser la réorganisation :</translation>
     </message>
     <message>
         <location/>
@@ -4561,7 +4561,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Elevation</source>
-        <translation>Elévation</translation>
+        <translation>Élévation</translation>
     </message>
     <message>
         <location/>
@@ -5764,7 +5764,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Swashplate Servo Angles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Angles Servos Plateau</translation>
     </message>
     <message>
         <location/>
@@ -5809,12 +5809,12 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Link Cyclic/Collective</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lier Cyclique/Collectif</translation>
     </message>
     <message>
         <location/>
         <source>Swashplate Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Agencement Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -5834,32 +5834,32 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>CCPM</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CCPM</translation>
     </message>
     <message>
         <location/>
         <source>Collective</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Collectif</translation>
     </message>
     <message>
         <location/>
         <source>Cyclic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cyclique</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Swashplate Levelling</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Niveau Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -5919,7 +5919,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Swashplate Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réglage Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -5949,7 +5949,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -6300,7 +6300,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Cruise Control</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -6565,7 +6565,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location/>
         <source>Linear</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished">Linéaire</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -7949,7 +7949,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Misc</source>
-        <translation type="unfinished">Divers</translation>
+        <translation>Divers</translation>
     </message>
     <message>
         <location/>
@@ -8908,7 +8908,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Il est nécessaire d&apos;avoir la même version de firmware et de logiciel de station au sol (GCS).&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Pour mettre à jour la version correcte de firmware maintenant :&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Débrancher toutes les batteries et le cordon USB de la carte&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Débrancher toutes les batteries et le cordon USB de la carte,&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Vérifier que la carte n&apos;est pas alimentée et qu&apos;aucune LED n&apos;est allumée.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Lorsque vous êtes prêt vous pouvez démarrer la mise à jour en appuyant sur le bouton ci-dessous et suivre les intructions à l&apos;écran. Il est essentiel que rien ne vienne perturber le fonctionnement de la carte tant que le firmware est en cours d&apos;écriture.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
@@ -11288,7 +11288,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Swashplate Servo Angles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Angles Servos Plateau</translation>
     </message>
     <message>
         <location/>
@@ -11333,17 +11333,17 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Link Cyclic/Collective</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lier Cyclique/collectif</translation>
     </message>
     <message>
         <location/>
         <source>Swashplate Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Agencement Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
         <source>REVO</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11358,32 +11358,32 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>CCPM</source>
-        <translation type="unfinished"></translation>
+        <translation>CCPM</translation>
     </message>
     <message>
         <location/>
         <source>Collective</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Collectif</translation>
     </message>
     <message>
         <location/>
         <source>Cyclic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cyclique</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Swashplate Levelling</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Niveau Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -11443,7 +11443,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Swashplate Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réglage Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -11473,7 +11473,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11519,7 +11519,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <location/>
         <source>Yaw</source>
         <translatorcomment>Tech : laisser tel quel?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11534,7 +11534,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Ch 3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12642,7 +12642,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/pathactioneditor/pathactioneditorgadgetfactory.cpp" line="+34"/>
         <source>PathAction Editor</source>
         <translatorcomment>PathAction ? à définir en Fr</translatorcomment>
-        <translation type="unfinished">Éditeur PathAction</translation>
+        <translation>Éditeur PathAction</translation>
     </message>
 </context>
 <context>
@@ -13255,7 +13255,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/telemetry/monitorgadgetfactory.cpp" line="+39"/>
         <source>Telemetry Monitor</source>
-        <translation type="unfinished">Moniteur de Télémétrie</translation>
+        <translation>Moniteur de Télémétrie</translation>
     </message>
 </context>
 <context>
@@ -13276,7 +13276,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configpipxtremewidget.cpp" line="+200"/>
         <source>Unknown</source>
-        <translation type="unfinished">Inconnu</translation>
+        <translation>Inconnu</translation>
     </message>
 </context>
 <context>

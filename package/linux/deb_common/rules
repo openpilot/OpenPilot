@@ -75,7 +75,7 @@ binary-arch: install
 	dh_compress
 	dh_fixperms
 	dh_installdeb
-	dh_shlibdeps -l/usr/local/OpenPilot/lib/openpilotgcs -l/usr/local/OpenPilot/lib/qt5 --dpkg-shlibdeps-params="--ignore-missing-info -v"
+	dh_shlibdeps -l/usr/local/OpenPilot/lib/openpilotgcs:/usr/local/OpenPilot/lib/qt5 --dpkg-shlibdeps-params="--ignore-missing-info -v"
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb -- -Zbzip2

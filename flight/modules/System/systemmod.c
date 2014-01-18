@@ -524,9 +524,11 @@ static void updateStats()
     stats.FlightTime    = xTaskGetTickCount() * portTICK_RATE_MS;
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
     // POSIX port of FreeRTOS doesn't have xPortGetFreeHeapSize()
+    stats.SystemModStackRemaining = 128;
     stats.HeapRemaining = 10240;
 #else
     stats.HeapRemaining = xPortGetFreeHeapSize();
+    stats.SystemModStackRemaining = uxTaskGetStackHighWaterMark( NULL ) * 4;
 #endif
 
     // Get Irq stack status

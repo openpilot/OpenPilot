@@ -154,11 +154,15 @@
 
 /* Task stack sizes */
 #define PIOS_ACTUATOR_STACK_SIZE        1020
-#define PIOS_MANUAL_STACK_SIZE          800
+#define PIOS_MANUAL_STACK_SIZE          850
+#ifdef DIAG_TASKS
+#define PIOS_SYSTEM_STACK_SIZE          720
+#else
 #define PIOS_SYSTEM_STACK_SIZE          660
+#endif
 #define PIOS_STABILIZATION_STACK_SIZE   790
-#define PIOS_TELEM_STACK_SIZE           800
-#define PIOS_EVENTDISPATCHER_STACK_SIZE 130
+#define PIOS_TELEM_STACK_SIZE           540
+#define PIOS_EVENTDISPATCHER_STACK_SIZE 150
 
 /* This can't be too high to stop eventdispatcher thread overflowing */
 #define PIOS_EVENTDISAPTCHER_QUEUE      10

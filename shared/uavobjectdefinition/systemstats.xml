@@ -4,6 +4,7 @@
         <field name="FlightTime" units="ms" type="uint32" elements="1"/>
         <field name="HeapRemaining" units="bytes" type="uint16" elements="1"/>
         <field name="IRQStackRemaining" units="bytes" type="uint16" elements="1"/>
+        <field name="SystemModStackRemaining" units="bytes" type="uint16" elements="1"/>
         <field name="CPULoad" units="%" type="uint8" elements="1"/>
         <field name="CPUTemp" units="C" type="int8" elements="1"/>
         <field name="EventSystemWarningID" units="uavoid" type="uint32" elements="1"/>

@@ -77,7 +77,7 @@
 #define FAILSAFE_TIMEOUT_MS 30
 
 // number of flight mode switch positions
-#define NUM_FMS_POSITIONS 6
+#define NUM_FMS_POSITIONS   6
 
 // The PID_RATE_ROLL set is used by Rate mode and the rate portion of Attitude mode
 // The PID_RATE set is used by the attitude portion of Attitude mode
@@ -99,19 +99,19 @@ float weak_leveling_kp    = 0;
 uint8_t weak_leveling_max = 0;
 bool lowThrottleZeroIntegral;
 bool lowThrottleZeroAxis[MAX_AXES];
-float vbar_decay = 0.991f;
+float vbar_decay    = 0.991f;
 struct pid pids[PID_MAX];
 
-int cur_flight_mode  = -1;
+int cur_flight_mode = -1;
 
 static uint8_t rattitude_anti_windup;
-static float   cruise_control_min_throttle;
-static float   cruise_control_max_throttle;
+static float cruise_control_min_throttle;
+static float cruise_control_max_throttle;
 static uint8_t cruise_control_max_angle;
-static float   cruise_control_max_power_factor;
-static float   cruise_control_power_trim;
-static int8_t  cruise_control_inverted_power_switch;
-static float   cruise_control_neutral_thrust;
+static float cruise_control_max_power_factor;
+static float cruise_control_power_trim;
+static int8_t cruise_control_inverted_power_switch;
+static float cruise_control_neutral_thrust;
 static uint8_t cruise_control_flight_mode_switch_pos_enable[NUM_FMS_POSITIONS];
 
 // Private functions
@@ -163,7 +163,7 @@ int32_t StabilizationStart()
 int32_t StabilizationInitialize()
 {
     // stop the compile if the number of switch positions changes, but has not been changed here
-    PIOS_STATIC_ASSERT(NUM_FMS_POSITIONS == sizeof(((ManualControlSettingsData *)0)->FlightModePosition) / sizeof((((ManualControlSettingsData *)0)->FlightModePosition)[0]) );
+    PIOS_STATIC_ASSERT(NUM_FMS_POSITIONS == sizeof(((ManualControlSettingsData *)0)->FlightModePosition) / sizeof((((ManualControlSettingsData *)0)->FlightModePosition)[0]));
 
     // Initialize variables
     StabilizationSettingsInitialize();
@@ -610,7 +610,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         // but without manually adjusting throttle
         // do it here and all the various flight modes (e.g. Altitude Hold) can use it
         if (flight_mode_switch_position < NUM_FMS_POSITIONS
-            && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t) 0
+            && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t)0
             && cruise_control_max_power_factor > 0.0001f) {
             static uint8_t toggle;
             static float factor;
@@ -639,7 +639,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                     // factor in the power trim, no effect at 1.0, linear effect increases with factor
                     factor = (factor - 1.0f) * cruise_control_power_trim + 1.0f;
                     // if inverted and they want negative boost
-                    if (angle > 90.0f && cruise_control_inverted_power_switch == (int8_t) -1) {
+                    if (angle > 90.0f && cruise_control_inverted_power_switch == (int8_t)-1) {
                         factor = -factor;
                         // as long as throttle is getting reversed
                         // we may as well do pitch and yaw for a complete "invert switch"
@@ -650,8 +650,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
             }
 
             // also don't adjust throttle if <= 0, leaves neg alone and zero throttle stops motors
-            if (actuatorDesired.Throttle > cruise_control_min_throttle)
-            {
+            if (actuatorDesired.Throttle > cruise_control_min_throttle) {
                 // quad    example factor of 2 at hover power of 40%: (0.4 - 0.0) * 2.0 + 0.0 = 0.8
                 // CP heli example factor of 2 at hover stick of 60%: (0.6 - 0.5) * 2.0 + 0.5 = 0.7
                 actuatorDesired.Throttle = (actuatorDesired.Throttle - cruise_control_neutral_thrust) * factor + cruise_control_neutral_thrust;
@@ -928,7 +927,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     }
 
     // Compute time constant for vbar decay term based on a tau
-    vbar_decay  = expf(-fakeDt / settings.VbarTau);
+    vbar_decay = expf(-fakeDt / settings.VbarTau);
 
     // force flight mode update
     cur_flight_mode = -1;
@@ -936,13 +935,13 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     // Rattitude flight mode anti-windup factor
     rattitude_anti_windup = settings.RattitudeAntiWindup;
 
-    cruise_control_min_throttle          = (float) settings.CruiseControlMinThrottle / 100.0f;
-    cruise_control_max_throttle          = (float) settings.CruiseControlMaxThrottle / 100.0f;
-    cruise_control_max_angle             = settings.CruiseControlMaxAngle;
-    cruise_control_max_power_factor      = settings.CruiseControlMaxPowerFactor;
-    cruise_control_power_trim            = settings.CruiseControlPowerTrim / 100.0f;
+    cruise_control_min_throttle     = (float)settings.CruiseControlMinThrottle / 100.0f;
+    cruise_control_max_throttle     = (float)settings.CruiseControlMaxThrottle / 100.0f;
+    cruise_control_max_angle        = settings.CruiseControlMaxAngle;
+    cruise_control_max_power_factor = settings.CruiseControlMaxPowerFactor;
+    cruise_control_power_trim       = settings.CruiseControlPowerTrim / 100.0f;
     cruise_control_inverted_power_switch = settings.CruiseControlInvertedPowerSwitch;
-    cruise_control_neutral_thrust        = (float) settings.CruiseControlNeutralThrust / 100.0f;
+    cruise_control_neutral_thrust   = (float)settings.CruiseControlNeutralThrust / 100.0f;
 
     memcpy(
         cruise_control_flight_mode_switch_pos_enable,

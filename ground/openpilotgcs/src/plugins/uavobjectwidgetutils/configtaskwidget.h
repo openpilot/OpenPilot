@@ -194,7 +194,7 @@ private:
         QString objectName;
         QString fieldName;
         QString elementName;
-        int index;
+        int     index;
         QString url;
         buttonTypeEnum buttonType;
         QList<int>     buttonGroup;

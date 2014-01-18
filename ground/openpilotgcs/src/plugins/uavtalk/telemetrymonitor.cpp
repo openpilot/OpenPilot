@@ -78,7 +78,6 @@ void TelemetryMonitor::startRetrievingObjects()
         if (mobj != NULL ||
                 (dobj != NULL &&
                  (dobj->isSettings() || UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE))) {
-            obj->setKnownByFlightSide(false);
             queue.enqueue(obj);
         }
     }
@@ -95,6 +94,19 @@ void TelemetryMonitor::stopRetrievingObjects()
 {
     qDebug("Object retrieval has been cancelled");
     queue.clear();
+}
+
+void TelemetryMonitor::setSettingObjectsStatus(bool knownByFlightSide)
+{
+    QList< QList<UAVObject *> > objs = objMngr->getObjects();
+    for (int n = 0; n < objs.length(); ++n) {
+        UAVObject *obj = objs[n][0];
+        UAVDataObject *dobj = dynamic_cast<UAVDataObject *>(obj);
+        if (dobj && dobj->isSettings()) {
+            obj->setKnownByFlightSide(knownByFlightSide);
+            obj->updated();
+        }
+    }
 }
 
 /**
@@ -248,11 +260,13 @@ void TelemetryMonitor::processStatsUpdates()
     // Act on new connections or disconnections
     if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED && gcsStats.Status != oldStatus) {
         statsTimer->setInterval(STATS_UPDATE_PERIOD_MS);
+        setSettingObjectsStatus(false);
         qDebug("Connection with the autopilot established");
         startRetrievingObjects();
     }
     if (gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED && gcsStats.Status != oldStatus) {
         statsTimer->setInterval(STATS_CONNECT_PERIOD_MS);
+        setSettingObjectsStatus(false);
         qDebug("Connection with the autopilot lost");
         qDebug("Trying to connect to the autopilot");
         emit disconnected();

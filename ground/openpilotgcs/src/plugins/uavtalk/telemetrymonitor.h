@@ -78,6 +78,7 @@ private:
     void startRetrievingObjects();
     void retrieveNextObject();
     void stopRetrievingObjects();
+    void setSettingObjectsStatus(bool knownByFlightSide);
 };
 
 #endif // TELEMETRYMONITOR_H

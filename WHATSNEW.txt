@@ -1,10 +1,10 @@
---- RELEASE-14.01-RC1 ---
-This is the release candidate 1 for the first 2014 software release. 
+--- RELEASE-14.01-RC1 --- Cruising Ratt ---
+This is the RC1 for the first 2014 software release. 
 This version still supports the  CopterControl and CC3D.
-It include some major "under the hood" changes like migration
-to Qt5.1 and QtQuick2 widgets, and a overhaul of UAVTalk to improve
+It includes some major "under the hood" changes like migration
+to Qt5.1 and QtQuick2 widgets, an overhaul of UAVTalk to improve
 Telemetry and OPLink reliability.
-Some functions addition in this release:
+Some additions in this release:
 - "Rattitude" flight mode;
 - Altitude Hold Reimplementation;
 - Multiple PID banks;
@@ -314,6 +314,7 @@ GCS code changes:
 - added OPLinkMini configuration page;
 - hardware options are now dynamically enabled/disabled to allow supported configurations only;
 - new artwork for all boards everywhere;
+
 - optimised some 3D models;
 - new About dialog showing version info and contributors list;
 - fixed badly broken HiTL options dialog;

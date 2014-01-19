@@ -29,11 +29,12 @@
 #include "opmapgadgetwidget.h"
 #include "ui_opmap_widget.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QClipboard>
-#include <QtGui/QMenu>
+#include <QtWidgets/QApplication>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QInputDialog>
+#include <QClipboard>
+#include <QMenu>
 #include <QStringList>
 #include <QDir>
 #include <QFile>
@@ -48,14 +49,14 @@
 #include "uavtalk/telemetrymanager.h"
 #include "uavobject.h"
 
-#include "positionactual.h"
+#include "positionstate.h"
 #include "homelocation.h"
-#include "gpsposition.h"
-#include "gyros.h"
-#include "attitudeactual.h"
-#include "positionactual.h"
-#include "velocityactual.h"
-#include "airspeedactual.h"
+#include "gpspositionsensor.h"
+#include "gyrostate.h"
+#include "attitudestate.h"
+#include "positionstate.h"
+#include "velocitystate.h"
+#include "airspeedstate.h"
 
 #define allow_manual_home_location_move
 
@@ -224,9 +225,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     mapProxy = new modelMapProxy(this, m_map, model, selectionModel);
     table->setModel(model, selectionModel);
     waypoint_edit_dialog = new opmap_edit_waypoint_dialog(this, model, selectionModel);
-    UAVProxy = new modelUavoProxy(this, model);
-    connect(table, SIGNAL(sendPathPlanToUAV()), UAVProxy, SLOT(modelToObjects()));
-    connect(table, SIGNAL(receivePathPlanFromUAV()), UAVProxy, SLOT(objectsToModel()));
+    UAVProxy = new ModelUavoProxy(this, model);
+    // sending and receiving is asynchronous
+    // TODO : buttons should be disabled while a send or receive is in progress
+    connect(table, SIGNAL(sendPathPlanToUAV()), UAVProxy, SLOT(sendPathPlan()));
+    connect(table, SIGNAL(receivePathPlanFromUAV()), UAVProxy, SLOT(receivePathPlan()));
 #endif
     magicWayPoint = m_map->magicWPCreate();
     magicWayPoint->setVisible(false);
@@ -499,7 +502,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
         contextMenu.addAction(wayPointEditorAct);
         contextMenu.addAction(addWayPointActFromContextMenu);
 
-        if (m_mouse_waypoint) { // we have a waypoint under the mouse
+        if (m_mouse_waypoint) {
+            // we have a waypoint under the mouse
             contextMenu.addAction(editWayPointAct);
 
             lockWayPointAct->setChecked(waypoint_locked);
@@ -579,10 +583,10 @@ void OPMapGadgetWidget::updatePosition()
 
     // *************
     // get the current GPS position and heading
-    GPSPosition *gpsPositionObj = GPSPosition::GetInstance(obm);
+    GPSPositionSensor *gpsPositionObj = GPSPositionSensor::GetInstance(obm);
     Q_ASSERT(gpsPositionObj);
 
-    GPSPosition::DataFields gpsPositionData = gpsPositionObj->getData();
+    GPSPositionSensor::DataFields gpsPositionData = gpsPositionObj->getData();
 
     gps_heading   = gpsPositionData.Heading;
     gps_latitude  = gpsPositionData.Latitude;
@@ -593,36 +597,36 @@ void OPMapGadgetWidget::updatePosition()
 
     // **********************
     // get the current position and heading estimates
-    AttitudeActual *attitudeActualObj = AttitudeActual::GetInstance(obm);
-    PositionActual *positionActualObj = PositionActual::GetInstance(obm);
-    VelocityActual *velocityActualObj = VelocityActual::GetInstance(obm);
-    AirspeedActual *airspeedActualObj = AirspeedActual::GetInstance(obm);
+    AttitudeState *attitudeStateObj = AttitudeState::GetInstance(obm);
+    PositionState *positionStateObj = PositionState::GetInstance(obm);
+    VelocityState *velocityStateObj = VelocityState::GetInstance(obm);
+    AirspeedState *airspeedStateObj = AirspeedState::GetInstance(obm);
 
-    Gyros *gyrosObj = Gyros::GetInstance(obm);
+    GyroState *gyroStateObj = GyroState::GetInstance(obm);
 
-    Q_ASSERT(attitudeActualObj);
-    Q_ASSERT(positionActualObj);
-    Q_ASSERT(velocityActualObj);
-    Q_ASSERT(airspeedActualObj);
-    Q_ASSERT(gyrosObj);
+    Q_ASSERT(attitudeStateObj);
+    Q_ASSERT(positionStateObj);
+    Q_ASSERT(velocityStateObj);
+    Q_ASSERT(airspeedStateObj);
+    Q_ASSERT(gyroStateObj);
 
-    AttitudeActual::DataFields attitudeActualData = attitudeActualObj->getData();
-    PositionActual::DataFields positionActualData = positionActualObj->getData();
-    VelocityActual::DataFields velocityActualData = velocityActualObj->getData();
-    AirspeedActual::DataFields airspeedActualData = airspeedActualObj->getData();
+    AttitudeState::DataFields attitudeStateData = attitudeStateObj->getData();
+    PositionState::DataFields positionStateData = positionStateObj->getData();
+    VelocityState::DataFields velocityStateData = velocityStateObj->getData();
+    AirspeedState::DataFields airspeedStateData = airspeedStateObj->getData();
 
-    Gyros::DataFields gyrosData = gyrosObj->getData();
+    GyroState::DataFields gyroStateData = gyroStateObj->getData();
 
-    double NED[3]  = { positionActualData.North, positionActualData.East, positionActualData.Down };
-    double vNED[3] = { velocityActualData.North, velocityActualData.East, velocityActualData.Down };
+    double NED[3]  = { positionStateData.North, positionStateData.East, positionStateData.Down };
+    double vNED[3] = { velocityStateData.North, velocityStateData.East, velocityStateData.Down };
 
     // Set the position and heading estimates in the painter module
     m_map->UAV->SetNED(NED);
-    m_map->UAV->SetCAS(airspeedActualData.CalibratedAirspeed);
+    m_map->UAV->SetCAS(airspeedStateData.CalibratedAirspeed);
     m_map->UAV->SetGroundspeed(vNED, m_maxUpdateRate);
 
     // Convert angular velocities into a rotationg rate around the world-frame yaw axis. This is found by simply taking the dot product of the angular Euler-rate matrix with the angular rates.
-    float psiRate_dps = 0 * gyrosData.z + sin(attitudeActualData.Roll * deg_to_rad) / cos(attitudeActualData.Pitch * deg_to_rad) * gyrosData.y + cos(attitudeActualData.Roll * deg_to_rad) / cos(attitudeActualData.Pitch * deg_to_rad) * gyrosData.z;
+    float psiRate_dps = 0 * gyroStateData.z + sin(attitudeStateData.Roll * deg_to_rad) / cos(attitudeStateData.Pitch * deg_to_rad) * gyroStateData.y + cos(attitudeStateData.Roll * deg_to_rad) / cos(attitudeStateData.Pitch * deg_to_rad) * gyroStateData.z;
 
     // Set the angular rate in the painter module
     m_map->UAV->SetYawRate(psiRate_dps); // Not correct, but I'm being lazy right now.
@@ -1867,8 +1871,12 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
 
 void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
+    // open dialog
     table->show();
+    // bring dialog to the front in case it was already open and hidden away
+    table->raise();
 }
+
 void OPMapGadgetWidget::onAddWayPointAct_triggeredFromContextMenu()
 {
     onAddWayPointAct_triggered(m_context_menu_lat_lon);
@@ -2170,14 +2178,14 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
 
     Q_ASSERT(obm != NULL);
 
-    PositionActual *positionActual = PositionActual::GetInstance(obm);
-    Q_ASSERT(positionActual != NULL);
-    PositionActual::DataFields positionActualData = positionActual->getData();
-    if (positionActualData.North == 0 && positionActualData.East == 0 && positionActualData.Down == 0) {
-        GPSPosition *gpsPositionObj = GPSPosition::GetInstance(obm);
+    PositionState *positionState = PositionState::GetInstance(obm);
+    Q_ASSERT(positionState != NULL);
+    PositionState::DataFields positionStateData = positionState->getData();
+    if (positionStateData.North == 0 && positionStateData.East == 0 && positionStateData.Down == 0) {
+        GPSPositionSensor *gpsPositionObj = GPSPositionSensor::GetInstance(obm);
         Q_ASSERT(gpsPositionObj);
 
-        GPSPosition::DataFields gpsPositionData = gpsPositionObj->getData();
+        GPSPositionSensor::DataFields gpsPositionData = gpsPositionObj->getData();
         latitude  = gpsPositionData.Latitude / 1.0e7;
         longitude = gpsPositionData.Longitude / 1.0e7;
         altitude  = gpsPositionData.Altitude;
@@ -2191,9 +2199,9 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     homeLLA[1] = homeLocationData.Longitude / 1.0e7;
     homeLLA[2] = homeLocationData.Altitude;
 
-    NED[0]     = positionActualData.North;
-    NED[1]     = positionActualData.East;
-    NED[2]     = positionActualData.Down;
+    NED[0]     = positionStateData.North;
+    NED[1]     = positionStateData.East;
+    NED[2]     = positionStateData.Down;
 
     Utils::CoordinateConversions().NED2LLA_HomeLLA(homeLLA, NED, LLA);
 
@@ -2229,7 +2237,7 @@ double OPMapGadgetWidget::getUAV_Yaw()
         return 0;
     }
 
-    UAVObject *obj = dynamic_cast<UAVDataObject *>(obm->getObject(QString("AttitudeActual")));
+    UAVObject *obj = dynamic_cast<UAVDataObject *>(obm->getObject(QString("AttitudeState")));
     double yaw     = obj->getField(QString("Yaw"))->getDouble();
 
     if (yaw != yaw) {
@@ -2245,7 +2253,7 @@ double OPMapGadgetWidget::getUAV_Yaw()
     return yaw;
 }
 
-bool OPMapGadgetWidget::getGPSPosition(double &latitude, double &longitude, double &altitude)
+bool OPMapGadgetWidget::getGPSPositionSensor(double &latitude, double &longitude, double &altitude)
 {
     double LLA[3];
 
@@ -2253,7 +2261,7 @@ bool OPMapGadgetWidget::getGPSPosition(double &latitude, double &longitude, doub
         return false;
     }
 
-    if (obum->getGPSPosition(LLA) < 0) {
+    if (obum->getGPSPositionSensor(LLA) < 0) {
         return false; // error
     }
     latitude  = LLA[0];

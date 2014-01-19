@@ -33,7 +33,10 @@
 QmlViewGadget::QmlViewGadget(QString classId, QmlViewGadgetWidget *widget, QWidget *parent) :
     IUAVGadget(classId, parent),
     m_widget(widget)
-{}
+{
+    m_container = NULL;
+    m_parent    = parent;
+}
 
 QmlViewGadget::~QmlViewGadget()
 {

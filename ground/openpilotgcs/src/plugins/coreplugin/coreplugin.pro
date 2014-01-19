@@ -2,7 +2,8 @@ TEMPLATE = lib
 TARGET = Core
 DEFINES += CORE_LIBRARY
 
-QT += declarative \
+QT += qml \
+    quick \
     xml \
     network \
     script \
@@ -32,7 +33,6 @@ SOURCES += mainwindow.cpp \
     uniqueidmanager.cpp \
     messagemanager.cpp \
     messageoutputwindow.cpp \
-    versiondialog.cpp \
     iuavgadget.cpp \
     uavgadgetmanager/uavgadgetmanager.cpp \
     uavgadgetmanager/uavgadgetview.cpp \
@@ -70,8 +70,7 @@ SOURCES += mainwindow.cpp \
     uavgadgetdecorator.cpp \
     workspacesettings.cpp \
     uavconfiginfo.cpp \
-    authorsdialog.cpp \
-    telemetrymonitorwidget.cpp
+    aboutdialog.cpp \
 
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
@@ -105,7 +104,6 @@ HEADERS += mainwindow.h \
     iversioncontrol.h \
     iview.h \
     icorelistener.h \
-    versiondialog.h \
     core_global.h \
     basemode.h \
     baseview.h \
@@ -131,9 +129,8 @@ HEADERS += mainwindow.h \
     uavgadgetdecorator.h \
     workspacesettings.h \
     uavconfiginfo.h \
-    authorsdialog.h \
     iconfigurableplugin.h \
-    telemetrymonitorwidget.h
+    aboutdialog.h
 
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \

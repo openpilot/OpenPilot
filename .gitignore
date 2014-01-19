@@ -10,6 +10,7 @@ GPATH
 GRTAGS
 GSYMS
 GTAGS
+core
 
 # flight
 /flight/*.pnproj
@@ -25,6 +26,7 @@ GTAGS
 openpilotgcs-build-desktop
 
 # Ignore some of the .pro.user files
+*.pro.user
 /ground/openpilotgcs/openpilotgcs.pro.user
 /ground/uavobjgenerator/uavobjgenerator.pro.user
 /ground/uavobjects/uavobjects.pro.user
@@ -55,6 +57,7 @@ openpilotgcs-build-desktop
 /.cproject
 /.project
 /.metadata
+/.settings
 
 # Ignore Eclipse temp folder, git plugin based?
 RemoteSystemsTempFiles

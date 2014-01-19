@@ -1,9 +1,14 @@
 <xml>
-    <object name="SystemSettings" singleinstance="true" settings="true">
+    <object name="SystemSettings" singleinstance="true" settings="true" category="System">
         <description>Select airframe type.  Currently used by @ref ActuatorModule to choose mixing from @ref ActuatorDesired to @ref ActuatorCommand</description>
         <field name="AirframeType" units="" type="enum" elements="1" options="FixedWing,FixedWingElevon,FixedWingVtail,VTOL,HeliCP,QuadX,QuadP,Hexa,Octo,Custom,HexaX,OctoV,OctoCoaxP,OctoCoaxX,HexaCoax,Tri,GroundVehicleCar,GroundVehicleDifferential,GroundVehicleMotorcycle" defaultvalue="QuadX"/>
         <field name="GUIConfigData" units="bits" type="uint32" elements="4" defaultvalue="0"/>
-        <field name="GPSDataProtocol" units="" type="enum" elements="1" options="NMEA,UBX" defaultvalue="UBX"/>
+        <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="30"/>
+                <!-- Vne, i.e. maximum airspeed the airframe can handle - used by autopilot, actuator compensation. as well as possibly by INS for plausibility checks -->
+        <field name="AirSpeedMin" units="m/s" type="float" elements="1" defaultvalue="10"/>
+                <!-- Vs0, i.e stall speed - minimum speed the airframe will be able to fly - used by autopilot, actuator compensation, as well as possibly by INS for plausibility check
+		     TODO: currently not used by vtols, needs its default changed to 0 as soon as its used by vtols-->
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

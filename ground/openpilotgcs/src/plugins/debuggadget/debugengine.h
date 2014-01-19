@@ -1,17 +1,21 @@
 #ifndef DEBUGENGINE_H
 #define DEBUGENGINE_H
-#include "qxtbasicstdloggerengine.h"
-#include <QObject>
-class debugengine : public QObject, public QxtBasicSTDLoggerEngine {
-    Q_OBJECT
-public:
+#include <QTextBrowser>
+#include <QPointer>
+#include <QMutex>
+
+class debugengine {
+// Add all missing constructor etc... to have singleton
     debugengine();
-protected:
-    void writeToStdErr(const QString & level, const QList<QVariant> & msgs);
-    void writeToStdOut(const QString & level, const QList<QVariant> & msgs);
-signals:
-    void dbgMsgError(const QString & level, const QList<QVariant> & msgs);
-    void dbgMsg(const QString & level, const QList<QVariant> & msgs);
+    ~debugengine();
+public:
+    static debugengine *getInstance();
+    void setTextEdit(QTextBrowser *textEdit);
+    void writeMessage(const QString &message);
+    void setColor(const QColor &c);
+    QMutex *mut_lock;
+private:
+    QPointer<QTextBrowser> _textEdit;
 };
 
 #endif // DEBUGENGINE_H

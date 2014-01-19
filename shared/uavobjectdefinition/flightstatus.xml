@@ -1,5 +1,5 @@
 <xml>
-    <object name="FlightStatus" singleinstance="true" settings="false">
+    <object name="FlightStatus" singleinstance="true" settings="false" category="Control">
         <description>Contains major flight status information for other modules.</description>
         <field name="Armed" units="" type="enum" elements="1" options="Disarmed,Arming,Armed" defaultvalue="Disarmed"/>
 

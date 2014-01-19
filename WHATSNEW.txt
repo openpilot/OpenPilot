@@ -1,3 +1,20 @@
+--- RELEASE-14.01-RC1 ---
+This is the release candidate 1 for the first 2014 software release. 
+This version still supports the  CopterControl and CC3D.
+It include some major "under the hood" changes like migration
+to Qt5.1 and QtQuick2 widgets, and a overhaul of UAVTalk to improve
+Telemetry and OPLink reliability.
+Some functions addition in this release:
+- "Rattitude" flight mode;
+- Altitude Hold Reimplementation;
+- Multiple PID banks;
+- "Cruise Control" 
+
+the full list of features, improvements and bufixes shipping
+in this release is accessible here:
+
+http://progress.openpilot.org/browse/OP/fixforversion/10220
+
 --- RELEASE-13.06.04 ---
 This maintenance release includes the following fixes missing in (previously not released to public) RELEASE-13.06.03.
 - Fixed issues with Google Maps;
@@ -6,7 +23,8 @@ This maintenance release includes the following fixes missing in (previously not
 JIRA issues addressed in this maintenance release:
 OP-1044, OP-1070, OP-1072
 Use the following link for a comprehensive list of issues addressed by this release
-http://progress.openpilot.org/browse/OP-1070
+
+http://progress.openpilot.org/issues/?filter=11060
 
 --- RELEASE-13.06.03 ---
 

@@ -26,6 +26,11 @@
  */
 
 #include <QtGui>
+#include <QtWidgets/QWidget>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QLineEdit>
+#include <QTableWidget>
 #include "notifyitemdelegate.h"
 #include "notifytablemodel.h"
 #include "notifylogging.h"

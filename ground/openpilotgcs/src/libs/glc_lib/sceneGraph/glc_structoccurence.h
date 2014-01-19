@@ -52,10 +52,16 @@ public:
 	GLC_StructOccurence();
 
 	//! Create Occurence of the specified instance
-	GLC_StructOccurence(GLC_StructInstance*, GLC_WorldHandle* pWorldHandle= NULL, GLuint shaderId=0);
+	GLC_StructOccurence(GLC_StructInstance* pStructInstance, GLC_WorldHandle* pWorldHandle= NULL, GLuint shaderId=0);
 
-	//! Construct Occurence withe the specified GLC_3DRep
-	GLC_StructOccurence(GLC_3DRep*);
+	//! Create Occurence of the specified instance and Uid
+	GLC_StructOccurence(GLC_StructInstance* pStructInstance, GLC_uint id, GLC_WorldHandle* pWorldHandle= NULL, GLuint shaderId=0);
+
+	//! Construct Occurence with the specified GLC_3DRep
+	GLC_StructOccurence(GLC_3DRep* pRep);
+
+	//! Construct Occurence from the given GLC_3DRep and Uid
+	GLC_StructOccurence(GLC_3DRep* pRep, GLC_uint id);
 
 	//! Copy constructor
 	GLC_StructOccurence(GLC_WorldHandle*, const GLC_StructOccurence&, bool shareInstance);
@@ -184,6 +190,13 @@ public:
 	//! Return true if this occurence is flexible
 	inline bool isFlexible() const
 	{return (m_pRelativeMatrix != NULL);}
+
+	//! Return the index position of the given occurrence
+	/*! Return -1 if the given occurence is not a child of this occurence*/
+	int indexOf(const GLC_StructOccurence* pOcc) const;
+
+	//! Return true if this occurence contains the given occurence has child
+	bool containsChild(const GLC_StructOccurence* pOcc) const;
 //@}
 //////////////////////////////////////////////////////////////////////
 /*! \name Set Functions*/
@@ -204,8 +217,15 @@ public:
 	/*! The new child must be orphan*/
 	void addChild(GLC_StructOccurence*);
 
+	//! insert Child at the given position
+	/*! The new child must be orphan and index >= childcount*/
+	void insertChild(int index, GLC_StructOccurence* pChild);
+
 	//! Add Child instance and returns the newly created occurence
 	GLC_StructOccurence* addChild(GLC_StructInstance*);
+
+	//! Insert Child instance and returns the newly created occurence
+	GLC_StructOccurence* insertChild(int index, GLC_StructInstance* pInstance);
 
 	//! make the occurence orphan
 	void makeOrphan();
@@ -218,7 +238,7 @@ public:
 	void reverseNormals();
 
 	//! Create the 3DViewInstance of this occurence if there is a valid 3DRep
-	bool create3DViewInstance();
+	bool create3DViewInstance(GLuint shaderId= 0);
 
 	//! Remove the 3DViewInstance of this occurence
 	bool remove3DViewInstance();
@@ -239,7 +259,7 @@ public:
 	//! Update the occurence number of this occurence branch
 	unsigned int updateOccurenceNumber(unsigned int n);
 
-	//! Set this occurence visibility
+    //! Set this occurence and children visibility
 	void setVisibility(bool visibility);
 
 	//! set the renderProperties of this occurence
@@ -260,6 +280,10 @@ public:
 
 	//! Make this occurence rigid
 	void makeRigid();
+
+	//! Exchange the occurrence at index position i with the occurrence at index position j
+	/*!This function assumes that both i and j are at least 0 but less than childCount().*/
+	void swap(int i, int j);
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -268,6 +292,9 @@ public:
 private:
 	//! Detach the occurence from the GLC_World
 	void detach();
+
+	//! Create occurrence from instance and given shader id
+	void doCreateOccurrenceFromInstance(GLuint shaderId);
 
 //////////////////////////////////////////////////////////////////////
 // Private members

@@ -29,9 +29,10 @@ USE_DSP_LIB ?= NO
 
 # List of mandatory modules to include
 MODULES += Sensors
-MODULES += Attitude/revolution
+#MODULES += Attitude/revolution
+MODULES += StateEstimation # use instead of Attitude
 MODULES += Altitude/revolution
-MODULES += Airspeed/revolution
+MODULES += Airspeed
 MODULES += AltitudeHold
 MODULES += Stabilization
 MODULES += VtolPathFollower
@@ -46,6 +47,7 @@ MODULES += Radio
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
 MODULES += Osd/osdoutout
+MODULES += Logging
 MODULES += Telemetry
 
 OPTMODULES += ComUsbBridge

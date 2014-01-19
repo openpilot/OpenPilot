@@ -29,7 +29,7 @@
 #include <cmath>
 #include <qwaitcondition.h>
 #include <QMetaType>
-#include <QApplication>
+#include <QtWidgets/QApplication>
 
 using namespace OP_DFU;
 
@@ -42,14 +42,7 @@ DFUObject::DFUObject(bool _debug, bool _use_serial, QString portname) :
     qRegisterMetaType<OP_DFU::Status>("Status");
 
     if (use_serial) {
-        PortSettings settings;
-        settings.BaudRate    = BAUD57600;
-        settings.DataBits    = DATA_8;
-        settings.FlowControl = FLOW_OFF;
-        settings.Parity = PAR_NONE;
-        settings.StopBits    = STOP_1;
-        settings.Timeout_Millisec = 1000;
-        info = new port(settings, portname);
+        info = new port(portname);
         info->rxBuf      = sspRxBuf;
         info->rxBufSize  = MAX_PACKET_DATA_LEN;
         info->txBuf      = sspTxBuf;
@@ -316,7 +309,7 @@ OP_DFU::Status DFUObject::UploadDescription(QVariant desc)
             padding.fill(' ', pad);
             description.append(padding);
         }
-        array = description.toAscii();
+        array = description.toLatin1();
     } else if (desc.type() == QMetaType::QByteArray) {
         array = desc.toByteArray();
     }
@@ -349,8 +342,9 @@ QString DFUObject::DownloadDescription(int const & numberOfChars)
     QByteArray arr;
 
     StartDownloadT(&arr, numberOfChars, OP_DFU::Descript);
-    QString str(arr);
-    return str;
+
+    int index = arr.indexOf(255);
+    return QString((index == -1) ? arr : arr.left(index));
 }
 
 QByteArray DFUObject::DownloadDescriptionAsBA(int const & numberOfChars)
@@ -358,6 +352,7 @@ QByteArray DFUObject::DownloadDescriptionAsBA(int const & numberOfChars)
     QByteArray arr;
 
     StartDownloadT(&arr, numberOfChars, OP_DFU::Descript);
+
     return arr;
 }
 

@@ -3,7 +3,7 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup AltitudeModule Altitude Module
- * @brief Communicate with BMP085 and update @ref AltitudeActual "AltitudeActual UAV Object"
+ * @brief Communicate with BMP085 and update @ref BaroSensor "BaroSensor UAV Object"
  * @{
  *
  * @file       altitude.h

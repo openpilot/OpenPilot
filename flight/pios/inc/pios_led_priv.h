@@ -31,21 +31,9 @@
 #ifndef PIOS_LED_PRIV_H
 #define PIOS_LED_PRIV_H
 
-#include <pios.h>
-#include <pios_stm32.h>
+#include <pios_gpio_priv.h>
 
-struct pios_led {
-    struct stm32_gpio pin;
-    uint32_t remap;
-    bool active_high;
-};
-
-struct pios_led_cfg {
-    const struct pios_led *leds;
-    uint8_t num_leds;
-};
-
-extern int32_t PIOS_LED_Init(const struct pios_led_cfg *cfg);
+extern int32_t PIOS_LED_Init(const struct pios_gpio_cfg *cfg);
 
 #endif /* PIOS_LED_PRIV_H */
 

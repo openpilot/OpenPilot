@@ -53,6 +53,9 @@ public:
 	//! Default constructor
 	GLC_World();
 
+	//! Create a world and set the root occurrence to the given occurrence
+	explicit GLC_World(GLC_StructOccurence* pOcc);
+
 	//! Copy constructor
 	GLC_World(const GLC_World&);
 
@@ -174,9 +177,8 @@ public:
 	inline QList<GLC_StructOccurence*> selectedOccurenceList() const
 	{return m_pWorldHandle->selectionSetHandle()->occurencesList();}
 
-	//! Return the list of selected occurences
-	inline QList<GLC_StructOccurence*> selectedPrimitiveOccurenceList() const
-	{return m_pWorldHandle->selectionSetHandle()->occurencesListWithSelectedPrimitive();}
+	//! Take the root occurence of this world
+	GLC_StructOccurence* takeRootOccurrence();
 
 //@}
 
@@ -185,6 +187,9 @@ public:
 //@{
 //////////////////////////////////////////////////////////////////////
 public:
+	//! Replace the root occurrence of this world by the given occurrence
+	void replaceRootOccurrence(GLC_StructOccurence* pOcc);
+
 	//! Merge this world with another world
 	void mergeWithAnotherWorld(GLC_World &);
 
@@ -244,8 +249,6 @@ public:
 	//! Hide selected 3DViewInstance
 	inline void hideSelected3DViewInstance()
 	{m_pWorldHandle->setSelected3DViewInstanceVisibility(false);}
-
-
 //@}
 
 //////////////////////////////////////////////////////////////////////

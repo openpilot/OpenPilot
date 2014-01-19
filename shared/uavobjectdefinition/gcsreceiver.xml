@@ -1,5 +1,5 @@
 <xml>
-    <object name="GCSReceiver" singleinstance="true" settings="false">
+    <object name="GCSReceiver" singleinstance="true" settings="false" category="Control">
         <description>A receiver channel group carried over the telemetry link.</description>
         <field name="Channel" units="us" type="uint16" elements="8"/>
         <access gcs="readwrite" flight="readwrite"/>

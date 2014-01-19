@@ -1,5 +1,5 @@
 <xml>
-    <object name="ActuatorCommand" singleinstance="true" settings="false">
+    <object name="ActuatorCommand" singleinstance="true" settings="false" category="Control">
         <description>Contains the pulse duration sent to each of the channels.  Set by @ref ActuatorModule</description>
         <field name="Channel" units="us" type="int16" elements="12"/>
         <field name="UpdateTime" units="ms" type="uint16" elements="1"/>

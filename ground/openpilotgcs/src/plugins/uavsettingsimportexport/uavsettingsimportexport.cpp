@@ -75,4 +75,3 @@ void UAVSettingsImportExportPlugin::shutdown()
 }
 void UAVSettingsImportExportPlugin::extensionsInitialized()
 {}
-Q_EXPORT_PLUGIN(UAVSettingsImportExportPlugin)

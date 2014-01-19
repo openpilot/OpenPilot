@@ -27,11 +27,12 @@
 
 
 #include "simulator.h"
-#include "qxtlogger.h"
-#include "extensionsystem/pluginmanager.h"
-#include "coreplugin/icore.h"
-#include "coreplugin/threadmanager.h"
 #include "hitlnoisegeneration.h"
+
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/icore.h>
+#include <coreplugin/threadmanager.h>
+#include <uavtalk/telemetrymanager.h>
 
 volatile bool Simulator::isStarted = false;
 
@@ -64,13 +65,13 @@ Simulator::Simulator(const SimulatorSettings & params) :
     emit myStart();
 
     QTime currentTime = QTime::currentTime();
-    gpsPosTime         = currentTime;
-    groundTruthTime    = currentTime;
-    gcsRcvrTime        = currentTime;
-    attRawTime         = currentTime;
-    baroAltTime        = currentTime;
+    gpsPosTime        = currentTime;
+    groundTruthTime   = currentTime;
+    gcsRcvrTime       = currentTime;
+    attRawTime        = currentTime;
+    baroAltTime       = currentTime;
     battTime = currentTime;
-    airspeedActualTime = currentTime;
+    airspeedStateTime = currentTime;
 
     // Define standard atmospheric constants
     airParameters.univGasConstant  = 8.31447; // [J/(mol·K)]
@@ -146,20 +147,20 @@ void Simulator::onStart()
     manCtrlCommand = ManualControlCommand::GetInstance(objManager);
     gcsReceiver    = GCSReceiver::GetInstance(objManager);
     flightStatus   = FlightStatus::GetInstance(objManager);
-    posHome        = HomeLocation::GetInstance(objManager);
-    velActual      = VelocityActual::GetInstance(objManager);
-    posActual      = PositionActual::GetInstance(objManager);
-    baroAlt        = BaroAltitude::GetInstance(objManager);
-    flightBatt     = FlightBatteryState::GetInstance(objManager);
-    airspeedActual = AirspeedActual::GetInstance(objManager);
-    attActual      = AttitudeActual::GetInstance(objManager);
-    attSettings    = AttitudeSettings::GetInstance(objManager);
-    accels      = Accels::GetInstance(objManager);
-    gyros       = Gyros::GetInstance(objManager);
-    gpsPos      = GPSPosition::GetInstance(objManager);
-    gpsVel      = GPSVelocity::GetInstance(objManager);
-    telStats    = GCSTelemetryStats::GetInstance(objManager);
-    groundTruth = GroundTruth::GetInstance(objManager);
+    posHome       = HomeLocation::GetInstance(objManager);
+    velState      = VelocityState::GetInstance(objManager);
+    posState      = PositionState::GetInstance(objManager);
+    baroAlt       = BaroSensor::GetInstance(objManager);
+    flightBatt    = FlightBatteryState::GetInstance(objManager);
+    airspeedState = AirspeedState::GetInstance(objManager);
+    attState      = AttitudeState::GetInstance(objManager);
+    attSettings   = AttitudeSettings::GetInstance(objManager);
+    accelState    = AccelState::GetInstance(objManager);
+    gyroState     = GyroState::GetInstance(objManager);
+    gpsPos = GPSPositionSensor::GetInstance(objManager);
+    gpsVel = GPSVelocitySensor::GetInstance(objManager);
+    telStats      = GCSTelemetryStats::GetInstance(objManager);
+    groundTruth   = GroundTruth::GetInstance(objManager);
 
     // Listen to autopilot connection events
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
@@ -182,7 +183,7 @@ void Simulator::onStart()
                        "inputPort: " + QString::number(settings.inPort) + "\n" + \
                        "outputPort: " + QString::number(settings.outPort) + "\n");
 
-    qxtLog->info("\nLocal interface: " + settings.hostAddress + "\n" + \
+    qDebug() << ("\nLocal interface: " + settings.hostAddress + "\n" + \
                  "Remote interface: " + settings.remoteAddress + "\n" + \
                  "inputPort: " + QString::number(settings.inPort) + "\n" + \
                  "outputPort: " + QString::number(settings.outPort) + "\n");
@@ -257,30 +258,30 @@ void Simulator::setupObjects()
     }
 
     if (settings.groundTruthEnabled) {
-        setupOutputObject(posActual, settings.groundTruthRate);
-        setupOutputObject(velActual, settings.groundTruthRate);
+        setupOutputObject(posState, settings.groundTruthRate);
+        setupOutputObject(velState, settings.groundTruthRate);
     }
 
     if (settings.attRawEnabled) {
-        setupOutputObject(accels, settings.attRawRate);
-        setupOutputObject(gyros, settings.attRawRate);
+        setupOutputObject(accelState, settings.attRawRate);
+        setupOutputObject(gyroState, settings.attRawRate);
     }
 
-    if (settings.attActualEnabled && settings.attActHW) {
-        setupOutputObject(accels, settings.attRawRate);
-        setupOutputObject(gyros, settings.attRawRate);
+    if (settings.attStateEnabled && settings.attActHW) {
+        setupOutputObject(accelState, settings.attRawRate);
+        setupOutputObject(gyroState, settings.attRawRate);
     }
 
-    if (settings.attActualEnabled && !settings.attActHW) {
-        setupOutputObject(attActual, 20); // Hardcoded? Bleh.
+    if (settings.attStateEnabled && !settings.attActHW) {
+        setupOutputObject(attState, 20); // Hardcoded? Bleh.
     } else {
-        setupWatchedObject(attActual, 100); // Hardcoded? Bleh.
+        setupWatchedObject(attState, 100); // Hardcoded? Bleh.
     }
-    if (settings.airspeedActualEnabled) {
-        setupOutputObject(airspeedActual, settings.airspeedActualRate);
+    if (settings.airspeedStateEnabled) {
+        setupOutputObject(airspeedState, settings.airspeedStateRate);
     }
 
-    if (settings.baroAltitudeEnabled) {
+    if (settings.baroSensorEnabled) {
         setupOutputObject(baroAlt, settings.baroAltRate);
         setupOutputObject(flightBatt, settings.baroAltRate);
     }
@@ -462,31 +463,31 @@ void Simulator::updateUAVOs(Output2Hardware out)
     groundTruth->setData(groundTruthData);
 
 /*******************************/
-    // Update attActual object
-    AttitudeActual::DataFields attActualData;
-    attActualData = attActual->getData();
+    // Update attState object
+    AttitudeState::DataFields attStateData;
+    attStateData = attState->getData();
 
     if (settings.attActHW) {
         // do nothing
         /*****************************************/
     } else if (settings.attActSim) {
         // take all data from simulator
-        attActualData.Roll  = out.roll + noise.attActualData.Roll;   // roll;
-        attActualData.Pitch = out.pitch + noise.attActualData.Pitch; // pitch
-        attActualData.Yaw   = out.heading + noise.attActualData.Yaw; // Yaw
+        attStateData.Roll  = out.roll + noise.attStateData.Roll;   // roll;
+        attStateData.Pitch = out.pitch + noise.attStateData.Pitch; // pitch
+        attStateData.Yaw   = out.heading + noise.attStateData.Yaw; // Yaw
         float rpy[3];
         float quat[4];
-        rpy[0] = attActualData.Roll;
-        rpy[1] = attActualData.Pitch;
-        rpy[2] = attActualData.Yaw;
+        rpy[0] = attStateData.Roll;
+        rpy[1] = attStateData.Pitch;
+        rpy[2] = attStateData.Yaw;
         Utils::CoordinateConversions().RPY2Quaternion(rpy, quat);
-        attActualData.q1 = quat[0];
-        attActualData.q2 = quat[1];
-        attActualData.q3 = quat[2];
-        attActualData.q4 = quat[3];
+        attStateData.q1 = quat[0];
+        attStateData.q2 = quat[1];
+        attStateData.q3 = quat[2];
+        attStateData.q4 = quat[3];
 
         // Set UAVO
-        attActual->setData(attActualData);
+        attState->setData(attStateData);
         /*****************************************/
     } else if (settings.attActCalc) {
         // calculate RPY with code from Attitude module
@@ -598,16 +599,16 @@ void Simulator::updateUAVOs(Output2Hardware out)
             rpy2[0] = RAD2DEG * atan2f(R23, R33);
         }
 
-        attActualData.Roll  = rpy2[0];
-        attActualData.Pitch = rpy2[1];
-        attActualData.Yaw   = rpy2[2];
-        attActualData.q1    = q[0];
-        attActualData.q2    = q[1];
-        attActualData.q3    = q[2];
-        attActualData.q4    = q[3];
+        attStateData.Roll  = rpy2[0];
+        attStateData.Pitch = rpy2[1];
+        attStateData.Yaw   = rpy2[2];
+        attStateData.q1    = q[0];
+        attStateData.q2    = q[1];
+        attStateData.q3    = q[2];
+        attStateData.q4    = q[3];
 
         // Set UAVO
-        attActual->setData(attActualData);
+        attState->setData(attStateData);
         /*****************************************/
     }
 
@@ -633,8 +634,8 @@ void Simulator::updateUAVOs(Output2Hardware out)
         if (gpsPosTime.msecsTo(currentTime) >= settings.gpsPosRate) {
             qDebug() << " GPS time:" << gpsPosTime << ", currentTime: " << currentTime << ", difference: " << gpsPosTime.msecsTo(currentTime);
             // Update GPS Position objects
-            GPSPosition::DataFields gpsPosData;
-            memset(&gpsPosData, 0, sizeof(GPSPosition::DataFields));
+            GPSPositionSensor::DataFields gpsPosData;
+            memset(&gpsPosData, 0, sizeof(GPSPositionSensor::DataFields));
             gpsPosData.Altitude        = out.altitude + noise.gpsPosData.Altitude;
             gpsPosData.Heading         = out.heading + noise.gpsPosData.Heading;
             gpsPosData.Groundspeed     = out.groundspeed + noise.gpsPosData.Groundspeed;
@@ -644,13 +645,13 @@ void Simulator::updateUAVOs(Output2Hardware out)
             gpsPosData.PDOP = 3.0;
             gpsPosData.VDOP = gpsPosData.PDOP * 1.5;
             gpsPosData.Satellites      = 10;
-            gpsPosData.Status = GPSPosition::STATUS_FIX3D;
+            gpsPosData.Status = GPSPositionSensor::STATUS_FIX3D;
 
             gpsPos->setData(gpsPosData);
 
             // Update GPS Velocity.{North,East,Down}
-            GPSVelocity::DataFields gpsVelData;
-            memset(&gpsVelData, 0, sizeof(GPSVelocity::DataFields));
+            GPSVelocitySensor::DataFields gpsVelData;
+            memset(&gpsVelData, 0, sizeof(GPSVelocitySensor::DataFields));
             gpsVelData.North = out.velNorth + noise.gpsVelData.North;
             gpsVelData.East  = out.velEast + noise.gpsVelData.East;
             gpsVelData.Down  = out.velDown + noise.gpsVelData.Down;
@@ -662,23 +663,23 @@ void Simulator::updateUAVOs(Output2Hardware out)
     }
 
     /*******************************/
-    // Update VelocityActual.{North,East,Down}
+    // Update VelocityState.{North,East,Down}
     if (settings.groundTruthEnabled) {
         if (groundTruthTime.msecsTo(currentTime) >= settings.groundTruthRate) {
-            VelocityActual::DataFields velocityActualData;
-            memset(&velocityActualData, 0, sizeof(VelocityActual::DataFields));
-            velocityActualData.North = out.velNorth + noise.velocityActualData.North;
-            velocityActualData.East  = out.velEast + noise.velocityActualData.East;
-            velocityActualData.Down  = out.velDown + noise.velocityActualData.Down;
-            velActual->setData(velocityActualData);
+            VelocityState::DataFields velocityStateData;
+            memset(&velocityStateData, 0, sizeof(VelocityState::DataFields));
+            velocityStateData.North = out.velNorth + noise.velocityStateData.North;
+            velocityStateData.East  = out.velEast + noise.velocityStateData.East;
+            velocityStateData.Down  = out.velDown + noise.velocityStateData.Down;
+            velState->setData(velocityStateData);
 
-            // Update PositionActual.{Nort,East,Down}
-            PositionActual::DataFields positionActualData;
-            memset(&positionActualData, 0, sizeof(PositionActual::DataFields));
-            positionActualData.North = (out.dstN - initN) + noise.positionActualData.North;
-            positionActualData.East  = (out.dstE - initE) + noise.positionActualData.East;
-            positionActualData.Down  = (out.dstD /*-initD*/) + noise.positionActualData.Down;
-            posActual->setData(positionActualData);
+            // Update PositionState.{Nort,East,Down}
+            PositionState::DataFields positionStateData;
+            memset(&positionStateData, 0, sizeof(PositionState::DataFields));
+            positionStateData.North = (out.dstN - initN) + noise.positionStateData.North;
+            positionStateData.East  = (out.dstE - initE) + noise.positionStateData.East;
+            positionStateData.Down  = (out.dstD /*-initD*/) + noise.positionStateData.Down;
+            posState->setData(positionStateData);
 
             groundTruthTime = groundTruthTime.addMSecs(settings.groundTruthRate);
         }
@@ -707,11 +708,11 @@ void Simulator::updateUAVOs(Output2Hardware out)
 // }
 
     /*******************************/
-    // Update BaroAltitude object
-    if (settings.baroAltitudeEnabled) {
+    // Update BaroSensor object
+    if (settings.baroSensorEnabled) {
         if (baroAltTime.msecsTo(currentTime) >= settings.baroAltRate) {
-            BaroAltitude::DataFields baroAltData;
-            memset(&baroAltData, 0, sizeof(BaroAltitude::DataFields));
+            BaroSensor::DataFields baroAltData;
+            memset(&baroAltData, 0, sizeof(BaroSensor::DataFields));
             baroAltData.Altitude    = out.altitude + noise.baroAltData.Altitude;
             baroAltData.Temperature = out.temperature + noise.baroAltData.Temperature;
             baroAltData.Pressure    = out.pressure + noise.baroAltData.Pressure;
@@ -723,7 +724,7 @@ void Simulator::updateUAVOs(Output2Hardware out)
 
     /*******************************/
     // Update FlightBatteryState object
-    if (settings.baroAltitudeEnabled) {
+    if (settings.baroSensorEnabled) {
         if (battTime.msecsTo(currentTime) >= settings.baroAltRate) {
             FlightBatteryState::DataFields batteryData;
             memset(&batteryData, 0, sizeof(FlightBatteryState::DataFields));
@@ -737,18 +738,18 @@ void Simulator::updateUAVOs(Output2Hardware out)
     }
 
     /*******************************/
-    // Update AirspeedActual object
-    if (settings.airspeedActualEnabled) {
-        if (airspeedActualTime.msecsTo(currentTime) >= settings.airspeedActualRate) {
-            AirspeedActual::DataFields airspeedActualData;
-            memset(&airspeedActualData, 0, sizeof(AirspeedActual::DataFields));
-            airspeedActualData.CalibratedAirspeed = out.calibratedAirspeed + noise.airspeedActual.CalibratedAirspeed;
-            airspeedActualData.TrueAirspeed = out.trueAirspeed + noise.airspeedActual.TrueAirspeed;
-            // airspeedActualData.alpha=out.angleOfAttack; // to be implemented
-            // airspeedActualData.beta=out.angleOfSlip;
-            airspeedActual->setData(airspeedActualData);
+    // Update AirspeedState object
+    if (settings.airspeedStateEnabled) {
+        if (airspeedStateTime.msecsTo(currentTime) >= settings.airspeedStateRate) {
+            AirspeedState::DataFields airspeedStateData;
+            memset(&airspeedStateData, 0, sizeof(AirspeedState::DataFields));
+            airspeedStateData.CalibratedAirspeed = out.calibratedAirspeed + noise.airspeedState.CalibratedAirspeed;
+            airspeedStateData.TrueAirspeed = out.trueAirspeed + noise.airspeedState.TrueAirspeed;
+            // airspeedStateData.alpha=out.angleOfAttack; // to be implemented
+            // airspeedStateData.beta=out.angleOfSlip;
+            airspeedState->setData(airspeedStateData);
 
-            airspeedActualTime = airspeedActualTime.addMSecs(settings.airspeedActualRate);
+            airspeedStateTime = airspeedStateTime.addMSecs(settings.airspeedStateRate);
         }
     }
 
@@ -757,22 +758,22 @@ void Simulator::updateUAVOs(Output2Hardware out)
     if (settings.attRawEnabled) {
         if (attRawTime.msecsTo(currentTime) >= settings.attRawRate) {
             // Update gyroscope sensor data
-            Gyros::DataFields gyroData;
-            memset(&gyroData, 0, sizeof(Gyros::DataFields));
-            gyroData.x = out.rollRate + noise.gyroData.x;
-            gyroData.y = out.pitchRate + noise.gyroData.y;
-            gyroData.z = out.yawRate + noise.gyroData.z;
-            gyros->setData(gyroData);
+            GyroState::DataFields gyroStateData;
+            memset(&gyroStateData, 0, sizeof(GyroState::DataFields));
+            gyroStateData.x = out.rollRate + noise.gyroStateData.x;
+            gyroStateData.y = out.pitchRate + noise.gyroStateData.y;
+            gyroStateData.z = out.yawRate + noise.gyroStateData.z;
+            gyroState->setData(gyroStateData);
 
             // Update accelerometer sensor data
-            Accels::DataFields accelData;
-            memset(&accelData, 0, sizeof(Accels::DataFields));
-            accelData.x = out.accX + noise.accelData.x;
-            accelData.y = out.accY + noise.accelData.y;
-            accelData.z = out.accZ + noise.accelData.z;
-            accels->setData(accelData);
+            AccelState::DataFields accelStateData;
+            memset(&accelStateData, 0, sizeof(AccelState::DataFields));
+            accelStateData.x = out.accX + noise.accelStateData.x;
+            accelStateData.y = out.accY + noise.accelStateData.y;
+            accelStateData.z = out.accZ + noise.accelStateData.z;
+            accelState->setData(accelStateData);
 
-            attRawTime  = attRawTime.addMSecs(settings.attRawRate);
+            attRawTime = attRawTime.addMSecs(settings.attRawRate);
         }
     }
 }

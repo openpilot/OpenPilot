@@ -66,7 +66,6 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/threadmanager.h>
 #include <math.h>
-#include <qxtlogger.h>
 
 const float IL2Simulator::FT2M     = 12 * .254;
 const float IL2Simulator::KT2MPS   = 0.514444444;
@@ -94,7 +93,7 @@ void IL2Simulator::setupUdpPorts(const QString & host, int inPort, int outPort)
 
     inSocket->connectToHost(host, inPort); // IL2
     if (!inSocket->waitForConnected()) {
-        qxtLog->error(Name() + " cann't connect to UDP Port: " + QString::number(inPort));
+        qCritical() << Name() + " cann't connect to UDP Port: " + QString::number(inPort);
     }
 }
 
@@ -115,7 +114,7 @@ void IL2Simulator::transmitUpdate()
           .arg(ailerons)
           .arg(elevator)
           .arg(rudder);
-    QByteArray data = cmd.toAscii();
+    QByteArray data = cmd.toLatin1();
     // outSocket->write(data);
     inSocket->write(data); // for IL2 must send to the same port as input!!!!!!!!!!!!!
 }
@@ -262,20 +261,20 @@ void IL2Simulator::processUpdate(const QByteArray & inp)
     out.dstE         = current.X;
     out.dstD         = -current.Z;
 
-    // Update BaroAltitude object
+    // Update BaroSensor object
     out.altitude     = current.Z;
     out.agl          = current.Z;
     out.temperature  = airParameters.groundTemp + (current.Z * airParameters.tempLapseRate) - 273.0;
     out.pressure     = airPressureFromAltitude(current.Z, airParameters, gravity); // kpa
 
 
-    // Update attActual object
+    // Update attState object
     out.roll    = current.roll;   // roll;
     out.pitch   = current.pitch;  // pitch
     out.heading = current.azimuth; // yaw
 
 
-    // Update VelocityActual.{North,East,Down}
+    // Update VelocityState.{North,East,Down}
     out.velNorth = current.dY;
     out.velEast  = current.dX;
     out.velDown  = -current.dZ;

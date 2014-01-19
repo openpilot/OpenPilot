@@ -109,7 +109,7 @@ inline QwtPoint3D::QwtPoint3D( const QPointF &other ):
 */
 inline bool QwtPoint3D::isNull() const
 {
-    return d_x == 0.0 && d_y == 0.0 && d_z == 0;
+    return d_x == 0.0 && d_y == 0.0 && d_z == 0.0;
 }
 
 //! Returns the x-coordinate of the point.

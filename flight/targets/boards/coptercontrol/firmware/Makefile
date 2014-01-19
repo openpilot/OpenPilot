@@ -84,12 +84,16 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/systemsettings.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationdesired.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationsettings.c
+    SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank1.c
+    SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank2.c
+    SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank3.c
+    SRC += $(OPUAVSYNTHDIR)/stabilizationbank.c
     SRC += $(OPUAVSYNTHDIR)/actuatorcommand.c
     SRC += $(OPUAVSYNTHDIR)/actuatordesired.c
     SRC += $(OPUAVSYNTHDIR)/actuatorsettings.c
-    SRC += $(OPUAVSYNTHDIR)/accels.c
-    SRC += $(OPUAVSYNTHDIR)/gyros.c
-    SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
+    SRC += $(OPUAVSYNTHDIR)/accelstate.c
+    SRC += $(OPUAVSYNTHDIR)/gyrostate.c
+    SRC += $(OPUAVSYNTHDIR)/attitudestate.c
     SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
     SRC += $(OPUAVSYNTHDIR)/i2cstats.c
     SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
@@ -99,8 +103,9 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
     SRC += $(OPUAVSYNTHDIR)/camerastabsettings.c
     SRC += $(OPUAVSYNTHDIR)/cameradesired.c
-    SRC += $(OPUAVSYNTHDIR)/gpsposition.c
-    SRC += $(OPUAVSYNTHDIR)/gpsvelocity.c
+    SRC += $(OPUAVSYNTHDIR)/gpspositionsensor.c
+    SRC += $(OPUAVSYNTHDIR)/gpsvelocitysensor.c
+    SRC += $(OPUAVSYNTHDIR)/gpssettings.c
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
     SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
     SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
@@ -109,9 +114,9 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/ratedesired.c
-    SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
+    SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
-    SRC += $(OPUAVSYNTHDIR)/airspeedactual.c
+    SRC += $(OPUAVSYNTHDIR)/airspeedstate.c
     SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
 else
     ## Test Code

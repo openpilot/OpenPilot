@@ -12,8 +12,8 @@ include(../../plugins/config/config.pri)
 LIBS *= -l$$qtLibraryName(Uploader)
 HEADERS += setupwizardplugin.h \ 
     setupwizard.h \
-    pages/startpage.h \
-    pages/endpage.h \
+    pages/opstartpage.h \
+    pages/opendpage.h \
     pages/controllerpage.h \
     pages/vehiclepage.h \
     pages/notyetimplementedpage.h \
@@ -39,8 +39,8 @@ HEADERS += setupwizardplugin.h \
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
-    pages/startpage.cpp \
-    pages/endpage.cpp \
+    pages/opstartpage.cpp \
+    pages/opendpage.cpp \
     pages/controllerpage.cpp \
     pages/vehiclepage.cpp \
     pages/notyetimplementedpage.cpp \
@@ -67,8 +67,8 @@ SOURCES += setupwizardplugin.cpp \
 OTHER_FILES += SetupWizard.pluginspec
 
 FORMS += \
-    pages/startpage.ui \
-    pages/endpage.ui \
+    pages/opstartpage.ui \
+    pages/opendpage.ui \
     pages/controllerpage.ui \
     pages/vehiclepage.ui \
     pages/notyetimplementedpage.ui \

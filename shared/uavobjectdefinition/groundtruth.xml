@@ -1,5 +1,5 @@
 <xml>
-    <object name="GroundTruth" singleinstance="true" settings="false">
+    <object name="GroundTruth" singleinstance="true" settings="false" category="State">
         <description>Ground truth data output by a simulator.</description>
         <field name="AccelerationXYZ" units="m/s^2" type="float" elements="3"/>
         <field name="PositionNED" units="m" type="float" elements="3"/>

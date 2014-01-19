@@ -39,9 +39,10 @@
  */
 
 #include <openpilot.h>
-
+#include <pios_struct_helper.h>
 // private includes
 #include "inc/systemmod.h"
+
 
 // UAVOs
 #include <objectpersistence.h>
@@ -168,11 +169,13 @@ MODULE_INITCALL(SystemModInitialize, 0);
  */
 static void systemTask(__attribute__((unused)) void *parameters)
 {
-    /* start the delayed callback scheduler */
-    CallbackSchedulerStart();
     uint8_t cycleCount = 0;
+
     /* create all modules thread */
     MODULE_TASKCREATE_ALL;
+
+    /* start the delayed callback scheduler */
+    CallbackSchedulerStart();
 
     if (mallocFailed) {
         /* We failed to malloc during task creation,
@@ -253,51 +256,58 @@ static void systemTask(__attribute__((unused)) void *parameters)
         int delayTime = SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2);
 
 #if defined(PIOS_INCLUDE_RFM22B)
+
         // Update the OPLinkStatus UAVO
         OPLinkStatusData oplinkStatus;
         OPLinkStatusGet(&oplinkStatus);
 
-        // Get the other device stats.
-        PIOS_RFM2B_GetPairStats(pios_rfm22b_id, oplinkStatus.PairIDs, oplinkStatus.PairSignalStrengths, OPLINKSTATUS_PAIRIDS_NUMELEM);
+        if (pios_rfm22b_id) {
+            // Get the other device stats.
+            PIOS_RFM2B_GetPairStats(pios_rfm22b_id, oplinkStatus.PairIDs, oplinkStatus.PairSignalStrengths, OPLINKSTATUS_PAIRIDS_NUMELEM);
 
-        // Get the stats from the radio device
-        struct rfm22b_stats radio_stats;
-        PIOS_RFM22B_GetStats(pios_rfm22b_id, &radio_stats);
+            // Get the stats from the radio device
+            struct rfm22b_stats radio_stats;
+            PIOS_RFM22B_GetStats(pios_rfm22b_id, &radio_stats);
 
-        // Update the OPLInk status
-        static bool first_time = true;
-        static uint16_t prev_tx_count = 0;
-        static uint16_t prev_rx_count = 0;
-        oplinkStatus.HeapRemaining = xPortGetFreeHeapSize();
-        oplinkStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
-        oplinkStatus.RxGood = radio_stats.rx_good;
-        oplinkStatus.RxCorrected   = radio_stats.rx_corrected;
-        oplinkStatus.RxErrors = radio_stats.rx_error;
-        oplinkStatus.RxMissed = radio_stats.rx_missed;
-        oplinkStatus.RxFailure     = radio_stats.rx_failure;
-        oplinkStatus.TxDropped     = radio_stats.tx_dropped;
-        oplinkStatus.TxResent = radio_stats.tx_resent;
-        oplinkStatus.TxFailure     = radio_stats.tx_failure;
-        oplinkStatus.Resets      = radio_stats.resets;
-        oplinkStatus.Timeouts    = radio_stats.timeouts;
-        oplinkStatus.RSSI        = radio_stats.rssi;
-        oplinkStatus.LinkQuality = radio_stats.link_quality;
-        if (first_time) {
-            first_time = false;
+            // Update the OPLInk status
+            static bool first_time = true;
+            static uint16_t prev_tx_count = 0;
+            static uint16_t prev_rx_count = 0;
+            oplinkStatus.HeapRemaining = xPortGetFreeHeapSize();
+            oplinkStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
+            oplinkStatus.RxGood = radio_stats.rx_good;
+            oplinkStatus.RxCorrected   = radio_stats.rx_corrected;
+            oplinkStatus.RxErrors = radio_stats.rx_error;
+            oplinkStatus.RxMissed = radio_stats.rx_missed;
+            oplinkStatus.RxFailure     = radio_stats.rx_failure;
+            oplinkStatus.TxDropped     = radio_stats.tx_dropped;
+            oplinkStatus.TxResent = radio_stats.tx_resent;
+            oplinkStatus.TxFailure     = radio_stats.tx_failure;
+            oplinkStatus.Resets      = radio_stats.resets;
+            oplinkStatus.Timeouts    = radio_stats.timeouts;
+            oplinkStatus.RSSI        = radio_stats.rssi;
+            oplinkStatus.LinkQuality = radio_stats.link_quality;
+            if (first_time) {
+                first_time = false;
+            } else {
+                uint16_t tx_count = radio_stats.tx_byte_count;
+                uint16_t rx_count = radio_stats.rx_byte_count;
+                uint16_t tx_bytes = (tx_count < prev_tx_count) ? (0xffff - prev_tx_count + tx_count) : (tx_count - prev_tx_count);
+                uint16_t rx_bytes = (rx_count < prev_rx_count) ? (0xffff - prev_rx_count + rx_count) : (rx_count - prev_rx_count);
+                oplinkStatus.TXRate = (uint16_t)((float)(tx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
+                oplinkStatus.RXRate = (uint16_t)((float)(rx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
+                prev_tx_count = tx_count;
+                prev_rx_count = rx_count;
+            }
+            oplinkStatus.TXSeq     = radio_stats.tx_seq;
+            oplinkStatus.RXSeq     = radio_stats.rx_seq;
+
+            oplinkStatus.LinkState = radio_stats.link_state;
         } else {
-            uint16_t tx_count = radio_stats.tx_byte_count;
-            uint16_t rx_count = radio_stats.rx_byte_count;
-            uint16_t tx_bytes = (tx_count < prev_tx_count) ? (0xffff - prev_tx_count + tx_count) : (tx_count - prev_tx_count);
-            uint16_t rx_bytes = (rx_count < prev_rx_count) ? (0xffff - prev_rx_count + rx_count) : (rx_count - prev_rx_count);
-            oplinkStatus.TXRate = (uint16_t)((float)(tx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
-            oplinkStatus.RXRate = (uint16_t)((float)(rx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
-            prev_tx_count = tx_count;
-            prev_rx_count = rx_count;
+            oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_DISABLED;
         }
-        oplinkStatus.TXSeq     = radio_stats.tx_seq;
-        oplinkStatus.RXSeq     = radio_stats.rx_seq;
-        oplinkStatus.LinkState = radio_stats.link_state;
         OPLinkStatusSet(&oplinkStatus);
+
 #endif /* if defined(PIOS_INCLUDE_RFM22B) */
 
         if (xQueueReceive(objectPersistenceQueue, &ev, delayTime) == pdTRUE) {
@@ -426,9 +436,9 @@ static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_
     // By convention, there is a direct mapping between task monitor task_id's and members
     // of the TaskInfoXXXXElem enums
     PIOS_DEBUG_Assert(task_id < TASKINFO_RUNNING_NUMELEM);
-    taskData->Running[task_id]        = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
-    taskData->StackRemaining[task_id] = task_info->stack_remaining;
-    taskData->RunningTime[task_id]    = task_info->running_time_percentage;
+    cast_struct_to_array(taskData->Running, taskData->Running.System)[task_id] = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
+    ((uint16_t *)&taskData->StackRemaining)[task_id] = task_info->stack_remaining;
+    ((uint8_t *)&taskData->RunningTime)[task_id]     = task_info->running_time_percentage;
 }
 #endif
 
@@ -511,12 +521,14 @@ static void updateStats()
 
     // Get stats and update
     SystemStatsGet(&stats);
-    stats.FlightTime    = xTaskGetTickCount() * portTICK_RATE_MS;
+    stats.FlightTime = xTaskGetTickCount() * portTICK_RATE_MS;
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
     // POSIX port of FreeRTOS doesn't have xPortGetFreeHeapSize()
+    stats.SystemModStackRemaining = 128;
     stats.HeapRemaining = 10240;
 #else
     stats.HeapRemaining = xPortGetFreeHeapSize();
+    stats.SystemModStackRemaining = uxTaskGetStackHighWaterMark(NULL) * 4;
 #endif
 
     // Get Irq stack status
@@ -545,19 +557,9 @@ static void updateStats()
     } // else: TickCount has wrapped, do not calc now
     lastTickCount    = now;
     idleCounterClear = 1;
-
 #if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)
-#if defined(STM32F4XX)
-    float temp_voltage = 3.3f * PIOS_ADC_PinGet(3) / ((1 << 12) - 1);
-    const float STM32_TEMP_V25 = 0.76f; /* V */
-    const float STM32_TEMP_AVG_SLOPE = 2.5f; /* mV/C */
-    stats.CPUTemp = (temp_voltage - STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
-#else
-    float temp_voltage = 3.3f * PIOS_ADC_PinGet(0) / ((1 << 12) - 1);
-    const float STM32_TEMP_V25 = 1.43f; /* V */
-    const float STM32_TEMP_AVG_SLOPE = 4.3f; /* mV/C */
-    stats.CPUTemp = (temp_voltage - STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
-#endif
+    float temp_voltage = PIOS_ADC_PinGetVolt(PIOS_ADC_TEMPERATURE_PIN);
+    stats.CPUTemp    = PIOS_CONVERT_VOLT_TO_CPU_TEMP(temp_voltage);;
 #endif
     SystemStatsSet(&stats);
 }

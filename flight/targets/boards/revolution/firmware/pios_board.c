@@ -133,7 +133,7 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 #if defined(PIOS_INCLUDE_MS5611)
 #include "pios_ms5611.h"
 static const struct pios_ms5611_cfg pios_ms5611_cfg = {
-    .oversampling = MS5611_OSR_512,
+    .oversampling = MS5611_OSR_4096,
 };
 #endif /* PIOS_INCLUDE_MS5611 */
 
@@ -346,7 +346,7 @@ void PIOS_Board_Init(void)
     const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
 #if defined(PIOS_INCLUDE_LED)
-    const struct pios_led_cfg *led_cfg   = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
+    const struct pios_gpio_cfg *led_cfg  = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
     PIOS_Assert(led_cfg);
     PIOS_LED_Init(led_cfg);
 #endif /* PIOS_INCLUDE_LED */
@@ -403,6 +403,9 @@ void PIOS_Board_Init(void)
         PIOS_Assert(0);
     }
 
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -414,9 +417,6 @@ void PIOS_Board_Init(void)
 
     /* Initialize the alarms library */
     AlarmsInitialize();
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
     /* Set up pulse timers */
     PIOS_TIM_InitClock(&tim_1_cfg);
@@ -907,6 +907,16 @@ void PIOS_Board_Init(void)
 #else
     PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
 #endif
+
+    // Disable GPIO_A8 Pullup to prevent wrong results on battery voltage readout
+    GPIO_InitTypeDef gpioA8 = {
+        .GPIO_Speed = GPIO_Speed_2MHz,
+        .GPIO_Mode  = GPIO_Mode_IN,
+        .GPIO_PuPd  = GPIO_PuPd_NOPULL,
+        .GPIO_Pin   = GPIO_Pin_8,
+        .GPIO_OType = GPIO_OType_OD,
+    };
+    GPIO_Init(GPIOA, &gpioA8);
 
     if (PIOS_I2C_Init(&pios_i2c_mag_pressure_adapter_id, &pios_i2c_mag_pressure_adapter_cfg)) {
         PIOS_DEBUG_Assert(0);

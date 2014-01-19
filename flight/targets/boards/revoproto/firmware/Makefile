@@ -30,8 +30,9 @@ USE_DSP_LIB ?= NO
 # List of mandatory modules to include
 MODULES += Sensors
 MODULES += Attitude/revolution
+#MODULES += StateEstimation # use instead of Attitude
 MODULES += Altitude/revolution
-MODULES += Airspeed/revolution
+MODULES += Airspeed
 MODULES += AltitudeHold
 MODULES += Stabilization
 MODULES += ManualControl

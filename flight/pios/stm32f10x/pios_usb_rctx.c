@@ -143,7 +143,7 @@ static void PIOS_USB_RCTX_SendReport(struct pios_usb_rctx_dev *usb_rctx_dev)
 
 #ifdef PIOS_INCLUDE_FREERTOS
     if (need_yield) {
-        vPortYieldFromISR();
+        vPortYield();
     }
 #endif /* PIOS_INCLUDE_FREERTOS */
 }

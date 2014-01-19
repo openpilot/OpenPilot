@@ -1,0 +1,20 @@
+<xml>
+    <object name="DebugLogControl" singleinstance="true" settings="false" category="System">
+        <description>Log Control Object - Used to issue commands to the on board logging system</description>
+	<!-- Set Operation to Retrieve, in combination with Flight and Entry
+	     fields, to
+	     load a specific log entry into the DebugLogEntry UAVObject on
+	     flight side - must be retrieved separately. If the log entry does
+	     not exist, its Type field will be set to Empty, indicating a
+	     nonexistant entry.
+	     Set Operation to FormatFlash to format the flash partition used
+	     for logs.  Will only format if flightstatus is DISARMED!-->
+	<field name="Operation" units="" type="enum" elements="1" options="None, Retrieve, FormatFlash" />
+	<field name="Flight" units="" type="uint16" elements="1" />
+	<field name="Entry" units="" type="uint16" elements="1" />
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="manual" period="0"/>
+        <telemetryflight acked="true" updatemode="manual" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

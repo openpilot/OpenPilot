@@ -1,5 +1,5 @@
 <xml>
-    <object name="FlightPlanStatus" singleinstance="true" settings="false">
+    <object name="FlightPlanStatus" singleinstance="true" settings="false" category="Navigation">
         <description>Status of the flight plan script</description>
         <field name="Status" units="" type="enum" elements="1" options="Stopped,Running,Error" defaultvalue="Stopped"/>
         <field name="ErrorType" units="" type="enum" elements="1" options="None,VMInitError,Exception,IOError,DivByZero,AssertError,AttributeError,ImportError,IndexError,KeyError,MemoryError,NameError,SyntaxError,SystemError,TypeError,ValueError,StopIteration,Warning,UnknownError" defaultvalue="None"/>

@@ -31,12 +31,11 @@
 #include <pios_gcsrcvr_priv.h>
 #include <uavobjectsinit.h>
 
-#include <accels.h>
-#include <baroaltitude.h>
-#include <gpsposition.h>
-#include <gyros.h>
-#include <gyrosbias.h>
-#include <magnetometer.h>
+#include <accelssensor.h>
+#include <barosensor.h>
+#include <gpspositionsensor.h>
+#include <gyrosensor.h>
+#include <magsensor.h>
 #include <manualcontrolsettings.h>
 
 void Stack_Change() {}
@@ -132,17 +131,19 @@ void PIOS_Board_Init(void)
     /* Delay system */
     PIOS_DELAY_Init();
 
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
     UAVObjectsInitializeAll();
 
-    AccelsInitialize();
-    BaroAltitudeInitialize();
-    MagnetometerInitialize();
-    GPSPositionInitialize();
-    GyrosInitialize();
-    GyrosBiasInitialize();
+    AccelSensorInitialize();
+    BaroSensorInitialize();
+    MagSensorInitialize();
+    GPSPositionSensorInitialize();
+    GyroSensorInitialize();
 
     /* Initialize the alarms library */
     AlarmsInitialize();
@@ -151,9 +152,6 @@ void PIOS_Board_Init(void)
     if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
         PIOS_Assert(0);
     }
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_TELEMETRY_RF) && 1

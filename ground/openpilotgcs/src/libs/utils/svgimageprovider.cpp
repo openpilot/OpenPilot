@@ -32,7 +32,7 @@
 
 SvgImageProvider::SvgImageProvider(const QString &basePath) :
     QObject(),
-    QDeclarativeImageProvider(QDeclarativeImageProvider::Image),
+    QQuickImageProvider(QQuickImageProvider::Image),
     m_basePath(basePath)
 {}
 

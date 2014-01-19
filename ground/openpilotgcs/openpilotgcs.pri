@@ -41,7 +41,7 @@ defineReplace(stripSrcDir) {
         !contains(1, ^/.*):1 = $$OUT_PWD/$$1
     }
     out = $$cleanPath($$1)
-    out ~= s|^$$re_escape($$PWD/)||$$i_flag
+    out ~= s|^$$re_escape($$_PRO_FILE_PWD_/)||$$i_flag
     return($$out)
 }
 
@@ -77,6 +77,7 @@ macx {
     GCS_APP_TARGET   = "OpenPilot GCS"
     GCS_LIBRARY_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Plugins
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH
+    GCS_QT_QML_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Imports
     GCS_LIBEXEC_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_PATH    = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_BASENAME = Resources
@@ -89,6 +90,9 @@ macx {
     } else {
         GCS_APP_WRAPPER  = openpilotgcs
         GCS_APP_TARGET   = openpilotgcs.bin
+        GCS_QT_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5
+        GCS_QT_PLUGINS_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/plugins
+        GCS_QT_QML_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/qml
     }
     GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
@@ -133,3 +137,9 @@ linux-g++-* {
     QMAKE_LFLAGS += -Wl,--allow-shlib-undefined -Wl,--no-undefined
 }
 
+win32 {
+    # Fix ((packed)) pragma handling issue introduced when upgrading MinGW from 4.4 to 4.8
+    # See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991
+    # The ((packet)) pragma is used in uav metadata struct and other places
+    QMAKE_CXXFLAGS += -mno-ms-bitfields
+}

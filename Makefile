@@ -859,12 +859,15 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   Here is a summary of the available targets:"
 	@$(ECHO)
+	@$(ECHO) "   [Source tree preparation]"
+	@$(ECHO) "     prepare              - Install GIT commit message template"
 	@$(ECHO) "   [Tool Installers]"
 	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
 	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
 	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
+	@$(ECHO) "     openssl_install      - Install the OpenSSL libraries (Windows only)"
 	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     doxygen_install      - Install the Doxygen documentation generator"
 	@$(ECHO) "     gtest_install        - Install the GoogleTest framework"

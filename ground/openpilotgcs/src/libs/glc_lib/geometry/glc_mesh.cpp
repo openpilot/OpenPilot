@@ -228,6 +228,29 @@ QVector<GLuint> GLC_Mesh::getTrianglesIndex(int lod, GLC_uint materialId) const
 	return resultIndex;
 }
 
+IndexList GLC_Mesh::getEquivalentTrianglesStripsFansIndex(int lod, GLC_uint materialId)
+{
+	IndexList subject;
+	if (containsTriangles(lod, materialId))
+	{
+		subject= getTrianglesIndex(lod, materialId).toList();
+	}
+
+	if (containsStrips(lod, materialId))
+	{
+		subject.append(equivalentTrianglesIndexOfstripsIndex(lod, materialId));
+	}
+
+	if (containsFans(lod, materialId))
+	{
+		subject.append(equivalentTrianglesIndexOfFansIndex(lod, materialId));
+	}
+
+	Q_ASSERT((subject.count() % 3) == 0);
+
+	return subject;
+}
+
 // Return the number of triangles
 int GLC_Mesh::numberOfTriangles(int lod, GLC_uint materialId) const
 {
@@ -317,7 +340,39 @@ int GLC_Mesh::numberOfFans(int lod, GLC_uint materialId) const
 	// Check if the lod exist and material exists
 	if(!m_PrimitiveGroups.contains(lod))return 0;
 	else if (!m_PrimitiveGroups.value(lod)->contains(materialId)) return 0;
-	else return m_PrimitiveGroups.value(lod)->value(materialId)->fansSizes().size();
+    else return m_PrimitiveGroups.value(lod)->value(materialId)->fansSizes().size();
+}
+
+GLC_Material *GLC_Mesh::MaterialOfPrimitiveId(GLC_uint id, int lod) const
+{
+    GLC_Material* pSubject= NULL;
+
+    if (!m_PrimitiveGroups.isEmpty())
+    {
+        LodPrimitiveGroups* pMasterLodPrimitiveGroup= m_PrimitiveGroups.value(lod);
+        LodPrimitiveGroups::const_iterator iGroup= pMasterLodPrimitiveGroup->constBegin();
+        while (iGroup != pMasterLodPrimitiveGroup->constEnd())
+        {
+            GLC_PrimitiveGroup* pCurrentGroup= iGroup.value();
+            QList<GLC_uint> listOfId;
+
+            listOfId.append(pCurrentGroup->triangleGroupId());
+            listOfId.append(pCurrentGroup->stripGroupId());
+            listOfId.append(pCurrentGroup->fanGroupId());
+            if (listOfId.contains(id))
+            {
+                const GLC_uint materialId= pCurrentGroup->id();
+                pSubject= this->material(materialId);
+                iGroup= pMasterLodPrimitiveGroup->constEnd();
+            }
+            else
+            {
+                ++iGroup;
+            }
+        }
+    }
+
+    return pSubject;
 }
 
 // Return the strips index
@@ -363,6 +418,26 @@ QList<QVector<GLuint> > GLC_Mesh::getFansIndex(int lod, GLC_uint materialId) con
 	}
 
 	return result;
+}
+
+QSet<GLC_uint> GLC_Mesh::setOfPrimitiveId() const
+{
+	QList<GLC_uint> subject;
+	if (!m_PrimitiveGroups.isEmpty())
+	{
+		LodPrimitiveGroups* pMasterLodPrimitiveGroup= m_PrimitiveGroups.value(0);
+		LodPrimitiveGroups::const_iterator iGroup= pMasterLodPrimitiveGroup->constBegin();
+		while (iGroup != pMasterLodPrimitiveGroup->constEnd())
+		{
+			GLC_PrimitiveGroup* pCurrentGroup= iGroup.value();
+			subject.append(pCurrentGroup->triangleGroupId());
+			subject.append(pCurrentGroup->stripGroupId());
+			subject.append(pCurrentGroup->fanGroupId());
+			++iGroup;
+		}
+	}
+
+	return QSet<GLC_uint>::fromList(subject);
 }
 
 GLC_Mesh* GLC_Mesh::createMeshOfGivenLod(int lodIndex)
@@ -645,11 +720,18 @@ void GLC_Mesh::reverseNormals()
 // Copy index list in a vector for Vertex Array Use
 void GLC_Mesh::finish()
 {
-	boundingBox();
+	if (m_MeshData.lodCount() > 0)
+	{
+		boundingBox();
 
-	m_MeshData.finishLod();
+		m_MeshData.finishLod();
 
-	moveIndexToMeshDataLod();
+		moveIndexToMeshDataLod();
+	}
+	else
+	{
+		clear();
+	}
 
 	//qDebug() << "Mesh mem size= " << memmorySize();
 }
@@ -662,7 +744,7 @@ void GLC_Mesh::setCurrentLod(const int value)
 	{
 		const int numberOfLod= m_MeshData.lodCount() - 1;
 		// Clamp value to number of load
-		m_CurrentLod= qRound(static_cast<int>((static_cast<double>(value) / 100.0) * numberOfLod));
+		m_CurrentLod= static_cast<int>((static_cast<double>(value) / 100.0) * numberOfLod);
 	}
 	else
 	{

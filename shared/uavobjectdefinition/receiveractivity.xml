@@ -1,5 +1,5 @@
 <xml>
-    <object name="ReceiverActivity" singleinstance="true" settings="false">
+    <object name="ReceiverActivity" singleinstance="true" settings="false" category="System">
         <description>Monitors which receiver channels have been active within the last second.</description>
 	<field name="ActiveGroup" units="Channel Group" type="enum" elements="1"
 	       options="PWM,PPM,DSM (MainPort),DSM (FlexiPort),S.Bus,GCS,OPLink,None"

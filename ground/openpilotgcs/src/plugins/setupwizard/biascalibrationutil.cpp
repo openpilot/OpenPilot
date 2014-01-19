@@ -29,8 +29,8 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "attitudesettings.h"
-#include "accels.h"
-#include "gyros.h"
+#include "accelstate.h"
+#include "gyrostate.h"
 #include "qdebug.h"
 #include "revocalibration.h"
 
@@ -74,12 +74,12 @@ void BiasCalibrationUtil::gyroMeasurementsUpdated(UAVObject *obj)
         UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
         Q_ASSERT(uavObjectManager);
 
-        Gyros *gyros = Gyros::GetInstance(uavObjectManager);
-        Gyros::DataFields gyrosData = gyros->getData();
+        GyroState *gyroState = GyroState::GetInstance(uavObjectManager);
+        GyroState::DataFields gyroStateData = gyroState->getData();
 
-        m_gyroX += gyrosData.x;
-        m_gyroY += gyrosData.y;
-        m_gyroZ += gyrosData.z;
+        m_gyroX += gyroStateData.x;
+        m_gyroY += gyroStateData.y;
+        m_gyroZ += gyroStateData.z;
 
         m_receivedGyroUpdates++;
         emit progress(m_receivedGyroUpdates + m_receivedAccelUpdates, m_gyroMeasurementCount + m_accelMeasurementCount);
@@ -98,12 +98,12 @@ void BiasCalibrationUtil::accelMeasurementsUpdated(UAVObject *obj)
         UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
         Q_ASSERT(uavObjectManager);
 
-        Accels *accels = Accels::GetInstance(uavObjectManager);
-        Accels::DataFields accelsData = accels->getData();
+        AccelState *accelState = AccelState::GetInstance(uavObjectManager);
+        AccelState::DataFields AccelStateData = accelState->getData();
 
-        m_accelerometerX += accelsData.x;
-        m_accelerometerY += accelsData.y;
-        m_accelerometerZ += accelsData.z;
+        m_accelerometerX += AccelStateData.x;
+        m_accelerometerY += AccelStateData.y;
+        m_accelerometerZ += AccelStateData.z;
 
         m_receivedAccelUpdates++;
         emit progress(m_receivedGyroUpdates + m_receivedAccelUpdates, m_gyroMeasurementCount + m_accelMeasurementCount);
@@ -166,7 +166,7 @@ void BiasCalibrationUtil::startMeasurement()
         AttitudeSettings::GetInstance(uavObjectManager)->setData(attitudeSettingsData);
     }
     // Set up to receive updates for accels
-    UAVDataObject *uavObject = Accels::GetInstance(uavObjectManager);
+    UAVDataObject *uavObject = AccelState::GetInstance(uavObjectManager);
     connect(uavObject, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(accelMeasurementsUpdated(UAVObject *)));
 
     // Set update period for accels
@@ -179,7 +179,7 @@ void BiasCalibrationUtil::startMeasurement()
         uavObject->setMetadata(newMetaData);
     }
     // Set up to receive updates from gyros
-    uavObject = Gyros::GetInstance(uavObjectManager);
+    uavObject = GyroState::GetInstance(uavObjectManager);
     connect(uavObject, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(gyroMeasurementsUpdated(UAVObject *)));
 
     // Set update period for gyros
@@ -207,12 +207,12 @@ void BiasCalibrationUtil::stopMeasurement()
     Q_ASSERT(uavObjectManager);
 
     // Stop listening for updates from accels
-    UAVDataObject *uavObject = Accels::GetInstance(uavObjectManager);
+    UAVDataObject *uavObject = AccelState::GetInstance(uavObjectManager);
     disconnect(uavObject, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(accelMeasurementsUpdated(UAVObject *)));
     uavObject->setMetadata(m_previousAccelMetaData);
 
     // Stop listening for updates from gyros
-    uavObject = Gyros::GetInstance(uavObjectManager);
+    uavObject = GyroState::GetInstance(uavObjectManager);
     disconnect(uavObject, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(gyroMeasurementsUpdated(UAVObject *)));
     uavObject->setMetadata(m_previousGyroMetaData);
 

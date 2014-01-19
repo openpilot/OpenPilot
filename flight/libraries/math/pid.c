@@ -69,6 +69,7 @@ float pid_apply(struct pid *pid, const float err, float dT)
 /**
  * Update the PID computation with setpoint weighting on the derivative
  * @param[in] pid The PID struture which stores temporary information
+ * @param[in] factor A dynamic factor to scale pid's by, to compensate nonlinearities
  * @param[in] setpoint The setpoint to use
  * @param[in] measured The measured value of output
  * @param[in] dT  The time step
@@ -77,12 +78,12 @@ float pid_apply(struct pid *pid, const float err, float dT)
  * This version of apply uses setpoint weighting for the derivative component so the gain
  * on the gyro derivative can be different than the gain on the setpoint derivative
  */
-float pid_apply_setpoint(struct pid *pid, const float setpoint, const float measured, float dT)
+float pid_apply_setpoint(struct pid *pid, const float factor, const float setpoint, const float measured, float dT)
 {
     float err = setpoint - measured;
 
     // Scale up accumulator by 1000 while computing to avoid losing precision
-    pid->iAccumulator += err * (pid->i * dT * 1000.0f);
+    pid->iAccumulator += err * (factor * pid->i * dT * 1000.0f);
     pid->iAccumulator  = bound(pid->iAccumulator, pid->iLim * 1000.0f);
 
     // Calculate DT1 term,
@@ -90,11 +91,11 @@ float pid_apply_setpoint(struct pid *pid, const float setpoint, const float meas
     float diff  = ((deriv_gamma * setpoint - measured) - pid->lastErr);
     pid->lastErr = (deriv_gamma * setpoint - measured);
     if (pid->d > 0.0f && dT > 0.0f) {
-        dterm = pid->lastDer + dT / (dT + deriv_tau) * ((diff * pid->d / dT) - pid->lastDer);
+        dterm = pid->lastDer + dT / (dT + deriv_tau) * ((factor * diff * pid->d / dT) - pid->lastDer);
         pid->lastDer = dterm; // ^ set constant to 1/(2*pi*f_cutoff)
     } // 7.9577e-3  means 20 Hz f_cutoff
 
-    return (err * pid->p) + pid->iAccumulator / 1000.0f + dterm;
+    return (err * factor * pid->p) + pid->iAccumulator / 1000.0f + dterm;
 }
 
 /**

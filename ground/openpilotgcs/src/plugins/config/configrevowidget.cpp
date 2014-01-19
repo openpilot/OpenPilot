@@ -30,10 +30,10 @@
 #include <QDebug>
 #include <QTimer>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include <QMessageBox>
 #include <QThread>
 #include <QErrorMessage>
@@ -44,9 +44,9 @@
 #include <ekfconfiguration.h>
 #include <revocalibration.h>
 #include <homelocation.h>
-#include <accels.h>
-#include <gyros.h>
-#include <magnetometer.h>
+#include <accelstate.h>
+#include <gyrostate.h>
+#include <magstate.h>
 
 #define GRAVITY 9.81f
 #include "assertions.h"
@@ -226,12 +226,12 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
 
-    addUAVObjectToWidgetRelation("RevoSettings", "FusionAlgorithm", m_ui->FusionAlgorithm);
+    addWidgetBinding("RevoSettings", "FusionAlgorithm", m_ui->FusionAlgorithm);
 
-    addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", m_ui->rollRotation, AttitudeSettings::BOARDROTATION_ROLL);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", m_ui->pitchRotation, AttitudeSettings::BOARDROTATION_PITCH);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", m_ui->yawRotation, AttitudeSettings::BOARDROTATION_YAW);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "AccelTau", m_ui->accelTau);
+    addWidgetBinding("AttitudeSettings", "BoardRotation", m_ui->rollRotation, AttitudeSettings::BOARDROTATION_ROLL);
+    addWidgetBinding("AttitudeSettings", "BoardRotation", m_ui->pitchRotation, AttitudeSettings::BOARDROTATION_PITCH);
+    addWidgetBinding("AttitudeSettings", "BoardRotation", m_ui->yawRotation, AttitudeSettings::BOARDROTATION_YAW);
+    addWidgetBinding("AttitudeSettings", "AccelTau", m_ui->accelTau);
 
     populateWidgets();
     refreshWidgetsValues();
@@ -298,26 +298,26 @@ void ConfigRevoWidget::doStartAccelGyroBiasCalibration()
     UAVObject::Metadata mdata;
 
     /* Need to get as many accel updates as possible */
-    Accels *accels = Accels::GetInstance(getObjectManager());
-    Q_ASSERT(accels);
-    initialAccelsMdata = accels->getMetadata();
-    mdata = initialAccelsMdata;
+    AccelState *accelState = AccelState::GetInstance(getObjectManager());
+    Q_ASSERT(accelState);
+    initialAccelStateMdata = accelState->getMetadata();
+    mdata = initialAccelStateMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
-    accels->setMetadata(mdata);
+    accelState->setMetadata(mdata);
 
-    Gyros *gyros = Gyros::GetInstance(getObjectManager());
-    Q_ASSERT(gyros);
-    initialGyrosMdata = gyros->getMetadata();
-    mdata = initialGyrosMdata;
+    GyroState *gyroState = GyroState::GetInstance(getObjectManager());
+    Q_ASSERT(gyroState);
+    initialGyroStateMdata = gyroState->getMetadata();
+    mdata = initialGyroStateMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
-    gyros->setMetadata(mdata);
+    gyroState->setMetadata(mdata);
 
     // Now connect to the accels and mag updates, gather for 100 samples
     collectingData = true;
-    connect(accels, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
-    connect(gyros, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
+    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
+    connect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
 }
 
 /**
@@ -330,26 +330,26 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
     Q_UNUSED(lock);
 
     switch (obj->getObjID()) {
-    case Accels::OBJID:
+    case AccelState::OBJID:
     {
-        Accels *accels = Accels::GetInstance(getObjectManager());
-        Q_ASSERT(accels);
-        Accels::DataFields accelsData = accels->getData();
+        AccelState *accelState = AccelState::GetInstance(getObjectManager());
+        Q_ASSERT(accelState);
+        AccelState::DataFields accelStateData = accelState->getData();
 
-        accel_accum_x.append(accelsData.x);
-        accel_accum_y.append(accelsData.y);
-        accel_accum_z.append(accelsData.z);
+        accel_accum_x.append(accelStateData.x);
+        accel_accum_y.append(accelStateData.y);
+        accel_accum_z.append(accelStateData.z);
         break;
     }
-    case Gyros::OBJID:
+    case GyroState::OBJID:
     {
-        Gyros *gyros = Gyros::GetInstance(getObjectManager());
-        Q_ASSERT(gyros);
-        Gyros::DataFields gyrosData = gyros->getData();
+        GyroState *gyroState = GyroState::GetInstance(getObjectManager());
+        Q_ASSERT(gyroState);
+        GyroState::DataFields gyroStateData = gyroState->getData();
 
-        gyro_accum_x.append(gyrosData.x);
-        gyro_accum_y.append(gyrosData.y);
-        gyro_accum_z.append(gyrosData.z);
+        gyro_accum_x.append(gyroStateData.x);
+        gyro_accum_y.append(gyroStateData.y);
+        gyro_accum_z.append(gyroStateData.z);
         break;
     }
     default:
@@ -366,11 +366,11 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
         collectingData == true) {
         collectingData = false;
 
-        Accels *accels = Accels::GetInstance(getObjectManager());
-        Gyros *gyros   = Gyros::GetInstance(getObjectManager());
+        AccelState *accelState = AccelState::GetInstance(getObjectManager());
+        GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
 
-        disconnect(accels, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
-        disconnect(gyros, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
+        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
+        disconnect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
 
         m_ui->accelBiasStart->setEnabled(true);
 
@@ -397,8 +397,8 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
         attitudeSettings->setData(attitudeSettingsData);
         attitudeSettings->updated();
 
-        accels->setMetadata(initialAccelsMdata);
-        gyros->setMetadata(initialGyrosMdata);
+        accelState->setMetadata(initialAccelStateMdata);
+        gyroState->setMetadata(initialGyroStateMdata);
 
         // Recall saved board rotation
         recallBoardRotation();
@@ -575,21 +575,21 @@ void ConfigRevoWidget::doStartSixPointCalibration()
 
 #ifdef SIX_POINT_CAL_ACCEL
     /* Need to get as many accel updates as possible */
-    Accels *accels = Accels::GetInstance(getObjectManager());
-    Q_ASSERT(accels);
+    AccelState *accelState = AccelState::GetInstance(getObjectManager());
+    Q_ASSERT(accelState);
 
-    initialAccelsMdata = accels->getMetadata();
-    mdata = initialAccelsMdata;
+    initialAccelStateMdata = accelState->getMetadata();
+    mdata = initialAccelStateMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
-    accels->setMetadata(mdata);
+    accelState->setMetadata(mdata);
 #endif
 
     /* Need to get as many mag updates as possible */
-    Magnetometer *mag = Magnetometer::GetInstance(getObjectManager());
+    MagState *mag = MagState::GetInstance(getObjectManager());
     Q_ASSERT(mag);
-    initialMagMdata = mag->getMetadata();
-    mdata = initialMagMdata;
+    initialMagStateMdata = mag->getMetadata();
+    mdata = initialMagStateMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     mag->setMetadata(mdata);
@@ -623,12 +623,12 @@ void ConfigRevoWidget::savePositionData()
 
     collectingData = true;
 
-    Accels *accels    = Accels::GetInstance(getObjectManager());
-    Q_ASSERT(accels);
-    Magnetometer *mag = Magnetometer::GetInstance(getObjectManager());
+    AccelState *accelState = AccelState::GetInstance(getObjectManager());
+    Q_ASSERT(accelState);
+    MagState *mag = MagState::GetInstance(getObjectManager());
     Q_ASSERT(mag);
 
-    connect(accels, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
+    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
     connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
 
     m_ui->sixPointCalibInstructions->append("Hold...");
@@ -645,19 +645,19 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
 
     // This is necessary to prevent a race condition on disconnect signal and another update
     if (collectingData == true) {
-        if (obj->getObjID() == Accels::OBJID) {
+        if (obj->getObjID() == AccelState::OBJID) {
 #ifdef SIX_POINT_CAL_ACCEL
-            Accels *accels = Accels::GetInstance(getObjectManager());
-            Q_ASSERT(accels);
-            Accels::DataFields accelsData = accels->getData();
-            accel_accum_x.append(accelsData.x);
-            accel_accum_y.append(accelsData.y);
-            accel_accum_z.append(accelsData.z);
+            AccelState *accelState = AccelState::GetInstance(getObjectManager());
+            Q_ASSERT(accelState);
+            AccelState::DataFields accelStateData = accelState->getData();
+            accel_accum_x.append(accelStateData.x);
+            accel_accum_y.append(accelStateData.y);
+            accel_accum_z.append(accelStateData.z);
 #endif
-        } else if (obj->getObjID() == Magnetometer::OBJID) {
-            Magnetometer *mag = Magnetometer::GetInstance(getObjectManager());
+        } else if (obj->getObjID() == MagState::OBJID) {
+            MagState *mag = MagState::GetInstance(getObjectManager());
             Q_ASSERT(mag);
-            Magnetometer::DataFields magData = mag->getData();
+            MagState::DataFields magData = mag->getData();
             mag_accum_x.append(magData.x);
             mag_accum_y.append(magData.y);
             mag_accum_z.append(magData.z);
@@ -677,16 +677,16 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
 
 #ifdef SIX_POINT_CAL_ACCEL
         // Store the mean for this position for the accel
-        Accels *accels = Accels::GetInstance(getObjectManager());
-        Q_ASSERT(accels);
-        disconnect(accels, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
+        AccelState *accelState = AccelState::GetInstance(getObjectManager());
+        Q_ASSERT(accelState);
+        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
         accel_data_x[position] = listMean(accel_accum_x);
         accel_data_y[position] = listMean(accel_accum_y);
         accel_data_z[position] = listMean(accel_accum_z);
 #endif
 
         // Store the mean for this position for the mag
-        Magnetometer *mag = Magnetometer::GetInstance(getObjectManager());
+        MagState *mag = MagState::GetInstance(getObjectManager());
         Q_ASSERT(mag);
         disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
         mag_data_x[position] = listMean(mag_accum_x);
@@ -721,9 +721,9 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
 
             /* Cleanup original settings */
 #ifdef SIX_POINT_CAL_ACCEL
-            accels->setMetadata(initialAccelsMdata);
+            accelState->setMetadata(initialAccelStateMdata);
 #endif
-            mag->setMetadata(initialMagMdata);
+            mag->setMetadata(initialMagStateMdata);
 
             // Recall saved board rotation
             recallBoardRotation();
@@ -925,36 +925,36 @@ void ConfigRevoWidget::doStartNoiseMeasurement()
     mag_accum_z.clear();
 
     /* Need to get as many accel, mag and gyro updates as possible */
-    Accels *accels    = Accels::GetInstance(getObjectManager());
-    Q_ASSERT(accels);
-    Gyros *gyros      = Gyros::GetInstance(getObjectManager());
-    Q_ASSERT(gyros);
-    Magnetometer *mag = Magnetometer::GetInstance(getObjectManager());
+    AccelState *accelState = AccelState::GetInstance(getObjectManager());
+    Q_ASSERT(accelState);
+    GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
+    Q_ASSERT(gyroState);
+    MagState *mag = MagState::GetInstance(getObjectManager());
     Q_ASSERT(mag);
 
     UAVObject::Metadata mdata;
 
-    initialAccelsMdata = accels->getMetadata();
-    mdata = initialAccelsMdata;
+    initialAccelStateMdata = accelState->getMetadata();
+    mdata = initialAccelStateMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
-    accels->setMetadata(mdata);
+    accelState->setMetadata(mdata);
 
-    initialGyrosMdata = gyros->getMetadata();
-    mdata = initialGyrosMdata;
+    initialGyroStateMdata = gyroState->getMetadata();
+    mdata = initialGyroStateMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
-    gyros->setMetadata(mdata);
+    gyroState->setMetadata(mdata);
 
-    initialMagMdata = mag->getMetadata();
-    mdata = initialMagMdata;
+    initialMagStateMdata = mag->getMetadata();
+    mdata = initialMagStateMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     mag->setMetadata(mdata);
 
     /* Connect for updates */
-    connect(accels, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
-    connect(gyros, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
+    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
+    connect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
     connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
 }
 
@@ -971,31 +971,31 @@ void ConfigRevoWidget::doGetNoiseSample(UAVObject *obj)
     Q_ASSERT(obj);
 
     switch (obj->getObjID()) {
-    case Gyros::OBJID:
+    case GyroState::OBJID:
     {
-        Gyros *gyros = Gyros::GetInstance(getObjectManager());
-        Q_ASSERT(gyros);
-        Gyros::DataFields gyroData = gyros->getData();
+        GyroState *gyroState = GyroState::GetInstance(getObjectManager());
+        Q_ASSERT(gyroState);
+        GyroState::DataFields gyroData = gyroState->getData();
         gyro_accum_x.append(gyroData.x);
         gyro_accum_y.append(gyroData.y);
         gyro_accum_z.append(gyroData.z);
         break;
     }
-    case Accels::OBJID:
+    case AccelState::OBJID:
     {
-        Accels *accels = Accels::GetInstance(getObjectManager());
-        Q_ASSERT(accels);
-        Accels::DataFields accelsData = accels->getData();
-        accel_accum_x.append(accelsData.x);
-        accel_accum_y.append(accelsData.y);
-        accel_accum_z.append(accelsData.z);
+        AccelState *accelState = AccelState::GetInstance(getObjectManager());
+        Q_ASSERT(accelState);
+        AccelState::DataFields accelStateData = accelState->getData();
+        accel_accum_x.append(accelStateData.x);
+        accel_accum_y.append(accelStateData.y);
+        accel_accum_z.append(accelStateData.z);
         break;
     }
-    case Magnetometer::OBJID:
+    case MagState::OBJID:
     {
-        Magnetometer *mags = Magnetometer::GetInstance(getObjectManager());
+        MagState *mags = MagState::GetInstance(getObjectManager());
         Q_ASSERT(mags);
-        Magnetometer::DataFields magData = mags->getData();
+        MagState::DataFields magData = mags->getData();
         mag_accum_x.append(magData.x);
         mag_accum_y.append(magData.y);
         mag_accum_z.append(magData.z);
@@ -1018,11 +1018,11 @@ void ConfigRevoWidget::doGetNoiseSample(UAVObject *obj)
         gyro_accum_x.length() >= NOISE_SAMPLES &&
         accel_accum_x.length() >= NOISE_SAMPLES) {
         // No need to for more updates
-        Magnetometer *mags = Magnetometer::GetInstance(getObjectManager());
-        Accels *accels     = Accels::GetInstance(getObjectManager());
-        Gyros *gyros = Gyros::GetInstance(getObjectManager());
-        disconnect(accels, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
-        disconnect(gyros, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
+        MagState *mags = MagState::GetInstance(getObjectManager());
+        AccelState *accelState = AccelState::GetInstance(getObjectManager());
+        GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
+        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
+        disconnect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
         disconnect(mags, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
 
         EKFConfiguration *ekfConfiguration = EKFConfiguration::GetInstance(getObjectManager());

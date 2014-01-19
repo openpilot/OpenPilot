@@ -44,7 +44,7 @@
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
                           float Q[NUMW], float dT, float P[NUMX][NUMX]);
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
-                  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX], float K[NUMX][NUMV],
+                  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX],
                   uint16_t SensorsUsed);
 void RungeKutta(float X[NUMX], float U[NUMU], float dT);
 void StateEq(float X[NUMX], float U[NUMU], float Xdot[NUMX]);
@@ -97,7 +97,6 @@ static struct EKFData {
     // input noise and measurement noise variances
     float Q[NUMW];
     float R[NUMV];
-    float K[NUMX][NUMV]; // feedback gain matrix
 } ekf;
 
 // Global variables
@@ -129,7 +128,6 @@ void INSGPSInit() // pretty much just a place holder for now
 
         for (int j = 0; j < NUMV; j++) {
             ekf.H[j][i] = 0.0f;
-            ekf.K[i][j] = 0.0f;
         }
 
         ekf.X[i] = 0.0f;
@@ -402,7 +400,7 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
     // EKF correction step
     LinearizeH(ekf.X, ekf.Be, ekf.H);
     MeasurementEq(ekf.X, ekf.Be, Y);
-    SerialUpdate(ekf.H, ekf.R, Z, Y, ekf.P, ekf.X, ekf.K, SensorsUsed);
+    SerialUpdate(ekf.H, ekf.R, Z, Y, ekf.P, ekf.X, SensorsUsed);
     qmag       = sqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
     ekf.X[6]  /= qmag;
     ekf.X[7]  /= qmag;
@@ -515,11 +513,12 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 // ************************************************
 
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
-                  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX], float K[NUMX][NUMV],
+                  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX],
                   uint16_t SensorsUsed)
 {
     float HP[NUMX], HPHR, Error;
     uint8_t i, j, k, m;
+    float Km[NUMX];
 
     for (m = 0; m < NUMV; m++) {
         if (SensorsUsed & (0x01 << m)) { // use this sensor for update
@@ -535,18 +534,18 @@ void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
             }
 
             for (k = 0; k < NUMX; k++) {
-                K[k][m] = HP[k] / HPHR; // find K = HP/HPHR
+                Km[k] = HP[k] / HPHR; // find K = HP/HPHR
             }
             for (i = 0; i < NUMX; i++) { // Find P(m)= P(m-1) + K*HP
                 for (j = i; j < NUMX; j++) {
                     P[i][j] = P[j][i] =
-                                  P[i][j] - K[i][m] * HP[j];
+                                  P[i][j] - Km[i] * HP[j];
                 }
             }
 
             Error = Z[m] - Y[m];
             for (i = 0; i < NUMX; i++) { // Find X(m)= X(m-1) + K*Error
-                X[i] = X[i] + K[i][m] * Error;
+                X[i] = X[i] + Km[i] * Error;
             }
         }
     }

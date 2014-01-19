@@ -42,12 +42,14 @@
 #include "defaulthwsettingswidget.h"
 #include "uavobjectutilmanager.h"
 
+#include <uavtalk/telemetrymanager.h>
+
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
 
 ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {

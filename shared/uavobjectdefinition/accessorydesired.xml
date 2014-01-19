@@ -1,5 +1,5 @@
 <xml>
-    <object name="AccessoryDesired" singleinstance="false" settings="false">
+    <object name="AccessoryDesired" singleinstance="false" settings="false" category="Control">
         <description>Desired Auxillary actuator settings.  Comes from @ref ManualControlModule.</description>
         <field name="AccessoryVal" units="" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>

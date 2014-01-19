@@ -30,7 +30,7 @@
 
 #include "utils_global.h"
 
-#include <QtGui/QTabWidget>
+#include <QTabWidget>
 
 /*
  * MyTabWidget is a plain QTabWidget with the addition of the signal

@@ -57,6 +57,9 @@ public:
 	 * and set GLC_Object::m_Name to specified name*/
 	GLC_Object(const QString& name= QString());
 
+	//! Construct a GLC_Object with the given UID
+	GLC_Object(GLC_uint id, const QString& name= QString());
+
 	//! Construct a GLC_Object from the given GLC_Object
 	GLC_Object(const GLC_Object& sourceObject);
 

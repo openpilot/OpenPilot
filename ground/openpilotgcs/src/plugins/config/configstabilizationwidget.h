@@ -33,7 +33,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "stabilizationsettings.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QTimer>
 
 
@@ -48,11 +48,17 @@ public:
 private:
     Ui_StabilizationWidget *ui;
     QTimer *realtimeUpdates;
+    QList<QTabBar *> m_pidTabBars;
+    QString m_stabilizationObjectsString;
 
     // Milliseconds between automatic 'Instant Updates'
     static const int AUTOMATIC_UPDATE_RATE = 500;
 
+    int m_pidBankCount;
     int boardModel;
+    int m_currentPIDBank;
+protected:
+    QString mapObjectName(const QString objectName);
 
 protected slots:
     void refreshWidgetsValues(UAVObject *o = NULL);
@@ -62,6 +68,7 @@ private slots:
     void linkCheckBoxes(bool value);
     void processLinkedWidgets(QWidget *);
     void onBoardConnected();
+    void pidBankChanged(int index);
 };
 
 #endif // ConfigStabilizationWidget_H

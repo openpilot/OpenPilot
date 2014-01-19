@@ -34,14 +34,8 @@ win32 {
 macx { 
     SOURCES += src/ophid_usbmon_mac.cpp \
                hidapi/mac/hid.c
-    SDK = /Developer/SDKs/MacOSX10.5.sdk
-    ARCH = -mmacosx-version-min=10.5 \
-           -arch ppc \
-           -arch i386
-    LIBS += $(ARCH) \
-            -Wl,-syslibroot,$(SDK) \
-            -framework IOKit \
-            -framework CoreFoundation
+    LIBS += -framework CoreFoundation \
+            -framework IOKit
 }
 
 linux-g++ {

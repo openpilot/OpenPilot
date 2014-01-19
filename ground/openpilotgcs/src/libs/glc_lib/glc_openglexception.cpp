@@ -74,5 +74,5 @@ const char* GLC_OpenGlException::what() const throw()
 	QString exceptionmsg("GLC_OpenGlException : ");
 	exceptionmsg.append(m_ErrorDescription);
 	exceptionmsg.append(m_GlErrorDescription);
-	return exceptionmsg.toAscii().data();
+	return exceptionmsg.toLatin1().data();
 }

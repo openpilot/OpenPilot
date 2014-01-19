@@ -41,7 +41,7 @@ class GLC_LIB_EXPORT GLC_Disc : public GLC_Mesh
 //////////////////////////////////////////////////////////////////////
 public:
 	//! Construct a disc with the given radius
-	GLC_Disc(double radius, double angle= 2.0 * glc::PI);
+	GLC_Disc(double radius, double angle= 2.0 * glc::PI, int discretization= glc::GLC_POLYDISCRET);
 
 	//! Copy constructor
 	GLC_Disc(const GLC_Disc& disc);

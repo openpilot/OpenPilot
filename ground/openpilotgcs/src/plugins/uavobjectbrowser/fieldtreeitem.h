@@ -30,11 +30,11 @@
 
 #include "treeitem.h"
 #include <QtCore/QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QSpinBox>
-#include <QtGui/QDoubleSpinBox>
+#include <QWidget>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <qscispinbox/QScienceSpinBox.h>
-#include <QtGui/QComboBox>
+#include <QComboBox>
 #include <limits>
 
 #define QINT8MIN   std::numeric_limits<qint8>::min()
@@ -115,6 +115,8 @@ public:
     {
         QComboBox *editor = new QComboBox(parent);
 
+        // Setting ClickFocus lets the ComboBox stay open on Mac OSX.
+        editor->setFocusPolicy(Qt::ClickFocus);
         foreach(QString option, m_enumOptions)
         editor->addItem(option);
         return editor;

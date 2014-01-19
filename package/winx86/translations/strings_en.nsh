@@ -42,4 +42,4 @@
 
   LangString DESC_UnSecProgram ${LANG_ENGLISH} "OpenPilot GCS application and all components."
   LangString DESC_UnSecCache ${LANG_ENGLISH} "OpenPilot GCS cached maps data."
-  LangString DESC_UnSecConfig ${LANG_ENGLISH} "OpenPilot GCS configuration files."
+  LangString DESC_UnSecConfig ${LANG_ENGLISH} "OpenPilot GCS layout files."

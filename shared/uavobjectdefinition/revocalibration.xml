@@ -1,5 +1,5 @@
 <xml>
-    <object name="RevoCalibration" singleinstance="true" settings="true">
+    <object name="RevoCalibration" singleinstance="true" settings="true" category="Sensors">
         <description>Settings for the INS to control the algorithm and what is updated</description>
 
 

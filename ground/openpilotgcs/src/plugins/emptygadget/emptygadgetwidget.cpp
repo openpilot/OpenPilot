@@ -28,10 +28,10 @@
 
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
 
 EmptyGadgetWidget::EmptyGadgetWidget(QWidget *parent) : QLabel(parent)
 {

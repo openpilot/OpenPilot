@@ -31,17 +31,15 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/actionmanager/actionmanager.h>
-#include "uavtalk/telemetrymanager.h"
 #include "objectpersistence.h"
 
-
 #include <QMessageBox>
-
 
 class ConfigGadgetFactory;
 
 class ConfigPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
+                                             Q_PLUGIN_METADATA(IID "OpenPilot.Config")
 
 public:
     ConfigPlugin();

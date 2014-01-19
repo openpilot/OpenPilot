@@ -60,39 +60,39 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     }
     addApplySaveButtons(m_oplink->Apply, m_oplink->Save);
 
-    addUAVObjectToWidgetRelation("OPLinkSettings", "MainPort", m_oplink->MainPort);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "FlexiPort", m_oplink->FlexiPort);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "VCPPort", m_oplink->VCPPort);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "MaxRFPower", m_oplink->MaxRFTxPower);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "MinChannel", m_oplink->MinimumChannel);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "MaxChannel", m_oplink->MaximumChannel);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "ChannelSet", m_oplink->ChannelSet);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "CoordID", m_oplink->CoordID);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "Coordinator", m_oplink->Coordinator);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "OneWay", m_oplink->OneWayLink);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "PPMOnly", m_oplink->PPMOnly);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "PPM", m_oplink->PPM);
+    addWidgetBinding("OPLinkSettings", "MainPort", m_oplink->MainPort);
+    addWidgetBinding("OPLinkSettings", "FlexiPort", m_oplink->FlexiPort);
+    addWidgetBinding("OPLinkSettings", "VCPPort", m_oplink->VCPPort);
+    addWidgetBinding("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed);
+    addWidgetBinding("OPLinkSettings", "MaxRFPower", m_oplink->MaxRFTxPower);
+    addWidgetBinding("OPLinkSettings", "MinChannel", m_oplink->MinimumChannel);
+    addWidgetBinding("OPLinkSettings", "MaxChannel", m_oplink->MaximumChannel);
+    addWidgetBinding("OPLinkSettings", "ChannelSet", m_oplink->ChannelSet);
+    addWidgetBinding("OPLinkSettings", "CoordID", m_oplink->CoordID);
+    addWidgetBinding("OPLinkSettings", "Coordinator", m_oplink->Coordinator);
+    addWidgetBinding("OPLinkSettings", "OneWay", m_oplink->OneWayLink);
+    addWidgetBinding("OPLinkSettings", "PPMOnly", m_oplink->PPMOnly);
+    addWidgetBinding("OPLinkSettings", "PPM", m_oplink->PPM);
 
-    addUAVObjectToWidgetRelation("OPLinkStatus", "DeviceID", m_oplink->DeviceID);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "RxGood", m_oplink->Good);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "RxCorrected", m_oplink->Corrected);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "RxErrors", m_oplink->Errors);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "RxMissed", m_oplink->Missed);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "RxFailure", m_oplink->RxFailure);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "UAVTalkErrors", m_oplink->UAVTalkErrors);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "TxDropped", m_oplink->Dropped);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "TxResent", m_oplink->Resent);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "TxFailure", m_oplink->TxFailure);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "Resets", m_oplink->Resets);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "Timeouts", m_oplink->Timeouts);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "RSSI", m_oplink->RSSI);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "HeapRemaining", m_oplink->FreeHeap);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "LinkQuality", m_oplink->LinkQuality);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "RXSeq", m_oplink->RXSeq);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "TXSeq", m_oplink->TXSeq);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "RXRate", m_oplink->RXRate);
-    addUAVObjectToWidgetRelation("OPLinkStatus", "TXRate", m_oplink->TXRate);
+    addWidgetBinding("OPLinkStatus", "DeviceID", m_oplink->DeviceID);
+    addWidgetBinding("OPLinkStatus", "RxGood", m_oplink->Good);
+    addWidgetBinding("OPLinkStatus", "RxCorrected", m_oplink->Corrected);
+    addWidgetBinding("OPLinkStatus", "RxErrors", m_oplink->Errors);
+    addWidgetBinding("OPLinkStatus", "RxMissed", m_oplink->Missed);
+    addWidgetBinding("OPLinkStatus", "RxFailure", m_oplink->RxFailure);
+    addWidgetBinding("OPLinkStatus", "UAVTalkErrors", m_oplink->UAVTalkErrors);
+    addWidgetBinding("OPLinkStatus", "TxDropped", m_oplink->Dropped);
+    addWidgetBinding("OPLinkStatus", "TxResent", m_oplink->Resent);
+    addWidgetBinding("OPLinkStatus", "TxFailure", m_oplink->TxFailure);
+    addWidgetBinding("OPLinkStatus", "Resets", m_oplink->Resets);
+    addWidgetBinding("OPLinkStatus", "Timeouts", m_oplink->Timeouts);
+    addWidgetBinding("OPLinkStatus", "RSSI", m_oplink->RSSI);
+    addWidgetBinding("OPLinkStatus", "HeapRemaining", m_oplink->FreeHeap);
+    addWidgetBinding("OPLinkStatus", "LinkQuality", m_oplink->LinkQuality);
+    addWidgetBinding("OPLinkStatus", "RXSeq", m_oplink->RXSeq);
+    addWidgetBinding("OPLinkStatus", "TXSeq", m_oplink->TXSeq);
+    addWidgetBinding("OPLinkStatus", "RXRate", m_oplink->RXRate);
+    addWidgetBinding("OPLinkStatus", "TXRate", m_oplink->TXRate);
 
     // Connect the bind buttons
     connect(m_oplink->Bind1, SIGNAL(clicked()), this, SLOT(bind1()));
@@ -151,7 +151,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
         m_oplink->PairID4->setEnabled(false);
         m_oplink->Bind4->setEnabled(pairid4);
     } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
+        qDebug() << "ConfigPipXtremeWidget: Count not read PairID field.";
     }
     UAVObjectField *pairRssiField = object->getField("PairSignalStrengths");
     if (pairRssiField) {
@@ -164,38 +164,43 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
         m_oplink->PairSignalStrengthLabel3->setText(QString("%1dB").arg(pairRssiField->getValue(2).toInt()));
         m_oplink->PairSignalStrengthLabel4->setText(QString("%1dB").arg(pairRssiField->getValue(3).toInt()));
     } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
+        qDebug() << "ConfigPipXtremeWidget: Count not read PairID field.";
     }
 
     // Update the Description field
+    // TODO use  UAVObjectUtilManager::descriptionToStructure()
     UAVObjectField *descField = object->getField("Description");
     if (descField) {
-        /*
-         * This looks like a binary with a description at the end:
-         *   4 bytes: header: "OpFw".
-         *   4 bytes: GIT commit tag (short version of SHA1).
-         *   4 bytes: Unix timestamp of compile time.
-         *   2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
-         *  26 bytes: commit tag if it is there, otherwise branch name. '-dirty' may be added if needed. Zero-padded.
-         *  20 bytes: SHA1 sum of the firmware.
-         *  20 bytes: SHA1 sum of the uavo definitions.
-         *  20 bytes: free for now.
-         */
-        char buf[OPLinkStatus::DESCRIPTION_NUMELEM];
-        for (unsigned int i = 0; i < 26; ++i) {
-            buf[i] = descField->getValue(i + 14).toChar().toAscii();
+        if (descField->getValue(0) != QChar(255)) {
+            /*
+             * This looks like a binary with a description at the end:
+             *   4 bytes: header: "OpFw".
+             *   4 bytes: GIT commit tag (short version of SHA1).
+             *   4 bytes: Unix timestamp of compile time.
+             *   2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+             *  26 bytes: commit tag if it is there, otherwise branch name. '-dirty' may be added if needed. Zero-padded.
+             *  20 bytes: SHA1 sum of the firmware.
+             *  20 bytes: SHA1 sum of the uavo definitions.
+             *  20 bytes: free for now.
+             */
+            char buf[OPLinkStatus::DESCRIPTION_NUMELEM];
+            for (unsigned int i = 0; i < 26; ++i) {
+                buf[i] = descField->getValue(i + 14).toChar().toLatin1();
+            }
+            buf[26] = '\0';
+            QString descstr(buf);
+            quint32 gitDate = descField->getValue(11).toChar().toLatin1() & 0xFF;
+            for (int i = 1; i < 4; i++) {
+                gitDate  = gitDate << 8;
+                gitDate += descField->getValue(11 - i).toChar().toLatin1() & 0xFF;
+            }
+            QString date = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyy-MM-dd HH:mm");
+            m_oplink->FirmwareVersion->setText(descstr + " " + date);
+        } else {
+            m_oplink->FirmwareVersion->setText(tr("Unknown"));
         }
-        buf[26] = '\0';
-        QString descstr(buf);
-        quint32 gitDate = descField->getValue(11).toChar().toAscii() & 0xFF;
-        for (int i = 1; i < 4; i++) {
-            gitDate  = gitDate << 8;
-            gitDate += descField->getValue(11 - i).toChar().toAscii() & 0xFF;
-        }
-        QString date = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyy-MM-dd HH:mm");
-        m_oplink->FirmwareVersion->setText(descstr + " " + date);
     } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read Description field.";
+        qDebug() << "ConfigPipXtremeWidget: Failed to read Description field.";
     }
 
     // Update the serial number field
@@ -211,7 +216,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
         buf[OPLinkStatus::CPUSERIAL_NUMELEM * 2] = '\0';
         m_oplink->SerialNumber->setText(buf);
     } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read Description field.";
+        qDebug() << "ConfigPipXtremeWidget: Failed to read CPUSerial field.";
     }
 
     // Update the link state
@@ -219,7 +224,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     if (linkField) {
         m_oplink->LinkState->setText(linkField->getValue().toString());
     } else {
-        qDebug() << "PipXtremeGadgetWidget: Count not read link state field.";
+        qDebug() << "ConfigPipXtremeWidget: Failed to read LinkState field.";
     }
 }
 

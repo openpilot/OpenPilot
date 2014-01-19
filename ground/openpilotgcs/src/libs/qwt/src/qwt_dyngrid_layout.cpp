@@ -9,7 +9,7 @@
 
 #include "qwt_dyngrid_layout.h"
 #include "qwt_math.h"
-#include <qwidget.h>
+#include <qvector.h>
 #include <qlist.h>
 
 class QwtDynGridLayout::PrivateData
@@ -211,7 +211,7 @@ Qt::Orientations QwtDynGridLayout::expandingDirections() const
 }
 
 /*!
-  Reorganizes columns and rows and resizes managed widgets within
+  Reorganizes columns and rows and resizes managed items within
   the rectangle rect.
 
   \param rect Layout geometry
@@ -234,12 +234,8 @@ void QwtDynGridLayout::setGeometry( const QRect &rect )
     for ( QList<QLayoutItem*>::iterator it = d_data->itemList.begin();
         it != d_data->itemList.end(); ++it )
     {
-        QWidget *w = ( *it )->widget();
-        if ( w )
-        {
-            w->setGeometry( itemGeometries[index] );
-            index++;
-        }
+        ( *it )->setGeometry( itemGeometries[index] );
+        index++;
     }
 }
 
@@ -256,11 +252,14 @@ uint QwtDynGridLayout::columnsForWidth( int width ) const
     if ( isEmpty() )
         return 0;
 
-    const int maxCols = ( d_data->maxCols > 0 ) ? d_data->maxCols : itemCount();
+    uint maxCols = itemCount();
+    if ( d_data->maxCols > 0 ) 
+        maxCols = qMin( d_data->maxCols, maxCols );
+
     if ( maxRowWidth( maxCols ) <= width )
         return maxCols;
 
-    for ( int numCols = 2; numCols <= maxCols; numCols++ )
+    for ( uint numCols = 2; numCols <= maxCols; numCols++ )
     {
         const int rowWidth = maxRowWidth( numCols );
         if ( rowWidth > width )
@@ -342,8 +341,11 @@ QList<QRect> QwtDynGridLayout::layoutItems( const QRect &rect,
         return itemGeometries;
 
     uint numRows = itemCount() / numCols;
-    if ( numRows % itemCount() )
+    if ( numCols % itemCount() )
         numRows++;
+
+    if ( numRows == 0 )
+        return itemGeometries;
 
     QVector<int> rowHeight( numRows );
     QVector<int> colWidth( numCols );
@@ -371,11 +373,11 @@ QList<QRect> QwtDynGridLayout::layoutItems( const QRect &rect,
     const int xySpace = spacing();
 
     rowY[0] = yOffset + margin();
-    for ( int r = 1; r < ( int )numRows; r++ )
+    for ( uint r = 1; r < numRows; r++ )
         rowY[r] = rowY[r-1] + rowHeight[r-1] + xySpace;
 
     colX[0] = xOffset + margin();
-    for ( int c = 1; c < ( int )numCols; c++ )
+    for ( uint c = 1; c < numCols; c++ )
         colX[c] = colX[c-1] + colWidth[c-1] + xySpace;
 
     const int itemCount = d_data->itemList.size();
@@ -411,8 +413,7 @@ void QwtDynGridLayout::layoutGrid( uint numCols,
     if ( d_data->isDirty )
         d_data->updateLayoutCache();
 
-    for ( uint index = 0;
-        index < ( uint )d_data->itemSizeHints.count(); index++ )
+    for ( int index = 0; index < d_data->itemSizeHints.count(); index++ )
     {
         const int row = index / numCols;
         const int col = index % numCols;
@@ -455,7 +456,7 @@ int QwtDynGridLayout::heightForWidth( int width ) const
     layoutGrid( numCols, rowHeight, colWidth );
 
     int h = 2 * margin() + ( numRows - 1 ) * spacing();
-    for ( int row = 0; row < ( int )numRows; row++ )
+    for ( uint row = 0; row < numRows; row++ )
         h += rowHeight[row];
 
     return h;
@@ -481,12 +482,12 @@ void QwtDynGridLayout::stretchGrid( const QRect &rect,
     if ( expandH )
     {
         int xDelta = rect.width() - 2 * margin() - ( numCols - 1 ) * spacing();
-        for ( int col = 0; col < ( int )numCols; col++ )
+        for ( uint col = 0; col < numCols; col++ )
             xDelta -= colWidth[col];
 
         if ( xDelta > 0 )
         {
-            for ( int col = 0; col < ( int )numCols; col++ )
+            for ( uint col = 0; col < numCols; col++ )
             {
                 const int space = xDelta / ( numCols - col );
                 colWidth[col] += space;
@@ -502,12 +503,12 @@ void QwtDynGridLayout::stretchGrid( const QRect &rect,
             numRows++;
 
         int yDelta = rect.height() - 2 * margin() - ( numRows - 1 ) * spacing();
-        for ( int row = 0; row < ( int )numRows; row++ )
+        for ( uint row = 0; row < numRows; row++ )
             yDelta -= rowHeight[row];
 
         if ( yDelta > 0 )
         {
-            for ( int row = 0; row < ( int )numRows; row++ )
+            for ( uint row = 0; row < numRows; row++ )
             {
                 const int space = yDelta / ( numRows - row );
                 rowHeight[row] += space;
@@ -529,7 +530,10 @@ QSize QwtDynGridLayout::sizeHint() const
     if ( isEmpty() )
         return QSize();
 
-    const uint numCols = ( d_data->maxCols > 0 ) ? d_data->maxCols : itemCount();
+    uint numCols = itemCount();
+    if ( d_data->maxCols > 0 )
+        numCols = qMin( d_data->maxCols, numCols );
+
     uint numRows = itemCount() / numCols;
     if ( itemCount() % numCols )
         numRows++;
@@ -540,11 +544,11 @@ QSize QwtDynGridLayout::sizeHint() const
     layoutGrid( numCols, rowHeight, colWidth );
 
     int h = 2 * margin() + ( numRows - 1 ) * spacing();
-    for ( int row = 0; row < ( int )numRows; row++ )
+    for ( uint row = 0; row < numRows; row++ )
         h += rowHeight[row];
 
     int w = 2 * margin() + ( numCols - 1 ) * spacing();
-    for ( int col = 0; col < ( int )numCols; col++ )
+    for ( uint col = 0; col < numCols; col++ )
         w += colWidth[col];
 
     return QSize( w, h );

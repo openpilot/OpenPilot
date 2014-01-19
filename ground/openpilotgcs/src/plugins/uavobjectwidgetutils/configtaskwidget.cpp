@@ -362,7 +362,7 @@ void ConfigTaskWidget::enableControls(bool enable)
         button->setEnabled(enable);
     }
 
-    foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
+    foreach(WidgetBinding * binding, m_widgetBindingsPerWidget) {
         if (binding->isEnabled() && binding->widget()) {
             binding->widget()->setEnabled(enable);
             foreach(ShadowWidgetBinding * shadow, binding->shadows()) {

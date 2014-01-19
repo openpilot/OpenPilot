@@ -25,11 +25,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "systemalarms.h"
 #include "systemhealthgadgetwidget.h"
+
 #include "utils/stylehelper.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
-#include "systemalarms.h"
+#include <uavtalk/telemetrymanager.h>
 
 #include <QDebug>
 #include <QWhatsThis>

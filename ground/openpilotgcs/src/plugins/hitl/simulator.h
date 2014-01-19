@@ -28,14 +28,7 @@
 #ifndef ISIMULATOR_H
 #define ISIMULATOR_H
 
-#include <QObject>
-#include <QUdpSocket>
-#include <QTimer>
-#include <QProcess>
-#include <qmath.h>
-
 #include "qscopedpointer.h"
-#include "uavtalk/telemetrymanager.h"
 #include "uavobjectmanager.h"
 
 #include "accelstate.h"
@@ -60,6 +53,13 @@
 #include "velocitystate.h"
 
 #include "utils/coordinateconversions.h"
+
+#include <QObject>
+#include <QUdpSocket>
+#include <QTime>
+#include <QTimer>
+#include <QProcess>
+#include <qmath.h>
 
 /**
  * just imagine this was a class without methods and all public properties

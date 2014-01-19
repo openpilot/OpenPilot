@@ -16,6 +16,7 @@
 			<elementname>Sensors</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>Guidance</elementname>
+			<elementname>PathPlan</elementname>
 			<elementname>Battery</elementname>
 			<elementname>FlightTime</elementname>
 			<elementname>I2C</elementname>

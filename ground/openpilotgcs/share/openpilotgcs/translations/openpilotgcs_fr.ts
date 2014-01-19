@@ -4155,7 +4155,7 @@ Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Feed Forward Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Paramètres Feed Forward</translation>
     </message>
     <message>
         <location/>
@@ -5061,7 +5061,10 @@ N&apos;oubliez pas de déclarer ce canal dans l&apos;onglet Input.</translation>
 
 Attitude: camera tracks level for the axis. Input controls the deflection.
 AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode de stabilisation des axes
+
+Attitude: La caméra reste de niveau sur les axes. L&apos;entrée contrôle la déviation angulaire.
+AxisLock: La caméra se souvient de l&apos;orientation. L&apos;entrée contrôle la vitesse de la correction.</translation>
     </message>
     <message>
         <location/>
@@ -5078,7 +5081,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
     <message>
         <location/>
         <source>Maximum camera yaw deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Déviation maximale de la caméra sur le Yaw pour une entrée de 100% en mode Attitude, en degrés.</translation>
     </message>
     <message>
         <location/>
@@ -5089,7 +5092,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
     <message>
         <location/>
         <source>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse maximale sur le Yaw pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
@@ -5106,22 +5109,22 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
     <message>
         <location/>
         <source>Maximum camera pitch deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Déviation maximale de la caméra sur le Pitch pour une entrée de 100% en mode Attitude, en degrés.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera pitch rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse maximale sur le Pitch pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Déviation maximale de la caméra sur le Roll pour une entrée de 100% en mode Attitude, en degrés.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse maximale sur le Roll pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
@@ -5148,7 +5151,14 @@ rate depending on input value.
 
 If you have drift in your Tx controls, you may want to increase this
 value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zone morte sur le manche pour tous les axes en mode AxisLock, degrés/s.
+
+Lorsque le manche est en dans la plage définie par MaxAxisLockRate, la caméra 
+son orientation actuelle. Autrement elle commence à bouger, avec une vitesse 
+dépendante de la valeur d&apos;entrée.
+
+Si vous avez une dérive dans vos contrôles Tx, vous pouvez augmenter cette
+valeur.</translation>
     </message>
     <message>
         <location/>
@@ -5184,7 +5194,10 @@ value.</source>
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Charge les paramètres par défaut du module, excepté les canaux de sortie dans GCS.
+
+Les paramètres chargés ne sont pas appliqués automatiquement. Vous devez cliquer
+sur Appliquer ou Enregistrer par la suite.</translation>
     </message>
     <message>
         <location/>
@@ -5205,7 +5218,11 @@ settings.
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Recharge les paramètres du module enregistrés dans la carte, excepté les canaux de sortie.
+Utile si vous avez modifié quelques paramètres accidentellement.
+
+Les paramètres chargés ne sont pas appliqués automatiquement. Vous devez cliquer
+sur Appliquer ou Enregistrer par la suite.</translation>
     </message>
     <message>
         <location/>
@@ -5268,22 +5285,22 @@ Apply or Save button afterwards.</source>
     <message>
         <location/>
         <source>Input Rate (Speed)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Taux d&apos;Entrée (Vitesse)</translation>
     </message>
     <message>
         <location/>
         <source>Input Range (Angle)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plage d&apos;Entrée (Angle)</translation>
     </message>
     <message>
         <location/>
         <source>Expert Settings (Attitude Filter and Feed Forward)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Paramètres Avancés (Filtrage Attitude et Feed Forward)</translation>
     </message>
     <message>
         <location/>
         <source>Attitude Filter RT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filtrage Attitude RT</translation>
     </message>
     <message>
         <location/>
@@ -5292,7 +5309,11 @@ Apply or Save button afterwards.</source>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temps de réponse filtrage sur l&apos;axe de Roll
+
+Plage : 0-250ms, 0 désactive le filtrage (défaut)
+
+Lisse l&apos;attitude estimée de l&apos;appareil utilisée par la stabilisation de la caméra.</translation>
     </message>
     <message>
         <location/>
@@ -5301,7 +5322,11 @@ Smoothes estimated airframe attitude used by camera stabilization.</source>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temps de réponse filtrage sur l&apos;axe de Pitch
+
+Plage : 0-250ms, 0 désactive le filtrage (défaut)
+
+Lisse l&apos;attitude estimée de l&apos;appareil utilisée par la stabilisation de la caméra.</translation>
     </message>
     <message>
         <location/>
@@ -5310,12 +5335,16 @@ Smoothes estimated airframe attitude used by camera stabilization.</source>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temps de réponse filtrage sur l&apos;axe de Yaw
+
+Plage : 0-250ms, 0 désactive le filtrage (défaut)
+
+Lisse l&apos;orientation estimée de l&apos;appareil utilisée par la stabilisation de la caméra.</translation>
     </message>
     <message>
         <location/>
         <source>FF Servo Acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FF Accélération Servo</translation>
     </message>
     <message>
         <location/>
@@ -5325,7 +5354,12 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Accéleration feed forward du servo de Roll
+
+Plage : 0-25, 0 désactive feed forward sur l&apos;axe (defaut).
+
+2-7 est une bonne valeur de départ.
+Une valeur trop élevée peut griller votre servo !</translation>
     </message>
     <message>
         <location/>
@@ -5341,7 +5375,12 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Accéleration feed forward du servo de Pitch
+
+Plage : 0-25, 0 désactive feed forward sur l&apos;axe (defaut).
+
+2-7 est une bonne valeur de départ.
+Une valeur trop élevée peut griller votre servo !</translation>
     </message>
     <message>
         <location/>
@@ -5351,19 +5390,26 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Accéleration feed forward du servo de Yaw
+
+Plage : 0-25, 0 désactive feed forward sur l&apos;axe (defaut).
+
+2-7 est une bonne valeur de départ.
+Une valeur trop élevée peut griller votre servo !</translation>
     </message>
     <message>
         <location/>
         <source>FF Accel Time Constant</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FF Const. Tps Accélération</translation>
     </message>
     <message>
         <location/>
         <source>Roll servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Constante de temps d&apos;accélération feed forward pour le servo de Roll
+
+Plage : 0-50ms, 5 par défaut.</translation>
     </message>
     <message>
         <location/>
@@ -5376,26 +5422,32 @@ Range: 0-50ms, default is 5.</source>
         <source>Pitch servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Constante de temps d&apos;accélération feed forward pour le servo de Pitch
+
+Plage : 0-50ms, 5 par défaut.</translation>
     </message>
     <message>
         <location/>
         <source>Yaw servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Constante de temps d&apos;accélération feed forward pour le servo de Yaw
+
+Plage : 0-50ms, 5 par défaut.</translation>
     </message>
     <message>
         <location/>
         <source>FF Decel Time Constant</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FF Const. Tps Décélération</translation>
     </message>
     <message>
         <location/>
         <source>Roll servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Constante de temps de décélération feed forward pour le servo de Roll
+
+Plage : 0-50ms, 5 par défaut.</translation>
     </message>
     <message>
         <location/>
@@ -5408,19 +5460,23 @@ Range: 0-50ms, default is 5.</source>
         <source>Pitch servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Constante de temps de décélération feed forward pour le servo de Pitch
+
+Plage : 0-50ms, 5 par défaut.</translation>
     </message>
     <message>
         <location/>
         <source>Yaw servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Constante de temps de décélération feed forward pour le servo de Yaw
+
+Plage : 0-50ms, 5 par défaut.</translation>
     </message>
     <message>
         <location/>
         <source>Gimbal Type:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Type Nacelle :</translation>
     </message>
     <message>
         <location/>
@@ -5428,7 +5484,10 @@ Range: 0-50ms, default is 5.</source>
 
 Used to limit feed forward acceleration at extreme angles.
 Generic type provides no limit.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Type de nacelle
+
+Utilisé pour limiter l&apos;accélération feed forward aux grands angles.
+Le type générique ne propose pas de limitation.</translation>
     </message>
     <message>
         <location/>
@@ -5444,7 +5503,7 @@ Generic type provides no limit.</source>
     <message>
         <location/>
         <source>FF Max Acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FF Accélération Maxi</translation>
     </message>
     <message>
         <location/>
@@ -5453,7 +5512,11 @@ Generic type provides no limit.</source>
 Range: 0-1000, default is 500.
 
 The same value is used for all axes.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Accélération maximale feed forward
+
+Plage : 0-1000, 500 par défaut.
+
+La même valeur est utilisé pour tous les axes.</translation>
     </message>
     <message>
         <location/>
@@ -5464,7 +5527,7 @@ The same value is used for all axes.</source>
     <message>
         <location/>
         <source>Input configuration also provides smoothing for controls. Look for RT options on the RC Input tab.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La configuration des entrées fournit également un lissage des contrôles. Recherchez les options RT dans l&apos;onglet Entrées RC.</translation>
     </message>
 </context>
 <context>
@@ -7739,7 +7802,7 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This function will avoid integral windup when at idle. Integral windup is an accumulation of over-correction and can make the vehicle flip during a slow takeoff.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translatorcomment>Traduction Windup ??</translatorcomment>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette fonction permet d&apos;annuler la saturation des corrections qui pourraient entrainer le retournement de l&apos;appareil lors de décollages lents.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette fonction permet d&apos;annuler la saturation des corrections qui pourraient entrainer le retournement de l&apos;appareil lors de décollages lents.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7965,7 +8028,8 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Higher values will keep larger Ki terms and limits from winding up at partial stick.  Consider increasing this if you have high Ki values and limits and a sudden stick motion from one aircraft bank angle to another causes the aircraft to rotate and then slowly change rotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Higher values will keep larger Ki terms and limits from winding up at partial stick.  Consider increasing this if you have high Ki values and limits and a sudden stick motion from one aircraft bank angle to another causes the aircraft to rotate and then slowly change rotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translatorcomment>A revoir...</translatorcomment>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Des valeurs élevées préviennent la saturation de grandes valeurs de Ki/Limites.&lt;/p&gt;&lt;p&gt;Envisagez l&apos;augmentation de cette valeur si vous avez des valeurs élevées sur Ki/limites et qu&apos;un mouvement brusque de manche provoquant un changement d&apos;inclinaison entraine une rotation puis un changement lent de l&apos;inclinaison.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>

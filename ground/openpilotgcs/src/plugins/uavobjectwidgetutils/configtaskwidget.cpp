@@ -746,7 +746,7 @@ void ConfigTaskWidget::reloadButtonClicked()
     }
     int groupID = sender()->property("group").toInt();
     QList<WidgetBinding *> bindings = m_reloadGroups.values(groupID);
-    if (!bindings.isEmpty()) {
+    if (bindings.isEmpty()) {
         return;
     }
     ObjectPersistence *objper = dynamic_cast<ObjectPersistence *>(getObjectManager()->getObject(ObjectPersistence::NAME));

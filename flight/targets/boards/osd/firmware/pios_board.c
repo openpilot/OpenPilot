@@ -81,10 +81,6 @@ void PIOS_ADC_DMC_irq_handler(void)
 
 #endif /* if defined(PIOS_INCLUDE_ADC) */
 
-
-static void Clock(uint32_t spektrum_id);
-
-
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN  128
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN  128
 
@@ -187,9 +183,6 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_RTC)
     /* Initialize the real-time clock and its associated tick */
     PIOS_RTC_Init(&pios_rtc_main_cfg);
-    if (!PIOS_RTC_RegisterTickCallback(Clock, 0)) {
-        PIOS_DEBUG_Assert(0);
-    }
 #endif
 
 #if defined(PIOS_INCLUDE_USB)
@@ -431,8 +424,6 @@ void PIOS_Board_Init(void)
     default:
         PIOS_DEBUG_Assert(0);
     }
-    // Start the pixel and line clock counter
-    // PIOS_TIM_InitClock(&pios_tim4_cfg);
     PIOS_Video_Init(&pios_video_cfg);
 #endif
 }
@@ -443,28 +434,4 @@ uint8_t PIOS_Board_Revision(void)
     const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
     return bdinfo->board_rev;
-}
-
-
-uint16_t supv_timer = 0;
-
-static void Clock(__attribute__((unused)) uint32_t spektrum_id)
-{
-    /* 125hz */
-    ++supv_timer;
-    if (supv_timer >= 625) {
-        supv_timer = 0;
-        timex.sec++;
-    }
-    if (timex.sec >= 60) {
-        timex.sec = 0;
-        timex.min++;
-    }
-    if (timex.min >= 60) {
-        timex.min = 0;
-        timex.hour++;
-    }
-    if (timex.hour >= 99) {
-        timex.hour = 0;
-    }
 }

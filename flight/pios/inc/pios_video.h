@@ -69,15 +69,6 @@ struct pios_video_cfg {
     TIM_OCInitTypeDef tim_oc_init;
 };
 
-// Time vars
-typedef struct {
-    uint8_t sec;
-    uint8_t min;
-    uint8_t hour;
-} TTime;
-
-extern TTime timex;
-
 extern bool PIOS_Vsync_ISR();
 extern bool PIOS_Hsync_ISR();
 extern void PIOS_Video_Init(const struct pios_video_cfg *cfg);

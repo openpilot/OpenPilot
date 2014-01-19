@@ -94,7 +94,6 @@ static void osdgenTask(void *parameters);
 // Private variables
 static xTaskHandle osdgenTaskHandle;
 xSemaphoreHandle osdSemaphore = NULL;
-TTime timex;
 Unit Convert[2];
 
 #ifdef DEBUG_TIMING
@@ -2337,8 +2336,7 @@ void updateGraphics()
         gpsData.Groundspeed = spd++;
 #endif
 
-        static uint8_t power_on_time = 0;
-        static uint8_t airborne = FALSE;
+        static portTickType airborne = 0;
         static double current_total  = 0;                // accumulated sensor current [mAh]
         static HomePosition homePos;
         static ADCfiltered filteredADC;
@@ -2466,13 +2464,14 @@ void updateGraphics()
         }
         // Flight time
         check = check_enable_and_srceen(OsdSettings.Time, (OsdSettingsWarningsSetupData *)&OsdSettings.TimeSetup, screen, &x, &y);
-        if (check == OSDSETTINGS_TIME_HOURMINSEC) {
-            sprintf(temp, "%02d:%02d:%02d", timex.hour, timex.min, timex.sec);
-        }
-        if (check == OSDSETTINGS_TIME_MINSEC) {
-            sprintf(temp, "FT%02d:%02d", timex.min, timex.sec);
-        }
         if (check != OSDSETTINGS_TIME_DISABLED) {
+            int flight_time = (int)((xTaskGetTickCount() - airborne) / 1000);
+            if (check == OSDSETTINGS_TIME_HOURMINSEC) {
+                sprintf(temp, "%02d:%02d:%02d", flight_time/3600, flight_time/60%60, flight_time%60);
+            }
+            if (check == OSDSETTINGS_TIME_MINSEC) {
+                sprintf(temp, "FT%02d:%02d", flight_time/60%60, flight_time%60);
+            }
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.TimeSetup.CharSize);
         }
 
@@ -2550,10 +2549,7 @@ void updateGraphics()
         }
         // Airborne reset time
         if (OsdSettings2.AirborneResetTime && !airborne && filteredADC.curr >= (double)OsdSettings2.AirborneResetTimeCurrent) {
-            airborne   = TRUE;
-            timex.sec  = 0;
-            timex.min  = 0;
-            timex.hour = 0;
+            airborne = xTaskGetTickCount();
         }
 
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
@@ -2573,12 +2569,11 @@ void updateGraphics()
         }
 #endif
 
-#define DO_NOT_MOVE_SECONDS 10
+#define DO_NOT_MOVE_MILLIS 10000
         // Draw warnings last so that they are above everything else
         // Warnings (centered relative to x)
         if (check_enable_and_srceen(OsdSettings.Warnings, (OsdSettingsWarningsSetupData *)&OsdSettings.WarningsSetup, screen, &x, &y)) {
-            power_on_time = power_on_time < DO_NOT_MOVE_SECONDS ? timex.sec : DO_NOT_MOVE_SECONDS;
-            WarnMask |= power_on_time < DO_NOT_MOVE_SECONDS ? WARN_DO_NOT_MOVE : 0x00;
+            WarnMask |= xTaskGetTickCount() < DO_NOT_MOVE_MILLIS ? WARN_DO_NOT_MOVE : 0x00;
             WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D ? WARN_NO_SAT_FIX : 0x00;
             WarnMask |= !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE ? WARN_HOME_NOT_SET : 0x00;
             WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED ? WARN_DISARMED : 0x00;

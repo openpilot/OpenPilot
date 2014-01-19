@@ -53,7 +53,6 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     } else {
         qDebug() << "Error: Object is unknown (OPLinkSettings).";
     }
-    autoLoadWidgets();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
     if (!settings->useExpertMode()) {
         m_oplink->Apply->setVisible(false);
@@ -114,7 +113,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 
     // Request and update of the setting object.
     settingsUpdated = false;
-
+    autoLoadWidgets();
     disableMouseWheelEvents();
 }
 

@@ -58,13 +58,13 @@
  *    00110100
  */
 
-#define SBUS_FRAME_LENGTH (1 + 22 + 1 + 1)
-#define SBUS_SOF_BYTE     0x0f
-#define SBUS_EOF_BYTE     0x00
-#define SBUS_FLAG_DC1     0x01
-#define SBUS_FLAG_DC2     0x02
-#define SBUS_FLAG_FL      0x04
-#define SBUS_FLAG_FS      0x08
+#define SBUS_FRAME_LENGTH             (1 + 22 + 1 + 1)
+#define SBUS_SOF_BYTE                 0x0f
+#define SBUS_EOF_BYTE                 0x00
+#define SBUS_FLAG_DC1                 0x01
+#define SBUS_FLAG_DC2                 0x02
+#define SBUS_FLAG_FL                  0x04
+#define SBUS_FLAG_FS                  0x08
 
 #define SBUS_R7008SB_EOF_COUNTER_MASK 0xCF
 #define SBUS_R7008SB_EOF_BYTE         0x04

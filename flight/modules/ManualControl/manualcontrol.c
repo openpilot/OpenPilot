@@ -331,7 +331,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 if (settings.FailsafeBehavior != MANUALCONTROLSETTINGS_FAILSAFEBEHAVIOR_NONE) {
                     FlightStatusGet(&flightStatus);
 
-                    cmd.FlightModeSwitchPosition = (uint8_t) settings.FailsafeBehavior - 1;
+                    cmd.FlightModeSwitchPosition = (uint8_t)settings.FailsafeBehavior - 1;
                     flightStatus.FlightMode = settings.FlightModePosition[settings.FailsafeBehavior - 1];
                     FlightStatusSet(&flightStatus);
                 }

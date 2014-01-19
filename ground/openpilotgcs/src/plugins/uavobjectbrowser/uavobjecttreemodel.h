@@ -92,9 +92,9 @@ private slots:
     void updateHighlight(TreeItem *);
 
 private:
-    void setupModelData(UAVObjectManager *objManager, bool categorize = true);
+    void setupModelData(UAVObjectManager *objManager);
     QModelIndex index(TreeItem *item);
-    void addDataObject(UAVDataObject *obj, bool categorize = true);
+    void addDataObject(UAVDataObject *obj);
     MetaObjectTreeItem *addMetaObject(UAVMetaObject *obj, TreeItem *parent);
     void addArrayField(UAVObjectField *field, TreeItem *parent);
     void addSingleField(int index, UAVObjectField *field, TreeItem *parent);
@@ -115,6 +115,7 @@ private:
     QColor m_manuallyChangedColor;
     bool m_onlyHilightChangedValues;
     bool m_useScientificFloatNotation;
+    bool m_categorize;
 
     // Highlight manager to handle highlighting of tree items.
     HighLightManager *m_highlightManager;

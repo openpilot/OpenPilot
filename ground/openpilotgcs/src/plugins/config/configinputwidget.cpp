@@ -89,11 +89,13 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         // in reverse order of the binding order otherwise the 'Reversed' logic will floor the neutral value
         // to the max value ( which is smaller than the neutral value when reversed )
         addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->channelNeutral, index);
+        addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->neutralValue, index);
         addWidgetBinding("ManualControlSettings", "ChannelMin", inpForm->ui->channelMin, index);
         addWidgetBinding("ManualControlSettings", "ChannelMax", inpForm->ui->channelMax, index);
 
         addWidget(inpForm->ui->channelNumberDropdown);
         addWidget(inpForm->ui->channelResponseTime);
+        addWidget(inpForm->ui->channelRev);
 
         // Input filter response time fields supported for some channels only
         switch (index) {

@@ -32,8 +32,9 @@ InputChannelForm::InputChannelForm(QWidget *parent, bool showlegend) :
 
     connect(ui->channelMin, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
     connect(ui->channelMax, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
+    connect(ui->neutralValue, SIGNAL(valueChanged(int)), this, SLOT(neutralUpdated()));
     connect(ui->channelGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(groupUpdated()));
-    connect(ui->channelNeutral, SIGNAL(valueChanged(int)), this, SLOT(neutralUpdated(int)));
+    connect(ui->channelRev, SIGNAL(toggled(bool)), this, SLOT(reversedUpdated()));
 
     // This is awkward but since we want the UI to be a dropdown but the field is not an enum
     // it breaks the UAUVObject widget relation of the task gadget.  Running the data through
@@ -87,9 +88,43 @@ void InputChannelForm::minMaxUpdated()
     ui->channelNeutral->setInvertedControls(reverse);
 }
 
-void InputChannelForm::neutralUpdated(int newval)
+void InputChannelForm::neutralUpdated()
 {
-    ui->neutral->setText(QString::number(newval));
+    int neutralValue = ui->neutralValue->value();
+    if(ui->channelRev->isChecked()) {
+        if(neutralValue > ui->channelMin->value()) {
+            ui->channelMin->setValue(neutralValue);
+        } else if(neutralValue < ui->channelMax->value()) {
+            ui->channelMax->setValue(neutralValue);
+        }
+    } else {
+        if(neutralValue < ui->channelMin->value()) {
+            ui->channelMin->setValue(neutralValue);
+        } else if(neutralValue > ui->channelMax->value()) {
+            ui->channelMax->setValue(neutralValue);
+        }
+    }
+}
+
+void InputChannelForm::reversedUpdated()
+{
+    int value = ui->channelNeutral->value();
+    int min = ui->channelMin->value();
+    int max = ui->channelMax->value();
+
+    if(ui->channelRev->isChecked()) {
+        if(min < max) {
+            ui->channelMax->setValue(min);
+            ui->channelMin->setValue(max);
+            ui->channelNeutral->setValue(value);
+        }
+    } else {
+        if(min > max) {
+            ui->channelMax->setValue(min);
+            ui->channelMin->setValue(max);
+            ui->channelNeutral->setValue(value);
+        }
+    }
 }
 
 /**

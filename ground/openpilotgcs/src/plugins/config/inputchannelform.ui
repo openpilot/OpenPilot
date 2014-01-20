@@ -565,22 +565,6 @@ font:bold;</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="6" alignment="Qt::AlignHCenter">
-    <widget class="QLabel" name="neutral">
-     <property name="minimumSize">
-      <size>
-       <width>30</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="12">
     <widget class="QSpinBox" name="channelResponseTime">
      <property name="enabled">
@@ -652,7 +636,7 @@ even lead to crash. Use with caution.</string>
       <item row="0" column="0" alignment="Qt::AlignHCenter">
        <widget class="QCheckBox" name="channelRev">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="minimumSize">
          <size>
@@ -666,6 +650,22 @@ even lead to crash. Use with caution.</string>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="1" column="6">
+    <widget class="QSpinBox" name="neutralValue">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
+     <property name="value">
+      <number>1000</number>
+     </property>
     </widget>
    </item>
   </layout>

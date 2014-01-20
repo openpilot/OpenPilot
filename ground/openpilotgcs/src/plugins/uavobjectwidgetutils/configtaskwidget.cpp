@@ -811,6 +811,8 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget *widget, const char *f
         connect(cb, SIGNAL(valueChanged(int)), this, function, Qt::UniqueConnection);
     } else if (QDoubleSpinBox * cb = qobject_cast<QDoubleSpinBox *>(widget)) {
         connect(cb, SIGNAL(valueChanged(double)), this, function, Qt::UniqueConnection);
+    } else if (QLineEdit * cb = qobject_cast<QLineEdit *>(widget)) {
+        connect(cb, SIGNAL(textChanged(QString)), this, function, Qt::UniqueConnection);
     } else if (QCheckBox * cb = qobject_cast<QCheckBox *>(widget)) {
         connect(cb, SIGNAL(stateChanged(int)), this, function, Qt::UniqueConnection);
     } else if (QPushButton * cb = qobject_cast<QPushButton *>(widget)) {
@@ -837,6 +839,8 @@ void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget *widget, const char
         disconnect(cb, SIGNAL(valueChanged(int)), this, function);
     } else if (QDoubleSpinBox * cb = qobject_cast<QDoubleSpinBox *>(widget)) {
         disconnect(cb, SIGNAL(valueChanged(double)), this, function);
+    }else if (QLineEdit * cb = qobject_cast<QLineEdit *>(widget)) {
+        disconnect(cb, SIGNAL(textChanged(double)), this, function);
     } else if (QCheckBox * cb = qobject_cast<QCheckBox *>(widget)) {
         disconnect(cb, SIGNAL(stateChanged(int)), this, function);
     } else if (QPushButton * cb = qobject_cast<QPushButton *>(widget)) {

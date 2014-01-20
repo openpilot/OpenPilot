@@ -695,22 +695,30 @@ static void updateGCSTelemetryStats()
 
     // Update stats object
     if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED) {
-        gcsStats.RxDataRate  = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
-        gcsStats.TxDataRate  = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
-        gcsStats.RxFailures += utalkStats.rxErrors;
-        gcsStats.TxFailures += txErrors;
-        gcsStats.TxRetries  += txRetries;
-        txErrors = 0;
-        txRetries = 0;
+        gcsStats.TxDataRate    = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        gcsStats.TxBytes      += utalkStats.txBytes;
+        gcsStats.TxFailures   += txErrors;
+        gcsStats.TxRetries    += txRetries;
+
+        gcsStats.RxDataRate    = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        gcsStats.RxBytes      += utalkStats.rxBytes;
+        gcsStats.RxFailures   += utalkStats.rxErrors;
+        gcsStats.RxSyncErrors += utalkStats.rxSyncErrors;
+        gcsStats.RxCrcErrors  += utalkStats.rxCrcErrors;
     } else {
-        gcsStats.RxDataRate = 0;
-        gcsStats.TxDataRate = 0;
-        gcsStats.RxFailures = 0;
-        gcsStats.TxFailures = 0;
-        gcsStats.TxRetries  = 0;
-        txErrors = 0;
-        txRetries = 0;
+        gcsStats.TxDataRate   = 0;
+        gcsStats.TxBytes      = 0;
+        gcsStats.TxFailures   = 0;
+        gcsStats.TxRetries    = 0;
+
+        gcsStats.RxDataRate   = 0;
+        gcsStats.RxBytes      = 0;
+        gcsStats.RxFailures   = 0;
+        gcsStats.RxSyncErrors = 0;
+        gcsStats.RxCrcErrors  = 0;
     }
+    txErrors = 0;
+    txRetries = 0;
 
     // Check for connection timeout
     timeNow = xTaskGetTickCount() * portTICK_RATE_MS;

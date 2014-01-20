@@ -251,12 +251,11 @@ static void tsrxtalk_parse(struct pios_tslrsdebug_state *state, uint8_t c)
         case TSRX_VALUE_START:
             switch (c) {
                 case SUBTOKEN_VALUE_ZERO:
-                    channel_cnt = -1;
+                    channel_cnt = 0;
                     state->state = state->version;
                 break;
                 case SUBTOKEN_VALUE_DATA_1:
-                    channel_cnt++;
-                    if (channel_cnt < 0 || channel_cnt >= TSRX_CHANNEL_MAX) channel_cnt = -100;
+                    if (channel_cnt >= 0) channel_cnt++;
                     state->state++;
                 break;
                 default:
@@ -282,6 +281,9 @@ static void tsrxtalk_parse(struct pios_tslrsdebug_state *state, uint8_t c)
         break;
         case TSRX_VALUE_PLOT:                   // plot marker
             LastPacketTime = xTaskGetTickCount();
+            if (channel_cnt >= TSRX_CHANNEL_MAX) {
+                channel_cnt = TSRX_CHANNEL_MAX - 1;
+            }
             if (channel_cnt >= 0 && channel_cnt < TSRX_CHANNEL_MAX) {
                 state->ChannelCount++;
                 if (state->ChannelFails[channel_cnt] != new_chan_fails_val) {

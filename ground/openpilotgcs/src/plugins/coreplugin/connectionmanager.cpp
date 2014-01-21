@@ -50,8 +50,7 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow) :
 {
     // device list
     m_availableDevList = new QComboBox;
-    m_availableDevList->setMinimumWidth(120);
-    m_availableDevList->setMaximumWidth(180);
+    m_availableDevList->setMinimumContentsLength(tr("USB: OPLinkMini").length());
     m_availableDevList->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // connect button

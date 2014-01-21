@@ -194,7 +194,6 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart);
 static void stabilizationTask(__attribute__((unused)) void *parameters)
 {
     UAVObjEvent ev;
-
     uint32_t timeval = PIOS_DELAY_GetRaw();
 
     ActuatorDesiredData actuatorDesired;
@@ -760,10 +759,10 @@ static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     if (cur_flight_mode < 0 || cur_flight_mode >= NUM_FMS_POSITIONS) {
         return;
     }
-    if ((settings.FlightModeMap[cur_flight_mode] == 0 && ev->obj != StabilizationSettingsBank1Handle()) ||
-        (settings.FlightModeMap[cur_flight_mode] == 1 && ev->obj != StabilizationSettingsBank2Handle()) ||
-        (settings.FlightModeMap[cur_flight_mode] == 2 && ev->obj != StabilizationSettingsBank3Handle()) ||
-        settings.FlightModeMap[cur_flight_mode] > 2) {
+    if ((ev) && ((settings.FlightModeMap[cur_flight_mode] == 0 && ev->obj != StabilizationSettingsBank1Handle()) ||
+                 (settings.FlightModeMap[cur_flight_mode] == 1 && ev->obj != StabilizationSettingsBank2Handle()) ||
+                 (settings.FlightModeMap[cur_flight_mode] == 2 && ev->obj != StabilizationSettingsBank3Handle()) ||
+                 settings.FlightModeMap[cur_flight_mode] > 2)) {
         return;
     }
 

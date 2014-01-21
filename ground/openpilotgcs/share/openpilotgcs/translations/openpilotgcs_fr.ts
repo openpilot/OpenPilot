@@ -3451,6 +3451,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location filename="../../../src/plugins/uavobjects/uavmetaobject.cpp" line="+42"/>
         <source>FlightReadOnly</source>
+        <translatorcomment>Meta object : Not translated</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6503,61 +6504,55 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Input Channel Configuration</source>
+        <translation type="unfinished">Configuration Canaux d&apos;Entrée</translation>
+    </message>
 </context>
 <context>
     <name>inputChannelForm</name>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.ui"/>
         <source>Form</source>
-        <translation>Formulaire</translation>
+        <translation type="obsolete">Formulaire</translation>
     </message>
     <message>
-        <location/>
         <source>Function</source>
-        <translation>Fonction</translation>
+        <translation type="obsolete">Fonction</translation>
     </message>
     <message>
-        <location/>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation type="obsolete">Type</translation>
     </message>
     <message>
-        <location/>
         <source>Number</source>
-        <translation>Nombre</translation>
+        <translation type="obsolete">Nombre</translation>
     </message>
     <message>
-        <location/>
         <source>Min</source>
-        <translation>Mini</translation>
+        <translation type="obsolete">Mini</translation>
     </message>
     <message>
-        <location/>
         <source>Neutral</source>
-        <translation>Neutre</translation>
+        <translation type="obsolete">Neutre</translation>
     </message>
     <message>
-        <location/>
         <source>Max</source>
-        <translation>Maxi</translation>
+        <translation type="obsolete">Maxi</translation>
     </message>
     <message>
-        <location/>
         <source>TextLabel</source>
-        <translation>Label de texte</translation>
+        <translation type="obsolete">Label de texte</translation>
     </message>
     <message>
-        <location/>
         <source>Rev</source>
-        <translation>Inv</translation>
+        <translation type="obsolete">Inv</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+133"/>
         <source>Chan %1</source>
-        <translation>Canal %1</translation>
+        <translation type="obsolete">Canal %1</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.ui"/>
         <source>Optional input filter response time.
 
 Range: 0-999ms, 0 disables filter (default).
@@ -6566,7 +6561,7 @@ Warning: this is an expert mode feature, mostly used for aerial video
 camera control (airframe yaw and camera gimbal accessory channels).
 Too high values for main controls can cause undesirable effects and
 even lead to crash. Use with caution.</source>
-        <translation>Filtrage optionnel du temps de réponse d&apos;entrée.
+        <translation type="obsolete">Filtrage optionnel du temps de réponse d&apos;entrée.
 
 Plage : 0-999ms; 0 désactive le filtre (défaut).
 
@@ -6574,12 +6569,6 @@ Attention: Ceci est une fonctionnalité en mode expert, principalement utilisée
 contrôle de la caméra en vidéo aérienne (lacet de l&apos;appareil et canaux accessoires de la nacelle).
 Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des effets indésirables 
 et même conduire au crash. A utiliser avec prudence.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>RT</source>
-        <translatorcomment>Temps de Réponse : TR ?</translatorcomment>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -8244,6 +8233,18 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>InvertedPower</source>
         <translation type="unfinished">PuissanceRenversé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:98,10</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:99,10</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10269,7 +10270,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+344"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+350"/>
         <location line="+1065"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
@@ -12901,7 +12902,7 @@ p, li { white-space: pre-wrap; }
         <location line="+4"/>
         <location line="+8"/>
         <source>Firmware tag: </source>
-        <translation type="unfinished">Tag firmware : </translation>
+        <translation>Tag firmware : </translation>
     </message>
     <message>
         <location line="-10"/>
@@ -12917,20 +12918,20 @@ p, li { white-space: pre-wrap; }
         <location line="+2"/>
         <location line="+7"/>
         <source>Git commit hash: </source>
-        <translation type="unfinished">Hash de commit GIT : </translation>
+        <translation>Hash de commit GIT : </translation>
     </message>
     <message>
         <location line="-6"/>
         <location line="+7"/>
         <source>Firmware date: </source>
-        <translation type="unfinished">Date firmware : </translation>
+        <translation>Date firmware : </translation>
     </message>
     <message>
         <location line="-4"/>
         <location line="+3"/>
         <location line="+1"/>
         <source>Unknown</source>
-        <translation type="unfinished">Inconnu</translation>
+        <translation>Inconnu</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -13364,7 +13365,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigPipXtremeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configpipxtremewidget.cpp" line="+200"/>
+        <location filename="../../../src/plugins/config/configpipxtremewidget.cpp" line="+199"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
@@ -13382,61 +13383,179 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/modeluavoproxy.cpp" line="+80"/>
         <source>Path Plan Upload Successful</source>
-        <translation type="unfinished">Téléversement Réussi du Projet de Trajet</translation>
+        <translation>Téléversement Réussi du Projet de Trajet</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Path plan upload was successful.</source>
-        <translation type="unfinished">Le téléversement du projet de trajet est réussi.</translation>
+        <translation>Le téléversement du projet de trajet est réussi.</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+238"/>
         <source>Path Plan Upload Failed</source>
-        <translation type="unfinished">Échec Téléversement Projet de Trajet</translation>
+        <translation>Échec Téléversement Projet de Trajet</translation>
     </message>
     <message>
         <location line="-238"/>
         <source>Failed to upload the path plan !</source>
-        <translation type="unfinished">Échec du téléversement du projet de trajet !</translation>
+        <translation>Échec du téléversement du projet de trajet !</translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Path Plan Download Successful</source>
-        <translation type="unfinished">Téléchargement Projet de Trajet Réussi</translation>
+        <translation>Téléchargement Projet de Trajet Réussi</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Path plan download was successful.</source>
-        <translation type="unfinished">Le téléchargement du projet de trajet est réussi.</translation>
+        <translation>Le téléchargement du projet de trajet est réussi.</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+190"/>
         <location line="+4"/>
         <source>Path Plan Download Failed</source>
-        <translation type="unfinished">Échec Téléchargement Projet de Trajet</translation>
+        <translation>Échec Téléchargement Projet de Trajet</translation>
     </message>
     <message>
         <location line="-194"/>
         <source>Failed to download the path plan !</source>
-        <translation type="unfinished">Échec du téléchargement du projet de trajet !</translation>
+        <translation>Échec du téléchargement du projet de trajet !</translation>
     </message>
     <message>
         <location line="+190"/>
         <source>Path plan way point count error !</source>
-        <translation type="unfinished">Erreur sur le nombre de waypoints dans le projet de trajet !</translation>
+        <translation>Erreur sur le nombre de waypoints dans le projet de trajet !</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Path plan path action count error !</source>
         <translatorcomment>Path actions ??</translatorcomment>
-        <translation type="unfinished">Erreur sur le nombre de path actions dans le projet de trajet !</translation>
+        <translation>Erreur sur le nombre de path actions dans le projet de trajet !</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Path plan CRC error !</source>
         <translation type="unfinished">Erreur de CRC dans le projet de trajet !</translation>
+    </message>
+</context>
+<context>
+    <name>InputChannelForm</name>
+    <message>
+        <location filename="../../../src/plugins/config/inputchannelform.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel neutral</source>
+        <translation type="unfinished">Neutre canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Neutral</source>
+        <translation type="unfinished">Neutre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Response time</source>
+        <translation type="unfinished">Temps de réponse (RT)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel values are inverted</source>
+        <translation type="unfinished">Les valeurs du canal sont inversées</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reversed</source>
+        <translation type="unfinished">Inversé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel function</source>
+        <translation type="unfinished">Fonction canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Function</source>
+        <translation type="unfinished">Fonction</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel type</source>
+        <translation type="unfinished">Type canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Type</source>
+        <translation type="unfinished">Type</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel number</source>
+        <translation type="unfinished">Numéro canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Number</source>
+        <translation type="unfinished">Nombre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel min</source>
+        <translation type="unfinished">Valeur mini canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation type="unfinished">Mini</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translatorcomment>Pas toucher ! ?</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel max</source>
+        <translation type="unfinished">Valeur maxi canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation type="unfinished">Maxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Optional input filter response time.
+
+Range: 0-999ms, 0 disables filter (default).
+
+Warning: this is an expert mode feature, mostly used for aerial video
+camera control (airframe yaw and camera gimbal accessory channels).
+Too high values for main controls can cause undesirable effects and
+even lead to crash. Use with caution.</source>
+        <translation type="unfinished">Filtrage optionnel du temps de réponse d&apos;entrée.
+
+Plage : 0-999ms; 0 désactive le filtre (défaut).
+
+Attention: Ceci est une fonctionnalité en mode expert, principalement utilisée pour le 
+contrôle de la caméra en vidéo aérienne (lacet de l&apos;appareil et canaux accessoires de la nacelle).
+Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des effets indésirables 
+et même conduire au crash. A utiliser avec prudence.</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+170"/>
+        <source>Chan %1</source>
+        <translation type="unfinished">Canal %1</translation>
     </message>
 </context>
 </TS>

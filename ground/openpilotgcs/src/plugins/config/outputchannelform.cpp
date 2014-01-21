@@ -56,7 +56,7 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const boo
     }
 
     // The convention for OP is Channel 1 to Channel 10.
-    ui.actuatorNumber->setText(QString("%1:").arg(m_index + 1));
+    ui.actuatorNumber->setText(QString("%1").arg(m_index + 1));
 
     // Register for ActuatorSettings changes:
     connect(ui.actuatorMin, SIGNAL(editingFinished()),
@@ -68,6 +68,8 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const boo
     // Now connect the channel out sliders to our signal to send updates in test mode
     connect(ui.actuatorNeutral, SIGNAL(valueChanged(int)),
             this, SLOT(sendChannelTest(int)));
+
+    connect(ui.actuatorValue, SIGNAL(valueChanged(int)), ui.actuatorNeutral, SLOT(setValue(int)));
 
     ui.actuatorLink->setChecked(false);
     connect(ui.actuatorLink, SIGNAL(toggled(bool)),
@@ -220,22 +222,19 @@ void OutputChannelForm::setChannelRange()
 {
     int oldMini = ui.actuatorNeutral->minimum();
 
-// int oldMaxi = ui.actuatorNeutral->maximum();
-
     if (ui.actuatorMin->value() < ui.actuatorMax->value()) {
         ui.actuatorNeutral->setRange(ui.actuatorMin->value(), ui.actuatorMax->value());
+        ui.actuatorValue->setRange(ui.actuatorMin->value(), ui.actuatorMax->value());
         ui.actuatorRev->setChecked(false);
     } else {
         ui.actuatorNeutral->setRange(ui.actuatorMax->value(), ui.actuatorMin->value());
+        ui.actuatorValue->setRange(ui.actuatorMax->value(), ui.actuatorMin->value());
         ui.actuatorRev->setChecked(true);
     }
 
     if (ui.actuatorNeutral->value() == oldMini) {
         ui.actuatorNeutral->setValue(ui.actuatorNeutral->minimum());
     }
-
-// if (ui.actuatorNeutral->value() == oldMaxi)
-// ui.actuatorNeutral->setValue(ui.actuatorNeutral->maximum());  // this can be dangerous if it happens to be controlling a motor at the time!
 }
 
 /**
@@ -285,11 +284,13 @@ void OutputChannelForm::sendChannelTest(int value)
         return;
     }
 
+    disconnect(ui.actuatorValue, SIGNAL(valueChanged(int)), ui.actuatorNeutral, SLOT(setValue(int)));
+
     if (ui.actuatorRev->isChecked()) {
         value = ui.actuatorMin->value() - value + ui.actuatorMax->value(); // the channel is reversed
     }
-    // update the label
-    ui.actuatorValue->setText(QString::number(value));
+
+    ui.actuatorValue->setValue(value);
 
     if (ui.actuatorLink->checkState() && parent()) { // the channel is linked to other channels
         QList<OutputChannelForm *> outputChannelForms = parent()->findChildren<OutputChannelForm *>();
@@ -315,12 +316,13 @@ void OutputChannelForm::sendChannelTest(int value)
             }
 
             outputChannelForm->ui.actuatorNeutral->setValue(val);
-            outputChannelForm->ui.actuatorValue->setText(QString::number(val));
+            outputChannelForm->ui.actuatorValue->setValue(val);
         }
     }
+    connect(ui.actuatorValue, SIGNAL(valueChanged(int)), ui.actuatorNeutral, SLOT(setValue(int)));
 
     if (!m_inChannelTest) {
         return; // we are not in Test Output mode
-    }
+    }    
     emit channelChanged(index(), value);
 }

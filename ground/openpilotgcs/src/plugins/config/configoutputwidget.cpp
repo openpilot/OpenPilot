@@ -62,8 +62,6 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     UAVSettingsImportExportFactory *importexportplugin = pm->getObject<UAVSettingsImportExportFactory>();
     connect(importexportplugin, SIGNAL(importAboutToBegin()), this, SLOT(stopTests()));
 
-    connect(ui->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
-
     // Configure the task widget
     // Connect the help button
     connect(ui->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
@@ -73,18 +71,14 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     // Track the ActuatorSettings object
     addUAVObject("ActuatorSettings");
 
-    // NOTE: we have channel indices from 0 to 9, but the convention for OP is Channel 1 to Channel 10.
+    // NOTE: we have channel indices from 0 to 9(11), but the convention for OP is Channel 1 to Channel 10(12).
     // Register for ActuatorSettings changes:
     for (unsigned int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
         OutputChannelForm *form = new OutputChannelForm(i, this, i == 0);
         connect(ui->channelOutTest, SIGNAL(toggled(bool)), form, SLOT(enableChannelTest(bool)));
         connect(form, SIGNAL(channelChanged(int, int)), this, SLOT(sendChannelTest(int, int)));
         ui->channelLayout->addWidget(form);
-        addWidget(form->ui.actuatorMin);
-        addWidget(form->ui.actuatorNeutral);
-        addWidget(form->ui.actuatorMax);
-        addWidget(form->ui.actuatorRev);
-        addWidget(form->ui.actuatorLink);
+        addWidget(form);
     }
 
     // Associate the buttons with their UAVO fields
@@ -104,6 +98,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
         this->setEnabled(false);
     }
     connect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(disableIfNotMe(UAVObject *)));
+    connect(ui->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
     refreshWidgetsValues();
     updateEnableControls();
@@ -243,19 +238,25 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
 
     bool dirty = isDirty();
 
+    // Get connected board model
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
+    Q_ASSERT(utilMngr);
+    int board = utilMngr->getBoardModel();
+
     // Get Actuator Settings
     ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
     Q_ASSERT(actuatorSettings);
     ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
 
     // Get channel descriptions
-    QStringList ChannelDesc = ConfigVehicleTypeWidget::getChannelDescriptions();
+    QStringList channelDescriptions = ConfigVehicleTypeWidget::getChannelDescriptions();
 
     // Initialize output forms
     QList<OutputChannelForm *> outputChannelForms = findChildren<OutputChannelForm *>();
     foreach(OutputChannelForm * outputChannelForm, outputChannelForms) {
-        outputChannelForm->setAssignment(ChannelDesc[outputChannelForm->index()]);
-
+        outputChannelForm->setAssignment(channelDescriptions[outputChannelForm->index()]);
         // init min,max,neutral
         int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
         int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
@@ -263,36 +264,25 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
 
         int neutral  = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
         outputChannelForm->neutral(neutral);
-    }
 
-    // Get the SpinWhileArmed setting
-    ui->spinningArmed->setChecked(actuatorSettingsData.MotorsSpinWhileArmed == ActuatorSettings::MOTORSSPINWHILEARMED_TRUE);
+        // Coptercontrol family of boards 10 channels only
+        outputChannelForm->setEnabled(!((board & 0xff00) == 0x0400 && outputChannelForm->index() > 9));
+    }
 
     // Setup output rates for all banks
-    if (ui->cb_outputRate1->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[0])) == -1) {
-        ui->cb_outputRate1->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[0]));
+    QList<QComboBox *> outputRateCombos;
+    outputRateCombos << ui->cb_outputRate1 << ui->cb_outputRate2 << ui->cb_outputRate3 <<
+        ui->cb_outputRate4 << ui->cb_outputRate5 << ui->cb_outputRate6;
+
+    int index = 0;
+    foreach(QComboBox * combo, outputRateCombos) {
+        if (combo->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[index])) == -1) {
+            combo->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[index]));
+        }
+        combo->setCurrentIndex(combo->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[index])));
+        combo->setEnabled(false);
+        index++;
     }
-    if (ui->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1])) == -1) {
-        ui->cb_outputRate2->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[1]));
-    }
-    if (ui->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2])) == -1) {
-        ui->cb_outputRate3->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[2]));
-    }
-    if (ui->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3])) == -1) {
-        ui->cb_outputRate4->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[3]));
-    }
-    if (ui->cb_outputRate5->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[4])) == -1) {
-        ui->cb_outputRate5->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[4]));
-    }
-    if (ui->cb_outputRate6->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[5])) == -1) {
-        ui->cb_outputRate6->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[5]));
-    }
-    ui->cb_outputRate1->setCurrentIndex(ui->cb_outputRate1->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[0])));
-    ui->cb_outputRate2->setCurrentIndex(ui->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1])));
-    ui->cb_outputRate3->setCurrentIndex(ui->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2])));
-    ui->cb_outputRate4->setCurrentIndex(ui->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3])));
-    ui->cb_outputRate5->setCurrentIndex(ui->cb_outputRate5->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[4])));
-    ui->cb_outputRate6->setCurrentIndex(ui->cb_outputRate6->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[5])));
 
     // Reset to all disabled
     ui->chBank1->setText("-");
@@ -301,47 +291,32 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     ui->chBank4->setText("-");
     ui->chBank5->setText("-");
     ui->chBank6->setText("-");
-    ui->cb_outputRate1->setEnabled(false);
-    ui->cb_outputRate2->setEnabled(false);
-    ui->cb_outputRate3->setEnabled(false);
-    ui->cb_outputRate4->setEnabled(false);
-    ui->cb_outputRate5->setEnabled(false);
-    ui->cb_outputRate6->setEnabled(false);
 
-    // Get connected board model
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    Q_ASSERT(pm);
-    UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
-    Q_ASSERT(utilMngr);
-
-    if (utilMngr) {
-        int board = utilMngr->getBoardModel();
-        // Setup labels and combos for banks according to board type
-        if ((board & 0xff00) == 0x0400) {
-            // Coptercontrol family of boards 4 timer banks
-            ui->chBank1->setText("1-3");
-            ui->chBank2->setText("4");
-            ui->chBank3->setText("5,7-8");
-            ui->chBank4->setText("6,9-10");
-            ui->cb_outputRate1->setEnabled(true);
-            ui->cb_outputRate2->setEnabled(true);
-            ui->cb_outputRate3->setEnabled(true);
-            ui->cb_outputRate4->setEnabled(true);
-        } else if ((board & 0xff00) == 0x0900) {
-            // Revolution family of boards 6 timer banks
-            ui->chBank1->setText("1-2");
-            ui->chBank2->setText("3");
-            ui->chBank3->setText("4");
-            ui->chBank4->setText("5-6");
-            ui->chBank5->setText("7-8");
-            ui->chBank6->setText("9-10");
-            ui->cb_outputRate1->setEnabled(true);
-            ui->cb_outputRate2->setEnabled(true);
-            ui->cb_outputRate3->setEnabled(true);
-            ui->cb_outputRate4->setEnabled(true);
-            ui->cb_outputRate5->setEnabled(true);
-            ui->cb_outputRate6->setEnabled(true);
-        }
+    // Setup labels and combos for banks according to board type
+    if ((board & 0xff00) == 0x0400) {
+        // Coptercontrol family of boards 4 timer banks
+        ui->chBank1->setText("1-3");
+        ui->chBank2->setText("4");
+        ui->chBank3->setText("5,7-8");
+        ui->chBank4->setText("6,9-10");
+        ui->cb_outputRate1->setEnabled(true);
+        ui->cb_outputRate2->setEnabled(true);
+        ui->cb_outputRate3->setEnabled(true);
+        ui->cb_outputRate4->setEnabled(true);
+    } else if ((board & 0xff00) == 0x0900) {
+        // Revolution family of boards 6 timer banks
+        ui->chBank1->setText("1-2");
+        ui->chBank2->setText("3");
+        ui->chBank3->setText("4");
+        ui->chBank4->setText("5-6");
+        ui->chBank5->setText("7-8");
+        ui->chBank6->setText("9-12");
+        ui->cb_outputRate1->setEnabled(true);
+        ui->cb_outputRate2->setEnabled(true);
+        ui->cb_outputRate3->setEnabled(true);
+        ui->cb_outputRate4->setEnabled(true);
+        ui->cb_outputRate5->setEnabled(true);
+        ui->cb_outputRate6->setEnabled(true);
     }
 
     // Get Channel ranges:
@@ -354,6 +329,9 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
         outputChannelForm->neutral(neutral);
     }
+
+    // Get the SpinWhileArmed setting
+    ui->spinningArmed->setChecked(actuatorSettingsData.MotorsSpinWhileArmed == ActuatorSettings::MOTORSSPINWHILEARMED_TRUE);
 
     setDirty(dirty);
 }

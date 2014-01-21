@@ -79,17 +79,23 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     unsigned int indexRT = 0;
     foreach(QString name, manualSettingsObj->getField("ChannelNumber")->getElementNames()) {
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
-        inputChannelForm *inpForm = new inputChannelForm(this, index == 0);
+        InputChannelForm *inpForm = new InputChannelForm(this, index == 0);
         ui->channelSettings->layout()->addWidget(inpForm); // Add the row to the UI
         inpForm->setName(name);
         addWidgetBinding("ManualControlSettings", "ChannelGroups", inpForm->ui->channelGroup, index);
         addWidgetBinding("ManualControlSettings", "ChannelNumber", inpForm->ui->channelNumber, index);
-        addWidgetBinding("ManualControlSettings", "ChannelMin", inpForm->ui->channelMin, index);
+
+        // The order of the following three binding calls is important. Since the values will be populated
+        // in reverse order of the binding order otherwise the 'Reversed' logic will floor the neutral value
+        // to the max value ( which is smaller than the neutral value when reversed )
         addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->channelNeutral, index);
+        addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->neutralValue, index);
+        addWidgetBinding("ManualControlSettings", "ChannelMin", inpForm->ui->channelMin, index);
         addWidgetBinding("ManualControlSettings", "ChannelMax", inpForm->ui->channelMax, index);
+
         addWidget(inpForm->ui->channelNumberDropdown);
-        addWidget(inpForm->ui->channelRev);
         addWidget(inpForm->ui->channelResponseTime);
+        addWidget(inpForm->ui->channelRev);
 
         // Input filter response time fields supported for some channels only
         switch (index) {

@@ -564,12 +564,16 @@ ifeq ($(UNAME), Windows)
 $(eval $(call TOOL_INSTALL_TEMPLATE,openssl,$(OPENSSL_DIR),$(OPENSSL_URL),$(notdir $(OPENSSL_URL))))
 
 ifeq ($(shell [ -d "$(OPENSSL_DIR)" ] && $(ECHO) "exists"), exists)
-    export OPENSSL := $(OPENSSL_DIR)
+    export OPENSSL := "$(OPENSSL_DIR)/bin/openssl"    
+    export OPENSSL_DIR := "$(OPENSSL_DIR)"
 else
     # not installed, hope it's in the path...
     # $(info $(EMPTY) WARNING     $(call toprel, $(OPENSSL_DIR)) not found (make openssl_install), using system PATH)
 endif
 
+.PHONY: openssl_version
+openssl_version:
+	-$(V1) $(ECHO) "OpenSSL `$(OPENSSL) version`"
 endif
 
 ##############################
@@ -947,6 +951,19 @@ android_sdk_update:
 	$(V0) @echo " UPDATE       $(ANDROID_SDK_DIR)"
 	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
 
+		#Install git hooks under the right folder
+
+.PHONY: prepare
+prepare:
+	$(V0) @echo " Configuring GIT commit template"
+	$(V1) $(CD) "$(ROOT_DIR)"
+	$(V1) $(GIT) config commit.template .commit-template
+
+.PHONY: prepare_clean
+prepare_clean:
+	$(V0) @echo " Cleanup GIT commit template configuration"
+	$(V1) $(CD) "$(ROOT_DIR)"
+	$(V1) $(GIT) config --unset commit.template 
 
 ##############################
 #

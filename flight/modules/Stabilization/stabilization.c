@@ -104,7 +104,7 @@ int cur_flight_mode = -1;
 static uint8_t rattitude_anti_windup;
 static float cruise_control_min_throttle;
 static float cruise_control_max_throttle;
-static uint8_t cruise_control_max_angle;
+static float cruise_control_max_angle_cos;
 static float cruise_control_max_power_factor;
 static float cruise_control_power_trim;
 static int8_t cruise_control_inverted_power_switch;
@@ -611,24 +611,27 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
             && cruise_control_max_power_factor > 0.0001f) {
             static uint8_t toggle;
             static float factor;
-            float angle;
             // get attitude state and calculate angle
             // do it every 8th iteration to save CPU
             if ((toggle++ & 7) == 0) {
-                // spherical right triangle
-                // 0 <= acosf() <= Pi
-                angle = RAD2DEG(acosf(cos_lookup_deg(attitudeState.Roll) * cos_lookup_deg(attitudeState.Pitch)));
-                // if past the cutoff angle (60 to 180 (180 means never))
-                if (angle > cruise_control_max_angle) {
+                // quaternion calculation, see CoordinateConversion.c Quaternion2R
+                // calculates rotation matrix, we seek Rbe[2][2]
+                #define q0s (attitudeState.q1 * attitudeState.q1)
+                #define q1s (attitudeState.q2 * attitudeState.q2)
+                #define q2s (attitudeState.q3 * attitudeState.q3)
+                #define q3s (attitudeState.q4 * attitudeState.q4)
+                float factor_1 = q0s - a1s - a2s + q3s;
+
+                if (factor_1 < cruise_control_max_angle_cos) {
                     // -1 reversed collective, 0 zero power, or 1 normal power
                     // these are all unboosted
                     factor = cruise_control_inverted_power_switch;
                 } else {
                     // avoid singularity
-                    if (angle > 89.999f && angle < 90.001f) {
+                    if (factor_1 > -1e-3f && factor_1 < 1e-3f) {
                         factor = cruise_control_max_power_factor;
                     } else {
-                        factor = 1.0f / fabsf(cos_lookup_deg(angle));
+                        factor = 1.0f / fabsf(factor_1);
                         if (factor > cruise_control_max_power_factor) {
                             factor = cruise_control_max_power_factor;
                         }
@@ -636,10 +639,15 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                     // factor in the power trim, no effect at 1.0, linear effect increases with factor
                     factor = (factor - 1.0f) * cruise_control_power_trim + 1.0f;
                     // if inverted and they want negative boost
-                    if (angle > 90.0f && cruise_control_inverted_power_switch == (int8_t)-1) {
+                    if (factor_1 < 0.0f && cruise_control_inverted_power_switch == (int8_t)-1) {
                         factor = -factor;
                         // as long as throttle is getting reversed
                         // we may as well do pitch and yaw for a complete "invert switch"
+                        //
+                        // TODO: WARNING: DANGEROUS: shouldn't thus be handled in Actuators?
+                        // this only applies to actuators coupled with throttle,
+                        // like a quads props not for example for a heli's tail rotor, or an airplanes control surfaces!!!
+                        // (but it does apply to thrust vectoring!)
                         actuatorDesired.Pitch = -actuatorDesired.Pitch;
                         actuatorDesired.Yaw   = -actuatorDesired.Yaw;
                     }
@@ -721,7 +729,7 @@ static float bound(float val, float range)
 static float stab_log2f(float x)
 {
     union {
-        volatile float    f;
+        volatile float f;
         volatile uint32_t i;
         volatile unsigned char c[4];
     } __attribute__((packed)) u1, u2;
@@ -934,9 +942,9 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     cruise_control_min_throttle     = (float)settings.CruiseControlMinThrottle / 100.0f;
     cruise_control_max_throttle     = (float)settings.CruiseControlMaxThrottle / 100.0f;
-    cruise_control_max_angle        = settings.CruiseControlMaxAngle;
+    cruise_control_max_angle_cos    = cos_lookup_deg(settings.CruiseControlMaxAngle);
     cruise_control_max_power_factor = settings.CruiseControlMaxPowerFactor;
-    cruise_control_power_trim       = settings.CruiseControlPowerTrim / 100.0f;
+    cruise_control_power_trim = settings.CruiseControlPowerTrim / 100.0f;
     cruise_control_inverted_power_switch = settings.CruiseControlInvertedPowerSwitch;
     cruise_control_neutral_thrust   = (float)settings.CruiseControlNeutralThrust / 100.0f;
 

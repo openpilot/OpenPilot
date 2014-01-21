@@ -270,6 +270,11 @@ extern uint32_t pios_i2c_flexiport_adapter_id;
 // ------------------------
 #define PIOS_BMP085_OVERSAMPLING 3
 
+// ------------------------
+// PIOS IO
+// ------------------------
+#define PIOS_PACKETRXOK_IN       0
+
 /**
  * glue macros for file IO
  * STM32 uses DOSFS for file IO

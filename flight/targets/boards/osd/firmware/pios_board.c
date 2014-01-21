@@ -401,6 +401,20 @@ void PIOS_Board_Init(void)
     }
 #endif /* PIOS_INCLUDE_TSLRSDEBUG */
         break;
+    case HWSETTINGS_OSD_FLEXIPORT_PACKETRXOK:
+#if defined(PIOS_INCLUDE_PACKETRXOK)
+    {
+        uint32_t pios_gpio_packetrxok_id;
+        if (PIOS_GPIO_Init(&pios_gpio_packetrxok_id, &pios_packetrxok_io_cfg)) {
+            PIOS_Assert(0);
+        }
+        uint32_t pios_packetrxok_id;
+        if (PIOS_PacketRxOk_Init(&pios_packetrxok_id, pios_gpio_packetrxok_id, pios_packetrxok_io[PIOS_PACKETRXOK_IN].pin.gpio, pios_packetrxok_io[PIOS_PACKETRXOK_IN].pin.init.GPIO_Pin)) {
+            PIOS_Assert(0);
+        }
+    }
+#endif /* PIOS_INCLUDE_PACKETRXOK */
+        break;
     }
 
 #if defined(PIOS_INCLUDE_WAVE)

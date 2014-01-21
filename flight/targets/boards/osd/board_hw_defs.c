@@ -1075,3 +1075,29 @@ static const struct pios_tslrsdebug_cfg pios_tslrsdebug_flexi_cfg = {
 };
 
 #endif /* #if defined(PIOS_INCLUDE_TSLRSDEBUG) */
+
+#if defined(PIOS_INCLUDE_PACKETRXOK)
+#include "pios_packetrxok_priv.h"
+
+static const struct pios_gpio pios_packetrxok_io[] = {
+    [PIOS_PACKETRXOK_IN] = {
+        .pin                =             {
+            .gpio = GPIOB,
+            .init =             {
+                    .GPIO_Pin   = GPIO_Pin_11,
+                    .GPIO_Speed = GPIO_Speed_25MHz,
+                    .GPIO_Mode  = GPIO_Mode_IN,
+                    .GPIO_OType = GPIO_OType_OD,
+                    .GPIO_PuPd  = GPIO_PuPd_NOPULL,
+            },
+        },
+        .active_low         = true
+    },
+};
+
+static const struct pios_gpio_cfg pios_packetrxok_io_cfg = {
+    .gpios     = pios_packetrxok_io,
+    .num_gpios = NELEMENTS(pios_packetrxok_io),
+};
+
+#endif /* #if defined(PIOS_INCLUDE_PACKETRXOK) */

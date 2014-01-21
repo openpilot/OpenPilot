@@ -65,6 +65,10 @@
 #include "pios_tslrsdebug.h"
 #endif
 
+#ifdef PIOS_INCLUDE_PACKETRXOK
+#include "pios_packetrxok.h"
+#endif
+
 #include "fonts.h"
 #include "font12x18.h"
 #include "font8x10.h"
@@ -78,6 +82,10 @@ extern uint8_t *draw_buffer_level;
 extern uint8_t *draw_buffer_mask;
 extern uint8_t *disp_buffer_level;
 extern uint8_t *disp_buffer_mask;
+
+#ifdef PIOS_INCLUDE_PACKETRXOK
+static uint8_t PacketRxOk = 0;
+#endif
 
 // ****************
 // Private functions
@@ -2072,12 +2080,13 @@ void accumulate_current(double current_amp, double *current_total)
 #define WARN_NO_SAT_FIX      0x0002
 #define WARN_HOME_NOT_SET    0x0004
 #define WARN_DISARMED        0x0008
-#define WARN_BAD_PACKETS     0x0010
-#define WARN_RSSI_LOW        0x0020
-#define WARN_BATT_FLIGHT_LOW 0x0040
-#define WARN_BATT_VIDEO_LOW  0x0080
-#define WARN_BATT_SCURR_HIGH 0x0100
-#define WARN_BATT_SVOLT_LOW  0x0200
+#define WARN_BAD_TSLRS_PKT   0x0010
+#define WARN_BAD_LEDRX_PKT   0x0020
+#define WARN_RSSI_LOW        0x0040
+#define WARN_BATT_FLIGHT_LOW 0x0080
+#define WARN_BATT_VIDEO_LOW  0x0100
+#define WARN_BATT_SCURR_HIGH 0x0200
+#define WARN_BATT_SVOLT_LOW  0x0400
 void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, int8_t char_size)
 {
     static portTickType on_off_time = 0;
@@ -2110,12 +2119,12 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
             write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
             d_y += v_spacing;
         }
+#define CRC_CRITICAL_PERCENT         75
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
-#define TSLRSDEBUG_CRITICAL_PERCENT         75
-        if (WarnMask & WARN_BAD_PACKETS) {
+        if (WarnMask & WARN_BAD_TSLRS_PKT) {
             if (DEBUG_CHAN_ACTIVE) {
                 uint8_t packet_window_percent = tslrsdebug_packet_window_percent();
-                if (packet_window_percent < TSLRSDEBUG_CRITICAL_PERCENT) {
+                if (packet_window_percent < CRC_CRITICAL_PERCENT) {
                     sprintf(temp, "!CRITICAL!  %4u %c%2u%%", tslrsdebug_state->BadChannelDelta, 0x15, packet_window_percent);
                 } else {
                     if (packet_window_percent < 100) {
@@ -2131,6 +2140,17 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
                 if (tslrsdebug_state->BadPacketsDelta) {
                     sprintf(temp, "BAD PACKETS %4u", tslrsdebug_state->BadPacketsDelta);
                 }
+            }
+            write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+            d_y += v_spacing;
+        }
+#endif
+#ifdef PIOS_INCLUDE_PACKETRXOK
+        if (WarnMask & WARN_BAD_LEDRX_PKT) {
+            if (PacketRxOk < CRC_CRITICAL_PERCENT) {
+                sprintf(temp, "!CRITICAL!  %c%2u%%", 0x15, PacketRxOk);
+            } else {
+                sprintf(temp, "BAD PACKETS %c%2u%%", 0x15, PacketRxOk);
             }
             write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
             d_y += v_spacing;
@@ -2221,7 +2241,7 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
 // show TSLRS debug status
 #define TSLRS_ROTARY_2_CHAR             0xDC
 #define TSLRS_ROTARY_3_CHAR             0xC0
-#define TSLRS_RADIOCRC_2_CHAR           0x43
+#define TSLRS_RADIOCRC_2_CHAR           0x15
 #define TSLRS_RADIOCRC_3_CHAR           0x15
 #define TSLRS_FAILSAFES_2_CHAR          0x46
 #define TSLRS_FAILSAFES_3_CHAR          0xCC
@@ -2260,10 +2280,8 @@ void draw_tslrsdebug_status(int16_t x, int16_t y, int8_t char_size)
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             }
         } else {
-            if (tslrsdebug_state->scan_value_percent < 100) {
-                sprintf(temp, " %c %3u%%", radiocrc, tslrsdebug_state->scan_value_percent);
-                write_string(temp, x, y     , 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
-            }
+            sprintf(temp, "%c   %3u%%", radiocrc, tslrsdebug_state->scan_value_percent);
+            write_string(temp, x, y     , 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             if (tslrsdebug_state->BadPackets) {
                 sprintf(temp, "%6u%c", tslrsdebug_state->BadPackets, badchannel);
                 write_string(temp, x, y + 10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
@@ -2295,6 +2313,21 @@ void draw_tslrsdebug_channel(int16_t x, int16_t y, int8_t size)
     }
 }
 #endif /* PIOS_INCLUDE_TSLRSDEBUG */
+
+
+#ifdef PIOS_INCLUDE_PACKETRXOK
+// show PacketRxOk status
+#define PACKETRXOK_RADIOCRC_2_CHAR           0x15
+#define PACKETRXOK_RADIOCRC_3_CHAR           0x15
+void draw_packetrxok_status(int16_t x, int16_t y, int8_t char_size)
+{
+    char temp[10] = { 0 };
+    char radiocrc = (char_size == 2 ? PACKETRXOK_RADIOCRC_2_CHAR : PACKETRXOK_RADIOCRC_3_CHAR);
+
+    sprintf(temp, "%c   %3u%%", radiocrc, PacketRxOk);
+    write_string(temp, x, y     , 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+}
+#endif /* PIOS_INCLUDE_PACKETRXOK */
 
 
 void updateGraphics()
@@ -2358,7 +2391,6 @@ void updateGraphics()
 #endif
 
         // JR_HINT TODO
-        // RSSI version PacketRxOk
         // use nice icons for some of the displayed values
         // use homePos.Altitude for baro.Altitude correction?
 
@@ -2555,7 +2587,7 @@ void updateGraphics()
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
         // Show TSLRS status data which is CRC checked good/bad packet data
         if (OsdSettings2.TSLRSdebug) {
-            WarnMask |= (tslrsdebug_state->BadChannelDelta || tslrsdebug_state->BadPacketsDelta) ? WARN_BAD_PACKETS : 0x00;
+            WarnMask |= (tslrsdebug_state->BadChannelDelta || tslrsdebug_state->BadPacketsDelta) ? WARN_BAD_TSLRS_PKT : 0x00;
             if (check_enable_and_srceen(OsdSettings2.TSLRSdebug, (OsdSettingsWarningsSetupData *)&OsdSettings2.TSLRSStatusSetup, screen, &x, &y)) {
                 draw_tslrsdebug_status(x, y, OsdSettings2.TSLRSStatusSetup.CharSize);
             }
@@ -2565,6 +2597,17 @@ void updateGraphics()
         if (OsdSettings2.TSLRSdebug && ((tslrsdebug_state->BadChannelDelta || tslrsdebug_state->BadPacketsDelta))) {
             if (check_enable_and_srceen(OsdSettings2.TSLRSdebug, (OsdSettingsWarningsSetupData *)&OsdSettings2.TSLRSChannelSetup, screen, &x, &y)) {
                 draw_tslrsdebug_channel(x, y, OsdSettings2.TSLRSChannelSetup.Size);
+            }
+        }
+#endif
+
+#ifdef PIOS_INCLUDE_PACKETRXOK
+        // Show PacketRxOk data
+        if (OsdSettings2.PacketRxOk) {
+            PacketRxOk = PacketRxOk_read();
+            WarnMask |= (PacketRxOk < 100) ? WARN_BAD_LEDRX_PKT : 0x00;
+            if (check_enable_and_srceen(OsdSettings2.PacketRxOk, (OsdSettingsWarningsSetupData *)&OsdSettings2.PacketRxOkSetup, screen, &x, &y)) {
+                draw_packetrxok_status(x, y, OsdSettings2.PacketRxOkSetup.CharSize);
             }
         }
 #endif

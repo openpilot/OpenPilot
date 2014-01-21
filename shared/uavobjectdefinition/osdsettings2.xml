@@ -11,6 +11,9 @@
         <field name="TSLRSStatusSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="172,20,172,20,-1000,-1000,2"/>
         <field name="TSLRSChannelSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,Size" defaultvalue="163,30,-1000,-1000,-1000,-1000,3"/>
         
+        <field name="PacketRxOk" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Disabled"/>
+        <field name="PacketRxOkSetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="172,20,172,20,-1000,-1000,2"/>
+        
         <field name="RSSI" units="" type="enum" elements="1" options="Disabled,Analog,PWM" defaultvalue="Disabled"/>
         <field name="RSSISetup" units="" type="int16" elements="7" elementnames="X1,Y1,X2,Y2,X3,Y3,CharSize" defaultvalue="35,40,35,40,-1000,-1000,2"/>
         <field name="RSSICalibration" units="" type="float" elementnames="Factor, Offset, Warning" defaultvalue="1.0, 0.0, 2.0"/>

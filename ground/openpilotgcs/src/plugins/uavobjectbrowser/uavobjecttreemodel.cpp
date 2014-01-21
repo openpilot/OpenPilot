@@ -228,7 +228,11 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
     case UAVObjectField::UINT32:
         data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new IntFieldTreeItem(field, index, data);
+        if (field->getUnits().toLower() == "hex") {
+            item = new HexFieldTreeItem(field, index, data);
+        } else {
+            item = new IntFieldTreeItem(field, index, data);
+        }
         break;
     case UAVObjectField::FLOAT32:
         data.append(field->getValue(index));
@@ -350,9 +354,6 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
         TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
         return item->data(index.column());
     }
-
-// if (role == Qt::DecorationRole)
-// return QIcon(":/core/images/openpilot_logo_128.png");
 
     if (role == Qt::ToolTipRole) {
         TreeItem *item = static_cast<TreeItem *>(index.internalPointer());

@@ -104,7 +104,7 @@ MonitorWidget::MonitorWidget(QWidget *parent) :
 
     setScene(scene);
 
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     // no scroll bars
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

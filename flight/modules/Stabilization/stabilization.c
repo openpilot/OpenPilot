@@ -76,9 +76,6 @@
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 4)
 #define FAILSAFE_TIMEOUT_MS 30
 
-// number of flight mode switch positions
-#define NUM_FMS_POSITIONS   6
-
 // The PID_RATE_ROLL set is used by Rate mode and the rate portion of Attitude mode
 // The PID_RATE set is used by the attitude portion of Attitude mode
 // The PID_RATEA_ROLL set is used by Rattitude mode because it needs to maintain
@@ -112,7 +109,7 @@ static float cruise_control_max_power_factor;
 static float cruise_control_power_trim;
 static int8_t cruise_control_inverted_power_switch;
 static float cruise_control_neutral_thrust;
-static uint8_t cruise_control_flight_mode_switch_pos_enable[NUM_FMS_POSITIONS];
+static uint8_t cruise_control_flight_mode_switch_pos_enable[STABILIZATIONSETTINGS_CRUISECONTROLFLIGHTMODESWITCHPOSENABLE_NUMELEM];
 
 // Private functions
 static void stabilizationTask(void *parameters);
@@ -163,7 +160,7 @@ int32_t StabilizationStart()
 int32_t StabilizationInitialize()
 {
     // stop the compile if the number of switch positions changes, but has not been changed here
-    PIOS_STATIC_ASSERT(NUM_FMS_POSITIONS == sizeof(((ManualControlSettingsData *)0)->FlightModePosition) / sizeof((((ManualControlSettingsData *)0)->FlightModePosition)[0]));
+    PIOS_STATIC_ASSERT(STABILIZATIONSETTINGS_CRUISECONTROLFLIGHTMODESWITCHPOSENABLE_NUMELEM == STABILIZATIONSETTINGS_FLIGHTMODEMAP_NUMELEM == sizeof(((ManualControlSettingsData *)0)->FlightModePosition) / sizeof((((ManualControlSettingsData *)0)->FlightModePosition)[0]));
 
     // Initialize variables
     StabilizationSettingsInitialize();
@@ -609,7 +606,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         // to maintain same altitdue with changing bank angle
         // but without manually adjusting throttle
         // do it here and all the various flight modes (e.g. Altitude Hold) can use it
-        if (flight_mode_switch_position < NUM_FMS_POSITIONS
+        if (flight_mode_switch_position < STABILIZATIONSETTINGS_CRUISECONTROLFLIGHTMODESWITCHPOSENABLE_NUMELEM
             && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t)0
             && cruise_control_max_power_factor > 0.0001f) {
             static uint8_t toggle;
@@ -761,7 +758,7 @@ static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     StabilizationBankGet(&oldBank);
 
-    if (cur_flight_mode < 0 || cur_flight_mode >= NUM_FMS_POSITIONS) {
+    if (cur_flight_mode < 0 || cur_flight_mode >= STABILIZATIONSETTINGS_FLIGHTMODEMAP_NUMELEM) {
         return;
     }
 

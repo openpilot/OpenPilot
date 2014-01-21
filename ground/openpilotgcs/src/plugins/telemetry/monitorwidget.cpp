@@ -98,7 +98,7 @@ QGraphicsTextItem *createTextItem(QGraphicsSvgItem *parent, QString elementId, Q
 MonitorWidget::MonitorWidget(QWidget *parent) :
     QGraphicsView(parent), aspectRatioMode(Qt::KeepAspectRatio)
 {
-    // setMinimumWidth(180);
+    setMinimumSize(180, 25);
 
     QGraphicsScene *scene = new QGraphicsScene();
 

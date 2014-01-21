@@ -160,7 +160,7 @@ int32_t StabilizationStart()
 int32_t StabilizationInitialize()
 {
     // stop the compile if the number of switch positions changes, but has not been changed here
-    PIOS_STATIC_ASSERT(STABILIZATIONSETTINGS_CRUISECONTROLFLIGHTMODESWITCHPOSENABLE_NUMELEM == STABILIZATIONSETTINGS_FLIGHTMODEMAP_NUMELEM == sizeof(((ManualControlSettingsData *)0)->FlightModePosition) / sizeof((((ManualControlSettingsData *)0)->FlightModePosition)[0]));
+    PIOS_STATIC_ASSERT(STABILIZATIONSETTINGS_CRUISECONTROLFLIGHTMODESWITCHPOSENABLE_NUMELEM == STABILIZATIONSETTINGS_FLIGHTMODEMAP_NUMELEM && STABILIZATIONSETTINGS_FLIGHTMODEMAP_NUMELEM == sizeof(((ManualControlSettingsData *)0)->FlightModePosition) / sizeof((((ManualControlSettingsData *)0)->FlightModePosition)[0]));
 
     // Initialize variables
     StabilizationSettingsInitialize();
@@ -620,7 +620,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 #define q1s (attitudeState.q2 * attitudeState.q2)
                 #define q2s (attitudeState.q3 * attitudeState.q3)
                 #define q3s (attitudeState.q4 * attitudeState.q4)
-                float factor_1 = q0s - a1s - a2s + q3s;
+                float factor_1 = q0s - q1s - q2s + q3s;
 
                 if (factor_1 < cruise_control_max_angle_cos) {
                     // -1 reversed collective, 0 zero power, or 1 normal power

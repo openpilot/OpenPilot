@@ -101,7 +101,7 @@ public:
 
     void apply()
     {
-        int value = data(dataColumn).toInt();
+        int value = data().toInt();
         QStringList options = m_field->getOptions();
 
         m_field->setValue(options[value], m_index);
@@ -231,7 +231,7 @@ public:
 
     void apply()
     {
-        m_field->setValue(data(dataColumn).toInt(), m_index);
+        m_field->setValue(data().toInt(), m_index);
         setChanged(false);
     }
 
@@ -268,7 +268,7 @@ public:
 
     void apply()
     {
-        m_field->setValue(data(dataColumn).toDouble(), m_index);
+        m_field->setValue(data().toDouble(), m_index);
         setChanged(false);
     }
 
@@ -364,13 +364,13 @@ public:
 
     void setData(QVariant value, int column)
     {
-        setChanged(m_field->getValue(m_index) != value);
+        setChanged(m_field->getValue(m_index) != toUInt(value));
         TreeItem::setData(value, column);
     }
 
     void apply()
     {
-        m_field->setValue(toUInt(data(dataColumn)), m_index);
+        m_field->setValue(toUInt(data()), m_index);
         setChanged(false);
     }
 

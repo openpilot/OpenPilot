@@ -84,15 +84,6 @@ GCS_LIBRARY_PATH
             data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_QT_QML_PATH/$$dir\") $$addNewline()
         }
 
-        # Remove the few unwanted libs after whole dir copy
-        QT_QUICK2_DELS = QtQuick/Controls/libqtquickcontrolsplugin.so \
-        QtQuick/Controls/Private/libqtquickcontrolsprivateplugin.so \
-        QtQuick/Dialogs/libdialogplugin.so
-
-        for(delfile, QT_QUICK2_DELS) {
-            data_copy.commands += $(DEL_FILE) $$targetPath(\"$$GCS_QT_QML_PATH/$${delfile}\") $$addNewline()
-        }
-
         # Remaining QtQuick plugin libs
         QT_QUICK2_DLLS = QtQuick.2/libqtquick2plugin.so \
                          QtQuick.2/plugins.qmltypes \
@@ -208,22 +199,6 @@ GCS_LIBRARY_PATH
                          qtquick/dialogs
         for(dir, QTQ_WHOLE_DIRS) {
             data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
-        }
-
-        # Remove the few unwanted DDLs after whole dir copy
-        QT_QUICK2_DELS = qtquick/controls/qtquickcontrolsplugin \
-        qtquick/controls/private/qtquickcontrolsprivateplugin \
-        qtquick/dialogs/dialogplugin
-
-        CONFIG(debug, debug|release) {
-            for(delfile, QT_QUICK2_DELS) {
-            data_copy.commands += $(DEL_FILE) $$targetPath(\"$$GCS_APP_PATH/$${delfile}.dll\") $$addNewline()
-            } 
-        }
-        CONFIG(release, debug|release) {
-            for(delfile, QT_QUICK2_DELS) {
-            data_copy.commands += $(DEL_FILE) $$targetPath(\"$$GCS_APP_PATH/$${delfile}d.dll\") $$addNewline()
-            }
         }
 
         # Remaining QtQuick plugin DLLs

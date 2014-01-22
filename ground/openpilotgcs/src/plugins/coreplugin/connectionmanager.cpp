@@ -50,8 +50,7 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow) :
 {
     // device list
     m_availableDevList = new QComboBox;
-    m_availableDevList->setMinimumWidth(120);
-    m_availableDevList->setMaximumWidth(180);
+    m_availableDevList->setMinimumContentsLength(tr("USB: OPLinkMini").length());
     m_availableDevList->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // connect button
@@ -60,9 +59,9 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow) :
 
     // put everything together
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setSpacing(5);
+    layout->setSpacing(6);
     // cheat a bit with the margin to "nicely" center things vertically
-    layout->setContentsMargins(5, 0, 5, 4);
+    layout->setContentsMargins(6, 0, 4, 2);
     setLayout(layout);
 
     layout->addWidget(new QLabel(tr("Connections:")), 0, Qt::AlignVCenter);

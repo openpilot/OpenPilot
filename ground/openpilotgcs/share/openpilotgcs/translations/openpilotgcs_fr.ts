@@ -7007,7 +7007,7 @@ en utilisant le bouton spécifique de calibration en haut de l&apos;écran.  </t
     <message>
         <location/>
         <source>Send settings to the board, and save to the non-volatile memory.</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile.</translation>
+        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile.</translation>
     </message>
     <message>
         <location/>
@@ -7766,7 +7766,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Damn this is insane how quick it moves. Mostly used by the Pro&apos;s</source>
-        <translation type="unfinished">Saperlipopette c&apos;est fou comment il se déplace rapidement. Principalement utilisé par les pros</translation>
+        <translation>Saperlipopette c&apos;est fou comment il se déplace rapidement. Principalement utilisé par les pros</translation>
     </message>
     <message>
         <location/>
@@ -8136,7 +8136,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the bank angle that CruiseControl goes into inverted / power disabled mode.  The power for inverted mode is controlled by CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci correspond à l&apos;angle d&apos;inclinaison où CruiseControl passe en inversé / mode puissance désactivé. La puissance en mode inversé est contrôlée par CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci correspond à l&apos;angle d&apos;inclinaison où CruiseControl passe en inversé / mode puissance désactivé. La puissance en mode inversé est contrôlée par CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8147,7 +8147,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Juste une limitation de sécurité. 4.0 signifie qu&apos;il n&apos;utilisera pas plus de 4 fois la puissance demandée par le manche des gaz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Juste une limitation de sécurité. 4.0 signifie qu&apos;il n&apos;utilisera pas plus de 4 fois la puissance demandée par le manche des gaz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8163,7 +8163,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This needs to be 0 for all copters except CP helis that are using idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci doit être à 0 pour tous les hélicoptères sauf les hélicos CP qui utilisent l&apos;idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci doit être à 0 pour tous les hélicoptères sauf les hélicos CP qui utilisent l&apos;idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8174,7 +8174,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that banging the stick around a lot makes the copter climb a bit, adjust this number down a little.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si vous trouvez qu&apos;un petit mouvement de manche fait légèrement monter l&apos;hélicoptère, baissez un petit peu cette valeur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si vous trouvez qu&apos;un petit mouvement de manche fait légèrement monter l&apos;hélicoptère, baissez un petit peu cette valeur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8216,7 +8216,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 90% to 95% to leave some headroom for stabilization.  CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les multicoptères devraient probablement utiliser une valeur de 90% à 95% afin de laisser une certaine marge pour la stabilisation. Les hélicos CP peuvent définir cette valeur à 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les multicoptères devraient probablement utiliser une valeur de 90% à 95% afin de laisser une certaine marge pour la stabilisation. Les hélicos CP peuvent définir cette valeur à 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8347,7 +8347,7 @@ accordingly.
 Note that it is possible to set PID Min &gt; Max. In that case increasing
 control input value will decrease the PID option value. This can be
 used, for instance, to decrease PID value when increasing Throttle.</source>
-        <translation type="unfinished">Sélectionner l&apos;entrée utilisé comme source de contrôle pour ce réglage
+        <translation>Sélectionner l&apos;entrée utilisé comme source de contrôle pour ce réglage
 Cela peut être un des canaux Accessoires ou la commande des gaz.
 
 Si un canal Accessoire est choisi alors sa plage [0..1] sera associée à 
@@ -8693,7 +8693,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Armed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Armé</translation>
     </message>
     <message>
         <location/>
@@ -10015,7 +10015,7 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished">Boote le système.
+        <translation>Boote le système.
 Utile seulement si le système est arrêté
 (LED blue de la carte qui clignote lentement, LED verte allumée)
 
@@ -10034,7 +10034,7 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished">Boote le système en mode sans échec (c.-à-d. Paramètres Matériels par défaut).
+        <translation>Boote le système en mode sans échec (c.-à-d. Paramètres Matériels par défaut).
 Seulement utile si le système est arrêté
 (LED blue de la carte qui clignote lentement, LED verte allumée)
 
@@ -10492,7 +10492,12 @@ Bougez le manche %1.</translation>
 <context>
     <name>Core::ConnectionManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/connectionmanager.cpp" line="+68"/>
+        <location filename="../../../src/plugins/coreplugin/connectionmanager.cpp" line="+53"/>
+        <source>USB: OPLinkMini</source>
+        <translation>USB : OPLinkMini</translation>
+    </message>
+    <message>
+        <location line="+14"/>
         <source>Connections:</source>
         <translation>Connexions :</translation>
     </message>
@@ -12167,7 +12172,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non volatile</translation>
+        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -12177,7 +12182,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile</translation>
+        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -12382,12 +12387,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Com speed in bps.</source>
-        <translation type="unfinished">Vitesse com en bps.</translation>
+        <translation>Vitesse com en bps.</translation>
     </message>
     <message>
         <location/>
         <source>Com Speed</source>
-        <translation type="unfinished">Vitesse Com</translation>
+        <translation>Vitesse Com</translation>
     </message>
     <message>
         <location/>
@@ -12806,7 +12811,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+2"/>
         <source>BL version: </source>
-        <translation type="unfinished">Version BL : </translation>
+        <translation>Version BL : </translation>
     </message>
     <message>
         <location line="+8"/>
@@ -12831,7 +12836,7 @@ p, li { white-space: pre-wrap; }
         <location line="-20"/>
         <location line="+25"/>
         <source>Untagged or custom firmware build</source>
-        <translation type="unfinished">Firmware non certifié ou version personnelle</translation>
+        <translation>Firmware non certifié ou version personnelle</translation>
     </message>
     <message>
         <location line="+72"/>
@@ -12890,7 +12895,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/uploader/runningdevicewidget.cpp" line="+67"/>
         <source>HW Revision: </source>
-        <translation type="unfinished">Révision Matériel : </translation>
+        <translation>Révision Matériel : </translation>
     </message>
     <message>
         <location line="+2"/>
@@ -12912,7 +12917,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+4"/>
         <source>Untagged or custom firmware build</source>
-        <translation type="unfinished">Firmware non certifié ou version personnelle</translation>
+        <translation>Firmware non certifié ou version personnelle</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -13437,7 +13442,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+4"/>
         <source>Path plan CRC error !</source>
-        <translation type="unfinished">Erreur de CRC dans le projet de trajet !</translation>
+        <translation>Erreur de CRC dans le projet de trajet !</translation>
     </message>
 </context>
 <context>
@@ -13553,7 +13558,7 @@ Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des
 et même conduire au crash. A utiliser avec prudence.</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+170"/>
+        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+171"/>
         <source>Chan %1</source>
         <translation type="unfinished">Canal %1</translation>
     </message>

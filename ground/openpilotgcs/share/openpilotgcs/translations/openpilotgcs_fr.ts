@@ -3297,7 +3297,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Lock/Unlock a waypoint</source>
-        <translation>Vérrouille / Dévérouille un waypoint</translation>
+        <translation>Verrouille / Déverrouille un waypoint</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -4226,7 +4226,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Méfiez-vous! Cochez &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:600;&quot;&gt;les trois&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt; cases pour essayer Feed Forward.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Méfiez-vous ! Cochez &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:600;&quot;&gt;les trois&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt; cases pour essayer Feed Forward.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Cela fonctionnera uniquement si la carte est armée.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -4583,7 +4583,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Azimuth</source>
-        <translation>Azimuth</translation>
+        <translation>Azimut</translation>
     </message>
     <message>
         <location/>
@@ -4875,7 +4875,7 @@ p, li { white-space: pre-wrap; }
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Dans l&apos;onglet &lt;span style=&quot; font-style:italic;&quot;&gt;Configuration Entrées&lt;/span&gt;, &lt;span style=&quot; font-style:italic;&quot;&gt;Inter. Mode Vol&lt;/span&gt;, régler un des modes de vol sur &amp;quot;Autotune&amp;quot;.&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Décoller, changer le mode de vol sur autotune et garder l&apos;appareil en l&apos;air pendant qu&apos;il est secoué.&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Atterrir et désarmer la carte.  (remarque - vous &lt;span style=&quot; font-weight:600;&quot;&gt;DEVEZ&lt;/span&gt; rester en mode autotune à partir de ce moment, le fait de quitter autotune avant de désarmer annule la procédure&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Nous vous recommandons de vérifier vos paramètres de stabilisation avant de les essayer (ex : comparer à ce que vous utilisez actuellement, si elles sont TRES différentes, c&apos;est probablement une bonne indication d&apos;un disfonctionnement).&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Nous vous recommandons de vérifier vos paramètres de stabilisation avant de les essayer (ex : comparer à ce que vous utilisez actuellement, si elles sont TRES différentes, c&apos;est probablement une bonne indication d&apos;un dysfonctionnement).&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Tester les nouveau paramètres en vol.&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Si vous êtes prêt à continuer, cochez &lt;span style=&quot; font-style:italic;&quot;&gt;Activer le module Autotune&lt;/span&gt; ci-dessus, &lt;span style=&quot; font-style:italic;&quot;&gt;enregistrez&lt;/span&gt; et passez à l&apos;onglet suivant.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -7044,7 +7044,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Les étapes #1 et #2 sont réellement nécessaires. L&apos;étape #3 vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Calibration Multi-Points :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Calibration Multipoints :&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration va calculer l&apos;amplitude de tous les capteurs de la carte. Appuyez sur &amp;quot;Démarrer&amp;quot; pour commencer l&apos;étalonnage puis suivez les instructions qui sont affichées ici. Veuillez noter que votre position Home doit être définie en premier, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Calibration du bruit des capteurs :&lt;/span&gt;&lt;/p&gt;
@@ -8347,7 +8347,7 @@ accordingly.
 Note that it is possible to set PID Min &gt; Max. In that case increasing
 control input value will decrease the PID option value. This can be
 used, for instance, to decrease PID value when increasing Throttle.</source>
-        <translation>Sélectionner l&apos;entrée utilisé comme source de contrôle pour ce réglage
+        <translation type="unfinished">Sélectionner l&apos;entrée utilisé comme source de contrôle pour ce réglage
 Cela peut être un des canaux Accessoires ou la commande des gaz.
 
 Si un canal Accessoire est choisi alors sa plage [0..1] sera associée à 
@@ -8358,7 +8358,7 @@ la plage PID [Mini..Maxi) définie pour ce réglage. Si les gaz dépassent
 les limites alors les valeurs PID Mini et Maxi seront utilisées en conséquence.
 
 Notez qu&apos;il est possible de définir un PID Mini &gt; Maxi. Dans ce cas en augmentant 
-la valeur de contrôle en entrée la valeur de loption PID diminue. Cela peut être
+la valeur de contrôle en entrée la valeur de l&apos;option PID diminue. Cela peut être
 utilisé par exemple pour diminuer la valeur PID lors de l&apos;augmentation des gaz.
 </translation>
     </message>
@@ -9002,7 +9002,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Débrancher toutes les batteries et le cordon USB de la carte,&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Vérifier que la carte n&apos;est pas alimentée et qu&apos;aucune LED n&apos;est allumée.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Lorsque vous êtes prêt vous pouvez démarrer la mise à jour en appuyant sur le bouton ci-dessous et suivre les intructions à l&apos;écran. Il est essentiel que rien ne vienne perturber le fonctionnement de la carte tant que le firmware est en cours d&apos;écriture.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Lorsque vous êtes prêt vous pouvez démarrer la mise à jour en appuyant sur le bouton ci-dessous et suivre les instructions à l&apos;écran. Il est essentiel que rien ne vienne perturber le fonctionnement de la carte tant que le firmware est en cours d&apos;écriture.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -9245,7 +9245,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotate clockwise and two counter clockwise. The motors positioned diagonal to each other rotate in the same direction. This setup is perfect for sport flying and is also commonly used for FPV platforms.</source>
-        <translation>Le Quadricoptère X utilise quatre moteurs et c&apos;est la configuration la plus commune en multirotor. Deux des moteurs tournent dans le sens horaire et les deux dans le sens anti-horaire. Les moteurs situés en diagonale tournent dans le même sens. Cette configuration est idéale pour le vol sportif et couramment utilisé pour des plates-formes FPV.</translation>
+        <translation>Le Quadricoptère X utilise quatre moteurs et c&apos;est la configuration la plus commune en multirotor. Deux des moteurs tournent dans le sens horaire et les deux dans le sens antihoraire. Les moteurs situés en diagonale tournent dans le même sens. Cette configuration est idéale pour le vol sportif et couramment utilisé pour des plates-formes FPV.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -9255,7 +9255,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited for FPV since the fore rotor tend to be in the way of the camera.</source>
-        <translation>Le Quadricoptère (+) utilise quatre moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens anti-horaire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
+        <translation>Le Quadricoptère (+) utilise quatre moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens antihoraire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -9296,9 +9296,9 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Configuration Multirotor OpenPilot&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette partie de l&apos;assistant configure la carte OpenPilot avec une plateforme de vol utilisant plusieurs rotors. L&apos;assistant reconnaît la plupart des types de multirotors. Les autres variantes de multirotors peuvent-être configurées en utilisant les options de configuration avancées dans l&apos;onglet Configuration de GCS.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette partie de l&apos;assistant configure la carte OpenPilot avec une plate-forme de vol utilisant plusieurs rotors. L&apos;assistant reconnaît la plupart des types de multirotors. Les autres variantes de multirotors peuvent-être configurées en utilisant les options de configuration avancées dans l&apos;onglet Configuration de GCS.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Veuillez choisir ci-dessous le type de multirotor souhaité pour créér une configuration :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Veuillez choisir ci-dessous le type de multirotor souhaité pour créer une configuration :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -9551,7 +9551,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Write configuration to controller</source>
-        <translation>Ecrire la configuration dans le contrôleur</translation>
+        <translation>Écrire la configuration dans le contrôleur</translation>
     </message>
     <message>
         <location/>
@@ -9603,7 +9603,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour continuer l&apos;assistant et passer par quelques étapes de configuration de base, veuillez passez à l&apos;étape suivante de l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les étapes suivantes requièrent que votre contrôleur OpenPilot soit mis en oeuvre comme sur le diagramme, &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;connecté à l&apos;ordinateur&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; par le port USB et que le véhicule soit&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt; alimenté par une batterie&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les étapes suivantes requièrent que votre contrôleur OpenPilot soit mis en œuvre comme sur le diagramme, &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;connecté à l&apos;ordinateur&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; par le port USB et que le véhicule soit&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt; alimenté par une batterie&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -10259,12 +10259,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+252"/>
         <source>Unsaved changes</source>
-        <translation type="unfinished">Modifications non sauvegardées</translation>
+        <translation>Modifications non sauvegardées</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The tab you are leaving has unsaved changes,if you proceed they will be lost.Do you still want to proceed?</source>
-        <translation type="unfinished">L&apos;onglet que vous quittez contient des modifications non sauvegardées, si vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translation>
+        <translation>L&apos;onglet que vous quittez contient des modifications non sauvegardées, si vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translation>
     </message>
 </context>
 <context>
@@ -10958,48 +10958,48 @@ Bougez le manche %1.</translation>
         <location line="-12"/>
         <location line="+12"/>
         <source>Failed!</source>
-        <translation>Echoué !</translation>
+        <translation>Échoué !</translation>
     </message>
     <message>
         <location line="+95"/>
         <source>Writing hardware settings</source>
-        <translation>Ecriture paramètres matériels</translation>
+        <translation>Écriture paramètres matériels</translation>
     </message>
     <message>
         <location line="+109"/>
         <source>Writing actuator settings</source>
-        <translation>Ecriture paramètres actionneurs</translation>
+        <translation>Écriture paramètres actionneurs</translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Writing flight mode settings</source>
-        <translation>Ecriture paramètres mode vol</translation>
+        <translation>Écriture paramètres mode vol</translation>
     </message>
     <message>
         <location line="+33"/>
         <location line="+20"/>
         <source>Writing gyro and accelerometer bias settings</source>
-        <translation>Ecriture paramètres d&apos;ajustement gyro et accéléromètres</translation>
+        <translation>Écriture paramètres d&apos;ajustement gyro et accéléromètres</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Writing stabilization settings</source>
-        <translation>Ecriture paramètres de stabilisation</translation>
+        <translation>Écriture paramètres de stabilisation</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Writing mixer settings</source>
-        <translation>Ecriture paramètres mixer</translation>
+        <translation>Écriture paramètres mixeur</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Writing vehicle settings</source>
-        <translation>Ecriture paramètres véhicule</translation>
+        <translation>Écriture paramètres véhicule</translation>
     </message>
     <message>
         <location line="+43"/>
         <source>Writing manual control defaults</source>
-        <translation>Ecriture contrôles manuels par défaut</translation>
+        <translation>Écriture contrôles manuels par défaut</translation>
     </message>
     <message>
         <location line="+153"/>
@@ -11235,7 +11235,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location line="+0"/>
         <source>No board connection was detected!</source>
-        <translation type="unfinished">Aucune connexion de carte n&apos;a été détectée !</translation>
+        <translation>Aucune connexion de carte n&apos;a été détectée !</translation>
     </message>
     <message>
         <location line="+280"/>
@@ -12367,7 +12367,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>This modem will be a coordinator and other modems will bind to it.</source>
-        <translation>Ce modem est coordonateur et les autres modems s&apos;associent avec lui.</translation>
+        <translation>Ce modem sera coordinateur et les autres modems s&apos;associeront avec lui.</translation>
     </message>
     <message>
         <location/>
@@ -12482,7 +12482,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>PPM packets will be received by this modem.  Must be selected if Coordinator modem is configured for PPM.</source>
-        <translation>Les packets PPM sont reçus par ce modem. Doit être sélectionné si le modem coordinateur est configuré en PPM.</translation>
+        <translation>Les paquets PPM sont reçus par ce modem. Doit être sélectionné si le modem coordinateur est configuré en PPM.</translation>
     </message>
     <message>
         <location/>
@@ -12637,7 +12637,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La procédure de calibration pour le contrôleur OpenPilot Revolution n&apos;est pas encore implémentée dans cet assistant  de configuration. Pour calibrer votre contrôleur OpenPilot Revolution veuillez utiliser l&apos;utilitaire de calibration que vous trouverez dans l&apos;onglet Configuration à la fin de cet assistant.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les futures versions de cet assistant possèderont une procédure de calibration simplifiée.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les futures versions de cet assistant posséderont une procédure de calibration simplifiée.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -12770,7 +12770,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetfactory.cpp" line="+25"/>
         <source>PFD</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13375,7 +13375,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configstabilizationwidget.cpp" line="+63"/>
         <source>PID Bank %1</source>
-        <translation type="unfinished">Banque PID %1</translation>
+        <translation>Banque PID %1</translation>
     </message>
 </context>
 <context>
@@ -13547,7 +13547,7 @@ even lead to crash. Use with caution.</source>
 
 Plage : 0-999ms; 0 désactive le filtre (défaut).
 
-Attention: Ceci est une fonctionnalité en mode expert, principalement utilisée pour le 
+Attention : Ceci est une fonctionnalité en mode expert, principalement utilisée pour le 
 contrôle de la caméra en vidéo aérienne (lacet de l&apos;appareil et canaux accessoires de la nacelle).
 Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des effets indésirables 
 et même conduire au crash. A utiliser avec prudence.</translation>

@@ -1634,7 +1634,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Restore last selected workspace on startup</source>
-        <translation>Restorer le dernier espace de travail au démarrage</translation>
+        <translation>Restaurer le dernier espace de travail au démarrage</translation>
     </message>
     <message>
         <location/>
@@ -3896,7 +3896,7 @@ Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Locked</source>
-        <translation>Vérrouillé</translation>
+        <translation>Verrouillé</translation>
     </message>
     <message>
         <location/>
@@ -4341,7 +4341,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Items</source>
-        <translation>Eléments</translation>
+        <translation>Éléments</translation>
     </message>
     <message>
         <location/>
@@ -5265,7 +5265,7 @@ sur Appliquer ou Enregistrer par la suite.</translation>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non-volatile</translation>
+        <translation type="unfinished">Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -5281,7 +5281,7 @@ sur Appliquer ou Enregistrer par la suite.</translation>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non-volatile</translation>
+        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -7007,7 +7007,7 @@ en utilisant le bouton spécifique de calibration en haut de l&apos;écran.  </t
     <message>
         <location/>
         <source>Send settings to the board, and save to the non-volatile memory.</source>
-        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non-volatile.</translation>
+        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile.</translation>
     </message>
     <message>
         <location/>
@@ -7766,7 +7766,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Damn this is insane how quick it moves. Mostly used by the Pro&apos;s</source>
-        <translation>Saperlipopète c&apos;est fou comment il se déplace rapidement. Principalement utilisé par les pros</translation>
+        <translation type="unfinished">Saperlipopette c&apos;est fou comment il se déplace rapidement. Principalement utilisé par les pros</translation>
     </message>
     <message>
         <location/>
@@ -7817,7 +7817,7 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This function will avoid integral windup when at idle. Integral windup is an accumulation of over-correction and can make the vehicle flip during a slow takeoff.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translatorcomment>Traduction Windup ??</translatorcomment>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette fonction permet d&apos;annuler la saturation des corrections qui pourraient entrainer le retournement de l&apos;appareil lors de décollages lents.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette fonction permet d&apos;annuler la saturation des corrections qui pourraient entraîner le retournement de l&apos;appareil lors de décollages lents.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7965,7 +7965,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avançant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7991,7 +7991,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avançant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8006,7 +8006,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Attitude Mode. Adding Ki in Attitude when Ki is present in Rate is not recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Attitude. Ajouter une valeur d&apos;intégrale en mode Attitude lorsque une intégrale est présente en mode Rate n&apos;est pas recommandé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avançant) en mode Attitude. Ajouter une valeur d&apos;intégrale en mode Attitude lorsque une intégrale est présente en mode Rate n&apos;est pas recommandé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8118,7 +8118,7 @@ Useful if you have accidentally changed some settings.</source>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrottle) when inverted.  1 says to use the unboosted throttle stick value.  -1 (DON&apos;T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the throttle stick when inverted.
 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, ou 1.  Cruise Control multiplie la position du manche des gaz par cette valeur si l&apos;angle d&apos;inclinaison a dépassé l&apos;AngleMaxi.&lt;/p&gt;&lt;p&gt;  La valeur par défaut 0 signifie l&apos;arrêt des moteurs (les basculer à la valeur de GazMini) lorsque l&apos;appareil est à l&apos;envers.&lt;/p&gt;
-&lt;p&gt;  La valeur 1 signifie qu&apos;il utilise la valeur du manche des gaz, non modifiée.&lt;/p&gt;&lt;p&gt;  -1 (NE PAS UTILISER, INCOMPLET, NON-TESTÉ, pour les hélicoptères CP utilisant le iddle up) signifie une inversion du manche des gaz lorsque l&apos;hélicoptère est à l&apos;envers.
+&lt;p&gt;  La valeur 1 signifie qu&apos;il utilise la valeur du manche des gaz, non modifiée.&lt;/p&gt;&lt;p&gt;  -1 (NE PAS UTILISER, INCOMPLET, NON TESTÉ, pour les hélicoptères CP utilisant le iddle up) signifie une inversion du manche des gaz lorsque l&apos;hélicoptère est à l&apos;envers.
 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -9056,7 +9056,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Connection device:</source>
-        <translation>Périphérique de connection :</translation>
+        <translation>Périphérique de connexion :</translation>
     </message>
     <message>
         <location/>
@@ -10015,11 +10015,11 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation>Boote le système.
+        <translation type="unfinished">Boote le système.
 Utile seulement si le système est arrêté
 (LED blue de la carte qui clignote lentement, LED verte allumée)
 
-Si la télémétrie n&apos;est pas en marche, sélectionner la connection en utilisant le menu déroulant de droite.</translation>
+Si la télémétrie n&apos;est pas en marche, sélectionner la connexion en utilisant le menu déroulant de droite.</translation>
     </message>
     <message>
         <location/>
@@ -10034,11 +10034,11 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation>Boote le système en mode sans échec (c.-à-d. Paramètres Matériels par défaut).
+        <translation type="unfinished">Boote le système en mode sans échec (c.-à-d. Paramètres Matériels par défaut).
 Seulement utile si le système est arrêté
 (LED blue de la carte qui clignote lentement, LED verte allumée)
 
-Si la télémétrie n&apos;est pas en marche, sélectionner la connection en utilisant le 
+Si la télémétrie n&apos;est pas en marche, sélectionner la connexion en utilisant le 
 menu déroulant de droite. </translation>
     </message>
     <message>
@@ -10114,11 +10114,11 @@ automatiquement lorsque vous arrêtez une carte en fonctionnement. </translation
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and earlier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;
 &lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;
 &lt;p&gt;Utile si la carte n&apos;arrive pas à booter correctement.&lt;/p&gt;
 &lt;p&gt;La led Bleue clignote rapidement pendant 20-30 secondes lorsque la carte démarre normalement&lt;/p&gt;
-&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez la connection dans la liste déroulante à droite.&lt;/p&gt;
+&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez la connexion dans la liste déroulante à droite.&lt;/p&gt;
 &lt;p&gt;A NOTER : Supporté par les bootloaders version 4 et supérieurs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -10259,12 +10259,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+252"/>
         <source>Unsaved changes</source>
-        <translation>Modifications non-sauvegardées</translation>
+        <translation type="unfinished">Modifications non sauvegardées</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The tab you are leaving has unsaved changes,if you proceed they will be lost.Do you still want to proceed?</source>
-        <translation>L&apos;onglet que vous quittez contient des modifications non-sauvegardées, si vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translation>
+        <translation type="unfinished">L&apos;onglet que vous quittez contient des modifications non sauvegardées, si vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translation>
     </message>
 </context>
 <context>
@@ -11220,7 +11220,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location line="+11"/>
         <source>Please connect your OpenPilot board (USB only!)</source>
-        <translation>Veuiller connecter votre carte OpenPilot (USB seulement !)</translation>
+        <translation>Veuillez connecter votre carte OpenPilot (USB seulement !)</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -11235,7 +11235,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location line="+0"/>
         <source>No board connection was detected!</source>
-        <translation>Aucune connection de carte n&apos;a été détectée !</translation>
+        <translation type="unfinished">Aucune connexion de carte n&apos;a été détectée !</translation>
     </message>
     <message>
         <location line="+280"/>
@@ -12167,7 +12167,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non-volatile</translation>
+        <translation type="unfinished">Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -12177,7 +12177,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non-volatile</translation>
+        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -12671,7 +12671,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+138"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
-        <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuiller corriger cela avant de tester les sorties.</translation>
+        <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuillez corriger cela avant de tester les sorties.</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -12831,7 +12831,7 @@ p, li { white-space: pre-wrap; }
         <location line="-20"/>
         <location line="+25"/>
         <source>Untagged or custom firmware build</source>
-        <translation>Firmware non-certifié ou version personnelle</translation>
+        <translation type="unfinished">Firmware non certifié ou version personnelle</translation>
     </message>
     <message>
         <location line="+72"/>
@@ -12912,7 +12912,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+4"/>
         <source>Untagged or custom firmware build</source>
-        <translation>Firmware non-certifié ou version personnelle</translation>
+        <translation type="unfinished">Firmware non certifié ou version personnelle</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -12945,7 +12945,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripper.cpp" line="+49"/>
         <location line="+2"/>
         <source>No valid selection</source>
-        <translation>Sélection non-valide</translation>
+        <translation type="unfinished">Sélection non valide</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -13185,7 +13185,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/libs/utils/fancymainwindow.cpp" line="+70"/>
         <source>Locked</source>
-        <translation>Vérrouillé</translation>
+        <translation>Verrouillé</translation>
     </message>
     <message>
         <location line="+2"/>

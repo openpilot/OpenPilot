@@ -91,16 +91,17 @@ void InputChannelForm::minMaxUpdated()
 void InputChannelForm::neutralUpdated()
 {
     int neutralValue = ui->neutralValue->value();
-    if(ui->channelRev->isChecked()) {
-        if(neutralValue > ui->channelMin->value()) {
+
+    if (ui->channelRev->isChecked()) {
+        if (neutralValue > ui->channelMin->value()) {
             ui->channelMin->setValue(neutralValue);
-        } else if(neutralValue < ui->channelMax->value()) {
+        } else if (neutralValue < ui->channelMax->value()) {
             ui->channelMax->setValue(neutralValue);
         }
     } else {
-        if(neutralValue < ui->channelMin->value()) {
+        if (neutralValue < ui->channelMin->value()) {
             ui->channelMin->setValue(neutralValue);
-        } else if(neutralValue > ui->channelMax->value()) {
+        } else if (neutralValue > ui->channelMax->value()) {
             ui->channelMax->setValue(neutralValue);
         }
     }
@@ -109,17 +110,17 @@ void InputChannelForm::neutralUpdated()
 void InputChannelForm::reversedUpdated()
 {
     int value = ui->channelNeutral->value();
-    int min = ui->channelMin->value();
-    int max = ui->channelMax->value();
+    int min   = ui->channelMin->value();
+    int max   = ui->channelMax->value();
 
-    if(ui->channelRev->isChecked()) {
-        if(min < max) {
+    if (ui->channelRev->isChecked()) {
+        if (min < max) {
             ui->channelMax->setValue(min);
             ui->channelMin->setValue(max);
             ui->channelNeutral->setValue(value);
         }
     } else {
-        if(min > max) {
+        if (min > max) {
             ui->channelMax->setValue(min);
             ui->channelMin->setValue(max);
             ui->channelNeutral->setValue(value);

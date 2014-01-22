@@ -754,7 +754,7 @@ static float stab_powf(float x, uint8_t p)
 }
 
 
-static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+static void SettingsBankUpdatedCb(UAVObjEvent *ev)
 {
     if (cur_flight_mode < 0 || cur_flight_mode >= NUM_FMS_POSITIONS) {
         return;

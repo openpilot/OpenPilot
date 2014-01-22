@@ -839,7 +839,7 @@ void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget *widget, const char
         disconnect(cb, SIGNAL(valueChanged(int)), this, function);
     } else if (QDoubleSpinBox * cb = qobject_cast<QDoubleSpinBox *>(widget)) {
         disconnect(cb, SIGNAL(valueChanged(double)), this, function);
-    }else if (QLineEdit * cb = qobject_cast<QLineEdit *>(widget)) {
+    } else if (QLineEdit * cb = qobject_cast<QLineEdit *>(widget)) {
         disconnect(cb, SIGNAL(textChanged(double)), this, function);
     } else if (QCheckBox * cb = qobject_cast<QCheckBox *>(widget)) {
         disconnect(cb, SIGNAL(stateChanged(int)), this, function);

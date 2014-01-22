@@ -194,7 +194,6 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart);
 static void stabilizationTask(__attribute__((unused)) void *parameters)
 {
     UAVObjEvent ev;
-
     uint32_t timeval = PIOS_DELAY_GetRaw();
 
     ActuatorDesiredData actuatorDesired;
@@ -757,13 +756,17 @@ static float stab_powf(float x, uint8_t p)
 
 static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    StabilizationBankData bank, oldBank;
-
-    StabilizationBankGet(&oldBank);
-
     if (cur_flight_mode < 0 || cur_flight_mode >= NUM_FMS_POSITIONS) {
         return;
     }
+    if ((ev) && ((settings.FlightModeMap[cur_flight_mode] == 0 && ev->obj != StabilizationSettingsBank1Handle()) ||
+                 (settings.FlightModeMap[cur_flight_mode] == 1 && ev->obj != StabilizationSettingsBank2Handle()) ||
+                 (settings.FlightModeMap[cur_flight_mode] == 2 && ev->obj != StabilizationSettingsBank3Handle()) ||
+                 settings.FlightModeMap[cur_flight_mode] > 2)) {
+        return;
+    }
+
+    StabilizationBankData bank;
 
     switch (settings.FlightModeMap[cur_flight_mode]) {
     case 0:
@@ -777,16 +780,8 @@ static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     case 2:
         StabilizationSettingsBank3Get((StabilizationSettingsBank3Data *)&bank);
         break;
-
-    default:
-        memset(&bank, 0, sizeof(StabilizationBankDataPacked));
-// return; //bank number is invalid. All we can do is ignore it.
     }
-
-    // Need to do this to prevent an infinite loop
-    if (memcmp(&oldBank, &bank, sizeof(StabilizationBankDataPacked)) != 0) {
-        StabilizationBankSet(&bank);
-    }
+    StabilizationBankSet(&bank);
 }
 
 static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)

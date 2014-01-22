@@ -162,7 +162,7 @@
 #endif
 #define PIOS_STABILIZATION_STACK_SIZE   790
 #define PIOS_TELEM_STACK_SIZE           540
-#define PIOS_EVENTDISPATCHER_STACK_SIZE 150
+#define PIOS_EVENTDISPATCHER_STACK_SIZE 160
 
 /* This can't be too high to stop eventdispatcher thread overflowing */
 #define PIOS_EVENTDISAPTCHER_QUEUE      10

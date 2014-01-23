@@ -2247,41 +2247,47 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
 #define TSLRS_FAILSAFES_3_CHAR          0xCC
 #define TSLRS_BADCHANNEL_2_CHAR         0x42
 #define TSLRS_BADCHANNEL_3_CHAR         0xCD
-void draw_tslrsdebug_status(int16_t x, int16_t y, int8_t char_size)
+void draw_tslrsdebug_status(int16_t x, int16_t y, int8_t char_size, bool GCSconnected)
 {
     char temp[10] = { 0 };
     char radiocrc = (char_size == 2 ? TSLRS_RADIOCRC_2_CHAR : TSLRS_RADIOCRC_3_CHAR);
     char failsafes = (char_size == 2 ? TSLRS_FAILSAFES_2_CHAR : TSLRS_FAILSAFES_3_CHAR);
     char badchannel = (char_size == 2 ? TSLRS_BADCHANNEL_2_CHAR : TSLRS_BADCHANNEL_3_CHAR);
 
+    if (GCSconnected) {
+        sprintf(temp, "xx%cxxx%c%c", failsafes, badchannel, char_size == 2 ? TSLRS_ROTARY_2_CHAR : TSLRS_ROTARY_3_CHAR);
+        write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+        return;
+    }
+
     if (tslrsdebug_state->version == TSRX_IDLE_OLDER) {
         if (tslrsdebug_state->BadChannel) {
-            sprintf(temp, "%6u%c", tslrsdebug_state->BadChannel, badchannel);
+            sprintf(temp, "%7u%c", tslrsdebug_state->BadChannel, badchannel);
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
         }
     } else {
         if (DEBUG_CHAN_ACTIVE) {
             char rotary = (char_size == 2 ? TSLRS_ROTARY_2_CHAR : TSLRS_ROTARY_3_CHAR) + tslrsdebug_state->ChannelCount % 12;
-            if (tslrsdebug_state->Failsafes > 9 || tslrsdebug_state->BadChannel > 999) {
-                sprintf(temp, "%5u%c%c", tslrsdebug_state->BadChannel, badchannel, rotary);
+            if (tslrsdebug_state->Failsafes > 99 || tslrsdebug_state->BadChannel > 999) {
+                sprintf(temp, "%6u%c%c", tslrsdebug_state->BadChannel, badchannel, rotary);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
                 if (tslrsdebug_state->Failsafes) {
-                    sprintf(temp, "%5u%c", tslrsdebug_state->Failsafes, failsafes);
+                    sprintf(temp, "%7u%c", tslrsdebug_state->Failsafes, failsafes);
                     write_string(temp, x, y + 10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
                 }
             } else if (tslrsdebug_state->Failsafes) {
-                sprintf(temp, "%1u%c%3u%c%c", tslrsdebug_state->Failsafes, failsafes, tslrsdebug_state->BadChannel, badchannel, rotary);
+                sprintf(temp, "%2u%c%3u%c%c", tslrsdebug_state->Failsafes, failsafes, tslrsdebug_state->BadChannel, badchannel, rotary);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             } else if (tslrsdebug_state->BadChannel) {
-                sprintf(temp, "%5u%c%c", tslrsdebug_state->BadChannel, badchannel, rotary);
+                sprintf(temp, "%6u%c%c", tslrsdebug_state->BadChannel, badchannel, rotary);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             } else {
-                sprintf(temp, "      %c", rotary);
+                sprintf(temp, "       %c", rotary);
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             }
         } else {
             sprintf(temp, "%c   %3u%%", radiocrc, tslrsdebug_state->scan_value_percent);
-            write_string(temp, x, y     , 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
             if (tslrsdebug_state->BadPackets) {
                 sprintf(temp, "%6u%c", tslrsdebug_state->BadPackets, badchannel);
                 write_string(temp, x, y + 10, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
@@ -2297,18 +2303,22 @@ void draw_tslrsdebug_status(int16_t x, int16_t y, int8_t char_size)
 // show TSLRS debug channel
 #define TSLRS_CHANNEL_NORM_HEIGHT       15
 #define TSLRS_CHANNEL_NORM_WIDTH        TSRX_CHANNEL_MAX
-void draw_tslrsdebug_channel(int16_t x, int16_t y, int8_t size)
+void draw_tslrsdebug_channel(int16_t x, int16_t y, int8_t size, bool GCSconnected)
 {
-    write_hline_outlined(x, x + size * TSLRS_CHANNEL_NORM_WIDTH + 1, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
-    write_vline_outlined(x, y, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
-    write_vline_outlined(x + size * TSLRS_CHANNEL_NORM_WIDTH + 1, y, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
+    if (GCSconnected || tslrsdebug_state->BadChannelDelta || tslrsdebug_state->BadPacketsDelta) {
+        write_hline_outlined(x, x + size * TSLRS_CHANNEL_NORM_WIDTH + 1, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
+        write_vline_outlined(x, y, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
+        write_vline_outlined(x + size * TSLRS_CHANNEL_NORM_WIDTH + 1, y, y + size * TSLRS_CHANNEL_NORM_HEIGHT, 2, 2, 0, 1);
 
-    int h, xx, xxx;
-    float height_factor = (float)(TSLRS_CHANNEL_NORM_HEIGHT * size) / (float)tslrsdebug_state->ChannelFailsMax;
-    for (xx = 1; xx <= TSRX_CHANNEL_MAX; xx++) {
-        h = (int)(height_factor * tslrsdebug_state->ChannelFails[xx - 1]);
-        for (xxx = 0; xxx < size; xxx++) {
-            write_vline_lm(x + xx * size - xxx, y + size * TSLRS_CHANNEL_NORM_HEIGHT, y + size * TSLRS_CHANNEL_NORM_HEIGHT - h, 1, 1);
+        if (GCSconnected) return;
+
+        int h, xx, xxx;
+        float height_factor = (float)(TSLRS_CHANNEL_NORM_HEIGHT * size) / (float)tslrsdebug_state->ChannelFailsMax;
+        for (xx = 1; xx <= TSRX_CHANNEL_MAX; xx++) {
+            h = (int)(height_factor * tslrsdebug_state->ChannelFails[xx - 1]);
+            for (xxx = 0; xxx < size; xxx++) {
+                write_vline_lm(x + xx * size - xxx, y + size * TSLRS_CHANNEL_NORM_HEIGHT, y + size * TSLRS_CHANNEL_NORM_HEIGHT - h, 1, 1);
+            }
         }
     }
 }
@@ -2319,13 +2329,17 @@ void draw_tslrsdebug_channel(int16_t x, int16_t y, int8_t size)
 // show PacketRxOk status
 #define PACKETRXOK_RADIOCRC_2_CHAR           0x15
 #define PACKETRXOK_RADIOCRC_3_CHAR           0x15
-void draw_packetrxok_status(int16_t x, int16_t y, int8_t char_size)
+void draw_packetrxok_status(int16_t x, int16_t y, int8_t char_size, bool GCSconnected)
 {
     char temp[10] = { 0 };
     char radiocrc = (char_size == 2 ? PACKETRXOK_RADIOCRC_2_CHAR : PACKETRXOK_RADIOCRC_3_CHAR);
 
-    sprintf(temp, "%c   %3u%%", radiocrc, PacketRxOk);
-    write_string(temp, x, y     , 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
+    if (GCSconnected) {
+        sprintf(temp, "%c   xxx%%", radiocrc);
+    } else {
+        sprintf(temp, "%c   %3u%%", radiocrc, PacketRxOk);
+    }
+    write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, char_size);
 }
 #endif /* PIOS_INCLUDE_PACKETRXOK */
 
@@ -2379,6 +2393,7 @@ void updateGraphics()
         int16_t x, y;
         uint32_t WarnMask = 0;
         Unit *convert;
+        bool GCSconnected = PIOS_COM_Available(PIOS_COM_TELEM_USB);
 
 #ifdef TEMP_GPS_STATUS_WORKAROUND
         static uint8_t gps_status = 0;
@@ -2585,29 +2600,25 @@ void updateGraphics()
         }
 
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
-        // Show TSLRS status data which is CRC checked good/bad packet data
+        // Show TSLRS status and channel data which is CRC checked good/bad packet data
         if (OsdSettings2.TSLRSdebug) {
             WarnMask |= (tslrsdebug_state->BadChannelDelta || tslrsdebug_state->BadPacketsDelta) ? WARN_BAD_TSLRS_PKT : 0x00;
             if (check_enable_and_srceen(OsdSettings2.TSLRSdebug, (OsdSettingsWarningsSetupData *)&OsdSettings2.TSLRSStatusSetup, screen, &x, &y)) {
-                draw_tslrsdebug_status(x, y, OsdSettings2.TSLRSStatusSetup.CharSize);
+                draw_tslrsdebug_status(x, y, OsdSettings2.TSLRSStatusSetup.CharSize, GCSconnected);
             }
-        }
-
-        // Show TSLRS channel data which is CRC checked good/bad packet data
-        if (OsdSettings2.TSLRSdebug && ((tslrsdebug_state->BadChannelDelta || tslrsdebug_state->BadPacketsDelta))) {
             if (check_enable_and_srceen(OsdSettings2.TSLRSdebug, (OsdSettingsWarningsSetupData *)&OsdSettings2.TSLRSChannelSetup, screen, &x, &y)) {
-                draw_tslrsdebug_channel(x, y, OsdSettings2.TSLRSChannelSetup.Size);
+                draw_tslrsdebug_channel(x, y, OsdSettings2.TSLRSChannelSetup.Size, GCSconnected);
             }
         }
 #endif
 
 #ifdef PIOS_INCLUDE_PACKETRXOK
-        // Show PacketRxOk data
+        // Show PacketRxOk status data
         if (OsdSettings2.PacketRxOk) {
             PacketRxOk = PacketRxOk_read();
             WarnMask |= (PacketRxOk < 100) ? WARN_BAD_LEDRX_PKT : 0x00;
             if (check_enable_and_srceen(OsdSettings2.PacketRxOk, (OsdSettingsWarningsSetupData *)&OsdSettings2.PacketRxOkSetup, screen, &x, &y)) {
-                draw_packetrxok_status(x, y, OsdSettings2.PacketRxOkSetup.CharSize);
+                draw_packetrxok_status(x, y, OsdSettings2.PacketRxOkSetup.CharSize, GCSconnected);
             }
         }
 #endif

@@ -36,22 +36,34 @@
 #include "pios_packetrxok.h"
 #include "pios_packetrxok_priv.h"
 
+#define MIN_READ_DELAY      100     // [ms]
+
+
 GPIO_TypeDef* PacketRxOk_GPIO;
 uint16_t PacketRxOk_GPIO_Pin;
 
-volatile int packet_ok = 0;
+volatile int packet_ok  = 0;
 volatile int packet_nok = 0;
-static float packet_rxok_percent = 0.0f;
 
 /* Forward Declarations */
 static void PIOS_PacketRxOk_Supervisor(uint32_t pios_gpio_packetrxok_id);
 
+// read the PacketRxOk percentage
 uint8_t PacketRxOk_read(void)
 {
-    packet_rxok_percent = 10.0f / (packet_ok + packet_nok) * packet_ok + packet_rxok_percent * .9f;
-    packet_ok = 0;
-    packet_nok = 0;
-    return ((uint8_t) packet_rxok_percent) >= 99 ? 100 : (uint8_t) packet_rxok_percent;
+    static portTickType last_read = 0;
+    static float last_percent = 100.0f;
+
+    portTickType current_time = xTaskGetTickCount();
+
+    if (current_time >= last_read + MIN_READ_DELAY) {
+        last_read = current_time;
+        last_percent = (float)(10 * packet_ok / (packet_ok + packet_nok)) + 0.05f + last_percent * .9f;
+        packet_ok = 0;
+        packet_nok = 0;
+
+    }
+    return (uint8_t) last_percent;
 }
 
 /* Initialise PacketRxOk interface */

@@ -105,12 +105,6 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 
     ppmOnlyToggled(m_oplink->PPMOnly->isChecked());
 
-    // Add scroll bar when necessary
-    QScrollArea *scroll = new QScrollArea;
-    scroll->setWidget(m_oplink->frame_3);
-    scroll->setWidgetResizable(true);
-    m_oplink->verticalLayout_3->addWidget(scroll);
-
     // Request and update of the setting object.
     settingsUpdated = false;
     autoLoadWidgets();

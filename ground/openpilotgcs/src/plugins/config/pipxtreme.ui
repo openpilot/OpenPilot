@@ -14,18 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="leftMargin">
-    <number>12</number>
-   </property>
-   <property name="topMargin">
-    <number>12</number>
-   </property>
-   <property name="rightMargin">
-    <number>12</number>
-   </property>
-   <property name="bottomMargin">
-    <number>12</number>
-   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -64,8 +52,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>670</width>
-            <height>702</height>
+            <width>678</width>
+            <height>714</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -575,12 +563,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
 			      border: none;
@@ -635,12 +617,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="toolTip">
                  <string>The modems current state</string>
                 </property>
@@ -689,12 +665,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
 			      border: none;
@@ -727,12 +697,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
 			      border: none;
@@ -742,6 +706,9 @@
 			      /*  background: transparent; */
 			      /*     selection-background-color: darkgray;*/
 			      }</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
                 </property>
                 <property name="readOnly">
                  <bool>true</bool>
@@ -778,13 +745,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <italic>false</italic>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="acceptDrops">
                  <bool>false</bool>
                 </property>
@@ -802,7 +762,7 @@
 			      }</string>
                 </property>
                 <property name="frame">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -839,12 +799,6 @@
                   <width>101</width>
                   <height>16777215</height>
                  </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
@@ -888,12 +842,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="toolTip">
                  <string>The number of packets that were unable to be transmitted</string>
                 </property>
@@ -906,6 +854,9 @@
 			      /*  background: transparent; */
 			      /*     selection-background-color: darkgray;*/
 			      }</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -938,12 +889,6 @@
                   <width>101</width>
                   <height>16777215</height>
                  </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
@@ -987,12 +932,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
 			      border: none;
@@ -1035,12 +974,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
 			      border: none;
@@ -1076,12 +1009,6 @@
                   <width>101</width>
                   <height>16777215</height>
                  </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
@@ -1131,12 +1058,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="toolTip">
                  <string>The percentage of packets that were corrected with error correction</string>
                 </property>
@@ -1149,6 +1070,9 @@
 			      /*  background: transparent; */
 			      /*     selection-background-color: darkgray;*/
 			      }</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1188,12 +1112,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="toolTip">
                  <string>The percentage of packets that were corrected with error correction</string>
                 </property>
@@ -1206,6 +1124,9 @@
 			      /*  background: transparent; */
 			      /*     selection-background-color: darkgray;*/
 			      }</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1239,12 +1160,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="toolTip">
                  <string>The percentage of packets that could not be corrected with error correction</string>
                 </property>
@@ -1257,6 +1172,9 @@
 			      /*  background: transparent; */
 			      /*     selection-background-color: darkgray;*/
 			      }</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1296,12 +1214,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="toolTip">
                  <string>The percentage of packets that were not received at all</string>
                 </property>
@@ -1314,6 +1226,9 @@
 			      /*  background: transparent; */
 			      /*     selection-background-color: darkgray;*/
 			      }</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1347,12 +1262,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="toolTip">
                  <string>The number of packets that were unable to be transmitted</string>
                 </property>
@@ -1365,6 +1274,9 @@
 			      /*  background: transparent; */
 			      /*     selection-background-color: darkgray;*/
 			      }</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1402,12 +1314,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
 			      border: none;
@@ -1444,12 +1350,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
 			      border: none;
@@ -1459,6 +1359,9 @@
 			      /*  background: transparent; */
 			      /*     selection-background-color: darkgray;*/
 			      }</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
                 </property>
                 <property name="readOnly">
                  <bool>true</bool>
@@ -1482,12 +1385,6 @@
                   <width>101</width>
                   <height>16777215</height>
                  </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
@@ -1520,12 +1417,6 @@
                   <width>101</width>
                   <height>16777215</height>
                  </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
@@ -1562,12 +1453,6 @@
                   <width>101</width>
                   <height>16777215</height>
                  </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">QLineEdit {
@@ -1627,12 +1512,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
                 <property name="toolTip">
                  <string>The percentage of packets that were not received at all</string>
                 </property>
@@ -1645,6 +1524,9 @@
 			      /*  background: transparent; */
 			      /*     selection-background-color: darkgray;*/
 			      }</string>
+                </property>
+                <property name="frame">
+                 <bool>false</bool>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1680,6 +1562,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="submitButtons">
+     <property name="spacing">
+      <number>6</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -1704,8 +1589,8 @@
        </property>
        <property name="iconSize">
         <size>
-         <width>32</width>
-         <height>32</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="flat">

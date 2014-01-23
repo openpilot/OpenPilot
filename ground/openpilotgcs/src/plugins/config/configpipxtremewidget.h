@@ -28,6 +28,7 @@
 #define CONFIGPIPXTREMEWIDGET_H
 
 #include <oplinksettings.h>
+#include <oplinkstatus.h>
 
 #include "ui_pipxtreme.h"
 #include "configtaskwidget.h"
@@ -44,13 +45,13 @@ public slots:
     void updateSettings(UAVObject *object1);
 
 private:
-    Ui_OPLinkWidget *m_oplink;
+    Ui_OPLinkWidget *ui;
 
     // The OPLink status UAVObject
-    UAVDataObject *oplinkStatusObj;
+    OPLinkStatus *oplinkStatusObject;
 
     // The OPLink ssettins UAVObject
-    OPLinkSettings *oplinkSettingsObj;
+    OPLinkSettings *oplinkSettingsObject;
 
     // Are the settings current?
     bool settingsUpdated;

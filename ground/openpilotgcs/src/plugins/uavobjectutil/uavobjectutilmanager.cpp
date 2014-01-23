@@ -256,11 +256,10 @@ int UAVObjectUtilManager::getBoardModel()
 {
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    qDebug() << "Board type=" << firmwareIapData.BoardType;
-    qDebug() << "Board revision=" << firmwareIapData.BoardRevision;
     int ret = firmwareIapData.BoardType << 8;
+
     ret = ret + firmwareIapData.BoardRevision;
-    qDebug() << "Board info=" << ret;
+
     return ret;
 }
 
@@ -301,6 +300,14 @@ QByteArray UAVObjectUtilManager::getBoardDescription()
     return ret;
 }
 
+QString UAVObjectUtilManager::getBoardDescriptionString()
+{
+    QByteArray arr = getBoardDescription();
+
+    int index = arr.indexOf(255);
+
+    return QString((index == -1) ? arr : arr.left(index));
+}
 
 // ******************************
 // HomeLocation
@@ -460,19 +467,20 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
         struc.fwHash   = desc.mid(40, 20);
         struc.uavoHash.clear();
         struc.uavoHash = desc.mid(60, 20);
-        qDebug() << __FUNCTION__ << ":description from board:";
-        foreach(char x, desc) {
-            qDebug() << QString::number(x, 16);
-        }
 
-        qDebug() << __FUNCTION__ << ":uavoHash:";
-        QByteArray array2 = struc.uavoHash.data();
-        foreach(char x, array2) {
+        /*
+           qDebug() << __FUNCTION__ << ":description from board:";
+           foreach(char x, desc) {
             qDebug() << QString::number(x, 16);
-        }
+           }
+
+           qDebug() << __FUNCTION__ << ":uavoHash:";
+           QByteArray array2 = struc.uavoHash.data();
+           foreach(char x, array2) {
+            qDebug() << QString::number(x, 16);
+           }
+         */
         return true;
     }
     return false;
 }
-
-// ******************************

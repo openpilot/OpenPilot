@@ -55,7 +55,8 @@ SOURCES += reloadpromptutils.cpp \
     cachedsvgitem.cpp \
     svgimageprovider.cpp \
     hostosinfo.cpp \
-    logfile.cpp
+    logfile.cpp \
+    crc.cpp
 
 SOURCES += xmlconfig.cpp
 
@@ -113,7 +114,8 @@ HEADERS += utils_global.h \
     cachedsvgitem.h \
     svgimageprovider.h \
     hostosinfo.h \
-    logfile.h
+    logfile.h \
+    crc.h
 
 
 HEADERS += xmlconfig.h

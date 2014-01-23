@@ -31,6 +31,7 @@
 
 #include "openpilot.h"
 
+#include "pathplan.h"
 #include "flightstatus.h"
 #include "airspeedstate.h"
 #include "pathaction.h"
@@ -40,23 +41,26 @@
 #include "velocitystate.h"
 #include "waypoint.h"
 #include "waypointactive.h"
-#include "taskinfo.h"
+#include "manualcontrolsettings.h"
 #include <pios_struct_helper.h>
 #include "paths.h"
 
 // Private constants
 #define STACK_SIZE_BYTES            1024
-#define TASK_PRIORITY               (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY               CALLBACK_TASK_NAVIGATION
 #define MAX_QUEUE_SIZE              2
-#define PATH_PLANNER_UPDATE_RATE_MS 20
+#define PATH_PLANNER_UPDATE_RATE_MS 100 // can be slow, since we listen to status updates as well
 
 // Private types
 
 // Private functions
-static void pathPlannerTask(void *parameters);
-static void updatePathDesired(UAVObjEvent *ev);
+static void pathPlannerTask();
+static void commandUpdated(UAVObjEvent *ev);
+static void statusUpdated(UAVObjEvent *ev);
+static void updatePathDesired();
 static void setWaypoint(uint16_t num);
 
+static uint8_t checkPathPlan();
 static uint8_t pathConditionCheck();
 static uint8_t conditionNone();
 static uint8_t conditionTimeOut();
@@ -71,7 +75,8 @@ static uint8_t conditionImmediate();
 
 
 // Private variables
-static xTaskHandle taskHandle;
+static DelayedCallbackInfo *pathPlannerHandle;
+static DelayedCallbackInfo *pathDesiredUpdaterHandle;
 static WaypointActiveData waypointActive;
 static WaypointData waypoint;
 static PathActionData pathAction;
@@ -83,11 +88,14 @@ static bool pathplanner_active = false;
  */
 int32_t PathPlannerStart()
 {
-    taskHandle = NULL;
+    // when the active waypoint changes, update pathDesired
+    WaypointConnectCallback(commandUpdated);
+    WaypointActiveConnectCallback(commandUpdated);
+    PathActionConnectCallback(commandUpdated);
+    PathStatusConnectCallback(statusUpdated);
 
-    // Start VM thread
-    xTaskCreate(pathPlannerTask, (signed char *)"PathPlanner", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_PATHPLANNER, taskHandle);
+    // Start main task callback
+    DelayedCallbackDispatch(pathPlannerHandle);
 
     return 0;
 }
@@ -97,8 +105,7 @@ int32_t PathPlannerStart()
  */
 int32_t PathPlannerInitialize()
 {
-    taskHandle = NULL;
-
+    PathPlanInitialize();
     PathActionInitialize();
     PathStatusInitialize();
     PathDesiredInitialize();
@@ -108,6 +115,9 @@ int32_t PathPlannerInitialize()
     WaypointInitialize();
     WaypointActiveInitialize();
 
+    pathPlannerHandle = DelayedCallbackCreate(&pathPlannerTask, CALLBACK_PRIORITY_REGULAR, TASK_PRIORITY, STACK_SIZE_BYTES);
+    pathDesiredUpdaterHandle = DelayedCallbackCreate(&updatePathDesired, CALLBACK_PRIORITY_CRITICAL, TASK_PRIORITY, STACK_SIZE_BYTES);
+
     return 0;
 }
 
@@ -116,129 +126,250 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart);
 /**
  * Module task
  */
-static void pathPlannerTask(__attribute__((unused)) void *parameters)
+static void pathPlannerTask()
 {
-    // when the active waypoint changes, update pathDesired
-    WaypointConnectCallback(updatePathDesired);
-    WaypointActiveConnectCallback(updatePathDesired);
-    PathActionConnectCallback(updatePathDesired);
+    DelayedCallbackSchedule(pathPlannerHandle, PATH_PLANNER_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+
+    bool endCondition = false;
+
+    // check path plan validity early to raise alarm
+    // even if not in guided mode
+    uint8_t validPathPlan = checkPathPlan();
 
     FlightStatusData flightStatus;
+    FlightStatusGet(&flightStatus);
+    if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
+        pathplanner_active = false;
+        if (!validPathPlan) {
+            // unverified path plans are only a warning while we are not in pathplanner mode
+            // so it does not prevent arming. However manualcontrols safety check
+            // shall test for this warning when pathplan is on the flight mode selector
+            // thus a valid flight plan is a prerequirement for arming
+            AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_WARNING);
+        } else {
+            AlarmsClear(SYSTEMALARMS_ALARM_PATHPLAN);
+        }
+
+        return;
+    }
+
     PathDesiredData pathDesired;
+    PathDesiredGet(&pathDesired);
+
+    static uint8_t failsafeRTHset = 0;
+    if (!validPathPlan) {
+        // At this point the craft is in PathPlanner mode, so pilot has no manual control capability.
+        // Failsafe: behave as if in return to base mode
+        // what to do in this case is debatable, it might be better to just
+        // make a forced disarming but rth has a higher chance of survival when
+        // in flight.
+        pathplanner_active = false;
+
+        if (!failsafeRTHset) {
+            failsafeRTHset = 1;
+            // copy pasta: same calculation as in manualcontrol, set return to home coordinates
+            PositionStateData positionState;
+            PositionStateGet(&positionState);
+            ManualControlSettingsData settings;
+            ManualControlSettingsGet(&settings);
+
+            pathDesired.Start.North      = 0;
+            pathDesired.Start.East       = 0;
+            pathDesired.Start.Down       = positionState.Down - settings.ReturnToHomeAltitudeOffset;
+            pathDesired.End.North        = 0;
+            pathDesired.End.East         = 0;
+            pathDesired.End.Down         = positionState.Down - settings.ReturnToHomeAltitudeOffset;
+            pathDesired.StartingVelocity = 1;
+            pathDesired.EndingVelocity   = 0;
+            pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+            PathDesiredSet(&pathDesired);
+        }
+        AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_ERROR);
+
+        return;
+    }
+    failsafeRTHset = 0;
+    AlarmsClear(SYSTEMALARMS_ALARM_PATHPLAN);
+
+    WaypointActiveGet(&waypointActive);
+
+    if (pathplanner_active == false) {
+        pathplanner_active   = true;
+
+        // This triggers callback to update variable
+        waypointActive.Index = 0;
+        WaypointActiveSet(&waypointActive);
+
+        return;
+    }
+
+    WaypointInstGet(waypointActive.Index, &waypoint);
+    PathActionInstGet(waypoint.Action, &pathAction);
     PathStatusData pathStatus;
+    PathStatusGet(&pathStatus);
 
-    // Main thread loop
-    bool endCondition = false;
-    while (1) {
-        vTaskDelay(PATH_PLANNER_UPDATE_RATE_MS);
+    // delay next step until path follower has acknowledged the path mode
+    if (pathStatus.UID != pathDesired.UID) {
+        return;
+    }
 
-        FlightStatusGet(&flightStatus);
-        if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
-            pathplanner_active = false;
-            continue;
+    // negative destinations DISABLE this feature
+    if (pathStatus.Status == PATHSTATUS_STATUS_CRITICAL && waypointActive.Index != pathAction.ErrorDestination && pathAction.ErrorDestination >= 0) {
+        setWaypoint(pathAction.ErrorDestination);
+        return;
+    }
+
+    // check if condition has been met
+    endCondition = pathConditionCheck();
+    // decide what to do
+    switch (pathAction.Command) {
+    case PATHACTION_COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
+        endCondition = !endCondition;
+    case PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT:
+        if (endCondition) {
+            setWaypoint(waypointActive.Index + 1);
         }
-
-        WaypointActiveGet(&waypointActive);
-
-        if (pathplanner_active == false) {
-            pathplanner_active   = true;
-
-            // This triggers callback to update variable
-            waypointActive.Index = 0;
-            WaypointActiveSet(&waypointActive);
-
-            continue;
-        }
-
-        WaypointInstGet(waypointActive.Index, &waypoint);
-        PathActionInstGet(waypoint.Action, &pathAction);
-        PathStatusGet(&pathStatus);
-        PathDesiredGet(&pathDesired);
-
-        // delay next step until path follower has acknowledged the path mode
-        if (pathStatus.UID != pathDesired.UID) {
-            continue;
-        }
-
-        // negative destinations DISABLE this feature
-        if (pathStatus.Status == PATHSTATUS_STATUS_CRITICAL && waypointActive.Index != pathAction.ErrorDestination && pathAction.ErrorDestination >= 0) {
-            setWaypoint(pathAction.ErrorDestination);
-            continue;
-        }
-
-        // check if condition has been met
-        endCondition = pathConditionCheck();
-
-        // decide what to do
-        switch (pathAction.Command) {
-        case PATHACTION_COMMAND_ONNOTCONDITIONNEXTWAYPOINT:
-            endCondition = !endCondition;
-        case PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT:
-            if (endCondition) {
-                setWaypoint(waypointActive.Index + 1);
-            }
-            break;
-        case PATHACTION_COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
-            endCondition = !endCondition;
-        case PATHACTION_COMMAND_ONCONDITIONJUMPWAYPOINT:
-            if (endCondition) {
-                if (pathAction.JumpDestination < 0) {
-                    // waypoint ids <0 code relative jumps
-                    setWaypoint(waypointActive.Index - pathAction.JumpDestination);
-                } else {
-                    setWaypoint(pathAction.JumpDestination);
-                }
-            }
-            break;
-        case PATHACTION_COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
-            if (endCondition) {
-                if (pathAction.JumpDestination < 0) {
-                    // waypoint ids <0 code relative jumps
-                    setWaypoint(waypointActive.Index - pathAction.JumpDestination);
-                } else {
-                    setWaypoint(pathAction.JumpDestination);
-                }
+        break;
+    case PATHACTION_COMMAND_ONNOTCONDITIONJUMPWAYPOINT:
+        endCondition = !endCondition;
+    case PATHACTION_COMMAND_ONCONDITIONJUMPWAYPOINT:
+        if (endCondition) {
+            if (pathAction.JumpDestination < 0) {
+                // waypoint ids <0 code relative jumps
+                setWaypoint(waypointActive.Index - pathAction.JumpDestination);
             } else {
-                setWaypoint(waypointActive.Index + 1);
+                setWaypoint(pathAction.JumpDestination);
             }
-            break;
         }
+        break;
+    case PATHACTION_COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT:
+        if (endCondition) {
+            if (pathAction.JumpDestination < 0) {
+                // waypoint ids <0 code relative jumps
+                setWaypoint(waypointActive.Index - pathAction.JumpDestination);
+            } else {
+                setWaypoint(pathAction.JumpDestination);
+            }
+        } else {
+            setWaypoint(waypointActive.Index + 1);
+        }
+        break;
     }
 }
 
+// safety checks for path plan integrity
+static uint8_t checkPathPlan()
+{
+    uint16_t i;
+    uint16_t waypointCount;
+    uint16_t actionCount;
+    uint8_t pathCrc;
+    PathPlanData pathPlan;
+
+    // WaypointData waypoint; // using global instead (?)
+    // PathActionData action; // using global instead (?)
+
+    PathPlanGet(&pathPlan);
+
+    waypointCount = pathPlan.WaypointCount;
+    if (waypointCount == 0) {
+        // an empty path plan is invalid
+        return false;
+    }
+    actionCount = pathPlan.PathActionCount;
+
+    // check count consistency
+    if (waypointCount > UAVObjGetNumInstances(WaypointHandle())) {
+        // PIOS_DEBUGLOG_Printf("PathPlan : waypoint count error!");
+        return false;
+    }
+    if (actionCount > UAVObjGetNumInstances(PathActionHandle())) {
+        // PIOS_DEBUGLOG_Printf("PathPlan : path action count error!");
+        return false;
+    }
+
+    // check CRC
+    pathCrc = 0;
+    for (i = 0; i < waypointCount; i++) {
+        pathCrc = UAVObjUpdateCRC(WaypointHandle(), i, pathCrc);
+    }
+    for (i = 0; i < actionCount; i++) {
+        pathCrc = UAVObjUpdateCRC(PathActionHandle(), i, pathCrc);
+    }
+    if (pathCrc != pathPlan.Crc) {
+        // failed crc check
+        // PIOS_DEBUGLOG_Printf("PathPlan : bad CRC (%d / %d)!", pathCrc, pathPlan.Crc);
+        return false;
+    }
+
+    // waypoint consistency
+    for (i = 0; i < waypointCount; i++) {
+        WaypointInstGet(i, &waypoint);
+        if (waypoint.Action >= actionCount) {
+            // path action id is out of range
+            return false;
+        }
+    }
+
+    // path action consistency
+    for (i = 0; i < actionCount; i++) {
+        PathActionInstGet(i, &pathAction);
+        if (pathAction.ErrorDestination >= waypointCount) {
+            // waypoint id is out of range
+            return false;
+        }
+        if (pathAction.JumpDestination >= waypointCount) {
+            // waypoint id is out of range
+            return false;
+        }
+    }
+
+    // path plan passed checks
+
+    return true;
+}
+
+// callback function when status changed, issue execution of state machine
+void commandUpdated(__attribute__((unused)) UAVObjEvent *ev)
+{
+    DelayedCallbackDispatch(pathDesiredUpdaterHandle);
+}
+
 // callback function when waypoints changed in any way, update pathDesired
-void updatePathDesired(__attribute__((unused)) UAVObjEvent *ev)
+void statusUpdated(__attribute__((unused)) UAVObjEvent *ev)
+{
+    DelayedCallbackDispatch(pathPlannerHandle);
+}
+
+
+// callback function when waypoints changed in any way, update pathDesired
+void updatePathDesired()
 {
     // only ever touch pathDesired if pathplanner is enabled
     if (!pathplanner_active) {
         return;
     }
 
-    // use local variables, dont use stack since this is huge and a callback,
-    // dont use the globals because we cant use mutexes here
-    static WaypointActiveData waypointActiveData;
-    static PathActionData pathActionData;
-    static WaypointData waypointData;
-    static PathDesiredData pathDesired;
+    PathDesiredData pathDesired;
 
     // find out current waypoint
-    WaypointActiveGet(&waypointActiveData);
+    WaypointActiveGet(&waypointActive);
 
-    WaypointInstGet(waypointActiveData.Index, &waypointData);
-    PathActionInstGet(waypointData.Action, &pathActionData);
+    WaypointInstGet(waypointActive.Index, &waypoint);
+    PathActionInstGet(waypoint.Action, &pathAction);
 
-    pathDesired.End.North = waypointData.Position.North;
-    pathDesired.End.East  = waypointData.Position.East;
-    pathDesired.End.Down  = waypointData.Position.Down;
-    pathDesired.EndingVelocity    = waypointData.Velocity;
-    pathDesired.Mode = pathActionData.Mode;
-    pathDesired.ModeParameters[0] = pathActionData.ModeParameters[0];
-    pathDesired.ModeParameters[1] = pathActionData.ModeParameters[1];
-    pathDesired.ModeParameters[2] = pathActionData.ModeParameters[2];
-    pathDesired.ModeParameters[3] = pathActionData.ModeParameters[3];
-    pathDesired.UID = waypointActiveData.Index;
+    pathDesired.End.North = waypoint.Position.North;
+    pathDesired.End.East  = waypoint.Position.East;
+    pathDesired.End.Down  = waypoint.Position.Down;
+    pathDesired.EndingVelocity    = waypoint.Velocity;
+    pathDesired.Mode = pathAction.Mode;
+    pathDesired.ModeParameters[0] = pathAction.ModeParameters[0];
+    pathDesired.ModeParameters[1] = pathAction.ModeParameters[1];
+    pathDesired.ModeParameters[2] = pathAction.ModeParameters[2];
+    pathDesired.ModeParameters[3] = pathAction.ModeParameters[3];
+    pathDesired.UID = waypointActive.Index;
 
-    if (waypointActiveData.Index == 0) {
+    if (waypointActive.Index == 0) {
         PositionStateData positionState;
         PositionStateGet(&positionState);
         // First waypoint has itself as start point (used to be home position but that proved dangerous when looping)
@@ -266,8 +397,13 @@ void updatePathDesired(__attribute__((unused)) UAVObjEvent *ev)
 // helper function to go to a specific waypoint
 static void setWaypoint(uint16_t num)
 {
-    // path plans wrap around
-    if (num >= UAVObjGetNumInstances(WaypointHandle())) {
+    PathPlanData pathPlan;
+
+    PathPlanGet(&pathPlan);
+
+    // here it is assumed that the path plan has been validated (waypoint count is consistent)
+    if (num >= pathPlan.WaypointCount) {
+        // path plans wrap around
         num = 0;
     }
 
@@ -275,10 +411,10 @@ static void setWaypoint(uint16_t num)
     WaypointActiveSet(&waypointActive);
 }
 
-// execute the apropriate condition and report result
+// execute the appropriate condition and report result
 static uint8_t pathConditionCheck()
 {
-    // i thought about a lookup table, but a switch is saver considering there could be invalid EndCondition ID's
+    // i thought about a lookup table, but a switch is safer considering there could be invalid EndCondition ID's
     switch (pathAction.EndCondition) {
     case PATHACTION_ENDCONDITION_NONE:
         return conditionNone();

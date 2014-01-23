@@ -27,18 +27,18 @@
 #ifndef CONFIGGADGETWIDGET_H
 #define CONFIGGADGETWIDGET_H
 
-#include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "objectpersistence.h"
+#include "utils/pathutils.h"
+#include "utils/mytabbedstackwidget.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
+
 #include <QWidget>
 #include <QList>
 #include <QTextBrowser>
-#include "utils/pathutils.h"
 #include <QMessageBox>
-#include "utils/mytabbedstackwidget.h"
-#include "../uavobjectwidgetutils/configtaskwidget.h"
 
 class ConfigGadgetWidget : public QWidget {
     Q_OBJECT

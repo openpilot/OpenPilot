@@ -60,12 +60,12 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
-    addUAVObjectToWidgetRelation("AttitudeSettings", "ZeroDuringArming", ui->zeroGyroBiasOnArming);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "AccelTau", ui->accelTauSpinbox);
+    addWidgetBinding("AttitudeSettings", "ZeroDuringArming", ui->zeroGyroBiasOnArming);
+    addWidgetBinding("AttitudeSettings", "AccelTau", ui->accelTauSpinbox);
 
-    addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", ui->rollBias, AttitudeSettings::BOARDROTATION_ROLL);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", ui->pitchBias, AttitudeSettings::BOARDROTATION_PITCH);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", ui->yawBias, AttitudeSettings::BOARDROTATION_YAW);
+    addWidgetBinding("AttitudeSettings", "BoardRotation", ui->rollBias, AttitudeSettings::BOARDROTATION_ROLL);
+    addWidgetBinding("AttitudeSettings", "BoardRotation", ui->pitchBias, AttitudeSettings::BOARDROTATION_PITCH);
+    addWidgetBinding("AttitudeSettings", "BoardRotation", ui->yawBias, AttitudeSettings::BOARDROTATION_YAW);
     addWidget(ui->zeroBias);
     refreshWidgetsValues();
 }

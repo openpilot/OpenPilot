@@ -10,6 +10,7 @@ GPATH
 GRTAGS
 GSYMS
 GTAGS
+core
 
 # flight
 /flight/*.pnproj
@@ -56,6 +57,7 @@ openpilotgcs-build-desktop
 /.cproject
 /.project
 /.metadata
+/.settings
 
 # Ignore Eclipse temp folder, git plugin based?
 RemoteSystemsTempFiles

@@ -122,7 +122,7 @@ void UAVObjectBrowserWidget::useScientificNotation(bool scientific)
     Q_ASSERT(objManager);
 
     UAVObjectTreeModel *tmpModel = m_model;
-    m_model = new UAVObjectTreeModel(0, m_viewoptions->cbCategorized, scientific);
+    m_model = new UAVObjectTreeModel(0, m_viewoptions->cbCategorized->isChecked(), scientific);
     m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
     m_model->setManuallyChangedColor(m_manuallyChangedColor);
     m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);

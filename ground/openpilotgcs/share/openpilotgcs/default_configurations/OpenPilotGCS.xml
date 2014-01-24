@@ -2286,7 +2286,6 @@
           <dataSize>240</dataSize>
           <plotCurve0>
             <color>4294901760</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-System</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2297,7 +2296,6 @@
           </plotCurve0>
           <plotCurve1>
             <color>4294945280</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-CallbackScheduler0</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2308,7 +2306,6 @@
           </plotCurve1>
           <plotCurve2>
             <color>4278190335</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-CallbackScheduler1</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2319,7 +2316,6 @@
           </plotCurve2>
           <plotCurve3>
             <color>4294967040</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-ManualControl</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2330,7 +2326,6 @@
           </plotCurve3>
           <plotCurve4>
             <color>4278255615</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-Stabilization</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2341,7 +2336,6 @@
           </plotCurve4>
           <plotCurve5>
             <color>4294923775</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-Actuator</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2352,7 +2346,6 @@
           </plotCurve5>
           <plotCurve6>
             <color>4289331327</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-Sensors</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2363,7 +2356,6 @@
           </plotCurve6>
           <plotCurve7>
             <color>4294945280</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-Altitude</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2374,7 +2366,6 @@
           </plotCurve7>
           <plotCurve8>
             <color>4283760767</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-TelemetryTx</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2385,7 +2376,6 @@
           </plotCurve8>
           <plotCurve9>
             <color>4289331327</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-TelemetryTxPri</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2396,7 +2386,6 @@
           </plotCurve9>
           <plotCurve10>
             <color>4294901760</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-TelemetryRx</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2407,7 +2396,6 @@
           </plotCurve10>
           <plotCurve11>
             <color>4283782527</color>
-            <drawAntialiased>true</drawAntialiased>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-RadioRx</uavField>
             <uavObject>TaskInfo</uavObject>

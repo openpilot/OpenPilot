@@ -1313,7 +1313,6 @@ margin:1px;</string>
                      <string>index:0</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1354,7 +1353,6 @@ margin:1px;</string>
                      <string>index:1</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1395,7 +1393,6 @@ margin:1px;</string>
                      <string>index:2</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1439,7 +1436,6 @@ margin:1px;</string>
                      <string>index:3</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1483,7 +1479,6 @@ margin:1px;</string>
                      <string>index:4</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1527,7 +1522,6 @@ margin:1px;</string>
                      <string>index:5</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>

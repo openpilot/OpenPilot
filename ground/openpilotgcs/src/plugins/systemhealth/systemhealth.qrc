@@ -27,4 +27,33 @@
         <file>html/Stack-Critical.html</file>
         <file>html/Telemetry-Error.html</file>
     </qresource>
+    <qresource prefix="/systemhealth" lang="fr">
+        <file alias="html/Actuator-Critical.html">html/fr/Actuator-Critical.html</file>
+        <file alias="html/ManualControl-Critical.html">html/fr/ManualControl-Critical.html</file>
+        <file alias="html/ManualControl-Warning.html">html/fr/ManualControl-Warning.html</file>
+        <file alias="html/CPU-Critical.html">html/fr/CPU-Critical.html</file>
+        <file alias="html/CPU-Warning.html">html/fr/CPU-Warning.html</file>
+        <file alias="html/FlightTime-Error.html">html/fr/FlightTime-Error.html</file>
+        <file alias="html/Battery-Warning.html">html/fr/Battery-Warning.html</file>
+        <file alias="html/BootFault-Critical.html">html/fr/BootFault-Critical.html</file>
+        <file alias="html/EventSystem-Warning.html">html/fr/EventSystem-Warning.html</file>
+        <file alias="html/FlightTime-Critical.html">html/fr/FlightTime-Critical.html</file>
+        <file alias="html/AlarmOK.html">html/fr/AlarmOK.html</file>
+        <file alias="html/Attitude-Critical.html">html/fr/Attitude-Critical.html</file>
+        <file alias="html/Attitude-Error.html">html/fr/Attitude-Error.html</file>
+        <file alias="html/Battery-Critical.html">html/fr/Battery-Critical.html</file>
+        <file alias="html/Battery-Error.html">html/fr/Battery-Error.html</file>
+        <file alias="html/FlightTime-Warning.html">html/fr/FlightTime-Warning.html</file>
+        <file alias="html/GPS-Critical.html">html/fr/GPS-Critical.html</file>
+        <file alias="html/GPS-Error.html">html/fr/GPS-Error.html</file>
+        <file alias="html/GPS-Warning.html">html/fr/GPS-Warning.html</file>
+        <file alias="html/Guidance-Warning.html">html/fr/Guidance-Warning.html</file>
+        <file alias="html/Memory-Critical.html">html/fr/Memory-Critical.html</file>
+        <file alias="html/Memory-Warning.html">html/fr/Memory-Warning.html</file>
+        <file alias="html/Sensors-Critical.html">html/fr/Sensors-Critical.html</file>
+        <file alias="html/Stabilization-Warning.html">html/fr/Stabilization-Warning.html</file>
+        <file alias="html/Stack-Critical.html">html/fr/Stack-Critical.html</file>
+        <file alias="html/Telemetry-Error.html">html/fr/Telemetry-Error.html</file>
+</qresource>
+
 </RCC>

@@ -46,9 +46,9 @@ void MapRipForm::SetPercentage(const int &perc)
 }
 void MapRipForm::SetProvider(const QString &prov, const int &zoom)
 {
-    ui->mainlabel->setText(QString("Currently ripping from:%1 at Zoom level %2").arg(prov).arg(zoom));
+    ui->mainlabel->setText(QString(tr("Currently ripping from:%1 at Zoom level %2")).arg(prov).arg(zoom));
 }
 void MapRipForm::SetNumberOfTiles(const int &total, const int &actual)
 {
-    ui->statuslabel->setText(QString("Downloading tile %1 of %2").arg(actual).arg(total));
+    ui->statuslabel->setText(QString(tr("Downloading tile %1 of %2")).arg(actual).arg(total));
 }

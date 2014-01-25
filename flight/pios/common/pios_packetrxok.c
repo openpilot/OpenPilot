@@ -61,7 +61,6 @@ uint8_t PacketRxOk_read(void)
         last_percent = (float)(10 * packet_ok / (packet_ok + packet_nok)) + 0.05f + last_percent * .9f;
         packet_ok = 0;
         packet_nok = 0;
-
     }
     return (uint8_t) last_percent;
 }

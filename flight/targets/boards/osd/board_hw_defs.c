@@ -230,9 +230,9 @@ void PIOS_SPI_sdcard_irq_handler(void)
 /*
  * GPS USART
  */
-static const struct pios_usart_cfg pios_usart_gps_cfg = {
-    .regs  = USART1,
-    .remap = GPIO_AF_USART1,
+static const struct pios_usart_cfg pios_usart_gps_flexi_io_cfg = {
+    .regs  = USART6,
+    .remap = GPIO_AF_USART6,
     .init  = {
         .USART_BaudRate   = 57600,
         .USART_WordLength = USART_WordLength_8b,
@@ -244,16 +244,16 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
     },
     .irq                                       = {
         .init                                  = {
-            .NVIC_IRQChannel    = USART1_IRQn,
+            .NVIC_IRQChannel    = USART6_IRQn,
             .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
             .NVIC_IRQChannelSubPriority        = 0,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
     .rx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOC,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Pin   = GPIO_Pin_7,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -261,9 +261,9 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
         },
     },
     .tx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOC,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_9,
+            .GPIO_Pin   = GPIO_Pin_6,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -323,9 +323,9 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 
 #ifdef PIOS_INCLUDE_COM_TELEM
 /*
- * Telemetry on main USART
+ * Telemetry on FltCtrl UART
  */
-static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
+static const struct pios_usart_cfg pios_usart_telem_fltctrl_cfg = {
     .regs  = UART4,
     .remap = GPIO_AF_UART4,
     .init  = {
@@ -1079,7 +1079,7 @@ static const struct pios_tslrsdebug_cfg pios_tslrsdebug_flexi_cfg = {
 #if defined(PIOS_INCLUDE_PACKETRXOK)
 #include "pios_packetrxok_priv.h"
 
-static const struct pios_gpio pios_packetrxok_io[] = {
+static const struct pios_gpio pios_io_packetrxok_flexi[] = {
     [PIOS_PACKETRXOK_IN] = {
         .pin                =             {
             .gpio = GPIOB,
@@ -1095,9 +1095,9 @@ static const struct pios_gpio pios_packetrxok_io[] = {
     },
 };
 
-static const struct pios_gpio_cfg pios_packetrxok_io_cfg = {
-    .gpios     = pios_packetrxok_io,
-    .num_gpios = NELEMENTS(pios_packetrxok_io),
+static const struct pios_gpio_cfg pios_io_packetrxok_flexi_cfg = {
+    .gpios     = pios_io_packetrxok_flexi,
+    .num_gpios = NELEMENTS(pios_io_packetrxok_flexi),
 };
 
 #endif /* #if defined(PIOS_INCLUDE_PACKETRXOK) */

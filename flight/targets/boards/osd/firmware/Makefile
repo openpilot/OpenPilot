@@ -30,7 +30,7 @@ override USE_DSP_LIB := NO
 MODULES += Osd/osdgen
 #MODULES += Osd/osdinput
 #MODULES += Osd/WavPlayer
-#MODULES += GPS
+MODULES += GPS
 #MODULES += Extensions/MagBaro
 MODULES += FirmwareIAP
 MODULES += Telemetry
@@ -73,7 +73,7 @@ ifndef TESTAPP
 
     ## Misc library functions
     SRC += $(FLIGHTLIB)/printf2.c
-#    SRC += $(FLIGHTLIB)/WorldMagModel.c
+    SRC += $(FLIGHTLIB)/WorldMagModel.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c

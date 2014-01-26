@@ -65,6 +65,20 @@ bool ThermalCalibrationHelper::setupBoardForCalibration()
     Q_ASSERT(baroSensor);
     setMetadataForCalibration(baroSensor);
 
+    // Clean up any gyro/accel correction before calibrating
+    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
+    Q_ASSERT(accelGyroSettings);
+    AccelGyroSettings::DataFields data = accelGyroSettings->getData();
+    for(int i = 0; i < AccelGyroSettings::ACCEL_TEMP_COEFF_NUMELEM; i++){
+        data.accel_temp_coeff[i] = 0.0f;
+    }
+
+    for(int i = 0; i < AccelGyroSettings::GYRO_TEMP_COEFF_NUMELEM; i++){
+        data.gyro_temp_coeff[i] = 0.0f;
+    }
+
+    accelGyroSettings->setData(data);
+
     // clean any correction before calibrating
     RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);
     Q_ASSERT(revoSettings);
@@ -101,6 +115,11 @@ bool ThermalCalibrationHelper::saveBoardInitialSettings()
     BaroSensor *baroSensor = BaroSensor::GetInstance(objManager);
     Q_ASSERT(baroSensor);
     m_boardInitialSettings.baroensorMeta = baroSensor->getMetadata();
+
+    // accelGyroSettings data
+    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
+    Q_ASSERT(accelGyroSettings);
+    m_boardInitialSettings.accelGyroSettings = accelGyroSettings->getData();
 
     // revoSettings data
     RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);
@@ -146,6 +165,11 @@ bool ThermalCalibrationHelper::restoreInitialSettings()
     BaroSensor *baroSensor = BaroSensor::GetInstance(objManager);
     Q_ASSERT(baroSensor);
     baroSensor->setMetadata(m_boardInitialSettings.baroensorMeta);
+
+    // AccelGyroSettings data
+    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
+    Q_ASSERT(accelGyroSettings);
+    accelGyroSettings->setData(m_boardInitialSettings.accelGyroSettings);
 
     // revoSettings data
     RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);

@@ -42,9 +42,11 @@ public:
         Eigen::Vector3f Scale;
         Eigen::Vector3f Bias;
     };
+    static bool EllipsoidCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ, float nominalRange, EllipsoidCalibrationResult *result);
+    static bool PolynomialCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, int degree, Eigen::Ref<Eigen::VectorXf> result, const double maxRelativeError);
 
-    static bool EllipsoidCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, float nominalRange, EllipsoidCalibrationResult *result);
-    static bool PolynomialCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, int degree, Eigen::Ref<Eigen::VectorXf> result, const double maxRelativeError);
+    static void ComputePoly(Eigen::VectorXf *samplesX, Eigen::VectorXf *polynomial, Eigen::VectorXf *polyY);
+    static float ComputeSigma(Eigen::VectorXf *samplesY);
 
 private:
     static void EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,

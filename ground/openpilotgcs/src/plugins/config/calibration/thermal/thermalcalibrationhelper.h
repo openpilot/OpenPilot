@@ -54,6 +54,7 @@ typedef struct {
     // this is not needed for revo, but should for CC/CC3D
     // AccelGyroSettings::DataFields accelGyroSettings;
     RevoSettings::DataFields revoSettings;
+    AccelGyroSettings::DataFields accelGyroSettings;
     UAVObject::Metadata gyroSensorMeta;
     UAVObject::Metadata accelSensorMeta;
     UAVObject::Metadata baroensorMeta;
@@ -67,6 +68,15 @@ typedef struct {
     float accel[3];
     bool  gyroCalibrated;
     float gyro[4];
+
+    float baroInSigma;
+    float baroOutSigma;
+
+    float accelInSigma[3];
+    float accelOutSigma[3];
+
+    float gyroInSigma[3];
+    float gyroOutSigma[3];
 } thermalCalibrationResults;
 class ThermalCalibrationHelper : public QObject {
     Q_OBJECT

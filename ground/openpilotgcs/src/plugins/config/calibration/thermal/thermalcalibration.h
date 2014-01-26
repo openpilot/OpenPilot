@@ -49,23 +49,40 @@ class ThermalCalibration {
     static const double GYRO_Y_MAX_REL_ERROR   = 1E-6f;
     static const double GYRO_Z_MAX_REL_ERROR   = 1E-6f;
 public:
+
+    /**
+     * @brief ComputeStats
+     * @param samplesX X values for input samples
+     * @param samplesY Y values for input samples
+     * @param correctionPoly coefficients for the correction polynomial
+     * @param degrees Degree of the correction polynomial
+     * @param initialSigma Standard deviation calculated over input samples
+     * @param rebiasedSigma Standard deviation calculated over calibrated samples
+     */
+    static void ComputeStats(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *correctionPoly, float *initialSigma, float *rebiasedSigma);
+
     /**
      * @brief produce the calibration polinomial coefficients from pressure and temperature samples
      * @param pressure Pressure samples
      * @param temperature Temperature samples
      * @param result Polinomial coefficients to be sent to board (x0, x1, x2, x3)
+     * @param inputSigma a float populated with input sample variance
+     * @param CalibratedSigma float populated with calibrated data variance
      * @return
      */
-    static bool BarometerCalibration(Eigen::VectorXf pressure, Eigen::VectorXf temperature, float *result);
+    static bool BarometerCalibration(Eigen::VectorXf pressure, Eigen::VectorXf temperature, float *result, float *inputSigma, float *calibratedSigma);
 
     /**
      * @brief AccelerometerCalibration produce the calibration polinomial coefficients from accelerometer axis and temperature samples
      * @param pressure
      * @param temperature
      * @param result a float[3] array containing value to populate calibration settings (x,y,z)
+     * @param inputSigma a float[3] array populated with input sample variance
+     * @param CalibratedSigma float[3] array populated with calibrated data variance
      * @return
      */
-    static bool AccelerometerCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, Eigen::VectorXf temperature, float *result);
+    static bool AccelerometerCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, Eigen::VectorXf temperature, float *result, float *inputSigma, float *calibratedSigma);
+
     /**
      * @brief GyroscopeCalibration produce the calibration polinomial coefficients from gyroscopes axis and temperature samples
      * @param samplesX
@@ -73,9 +90,11 @@ public:
      * @param samplesZ
      * @param temperature
      * @param result a float[4] array containing value to populate calibration settings (x,y,z1, z2)
+     * @param inputSigma a float[3] array populated with input sample variance
+     * @param CalibratedSigma float[3] array populated with calibrated data variance
      * @return
      */
-    static bool GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, Eigen::VectorXf temperature, float *result);
+    static bool GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, Eigen::VectorXf temperature, float *result, float *inputSigma, float *calibratedSigma);
 
 
 private:

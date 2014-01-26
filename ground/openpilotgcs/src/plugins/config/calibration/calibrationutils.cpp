@@ -27,19 +27,27 @@
  */
 
 #include "calibrationutils.h"
+#include <math.h>
 using namespace Eigen;
 namespace OpenPilot {
+float CalibrationUtils::ComputeSigma(Eigen::VectorXf *samplesY)
+{
+    Eigen::ArrayXd tmpd = samplesY->cast<double>().array();
+    double mean = tmpd.mean();
+    return (float) sqrt((tmpd - mean).square().mean());
+}
+
 /*
  * The following ellipsoid calibration code is based on RazorImu calibration samples that can be found here:
  * https://github.com/ptrbrtz/razor-9dof-ahrs/tree/master/Matlab/magnetometer_calibration
  */
-bool CalibrationUtils::EllipsoidCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, Eigen::VectorXf samplesZ, float nominalRange, EllipsoidCalibrationResult *result)
+bool CalibrationUtils::EllipsoidCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ, float nominalRange, EllipsoidCalibrationResult *result)
 {
     Eigen::VectorXf radii;
     Eigen::Vector3f center;
     Eigen::MatrixXf evecs;
 
-    EllipsoidFit(&samplesX, &samplesY, &samplesZ, &center, &radii, &evecs);
+    EllipsoidFit(samplesX, samplesY, samplesZ, &center, &radii, &evecs);
 
     result->Scale.setZero();
 
@@ -58,12 +66,12 @@ bool CalibrationUtils::EllipsoidCalibration(Eigen::VectorXf samplesX, Eigen::Vec
     return true;
 }
 
-bool CalibrationUtils::PolynomialCalibration(Eigen::VectorXf samplesX, Eigen::VectorXf samplesY, int degree, Eigen::Ref<Eigen::VectorXf> result, const double maxRelativeError)
+bool CalibrationUtils::PolynomialCalibration(VectorXf *samplesX, Eigen::VectorXf *samplesY, int degree, Eigen::Ref<Eigen::VectorXf> result, const double maxRelativeError)
 {
-    int samples = samplesX.rows();
+    int samples = samplesX->rows();
     // perform internal calculation using doubles
-    VectorXd doubleX = samplesX.cast<double>();
-    VectorXd doubleY = samplesY.cast<double>();
+    VectorXd doubleX = samplesX->cast<double>();
+    VectorXd doubleY = samplesY->cast<double>();
     Eigen::MatrixXd x(samples, degree + 1);
 
     x.setOnes(samples, degree + 1);
@@ -84,6 +92,14 @@ bool CalibrationUtils::PolynomialCalibration(Eigen::VectorXf samplesX, Eigen::Ve
     double relativeError = (xtx * tmpx - xty).norm() / xty.norm();
     std::cout << "Estimated relative error " << relativeError << "; Max allowed error " << maxRelativeError << std::endl;
     return relativeError < maxRelativeError;
+}
+
+void CalibrationUtils::ComputePoly(VectorXf *samplesX, Eigen::VectorXf *polynomial, VectorXf *polyY)
+{
+    polyY->array().fill(polynomial->coeff(0));
+    for(int i = 1; i < polynomial->rows(); i++){
+         polyY->array() += samplesX->array().pow(i) * polynomial->coeff(i);
+    }
 }
 
 /* C++ Implementation of Yury Petrov's ellipsoid fit algorithm

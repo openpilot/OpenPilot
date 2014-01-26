@@ -271,7 +271,7 @@ void ThermalCalibrationHelper::calculate()
         datat[x] = m_baroSamples[x].Temperature;
     }
 
-    m_results.baroCalibrated = ThermalCalibration::BarometerCalibration(datax, datat, m_results.baro);
+    m_results.baroCalibrated = ThermalCalibration::BarometerCalibration(datax, datat, m_results.baro, &m_results.baroInSigma, &m_results.baroOutSigma);
 
     setProcessPercentage(processPercentage() + 2);
     count = m_gyroSamples.count();
@@ -287,7 +287,7 @@ void ThermalCalibrationHelper::calculate()
         datat[x] = m_gyroSamples[x].temperature;
     }
 
-    m_results.gyroCalibrated = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro);
+    m_results.gyroCalibrated = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro, m_results.gyroInSigma, m_results.gyroOutSigma);
 
     // TODO: sanity checks needs to be enforced before accel calibration can be enabled and usable.
     /*
@@ -308,6 +308,19 @@ void ThermalCalibrationHelper::calculate()
        m_results.accelCalibrated = ThermalCalibration::AccelerometerCalibration(datax, datay, dataz, datat, m_results.accel);
      */
     m_results.accelCalibrated = false;
+
+    qDebug() << QStringLiteral("Calibration results");
+    qDebug() << QStringLiteral("Baro cal {%1, %2, %3, %4}; initial variance: %5; Calibrated variance %6")
+                .arg(m_results.baro[0]).arg(m_results.baro[1]).arg(m_results.baro[2]).arg(m_results.baro[3])
+                .arg(m_results.baroInSigma).arg(m_results.baroOutSigma);
+    qDebug() << QStringLiteral("Gyro cal x{%1} y{%2} z{%3, %4}; initial variance: {%5, %6, %7}; Calibrated variance {%8, %9, %10}")
+                .arg(m_results.gyro[0]).arg(m_results.gyro[1]).arg(m_results.gyro[2]).arg(m_results.baro[3])
+                .arg(m_results.gyroInSigma[0]).arg(m_results.gyroInSigma[1]).arg(m_results.gyroInSigma[2])
+                .arg(m_results.gyroOutSigma[0]).arg(m_results.gyroOutSigma[1]).arg(m_results.gyroOutSigma[2]);
+    qDebug() << QStringLiteral("Accel cal x{%1} y{%2} z{%3}; initial variance: {%4, %5, %6}; Calibrated variance {%7, %8, %9}")
+                .arg(m_results.accel[0]).arg(m_results.accel[1]).arg(m_results.accel[2])
+                .arg(m_results.accelInSigma[0]).arg(m_results.accelInSigma[1]).arg(m_results.accelInSigma[2])
+                .arg(m_results.accelOutSigma[0]).arg(m_results.accelOutSigma[1]).arg(m_results.accelOutSigma[2]);
     copyResultToSettings();
     emit calculationCompleted();
 }

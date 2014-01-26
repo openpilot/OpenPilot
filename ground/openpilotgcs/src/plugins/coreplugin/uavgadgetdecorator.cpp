@@ -121,6 +121,10 @@ void UAVGadgetDecorator::saveState(QSettings *qSettings)
     if (m_activeConfiguration) {
         qSettings->setValue("activeConfiguration", m_activeConfiguration->name());
     }
+    // save gadget individual state
+    qSettings->beginGroup("state");
+    m_gadget->saveState(qSettings);
+    qSettings->endGroup();
 }
 
 void UAVGadgetDecorator::restoreState(QSettings *qSettings)
@@ -134,4 +138,8 @@ void UAVGadgetDecorator::restoreState(QSettings *qSettings)
             break;
         }
     }
+    // store gadget individual state
+    qSettings->beginGroup("state");
+    m_gadget->restoreState(qSettings);
+    qSettings->endGroup();
 }

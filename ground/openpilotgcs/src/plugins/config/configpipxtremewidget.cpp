@@ -104,6 +104,15 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 
     ppmOnlyToggled(ui->PPMOnly->isChecked());
 
+    ui->modeCsomboBox->addItem(tr("Disabled"), QVariant(0));
+    ui->modeCsomboBox->addItem(tr("Receiver - Telemetry only"), QVariant(0));
+    ui->modeCsomboBox->addItem(tr("Receiver - Telemetry and Control"), QVariant(1));
+    ui->modeCsomboBox->addItem(tr("Receiver - Control only"), QVariant(2));
+    ui->modeCsomboBox->addItem(tr("Transmitter - Telemetry only"), QVariant(3));
+    ui->modeCsomboBox->addItem(tr("Transmitter - Telemetry and Control"), QVariant(4));
+    ui->modeCsomboBox->addItem(tr("Transmitter - Control only"), QVariant(5));
+    connect(ui->modeCsomboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(modeComboChanged(index)));
+
     // Request and update of the setting object.
     settingsUpdated = false;
     autoLoadWidgets();
@@ -149,12 +158,14 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
         ui->PairSignalStrengthBar2->setValue(ui->PairSignalStrengthBar2->minimum());
         ui->PairSignalStrengthBar3->setValue(ui->PairSignalStrengthBar3->minimum());
         ui->PairSignalStrengthBar4->setValue(ui->PairSignalStrengthBar4->minimum());
+        ui->LinkState->setStyleSheet("color: rgb(200, 0, 0);");
     } else {
         UAVObjectField *pairRssiField = object->getField("PairSignalStrengths");
         ui->PairSignalStrengthBar1->setValue(pairRssiField->getValue(0).toInt());
         ui->PairSignalStrengthBar2->setValue(pairRssiField->getValue(1).toInt());
         ui->PairSignalStrengthBar3->setValue(pairRssiField->getValue(2).toInt());
         ui->PairSignalStrengthBar4->setValue(pairRssiField->getValue(3).toInt());
+        ui->LinkState->setStyleSheet("color: rgb(0, 200, 0);");
     }
     ui->PairSignalStrengthLabel1->setText(QString("%1dB").arg(ui->PairSignalStrengthBar1->value()));
     ui->PairSignalStrengthLabel2->setText(QString("%1dB").arg(ui->PairSignalStrengthBar2->value()));
@@ -217,37 +228,37 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
         UAVObjectField *board_type_field = oplinkStatusObject->getField("BoardType");
         switch (board_type_field->getValue().toInt()) {
         case 0x09: // Revolution
-            ui->MainPort->setVisible(false);
-            ui->MainPortLabel->setVisible(false);
-            ui->FlexiPort->setVisible(false);
-            ui->FlexiPortLabel->setVisible(false);
-            ui->VCPPort->setVisible(false);
-            ui->VCPPortLabel->setVisible(false);
-            ui->FlexiIOPort->setVisible(false);
-            ui->FlexiIOPortLabel->setVisible(false);
-            ui->PPM->setVisible(true);
+            ui->MainPort->setEnabled(false);
+            ui->MainPortLabel->setEnabled(false);
+            ui->FlexiPort->setEnabled(false);
+            ui->FlexiPortLabel->setEnabled(false);
+            ui->VCPPort->setEnabled(false);
+            ui->VCPPortLabel->setEnabled(false);
+            ui->FlexiIOPort->setEnabled(false);
+            ui->FlexiIOPortLabel->setEnabled(false);
+            ui->PPM->setEnabled(true);
             break;
         case 0x03: // OPLinkMini
-            ui->MainPort->setVisible(true);
-            ui->MainPortLabel->setVisible(true);
-            ui->FlexiPort->setVisible(true);
-            ui->FlexiPortLabel->setVisible(true);
-            ui->VCPPort->setVisible(true);
-            ui->VCPPortLabel->setVisible(true);
-            ui->FlexiIOPort->setVisible(false);
-            ui->FlexiIOPortLabel->setVisible(false);
-            ui->PPM->setVisible(false);
+            ui->MainPort->setEnabled(true);
+            ui->MainPortLabel->setEnabled(true);
+            ui->FlexiPort->setEnabled(true);
+            ui->FlexiPortLabel->setEnabled(true);
+            ui->VCPPort->setEnabled(true);
+            ui->VCPPortLabel->setEnabled(true);
+            ui->FlexiIOPort->setEnabled(false);
+            ui->FlexiIOPortLabel->setEnabled(false);
+            ui->PPM->setEnabled(false);
             break;
-        case 0x0A:
-            ui->MainPort->setVisible(true);
-            ui->MainPortLabel->setVisible(true);
-            ui->FlexiPort->setVisible(true);
-            ui->FlexiPortLabel->setVisible(true);
-            ui->VCPPort->setVisible(true);
-            ui->VCPPortLabel->setVisible(true);
-            ui->FlexiIOPort->setVisible(true);
-            ui->FlexiIOPortLabel->setVisible(true);
-            ui->PPM->setVisible(false);
+        case 0x0A: // OPLink
+            ui->MainPort->setEnabled(true);
+            ui->MainPortLabel->setEnabled(true);
+            ui->FlexiPort->setEnabled(true);
+            ui->FlexiPortLabel->setEnabled(true);
+            ui->VCPPort->setEnabled(true);
+            ui->VCPPortLabel->setEnabled(true);
+            ui->FlexiIOPort->setEnabled(true);
+            ui->FlexiIOPortLabel->setEnabled(true);
+            ui->PPM->setEnabled(false);
             break;
         default:
             // This shouldn't happen.
@@ -255,7 +266,7 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
         }
 
         // Enable the push buttons.
-        enableControls(true);
+        //enableControls(true);
     }
 }
 
@@ -265,7 +276,7 @@ void ConfigPipXtremeWidget::disconnected()
         settingsUpdated = false;
 
         // Enable the push buttons.
-        enableControls(false);
+        //enableControls(false);
     }
 }
 
@@ -320,7 +331,6 @@ void ConfigPipXtremeWidget::ppmOnlyToggled(bool on)
 
 void ConfigPipXtremeWidget::comSpeedChanged(int index)
 {
-    qDebug() << "comSpeedChanged: " << index;
     switch (index) {
     case OPLinkSettings::COMSPEED_4800:
         ui->PPMOnly->setChecked(true);
@@ -329,4 +339,9 @@ void ConfigPipXtremeWidget::comSpeedChanged(int index)
         ui->PPMOnly->setChecked(false);
         break;
     }
+}
+
+void ConfigPipXtremeWidget::enableControls(bool enable)
+{
+    //Do nothing
 }

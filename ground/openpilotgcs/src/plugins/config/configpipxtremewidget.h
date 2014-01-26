@@ -66,6 +66,11 @@ private slots:
     void bind4();
     void ppmOnlyToggled(bool toggled);
     void comSpeedChanged(int index);
+    void modeComboChanged(int index);
+
+protected:
+    void enableControls(bool enable);
+
 };
 
 #endif // CONFIGTXPIDWIDGET_H

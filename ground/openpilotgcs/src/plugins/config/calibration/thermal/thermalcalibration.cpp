@@ -122,7 +122,7 @@ bool ThermalCalibration::GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::V
     solution[0] = 0;
     std::cout << solution << std::endl;
     ComputeStats(&temperature, &samplesZ, &solution, &inputSigma[2], &calibratedSigma[2]);
-    return (inputSigma[0] < calibratedSigma[0]) && (inputSigma[1] < calibratedSigma[1]) && (inputSigma[2] < calibratedSigma[2]);
+    return (inputSigma[0] > calibratedSigma[0]) && (inputSigma[1] > calibratedSigma[1]) && (inputSigma[2] > calibratedSigma[2]);
 }
 
 void ThermalCalibration::copyToArray(float *result, Eigen::VectorXf solution, int elements)

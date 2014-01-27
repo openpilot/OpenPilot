@@ -175,7 +175,7 @@ private:
     const static int ProcessPercentageBaseAcquisition = 15;
     const static int ProcessPercentageBaseCalculation = 85;
     const static int ProcessPercentageSaveResults     = 95;
-    const static float TargetGradient = 0.35f;
+    const static float TargetGradient = 0.20f;
     int m_targetduration;
     int m_processPercentage;
 

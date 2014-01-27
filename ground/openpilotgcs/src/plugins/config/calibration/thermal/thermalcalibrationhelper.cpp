@@ -68,12 +68,12 @@ bool ThermalCalibrationHelper::setupBoardForCalibration()
     // Clean up any gyro/accel correction before calibrating
     AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
     Q_ASSERT(accelGyroSettings);
-    AccelGyroSettings::DataFields data = accelGyroSettings->getData();
-    for(int i = 0; i < AccelGyroSettings::ACCEL_TEMP_COEFF_NUMELEM; i++){
+    AccelGyroSettings::DataFields data   = accelGyroSettings->getData();
+    for (int i = 0; i < AccelGyroSettings::ACCEL_TEMP_COEFF_NUMELEM; i++) {
         data.accel_temp_coeff[i] = 0.0f;
     }
 
-    for(int i = 0; i < AccelGyroSettings::GYRO_TEMP_COEFF_NUMELEM; i++){
+    for (int i = 0; i < AccelGyroSettings::GYRO_TEMP_COEFF_NUMELEM; i++) {
         data.gyro_temp_coeff[i] = 0.0f;
     }
 
@@ -335,16 +335,16 @@ void ThermalCalibrationHelper::calculate()
 
     qDebug() << QStringLiteral("Calibration results");
     qDebug() << QStringLiteral("Baro cal {%1, %2, %3, %4}; initial variance: %5; Calibrated variance %6")
-                .arg(m_results.baro[0]).arg(m_results.baro[1]).arg(m_results.baro[2]).arg(m_results.baro[3])
-                .arg(m_results.baroInSigma).arg(m_results.baroOutSigma);
+        .arg(m_results.baro[0]).arg(m_results.baro[1]).arg(m_results.baro[2]).arg(m_results.baro[3])
+        .arg(m_results.baroInSigma).arg(m_results.baroOutSigma);
     qDebug() << QStringLiteral("Gyro cal x{%1} y{%2} z{%3, %4}; initial variance: {%5, %6, %7}; Calibrated variance {%8, %9, %10}")
-                .arg(m_results.gyro[0]).arg(m_results.gyro[1]).arg(m_results.gyro[2]).arg(m_results.baro[3])
-                .arg(m_results.gyroInSigma[0]).arg(m_results.gyroInSigma[1]).arg(m_results.gyroInSigma[2])
-                .arg(m_results.gyroOutSigma[0]).arg(m_results.gyroOutSigma[1]).arg(m_results.gyroOutSigma[2]);
+        .arg(m_results.gyro[0]).arg(m_results.gyro[1]).arg(m_results.gyro[2]).arg(m_results.baro[3])
+        .arg(m_results.gyroInSigma[0]).arg(m_results.gyroInSigma[1]).arg(m_results.gyroInSigma[2])
+        .arg(m_results.gyroOutSigma[0]).arg(m_results.gyroOutSigma[1]).arg(m_results.gyroOutSigma[2]);
     qDebug() << QStringLiteral("Accel cal x{%1} y{%2} z{%3}; initial variance: {%4, %5, %6}; Calibrated variance {%7, %8, %9}")
-                .arg(m_results.accel[0]).arg(m_results.accel[1]).arg(m_results.accel[2])
-                .arg(m_results.accelInSigma[0]).arg(m_results.accelInSigma[1]).arg(m_results.accelInSigma[2])
-                .arg(m_results.accelOutSigma[0]).arg(m_results.accelOutSigma[1]).arg(m_results.accelOutSigma[2]);
+        .arg(m_results.accel[0]).arg(m_results.accel[1]).arg(m_results.accel[2])
+        .arg(m_results.accelInSigma[0]).arg(m_results.accelInSigma[1]).arg(m_results.accelInSigma[2])
+        .arg(m_results.accelOutSigma[0]).arg(m_results.accelOutSigma[1]).arg(m_results.accelOutSigma[2]);
     copyResultToSettings();
     emit calculationCompleted();
 }
@@ -356,7 +356,7 @@ void ThermalCalibrationHelper::updateTemp(float temp)
     int elapsed = m_startTime.secsTo(QTime::currentTime());
     int secondsSinceLastCheck = m_lastCheckpointTime.secsTo(QTime::currentTime());
 
-    m_temperature = m_temperature * 0.9f + temp * 0.1f;
+    m_temperature = m_temperature * 0.95f + temp * 0.05f;
     emit temperatureChanged(m_temperature);
 
     if (secondsSinceLastCheck > TimeBetweenCheckpoints) {
@@ -467,6 +467,7 @@ void ThermalCalibrationHelper::copyResultToSettings()
         accelGyroSettings->setData(data);
         accelGyroSettings->updated();
     }
+    setProcessPercentage(100.0f);
 }
 
 void ThermalCalibrationHelper::setMetadataForCalibration(UAVDataObject *uavo)

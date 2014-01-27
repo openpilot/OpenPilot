@@ -34,7 +34,8 @@ float CalibrationUtils::ComputeSigma(Eigen::VectorXf *samplesY)
 {
     Eigen::ArrayXd tmpd = samplesY->cast<double>().array();
     double mean = tmpd.mean();
-    return (float) sqrt((tmpd - mean).square().mean());
+
+    return (float)sqrt((tmpd - mean).square().mean());
 }
 
 /*
@@ -97,8 +98,8 @@ bool CalibrationUtils::PolynomialCalibration(VectorXf *samplesX, Eigen::VectorXf
 void CalibrationUtils::ComputePoly(VectorXf *samplesX, Eigen::VectorXf *polynomial, VectorXf *polyY)
 {
     polyY->array().fill(polynomial->coeff(0));
-    for(int i = 1; i < polynomial->rows(); i++){
-         polyY->array() += samplesX->array().pow(i) * polynomial->coeff(i);
+    for (int i = 1; i < polynomial->rows(); i++) {
+        polyY->array() += samplesX->array().pow(i) * polynomial->coeff(i);
     }
 }
 

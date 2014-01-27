@@ -114,7 +114,7 @@ public slots:
     }
     void setTemperatureGradient(float status)
     {
-        QString tmp = QString("%1 %2").arg(status, 5, 'f', 2);
+        QString tmp = QString("%1").arg(status, 5, 'f', 2);
 
         if (m_temperatureGradient != tmp) {
             m_temperatureGradient = tmp;

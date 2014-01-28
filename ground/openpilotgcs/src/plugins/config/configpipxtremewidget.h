@@ -56,14 +56,9 @@ private:
     // Are the settings current?
     bool settingsUpdated;
 
-    void SetPairID(QLineEdit *pairIdWidget);
-
 private slots:
     void disconnected();
-    void bind1();
-    void bind2();
-    void bind3();
-    void bind4();
+    void bind();
     void ppmOnlyToggled(bool toggled);
     void comSpeedChanged(int index);
     void modeComboChanged(int index);

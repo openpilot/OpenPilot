@@ -93,10 +93,10 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     addWidgetBinding("OPLinkStatus", "TXRate", ui->TXRate);
 
     // Connect the bind buttons
-    connect(ui->Bind1, SIGNAL(clicked()), this, SLOT(bind1()));
-    connect(ui->Bind2, SIGNAL(clicked()), this, SLOT(bind2()));
-    connect(ui->Bind3, SIGNAL(clicked()), this, SLOT(bind3()));
-    connect(ui->Bind4, SIGNAL(clicked()), this, SLOT(bind4()));
+    connect(ui->Bind1, SIGNAL(clicked()), this, SLOT(bind()));
+    connect(ui->Bind2, SIGNAL(clicked()), this, SLOT(bind()));
+    connect(ui->Bind3, SIGNAL(clicked()), this, SLOT(bind()));
+    connect(ui->Bind4, SIGNAL(clicked()), this, SLOT(bind()));
 
     // Connect the selection changed signals.
     connect(ui->PPMOnly, SIGNAL(toggled(bool)), this, SLOT(ppmOnlyToggled(bool)));
@@ -111,7 +111,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     ui->modeCsomboBox->addItem(tr("Transmitter - Telemetry only"), QVariant(3));
     ui->modeCsomboBox->addItem(tr("Transmitter - Telemetry and Control"), QVariant(4));
     ui->modeCsomboBox->addItem(tr("Transmitter - Control only"), QVariant(5));
-    connect(ui->modeCsomboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(modeComboChanged(index)));
+    connect(ui->modeCsomboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(modeComboChanged(int)));
 
     // Request and update of the setting object.
     settingsUpdated = false;
@@ -138,18 +138,22 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     quint32 pairid = pairIdField->getValue(0).toUInt();
     ui->PairID1->setText(QString::number(pairid, 16).toUpper());
     ui->PairID1->setEnabled(false);
+    ui->Bind1->setText(pairid ? tr("Unbind") : tr("Bind"));
     ui->Bind1->setEnabled(pairid);
     pairid = pairIdField->getValue(1).toUInt();
     ui->PairID2->setText(QString::number(pairIdField->getValue(1).toUInt(), 16).toUpper());
     ui->PairID2->setEnabled(false);
+    ui->Bind2->setText(pairid ? tr("Unbind") : tr("Bind"));
     ui->Bind2->setEnabled(pairid);
     pairid = pairIdField->getValue(2).toUInt();
     ui->PairID3->setText(QString::number(pairIdField->getValue(2).toUInt(), 16).toUpper());
     ui->PairID3->setEnabled(false);
+    ui->Bind3->setText(pairid ? tr("Unbind") : tr("Bind"));
     ui->Bind3->setEnabled(pairid);
     pairid = pairIdField->getValue(3).toUInt();
     ui->PairID4->setText(QString::number(pairIdField->getValue(3).toUInt(), 16).toUpper());
     ui->PairID4->setEnabled(false);
+    ui->Bind4->setText(pairid ? tr("Unbind") : tr("Bind"));
     ui->Bind4->setEnabled(pairid);
 
     if(linkState->getValue() == linkState->getOptions().at(OPLinkStatus::LINKSTATE_DISABLED) ||
@@ -249,17 +253,6 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
             ui->FlexiIOPortLabel->setEnabled(false);
             ui->PPM->setEnabled(false);
             break;
-        case 0x0A: // OPLink
-            ui->MainPort->setEnabled(true);
-            ui->MainPortLabel->setEnabled(true);
-            ui->FlexiPort->setEnabled(true);
-            ui->FlexiPortLabel->setEnabled(true);
-            ui->VCPPort->setEnabled(true);
-            ui->VCPPortLabel->setEnabled(true);
-            ui->FlexiIOPort->setEnabled(true);
-            ui->FlexiIOPortLabel->setEnabled(true);
-            ui->PPM->setEnabled(false);
-            break;
         default:
             // This shouldn't happen.
             break;
@@ -280,68 +273,33 @@ void ConfigPipXtremeWidget::disconnected()
     }
 }
 
-void ConfigPipXtremeWidget::SetPairID(QLineEdit *pairIdWidget)
+void ConfigPipXtremeWidget::bind()
 {
+    QLineEdit* sender = static_cast<QLineEdit*>(this->sender());
+    Q_ASSERT(sender);
+
     // Get the pair ID out of the selection widget
     quint32 pairID = 0;
     bool okay;
 
-    pairID = pairIdWidget->text().toUInt(&okay, 16);
+    pairID = sender->text().toUInt(&okay, 16);
 
     // Store the ID in the coord ID field.
     ui->CoordID->setText(QString::number(pairID, 16).toUpper());
 }
 
-void ConfigPipXtremeWidget::bind1()
-{
-    SetPairID(ui->PairID1);
-}
-
-void ConfigPipXtremeWidget::bind2()
-{
-    SetPairID(ui->PairID2);
-}
-
-void ConfigPipXtremeWidget::bind3()
-{
-    SetPairID(ui->PairID3);
-}
-
-void ConfigPipXtremeWidget::bind4()
-{
-    SetPairID(ui->PairID4);
-}
-
 void ConfigPipXtremeWidget::ppmOnlyToggled(bool on)
 {
-    if (on) {
-        ui->PPM->setEnabled(false);
-        ui->OneWayLink->setEnabled(false);
-        ui->ComSpeed->setEnabled(false);
-    } else {
-        ui->PPM->setEnabled(true);
-        ui->OneWayLink->setEnabled(true);
-        ui->ComSpeed->setEnabled(true);
-        // Change the comspeed from 4800 of PPM only is turned off.
-        if (ui->ComSpeed->currentIndex() == OPLinkSettings::COMSPEED_4800) {
-            ui->ComSpeed->setCurrentIndex(OPLinkSettings::COMSPEED_9600);
-        }
-    }
 }
 
 void ConfigPipXtremeWidget::comSpeedChanged(int index)
 {
-    switch (index) {
-    case OPLinkSettings::COMSPEED_4800:
-        ui->PPMOnly->setChecked(true);
-        break;
-    default:
-        ui->PPMOnly->setChecked(false);
-        break;
-    }
+}
+
+void ConfigPipXtremeWidget::modeComboChanged(int index)
+{
 }
 
 void ConfigPipXtremeWidget::enableControls(bool enable)
 {
-    //Do nothing
 }

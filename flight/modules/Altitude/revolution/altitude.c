@@ -55,6 +55,8 @@
 // Private variables
 static xTaskHandle taskHandle;
 static RevoSettingsBaroTempCorrectionPolynomialData baroCorrection;
+static RevoSettingsBaroTempCorrectionExtentData baroCorrectionExtent;
+static volatile bool tempCorrectionEnabled;
 // Private functions
 static void altitudeTask(void *parameters);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
@@ -164,9 +166,13 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
         temp  = PIOS_MS5611_GetTemperature();
         press = PIOS_MS5611_GetPressure();
 
-        // pressure bias = A + B*t + C*t^2 + D * t^3
-        press -= baroCorrection.a + ((baroCorrection.d * temp + baroCorrection.c) * temp + baroCorrection.b) * temp;
-
+        if (tempCorrectionEnabled) {
+            // pressure bias = A + B*t + C*t^2 + D * t^3
+            // in case the temperature is outside of the calibrated range, uses the nearest extremes
+            float ctemp = temp > baroCorrectionExtent.max ? baroCorrectionExtent.max :
+                          (temp < baroCorrectionExtent.min ? baroCorrectionExtent.min : temp);
+            press -= baroCorrection.a + ((baroCorrection.d * ctemp + baroCorrection.c) * ctemp + baroCorrection.b) * ctemp;
+        }
         float altitude = 44330.0f * (1.0f - powf((press) / MS5611_P0, (1.0f / 5.255f)));
 
         if (!isnan(altitude)) {
@@ -182,6 +188,9 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     RevoSettingsBaroTempCorrectionPolynomialGet(&baroCorrection);
+    RevoSettingsBaroTempCorrectionExtentGet(&baroCorrectionExtent);
+    tempCorrectionEnabled = !(baroCorrectionExtent.max - baroCorrectionExtent.min < 0.1f ||
+                              (baroCorrection.a < 1e-9f && baroCorrection.b < 1e-9f && baroCorrection.c < 1e-9f && baroCorrection.d < 1e-9f));
 }
 /**
  * @}

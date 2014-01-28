@@ -77,6 +77,8 @@ typedef struct {
 
     float gyroInSigma[3];
     float gyroOutSigma[3];
+    float baroTempMin;
+    float baroTempMax;
 } thermalCalibrationResults;
 class ThermalCalibrationHelper : public QObject {
     Q_OBJECT

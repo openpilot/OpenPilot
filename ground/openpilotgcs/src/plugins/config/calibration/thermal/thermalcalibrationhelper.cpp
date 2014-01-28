@@ -76,7 +76,6 @@ bool ThermalCalibrationHelper::setupBoardForCalibration()
     for (int i = 0; i < AccelGyroSettings::GYRO_TEMP_COEFF_NUMELEM; i++) {
         data.gyro_temp_coeff[i] = 0.0f;
     }
-
     accelGyroSettings->setData(data);
 
     // clean any correction before calibrating
@@ -86,6 +85,9 @@ bool ThermalCalibrationHelper::setupBoardForCalibration()
     for (uint i = 0; i < RevoSettings::BAROTEMPCORRECTIONPOLYNOMIAL_NUMELEM; i++) {
         revoSettingsData.BaroTempCorrectionPolynomial[i] = 0.0f;
     }
+    revoSettingsData.BaroTempCorrectionExtent[0] = 0.0f;
+    revoSettingsData.BaroTempCorrectionExtent[1] = 0.0f;
+
     revoSettings->setData(revoSettingsData);
 
     return true;
@@ -297,6 +299,8 @@ void ThermalCalibrationHelper::calculate()
 
     m_results.baroCalibrated = ThermalCalibration::BarometerCalibration(datax, datat, m_results.baro, &m_results.baroInSigma, &m_results.baroOutSigma);
 
+    m_results.baroTempMin    = datat.array().minCoeff();
+    m_results.baroTempMax    = datat.array().maxCoeff();
     setProcessPercentage(processPercentage() + 2);
     count = m_gyroSamples.count();
     datax.resize(count);
@@ -388,7 +392,7 @@ void ThermalCalibrationHelper::updateTemp(float temp)
         } else if (m_gradient > .1 && m_initialGradient / 2.0f > m_gradient) {
             qDebug() << "M_gradient " << m_gradient << " Elapsed" << elapsed << " m_initialGradient" << m_initialGradient;
             // make a rough estimation of the time needed
-            m_targetduration = elapsed * 5;
+            m_targetduration = elapsed * 7;
         }
     }
 }
@@ -440,10 +444,14 @@ void ThermalCalibrationHelper::copyResultToSettings()
     if (m_results.baroCalibrated) {
         RevoSettings *revosettings = RevoSettings::GetInstance(objManager);
         Q_ASSERT(revosettings);
-        revosettings->setBaroTempCorrectionPolynomial_a(m_results.baro[0]);
-        revosettings->setBaroTempCorrectionPolynomial_b(m_results.baro[1]);
-        revosettings->setBaroTempCorrectionPolynomial_c(m_results.baro[2]);
-        revosettings->setBaroTempCorrectionPolynomial_d(m_results.baro[3]);
+        RevoSettings::DataFields revosettingsdata = revosettings->getData();
+        revosettingsdata.BaroTempCorrectionPolynomial[0] = m_results.baro[0];
+        revosettingsdata.BaroTempCorrectionPolynomial[1] = m_results.baro[1];
+        revosettingsdata.BaroTempCorrectionPolynomial[2] = m_results.baro[2];
+        revosettingsdata.BaroTempCorrectionPolynomial[3] = m_results.baro[3];
+        revosettingsdata.BaroTempCorrectionExtent[0]     = m_results.baroTempMin;
+        revosettingsdata.BaroTempCorrectionExtent[1]     = m_results.baroTempMax;
+        revosettings->setData(revosettingsdata);
         revosettings->updated();
     }
 

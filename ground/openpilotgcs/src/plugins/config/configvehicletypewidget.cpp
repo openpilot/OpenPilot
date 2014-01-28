@@ -122,18 +122,18 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     addUAVObject("MixerSettings");
     addUAVObject("ActuatorSettings");
 
-    ffTuningInProgress = false;
-    ffTuningPhase = false;
+    m_ffTuningInProgress = false;
+    m_ffTuningPhase = false;
 
-    QStringList airframeTypes;
-    airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Ground" << "Custom";
-    m_aircraft->aircraftType->addItems(airframeTypes);
-
-    // Set default vehicle to MultiRotor
-    // m_aircraft->aircraftType->setCurrentIndex(3);
+    // The order of the tabs is important since they correspond with the AirframCategory enum
+    m_aircraft->aircraftType->addTab(tr("Multirotor"));
+    m_aircraft->aircraftType->addTab(tr("Fixed Wing"));
+    m_aircraft->aircraftType->addTab(tr("Helicopter"));
+    m_aircraft->aircraftType->addTab(tr("Ground"));
+    m_aircraft->aircraftType->addTab(tr("Custom"));
 
     // Connect aircraft type selection dropbox to callback function
-    connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
+    connect(m_aircraft->aircraftType, SIGNAL(currentChanged(int)), this, SLOT(switchAirframeType(int)));
 
     // Connect the three feed forward test checkboxes
     connect(m_aircraft->ffTestBox1, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
@@ -144,9 +144,6 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     connect(m_aircraft->airframeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
     refreshWidgetsValues();
-
-    // register widgets for dirty state management
-    addWidget(m_aircraft->aircraftType);
 
     // register FF widgets for dirty state management
     addWidget(m_aircraft->feedForwardSlider);
@@ -171,10 +168,7 @@ ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
 
 void ConfigVehicleTypeWidget::switchAirframeType(int index)
 {
-    // TODO not safe w/r to translation!!!
-    QString frameCategory = m_aircraft->aircraftType->currentText();
-
-    m_aircraft->airframesWidget->setCurrentWidget(getVehicleConfigWidget(frameCategory));
+    m_aircraft->airframesWidget->setCurrentWidget(getVehicleConfigWidget(index));
 }
 
 /**
@@ -202,10 +196,9 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     // At this stage, we will need to have some hardcoded settings in this code, this
     // is not ideal, but there you go.
     QString frameType = field->getValue().toString();
-    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - frame type:" << frameType;
 
-    QString category  = frameCategory(frameType);
-    setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText(category));
+    int category  = frameCategory(frameType);
+    m_aircraft->aircraftType->setCurrentIndex(category);
 
     VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
     if (vehicleConfig) {
@@ -215,8 +208,6 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     updateFeedForwardUI();
 
     setDirty(dirty);
-
-    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - end";
 }
 
 /**
@@ -264,63 +255,61 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
     updateFeedForwardUI();
 }
 
-QString ConfigVehicleTypeWidget::frameCategory(QString frameType)
+int ConfigVehicleTypeWidget::frameCategory(QString frameType)
 {
-    QString category;
-
     if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
         || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
-        category = "Fixed Wing";
+        return ConfigVehicleTypeWidget::FIXED_WING;
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
                || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
                || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
                || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
                || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
                || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
-        category = "Multirotor";
+        return ConfigVehicleTypeWidget::MULTIROTOR;
     } else if (frameType == "HeliCP") {
-        category = "Helicopter";
+        return ConfigVehicleTypeWidget::HELICOPTER;
     } else if (frameType == "GroundVehicleCar" || frameType == "Turnable (car)"
                || frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)"
                || frameType == "GroundVehicleMotorcyle" || frameType == "Motorcycle") {
-        category = "Ground";
+        return ConfigVehicleTypeWidget::GROUND;
     } else {
-        category = "Custom";
+        return ConfigVehicleTypeWidget::CUSTOM;
     }
-    return category;
 }
 
-VehicleConfig *ConfigVehicleTypeWidget::getVehicleConfigWidget(QString frameCategory)
+VehicleConfig *ConfigVehicleTypeWidget::getVehicleConfigWidget(int frameCategory)
 {
     VehicleConfig *vehiculeConfig;
 
-    if (!vehicleIndexMap.contains(frameCategory)) {
+    if (!m_vehicleIndexMap.contains(frameCategory)) {
         // create config widget
         vehiculeConfig = createVehicleConfigWidget(frameCategory);
         // bind config widget "field" to this ConfigTaskWodget
         // this is necessary to get "dirty" state management
         vehiculeConfig->registerWidgets(*this);
+
         // add config widget to UI
         int index = m_aircraft->airframesWidget->insertWidget(m_aircraft->airframesWidget->count(), vehiculeConfig);
-        vehicleIndexMap[frameCategory] = index;
+        m_vehicleIndexMap[frameCategory] = index;
+        updateEnableControls();
     }
-    int index = vehicleIndexMap.value(frameCategory);
+    int index = m_vehicleIndexMap.value(frameCategory);
     vehiculeConfig = (VehicleConfig *)m_aircraft->airframesWidget->widget(index);
     return vehiculeConfig;
 }
 
-VehicleConfig *ConfigVehicleTypeWidget::createVehicleConfigWidget(QString frameCategory)
+VehicleConfig *ConfigVehicleTypeWidget::createVehicleConfigWidget(int frameCategory)
 {
-    qDebug() << "ConfigVehicleTypeWidget::createVehicleConfigWidget - creating" << frameCategory;
-    if (frameCategory == "Fixed Wing") {
+    if (frameCategory == ConfigVehicleTypeWidget::FIXED_WING) {
         return new ConfigFixedWingWidget();
-    } else if (frameCategory == "Multirotor") {
+    } else if (frameCategory == ConfigVehicleTypeWidget::MULTIROTOR){
         return new ConfigMultiRotorWidget();
-    } else if (frameCategory == "Helicopter") {
+    } else if (frameCategory == ConfigVehicleTypeWidget::HELICOPTER) {
         return new ConfigCcpmWidget();
-    } else if (frameCategory == "Ground") {
+    } else if (frameCategory == ConfigVehicleTypeWidget::GROUND) {
         return new ConfigGroundVehicleWidget();
-    } else if (frameCategory == "Custom") {
+    } else if (frameCategory ==ConfigVehicleTypeWidget::CUSTOM) {
         return new ConfigCustomWidget();
     }
     return NULL;
@@ -337,17 +326,17 @@ void ConfigVehicleTypeWidget::enableFFTest()
     // - Every other time event: send FF settings to flight FW
     if (m_aircraft->ffTestBox1->isChecked() && m_aircraft->ffTestBox2->isChecked()
         && m_aircraft->ffTestBox3->isChecked()) {
-        if (!ffTuningInProgress) {
+        if (!m_ffTuningInProgress) {
             // Initiate tuning:
             UAVDataObject *obj = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(
                                                                    QString("ManualControlCommand")));
             UAVObject::Metadata mdata = obj->getMetadata();
-            accInitialData = mdata;
+            m_accInitialData = mdata;
             UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
             obj->setMetadata(mdata);
         }
         // Depending on phase, either move actuator or send FF settings:
-        if (ffTuningPhase) {
+        if (m_ffTuningPhase) {
             // Send FF settings to the board
             UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
             Q_ASSERT(mixer);
@@ -369,18 +358,18 @@ void ConfigVehicleTypeWidget::enableFFTest()
             obj->getField("Throttle")->setValue(target);
             obj->updated();
         }
-        ffTuningPhase = !ffTuningPhase;
-        ffTuningInProgress = true;
+        m_ffTuningPhase = !m_ffTuningPhase;
+        m_ffTuningInProgress = true;
         QTimer::singleShot(1000, this, SLOT(enableFFTest()));
     } else {
         // - If no: disarm timer, restore actuatorcommand metadata
         // Disarm!
-        if (ffTuningInProgress) {
-            ffTuningInProgress = false;
+        if (m_ffTuningInProgress) {
+            m_ffTuningInProgress = false;
             UAVDataObject *obj = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(
                                                                    QString("ManualControlCommand")));
             UAVObject::Metadata mdata = obj->getMetadata();
-            mdata = accInitialData; // Restore metadata
+            mdata = m_accInitialData; // Restore metadata
             obj->setMetadata(mdata);
         }
     }
@@ -412,16 +401,4 @@ void ConfigVehicleTypeWidget::updateFeedForwardUI()
 void ConfigVehicleTypeWidget::openHelp()
 {
     QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode));
-}
-
-/**
-   Helper function:
-   Sets the current index on supplied combobox to index
-   if it is within bounds 0 <= index < combobox.count()
- */
-void ConfigVehicleTypeWidget::setComboCurrentIndex(QComboBox *box, int index)
-{
-    if (index >= 0 && index < box->count()) {
-        box->setCurrentIndex(index);
-    }
 }

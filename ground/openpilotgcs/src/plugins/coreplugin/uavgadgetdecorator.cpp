@@ -138,7 +138,7 @@ void UAVGadgetDecorator::restoreState(QSettings *qSettings)
             break;
         }
     }
-    // store gadget individual state
+    // restore gadget individual state
     qSettings->beginGroup("state");
     m_gadget->restoreState(qSettings);
     qSettings->endGroup();

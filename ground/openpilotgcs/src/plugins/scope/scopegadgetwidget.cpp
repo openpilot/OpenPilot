@@ -520,7 +520,10 @@ void ScopeGadgetWidget::saveState(QSettings *qSettings)
     int i = 1;
 
     foreach(PlotData * plotData, m_curvesData.values()) {
-        qSettings->setValue(QString("plot%1").arg(i), plotData->curve->isVisible());
+        bool plotVisible = plotData->curve->isVisible();
+        if (!plotVisible) {
+            qSettings->setValue(QString("plot%1").arg(i), plotVisible);
+        }
         i++;
     }
     // legend state

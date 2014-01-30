@@ -17,7 +17,6 @@ HEADERS += configplugin.h \
     configvehicletypewidget.h \
     config_cc_hw_widget.h \
     configccattitudewidget.h \
-    configpipxtremewidget.h \
     configstabilizationwidget.h \
     assertions.h \
     defaultattitudewidget.h \
@@ -36,7 +35,8 @@ HEADERS += configplugin.h \
     config_global.h \
     mixercurve.h \
     dblspindelegate.h \
-    configrevohwwidget.h
+    configrevohwwidget.h \
+    configoplinkwidget.h
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \
@@ -49,7 +49,6 @@ SOURCES += configplugin.cpp \
     config_cc_hw_widget.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
-    configpipxtremewidget.cpp \
     legacy-calibration.cpp \
     defaultattitudewidget.cpp \
     defaulthwsettingswidget.cpp \
@@ -66,7 +65,8 @@ SOURCES += configplugin.cpp \
     outputchannelform.cpp \
     mixercurve.cpp \
     dblspindelegate.cpp \
-    configrevohwwidget.cpp
+    configrevohwwidget.cpp \
+    configoplinkwidget.cpp
 
 FORMS += airframe.ui \
     airframe_ccpm.ui \
@@ -86,8 +86,8 @@ FORMS += airframe.ui \
     outputchannelform.ui \
     revosensors.ui \
     txpid.ui \
-    pipxtreme.ui \
     mixercurve.ui \
-    configrevohwwidget.ui
+    configrevohwwidget.ui \
+    oplink.ui
 
 RESOURCES += configgadget.qrc

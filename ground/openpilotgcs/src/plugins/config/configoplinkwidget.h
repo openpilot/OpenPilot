@@ -24,21 +24,21 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGPIPXTREMEWIDGET_H
-#define CONFIGPIPXTREMEWIDGET_H
+#ifndef CONFIGOPLINKWIDGET_H
+#define CONFIGOPLINKWIDGET_H
 
 #include <oplinksettings.h>
 #include <oplinkstatus.h>
 
-#include "ui_pipxtreme.h"
+#include "ui_oplink.h"
 #include "configtaskwidget.h"
 
-class ConfigPipXtremeWidget : public ConfigTaskWidget {
+class ConfigOPLinkWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
-    ConfigPipXtremeWidget(QWidget *parent = 0);
-    ~ConfigPipXtremeWidget();
+    ConfigOPLinkWidget(QWidget *parent = 0);
+    ~ConfigOPLinkWidget();
 
 public slots:
     void updateStatus(UAVObject *object1);
@@ -46,6 +46,9 @@ public slots:
 
 private:
     Ui_OPLinkWidget *ui;
+
+    enum { DISABLED = 0, RECEIVER_TELEMETRY_ONLY, RECEIVER_TELEMETRY_AND_CONTROL, RECEIVER_CONTROL_ONLY,
+           TRANSMITTER_TELEMETRY_ONLY, TRANSMITTER_TELEMETRY_AND_CONTROL, TRANSMITTER_CONTROL_ONLY, CUSTOM } OperationMode;
 
     // The OPLink status UAVObject
     OPLinkStatus *oplinkStatusObject;
@@ -55,6 +58,9 @@ private:
 
     // Are the settings current?
     bool settingsUpdated;
+
+    void keepRfPowerOrSetLowest();
+    void keepBaudRateOrSet(int baudrate);
 
 private slots:
     void disconnected();
@@ -68,4 +74,4 @@ protected:
 
 };
 
-#endif // CONFIGTXPIDWIDGET_H
+#endif // CONFIGOPLINKWIDGET_H

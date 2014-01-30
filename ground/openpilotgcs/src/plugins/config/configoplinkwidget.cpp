@@ -25,13 +25,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "configpipxtremewidget.h"
+#include "configoplinkwidget.h"
 
 #include <coreplugin/generalsettings.h>
 #include <oplinksettings.h>
 #include <oplinkstatus.h>
 
-ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigOPLinkWidget::ConfigOPLinkWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     ui = new Ui_OPLinkWidget();
     ui->setupUi(this);
@@ -39,7 +39,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pluginManager);
 
-    Core::Internal::GeneralSettings *settings = pluginManager->getObject<Core::Internal::GeneralSettings>();
+    Core::Internal::GeneralSettings *settings     = pluginManager->getObject<Core::Internal::GeneralSettings>();
     ui->Apply->setVisible(settings->useExpertMode());
 
     UAVObjectManager *objectmanager = pluginManager->getObject<UAVObjectManager>();
@@ -104,13 +104,14 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 
     ppmOnlyToggled(ui->PPMOnly->isChecked());
 
-    ui->modeCsomboBox->addItem(tr("Disabled"), QVariant(0));
-    ui->modeCsomboBox->addItem(tr("Receiver - Telemetry only"), QVariant(0));
-    ui->modeCsomboBox->addItem(tr("Receiver - Telemetry and Control"), QVariant(1));
-    ui->modeCsomboBox->addItem(tr("Receiver - Control only"), QVariant(2));
-    ui->modeCsomboBox->addItem(tr("Transmitter - Telemetry only"), QVariant(3));
-    ui->modeCsomboBox->addItem(tr("Transmitter - Telemetry and Control"), QVariant(4));
-    ui->modeCsomboBox->addItem(tr("Transmitter - Control only"), QVariant(5));
+    ui->modeCsomboBox->addItem(tr("Disabled"), DISABLED);
+    ui->modeCsomboBox->addItem(tr("Receiver - Telemetry only"), RECEIVER_TELEMETRY_ONLY);
+    ui->modeCsomboBox->addItem(tr("Receiver - Telemetry and Control"), RECEIVER_TELEMETRY_AND_CONTROL);
+    ui->modeCsomboBox->addItem(tr("Receiver - Control only"), RECEIVER_CONTROL_ONLY);
+    ui->modeCsomboBox->addItem(tr("Transmitter - Telemetry only"), TRANSMITTER_TELEMETRY_ONLY);
+    ui->modeCsomboBox->addItem(tr("Transmitter - Telemetry and Control"), TRANSMITTER_TELEMETRY_AND_CONTROL);
+    ui->modeCsomboBox->addItem(tr("Transmitter - Control only"), TRANSMITTER_CONTROL_ONLY);
+    ui->modeCsomboBox->addItem(tr("Custom"), CUSTOM);
     connect(ui->modeCsomboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(modeComboChanged(int)));
 
     // Request and update of the setting object.
@@ -119,10 +120,10 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     disableMouseWheelEvents();
 }
 
-ConfigPipXtremeWidget::~ConfigPipXtremeWidget()
+ConfigOPLinkWidget::~ConfigOPLinkWidget()
 {}
 
-void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
+void ConfigOPLinkWidget::updateStatus(UAVObject *object)
 {
     // Request and update of the setting object if we haven't received it yet.
     if (!settingsUpdated) {
@@ -156,8 +157,8 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     ui->Bind4->setText(pairid ? tr("Unbind") : tr("Bind"));
     ui->Bind4->setEnabled(pairid);
 
-    if(linkState->getValue() == linkState->getOptions().at(OPLinkStatus::LINKSTATE_DISABLED) ||
-            linkState->getValue() == linkState->getOptions().at(OPLinkStatus::LINKSTATE_DISCONNECTED) ) {
+    if (linkState->getValue() == linkState->getOptions().at(OPLinkStatus::LINKSTATE_DISABLED) ||
+        linkState->getValue() == linkState->getOptions().at(OPLinkStatus::LINKSTATE_DISCONNECTED)) {
         ui->PairSignalStrengthBar1->setValue(ui->PairSignalStrengthBar1->minimum());
         ui->PairSignalStrengthBar2->setValue(ui->PairSignalStrengthBar2->minimum());
         ui->PairSignalStrengthBar3->setValue(ui->PairSignalStrengthBar3->minimum());
@@ -221,7 +222,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     ui->SerialNumber->setText(buf);
 }
 
-void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
+void ConfigOPLinkWidget::updateSettings(UAVObject *object)
 {
     Q_UNUSED(object);
 
@@ -259,23 +260,42 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
         }
 
         // Enable the push buttons.
-        //enableControls(true);
+        // enableControls(true);
     }
 }
 
-void ConfigPipXtremeWidget::disconnected()
+void ConfigOPLinkWidget::keepRfPowerOrSetLowest()
+{
+    if (ui->MaxRFTxPower->currentIndex() == 0) {
+        ui->MaxRFTxPower->setCurrentIndex(1);
+    }
+    ui->MaxRFTxPower->setEnabled(true);
+}
+
+void ConfigOPLinkWidget::keepBaudRateOrSet(int baudrate)
+{
+    bool ok;
+    int currentBaudRate = ui->ComSpeed->currentText().toInt(&ok);
+    if (ok && currentBaudRate < baudrate) {
+        ui->ComSpeed->setCurrentIndex(ui->ComSpeed->findText(QString::number(baudrate)));
+    }
+    ui->ComSpeed->setEnabled(true);
+}
+
+void ConfigOPLinkWidget::disconnected()
 {
     if (settingsUpdated) {
         settingsUpdated = false;
 
         // Enable the push buttons.
-        //enableControls(false);
+        // enableControls(false);
     }
 }
 
-void ConfigPipXtremeWidget::bind()
+void ConfigOPLinkWidget::bind()
 {
-    QLineEdit* sender = static_cast<QLineEdit*>(this->sender());
+    QLineEdit *sender = static_cast<QLineEdit *>(this->sender());
+
     Q_ASSERT(sender);
 
     // Get the pair ID out of the selection widget
@@ -288,18 +308,111 @@ void ConfigPipXtremeWidget::bind()
     ui->CoordID->setText(QString::number(pairID, 16).toUpper());
 }
 
-void ConfigPipXtremeWidget::ppmOnlyToggled(bool on)
+void ConfigOPLinkWidget::ppmOnlyToggled(bool on)
+{}
+
+void ConfigOPLinkWidget::comSpeedChanged(int index)
+{}
+
+void ConfigOPLinkWidget::modeComboChanged(int index)
 {
+    int mode = ui->modeCsomboBox->itemData(index).toInt();
+
+    switch (mode) {
+    case DISABLED:
+    {
+        // Turn off power
+        ui->MaxRFTxPower->setCurrentIndex(0);
+        ui->MaxRFTxPower->setEnabled(false);
+        ui->ComSpeed->setEnabled(false);
+        ui->PPM->setChecked(false);
+        ui->PPMOnly->setChecked(false);
+        ui->OneWayLink->setChecked(false);
+        ui->Coordinator->setChecked(false);
+        ui->CoordID->setEnabled(false);
+        ui->CoordID->setText("0");
+        break;
+    }
+    case RECEIVER_TELEMETRY_ONLY:
+    {
+        keepRfPowerOrSetLowest();
+        keepBaudRateOrSet(38400);
+        ui->Coordinator->setChecked(false);
+        ui->PPM->setChecked(false);
+        ui->PPMOnly->setChecked(false);
+        ui->OneWayLink->setChecked(false);
+        ui->CoordID->setEnabled(true);
+        ui->CoordID->setText("0");
+        break;
+    }
+    case RECEIVER_TELEMETRY_AND_CONTROL:
+    {
+        keepRfPowerOrSetLowest();
+        keepBaudRateOrSet(38400);
+        ui->Coordinator->setChecked(false);
+        ui->PPM->setChecked(true);
+        ui->PPMOnly->setChecked(false);
+        ui->OneWayLink->setChecked(false);
+        ui->CoordID->setEnabled(true);
+        ui->CoordID->setText("0");
+        break;
+    }
+    case RECEIVER_CONTROL_ONLY:
+    {
+        keepRfPowerOrSetLowest();
+        keepBaudRateOrSet(19200);
+        ui->Coordinator->setChecked(false);
+        ui->PPM->setChecked(true);
+        ui->PPMOnly->setChecked(true);
+        ui->OneWayLink->setChecked(true);
+        ui->CoordID->setEnabled(true);
+        ui->CoordID->setText("0");
+        break;
+    }
+    case TRANSMITTER_TELEMETRY_ONLY:
+    {
+        keepRfPowerOrSetLowest();
+        keepBaudRateOrSet(38400);
+        ui->Coordinator->setChecked(true);
+        ui->PPM->setChecked(false);
+        ui->PPMOnly->setChecked(false);
+        ui->OneWayLink->setChecked(false);
+        ui->CoordID->setEnabled(false);
+        ui->CoordID->setText("0");
+        break;
+    }
+    case TRANSMITTER_TELEMETRY_AND_CONTROL:
+    {
+        keepRfPowerOrSetLowest();
+        keepBaudRateOrSet(38400);
+        ui->Coordinator->setChecked(true);
+        ui->PPM->setChecked(true);
+        ui->PPMOnly->setChecked(false);
+        ui->OneWayLink->setChecked(false);
+        ui->CoordID->setEnabled(false);
+        ui->CoordID->setText("0");
+        break;
+    }
+    case TRANSMITTER_CONTROL_ONLY:
+    {
+        keepRfPowerOrSetLowest();
+        keepBaudRateOrSet(19200);
+        ui->Coordinator->setChecked(true);
+        ui->PPM->setChecked(true);
+        ui->PPMOnly->setChecked(true);
+        ui->OneWayLink->setChecked(true);
+        ui->CoordID->setEnabled(false);
+        ui->CoordID->setText("0");
+        break;
+    }
+    case CUSTOM:
+    {
+        break;
+    }
+    default:
+    {}
+    }
 }
 
-void ConfigPipXtremeWidget::comSpeedChanged(int index)
-{
-}
-
-void ConfigPipXtremeWidget::modeComboChanged(int index)
-{
-}
-
-void ConfigPipXtremeWidget::enableControls(bool enable)
-{
-}
+void ConfigOPLinkWidget::enableControls(bool enable)
+{}

@@ -55,8 +55,10 @@ QWidget *UAVGadgetOptionsPageDecorator::createPage(QWidget *parent)
     m_page->setupUi(w);
 
     QWidget *wi = m_optionsPage->createPage(w);
-    wi->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    m_page->verticalLayout_4->addWidget(wi);
+    if (wi) {
+        wi->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+        m_page->verticalLayout_4->addWidget(wi);
+    }
 
     // For some gadgets it might not make sense to have multiple configurations
     if (m_isSingleConfigurationGadget) {

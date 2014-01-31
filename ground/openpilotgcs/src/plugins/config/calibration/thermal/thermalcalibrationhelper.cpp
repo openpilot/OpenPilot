@@ -76,6 +76,10 @@ bool ThermalCalibrationHelper::setupBoardForCalibration()
     for (int i = 0; i < AccelGyroSettings::GYRO_TEMP_COEFF_NUMELEM; i++) {
         data.gyro_temp_coeff[i] = 0.0f;
     }
+
+    data.temp_calibrated_extent[0] = 0.0f;
+    data.temp_calibrated_extent[1] = 0.0f;
+
     accelGyroSettings->setData(data);
 
     // clean any correction before calibrating
@@ -316,7 +320,8 @@ void ThermalCalibrationHelper::calculate()
     }
 
     m_results.gyroCalibrated = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro, m_results.gyroInSigma, m_results.gyroOutSigma);
-
+    m_results.accelGyroTempMin = datat.array().minCoeff();
+    m_results.accelGyroTempMax = datat.array().maxCoeff();
     // TODO: sanity checks needs to be enforced before accel calibration can be enabled and usable.
     /*
        setProcessPercentage(processPercentage() + 2);
@@ -472,6 +477,9 @@ void ThermalCalibrationHelper::copyResultToSettings()
             data.accel_temp_coeff[1] = m_results.gyro[1];
             data.accel_temp_coeff[2] = m_results.gyro[2];
         }
+        data.temp_calibrated_extent[0] = m_results.accelGyroTempMin;
+        data.temp_calibrated_extent[1] = m_results.accelGyroTempMax;
+
         accelGyroSettings->setData(data);
         accelGyroSettings->updated();
     }

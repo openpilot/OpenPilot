@@ -71,7 +71,6 @@ qmfiles.CONFIG += no_check_exist
 INSTALLS += qmfiles
 
 #========= begin block copying qt_*.qm files ==========
-#win32 {
     defineReplace(QtQmExists) {
         for(lang,$$1) {
             qm_file = $$[QT_INSTALL_TRANSLATIONS]/qt_$${lang}.qm
@@ -88,5 +87,4 @@ INSTALLS += qmfiles
     copyQT_QMs.name = Copy ${QMAKE_FILE_IN}
     copyQT_QMs.CONFIG += no_link
     QMAKE_EXTRA_COMPILERS += copyQT_QMs
-#}
 #========= end block copying qt_*.qm files ============

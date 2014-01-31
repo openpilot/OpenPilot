@@ -92,7 +92,10 @@ static float gyro_scale[3] = { 0, 0, 0 };
 // temp coefficient to calculate gyro bias
 static float gyro_temp_coeff[4] = { 0 };
 static float accel_temp_coeff[4] = { 0 };
-
+static float calibrated_temp_min = 0.0f;
+static float calibrated_temp_max = 0.0f;
+static volatile bool gyro_temp_calibrated = false;
+static volatile bool accel_temp_calibrated = false;
 static float R[3][3] = {
     { 0 }
 };
@@ -350,15 +353,21 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         float accels[3]     = { (float)accel_accum[0] / accel_samples,
                                 (float)accel_accum[1] / accel_samples,
                                 (float)accel_accum[2] / accel_samples };
-        float accels_out[3] = { accels[0] * accel_scaling * accel_scale[0]
-                                - accel_bias[0]
-                                - accel_temp_coeff[0] * accelSensorData.temperature,
-                                accels[1] * accel_scaling * accel_scale[1]
-                                - accel_bias[1]
-                                - accel_temp_coeff[1] * accelSensorData.temperature,
-                                accels[2] * accel_scaling * accel_scale[2]
-                                - accel_bias[2]
-                                - accel_temp_coeff[2] * accelSensorData.temperature };
+
+
+        float accels_out[3] = { accels[0] * accel_scaling * accel_scale[0] - accel_bias[0],
+                                accels[1] * accel_scaling * accel_scale[1] - accel_bias[1],
+                                accels[2] * accel_scaling * accel_scale[2] - accel_bias[2] };
+
+        if(accel_temp_calibrated){
+            float ctemp = accelSensorData.temperature > calibrated_temp_max ? calibrated_temp_max :
+                          (accelSensorData.temperature < calibrated_temp_min ? calibrated_temp_min
+                          : accelSensorData.temperature );
+            accels_out[0] -= accel_temp_coeff[0] * ctemp;
+            accels_out[1] -= accel_temp_coeff[1] * ctemp;
+            accels_out[2] -= accel_temp_coeff[2] * ctemp;
+        }
+
         if (rotate) {
             rot_mult(R, accels_out, accels);
             accelSensorData.x = accels[0];
@@ -375,16 +384,20 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         float gyros[3]     = { (float)gyro_accum[0] / gyro_samples,
                                (float)gyro_accum[1] / gyro_samples,
                                (float)gyro_accum[2] / gyro_samples };
-        float gyros_out[3] = { gyros[0] * gyro_scaling * gyro_scale[0]
-                               - gyro_staticbias[0]
-                               - gyro_temp_coeff[0] * gyroSensorData.temperature,
-                               gyros[1] * gyro_scaling * gyro_scale[1]
-                               - gyro_staticbias[1]
-                               - gyro_temp_coeff[1] * gyroSensorData.temperature,
-                               gyros[2] * gyro_scaling * gyro_scale[2]
-                               - gyro_staticbias[2]
-                               - gyro_temp_coeff[2] * gyroSensorData.temperature
-                               - gyro_temp_coeff[3] * gyroSensorData.temperature * gyroSensorData.temperature };
+
+        float gyros_out[3] = { gyros[0] * gyro_scaling * gyro_scale[0] - gyro_staticbias[0],
+                               gyros[1] * gyro_scaling * gyro_scale[1] - gyro_staticbias[1],
+                               gyros[2] * gyro_scaling * gyro_scale[2] - gyro_staticbias[2]};
+
+        if(gyro_temp_calibrated){
+            float ctemp = gyroSensorData.temperature > calibrated_temp_max ? calibrated_temp_max :
+                          (gyroSensorData.temperature < calibrated_temp_min ? calibrated_temp_min
+                          : gyroSensorData.temperature );
+            gyros_out[0] -= gyro_temp_coeff[0] * ctemp;
+            gyros_out[1] -= gyro_temp_coeff[1] * ctemp;
+            gyros_out[2] -= (gyro_temp_coeff[2] + gyro_temp_coeff[3] * ctemp) * ctemp;
+        }
+
         if (rotate) {
             rot_mult(R, gyros_out, gyros);
             gyroSensorData.x = gyros[0];
@@ -466,6 +479,17 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     accel_temp_coeff[0] = agcal.accel_temp_coeff.X;
     accel_temp_coeff[1] = agcal.accel_temp_coeff.Y;
     accel_temp_coeff[2] = agcal.accel_temp_coeff.Z;
+    calibrated_temp_max = agcal.temp_calibrated_extent.max;
+    calibrated_temp_min = agcal.temp_calibrated_extent.min;
+
+    accel_temp_calibrated = (agcal.temp_calibrated_extent.max - agcal.temp_calibrated_extent.min > .1f) &&
+            agcal.accel_temp_coeff.X > 1e-9f && agcal.accel_temp_coeff.Y > 1e-9f && agcal.accel_temp_coeff.Z > 1e-9f;
+
+    gyro_temp_calibrated =  (agcal.temp_calibrated_extent.max - agcal.temp_calibrated_extent.min > .1f) &&
+            agcal.gyro_temp_coeff.X > 1e-9f && agcal.gyro_temp_coeff.Y > 1e-9f &&
+            agcal.gyro_temp_coeff.Z > 1e-9f && agcal.gyro_temp_coeff.Z2 > 1e-9f;
+
+
 
     AttitudeSettingsData attitudeSettings;
     AttitudeSettingsGet(&attitudeSettings);

@@ -35,12 +35,14 @@
 
 #ifdef VERBOSE_UAVTALK
 // uncomment and adapt the following lines to filter verbose logging to include specific object(s) only
-// #include "flighttelemetrystats.h"
-// #define VERBOSE_FILTER(objId) if (objId == FlightTelemetryStats::OBJID)
+//#include "oplinkstatus.h"
+//#define VERBOSE_FILTER(objId) if (objId == OPLinkStatus::OBJID)
 #endif
 #ifndef VERBOSE_FILTER
 #define VERBOSE_FILTER(objId)
 #endif
+
+#define OBJ_HEX_ID(objId) (QString("%1").arg(objId, 1, 16).toUpper())
 
 #define SYNC_VAL 0x3C
 
@@ -363,7 +365,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         {
             UAVObject *rxObj = objMngr->getObject(rxObjId);
             if (rxObj == NULL && rxType != TYPE_OBJ_REQ) {
-                qWarning() << "UAVTalk - error : unknown object" << rxObjId;
+                qWarning() << "UAVTalk - error : unknown object" << OBJ_HEX_ID(rxObjId);
                 stats.rxErrors++;
                 rxState = STATE_ERROR;
                 break;
@@ -383,7 +385,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             // Check length and determine next state
             if (rxLength >= MAX_PAYLOAD_LENGTH) {
                 // packet error - exceeded payload max length
-                qWarning() << "UAVTalk - error : exceeded payload max length" << rxObjId;
+                qWarning() << "UAVTalk - error : exceeded payload max length" << OBJ_HEX_ID(rxObjId);
                 stats.rxErrors++;
                 rxState = STATE_ERROR;
                 break;
@@ -392,7 +394,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             // Check the lengths match
             if ((rxPacketLength + rxLength) != packetSize) {
                 // packet error - mismatched packet size
-                qWarning() << "UAVTalk - error : mismatched packet size" << rxObjId;
+                qWarning() << "UAVTalk - error : mismatched packet size" << OBJ_HEX_ID(rxObjId);
                 stats.rxErrors++;
                 rxState = STATE_ERROR;
                 break;
@@ -428,7 +430,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         if (rxCS != rxCSPacket) {
             // packet error - faulty CRC
-            qWarning() << "UAVTalk - error : failed CRC check" << rxObjId;
+            qWarning() << "UAVTalk - error : failed CRC check" << OBJ_HEX_ID(rxObjId);
             stats.rxCrcErrors++;
             rxState = STATE_ERROR;
             break;
@@ -436,7 +438,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
         if (rxPacketLength != packetSize + CHECKSUM_LENGTH) {
             // packet error - mismatched packet size
-            qWarning() << "UAVTalk - error : mismatched packet size" << rxObjId;
+            qWarning() << "UAVTalk - error : mismatched packet size" << OBJ_HEX_ID(rxObjId);
             stats.rxErrors++;
             rxState = STATE_ERROR;
             break;
@@ -588,7 +590,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8 *
         error = true;
     }
     if (error) {
-        qWarning() << "UAVTalk - !!! error receiving" << typeToString(type) << objId << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
+        qWarning() << "UAVTalk - !!! error receiving" << typeToString(type) << OBJ_HEX_ID(objId) << instId << (obj != NULL ? obj->toStringBrief() : "<null object>");
     }
     // Done
     return !error;
@@ -609,7 +611,7 @@ UAVObject *UAVTalk::updateObject(quint32 objId, quint16 instId, quint8 *data)
         // Get the object type
         UAVObject *typeObj = objMngr->getObject(objId);
         if (typeObj == NULL) {
-            qWarning() << "UAVTalk - failed to get object, object ID :" << objId;
+            qWarning() << "UAVTalk - failed to get object, object ID :" << OBJ_HEX_ID(objId);
             return NULL;
         }
         // Make sure this is a data object
@@ -861,7 +863,7 @@ void UAVTalk::closeAllTransactions()
         foreach(quint32 instId, objTransactions->keys()) {
             Transaction *trans = objTransactions->value(instId);
 
-            qWarning() << "UAVTalk - closing active transaction for object" << trans->respObjId;
+            qWarning() << "UAVTalk - closing active transaction for object" << OBJ_HEX_ID(trans->respObjId);
             objTransactions->remove(instId);
             delete trans;
         }

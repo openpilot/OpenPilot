@@ -55,7 +55,7 @@
 #define STACK_SIZE_BYTES     1312
 #endif
 
-#define TASK_PRIORITY        (tskIDLE_PRIORITY + 4)
+#define TASK_PRIORITY        (tskIDLE_PRIORITY + 4) // device driver
 #define FAILSAFE_TIMEOUT_MS  100
 #define MAX_MIX_ACTUATORS    ACTUATORCOMMAND_CHANNEL_NUMELEM
 

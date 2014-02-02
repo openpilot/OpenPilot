@@ -263,10 +263,10 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
         Q_ASSERT(reading);
         m_accelSamples.append(reading->getData());
         m_debugStream << "ACCEL:: " << m_accelSamples.last().temperature <<
-                         "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
-                         "\t" << m_accelSamples.last().x <<
-                         "\t" << m_accelSamples.last().y <<
-                         "\t" << m_accelSamples.last().z << endl;
+            "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
+            "\t" << m_accelSamples.last().x <<
+            "\t" << m_accelSamples.last().y <<
+            "\t" << m_accelSamples.last().z << endl;
 
         break;
     }
@@ -276,10 +276,10 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
         Q_ASSERT(reading);
         m_gyroSamples.append(reading->getData());
         m_debugStream << "GYRO:: " << m_gyroSamples.last().temperature <<
-                         "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
-                         "\t" << m_gyroSamples.last().x <<
-                         "\t" << m_gyroSamples.last().y <<
-                         "\t" << m_gyroSamples.last().z << endl;
+            "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
+            "\t" << m_gyroSamples.last().x <<
+            "\t" << m_gyroSamples.last().y <<
+            "\t" << m_gyroSamples.last().z << endl;
         break;
     }
     case BaroSensor::OBJID:
@@ -288,9 +288,9 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
         Q_ASSERT(reading);
         m_baroSamples.append(reading->getData());
         m_debugStream << "BARO:: " << m_baroSamples.last().Temperature <<
-                         "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
-                         "\t" << m_baroSamples.last().Pressure <<
-                         "\t" << m_baroSamples.last().Altitude << endl;
+            "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
+            "\t" << m_baroSamples.last().Pressure <<
+            "\t" << m_baroSamples.last().Altitude << endl;
         // this is needed as temperature is low pass filtered
         m_temperature = reading->getTemperature();
         updateTemp(m_temperature);
@@ -302,10 +302,10 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
         Q_ASSERT(reading);
         m_magSamples.append(reading->getData());
         m_debugStream << "MAG:: " <<
-                         "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
-                         "\t" << m_magSamples.last().x <<
-                         "\t" << m_magSamples.last().y <<
-                         "\t" << m_magSamples.last().z << endl;
+            "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
+            "\t" << m_magSamples.last().x <<
+            "\t" << m_magSamples.last().y <<
+            "\t" << m_magSamples.last().z << endl;
         break;
     }
     default:
@@ -355,7 +355,7 @@ void ThermalCalibrationHelper::calculate()
         datat[x] = m_gyroSamples[x].temperature;
     }
 
-    m_results.gyroCalibrated = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro, m_results.gyroInSigma, m_results.gyroOutSigma);
+    m_results.gyroCalibrated   = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro, m_results.gyroInSigma, m_results.gyroOutSigma);
     m_results.accelGyroTempMin = datat.array().minCoeff();
     m_results.accelGyroTempMax = datat.array().maxCoeff();
     // TODO: sanity checks needs to be enforced before accel calibration can be enabled and usable.
@@ -376,27 +376,26 @@ void ThermalCalibrationHelper::calculate()
 
        m_results.accelCalibrated = ThermalCalibration::AccelerometerCalibration(datax, datay, dataz, datat, m_results.accel);
      */
-    m_results.accelCalibrated = false;
+    m_results.accelCalibrated  = false;
     QString str;
     str += QStringLiteral("info::Calibration results");
 
     str += QStringLiteral("info::Baro cal {%1, %2, %3, %4}; initial variance: %5; Calibrated variance %6")
-        .arg(m_results.baro[0]).arg(m_results.baro[1]).arg(m_results.baro[2]).arg(m_results.baro[3])
-        .arg(m_results.baroInSigma).arg(m_results.baroOutSigma) + QChar::CarriageReturn;
+           .arg(m_results.baro[0]).arg(m_results.baro[1]).arg(m_results.baro[2]).arg(m_results.baro[3])
+           .arg(m_results.baroInSigma).arg(m_results.baroOutSigma) + QChar::CarriageReturn;
     str += QStringLiteral("info::Gyro cal x{%1} y{%2} z{%3, %4}; initial variance: {%5, %6, %7}; Calibrated variance {%8, %9, %10}")
-        .arg(m_results.gyro[0]).arg(m_results.gyro[1]).arg(m_results.gyro[2]).arg(m_results.baro[3])
-        .arg(m_results.gyroInSigma[0]).arg(m_results.gyroInSigma[1]).arg(m_results.gyroInSigma[2])
-        .arg(m_results.gyroOutSigma[0]).arg(m_results.gyroOutSigma[1]).arg(m_results.gyroOutSigma[2]) + QChar::CarriageReturn;
-    str +=  QStringLiteral("info::Accel cal x{%1} y{%2} z{%3}; initial variance: {%4, %5, %6}; Calibrated variance {%7, %8, %9}")
-        .arg(m_results.accel[0]).arg(m_results.accel[1]).arg(m_results.accel[2])
-        .arg(m_results.accelInSigma[0]).arg(m_results.accelInSigma[1]).arg(m_results.accelInSigma[2])
-        .arg(m_results.accelOutSigma[0]).arg(m_results.accelOutSigma[1]).arg(m_results.accelOutSigma[2]) + QChar::CarriageReturn;
+           .arg(m_results.gyro[0]).arg(m_results.gyro[1]).arg(m_results.gyro[2]).arg(m_results.baro[3])
+           .arg(m_results.gyroInSigma[0]).arg(m_results.gyroInSigma[1]).arg(m_results.gyroInSigma[2])
+           .arg(m_results.gyroOutSigma[0]).arg(m_results.gyroOutSigma[1]).arg(m_results.gyroOutSigma[2]) + QChar::CarriageReturn;
+    str += QStringLiteral("info::Accel cal x{%1} y{%2} z{%3}; initial variance: {%4, %5, %6}; Calibrated variance {%7, %8, %9}")
+           .arg(m_results.accel[0]).arg(m_results.accel[1]).arg(m_results.accel[2])
+           .arg(m_results.accelInSigma[0]).arg(m_results.accelInSigma[1]).arg(m_results.accelInSigma[2])
+           .arg(m_results.accelOutSigma[0]).arg(m_results.accelOutSigma[1]).arg(m_results.accelOutSigma[2]) + QChar::CarriageReturn;
     qDebug() << str;
-    m_debugStream  << str;
+    m_debugStream << str;
     copyResultToSettings();
     emit calculationCompleted();
     closeDebugLog();
-
 }
 
 
@@ -439,9 +438,9 @@ void ThermalCalibrationHelper::updateTemp(float temp)
             qDebug() << "M_gradient " << m_gradient << " Elapsed" << elapsed << " m_initialGradient" << m_initialGradient;
             // make a rough estimation of the time needed
             m_targetduration = elapsed * 8;
-            if(m_debugFile.isOpen()){
+            if (m_debugFile.isOpen()) {
                 m_debugStream << "INFO::Trace gradient " << m_gradient << " Elapsed" << elapsed << " m_initialGradient" << m_initialGradient
-                          << " target:" << m_targetduration << endl;
+                              << " target:" << m_targetduration << endl;
             }
         }
     }
@@ -488,14 +487,14 @@ void ThermalCalibrationHelper::disconnectUAVOs()
 
 void ThermalCalibrationHelper::createDebugLog()
 {
-    if(m_debugFile.isOpen()){
+    if (m_debugFile.isOpen()) {
         closeDebugLog();
     }
-    if(m_tempdir->isValid()){
+    if (m_tempdir->isValid()) {
         QString filename = QStringLiteral("thcaldebug_%1.txt").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy-hh.mm.ss.zzz"));
         QDir dir = QDir(m_tempdir->path());
         m_debugFile.setFileName(dir.filePath(filename));
-        if (!m_debugFile.open(QIODevice::WriteOnly | QIODevice::Text)){
+        if (!m_debugFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
             m_debugStream.setDevice(0);
             return;
         }
@@ -504,28 +503,27 @@ void ThermalCalibrationHelper::createDebugLog()
         m_debugStream.setDevice(&m_debugFile);
 
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-        UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
-        deviceDescriptorStruct board   = utilMngr->getBoardDescriptionStruct();
+        UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
+        deviceDescriptorStruct board = utilMngr->getBoardDescriptionStruct();
 
         m_debugStream << "INFO::Hardware";
         m_debugStream << " type:" << QString().setNum(board.boardType, 16);
-        m_debugStream << " revision:"<<QString().setNum(board.boardRevision, 16);
+        m_debugStream << " revision:" << QString().setNum(board.boardRevision, 16);
         m_debugStream << " serial:" << QString(utilMngr->getBoardCPUSerial().toHex()) << endl;
 
-        QString uavo   = board.uavoHash.toHex();
+        QString uavo = board.uavoHash.toHex();
         m_debugStream << "INFO::firmware tag:" << board.gitTag << " date:" << board.gitDate << " hash:" << board.gitHash <<
-                      "uavo:" << uavo.left(8) << endl;
+            "uavo:" << uavo.left(8) << endl;
 
 
         m_debugStream << "INFO::gcs tag:" << VersionInfo::tagOrBranch() + VersionInfo::dirty() << " date:" << VersionInfo::dateTime() <<
-                         " hash:" << VersionInfo::hash().left(8) << " uavo:" << VersionInfo::uavoHash().left(8) << endl;
-
+            " hash:" << VersionInfo::hash().left(8) << " uavo:" << VersionInfo::uavoHash().left(8) << endl;
     }
 }
 
 void ThermalCalibrationHelper::closeDebugLog()
 {
-    if(m_debugFile.isOpen()){
+    if (m_debugFile.isOpen()) {
         m_debugStream.flush();
         m_debugStream.setDevice(0);
         m_debugFile.close();

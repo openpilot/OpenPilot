@@ -161,7 +161,7 @@ private:
     void connectUAVOs();
     void disconnectUAVOs();
 
-    QFile  m_debugFile;
+    QFile m_debugFile;
     QTextStream m_debugStream;
     QScopedPointer<QTemporaryDir> m_tempdir;
     void createDebugLog();
@@ -211,7 +211,6 @@ private:
     void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();
 
-    //Q_DISABLE_COPY(ThermalCalibrationHelper)
 };
 }
 #endif // THERMALCALIBRATIONHELPER_H

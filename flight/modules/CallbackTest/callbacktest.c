@@ -65,13 +65,13 @@ int32_t CallbackTestInitialize()
 {
     mutex     = xSemaphoreCreateRecursiveMutex();
 
-    cbinfo[0] = DelayedCallbackCreate(&DelayedCb0, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[1] = DelayedCallbackCreate(&DelayedCb1, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[2] = DelayedCallbackCreate(&DelayedCb2, CALLBACK_PRIORITY_CRITICAL, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[3] = DelayedCallbackCreate(&DelayedCb3, CALLBACK_PRIORITY_CRITICAL, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[4] = DelayedCallbackCreate(&DelayedCb4, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[5] = DelayedCallbackCreate(&DelayedCb5, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[6] = DelayedCallbackCreate(&DelayedCb6, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 20, STACK_SIZE);
+    cbinfo[0] = DelayedCallbackCreate(&DelayedCb0, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[1] = DelayedCallbackCreate(&DelayedCb1, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[2] = DelayedCallbackCreate(&DelayedCb2, CALLBACK_PRIORITY_CRITICAL, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[3] = DelayedCallbackCreate(&DelayedCb3, CALLBACK_PRIORITY_CRITICAL, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[4] = DelayedCallbackCreate(&DelayedCb4, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[5] = DelayedCallbackCreate(&DelayedCb5, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[6] = DelayedCallbackCreate(&DelayedCb6, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 20, -1, STACK_SIZE);
 
 
     return 0;

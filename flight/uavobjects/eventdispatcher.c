@@ -26,7 +26,7 @@
 
 #include <openpilot.h>
 
-#include <taskinfo.h>
+#include <callbackinfo.h>
 
 // Private constants
 #if defined(PIOS_EVENTDISAPTCHER_QUEUE)
@@ -103,7 +103,7 @@ int32_t EventDispatcherInitialize()
     mQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(EventCallbackInfo));
 
     // Create callback
-    eventSchedulerCallback = DelayedCallbackCreate(&eventTask, CALLBACK_PRIORITY, TASK_PRIORITY, STACK_SIZE * 4);
+    eventSchedulerCallback = DelayedCallbackCreate(&eventTask, CALLBACK_PRIORITY, TASK_PRIORITY, CALLBACKINFO_RUNNING_EVENTDISPATCHER, STACK_SIZE * 4);
     DelayedCallbackDispatch(eventSchedulerCallback);
 
     // Done

@@ -45,6 +45,8 @@
 
 #include <openpilot.h>
 
+#include <callbackinfo.h>
+
 #include <math.h>
 #include <pid.h>
 #include <CoordinateConversions.h>
@@ -101,7 +103,7 @@ int32_t AltitudeHoldInitialize()
 
     // Create object queue
 
-    altitudeHoldCBInfo = DelayedCallbackCreate(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, STACK_SIZE_BYTES);
+    altitudeHoldCBInfo = DelayedCallbackCreate(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_ALTITUDEHOLD, STACK_SIZE_BYTES);
     AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
 
     return 0;

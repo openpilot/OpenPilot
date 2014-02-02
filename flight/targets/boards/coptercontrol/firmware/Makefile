@@ -112,6 +112,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/relaytuningsettings.c
     SRC += $(OPUAVSYNTHDIR)/relaytuning.c
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+    SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/ratedesired.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c

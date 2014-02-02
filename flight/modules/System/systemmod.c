@@ -52,7 +52,7 @@
 #include <i2cstats.h>
 #include <taskinfo.h>
 #include <watchdogstatus.h>
-#include <taskinfo.h>
+#include <callbackinfo.h>
 #include <hwsettings.h>
 #include <pios_flashfs.h>
 #if defined(PIOS_INCLUDE_RFM22B)
@@ -147,6 +147,7 @@ int32_t SystemModInitialize(void)
     ObjectPersistenceInitialize();
 #ifdef DIAG_TASKS
     TaskInfoInitialize();
+    CallbackInfoInitialize();
 #endif
 #ifdef DIAG_I2C_WDG_STATS
     I2CStatsInitialize();

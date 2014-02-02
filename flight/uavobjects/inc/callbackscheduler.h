@@ -135,12 +135,14 @@ int32_t CallbackSchedulerStart();
  * \param[in] priority Priority of the callback compared to other callbacks scheduled by the same delayed callback scheduler task.
  * \param[in] priorityTask Task priority of the scheduler task. One scheduler task will be spawned for each distinct value specified, further callbacks created  with the same priorityTask will all be handled by the same delayed callback scheduler task and scheduled according to their individual callback priorities
  * \param[in] stacksize The stack requirements of the callback when called by the scheduler.
+ * \param[in] callbackID - CallbackInfoRunningElem from CallbackInfo UAVObject, unique identified to collect stats for the callback, -1 to ignore!
  * \return CallbackInfo Pointer on success, NULL if failed.
  */
 DelayedCallbackInfo *DelayedCallbackCreate(
     DelayedCallback cb,
     DelayedCallbackPriority priority,
     DelayedCallbackPriorityTask priorityTask,
+    int16_t callbackID,
     uint32_t stacksize);
 
 /**

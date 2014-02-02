@@ -31,6 +31,7 @@
 
 #include "openpilot.h"
 
+#include "callbackinfo.h"
 #include "pathplan.h"
 #include "flightstatus.h"
 #include "airspeedstate.h"
@@ -115,8 +116,8 @@ int32_t PathPlannerInitialize()
     WaypointInitialize();
     WaypointActiveInitialize();
 
-    pathPlannerHandle = DelayedCallbackCreate(&pathPlannerTask, CALLBACK_PRIORITY_REGULAR, TASK_PRIORITY, STACK_SIZE_BYTES);
-    pathDesiredUpdaterHandle = DelayedCallbackCreate(&updatePathDesired, CALLBACK_PRIORITY_CRITICAL, TASK_PRIORITY, STACK_SIZE_BYTES);
+    pathPlannerHandle = DelayedCallbackCreate(&pathPlannerTask, CALLBACK_PRIORITY_REGULAR, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER0, STACK_SIZE_BYTES);
+    pathDesiredUpdaterHandle = DelayedCallbackCreate(&updatePathDesired, CALLBACK_PRIORITY_CRITICAL, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER1, STACK_SIZE_BYTES);
 
     return 0;
 }

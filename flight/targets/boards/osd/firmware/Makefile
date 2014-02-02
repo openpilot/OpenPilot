@@ -84,6 +84,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+    SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/homelocation.c
     SRC += $(OPUAVSYNTHDIR)/gpspositionsensor.c

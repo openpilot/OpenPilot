@@ -31,6 +31,8 @@
 
 #include "inc/stateestimation.h"
 
+#include <callbackinfo.h>
+
 #include <gyrosensor.h>
 #include <accelsensor.h>
 #include <magsensor.h>
@@ -266,7 +268,7 @@ int32_t StateEstimationInitialize(void)
     stack_required = maxint32_t(stack_required, filterEKF13iInitialize(&ekf13iFilter));
     stack_required = maxint32_t(stack_required, filterEKF13Initialize(&ekf13Filter));
 
-    stateEstimationCallback = DelayedCallbackCreate(&StateEstimationCb, CALLBACK_PRIORITY, TASK_PRIORITY, stack_required);
+    stateEstimationCallback = DelayedCallbackCreate(&StateEstimationCb, CALLBACK_PRIORITY, TASK_PRIORITY, CALLBACKINFO_RUNNING_STATEESTIMATION, stack_required);
 
     return 0;
 }

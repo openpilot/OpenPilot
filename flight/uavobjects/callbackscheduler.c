@@ -52,6 +52,7 @@ struct DelayedCallbackTaskStruct {
  */
 struct DelayedCallbackInfoStruct {
     DelayedCallback   cb;
+    int16_t callbackID;
     bool volatile     waiting;
     uint32_t volatile scheduletime;
     struct DelayedCallbackTaskStruct *task;
@@ -241,6 +242,7 @@ DelayedCallbackInfo *DelayedCallbackCreate(
     DelayedCallback cb,
     DelayedCallbackPriority priority,
     DelayedCallbackPriorityTask priorityTask,
+    int16_t callbackID,
     uint32_t stacksize)
 {
     xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -318,11 +320,12 @@ DelayedCallbackInfo *DelayedCallbackCreate(
         xSemaphoreGiveRecursive(mutex);
         return NULL; // error - not enough memory
     }
-    info->next    = NULL;
-    info->waiting = false;
+    info->next         = NULL;
+    info->waiting      = false;
     info->scheduletime = 0;
-    info->task    = task;
+    info->task         = task;
     info->cb = cb;
+    info->callbackID   = callbackID;
 
     // add to scheduling queue
     LL_APPEND(task->callbackQueue[priority], info);

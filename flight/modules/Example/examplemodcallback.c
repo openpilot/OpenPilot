@@ -45,6 +45,7 @@
  */
 
 #include "openpilot.h"
+#include "callbackinfo.h" // object needed for callback id macro CALLBACKINFO_RUNNING_<MODULENAME>
 #include "exampleobject1.h" // object the module will listen for updates (input)
 #include "exampleobject2.h" // object the module will update (output)
 #include "examplesettings.h" // object holding module settings (input)
@@ -71,7 +72,7 @@ int32_t ExampleModCallbackInitialize()
     // Listen for ExampleObject1 updates, connect a callback function
     ExampleObject1ConnectCallback(&ObjectUpdatedCb);
 
-    cbinfo = DelayedCallbackCreate(&DelayedCb, CALLBACK_PRIORITY, CBTASK_PRIORITY, STACK_SIZE);
+    cbinfo = DelayedCallbackCreate(&DelayedCb, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_EXAMPLE, STACK_SIZE);
 
     return 0;
 }

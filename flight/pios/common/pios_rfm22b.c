@@ -64,7 +64,7 @@
 
 /* Local Defines */
 #define STACK_SIZE_BYTES                 200
-#define TASK_PRIORITY                    (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY                    (tskIDLE_PRIORITY + 4) // flight control relevant device driver (ppm link)
 #define ISR_TIMEOUT                      1 // ms
 #define EVENT_QUEUE_SIZE                 5
 #define RFM22B_DEFAULT_RX_DATARATE       RFM22_datarate_9600

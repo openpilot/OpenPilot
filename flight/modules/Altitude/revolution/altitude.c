@@ -83,7 +83,7 @@ int32_t AltitudeInitialize()
     BaroSensorInitialize();
     RevoSettingsInitialize();
     RevoSettingsConnectCallback(&SettingsUpdatedCb);
-
+    SettingsUpdatedCb(NULL);
 #if defined(PIOS_INCLUDE_HCSR04)
     SonarAltitudeInitialize();
 #endif

@@ -39,7 +39,7 @@ namespace OpenPilot {
 ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     WizardModel(parent)
 {
-    m_helper           = new ThermalCalibrationHelper();
+    m_helper.reset(new ThermalCalibrationHelper());
     m_readyState       = new WizardState(tr("Start"), this),
     m_workingState     = new WizardState(NULL, this);
 
@@ -57,9 +57,9 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     m_completedState   = new WizardState("Completed", this);
     setTransitions();
 
-    connect(m_helper, SIGNAL(gradientChanged(float)), this, SLOT(setTemperatureGradient(float)));
-    connect(m_helper, SIGNAL(temperatureChanged(float)), this, SLOT(setTemperature(float)));
-    connect(m_helper, SIGNAL(processPercentageChanged(int)), this, SLOT(setProgress(int)));
+    connect(m_helper.data(), SIGNAL(gradientChanged(float)), this, SLOT(setTemperatureGradient(float)));
+    connect(m_helper.data(), SIGNAL(temperatureChanged(float)), this, SLOT(setTemperature(float)));
+    connect(m_helper.data(), SIGNAL(processPercentageChanged(int)), this, SLOT(setProgress(int)));
     connect(m_readyState, SIGNAL(entered()), this, SLOT(wizardReady()));
     connect(m_readyState, SIGNAL(exited()), this, SLOT(wizardStarted()));
     connect(m_completedState, SIGNAL(entered()), this, SLOT(wizardReady()));
@@ -90,19 +90,19 @@ void ThermalCalibrationModel::setTransitions()
     m_completedState->addTransition(this, SIGNAL(next()), m_workingState);
     // handles board status save
     // Ready->WorkingState->saveSettings->setup
-    m_saveSettingState->addTransition(new BoardStatusSaveTransition(m_helper, m_saveSettingState, m_setupState));
+    m_saveSettingState->addTransition(new BoardStatusSaveTransition(m_helper.data(), m_saveSettingState, m_setupState));
     // board setup
     // setup
-    m_setupState->addTransition(new BoardSetupTransition(m_helper, m_setupState, m_acquisitionState));
+    m_setupState->addTransition(new BoardSetupTransition(m_helper.data(), m_setupState, m_acquisitionState));
 
     // acquisition -revertSettings-> calculation
     // revert settings after acquisition is completed
     // m_acquisitionState->addTransition(new BoardStatusRestoreTransition(m_helper, m_acquisitionState, m_calculateState));
-    m_acquisitionState->addTransition(new DataAcquisitionTransition(m_helper, m_acquisitionState, m_restoreState));
-    m_restoreState->addTransition(new BoardStatusRestoreTransition(m_helper, m_restoreState, m_calculateState));
-    m_calculateState->addTransition(new CompensationCalculationTransition(m_helper, m_calculateState, m_completedState));
-    m_abortState->addTransition(new BoardStatusRestoreTransition(m_helper, m_abortState, m_readyState));
-    m_workingState->addTransition(m_helper, SIGNAL(abort()), m_abortState);
+    m_acquisitionState->addTransition(new DataAcquisitionTransition(m_helper.data(), m_acquisitionState, m_restoreState));
+    m_restoreState->addTransition(new BoardStatusRestoreTransition(m_helper.data(), m_restoreState, m_calculateState));
+    m_calculateState->addTransition(new CompensationCalculationTransition(m_helper.data(), m_calculateState, m_completedState));
+    m_abortState->addTransition(new BoardStatusRestoreTransition(m_helper.data(), m_abortState, m_readyState));
+    m_workingState->addTransition(m_helper.data(), SIGNAL(abort()), m_abortState);
     // Ready
 }
 }

@@ -138,7 +138,7 @@ private:
     QString m_temperature;
     QString m_temperatureGradient;
 
-    ThermalCalibrationHelper *m_helper;
+    QScopedPointer<ThermalCalibrationHelper> m_helper;
 
     // Start from here
     WizardState *m_readyState;

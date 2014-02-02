@@ -31,6 +31,9 @@
 #include <QObject>
 #include <QtCore>
 #include <QTime>
+#include <QTemporaryDir>
+#include <QTextStream>
+
 #include "uavobjectmanager.h"
 #include <uavobject.h>
 #include <uavobjectmanager.h>
@@ -151,11 +154,18 @@ public slots:
         }
     }
 
+    void cleanup();
+
 private:
     void updateTemp(float temp);
     void connectUAVOs();
     void disconnectUAVOs();
 
+    QFile  m_debugFile;
+    QTextStream m_debugStream;
+    QScopedPointer<QTemporaryDir> m_tempdir;
+    void createDebugLog();
+    void closeDebugLog();
     void copyResultToSettings();
 
     QMutex sensorsUpdateLock;
@@ -200,6 +210,8 @@ private:
 
     void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();
+
+    //Q_DISABLE_COPY(ThermalCalibrationHelper)
 };
 }
 #endif // THERMALCALIBRATIONHELPER_H

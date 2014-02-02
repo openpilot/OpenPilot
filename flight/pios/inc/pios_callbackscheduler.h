@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       callbackscheduler.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Include files of the uavobjectlist library
+ * @file       pios_callbackscheduler.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      Include files of the PIOS_CALLBACKSCHEDULER
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,8 +23,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef CALLBACKSCHEDULER_H
-#define CALLBACKSCHEDULER_H
+#ifndef PIOS_CALLBACKSCHEDULER_H
+#define PIOS_CALLBACKSCHEDULER_H
 
 // Public types
 typedef enum {
@@ -48,7 +48,7 @@ typedef enum {
 // ...ABcABdABxABcABdAByABcABdABxABcABdABy...
 // However if only the 3 callbacks, A, c and x want to execute, you will get:
 // ...AcAxAcAxAcAxAcAxAcAxAcAxAcAxAcAxAcAx...
-// And if onlz A and y need execution it will be:
+// And if only A and y need execution it will be:
 // ...AyAyAyAyAyAyAyAyAyAyAyAyAyAyAyAyAyAy...
 // despite their different priority they would get treated equally in this case.
 //
@@ -113,7 +113,7 @@ typedef struct DelayedCallbackInfoStruct DelayedCallbackInfo;
  * must be called before any other functions are called
  * \return Success (0), failure (-1)
  */
-int32_t CallbackSchedulerInitialize();
+int32_t PIOS_CALLBACKSCHEDULER_Initialize();
 
 /**
  * Start all scheduler tasks
@@ -125,7 +125,7 @@ int32_t CallbackSchedulerInitialize();
  * they can be marked for later execution by executing the dispatch function.
  * \return Success (0), failure (-1)
  */
-int32_t CallbackSchedulerStart();
+int32_t PIOS_CALLBACKSCHEDULER_Start();
 
 /**
  * Register a new callback to be called by a delayed callback scheduler task.
@@ -138,7 +138,7 @@ int32_t CallbackSchedulerStart();
  * \param[in] callbackID - CallbackInfoRunningElem from CallbackInfo UAVObject, unique identified to collect stats for the callback, -1 to ignore!
  * \return CallbackInfo Pointer on success, NULL if failed.
  */
-DelayedCallbackInfo *DelayedCallbackCreate(
+DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     DelayedCallback cb,
     DelayedCallbackPriority priority,
     DelayedCallbackPriorityTask priorityTask,
@@ -157,7 +157,7 @@ DelayedCallbackInfo *DelayedCallbackCreate(
  * UPDATEMODE_OVERRIDE: The callback will be rescheduled in any case, effectively overriding any previous schedule. (sooner+later=override)
  * \return 0: not scheduled, previous schedule takes precedence, 1: new schedule, 2: previous schedule overridden
  */
-int32_t DelayedCallbackSchedule(
+int32_t PIOS_CALLBACKSCHEDULER_Schedule(
     DelayedCallbackInfo *cbinfo,
     int32_t milliseconds,
     DelayedCallbackUpdateMode updatemode);
@@ -168,7 +168,7 @@ int32_t DelayedCallbackSchedule(
  * \param[in] *cbinfo the callback handle
  * \return Success (-1), failure (0)
  */
-int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo);
+int32_t PIOS_CALLBACKSCHEDULER_Dispatch(DelayedCallbackInfo *cbinfo);
 
 /**
  * Dispatch an event by invoking the supplied callback. The function
@@ -184,6 +184,6 @@ int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo);
  * Check the demo task for your port to find the syntax required.
  * \return Success (-1), failure (0)
  */
-int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken);
+int32_t PIOS_CALLBACKSCHEDULER_DispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken);
 
-#endif // CALLBACKSCHEDULER_H
+#endif // PIOS_CALLBACKSCHEDULER_H

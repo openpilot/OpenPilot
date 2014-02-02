@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       callbackscheduler.c
+ * @file       pios_callbackscheduler.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @brief      Scheduler to run callback functions from a shared context with given priorities.
  *
@@ -24,8 +24,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <openpilot.h>
+#include <pios.h>
+#ifdef PIOS_INCLUDE_CALLBACKSCHEDULER
 
+#include <utlist.h>
+#include <uavobjectmanager.h>
 #include <taskinfo.h>
 
 // Private constants
@@ -74,7 +77,7 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
  * must be called before any other functions are called
  * \return Success (0), failure (-1)
  */
-int32_t CallbackSchedulerInitialize()
+int32_t PIOS_CALLBACKSCHEDULER_Initialize()
 {
     // Initialize variables
     schedulerTasks   = NULL;
@@ -100,7 +103,7 @@ int32_t CallbackSchedulerInitialize()
  * they can be marked for later execution by executing the dispatch function.
  * \return Success (0), failure (-1)
  */
-int32_t CallbackSchedulerStart()
+int32_t PIOS_CALLBACKSCHEDULER_Start()
 {
     xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
@@ -144,7 +147,7 @@ int32_t CallbackSchedulerStart()
  * UPDATEMODE_OVERRIDE: The callback will be rescheduled in any case, effectively overriding any previous schedule. (sooner+later=override)
  * \return 0: not scheduled, previous schedule takes precedence, 1: new schedule, 2: previous schedule overridden
  */
-int32_t DelayedCallbackSchedule(
+int32_t PIOS_CALLBACKSCHEDULER_Schedule(
     DelayedCallbackInfo *cbinfo,
     int32_t milliseconds,
     DelayedCallbackUpdateMode updatemode)
@@ -192,7 +195,7 @@ int32_t DelayedCallbackSchedule(
  * \param[in] cbinfo the callback handle
  * \return Success (-1), failure (0)
  */
-int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo)
+int32_t PIOS_CALLBACKSCHEDULER_Dispatch(DelayedCallbackInfo *cbinfo)
 {
     PIOS_Assert(cbinfo);
 
@@ -216,7 +219,7 @@ int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo)
  * Check the demo task for your port to find the syntax required.
  * \return Success (-1), failure (0)
  */
-int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken)
+int32_t PIOS_CALLBACKSCHEDULER_DispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken)
 {
     PIOS_Assert(cbinfo);
 
@@ -238,7 +241,7 @@ int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigh
  * \param[in] stacksize The stack requirements of the callback when called by the scheduler.
  * \return CallbackInfo Pointer on success, NULL if failed.
  */
-DelayedCallbackInfo *DelayedCallbackCreate(
+DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     DelayedCallback cb,
     DelayedCallbackPriority priority,
     DelayedCallbackPriorityTask priorityTask,
@@ -287,7 +290,7 @@ DelayedCallbackInfo *DelayedCallbackCreate(
         // add to list of scheduler tasks
         LL_APPEND(schedulerTasks, task);
 
-        // Previously registered tasks are spawned when CallbackSchedulerStart() is called.
+        // Previously registered tasks are spawned when PIOS_CALLBACKSCHEDULER_Start() is called.
         // Tasks registered afterwards need to spawn upon creation.
         if (schedulerStarted) {
             xTaskCreate(
@@ -414,3 +417,5 @@ static void CallbackSchedulerTask(void *task)
         }
     }
 }
+
+#endif // ifdef PIOS_INCLUDE_CALLBACKSCHEDULER

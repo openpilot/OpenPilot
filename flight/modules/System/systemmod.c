@@ -176,7 +176,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
     MODULE_TASKCREATE_ALL;
 
     /* start the delayed callback scheduler */
-    CallbackSchedulerStart();
+    PIOS_CALLBACKSCHEDULER_Start();
 
     if (mallocFailed) {
         /* We failed to malloc during task creation,

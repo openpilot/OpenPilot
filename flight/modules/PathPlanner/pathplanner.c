@@ -96,7 +96,7 @@ int32_t PathPlannerStart()
     PathStatusConnectCallback(statusUpdated);
 
     // Start main task callback
-    DelayedCallbackDispatch(pathPlannerHandle);
+    PIOS_CALLBACKSCHEDULER_Dispatch(pathPlannerHandle);
 
     return 0;
 }
@@ -116,8 +116,8 @@ int32_t PathPlannerInitialize()
     WaypointInitialize();
     WaypointActiveInitialize();
 
-    pathPlannerHandle = DelayedCallbackCreate(&pathPlannerTask, CALLBACK_PRIORITY_REGULAR, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER0, STACK_SIZE_BYTES);
-    pathDesiredUpdaterHandle = DelayedCallbackCreate(&updatePathDesired, CALLBACK_PRIORITY_CRITICAL, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER1, STACK_SIZE_BYTES);
+    pathPlannerHandle = PIOS_CALLBACKSCHEDULER_Create(&pathPlannerTask, CALLBACK_PRIORITY_REGULAR, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER0, STACK_SIZE_BYTES);
+    pathDesiredUpdaterHandle = PIOS_CALLBACKSCHEDULER_Create(&updatePathDesired, CALLBACK_PRIORITY_CRITICAL, TASK_PRIORITY, CALLBACKINFO_RUNNING_PATHPLANNER1, STACK_SIZE_BYTES);
 
     return 0;
 }
@@ -129,7 +129,7 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart);
  */
 static void pathPlannerTask()
 {
-    DelayedCallbackSchedule(pathPlannerHandle, PATH_PLANNER_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+    PIOS_CALLBACKSCHEDULER_Schedule(pathPlannerHandle, PATH_PLANNER_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
 
     bool endCondition = false;
 
@@ -333,13 +333,13 @@ static uint8_t checkPathPlan()
 // callback function when status changed, issue execution of state machine
 void commandUpdated(__attribute__((unused)) UAVObjEvent *ev)
 {
-    DelayedCallbackDispatch(pathDesiredUpdaterHandle);
+    PIOS_CALLBACKSCHEDULER_Dispatch(pathDesiredUpdaterHandle);
 }
 
 // callback function when waypoints changed in any way, update pathDesired
 void statusUpdated(__attribute__((unused)) UAVObjEvent *ev)
 {
-    DelayedCallbackDispatch(pathPlannerHandle);
+    PIOS_CALLBACKSCHEDULER_Dispatch(pathPlannerHandle);
 }
 
 

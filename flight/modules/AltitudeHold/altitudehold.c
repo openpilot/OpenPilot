@@ -86,7 +86,7 @@ int32_t AltitudeHoldStart()
 {
     // Start main task
     SettingsUpdatedCb(NULL);
-    DelayedCallbackDispatch(altitudeHoldCBInfo);
+    PIOS_CALLBACKSCHEDULER_Dispatch(altitudeHoldCBInfo);
 
     return 0;
 }
@@ -103,7 +103,7 @@ int32_t AltitudeHoldInitialize()
 
     // Create object queue
 
-    altitudeHoldCBInfo = DelayedCallbackCreate(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_ALTITUDEHOLD, STACK_SIZE_BYTES);
+    altitudeHoldCBInfo = PIOS_CALLBACKSCHEDULER_Create(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_ALTITUDEHOLD, STACK_SIZE_BYTES);
     AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
 
     return 0;
@@ -130,7 +130,7 @@ static void altitudeHoldTask(void)
         pid_zero(&pid0);
         pid_zero(&pid1);
         StabilizationDesiredThrottleGet(&startThrottle);
-        DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+        PIOS_CALLBACKSCHEDULER_Schedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
         return;
 
         break;
@@ -192,7 +192,7 @@ static void altitudeHoldTask(void)
 
     StabilizationDesiredSet(&stab);
 
-    DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+    PIOS_CALLBACKSCHEDULER_Schedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
 }
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)

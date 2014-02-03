@@ -71,20 +71,20 @@ qmfiles.CONFIG += no_check_exist
 INSTALLS += qmfiles
 
 #========= begin block copying qt_*.qm files ==========
-    defineReplace(QtQmExists) {
-        for(lang,$$1) {
-            qm_file = $$[QT_INSTALL_TRANSLATIONS]/qt_$${lang}.qm
-            exists($$qm_file) : result += $$qm_file
-        }
-        return($$result)
+defineReplace(QtQmExists) {
+    for(lang,$$1) {
+        qm_file = $$[QT_INSTALL_TRANSLATIONS]/qt_$${lang}.qm
+        exists($$qm_file) : result += $$qm_file
     }
-    QT_TRANSLATIONS = $$QtQmExists(LANGUAGES)
+    return($$result)
+}
+QT_TRANSLATIONS = $$QtQmExists(LANGUAGES)
 
-    copyQT_QMs.input = QT_TRANSLATIONS
-    copyQT_QMs.output = $$GCS_DATA_PATH/translations/${QMAKE_FILE_BASE}.qm
-    isEmpty(vcproj):copyQT_QMs.variable_out = PRE_TARGETDEPS
-    copyQT_QMs.commands = $(COPY_FILE) ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
-    copyQT_QMs.name = Copy ${QMAKE_FILE_IN}
-    copyQT_QMs.CONFIG += no_link
-    QMAKE_EXTRA_COMPILERS += copyQT_QMs
+copyQT_QMs.input = QT_TRANSLATIONS
+copyQT_QMs.output = $$GCS_DATA_PATH/translations/${QMAKE_FILE_BASE}.qm
+isEmpty(vcproj):copyQT_QMs.variable_out = PRE_TARGETDEPS
+copyQT_QMs.commands = $(COPY_FILE) ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
+copyQT_QMs.name = Copy ${QMAKE_FILE_IN}
+copyQT_QMs.CONFIG += no_link
+QMAKE_EXTRA_COMPILERS += copyQT_QMs
 #========= end block copying qt_*.qm files ============

@@ -113,9 +113,9 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject *obj)
         disconnect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sensorsUpdated(UAVObject *)));
         disconnect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
 
-        float x_bias = listMean(x_accum) / ACCEL_SCALE;
-        float y_bias = listMean(y_accum) / ACCEL_SCALE;
-        float z_bias = (listMean(z_accum) + 9.81) / ACCEL_SCALE;
+        float x_bias = listMean(x_accum);
+        float y_bias = listMean(y_accum);
+        float z_bias = (listMean(z_accum) + 9.81);
 
         float x_gyro_bias = listMean(x_gyro_accum);
         float y_gyro_bias = listMean(y_gyro_accum);

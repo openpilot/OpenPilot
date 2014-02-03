@@ -257,6 +257,9 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 // until we decide to go to failsafe
                 if (cmd.Channel[n] == (uint16_t)PIOS_RCVR_TIMEOUT) {
                     valid_input_detected = false;
+#ifdef FLASH_FREERTOS
+        PIOS_DEBUGLOG_Printf("MANUAL CONTROL TIMED OUT");
+#endif
                 } else {
                     scaledChannel[n] = scaleChannel(cmd.Channel[n],
                                                     cast_struct_to_array(settings.ChannelMax, settings.ChannelMax.Pitch)[n],
@@ -323,6 +326,9 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
             int8_t armSwitch = 0;
             if (cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE) {
+#ifdef FLASH_FREERTOS
+        PIOS_DEBUGLOG_Printf("MANUAL CONTROL FAIL SAFE");
+#endif
                 cmd.Throttle   = -1;      // Shut down engine with no control
                 cmd.Roll       = 0;
                 cmd.Yaw = 0;

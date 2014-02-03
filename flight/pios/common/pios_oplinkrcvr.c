@@ -181,6 +181,9 @@ static void PIOS_oplinkrcvr_Supervisor(uint32_t oplinkrcvr_id)
         for (int32_t i = 0; i < OPLINKRECEIVER_CHANNEL_NUMELEM; i++) {
             oplinkreceiverdata.Channel[i] = PIOS_RCVR_TIMEOUT;
         }
+#ifdef FLASH_FREERTOS
+        PIOS_DEBUGLOG_Printf("OPLINKRECEIVER TIMED OUT");
+#endif
     }
 
     oplinkrcvr_dev->Fresh = false;

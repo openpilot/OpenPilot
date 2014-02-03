@@ -96,7 +96,7 @@ static float accels_filtered[3];
 static float grot_filtered[3];
 static float yawBiasRate = 0;
 static float rollPitchBiasRate = 0.0f;
-static int16_t accelbias[3];
+static float accel_bias[3];
 static float q[4] = { 1, 0, 0, 0 };
 static float R[3][3];
 static int8_t rotate = 0;
@@ -372,9 +372,9 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
     }
 
     // Scale accels and correct bias
-    accelState->x -= accelbias[0];
-    accelState->y -= accelbias[1];
-    accelState->z -= accelbias[2];
+    accelState->x -= accel_bias[0];
+    accelState->y -= accel_bias[1];
+    accelState->z -= accel_bias[2];
 
     if (bias_correct_gyro) {
         // Applying integral component here so it can be seen on the gyros and correct bias
@@ -454,9 +454,9 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
         gyros[2]  = vec_out[2];
     }
 
-    accelStateData->x = accels[0] - accelbias[0];
-    accelStateData->y = accels[1] - accelbias[1];
-    accelStateData->z = accels[2] - accelbias[2];
+    accelStateData->x = accels[0] - accel_bias[0];
+    accelStateData->y = accels[1] - accel_bias[1];
+    accelStateData->z = accels[2] - accel_bias[2];
 
     gyrosData->x = gyros[0];
     gyrosData->y = gyros[1];
@@ -658,9 +658,9 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 
 
     if (BOARDISCC3D) {
-        accelbias[0]   = accelGyroSettings.accel_bias.X;
-        accelbias[1]   = accelGyroSettings.accel_bias.Y;
-        accelbias[2]   = accelGyroSettings.accel_bias.Z;
+        accel_bias[0]  = accelGyroSettings.accel_bias.X;
+        accel_bias[1]  = accelGyroSettings.accel_bias.Y;
+        accel_bias[2]  = accelGyroSettings.accel_bias.Z;
 
         gyro_scale[0]  = accelGyroSettings.gyro_scale.X * PIOS_MPU6000_GetScale();
         gyro_scale[1]  = accelGyroSettings.gyro_scale.Y * PIOS_MPU6000_GetScale();
@@ -671,9 +671,9 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         accel_scale[2] = accelGyroSettings.accel_scale.Z * PIOS_MPU6000_GetAccelScale();
     } else {
         // Original CC with analog gyros and ADXL accel
-        accelbias[0]   = accelGyroSettings.accel_bias.X;
-        accelbias[1]   = accelGyroSettings.accel_bias.Y;
-        accelbias[2]   = accelGyroSettings.accel_bias.Z;
+        accel_bias[0]  = accelGyroSettings.accel_bias.X;
+        accel_bias[1]  = accelGyroSettings.accel_bias.Y;
+        accel_bias[2]  = accelGyroSettings.accel_bias.Z;
 
         gyro_scale[0]  = accelGyroSettings.gyro_scale.X * STD_CC_ANALOG_GYRO_GAIN;
         gyro_scale[1]  = accelGyroSettings.gyro_scale.Y * STD_CC_ANALOG_GYRO_GAIN;

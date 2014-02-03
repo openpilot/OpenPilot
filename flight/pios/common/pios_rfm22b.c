@@ -1945,9 +1945,16 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
         }
 
         // We only synchronize the clock on packets from our coordinator on the sync channel.
-        if (!rfm22_isCoordinator(radio_dev) && (radio_dev->rx_destination_id == rfm22_destinationID(radio_dev)) && (radio_dev->channel_index == 0)) {
+        if (!rfm22_isCoordinator(radio_dev)
+                && (radio_dev->rx_destination_id == rfm22_destinationID(radio_dev))
+                && (radio_dev->channel_index == 0)) {
             rfm22_synchronizeClock(radio_dev);
-            radio_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
+            if (radio_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED) {
+#ifdef FLASH_FREERTOS
+                PIOS_DEBUGLOG_Printf("RADIO CONNECTED");
+#endif
+                radio_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
+            }
             radio_dev->on_sync_channel  = false;
         }
     } else {
@@ -1966,6 +1973,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
 static enum pios_radio_event radio_rxData(struct pios_rfm22b_dev *radio_dev)
 {
     enum pios_radio_event ret_event = RADIO_EVENT_NUM_EVENTS;
+
     pios_rfm22b_int_result res = PIOS_RFM22B_ProcessRx((uint32_t)radio_dev);
 
     switch (res) {
@@ -2218,6 +2226,9 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
 
             // Set the link state to disconnected.
             if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
+#ifdef FLASH_FREERTOS
+                PIOS_DEBUGLOG_Printf("RADIO DISCONNECTED");
+#endif
                 rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
                 // Set the PPM outputs to INVALID
                 for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {

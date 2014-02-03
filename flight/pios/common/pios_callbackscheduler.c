@@ -27,13 +27,16 @@
 #include <pios.h>
 #ifdef PIOS_INCLUDE_CALLBACKSCHEDULER
 
+#include <pios_struct_helper.h>
 #include <utlist.h>
 #include <uavobjectmanager.h>
 #include <taskinfo.h>
+#include <callbackinfo.h>
 
 // Private constants
-#define STACK_SIZE 128
-#define MAX_SLEEP  1000
+#define STACK_SIZE        384
+#define STACK_GRANULARITY 16
+#define MAX_SLEEP         1000
 
 // Private types
 /**
@@ -58,6 +61,9 @@ struct DelayedCallbackInfoStruct {
     int16_t callbackID;
     bool volatile     waiting;
     uint32_t volatile scheduletime;
+    uint32_t stackSize;
+    int32_t  stackFree;
+    uint32_t runCount;
     struct DelayedCallbackTaskStruct *task;
     struct DelayedCallbackInfoStruct *next;
 };
@@ -67,6 +73,7 @@ struct DelayedCallbackInfoStruct {
 static struct DelayedCallbackTaskStruct *schedulerTasks;
 static xSemaphoreHandle mutex;
 static bool schedulerStarted;
+static CallbackInfoData callbackInfo;
 
 // Private functions
 static void CallbackSchedulerTask(void *task);
@@ -110,6 +117,11 @@ int32_t PIOS_CALLBACKSCHEDULER_Start()
     // only call once
     PIOS_Assert(schedulerStarted == false);
 
+    #ifdef DIAG_TASKS
+    CallbackInfoInitialize();
+    CallbackInfoGet(&callbackInfo);
+    #endif
+
     // start tasks
     struct DelayedCallbackTaskStruct *cursor = NULL;
     int t = 0;
@@ -117,7 +129,7 @@ int32_t PIOS_CALLBACKSCHEDULER_Start()
         xTaskCreate(
             CallbackSchedulerTask,
             cursor->name,
-            cursor->stackSize / 4,
+            1 + (cursor->stackSize / 4),
             cursor,
             cursor->priorityTask,
             &cursor->callbackSchedulerTaskHandle
@@ -250,6 +262,9 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
 {
     xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
+    // add callback schedulers own stack requirements
+    stacksize += STACK_SIZE;
+
     // find appropriate scheduler task matching priorityTask
     struct DelayedCallbackTaskStruct *task = NULL;
     int t = 0;
@@ -276,7 +291,7 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
         task->name[0]      = 'C';
         task->name[1]      = 'a' + t;
         task->name[2]      = 0;
-        task->stackSize    = ((STACK_SIZE > stacksize) ? STACK_SIZE : stacksize);
+        task->stackSize    = stacksize;
         task->priorityTask = priorityTask;
         task->next = NULL;
 
@@ -296,7 +311,7 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
             xTaskCreate(
                 CallbackSchedulerTask,
                 task->name,
-                task->stackSize / 4,
+                1 + (task->stackSize / 4),
                 task,
                 task->priorityTask,
                 &task->callbackSchedulerTaskHandle
@@ -329,6 +344,10 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     info->task         = task;
     info->cb = cb;
     info->callbackID   = callbackID;
+    info->runCount     = 0;
+    // info->stackSize    = stacksize - STACK_SIZE;
+    info->stackFree    = stacksize - STACK_SIZE;
+    info->stackSize    = info->stackFree;
 
     // add to scheduling queue
     LL_APPEND(task->callbackQueue[priority], info);
@@ -337,6 +356,36 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
 
     return info;
 }
+
+
+#ifdef DIAG_TASKS
+/**
+ * Stack magic, check presence of unique value
+ */
+__attribute__((optimize("O0"))) static int32_t checkStack(DelayedCallbackInfo *current)
+{
+#if 0
+    register uint32_t t;
+    register int32_t result;
+    volatile unsigned char marker[current->stackSize];
+
+    result = -1;
+    for (t = 0; t < current->stackSize; t += STACK_GRANULARITY) {
+        if (marker[t] != t + '#') {
+            if (result == -1) {
+                result = t;
+            }
+        }
+        marker[t] = t + '#';
+    }
+    return result;
+
+#endif
+
+// this is not working yet, until a fix is found just return old value
+    return current->stackFree;
+}
+#endif /* ifdef DIAG_TASKS */
 
 /**
  * Scheduler subtask
@@ -390,7 +439,28 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
                 current->scheduletime = 0; // any schedules are reset
                 current->waiting = false; // the flag is reset just before execution.
                 xSemaphoreGiveRecursive(mutex);
+
+                #ifdef DIAG_TASKS
+                /* callback gets invoked here - check stack sizes */
+                diff = checkStack(current);
+                #endif
+
                 current->cb(); // call the callback
+
+                #ifdef DIAG_TASKS
+                diff = checkStack(current);
+                current->stackFree = diff; // < current->stackFree ? diff : current->stackFree;
+                current->runCount++;
+                if (current->callbackID >= 0 && current->callbackID < CALLBACKINFO_RUNNING_NUMELEM) {
+                    xSemaphoreTakeRecursive(mutex, portMAX_DELAY); // access to uavobject
+                    ((uint8_t *)&callbackInfo.Running)[current->callbackID] = true;
+                    ((uint32_t *)&callbackInfo.RunningTime)[current->callbackID]   = current->runCount;
+                    ((int16_t *)&callbackInfo.StackRemaining)[current->callbackID] = (int16_t)current->stackFree;
+                    CallbackInfoSet(&callbackInfo);
+                    xSemaphoreGiveRecursive(mutex);
+                }
+                #endif
+
                 return 0;
             }
             xSemaphoreGiveRecursive(mutex);

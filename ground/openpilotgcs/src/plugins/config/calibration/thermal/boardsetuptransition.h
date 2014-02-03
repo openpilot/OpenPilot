@@ -48,14 +48,12 @@ public:
 
     virtual bool eventTest(QEvent *e)
     {
-        qDebug() << "BoardSetupTransition::eventTest";
         if (!QSignalTransition::eventTest(e)) {
             return false;
         }
         QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent *>(e);
 
         // check wether status save was successful and retry if not
-        qDebug() << "BoardSetupTransition::eventTest - " << se->arguments().at(0).toBool();
         if (se->arguments().at(0).toBool()) {
             return true;
         } else {
@@ -67,8 +65,6 @@ public:
     virtual void onTransition(QEvent *e)
     {
         QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent *>(e);
-
-        qDebug() << "BoardSetupTransition::onTransition" << se->arguments().at(0).toBool();
     }
 public slots:
     void enterState()

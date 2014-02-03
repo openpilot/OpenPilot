@@ -45,7 +45,7 @@ class ThermalCalibrationModel : public WizardModel {
 
     Q_PROPERTY(QString temperature READ temperature NOTIFY temperatureChanged)
     Q_PROPERTY(QString temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
-    Q_PROPERTY(int progress READ progress NOTIFY progressChanged)
+    Q_PROPERTY(int progress READ progress WRITE setProgress NOTIFY progressChanged)
     Q_OBJECT
 public:
     explicit ThermalCalibrationModel(QObject *parent = 0);
@@ -54,10 +54,12 @@ public:
     {
         return m_startEnabled;
     }
+
     bool endEnabled()
     {
         return m_endEnabled;
     }
+
     bool cancelEnabled()
     {
         return m_cancelEnabled;
@@ -78,6 +80,7 @@ public:
             emit endEnabledChanged(status);
         }
     }
+
     void setCancelEnabled(bool status)
     {
         if (m_cancelEnabled != status) {
@@ -112,6 +115,7 @@ public slots:
             emit temperatureChanged(tmp);
         }
     }
+
     void setTemperatureGradient(float status)
     {
         QString tmp = QString("%1").arg(status, 5, 'f', 2);
@@ -121,6 +125,7 @@ public slots:
             emit temperatureGradientChanged(tmp);
         }
     }
+
     void setProgress(int status)
     {
         m_progress = status;
@@ -163,7 +168,6 @@ private:
     WizardState *m_completedState;
     void setTransitions();
 
-
 signals:
     void startEnabledChanged(bool state);
     void endEnabledChanged(bool state);
@@ -186,7 +190,6 @@ public slots:
 
     void btnEnd()
     {
-        // emit previous();
         m_helper->stopAcquisition();
     }
 

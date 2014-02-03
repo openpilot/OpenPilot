@@ -34,7 +34,7 @@ class WizardState : public QState {
     Q_OBJECT Q_PROPERTY(bool isActive READ isActive NOTIFY isActiveChanged)
     Q_PROPERTY(bool isDone READ isDone NOTIFY isDoneChanged)
     Q_PROPERTY(qint8 completion READ completion NOTIFY completionChanged)
-    Q_PROPERTY(QString stepName READ stepName NOTIFY stepNameChanged)
+    Q_PROPERTY(QString stepName READ stepName WRITE setStepName NOTIFY stepNameChanged)
 public:
     explicit WizardState(QString name, QState *parent = 0);
     bool isActive()

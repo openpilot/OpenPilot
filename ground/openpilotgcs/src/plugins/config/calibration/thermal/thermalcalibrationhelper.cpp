@@ -143,7 +143,7 @@ bool ThermalCalibrationHelper::saveBoardInitialSettings()
 
     // accelGyroSettings data
     /*
-     * Note: for revolution it is not neede but in case of CC we would prevent having
+     * TODO: for revolution it is not neede but in case of CC we would prevent having
      * a new set of xxxSensor UAVOs beside actual xxxState so it may be needed to reset the following
        AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
        Q_ASSERT(accelGyroSettings);
@@ -378,16 +378,16 @@ void ThermalCalibrationHelper::calculate()
      */
     m_results.accelCalibrated  = false;
     QString str;
-    str += QStringLiteral("info::Calibration results");
+    str += QStringLiteral("INFO::Calibration results");
 
-    str += QStringLiteral("info::Baro cal {%1, %2, %3, %4}; initial variance: %5; Calibrated variance %6")
+    str += QStringLiteral("INFO::Baro cal {%1, %2, %3, %4}; initial variance: %5; Calibrated variance %6")
            .arg(m_results.baro[0]).arg(m_results.baro[1]).arg(m_results.baro[2]).arg(m_results.baro[3])
            .arg(m_results.baroInSigma).arg(m_results.baroOutSigma) + QChar::CarriageReturn;
-    str += QStringLiteral("info::Gyro cal x{%1} y{%2} z{%3, %4}; initial variance: {%5, %6, %7}; Calibrated variance {%8, %9, %10}")
+    str += QStringLiteral("INFO::Gyro cal x{%1} y{%2} z{%3, %4}; initial variance: {%5, %6, %7}; Calibrated variance {%8, %9, %10}")
            .arg(m_results.gyro[0]).arg(m_results.gyro[1]).arg(m_results.gyro[2]).arg(m_results.baro[3])
            .arg(m_results.gyroInSigma[0]).arg(m_results.gyroInSigma[1]).arg(m_results.gyroInSigma[2])
            .arg(m_results.gyroOutSigma[0]).arg(m_results.gyroOutSigma[1]).arg(m_results.gyroOutSigma[2]) + QChar::CarriageReturn;
-    str += QStringLiteral("info::Accel cal x{%1} y{%2} z{%3}; initial variance: {%4, %5, %6}; Calibrated variance {%7, %8, %9}")
+    str += QStringLiteral("INFO::Accel cal x{%1} y{%2} z{%3}; initial variance: {%4, %5, %6}; Calibrated variance {%7, %8, %9}")
            .arg(m_results.accel[0]).arg(m_results.accel[1]).arg(m_results.accel[2])
            .arg(m_results.accelInSigma[0]).arg(m_results.accelInSigma[1]).arg(m_results.accelInSigma[2])
            .arg(m_results.accelOutSigma[0]).arg(m_results.accelOutSigma[1]).arg(m_results.accelOutSigma[2]) + QChar::CarriageReturn;
@@ -449,7 +449,6 @@ void ThermalCalibrationHelper::updateTemp(float temp)
 void ThermalCalibrationHelper::endAcquisition()
 {
     disconnectUAVOs();
-    setProcessPercentage(ProcessPercentageBaseCalculation);
 }
 
 void ThermalCalibrationHelper::connectUAVOs()
@@ -498,7 +497,7 @@ void ThermalCalibrationHelper::createDebugLog()
             m_debugStream.setDevice(0);
             return;
         }
-        qDebug() << "Saving debug data to " << dir.filePath(filename);
+        qDebug() << "Saving debug data for this session to " << dir.filePath(filename);
 
         m_debugStream.setDevice(&m_debugFile);
 
@@ -536,7 +535,7 @@ void ThermalCalibrationHelper::copyResultToSettings()
 
     Q_ASSERT(objManager);
 
-    if (m_results.baroCalibrated) {
+    if (calibrationSuccessful()) {
         RevoSettings *revosettings = RevoSettings::GetInstance(objManager);
         Q_ASSERT(revosettings);
         RevoSettings::DataFields revosettingsdata = revosettings->getData();
@@ -548,9 +547,7 @@ void ThermalCalibrationHelper::copyResultToSettings()
         revosettingsdata.BaroTempCorrectionExtent[1]     = m_results.baroTempMax;
         revosettings->setData(revosettingsdata);
         revosettings->updated();
-    }
 
-    if (m_results.gyroCalibrated || m_results.accelCalibrated) {
         AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
         Q_ASSERT(accelGyroSettings);
         AccelGyroSettings::DataFields data   = accelGyroSettings->getData();
@@ -573,7 +570,6 @@ void ThermalCalibrationHelper::copyResultToSettings()
         accelGyroSettings->setData(data);
         accelGyroSettings->updated();
     }
-    setProcessPercentage(100.0f);
 }
 
 void ThermalCalibrationHelper::setMetadataForCalibration(UAVDataObject *uavo)

@@ -32,9 +32,6 @@
 #include "dataacquisitiontransition.h"
 #include "compensationcalculationtransition.h"
 
-#define NEXT_EVENT     "next"
-#define PREVIOUS_EVENT "previous"
-#define ABORT_EVENT    "abort"
 namespace OpenPilot {
 ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     WizardModel(parent)
@@ -50,11 +47,12 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
 
     m_acquisitionState = new WizardState(tr("*** Please Wait *** Samples acquisition, this can take several minutes"), m_workingState);
     m_restoreState     = new WizardState(tr("Restore board settings"), m_workingState);
-    m_calculateState   = new WizardState(tr("Calculate calibration matrix"), m_workingState);
+    m_calculateState   = new WizardState(tr("Calculate calibration data"), m_workingState);
 
-    m_abortState       = new WizardState("Canceled", this);
+    m_abortState       = new WizardState(tr("Canceled"), this);
 
-    m_completedState   = new WizardState("Completed", this);
+    // note: step name for this state is changed by CompensationCalculationTransition based on result
+    m_completedState   = new WizardState(NULL, this);
     setTransitions();
 
     connect(m_helper.data(), SIGNAL(gradientChanged(float)), this, SLOT(setTemperatureGradient(float)));
@@ -87,22 +85,27 @@ void ThermalCalibrationModel::stepChanged(WizardState *state)
 void ThermalCalibrationModel::setTransitions()
 {
     m_readyState->addTransition(this, SIGNAL(next()), m_workingState);
+    m_readyState->assignProperty(this, "progress", 0);
+
     m_completedState->addTransition(this, SIGNAL(next()), m_workingState);
-    // handles board status save
+    m_completedState->assignProperty(this, "progress", 100);
+
+    // handles board initial status save
     // Ready->WorkingState->saveSettings->setup
     m_saveSettingState->addTransition(new BoardStatusSaveTransition(m_helper.data(), m_saveSettingState, m_setupState));
     // board setup
     // setup
     m_setupState->addTransition(new BoardSetupTransition(m_helper.data(), m_setupState, m_acquisitionState));
 
-    // acquisition -revertSettings-> calculation
+    // acquisition>revertSettings>calculation(save state)
     // revert settings after acquisition is completed
-    // m_acquisitionState->addTransition(new BoardStatusRestoreTransition(m_helper, m_acquisitionState, m_calculateState));
     m_acquisitionState->addTransition(new DataAcquisitionTransition(m_helper.data(), m_acquisitionState, m_restoreState));
     m_restoreState->addTransition(new BoardStatusRestoreTransition(m_helper.data(), m_restoreState, m_calculateState));
     m_calculateState->addTransition(new CompensationCalculationTransition(m_helper.data(), m_calculateState, m_completedState));
+
+    // abort causes initial settings to be restored and acquisition stopped.
     m_abortState->addTransition(new BoardStatusRestoreTransition(m_helper.data(), m_abortState, m_readyState));
-    m_workingState->addTransition(m_helper.data(), SIGNAL(abort()), m_abortState);
+    m_workingState->addTransition(this, SIGNAL(abort()), m_abortState);
     // Ready
 }
 }

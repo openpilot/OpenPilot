@@ -105,6 +105,12 @@ public:
     }
     void endAcquisition();
 
+    bool calibrationSuccessful()
+    {
+        return m_results.baroCalibrated &&
+               ((m_results.baroTempMax - m_results.baroTempMin) > 10.0f);
+    }
+
 signals:
     void statusRestoreCompleted(bool succesful);
     void statusSaveCompleted(bool succesful);
@@ -210,7 +216,6 @@ private:
 
     void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();
-
 };
 }
 #endif // THERMALCALIBRATIONHELPER_H

@@ -50,13 +50,11 @@ public:
     {
         Q_UNUSED(e);
         m_helper->endAcquisition();
-        qDebug() << "DataAcquisitionTransition::collectionCompleted";
     }
 
 public slots:
     void enterState()
     {
-        qDebug() << "DataAcquisitionTransition::enterStatus";
         m_helper->initAcquisition();
     }
 private:

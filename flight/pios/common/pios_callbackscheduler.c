@@ -35,7 +35,7 @@
 
 // Private constants
 #define STACK_SIZE        384
-#define STACK_GRANULARITY 16
+#define STACK_GRANULARITY 4
 #define MAX_SLEEP         1000
 
 // Private types
@@ -62,6 +62,7 @@ struct DelayedCallbackInfoStruct {
     bool volatile     waiting;
     uint32_t volatile scheduletime;
     uint32_t stackSize;
+    int32_t stackWatermark;
     int32_t  stackFree;
     uint32_t runCount;
     struct DelayedCallbackTaskStruct *task;
@@ -348,6 +349,7 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     // info->stackSize    = stacksize - STACK_SIZE;
     info->stackFree    = stacksize - STACK_SIZE;
     info->stackSize    = info->stackFree;
+    info->stackWatermark    = 0;
 
     // add to scheduling queue
     LL_APPEND(task->callbackQueue[priority], info);
@@ -362,28 +364,41 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
 /**
  * Stack magic, check presence of unique value
  */
-__attribute__((optimize("O0"))) static int32_t checkStack(DelayedCallbackInfo *current)
+static int8_t markStack(DelayedCallbackInfo *current)
 {
-#if 0
-    register uint32_t t;
-    register int32_t result;
-    volatile unsigned char marker[current->stackSize];
-
-    result = -1;
-    for (t = 0; t < current->stackSize; t += STACK_GRANULARITY) {
-        if (marker[t] != t + '#') {
-            if (result == -1) {
-                result = t;
-            }
-        }
-        marker[t] = t + '#';
-    }
-    return result;
-
-#endif
-
-// this is not working yet, until a fix is found just return old value
-    return current->stackFree;
+	volatile unsigned char *marker;
+	marker = (unsigned char*)(((size_t)&marker) - (size_t)current->stackSize);
+	// end of stack watermark
+	*(marker) = '#';
+	// shifted watermarks
+	marker += 16 + (size_t)current->stackWatermark;
+	*(marker-15) = '#';
+	*(marker-14) = '#';
+	*(marker-13) = '#';
+	*(marker-12) = '#';
+	*(marker-3) = '#';
+	*(marker-2) = '#';
+	*(marker-1) = '#';
+	*(marker) = '#';
+	return 0;
+}
+static int8_t checkStack(DelayedCallbackInfo *current)
+{
+	volatile unsigned char *marker;
+	marker = (unsigned char*)(((size_t)&marker) - (size_t)current->stackSize);
+	// end of stack watermark
+	if (*marker != '#') return -1;
+	// shifted watermarks
+	marker += 16 + (size_t)current->stackWatermark;
+	if (*(marker-15) != '#') return -2;
+	if (*(marker-14) != '#') return -2;
+	if (*(marker-13) != '#') return -2;
+	if (*(marker-12) != '#') return -2;
+	if (*(marker-3) != '#') return -2;
+	if (*(marker-2) != '#') return 3;
+	if (*(marker-1) != '#') return 2;
+	if (*(marker) != '#') return 1;
+	return 0;
 }
 #endif /* ifdef DIAG_TASKS */
 
@@ -442,20 +457,39 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
 
                 #ifdef DIAG_TASKS
                 /* callback gets invoked here - check stack sizes */
-                diff = checkStack(current);
+                diff = markStack(current);
                 #endif
 
                 current->cb(); // call the callback
 
                 #ifdef DIAG_TASKS
                 diff = checkStack(current);
-                current->stackFree = diff; // < current->stackFree ? diff : current->stackFree;
+		switch (diff) {
+		case -2:
+			current->stackWatermark = -1;
+			break;
+		case -1:
+			current->stackFree = -1;
+			current->stackWatermark = -1;
+			break;
+		case 0:
+			current->stackWatermark++;
+			if (current->stackWatermark>current->stackFree) {
+			    current->stackWatermark = current->stackFree;
+			}
+			break;
+		default:
+			current->stackWatermark -= diff;
+			current->stackFree = current->stackWatermark;
+			break;
+		}
+
                 current->runCount++;
                 if (current->callbackID >= 0 && current->callbackID < CALLBACKINFO_RUNNING_NUMELEM) {
                     xSemaphoreTakeRecursive(mutex, portMAX_DELAY); // access to uavobject
                     ((uint8_t *)&callbackInfo.Running)[current->callbackID] = true;
                     ((uint32_t *)&callbackInfo.RunningTime)[current->callbackID]   = current->runCount;
-                    ((int16_t *)&callbackInfo.StackRemaining)[current->callbackID] = (int16_t)current->stackFree;
+                    ((int16_t *)&callbackInfo.StackRemaining)[current->callbackID] = (int16_t)current->stackWatermark;
                     CallbackInfoSet(&callbackInfo);
                     xSemaphoreGiveRecursive(mutex);
                 }

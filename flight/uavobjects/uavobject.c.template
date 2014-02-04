@@ -65,7 +65,7 @@ int32_t $(NAME)Initialize(void)
 
     // Register object with the object manager
     handle = UAVObjRegister($(NAMEUC)_OBJID,
-        $(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_NUMBYTES, &$(NAME)SetDefaults);
+        $(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_ISPRIORITY, $(NAMEUC)_NUMBYTES, &$(NAME)SetDefaults);
 
     // Done
     return handle ? 0 : -1;

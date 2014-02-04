@@ -268,12 +268,11 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
         eventMask |= EV_LOGGING_MANUAL;
         break;
     }
-    if(UAVObjIsSettings(obj)){
+    if (UAVObjIsPriority(obj)) {
         UAVObjConnectQueue(obj, priorityQueue, eventMask);
     } else {
         UAVObjConnectQueue(obj, queue, eventMask);
     }
-
 }
 
 /**
@@ -376,10 +375,10 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
          */
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
         // Loop forever
-           while (xQueueReceive(priorityQueue, &ev, 1) == pdTRUE) {
-               // Process event
-               processObjEvent(&ev);
-           }
+        while (xQueueReceive(priorityQueue, &ev, 1) == pdTRUE) {
+            // Process event
+            processObjEvent(&ev);
+        }
 #endif
         // Wait for queue message
         if (xQueueReceive(queue, &ev, 1) == pdTRUE) {

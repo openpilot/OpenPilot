@@ -68,7 +68,7 @@
 #define UPDATE_EXPECTED     (1.0f / 666.0f)
 #define UPDATE_MIN          1.0e-6f
 #define UPDATE_MAX          1.0f
-#define UPDATE_ALPHA        1.0e-3f
+#define UPDATE_ALPHA        1.0e-2f
 
 #define MAX_QUEUE_SIZE      1
 
@@ -234,7 +234,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         }
 
         dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
-
+        fprintf(stderr, "dt is %f\n", dT);
         FlightStatusGet(&flightStatus);
         StabilizationDesiredGet(&stabDesired);
         AttitudeStateGet(&attitudeState);

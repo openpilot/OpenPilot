@@ -32,6 +32,7 @@
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_DELAY
+#define PIOS_INCLUDE_DELTATIME
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_SDCARD
 #define PIOS_INCLUDE_FREERTOS

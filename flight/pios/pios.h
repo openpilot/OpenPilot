@@ -104,6 +104,10 @@
 #include <pios_delay.h>
 #endif
 
+#ifdef PIOS_INCLUDE_DELTATIME
+#include <pios_deltatime.h>
+#endif
+
 #ifdef PIOS_INCLUDE_INITCALL
 #include "pios_initcall.h"
 #endif

@@ -65,6 +65,11 @@
 #include "relay_tuning.h"
 
 // Private constants
+#define UPDATE_EXPECTED     (1.0f / 666.0f)
+#define UPDATE_MIN          1.0e-6f
+#define UPDATE_MAX          1.0f
+#define UPDATE_ALPHA        1.0e-3f
+
 #define MAX_QUEUE_SIZE      1
 
 #if defined(PIOS_STABILIZATION_STACK_SIZE)
@@ -194,7 +199,9 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart);
 static void stabilizationTask(__attribute__((unused)) void *parameters)
 {
     UAVObjEvent ev;
-    uint32_t timeval = PIOS_DELAY_GetRaw();
+    PiOSDeltatimeConfig timeval;
+
+    PIOS_DELTATIME_Init(&timeval, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
 
     ActuatorDesiredData actuatorDesired;
     StabilizationDesiredData stabDesired;
@@ -226,8 +233,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
             continue;
         }
 
-        dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
-        timeval = PIOS_DELAY_GetRaw();
+        dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
 
         FlightStatusGet(&flightStatus);
         StabilizationDesiredGet(&stabDesired);

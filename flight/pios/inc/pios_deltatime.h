@@ -1,10 +1,14 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_DELTATIME time measurement Functions
+ * @brief PiOS Delay functionality
+ * @{
  *
- * @file       pios_config.h
+ * @file       pios_deltatime.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      PiOS configuration header.
- *             Central compile time config for the project.
+ * @brief      Settings functions header
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,25 +28,26 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef PIOS_DELTATIME_H
+#define PIOS_DELTATIME_H
 
-#ifndef PIOS_CONFIG_POSIX_H
-#define PIOS_CONFIG_POSIX_H
+struct PiOSDeltatimeConfigStruct {
+    uint32_t last;
+    float    average;
+    float    min;
+    float    max;
+    float    alpha;
+};
+typedef struct PiOSDeltatimeConfigStruct PiOSDeltatimeConfig;
 
+/* Public Functions */
+void PIOS_DELTATIME_Init(PiOSDeltatimeConfig *config, float average, float min, float max, float alpha);
 
-/* Enable/Disable PiOS Modules */
-#define PIOS_INCLUDE_SYS
-#define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_DELTATIME
-#define PIOS_INCLUDE_LED
-#define PIOS_INCLUDE_FREERTOS
-#define PIOS_INCLUDE_TASK_MONITOR
-#define PIOS_INCLUDE_COM
-#define PIOS_INCLUDE_UDP
-#define PIOS_INCLUDE_SERVO
+float PIOS_DELTATIME_GetAverageSeconds(PiOSDeltatimeConfig *config);
 
+#endif /* PIOS_DELTATIME_H */
 
-/* Defaults for Logging */
-#define LOG_FILENAME        "PIOS.LOG"
-#define STARTUP_LOG_ENABLED 1
-
-#endif /* PIOS_CONFIG_POSIX_H */
+/**
+ * @}
+ * @}
+ */

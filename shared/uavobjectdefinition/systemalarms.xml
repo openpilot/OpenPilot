@@ -1,5 +1,5 @@
 <xml>
-    <object name="SystemAlarms" singleinstance="true" settings="false" category="System">
+    <object name="SystemAlarms" singleinstance="true" settings="false" category="System" priority="true">
         <description>Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.  Some modules may have a module defined Status and Substatus fields that details its condition.</description>
         <field name="Alarm" units="" type="enum" options="Uninitialised,OK,Warning,Error,Critical" defaultvalue="Uninitialised">
 		<elementnames>

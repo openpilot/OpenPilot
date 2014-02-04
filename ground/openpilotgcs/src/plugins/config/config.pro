@@ -10,7 +10,6 @@ include(config_dependencies.pri)
 INCLUDEPATH += ../../libs/eigen
 
 OTHER_FILES += Config.pluginspec \
-    calibration/magcalibrationui.qml \
     calibration/WizardStepIndicator.qml
 
 HEADERS += configplugin.h \

@@ -234,7 +234,6 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         }
 
         dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
-        fprintf(stderr, "dt is %f\n", dT);
         FlightStatusGet(&flightStatus);
         StabilizationDesiredGet(&stabDesired);
         AttitudeStateGet(&attitudeState);

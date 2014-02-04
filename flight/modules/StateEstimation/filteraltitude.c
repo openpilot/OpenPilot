@@ -40,20 +40,22 @@
 
 #define STACK_REQUIRED 128
 
-#define DT_ALPHA       1e-3f
+#define DT_ALPHA       1e-2f
+#define DT_MIN         1e-6f
+#define DT_MAX         1.0f
+#define DT_AVERAGE     1e-3f
 
 // Private types
 struct data {
-    float   state[4]; // state = altitude,velocity,accel_offset,accel
-    float   pos[3]; // position updates from other filters
-    float   vel[3]; // position updates from other filters
-    float   dTA;
-    float   dTA2;
-    int32_t lastTime;
-    float   accelLast;
-    float   baroLast;
-    int32_t baroLastTime;
-    bool    first_run;
+    float state[4]; // state = altitude,velocity,accel_offset,accel
+    float pos[3]; // position updates from other filters
+    float vel[3]; // position updates from other filters
+
+    PiOSDeltatimeConfig dt1config;
+    PiOSDeltatimeConfig dt2config;
+    float accelLast;
+    float baroLast;
+    bool  first_run;
     AltitudeFilterSettingsData settings;
 };
 
@@ -89,8 +91,8 @@ static int32_t init(stateFilter *self)
     this->vel[0]    = 0.0f;
     this->vel[1]    = 0.0f;
     this->vel[2]    = 0.0f;
-    this->dTA = -1.0f;
-    this->dTA2      = -1.0f;
+    PIOS_DELTATIME_Init(&this->dt1config, DT_AVERAGE, DT_MIN, DT_MAX, DT_ALPHA);
+    PIOS_DELTATIME_Init(&this->dt2config, DT_AVERAGE, DT_MIN, DT_MAX, DT_ALPHA);
     this->baroLast  = 0.0f;
     this->accelLast = 0.0f;
     this->first_run = 1;
@@ -104,12 +106,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
     if (this->first_run) {
         // Initialize to current altitude reading at initial location
-        if (IS_SET(state->updated, SENSORUPDATES_accel)) {
-            this->lastTime = PIOS_DELAY_GetRaw();
-        }
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
-            this->first_run    = 0;
-            this->baroLastTime = PIOS_DELAY_GetRaw();
+            this->first_run = 0;
         }
     } else {
         // save existing position and velocity updates so GPS will still work
@@ -141,22 +139,14 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
             // correct velocity and position state (integration)
             // low pass for average dT, compensate timing jitter from scheduler
-            float dT = PIOS_DELAY_DiffuS(this->lastTime) / 1.0e6f;
-            this->lastTime = PIOS_DELAY_GetRaw();
-            if (dT < 0.001f) {
-                dT = 0.001f;
-            }
-            if (this->dTA < 0) {
-                this->dTA = dT;
-            } else {
-                this->dTA = this->dTA * (1.0f - DT_ALPHA) + dT * DT_ALPHA;
-            }
+            //
+            float dT = PIOS_DELTATIME_GetAverageSeconds(&this->dt1config);
             float speedLast = this->state[1];
 
-            this->state[1] += 0.5f * (this->accelLast + (this->state[3] - this->state[2])) * this->dTA;
+            this->state[1] += 0.5f * (this->accelLast + (this->state[3] - this->state[2])) * dT;
             this->accelLast = this->state[3] - this->state[2];
 
-            this->state[0] += 0.5f * (speedLast + this->state[1]) * this->dTA;
+            this->state[0] += 0.5f * (speedLast + this->state[1]) * dT;
 
 
             state->pos[0]   = this->pos[0];
@@ -175,17 +165,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
             // correct the velocity state (low pass differentiation)
             // low pass for average dT, compensate timing jitter from scheduler
-            float dT = PIOS_DELAY_DiffuS(this->baroLastTime) / 1.0e6f;
-            this->baroLastTime = PIOS_DELAY_GetRaw();
-            if (dT < 0.001f) {
-                dT = 0.001f;
-            }
-            if (this->dTA2 < 0) {
-                this->dTA2 = dT;
-            } else {
-                this->dTA2 = this->dTA2 * (1.0f - DT_ALPHA) + dT * DT_ALPHA;
-            }
-            this->state[1]  = (1.0f - (this->settings.BaroKp * this->settings.BaroKp)) * this->state[1] + (this->settings.BaroKp * this->settings.BaroKp) * (state->baro[0] - this->baroLast) / this->dTA2;
+            float dT = PIOS_DELTATIME_GetAverageSeconds(&this->dt2config);
+            this->state[1]  = (1.0f - (this->settings.BaroKp * this->settings.BaroKp)) * this->state[1] + (this->settings.BaroKp * this->settings.BaroKp) * (state->baro[0] - this->baroLast) / dT;
             this->baroLast  = state->baro[0];
 
             state->pos[0]   = this->pos[0];

@@ -45,7 +45,6 @@
 #define TASK_PRIORITY_RX       (tskIDLE_PRIORITY + 2)
 #define TASK_PRIORITY_TX       (tskIDLE_PRIORITY + 2)
 #define TASK_PRIORITY_RADRX    (tskIDLE_PRIORITY + 2)
-#define TASK_PRIORITY_TXPRI    (tskIDLE_PRIORITY + 2)
 #define REQ_TIMEOUT_MS         250
 #define MAX_RETRIES            2
 #define STATS_UPDATE_PERIOD_MS 4000
@@ -59,8 +58,6 @@ static xQueueHandle queue;
 
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
 static xQueueHandle priorityQueue;
-static xTaskHandle telemetryTxPriTaskHandle;
-static void telemetryTxPriTask(void *parameters);
 #else
 #define priorityQueue queue
 #endif
@@ -117,11 +114,6 @@ int32_t TelemetryStart(void)
 #ifdef PIOS_INCLUDE_RFM22B
     xTaskCreate(radioRxTask, (signed char *)"RadioRx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIORX, radioRxTaskHandle);
-#endif
-
-#if defined(PIOS_TELEM_PRIORITY_QUEUE)
-    xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTXPRI, telemetryTxPriTaskHandle);
 #endif
 
     return 0;
@@ -276,7 +268,12 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
         eventMask |= EV_LOGGING_MANUAL;
         break;
     }
-    UAVObjConnectQueue(obj, priorityQueue, eventMask);
+    if(UAVObjIsSettings(obj)){
+        UAVObjConnectQueue(obj, priorityQueue, eventMask);
+    } else {
+        UAVObjConnectQueue(obj, queue, eventMask);
+    }
+
 }
 
 /**
@@ -374,32 +371,24 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
 
     // Loop forever
     while (1) {
-        // Wait for queue message
-        if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
-            // Process event
-            processObjEvent(&ev);
-        }
-    }
-}
-
-/**
- * Telemetry transmit task, high priority
- */
+        /**
+         * Tries to empty the high priority queue before handling any standard priority item
+         */
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
-static void telemetryTxPriTask(__attribute__((unused)) void *parameters)
-{
-    UAVObjEvent ev;
-
-    // Loop forever
-    while (1) {
+        // Loop forever
+           while (xQueueReceive(priorityQueue, &ev, 1) == pdTRUE) {
+               // Process event
+               processObjEvent(&ev);
+           }
+#endif
         // Wait for queue message
-        if (xQueueReceive(priorityQueue, &ev, portMAX_DELAY) == pdTRUE) {
+        if (xQueueReceive(queue, &ev, 1) == pdTRUE) {
             // Process event
             processObjEvent(&ev);
         }
     }
 }
-#endif
+
 
 /**
  * Telemetry receive task. Processes queue events and periodic updates.

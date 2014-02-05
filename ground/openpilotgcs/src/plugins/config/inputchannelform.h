@@ -4,26 +4,27 @@
 #include <QWidget>
 #include "configinputwidget.h"
 namespace Ui {
-class inputChannelForm;
+class InputChannelForm;
 }
 
-class inputChannelForm : public ConfigTaskWidget {
+class InputChannelForm : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
-    explicit inputChannelForm(QWidget *parent = 0, bool showlegend = false);
-    ~inputChannelForm();
+    explicit InputChannelForm(QWidget *parent = 0, bool showlegend = false);
+    ~InputChannelForm();
     friend class ConfigInputWidget;
     void setName(QString &name);
 private slots:
     void minMaxUpdated();
-    void neutralUpdated(int);
+    void neutralUpdated();
+    void reversedUpdated();
     void groupUpdated();
     void channelDropdownUpdated(int);
     void channelNumberUpdated(int);
 
 private:
-    Ui::inputChannelForm *ui;
+    Ui::InputChannelForm *ui;
 };
 
 #endif // INPUTCHANNELFORM_H

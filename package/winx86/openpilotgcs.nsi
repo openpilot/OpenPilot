@@ -219,7 +219,7 @@ SectionEnd
 ; Disabled until GCS source is stable and properly localized
 Section "-Localization" InSecLocalization
   SetOutPath "$INSTDIR\share\openpilotgcs\translations"
-; File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\openpilotgcs_*.qm"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\openpilotgcs_*.qm"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\qt_*.qm"
 SectionEnd
 

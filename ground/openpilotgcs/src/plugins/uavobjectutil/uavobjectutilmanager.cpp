@@ -467,16 +467,19 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
         struc.fwHash   = desc.mid(40, 20);
         struc.uavoHash.clear();
         struc.uavoHash = desc.mid(60, 20);
-        qDebug() << __FUNCTION__ << ":description from board:";
-        foreach(char x, desc) {
-            qDebug() << QString::number(x, 16);
-        }
 
-        qDebug() << __FUNCTION__ << ":uavoHash:";
-        QByteArray array2 = struc.uavoHash.data();
-        foreach(char x, array2) {
+        /*
+           qDebug() << __FUNCTION__ << ":description from board:";
+           foreach(char x, desc) {
             qDebug() << QString::number(x, 16);
-        }
+           }
+
+           qDebug() << __FUNCTION__ << ":uavoHash:";
+           QByteArray array2 = struc.uavoHash.data();
+           foreach(char x, array2) {
+            qDebug() << QString::number(x, 16);
+           }
+         */
         return true;
     }
     return false;

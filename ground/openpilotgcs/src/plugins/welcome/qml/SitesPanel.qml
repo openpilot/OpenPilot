@@ -21,12 +21,25 @@ Item {
 
     ListModel {
         id: sitesModel
-        ListElement { title: "Home"; link: "http://www.openpilot.org" }
-        ListElement { title: "Wiki"; link: "http://wiki.openpilot.org" }
-        ListElement { title: "Store"; link: "http://www.openpilot.org/hardware/get-hardware/" }
-        ListElement { title: "Forums"; link: "http://forums.openpilot.org" }
-        ListElement { title: "Code Reviews"; link: "http://git.openpilot.org" }
-        ListElement { title: "Progress Tracker"; link: "http://progress.openpilot.org" }
+        ListElement { link: "http://www.openpilot.org" }
+        ListElement { link: "http://wiki.openpilot.org" }
+        ListElement { link: "http://www.openpilot.org/hardware/get-hardware/" }
+        ListElement { link: "http://forums.openpilot.org" }
+        ListElement { link: "http://git.openpilot.org" }
+        ListElement { link: "http://progress.openpilot.org" }
+        function title(index){
+            if (title["text"] === undefined) {
+            title.text = [
+                qsTr("Home"),
+                qsTr("Wiki"),
+                qsTr("Store"),
+                qsTr("Forums"),
+                qsTr("Code Reviews"),
+                qsTr("Progress Tracker")
+               ]
+             }
+              return title.text[index]
+       }
     }
 
     ListView {
@@ -36,10 +49,10 @@ Item {
         anchors { top: parent.top; bottom: parent.bottom }
         orientation: ListView.Horizontal
         model: sitesModel
-        spacing: 80
+        spacing: 40  // Need dynamic spacing
 
         delegate: Text {
-            text: title
+            text: view.model.title(index)
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             font {
                 pointSize: 12

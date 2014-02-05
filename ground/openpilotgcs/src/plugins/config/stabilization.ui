@@ -8614,16 +8614,16 @@ border-radius: 5;</string>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_11">
                 <property name="leftMargin">
-                 <number>0</number>
+                 <number>9</number>
                 </property>
                 <property name="topMargin">
-                 <number>0</number>
+                 <number>9</number>
                 </property>
                 <property name="rightMargin">
-                 <number>0</number>
+                 <number>9</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>0</number>
+                 <number>9</number>
                 </property>
                 <item>
                  <widget class="QCheckBox" name="lowThrottleZeroIntegral_8">
@@ -18750,8 +18750,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>752</width>
-            <height>526</height>
+            <width>796</width>
+            <height>708</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -26881,14 +26881,11 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>284</width>
-            <height>133</height>
+            <width>796</width>
+            <height>708</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_17">
-           <property name="spacing">
-            <number>0</number>
-           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_19">
            <item>
             <widget class="QGroupBox" name="gridGroupBox">
              <property name="title">
@@ -27107,7 +27104,7 @@ border-radius: 5;</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_23">
               <property name="leftMargin">
-               <number>9</number>
+               <number>0</number>
               </property>
               <property name="topMargin">
                <number>9</number>
@@ -27118,20 +27115,47 @@ border-radius: 5;</string>
               <property name="bottomMargin">
                <number>9</number>
               </property>
+              <item row="0" column="1">
+               <widget class="QPushButton" name="pushButton_11">
+                <property name="text">
+                 <string>Default</string>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:StabilizationSettings</string>
+                  <string>button:default</string>
+                  <string>buttongroup:16</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <spacer name="horizontalSpacer_58">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item row="1" column="0" colspan="2">
-               <widget class="QGroupBox" name="gridGroupBox">
+               <widget class="QFrame" name="gridFrame">
                 <layout class="QGridLayout" name="gridLayout_25">
                  <property name="leftMargin">
-                  <number>0</number>
+                  <number>9</number>
                  </property>
                  <property name="topMargin">
                   <number>9</number>
                  </property>
                  <property name="rightMargin">
-                  <number>0</number>
+                  <number>9</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>0</number>
+                  <number>9</number>
                  </property>
                  <item row="1" column="4">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
@@ -27614,32 +27638,39 @@ border-radius: 5;</string>
                 </layout>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QPushButton" name="pushButton_11">
-                <property name="text">
-                 <string>Default</string>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_9">
+             <property name="title">
+              <string>Instant Update</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_17">
+              <item>
+               <widget class="QCheckBox" name="realTimeUpdates_9">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="objrelation" stdset="0">
-                 <stringlist>
-                  <string>objname:StabilizationSettings</string>
-                  <string>button:default</string>
-                  <string>buttongroup:16</string>
-                 </stringlist>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_58">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
+                <property name="minimumSize">
                  <size>
-                  <width>40</width>
+                  <width>136</width>
                   <height>20</height>
                  </size>
                 </property>
-               </spacer>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Update flight controller in real time</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -27696,8 +27727,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>347</width>
-            <height>500</height>
+            <width>796</width>
+            <height>708</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -29523,7 +29554,7 @@ border-radius: 5;</string>
                      <string>element:Kp</string>
                      <string>scale:0.01</string>
                      <string>haslimits:yes</string>
-                     <string>buttongroup:98</string>
+                     <string>buttongroup:98,10</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -29570,7 +29601,7 @@ border-radius: 5;</string>
                      <string>element:Kp</string>
                      <string>scale:0.01</string>
                      <string>haslimits:yes</string>
-                     <string>buttongroup:98</string>
+                     <string>buttongroup:98,10</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -29617,7 +29648,7 @@ border-radius: 5;</string>
                      <string>element:Ki</string>
                      <string>scale:0.00001</string>
                      <string>haslimits:yes</string>
-                     <string>buttongroup:98</string>
+                     <string>buttongroup:98,10</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -30763,7 +30794,7 @@ border-radius: 5;</string>
                      <string>fieldname:ThrottleExp</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:99</string>
+                     <string>buttongroup:99,10</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -30837,7 +30868,7 @@ border-radius: 5;</string>
                      <string>fieldname:ThrottleRate</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:99</string>
+                     <string>buttongroup:99,10</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -31491,7 +31522,7 @@ border-radius: 5;</string>
              <property name="title">
               <string>Instant Update</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_14">
+             <layout class="QVBoxLayout" name="verticalLayout_14" stretch="0">
               <item>
                <widget class="QCheckBox" name="realTimeUpdates_7">
                 <property name="sizePolicy">

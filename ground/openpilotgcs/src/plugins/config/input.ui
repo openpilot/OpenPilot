@@ -128,8 +128,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>768</width>
-            <height>742</height>
+            <width>766</width>
+            <height>745</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -151,7 +151,7 @@
            <item row="1" column="0">
             <widget class="QGroupBox" name="groupBox_5">
              <property name="title">
-              <string/>
+              <string>Input Channel Configuration</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <property name="leftMargin">
@@ -277,13 +277,6 @@
                     </property>
                    </spacer>
                   </item>
-                  <item>
-                   <widget class="Line" name="line_2">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                   </widget>
-                  </item>
                  </layout>
                 </widget>
                 <widget class="QWidget" name="wizard">
@@ -388,6 +381,12 @@
               </item>
               <item>
                <widget class="QPushButton" name="configurationWizard">
+                <property name="minimumSize">
+                 <size>
+                  <width>210</width>
+                  <height>0</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Start Configuration Wizard</string>
                 </property>
@@ -559,8 +558,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>768</width>
-            <height>742</height>
+            <width>766</width>
+            <height>745</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7" rowstretch="1,0,0,0">
@@ -1314,7 +1313,6 @@ margin:1px;</string>
                      <string>index:0</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1355,7 +1353,6 @@ margin:1px;</string>
                      <string>index:1</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1396,7 +1393,6 @@ margin:1px;</string>
                      <string>index:2</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1440,7 +1436,6 @@ margin:1px;</string>
                      <string>index:3</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1484,7 +1479,6 @@ margin:1px;</string>
                      <string>index:4</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -1528,7 +1522,6 @@ margin:1px;</string>
                      <string>index:5</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
-                     <string>buttongroup:16</string>
                     </stringlist>
                    </property>
                   </widget>
@@ -2183,8 +2176,8 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>504</width>
-            <height>156</height>
+            <width>766</width>
+            <height>745</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

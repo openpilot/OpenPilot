@@ -85,15 +85,7 @@ AccelGyroSettingsData agcal;
 
 static float mag_bias[3] = { 0, 0, 0 };
 static float mag_scale[3] = { 0, 0, 0 };
-static float accel_bias[3] = { 0, 0, 0 };
-static float accel_scale[3] = { 0, 0, 0 };
-static float gyro_staticbias[3] = { 0, 0, 0 };
-static float gyro_scale[3] = { 0, 0, 0 };
 // temp coefficient to calculate gyro bias
-static float gyro_temp_coeff[4] = { 0 };
-static float accel_temp_coeff[4] = { 0 };
-static float calibrated_temp_min = 0.0f;
-static float calibrated_temp_max = 0.0f;
 static volatile bool gyro_temp_calibrated = false;
 static volatile bool accel_temp_calibrated = false;
 static float R[3][3] = {
@@ -355,17 +347,17 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                             (float)accel_accum[2] / accel_samples };
 
 
-        float accels_out[3] = { accels[0] * accel_scaling * accel_scale[0] - accel_bias[0],
-                                accels[1] * accel_scaling * accel_scale[1] - accel_bias[1],
-                                accels[2] * accel_scaling * accel_scale[2] - accel_bias[2] };
+        float accels_out[3] = { accels[0] * accel_scaling * agcal.accel_scale.X - agcal.accel_bias.X,
+                                accels[1] * accel_scaling * agcal.accel_scale.Y - agcal.accel_bias.Y,
+                                accels[2] * accel_scaling * agcal.accel_scale.Z - agcal.accel_bias.Z };
 
         if (accel_temp_calibrated) {
-            float ctemp = accelSensorData.temperature > calibrated_temp_max ? calibrated_temp_max :
-                          (accelSensorData.temperature < calibrated_temp_min ? calibrated_temp_min
+            float ctemp = accelSensorData.temperature > agcal.temp_calibrated_extent.max ? agcal.temp_calibrated_extent.max :
+                          (accelSensorData.temperature < agcal.temp_calibrated_extent.min ? agcal.temp_calibrated_extent.min
                            : accelSensorData.temperature);
-            accels_out[0] -= accel_temp_coeff[0] * ctemp;
-            accels_out[1] -= accel_temp_coeff[1] * ctemp;
-            accels_out[2] -= accel_temp_coeff[2] * ctemp;
+            accels_out[0] -= agcal.accel_temp_coeff.X * ctemp;
+            accels_out[1] -= agcal.accel_temp_coeff.Y * ctemp;
+            accels_out[2] -= agcal.accel_temp_coeff.Z * ctemp;
         }
 
         if (rotate) {
@@ -385,17 +377,17 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                            (float)gyro_accum[1] / gyro_samples,
                            (float)gyro_accum[2] / gyro_samples };
 
-        float gyros_out[3] = { gyros[0] * gyro_scaling * gyro_scale[0] - gyro_staticbias[0],
-                               gyros[1] * gyro_scaling * gyro_scale[1] - gyro_staticbias[1],
-                               gyros[2] * gyro_scaling * gyro_scale[2] - gyro_staticbias[2] };
+        float gyros_out[3] = { gyros[0] * gyro_scaling * agcal.gyro_scale.X - agcal.gyro_bias.X,
+                               gyros[1] * gyro_scaling * agcal.gyro_scale.Y - agcal.gyro_bias.Y,
+                               gyros[2] * gyro_scaling * agcal.gyro_scale.Z - agcal.gyro_bias.Z };
 
         if (gyro_temp_calibrated) {
-            float ctemp = gyroSensorData.temperature > calibrated_temp_max ? calibrated_temp_max :
-                          (gyroSensorData.temperature < calibrated_temp_min ? calibrated_temp_min
+            float ctemp = gyroSensorData.temperature > agcal.temp_calibrated_extent.max ? agcal.temp_calibrated_extent.max :
+                          (gyroSensorData.temperature < agcal.temp_calibrated_extent.min ? agcal.temp_calibrated_extent.min
                            : gyroSensorData.temperature);
-            gyros_out[0] -= gyro_temp_coeff[0] * ctemp;
-            gyros_out[1] -= gyro_temp_coeff[1] * ctemp;
-            gyros_out[2] -= (gyro_temp_coeff[2] + gyro_temp_coeff[3] * ctemp) * ctemp;
+            gyros_out[0] -= (agcal.gyro_temp_coeff.X + agcal.gyro_temp_coeff.X2 * ctemp) * ctemp;
+            gyros_out[1] -= (agcal.gyro_temp_coeff.Y + agcal.gyro_temp_coeff.Y2 * ctemp) * ctemp;
+            gyros_out[2] -= (agcal.gyro_temp_coeff.Z + agcal.gyro_temp_coeff.Z2 * ctemp) * ctemp;
         }
 
         if (rotate) {
@@ -460,27 +452,6 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     mag_scale[0]          = cal.mag_scale.X;
     mag_scale[1]          = cal.mag_scale.Y;
     mag_scale[2]          = cal.mag_scale.Z;
-    accel_bias[0]         = agcal.accel_bias.X;
-    accel_bias[1]         = agcal.accel_bias.Y;
-    accel_bias[2]         = agcal.accel_bias.Z;
-    accel_scale[0]        = agcal.accel_scale.X;
-    accel_scale[1]        = agcal.accel_scale.Y;
-    accel_scale[2]        = agcal.accel_scale.Z;
-    gyro_staticbias[0]    = agcal.gyro_bias.X;
-    gyro_staticbias[1]    = agcal.gyro_bias.Y;
-    gyro_staticbias[2]    = agcal.gyro_bias.Z;
-    gyro_scale[0]         = agcal.gyro_scale.X;
-    gyro_scale[1]         = agcal.gyro_scale.Y;
-    gyro_scale[2]         = agcal.gyro_scale.Z;
-    gyro_temp_coeff[0]    = agcal.gyro_temp_coeff.X;
-    gyro_temp_coeff[1]    = agcal.gyro_temp_coeff.Y;
-    gyro_temp_coeff[2]    = agcal.gyro_temp_coeff.Z;
-    gyro_temp_coeff[3]    = agcal.gyro_temp_coeff.Z2;
-    accel_temp_coeff[0]   = agcal.accel_temp_coeff.X;
-    accel_temp_coeff[1]   = agcal.accel_temp_coeff.Y;
-    accel_temp_coeff[2]   = agcal.accel_temp_coeff.Z;
-    calibrated_temp_max   = agcal.temp_calibrated_extent.max;
-    calibrated_temp_min   = agcal.temp_calibrated_extent.min;
 
     accel_temp_calibrated = (agcal.temp_calibrated_extent.max - agcal.temp_calibrated_extent.min > .1f) &&
                             agcal.accel_temp_coeff.X > 1e-9f && agcal.accel_temp_coeff.Y > 1e-9f && agcal.accel_temp_coeff.Z > 1e-9f;

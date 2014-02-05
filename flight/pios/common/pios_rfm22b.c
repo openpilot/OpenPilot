@@ -62,6 +62,15 @@
 #include <pios_ppm_out.h>
 #include <ecc.h>
 
+#define RFM_DEBUGLOG 1
+
+#if defined RFM_DEBUGLOG && defined FLASH_FREERTOS
+#define RFM_DEBUGLOG_PRINTF(...) PIOS_DEBUGLOG_Printf(__VA_ARGS__)
+#endif
+#ifndef RFM_DEBUGLOG_PRINTF
+#define RFM_DEBUGLOG_PRINTF(...)
+#endif
+
 /* Local Defines */
 #define STACK_SIZE_BYTES                 200
 #define TASK_PRIORITY                    (tskIDLE_PRIORITY + 4) // flight control relevant device driver (ppm link)
@@ -1950,9 +1959,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
                 && (radio_dev->channel_index == 0)) {
             rfm22_synchronizeClock(radio_dev);
             if (radio_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED) {
-#ifdef FLASH_FREERTOS
-                PIOS_DEBUGLOG_Printf("RADIO CONNECTED");
-#endif
+                RFM_DEBUGLOG_PRINTF("RADIO CONNECTED");
                 radio_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
             }
             radio_dev->on_sync_channel  = false;
@@ -2226,9 +2233,7 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
 
             // Set the link state to disconnected.
             if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
-#ifdef FLASH_FREERTOS
-                PIOS_DEBUGLOG_Printf("RADIO DISCONNECTED");
-#endif
+                RFM_DEBUGLOG_PRINTF("RADIO DISCONNECTED");
                 rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
                 // Set the PPM outputs to INVALID
                 for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {

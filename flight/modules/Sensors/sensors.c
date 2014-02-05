@@ -86,7 +86,7 @@ AccelGyroSettingsData agcal;
 static float mag_bias[3] = { 0, 0, 0 };
 static float mag_scale[3] = { 0, 0, 0 };
 // temp coefficient to calculate gyro bias
-static volatile bool gyro_temp_calibrated = false;
+static volatile bool gyro_temp_calibrated  = false;
 static volatile bool accel_temp_calibrated = false;
 static float R[3][3] = {
     { 0 }
@@ -446,12 +446,12 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 {
     RevoCalibrationGet(&cal);
     AccelGyroSettingsGet(&agcal);
-    mag_bias[0]           = cal.mag_bias.X;
-    mag_bias[1]           = cal.mag_bias.Y;
-    mag_bias[2]           = cal.mag_bias.Z;
-    mag_scale[0]          = cal.mag_scale.X;
-    mag_scale[1]          = cal.mag_scale.Y;
-    mag_scale[2]          = cal.mag_scale.Z;
+    mag_bias[0]  = cal.mag_bias.X;
+    mag_bias[1]  = cal.mag_bias.Y;
+    mag_bias[2]  = cal.mag_bias.Z;
+    mag_scale[0] = cal.mag_scale.X;
+    mag_scale[1] = cal.mag_scale.Y;
+    mag_scale[2] = cal.mag_scale.Z;
 
     accel_temp_calibrated = (agcal.temp_calibrated_extent.max - agcal.temp_calibrated_extent.min > .1f) &&
                             agcal.accel_temp_coeff.X > 1e-9f && agcal.accel_temp_coeff.Y > 1e-9f && agcal.accel_temp_coeff.Z > 1e-9f;

@@ -265,7 +265,6 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 // If a channel has timed out this is not valid data and we shouldn't update anything
                 // until we decide to go to failsafe
                 if (cmd.Channel[n] == (uint16_t)PIOS_RCVR_TIMEOUT) {
-                    MC_DEBUGLOG_PRINTF("MANUAL CONTROL TIMED OUT");
                     valid_input_detected = false;
                 } else {
                     scaledChannel[n] = scaleChannel(cmd.Channel[n],
@@ -333,7 +332,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
             int8_t armSwitch = 0;
             if (cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE) {
-                MC_DEBUGLOG_PRINTF("MANUAL CONTROL FAIL SAFE");
+                //MC_DEBUGLOG_PRINTF("MANUAL CONTROL FAIL SAFE");
                 cmd.Throttle   = -1;      // Shut down engine with no control
                 cmd.Roll       = 0;
                 cmd.Yaw = 0;

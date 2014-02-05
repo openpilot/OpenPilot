@@ -1,15 +1,16 @@
 <xml>
 	<object name="OPLinkStatus" singleinstance="true" settings="false" category="System">
 		<description>OPLink device status.</description>
+
 		<field name="Description" units="" type="uint8" elements="40"/> 
 		<field name="CPUSerial" units="hex" type="uint8" elements="12" /> 
 		<field name="BoardRevision" units="" type="uint16" elements="1"/> 
 		<field name="BoardType" units="" type="uint8" elements="1"/> 
 		<field name="DeviceID" units="hex" type="uint32" elements="1" defaultvalue="0"/>
-                <field name="HeapRemaining" units="bytes" type="uint16" elements="1"/>
-		<field name="RxGood" units="%" type="uint8" elements="1" defaultvalue="0"/>
-		<field name="RxCorrected" units="%" type="uint8" elements="1" defaultvalue="0"/>
-		<field name="RxErrors" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="HeapRemaining" units="bytes" type="uint16" elements="1"/>
+		<field name="RxGood" units="" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="RxCorrected" units="" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="RxErrors" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="RxMissed" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="RxFailure" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="UAVTalkErrors" units="" type="uint16" elements="1" defaultvalue="0"/>

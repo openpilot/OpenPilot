@@ -96,7 +96,7 @@ static float accels_filtered[3];
 static float grot_filtered[3];
 static float yawBiasRate = 0;
 static float rollPitchBiasRate = 0.0f;
-static float accel_bias[3];
+static AccelGyroSettingsaccel_biasData accel_bias;
 static float q[4] = { 1, 0, 0, 0 };
 static float R[3][3];
 static int8_t rotate = 0;
@@ -106,14 +106,15 @@ static bool bias_correct_gyro  = true;
 // static float gyros_passed[3];
 
 // temp coefficient to calculate gyro bias
-static bool apply_gyro_temp     = false;
-static bool apply_accel_temp    = false;
-static float gyro_temp_coeff[4] = { 0 };
-static float accel_temp_coeff[4] = { 0 };
+static bool apply_gyro_temp  = false;
+static bool apply_accel_temp = false;
+static AccelGyroSettingsgyro_temp_coeffData gyro_temp_coeff;;
+static AccelGyroSettingsaccel_temp_coeffData accel_temp_coeff;
+static AccelGyroSettingstemp_calibrated_extentData temp_calibrated_extent;
 
 // Accel and Gyro scaling (this is the product of sensor scale and adjustement in AccelGyroSettings
-static float gyro_scale[3] = { 0 };
-static float accel_scale[3] = { 0 };
+static AccelGyroSettingsgyro_scaleData gyro_scale;
+static AccelGyroSettingsaccel_scaleData accel_scale;
 
 
 // For running trim flights
@@ -315,9 +316,9 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
     }
 
     // First sample is temperature
-    gyros->x = -(gyro[1] - STD_CC_ANALOG_GYRO_NEUTRAL) * gyro_scale[0];
-    gyros->y = (gyro[2] - STD_CC_ANALOG_GYRO_NEUTRAL) * gyro_scale[1];
-    gyros->z = -(gyro[3] - STD_CC_ANALOG_GYRO_NEUTRAL) * gyro_scale[2];
+    gyros->x = -(gyro[1] - STD_CC_ANALOG_GYRO_NEUTRAL) * gyro_scale.X;
+    gyros->y = (gyro[2] - STD_CC_ANALOG_GYRO_NEUTRAL) * gyro_scale.Y;
+    gyros->z = -(gyro[3] - STD_CC_ANALOG_GYRO_NEUTRAL) * gyro_scale.Z;
 
     int32_t x = 0;
     int32_t y = 0;
@@ -332,9 +333,9 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
         z += -accel_data.z;
     } while ((i < 32) && (samples_remaining > 0));
 
-    float accel[3] = { accel_scale[0] * (float)x / i,
-                       accel_scale[1] * (float)y / i,
-                       accel_scale[2] * (float)z / i };
+    float accel[3] = { accel_scale.X * (float)x / i,
+                       accel_scale.Y * (float)y / i,
+                       accel_scale.Z * (float)z / i };
 
     if (rotate) {
         // TODO: rotate sensors too so stabilization is well behaved
@@ -372,9 +373,9 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
     }
 
     // Scale accels and correct bias
-    accelState->x -= accel_bias[0];
-    accelState->y -= accel_bias[1];
-    accelState->z -= accel_bias[2];
+    accelState->x -= accel_bias.X;
+    accelState->y -= accel_bias.Y;
+    accelState->z -= accel_bias.Z;
 
     if (bias_correct_gyro) {
         // Applying integral component here so it can be seen on the gyros and correct bias
@@ -418,24 +419,29 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     if (GyroStateReadOnly() || AccelStateReadOnly()) {
         return 0;
     }
-    gyros[0]  = mpu6000_data.gyro_x * gyro_scale[0];
-    gyros[1]  = mpu6000_data.gyro_y * gyro_scale[1];
-    gyros[2]  = mpu6000_data.gyro_z * gyro_scale[2];
+    gyros[0]  = mpu6000_data.gyro_x * gyro_scale.X;
+    gyros[1]  = mpu6000_data.gyro_y * gyro_scale.Y;
+    gyros[2]  = mpu6000_data.gyro_z * gyro_scale.Z;
 
-    accels[0] = mpu6000_data.accel_x * accel_scale[0];
-    accels[1] = mpu6000_data.accel_y * accel_scale[1];
-    accels[2] = mpu6000_data.accel_z * accel_scale[2];
+    accels[0] = mpu6000_data.accel_x * accel_scale.X;
+    accels[1] = mpu6000_data.accel_y * accel_scale.Y;
+    accels[2] = mpu6000_data.accel_z * accel_scale.Z;
+
+    float ctemp = mpu6000_data.temperature > temp_calibrated_extent.max ? temp_calibrated_extent.max :
+                  (mpu6000_data.temperature < temp_calibrated_extent.min ? temp_calibrated_extent.min
+                   : mpu6000_data.temperature);
+
 
     if (apply_gyro_temp) {
-        gyros[0] -= gyro_temp_coeff[0] * mpu6000_data.temperature;
-        gyros[1] -= gyro_temp_coeff[1] * mpu6000_data.temperature;
-        gyros[2] -= (gyro_temp_coeff[2] + gyro_temp_coeff[3] * mpu6000_data.temperature) * mpu6000_data.temperature;
+        gyros[0] -= (gyro_temp_coeff.X + gyro_temp_coeff.X2 * ctemp) * ctemp;
+        gyros[1] -= (gyro_temp_coeff.Y + gyro_temp_coeff.Y2 * ctemp) * ctemp;
+        gyros[2] -= (gyro_temp_coeff.Z + gyro_temp_coeff.Z2 * ctemp) * ctemp;
     }
 
     if (apply_accel_temp) {
-        accels[0] -= accel_temp_coeff[0] * mpu6000_data.temperature;
-        accels[1] -= accel_temp_coeff[1] * mpu6000_data.temperature;
-        accels[2] -= accel_temp_coeff[2] * mpu6000_data.temperature;
+        accels[0] -= accel_temp_coeff.X * ctemp;
+        accels[1] -= accel_temp_coeff.Y * ctemp;
+        accels[2] -= accel_temp_coeff.Z * ctemp;
     }
     // gyrosData->temperature  = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
     // accelsData->temperature = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
@@ -454,9 +460,9 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
         gyros[2]  = vec_out[2];
     }
 
-    accelStateData->x = accels[0] - accel_bias[0];
-    accelStateData->y = accels[1] - accel_bias[1];
-    accelStateData->z = accels[2] - accel_bias[2];
+    accelStateData->x = accels[0] - accel_bias.X;
+    accelStateData->y = accels[1] - accel_bias.Y;
+    accelStateData->z = accels[2] - accel_bias.Z;
 
     gyrosData->x = gyros[0];
     gyrosData->y = gyros[1];
@@ -631,57 +637,56 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         accel_filter_enabled = true;
     }
 
-    zero_during_arming  = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
-    bias_correct_gyro   = attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE;
+    zero_during_arming = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
+    bias_correct_gyro  = attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE;
 
-    gyro_temp_coeff[0]  = accelGyroSettings.gyro_temp_coeff.X;
-    gyro_temp_coeff[1]  = accelGyroSettings.gyro_temp_coeff.Y;
-    gyro_temp_coeff[2]  = accelGyroSettings.gyro_temp_coeff.Z;
-    gyro_temp_coeff[3]  = accelGyroSettings.gyro_temp_coeff.Z2;
+    memcpy(&gyro_temp_coeff, &accelGyroSettings.gyro_temp_coeff, sizeof(AccelGyroSettingsgyro_temp_coeffData));
+    memcpy(&accel_temp_coeff, &accelGyroSettings.accel_temp_coeff, sizeof(AccelGyroSettingsaccel_temp_coeffData));
 
-    accel_temp_coeff[0] = accelGyroSettings.accel_temp_coeff.X;
-    accel_temp_coeff[1] = accelGyroSettings.accel_temp_coeff.Y;
-    accel_temp_coeff[2] = accelGyroSettings.accel_temp_coeff.Z;
 
-    apply_gyro_temp     = (fabsf(gyro_temp_coeff[0]) > 1e-6f ||
-                           fabsf(gyro_temp_coeff[1]) > 1e-6f ||
-                           fabsf(gyro_temp_coeff[2]) > 1e-6f ||
-                           fabsf(gyro_temp_coeff[3]) > 1e-6f);
+    apply_gyro_temp = (fabsf(gyro_temp_coeff.X) > 1e-6f ||
+                       fabsf(gyro_temp_coeff.Y) > 1e-6f ||
+                       fabsf(gyro_temp_coeff.Z) > 1e-6f ||
+                       fabsf(gyro_temp_coeff.X2) > 1e-6f ||
+                       fabsf(gyro_temp_coeff.Y2) > 1e-6f ||
+                       fabsf(gyro_temp_coeff.Z2) > 1e-6f);
 
-    apply_accel_temp = (fabsf(accel_temp_coeff[0]) > 1e-6f ||
-                        fabsf(accel_temp_coeff[1]) > 1e-6f ||
-                        fabsf(accel_temp_coeff[2]) > 1e-6f);
+    apply_accel_temp = (fabsf(accel_temp_coeff.X) > 1e-6f ||
+                        fabsf(accel_temp_coeff.Y) > 1e-6f ||
+                        fabsf(accel_temp_coeff.Z) > 1e-6f);
 
     gyro_correct_int[0] = accelGyroSettings.gyro_bias.X;
     gyro_correct_int[1] = accelGyroSettings.gyro_bias.Y;
     gyro_correct_int[2] = accelGyroSettings.gyro_bias.Z;
 
+    temp_calibrated_extent.min = accelGyroSettings.temp_calibrated_extent.min;
+    temp_calibrated_extent.max = accelGyroSettings.temp_calibrated_extent.max;
 
     if (BOARDISCC3D) {
-        accel_bias[0]  = accelGyroSettings.accel_bias.X;
-        accel_bias[1]  = accelGyroSettings.accel_bias.Y;
-        accel_bias[2]  = accelGyroSettings.accel_bias.Z;
+        accel_bias.X  = accelGyroSettings.accel_bias.X;
+        accel_bias.Y  = accelGyroSettings.accel_bias.Y;
+        accel_bias.Z  = accelGyroSettings.accel_bias.Z;
 
-        gyro_scale[0]  = accelGyroSettings.gyro_scale.X * PIOS_MPU6000_GetScale();
-        gyro_scale[1]  = accelGyroSettings.gyro_scale.Y * PIOS_MPU6000_GetScale();
-        gyro_scale[2]  = accelGyroSettings.gyro_scale.Z * PIOS_MPU6000_GetScale();
+        gyro_scale.X  = accelGyroSettings.gyro_scale.X * PIOS_MPU6000_GetScale();
+        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * PIOS_MPU6000_GetScale();
+        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * PIOS_MPU6000_GetScale();
 
-        accel_scale[0] = accelGyroSettings.accel_scale.X * PIOS_MPU6000_GetAccelScale();
-        accel_scale[1] = accelGyroSettings.accel_scale.Y * PIOS_MPU6000_GetAccelScale();
-        accel_scale[2] = accelGyroSettings.accel_scale.Z * PIOS_MPU6000_GetAccelScale();
+        accel_scale.X = accelGyroSettings.accel_scale.X * PIOS_MPU6000_GetAccelScale();
+        accel_scale.Y = accelGyroSettings.accel_scale.Y * PIOS_MPU6000_GetAccelScale();
+        accel_scale.Z = accelGyroSettings.accel_scale.Z * PIOS_MPU6000_GetAccelScale();
     } else {
         // Original CC with analog gyros and ADXL accel
-        accel_bias[0]  = accelGyroSettings.accel_bias.X;
-        accel_bias[1]  = accelGyroSettings.accel_bias.Y;
-        accel_bias[2]  = accelGyroSettings.accel_bias.Z;
+        accel_bias.X  = accelGyroSettings.accel_bias.X;
+        accel_bias.Y  = accelGyroSettings.accel_bias.Y;
+        accel_bias.Z  = accelGyroSettings.accel_bias.Z;
 
-        gyro_scale[0]  = accelGyroSettings.gyro_scale.X * STD_CC_ANALOG_GYRO_GAIN;
-        gyro_scale[1]  = accelGyroSettings.gyro_scale.Y * STD_CC_ANALOG_GYRO_GAIN;
-        gyro_scale[2]  = accelGyroSettings.gyro_scale.Z * STD_CC_ANALOG_GYRO_GAIN;
+        gyro_scale.X  = accelGyroSettings.gyro_scale.X * STD_CC_ANALOG_GYRO_GAIN;
+        gyro_scale.Y  = accelGyroSettings.gyro_scale.Y * STD_CC_ANALOG_GYRO_GAIN;
+        gyro_scale.Z  = accelGyroSettings.gyro_scale.Z * STD_CC_ANALOG_GYRO_GAIN;
 
-        accel_scale[0] = accelGyroSettings.accel_scale.X * STD_CC_ACCEL_SCALE;
-        accel_scale[1] = accelGyroSettings.accel_scale.Y * STD_CC_ACCEL_SCALE;
-        accel_scale[2] = accelGyroSettings.accel_scale.Z * STD_CC_ACCEL_SCALE;
+        accel_scale.X = accelGyroSettings.accel_scale.X * STD_CC_ACCEL_SCALE;
+        accel_scale.Y = accelGyroSettings.accel_scale.Y * STD_CC_ACCEL_SCALE;
+        accel_scale.Z = accelGyroSettings.accel_scale.Z * STD_CC_ACCEL_SCALE;
     }
 
     // Indicates not to expend cycles on rotation

@@ -108,8 +108,8 @@
 		</elementnames>
 	</field> 
         <access gcs="readonly" flight="readwrite"/>
-        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
-        <telemetryflight acked="true" updatemode="periodic" period="10000"/>
+        <telemetrygcs acked="false" updatemode="onchange" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="10000"/>
 	<logging updatemode="manual" period="0"/>
     </object>
 </xml>

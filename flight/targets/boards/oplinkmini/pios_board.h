@@ -194,7 +194,7 @@ extern uint32_t pios_ppm_out_id;
 #define PIOS_PPM_RECEIVER         (pios_ppm_rcvr_id)
 #define PIOS_PPM_OUTPUT           (pios_ppm_out_id)
 
-#define RFM22_DEBUG               1
+#define RFM22_DEBUG               0
 
 // -------------------------
 // ADC

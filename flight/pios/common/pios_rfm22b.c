@@ -62,7 +62,7 @@
 #include <pios_ppm_out.h>
 #include <ecc.h>
 
-#define RFM_DEBUGLOG 1
+//#define RFM_DEBUGLOG 1
 
 #if defined RFM_DEBUGLOG && defined FLASH_FREERTOS
 #define RFM_DEBUGLOG_PRINTF(...) PIOS_DEBUGLOG_Printf(__VA_ARGS__)

@@ -57,6 +57,15 @@
 #include "pios_usb_rctx.h"
 #endif /* PIOS_INCLUDE_USB_RCTX */
 
+//#define MC_DEBUGLOG 1
+
+#if defined MC_DEBUGLOG && defined FLASH_FREERTOS
+#define MC_DEBUGLOG_PRINTF(...) PIOS_DEBUGLOG_Printf(__VA_ARGS__)
+#endif
+#ifndef MC_DEBUGLOG_PRINTF
+#define MC_DEBUGLOG_PRINTF(...)
+#endif
+
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES  PIOS_MANUAL_STACK_SIZE
@@ -256,10 +265,8 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 // If a channel has timed out this is not valid data and we shouldn't update anything
                 // until we decide to go to failsafe
                 if (cmd.Channel[n] == (uint16_t)PIOS_RCVR_TIMEOUT) {
+                    MC_DEBUGLOG_PRINTF("MANUAL CONTROL TIMED OUT");
                     valid_input_detected = false;
-#ifdef FLASH_FREERTOS
-        PIOS_DEBUGLOG_Printf("MANUAL CONTROL TIMED OUT");
-#endif
                 } else {
                     scaledChannel[n] = scaleChannel(cmd.Channel[n],
                                                     cast_struct_to_array(settings.ChannelMax, settings.ChannelMax.Pitch)[n],
@@ -326,9 +333,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
             int8_t armSwitch = 0;
             if (cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE) {
-#ifdef FLASH_FREERTOS
-        PIOS_DEBUGLOG_Printf("MANUAL CONTROL FAIL SAFE");
-#endif
+                MC_DEBUGLOG_PRINTF("MANUAL CONTROL FAIL SAFE");
                 cmd.Throttle   = -1;      // Shut down engine with no control
                 cmd.Roll       = 0;
                 cmd.Yaw = 0;

@@ -36,6 +36,15 @@
 #include <oplinkreceiver.h>
 #include <pios_oplinkrcvr_priv.h>
 
+//#define OPLINKRCVR_DEBUGLOG 1
+
+#if defined OPLINKRCVR_DEBUGLOG && defined FLASH_FREERTOS
+#define OPLINKRCVR_DEBUGLOG_PRINTF(...) PIOS_DEBUGLOG_Printf(__VA_ARGS__)
+#endif
+#ifndef OPLINKRCVR_DEBUGLOG_PRINTF
+#define OPLINKRCVR_DEBUGLOG_PRINTF(...)
+#endif
+
 static OPLinkReceiverData oplinkreceiverdata;
 
 /* Provide a RCVR driver */
@@ -178,12 +187,10 @@ static void PIOS_oplinkrcvr_Supervisor(uint32_t oplinkrcvr_id)
     oplinkrcvr_dev->supv_timer = 0;
 
     if (!oplinkrcvr_dev->Fresh) {
+        OPLINKRCVR_DEBUGLOG_PRINTF("OPLINKRECEIVER TIMED OUT");
         for (int32_t i = 0; i < OPLINKRECEIVER_CHANNEL_NUMELEM; i++) {
             oplinkreceiverdata.Channel[i] = PIOS_RCVR_TIMEOUT;
         }
-#ifdef FLASH_FREERTOS
-        PIOS_DEBUGLOG_Printf("OPLINKRECEIVER TIMED OUT");
-#endif
     }
 
     oplinkrcvr_dev->Fresh = false;

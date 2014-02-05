@@ -99,7 +99,9 @@ bool ThermalCalibration::GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::V
     if (!CalibrationUtils::PolynomialCalibration(&temperature, &samplesX, GYRO_X_POLY_DEGREE, solution, GYRO_X_MAX_REL_ERROR)) {
         return false;
     }
+
     result[0]   = solution[1];
+    result[1]   = solution[2];
     solution[0] = 0;
     ComputeStats(&temperature, &samplesX, &solution, &inputSigma[0], &calibratedSigma[0]);
 
@@ -108,7 +110,8 @@ bool ThermalCalibration::GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::V
     if (!CalibrationUtils::PolynomialCalibration(&temperature, &samplesY, GYRO_Y_POLY_DEGREE, solution, GYRO_Y_MAX_REL_ERROR)) {
         return false;
     }
-    result[1]   = solution[1];
+    result[2]   = solution[1];
+    result[3]   = solution[2];
     solution[0] = 0;
     ComputeStats(&temperature, &samplesY, &solution, &inputSigma[1], &calibratedSigma[1]);
 
@@ -116,8 +119,8 @@ bool ThermalCalibration::GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::V
     if (!CalibrationUtils::PolynomialCalibration(&temperature, &samplesZ, GYRO_Z_POLY_DEGREE, solution, GYRO_Z_MAX_REL_ERROR)) {
         return false;
     }
-    result[2]   = solution[1];
-    result[3]   = solution[2];
+    result[4]   = solution[1];
+    result[5]   = solution[2];
     solution[0] = 0;
     std::cout << solution << std::endl;
     ComputeStats(&temperature, &samplesZ, &solution, &inputSigma[2], &calibratedSigma[2]);

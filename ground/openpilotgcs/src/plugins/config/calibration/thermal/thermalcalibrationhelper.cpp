@@ -383,8 +383,9 @@ void ThermalCalibrationHelper::calculate()
     str += QStringLiteral("INFO::Baro cal {%1, %2, %3, %4}; initial variance: %5; Calibrated variance %6")
            .arg(m_results.baro[0]).arg(m_results.baro[1]).arg(m_results.baro[2]).arg(m_results.baro[3])
            .arg(m_results.baroInSigma).arg(m_results.baroOutSigma) + QChar::CarriageReturn;
-    str += QStringLiteral("INFO::Gyro cal x{%1} y{%2} z{%3, %4}; initial variance: {%5, %6, %7}; Calibrated variance {%8, %9, %10}")
-           .arg(m_results.gyro[0]).arg(m_results.gyro[1]).arg(m_results.gyro[2]).arg(m_results.baro[3])
+    str += QStringLiteral("INFO::Gyro cal x{%1, %2} y{%3, %4} z{%5, %6}; initial variance: {%7, %8, %9}; Calibrated variance {%10, %11, %12}")
+           .arg(m_results.gyro[0]).arg(m_results.gyro[1]).arg(m_results.gyro[2])
+           .arg(m_results.gyro[3]).arg(m_results.gyro[4]).arg(m_results.gyro[5])
            .arg(m_results.gyroInSigma[0]).arg(m_results.gyroInSigma[1]).arg(m_results.gyroInSigma[2])
            .arg(m_results.gyroOutSigma[0]).arg(m_results.gyroOutSigma[1]).arg(m_results.gyroOutSigma[2]) + QChar::CarriageReturn;
     str += QStringLiteral("INFO::Accel cal x{%1} y{%2} z{%3}; initial variance: {%4, %5, %6}; Calibrated variance {%7, %8, %9}")
@@ -557,6 +558,8 @@ void ThermalCalibrationHelper::copyResultToSettings()
             data.gyro_temp_coeff[1] = m_results.gyro[1];
             data.gyro_temp_coeff[2] = m_results.gyro[2];
             data.gyro_temp_coeff[3] = m_results.gyro[3];
+            data.gyro_temp_coeff[4] = m_results.gyro[4];
+            data.gyro_temp_coeff[5] = m_results.gyro[5];
         }
 
         if (m_results.accelCalibrated) {

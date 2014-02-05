@@ -70,7 +70,7 @@ typedef struct {
     bool  accelCalibrated;
     float accel[3];
     bool  gyroCalibrated;
-    float gyro[4];
+    float gyro[6];
 
     float baroInSigma;
     float baroOutSigma;

@@ -73,7 +73,7 @@
 #define STACK_SIZE_BYTES    840
 #endif
 
-#define TASK_PRIORITY       (tskIDLE_PRIORITY + 4)
+#define TASK_PRIORITY       (tskIDLE_PRIORITY + 3) // FLIGHT CONTROL priority
 #define FAILSAFE_TIMEOUT_MS 30
 
 // number of flight mode switch positions

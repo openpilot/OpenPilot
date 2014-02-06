@@ -41,7 +41,6 @@
 /* Enable/Disable PiOS Modules */
 // #define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_DELTATIME
 // #define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED

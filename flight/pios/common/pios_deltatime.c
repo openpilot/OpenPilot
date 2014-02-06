@@ -30,7 +30,6 @@
 
 #include <pios.h>
 
-#ifdef PIOS_INCLUDE_DELTATIME
 
 void PIOS_DELTATIME_Init(PiOSDeltatimeConfig *config, float average, float min, float max, float alpha)
 {
@@ -57,9 +56,6 @@ float PIOS_DELTATIME_GetAverageSeconds(PiOSDeltatimeConfig *config)
     config->average = config->average * (1.0f - config->alpha) + dT * config->alpha;
     return config->average;
 }
-
-
-#endif // PIOS_INCLUDE_DELTATIME
 
 
 /**

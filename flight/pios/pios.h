@@ -110,6 +110,7 @@
 /* PIOS system functions */
 #ifdef PIOS_INCLUDE_DELAY
 #include <pios_delay.h>
+#include <pios_deltatime.h>
 #endif
 
 #ifdef PIOS_INCLUDE_INITCALL

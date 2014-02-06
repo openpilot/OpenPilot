@@ -101,6 +101,7 @@ SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
 SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
 SRC += $(PIOSCORECOMMON)/pios_debuglog.c
 SRC += $(PIOSCORECOMMON)/pios_callbackscheduler.c
+SRC += $(PIOSCORECOMMON)/pios_deltatime.c
 
 ## PIOS Hardware
 include $(PIOS)/posix/library.mk

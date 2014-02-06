@@ -91,7 +91,6 @@ bool CalibrationUtils::PolynomialCalibration(VectorXf *samplesX, Eigen::VectorXf
     Eigen::VectorXd tmpx = xtx.fullPivHouseholderQr().solve(xty);
     result = tmpx.cast<float>();
     double relativeError = (xtx * tmpx - xty).norm() / xty.norm();
-    std::cout << "Estimated relative error " << relativeError << "; Max allowed error " << maxRelativeError << std::endl;
     return relativeError < maxRelativeError;
 }
 

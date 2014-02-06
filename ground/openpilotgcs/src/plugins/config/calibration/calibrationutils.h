@@ -32,7 +32,6 @@
 #include <Eigen/Eigenvalues>
 #include <Eigen/Dense>
 #include <Eigen/LU>
-#include <iostream>
 
 namespace OpenPilot {
 class CalibrationUtils {

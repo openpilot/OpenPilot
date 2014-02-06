@@ -53,7 +53,6 @@ bool ThermalCalibration::BarometerCalibration(Eigen::VectorXf pressure, Eigen::V
     if (!CalibrationUtils::PolynomialCalibration(&temperature, &pressure, BARO_PRESSURE_POLY_DEGREE, solution, BARO_PRESSURE_MAX_REL_ERROR)) {
         return false;
     }
-    std::cout << "Baro calibration " << solution << std::endl;
     copyToArray(result, solution, BARO_PRESSURE_POLY_DEGREE + 1);
     ComputeStats(&temperature, &pressure, &solution, inputSigma, calibratedSigma);
     return (*calibratedSigma) < (*inputSigma);
@@ -122,7 +121,6 @@ bool ThermalCalibration::GyroscopeCalibration(Eigen::VectorXf samplesX, Eigen::V
     result[4]   = solution[1];
     result[5]   = solution[2];
     solution[0] = 0;
-    std::cout << solution << std::endl;
     ComputeStats(&temperature, &samplesZ, &solution, &inputSigma[2], &calibratedSigma[2]);
     return (inputSigma[0] > calibratedSigma[0]) && (inputSigma[1] > calibratedSigma[1]) && (inputSigma[2] > calibratedSigma[2]);
 }

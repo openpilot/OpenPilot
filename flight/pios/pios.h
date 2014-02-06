@@ -102,9 +102,6 @@
 /* PIOS system functions */
 #ifdef PIOS_INCLUDE_DELAY
 #include <pios_delay.h>
-#endif
-
-#ifdef PIOS_INCLUDE_DELTATIME
 #include <pios_deltatime.h>
 #endif
 

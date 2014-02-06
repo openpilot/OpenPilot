@@ -14,9 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="margin">
-    <number>12</number>
-   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -27,7 +24,16 @@
        <string>HW settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -110,12 +116,21 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>616</width>
-            <height>513</height>
+            <width>624</width>
+            <height>516</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>12</number>
+           </property>
+           <property name="topMargin">
+            <number>12</number>
+           </property>
+           <property name="rightMargin">
+            <number>12</number>
+           </property>
+           <property name="bottomMargin">
             <number>12</number>
            </property>
            <item row="6" column="0" colspan="3">
@@ -627,7 +642,6 @@ Beware of not locking yourself out!</string>
   </layout>
  </widget>
  <resources>
-  <include location="configgadget.qrc"/>
   <include location="../coreplugin/core.qrc"/>
  </resources>
  <connections/>

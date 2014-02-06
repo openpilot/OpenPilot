@@ -16,7 +16,7 @@
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QTabWidget" name="tabWidget_3">
-     <widget class="QWidget" name="tabWidget_3Page1" native="true">
+     <widget class="QWidget" name="tabWidget_3Page1">
       <attribute name="title">
        <string>OPLink configuration</string>
       </attribute>
@@ -686,7 +686,7 @@
                  </font>
                 </property>
                 <property name="toolTip">
-                 <string>This is the coordinator id currently bound to.</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the coordinator id we currently are bound to.&lt;/p&gt;&lt;p&gt;To manually bind to a specific coordinator, just type&lt;/p&gt;&lt;p&gt;or paste its device id in this box and save.&lt;/p&gt;&lt;p&gt;The device must be rebooted for the binding to take place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="maxLength">
                  <number>8</number>

@@ -139,6 +139,7 @@ private:
     bool m_startEnabled;
     bool m_cancelEnabled;
     bool m_endEnabled;
+    bool m_initDone;
     int m_progress;
     QString m_temperature;
     QString m_temperatureGradient;

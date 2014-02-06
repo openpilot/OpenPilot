@@ -34,7 +34,8 @@
 
 namespace OpenPilot {
 ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
-    WizardModel(parent)
+    WizardModel(parent),
+    m_initDone(false)
 {
     m_helper.reset(new ThermalCalibrationHelper());
     m_readyState       = new WizardState(tr("Start"), this),
@@ -68,13 +69,16 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
 }
 void ThermalCalibrationModel::init()
 {
-    setStartEnabled(true);
-    setEndEnabled(false);
-    setCancelEnabled(false);
-    start();
-    setTemperature(0);
-    setTemperatureGradient(0);
-    emit instructionsChanged(instructions());
+    if(!m_initDone){
+        m_initDone = true;
+        setStartEnabled(true);
+        setEndEnabled(false);
+        setCancelEnabled(false);
+        start();
+        setTemperature(0);
+        setTemperatureGradient(0);
+        emit instructionsChanged(instructions());
+    }
 }
 
 void ThermalCalibrationModel::stepChanged(WizardState *state)

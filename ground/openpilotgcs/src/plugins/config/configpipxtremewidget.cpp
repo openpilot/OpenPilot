@@ -305,7 +305,7 @@ void ConfigPipXtremeWidget::bind()
             quint32 boundPairId = m_oplink->CoordID->text().toUInt(&ok, 16);
             (pairid != boundPairId) ? m_oplink->CoordID->setText(QString::number(pairid, 16).toUpper()) : m_oplink->CoordID->setText("0");
         }
-        QMessageBox::information(this, tr("Information", "To apply the changes when binding/unbinding the board must be rebooted or power cycled."), QMessageBox::Ok);
+        QMessageBox::information(this, tr("Information"), tr("To apply the changes when binding/unbinding the board must be rebooted or power cycled."), QMessageBox::Ok);
     }
 }
 

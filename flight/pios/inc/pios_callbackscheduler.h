@@ -186,4 +186,12 @@ int32_t PIOS_CALLBACKSCHEDULER_Dispatch(DelayedCallbackInfo *cbinfo);
  */
 int32_t PIOS_CALLBACKSCHEDULER_DispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken);
 
+/**
+ * Retrieve callback specific runtime information
+ * \param[out] *callbackInfoData pointer to CallbackInfoData structure
+ * \return Success (-1), failure (0)
+ */
+int32_t PIOS_CALLBACKSCHEDULER_CallbackInfo(void *callbackInfoData);
+
+
 #endif // PIOS_CALLBACKSCHEDULER_H

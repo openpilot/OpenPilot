@@ -34,8 +34,9 @@
 #include <callbackinfo.h>
 
 // Private constants
-#define STACK_SIZE        384
-#define STACK_GRANULARITY 4
+#define STACK_SAFETYCOUNT 16
+#define STACK_SIZE        (384 + STACK_SAFETYSIZE)
+#define STACK_SAFETYSIZE  8
 #define MAX_SLEEP         1000
 
 // Private types
@@ -62,8 +63,10 @@ struct DelayedCallbackInfoStruct {
     bool volatile     waiting;
     uint32_t volatile scheduletime;
     uint32_t stackSize;
-    int32_t stackWatermark;
     int32_t  stackFree;
+    int32_t  stackNotFree;
+    uint16_t stackSafetyCount;
+    uint16_t currentSafetyCount;
     uint32_t runCount;
     struct DelayedCallbackTaskStruct *task;
     struct DelayedCallbackInfoStruct *next;
@@ -74,7 +77,6 @@ struct DelayedCallbackInfoStruct {
 static struct DelayedCallbackTaskStruct *schedulerTasks;
 static xSemaphoreHandle mutex;
 static bool schedulerStarted;
-static CallbackInfoData callbackInfo;
 
 // Private functions
 static void CallbackSchedulerTask(void *task);
@@ -117,11 +119,6 @@ int32_t PIOS_CALLBACKSCHEDULER_Start()
 
     // only call once
     PIOS_Assert(schedulerStarted == false);
-
-    #ifdef DIAG_TASKS
-    CallbackInfoInitialize();
-    CallbackInfoGet(&callbackInfo);
-    #endif
 
     // start tasks
     struct DelayedCallbackTaskStruct *cursor = NULL;
@@ -339,17 +336,18 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
         xSemaphoreGiveRecursive(mutex);
         return NULL; // error - not enough memory
     }
-    info->next         = NULL;
-    info->waiting      = false;
-    info->scheduletime = 0;
-    info->task         = task;
+    info->next               = NULL;
+    info->waiting            = false;
+    info->scheduletime       = 0;
+    info->task               = task;
     info->cb = cb;
-    info->callbackID   = callbackID;
-    info->runCount     = 0;
-    // info->stackSize    = stacksize - STACK_SIZE;
-    info->stackFree    = stacksize - STACK_SIZE;
-    info->stackSize    = info->stackFree;
-    info->stackWatermark    = 0;
+    info->callbackID         = callbackID;
+    info->runCount           = 0;
+    info->stackNotFree       = stacksize - STACK_SIZE;
+    info->stackSize          = info->stackNotFree;
+    info->stackFree          = 0;
+    info->stackSafetyCount   = STACK_SAFETYCOUNT;
+    info->currentSafetyCount = 0;
 
     // add to scheduling queue
     LL_APPEND(task->callbackQueue[priority], info);
@@ -359,48 +357,109 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     return info;
 }
 
-
-#ifdef DIAG_TASKS
 /**
- * Stack magic, check presence of unique value
+ * Retrieve callback specific runtime information
+ * \param[out] *callbackInfoData pointer to CallbackInfoData structure
+ * \return Success (-1), failure (0)
  */
-static int8_t markStack(DelayedCallbackInfo *current)
+int32_t PIOS_CALLBACKSCHEDULER_CallbackInfo(void *callbackInfoData)
 {
-	volatile unsigned char *marker;
-	marker = (unsigned char*)(((size_t)&marker) - (size_t)current->stackSize);
-	// end of stack watermark
-	*(marker) = '#';
-	// shifted watermarks
-	marker += 16 + (size_t)current->stackWatermark;
-	*(marker-15) = '#';
-	*(marker-14) = '#';
-	*(marker-13) = '#';
-	*(marker-12) = '#';
-	*(marker-3) = '#';
-	*(marker-2) = '#';
-	*(marker-1) = '#';
-	*(marker) = '#';
-	return 0;
+    if (!callbackInfoData) {
+        return 0;
+    }
+
+    CallbackInfoData *info = (CallbackInfoData *)callbackInfoData;
+
+
+    struct DelayedCallbackTaskStruct *task = NULL;
+    LL_FOREACH(schedulerTasks, task) {
+        int prio;
+
+        for (prio = 0; prio < (CALLBACK_PRIORITY_LOW + 1); prio++) {
+            struct DelayedCallbackInfoStruct *cbinfo;
+            LL_FOREACH(task->callbackQueue[prio], cbinfo) {
+                if (cbinfo->callbackID >= 0 && cbinfo->callbackID < CALLBACKINFO_RUNNING_NUMELEM) {
+                    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+                    ((uint8_t *)&info->Running)[cbinfo->callbackID] = true;
+                    ((uint32_t *)&info->RunningTime)[cbinfo->callbackID]   = cbinfo->runCount;
+                    ((int16_t *)&info->StackRemaining)[cbinfo->callbackID] = (int16_t)cbinfo->stackNotFree;
+                    xSemaphoreGiveRecursive(mutex);
+                }
+            }
+        }
+    }
+    return -1;
 }
-static int8_t checkStack(DelayedCallbackInfo *current)
+
+/**
+ * Stack magic, find how much stack is being used without affecting performance
+ */
+static void markStack(DelayedCallbackInfo *current)
 {
-	volatile unsigned char *marker;
-	marker = (unsigned char*)(((size_t)&marker) - (size_t)current->stackSize);
-	// end of stack watermark
-	if (*marker != '#') return -1;
-	// shifted watermarks
-	marker += 16 + (size_t)current->stackWatermark;
-	if (*(marker-15) != '#') return -2;
-	if (*(marker-14) != '#') return -2;
-	if (*(marker-13) != '#') return -2;
-	if (*(marker-12) != '#') return -2;
-	if (*(marker-3) != '#') return -2;
-	if (*(marker-2) != '#') return 3;
-	if (*(marker-1) != '#') return 2;
-	if (*(marker) != '#') return 1;
-	return 0;
+    register int8_t t;
+    register int32_t halfWayMark;
+    volatile unsigned char *marker;
+
+    if (current->stackFree < 0) {
+        return;
+    }
+
+    // end of stack watermark
+    marker = (unsigned char *)(((size_t)&marker) - (size_t)current->stackSize);
+    for (t = -STACK_SAFETYSIZE; t < 0; t++) {
+        *(marker + t) = '#';
+    }
+    // shifted watermarks
+    halfWayMark = current->stackFree + (current->stackNotFree - current->stackFree) / 2;
+    marker = (unsigned char *)((size_t)marker + halfWayMark);
+    for (t = -STACK_SAFETYSIZE; t < 0; t++) {
+        *(marker + t) = '#';
+    }
 }
-#endif /* ifdef DIAG_TASKS */
+static void checkStack(DelayedCallbackInfo *current)
+{
+    register int8_t t;
+    register int32_t halfWayMark;
+    volatile unsigned char *marker;
+
+    if (current->stackFree < 0) {
+        return;
+    }
+
+    // end of stack watermark
+    marker = (unsigned char *)(((size_t)&marker) - (size_t)current->stackSize);
+    for (t = -STACK_SAFETYSIZE; t < 0; t++) {
+        if (*(marker + t) != '#') {
+            current->stackFree = -1; // stack overflow, disable all further checks
+            return;
+        }
+    }
+    // shifted watermarks
+    halfWayMark = current->stackFree + (current->stackNotFree - current->stackFree) / 2;
+    marker = (unsigned char *)((size_t)marker + halfWayMark);
+    for (t = -STACK_SAFETYSIZE; t < 0; t++) {
+        if (*(marker + t) != '#') {
+            current->stackNotFree = halfWayMark; // tainted mark, this place is definitely used stack
+            current->currentSafetyCount = 0;
+            if (current->stackNotFree <= current->stackFree) {
+                current->stackFree = 0; // if it was supposed to be free, restart search between here and bottom of stack
+            }
+            return;
+        }
+    }
+
+    if (current->currentSafetyCount < 0xffff) {
+        current->currentSafetyCount++; // mark has not been tainted, increase safety counter
+    }
+    if (current->currentSafetyCount >= current->stackSafetyCount) { // if the safety counter is above the limit, then
+        if (halfWayMark == current->stackFree) { // check if search already converged, if so increase the limit to find very rare stack usage incidents
+            current->stackSafetyCount = current->currentSafetyCount;
+        } else {
+            current->stackFree = halfWayMark; // otherwise just mark this position as free stack to narrow search
+            current->currentSafetyCount = 0;
+        }
+    }
+}
 
 /**
  * Scheduler subtask
@@ -455,45 +514,14 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
                 current->waiting = false; // the flag is reset just before execution.
                 xSemaphoreGiveRecursive(mutex);
 
-                #ifdef DIAG_TASKS
                 /* callback gets invoked here - check stack sizes */
-                diff = markStack(current);
-                #endif
+                markStack(current);
 
                 current->cb(); // call the callback
 
-                #ifdef DIAG_TASKS
-                diff = checkStack(current);
-		switch (diff) {
-		case -2:
-			current->stackWatermark = -1;
-			break;
-		case -1:
-			current->stackFree = -1;
-			current->stackWatermark = -1;
-			break;
-		case 0:
-			current->stackWatermark++;
-			if (current->stackWatermark>current->stackFree) {
-			    current->stackWatermark = current->stackFree;
-			}
-			break;
-		default:
-			current->stackWatermark -= diff;
-			current->stackFree = current->stackWatermark;
-			break;
-		}
+                checkStack(current);
 
                 current->runCount++;
-                if (current->callbackID >= 0 && current->callbackID < CALLBACKINFO_RUNNING_NUMELEM) {
-                    xSemaphoreTakeRecursive(mutex, portMAX_DELAY); // access to uavobject
-                    ((uint8_t *)&callbackInfo.Running)[current->callbackID] = true;
-                    ((uint32_t *)&callbackInfo.RunningTime)[current->callbackID]   = current->runCount;
-                    ((int16_t *)&callbackInfo.StackRemaining)[current->callbackID] = (int16_t)current->stackWatermark;
-                    CallbackInfoSet(&callbackInfo);
-                    xSemaphoreGiveRecursive(mutex);
-                }
-                #endif
 
                 return 0;
             }

@@ -205,6 +205,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
 
 #ifdef DIAG_TASKS
     TaskInfoData taskInfoData;
+    CallbackInfoData callbackInfoData;
 #endif
 
     // Main system loop
@@ -224,6 +225,9 @@ static void systemTask(__attribute__((unused)) void *parameters)
         // Update the task status object
         PIOS_TASK_MONITOR_ForEachTask(taskMonitorForEachCallback, &taskInfoData);
         TaskInfoSet(&taskInfoData);
+        // Update the callback status object
+        PIOS_CALLBACKSCHEDULER_CallbackInfo(&callbackInfoData);
+        CallbackInfoSet(&callbackInfoData);
 #endif
 
         // Flash the heartbeat LED

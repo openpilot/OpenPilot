@@ -64,7 +64,7 @@ public:
 
     virtual void onTransition(QEvent *e)
     {
-        QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent *>(e);
+        Q_UNUSED(e);
     }
 public slots:
     void enterState()

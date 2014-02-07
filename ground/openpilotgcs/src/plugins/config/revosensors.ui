@@ -33,11 +33,11 @@
        <item>
         <layout class="QHBoxLayout" name="sensorNoiseLayout">
          <item>
-          <widget class="QGroupBox" name="groupBox_4">
+          <widget class="QGroupBox" name="groupBox_1_1">
            <property name="title">
             <string>#1: Thermal calibration</string>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
+           <layout class="QVBoxLayout" name="verticalLayout_1_2">
             <property name="leftMargin">
              <number>9</number>
             </property>
@@ -82,7 +82,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_thermalGradient">
+                 <widget class="QLabel" name="label_thermalcal1">
                   <property name="font">
                    <font>
                     <weight>50</weight>
@@ -109,7 +109,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_thermalGradient">
+                 <widget class="QLabel" name="label_thermalcal2">
                   <property name="font">
                    <font>
                     <weight>50</weight>
@@ -203,7 +203,7 @@
        <item>
         <layout class="QHBoxLayout" name="sixPointLayout" stretch="1,2">
          <item>
-          <widget class="QGroupBox" name="groupBox_4">
+          <widget class="QGroupBox" name="groupBox_1_2">
            <property name="title">
             <string>#2: Magnetometer calibration</string>
            </property>
@@ -265,7 +265,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox_4">
+          <widget class="QGroupBox" name="groupBox_1_3">
            <property name="title">
             <string>#3: Sensor noise calibration</string>
            </property>
@@ -341,13 +341,13 @@ Hint: run this with engines at cruising speed.</string>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="sensorNoiseLayout">
+        <layout class="QHBoxLayout" name="AccelBiasLayout">
          <item>
-          <widget class="QGroupBox" name="groupBox_4">
+          <widget class="QGroupBox" name="groupBox_1_4">
            <property name="title">
             <string>#4: Accelerometer Bias calibration</string>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
+           <layout class="QVBoxLayout" name="verticalLayout_1_3">
             <property name="leftMargin">
              <number>9</number>
             </property>

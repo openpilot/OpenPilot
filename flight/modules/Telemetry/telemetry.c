@@ -376,13 +376,13 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
          */
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
         // Loop forever
-        while (xQueueReceive(priorityQueue, &ev, 0) == pdTRUE) {
+        while (xQueueReceive(priorityQueue, &ev, 1) == pdTRUE) {
             // Process event
             processObjEvent(&ev);
         }
 #endif
         // Wait for queue message
-        if (xQueueReceive(queue, &ev, 1) == pdTRUE) {
+        if (xQueueReceive(queue, &ev, 0) == pdTRUE) {
             // Process event
             processObjEvent(&ev);
         }

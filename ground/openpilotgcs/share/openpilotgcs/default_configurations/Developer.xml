@@ -2301,16 +2301,6 @@
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve2>
-          <plotCurve3>
-            <color>4294945280</color>
-            <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-TelemetryTxPri</uavField>
-            <uavObject>TaskInfo</uavObject>
-            <yMaximum>1.72723371101889e-77</yMaximum>
-            <yMeanSamples>1</yMeanSamples>
-            <yMinimum>1.72723371101889e-77</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve3>
           <plotCurve4>
             <color>4294945280</color>
             <mathFunction>None</mathFunction>

@@ -33,6 +33,7 @@
 // #define DEBUG_TIMING
 // #define DEBUG_ALARMS
 // #define DEBUG_TELEMETRY
+// #define DEBUG_ACCEL
 // #define DEBUG_BLACK_WHITE
 // #define DEBUG_STUFF
 // #define SIMULATE_DATA
@@ -59,6 +60,10 @@
 #ifdef DEBUG_TELEMETRY
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
+#endif
+#ifdef DEBUG_ACCEL
+#include "accelsensor.h"
+#include "accelstate.h"
 #endif
 
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
@@ -2371,6 +2376,12 @@ void updateGraphics()
     GCSTelemetryStatsData g_telemetry;
     GCSTelemetryStatsGet(&g_telemetry);
 #endif
+#ifdef DEBUG_ACCEL
+    AccelSensorData accelSensor;
+    AccelSensorGet(&accelSensor);
+    AccelStateData accelState;
+    AccelStateGet(&accelState);
+#endif
 
     switch (OsdSettings.Screen) {
     // show main flight screen
@@ -2703,6 +2714,41 @@ void updateGraphics()
             write_string(temp, 270, 80, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         }
 #endif /* ifdef DEBUG_TELEMETRY */
+
+#ifdef DEBUG_ACCEL
+#define DEBUG_ACCEL_X   270
+#define DEBUG_ACCEL_Y    30
+#define DEBUG_ACCEL_D_X 8*7
+#define DEBUG_ACCEL_D_Y  10
+#define DEBUG_ACCEL_SENSOR
+#define DEBUG_ACCEL_STATE
+        x = DEBUG_ACCEL_X;
+        y = DEBUG_ACCEL_Y;
+#ifdef DEBUG_ACCEL_SENSOR
+        sprintf(temp, "X%5.2f", (double)accelSensor.x);
+        write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        y += DEBUG_ACCEL_D_Y;
+        sprintf(temp, "Y%5.2f", (double)accelSensor.y);
+        write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        y += DEBUG_ACCEL_D_Y;
+        sprintf(temp, "Z%5.2f", (double)accelSensor.z);
+        write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        y += DEBUG_ACCEL_D_Y;
+        x += DEBUG_ACCEL_D_X;
+#endif // DEBUG_ACCEL_SENSOR
+#ifdef DEBUG_ACCEL_STATE
+        y = DEBUG_ACCEL_Y;
+        sprintf(temp, "X%5.2f", (double)accelState.x);
+        write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        y += DEBUG_ACCEL_D_Y;
+        sprintf(temp, "Y%5.2f", (double)accelState.y);
+        write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        y += DEBUG_ACCEL_D_Y;
+        sprintf(temp, "Z%5.2f", (double)accelState.z);
+        write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
+        y += DEBUG_ACCEL_D_Y;
+#endif // DEBUG_ACCEL_STATE
+#endif // DEBUG_ACCEL
 
 #ifdef DEBUG_BLACK_WHITE
         int bw;

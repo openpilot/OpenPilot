@@ -101,6 +101,8 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/osdsettings2.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/magsensor.c
+    SRC += $(OPUAVSYNTHDIR)/accelsensor.c
+    SRC += $(OPUAVSYNTHDIR)/accelstate.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

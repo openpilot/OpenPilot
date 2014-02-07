@@ -35,6 +35,9 @@
 namespace OpenPilot {
 ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     WizardModel(parent),
+    m_startEnabled(false),
+    m_cancelEnabled(false),
+    m_endEnabled(false),
     m_initDone(false)
 {
     m_helper.reset(new ThermalCalibrationHelper());

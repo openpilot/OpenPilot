@@ -268,6 +268,7 @@ static void updateObject(UAVObjHandle obj, int32_t eventType)
         eventMask |= EV_LOGGING_MANUAL;
         break;
     }
+    // note that all setting objects have implicitly IsPriority=true
     if (UAVObjIsPriority(obj)) {
         UAVObjConnectQueue(obj, priorityQueue, eventMask);
     } else {
@@ -375,7 +376,7 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
          */
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
         // Loop forever
-        while (xQueueReceive(priorityQueue, &ev, 1) == pdTRUE) {
+        while (xQueueReceive(priorityQueue, &ev, 0) == pdTRUE) {
             // Process event
             processObjEvent(&ev);
         }
@@ -476,9 +477,11 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
     ev.instId = UAVOBJ_ALL_INSTANCES;
     ev.event  = EV_UPDATED_PERIODIC;
 
-    ret = EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
+    xQueueHandle targetQueue = UAVObjIsPriority(obj) ? priorityQueue : queue;
+
+    ret = EventPeriodicQueueUpdate(&ev, targetQueue, updatePeriodMs);
     if (ret == -1) {
-        ret = EventPeriodicQueueCreate(&ev, queue, updatePeriodMs);
+        ret = EventPeriodicQueueCreate(&ev, targetQueue, updatePeriodMs);
     }
     return ret;
 }
@@ -500,9 +503,11 @@ static int32_t setLoggingPeriod(UAVObjHandle obj, int32_t updatePeriodMs)
     ev.instId = UAVOBJ_ALL_INSTANCES;
     ev.event  = EV_LOGGING_PERIODIC;
 
-    ret = EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
+    xQueueHandle targetQueue = UAVObjIsPriority(obj) ? priorityQueue : queue;
+
+    ret = EventPeriodicQueueUpdate(&ev, targetQueue, updatePeriodMs);
     if (ret == -1) {
-        ret = EventPeriodicQueueCreate(&ev, queue, updatePeriodMs);
+        ret = EventPeriodicQueueCreate(&ev, targetQueue, updatePeriodMs);
     }
     return ret;
 }

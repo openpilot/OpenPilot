@@ -187,11 +187,33 @@ int32_t PIOS_CALLBACKSCHEDULER_Dispatch(DelayedCallbackInfo *cbinfo);
 int32_t PIOS_CALLBACKSCHEDULER_DispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken);
 
 /**
- * Retrieve callback specific runtime information
- * \param[out] *callbackInfoData pointer to CallbackInfoData structure
- * \return Success (-1), failure (0)
+ * Information about a running callback that has been registered
+ * via a call to PIOS_CALLBACKSCHEDULER_Create().
  */
-int32_t PIOS_CALLBACKSCHEDULER_CallbackInfo(void *callbackInfoData);
+struct pios_callback_info {
+    /** Remaining task stack in bytes -1 for detected stack overflow. */
+    int32_t  stack_remaining;
+    /** Flag indicating whether or not the task is running. */
+    bool     is_running;
+    /** Count of executions of the callback since system start */
+    uint32_t running_time_count;
+};
 
+/**
+ * Iterator callback, called for each monitored callback by PIOS_CALLBACKSCHEDULER_ForEachCallback().
+ *
+ * @param task_id   The id of the task the task_info refers to.
+ * @param task_info Information about the task identified by task_id.
+ * @param context   Context information optionally provided by the caller to PIOS_TASK_MONITOR_TasksIterate()
+ */
+typedef void (*CallbackSchedulerCallbackInfoCallback)(int16_t task_id, const struct pios_callback_info *callback_info, void *context);
+
+/**
+ * Iterator. Iterates over all callbacks and all scheduler tasks and retrieves information
+ *
+ * @param[in] callback  Callback function to receive the data - will be called in same task context as the callerThe id of the task the task_info refers to.
+ * @param     context   Context information optionally provided to the callback.
+ */
+void PIOS_CALLBACKSCHEDULER_ForEachCallback(CallbackSchedulerCallbackInfoCallback callback, void *context);
 
 #endif // PIOS_CALLBACKSCHEDULER_H

@@ -27,11 +27,9 @@
 #include <pios.h>
 #ifdef PIOS_INCLUDE_CALLBACKSCHEDULER
 
-#include <pios_struct_helper.h>
 #include <utlist.h>
 #include <uavobjectmanager.h>
 #include <taskinfo.h>
-#include <callbackinfo.h>
 
 // Private constants
 #define STACK_SAFETYCOUNT 16
@@ -358,18 +356,18 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
 }
 
 /**
- * Retrieve callback specific runtime information
- * \param[out] *callbackInfoData pointer to CallbackInfoData structure
- * \return Success (-1), failure (0)
+ * Iterator. Iterates over all callbacks and all scheduler tasks and retrieves information
+ *
+ * @param[in] callback  Callback function to receive the data - will be called in same task context as the callerThe id of the task the task_info refers to.
+ * @param     context   Context information optionally provided to the callback.
  */
-int32_t PIOS_CALLBACKSCHEDULER_CallbackInfo(void *callbackInfoData)
+void PIOS_CALLBACKSCHEDULER_ForEachCallback(CallbackSchedulerCallbackInfoCallback callback, void *context)
 {
-    if (!callbackInfoData) {
-        return 0;
+    if (!callback) {
+        return;
     }
 
-    CallbackInfoData *info = (CallbackInfoData *)callbackInfoData;
-
+    struct pios_callback_info info;
 
     struct DelayedCallbackTaskStruct *task = NULL;
     LL_FOREACH(schedulerTasks, task) {
@@ -378,17 +376,15 @@ int32_t PIOS_CALLBACKSCHEDULER_CallbackInfo(void *callbackInfoData)
         for (prio = 0; prio < (CALLBACK_PRIORITY_LOW + 1); prio++) {
             struct DelayedCallbackInfoStruct *cbinfo;
             LL_FOREACH(task->callbackQueue[prio], cbinfo) {
-                if (cbinfo->callbackID >= 0 && cbinfo->callbackID < CALLBACKINFO_RUNNING_NUMELEM) {
-                    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-                    ((uint8_t *)&info->Running)[cbinfo->callbackID] = true;
-                    ((uint32_t *)&info->RunningTime)[cbinfo->callbackID]   = cbinfo->runCount;
-                    ((int16_t *)&info->StackRemaining)[cbinfo->callbackID] = (int16_t)cbinfo->stackNotFree;
-                    xSemaphoreGiveRecursive(mutex);
-                }
+                xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+                info.is_running = true;
+                info.stack_remaining    = cbinfo->stackNotFree;
+                info.running_time_count = cbinfo->runCount;
+                xSemaphoreGiveRecursive(mutex);
+                callback(cbinfo->callbackID, &info, context);
             }
         }
     }
-    return -1;
 }
 
 /**

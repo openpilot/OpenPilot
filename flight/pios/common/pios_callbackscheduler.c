@@ -341,8 +341,8 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     info->cb = cb;
     info->callbackID         = callbackID;
     info->runCount           = 0;
-    info->stackNotFree       = stacksize - STACK_SIZE;
-    info->stackSize          = info->stackNotFree;
+    info->stackSize          = stacksize - STACK_SIZE;
+    info->stackNotFree       = info->stackSize;
     info->stackFree          = 0;
     info->stackSafetyCount   = STACK_SAFETYCOUNT;
     info->currentSafetyCount = 0;
@@ -396,7 +396,7 @@ static void markStack(DelayedCallbackInfo *current)
     register int32_t halfWayMark;
     volatile unsigned char *marker;
 
-    if (current->stackFree < 0) {
+    if (current->stackNotFree < 0) {
         return;
     }
 
@@ -418,7 +418,7 @@ static void checkStack(DelayedCallbackInfo *current)
     register int32_t halfWayMark;
     volatile unsigned char *marker;
 
-    if (current->stackFree < 0) {
+    if (current->stackNotFree < 0) {
         return;
     }
 
@@ -426,7 +426,7 @@ static void checkStack(DelayedCallbackInfo *current)
     marker = (unsigned char *)(((size_t)&marker) - (size_t)current->stackSize);
     for (t = -STACK_SAFETYSIZE; t < 0; t++) {
         if (*(marker + t) != '#') {
-            current->stackFree = -1; // stack overflow, disable all further checks
+            current->stackNotFree = -1; // stack overflow, disable all further checks
             return;
         }
     }

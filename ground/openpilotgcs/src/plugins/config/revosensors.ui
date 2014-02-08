@@ -874,8 +874,8 @@ A setting of 0.00 disables the filter.</string>
        </property>
        <property name="maximumSize">
         <size>
-         <width>32</width>
-         <height>32</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="font">

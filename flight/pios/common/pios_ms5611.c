@@ -166,7 +166,6 @@ uint32_t PIOS_MS5611_GetDelayUs()
 
 /**
  * Read the ADC conversion value (once ADC conversion has completed)
- * \param[in] PresOrTemp BMP085_PRES_ADDR or BMP085_TEMP_ADDR
  * \return 0 if successfully read the ADC, -1 if failed
  */
 int32_t PIOS_MS5611_ReadADC(void)
@@ -206,14 +205,15 @@ int32_t PIOS_MS5611_ReadADC(void)
         }
         // check if temperature is less than 20°C
         if (Temperature < 2000) {
-            Offset2 = 5 * (Temperature - 2000) >> 1;
-            Sens2   = Offset2 >> 1;
+            int64_t tcorr = (Temperature - 2000) * (Temperature - 2000);
+            Offset2 = (5 * tcorr) >> 1;
+            Sens2   = (5 * tcorr) >> 2;
             compensation_t2 = (deltaTemp * deltaTemp) >> 31;
             // Apply the "Very low temperature compensation" when temp is less than -15°C
             if (Temperature < -1500) {
-                int64_t tcorr = (Temperature + 1500) * (Temperature + 1500);
-                Offset2 += 7 * tcorr;
-                Sens2   += (11 * tcorr) >> 1;
+                int64_t tcorr2 = (Temperature + 1500) * (Temperature + 1500);
+                Offset2 += 7 * tcorr2;
+                Sens2   += (11 * tcorr2) >> 1;
             }
         } else {
             compensation_t2 = 0;

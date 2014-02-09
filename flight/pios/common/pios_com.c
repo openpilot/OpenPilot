@@ -271,6 +271,40 @@ int32_t PIOS_COM_ChangeBaud(uint32_t com_id, uint32_t baud)
     return 0;
 }
 
+
+static int32_t PIOS_COM_SendBufferNonBlockingInternal(struct pios_com_dev *com_dev, const uint8_t *buffer, uint16_t len)
+{
+PIOS_Assert(com_dev);
+PIOS_Assert(com_dev->has_tx);
+if (com_dev->driver->available && !com_dev->driver->available(com_dev->lower_id)) {
+    /*
+     * Underlying device is down/unconnected.
+     * Dump our fifo contents and act like an infinite data sink.
+     * Failure to do this results in stale data in the fifo as well as
+     * possibly having the caller block trying to send to a device that's
+     * no longer accepting data.
+     */
+    fifoBuf_clearData(&com_dev->tx);
+    return len;
+}
+
+if (len > fifoBuf_getFree(&com_dev->tx)) {
+    /* Buffer cannot accept all requested bytes (retry) */
+    return -2;
+}
+
+uint16_t bytes_into_fifo = fifoBuf_putData(&com_dev->tx, buffer, len);
+
+if (bytes_into_fifo > 0) {
+    /* More data has been put in the tx buffer, make sure the tx is started */
+    if (com_dev->driver->tx_start) {
+        com_dev->driver->tx_start(com_dev->lower_id,
+                                  fifoBuf_getUsed(&com_dev->tx));
+    }
+}
+return bytes_into_fifo;
+}
+
 /**
  * Sends a package over given port
  * \param[in] port COM port
@@ -291,50 +325,18 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
         /* Undefined COM port for this board (see pios_board.c) */
         return -1;
     }
-
-    PIOS_Assert(com_dev->has_tx);
 #if defined(PIOS_INCLUDE_FREERTOS)
-    if(xSemaphoreTake(com_dev->sendbuffer_sem, 0) != pdTRUE){
+    if (xSemaphoreTake(com_dev->sendbuffer_sem, 0) != pdTRUE) {
         return -3;
     }
 #endif /* PIOS_INCLUDE_FREERTOS */
-    if (com_dev->driver->available && !com_dev->driver->available(com_dev->lower_id)) {
-        /*
-         * Underlying device is down/unconnected.
-         * Dump our fifo contents and act like an infinite data sink.
-         * Failure to do this results in stale data in the fifo as well as
-         * possibly having the caller block trying to send to a device that's
-         * no longer accepting data.
-         */
-        fifoBuf_clearData(&com_dev->tx);
+    int32_t ret = PIOS_COM_SendBufferNonBlockingInternal(com_dev, buffer, len);
 #if defined(PIOS_INCLUDE_FREERTOS)
-        xSemaphoreGive(com_dev->sendbuffer_sem);
+    xSemaphoreGive(com_dev->sendbuffer_sem);
 #endif /* PIOS_INCLUDE_FREERTOS */
-        return len;
-    }
-
-    if (len > fifoBuf_getFree(&com_dev->tx)) {
-#if defined(PIOS_INCLUDE_FREERTOS)
-        xSemaphoreGive(com_dev->sendbuffer_sem);
-#endif /* PIOS_INCLUDE_FREERTOS */
-        /* Buffer cannot accept all requested bytes (retry) */
-        return -2;
-    }
-
-    uint16_t bytes_into_fifo = fifoBuf_putData(&com_dev->tx, buffer, len);
-
-    if (bytes_into_fifo > 0) {
-        /* More data has been put in the tx buffer, make sure the tx is started */
-        if (com_dev->driver->tx_start) {
-            com_dev->driver->tx_start(com_dev->lower_id,
-                                      fifoBuf_getUsed(&com_dev->tx));
-        }
-    }
-#if defined(PIOS_INCLUDE_FREERTOS)
-        xSemaphoreGive(com_dev->sendbuffer_sem);
-#endif /* PIOS_INCLUDE_FREERTOS */
-    return bytes_into_fifo;
+    return ret;
 }
+
 
 /**
  * Sends a package over given port
@@ -343,6 +345,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
  * \param[in] buffer character buffer
  * \param[in] len buffer length
  * \return -1 if port not available
+ * \return -2 if mutex can't be taken;
  * \return number of bytes transmitted on success
  */
 int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len)
@@ -353,9 +356,12 @@ int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len
         /* Undefined COM port for this board (see pios_board.c) */
         return -1;
     }
-
     PIOS_Assert(com_dev->has_tx);
-
+#if defined(PIOS_INCLUDE_FREERTOS)
+    if (xSemaphoreTake(com_dev->sendbuffer_sem, 0) != pdTRUE) {
+        return -2;
+    }
+#endif /* PIOS_INCLUDE_FREERTOS */
     uint32_t max_frag_len  = fifoBuf_getSize(&com_dev->tx);
     uint32_t bytes_to_send = len;
     while (bytes_to_send) {
@@ -366,13 +372,16 @@ int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len
         } else {
             frag_size = bytes_to_send;
         }
-        int32_t rc = PIOS_COM_SendBufferNonBlocking(com_id, buffer, frag_size);
+        int32_t rc = PIOS_COM_SendBufferNonBlockingInternal(com_dev, buffer, frag_size);
         if (rc >= 0) {
             bytes_to_send -= rc;
             buffer += rc;
         } else {
             switch (rc) {
             case -1:
+#if defined(PIOS_INCLUDE_FREERTOS)
+                xSemaphoreGive(com_dev->sendbuffer_sem);
+#endif /* PIOS_INCLUDE_FREERTOS */
                 /* Device is invalid, this will never work */
                 return -1;
 
@@ -385,17 +394,23 @@ int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len
                 }
 #if defined(PIOS_INCLUDE_FREERTOS)
                 if (xSemaphoreTake(com_dev->tx_sem, 5000) != pdTRUE) {
+                    xSemaphoreGive(com_dev->sendbuffer_sem);
                     return -3;
                 }
 #endif
                 continue;
             default:
                 /* Unhandled return code */
+#if defined(PIOS_INCLUDE_FREERTOS)
+                xSemaphoreGive(com_dev->sendbuffer_sem);
+#endif /* PIOS_INCLUDE_FREERTOS */
                 return rc;
             }
         }
     }
-
+#if defined(PIOS_INCLUDE_FREERTOS)
+    xSemaphoreGive(com_dev->sendbuffer_sem);
+#endif /* PIOS_INCLUDE_FREERTOS */
     return len;
 }
 

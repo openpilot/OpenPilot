@@ -32,7 +32,7 @@
 
 #ifdef PIOS_INCLUDE_MS5611
 
-#define POW2(x) (2 << (x - 1))
+#define POW2(x) (1 << x)
 
 // TODO: Clean this up.  Getting around old constant.
 #define PIOS_MS5611_OVERSAMPLING oversampling

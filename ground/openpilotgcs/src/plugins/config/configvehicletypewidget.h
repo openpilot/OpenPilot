@@ -64,7 +64,6 @@ class ConfigVehicleTypeWidget : public ConfigTaskWidget {
 
 public:
     static QStringList getChannelDescriptions();
-    static void setComboCurrentIndex(QComboBox *box, int index);
 
     ConfigVehicleTypeWidget(QWidget *parent = 0);
     ~ConfigVehicleTypeWidget();
@@ -76,20 +75,23 @@ protected slots:
 private:
     Ui_AircraftWidget *m_aircraft;
 
+    static enum { MULTIROTOR = 0, FIXED_WING, HELICOPTER, GROUND, CUSTOM } AirframeCategory;
+
     // Maps a frame category to its index in the m_aircraft->airframesWidget QStackedWidget
-    QMap<QString, int> vehicleIndexMap;
+    QMap<int, int> m_vehicleIndexMap;
 
-    QString frameCategory(QString frameType);
 
-    VehicleConfig *getVehicleConfigWidget(QString frameCategory);
-    VehicleConfig *createVehicleConfigWidget(QString frameCategory);
+    int frameCategory(QString frameType);
+
+    VehicleConfig *getVehicleConfigWidget(int frameCategory);
+    VehicleConfig *createVehicleConfigWidget(int frameCategory);
 
     // Feed Forward
     void updateFeedForwardUI();
 
-    bool ffTuningInProgress;
-    bool ffTuningPhase;
-    UAVObject::Metadata accInitialData;
+    bool m_ffTuningInProgress;
+    bool m_ffTuningPhase;
+    UAVObject::Metadata m_accInitialData;
 
 private slots:
     void switchAirframeType(int index);

@@ -79,6 +79,7 @@ extern void PIOS_LED_Init(void);
 #include <pios_wdg.h>
 #include <pios_debug.h>
 #include <pios_debuglog.h>
+#include <pios_deltatime.h>
 #include <pios_crc.h>
 #include <pios_rcvr.h>
 #include <pios_flash.h>

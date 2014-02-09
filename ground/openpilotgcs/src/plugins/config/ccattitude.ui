@@ -14,9 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
-   <property name="margin">
-    <number>12</number>
-   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -27,7 +24,16 @@
        <string>Attitude</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -110,12 +116,21 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>750</width>
-            <height>483</height>
+            <width>758</width>
+            <height>486</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>12</number>
+           </property>
+           <property name="topMargin">
+            <number>12</number>
+           </property>
+           <property name="rightMargin">
+            <number>12</number>
+           </property>
+           <property name="bottomMargin">
             <number>12</number>
            </property>
            <item>

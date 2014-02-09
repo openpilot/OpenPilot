@@ -25391,6 +25391,9 @@ border-radius: 5;</string>
                  </item>
                  <item row="1" column="2">
                   <widget class="QSlider" name="AltKpSlider">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference. higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="maximum">
                     <number>100</number>
                    </property>
@@ -25417,6 +25420,9 @@ border-radius: 5;</string>
                  </item>
                  <item row="2" column="2">
                   <widget class="QSlider" name="AltKiSlider">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How much the vehicle should throttle up or down to compensate or achieve a certain vertical speed. Higher values lead to more aggressive throttle changes and could lead to oscillations. This is the most likely candidate to change depending on the crafts engine thrust. Heavy craft with weak engines might require higher values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="maximum">
                     <number>100</number>
                    </property>
@@ -25443,6 +25449,9 @@ border-radius: 5;</string>
                  </item>
                  <item row="3" column="2">
                   <widget class="QSlider" name="AltKdSlider">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="maximum">
                     <number>1000</number>
                    </property>

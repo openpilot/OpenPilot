@@ -44,6 +44,7 @@
 #include "manualcontrol.h"
 #include "manualcontrolsettings.h"
 #include "manualcontrolcommand.h"
+#include "flightmodesettings.h"
 #include "positionstate.h"
 #include "pathdesired.h"
 #include "stabilizationbank.h"
@@ -92,12 +93,12 @@ static float inputFiltered[MANUALCONTROLSETTINGS_RESPONSETIME_NUMELEM];
 
 // Private functions
 static void updateActuatorDesired(ManualControlCommandData *cmd);
-static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualControlSettingsData *settings);
+static void updateStabilizationDesired(ManualControlCommandData *cmd, FlightModeSettingsData *settings);
 static void updateLandDesired(ManualControlCommandData *cmd, bool changed);
 static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed);
 static void updatePathDesired(ManualControlCommandData *cmd, bool changed, bool home);
-static void processFlightMode(ManualControlSettingsData *settings, float flightMode, ManualControlCommandData *cmd);
-static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, int8_t armSwitch);
+static void processFlightMode(ManualControlSettingsData *settings, FlightModeSettingsData *modeSettings, float flightMode, ManualControlCommandData *cmd);
+static void processArm(ManualControlCommandData *cmd, FlightModeSettingsData *settings, int8_t armSwitch);
 static void setArmedIfChanged(uint8_t val);
 static void configurationUpdatedCb(UAVObjEvent *ev);
 
@@ -157,6 +158,7 @@ int32_t ManualControlInitialize()
     StabilizationDesiredInitialize();
     ReceiverActivityInitialize();
     ManualControlSettingsInitialize();
+    FlightModeSettingsInitialize();
 
     return 0;
 }
@@ -168,6 +170,7 @@ MODULE_INITCALL(ManualControlInitialize, ManualControlStart);
 static void manualControlTask(__attribute__((unused)) void *parameters)
 {
     ManualControlSettingsData settings;
+    FlightModeSettingsData modeSettings;
     ManualControlCommandData cmd;
     FlightStatusData flightStatus;
     float flightMode = 0;
@@ -203,6 +206,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
     lastSysTime = xTaskGetTickCount();
 
     float scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM] = { 0 };
+    SystemSettingsThrustControlOptions thrustType;
 
     while (1) {
         // Wait until next update
@@ -213,6 +217,8 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
         // Read settings
         ManualControlSettingsGet(&settings);
+        FlightModeSettingsGet(&modeSettings);
+        SystemSettingsThrustControlGet(&thrustType);
 
         /* Update channel activity monitor */
         if (flightStatus.Armed == ARM_STATE_DISARMED) {
@@ -283,7 +289,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] == (uint16_t)PIOS_RCVR_NODRIVER
                 || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] == (uint16_t)PIOS_RCVR_NODRIVER ||
                 // Check the FlightModeNumber is valid
-                settings.FlightModeNumber < 1 || settings.FlightModeNumber > MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_NUMELEM ||
+                settings.FlightModeNumber < 1 || settings.FlightModeNumber > FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM ||
                 // Similar checks for FlightMode channel but only if more than one flight mode has been set. Otherwise don't care
                 ((settings.FlightModeNumber > 1)
                  && (settings.ChannelGroups.FlightMode >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
@@ -323,16 +329,26 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
             int8_t armSwitch = 0;
             if (cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE) {
-                cmd.Throttle   = -1;      // Shut down engine with no control
-                cmd.Roll       = 0;
-                cmd.Yaw = 0;
-                cmd.Pitch      = 0;
-                cmd.Collective = 0;
-                if (settings.FailsafeBehavior != MANUALCONTROLSETTINGS_FAILSAFEBEHAVIOR_NONE) {
+                cmd.Throttle   = settings.FailsafeChannel.Throttle;
+                cmd.Roll       = settings.FailsafeChannel.Roll;
+                cmd.Pitch      = settings.FailsafeChannel.Pitch;
+                cmd.Yaw = settings.FailsafeChannel.Yaw;
+                cmd.Collective = settings.FailsafeChannel.Collective;
+                switch (thrustType) {
+                case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
+                    cmd.Thrust = cmd.Throttle;
+                    break;
+                case SYSTEMSETTINGS_THRUSTCONTROL_COLLECTIVE:
+                    cmd.Thrust = cmd.Collective;
+                    break;
+                default:
+                    break;
+                }
+                if (settings.FailsafeFlightModeSwitchPosition >= 0 && settings.FailsafeFlightModeSwitchPosition < settings.FlightModeNumber) {
                     FlightStatusGet(&flightStatus);
 
-                    cmd.FlightModeSwitchPosition = (uint8_t)settings.FailsafeBehavior - 1;
-                    flightStatus.FlightMode = settings.FlightModePosition[settings.FailsafeBehavior - 1];
+                    cmd.FlightModeSwitchPosition = (uint8_t)settings.FailsafeFlightModeSwitchPosition;
+                    flightStatus.FlightMode = modeSettings.FlightModePosition[settings.FailsafeFlightModeSwitchPosition];
                     FlightStatusSet(&flightStatus);
                 }
                 AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
@@ -340,21 +356,21 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 AccessoryDesiredData accessory;
                 // Set Accessory 0
                 if (settings.ChannelGroups.Accessory0 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
-                    accessory.AccessoryVal = 0;
+                    accessory.AccessoryVal = settings.FailsafeChannel.Accessory0;
                     if (AccessoryDesiredInstSet(0, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
                 }
                 // Set Accessory 1
                 if (settings.ChannelGroups.Accessory1 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
-                    accessory.AccessoryVal = 0;
+                    accessory.AccessoryVal = settings.FailsafeChannel.Accessory1;
                     if (AccessoryDesiredInstSet(1, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
                 }
                 // Set Accessory 2
                 if (settings.ChannelGroups.Accessory2 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
-                    accessory.AccessoryVal = 0;
+                    accessory.AccessoryVal = settings.FailsafeChannel.Accessory2;
                     if (AccessoryDesiredInstSet(2, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
@@ -393,6 +409,17 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                     cmd.Collective = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE];
                 }
 
+                switch (thrustType) {
+                case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
+                    cmd.Thrust = cmd.Throttle;
+                    break;
+                case SYSTEMSETTINGS_THRUSTCONTROL_COLLECTIVE:
+                    cmd.Thrust = cmd.Collective;
+                    break;
+                default:
+                    break;
+                }
+
                 AccessoryDesiredData accessory;
                 // Set Accessory 0
                 if (settings.ChannelGroups.Accessory0 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
@@ -400,7 +427,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY0, &settings, dT);
 #endif
-                    if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY0) {
+                    if (modeSettings.Arming == FLIGHTMODESETTINGS_ARMING_ACCESSORY0) {
                         if (accessory.AccessoryVal > ARMED_THRESHOLD) {
                             armSwitch = 1;
                         } else if (accessory.AccessoryVal < -ARMED_THRESHOLD) {
@@ -417,7 +444,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY1, &settings, dT);
 #endif
-                    if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY1) {
+                    if (modeSettings.Arming == FLIGHTMODESETTINGS_ARMING_ACCESSORY1) {
                         if (accessory.AccessoryVal > ARMED_THRESHOLD) {
                             armSwitch = 1;
                         } else if (accessory.AccessoryVal < -ARMED_THRESHOLD) {
@@ -434,7 +461,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY2, &settings, dT);
 #endif
-                    if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY2) {
+                    if (modeSettings.Arming == FLIGHTMODESETTINGS_ARMING_ACCESSORY2) {
                         if (accessory.AccessoryVal > ARMED_THRESHOLD) {
                             armSwitch = 1;
                         } else if (accessory.AccessoryVal < -ARMED_THRESHOLD) {
@@ -447,11 +474,11 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                     }
                 }
 
-                processFlightMode(&settings, flightMode, &cmd);
+                processFlightMode(&settings, &modeSettings, flightMode, &cmd);
             }
 
             // Process arming outside conditional so system will disarm when disconnected
-            processArm(&cmd, &settings, armSwitch);
+            processArm(&cmd, &modeSettings, armSwitch);
 
             // Update cmd object
             ManualControlCommandSet(&cmd);
@@ -481,7 +508,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
             updateActuatorDesired(&cmd);
             break;
         case FLIGHTMODE_STABILIZED:
-            updateStabilizationDesired(&cmd, &settings);
+            updateStabilizationDesired(&cmd, &modeSettings);
             break;
         case FLIGHTMODE_TUNING:
             // Tuning takes settings directly from manualcontrolcommand.  No need to
@@ -656,14 +683,14 @@ static void updateActuatorDesired(ManualControlCommandData *cmd)
     ActuatorDesiredData actuator;
 
     ActuatorDesiredGet(&actuator);
-    actuator.Roll     = cmd->Roll;
-    actuator.Pitch    = cmd->Pitch;
-    actuator.Yaw      = cmd->Yaw;
-    actuator.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle;
+    actuator.Roll   = cmd->Roll;
+    actuator.Pitch  = cmd->Pitch;
+    actuator.Yaw    = cmd->Yaw;
+    actuator.Thrust = cmd->Thrust;
     ActuatorDesiredSet(&actuator);
 }
 
-static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualControlSettingsData *settings)
+static void updateStabilizationDesired(ManualControlCommandData *cmd, FlightModeSettingsData *settings)
 {
     StabilizationDesiredData stabilization;
 
@@ -738,7 +765,7 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
             0; // this is an invalid mode
     }
 
-    stabilization.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle;
+    stabilization.Thrust = cmd->Thrust;
     StabilizationDesiredSet(&stabilization);
 }
 
@@ -761,8 +788,8 @@ static void updatePathDesired(__attribute__((unused)) ManualControlCommandData *
         // Simple Return To Base mode - keep altitude the same, fly to home position
         PositionStateData positionState;
         PositionStateGet(&positionState);
-        ManualControlSettingsData settings;
-        ManualControlSettingsGet(&settings);
+        FlightModeSettingsData settings;
+        FlightModeSettingsGet(&settings);
 
         PathDesiredData pathDesired;
         PathDesiredGet(&pathDesired);
@@ -850,9 +877,9 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     const float DEADBAND_HIGH = 1.0f / 2 + DEADBAND / 2;
     const float DEADBAND_LOW  = 1.0f / 2 - DEADBAND / 2;
 
-    // this is the max speed in m/s at the extents of throttle
-    float throttleRate;
-    uint8_t throttleExp;
+    // this is the max speed in m/s at the extents of thrust
+    float thrustRate;
+    uint8_t thrustExp;
 
     static uint8_t flightMode;
     static bool newaltitude = true;
@@ -862,8 +889,8 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     AltitudeHoldDesiredData altitudeHoldDesiredData;
     AltitudeHoldDesiredGet(&altitudeHoldDesiredData);
 
-    AltitudeHoldSettingsThrottleExpGet(&throttleExp);
-    AltitudeHoldSettingsThrottleRateGet(&throttleRate);
+    AltitudeHoldSettingsThrustExpGet(&thrustExp);
+    AltitudeHoldSettingsThrustRateGet(&thrustRate);
 
     StabilizationBankData stabSettings;
     StabilizationBankGet(&stabSettings);
@@ -880,20 +907,20 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     }
 
     uint8_t cutOff;
-    AltitudeHoldSettingsCutThrottleWhenZeroGet(&cutOff);
-    if (cutOff && cmd->Throttle < 0) {
-        // Cut throttle if desired
-        altitudeHoldDesiredData.SetPoint    = cmd->Throttle;
-        altitudeHoldDesiredData.ControlMode = ALTITUDEHOLDDESIRED_CONTROLMODE_THROTTLE;
+    AltitudeHoldSettingsCutThrustWhenZeroGet(&cutOff);
+    if (cutOff && cmd->Thrust < 0) {
+        // Cut thrust if desired
+        altitudeHoldDesiredData.SetPoint    = cmd->Thrust;
+        altitudeHoldDesiredData.ControlMode = ALTITUDEHOLDDESIRED_CONTROLMODE_THRUST;
         newaltitude = true;
-    } else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO && cmd->Throttle > DEADBAND_HIGH) {
+    } else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO && cmd->Thrust > DEADBAND_HIGH) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
         // then apply an "exp" f(x,k) = (k*x*x*x + (255-k)*x) / 255
-        altitudeHoldDesiredData.SetPoint    = -((throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - throttleExp) * (cmd->Throttle - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * throttleRate);
+        altitudeHoldDesiredData.SetPoint    = -((thrustExp * powf((cmd->Thrust - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - thrustExp) * (cmd->Thrust - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * thrustRate);
         altitudeHoldDesiredData.ControlMode = ALTITUDEHOLDDESIRED_CONTROLMODE_VELOCITY;
         newaltitude = true;
-    } else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO && cmd->Throttle < DEADBAND_LOW) {
-        altitudeHoldDesiredData.SetPoint    = -(-(throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (255 - throttleExp) * (DEADBAND_LOW - cmd->Throttle) / DEADBAND_LOW) / 255 * throttleRate);
+    } else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO && cmd->Thrust < DEADBAND_LOW) {
+        altitudeHoldDesiredData.SetPoint    = -(-(thrustExp * powf((DEADBAND_LOW - (cmd->Thrust < 0 ? 0 : cmd->Thrust)) / DEADBAND_LOW, 3) + (255 - thrustExp) * (DEADBAND_LOW - cmd->Thrust) / DEADBAND_LOW) / 255 * thrustRate);
         altitudeHoldDesiredData.ControlMode = ALTITUDEHOLDDESIRED_CONTROLMODE_VELOCITY;
         newaltitude = true;
     } else if (newaltitude == true) {
@@ -1041,7 +1068,7 @@ static void setArmedIfChanged(uint8_t val)
  * @param[out] cmd The structure to set the armed in
  * @param[in] settings Settings indicating the necessary position
  */
-static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, int8_t armSwitch)
+static void processArm(ManualControlCommandData *cmd, FlightModeSettingsData *settings, int8_t armSwitch)
 {
     bool lowThrottle = cmd->Throttle < 0;
 
@@ -1049,9 +1076,9 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
      * do NOT check throttle if disarming via switch, must be instant
      */
     switch (settings->Arming) {
-    case MANUALCONTROLSETTINGS_ARMING_ACCESSORY0:
-    case MANUALCONTROLSETTINGS_ARMING_ACCESSORY1:
-    case MANUALCONTROLSETTINGS_ARMING_ACCESSORY2:
+    case FLIGHTMODESETTINGS_ARMING_ACCESSORY0:
+    case FLIGHTMODESETTINGS_ARMING_ACCESSORY1:
+    case FLIGHTMODESETTINGS_ARMING_ACCESSORY2:
         if (armSwitch < 0) {
             lowThrottle = true;
         }
@@ -1066,7 +1093,7 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
         return;
     }
 
-    if (settings->Arming == MANUALCONTROLSETTINGS_ARMING_ALWAYSDISARMED) {
+    if (settings->Arming == FLIGHTMODESETTINGS_ARMING_ALWAYSDISARMED) {
         // In this configuration we always disarm
         setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
     } else {
@@ -1093,7 +1120,7 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
         }
 
         // The rest of these cases throttle is low
-        if (settings->Arming == MANUALCONTROLSETTINGS_ARMING_ALWAYSARMED) {
+        if (settings->Arming == FLIGHTMODESETTINGS_ARMING_ALWAYSARMED) {
             // In this configuration, we go into armed state as soon as the throttle is low, never disarm
             setArmedIfChanged(FLIGHTSTATUS_ARMED_ARMED);
             return;
@@ -1106,27 +1133,27 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
 
         // Calc channel see assumptions7
         switch (settings->Arming) {
-        case MANUALCONTROLSETTINGS_ARMING_ROLLLEFT:
+        case FLIGHTMODESETTINGS_ARMING_ROLLLEFT:
             armingInputLevel = 1.0f * cmd->Roll;
             break;
-        case MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT:
+        case FLIGHTMODESETTINGS_ARMING_ROLLRIGHT:
             armingInputLevel = -1.0f * cmd->Roll;
             break;
-        case MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD:
+        case FLIGHTMODESETTINGS_ARMING_PITCHFORWARD:
             armingInputLevel = 1.0f * cmd->Pitch;
             break;
-        case MANUALCONTROLSETTINGS_ARMING_PITCHAFT:
+        case FLIGHTMODESETTINGS_ARMING_PITCHAFT:
             armingInputLevel = -1.0f * cmd->Pitch;
             break;
-        case MANUALCONTROLSETTINGS_ARMING_YAWLEFT:
+        case FLIGHTMODESETTINGS_ARMING_YAWLEFT:
             armingInputLevel = 1.0f * cmd->Yaw;
             break;
-        case MANUALCONTROLSETTINGS_ARMING_YAWRIGHT:
+        case FLIGHTMODESETTINGS_ARMING_YAWRIGHT:
             armingInputLevel = -1.0f * cmd->Yaw;
             break;
-        case MANUALCONTROLSETTINGS_ARMING_ACCESSORY0:
-        case MANUALCONTROLSETTINGS_ARMING_ACCESSORY1:
-        case MANUALCONTROLSETTINGS_ARMING_ACCESSORY2:
+        case FLIGHTMODESETTINGS_ARMING_ACCESSORY0:
+        case FLIGHTMODESETTINGS_ARMING_ACCESSORY1:
+        case FLIGHTMODESETTINGS_ARMING_ACCESSORY2:
             armingInputLevel = -1.0f * (float)armSwitch;
             break;
         }
@@ -1199,7 +1226,7 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
  * @param[in] settings The settings which indicate which position is which mode
  * @param[in] flightMode the value of the switch position
  */
-static void processFlightMode(ManualControlSettingsData *settings, float flightMode, ManualControlCommandData *cmd)
+static void processFlightMode(ManualControlSettingsData *settings, FlightModeSettingsData *modeSettings, float flightMode, ManualControlCommandData *cmd)
 {
     FlightStatusData flightStatus;
 
@@ -1213,7 +1240,7 @@ static void processFlightMode(ManualControlSettingsData *settings, float flightM
 
     cmd->FlightModeSwitchPosition = pos;
 
-    uint8_t newMode = settings->FlightModePosition[pos];
+    uint8_t newMode = modeSettings->FlightModePosition[pos];
 
     if (flightStatus.FlightMode != newMode) {
         flightStatus.FlightMode = newMode;

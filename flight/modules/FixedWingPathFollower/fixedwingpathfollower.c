@@ -357,10 +357,10 @@ static void updateFixedAttitude(float *attitude)
     StabilizationDesiredData stabDesired;
 
     StabilizationDesiredGet(&stabDesired);
-    stabDesired.Roll     = attitude[0];
-    stabDesired.Pitch    = attitude[1];
-    stabDesired.Yaw      = attitude[2];
-    stabDesired.Throttle = attitude[3];
+    stabDesired.Roll   = attitude[0];
+    stabDesired.Pitch  = attitude[1];
+    stabDesired.Yaw    = attitude[2];
+    stabDesired.Thrust = attitude[3];
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
@@ -420,7 +420,7 @@ static uint8_t updateFixedDesiredAttitude()
 
 
     /**
-     * Compute speed error (required for throttle and pitch)
+     * Compute speed error (required for thrust and pitch)
      */
 
     // Current ground speed
@@ -474,9 +474,9 @@ static uint8_t updateFixedDesiredAttitude()
     }
 
     /**
-     * Compute desired throttle command
+     * Compute desired thrust command
      */
-    // compute saturated integral error throttle response. Make integral leaky for better performance. Approximately 30s time constant.
+    // compute saturated integral error thrust response. Make integral leaky for better performance. Approximately 30s time constant.
     if (fixedwingpathfollowerSettings.PowerPI.Ki > 0) {
         powerIntegral = bound(powerIntegral + -descentspeedError * dT,
                               -fixedwingpathfollowerSettings.PowerPI.ILimit / fixedwingpathfollowerSettings.PowerPI.Ki,
@@ -491,7 +491,7 @@ static uint8_t updateFixedDesiredAttitude()
         fixedwingpathfollowerSettings.AirspeedToPowerCrossFeed.Max
         );
 
-    // Compute final throttle response
+    // Compute final thrust response
     powerCommand = -descentspeedError * fixedwingpathfollowerSettings.PowerPI.Kp +
                    powerIntegral * fixedwingpathfollowerSettings.PowerPI.Ki +
                    speedErrorToPowerCommandComponent;
@@ -501,14 +501,14 @@ static uint8_t updateFixedDesiredAttitude()
     fixedwingpathfollowerStatus.ErrorInt.Power = powerIntegral;
     fixedwingpathfollowerStatus.Command.Power  = powerCommand;
 
-    // set throttle
-    stabDesired.Throttle = bound(fixedwingpathfollowerSettings.ThrottleLimit.Neutral + powerCommand,
-                                 fixedwingpathfollowerSettings.ThrottleLimit.Min,
-                                 fixedwingpathfollowerSettings.ThrottleLimit.Max);
+    // set thrust
+    stabDesired.Thrust = bound(fixedwingpathfollowerSettings.ThrustLimit.Neutral + powerCommand,
+                               fixedwingpathfollowerSettings.ThrustLimit.Min,
+                               fixedwingpathfollowerSettings.ThrustLimit.Max);
 
     // Error condition: plane cannot hold altitude at current speed.
     fixedwingpathfollowerStatus.Errors.Lowpower = 0;
-    if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit.Max && // throttle at maximum
+    if (powerCommand >= fixedwingpathfollowerSettings.ThrustLimit.Max && // thrust at maximum
         velocityState.Down > 0 && // we ARE going down
         descentspeedDesired < 0 && // we WANT to go up
         airspeedError > 0 && // we are too slow already
@@ -516,9 +516,9 @@ static uint8_t updateFixedDesiredAttitude()
         fixedwingpathfollowerStatus.Errors.Lowpower = 1;
         result = 0;
     }
-    // Error condition: plane keeps climbing despite minimum throttle (opposite of above)
+    // Error condition: plane keeps climbing despite minimum thrust (opposite of above)
     fixedwingpathfollowerStatus.Errors.Highpower = 0;
-    if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit.Min && // throttle at minimum
+    if (powerCommand >= fixedwingpathfollowerSettings.ThrustLimit.Min && // thrust at minimum
         velocityState.Down < 0 && // we ARE going up
         descentspeedDesired > 0 && // we WANT to go down
         airspeedError < 0 && // we are too fast already

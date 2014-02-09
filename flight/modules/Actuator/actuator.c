@@ -166,6 +166,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
     ActuatorDesiredData desired;
     MixerStatusData mixerStatus;
     FlightStatusData flightStatus;
+    SystemSettingsThrustControlOptions thrustType;
+    float throttleDesired;
+    float collectiveDesired;
 
     /* Read initial values of ActuatorSettings */
     ActuatorSettingsData actuatorSettings;
@@ -220,6 +223,22 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         FlightStatusGet(&flightStatus);
         ActuatorDesiredGet(&desired);
         ActuatorCommandGet(&command);
+        SystemSettingsThrustControlGet(&thrustType);
+
+        // read in throttle and collective -demultiplex thrust
+        switch (thrustType) {
+        case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
+            throttleDesired = desired.Thrust;
+            ManualControlCommandCollectiveGet(&collectiveDesired);
+            break;
+        case SYSTEMSETTINGS_THRUSTCONTROL_COLLECTIVE:
+            ManualControlCommandThrottleGet(&throttleDesired);
+            collectiveDesired = desired.Thrust;
+            break;
+        default:
+            ManualControlCommandThrottleGet(&throttleDesired);
+            ManualControlCommandCollectiveGet(&collectiveDesired);
+        }
 
 #ifdef DIAG_MIXERSTATUS
         MixerStatusGet(&mixerStatus);
@@ -239,17 +258,17 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
         bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
-        bool positiveThrottle = desired.Throttle >= 0.00f;
+        bool positiveThrottle = throttleDesired >= 0.00f;
         bool spinWhileArmed   = actuatorSettings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 
-        float curve1 = MixerCurve(desired.Throttle, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
+        float curve1 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
 
         // The source for the secondary curve is selectable
         float curve2 = 0;
         AccessoryDesiredData accessory;
         switch (mixerSettings.Curve2Source) {
         case MIXERSETTINGS_CURVE2SOURCE_THROTTLE:
-            curve2 = MixerCurve(desired.Throttle, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+            curve2 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_ROLL:
             curve2 = MixerCurve(desired.Roll, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
@@ -262,8 +281,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             curve2 = MixerCurve(desired.Yaw, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_COLLECTIVE:
-            ManualControlCommandCollectiveGet(&curve2);
-            curve2 = MixerCurve(curve2, mixerSettings.ThrottleCurve2,
+            curve2 = MixerCurve(collectiveDesired, mixerSettings.ThrottleCurve2,
                                 MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0:

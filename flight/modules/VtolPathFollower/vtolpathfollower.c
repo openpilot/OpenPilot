@@ -158,7 +158,7 @@ static float northPosIntegral = 0;
 static float eastPosIntegral  = 0;
 static float downPosIntegral  = 0;
 
-static float throttleOffset   = 0;
+static float thrustOffset     = 0;
 /**
  * Module thread, should not return.
  */
@@ -263,10 +263,10 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
             eastPosIntegral  = 0;
             downPosIntegral  = 0;
 
-            // Track throttle before engaging this mode.  Cheap system ident
+            // Track thrust before engaging this mode.  Cheap system ident
             StabilizationDesiredData stabDesired;
             StabilizationDesiredGet(&stabDesired);
-            throttleOffset = stabDesired.Throttle;
+            thrustOffset = stabDesired.Thrust;
 
             break;
         }
@@ -550,10 +550,10 @@ static void updateFixedAttitude(float *attitude)
     StabilizationDesiredData stabDesired;
 
     StabilizationDesiredGet(&stabDesired);
-    stabDesired.Roll     = attitude[0];
-    stabDesired.Pitch    = attitude[1];
-    stabDesired.Yaw      = attitude[2];
-    stabDesired.Throttle = attitude[3];
+    stabDesired.Roll   = attitude[0];
+    stabDesired.Pitch  = attitude[1];
+    stabDesired.Yaw    = attitude[2];
+    stabDesired.Thrust = attitude[3];
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
@@ -653,13 +653,13 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
     downError = velocityDesired.Down - downVel;
     // Must flip this sign
     downError = -downError;
-    downVelIntegral = bound(downVelIntegral + downError * dT * vtolpathfollowerSettings.VerticalVelPID.Ki,
-                            -vtolpathfollowerSettings.VerticalVelPID.ILimit,
-                            vtolpathfollowerSettings.VerticalVelPID.ILimit);
-    downCommand     = (downError * vtolpathfollowerSettings.VerticalVelPID.Kp + downVelIntegral
-                       - nedAccel.Down * vtolpathfollowerSettings.VerticalVelPID.Kd);
+    downVelIntegral    = bound(downVelIntegral + downError * dT * vtolpathfollowerSettings.VerticalVelPID.Ki,
+                               -vtolpathfollowerSettings.VerticalVelPID.ILimit,
+                               vtolpathfollowerSettings.VerticalVelPID.ILimit);
+    downCommand        = (downError * vtolpathfollowerSettings.VerticalVelPID.Kp + downVelIntegral
+                          - nedAccel.Down * vtolpathfollowerSettings.VerticalVelPID.Kd);
 
-    stabDesired.Throttle = bound(downCommand + throttleOffset, 0, 1);
+    stabDesired.Thrust = bound(downCommand + thrustOffset, 0, 1);
 
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
     // craft should move similarly for 5 deg roll versus 5 deg pitch
@@ -670,11 +670,11 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
                               eastCommand * cosf(DEG2RAD(attitudeState.Yaw)),
                               -vtolpathfollowerSettings.MaxRollPitch, vtolpathfollowerSettings.MaxRollPitch);
 
-    if (vtolpathfollowerSettings.ThrottleControl == VTOLPATHFOLLOWERSETTINGS_THROTTLECONTROL_FALSE) {
-        // For now override throttle with manual control.  Disable at your risk, quad goes to China.
+    if (vtolpathfollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_FALSE) {
+        // For now override thrust with manual control.  Disable at your risk, quad goes to China.
         ManualControlCommandData manualControl;
         ManualControlCommandGet(&manualControl);
-        stabDesired.Throttle = manualControl.Throttle;
+        stabDesired.Thrust = manualControl.Thrust;
     }
 
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

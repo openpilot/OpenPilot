@@ -197,7 +197,7 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     // is not ideal, but there you go.
     QString frameType = field->getValue().toString();
 
-    int category  = frameCategory(frameType);
+    int category = frameCategory(frameType);
     m_aircraft->aircraftType->setCurrentIndex(category);
 
     VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
@@ -303,13 +303,13 @@ VehicleConfig *ConfigVehicleTypeWidget::createVehicleConfigWidget(int frameCateg
 {
     if (frameCategory == ConfigVehicleTypeWidget::FIXED_WING) {
         return new ConfigFixedWingWidget();
-    } else if (frameCategory == ConfigVehicleTypeWidget::MULTIROTOR){
+    } else if (frameCategory == ConfigVehicleTypeWidget::MULTIROTOR) {
         return new ConfigMultiRotorWidget();
     } else if (frameCategory == ConfigVehicleTypeWidget::HELICOPTER) {
         return new ConfigCcpmWidget();
     } else if (frameCategory == ConfigVehicleTypeWidget::GROUND) {
         return new ConfigGroundVehicleWidget();
-    } else if (frameCategory ==ConfigVehicleTypeWidget::CUSTOM) {
+    } else if (frameCategory == ConfigVehicleTypeWidget::CUSTOM) {
         return new ConfigCustomWidget();
     }
     return NULL;

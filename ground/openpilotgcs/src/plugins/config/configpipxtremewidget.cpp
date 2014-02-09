@@ -121,9 +121,9 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     // Update the link state
     UAVObjectField *linkField = object->getField("LinkState");
     m_oplink->LinkState->setText(linkField->getValue().toString());
-    bool linkConnected  = (linkField->getValue() == linkField->getOptions().at(OPLinkStatus::LINKSTATE_CONNECTED));
+    bool linkConnected = (linkField->getValue() == linkField->getOptions().at(OPLinkStatus::LINKSTATE_CONNECTED));
     bool modemEnabled  = linkConnected || (linkField->getValue() == linkField->getOptions().at(OPLinkStatus::LINKSTATE_DISCONNECTED)) ||
-                                           (linkField->getValue() == linkField->getOptions().at(OPLinkStatus::LINKSTATE_ENABLED));
+                         (linkField->getValue() == linkField->getOptions().at(OPLinkStatus::LINKSTATE_ENABLED));
 
     UAVObjectField *pairRssiField = object->getField("PairSignalStrengths");
 
@@ -143,7 +143,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     m_oplink->PairSignalStrengthLabel1->setText(QString("%1dB").arg(m_oplink->PairSignalStrengthBar1->value()));
 
     pairid = pairIdField->getValue(1).toUInt();
-    bound = (pairid == boundPairId);
+    bound  = (pairid == boundPairId);
     m_oplink->PairID2->setText(QString::number(pairid, 16).toUpper());
     m_oplink->PairID2->setEnabled(false);
     m_oplink->Bind2->setText(bound ? tr("Unbind") : tr("Bind"));
@@ -152,7 +152,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     m_oplink->PairSignalStrengthLabel2->setText(QString("%1dB").arg(m_oplink->PairSignalStrengthBar2->value()));
 
     pairid = pairIdField->getValue(2).toUInt();
-    bound = (pairid == boundPairId);
+    bound  = (pairid == boundPairId);
     m_oplink->PairID3->setText(QString::number(pairid, 16).toUpper());
     m_oplink->PairID3->setEnabled(false);
     m_oplink->Bind3->setText(bound ? tr("Unbind") : tr("Bind"));
@@ -161,7 +161,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
     m_oplink->PairSignalStrengthLabel3->setText(QString("%1dB").arg(m_oplink->PairSignalStrengthBar3->value()));
 
     pairid = pairIdField->getValue(3).toUInt();
-    bound = (pairid == boundPairId);
+    bound  = (pairid == boundPairId);
     m_oplink->PairID4->setText(QString::number(pairid, 16).toUpper());
     m_oplink->PairID4->setEnabled(false);
     m_oplink->Bind4->setText(bound ? tr("Unbind") : tr("Bind"));

@@ -37,6 +37,7 @@
 // Private constants
 
 #define STACK_REQUIRED 64
+#define INIT_CYCLES    100
 
 // Private types
 struct data {
@@ -67,7 +68,7 @@ static int32_t init(stateFilter *self)
     struct data *this = (struct data *)self->localdata;
 
     this->baroOffset = 0.0f;
-    this->first_run  = 100;
+    this->first_run  = INIT_CYCLES;
 
     RevoSettingsInitialize();
     RevoSettingsBaroGPSOffsetCorrectionAlphaGet(&this->baroGPSOffsetCorrectionAlpha);
@@ -82,8 +83,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     if (this->first_run) {
         // Initialize to current altitude reading at initial location
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
-            this->baroOffset = (100.f - this->first_run) / 100.f * this->baroOffset + (this->first_run / 100.f) * state->baro[0];
-            this->baroAlt    = this->baroOffset;
+            this->baroOffset = ((float)(INIT_CYCLES)-this->first_run) / (float)(INIT_CYCLES)*this->baroOffset + (this->first_run / (float)(INIT_CYCLES)) * state->baro[0];
+            this->baroAlt    = 0;
             this->first_run--;
             UNSET_MASK(state->updated, SENSORUPDATES_baro);
         }

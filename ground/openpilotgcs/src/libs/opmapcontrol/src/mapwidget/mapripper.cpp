@@ -46,9 +46,9 @@ MapRipper::MapRipper(internals::Core *core, const internals::RectLatLng & rect) 
         emit numberOfTilesChanged(0, 0);
     } else
 #ifdef Q_OS_DARWIN
-    { QMessageBox::information(new QWidget(), "No valid selection", "This pre-caches map data.\n\nPlease first select the area of the map to rip with <COMMAND>+Left mouse click"); }
+    { QMessageBox::information(new QWidget(), tr("No valid selection"), tr("This pre-caches map data.\n\nPlease first select the area of the map to rip with <COMMAND>+Left mouse click")); }
 #else
-    { QMessageBox::information(new QWidget(), "No valid selection", "This pre-caches map data.\n\nPlease first select the area of the map to rip with <CTRL>+Left mouse click"); }
+    { QMessageBox::information(new QWidget(), tr("No valid selection"), tr("This pre-caches map data.\n\nPlease first select the area of the map to rip with <CTRL>+Left mouse click")); }
 #endif
 }
 void MapRipper::finish()
@@ -58,7 +58,7 @@ void MapRipper::finish()
         int ret;
         if (!yesToAll) {
             QMessageBox msgBox;
-            msgBox.setText(QString("Continue Ripping at zoom level %1?").arg(zoom));
+            msgBox.setText(QString(tr("Continue Ripping at zoom level %1?")).arg(zoom));
             // msgBox.setInformativeText("Do you want to save your changes?");
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::YesAll);
             msgBox.setDefaultButton(QMessageBox::Yes);

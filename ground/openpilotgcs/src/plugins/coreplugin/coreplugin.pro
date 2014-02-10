@@ -129,7 +129,6 @@ HEADERS += mainwindow.h \
     uavgadgetdecorator.h \
     workspacesettings.h \
     uavconfiginfo.h \
-    authorsdialog.h \
     iconfigurableplugin.h \
     aboutdialog.h
 

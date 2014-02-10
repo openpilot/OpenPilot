@@ -4,9 +4,9 @@
 #include "manualcontrolsettings.h"
 #include "gcsreceiver.h"
 
-inputChannelForm::inputChannelForm(QWidget *parent, bool showlegend) :
+InputChannelForm::InputChannelForm(QWidget *parent, bool showlegend) :
     ConfigTaskWidget(parent),
-    ui(new Ui::inputChannelForm)
+    ui(new Ui::InputChannelForm)
 {
     ui->setupUi(this);
 
@@ -19,6 +19,7 @@ inputChannelForm::inputChannelForm(QWidget *parent, bool showlegend) :
         layout()->removeWidget(ui->legend4);
         layout()->removeWidget(ui->legend5);
         layout()->removeWidget(ui->legend6);
+        layout()->removeWidget(ui->legend7);
         delete ui->legend0;
         delete ui->legend1;
         delete ui->legend2;
@@ -26,12 +27,14 @@ inputChannelForm::inputChannelForm(QWidget *parent, bool showlegend) :
         delete ui->legend4;
         delete ui->legend5;
         delete ui->legend6;
+        delete ui->legend7;
     }
 
     connect(ui->channelMin, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
     connect(ui->channelMax, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
+    connect(ui->neutralValue, SIGNAL(valueChanged(int)), this, SLOT(neutralUpdated()));
     connect(ui->channelGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(groupUpdated()));
-    connect(ui->channelNeutral, SIGNAL(valueChanged(int)), this, SLOT(neutralUpdated(int)));
+    connect(ui->channelRev, SIGNAL(toggled(bool)), this, SLOT(reversedUpdated()));
 
     // This is awkward but since we want the UI to be a dropdown but the field is not an enum
     // it breaks the UAUVObject widget relation of the task gadget.  Running the data through
@@ -43,17 +46,17 @@ inputChannelForm::inputChannelForm(QWidget *parent, bool showlegend) :
 }
 
 
-inputChannelForm::~inputChannelForm()
+InputChannelForm::~InputChannelForm()
 {
     delete ui;
 }
 
-void inputChannelForm::setName(QString &name)
+void InputChannelForm::setName(QString &name)
 {
     ui->channelName->setText(name);
     QFontMetrics metrics(ui->channelName->font());
     int width = metrics.width(name) + 5;
-    foreach(inputChannelForm * form, parent()->findChildren<inputChannelForm *>()) {
+    foreach(InputChannelForm * form, parent()->findChildren<InputChannelForm *>()) {
         if (form == this) {
             continue;
         }
@@ -69,7 +72,7 @@ void inputChannelForm::setName(QString &name)
 /**
  * Update the direction of the slider and boundaries
  */
-void inputChannelForm::minMaxUpdated()
+void InputChannelForm::minMaxUpdated()
 {
     bool reverse = ui->channelMin->value() > ui->channelMax->value();
 
@@ -85,9 +88,44 @@ void inputChannelForm::minMaxUpdated()
     ui->channelNeutral->setInvertedControls(reverse);
 }
 
-void inputChannelForm::neutralUpdated(int newval)
+void InputChannelForm::neutralUpdated()
 {
-    ui->neutral->setText(QString::number(newval));
+    int neutralValue = ui->neutralValue->value();
+
+    if (ui->channelRev->isChecked()) {
+        if (neutralValue > ui->channelMin->value()) {
+            ui->channelMin->setValue(neutralValue);
+        } else if (neutralValue < ui->channelMax->value()) {
+            ui->channelMax->setValue(neutralValue);
+        }
+    } else {
+        if (neutralValue < ui->channelMin->value()) {
+            ui->channelMin->setValue(neutralValue);
+        } else if (neutralValue > ui->channelMax->value()) {
+            ui->channelMax->setValue(neutralValue);
+        }
+    }
+}
+
+void InputChannelForm::reversedUpdated()
+{
+    int value = ui->channelNeutral->value();
+    int min   = ui->channelMin->value();
+    int max   = ui->channelMax->value();
+
+    if (ui->channelRev->isChecked()) {
+        if (min < max) {
+            ui->channelMax->setValue(min);
+            ui->channelMin->setValue(max);
+            ui->channelNeutral->setValue(value);
+        }
+    } else {
+        if (min > max) {
+            ui->channelMax->setValue(min);
+            ui->channelMin->setValue(max);
+            ui->channelNeutral->setValue(value);
+        }
+    }
 }
 
 /**
@@ -96,7 +134,7 @@ void inputChannelForm::neutralUpdated(int newval)
  * I fully admit this is terrible practice to embed data within UI
  * like this.  Open to suggestions. JC 2011-09-07
  */
-void inputChannelForm::groupUpdated()
+void InputChannelForm::groupUpdated()
 {
     ui->channelNumberDropdown->clear();
     ui->channelNumberDropdown->addItem("Disabled");
@@ -140,7 +178,7 @@ void inputChannelForm::groupUpdated()
 /**
  * Update the dropdown from the hidden control
  */
-void inputChannelForm::channelDropdownUpdated(int newval)
+void InputChannelForm::channelDropdownUpdated(int newval)
 {
     ui->channelNumber->setValue(newval);
 }
@@ -148,7 +186,7 @@ void inputChannelForm::channelDropdownUpdated(int newval)
 /**
  * Update the hidden control from the dropdown
  */
-void inputChannelForm::channelNumberUpdated(int newval)
+void InputChannelForm::channelNumberUpdated(int newval)
 {
     ui->channelNumberDropdown->setCurrentIndex(newval);
 }

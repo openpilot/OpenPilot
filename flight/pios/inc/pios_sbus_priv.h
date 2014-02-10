@@ -50,14 +50,24 @@
  *                   0x08 - failsafe flag,
  *                   0xf0 - reserved
  *  1 byte  - 0x00 (end of frame byte)
+ *
+ * The R7008SB receiver has four different end of frame bytes, which rotates in order:
+ *    00000100
+ *    00010100
+ *    00100100
+ *    00110100
  */
-#define SBUS_FRAME_LENGTH (1 + 22 + 1 + 1)
-#define SBUS_SOF_BYTE     0x0f
-#define SBUS_EOF_BYTE     0x00
-#define SBUS_FLAG_DC1     0x01
-#define SBUS_FLAG_DC2     0x02
-#define SBUS_FLAG_FL      0x04
-#define SBUS_FLAG_FS      0x08
+
+#define SBUS_FRAME_LENGTH             (1 + 22 + 1 + 1)
+#define SBUS_SOF_BYTE                 0x0f
+#define SBUS_EOF_BYTE                 0x00
+#define SBUS_FLAG_DC1                 0x01
+#define SBUS_FLAG_DC2                 0x02
+#define SBUS_FLAG_FL                  0x04
+#define SBUS_FLAG_FS                  0x08
+
+#define SBUS_R7008SB_EOF_COUNTER_MASK 0xCF
+#define SBUS_R7008SB_EOF_BYTE         0x04
 
 /*
  * S.Bus protocol provides 16 proportional and 2 discrete channels.

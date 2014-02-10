@@ -64,7 +64,7 @@
 
 /* Local Defines */
 #define STACK_SIZE_BYTES                 200
-#define TASK_PRIORITY                    (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY                    (tskIDLE_PRIORITY + 4) // flight control relevant device driver (ppm link)
 #define ISR_TIMEOUT                      1 // ms
 #define EVENT_QUEUE_SIZE                 5
 #define RFM22B_DEFAULT_RX_DATARATE       RFM22_datarate_9600
@@ -1221,7 +1221,7 @@ static void pios_rfm22_inject_event(struct pios_rfm22b_dev *rfm22b_dev, enum pio
             // Something went fairly seriously wrong
             rfm22b_dev->errors++;
         }
-        portEND_SWITCHING_ISR((pxHigherPriorityTaskWoken2 == pdTRUE) || (pxHigherPriorityTaskWoken2 == pdTRUE));
+        portEND_SWITCHING_ISR((pxHigherPriorityTaskWoken1 == pdTRUE) || (pxHigherPriorityTaskWoken2 == pdTRUE));
     } else {
         // Store the event.
         if (xQueueSend(rfm22b_dev->eventQueue, &event, portMAX_DELAY) != pdTRUE) {

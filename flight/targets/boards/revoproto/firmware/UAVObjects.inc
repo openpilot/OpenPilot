@@ -4,7 +4,7 @@
 # Makefile for OpenPilot UAVObject code
 #
 # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2011.
-# 
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
@@ -28,7 +28,6 @@ UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired
 UAVOBJSRCFILENAMES += actuatorsettings
-UAVOBJSRCFILENAMES += altholdsmoothed
 UAVOBJSRCFILENAMES += attitudesettings
 UAVOBJSRCFILENAMES += attitudestate
 UAVOBJSRCFILENAMES += gyrostate
@@ -70,6 +69,7 @@ UAVOBJSRCFILENAMES += overosyncstats
 UAVOBJSRCFILENAMES += overosyncsettings
 UAVOBJSRCFILENAMES += pathaction
 UAVOBJSRCFILENAMES += pathdesired
+UAVOBJSRCFILENAMES += pathplan
 UAVOBJSRCFILENAMES += pathstatus
 UAVOBJSRCFILENAMES += positionstate
 UAVOBJSRCFILENAMES += ratedesired
@@ -82,6 +82,10 @@ UAVOBJSRCFILENAMES += revosettings
 UAVOBJSRCFILENAMES += sonaraltitude
 UAVOBJSRCFILENAMES += stabilizationdesired
 UAVOBJSRCFILENAMES += stabilizationsettings
+UAVOBJSRCFILENAMES += stabilizationsettingsbank1
+UAVOBJSRCFILENAMES += stabilizationsettingsbank2
+UAVOBJSRCFILENAMES += stabilizationsettingsbank3
+UAVOBJSRCFILENAMES += stabilizationbank
 UAVOBJSRCFILENAMES += systemalarms
 UAVOBJSRCFILENAMES += systemsettings
 UAVOBJSRCFILENAMES += systemstats
@@ -97,6 +101,7 @@ UAVOBJSRCFILENAMES += camerastabsettings
 UAVOBJSRCFILENAMES += altitudeholdsettings
 UAVOBJSRCFILENAMES += altitudefiltersettings
 UAVOBJSRCFILENAMES += altitudeholddesired
+UAVOBJSRCFILENAMES += altitudeholdstatus
 UAVOBJSRCFILENAMES += waypoint
 UAVOBJSRCFILENAMES += waypointactive
 UAVOBJSRCFILENAMES += poilocation

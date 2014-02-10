@@ -1,15 +1,14 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup FlightPlan Flight Plan Module
- * @brief Executes flight plan scripts in Python
+ * @addtogroup PIOS_DELTATIME time measurement Functions
+ * @brief PiOS Delay functionality
  * @{
  *
- * @file       flightplan.c
+ * @file       pios_deltatime.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Executes flight plan scripts in Python
- *
+ * @brief      Settings functions header
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,9 +27,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef FLIGHTPLAN_H
-#define FLIGHTPLAN_H
 
-int32_t FlightPlanInitialize();
+#ifndef PIOS_DELTATIME_H
+#define PIOS_DELTATIME_H
 
-#endif // FLIGHTPLAN_H
+struct PiOSDeltatimeConfigStruct {
+    uint32_t last;
+    float    average;
+    float    min;
+    float    max;
+    float    alpha;
+};
+typedef struct PiOSDeltatimeConfigStruct PiOSDeltatimeConfig;
+
+/* Public Functions */
+void PIOS_DELTATIME_Init(PiOSDeltatimeConfig *config, float average, float min, float max, float alpha);
+
+float PIOS_DELTATIME_GetAverageSeconds(PiOSDeltatimeConfig *config);
+
+#endif /* PIOS_DELTATIME_H */
+
+/**
+ * @}
+ * @}
+ */

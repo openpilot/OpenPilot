@@ -91,6 +91,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         addWidgetBinding("ManualControlSettings", "ChannelGroups", inpForm->ui->channelGroup, index);
         addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->channelNeutral, index);
         addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->neutralValue, index);
+        addWidgetBinding("ManualControlSettings", "ChannelMax", inpForm->ui->channelMax, index);
         addWidgetBinding("ManualControlSettings", "ChannelMin", inpForm->ui->channelMin, index);
         addWidgetBinding("ManualControlSettings", "ChannelMax", inpForm->ui->channelMax, index);
 

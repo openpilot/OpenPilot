@@ -415,7 +415,11 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
                     // Send the data straight to the telemetry port.
                     // FIXME following call can fail (with -2 error code) if buffer is full
                     // it is the caller responsibility to retry in such cases...
-                    PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, serial_data, bytes_to_process);
+                    int32_t ret = -2;
+                    uint8_t count = 5;
+                    while(count-- > 0 && ret < -1){
+                        ret = PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, serial_data, bytes_to_process);
+                    }
                 }
             }
         } else {
@@ -511,7 +515,11 @@ static void serialRxTask(__attribute__((unused)) void *parameters)
                 // Send the data over the radio link.
                 // FIXME following call can fail (with -2 error code) if buffer is full
                 // it is the caller responsibility to retry in such cases...
-                PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, data->serialRxBuf, bytes_to_process);
+                int32_t ret = -2;
+                uint8_t count = 5;
+                while(count-- > 0 && ret < -1){
+                    PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, data->serialRxBuf, bytes_to_process);
+                }
             }
         } else {
             vTaskDelay(5);
@@ -541,7 +549,11 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
     if (outputPort) {
         // FIXME following call can fail (with -2 error code) if buffer is full
         // it is the caller responsibility to retry in such cases...
-        ret = PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+        ret = -2;
+        uint8_t count = 5;
+        while(count-- > 0 && ret < -1){
+            ret = PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+        }
     } else {
         ret = -1;
     }
@@ -567,7 +579,12 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
     if (outputPort && PIOS_COM_Available(outputPort)) {
         // FIXME following call can fail (with -2 error code) if buffer is full
         // it is the caller responsibility to retry in such cases...
-        return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+        int32_t ret = -2;
+        uint8_t count = 5;
+        while(count-- > 0 && ret < -1){
+            ret = PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+        }
+        return ret;
     } else {
         return -1;
     }

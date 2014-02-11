@@ -14,18 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>12</number>
-   </property>
-   <property name="topMargin">
-    <number>12</number>
-   </property>
-   <property name="rightMargin">
-    <number>12</number>
-   </property>
-   <property name="bottomMargin">
-    <number>12</number>
-   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -128,8 +116,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>745</height>
+            <width>774</width>
+            <height>748</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -558,8 +546,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>745</height>
+            <width>768</width>
+            <height>742</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7" rowstretch="1,0,0,0">
@@ -2176,8 +2164,8 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>766</width>
-            <height>745</height>
+            <width>768</width>
+            <height>742</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

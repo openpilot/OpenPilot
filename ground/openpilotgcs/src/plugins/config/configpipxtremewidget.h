@@ -55,16 +55,13 @@ private:
     // Are the settings current?
     bool settingsUpdated;
 
-    void SetPairID(QLineEdit *pairIdWidget);
+protected:
+    void updateEnableControls();
 
 private slots:
     void disconnected();
-    void bind1();
-    void bind2();
-    void bind3();
-    void bind4();
-    void ppmOnlyToggled(bool toggled);
-    void comSpeedChanged(int index);
+    void bind();
+    void ppmOnlyChanged();
 };
 
 #endif // CONFIGTXPIDWIDGET_H

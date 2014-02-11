@@ -72,10 +72,16 @@
 #define UPDATE_RATE      25.0f
 #define GYRO_NEUTRAL     1665
 
+#define UPDATE_EXPECTED  (1.0f / 666.0f)
+#define UPDATE_MIN       1.0e-6f
+#define UPDATE_MAX       1.0f
+#define UPDATE_ALPHA     1.0e-2f
+
 // Private types
 
 // Private variables
 static xTaskHandle taskHandle;
+static PiOSDeltatimeConfig dtconfig;
 
 // Private functions
 static void AttitudeTask(void *parameters);
@@ -213,6 +219,8 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
     }
     // Force settings update to make sure rotation loaded
     settingsUpdatedCb(AttitudeSettingsHandle());
+
+    PIOS_DELTATIME_Init(&dtconfig, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
 
     // Main task loop
     while (1) {
@@ -473,12 +481,7 @@ static inline void apply_accel_filter(const float *raw, float *filtered)
 
 static void updateAttitude(AccelStateData *accelStateData, GyroStateData *gyrosData)
 {
-    float dT;
-    portTickType thisSysTime = xTaskGetTickCount();
-    static portTickType lastSysTime = 0;
-
-    dT = (thisSysTime == lastSysTime) ? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f;
-    lastSysTime = thisSysTime;
+    float dT      = PIOS_DELTATIME_GetAverageSeconds(&dtconfig);
 
     // Bad practice to assume structure order, but saves memory
     float *gyros  = &gyrosData->x;

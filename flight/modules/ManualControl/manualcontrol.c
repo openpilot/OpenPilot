@@ -64,7 +64,7 @@
 #define STACK_SIZE_BYTES  1152
 #endif
 
-#define TASK_PRIORITY     (tskIDLE_PRIORITY + 4)
+#define TASK_PRIORITY     (tskIDLE_PRIORITY + 3) // 3 = flight control
 #define UPDATE_PERIOD_MS  20
 #define THROTTLE_FAILSAFE -0.1f
 #define ARMED_THRESHOLD   0.50f

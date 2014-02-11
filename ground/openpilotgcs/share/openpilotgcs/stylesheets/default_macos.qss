@@ -1,22 +1,2 @@
 /* MacOS styles */
 
-QGroupBox {
-    border: 1px solid gray;
-    border-radius: 5px;
-    margin-top: 1ex;
-    font-size: 11px;
-    font-weight: bold;
-}
-
-QGroupBox::title {
-    subcontrol-origin: margin;
-    subcontrol-position: top left;
-    padding: 0 3px;
-}
-
-QTabWidget::pane {  
-    margin: 1px, 1px, 1px, 1px;
-    border: 2px solid rgb(196, 196, 196);
-    border-radius: 5px;
-    padding: 0px;
-}

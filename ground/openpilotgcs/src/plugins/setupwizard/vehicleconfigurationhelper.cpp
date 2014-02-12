@@ -214,6 +214,19 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
         break;
     }
     case VehicleConfigurationSource::VEHICLE_FIXEDWING:
+    {
+        switch (m_configSource->getVehicleSubType()) {
+        case VehicleConfigurationSource::FIXED_WING_AILERON:
+            setupAileron();
+            break;
+        case VehicleConfigurationSource::FIXED_WING_VTAIL:
+            setupVtail();
+            break;
+        default:
+            break;
+        }
+        break;
+    }
     case VehicleConfigurationSource::VEHICLE_HELI:
     case VehicleConfigurationSource::VEHICLE_SURFACE:
         // TODO: Implement settings for other vehicle types?
@@ -293,7 +306,23 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         addModifiedObject(actSettings, tr("Writing actuator settings"));
         break;
     }
+/*
     case VehicleConfigurationSource::VEHICLE_FIXEDWING:
+    {
+        ActuatorSettings::DataFields data = actSettings->getData();
+
+	qDebug() << "Override center pulse for fixed wing servos\n";
+	// move all but first chan to 1500 center pluse
+        QList<actuatorChannelSettings> actuatorSettings = m_configSource->getActuatorSettings();
+        for (quint16 i = 1; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
+            data.ChannelType[i]    = ActuatorSettings::CHANNELTYPE_PWM;
+            data.ChannelAddr[i]    = i;
+            data.ChannelMin[i]     = 1500;
+            data.ChannelNeutral[i] = 1500;
+            data.ChannelMax[i]     = 1500;
+        }
+    }
+*/
     case VehicleConfigurationSource::VEHICLE_HELI:
     case VehicleConfigurationSource::VEHICLE_SURFACE:
         // TODO: Implement settings for other vehicle types?
@@ -1286,4 +1315,94 @@ void VehicleConfigurationHelper::setupOctoCopter()
 
     applyMixerConfiguration(channels);
     applyMultiGUISettings(frame, guiSettings);
+}
+
+void VehicleConfigurationHelper::setupVtail()
+{
+
+    mixerChannelSettings channels[10];
+    GUIConfigDataUnion guiSettings = getGUIConfigData();
+
+    channels[0].type      = MIXER_TYPE_MOTOR;
+    channels[0].throttle1 = 100;
+    channels[0].throttle2 = 0;
+    channels[0].roll      = 0;
+    channels[0].pitch     = 0;
+    channels[0].yaw = 0;
+
+    channels[1].type      = MIXER_TYPE_SERVO;
+    channels[1].throttle1 = 0;
+    channels[1].throttle2 = 0;
+    channels[1].roll      = -100;
+    channels[1].pitch     = 50;
+    channels[1].yaw = 0;
+
+    channels[2].type      = MIXER_TYPE_SERVO;
+    channels[2].throttle1 = 0;
+    channels[2].throttle2 = 0;
+    channels[2].roll      = 100;
+    channels[2].pitch     = -50;
+    channels[2].yaw = 0;
+
+    guiSettings.fixedwing.FixedWingThrottle = 1;
+    guiSettings.fixedwing.FixedWingRoll1 = 2;
+    guiSettings.fixedwing.FixedWingRoll2  = 3;
+
+    applyMixerConfiguration(channels);
+    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL, guiSettings);
+}
+
+void VehicleConfigurationHelper::setupAileron()
+{
+    // Typical vehicle setup
+    // 1. Setup mixer data
+    // 2. Setup GUI data
+    // 3. Apply changes
+
+    mixerChannelSettings channels[10];
+    GUIConfigDataUnion guiSettings = getGUIConfigData();
+
+    channels[0].type      = MIXER_TYPE_MOTOR;
+    channels[0].throttle1 = 100;
+    channels[0].throttle2 = 0;
+    channels[0].roll      = 0;
+    channels[0].pitch     = 0;
+    channels[0].yaw = 0;
+
+    channels[1].type      = MIXER_TYPE_SERVO;
+    channels[1].throttle1 = 0;
+    channels[1].throttle2 = 0;
+    channels[1].roll      = -100;
+    channels[1].pitch     = 0;
+    channels[1].yaw = 0;
+
+    channels[2].type      = MIXER_TYPE_SERVO;
+    channels[2].throttle1 = 0;
+    channels[2].throttle2 = 0;
+    channels[2].roll      = 100;
+    channels[2].pitch     = 0;
+    channels[2].yaw = 0;
+
+    channels[3].type      = MIXER_TYPE_SERVO;
+    channels[3].throttle1 = 0;
+    channels[3].throttle2 = 0;
+    channels[3].roll      = 0;
+    channels[3].pitch     = 100;
+    channels[3].yaw = 0;
+
+    channels[3].type      = MIXER_TYPE_SERVO;
+    channels[3].throttle1 = 0;
+    channels[3].throttle2 = 0;
+    channels[3].roll      = 0;
+    channels[3].pitch     = 0;
+    channels[3].yaw = 100;
+
+    guiSettings.fixedwing.FixedWingThrottle = 1;
+    guiSettings.fixedwing.FixedWingRoll1 = 2;
+    guiSettings.fixedwing.FixedWingRoll2  = 3;
+    guiSettings.fixedwing.FixedWingPitch1 = 4;
+    guiSettings.fixedwing.FixedWingYaw1  = 5;
+
+    applyMixerConfiguration(channels);
+    applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWING, guiSettings);
 }

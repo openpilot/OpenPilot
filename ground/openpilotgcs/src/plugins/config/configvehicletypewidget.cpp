@@ -68,9 +68,11 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     QStringList channelDesc;
     switch (systemSettingsData.AirframeType) {
     case SystemSettings::AIRFRAMETYPE_FIXEDWING:
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        break;
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
+	// do nothing for elevon support for the time being. 
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
-        // fixed wing
         channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
         break;
     case SystemSettings::AIRFRAMETYPE_HELICP:

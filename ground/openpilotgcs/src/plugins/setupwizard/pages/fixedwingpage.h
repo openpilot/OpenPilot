@@ -28,6 +28,10 @@
 #ifndef FIXEDWINGPAGE_H
 #define FIXEDWINGPAGE_H
 
+#include <QtSvg/QGraphicsSvgItem>
+#include <QtSvg/QSvgRenderer>
+#include <QList>
+
 #include "abstractwizardpage.h"
 
 namespace Ui {
@@ -41,8 +45,21 @@ public:
     explicit FixedWingPage(SetupWizard *wizard, QWidget *parent = 0);
     ~FixedWingPage();
 
+    void initializePage();
+    bool validatePage();
+
+protected:
+    void resizeEvent(QResizeEvent *event);
+
 private:
     Ui::FixedWingPage *ui;
+    void setupFixedWingTypesCombo();
+    QGraphicsSvgItem *m_fixedwingPic;
+    void updateAvailableTypes();
+    QList<QString> m_descriptions;
+
+private slots:
+    void updateImageAndDescription();
 };
 
 #endif // FIXEDWINGPAGE_H

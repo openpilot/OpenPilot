@@ -44,6 +44,7 @@ class ConfigFixedWingWidget : public VehicleConfig {
     Q_OBJECT
 
 public:
+    static const QString CHANNELBOXNAME;
     static QStringList getChannelDescriptions();
 
     ConfigFixedWingWidget(QWidget *parent = 0);
@@ -52,19 +53,25 @@ public:
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
+protected:      									      
+    void showEvent(QShowEvent *event);					      
+    void resizeEvent(QResizeEvent *event);
+    void enableControls(bool enable);
+
 private:
     Ui_FixedWingConfigWidget *m_aircraft;
+    QGraphicsSvgItem *plane;
 
     virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
     bool setupFrameFixedWing(QString airframeType);
-    bool setupFrameElevon(QString airframeType);
     bool setupFrameVtail(QString airframeType);
+    bool setupFixedWingMixer(double mixerFactors[8][3]);
+    void setupMotors(QList<QString> motorList);
 
-protected:
-    void enableControls(bool enable);
-
+    void updateAirframe(QString multiRotorType);
+    void setupEnabledControls(QString airframeType);
 private slots:
     virtual void setupUI(QString airframeType);
     virtual bool throwConfigError(QString airframeType);

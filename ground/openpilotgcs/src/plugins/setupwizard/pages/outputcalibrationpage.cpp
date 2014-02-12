@@ -36,13 +36,13 @@ OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *paren
 {
     ui->setupUi(this);
 
+    qDebug() << "calling output calibration page";
     m_vehicleRenderer = new QSvgRenderer();
-    if (QFile::exists(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
-        m_vehicleRenderer->load(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
-        m_vehicleRenderer->isValid()) {
-        m_vehicleScene = new QGraphicsScene(this);
-        ui->vehicleView->setScene(m_vehicleScene);
-    }
+
+    // move the code that was here to setupVehicle() so we can determine which image to use. 
+    m_vehicleScene = new QGraphicsScene(this);
+    ui->vehicleView->setScene(m_vehicleScene);
+
 }
 
 OutputCalibrationPage::~OutputCalibrationPage()
@@ -63,8 +63,18 @@ void OutputCalibrationPage::setupVehicle()
     m_channelIndex.clear();
     m_currentWizardIndex = 0;
     m_vehicleScene->clear();
+
+// KF moved code from OutputCalibrationPage() here so it can be used to detect the current vehicle 
+// needs to be slimmed down and not repeated. 
+
     switch (getWizard()->getVehicleSubType()) {
     case SetupWizard::MULTI_ROTOR_TRI_Y:
+        if (QFile::exists(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->load(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->isValid()) {
+            ui->vehicleView->setScene(m_vehicleScene);
+        }
+
         m_wizardIndexes << 0 << 1 << 1 << 1 << 2 << 3 << 4;
         m_vehicleElementIds << "tri" << "tri-frame" << "tri-m1" << "tri-m2" << "tri-m3" << "tri-s1";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 4 << 4;
@@ -75,34 +85,115 @@ void OutputCalibrationPage::setupVehicle()
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
     case SetupWizard::MULTI_ROTOR_QUAD_X:
+        if (QFile::exists(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->load(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->isValid()) {
+            ui->vehicleView->setScene(m_vehicleScene);
+        }
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "quad-x" << "quad-x-frame" << "quad-x-m1" << "quad-x-m2" << "quad-x-m3" << "quad-x-m4";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
         break;
     case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
+        if (QFile::exists(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->load(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->isValid()) {
+            ui->vehicleView->setScene(m_vehicleScene);
+        }
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "quad-p" << "quad-p-frame" << "quad-p-m1" << "quad-p-m2" << "quad-p-m3" << "quad-p-m4";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
         break;
     case SetupWizard::MULTI_ROTOR_HEXA:
+        if (QFile::exists(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->load(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->isValid()) {
+            ui->vehicleView->setScene(m_vehicleScene);
+        }
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "hexa" << "hexa-frame" << "hexa-m1" << "hexa-m2" << "hexa-m3" << "hexa-m4" << "hexa-m5" << "hexa-m6";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         break;
     case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
+        if (QFile::exists(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->load(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->isValid()) {
+            ui->vehicleView->setScene(m_vehicleScene);
+        }
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "hexa-y6" << "hexa-y6-frame" << "hexa-y6-m2" << "hexa-y6-m1" << "hexa-y6-m4" << "hexa-y6-m3" << "hexa-y6-m6" << "hexa-y6-m5";
         m_vehicleHighlightElementIndexes << 0 << 2 << 1 << 4 << 3 << 6 << 5;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         break;
     case SetupWizard::MULTI_ROTOR_HEXA_H:
+        if (QFile::exists(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->load(QString(":/setupwizard/resources/multirotor-shapes.svg")) &&
+            m_vehicleRenderer->isValid()) {
+            ui->vehicleView->setScene(m_vehicleScene);
+        }
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "hexa-h" << "hexa-h-frame" << "hexa-h-m1" << "hexa-h-m2" << "hexa-h-m3" << "hexa-h-m4" << "hexa-h-m5" << "hexa-h-m6";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        break;
+// KF hack
+    case SetupWizard::FIXED_WING_AILERON:
+    	if (QFile::exists(QString(":/setupwizard/resources/fixedwing-shapes.svg")) &&
+           m_vehicleRenderer->load(QString(":/setupwizard/resources/fixedwing-shapes.svg")) &&
+           m_vehicleRenderer->isValid()) {
+           ui->vehicleView->setScene(m_vehicleScene);
+    	}
+	qDebug() << "no clue what a wizard index is!";
+        m_wizardIndexes << 0 << 1 << 3 << 3 << 3 << 3; // These come from OutputCalibrationPage::setWizardPage()
+        m_vehicleElementIds << "fixed-aileron" << "aileron";
+        m_vehicleHighlightElementIndexes << 0 << 1;
+        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4;
+
+	// see Servo city for an example. 1500 usec is center on MS85mg for example. - http://www.servocity.com/html/hs-85mg__mighty_micro.html
+        // make sure Aileron servo one does not go to an extreme value
+        m_actuatorSettings[1].channelMin     = 1500;
+        m_actuatorSettings[1].channelNeutral = 1500;
+        m_actuatorSettings[1].channelMax     = 1500;
+        // make sure Aileron servo two does not go to an extreme value
+        m_actuatorSettings[2].channelMin     = 1500;
+        m_actuatorSettings[2].channelNeutral = 1500;
+        m_actuatorSettings[2].channelMax     = 1500;
+        // make sure Elevator servo one does not go to an extreme value
+        m_actuatorSettings[3].channelMin     = 1500;
+        m_actuatorSettings[4].channelNeutral = 1500;
+        m_actuatorSettings[3].channelMax     = 1500;
+        // make sure Rudder servo one does not go to an extreme value
+        m_actuatorSettings[4].channelMin     = 1500;
+        m_actuatorSettings[4].channelNeutral = 1500;
+        m_actuatorSettings[4].channelMax     = 1500;
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
+    case SetupWizard::FIXED_WING_VTAIL:
+    	if (QFile::exists(QString(":/setupwizard/resources/fixedwing-shapes.svg")) &&
+           m_vehicleRenderer->load(QString(":/setupwizard/resources/fixedwing-shapes.svg")) &&
+           m_vehicleRenderer->isValid()) {
+           ui->vehicleView->setScene(m_vehicleScene);
+    	}
+	qDebug() << "no clue what a wizard index is!";
+        m_wizardIndexes << 0 << 1 << 3 << 3; // These come from OutputCalibrationPage::setWizardPage()
+        m_vehicleElementIds << "fixed-vtail" << "vtail";
+        m_vehicleHighlightElementIndexes << 0 << 1;
+        m_channelIndex << 0 << 0 << 1 << 2;
+
+        // make sure elevon servo one does not go to an extreme value
+        m_actuatorSettings[1].channelMin     = 1500;
+        m_actuatorSettings[1].channelNeutral = 1500;
+        m_actuatorSettings[1].channelMax     = 1500;
+        // make sure elevon servo two does not go to an extreme value
+        m_actuatorSettings[2].channelMin     = 1500;
+        m_actuatorSettings[2].channelNeutral = 1500;
+        m_actuatorSettings[2].channelMax     = 1500;
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
     default:
         break;
@@ -191,7 +282,7 @@ void OutputCalibrationPage::setWizardPage()
             ui->servoMaxAngleSlider->setValue(m_actuatorSettings[currentChannel].channelMax);
         }
     }
-    setupVehicleHighlightedPart();
+    // setupVehicleHighlightedPart(); // turn this off for now, need to fix fixedwing image elements
 }
 
 void OutputCalibrationPage::initializePage()

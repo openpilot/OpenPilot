@@ -106,7 +106,7 @@ void FixedWingPage::updateImageAndDescription()
         elementId = "aileron";
         break;
     case SetupWizard::FIXED_WING_VTAIL:
-        elementId = "vtail";
+        elementId = "v-tail";
         break;
     default:
         elementId = "";

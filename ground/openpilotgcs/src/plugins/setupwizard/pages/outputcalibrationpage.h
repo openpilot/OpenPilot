@@ -52,6 +52,7 @@ public:
         return m_currentWizardIndex >= m_wizardIndexes.size() - 1;
     }
 
+    void loadSVGFile(QString file);
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -100,6 +101,9 @@ private:
     QList<actuatorChannelSettings> m_actuatorSettings;
 
     OutputCalibrationUtil *m_calibrationUtil;
+
+    static const QString MULTI_SVG_FILE;
+    static const QString FIXEDWING_SVG_FILE;
 };
 
 #endif // OUTPUTCALIBRATIONPAGE_H

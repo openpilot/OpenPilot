@@ -132,7 +132,7 @@ void DeviceWidget::populate()
         myDevice->lblGitTag->setText(tr("Unknown"));
         myDevice->lblBrdName->setText(tr("Unknown"));
     }
-
+    myDevice->filenameLabel->setText(tr("No file loaded"));
     status("Ready...", STATUSICON_INFO);
     QString fwFileName = getDevFirmwarePath();
     QFile fwFile(fwFileName);

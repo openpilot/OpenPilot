@@ -274,35 +274,35 @@ int32_t PIOS_COM_ChangeBaud(uint32_t com_id, uint32_t baud)
 
 static int32_t PIOS_COM_SendBufferNonBlockingInternal(struct pios_com_dev *com_dev, const uint8_t *buffer, uint16_t len)
 {
-PIOS_Assert(com_dev);
-PIOS_Assert(com_dev->has_tx);
-if (com_dev->driver->available && !com_dev->driver->available(com_dev->lower_id)) {
-    /*
-     * Underlying device is down/unconnected.
-     * Dump our fifo contents and act like an infinite data sink.
-     * Failure to do this results in stale data in the fifo as well as
-     * possibly having the caller block trying to send to a device that's
-     * no longer accepting data.
-     */
-    fifoBuf_clearData(&com_dev->tx);
-    return len;
-}
-
-if (len > fifoBuf_getFree(&com_dev->tx)) {
-    /* Buffer cannot accept all requested bytes (retry) */
-    return -2;
-}
-
-uint16_t bytes_into_fifo = fifoBuf_putData(&com_dev->tx, buffer, len);
-
-if (bytes_into_fifo > 0) {
-    /* More data has been put in the tx buffer, make sure the tx is started */
-    if (com_dev->driver->tx_start) {
-        com_dev->driver->tx_start(com_dev->lower_id,
-                                  fifoBuf_getUsed(&com_dev->tx));
+    PIOS_Assert(com_dev);
+    PIOS_Assert(com_dev->has_tx);
+    if (com_dev->driver->available && !com_dev->driver->available(com_dev->lower_id)) {
+        /*
+         * Underlying device is down/unconnected.
+         * Dump our fifo contents and act like an infinite data sink.
+         * Failure to do this results in stale data in the fifo as well as
+         * possibly having the caller block trying to send to a device that's
+         * no longer accepting data.
+         */
+        fifoBuf_clearData(&com_dev->tx);
+        return len;
     }
-}
-return bytes_into_fifo;
+
+    if (len > fifoBuf_getFree(&com_dev->tx)) {
+        /* Buffer cannot accept all requested bytes (retry) */
+        return -2;
+    }
+
+    uint16_t bytes_into_fifo = fifoBuf_putData(&com_dev->tx, buffer, len);
+
+    if (bytes_into_fifo > 0) {
+        /* More data has been put in the tx buffer, make sure the tx is started */
+        if (com_dev->driver->tx_start) {
+            com_dev->driver->tx_start(com_dev->lower_id,
+                                      fifoBuf_getUsed(&com_dev->tx));
+        }
+    }
+    return bytes_into_fifo;
 }
 
 /**
@@ -346,6 +346,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
  * \param[in] len buffer length
  * \return -1 if port not available
  * \return -2 if mutex can't be taken;
+ * \return -3 if data cannot be sent in the max allotted time of 5000msec
  * \return number of bytes transmitted on success
  */
 int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len)

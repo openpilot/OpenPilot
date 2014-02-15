@@ -359,7 +359,7 @@ int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len
     }
     PIOS_Assert(com_dev->has_tx);
 #if defined(PIOS_INCLUDE_FREERTOS)
-    if (xSemaphoreTake(com_dev->sendbuffer_sem, 0) != pdTRUE) {
+    if (xSemaphoreTake(com_dev->sendbuffer_sem, 5) != pdTRUE) {
         return -2;
     }
 #endif /* PIOS_INCLUDE_FREERTOS */

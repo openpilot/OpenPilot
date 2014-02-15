@@ -2260,7 +2260,7 @@
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
-            <color>4294945280</color>
+            <color>4294901760</color>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-System</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2272,47 +2272,37 @@
           <plotCurve1>
             <color>4294945280</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-Actuator</uavField>
+            <uavField>StackRemaining-CallbackScheduler0</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve1>
-          <plotCurve10>
-            <color>4294945280</color>
-            <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-Guidance</uavField>
-            <uavObject>TaskInfo</uavObject>
-            <yMaximum>0</yMaximum>
-            <yMeanSamples>1</yMeanSamples>
-            <yMinimum>0</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve10>
-          <plotCurve11>
-            <color>4294945280</color>
-            <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-Watchdog</uavField>
-            <uavObject>TaskInfo</uavObject>
-            <yMaximum>0</yMaximum>
-            <yMeanSamples>1</yMeanSamples>
-            <yMinimum>0</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve11>
           <plotCurve2>
-            <color>4294945280</color>
+            <color>4278190335</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-TelemetryTx</uavField>
+            <uavField>StackRemaining-CallbackScheduler1</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve2>
-          <plotCurve4>
-            <color>4294945280</color>
+          <plotCurve3>
+            <color>4294967040</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-TelemetryRx</uavField>
+            <uavField>StackRemaining-ManualControl</uavField>
+            <uavObject>TaskInfo</uavObject>
+            <yMaximum>0</yMaximum>
+            <yMeanSamples>1</yMeanSamples>
+            <yMinimum>0</yMinimum>
+            <yScalePower>0</yScalePower>
+          </plotCurve3>
+          <plotCurve4>
+            <color>4278255615</color>
+            <mathFunction>None</mathFunction>
+            <uavField>StackRemaining-Stabilization</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2320,9 +2310,9 @@
             <yScalePower>0</yScalePower>
           </plotCurve4>
           <plotCurve5>
-            <color>4294945280</color>
+            <color>4294923775</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-GPS</uavField>
+            <uavField>StackRemaining-Actuator</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2330,9 +2320,9 @@
             <yScalePower>0</yScalePower>
           </plotCurve5>
           <plotCurve6>
-            <color>4294945280</color>
+            <color>4289331327</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-ManualControl</uavField>
+            <uavField>StackRemaining-Sensors</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2350,9 +2340,9 @@
             <yScalePower>0</yScalePower>
           </plotCurve7>
           <plotCurve8>
-            <color>4294945280</color>
+            <color>4283760767</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-AHRSComms</uavField>
+            <uavField>StackRemaining-TelemetryTx</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2360,16 +2350,26 @@
             <yScalePower>0</yScalePower>
           </plotCurve8>
           <plotCurve9>
-            <color>4294945280</color>
+            <color>4294901760</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-Stabilization</uavField>
+            <uavField>StackRemaining-TelemetryRx</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve9>
-          <plotCurveCount>12</plotCurveCount>
+          <plotCurve10>
+            <color>4283782527</color>
+            <mathFunction>None</mathFunction>
+            <uavField>StackRemaining-RadioRx</uavField>
+            <uavObject>TaskInfo</uavObject>
+            <yMaximum>0</yMaximum>
+            <yMeanSamples>1</yMeanSamples>
+            <yMinimum>0</yMinimum>
+            <yScalePower>0</yScalePower>
+          </plotCurve10>
+          <plotCurveCount>11</plotCurveCount>
           <plotType>1</plotType>
           <refreshInterval>1000</refreshInterval>
         </data>

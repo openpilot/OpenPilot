@@ -134,6 +134,11 @@ void DeviceWidget::populate()
     }
 
     status("Ready...", STATUSICON_INFO);
+    QString fwFileName = getDevFirmwarePath();
+    QFile fwFile(fwFileName);
+    if(fwFile.exists()){
+        loadFirmware(fwFileName);
+    }
 }
 
 /**
@@ -254,10 +259,16 @@ void DeviceWidget::status(QString str, StatusIcon ic)
 
 void DeviceWidget::loadFirmware()
 {
+    QString file = setOpenFileName();
+    loadFirmware(file);
+}
+
+void DeviceWidget::loadFirmware(QString fwfilename)
+{
     myDevice->verticalGroupBox_loaded->setVisible(false);
     myDevice->groupCustom->setVisible(false);
 
-    filename = setOpenFileName();
+    filename = fwfilename;
 
     myDevice->confirmCheckBox->setVisible(false);
     myDevice->confirmCheckBox->setChecked(false);
@@ -312,6 +323,7 @@ void DeviceWidget::loadFirmware()
         myDevice->verticalGroupBox_loaded->setVisible(false);
         myDevice->groupCustom->setVisible(true);
     }
+    myDevice->filenameLabel->setText(tr("Firmware loaded: ") + filename);
     myDevice->statusIcon->setPixmap(px);
 }
 
@@ -508,17 +520,10 @@ void DeviceWidget::setProgress(int percent)
     myDevice->progressBar->setValue(percent);
 }
 
-/**
- * Opens an open file dialog.
- */
-QString DeviceWidget::setOpenFileName()
+QString DeviceWidget::getDevFirmwarePath()
 {
-    QFileDialog::Options options;
-    QString selectedFilter;
-    QString fwDirectoryStr;
     QDir fwDirectory;
-
-    // Format filename for file chooser
+    QString fwDirectoryStr;
 #ifdef Q_OS_WIN
     fwDirectoryStr = QCoreApplication::applicationDirPath();
     fwDirectory    = QDir(fwDirectoryStr);
@@ -528,7 +533,7 @@ QString DeviceWidget::setOpenFileName()
 #elif defined Q_OS_LINUX
     fwDirectoryStr = QCoreApplication::applicationDirPath();
     fwDirectory    = QDir(fwDirectoryStr);
-    fwDirectory.cd("../../..");
+    fwDirectory.cd("../..");
     fwDirectoryStr = fwDirectory.absolutePath();
     fwDirectoryStr = fwDirectoryStr + "/fw_" + myDevice->lblBrdName->text().toLower() + "/fw_" + myDevice->lblBrdName->text().toLower() + ".opfw";
 #elif defined Q_OS_MAC
@@ -538,12 +543,21 @@ QString DeviceWidget::setOpenFileName()
     fwDirectoryStr = fwDirectory.absolutePath();
     fwDirectoryStr = fwDirectoryStr + "/fw_" + myDevice->lblBrdName->text().toLower() + "/fw_" + myDevice->lblBrdName->text().toLower() + ".opfw";
 #endif
+    return fwDirectoryStr;
+}
+
+/**
+ * Opens an open file dialog.
+ */
+QString DeviceWidget::setOpenFileName()
+{
+    QString fwDirectoryStr = getDevFirmwarePath();
+
+    // Format filename for file chooser
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Select firmware file"),
                                                     fwDirectoryStr,
-                                                    tr("Firmware Files (*.opfw *.bin)"),
-                                                    &selectedFilter,
-                                                    options);
+                                                    tr("Firmware Files (*.opfw *.bin)"));
     return fileName;
 }
 

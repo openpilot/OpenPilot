@@ -96,7 +96,7 @@ static uint32_t idleCounter;
 static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
 static xQueueHandle objectPersistenceQueue;
-static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_HARMLESS = 1, STACKOVERFLOW_CRITICAL = 3 } stackOverflow;
+static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_CRITICAL = 3 } stackOverflow;
 static bool mallocFailed;
 static HwSettingsData bootHwSettings;
 static struct PIOS_FLASHFS_Stats fsStats;
@@ -456,7 +456,7 @@ static void callbackSchedulerForEachCallback(int16_t callback_id, const struct p
     }
     // delayed callback scheduler reports callback stack overflows as remaininng: -1
     if (callback_info->stack_remaining < 0 && stackOverflow == STACKOVERFLOW_NONE) {
-        stackOverflow = STACKOVERFLOW_HARMLESS;
+        stackOverflow = STACKOVERFLOW_WARNING;
     }
     // By convention, there is a direct mapping between (not negative) callback scheduler callback_id's and members
     // of the CallbackInfoXXXXElem enums
@@ -631,7 +631,7 @@ static void updateSystemAlarms()
     case STACKOVERFLOW_NONE:
         AlarmsClear(SYSTEMALARMS_ALARM_STACKOVERFLOW);
         break;
-    case STACKOVERFLOW_HARMLESS:
+    case STACKOVERFLOW_WARNING:
         AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_WARNING);
         break;
     default:

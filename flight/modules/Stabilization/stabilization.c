@@ -50,7 +50,6 @@
 #include "flightstatus.h"
 #include "manualcontrolsettings.h"
 #include "flightmodesettings.h"
-#include "manualcontrol.h" // Just to get a macro
 #include "taskinfo.h"
 
 // Math libraries
@@ -669,7 +668,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
             }
         }
 
-        if (PARSE_FLIGHT_MODE(flightStatus.FlightMode) != FLIGHTMODE_MANUAL) {
+        if (flightStatus.ControlChain.Stabilization == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
             ActuatorDesiredSet(&actuatorDesired);
         } else {
             // Force all axes to reinitialize when engaged

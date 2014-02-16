@@ -206,55 +206,53 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
         PathDesiredGet(&pathDesired);
 
         // Check the combinations of flightmode and pathdesired mode
-        switch (flightStatus.FlightMode) {
-        case FLIGHTSTATUS_FLIGHTMODE_LAND:
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-        case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-            if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
-                updateEndpointVelocity();
-                updateVtolDesiredAttitude(false);
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+        if (flightStatus.ControlChain.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+            if (flightStatus.ControlChain.PathPlanner == FLIGHTSTATUS_CONTROLCHAIN_FALSE) {
+                if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POI) {
+                    if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
+                        updateEndpointVelocity();
+                        updateVtolDesiredAttitude(true);
+                        updatePOIBearing();
+                    } else {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    }
+                } else {
+                    if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
+                        updateEndpointVelocity();
+                        updateVtolDesiredAttitude(false);
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    } else {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    }
+                }
             } else {
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                pathStatus.UID    = pathDesired.UID;
+                pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
+                switch (pathDesired.Mode) {
+                // TODO: Make updateVtolDesiredAttitude and velocity report success and update PATHSTATUS_STATUS accordingly
+                case PATHDESIRED_MODE_FLYENDPOINT:
+                case PATHDESIRED_MODE_FLYVECTOR:
+                case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+                case PATHDESIRED_MODE_FLYCIRCLELEFT:
+                    updatePathVelocity();
+                    updateVtolDesiredAttitude(false);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    break;
+                case PATHDESIRED_MODE_FIXEDATTITUDE:
+                    updateFixedAttitude(pathDesired.ModeParameters);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    break;
+                case PATHDESIRED_MODE_DISARMALARM:
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
+                    break;
+                default:
+                    pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    break;
+                }
+                PathStatusSet(&pathStatus);
             }
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
-            pathStatus.UID    = pathDesired.UID;
-            pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
-            switch (pathDesired.Mode) {
-            // TODO: Make updateVtolDesiredAttitude and velocity report success and update PATHSTATUS_STATUS accordingly
-            case PATHDESIRED_MODE_FLYENDPOINT:
-            case PATHDESIRED_MODE_FLYVECTOR:
-            case PATHDESIRED_MODE_FLYCIRCLERIGHT:
-            case PATHDESIRED_MODE_FLYCIRCLELEFT:
-                updatePathVelocity();
-                updateVtolDesiredAttitude(false);
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
-                break;
-            case PATHDESIRED_MODE_FIXEDATTITUDE:
-                updateFixedAttitude(pathDesired.ModeParameters);
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
-                break;
-            case PATHDESIRED_MODE_DISARMALARM:
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
-                break;
-            default:
-                pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
-                break;
-            }
-            PathStatusSet(&pathStatus);
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_POI:
-            if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
-                updateEndpointVelocity();
-                updateVtolDesiredAttitude(true);
-                updatePOIBearing();
-            } else {
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
-            }
-            break;
-        default:
+        } else {
             // Be cleaner and get rid of global variables
             northVelIntegral = 0;
             eastVelIntegral  = 0;
@@ -267,8 +265,6 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
             StabilizationDesiredData stabDesired;
             StabilizationDesiredGet(&stabDesired);
             thrustOffset = stabDesired.Thrust;
-
-            break;
         }
 
         AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);

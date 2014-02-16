@@ -181,52 +181,50 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
 
         uint8_t result;
         // Check the combinations of flightmode and pathdesired mode
-        switch (flightStatus.FlightMode) {
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-        case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-            if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
-                updatePathVelocity();
-                result = updateFixedDesiredAttitude();
-                if (result) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+        if (flightStatus.ControlChain.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+            if (flightStatus.ControlChain.PathPlanner == FLIGHTSTATUS_CONTROLCHAIN_FALSE) {
+                if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
+                    updatePathVelocity();
+                    result = updateFixedDesiredAttitude();
+                    if (result) {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    } else {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+                    }
                 } else {
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
                 }
             } else {
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
-            }
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
-            pathStatus.UID    = pathDesired.UID;
-            pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
-            switch (pathDesired.Mode) {
-            case PATHDESIRED_MODE_FLYENDPOINT:
-            case PATHDESIRED_MODE_FLYVECTOR:
-            case PATHDESIRED_MODE_FLYCIRCLERIGHT:
-            case PATHDESIRED_MODE_FLYCIRCLELEFT:
-                updatePathVelocity();
-                result = updateFixedDesiredAttitude();
-                if (result) {
+                pathStatus.UID    = pathDesired.UID;
+                pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
+                switch (pathDesired.Mode) {
+                case PATHDESIRED_MODE_FLYENDPOINT:
+                case PATHDESIRED_MODE_FLYVECTOR:
+                case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+                case PATHDESIRED_MODE_FLYCIRCLELEFT:
+                    updatePathVelocity();
+                    result = updateFixedDesiredAttitude();
+                    if (result) {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    } else {
+                        pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+                    }
+                    break;
+                case PATHDESIRED_MODE_FIXEDATTITUDE:
+                    updateFixedAttitude(pathDesired.ModeParameters);
                     AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
-                } else {
+                    break;
+                case PATHDESIRED_MODE_DISARMALARM:
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
+                    break;
+                default:
                     pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    break;
                 }
-                break;
-            case PATHDESIRED_MODE_FIXEDATTITUDE:
-                updateFixedAttitude(pathDesired.ModeParameters);
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
-                break;
-            case PATHDESIRED_MODE_DISARMALARM:
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
-                break;
-            default:
-                pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
-                break;
             }
-            break;
-        default:
+        } else {
             // Be cleaner and get rid of global variables
             northVelIntegral = 0;
             eastVelIntegral  = 0;
@@ -234,8 +232,6 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
             courseIntegral   = 0;
             speedIntegral    = 0;
             powerIntegral    = 0;
-
-            break;
         }
         PathStatusSet(&pathStatus);
     }

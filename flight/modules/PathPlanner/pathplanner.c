@@ -138,7 +138,7 @@ static void pathPlannerTask()
 
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);
-    if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
+    if (flightStatus.ControlChain.PathPlanner != FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
         pathplanner_active = false;
         if (!validPathPlan) {
             // unverified path plans are only a warning while we are not in pathplanner mode

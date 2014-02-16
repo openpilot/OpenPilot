@@ -167,6 +167,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
     MixerStatusData mixerStatus;
     FlightStatusData flightStatus;
     SystemSettingsThrustControlOptions thrustType;
+    SystemSettingsAllowReverseThrottleOptions noClamping;
     float throttleDesired;
     float collectiveDesired;
 
@@ -224,6 +225,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         ActuatorDesiredGet(&desired);
         ActuatorCommandGet(&command);
         SystemSettingsThrustControlGet(&thrustType);
+        SystemSettingsAllowReverseThrottleGet(&noClamping);
 
         // read in throttle and collective -demultiplex thrust
         switch (thrustType) {
@@ -238,6 +240,10 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         default:
             ManualControlCommandThrottleGet(&throttleDesired);
             ManualControlCommandCollectiveGet(&collectiveDesired);
+        }
+
+        if (noClamping == SYSTEMSETTINGS_ALLOWREVERSETHROTTLE_FALSE) {
+            throttleDesired = (throttleDesired < 0) ? -1 : throttleDesired;
         }
 
 #ifdef DIAG_MIXERSTATUS

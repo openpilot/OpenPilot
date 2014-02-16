@@ -4,9 +4,25 @@
         <field name="AirframeType" units="" type="enum" elements="1" options="FixedWing,FixedWingElevon,FixedWingVtail,VTOL,HeliCP,QuadX,QuadP,Hexa,Octo,Custom,HexaX,OctoV,OctoCoaxP,OctoCoaxX,HexaCoax,Tri,GroundVehicleCar,GroundVehicleDifferential,GroundVehicleMotorcycle" defaultvalue="QuadX"/>
 	<field name="ThrustControl" units="" type="enum" elements="1" options="Throttle,Collective,None" defaultvalue="Throttle" />
 		<!-- Which way the vehicle controls its thrust. Can be through
-			"Throttle" (quadcopter, simple brushless planes, car-type ground vehicles)
-			"Collective" (collective pitch as in most helicopters, 3d quads, constant RPM variable pitch airplanes, and ground vehicles with diesel-electric locomotion)
-			"None" (craft has neither engines nor dynamic brakes. Note that a glider with breaking flaps should likely use "collective" and use the collective channel to control the brakes for optimum autopilot performance) -->
+			"Throttle" (quadcopter, simple brushless planes,
+			  car-type ground vehicles)
+			"Collective" (collective pitch as in most
+			  helicopters, 3d quads, constant RPM variable pitch
+			  airplanes, and ground vehicles with diesel-electric
+			  locomotion)
+			"None" (craft has neither engines nor dynamic brakes.
+			  Note that a glider with breaking flaps should likely
+			  use "collective" and use the collective channel to
+			  control the brakes for optimum autopilot performance)
+		-->
+	<field name="AllowReverseThrottle" units="bool" type="enum" elements="1" options="false,true" defaultvalue="false" />
+		<!-- on quadcopters and most other craft, throttle can only be
+		     positive. Negative throttles are treated as an emergency
+		     cutoff and will set the actuator to the minimum configured
+		     value. On a ground vehicle or other craft that can spin
+		     propellers 'both ways' however this minimum value would be
+		     'full reverese' and it's 'save' value is at neutral.
+		     Therefore no "throttle clamping" takes place! -->
         <field name="GUIConfigData" units="bits" type="uint32" elements="4" defaultvalue="0"/>
         <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="30"/>
                 <!-- Vne, i.e. maximum airspeed the airframe can handle - used by autopilot, actuator compensation. as well as possibly by INS for plausibility checks -->

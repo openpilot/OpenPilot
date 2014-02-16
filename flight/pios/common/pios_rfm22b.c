@@ -2228,7 +2228,7 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
                 // Stay on the sync channel.
                 idx = 0;
             }
-        } else if (idx == 0) {
+        } else if (idx == 0 && rfm22_isCoordinator(rfm22b_dev)) {
             // If we're switching to the sync channel, set a flag that can be used to detect if a packet was received.
             rfm22b_dev->on_sync_channel = true;
         }

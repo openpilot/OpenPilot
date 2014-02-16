@@ -11,6 +11,7 @@
 			<elementname>CallbackScheduler3</elementname>
 			<!-- fligth -->
 			<elementname>ManualControl</elementname>
+			<elementname>Receiver</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>Actuator</elementname>
 			<elementname>Sensors</elementname>
@@ -45,6 +46,7 @@
 			<elementname>CallbackScheduler3</elementname>
 			<!-- fligth -->
 			<elementname>ManualControl</elementname>
+			<elementname>Receiver</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>Actuator</elementname>
 			<elementname>Sensors</elementname>
@@ -83,6 +85,7 @@
 			<elementname>CallbackScheduler3</elementname>
 			<!-- fligth -->
 			<elementname>ManualControl</elementname>
+			<elementname>Receiver</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>Actuator</elementname>
 			<elementname>Sensors</elementname>

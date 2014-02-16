@@ -35,7 +35,7 @@ install:
 	# Add here commands to install the package into debian/<packagename>
 	cp -arp build/openpilotgcs_release/bin   debian/openpilot/usr/local/OpenPilot
 	cp -arp build/openpilotgcs_release/lib   debian/openpilot/usr/local/OpenPilot
-	cp -arp build/openpilotgcs_release/share debian/openpilot/usr/local/OpenPilot
+	cp -arp build/openpilotgcs_release/share debian/openpilot/usr/local/OpenPilot     
 	cp -arp build/openpilotgcs_release/.obj  debian/openpilot/usr/local/OpenPilot
 	cp -arp package/linux/qt.conf debian/openpilot/usr/local/OpenPilot/bin
 	cp -arp package/linux/openpilot.desktop debian/openpilot/usr/share/applications

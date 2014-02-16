@@ -32,6 +32,7 @@
 
 #ifdef PIOS_INCLUDE_MS5611
 
+#define POW2(x) (1 << x)
 
 // TODO: Clean this up.  Getting around old constant.
 #define PIOS_MS5611_OVERSAMPLING oversampling
@@ -166,7 +167,6 @@ uint32_t PIOS_MS5611_GetDelayUs()
 
 /**
  * Read the ADC conversion value (once ADC conversion has completed)
- * \param[in] PresOrTemp BMP085_PRES_ADDR or BMP085_TEMP_ADDR
  * \return 0 if successfully read the ADC, -1 if failed
  */
 int32_t PIOS_MS5611_ReadADC(void)
@@ -190,9 +190,12 @@ int32_t PIOS_MS5611_ReadADC(void)
         }
 
         RawTemperature = (Data[0] << 16) | (Data[1] << 8) | Data[2];
-
-        deltaTemp = ((int32_t)RawTemperature) - (CalibData.C[4] << 8);
-        Temperature    = 2000l + ((deltaTemp * CalibData.C[5]) >> 23);
+        // Difference between actual and reference temperature
+        // dT = D2 - TREF = D2 - C5 * 2^8
+        deltaTemp   = ((int32_t)RawTemperature) - (CalibData.C[4] * POW2(8));
+        // Actual temperature (-40…85°C with 0.01°C resolution)
+        // TEMP = 20°C + dT * TEMPSENS = 2000 + dT * C6 / 2^23
+        Temperature = 2000l + ((deltaTemp * CalibData.C[5]) / POW2(23));
     } else {
         int64_t Offset;
         int64_t Sens;
@@ -206,14 +209,22 @@ int32_t PIOS_MS5611_ReadADC(void)
         }
         // check if temperature is less than 20°C
         if (Temperature < 2000) {
-            Offset2 = 5 * (Temperature - 2000) >> 1;
-            Sens2   = Offset2 >> 1;
+            // Apply compensation
+            // T2 = dT^2 / 2^31
+            // OFF2 = 5 ⋅ (TEMP – 2000)^2/2
+            // SENS2 = 5 ⋅ (TEMP – 2000)^2/2^2
+
+            int64_t tcorr = (Temperature - 2000) * (Temperature - 2000);
+            Offset2 = (5 * tcorr) / 2;
+            Sens2   = (5 * tcorr) / 4;
             compensation_t2 = (deltaTemp * deltaTemp) >> 31;
             // Apply the "Very low temperature compensation" when temp is less than -15°C
             if (Temperature < -1500) {
-                int64_t tcorr = (Temperature + 1500) * (Temperature + 1500);
-                Offset2 += 7 * tcorr;
-                Sens2   += (11 * tcorr) >> 1;
+                // OFF2 = OFF2 + 7 ⋅ (TEMP + 1500)^2
+                // SENS2 = SENS2 + 11 ⋅ (TEMP + 1500)^2 / 2
+                int64_t tcorr2 = (Temperature + 1500) * (Temperature + 1500);
+                Offset2 += 7 * tcorr2;
+                Sens2   += (11 * tcorr2) / 2;
             }
         } else {
             compensation_t2 = 0;
@@ -221,10 +232,15 @@ int32_t PIOS_MS5611_ReadADC(void)
             Sens2 = 0;
         }
         RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]);
-        Offset   = (((int64_t)CalibData.C[1]) << 16) + ((((int64_t)CalibData.C[3]) * deltaTemp) >> 7) - Offset2;
-        Sens     = ((int64_t)CalibData.C[0]) << 15;
-        Sens     = Sens + ((((int64_t)CalibData.C[2]) * deltaTemp) >> 8) - Sens2;
-        Pressure = (((((int64_t)RawPressure) * Sens) >> 21) - Offset) >> 15;
+        // Offset at actual temperature
+        // OFF = OFFT1 + TCO * dT = C2 * 2^16 + (C4 * dT) / 2^7
+        Offset   = ((int64_t)CalibData.C[1]) * POW2(16) + (((int64_t)CalibData.C[3]) * deltaTemp) / POW2(7) - Offset2;
+        // Sensitivity at actual temperature
+        // SENS = SENST1 + TCS * dT = C1 * 2^15 + (C3 * dT) / 2^8
+        Sens     = ((int64_t)CalibData.C[0]) * POW2(15) + (((int64_t)CalibData.C[2]) * deltaTemp) / POW2(8) - Sens2;
+        // Temperature compensated pressure (10…1200mbar with 0.01mbar resolution)
+        // P = D1 * SENS - OFF = (D1 * SENS / 2^21 - OFF) / 2^15
+        Pressure = (((((int64_t)RawPressure) * Sens) / POW2(21)) - Offset) / POW2(15);
     }
     return 0;
 }

@@ -104,7 +104,7 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
             ++index;
         }
 
-        m_defaultToolBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+        m_defaultToolBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
         m_activeToolBar = m_defaultToolBar;
 
         QHBoxLayout *toolBarLayout = new QHBoxLayout(m_toolBar);
@@ -115,7 +115,7 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         m_toolBar->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::MinimumExpanding);
 
         QWidget *spacerWidget = new QWidget(this);
-        spacerWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+        spacerWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         m_activeLabel->setTextFormat(Qt::RichText);
         m_activeLabel->setText("<font color=red><b>" + tr("Active") + "</b></font>");
@@ -124,9 +124,10 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         m_closeButton->setIcon(QIcon(":/core/images/closebutton.png"));
 
         m_top = new Utils::StyledBar(this);
+        m_top->setMaximumHeight(35);
         QHBoxLayout *toplayout = new QHBoxLayout(m_top);
-        toplayout->setSpacing(0);
-        toplayout->setMargin(0);
+        toplayout->setSpacing(4);
+        toplayout->setMargin(4);
         toplayout->addWidget(m_uavGadgetList);
         toplayout->addWidget(m_toolBar); // Custom toolbar stretches
         toplayout->addWidget(spacerWidget);

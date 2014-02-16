@@ -83,12 +83,13 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         InputChannelForm *inpForm = new InputChannelForm(this, index == 0);
         ui->channelSettings->layout()->addWidget(inpForm); // Add the row to the UI
         inpForm->setName(name);
-        addWidgetBinding("ManualControlSettings", "ChannelGroups", inpForm->ui->channelGroup, index);
-        addWidgetBinding("ManualControlSettings", "ChannelNumber", inpForm->ui->channelNumber, index);
 
-        // The order of the following three binding calls is important. Since the values will be populated
+        // The order of the following binding calls is important. Since the values will be populated
         // in reverse order of the binding order otherwise the 'Reversed' logic will floor the neutral value
-        // to the max value ( which is smaller than the neutral value when reversed )
+        // to the max value ( which is smaller than the neutral value when reversed ) and the channel number
+        // will not be set correctly.
+        addWidgetBinding("ManualControlSettings", "ChannelNumber", inpForm->ui->channelNumber, index);
+        addWidgetBinding("ManualControlSettings", "ChannelGroups", inpForm->ui->channelGroup, index);
         addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->channelNeutral, index);
         addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->neutralValue, index);
         addWidgetBinding("ManualControlSettings", "ChannelMin", inpForm->ui->channelMin, index);

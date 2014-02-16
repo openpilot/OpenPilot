@@ -91,6 +91,7 @@ UAVOBJSRCFILENAMES += systemalarms
 UAVOBJSRCFILENAMES += systemsettings
 UAVOBJSRCFILENAMES += systemstats
 UAVOBJSRCFILENAMES += taskinfo
+UAVOBJSRCFILENAMES += callbackinfo
 UAVOBJSRCFILENAMES += velocitystate
 UAVOBJSRCFILENAMES += velocitydesired
 UAVOBJSRCFILENAMES += watchdogstatus

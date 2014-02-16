@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       callbackscheduler.c
+ * @file       pios_callbackscheduler.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @brief      Scheduler to run callback functions from a shared context with given priorities.
  *
@@ -24,13 +24,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <openpilot.h>
+#include <pios.h>
+#ifdef PIOS_INCLUDE_CALLBACKSCHEDULER
 
+#include <utlist.h>
+#include <uavobjectmanager.h>
 #include <taskinfo.h>
 
 // Private constants
-#define STACK_SIZE 128
-#define MAX_SLEEP  1000
+#define STACK_SAFETYCOUNT 16
+#define STACK_SIZE        (384 + STACK_SAFETYSIZE)
+#define STACK_SAFETYSIZE  8
+#define MAX_SLEEP         1000
 
 // Private types
 /**
@@ -52,8 +57,15 @@ struct DelayedCallbackTaskStruct {
  */
 struct DelayedCallbackInfoStruct {
     DelayedCallback   cb;
+    int16_t callbackID;
     bool volatile     waiting;
     uint32_t volatile scheduletime;
+    uint32_t stackSize;
+    int32_t  stackFree;
+    int32_t  stackNotFree;
+    uint16_t stackSafetyCount;
+    uint16_t currentSafetyCount;
+    uint32_t runCount;
     struct DelayedCallbackTaskStruct *task;
     struct DelayedCallbackInfoStruct *next;
 };
@@ -73,7 +85,7 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
  * must be called before any other functions are called
  * \return Success (0), failure (-1)
  */
-int32_t CallbackSchedulerInitialize()
+int32_t PIOS_CALLBACKSCHEDULER_Initialize()
 {
     // Initialize variables
     schedulerTasks   = NULL;
@@ -99,7 +111,7 @@ int32_t CallbackSchedulerInitialize()
  * they can be marked for later execution by executing the dispatch function.
  * \return Success (0), failure (-1)
  */
-int32_t CallbackSchedulerStart()
+int32_t PIOS_CALLBACKSCHEDULER_Start()
 {
     xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
@@ -113,7 +125,7 @@ int32_t CallbackSchedulerStart()
         xTaskCreate(
             CallbackSchedulerTask,
             cursor->name,
-            cursor->stackSize / 4,
+            1 + (cursor->stackSize / 4),
             cursor,
             cursor->priorityTask,
             &cursor->callbackSchedulerTaskHandle
@@ -143,7 +155,7 @@ int32_t CallbackSchedulerStart()
  * UPDATEMODE_OVERRIDE: The callback will be rescheduled in any case, effectively overriding any previous schedule. (sooner+later=override)
  * \return 0: not scheduled, previous schedule takes precedence, 1: new schedule, 2: previous schedule overridden
  */
-int32_t DelayedCallbackSchedule(
+int32_t PIOS_CALLBACKSCHEDULER_Schedule(
     DelayedCallbackInfo *cbinfo,
     int32_t milliseconds,
     DelayedCallbackUpdateMode updatemode)
@@ -191,7 +203,7 @@ int32_t DelayedCallbackSchedule(
  * \param[in] cbinfo the callback handle
  * \return Success (-1), failure (0)
  */
-int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo)
+int32_t PIOS_CALLBACKSCHEDULER_Dispatch(DelayedCallbackInfo *cbinfo)
 {
     PIOS_Assert(cbinfo);
 
@@ -215,7 +227,7 @@ int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo)
  * Check the demo task for your port to find the syntax required.
  * \return Success (-1), failure (0)
  */
-int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken)
+int32_t PIOS_CALLBACKSCHEDULER_DispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken)
 {
     PIOS_Assert(cbinfo);
 
@@ -237,13 +249,17 @@ int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigh
  * \param[in] stacksize The stack requirements of the callback when called by the scheduler.
  * \return CallbackInfo Pointer on success, NULL if failed.
  */
-DelayedCallbackInfo *DelayedCallbackCreate(
+DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     DelayedCallback cb,
     DelayedCallbackPriority priority,
     DelayedCallbackPriorityTask priorityTask,
+    int16_t callbackID,
     uint32_t stacksize)
 {
     xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+    // add callback schedulers own stack requirements
+    stacksize += STACK_SIZE;
 
     // find appropriate scheduler task matching priorityTask
     struct DelayedCallbackTaskStruct *task = NULL;
@@ -271,7 +287,7 @@ DelayedCallbackInfo *DelayedCallbackCreate(
         task->name[0]      = 'C';
         task->name[1]      = 'a' + t;
         task->name[2]      = 0;
-        task->stackSize    = ((STACK_SIZE > stacksize) ? STACK_SIZE : stacksize);
+        task->stackSize    = stacksize;
         task->priorityTask = priorityTask;
         task->next = NULL;
 
@@ -285,13 +301,13 @@ DelayedCallbackInfo *DelayedCallbackCreate(
         // add to list of scheduler tasks
         LL_APPEND(schedulerTasks, task);
 
-        // Previously registered tasks are spawned when CallbackSchedulerStart() is called.
+        // Previously registered tasks are spawned when PIOS_CALLBACKSCHEDULER_Start() is called.
         // Tasks registered afterwards need to spawn upon creation.
         if (schedulerStarted) {
             xTaskCreate(
                 CallbackSchedulerTask,
                 task->name,
-                task->stackSize / 4,
+                1 + (task->stackSize / 4),
                 task,
                 task->priorityTask,
                 &task->callbackSchedulerTaskHandle
@@ -318,11 +334,18 @@ DelayedCallbackInfo *DelayedCallbackCreate(
         xSemaphoreGiveRecursive(mutex);
         return NULL; // error - not enough memory
     }
-    info->next    = NULL;
-    info->waiting = false;
-    info->scheduletime = 0;
-    info->task    = task;
+    info->next               = NULL;
+    info->waiting            = false;
+    info->scheduletime       = 0;
+    info->task               = task;
     info->cb = cb;
+    info->callbackID         = callbackID;
+    info->runCount           = 0;
+    info->stackSize          = stacksize - STACK_SIZE;
+    info->stackNotFree       = info->stackSize;
+    info->stackFree          = 0;
+    info->stackSafetyCount   = STACK_SAFETYCOUNT;
+    info->currentSafetyCount = 0;
 
     // add to scheduling queue
     LL_APPEND(task->callbackQueue[priority], info);
@@ -330,6 +353,108 @@ DelayedCallbackInfo *DelayedCallbackCreate(
     xSemaphoreGiveRecursive(mutex);
 
     return info;
+}
+
+/**
+ * Iterator. Iterates over all callbacks and all scheduler tasks and retrieves information
+ *
+ * @param[in] callback  Callback function to receive the data - will be called in same task context as the callerThe id of the task the task_info refers to.
+ * @param     context   Context information optionally provided to the callback.
+ */
+void PIOS_CALLBACKSCHEDULER_ForEachCallback(CallbackSchedulerCallbackInfoCallback callback, void *context)
+{
+    if (!callback) {
+        return;
+    }
+
+    struct pios_callback_info info;
+
+    struct DelayedCallbackTaskStruct *task = NULL;
+    LL_FOREACH(schedulerTasks, task) {
+        int prio;
+
+        for (prio = 0; prio < (CALLBACK_PRIORITY_LOW + 1); prio++) {
+            struct DelayedCallbackInfoStruct *cbinfo;
+            LL_FOREACH(task->callbackQueue[prio], cbinfo) {
+                xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+                info.is_running = true;
+                info.stack_remaining    = cbinfo->stackNotFree;
+                info.running_time_count = cbinfo->runCount;
+                xSemaphoreGiveRecursive(mutex);
+                callback(cbinfo->callbackID, &info, context);
+            }
+        }
+    }
+}
+
+/**
+ * Stack magic, find how much stack is being used without affecting performance
+ */
+static void markStack(DelayedCallbackInfo *current)
+{
+    register int8_t t;
+    register int32_t halfWayMark;
+    volatile unsigned char *marker;
+
+    if (current->stackNotFree < 0) {
+        return;
+    }
+
+    // end of stack watermark
+    marker = (unsigned char *)(((size_t)&marker) - (size_t)current->stackSize);
+    for (t = -STACK_SAFETYSIZE; t < 0; t++) {
+        *(marker + t) = '#';
+    }
+    // shifted watermarks
+    halfWayMark = current->stackFree + (current->stackNotFree - current->stackFree) / 2;
+    marker = (unsigned char *)((size_t)marker + halfWayMark);
+    for (t = -STACK_SAFETYSIZE; t < 0; t++) {
+        *(marker + t) = '#';
+    }
+}
+static void checkStack(DelayedCallbackInfo *current)
+{
+    register int8_t t;
+    register int32_t halfWayMark;
+    volatile unsigned char *marker;
+
+    if (current->stackNotFree < 0) {
+        return;
+    }
+
+    // end of stack watermark
+    marker = (unsigned char *)(((size_t)&marker) - (size_t)current->stackSize);
+    for (t = -STACK_SAFETYSIZE; t < 0; t++) {
+        if (*(marker + t) != '#') {
+            current->stackNotFree = -1; // stack overflow, disable all further checks
+            return;
+        }
+    }
+    // shifted watermarks
+    halfWayMark = current->stackFree + (current->stackNotFree - current->stackFree) / 2;
+    marker = (unsigned char *)((size_t)marker + halfWayMark);
+    for (t = -STACK_SAFETYSIZE; t < 0; t++) {
+        if (*(marker + t) != '#') {
+            current->stackNotFree = halfWayMark; // tainted mark, this place is definitely used stack
+            current->currentSafetyCount = 0;
+            if (current->stackNotFree <= current->stackFree) {
+                current->stackFree = 0; // if it was supposed to be free, restart search between here and bottom of stack
+            }
+            return;
+        }
+    }
+
+    if (current->currentSafetyCount < 0xffff) {
+        current->currentSafetyCount++; // mark has not been tainted, increase safety counter
+    }
+    if (current->currentSafetyCount >= current->stackSafetyCount) { // if the safety counter is above the limit, then
+        if (halfWayMark == current->stackFree) { // check if search already converged, if so increase the limit to find very rare stack usage incidents
+            current->stackSafetyCount = current->currentSafetyCount;
+        } else {
+            current->stackFree = halfWayMark; // otherwise just mark this position as free stack to narrow search
+            current->currentSafetyCount = 0;
+        }
+    }
 }
 
 /**
@@ -384,7 +509,16 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
                 current->scheduletime = 0; // any schedules are reset
                 current->waiting = false; // the flag is reset just before execution.
                 xSemaphoreGiveRecursive(mutex);
+
+                /* callback gets invoked here - check stack sizes */
+                markStack(current);
+
                 current->cb(); // call the callback
+
+                checkStack(current);
+
+                current->runCount++;
+
                 return 0;
             }
             xSemaphoreGiveRecursive(mutex);
@@ -411,3 +545,5 @@ static void CallbackSchedulerTask(void *task)
         }
     }
 }
+
+#endif // ifdef PIOS_INCLUDE_CALLBACKSCHEDULER

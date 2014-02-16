@@ -70,7 +70,6 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/accessorydesired.c
@@ -113,6 +112,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/relaytuningsettings.c
     SRC += $(OPUAVSYNTHDIR)/relaytuning.c
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+    SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/ratedesired.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c

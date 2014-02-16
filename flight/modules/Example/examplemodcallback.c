@@ -45,6 +45,7 @@
  */
 
 #include "openpilot.h"
+#include "callbackinfo.h" // object needed for callback id macro CALLBACKINFO_RUNNING_<MODULENAME>
 #include "exampleobject1.h" // object the module will listen for updates (input)
 #include "exampleobject2.h" // object the module will update (output)
 #include "examplesettings.h" // object holding module settings (input)
@@ -71,7 +72,7 @@ int32_t ExampleModCallbackInitialize()
     // Listen for ExampleObject1 updates, connect a callback function
     ExampleObject1ConnectCallback(&ObjectUpdatedCb);
 
-    cbinfo = DelayedCallbackCreate(&DelayedCb, CALLBACK_PRIORITY, CBTASK_PRIORITY, STACK_SIZE);
+    cbinfo = PIOS_CALLBACKSCHEDULER_Create(&DelayedCb, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_EXAMPLE, STACK_SIZE);
 
     return 0;
 }
@@ -85,11 +86,11 @@ int32_t ExampleModCallbackInitialize()
  */
 static void ObjectUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    DelayedCallbackDispatch(cbinfo);
+    PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo);
 }
 
 /**
- * This function is called by the DelayedCallbackScheduler when its execution
+ * This function is called by the PIOS_CALLBACKSCHEDULER_Scheduler when its execution
  * has been requested.  Callbacks scheduled for execution are executed in the
  * same thread in a round robin fashion. The Dispatch function to reschedule
  * execution can be called from within the Callback itself, in which case the
@@ -135,5 +136,5 @@ ExampleObject2Set(&data2);
 
 // call the module again 10 seconds later,
 // even if the exampleobject has not been updated
-DelayedCallbackSchedule(cbinfo, 10 * 1000, CALLBACK_UPDATEMODE_NONE);
+PIOS_CALLBACKSCHEDULER_Schedule(cbinfo, 10 * 1000, CALLBACK_UPDATEMODE_NONE);
 }

@@ -103,6 +103,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/i2cstats.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterysettings.h \
     $$UAVOBJECT_SYNTHETICS/taskinfo.h \
+    $$UAVOBJECT_SYNTHETICS/callbackinfo.h \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.h \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.h \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.h \
@@ -202,6 +203,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/i2cstats.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterysettings.cpp \
     $$UAVOBJECT_SYNTHETICS/taskinfo.cpp \
+    $$UAVOBJECT_SYNTHETICS/callbackinfo.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.cpp \

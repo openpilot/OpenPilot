@@ -1,0 +1,40 @@
+<xml>
+    <object name="CallbackInfo" singleinstance="true" settings="false" category="System">
+        <description>Task information</description>
+        <field name="StackRemaining" units="bytes" type="int16">
+		<elementnames>
+			<elementname>EventDispatcher</elementname>
+			<elementname>StateEstimation</elementname>
+			<elementname>AltitudeHold</elementname>
+			<elementname>PathPlanner0</elementname>
+			<elementname>PathPlanner1</elementname>
+		</elementnames>
+	</field> 
+	<field name="Running" units="bool" type="enum">
+		<elementnames>
+			<elementname>EventDispatcher</elementname>
+			<elementname>StateEstimation</elementname>
+			<elementname>AltitudeHold</elementname>
+			<elementname>PathPlanner0</elementname>
+			<elementname>PathPlanner1</elementname>
+		</elementnames>
+		<options>
+			<option>False</option>
+			<option>True</option>
+		</options>
+	</field>
+	<field name="RunningTime" units="#" type="uint32">
+		<elementnames>
+			<elementname>EventDispatcher</elementname>
+			<elementname>StateEstimation</elementname>
+			<elementname>AltitudeHold</elementname>
+			<elementname>PathPlanner0</elementname>
+			<elementname>PathPlanner1</elementname>
+		</elementnames>
+	</field> 
+        <access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="onchange" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="10000"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

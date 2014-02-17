@@ -31,6 +31,8 @@
 
 #include "inc/stateestimation.h"
 
+#include <callbackinfo.h>
+
 #include <gyrosensor.h>
 #include <accelsensor.h>
 #include <magsensor.h>
@@ -266,7 +268,7 @@ int32_t StateEstimationInitialize(void)
     stack_required = maxint32_t(stack_required, filterEKF13iInitialize(&ekf13iFilter));
     stack_required = maxint32_t(stack_required, filterEKF13Initialize(&ekf13Filter));
 
-    stateEstimationCallback = DelayedCallbackCreate(&StateEstimationCb, CALLBACK_PRIORITY, TASK_PRIORITY, stack_required);
+    stateEstimationCallback = PIOS_CALLBACKSCHEDULER_Create(&StateEstimationCb, CALLBACK_PRIORITY, TASK_PRIORITY, CALLBACKINFO_RUNNING_STATEESTIMATION, stack_required);
 
     return 0;
 }
@@ -305,7 +307,7 @@ static void StateEstimationCb(void)
     // after system startup, first few sensor readings might be messed up, delay until everything has settled
     if (bootDelay) {
         bootDelay--;
-        DelayedCallbackSchedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
+        PIOS_CALLBACKSCHEDULER_Schedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
         return;
     }
 
@@ -388,7 +390,7 @@ static void StateEstimationCb(void)
 
         // we are not done, re-dispatch self execution
         runState = RUNSTATE_FILTER;
-        DelayedCallbackDispatch(stateEstimationCallback);
+        PIOS_CALLBACKSCHEDULER_Dispatch(stateEstimationCallback);
         break;
 
     case RUNSTATE_FILTER:
@@ -405,7 +407,7 @@ static void StateEstimationCb(void)
         if (!current) {
             runState = RUNSTATE_SAVE;
         }
-        DelayedCallbackDispatch(stateEstimationCallback);
+        PIOS_CALLBACKSCHEDULER_Dispatch(stateEstimationCallback);
         break;
 
     case RUNSTATE_SAVE:
@@ -458,9 +460,9 @@ static void StateEstimationCb(void)
         // we are done, re-schedule next self execution
         runState = RUNSTATE_LOAD;
         if (updatedSensors) {
-            DelayedCallbackDispatch(stateEstimationCallback);
+            PIOS_CALLBACKSCHEDULER_Dispatch(stateEstimationCallback);
         } else {
-            DelayedCallbackSchedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
+            PIOS_CALLBACKSCHEDULER_Schedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
         }
         break;
     }
@@ -513,7 +515,7 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
         updatedSensors |= SENSORUPDATES_airspeed;
     }
 
-    DelayedCallbackDispatch(stateEstimationCallback);
+    PIOS_CALLBACKSCHEDULER_Dispatch(stateEstimationCallback);
 }
 
 

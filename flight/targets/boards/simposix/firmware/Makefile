@@ -85,7 +85,6 @@ SRC += $(FLIGHTLIB)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(OPUAVOBJ)/callbackscheduler.c
 SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
@@ -101,6 +100,7 @@ SRC += $(MATHLIB)/pid.c
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
 SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
 SRC += $(PIOSCORECOMMON)/pios_debuglog.c
+SRC += $(PIOSCORECOMMON)/pios_callbackscheduler.c
 SRC += $(PIOSCORECOMMON)/pios_deltatime.c
 
 ## PIOS Hardware

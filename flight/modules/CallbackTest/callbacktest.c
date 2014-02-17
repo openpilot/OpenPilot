@@ -65,13 +65,13 @@ int32_t CallbackTestInitialize()
 {
     mutex     = xSemaphoreCreateRecursiveMutex();
 
-    cbinfo[0] = DelayedCallbackCreate(&DelayedCb0, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[1] = DelayedCallbackCreate(&DelayedCb1, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[2] = DelayedCallbackCreate(&DelayedCb2, CALLBACK_PRIORITY_CRITICAL, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[3] = DelayedCallbackCreate(&DelayedCb3, CALLBACK_PRIORITY_CRITICAL, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[4] = DelayedCallbackCreate(&DelayedCb4, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[5] = DelayedCallbackCreate(&DelayedCb5, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, STACK_SIZE);
-    cbinfo[6] = DelayedCallbackCreate(&DelayedCb6, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 20, STACK_SIZE);
+    cbinfo[0] = PIOS_CALLBACKSCHEDULER_Create(&DelayedCb0, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[1] = PIOS_CALLBACKSCHEDULER_Create(&DelayedCb1, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[2] = PIOS_CALLBACKSCHEDULER_Create(&DelayedCb2, CALLBACK_PRIORITY_CRITICAL, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[3] = PIOS_CALLBACKSCHEDULER_Create(&DelayedCb3, CALLBACK_PRIORITY_CRITICAL, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[4] = PIOS_CALLBACKSCHEDULER_Create(&DelayedCb4, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[5] = PIOS_CALLBACKSCHEDULER_Create(&DelayedCb5, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 2, -1, STACK_SIZE);
+    cbinfo[6] = PIOS_CALLBACKSCHEDULER_Create(&DelayedCb6, CALLBACK_PRIORITY_LOW, tskIDLE_PRIORITY + 20, -1, STACK_SIZE);
 
 
     return 0;
@@ -79,22 +79,22 @@ int32_t CallbackTestInitialize()
 int32_t CallbackTestStart()
 {
     xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-    DelayedCallbackDispatch(cbinfo[3]);
-    DelayedCallbackDispatch(cbinfo[2]);
-    DelayedCallbackDispatch(cbinfo[1]);
-    DelayedCallbackDispatch(cbinfo[0]);
+    PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[3]);
+    PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[2]);
+    PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[1]);
+    PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[0]);
     // different callback priorities within a taskpriority
-    DelayedCallbackSchedule(cbinfo[4], 30000, CALLBACK_UPDATEMODE_NONE);
-    DelayedCallbackSchedule(cbinfo[4], 5000, CALLBACK_UPDATEMODE_OVERRIDE);
-    DelayedCallbackSchedule(cbinfo[4], 4000, CALLBACK_UPDATEMODE_SOONER);
-    DelayedCallbackSchedule(cbinfo[4], 10000, CALLBACK_UPDATEMODE_SOONER);
-    DelayedCallbackSchedule(cbinfo[4], 1000, CALLBACK_UPDATEMODE_LATER);
-    DelayedCallbackSchedule(cbinfo[4], 4800, CALLBACK_UPDATEMODE_LATER);
-    DelayedCallbackSchedule(cbinfo[4], 48000, CALLBACK_UPDATEMODE_NONE);
+    PIOS_CALLBACKSCHEDULER_Schedule(cbinfo[4], 30000, CALLBACK_UPDATEMODE_NONE);
+    PIOS_CALLBACKSCHEDULER_Schedule(cbinfo[4], 5000, CALLBACK_UPDATEMODE_OVERRIDE);
+    PIOS_CALLBACKSCHEDULER_Schedule(cbinfo[4], 4000, CALLBACK_UPDATEMODE_SOONER);
+    PIOS_CALLBACKSCHEDULER_Schedule(cbinfo[4], 10000, CALLBACK_UPDATEMODE_SOONER);
+    PIOS_CALLBACKSCHEDULER_Schedule(cbinfo[4], 1000, CALLBACK_UPDATEMODE_LATER);
+    PIOS_CALLBACKSCHEDULER_Schedule(cbinfo[4], 4800, CALLBACK_UPDATEMODE_LATER);
+    PIOS_CALLBACKSCHEDULER_Schedule(cbinfo[4], 48000, CALLBACK_UPDATEMODE_NONE);
     // should be at 4.8 seconds after this, allowing for exactly 9 prints of the following
-    DelayedCallbackSchedule(cbinfo[5], 500, CALLBACK_UPDATEMODE_NONE);
+    PIOS_CALLBACKSCHEDULER_Schedule(cbinfo[5], 500, CALLBACK_UPDATEMODE_NONE);
     // delayed counter with 500 ms
-    DelayedCallbackDispatch(cbinfo[6]);
+    PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[6]);
     // high task prio
     xSemaphoreGiveRecursive(mutex);
     return 0;
@@ -104,28 +104,28 @@ static void DelayedCb0()
 {
     DEBUGPRINT("delayed counter low prio 0 updated: %i\n", counter[0]);
     if (++counter[0] < 10) {
-        DelayedCallbackDispatch(cbinfo[0]);
+        PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[0]);
     }
 }
 static void DelayedCb1()
 {
     DEBUGPRINT("delayed counter low prio 1 updated: %i\n", counter[1]);
     if (++counter[1] < 10) {
-        DelayedCallbackDispatch(cbinfo[1]);
+        PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[1]);
     }
 }
 static void DelayedCb2()
 {
     DEBUGPRINT("delayed counter high prio 2 updated: %i\n", counter[2]);
     if (++counter[2] < 10) {
-        DelayedCallbackDispatch(cbinfo[2]);
+        PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[2]);
     }
 }
 static void DelayedCb3()
 {
     DEBUGPRINT("delayed counter high prio 3 updated: %i\n", counter[3]);
     if (++counter[3] < 10) {
-        DelayedCallbackDispatch(cbinfo[3]);
+        PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[3]);
     }
 }
 static void DelayedCb4()
@@ -137,7 +137,7 @@ static void DelayedCb5()
 {
     DEBUGPRINT("delayed scheduled counter 5 updated: %i\n", counter[5]);
     if (++counter[5] < 10) {
-        DelayedCallbackSchedule(cbinfo[5], 500, CALLBACK_UPDATEMODE_NONE);
+        PIOS_CALLBACKSCHEDULER_Schedule(cbinfo[5], 500, CALLBACK_UPDATEMODE_NONE);
     }
     // it will likely only reach 8 due to cb4 aborting the run
 }
@@ -145,6 +145,6 @@ static void DelayedCb6()
 {
     DEBUGPRINT("delayed counter 6 (high task prio) updated: %i\n", counter[6]);
     if (++counter[6] < 10) {
-        DelayedCallbackDispatch(cbinfo[6]);
+        PIOS_CALLBACKSCHEDULER_Dispatch(cbinfo[6]);
     }
 }

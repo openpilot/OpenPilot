@@ -36,6 +36,7 @@
 
 /* Major features */
 #define PIOS_INCLUDE_FREERTOS
+#define PIOS_INCLUDE_CALLBACKSCHEDULER
 #define PIOS_INCLUDE_BL_HELPER
 
 /* Enable/Disable PiOS Modules */

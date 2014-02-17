@@ -55,7 +55,6 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     ## OSD fonts
     SRC += $(OPSYSTEM)/fonts.c
@@ -84,6 +83,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+    SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/homelocation.c
     SRC += $(OPUAVSYNTHDIR)/gpspositionsensor.c

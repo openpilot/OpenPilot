@@ -26,7 +26,7 @@
 
 #include <openpilot.h>
 
-#include <taskinfo.h>
+#include <callbackinfo.h>
 
 // Private constants
 #if defined(PIOS_EVENTDISAPTCHER_QUEUE)
@@ -103,8 +103,8 @@ int32_t EventDispatcherInitialize()
     mQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(EventCallbackInfo));
 
     // Create callback
-    eventSchedulerCallback = DelayedCallbackCreate(&eventTask, CALLBACK_PRIORITY, TASK_PRIORITY, STACK_SIZE * 4);
-    DelayedCallbackDispatch(eventSchedulerCallback);
+    eventSchedulerCallback = PIOS_CALLBACKSCHEDULER_Create(&eventTask, CALLBACK_PRIORITY, TASK_PRIORITY, CALLBACKINFO_RUNNING_EVENTDISPATCHER, STACK_SIZE * 4);
+    PIOS_CALLBACKSCHEDULER_Dispatch(eventSchedulerCallback);
 
     // Done
     return 0;
@@ -148,7 +148,7 @@ int32_t EventCallbackDispatch(UAVObjEvent *ev, UAVObjEventCallback cb)
     evInfo.queue = 0;
     // Push to queue
     int32_t result = xQueueSend(mQueue, &evInfo, 0); // will not block if queue is full
-    DelayedCallbackDispatch(eventSchedulerCallback);
+    PIOS_CALLBACKSCHEDULER_Dispatch(eventSchedulerCallback);
     return result;
 }
 
@@ -306,7 +306,7 @@ static void eventTask()
         timeToNextUpdateMs = processPeriodicUpdates();
     }
 
-    DelayedCallbackSchedule(eventSchedulerCallback, timeToNextUpdateMs - (xTaskGetTickCount() * portTICK_RATE_MS), CALLBACK_UPDATEMODE_SOONER);
+    PIOS_CALLBACKSCHEDULER_Schedule(eventSchedulerCallback, timeToNextUpdateMs - (xTaskGetTickCount() * portTICK_RATE_MS), CALLBACK_UPDATEMODE_SOONER);
 }
 
 /**

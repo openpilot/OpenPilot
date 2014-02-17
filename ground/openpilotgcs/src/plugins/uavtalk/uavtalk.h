@@ -38,6 +38,10 @@
 #include <QThread>
 #include <QtNetwork/QUdpSocket>
 
+#ifdef PROBE_UAVTALK
+class UAVTalkProbe;
+#endif
+
 class UAVTALK_EXPORT UAVTalk : public QObject {
     Q_OBJECT
 
@@ -59,6 +63,11 @@ public:
         quint32 rxSyncErrors;
         quint32 rxCrcErrors;
     } ComStats;
+
+    typedef enum {
+        STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS, STATE_COMPLETE, STATE_ERROR
+    } RxStateType;
+
 
     UAVTalk(QIODevice *iodev, UAVObjectManager *objMngr);
     ~UAVTalk();
@@ -107,11 +116,6 @@ private:
 
     static const quint8 crc_table[256];
 
-    // Types
-    typedef enum {
-        STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS, STATE_COMPLETE, STATE_ERROR
-    } RxStateType;
-
     // Variables
     QPointer<QIODevice> io;
 
@@ -146,6 +150,10 @@ private:
     QUdpSocket *udpSocketTx;
     QUdpSocket *udpSocketRx;
     QByteArray rxDataArray;
+
+#ifdef PROBE_UAVTALK
+    UAVTalkProbe *probe;
+#endif
 
     // Methods
     bool objectTransaction(quint8 type, quint32 objId, quint16 instId, UAVObject *obj);

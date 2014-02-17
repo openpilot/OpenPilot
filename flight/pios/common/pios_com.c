@@ -346,6 +346,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
  * \param[in] len buffer length
  * \return -1 if port not available
  * \return -2 if mutex can't be taken;
+ * \return -3 if data cannot be sent in the max allotted time of 5000msec
  * \return number of bytes transmitted on success
  */
 int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len)
@@ -358,7 +359,7 @@ int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len
     }
     PIOS_Assert(com_dev->has_tx);
 #if defined(PIOS_INCLUDE_FREERTOS)
-    if (xSemaphoreTake(com_dev->sendbuffer_sem, 0) != pdTRUE) {
+    if (xSemaphoreTake(com_dev->sendbuffer_sem, 5) != pdTRUE) {
         return -2;
     }
 #endif /* PIOS_INCLUDE_FREERTOS */

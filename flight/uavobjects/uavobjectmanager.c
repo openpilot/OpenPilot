@@ -1719,6 +1719,7 @@ static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType 
         .obj    = (UAVObjHandle)obj,
         .event  = triggered_event,
         .instId = instId,
+        .lowPriority = false,
     };
 
     // Go through each object and push the event message in the queue (if event is activated for the queue)

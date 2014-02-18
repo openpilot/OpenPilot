@@ -487,6 +487,7 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
     ev.obj    = obj;
     ev.instId = UAVOBJ_ALL_INSTANCES;
     ev.event  = EV_UPDATED_PERIODIC;
+    ev.lowPriority = true;
 
     ret = EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
     if (ret == -1) {
@@ -511,6 +512,7 @@ static int32_t setLoggingPeriod(UAVObjHandle obj, int32_t updatePeriodMs)
     ev.obj    = obj;
     ev.instId = UAVOBJ_ALL_INSTANCES;
     ev.event  = EV_LOGGING_PERIODIC;
+    ev.lowPriority = true;
 
     ret = EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
     if (ret == -1) {

@@ -75,6 +75,8 @@ extern void PIOS_Video_Init(const struct pios_video_cfg *cfg);
 extern void PIOS_Pixel_Init(void);
 uint16_t PIOS_Video_GetLines(void);
 uint16_t PIOS_Video_GetType(void);
+void PIOS_Video_BoundaryReset(void);
+void PIOS_Video_BoundaryLimit(uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
 
 
 // video boundary values

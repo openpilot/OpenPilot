@@ -47,6 +47,13 @@
 
 extern xSemaphoreHandle osdSemaphore;
 
+static struct pios_video_type_boundary pios_video_type_boundary_temp = {
+    .graphics_left   = 0,
+    .graphics_top    = 0,
+    .graphics_right  = 0,
+    .graphics_bottom = 0,
+};
+
 static const struct pios_video_type_boundary pios_video_type_boundary_ntsc = {
     .graphics_left   = 0,
     .graphics_top    = 0,
@@ -421,6 +428,9 @@ void PIOS_Video_Init(const struct pios_video_cfg *cfg)
 }
 
 
+/**
+ *
+ */
 void PIOS_Pixel_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -468,6 +478,33 @@ uint16_t PIOS_Video_GetLines(void)
 uint16_t PIOS_Video_GetType(void)
 {
     return video_type_act;
+}
+
+
+/**
+ *
+ */
+void PIOS_Video_BoundaryReset(void)
+{
+    if (video_type_act == VIDEO_TYPE_NTSC) {
+        pios_video_type_boundary_act = &pios_video_type_boundary_ntsc;
+    } else {
+        pios_video_type_boundary_act = &pios_video_type_boundary_pal;
+    }
+}
+
+
+/**
+ *
+ */
+void PIOS_Video_BoundaryLimit(uint16_t left, uint16_t top, uint16_t right, uint16_t bottom)
+{
+    pios_video_type_boundary_temp.graphics_left   = left   >= GRAPHICS_LEFT   ? left   : GRAPHICS_LEFT;
+    pios_video_type_boundary_temp.graphics_top    = top    >= GRAPHICS_TOP    ? top    : GRAPHICS_TOP;
+    pios_video_type_boundary_temp.graphics_right  = right  <= GRAPHICS_RIGHT  ? right  : GRAPHICS_RIGHT;
+    pios_video_type_boundary_temp.graphics_bottom = bottom <= GRAPHICS_BOTTOM ? bottom : GRAPHICS_BOTTOM;
+
+    pios_video_type_boundary_act = &pios_video_type_boundary_temp;
 }
 
 

@@ -285,11 +285,11 @@ void write_pixel(uint8_t *buff, int x, int y, int mode)
     CHECK_COORDS(x, y);
     // Determine the bit in the word to be set and the word
     // index to set it in.
-    int bitnum    = CALC_BIT_IN_WORD(x);
-    int wordnum   = CALC_BUFF_ADDR(x, y);
+    int bitnum    = CALC_BIT_IN_BYTE(x);
+    int bytenum   = CALC_BUFF_ADDR(x, y);
     // Apply a mask.
     uint16_t mask = 1 << (7 - bitnum);
-    WRITE_WORD_MODE(buff, wordnum, mask, mode);
+    WRITE_BYTE_MODE(buff, bytenum, mask, mode);
 }
 
 /**
@@ -306,12 +306,12 @@ void write_pixel_lm(int x, int y, int mmode, int lmode)
     CHECK_COORDS(x, y);
     // Determine the bit in the word to be set and the word
     // index to set it in.
-    int bitnum    = CALC_BIT_IN_WORD(x);
-    int wordnum   = CALC_BUFF_ADDR(x, y);
+    int bitnum    = CALC_BIT_IN_BYTE(x);
+    int bytenum   = CALC_BUFF_ADDR(x, y);
     // Apply the masks.
     uint16_t mask = 1 << (7 - bitnum);
-    WRITE_WORD_MODE(draw_buffer_mask, wordnum, mask, mmode);
-    WRITE_WORD_MODE(draw_buffer_level, wordnum, mask, lmode);
+    WRITE_BYTE_MODE(draw_buffer_mask, bytenum, mask, mmode);
+    WRITE_BYTE_MODE(draw_buffer_level, bytenum, mask, lmode);
 }
 
 /**
@@ -338,24 +338,23 @@ void write_hline(uint8_t *buff, int x0, int x1, int y, int mode)
      * We begin by finding the addresses of the x0 and x1 points. */
     int addr0     = CALC_BUFF_ADDR(x0, y);
     int addr1     = CALC_BUFF_ADDR(x1, y);
-    int addr0_bit = CALC_BIT_IN_WORD(x0);
-    int addr1_bit = CALC_BIT_IN_WORD(x1);
+    int addr0_bit = CALC_BIT_IN_BYTE(x0);
+    int addr1_bit = CALC_BIT_IN_BYTE(x1);
     int mask, mask_l, mask_r, i;
-    /* If the addresses are equal, we only need to write one word
-     * which is an island. */
+    /* If the addresses are equal, we only need to write one byte which is an island. */
     if (addr0 == addr1) {
         mask = COMPUTE_HLINE_ISLAND_MASK(addr0_bit, addr1_bit);
-        WRITE_WORD_MODE(buff, addr0, mask, mode);
+        WRITE_BYTE_MODE(buff, addr0, mask, mode);
     } else {
         /* Otherwise we need to write the edges and then the middle. */
         mask_l = COMPUTE_HLINE_EDGE_L_MASK(addr0_bit);
         mask_r = COMPUTE_HLINE_EDGE_R_MASK(addr1_bit);
-        WRITE_WORD_MODE(buff, addr0, mask_l, mode);
-        WRITE_WORD_MODE(buff, addr1, mask_r, mode);
-        // Now write 0xffff words from start+1 to end-1.
+        WRITE_BYTE_MODE(buff, addr0, mask_l, mode);
+        WRITE_BYTE_MODE(buff, addr1, mask_r, mode);
+        // Now write 0xff bytes from start+1 to end-1.
         for (i = addr0 + 1; i <= addr1 - 1; i++) {
             uint8_t m = 0xff;
-            WRITE_WORD_MODE(buff, i, m, mode);
+            WRITE_BYTE_MODE(buff, i, m, mode);
         }
     }
 }
@@ -431,12 +430,12 @@ void write_vline(uint8_t *buff, int x, int y0, int y1, int mode)
     int addr0  = CALC_BUFF_ADDR(x, y0);
     int addr1  = CALC_BUFF_ADDR(x, y1);
     /* Then we calculate the pixel data to be written. */
-    int bitnum = CALC_BIT_IN_WORD(x);
+    int bitnum = CALC_BIT_IN_BYTE(x);
     uint16_t mask = 1 << (7 - bitnum);
     /* Run from addr0 to addr1 placing pixels. Increment by the number
-     * of words n each graphics line. */
+     * of bytes n each graphics line. */
     for (int a = addr0; a <= addr1; a += BUFFER_WIDTH) {
-        WRITE_WORD_MODE(buff, a, mask, mode);
+        WRITE_BYTE_MODE(buff, a, mask, mode);
     }
 }
 
@@ -513,14 +512,14 @@ void write_filled_rectangle(uint8_t *buff, int x, int y, int width, int height, 
     // step these addresses through each row until we iterate `height` times.
     int addr0     = CALC_BUFF_ADDR(x, y);
     int addr1     = CALC_BUFF_ADDR(x + width, y);
-    int addr0_bit = CALC_BIT_IN_WORD(x);
-    int addr1_bit = CALC_BIT_IN_WORD(x + width);
+    int addr0_bit = CALC_BIT_IN_BYTE(x);
+    int addr1_bit = CALC_BIT_IN_BYTE(x + width);
     int mask, mask_l, mask_r, i;
-    // If the addresses are equal, we need to write one word vertically.
+    // If the addresses are equal, we need to write one byte vertically.
     if (addr0 == addr1) {
         mask = COMPUTE_HLINE_ISLAND_MASK(addr0_bit, addr1_bit);
         while (height--) {
-            WRITE_WORD_MODE(buff, addr0, mask, mode);
+            WRITE_BYTE_MODE(buff, addr0, mask, mode);
             addr0 += BUFFER_WIDTH;
         }
     } else {
@@ -532,20 +531,20 @@ void write_filled_rectangle(uint8_t *buff, int x, int y, int width, int height, 
         addr0_old = addr0;
         addr1_old = addr1;
         while (yy < height) {
-            WRITE_WORD_MODE(buff, addr0, mask_l, mode);
-            WRITE_WORD_MODE(buff, addr1, mask_r, mode);
+            WRITE_BYTE_MODE(buff, addr0, mask_l, mode);
+            WRITE_BYTE_MODE(buff, addr1, mask_r, mode);
             addr0 += BUFFER_WIDTH;
             addr1 += BUFFER_WIDTH;
             yy++;
         }
-        // Now write 0xffff words from start+1 to end-1 for each row.
+        // Now write 0xff bytes from start+1 to end-1 for each row.
         yy    = 0;
         addr0 = addr0_old;
         addr1 = addr1_old;
         while (yy < height) {
             for (i = addr0 + 1; i <= addr1 - 1; i++) {
                 uint8_t m = 0xff;
-                WRITE_WORD_MODE(buff, i, m, mode);
+                WRITE_BYTE_MODE(buff, i, m, mode);
             }
             addr0 += BUFFER_WIDTH;
             addr1 += BUFFER_WIDTH;
@@ -961,99 +960,83 @@ void write_line_outlined_dashed(int x0, int y0, int x1, int y1,
 }
 
 /**
- * write_word_misaligned: Write a misaligned word across two addresses
- * with an x offset.
- *
- * This allows for many pixels to be set in one write.
+ * write_word_misaligned: Write a misaligned word across up to three addresses with an x offset.
  *
  * @param       buff    buffer to write in
- * @param       word    word to write (16 bits)
- * @param       addr    address of first word
- * @param       xoff    x offset (0-15)
+ * @param       word    misaligned word to write (16 bits)
+ * @param       addr    address of first byte in the buffer
+ * @param       xoff    x offset (0-7)
  * @param       mode    0 = clear, 1 = set, 2 = toggle
  */
 void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode)
 {
-    int16_t firstmask = word >> xoff;
-    int16_t lastmask  = word << (16 - xoff);
-
-    WRITE_WORD_MODE(buff, addr + 1, firstmask && 0x00ff, mode);
-    WRITE_WORD_MODE(buff, addr, (firstmask & 0xff00) >> 8, mode);
-    if (xoff > 0) {
-        WRITE_WORD_MODE(buff, addr + 2, (lastmask & 0xff00) >> 8, mode);
-    }
+    WRITE_BYTE_MODE(buff, addr++, word >> (8 + xoff), mode);
+    WRITE_BYTE_MODE(buff, addr++, word >> xoff, mode);
+    if (xoff > 0) WRITE_BYTE_MODE(buff, addr, word << (8 - xoff), mode);
 }
 
 /**
- * write_word_misaligned_NAND: Write a misaligned word across two addresses
- * with an x offset, using a NAND mask.
- *
- * This allows for many pixels to be set in one write.
+ * write_word_misaligned_NAND: Write a misaligned word across up to three addresses with an x offset, using a NAND mask.
  *
  * @param       buff    buffer to write in
- * @param       word    word to write (16 bits)
- * @param       addr    address of first word
- * @param       xoff    x offset (0-15)
+ * @param       word    misaligned word to write (16 bits)
+ * @param       addr    address of first byte in the buffer
+ * @param       xoff    x offset (0-7)
  *
  * This is identical to calling write_word_misaligned with a mode of 0 but
- * it doesn't go through a lot of switch logic which slows down text writing
- * a lot.
+ * it doesn't go through a switch logic which slows down text writing.
  */
 void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff)
 {
-    uint16_t firstmask = word >> xoff;
-    uint16_t lastmask  = word << (16 - xoff);
-
-    WRITE_WORD_NAND(buff, addr + 1, firstmask & 0x00ff);
-    WRITE_WORD_NAND(buff, addr, (firstmask & 0xff00) >> 8);
-    if (xoff > 0) {
-        WRITE_WORD_NAND(buff, addr + 2, (lastmask & 0xff00) >> 8);
-    }
+    WRITE_BYTE_NAND(buff, addr++, word >> (8 + xoff));
+    WRITE_BYTE_NAND(buff, addr++, word >> xoff);
+    if (xoff > 0) WRITE_BYTE_NAND(buff, addr, word << (8 - xoff));
 }
 
 /**
- * write_word_misaligned_OR: Write a misaligned word across two addresses
- * with an x offset, using an OR mask.
- *
- * This allows for many pixels to be set in one write.
+ * write_word_misaligned_OR: Write a misaligned word across up to three addresses with an x offset, using an OR mask.
  *
  * @param       buff    buffer to write in
- * @param       word    word to write (16 bits)
- * @param       addr    address of first word
- * @param       xoff    x offset (0-15)
+ * @param       word    misaligned word to write (16 bits)
+ * @param       addr    address of first byte in the buffer
+ * @param       xoff    x offset (0-7)
  *
  * This is identical to calling write_word_misaligned with a mode of 1 but
- * it doesn't go through a lot of switch logic which slows down text writing
- * a lot.
+ * it doesn't go through a switch logic which slows down text writing.
  */
 void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff)
 {
-    uint16_t firstmask = word >> xoff;
-    uint16_t lastmask  = word << (16 - xoff);
-
-    WRITE_WORD_OR(buff, addr + 1, firstmask & 0x00ff);
-    WRITE_WORD_OR(buff, addr, (firstmask & 0xff00) >> 8);
-    if (xoff > 0) {
-        WRITE_WORD_OR(buff, addr + 2, (lastmask & 0xff00) >> 8);
-    }
+    WRITE_BYTE_OR(buff, addr++, word >> (8 + xoff));
+    WRITE_BYTE_OR(buff, addr++, word >> xoff);
+    if (xoff > 0) WRITE_BYTE_OR(buff, addr, word << (8 - xoff));
 }
 
 /**
- * write_word_misaligned_lm: Write a misaligned word across two
- * words, in both level and mask buffers. This is core to the text
- * writing routines.
+ * write_byte_misaligned_NAND: Write a misaligned byte across up to two addresses with an x offset, using a NAND mask.
  *
  * @param       buff    buffer to write in
- * @param       word    word to write (16 bits)
- * @param       addr    address of first word
- * @param       xoff    x offset (0-15)
- * @param       lmode   0 = clear, 1 = set, 2 = toggle
- * @param       mmode   0 = clear, 1 = set, 2 = toggle
+ * @param       byte    misaligned byte to write (8 bits)
+ * @param       addr    address of first byte in the buffer
+ * @param       xoff    x offset (0-7)
  */
-void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr, unsigned int xoff, int lmode, int mmode)
+void write_byte_misaligned_NAND(uint8_t *buff, uint8_t byte, unsigned int addr, unsigned int xoff)
 {
-    write_word_misaligned(draw_buffer_level, wordl, addr, xoff, lmode);
-    write_word_misaligned(draw_buffer_mask, wordm, addr, xoff, mmode);
+    WRITE_BYTE_NAND(buff, addr++, byte >> xoff);
+    if (xoff > 0) WRITE_BYTE_NAND(buff, addr, byte << (8 - xoff));
+}
+
+/**
+ * write_byte_misaligned_OR: Write a misaligned byte across up to two addresses with an x offset, using an OR mask.
+ *
+ * @param       buff    buffer to write in
+ * @param       byte    misaligned byte to write (8 bits)
+ * @param       addr    address of first byte in the buffer
+ * @param       xoff    x offset (0-7)
+ */
+void write_byte_misaligned_OR(uint8_t *buff, uint8_t byte, unsigned int addr, unsigned int xoff)
+{
+    WRITE_BYTE_OR(buff, addr++, byte >> xoff);
+    if (xoff > 0) WRITE_BYTE_OR(buff, addr, byte << (8 - xoff));
 }
 
 /**
@@ -1105,7 +1088,7 @@ void write_char16(char ch, int x, int y, int font)
 
     // Compute starting address of character
     int addr = CALC_BUFF_ADDR(x, y);
-    int wbit = CALC_BIT_IN_WORD(x);
+    int bbit = CALC_BIT_IN_BYTE(x);
 
     // If font only supports lowercase or uppercase, make the letter lowercase or uppercase
     // if (font_info.flags & FONT_LOWERCASE_ONLY) ch = tolower(ch);
@@ -1123,7 +1106,7 @@ void write_char16(char ch, int x, int y, int font)
             if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
                 if (font == 3) {
                     // mask
-                    write_word_misaligned_OR(draw_buffer_mask, font_mask12x18[row] << xshift, addr, wbit);
+                    write_word_misaligned_OR(draw_buffer_mask, font_mask12x18[row] << xshift, addr, bbit);
                     // level
                     levels   = font_frame12x18[row];
                     // if (!(flags & FONT_INVERT)) // data is normally inverted
@@ -1132,7 +1115,7 @@ void write_char16(char ch, int x, int y, int font)
                     and_mask = (font_mask12x18[row] & levels) << xshift;
                 } else {
                     // mask
-                    write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, wbit);
+                    write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, bbit);
                     // level
                     levels   = font_frame8x10[row];
                     // if (!(flags & FONT_INVERT)) // data is normally inverted
@@ -1140,10 +1123,10 @@ void write_char16(char ch, int x, int y, int font)
                     or_mask  = font_mask8x10[row] << xshift;
                     and_mask = (font_mask8x10[row] & levels) << xshift;
                 }
-                write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
+                write_word_misaligned_OR(draw_buffer_level, or_mask, addr, bbit);
                 // If we're not bold write the AND mask.
                 // if (!(flags & FONT_BOLD))
-                write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
+                write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, bbit);
             }
             addr += BUFFER_WIDTH;
             row++;
@@ -1164,7 +1147,7 @@ void write_char16(char ch, int x, int y, int font)
 void write_char(char ch, int x, int y, int flags, int font)
 {
     int yy, row, xshift;
-    uint16_t and_mask, or_mask, levels;
+    uint8_t and_mask, or_mask, levels;
     struct FontEntry font_info;
     char lookup = 0;
 
@@ -1178,8 +1161,8 @@ void write_char(char ch, int x, int y, int flags, int font)
     }
 
     // Compute starting address of character
-    unsigned int addr = CALC_BUFF_ADDR(x, y);
-    unsigned int wbit = CALC_BIT_IN_WORD(x);
+    int addr = CALC_BUFF_ADDR(x, y);
+    int bbit = CALC_BIT_IN_BYTE(x);
 
     // If font only supports lowercase or uppercase, make the letter lowercase or uppercase
     // if (font_info.flags & FONT_LOWERCASE_ONLY) ch = tolower(ch);
@@ -1189,14 +1172,14 @@ void write_char(char ch, int x, int y, int flags, int font)
     if (font_info.width <= 8) {
         // Load data pointer.
         row    = lookup * font_info.height * 2;
-        xshift = 16 - font_info.width;
+        xshift = 8 - font_info.width;
         // We can write mask words easily.
         // Level bits are more complicated. We need to set or clear level bits, but only where the mask bit is set; otherwise, we need to leave them alone.
         // To do this, for each word, we construct an AND mask and an OR mask, and apply each individually.
         for (yy = y; yy < y + font_info.height; yy++) {
             if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
                 // mask
-                write_word_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, wbit);
+                write_byte_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, bbit);
                 // level
                 levels = font_info.data[row + font_info.height];
                 if (!(flags & FONT_INVERT)) { // data is normally inverted
@@ -1204,10 +1187,10 @@ void write_char(char ch, int x, int y, int flags, int font)
                 }
                 or_mask  = font_info.data[row] << xshift;
                 and_mask = (font_info.data[row] & levels) << xshift;
-                write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
+                write_byte_misaligned_OR(draw_buffer_level, or_mask, addr, bbit);
                 // If we're not bold write the AND mask.
                 // if (!(flags & FONT_BOLD))
-                write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, wbit);
+                write_byte_misaligned_NAND(draw_buffer_level, and_mask, addr, bbit);
             }
             addr += BUFFER_WIDTH;
             row++;
@@ -1348,7 +1331,6 @@ void drawBattery(uint16_t x, uint16_t y, uint8_t battery, uint16_t size)
  * @param       max_val             maximum expected value (used to compute size of arrow ticker)
  * @param       flags               special flags (see hud.h.)
  */
-// #define VERTICAL_SCALE_BRUTE_FORCE_BLANK_OUT
 // #define VERTICAL_SCALE_FILLED_NUMBER
 void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int height, int mintick_step, int majtick_step, int mintick_len, int majtick_len,
                              int boundtick_len, __attribute__((unused)) int max_val, int flags)
@@ -1380,6 +1362,8 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     // For -(range / 2) to +(range / 2), draw the scale.
     int range_2 = range / 2; // , height_2 = height / 2;
     int r = 0, rr = 0, rv = 0, ys = 0, style = 0; // calc_ys = 0,
+    // temporary restrict boundary for smooth value shifting till call of PIOS_Video_BoundaryReset
+    PIOS_Video_BoundaryLimit(GRAPHICS_LEFT, y - (height / 2) + 1, GRAPHICS_RIGHT, y + (height / 2) - 2);
     // Iterate through each step.
     for (r = -range_2; r <= +range_2; r++) {
         style = 0;
@@ -1420,6 +1404,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
             }
         }
     }
+    PIOS_Video_BoundaryReset();
     // Generate the string for the value, as well as calculating its dimensions.
     memset(temp, ' ', 10);
     // my_itoa(v, temp);
@@ -1472,19 +1457,6 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
     } else {
         write_string(temp, xx, y, 1, 0, TEXT_VA_MIDDLE, TEXT_HA_RIGHT, 0, 0);
     }
-#ifdef VERTICAL_SCALE_BRUTE_FORCE_BLANK_OUT
-    // This is a bad brute force method destuctive to other things that maybe drawn underneath like e.g. the artificial horizon:
-    // Then, add a slow cut off on the edges, so the text doesn't sharply
-    // disappear. We simply clear the areas above and below the ticker, and we
-    // use little markers on the edges.
-    if (halign == -1) {
-        write_filled_rectangle_lm(majtick_end + text_x_spacing, y + (height / 2) - (font_info.height / 2), max_text_y - boundtick_start, font_info.height, 0, 0);
-        write_filled_rectangle_lm(majtick_end + text_x_spacing, y - (height / 2) - (font_info.height / 2), max_text_y - boundtick_start, font_info.height, 0, 0);
-    } else {
-        write_filled_rectangle_lm(majtick_end - text_x_spacing - max_text_y, y + (height / 2) - (font_info.height / 2), max_text_y, font_info.height, 0, 0);
-        write_filled_rectangle_lm(majtick_end - text_x_spacing - max_text_y, y - (height / 2) - (font_info.height / 2), max_text_y, font_info.height, 0, 0);
-    }
-#endif
     y--;
     write_hline_outlined(boundtick_start, boundtick_end, y + (height / 2), 2, 2, 0, 1);
     write_hline_outlined(boundtick_start, boundtick_end, y - (height / 2), 2, 2, 0, 1);
@@ -2352,7 +2324,6 @@ void draw_packetrxok_status(int16_t x, int16_t y, int8_t char_size, bool GCSconn
 void updateGraphics()
 {
     OsdSettingsData OsdSettings;
-
     OsdSettingsGet(&OsdSettings);
     OsdSettings2Data OsdSettings2;
     OsdSettings2Get(&OsdSettings2);
@@ -2388,10 +2359,12 @@ void updateGraphics()
     case 0:
     {
 #ifdef SIMULATE_DATA
-        static int alt = 0;
-        gpsData.Altitude    = alt++;
-        static int spd = 0;
-        gpsData.Groundspeed = spd++;
+        static float alt = 0.0f;
+        gpsData.Altitude    = alt;
+        alt += 0.1f;
+        static float spd = 0.0f;
+        gpsData.Groundspeed = spd;
+        spd += 0.01f;
 #endif
 
         static portTickType airborne = 0;
@@ -2624,10 +2597,11 @@ void updateGraphics()
 #endif
 
 #ifdef PIOS_INCLUDE_PACKETRXOK
+#define PACKETRXOK_WARN_THRESHOLD   95
         // Show PacketRxOk status data
         if (OsdSettings2.PacketRxOk) {
             PacketRxOk = PacketRxOk_read();
-            WarnMask |= (PacketRxOk < 100) ? WARN_BAD_LEDRX_PKT : 0x00;
+            WarnMask |= (PacketRxOk <= PACKETRXOK_WARN_THRESHOLD) ? WARN_BAD_LEDRX_PKT : 0x00;
             if (check_enable_and_srceen(OsdSettings2.PacketRxOk, (OsdSettingsWarningsSetupData *)&OsdSettings2.PacketRxOkSetup, screen, &x, &y)) {
                 draw_packetrxok_status(x, y, OsdSettings2.PacketRxOkSetup.CharSize, GCSconnected);
             }
@@ -2716,12 +2690,12 @@ void updateGraphics()
 #endif /* ifdef DEBUG_TELEMETRY */
 
 #ifdef DEBUG_ACCEL
+#define DEBUG_ACCEL_SENSOR
+#define DEBUG_ACCEL_STATE
 #define DEBUG_ACCEL_X   270
 #define DEBUG_ACCEL_Y    30
 #define DEBUG_ACCEL_D_X 8*7
 #define DEBUG_ACCEL_D_Y  10
-#define DEBUG_ACCEL_SENSOR
-#define DEBUG_ACCEL_STATE
         x = DEBUG_ACCEL_X;
         y = DEBUG_ACCEL_Y;
 #ifdef DEBUG_ACCEL_SENSOR
@@ -2746,7 +2720,6 @@ void updateGraphics()
         y += DEBUG_ACCEL_D_Y;
         sprintf(temp, "Z%5.2f", (double)accelState.z);
         write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-        y += DEBUG_ACCEL_D_Y;
 #endif // DEBUG_ACCEL_STATE
 #endif // DEBUG_ACCEL
 

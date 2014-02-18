@@ -44,19 +44,19 @@ int32_t osdgenInitialize(void);
 
 // Macros for computing addresses and bit positions.
 #define CALC_BUFF_ADDR(x, y) (((x) / 8) + ((y) * BUFFER_WIDTH))
-#define CALC_BIT_IN_WORD(x)  ((x) & 7)
-#define DEBUG_DELAY
-// Macro for writing a word with a mode (NAND = clear, OR = set, XOR = toggle)
-// at a given position
-#define WRITE_WORD_MODE(buff, addr, mask, mode) \
-    switch (mode) { \
-    case 0: buff[addr] &= ~mask; break; \
-    case 1: buff[addr] |= mask; break; \
-    case 2: buff[addr] ^= mask; break; }
+#define CALC_BIT_IN_BYTE(x)  ((x) & 7)
 
-#define WRITE_WORD_NAND(buff, addr, mask) { buff[addr] &= ~mask; DEBUG_DELAY; }
-#define WRITE_WORD_OR(buff, addr, mask)   { buff[addr] |= mask; DEBUG_DELAY; }
-#define WRITE_WORD_XOR(buff, addr, mask)  { buff[addr] ^= mask; DEBUG_DELAY; }
+// Macro for writing a byte with a mode (NAND = clear, OR = set, XOR = toggle) at a given position
+#define WRITE_BYTE_MODE(buff, addr, mask, mode) \
+    switch (mode) { \
+    case 0: buff[addr] &= ~(mask); break; \
+    case 1: buff[addr] |= (mask); break; \
+    case 2: buff[addr] ^= (mask); break; }
+
+// Macros for writing a byte nand, or, xor at a given position
+#define WRITE_BYTE_NAND(buff, addr, mask) { buff[addr] &= ~(mask); }
+#define WRITE_BYTE_OR(buff, addr, mask)   { buff[addr] |= (mask); }
+#define WRITE_BYTE_XOR(buff, addr, mask)  { buff[addr] ^= (mask); }
 
 // Horizontal line calculations.
 // Edge cases.
@@ -198,7 +198,9 @@ void write_line_outlined_dashed(int x0, int y0, int x1, int y1, int endcap0, int
 void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode);
 void write_word_misaligned_NAND(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
 void write_word_misaligned_OR(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff);
-void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr, unsigned int xoff, int lmode, int mmode);
+
+void write_byte_misaligned_NAND(uint8_t *buff, uint8_t byte, unsigned int addr, unsigned int xoff);
+void write_byte_misaligned_OR(uint8_t *buff, uint8_t byte, unsigned int addr, unsigned int xoff);
 
 void write_char16(char ch, int x, int y, int font);
 void write_char(char ch, int x, int y, int flags, int font);

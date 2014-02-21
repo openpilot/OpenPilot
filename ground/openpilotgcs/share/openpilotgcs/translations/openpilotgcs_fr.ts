@@ -5114,7 +5114,7 @@ N&apos;oubliez pas de déclarer ce canal dans l&apos;onglet Input.</translation>
 
 Attitude: camera tracks level for the axis. Input controls the deflection.
 AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</source>
-        <translation type="unfinished">Mode de stabilisation des axes
+        <translation>Mode de stabilisation des axes
 
 Attitude: La caméra reste de niveau sur les axes. L&apos;entrée contrôle la déviation angulaire.
 AxisLock: La caméra se souvient de l&apos;orientation. L&apos;entrée contrôle la vitesse de la correction.</translation>
@@ -5134,7 +5134,7 @@ AxisLock: La caméra se souvient de l&apos;orientation. L&apos;entrée contrôle
     <message>
         <location/>
         <source>Maximum camera yaw deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished">Déviation maximale de la caméra sur le Yaw pour une entrée de 100% en mode Attitude, en degrés.</translation>
+        <translation>Déviation maximale de la caméra sur le Yaw pour une entrée de 100% en mode Attitude, en degrés.</translation>
     </message>
     <message>
         <location/>
@@ -5145,7 +5145,7 @@ AxisLock: La caméra se souvient de l&apos;orientation. L&apos;entrée contrôle
     <message>
         <location/>
         <source>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished">Vitesse maximale sur le Yaw pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
+        <translation>Vitesse maximale sur le Yaw pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
@@ -5162,22 +5162,22 @@ AxisLock: La caméra se souvient de l&apos;orientation. L&apos;entrée contrôle
     <message>
         <location/>
         <source>Maximum camera pitch deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished">Déviation maximale de la caméra sur le Pitch pour une entrée de 100% en mode Attitude, en degrés.</translation>
+        <translation>Déviation maximale de la caméra sur le Pitch pour une entrée de 100% en mode Attitude, en degrés.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera pitch rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished">Vitesse maximale sur le Pitch pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
+        <translation>Vitesse maximale sur le Pitch pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished">Déviation maximale de la caméra sur le Roll pour une entrée de 100% en mode Attitude, en degrés.</translation>
+        <translation>Déviation maximale de la caméra sur le Roll pour une entrée de 100% en mode Attitude, en degrés.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished">Vitesse maximale sur le Roll pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
+        <translation>Vitesse maximale sur le Roll pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
@@ -5204,7 +5204,7 @@ rate depending on input value.
 
 If you have drift in your Tx controls, you may want to increase this
 value.</source>
-        <translation type="unfinished">Zone morte sur le manche pour tous les axes en mode AxisLock, degrés/s.
+        <translation>Zone morte sur le manche pour tous les axes en mode AxisLock, degrés/s.
 
 Lorsque le manche est en dans la plage définie par MaxAxisLockRate, la caméra 
 son orientation actuelle. Autrement elle commence à bouger, avec une vitesse 
@@ -5247,7 +5247,7 @@ valeur.</translation>
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished">Charge les paramètres par défaut du module, excepté les canaux de sortie dans GCS.
+        <translation>Charge les paramètres par défaut du module, excepté les canaux de sortie dans GCS.
 
 Les paramètres chargés ne sont pas appliqués automatiquement. Vous devez cliquer
 sur Appliquer ou Enregistrer par la suite.</translation>
@@ -5271,7 +5271,7 @@ settings.
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished">Recharge les paramètres du module enregistrés dans la carte, excepté les canaux de sortie.
+        <translation>Recharge les paramètres du module enregistrés dans la carte, excepté les canaux de sortie.
 Utile si vous avez modifié quelques paramètres accidentellement.
 
 Les paramètres chargés ne sont pas appliqués automatiquement. Vous devez cliquer
@@ -5291,7 +5291,7 @@ sur Appliquer ou Enregistrer par la suite.</translation>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non volatile</translation>
+        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -5307,7 +5307,7 @@ sur Appliquer ou Enregistrer par la suite.</translation>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile</translation>
+        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -5323,37 +5323,37 @@ sur Appliquer ou Enregistrer par la suite.</translation>
     <message>
         <location/>
         <source>Output Range (Angle)</source>
-        <translation type="unfinished">Plage Sortie (Angle)</translation>
+        <translation>Plage Sortie (Angle)</translation>
     </message>
     <message>
         <location/>
         <source>Pitch Or Servo2</source>
-        <translation type="unfinished">Pitch ou Servo2</translation>
+        <translation>Pitch ou Servo2</translation>
     </message>
     <message>
         <location/>
         <source>Roll Or Servo1</source>
-        <translation type="unfinished">Roll ou Servo1</translation>
+        <translation>Roll ou Servo1</translation>
     </message>
     <message>
         <location/>
         <source>Input Rate (Speed)</source>
-        <translation type="unfinished">Taux d&apos;Entrée (Vitesse)</translation>
+        <translation>Taux d&apos;Entrée (Vitesse)</translation>
     </message>
     <message>
         <location/>
         <source>Input Range (Angle)</source>
-        <translation type="unfinished">Plage d&apos;Entrée (Angle)</translation>
+        <translation>Plage d&apos;Entrée (Angle)</translation>
     </message>
     <message>
         <location/>
         <source>Expert Settings (Attitude Filter and Feed Forward)</source>
-        <translation type="unfinished">Paramètres Avancés (Filtrage Attitude et Feed Forward)</translation>
+        <translation>Paramètres Avancés (Filtrage Attitude et Feed Forward)</translation>
     </message>
     <message>
         <location/>
         <source>Attitude Filter RT</source>
-        <translation type="unfinished">Filtrage Attitude RT</translation>
+        <translation>Filtrage Attitude RT</translation>
     </message>
     <message>
         <location/>
@@ -5362,7 +5362,7 @@ sur Appliquer ou Enregistrer par la suite.</translation>
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished">Temps de réponse filtrage sur l&apos;axe de Roll
+        <translation>Temps de réponse filtrage sur l&apos;axe de Roll
 
 Plage : 0-250ms, 0 désactive le filtrage (défaut)
 
@@ -5375,7 +5375,7 @@ Lisse l&apos;attitude estimée de l&apos;appareil utilisée par la stabilisation
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished">Temps de réponse filtrage sur l&apos;axe de Pitch
+        <translation>Temps de réponse filtrage sur l&apos;axe de Pitch
 
 Plage : 0-250ms, 0 désactive le filtrage (défaut)
 
@@ -5388,7 +5388,7 @@ Lisse l&apos;attitude estimée de l&apos;appareil utilisée par la stabilisation
 Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</source>
-        <translation type="unfinished">Temps de réponse filtrage sur l&apos;axe de Yaw
+        <translation>Temps de réponse filtrage sur l&apos;axe de Yaw
 
 Plage : 0-250ms, 0 désactive le filtrage (défaut)
 
@@ -5397,7 +5397,7 @@ Lisse l&apos;orientation estimée de l&apos;appareil utilisée par la stabilisat
     <message>
         <location/>
         <source>FF Servo Acceleration</source>
-        <translation type="unfinished">FF Accélération Servo</translation>
+        <translation>FF Accélération Servo</translation>
     </message>
     <message>
         <location/>
@@ -5407,7 +5407,7 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished">Accéleration feed forward du servo de Roll
+        <translation>Accéleration feed forward du servo de Roll
 
 Plage : 0-25, 0 désactive feed forward sur l&apos;axe (defaut).
 
@@ -5428,7 +5428,7 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished">Accéleration feed forward du servo de Pitch
+        <translation>Accéleration feed forward du servo de Pitch
 
 Plage : 0-25, 0 désactive feed forward sur l&apos;axe (defaut).
 
@@ -5443,7 +5443,7 @@ Range: 0-25, 0 disables feed forward for the axis (default).
 
 Good starting value is 2-7.
 Too high value may burn your servo!</source>
-        <translation type="unfinished">Accéleration feed forward du servo de Yaw
+        <translation>Accéleration feed forward du servo de Yaw
 
 Plage : 0-25, 0 désactive feed forward sur l&apos;axe (defaut).
 
@@ -5453,14 +5453,14 @@ Une valeur trop élevée peut griller votre servo !</translation>
     <message>
         <location/>
         <source>FF Accel Time Constant</source>
-        <translation type="unfinished">FF Const. Tps Accélération</translation>
+        <translation>FF Const. Tps Accélération</translation>
     </message>
     <message>
         <location/>
         <source>Roll servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished">Constante de temps d&apos;accélération feed forward pour le servo de Roll
+        <translation>Constante de temps d&apos;accélération feed forward pour le servo de Roll
 
 Plage : 0-50ms, 5 par défaut.</translation>
     </message>
@@ -5475,7 +5475,7 @@ Plage : 0-50ms, 5 par défaut.</translation>
         <source>Pitch servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished">Constante de temps d&apos;accélération feed forward pour le servo de Pitch
+        <translation>Constante de temps d&apos;accélération feed forward pour le servo de Pitch
 
 Plage : 0-50ms, 5 par défaut.</translation>
     </message>
@@ -5484,21 +5484,21 @@ Plage : 0-50ms, 5 par défaut.</translation>
         <source>Yaw servo feed forward acceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished">Constante de temps d&apos;accélération feed forward pour le servo de Yaw
+        <translation>Constante de temps d&apos;accélération feed forward pour le servo de Yaw
 
 Plage : 0-50ms, 5 par défaut.</translation>
     </message>
     <message>
         <location/>
         <source>FF Decel Time Constant</source>
-        <translation type="unfinished">FF Const. Tps Décélération</translation>
+        <translation>FF Const. Tps Décélération</translation>
     </message>
     <message>
         <location/>
         <source>Roll servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished">Constante de temps de décélération feed forward pour le servo de Roll
+        <translation>Constante de temps de décélération feed forward pour le servo de Roll
 
 Plage : 0-50ms, 5 par défaut.</translation>
     </message>
@@ -5513,7 +5513,7 @@ Plage : 0-50ms, 5 par défaut.</translation>
         <source>Pitch servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished">Constante de temps de décélération feed forward pour le servo de Pitch
+        <translation>Constante de temps de décélération feed forward pour le servo de Pitch
 
 Plage : 0-50ms, 5 par défaut.</translation>
     </message>
@@ -5522,14 +5522,14 @@ Plage : 0-50ms, 5 par défaut.</translation>
         <source>Yaw servo feed forward deceleration time constant
 
 Range: 0-50ms, default is 5.</source>
-        <translation type="unfinished">Constante de temps de décélération feed forward pour le servo de Yaw
+        <translation>Constante de temps de décélération feed forward pour le servo de Yaw
 
 Plage : 0-50ms, 5 par défaut.</translation>
     </message>
     <message>
         <location/>
         <source>Gimbal Type:</source>
-        <translation type="unfinished">Type Nacelle :</translation>
+        <translation>Type Nacelle :</translation>
     </message>
     <message>
         <location/>
@@ -5537,7 +5537,7 @@ Plage : 0-50ms, 5 par défaut.</translation>
 
 Used to limit feed forward acceleration at extreme angles.
 Generic type provides no limit.</source>
-        <translation type="unfinished">Type de nacelle
+        <translation>Type de nacelle
 
 Utilisé pour limiter l&apos;accélération feed forward aux grands angles.
 Le type générique ne propose pas de limitation.</translation>
@@ -5556,7 +5556,7 @@ Le type générique ne propose pas de limitation.</translation>
     <message>
         <location/>
         <source>FF Max Acceleration</source>
-        <translation type="unfinished">FF Accélération Maxi</translation>
+        <translation>FF Accélération Maxi</translation>
     </message>
     <message>
         <location/>
@@ -5565,7 +5565,7 @@ Le type générique ne propose pas de limitation.</translation>
 Range: 0-1000, default is 500.
 
 The same value is used for all axes.</source>
-        <translation type="unfinished">Accélération maximale feed forward
+        <translation>Accélération maximale feed forward
 
 Plage : 0-1000, 500 par défaut.
 
@@ -5580,7 +5580,7 @@ La même valeur est utilisé pour tous les axes.</translation>
     <message>
         <location/>
         <source>Input configuration also provides smoothing for controls. Look for RT options on the RC Input tab.</source>
-        <translation type="unfinished">La configuration des entrées fournit également un lissage des contrôles. Recherchez les options RT dans l&apos;onglet Entrées RC.</translation>
+        <translation>La configuration des entrées fournit également un lissage des contrôles. Recherchez les options RT dans l&apos;onglet Entrées RC.</translation>
     </message>
 </context>
 <context>
@@ -5810,7 +5810,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Swashplate config:</source>
-        <translation type="unfinished">Configuration plateau cyclique :</translation>
+        <translation>Configuration plateau cyclique :</translation>
     </message>
     <message>
         <location/>
@@ -6377,41 +6377,41 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Stabilization Modes Configuration</source>
-        <translation type="unfinished">Configuration des Modes de Stabilisation</translation>
+        <translation>Configuration des Modes de Stabilisation</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 1</source>
         <translatorcomment>Typo Need translation in selection list above</translatorcomment>
-        <translation type="unfinished">Stabilisé 1   </translation>
+        <translation>Stabilisé 1   </translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 2</source>
         <translatorcomment>Typo Need translation in selection list above</translatorcomment>
-        <translation type="unfinished">Stabilisé 2</translation>
+        <translation>Stabilisé 2</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 3</source>
         <translatorcomment>Typo Need translation in selection list above</translatorcomment>
-        <translation type="unfinished">Stabilisé 3</translation>
+        <translation>Stabilisé 3</translation>
     </message>
     <message>
         <location/>
         <source>PID Bank</source>
         <translatorcomment>Typo Need translation for &quot;Bank1&quot; &quot;Bank 2&quot;... in selection list below</translatorcomment>
-        <translation type="unfinished">Banque PID</translation>
+        <translation>Banque PID</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode Switch Positions</source>
-        <translation type="unfinished">Positions Inter Mode de Vol</translation>
+        <translation>Positions Inter Mode de Vol</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode Count</source>
-        <translation type="unfinished">Nombre de modes de vol</translation>
+        <translation>Nombre de modes de vol</translation>
     </message>
     <message>
         <location/>
@@ -6421,12 +6421,12 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Flight Mode</source>
-        <translation type="unfinished">Mode de Vol</translation>
+        <translation>Mode de Vol</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #1 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #1 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6467,7 +6467,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #2.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #2 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #2 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6478,7 +6478,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #3.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #3 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #3 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6489,7 +6489,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #4.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #4 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #4 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6500,7 +6500,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #5.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #5 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #5 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6511,7 +6511,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #6.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #6 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #6 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6522,7 +6522,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionnez quels paramètres de vitesse / angle d&apos;inclinaison / PID vous souhaitez utiliser pour cette position d&apos;interrupteur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionnez quels paramètres de vitesse / angle d&apos;inclinaison / PID vous souhaitez utiliser pour cette position d&apos;interrupteur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6837,12 +6837,12 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Output Channel Configuration</source>
-        <translation type="unfinished">Configuration Canaux de Sortie</translation>
+        <translation>Configuration Canaux de Sortie</translation>
     </message>
     <message>
         <location/>
         <source>Live Testing</source>
-        <translation type="unfinished">Test en Temps Réel</translation>
+        <translation>Test en Temps Réel</translation>
     </message>
 </context>
 <context>
@@ -12441,12 +12441,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Resets</source>
-        <translation type="unfinished">Réinitialisations</translation>
+        <translation>Réinitialisations</translation>
     </message>
     <message>
         <location/>
         <source>Timeouts</source>
-        <translation type="unfinished">Temps Dépassé</translation>
+        <translation>Temps Dépassé</translation>
     </message>
     <message>
         <location/>
@@ -12603,27 +12603,27 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>OPLink configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration OPLink</translation>
     </message>
     <message>
         <location/>
         <source>One-Way</source>
-        <translation type="unfinished"></translation>
+        <translation>Unidirectionnel</translation>
     </message>
     <message>
         <location/>
         <source>Remote modems</source>
-        <translation type="unfinished"></translation>
+        <translation>Modems distants</translation>
     </message>
     <message>
         <location/>
         <source>Coordinator ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID Coordinateur</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the coordinator id we currently are bound to.&lt;/p&gt;&lt;p&gt;To manually bind to a specific coordinator, just type&lt;/p&gt;&lt;p&gt;or paste its device id in this box and save.&lt;/p&gt;&lt;p&gt;The device must be rebooted for the binding to take place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci est l&apos;identifiant du coordinateur avec lequel vous êtes associé.&lt;/p&gt;&lt;p&gt;Pour vous associer manuellement à un  coordinateur précis, il suffit de taper&lt;/p&gt;&lt;p&gt;ou coller l&apos;identifiant de l&apos;appareil dans cette case et Enregistrer.&lt;/p&gt;&lt;p&gt;L&apos;appareil doit être redémarré pour que la liaison puisse s&apos;établir.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>

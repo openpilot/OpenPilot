@@ -23,7 +23,6 @@
 			<elementname>FlightPlan</elementname>
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>
-			<elementname>TelemetryTxPri</elementname>
 			<elementname>TelemetryRx</elementname>
 			<!-- com -->
 			<elementname>RadioRx</elementname>

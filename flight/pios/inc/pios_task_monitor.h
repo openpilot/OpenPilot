@@ -104,4 +104,10 @@ typedef void (*TaskMonitorTaskInfoCallback)(uint16_t task_id, const struct pios_
  */
 extern void PIOS_TASK_MONITOR_ForEachTask(TaskMonitorTaskInfoCallback callback, void *context);
 
+/**
+ * Return the idle task running time percentage.
+ */
+
+extern uint8_t PIOS_TASK_MONITOR_GetIdlePercentage();
+
 #endif // PIOS_TASK_MONITOR_H

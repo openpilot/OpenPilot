@@ -81,5 +81,5 @@ IUAVGadgetConfiguration *MonitorGadgetFactory::createConfiguration(QSettings *qS
 
 IOptionsPage *MonitorGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return 0; //new MonitorGadgetOptionsPage(qobject_cast<MonitorGadgetConfiguration *>(config));
+    return 0; // new MonitorGadgetOptionsPage(qobject_cast<MonitorGadgetConfiguration *>(config));
 }

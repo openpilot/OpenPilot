@@ -1,3 +1,16 @@
+--- RELEASE-14.01-RC4 --- Cruising Ratt ---
+this issue includes the following fixes to previous RC3:
+OP-1228 OP-1218
+
+Full list of bug fixed in this release is accessible here
+http://progress.openpilot.org/issues/?filter=11364
+
+--- RELEASE-14.01-RC3 --- Cruising Ratt ---
+this issue includes the following fixes to previous RC2:
+OP-1088 OP-1141 OP-1166 OP-1187 OP-1191 OP-1195 OP-1211 OP-1218 
+
+Full list of bug fixed in this release is accessible here
+http://progress.openpilot.org/issues/?filter=11361
 
 --- RELEASE-14.01-RC2 --- Cruising Ratt ---
 This is the RC2 for the first 2014 software release. 

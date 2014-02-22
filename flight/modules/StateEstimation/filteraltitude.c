@@ -44,6 +44,7 @@
 #define DT_MIN         1e-6f
 #define DT_MAX         1.0f
 #define DT_AVERAGE     1e-3f
+static volatile bool reloadSettings;
 
 // Private types
 struct data {
@@ -68,6 +69,7 @@ struct data {
 
 static int32_t init(stateFilter *self);
 static int32_t filter(stateFilter *self, stateEstimation *state);
+static void settingsUpdatedCb(UAVObjEvent *ev);
 
 
 int32_t filterAltitudeInitialize(stateFilter *handle)
@@ -77,6 +79,8 @@ int32_t filterAltitudeInitialize(stateFilter *handle)
     handle->localdata = pvPortMalloc(sizeof(struct data));
     AttitudeStateInitialize();
     AltitudeFilterSettingsInitialize();
+    AltitudeFilterSettingsConnectCallback(&settingsUpdatedCb);
+    reloadSettings = true;
     return STACK_REQUIRED;
 }
 
@@ -99,13 +103,17 @@ static int32_t init(stateFilter *self)
     this->baroLast  = 0.0f;
     this->accelLast = 0.0f;
     this->first_run = 1;
-    AltitudeFilterSettingsGet(&this->settings);
     return 0;
 }
 
 static int32_t filter(stateFilter *self, stateEstimation *state)
 {
     struct data *this = (struct data *)self->localdata;
+
+    if (reloadSettings) {
+        reloadSettings = false;
+        AltitudeFilterSettingsGet(&this->settings);
+    }
 
     if (this->first_run) {
         // Initialize to current altitude reading at initial location
@@ -187,6 +195,12 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     return 0;
 }
 
+void settingsUpdatedCb(UAVObjEvent *ev)
+{
+    if (ev->obj == AltitudeFilterSettingsHandle()) {
+        reloadSettings = true;
+    }
+}
 
 /**
  * @}

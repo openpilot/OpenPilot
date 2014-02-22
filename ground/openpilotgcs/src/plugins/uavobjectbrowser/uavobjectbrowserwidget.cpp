@@ -32,12 +32,12 @@
 #include "ui_viewoptions.h"
 #include "uavobjectmanager.h"
 #include <QStringList>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QComboBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QComboBox>
 #include <QtCore/QDebug>
-#include <QtGui/QItemEditorFactory>
+#include <QItemEditorFactory>
 #include "extensionsystem/pluginmanager.h"
 
 UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent)
@@ -56,7 +56,7 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     m_browser->treeView->setSelectionBehavior(QAbstractItemView::SelectItems);
     showMetaData(m_viewoptions->cbMetaData->isChecked());
-    connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(currentChanged(QModelIndex, QModelIndex)));
+    connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(currentChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);
     connect(m_viewoptions->cbMetaData, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
     connect(m_viewoptions->cbCategorized, SIGNAL(toggled(bool)), this, SLOT(categorize(bool)));
     connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveObject()));
@@ -108,6 +108,7 @@ void UAVObjectBrowserWidget::categorize(bool categorize)
     m_model->setOnlyHilightChangedValues(m_onlyHilightChangedValues);
     m_browser->treeView->setModel(m_model);
     showMetaData(m_viewoptions->cbMetaData->isChecked());
+    connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(currentChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);
 
     delete tmpModel;
 }
@@ -121,12 +122,13 @@ void UAVObjectBrowserWidget::useScientificNotation(bool scientific)
     Q_ASSERT(objManager);
 
     UAVObjectTreeModel *tmpModel = m_model;
-    m_model = new UAVObjectTreeModel(0, m_viewoptions->cbCategorized, scientific);
+    m_model = new UAVObjectTreeModel(0, m_viewoptions->cbCategorized->isChecked(), scientific);
     m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
     m_model->setManuallyChangedColor(m_manuallyChangedColor);
     m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
     m_browser->treeView->setModel(m_model);
     showMetaData(m_viewoptions->cbMetaData->isChecked());
+    connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(currentChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);
 
     delete tmpModel;
 }

@@ -33,6 +33,9 @@
 class LineardialGadgetFactory;
 
 class LineardialPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                                 Q_PLUGIN_METADATA(IID "OpenPilot.Lineardial")
+
 public:
     LineardialPlugin();
     ~LineardialPlugin();
@@ -43,4 +46,5 @@ public:
 private:
     LineardialGadgetFactory *mf;
 };
+
 #endif /* LINEARDIALPLUGIN_H_ */

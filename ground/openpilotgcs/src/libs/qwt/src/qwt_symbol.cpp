@@ -941,7 +941,7 @@ void QwtSymbol::drawSymbols( QPainter *painter,
 //!  \return Size of the bounding rectangle of a symbol
 QSize QwtSymbol::boundingSize() const
 {
-    QSize size;
+    QSizeF size;
 
     switch ( d_data->style )
     {
@@ -953,7 +953,7 @@ QSize QwtSymbol::boundingSize() const
             if ( d_data->pen.style() != Qt::NoPen )
                 pw = qMax( d_data->pen.widthF(), qreal( 1.0 ) );
 
-            size = d_data->size + QSize( pw, pw );
+            size = d_data->size + QSizeF( pw, pw );
 
             break;
         }
@@ -971,7 +971,7 @@ QSize QwtSymbol::boundingSize() const
             if ( d_data->pen.style() != Qt::NoPen )
                 pw = qMax( d_data->pen.widthF(), qreal( 1.0 ) );
 
-            size = d_data->size + QSize( 2 * pw, 2 * pw );
+            size = d_data->size + QSizeF( 2 * pw, 2 * pw );
             break;
         }
         default:
@@ -980,7 +980,9 @@ QSize QwtSymbol::boundingSize() const
         }
     }
 
-    return size + QSize( 1, 1 ); // for antialiasing
+    size += QSizeF( 1.0, 1.0 ); // for antialiasing
+
+    return QSize( qCeil( size.width() ), qCeil( size.height() ) );
 }
 
 /*!

@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "homeitem.h"
+#include <QGraphicsSceneMouseEvent>
 namespace mapcontrol {
 HomeItem::HomeItem(MapGraphicItem *map, OPMapWidget *parent) : safe(true), map(map), mapwidget(parent),
     showsafearea(true), toggleRefresh(true), safearea(1000), altitude(0), isDragging(false)

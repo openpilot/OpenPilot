@@ -39,6 +39,7 @@ HWDEFSINC	= ../../boards/$(BOARD_NAME)
 # Use file-extension c for "c-only"-files
 SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
+SRC += $(PIOSCOMMON)/pios_led.c
 ## PIOS Hardware
 ifeq ($(MCU),cortex-m3)
     include $(PIOS)/stm32f10x/library.mk

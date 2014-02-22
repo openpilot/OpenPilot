@@ -33,8 +33,8 @@
 #include "ui_pluginview.h"
 
 #include <QtCore/QDir>
-#include <QtGui/QHeaderView>
-#include <QtGui/QTreeWidgetItem>
+#include <QHeaderView>
+#include <QTreeWidgetItem>
 #include <QtDebug>
 
 /*!
@@ -76,9 +76,9 @@ PluginView::PluginView(PluginManager *manager, QWidget *parent)
 {
     m_ui->setupUi(this);
     QHeaderView *header = m_ui->pluginWidget->header();
-    header->setResizeMode(0, QHeaderView::ResizeToContents);
-    header->setResizeMode(1, QHeaderView::ResizeToContents);
-    header->setResizeMode(2, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     m_ui->pluginWidget->sortItems(1, Qt::AscendingOrder);
     p->manager = manager;
     connect(p->manager, SIGNAL(pluginsChanged()), this, SLOT(updateList()));

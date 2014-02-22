@@ -38,21 +38,19 @@
 #include <QtCore/qfileinfo.h>
 #include <QtCore/qdir.h>
 
-#include <QtDeclarative/qdeclarativeengine.h>
-#include <QtDeclarative/qdeclarativecontext.h>
+#include <QQmlEngine>
+#include <QQmlContext>
 
-QmlViewGadgetWidget::QmlViewGadgetWidget(QWidget *parent) :
-    QDeclarativeView(parent)
+QmlViewGadgetWidget::QmlViewGadgetWidget(QWindow *parent) :
+    QQuickView(parent)
 {
-    setMinimumSize(64, 64);
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setResizeMode(SizeRootObjectToView);
 
     QStringList objectsToExport;
-    objectsToExport << "VelocityActual" <<
-        "PositionActual" <<
-        "AttitudeActual" <<
-        "GPSPosition" <<
+    objectsToExport << "VelocityState" <<
+        "PositionState" <<
+        "AttitudeState" <<
+        "GPSPositionSensor" <<
         "GCSTelemetryStats" <<
         "FlightBatteryState";
 
@@ -90,7 +88,7 @@ void QmlViewGadgetWidget::setQmlFile(QString fn)
     qDebug() << Q_FUNC_INFO << fn;
     setSource(QUrl::fromLocalFile(fn));
 
-    foreach(const QDeclarativeError &error, errors()) {
+    foreach(const QQmlError &error, errors()) {
         qDebug() << error.description();
     }
 }
@@ -100,9 +98,5 @@ void QmlViewGadgetWidget::setQmlFile(QString fn)
  */
 void QmlViewGadgetWidget::enableOpenGL(bool flag)
 {
-    if (flag) {
-        setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-    } else {
-        setViewport(new QWidget);
-    }
+    Q_UNUSED(flag)
 }

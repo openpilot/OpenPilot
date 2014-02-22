@@ -102,7 +102,7 @@
 // TELEMETRY
 // ------------------------
 #define TELEM_QUEUE_SIZE           20
-#define PIOS_TELEM_STACK_SIZE      624
+#define PIOS_TELEM_STACK_SIZE      800
 
 // *****************************************************************
 // Interrupt Priorities
@@ -223,7 +223,10 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_ADC_NUM_CHANNELS     7
 #define PIOS_ADC_MAX_OVERSAMPLING 10
 #define PIOS_ADC_USE_ADC2         0
-#define PIOS_ADC_USE_TEMP_SENSOR  1
+
+#define PIOS_ADC_USE_TEMP_SENSOR
+
+#define PIOS_ADC_TEMPERATURE_PIN  6              /* V */
 
 // *****************************************************************
 // USB

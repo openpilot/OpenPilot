@@ -1,5 +1,5 @@
 <xml>
-	<object name="OPLinkStatus" singleinstance="true" settings="false">
+	<object name="OPLinkStatus" singleinstance="true" settings="false" category="System">
 		<description>OPLink device status.</description>
 		<field name="Description" units="" type="uint8" elements="40"/> 
 		<field name="CPUSerial" units="hex" type="uint8" elements="12" /> 
@@ -31,6 +31,6 @@
 		<access gcs="readonly" flight="readwrite"/>
 		<telemetrygcs acked="false" updatemode="manual" period="0"/>
 		<telemetryflight acked="false" updatemode="throttled" period="500"/>
-		<logging updatemode="periodic" period="1000"/>
+		<logging updatemode="manual" period="0"/>
 	</object>
 </xml>

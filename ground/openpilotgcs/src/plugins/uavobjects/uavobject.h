@@ -45,6 +45,7 @@
 #define UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT       3
 #define UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT     4
 #define UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT 6
+#define UAVOBJ_LOGGING_UPDATE_MODE_SHIFT       8
 #define UAVOBJ_UPDATE_MODE_MASK                0x3
 
 class UAVObjectField;
@@ -87,9 +88,10 @@ public:
      *      3    gcsTelemetryAcked          Defines if an ack is required for the transactions of this object (1:acked, 0:not acked)
      *    4-5    telemetryUpdateMode        Update mode used by the telemetry module (UAVObjUpdateMode)
      *    6-7    gcsTelemetryUpdateMode     Update mode used by the GCS (UAVObjUpdateMode)
+     *    8-9    loggingUpdateMode          Update mode used by the logging module (UAVObjUpdateMode)
      */
     typedef struct {
-        quint8  flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
+        quint16 flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
         quint16 flightTelemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
         quint16 gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
         quint16 loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
@@ -107,6 +109,7 @@ public:
     quint32 getNumBytes();
     qint32 pack(quint8 *dataOut);
     qint32 unpack(const quint8 *dataIn);
+    quint8 updateCRC(quint8 crc = 0);
     bool save();
     bool save(QFile & file);
     bool load();
@@ -144,15 +147,17 @@ public:
 
 public slots:
     void requestUpdate();
+    void requestUpdateAll();
     void updated();
+    void updatedAll();
 
 signals:
     void objectUpdated(UAVObject *obj);
     void objectUpdatedAuto(UAVObject *obj);
-    void objectUpdatedManual(UAVObject *obj);
+    void objectUpdatedManual(UAVObject *obj, bool all = false);
     void objectUpdatedPeriodic(UAVObject *obj);
     void objectUnpacked(UAVObject *obj);
-    void updateRequested(UAVObject *obj);
+    void updateRequested(UAVObject *obj, bool all = false);
     void transactionCompleted(UAVObject *obj, bool success);
     void newInstance(UAVObject *obj);
 

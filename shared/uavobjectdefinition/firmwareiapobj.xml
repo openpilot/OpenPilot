@@ -1,5 +1,5 @@
 <xml> 
-    <object name="FirmwareIAPObj" singleinstance="true" settings="false"> 
+    <object name="FirmwareIAPObj" singleinstance="true" settings="false" category="System"> 
         <description>Queries board for SN, model, revision, and sends reset command</description> 
         <field name="Command" units="" type="uint16" elements="1"/> 
         <field name="Description" units="" type="uint8" elements="100"/> 

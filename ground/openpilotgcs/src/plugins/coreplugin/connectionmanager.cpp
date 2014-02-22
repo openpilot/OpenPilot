@@ -31,8 +31,8 @@
 #include <aggregation/aggregate.h>
 #include <coreplugin/iconnection.h>
 #include <extensionsystem/pluginmanager.h>
-#include "qextserialport/src/qextserialenumerator.h"
-#include "qextserialport/src/qextserialport.h"
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include <QDebug>
 #include <QLabel>
 #include <QHBoxLayout>
@@ -40,7 +40,7 @@
 #include <QEventLoop>
 
 namespace Core {
-ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack) :
+ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow) :
     QWidget(mainWindow),
     m_availableDevList(0),
     m_connectBtn(0),
@@ -48,13 +48,9 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     polling(true),
     m_mainWindow(mainWindow)
 {
-    // monitor widget
-    m_monitorWidget    = new TelemetryMonitorWidget(this);
-
     // device list
     m_availableDevList = new QComboBox;
-    m_availableDevList->setMinimumWidth(120);
-    m_availableDevList->setMaximumWidth(180);
+    m_availableDevList->setMinimumContentsLength(tr("USB: OPLinkMini").length());
     m_availableDevList->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // connect button
@@ -63,17 +59,13 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
 
     // put everything together
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setSpacing(5);
+    layout->setSpacing(6);
     layout->setContentsMargins(5, 2, 5, 2);
+    setLayout(layout);
 
-    layout->addWidget(m_monitorWidget, 0, Qt::AlignVCenter);
     layout->addWidget(new QLabel(tr("Connections:")), 0, Qt::AlignVCenter);
     layout->addWidget(m_availableDevList, 0, Qt::AlignVCenter);
     layout->addWidget(m_connectBtn, 0, Qt::AlignVCenter);
-
-    setLayout(layout);
-
-    modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
     QObject::connect(m_connectBtn, SIGNAL(clicked()), this, SLOT(onConnectClicked()));
     QObject::connect(m_availableDevList, SIGNAL(currentIndexChanged(int)), this, SLOT(onDeviceSelectionChanged(int)));
@@ -89,9 +81,6 @@ ConnectionManager::~ConnectionManager()
 {
     disconnectDevice();
     suspendPolling();
-    if (m_monitorWidget) {
-        delete m_monitorWidget;
-    }
 }
 
 void ConnectionManager::init()
@@ -100,6 +89,15 @@ void ConnectionManager::init()
     // new connection object from plugins
     QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(objectAdded(QObject *)), this, SLOT(objectAdded(QObject *)));
     QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(aboutToRemoveObject(QObject *)), this, SLOT(aboutToRemoveObject(QObject *)));
+}
+
+
+// TODO needs documentation?
+void ConnectionManager::addWidget(QWidget *widget)
+{
+    QHBoxLayout *l = (QHBoxLayout *)layout();
+
+    l->insertWidget(0, widget, 0, Qt::AlignVCenter);
 }
 
 /**
@@ -135,11 +133,9 @@ bool ConnectionManager::connectDevice(DevListItem device)
 
     // signal interested plugins that we connected to the device
     emit deviceConnected(io_dev);
-    m_connectBtn->setText("Disconnect");
-    m_availableDevList->setEnabled(false);
 
-    // tell the monitorwidget we're conneced
-    m_monitorWidget->connect();
+    m_connectBtn->setText(tr("Disconnect"));
+    m_availableDevList->setEnabled(false);
 
     return true;
 }
@@ -150,9 +146,6 @@ bool ConnectionManager::connectDevice(DevListItem device)
  */
 bool ConnectionManager::disconnectDevice()
 {
-    // tell the monitor widget we're disconnected
-    m_monitorWidget->disconnect();
-
     if (!m_ioDev) {
         // apparently we are already disconnected: this can
         // happen if a plugin tries to force a disconnect whereas
@@ -184,8 +177,10 @@ bool ConnectionManager::disconnectDevice()
     m_connectionDevice.connection = NULL;
     m_ioDev = NULL;
 
+    // signal interested plugins that we disconnected from the device
     emit deviceDisconnected();
-    m_connectBtn->setText("Connect");
+
+    m_connectBtn->setText(tr("Connect"));
     m_availableDevList->setEnabled(true);
 
     return true;
@@ -280,9 +275,6 @@ void ConnectionManager::telemetryConnected()
     if (reconnectCheck->isActive()) {
         reconnectCheck->stop();
     }
-
-    // tell the monitor we're connected
-    m_monitorWidget->connect();
 }
 
 /**
@@ -299,17 +291,6 @@ void ConnectionManager::telemetryDisconnected()
             }
         }
     }
-
-    // tell the monitor we're disconnected
-    m_monitorWidget->disconnect();
-}
-
-/**
- *   Slot called when the telemetry rates are updated
- */
-void ConnectionManager::telemetryUpdated(double txRate, double rxRate)
-{
-    m_monitorWidget->updateTelemetry(txRate, rxRate);
 }
 
 void ConnectionManager::reconnectSlot()

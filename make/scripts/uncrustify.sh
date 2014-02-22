@@ -45,6 +45,7 @@ recursive()
         case "$1" in
             *.c|*.h|*.cc|*.cpp|*.hpp)
                 ${UNCRUSTIFY} -c "${UNCRUSTIFY_CONFIG}" --no-backup "$1"
+                ${UNCRUSTIFY} -c "${UNCRUSTIFY_CONFIG}" --no-backup "$1" -q
                 ;;
         esac
     fi

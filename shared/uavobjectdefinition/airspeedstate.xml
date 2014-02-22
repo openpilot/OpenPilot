@@ -1,0 +1,11 @@
+<xml>
+    <object name="AirspeedState" singleinstance="true" settings="false" category="State">
+        <description>UAVO for true airspeed and calibrated airspeed state estimation.</description>
+        <field name="CalibratedAirspeed" units="m/s" type="float" elements="1"/>
+        <field name="TrueAirspeed" units="m/s" type="float" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

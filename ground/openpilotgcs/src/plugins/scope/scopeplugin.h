@@ -33,6 +33,9 @@
 class ScopeGadgetFactory;
 
 class ScopePlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                            Q_PLUGIN_METADATA(IID "OpenPilot.Scope")
+
 public:
     ScopePlugin();
     ~ScopePlugin();
@@ -44,4 +47,5 @@ public:
 private:
     ScopeGadgetFactory *mf;
 };
+
 #endif /* SCOPEPLUGIN_H_ */

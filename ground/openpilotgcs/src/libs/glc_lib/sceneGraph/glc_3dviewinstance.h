@@ -69,11 +69,17 @@ public:
 	//! Default constructor
 	GLC_3DViewInstance();
 
-	//! Contruct instance with a geometry
+	//! Contruct instance from a geometry
 	GLC_3DViewInstance(GLC_Geometry* pGeom);
 
-	//! Contruct instance with a 3DRep
+	//! Contruct instance from a geometry and the given UID
+	GLC_3DViewInstance(GLC_Geometry* pGeom, GLC_uint id);
+
+	//! Contruct instance from a 3DRep
 	GLC_3DViewInstance(const GLC_3DRep&);
+
+	//! Contruct instance from a 3DRep and the given UID
+	GLC_3DViewInstance(const GLC_3DRep& rep, GLC_uint id);
 
 	//! Copy constructor
 	GLC_3DViewInstance(const GLC_3DViewInstance& );

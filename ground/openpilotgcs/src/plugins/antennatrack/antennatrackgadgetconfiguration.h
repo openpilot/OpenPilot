@@ -29,9 +29,22 @@
 #define ANTENNATRACKGADGETCONFIGURATION_H
 
 #include <coreplugin/iuavgadgetconfiguration.h>
-#include <qextserialport/src/qextserialport.h>
+#include <QtSerialPort/QSerialPort>
 
 using namespace Core;
+
+/**
+ * structure to contain port settings
+ */
+struct PortSettings {
+    QSerialPort::BaudRate    BaudRate;
+    QSerialPort::DataBits    DataBits;
+    QSerialPort::Parity      Parity;
+    QSerialPort::StopBits    StopBits;
+    QSerialPort::FlowControl FlowControl;
+    long Timeout_Millisec;
+};
+
 
 class AntennaTrackGadgetConfiguration : public IUAVGadgetConfiguration {
     Q_OBJECT
@@ -48,23 +61,23 @@ public:
     }
 
     // set port configuration functions
-    void setSpeed(BaudRateType speed)
+    void setSpeed(QSerialPort::BaudRate speed)
     {
         m_defaultSpeed = speed;
     }
-    void setDataBits(DataBitsType databits)
+    void setDataBits(QSerialPort::DataBits databits)
     {
         m_defaultDataBits = databits;
     }
-    void setFlow(FlowType flow)
+    void setFlow(QSerialPort::FlowControl flow)
     {
         m_defaultFlow = flow;
     }
-    void setParity(ParityType parity)
+    void setParity(QSerialPort::Parity parity)
     {
         m_defaultParity = parity;
     }
-    void setStopBits(StopBitsType stopbits)
+    void setStopBits(QSerialPort::StopBits stopbits)
     {
         m_defaultStopBits = stopbits;
     }
@@ -82,23 +95,23 @@ public:
     {
         return m_defaultPort;
     }
-    BaudRateType speed()
+    QSerialPort::BaudRate speed()
     {
         return m_defaultSpeed;
     }
-    FlowType flow()
+    QSerialPort::FlowControl flow()
     {
         return m_defaultFlow;
     }
-    DataBitsType dataBits()
+    QSerialPort::DataBits dataBits()
     {
         return m_defaultDataBits;
     }
-    StopBitsType stopBits()
+    QSerialPort::StopBits stopBits()
     {
         return m_defaultStopBits;
     }
-    ParityType parity()
+    QSerialPort::Parity parity()
     {
         return m_defaultParity;
     }
@@ -113,11 +126,11 @@ public:
 private:
     QString m_connectionMode;
     QString m_defaultPort;
-    BaudRateType m_defaultSpeed;
-    DataBitsType m_defaultDataBits;
-    FlowType m_defaultFlow;
-    ParityType m_defaultParity;
-    StopBitsType m_defaultStopBits;
+    QSerialPort::BaudRate m_defaultSpeed;
+    QSerialPort::DataBits m_defaultDataBits;
+    QSerialPort::FlowControl m_defaultFlow;
+    QSerialPort::Parity m_defaultParity;
+    QSerialPort::StopBits m_defaultStopBits;
     long m_defaultTimeOut;
 };
 

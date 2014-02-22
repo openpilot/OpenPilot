@@ -1,5 +1,5 @@
 // import QtQuick 1.0 // to target S60 5th Edition or Maemo 5
-import QtQuick 1.1
+import QtQuick 2.0
 
 Item {
     id: container
@@ -21,26 +21,39 @@ Item {
 
     ListModel {
         id: sitesModel
-        ListElement { title: "OpenPilot Home"; link: "http://www.openpilot.org" }
-        ListElement { title: "OpenPilot Wiki"; link: "http://wiki.openpilot.org" }
-        ListElement { title: "OpenPilot Store"; link: "http://www.openpilot.org/hardware/get-hardware/" }
-        ListElement { title: "OpenPilot Forums"; link: "http://forums.openpilot.org" }
-        ListElement { title: "OpenPilot Code Reviews"; link: "http://git.openpilot.org" }
-        ListElement { title: "OpenPilot Progress Tracker"; link: "http://progress.openpilot.org" }
+        ListElement { link: "http://www.openpilot.org" }
+        ListElement { link: "http://wiki.openpilot.org" }
+        ListElement { link: "http://www.openpilot.org/hardware/get-hardware/" }
+        ListElement { link: "http://forums.openpilot.org" }
+        ListElement { link: "http://git.openpilot.org" }
+        ListElement { link: "http://progress.openpilot.org" }
+        function title(index){
+            if (title["text"] === undefined) {
+            title.text = [
+                qsTr("Home"),
+                qsTr("Wiki"),
+                qsTr("Store"),
+                qsTr("Forums"),
+                qsTr("Code Reviews"),
+                qsTr("Progress Tracker")
+               ]
+             }
+              return title.text[index]
+       }
     }
 
     ListView {
         id: view
-        width: parent.width
-        anchors { top: header.bottom; topMargin: 14; leftMargin: 32; bottom: parent.bottom }
+        width: 839
+        anchors.topMargin: 30
+        anchors { top: parent.top; bottom: parent.bottom }
+        orientation: ListView.Horizontal
         model: sitesModel
-        spacing: 8
+        spacing: 40  // Need dynamic spacing
 
         delegate: Text {
-            text: title
-            width: view.width
+            text: view.model.title(index)
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-
             font {
                 pointSize: 12
                 weight: Font.Bold

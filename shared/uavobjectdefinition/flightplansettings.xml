@@ -1,5 +1,5 @@
 <xml>
-    <object name="FlightPlanSettings" singleinstance="true" settings="true">
+    <object name="FlightPlanSettings" singleinstance="true" settings="true" category="Navigation">
         <description>Settings for the flight plan module, control the execution of the script</description>
         <field name="Test" units="" type="float" elements="1" defaultvalue="0.0"/>
         <access gcs="readwrite" flight="readwrite"/>

@@ -14,8 +14,9 @@ rm -f "${TEMP_FILE}"
 rm -f "${OUT_FILE}"
 
 # if an OpenPilot volume is already mounted, unmount it
-if [ ! -f "/Volumes/${VOL_NAME}" ]
+if [ -f "/Volumes/${VOL_NAME}" ]
 then
+echo "Unmount existing /Volumes/${VOL_NAME}"
 hdiutil unmount "/Volumes/${VOL_NAME}"
 fi
 
@@ -24,18 +25,30 @@ hdiutil convert "${ROOT_DIR}/package/osx/OpenPilot.dmg" \
 device=$(hdiutil attach "${TEMP_FILE}" | \
     egrep '^/dev/' | sed 1q | awk '{print $1}')
 
+#Just in case something is still mounted as ${VOL_NAME}, check the correct mount point
+mountvolume=$(hdiutil info | egrep "^${device}"| egrep "${VOL_NAME}" | sed 's/.*Volumes\///;s/*//' | sed 1q)
+
+echo "Image mounted as /Volumes/${mountvolume}"
+
+if [ ! -d "/Volumes/${mountvolume}/OpenPilot GCS.app" ]
+then
+    echo "Cannot find a valid image at /Volumes/${mountvolume}"
+    exit 1
+fi
+
 # packaging goes here
-cp -a "${APP_PATH}" "/Volumes/${VOL_NAME}"
+cp -a "${APP_PATH}" "/Volumes/${mountvolume}"
+
 #ls "${FW_DIR}" | xargs -n 1 -I {} cp "${FW_DIR}/{}" "/Volumes/${VOL_NAME}/Firmware"
-cp "${BUILD_DIR}/uavobject-synthetics/matlab/OPLogConvert.m" "/Volumes/${VOL_NAME}/Utilities"
-cp "${ROOT_DIR}/WHATSNEW.txt" "/Volumes/${VOL_NAME}"
-cp "${ROOT_DIR}/README.txt" "/Volumes/${VOL_NAME}/Docs"
-cp "${ROOT_DIR}/MILESTONES.txt" "/Volumes/${VOL_NAME}/Docs"
-cp "${ROOT_DIR}/LICENSE.txt" "/Volumes/${VOL_NAME}/Docs"
-cp "${ROOT_DIR}/GPLv3.txt" "/Volumes/${VOL_NAME}/Docs"
+cp "${BUILD_DIR}/uavobject-synthetics/matlab/OPLogConvert.m" "/Volumes/${mountvolume}/Utilities"
+cp "${ROOT_DIR}/WHATSNEW.txt" "/Volumes/${mountvolume}"
+cp "${ROOT_DIR}/README.txt" "/Volumes/${mountvolume}/Docs"
+cp "${ROOT_DIR}/MILESTONES.txt" "/Volumes/${mountvolume}/Docs"
+cp "${ROOT_DIR}/LICENSE.txt" "/Volumes/${mountvolume}/Docs"
+cp "${ROOT_DIR}/GPLv3.txt" "/Volumes/${mountvolume}/Docs"
 
 "${ROOT_DIR}/package/osx/libraries" \
-    "/Volumes/${VOL_NAME}/OpenPilot GCS.app" || exit 1
+    "/Volumes/${mountvolume}/OpenPilot GCS.app" || exit 1
 
 hdiutil detach ${device}
 

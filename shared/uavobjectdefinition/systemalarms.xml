@@ -1,5 +1,5 @@
 <xml>
-    <object name="SystemAlarms" singleinstance="true" settings="false">
+    <object name="SystemAlarms" singleinstance="true" settings="false" category="System">
         <description>Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.  Some modules may have a module defined Status and Substatus fields that details its condition.</description>
         <field name="Alarm" units="" type="enum" options="Uninitialised,OK,Warning,Error,Critical" defaultvalue="Uninitialised">
 		<elementnames>
@@ -16,6 +16,7 @@
 			<elementname>Sensors</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>Guidance</elementname>
+			<elementname>PathPlan</elementname>
 			<elementname>Battery</elementname>
 			<elementname>FlightTime</elementname>
 			<elementname>I2C</elementname>
@@ -43,6 +44,6 @@
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>
-        <logging updatemode="periodic" period="1000"/>
+	<logging updatemode="manual" period="0"/>
     </object>
 </xml>

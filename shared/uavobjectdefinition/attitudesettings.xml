@@ -1,5 +1,5 @@
 <xml>
-    <object name="AttitudeSettings" singleinstance="true" settings="true">
+    <object name="AttitudeSettings" singleinstance="true" settings="true" category="State">
         <description>Settings for the @ref Attitude module used on CopterControl</description>
         <field name="AccelBias" units="lsb" type="int16" elementnames="X,Y,Z" defaultvalue="0"/>
         <field name="GyroBias" units="deg/s * 100" type="int16" elementnames="X,Y,Z" defaultvalue="0"/>

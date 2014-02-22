@@ -2,7 +2,7 @@ TEMPLATE = lib
 TARGET = PfdQml
 QT += svg
 QT += opengl
-QT += declarative
+QT += qml quick
 OSG {
     DEFINES += USE_OSG
 }

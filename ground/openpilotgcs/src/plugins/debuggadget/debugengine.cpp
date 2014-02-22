@@ -1,12 +1,44 @@
 #include "debugengine.h"
-debugengine::debugengine()
-{}
 
-void debugengine::writeToStdErr(const QString &level, const QList<QVariant> &msgs)
+debugengine::debugengine()
 {
-    emit dbgMsgError(level, msgs);
+    mut_lock = new QMutex(QMutex::Recursive);
 }
-void debugengine::writeToStdOut(const QString &level, const QList<QVariant> &msgs)
+
+debugengine *debugengine::getInstance()
 {
-    emit dbgMsg(level, msgs);
+    static debugengine objectInstance;
+
+    return &objectInstance;
+}
+
+debugengine::~debugengine()
+{
+    delete mut_lock;
+    mut_lock = NULL;
+}
+
+void debugengine::setTextEdit(QTextBrowser *textEdit)
+{
+    QMutexLocker lock(mut_lock);
+
+    _textEdit = textEdit;
+}
+
+void debugengine::writeMessage(const QString &message)
+{
+    QMutexLocker lock(mut_lock);
+
+    if (_textEdit) {
+        _textEdit->append(message);
+    }
+}
+
+void debugengine::setColor(const QColor &c)
+{
+    QMutexLocker lock(mut_lock);
+
+    if (_textEdit) {
+        _textEdit->setTextColor(c);
+    }
 }

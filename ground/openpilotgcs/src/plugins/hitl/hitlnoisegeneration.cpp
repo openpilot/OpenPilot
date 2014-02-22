@@ -44,9 +44,9 @@ Noise HitlNoiseGeneration::getNoise()
 
 Noise HitlNoiseGeneration::generateNoise()
 {
-    noise.accelData.x = 0;
-    noise.accelData.y = 0;
-    noise.accelData.z = 0;
+    noise.accelStateData.x       = 0;
+    noise.accelStateData.y       = 0;
+    noise.accelStateData.z       = 0;
 
     noise.gpsPosData.Latitude    = 0;
     noise.gpsPosData.Longitude   = 0;
@@ -54,25 +54,25 @@ Noise HitlNoiseGeneration::generateNoise()
     noise.gpsPosData.Heading     = 0;
     noise.gpsPosData.Altitude    = 0;
 
-    noise.gpsVelData.North     = 0;
-    noise.gpsVelData.East      = 0;
-    noise.gpsVelData.Down      = 0;
+    noise.gpsVelData.North       = 0;
+    noise.gpsVelData.East = 0;
+    noise.gpsVelData.Down = 0;
 
     noise.baroAltData.Altitude = 0;
 
-    noise.attActualData.Roll   = 0;
-    noise.attActualData.Pitch  = 0;
-    noise.attActualData.Yaw    = 0;
+    noise.attStateData.Roll    = 0;
+    noise.attStateData.Pitch   = 0;
+    noise.attStateData.Yaw     = 0;
 
-    noise.gyroData.x  = 0;
-    noise.gyroData.y  = 0;
-    noise.gyroData.z  = 0;
+    noise.gyroStateData.x  = 0;
+    noise.gyroStateData.y  = 0;
+    noise.gyroStateData.z  = 0;
 
-    noise.accelData.x = 0;
-    noise.accelData.y = 0;
-    noise.accelData.z = 0;
+    noise.accelStateData.x = 0;
+    noise.accelStateData.y = 0;
+    noise.accelStateData.z = 0;
 
-    noise.airspeedActual.CalibratedAirspeed = 0;
+    noise.airspeedState.CalibratedAirspeed = 0;
 
     return noise;
 }

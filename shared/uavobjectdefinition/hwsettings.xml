@@ -1,5 +1,5 @@
 <xml>
-	<object name="HwSettings" singleinstance="true" settings="true">
+	<object name="HwSettings" singleinstance="true" settings="true" category="System">
 		<description>Selection of optional hardware configurations.</description>
 		<field name="CC_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+PWM,PPM+Outputs,Outputs" defaultvalue="PWM"/>
 		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge,OsdHk" defaultvalue="Telemetry"/>
@@ -23,7 +23,7 @@
 		<field name="USB_VCPPort" units="function" type="enum" elements="1" options="USBTelemetry,ComBridge,DebugConsole,Disabled" defaultvalue="Disabled"/>
 
 		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS,ComUsbBridge,Fault,Altitude,Airspeed,TxPID,Autotune,VtolPathFollower,FixedWingPathFollower,Battery,Overo,MagBaro,OsdHk" options="Disabled,Enabled" defaultvalue="Disabled"/>
-		<field name="ADCRouting" units="" type="enum" elementnames="ADC0,ADC1,ADC2,ADC3" options="Disabled,BatteryVoltage,BatteryCurrent,AnalogAirspeed,Generic" defaultvalue="Disabled"/>
+		<field name="ADCRouting" units="" type="enum" elementnames="adc0,adc1,adc2,adc3" options="Disabled,BatteryVoltage,BatteryCurrent,AnalogAirspeed,Generic" defaultvalue="Disabled"/>
 		<field name="DSMxBind" units=""  type="uint8"  elements="1" defaultvalue="0"/>
 
 		<access gcs="readwrite" flight="readwrite"/>

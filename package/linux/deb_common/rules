@@ -25,7 +25,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	dh_clean
- 
+
 install:
 	dh_testdir
 	dh_testroot
@@ -35,8 +35,9 @@ install:
 	# Add here commands to install the package into debian/<packagename>
 	cp -arp build/openpilotgcs_release/bin   debian/openpilot/usr/local/OpenPilot
 	cp -arp build/openpilotgcs_release/lib   debian/openpilot/usr/local/OpenPilot
-	cp -arp build/openpilotgcs_release/share debian/openpilot/usr/local/OpenPilot
+	cp -arp build/openpilotgcs_release/share debian/openpilot/usr/local/OpenPilot     
 	cp -arp build/openpilotgcs_release/.obj  debian/openpilot/usr/local/OpenPilot
+	cp -arp package/linux/qt.conf debian/openpilot/usr/local/OpenPilot/bin
 	cp -arp package/linux/openpilot.desktop debian/openpilot/usr/share/applications
 	cp -arp package/linux/openpilot.png     debian/openpilot/usr/share/pixmaps
 	cp -arp package/linux/openpilot_menu.png  debian/openpilot/usr/share/pixmaps
@@ -54,7 +55,8 @@ endif
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/mapicons/mapicons
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/dials/dials
 	rm -rf debian/openpilot/usr/local/OpenPilot/share/openpilotgcs/diagrams/diagrams
-
+# Removing leaked files from the dist
+	find debian/openpilot -name Makefile -exec rm -f {} \;
 
 # Build architecture-independent files here.
 binary-indep: install
@@ -73,10 +75,10 @@ binary-arch: install
 	dh_compress
 	dh_fixperms
 	dh_installdeb
-	dh_shlibdeps -l/usr/local/OpenPilot/lib/openpilotgcs --dpkg-shlibdeps-params="--ignore-missing-info -v"
+	dh_shlibdeps -l/usr/local/OpenPilot/lib/openpilotgcs:/usr/local/OpenPilot/lib/qt5 --dpkg-shlibdeps-params="--ignore-missing-info -v"
 	dh_gencontrol
 	dh_md5sums
-	dh_builddeb
+	dh_builddeb -- -Zbzip2
 
 binary: binary-indep binary-arch
 

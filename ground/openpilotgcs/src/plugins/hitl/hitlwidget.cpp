@@ -26,7 +26,6 @@
  */
 #include "hitlwidget.h"
 #include "ui_hitlwidget.h"
-#include "qxtlogger.h"
 #include <QDebug>
 #include <QFile>
 #include <QDir>
@@ -85,7 +84,7 @@ void HITLWidget::startButtonClicked()
     }
 
     if (!HITLPlugin::typeSimulators.size()) {
-        qxtLog->info("There is no registered simulators, add through HITLPlugin::addSimulator");
+        qWarning("There is no registered simulators, add through HITLPlugin::addSimulator");
         return;
     }
 
@@ -111,7 +110,7 @@ void HITLWidget::startButtonClicked()
 
     // Setup process
     widget->textBrowser->append(QString("[%1] Starting %2... ").arg(QTime::currentTime().toString("hh:mm:ss")).arg(creator->Description()));
-    qxtLog->info("HITL: Starting " + creator->Description());
+    qWarning() << ("HITL: Starting " + creator->Description());
 
     // Start bridge
     bool ret = QMetaObject::invokeMethod(simulator, "setupProcess", Qt::QueuedConnection);
@@ -122,7 +121,7 @@ void HITLWidget::startButtonClicked()
 
         widget->startButton->setEnabled(false);
         widget->stopButton->setEnabled(true);
-        qxtLog->info("HITL: Starting bridge, initializing flight simulator and Autopilot connections");
+        qWarning("HITL: Starting bridge, initializing flight simulator and Autopilot connections");
 
         connect(simulator, SIGNAL(autopilotConnected()), this, SLOT(onAutopilotConnect()), Qt::QueuedConnection);
         connect(simulator, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()), Qt::QueuedConnection);
@@ -177,26 +176,26 @@ void HITLWidget::onAutopilotConnect()
 {
     widget->apLabel->setStyleSheet(strStyleEnable);
     widget->apLabel->setText(strAutopilotConnected);
-    qxtLog->info("HITL: Autopilot connected, initializing for HITL simulation");
+    qWarning("HITL: Autopilot connected, initializing for HITL simulation");
 }
 
 void HITLWidget::onAutopilotDisconnect()
 {
     widget->apLabel->setStyleSheet(strStyleDisable);
     widget->apLabel->setText(strAutopilotDisconnected);
-    qxtLog->info(strAutopilotDisconnected);
+    qWarning() << strAutopilotDisconnected;
 }
 
 void HITLWidget::onSimulatorConnect()
 {
     widget->simLabel->setStyleSheet(strStyleEnable);
     widget->simLabel->setText(" " + simulator->Name() + " connected ");
-    qxtLog->info(QString("HITL: %1 connected").arg(simulator->Name()));
+    qWarning() << (QString("HITL: %1 connected").arg(simulator->Name()));
 }
 
 void HITLWidget::onSimulatorDisconnect()
 {
     widget->simLabel->setStyleSheet(strStyleDisable);
     widget->simLabel->setText(" " + simulator->Name() + " disconnected ");
-    qxtLog->info(QString("HITL: %1 disconnected").arg(simulator->Name()));
+    qWarning() << (QString("HITL: %1 disconnected").arg(simulator->Name()));
 }

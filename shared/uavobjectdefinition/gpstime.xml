@@ -1,5 +1,5 @@
 <xml>
-    <object name="GPSTime" singleinstance="true" settings="false">
+    <object name="GPSTime" singleinstance="true" settings="false" category="Sensors">
         <description>Contains the GPS time from @ref GPSModule.  Required to compute the world magnetic model correctly when setting the home location.</description>
         <field name="Month" units="" type="int8" elements="1"/>
         <field name="Day" units="" type="int8" elements="1"/>
@@ -10,6 +10,6 @@
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="10000"/>
-        <logging updatemode="periodic" period="30000"/>
+        <logging updatemode="manual" period="0"/>
     </object>
 </xml>

@@ -129,7 +129,7 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 #if defined(PIOS_INCLUDE_MS5611)
 #include "pios_ms5611.h"
 static const struct pios_ms5611_cfg pios_ms5611_cfg = {
-    .oversampling = MS5611_OSR_512,
+    .oversampling = MS5611_OSR_4096,
 };
 #endif /* PIOS_INCLUDE_MS5611 */
 
@@ -443,6 +443,9 @@ void PIOS_Board_Init(void)
         PIOS_Assert(0);
     }
 
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -451,9 +454,6 @@ void PIOS_Board_Init(void)
 
     /* Initialize the alarms library */
     AlarmsInitialize();
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
     /* Set up pulse timers */
     PIOS_TIM_InitClock(&tim_1_cfg);
@@ -866,7 +866,7 @@ void PIOS_Board_Init(void)
     {
         HwSettingsData hwSettings;
         HwSettingsGet(&hwSettings);
-        if (hwSettings.OptionalModules[HWSETTINGS_OPTIONALMODULES_OVERO] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+        if (hwSettings.OptionalModules.Overo == HWSETTINGS_OPTIONALMODULES_ENABLED) {
             if (PIOS_OVERO_Init(&pios_overo_id, &pios_overo_cfg)) {
                 PIOS_DEBUG_Assert(0);
             }

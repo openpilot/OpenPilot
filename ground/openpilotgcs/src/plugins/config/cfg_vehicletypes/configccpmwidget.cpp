@@ -31,16 +31,16 @@
 
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include <QBrush>
 #include <QMessageBox>
 
 #include <math.h>
 
-#define Pi 3.14159265358979323846
+#define  Pi 3.14159265358979323846
 
 QStringList ConfigCcpmWidget::getChannelDescriptions()
 {
@@ -126,8 +126,8 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     SwashLvlConfigurationInProgress = 0;
     SwashLvlState = 0;
     SwashLvlServoInterlock = 0;
-    updatingFromHardware   = FALSE;
-    updatingToHardware     = FALSE;
+    updatingFromHardware   = false;
+    updatingToHardware     = false;
 
     // Initialization of the swashplaye widget
     m_aircraft->SwashplateImage->setScene(new QGraphicsScene(this));
@@ -687,7 +687,7 @@ void ConfigCcpmWidget::UpdateMixer()
     }
 
     if (config.heli.SwashplateType > 0) { // not advanced settings
-                                          // get the channel data from the ui
+        // get the channel data from the ui
         MixerChannelData[0] = m_aircraft->ccpmEngineChannel->currentIndex();
         MixerChannelData[1] = m_aircraft->ccpmTailChannel->currentIndex();
         MixerChannelData[2] = m_aircraft->ccpmServoWChannel->currentIndex();
@@ -796,11 +796,11 @@ QString ConfigCcpmWidget::updateConfigObjects()
     bool useCCPM;
     bool useCyclic;
 
-    if (updatingFromHardware == TRUE) {
+    if (updatingFromHardware == true) {
         return airframeType;
     }
 
-    updatingFromHardware = TRUE;
+    updatingFromHardware = true;
 
     // get the user options
     GUIConfigDataUnion config = getConfigData();
@@ -845,7 +845,7 @@ QString ConfigCcpmWidget::updateConfigObjects()
 
     setConfigData(config);
 
-    updatingFromHardware = FALSE;
+    updatingFromHardware = false;
     return airframeType;
 }
 
@@ -888,7 +888,7 @@ void ConfigCcpmWidget::getMixer()
         return;
     }
 
-    updatingFromHardware = TRUE;
+    updatingFromHardware = true;
 
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
@@ -911,7 +911,7 @@ void ConfigCcpmWidget::getMixer()
         m_aircraft->PitchCurve->ResetCurve();
     }
 
-    updatingFromHardware = FALSE;
+    updatingFromHardware = false;
 
     ccpmSwashplateUpdate();
 }
@@ -926,11 +926,11 @@ void ConfigCcpmWidget::setMixer()
     if (SwashLvlConfigurationInProgress) {
         return;
     }
-    if (updatingToHardware == TRUE) {
+    if (updatingToHardware == true) {
         return;
     }
 
-    updatingToHardware = TRUE;
+    updatingToHardware = true;
 
     MixerSettings *mixerSettings = MixerSettings::GetInstance(getObjectManager());
     Q_ASSERT(mixerSettings);
@@ -1004,7 +1004,7 @@ void ConfigCcpmWidget::setMixer()
 
     mixerSettings->setData(mixerSettingsData);
     mixerSettings->updated();
-    updatingToHardware = FALSE;
+    updatingToHardware = false;
 }
 
 /**

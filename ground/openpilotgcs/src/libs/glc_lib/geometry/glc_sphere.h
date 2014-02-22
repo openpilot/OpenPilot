@@ -26,7 +26,7 @@
 #define GLC_SPHERE_H_
 
 #include "glc_mesh.h"
-
+#include "../maths/glc_vector3d.h"
 #include "../glc_config.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -43,7 +43,10 @@ class GLC_LIB_EXPORT GLC_Sphere : public GLC_Mesh
 //////////////////////////////////////////////////////////////////////
 public:
 	//! Construct a sphere with the given radius
-	GLC_Sphere(double radius);
+	GLC_Sphere(double radius, int discretization= glc::GLC_POLYDISCRET);
+
+	//! Construct a sphere with the given radius and center
+	GLC_Sphere(double radius, const GLC_Point3d& center, int discretization= glc::GLC_POLYDISCRET);
 
 	//! Copy constructor
 	GLC_Sphere(const GLC_Sphere & sphere);
@@ -73,6 +76,10 @@ public:
 
 	//! Return the sphere bounding box
 	virtual const GLC_BoundingBox& boundingBox(void);
+
+	//! Return the sphere center
+	inline GLC_Point3d center() const
+	{return m_Center;}
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -87,6 +94,9 @@ public:
 	//! Set Discretion
 	/*! Discretion must be > 0*/
 	void setDiscretion(int TargetDiscret);
+
+	//! Set Sphere center
+	void setCenter(const GLC_Point3d& pos);
 
 //@}
 
@@ -125,6 +135,8 @@ private:
 	double m_ThetaMax;
 	double m_PhiMin;
 	double m_PhiMax;
+
+	GLC_Point3d m_Center;
 
 	//! Class chunk id
 	static quint32 m_ChunkId;

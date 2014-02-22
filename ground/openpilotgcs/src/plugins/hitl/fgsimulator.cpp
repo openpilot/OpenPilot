@@ -82,7 +82,7 @@ bool FGSimulator::setupProcess()
     // xmlFile.close();
     // QFile xmlFileOut(pathData + "/Protocol/opfgprotocol.xml");
     // xmlFileOut.open(QIODevice::WriteOnly | QIODevice::Text);
-    // xmlFileOut.write(xml.toAscii());
+    // xmlFileOut.write(xml.toLatin1());
     // xmlFileOut.close();
 
     Qt::HANDLE mainThread = QThread::currentThreadId();
@@ -125,7 +125,7 @@ bool FGSimulator::setupProcess()
     // Start FlightGear - only if checkbox is selected in HITL options page
     if (settings.startSim) {
         QString cmd("\"" + settings.binPath + "\" " + args + "\n");
-        simProcess->write(cmd.toAscii());
+        simProcess->write(cmd.toLatin1());
     } else {
         emit processOutput("Start Flightgear from the command line with the following arguments: \n\n" + args + "\n\n" +
                            "You can optionally run Flightgear from a networked computer.\n" +
@@ -197,7 +197,7 @@ void FGSimulator::transmitUpdate()
               .arg(throttle) // throttle
               .arg(udpCounterGCSsend); // UDP packet counter delay
 
-        QByteArray data = cmd.toAscii();
+        QByteArray data = cmd.toLatin1();
 
         if (outSocket->writeDatagram(data, QHostAddress(settings.remoteAddress), settings.outPort) == -1) {
             emit processOutput("Error sending UDP packet to FG: " + outSocket->errorString() + "\n");
@@ -268,12 +268,12 @@ void FGSimulator::processUpdate(const QByteArray & inp)
     float temperature  = fields[19].toFloat();
     // Get pressure (kpa)
     float pressure     = fields[20].toFloat() * INHG2KPA;
-    // Get VelocityActual Down (cm/s)
-    float velocityActualDown  = -fields[21].toFloat() * FPS2CMPS;
-    // Get VelocityActual East (cm/s)
-    float velocityActualEast  = fields[22].toFloat() * FPS2CMPS;
-    // Get VelocityActual Down (cm/s)
-    float velocityActualNorth = fields[23].toFloat() * FPS2CMPS;
+    // Get VelocityState Down (cm/s)
+    float velocityStateDown  = -fields[21].toFloat() * FPS2CMPS;
+    // Get VelocityState East (cm/s)
+    float velocityStateEast  = fields[22].toFloat() * FPS2CMPS;
+    // Get VelocityState Down (cm/s)
+    float velocityStateNorth = fields[23].toFloat() * FPS2CMPS;
 
     // Get UDP packets received by FG
     int n = fields[24].toInt();
@@ -307,11 +307,11 @@ void FGSimulator::processUpdate(const QByteArray & inp)
     out.calibratedAirspeed = airspeed;
 
 
-    // Update BaroAltitude object
+    // Update BaroSensor object
     out.temperature = temperature;
     out.pressure    = pressure;
 
-    // Update attActual object
+    // Update attState object
     out.roll      = roll;       // roll;
     out.pitch     = pitch;     // pitch
     out.heading   = yaw; // yaw
@@ -320,10 +320,10 @@ void FGSimulator::processUpdate(const QByteArray & inp)
     out.dstE      = NED[1];
     out.dstD      = NED[2];
 
-    // Update VelocityActual.{North,East,Down}
-    out.velNorth  = velocityActualNorth;
-    out.velEast   = velocityActualEast;
-    out.velDown   = velocityActualDown;
+    // Update VelocityState.{North,East,Down}
+    out.velNorth  = velocityStateNorth;
+    out.velEast   = velocityStateEast;
+    out.velDown   = velocityStateDown;
 
     // Update gyroscope sensor data
     out.rollRate  = rollRate;

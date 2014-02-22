@@ -1,0 +1,23 @@
+
+
+# *************** OpenPilot commits guidelines ***************
+# Each commit needs to have a message like the following sample:
+#  OP-1150 UI for thermal calibration: Connect State machine to UI
+#
+# It needs to begin with a reference to one or more Jira tickets followed by a short description.
+# If needed add a longer description in the following lines, after an empty line.
+#
+# Before  committing, ensure your code is properly formatted using:
+#  	make uncrustify_all 
+# You can format flight or ground code only using respectively 
+# uncrustify_flight or uncrustify_ground
+#
+# To automatically create a review, append the following smart commit messages:
+#   +review OPReview
+#
+# To append the commit to an existing review, use the following smart commit message:
+#   +review OPReview-NNN
+# For example "+review OPReview-609"  
+#
+# *NOTE* leave an empty line between the commit message and "smart commit command"
+# Smart commits commands need to starts immediately at first column

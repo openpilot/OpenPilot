@@ -1,0 +1,12 @@
+<xml>
+    <object name="VelocityState" singleinstance="true" settings="false" category="State">
+        <description>Updated by @ref StateEstimationModule, velocity relative to @ref HomeLocation.</description>
+        <field name="North" units="m/s" type="float" elements="1"/>
+        <field name="East" units="m/s" type="float" elements="1"/>
+        <field name="Down" units="m/s" type="float" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

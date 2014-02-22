@@ -28,6 +28,7 @@
 #include "gpsitem.h"
 #include "homeitem.h"
 #include "mapgraphicitem.h"
+#include <QGraphicsSceneMouseEvent>
 
 namespace mapcontrol {
 MapGraphicItem::MapGraphicItem(internals::Core *core, Configuration *configuration) : core(core), config(configuration), MapRenderTransform(1), maxZoom(17), minZoom(2), zoomReal(0), isSelected(false), rotation(0), zoomDigi(0)

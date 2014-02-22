@@ -35,6 +35,7 @@
 // UAVOs
 #include <manualcontrolsettings.h>
 #include <systemsettings.h>
+#include <systemalarms.h>
 #include <taskinfo.h>
 
 /****************************
@@ -113,9 +114,9 @@ int32_t configuration_check()
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEVARIO:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_ALTITUDEHOLD)) { // Revo supports altitude hold
-                severity = SYSTEMALARMS_ALARM_ERROR;
             }
+            // TODO: put check equivalent to TASK_MONITOR_IsRunning
+            // here as soon as available for delayed callbacks
             break;
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
             if (coptercontrol) {
@@ -151,9 +152,15 @@ int32_t configuration_check()
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
-                // Revo supports PathPlanner
-                severity = SYSTEMALARMS_ALARM_ERROR;
+            } else {
+                // Revo supports PathPlanner and that must be OK or we are not sane
+                // PathPlan alarm is uninitialized if not running
+                // PathPlan alarm is warning or error if the flightplan is invalid
+                SystemAlarmsAlarmData alarms;
+                SystemAlarmsAlarmGet(&alarms);
+                if (alarms.PathPlan != SYSTEMALARMS_ALARM_OK) {
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                }
             }
             break;
         case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
@@ -204,13 +211,13 @@ static int32_t check_stabilization_settings(int index, bool multirotor)
     // Get the different axis modes for this switch position
     switch (index) {
     case 1:
-        ManualControlSettingsStabilization1SettingsGet(modes);
+        ManualControlSettingsStabilization1SettingsArrayGet(modes);
         break;
     case 2:
-        ManualControlSettingsStabilization2SettingsGet(modes);
+        ManualControlSettingsStabilization2SettingsArrayGet(modes);
         break;
     case 3:
-        ManualControlSettingsStabilization3SettingsGet(modes);
+        ManualControlSettingsStabilization3SettingsArrayGet(modes);
         break;
     default:
         return SYSTEMALARMS_ALARM_ERROR;

@@ -1,5 +1,6 @@
 /**
  ******************************************************************************
+
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup RadioComBridgeModule Com Port to Radio Bridge Module
@@ -36,6 +37,7 @@
 #include <objectpersistence.h>
 #include <oplinksettings.h>
 #include <oplinkreceiver.h>
+#include <radiocombridgestats.h>
 #include <uavtalk_priv.h>
 #include <pios_rfm22b.h>
 #include <ecc.h>
@@ -56,6 +58,7 @@
 #define MAX_PORT_DELAY    200
 #define SERIAL_RX_BUF_LEN 100
 #define PPM_INPUT_TIMEOUT 100
+
 
 // ****************
 // Private types
@@ -81,10 +84,11 @@ typedef struct {
     uint8_t  serialRxBuf[SERIAL_RX_BUF_LEN];
 
     // Error statistics.
-    uint32_t comTxErrors;
-    uint32_t comTxRetries;
-    uint32_t UAVTalkErrors;
-    uint32_t droppedPackets;
+    uint32_t telemetryTxRetries;
+    uint32_t radioTxRetries;
+
+    // Is this modem the coordinator
+    bool     isCoordinator;
 
     // Should we parse UAVTalk?
     bool     parseUAVTalk;
@@ -107,6 +111,7 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length);
 static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte);
 static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte);
 static void objectPersistenceUpdatedCb(UAVObjEvent *objEv);
+static void registerObject(UAVObjHandle obj);
 
 // ****************
 // Private variables
@@ -124,12 +129,14 @@ static int32_t RadioComBridgeStart(void)
         // Get the settings.
         OPLinkSettingsData oplinkSettings;
         OPLinkSettingsGet(&oplinkSettings);
-        bool is_coordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
+
+        // Check if this is the coordinator modem
+        data->isCoordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
 
         // We will not parse/send UAVTalk if any ports are configured as Serial (except for over the USB HID port).
-        data->parseUAVTalk = ((oplinkSettings.MainPort != OPLINKSETTINGS_MAINPORT_SERIAL) &&
-                              (oplinkSettings.FlexiPort != OPLINKSETTINGS_FLEXIPORT_SERIAL) &&
-                              (oplinkSettings.VCPPort != OPLINKSETTINGS_VCPPORT_SERIAL));
+        data->parseUAVTalk  = ((oplinkSettings.MainPort != OPLINKSETTINGS_MAINPORT_SERIAL) &&
+                               (oplinkSettings.FlexiPort != OPLINKSETTINGS_FLEXIPORT_SERIAL) &&
+                               (oplinkSettings.VCPPort != OPLINKSETTINGS_VCPPORT_SERIAL));
 
         // Set the maximum radio RF power.
         switch (oplinkSettings.MaxRFPower) {
@@ -165,10 +172,14 @@ static int32_t RadioComBridgeStart(void)
         // Configure our UAVObjects for updates.
         UAVObjConnectQueue(UAVObjGetByID(OPLINKSTATUS_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
         UAVObjConnectQueue(UAVObjGetByID(OBJECTPERSISTENCE_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
-        if (is_coordinator) {
+        if (data->isCoordinator) {
             UAVObjConnectQueue(UAVObjGetByID(OPLINKRECEIVER_OBJID), data->radioEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
         } else {
             UAVObjConnectQueue(UAVObjGetByID(OPLINKRECEIVER_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+        }
+
+        if (data->isCoordinator) {
+            registerObject(RadioComBridgeStatsHandle());
         }
 
         // Configure the UAVObject callbacks
@@ -223,26 +234,93 @@ static int32_t RadioComBridgeInitialize(void)
     OPLinkStatusInitialize();
     ObjectPersistenceInitialize();
     OPLinkReceiverInitialize();
+    RadioComBridgeStatsInitialize();
 
     // Initialise UAVTalk
-    data->telemUAVTalkCon   = UAVTalkInitialize(&UAVTalkSendHandler);
-    data->radioUAVTalkCon   = UAVTalkInitialize(&RadioSendHandler);
+    data->telemUAVTalkCon    = UAVTalkInitialize(&UAVTalkSendHandler);
+    data->radioUAVTalkCon    = UAVTalkInitialize(&RadioSendHandler);
 
     // Initialize the queues.
-    data->uavtalkEventQueue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
-    data->radioEventQueue   = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
+    data->uavtalkEventQueue  = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
+    data->radioEventQueue    = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
 
     // Initialize the statistics.
-    data->comTxErrors   = 0;
-    data->comTxRetries  = 0;
-    data->UAVTalkErrors = 0;
-    data->parseUAVTalk  = true;
-    data->comSpeed = OPLINKSETTINGS_COMSPEED_9600;
-    PIOS_COM_RADIO = PIOS_COM_RFM22B;
+    data->telemetryTxRetries = 0;
+    data->radioTxRetries     = 0;
+
+    data->parseUAVTalk = true;
+    data->comSpeed     = OPLINKSETTINGS_COMSPEED_9600;
+    PIOS_COM_RADIO     = PIOS_COM_RFM22B;
 
     return 0;
 }
 MODULE_INITCALL(RadioComBridgeInitialize, RadioComBridgeStart);
+
+
+// TODO this code (badly) duplicates code from telemetry.c
+// This method should be used only for periodically updated objects.
+// The register method defined in telemetry.c should be factored out in a shared location so it can be
+// used from here...
+static void registerObject(UAVObjHandle obj)
+{
+    // Setup object for periodic updates
+    UAVObjEvent ev = {
+        .obj    = obj,
+        .instId = UAVOBJ_ALL_INSTANCES,
+        .event  = EV_UPDATED_PERIODIC,
+    };
+
+    // Get metadata
+    UAVObjMetadata metadata;
+
+    UAVObjGetMetadata(obj, &metadata);
+
+    EventPeriodicQueueCreate(&ev, data->uavtalkEventQueue, metadata.telemetryUpdatePeriod);
+    UAVObjConnectQueue(obj, data->uavtalkEventQueue, EV_UPDATED_PERIODIC | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+}
+
+/**
+ * Update telemetry statistics
+ */
+static void updateRadioComBridgeStats()
+{
+    UAVTalkStats telemetryUAVTalkStats;
+    UAVTalkStats radioUAVTalkStats;
+    RadioComBridgeStatsData radioComBridgeStats;
+
+    // Get telemetry stats
+    UAVTalkGetStats(data->telemUAVTalkCon, &telemetryUAVTalkStats);
+    UAVTalkResetStats(data->telemUAVTalkCon);
+
+    // Get radio stats
+    UAVTalkGetStats(data->radioUAVTalkCon, &radioUAVTalkStats);
+    UAVTalkResetStats(data->radioUAVTalkCon);
+
+    // Get stats object data
+    RadioComBridgeStatsGet(&radioComBridgeStats);
+
+    // Update stats object
+    radioComBridgeStats.TelemetryTxBytes      += telemetryUAVTalkStats.txBytes;
+    radioComBridgeStats.TelemetryTxFailures   += telemetryUAVTalkStats.txErrors;
+    radioComBridgeStats.TelemetryTxRetries    += data->telemetryTxRetries;
+
+    radioComBridgeStats.TelemetryRxBytes      += telemetryUAVTalkStats.rxBytes;
+    radioComBridgeStats.TelemetryRxFailures   += telemetryUAVTalkStats.rxErrors;
+    radioComBridgeStats.TelemetryRxSyncErrors += telemetryUAVTalkStats.rxSyncErrors;
+    radioComBridgeStats.TelemetryRxCrcErrors  += telemetryUAVTalkStats.rxCrcErrors;
+
+    radioComBridgeStats.RadioTxBytes      += radioUAVTalkStats.txBytes;
+    radioComBridgeStats.RadioTxFailures   += radioUAVTalkStats.txErrors;
+    radioComBridgeStats.RadioTxRetries    += data->radioTxRetries;
+
+    radioComBridgeStats.RadioRxBytes      += radioUAVTalkStats.rxBytes;
+    radioComBridgeStats.RadioRxFailures   += radioUAVTalkStats.rxErrors;
+    radioComBridgeStats.RadioRxSyncErrors += radioUAVTalkStats.rxSyncErrors;
+    radioComBridgeStats.RadioRxCrcErrors  += radioUAVTalkStats.rxCrcErrors;
+
+    // Update stats object data
+    RadioComBridgeStatsSet(&radioComBridgeStats);
+}
 
 /**
  * @brief Telemetry transmit task, regular priority
@@ -260,18 +338,20 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
 #endif
         // Wait for queue message
         if (xQueueReceive(data->uavtalkEventQueue, &ev, MAX_PORT_DELAY) == pdTRUE) {
-            if ((ev.event == EV_UPDATED) || (ev.event == EV_UPDATE_REQ)) {
-                // Send update (with retries)
-                uint32_t retries = 0;
-                int32_t success  = -1;
-                while (retries < MAX_RETRIES && success == -1) {
-                    success = UAVTalkSendObject(data->telemUAVTalkCon, ev.obj, 0, 0, RETRY_TIMEOUT_MS) == 0;
-                    if (!success) {
-                        ++retries;
-                    }
-                }
-                data->comTxRetries += retries;
+            if (ev.obj == RadioComBridgeStatsHandle()) {
+                updateRadioComBridgeStats();
             }
+            // Send update (with retries)
+            uint32_t retries = 0;
+            int32_t success  = -1;
+            while (retries < MAX_RETRIES && success == -1) {
+                success = UAVTalkSendObject(data->telemUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS) == 0;
+                if (success == -1) {
+                    ++retries;
+                }
+            }
+            // Update stats
+            data->telemetryTxRetries += retries;
         }
     }
 }
@@ -299,12 +379,12 @@ static void radioTxTask(__attribute__((unused)) void *parameters)
                 uint32_t retries = 0;
                 int32_t success  = -1;
                 while (retries < MAX_RETRIES && success == -1) {
-                    success = UAVTalkSendObject(data->radioUAVTalkCon, ev.obj, 0, 0, RETRY_TIMEOUT_MS) == 0;
-                    if (!success) {
+                    success = UAVTalkSendObject(data->radioUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS) == 0;
+                    if (success == -1) {
                         ++retries;
                     }
                 }
-                data->comTxRetries += retries;
+                data->radioTxRetries += retries;
             }
         }
     }
@@ -333,7 +413,13 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
                     }
                 } else if (PIOS_COM_TELEMETRY) {
                     // Send the data straight to the telemetry port.
-                    PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, serial_data, bytes_to_process);
+                    // FIXME following call can fail (with -2 error code) if buffer is full
+                    // it is the caller responsibility to retry in such cases...
+                    int32_t ret   = -2;
+                    uint8_t count = 5;
+                    while (count-- > 0 && ret < -1) {
+                        ret = PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, serial_data, bytes_to_process);
+                    }
                 }
             }
         } else {
@@ -425,9 +511,15 @@ static void serialRxTask(__attribute__((unused)) void *parameters)
             // Receive some data.
             uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, data->serialRxBuf, sizeof(data->serialRxBuf), MAX_PORT_DELAY);
 
-            // Send the data over the radio link.
             if (bytes_to_process > 0) {
-                PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, data->serialRxBuf, bytes_to_process);
+                // Send the data over the radio link.
+                // FIXME following call can fail (with -2 error code) if buffer is full
+                // it is the caller responsibility to retry in such cases...
+                int32_t ret   = -2;
+                uint8_t count = 5;
+                while (count-- > 0 && ret < -1) {
+                    ret = PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, data->serialRxBuf, bytes_to_process);
+                }
             }
         } else {
             vTaskDelay(5);
@@ -445,6 +537,7 @@ static void serialRxTask(__attribute__((unused)) void *parameters)
  */
 static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
 {
+    int32_t ret;
     uint32_t outputPort = data->parseUAVTalk ? PIOS_COM_TELEMETRY : 0;
 
 #if defined(PIOS_INCLUDE_USB)
@@ -454,10 +547,17 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
     }
 #endif /* PIOS_INCLUDE_USB */
     if (outputPort) {
-        return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+        // FIXME following call can fail (with -2 error code) if buffer is full
+        // it is the caller responsibility to retry in such cases...
+        ret = -2;
+        uint8_t count = 5;
+        while (count-- > 0 && ret < -1) {
+            ret = PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+        }
     } else {
-        return -1;
+        ret = -1;
     }
+    return ret;
 }
 
 /**
@@ -477,10 +577,16 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
 
     // Don't send any data unless the radio port is available.
     if (outputPort && PIOS_COM_Available(outputPort)) {
-        return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+        // FIXME following call can fail (with -2 error code) if buffer is full
+        // it is the caller responsibility to retry in such cases...
+        int32_t ret   = -2;
+        uint8_t count = 5;
+        while (count-- > 0 && ret < -1) {
+            ret = PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+        }
+        return ret;
     } else {
-        // For some reason, if this function returns failure, it prevents saving settings.
-        return length;
+        return -1;
     }
 }
 
@@ -494,12 +600,40 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
 static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte)
 {
     // Keep reading until we receive a completed packet.
-    UAVTalkRxState state = UAVTalkProcessInputStream(inConnectionHandle, rxbyte);
+    UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbyte);
 
-    if (state == UAVTALK_STATE_ERROR) {
-        data->UAVTalkErrors++;
-    } else if (state == UAVTALK_STATE_COMPLETE) {
-        UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
+    if (state == UAVTALK_STATE_COMPLETE) {
+        // We only want to unpack certain telemetry objects
+        uint32_t objId = UAVTalkGetPacketObjId(inConnectionHandle);
+        switch (objId) {
+        case OPLINKSTATUS_OBJID:
+        case OPLINKSETTINGS_OBJID:
+        case OPLINKRECEIVER_OBJID:
+        case MetaObjectId(OPLINKSTATUS_OBJID):
+        case MetaObjectId(OPLINKSETTINGS_OBJID):
+        case MetaObjectId(OPLINKRECEIVER_OBJID):
+            UAVTalkReceiveObject(inConnectionHandle);
+            break;
+        case OBJECTPERSISTENCE_OBJID:
+        case MetaObjectId(OBJECTPERSISTENCE_OBJID):
+            // receive object locally
+            // some objects will send back a response to telemetry
+            // FIXME:
+            // OPLM will ack or nack all objects requests and acked object sends
+            // Receiver will probably also ack / nack the same messages
+            // This has some consequences like :
+            // Second ack/nack will not match an open transaction or will apply to wrong transaction
+            // Question : how does GCS handle receiving the same object twice
+            // The OBJECTPERSISTENCE logic can be broken too if for example OPLM nacks and then REVO acks...
+            UAVTalkReceiveObject(inConnectionHandle);
+            // relay packet to remote modem
+            UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
+            break;
+        default:
+            // all other packets are relayed to the remote modem
+            UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
+            break;
+        }
     }
 }
 
@@ -515,19 +649,30 @@ static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConn
     // Keep reading until we receive a completed packet.
     UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(inConnectionHandle, rxbyte);
 
-    if (state == UAVTALK_STATE_ERROR) {
-        data->UAVTalkErrors++;
-    } else if (state == UAVTALK_STATE_COMPLETE) {
-        // We only want to unpack certain objects from the remote modem.
+    if (state == UAVTALK_STATE_COMPLETE) {
+        // We only want to unpack certain objects from the remote modem
+        // Similarly we only want to relay certain objects to the telemetry port
         uint32_t objId = UAVTalkGetPacketObjId(inConnectionHandle);
         switch (objId) {
         case OPLINKSTATUS_OBJID:
         case OPLINKSETTINGS_OBJID:
+        case MetaObjectId(OPLINKSTATUS_OBJID):
+        case MetaObjectId(OPLINKSETTINGS_OBJID):
+            // Ignore object...
+            // These objects are shadowed by the modem and are not transmitted to the telemetry port
+            // - OPLINKSTATUS_OBJID : ground station will receive the OPLM link status instead
+            // - OPLINKSETTINGS_OBJID : ground station will read and write the OPLM settings instead
             break;
         case OPLINKRECEIVER_OBJID:
+        case MetaObjectId(OPLINKRECEIVER_OBJID):
+            // Receive object locally
+            // These objects are received by the modem and are not transmitted to the telemetry port
+            // - OPLINKRECEIVER_OBJID : not sure why
+            // some objects will send back a response to the remote modem
             UAVTalkReceiveObject(inConnectionHandle);
             break;
         default:
+            // all other packets are relayed to the telemetry port
             UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
             break;
         }
@@ -545,7 +690,7 @@ static void objectPersistenceUpdatedCb(__attribute__((unused)) UAVObjEvent *objE
 
     ObjectPersistenceGet(&obj_per);
 
-    // Is this concerning or setting object?
+    // Is this concerning our setting object?
     if (obj_per.ObjectID == OPLINKSETTINGS_OBJID) {
         // Is this a save, load, or delete?
         bool success = false;

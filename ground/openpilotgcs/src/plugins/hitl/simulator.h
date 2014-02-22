@@ -28,38 +28,38 @@
 #ifndef ISIMULATOR_H
 #define ISIMULATOR_H
 
-#include <QObject>
-#include <QUdpSocket>
-#include <QTimer>
-#include <QProcess>
-#include <qmath.h>
-
 #include "qscopedpointer.h"
-#include "uavtalk/telemetrymanager.h"
 #include "uavobjectmanager.h"
 
-#include "accels.h"
+#include "accelstate.h"
 #include "actuatorcommand.h"
 #include "actuatordesired.h"
-#include "airspeedactual.h"
-#include "attitudeactual.h"
+#include "airspeedstate.h"
+#include "attitudestate.h"
 #include "attitudesettings.h"
-#include "baroaltitude.h"
+#include "barosensor.h"
 #include "flightbatterystate.h"
 #include "flightstatus.h"
 #include "gcsreceiver.h"
 #include "gcstelemetrystats.h"
-#include "gpsposition.h"
-#include "gpsvelocity.h"
+#include "gpspositionsensor.h"
+#include "gpsvelocitysensor.h"
 #include "groundtruth.h"
-#include "gyros.h"
+#include "gyrostate.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
-#include "positionactual.h"
+#include "positionstate.h"
 #include "sonaraltitude.h"
-#include "velocityactual.h"
+#include "velocitystate.h"
 
 #include "utils/coordinateconversions.h"
+
+#include <QObject>
+#include <QUdpSocket>
+#include <QTime>
+#include <QTimer>
+#include <QProcess>
+#include <qmath.h>
 
 /**
  * just imagine this was a class without methods and all public properties
@@ -130,12 +130,12 @@ typedef struct _CONNECTION {
     bool    attRawEnabled;
     quint8  attRawRate;
 
-    bool    attActualEnabled;
+    bool    attStateEnabled;
     bool    attActHW;
     bool    attActSim;
     bool    attActCalc;
 
-    bool    baroAltitudeEnabled;
+    bool    baroSensorEnabled;
     quint16 baroAltRate;
 
     bool    groundTruthEnabled;
@@ -149,8 +149,8 @@ typedef struct _CONNECTION {
     bool    manualControlEnabled;
     quint16 minOutputPeriod;
 
-    bool    airspeedActualEnabled;
-    quint16 airspeedActualRate;
+    bool    airspeedStateEnabled;
+    quint16 airspeedStateRate;
 } SimulatorSettings;
 
 
@@ -321,17 +321,17 @@ protected:
     ManualControlCommand *manCtrlCommand;
     FlightStatus *flightStatus;
     FlightBatteryState *flightBatt;
-    BaroAltitude *baroAlt;
-    AirspeedActual *airspeedActual;
-    AttitudeActual *attActual;
+    BaroSensor *baroAlt;
+    AirspeedState *airspeedState;
+    AttitudeState *attState;
     AttitudeSettings *attSettings;
-    VelocityActual *velActual;
-    GPSPosition *gpsPos;
-    GPSVelocity *gpsVel;
-    PositionActual *posActual;
+    VelocityState *velState;
+    GPSPositionSensor *gpsPos;
+    GPSVelocitySensor *gpsVel;
+    PositionState *posState;
     HomeLocation *posHome;
-    Accels *accels;
-    Gyros *gyros;
+    AccelState *accelState;
+    GyroState *gyroState;
     GCSTelemetryStats *telStats;
     GCSReceiver *gcsReceiver;
     GroundTruth *groundTruth;
@@ -361,7 +361,7 @@ private:
     QTime baroAltTime;
     QTime battTime;
     QTime gcsRcvrTime;
-    QTime airspeedActualTime;
+    QTime airspeedStateTime;
 
     QString name;
     QString simulatorId;

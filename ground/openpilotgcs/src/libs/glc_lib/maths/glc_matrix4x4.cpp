@@ -82,7 +82,7 @@ QVector<double> GLC_Matrix4x4::toEuler(void) const
 	angle_y= -asin(m_Matrix[8]);
 	double C= cos(angle_y);
 
-	if (!qFuzzyCompare(C, 0.0)) // Gimball lock?
+	if (!(qAbs(C - 0.0) <= glc::EPSILON)) // Gimball lock?
 	{
 		tracex= m_Matrix[10] / C;
 		tracey= - m_Matrix[9] / C;
@@ -120,3 +120,82 @@ QString GLC_Matrix4x4::toString() const
 	result.remove(result.size() - 1, 1);
 	return result;
 }
+
+QQuaternion GLC_Matrix4x4::quaternion() const
+{
+	QQuaternion subject;
+	GLC_Matrix4x4 rotMat= rotationMatrix();
+	if ((this->type() != GLC_Matrix4x4::Identity) && (rotMat != GLC_Matrix4x4()))
+	{
+		const double matrixTrace= rotMat.trace();
+		double s, w, x, y, z;
+
+		if (matrixTrace > 0.0)
+		{
+			s= 0.5 / sqrt(matrixTrace);
+			w= 0.25 / s;
+			x= (rotMat.m_Matrix[9] - rotMat.m_Matrix[6]) * s;
+			y= (rotMat.m_Matrix[2] - rotMat.m_Matrix[8]) * s;
+			z= (rotMat.m_Matrix[4] - rotMat.m_Matrix[1]) * s;
+		}
+		else
+		{
+			if ((abs(rotMat.m_Matrix[0]) > abs(rotMat.m_Matrix[5])) &&  (abs(rotMat.m_Matrix[0]) > abs(rotMat.m_Matrix[15])))
+			{	// column 0 greater
+		        s= sqrt(1.0 + rotMat.m_Matrix[0] - rotMat.m_Matrix[5] - rotMat.m_Matrix[10]) * 2.0;
+
+		        w= (rotMat.m_Matrix[6] + rotMat.m_Matrix[9] ) / s;
+		        x= 0.5 / s;
+		        y= (rotMat.m_Matrix[1] + rotMat.m_Matrix[4] ) / s;
+		        z= (rotMat.m_Matrix[2] + rotMat.m_Matrix[8] ) / s;
+			}
+			else if ((abs(rotMat.m_Matrix[5]) > abs(rotMat.m_Matrix[0])) &&  (abs(rotMat.m_Matrix[5]) > abs(rotMat.m_Matrix[15])))
+			{	// column 1 greater
+		        s= sqrt(1.0 + rotMat.m_Matrix[5] - rotMat.m_Matrix[0] - rotMat.m_Matrix[10]) * 2.0;
+
+		        w= (rotMat.m_Matrix[2] + rotMat.m_Matrix[8]) / s;
+		        x= (rotMat.m_Matrix[1] + rotMat.m_Matrix[4]) / s;
+		        y= 0.5 / s;
+		        z= (rotMat.m_Matrix[6] + rotMat.m_Matrix[9]) / s;
+			}
+			else
+			{	// column 3 greater
+		        s= sqrt(1.0 + rotMat.m_Matrix[10] - rotMat.m_Matrix[0] - rotMat.m_Matrix[5]) * 2.0;
+
+		        w = (rotMat.m_Matrix[1] + rotMat.m_Matrix[4]) / s;
+		        x = (rotMat.m_Matrix[2] + rotMat.m_Matrix[8]) / s;
+		        y = (rotMat.m_Matrix[6] + rotMat.m_Matrix[9]) / s;
+		        z = 0.5 / s;
+			}
+		}
+		subject= QQuaternion(w, x, y, z);
+	}
+
+	return subject;
+}
+
+QPair<GLC_Vector3d, double> GLC_Matrix4x4::rotationVectorAndAngle() const
+{
+	QPair<GLC_Vector3d, double> subject(GLC_Vector3d(), 0.0);
+	if (GLC_Matrix4x4(*this).optimise().type() != GLC_Matrix4x4::Identity)
+	{
+		QQuaternion quaternion= this->quaternion();
+		quaternion.normalize();
+
+	    const double cos_angle= quaternion.scalar();
+	    const double angle= acos(cos_angle);
+	    double sin_angle= sqrt(1.0 - cos_angle * cos_angle);
+
+
+	    if (fabs(sin_angle) < 0.0005) sin_angle= 1.0;
+
+	    subject.first.setX(quaternion.x() / sin_angle);
+	    subject.first.setY(quaternion.y() / sin_angle);
+	    subject.first.setZ(quaternion.z() / sin_angle);
+
+	    subject.second= angle * 2.0;
+	}
+
+	return subject;
+}
+

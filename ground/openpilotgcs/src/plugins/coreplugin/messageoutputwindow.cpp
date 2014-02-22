@@ -28,7 +28,7 @@
 
 #include "messageoutputwindow.h"
 
-#include <QtGui/QTextEdit>
+#include <QTextEdit>
 
 using namespace Core::Internal;
 

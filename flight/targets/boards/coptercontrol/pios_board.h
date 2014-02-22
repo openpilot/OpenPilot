@@ -25,7 +25,6 @@
 
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
-
 // ------------------------
 // Timers and Channels Used
 // ------------------------
@@ -212,6 +211,8 @@ extern uint32_t pios_com_hkosd_id;
 // ADCCLK = PCLK2 / 2
 #define PIOS_ADC_RATE                    (72.0e6f / 1.0f / 8.0f / 252.0f / (PIOS_ADC_NUM_CHANNELS >> PIOS_ADC_USE_ADC2))
 #define PIOS_ADC_MAX_OVERSAMPLING        36
+
+#define PIOS_ADC_TEMPERATURE_PIN         0
 
 // ------------------------
 // PIOS_RCVR

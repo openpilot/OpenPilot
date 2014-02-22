@@ -35,7 +35,7 @@
 #include <QtCore/QList>
 #include <QtCore/QMultiMap>
 #include <QtCore/QPointer>
-#include <QtGui/QKeySequence>
+#include <QKeySequence>
 
 namespace Core {
 namespace Internal {

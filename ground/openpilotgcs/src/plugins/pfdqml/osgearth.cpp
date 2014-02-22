@@ -21,8 +21,8 @@
 #include <QtDeclarative/qdeclarative.h>
 #include <QtDeclarative/qdeclarativeview.h>
 #include <QtDeclarative/qdeclarativeengine.h>
-#include <QtGui/qpainter.h>
-#include <QtGui/qvector3d.h>
+#include <qpainter.h>
+#include <qvector3d.h>
 #include <QtOpenGL/qglframebufferobject.h>
 
 #include <osg/MatrixTransform>

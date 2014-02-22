@@ -1,0 +1,12 @@
+<xml>
+    <object name="AltitudeFilterSettings" singleinstance="true" settings="true" category="State">
+        <description>Settings for the @ref State Estimator module plugin altitudeFilter</description>
+        <field name="AccelLowPassKp" units="m/s^2" type="float" elements="1" defaultvalue="0.04"/>
+        <field name="AccelDriftKi" units="m/s^2" type="float" elements="1" defaultvalue="0.0005"/>
+        <field name="BaroKp" units="m" type="float" elements="1" defaultvalue="0.04"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

@@ -81,11 +81,14 @@ SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
+SRC += $(PIOSCOMMON)/pios_debuglog.c
+SRC += $(PIOSCOMMON)/pios_deltatime.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_rfm22b.c
 SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
 SRC += $(PIOSCOMMON)/pios_sbus.c
 SRC += $(PIOSCOMMON)/pios_sdcard.c
+SRC += $(PIOSCOMMON)/pios_led.c
 
 ## PIOS USB related files
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
@@ -101,6 +104,7 @@ SRC += $(FLIGHTLIB)/sanitycheck.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
+SRC += $(FLIGHTLIB)/printf-stdarg.c
 
 ## Modules
 SRC += $(foreach mod, $(MODULES), $(sort $(wildcard $(OPMODULEDIR)/$(mod)/*.c)))

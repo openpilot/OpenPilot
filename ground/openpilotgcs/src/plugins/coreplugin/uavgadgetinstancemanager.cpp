@@ -39,7 +39,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QSettings>
 #include <QtCore/QDebug>
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 
 using namespace Core;
@@ -238,6 +238,10 @@ void UAVGadgetInstanceManager::createOptionsPages()
     while (ite.hasNext()) {
         IUAVGadgetConfiguration *config = ite.next();
         IUAVGadgetFactory *f = factory(config->classId());
+        if (!f) {
+            qWarning() << "No gadget factory for configuration " + config->classId();
+            continue;
+        }
         IOptionsPage *p = f->createOptionsPage(config);
         if (p) {
             IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config, f->isSingleConfigurationGadget());

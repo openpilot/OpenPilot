@@ -32,6 +32,7 @@
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 #include <taskinfo.h>
+#include <pios_port_abstraction.h>
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -130,6 +131,20 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
     .orientation   = PIOS_MPU6000_TOP_180DEG
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
+
+/*
+ * Setup a Usart, register with PORT_ABSTRACTION
+ */
+static void PIOS_Board_RegisterUsart(const struct pios_usart_cfg *usart_port_cfg, uint8_t portId)
+{
+    uint32_t pios_usart_id;
+
+    if (PIOS_USART_Init(&pios_usart_id, usart_port_cfg)) {
+        PIOS_Assert(0);
+    }
+    PIOS_PORT_ABSTRACTION_RegisterUsart(portId, pios_usart_id);
+}
+
 
 /**
  * PIOS_Board_Init()
@@ -246,6 +261,7 @@ void PIOS_Board_Init(void)
     PIOS_TIM_InitClock(&tim_3_cfg);
     PIOS_TIM_InitClock(&tim_4_cfg);
 
+    PIOS_PORT_ABSTRACTION_Init(3);
 #if defined(PIOS_INCLUDE_USB)
     /* Initialize board specific USB data */
     PIOS_USB_BOARD_DATA_Init();
@@ -567,6 +583,9 @@ void PIOS_Board_Init(void)
         }
     }
     break;
+    case HWSETTINGS_CC_MAINPORT_SERIALPORT0:
+        PIOS_Board_RegisterUsart(&pios_usart_generic_main_cfg, 0);
+        break;
     }
 
     /* Configure the flexi port */
@@ -732,6 +751,9 @@ void PIOS_Board_Init(void)
         }
     }
     break;
+    case HWSETTINGS_CC_FLEXIPORT_SERIALPORT1:
+            PIOS_Board_RegisterUsart(&pios_usart_generic_flexi_cfg, 1);
+            break;
     }
 
     /* Configure the rcvr port */

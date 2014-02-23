@@ -50,8 +50,10 @@ extern const char *PIOS_DEBUG_AssertMsg;
 #ifdef USE_SIM_POSIX
 void PIOS_DEBUG_Init(void);
 #else
+#ifdef PIOS_INCLUDE_TIM
 #include <pios_tim_priv.h>
 void PIOS_DEBUG_Init(const struct pios_tim_channel *channels, uint8_t num_channels);
+#endif
 #endif
 
 void PIOS_DEBUG_PinHigh(uint8_t pin);

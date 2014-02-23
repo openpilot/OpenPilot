@@ -60,6 +60,7 @@ struct data {
     float accelLast;
     float baroLast;
     bool  first_run;
+    portTickType initTimer;
     AltitudeFilterSettingsData settings;
 };
 
@@ -119,6 +120,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         // Initialize to current altitude reading at initial location
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
             this->first_run = 0;
+            this->initTimer = xTaskGetTickCount();
         }
     } else {
         // save existing position and velocity updates so GPS will still work
@@ -143,11 +145,14 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             float current = -(Rbe[0][2] * state->accel[0] + Rbe[1][2] * state->accel[1] + Rbe[2][2] * state->accel[2] + 9.81f);
 
             // low pass filter accelerometers
-            this->accelState     = (1.0f - this->settings.AccelLowPassKp) * this->accelState + this->settings.AccelLowPassKp * current;
-
-            // correct accel offset (low pass zeroing)
-            this->accelBiasState = (1.0f - this->settings.AccelDriftKi) * this->accelBiasState + this->settings.AccelDriftKi * this->accelState;
-
+            this->accelState = (1.0f - this->settings.AccelLowPassKp) * this->accelState + this->settings.AccelLowPassKp * current;
+            if (((xTaskGetTickCount() - this->initTimer) / portTICK_RATE_MS) < 5000) {
+                // allow the offset to reach quickly the target value in case of small AccelDriftKi
+                this->accelBiasState = (1.0f - 0.2f) * this->accelBiasState + 0.2f * this->accelState;
+            } else {
+                // correct accel offset (low pass zeroing)
+                this->accelBiasState = (1.0f - this->settings.AccelDriftKi) * this->accelBiasState + this->settings.AccelDriftKi * this->accelState;
+            }
             // correct velocity and position state (integration)
             // low pass for average dT, compensate timing jitter from scheduler
             //

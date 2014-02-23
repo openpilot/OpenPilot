@@ -26,7 +26,7 @@
 #include <pios_port_abstraction.h>
 #include <stdlib.h>
 #include <pios_debug.h>
-
+#include <FreeRTOS.h>
 // Number of Port allowed by current system
 static uint8_t usartPortCount;
 // Usart_ids associated with each registered port.
@@ -42,8 +42,8 @@ void PIOS_PORT_ABSTRACTION_Init(uint8_t usartCounts)
     usartPortCount = usartCounts;
 
     if (usartCounts != 0) {
-        usartPortAvailabilityList = (bool *)malloc(sizeof(bool) * usartCounts);
-        usartPortList = (uint32_t *)malloc(sizeof(uint32_t) * usartCounts);
+        usartPortAvailabilityList = (bool *)pvPortMalloc(sizeof(bool) * usartCounts);
+        usartPortList = (uint32_t *)pvPortMalloc(sizeof(uint32_t) * usartCounts);
 
         // initializes port list
         for (uint8_t x = 0; x < usartCounts; x++) {

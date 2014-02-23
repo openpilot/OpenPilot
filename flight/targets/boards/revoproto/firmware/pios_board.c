@@ -31,6 +31,7 @@
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <taskinfo.h>
+#include <pios_port_abstraction.h>
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -341,6 +342,19 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
     }
 }
 
+/*
+ * Setup a Usart, register with PORT_ABSTRACTION
+ */
+static void PIOS_Board_RegisterUsart(const struct pios_usart_cfg *usart_port_cfg, uint8_t portId)
+{
+    uint32_t pios_usart_id;
+
+    if (PIOS_USART_Init(&pios_usart_id, usart_port_cfg)) {
+        PIOS_Assert(0);
+    }
+    PIOS_PORT_ABSTRACTION_RegisterUsart(portId, pios_usart_id);
+}
+
 static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm_cfg, const struct pios_dsm_cfg *pios_dsm_cfg,
                                      const struct pios_com_driver *usart_com_driver, enum pios_dsm_proto *proto,
                                      ManualControlSettingsChannelGroupsOptions channelgroup, uint8_t *bind)
@@ -477,7 +491,7 @@ void PIOS_Board_Init(void)
 
 
     // PIOS_IAP_Init();
-
+    PIOS_PORT_ABSTRACTION_Init(6);
 #if defined(PIOS_INCLUDE_USB)
     /* Initialize board specific USB data */
     PIOS_USB_BOARD_DATA_Init();
@@ -632,6 +646,9 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_TELEMETRYPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_telem_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
+    case HWSETTINGS_RV_TELEMETRYPORT_SERIALPORT3:
+        PIOS_Board_RegisterUsart(&pios_usart_telem_cfg, 3);
+        break;
     } /*        hwsettings_rv_telemetryport */
 
     /* Configure GPS port */
@@ -656,6 +673,9 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_GPSPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_gps_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
+    case HWSETTINGS_RV_GPSPORT_SERIALPORT4:
+            PIOS_Board_RegisterUsart(&pios_usart_gps_cfg, 4);
+            break;
     } /* hwsettings_rv_gpsport */
 
     /* Configure AUXPort */
@@ -702,6 +722,9 @@ void PIOS_Board_Init(void)
         break;
     case HWSETTINGS_RV_AUXPORT_OSDHK:
         PIOS_Board_configure_com(&pios_usart_hkosd_aux_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+        break;
+    case HWSETTINGS_RV_AUXPORT_SERIALPORT0:
+        PIOS_Board_RegisterUsart(&pios_usart_aux_cfg, 0);
         break;
     } /* hwsettings_rv_auxport */
       /* Configure AUXSbusPort */
@@ -767,6 +790,9 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_AUXSBUSPORT_OSDHK:
         PIOS_Board_configure_com(&pios_usart_hkosd_auxsbus_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
         break;
+    case HWSETTINGS_RV_AUXSBUSPORT_SERIALPORT1:
+            PIOS_Board_RegisterUsart(&pios_usart_auxsbus_cfg, 1);
+            break;
     } /* hwsettings_rv_auxport */
 
     /* Configure FlexiPort */
@@ -817,6 +843,9 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_FLEXIPORT_COMBRIDGE:
         PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
         break;
+    case HWSETTINGS_RV_FLEXIPORT_SERIALPORT2:
+                PIOS_Board_RegisterUsart(&pios_usart_flexi_cfg, 2);
+                break;
     } /* hwsettings_rv_flexiport */
 
 

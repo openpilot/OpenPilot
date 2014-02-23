@@ -6,11 +6,11 @@
 		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,PPM,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
 
 		<field name="RV_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+Outputs,Outputs" defaultvalue="PWM"/>
-		<field name="RV_AuxPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge,OsdHk" defaultvalue="Disabled"/>
-		<field name="RV_AuxSBusPort" units="function" type="enum" elements="1" options="Disabled,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge,OsdHk" defaultvalue="Disabled"/>
-		<field name="RV_FlexiPort" units="function" type="enum" elements="1" options="Disabled,I2C,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge" defaultvalue="Disabled"/>
-		<field name="RV_TelemetryPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,ComAux,ComBridge" defaultvalue="Telemetry"/>
-		<field name="RV_GPSPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,ComAux,ComBridge" defaultvalue="GPS"/>
+		<field name="RV_AuxPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge,OsdHk,SerialPort 0" defaultvalue="Disabled"/>
+		<field name="RV_AuxSBusPort" units="function" type="enum" elements="1" options="Disabled,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge,OsdHk,SerialPort 1" defaultvalue="Disabled"/>
+		<field name="RV_FlexiPort" units="function" type="enum" elements="1" options="Disabled,I2C,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge,SerialPort 2" defaultvalue="Disabled"/>
+		<field name="RV_TelemetryPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,ComAux,ComBridge,SerialPort 3" defaultvalue="Telemetry"/>
+		<field name="RV_GPSPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,ComAux,ComBridge,SerialPort 4" defaultvalue="GPS"/>
 
 		<field name="RM_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+PWM,PPM+Outputs,Outputs" defaultvalue="PWM"/>
 		<field name="RM_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge,OsdHk,SerialPort 0" defaultvalue="Telemetry"/>

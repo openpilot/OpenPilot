@@ -35,6 +35,7 @@
 #include <oplinkreceiver.h>
 #include <pios_oplinkrcvr_priv.h>
 #include <taskinfo.h>
+#include <pios_port_abstraction.h>
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -269,6 +270,19 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
     }
 }
 
+/*
+ * Setup a Usart, register with PORT_ABSTRACTION
+ */
+static void PIOS_Board_RegisterUsart(const struct pios_usart_cfg *usart_port_cfg, uint8_t portId)
+{
+    uint32_t pios_usart_id;
+
+    if (PIOS_USART_Init(&pios_usart_id, usart_port_cfg)) {
+        PIOS_Assert(0);
+    }
+    PIOS_PORT_ABSTRACTION_RegisterUsart(portId, pios_usart_id);
+}
+
 static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm_cfg, const struct pios_dsm_cfg *pios_dsm_cfg,
                                      const struct pios_com_driver *usart_com_driver, enum pios_dsm_proto *proto,
                                      ManualControlSettingsChannelGroupsOptions channelgroup, uint8_t *bind)
@@ -440,7 +454,7 @@ void PIOS_Board_Init(void)
     }
 
 
-    // PIOS_IAP_Init();
+    PIOS_PORT_ABSTRACTION_Init(4);
 
 #if defined(PIOS_INCLUDE_USB)
     /* Initialize board specific USB data */
@@ -653,6 +667,9 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_MAINPORT_OSDHK:
         PIOS_Board_configure_com(&pios_usart_hkosd_main_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
         break;
+    case HWSETTINGS_RM_MAINPORT_SERIALPORT0:
+        PIOS_Board_RegisterUsart(&pios_usart_main_cfg, 0);
+        break;
     } /*        hwsettings_rm_mainport */
 
     if (hwsettings_mainport != HWSETTINGS_RM_MAINPORT_SBUS) {
@@ -717,6 +734,9 @@ void PIOS_Board_Init(void)
         break;
     case HWSETTINGS_RM_FLEXIPORT_OSDHK:
         PIOS_Board_configure_com(&pios_usart_hkosd_flexi_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+        break;
+    case HWSETTINGS_RM_FLEXIPORT_SERIALPORT1:
+        PIOS_Board_RegisterUsart(&pios_usart_flexi_cfg, 1);
         break;
     } /* hwsettings_rm_flexiport */
 

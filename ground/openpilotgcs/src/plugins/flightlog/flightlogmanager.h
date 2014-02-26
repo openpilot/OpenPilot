@@ -48,8 +48,8 @@ public:
     ~ExtendedDebugLogEntry();
 
     QString getLogString();
-    void toXML(QXmlStreamWriter *xmlWriter);
-    void toCSV(QTextStream *csvStream);
+    void toXML(QXmlStreamWriter *xmlWriter, quint32 baseTime);
+    void toCSV(QTextStream *csvStream, quint32 baseTime);
     UAVDataObject *uavObject()
     {
         return m_object;

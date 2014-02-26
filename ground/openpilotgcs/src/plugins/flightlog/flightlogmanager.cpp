@@ -242,13 +242,19 @@ void FlightLogManager::exportToOPL(QString fileName)
 void FlightLogManager::exportToCSV(QString fileName)
 {
     QFile csvFile(fileName);
-    if (csvFile.open(QFile::ReadWrite)) {
+    if (csvFile.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream csvStream(&csvFile);
-
+        quint32 baseTime = 0;
+        quint32 currentFlight = 0;
         csvStream << "Flight" << '\t' << "Flight Time" << '\t' << "Entry" << '\t' << "Data" << '\n';
         foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
-            entry->toCSV(&csvStream);
+            if(m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
+                currentFlight = entry->getFlight();
+                baseTime = entry->getFlightTime();
+            }
+            entry->toCSV(&csvStream, baseTime);
         }
+        csvStream.flush();
         csvFile.flush();
         csvFile.close();
     }
@@ -257,7 +263,7 @@ void FlightLogManager::exportToCSV(QString fileName)
 void FlightLogManager::exportToXML(QString fileName)
 {
     QFile xmlFile(fileName);
-    if (xmlFile.open(QFile::ReadWrite)) {
+    if (xmlFile.open(QFile::WriteOnly | QFile::Truncate)) {
 
         QXmlStreamWriter xmlWriter(&xmlFile);
         xmlWriter.setAutoFormatting(true);
@@ -266,8 +272,15 @@ void FlightLogManager::exportToXML(QString fileName)
         xmlWriter.writeStartDocument("1.0", true);
         xmlWriter.writeStartElement("logs");
         xmlWriter.writeComment("This file was created by the flight log export in OpenPilot GCS.");
+
+        quint32 baseTime = 0;
+        quint32 currentFlight = 0;
         foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
-            entry->toXML(&xmlWriter);
+            if(m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
+                currentFlight = entry->getFlight();
+                baseTime = entry->getFlightTime();
+            }
+            entry->toXML(&xmlWriter, baseTime);
         }
         xmlWriter.writeEndElement();
         xmlWriter.writeEndDocument();
@@ -362,11 +375,11 @@ QString ExtendedDebugLogEntry::getLogString()
     }
 }
 
-void ExtendedDebugLogEntry::toXML(QXmlStreamWriter *xmlWriter)
+void ExtendedDebugLogEntry::toXML(QXmlStreamWriter *xmlWriter, quint32 baseTime)
 {
     xmlWriter->writeStartElement("entry");
-    xmlWriter->writeAttribute("flight", QString::number(getFlight()));
-    xmlWriter->writeAttribute("flighttime", QString::number(getFlightTime()));
+    xmlWriter->writeAttribute("flight", QString::number(getFlight() + 1));
+    xmlWriter->writeAttribute("flighttime", QString::number(getFlightTime() - baseTime));
     xmlWriter->writeAttribute("entry", QString::number(getEntry()));
     if (getType() == DebugLogEntry::TYPE_TEXT) {
         xmlWriter->writeAttribute("type", "text");
@@ -378,7 +391,7 @@ void ExtendedDebugLogEntry::toXML(QXmlStreamWriter *xmlWriter)
     xmlWriter->writeEndElement(); //entry
 }
 
-void ExtendedDebugLogEntry::toCSV(QTextStream *csvStream)
+void ExtendedDebugLogEntry::toCSV(QTextStream *csvStream, quint32 baseTime)
 {
     QString data;
     if (getType() == DebugLogEntry::TYPE_TEXT) {
@@ -386,7 +399,7 @@ void ExtendedDebugLogEntry::toCSV(QTextStream *csvStream)
     } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
         data = m_object->toString().replace("\n", "").replace("\t", "");
     }
-    *csvStream << QString::number(getFlight()) << '\t' << QString::number(getFlightTime()) << '\t' << QString::number(getEntry()) << '\t' << data << '\n';
+    *csvStream << QString::number(getFlight() + 1) << '\t' << QString::number(getFlightTime() - baseTime) << '\t' << QString::number(getEntry()) << '\t' << data << '\n';
 }
 
 void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVObjectManager *objectManager)

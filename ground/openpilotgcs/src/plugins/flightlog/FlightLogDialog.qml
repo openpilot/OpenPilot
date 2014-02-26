@@ -25,7 +25,6 @@ Rectangle {
                 Text {
                     Layout.fillWidth: true
                     text: "<b>" + qsTr("Log entries") + "</b>"
-                    font.pixelSize: 12
                 }
                 TableView {
                     Layout.fillWidth: true
@@ -94,12 +93,10 @@ Rectangle {
                         spacing: 10
                         Text {
                             id: totalFlights
-                            font.pixelSize: 12
                             text: "<b>" + qsTr("Flights recorded: ") + "</b>" + (logStatus.Flight + 1)
                         }
                         Text {
                             id: totalEntries
-                            font.pixelSize: 12
                             text: "<b>" + qsTr("Entries logged (free): ") + "</b>" +
                                   logStatus.UsedSlots + " (" + logStatus.FreeSlots + ")"
                         }
@@ -114,7 +111,6 @@ Rectangle {
                             checked: logManager.adjustExportedTimestamps
                             onCheckedChanged: logManager.setAdjustExportedTimestamps(checked)
                         }
-
                     }
                     Rectangle {
                         Layout.fillWidth: true
@@ -126,7 +122,6 @@ Rectangle {
                                 Layout.fillWidth: true
                             }
                             Text {
-                                font.pixelSize: 12
                                 text: "<b>" + qsTr("Flight to download:") + "</b>"
                             }
 
@@ -142,13 +137,6 @@ Rectangle {
                                 Layout.fillWidth: true
                             }
                             Button {
-                                id: clearButton
-                                enabled: !logManager.disableControls
-                                text: qsTr("Clear all logs")
-                                activeFocusOnPress: true
-                                onClicked: logManager.clearAllLogs()
-                            }
-                            Button {
                                 text: qsTr("Download logs")
                                 enabled: !logManager.disableControls
                                 activeFocusOnPress: true
@@ -161,6 +149,13 @@ Rectangle {
                         RowLayout {
                             Rectangle {
                                 Layout.fillWidth: true
+                            }
+                            Button {
+                                id: clearButton
+                                enabled: !logManager.disableControls
+                                text: qsTr("Clear all logs")
+                                activeFocusOnPress: true
+                                onClicked: logManager.clearAllLogs()
                             }
                             Button {
                                 id: exportButton

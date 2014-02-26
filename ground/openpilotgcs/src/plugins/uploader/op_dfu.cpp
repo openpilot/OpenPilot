@@ -637,8 +637,8 @@ bool DFUObject::findDevices()
             buf[7] = 0;
             buf[8] = 0;
             buf[9] = 0;
-            int result = sendData(buf, BUF_LEN);
-            result = receiveData(buf, BUF_LEN);
+            sendData(buf, BUF_LEN);
+            receiveData(buf, BUF_LEN);
             devices[x].ID = buf[14];
             devices[x].ID = devices[x].ID << 8 | (quint8)buf[15];
             devices[x].BL_Version = buf[7];
@@ -749,7 +749,7 @@ OP_DFU::Status DFUObject::UploadFirmwareT(const QString &sfile, const bool &veri
         pad = pad - arr.length();
         arr.append(QByteArray(pad, 255));
     }
-    if (devices[device].SizeOfCode < arr.length()) {
+    if (devices[device].SizeOfCode < (quint32)arr.length()) {
         if (debug) {
             qDebug() << "ERROR file to big for device";
         }

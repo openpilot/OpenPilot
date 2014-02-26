@@ -30,7 +30,6 @@
 
 #include <QApplication>
 #include <QFileDialog>
-#include <QXmlStreamWriter>
 
 #include "debuglogcontrol.h"
 #include "uavobjecthelper.h"
@@ -246,6 +245,24 @@ void FlightLogManager::exportToCSV(QString fileName)
 
 void FlightLogManager::exportToXML(QString fileName)
 {
+    QFile xmlFile(fileName);
+    if (xmlFile.open(QFile::ReadWrite)) {
+
+        QXmlStreamWriter xmlWriter(&xmlFile);
+        xmlWriter.setAutoFormatting(true);
+        xmlWriter.setAutoFormattingIndent(4);
+
+        xmlWriter.writeStartDocument("1.0", true);
+        xmlWriter.writeStartElement("logs");
+        xmlWriter.writeComment("This file was created by the export function in OpenPilot GCS.");
+        foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
+            entry->toXML(&xmlWriter);
+        }
+        xmlWriter.writeEndElement();
+        xmlWriter.writeEndDocument();
+        xmlFile.flush();
+        xmlFile.close();
+    }
 }
 
 void FlightLogManager::exportLogs()
@@ -332,6 +349,22 @@ QString ExtendedDebugLogEntry::getLogString()
     } else {
         return "";
     }
+}
+
+void ExtendedDebugLogEntry::toXML(QXmlStreamWriter *xmlWriter)
+{
+    xmlWriter->writeStartElement("entry");
+    xmlWriter->writeAttribute("flight", QString::number(getFlight()));
+    xmlWriter->writeAttribute("flighttime", QString::number(getFlightTime()));
+    xmlWriter->writeAttribute("entry", QString::number(getEntry()));
+    if (getType() == DebugLogEntry::TYPE_TEXT) {
+        xmlWriter->writeAttribute("type", "text");
+        xmlWriter->writeTextElement("message", QString((const char *)getData().Data));
+    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+        xmlWriter->writeAttribute("type", "uavobject");
+        m_object->toXML(xmlWriter);
+    }
+    xmlWriter->writeEndElement(); //entry
 }
 
 void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVObjectManager *objectManager)

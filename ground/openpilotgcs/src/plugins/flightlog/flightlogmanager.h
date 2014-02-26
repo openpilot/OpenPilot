@@ -32,6 +32,7 @@
 #include <QList>
 #include <QQmlListProperty>
 #include <QSemaphore>
+#include <QXmlStreamWriter>
 
 #include "uavobjectmanager.h"
 #include "debuglogentry.h"
@@ -46,6 +47,7 @@ public:
     ~ExtendedDebugLogEntry();
 
     QString getLogString();
+    void toXML(QXmlStreamWriter *xmlWriter);
     UAVDataObject *uavObject()
     {
         return m_object;

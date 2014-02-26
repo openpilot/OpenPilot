@@ -157,6 +157,11 @@ private:
     bool m_disableExport;
     bool m_cancelDownload;
     bool m_adjustExportedTimestamps;
+
+    void exportToOPL(QString fileName);
+    void exportToCSV(QString fileName);
+    void exportToXML(QString fileName);
+
 };
 
 #endif // FLIGHTLOGMANAGER_H

@@ -241,6 +241,17 @@ void FlightLogManager::exportToOPL(QString fileName)
 
 void FlightLogManager::exportToCSV(QString fileName)
 {
+    QFile csvFile(fileName);
+    if (csvFile.open(QFile::ReadWrite)) {
+        QTextStream csvStream(&csvFile);
+
+        csvStream << "Flight" << '\t' << "Flight Time" << '\t' << "Entry" << '\t' << "Data" << '\n';
+        foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
+            entry->toCSV(&csvStream);
+        }
+        csvFile.flush();
+        csvFile.close();
+    }
 }
 
 void FlightLogManager::exportToXML(QString fileName)
@@ -254,7 +265,7 @@ void FlightLogManager::exportToXML(QString fileName)
 
         xmlWriter.writeStartDocument("1.0", true);
         xmlWriter.writeStartElement("logs");
-        xmlWriter.writeComment("This file was created by the export function in OpenPilot GCS.");
+        xmlWriter.writeComment("This file was created by the flight log export in OpenPilot GCS.");
         foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
             entry->toXML(&xmlWriter);
         }
@@ -365,6 +376,17 @@ void ExtendedDebugLogEntry::toXML(QXmlStreamWriter *xmlWriter)
         m_object->toXML(xmlWriter);
     }
     xmlWriter->writeEndElement(); //entry
+}
+
+void ExtendedDebugLogEntry::toCSV(QTextStream *csvStream)
+{
+    QString data;
+    if (getType() == DebugLogEntry::TYPE_TEXT) {
+        data = QString((const char *)getData().Data);
+    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+        data = m_object->toString().replace("\n", "").replace("\t", "");
+    }
+    *csvStream << QString::number(getFlight()) << '\t' << QString::number(getFlightTime()) << '\t' << QString::number(getEntry()) << '\t' << data << '\n';
 }
 
 void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVObjectManager *objectManager)

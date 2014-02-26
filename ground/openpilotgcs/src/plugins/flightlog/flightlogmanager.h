@@ -33,6 +33,7 @@
 #include <QQmlListProperty>
 #include <QSemaphore>
 #include <QXmlStreamWriter>
+#include <QTextStream>
 
 #include "uavobjectmanager.h"
 #include "debuglogentry.h"
@@ -48,6 +49,7 @@ public:
 
     QString getLogString();
     void toXML(QXmlStreamWriter *xmlWriter);
+    void toCSV(QTextStream *csvStream);
     UAVDataObject *uavObject()
     {
         return m_object;

@@ -30,6 +30,7 @@ Rectangle {
                 TableView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Layout.preferredHeight: 1000;
                     model: logManager.logEntries
 
                     itemDelegate: Text {
@@ -88,6 +89,7 @@ Rectangle {
                 RowLayout {
                     anchors.margins: 10
                     spacing: 10
+
                     ColumnLayout {
                         spacing: 10
                         Text {
@@ -101,6 +103,18 @@ Rectangle {
                             text: "<b>" + qsTr("Entries logged (free): ") + "</b>" +
                                   logStatus.UsedSlots + " (" + logStatus.FreeSlots + ")"
                         }
+                        Rectangle {
+                            Layout.fillHeight: true
+                        }
+                        CheckBox {
+                            id: exportRelativeTimeCB
+                            enabled: !logManager.disableControls && !logManager.disableExport
+                            text: qsTr("Adjust timestamps")
+                            activeFocusOnPress: true
+                            checked: logManager.adjustExportedTimestamps
+                            onCheckedChanged: logManager.setAdjustExportedTimestamps(checked)
+                        }
+
                     }
                     Rectangle {
                         Layout.fillWidth: true
@@ -123,16 +137,37 @@ Rectangle {
                             }
                         }
                         RowLayout {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
+                            spacing: 10
                             Rectangle {
                                 Layout.fillWidth: true
+                            }
+                            Button {
+                                id: clearButton
+                                enabled: !logManager.disableControls
+                                text: qsTr("Clear all logs")
+                                activeFocusOnPress: true
+                                onClicked: logManager.clearAllLogs()
                             }
                             Button {
                                 text: qsTr("Download logs")
                                 enabled: !logManager.disableControls
                                 activeFocusOnPress: true
                                 onClicked: logManager.retrieveLogs(flightCombo.currentIndex - 1)
+                            }
+                        }
+                        Rectangle {
+                            Layout.fillHeight: true
+                        }
+                        RowLayout {
+                            Rectangle {
+                                Layout.fillWidth: true
+                            }
+                            Button {
+                                id: exportButton
+                                enabled: !logManager.disableControls && !logManager.disableExport
+                                text: qsTr("Export logs...")
+                                activeFocusOnPress: true
+                                onClicked: logManager.exportLogs()
                             }
                         }
                     }
@@ -143,29 +178,6 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             height: 40
-            Button {
-                id: exportButton
-                enabled: !logManager.disableControls && !logManager.disableExport
-                text: qsTr("Export...")
-                activeFocusOnPress: true
-                onClicked: logManager.exportLogs()
-            }
-            CheckBox {
-                id: exportRelativeTimeCB
-                enabled: !logManager.disableControls && !logManager.disableExport
-                text: qsTr("Adjust timestamps")
-                activeFocusOnPress: true
-                checked: logManager.adjustExportedTimestamps
-                onCheckedChanged: logManager.setAdjustExportedTimestamps(checked)
-            }
-
-            Button {
-                id: clearButton
-                enabled: !logManager.disableControls
-                text: qsTr("Clear all logs")
-                activeFocusOnPress: true
-                onClicked: logManager.clearAllLogs()
-            }
             Rectangle {
                 Layout.fillWidth: true
             }

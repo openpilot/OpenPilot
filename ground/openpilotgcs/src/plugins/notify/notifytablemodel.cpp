@@ -186,6 +186,7 @@ QStringList NotifyTableModel::mimeTypes() const
 bool NotifyTableModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row,
                                     int column, const QModelIndex & parent)
 {
+    Q_UNUSED(column);
     if (action == Qt::IgnoreAction) {
         return true;
     }

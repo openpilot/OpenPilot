@@ -654,6 +654,16 @@ QString UAVObjectField::toString()
     return sout;
 }
 
+void UAVObjectField::toXML(QXmlStreamWriter *xmlWriter)
+{
+    xmlWriter->writeStartElement("field");
+    xmlWriter->writeAttribute("name", getName());
+    xmlWriter->writeAttribute("type", getTypeAsString());
+    for (unsigned int n = 0; n < numElements; ++n) {
+        xmlWriter->writeTextElement("value", getValue(n).toString());
+    }
+    xmlWriter->writeEndElement(); // field
+}
 
 qint32 UAVObjectField::pack(quint8 *dataOut)
 {

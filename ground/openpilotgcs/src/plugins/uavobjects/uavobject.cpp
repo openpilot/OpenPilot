@@ -519,6 +519,20 @@ QString UAVObject::toStringData()
     return sout;
 }
 
+void UAVObject::toXML(QXmlStreamWriter *xmlWriter)
+{
+    xmlWriter->writeStartElement("object");
+    xmlWriter->writeAttribute("name", getName());
+    xmlWriter->writeAttribute("objectid", QString::number(getObjID()));
+    xmlWriter->writeAttribute("instanceid", QString::number(getInstID()));
+    xmlWriter->writeStartElement("fields");
+    foreach(UAVObjectField* field , fields) {
+        field->toXML(xmlWriter);
+    }
+    xmlWriter->writeEndElement(); // fields
+    xmlWriter->writeEndElement(); // object
+}
+
 /**
  * Emit the transactionCompleted event (used by the UAVTalk plugin)
  */

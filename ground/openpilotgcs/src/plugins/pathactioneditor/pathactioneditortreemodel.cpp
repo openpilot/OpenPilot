@@ -423,6 +423,7 @@ void PathActionEditorTreeModel::newInstance(UAVObject *obj)
 
 void PathActionEditorTreeModel::objUpdated(UAVObject *obj)
 {
+    Q_UNUSED(obj);
     quint16 index = m_objManager->getObject("WaypointActive")->getField("Index")->getValue().toInt();
     quint16 action;
 

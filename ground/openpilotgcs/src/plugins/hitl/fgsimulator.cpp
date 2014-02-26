@@ -255,7 +255,7 @@ void FGSimulator::processUpdate(const QByteArray & inp)
     // Get longitude (deg)
     float longitude    = fields[13].toFloat();
     // Get heading (deg)
-    float heading      = fields[14].toFloat();
+    //float heading      = fields[14].toFloat();
     // Get altitude (m)
     float altitude_msl = fields[15].toFloat() * FT2M;
     // Get altitudeAGL (m)

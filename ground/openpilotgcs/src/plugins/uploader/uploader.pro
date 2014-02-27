@@ -11,6 +11,8 @@ macx {
     QMAKE_CXXFLAGS  += -fpermissive
 }
 
+QMAKE_CXXFLAGS += -Wno-enum-compare
+
 HEADERS += uploadergadget.h \
     uploadergadgetconfiguration.h \
     uploadergadgetfactory.h \

@@ -27,6 +27,9 @@ else {
     CONFIG += staticlib
 }
 
+# disable all warnings (no need for warnings as qwt sources are imported)
+CONFIG += exceptions warn_off
+
 unix:!mac:LIBS += -lrt
 
 HEADERS += \

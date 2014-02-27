@@ -56,7 +56,7 @@ Point MercatorProjectionYandex::FromLatLngToPixel(double lat, double lng, const 
 }
 internals::PointLatLng MercatorProjectionYandex::FromPixelToLatLng(const int &x, const int &y, const int &zoom)
 {
-    Size s = GetTileMatrixSizePixel(zoom);
+    //Size s = GetTileMatrixSizePixel(zoom);
 
     // double mapSizeX = s.Width();
     // double mapSizeY = s.Height();

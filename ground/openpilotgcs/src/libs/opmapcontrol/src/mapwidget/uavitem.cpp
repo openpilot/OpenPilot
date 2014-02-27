@@ -31,8 +31,8 @@
 namespace mapcontrol {
 double UAVItem::groundspeed_mps_filt = 0;
 
-UAVItem::UAVItem(MapGraphicItem *map, OPMapWidget *parent, QString uavPic) : map(map), mapwidget(parent), showtrail(true), showtrailline(true), trailtime(5), traildistance(50), autosetreached(true)
-    , autosetdistance(100), altitude(0), showUAVInfo(false)
+UAVItem::UAVItem(MapGraphicItem *map, OPMapWidget *parent, QString uavPic) : map(map), mapwidget(parent), altitude(0), showtrail(true), showtrailline(true),
+    trailtime(5), traildistance(50), autosetreached(true), autosetdistance(100), showUAVInfo(false)
 {
     pic.load(uavPic);
     this->setFlag(QGraphicsItem::ItemIsMovable, false);

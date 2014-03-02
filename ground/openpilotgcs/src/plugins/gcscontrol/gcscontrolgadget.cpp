@@ -231,7 +231,9 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
         }
         if (buttonThrottleControl == 0) {
             obj->getField("Throttle")->setDouble(newThrottle);
+            obj->getField("Thrust")->setDouble(newThrottle);
         }
+        obj->getField("Connected")->setValue("True");
         obj->updated();
     }
 }
@@ -308,9 +310,11 @@ void GCSControlGadget::readUDPCommand()
             }
             if (throttle != obj->getField("Throttle")->getDouble()) {
                 obj->getField("Throttle")->setDouble(constrain(throttle));
+                obj->getField("Thrust")->setDouble(constrain(throttle));
                 update = true;
             }
             if (update) {
+                obj->getField("Connected")->setValue("True");
                 obj->updated();
             }
         }
@@ -354,6 +358,7 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
                     break;
                 case 4: // Throttle
                     obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble() + buttonSettings[number].Amount));
+                    obj->getField("Thrust")->setValue(bound(obj->getField("Thrust")->getValue().toDouble() + buttonSettings[number].Amount));
                     break;
                 }
             }
@@ -372,6 +377,7 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
                     break;
                 case 4: // Throttle
                     obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble() - buttonSettings[number].Amount));
+                    obj->getField("Thrust")->setValue(bound(obj->getField("Thrust")->getValue().toDouble() - buttonSettings[number].Amount));
                     break;
                 }
             }
@@ -380,14 +386,10 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
             switch (buttonSettings[number].FunctionID) {
             case 1: // Armed
                 if (currentCGSControl) {
-                    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-                    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-                    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject(QString("FlightStatus")));
-
-                    if (obj->getField("Armed")->getValue().toString().compare("Armed") == 0) {
-                        obj->getField("Armed")->setValue("Disarmed");
+                    if (((GCSControlGadgetWidget *)m_widget)->getArmed()) {
+                        ((GCSControlGadgetWidget *)m_widget)->setArmed(false);
                     } else {
-                        obj->getField("Armed")->setValue("Armed");
+                        ((GCSControlGadgetWidget *)m_widget)->setArmed(true);
                     }
                 }
                 break;
@@ -407,6 +409,7 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
             break;
         }
 
+        obj->getField("Connected")->setValue("True");
         obj->updated();
     }
     // buttonSettings[number].ActionID NIDT

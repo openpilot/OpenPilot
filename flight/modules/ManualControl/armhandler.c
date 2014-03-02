@@ -90,11 +90,11 @@ void armHandler(bool newinit)
         armSwitch = true;
         break;
     case FLIGHTMODESETTINGS_ARMING_ACCESSORY1:
-        AccessoryDesiredInstGet(0, &acc);
+        AccessoryDesiredInstGet(1, &acc);
         armSwitch = true;
         break;
     case FLIGHTMODESETTINGS_ARMING_ACCESSORY2:
-        AccessoryDesiredInstGet(0, &acc);
+        AccessoryDesiredInstGet(2, &acc);
         armSwitch = true;
         break;
     default:
@@ -298,7 +298,7 @@ static bool forcedDisArm(void)
     if (alarms.Guidance == SYSTEMALARMS_ALARM_CRITICAL) {
         return true;
     }
-    if (alarms.ManualControl == SYSTEMALARMS_ALARM_CRITICAL) {
+    if (alarms.Receiver == SYSTEMALARMS_ALARM_CRITICAL) {
         return true;
     }
     return false;

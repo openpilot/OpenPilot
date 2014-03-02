@@ -193,7 +193,7 @@ static void manualControlTask(void)
 
     // Depending on the mode update the Stabilization or Actuator objects
     controlHandler *handler = &handler_MANUAL;
-    switch (flightStatus.FlightMode) {
+    switch (newMode) {
     case FLIGHTSTATUS_FLIGHTMODE_MANUAL:
         handler = &handler_MANUAL;
         break;
@@ -223,7 +223,12 @@ static void manualControlTask(void)
     }
 
     bool newinit = false;
-    if (flightStatus.FlightMode != newMode) {
+
+    // FlightMode needs to be set correctly on first run (otherwise ControlChain is invalid)
+    static bool firstRun = true;
+
+    if (flightStatus.FlightMode != newMode || firstRun) {
+        firstRun = false;
         flightStatus.ControlChain = handler->controlChain;
         flightStatus.FlightMode   = newMode;
         FlightStatusSet(&flightStatus);

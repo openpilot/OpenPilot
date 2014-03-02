@@ -29,25 +29,24 @@
 /* --------------   Buffer Description Table  -----------------*/
 /*-------------------------------------------------------------*/
 /* buffer table base address */
-/* buffer table base address */
 #define BTABLE_ADDRESS (0x00)
 
-/* EP0  */
+/* EP0 (Control) */
 /* rx/tx buffer base address */
 #define ENDP0_RXADDR   (0x20)
 #define ENDP0_TXADDR   (0x40)
 
-/* EP1  */
+/* EP1 (HID) */
 /* rx/tx buffer base address */
 #define ENDP1_TXADDR   (0x60)
 #define ENDP1_RXADDR   (0x80)
 
-/* EP2 */
+/* EP2 (CDC Call Control) */
 /* rx/tx buffer base address */
 #define ENDP2_TXADDR   (0x100)
 #define ENDP2_RXADDR   (0x140)
 
-/* EP3 */
+/* EP3 (CDC Data) */
 /* rx/tx buffer base address */
 #define ENDP3_TXADDR   (0x180)
 #define ENDP3_RXADDR   (0x1C0)

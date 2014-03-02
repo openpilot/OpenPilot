@@ -167,7 +167,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
     MixerStatusData mixerStatus;
     FlightStatusData flightStatus;
     SystemSettingsThrustControlOptions thrustType;
-    SystemSettingsAllowReverseThrottleOptions noClamping;
+    SystemSettingsAllowReverseThrottleOptions allowReverseThrottle;
     float throttleDesired;
     float collectiveDesired;
 
@@ -225,7 +225,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         ActuatorDesiredGet(&desired);
         ActuatorCommandGet(&command);
         SystemSettingsThrustControlGet(&thrustType);
-        SystemSettingsAllowReverseThrottleGet(&noClamping);
+        SystemSettingsAllowReverseThrottleGet(&allowReverseThrottle);
 
         // read in throttle and collective -demultiplex thrust
         switch (thrustType) {
@@ -242,8 +242,25 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             ManualControlCommandCollectiveGet(&collectiveDesired);
         }
 
-        if (noClamping == SYSTEMSETTINGS_ALLOWREVERSETHROTTLE_FALSE) {
-            throttleDesired = (throttleDesired < 0) ? -1 : throttleDesired;
+        bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
+
+        // safety settings
+        if (allowReverseThrottle == SYSTEMSETTINGS_ALLOWREVERSETHROTTLE_FALSE && (throttleDesired < 0 || !armed)) {
+            throttleDesired = -1;
+        } else if (allowReverseThrottle == SYSTEMSETTINGS_ALLOWREVERSETHROTTLE_TRUE && !armed) {
+            throttleDesired = 0;
+        }
+        if (throttleDesired < 0 || !armed) {
+            // force set all other controls to zero if throttle is cut (previously set in Stabilization)
+            if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+                desired.Roll = 0;
+            }
+            if (actuatorSettings.LowThrottleZeroAxis.Pitch == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+                desired.Pitch = 0;
+            }
+            if (actuatorSettings.LowThrottleZeroAxis.Yaw == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+                desired.Yaw = 0;
+            }
         }
 
 #ifdef DIAG_MIXERSTATUS
@@ -263,7 +280,6 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
-        bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
         bool positiveThrottle = throttleDesired >= 0.00f;
         bool spinWhileArmed   = actuatorSettings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 

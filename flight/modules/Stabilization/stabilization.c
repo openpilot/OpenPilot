@@ -104,7 +104,6 @@ uint8_t max_axislock_rate = 0;
 float weak_leveling_kp    = 0;
 uint8_t weak_leveling_max = 0;
 bool lowThrottleZeroIntegral;
-bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay    = 0.991f;
 struct pid pids[PID_MAX];
 
@@ -597,21 +596,6 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         actuatorDesired.UpdateTime = dT * 1000;
         actuatorDesired.Thrust     = stabDesired.Thrust;
 
-        // Suppress desired output while disarmed
-        if (flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED) {
-            if (lowThrottleZeroAxis[ROLL]) {
-                actuatorDesired.Roll = 0.0f;
-            }
-
-            if (lowThrottleZeroAxis[PITCH]) {
-                actuatorDesired.Pitch = 0.0f;
-            }
-
-            if (lowThrottleZeroAxis[YAW]) {
-                actuatorDesired.Yaw = 0.0f;
-            }
-        }
-
         // modify thrust according to 1/cos(bank angle)
         // to maintain same altitdue with changing bank angle
         // but without manually adjusting thrust
@@ -910,12 +894,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     weak_leveling_max = settings.MaxWeakLevelingRate;
 
     // Whether to zero the PID integrals while thrust is low
-    lowThrottleZeroIntegral    = settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE;
-
-    // Whether to suppress (zero) the StabilizationDesired output for each axis while disarmed or thrust is low
-    lowThrottleZeroAxis[ROLL]  = settings.LowThrottleZeroAxis.Roll == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
-    lowThrottleZeroAxis[PITCH] = settings.LowThrottleZeroAxis.Pitch == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
-    lowThrottleZeroAxis[YAW]   = settings.LowThrottleZeroAxis.Yaw == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
+    lowThrottleZeroIntegral = settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE;
 
     // The dT has some jitter iteration to iteration that we don't want to
     // make thie result unpredictable.  Still, it's nicer to specify the constant

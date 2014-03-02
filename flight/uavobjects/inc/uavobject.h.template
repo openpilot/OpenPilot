@@ -44,6 +44,7 @@
 #define $(NAMEUC)_OBJID $(OBJIDHEX)
 #define $(NAMEUC)_ISSINGLEINST $(ISSINGLEINST)
 #define $(NAMEUC)_ISSETTINGS $(ISSETTINGS)
+#define $(NAMEUC)_ISPRIORITY $(ISPRIORITY)
 #define $(NAMEUC)_NUMBYTES sizeof($(NAME)Data)
 
 /* Generic interface functions */

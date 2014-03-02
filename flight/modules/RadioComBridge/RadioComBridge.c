@@ -518,7 +518,7 @@ static void serialRxTask(__attribute__((unused)) void *parameters)
                 int32_t ret   = -2;
                 uint8_t count = 5;
                 while (count-- > 0 && ret < -1) {
-                    PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, data->serialRxBuf, bytes_to_process);
+                    ret = PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, data->serialRxBuf, bytes_to_process);
                 }
             }
         } else {

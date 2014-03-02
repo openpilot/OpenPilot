@@ -171,6 +171,10 @@ int32_t StabilizationInitialize()
     PIOS_STATIC_ASSERT(NUM_FMS_POSITIONS == sizeof(((FlightModeSettingsData *)0)->FlightModePosition) / sizeof((((FlightModeSettingsData *)0)->FlightModePosition)[0]));
 
     // Initialize variables
+    ManualControlCommandInitialize();
+    ManualControlSettingsInitialize();
+    FlightStatusInitialize();
+    StabilizationDesiredInitialize();
     StabilizationSettingsInitialize();
     StabilizationBankInitialize();
     StabilizationSettingsBank1Initialize();

@@ -83,6 +83,14 @@ static controlHandler handler_ALTITUDE = {
     },
     .handler           = &altitudeHandler,
 };
+static controlHandler handler_AUTOTUNE = {
+    .controlChain      = {
+        .Stabilization = false,
+        .PathFollower  = false,
+        .PathPlanner   = false,
+    },
+    .handler           = NULL,
+};
 
 static controlHandler handler_PATHFOLLOWER = {
     .controlChain      = {
@@ -127,6 +135,8 @@ int32_t ManualControlStart()
     ManualControlSettingsConnectCallback(configurationUpdatedCb);
     ManualControlCommandConnectCallback(commandUpdatedCb);
 
+    // clear alarms
+    AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 
     // Make sure unarmed on power up
     armHandler(true);
@@ -207,19 +217,19 @@ static void manualControlTask(void)
         handler = &handler_ALTITUDE;
         break;
     case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:
-        handler = NULL;
+        handler = &handler_AUTOTUNE;
         break;
         // There is no default, so if a flightmode is forgotten the compiler can throw a warning!
     }
 
-    if (handler) {
-        bool newinit = false;
-        if (flightStatus.FlightMode != newMode) {
-            flightStatus.ControlChain = handler->controlChain;
-            flightStatus.FlightMode   = newMode;
-            FlightStatusSet(&flightStatus);
-            newinit = true;
-        }
+    bool newinit = false;
+    if (flightStatus.FlightMode != newMode) {
+        flightStatus.ControlChain = handler->controlChain;
+        flightStatus.FlightMode   = newMode;
+        FlightStatusSet(&flightStatus);
+        newinit = true;
+    }
+    if (handler->handler) {
         handler->handler(newinit);
     }
 }

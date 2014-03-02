@@ -260,7 +260,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
              && (settings.ChannelGroups.FlightMode >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE
                  || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t)PIOS_RCVR_INVALID
                  || cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == (uint16_t)PIOS_RCVR_NODRIVER))) {
-            AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
+            AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_CRITICAL);
             cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
             ManualControlCommandSet(&cmd);
 
@@ -324,32 +324,32 @@ static void receiverTask(__attribute__((unused)) void *parameters)
             if (settings.FailsafeFlightModeSwitchPosition >= 0 && settings.FailsafeFlightModeSwitchPosition < settings.FlightModeNumber) {
                 cmd.FlightModeSwitchPosition = (uint8_t)settings.FailsafeFlightModeSwitchPosition;
             }
-            AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+            AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_WARNING);
 
             AccessoryDesiredData accessory;
             // Set Accessory 0
             if (settings.ChannelGroups.Accessory0 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                 accessory.AccessoryVal = settings.FailsafeChannel.Accessory0;
                 if (AccessoryDesiredInstSet(0, &accessory) != 0) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_WARNING);
                 }
             }
             // Set Accessory 1
             if (settings.ChannelGroups.Accessory1 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                 accessory.AccessoryVal = settings.FailsafeChannel.Accessory1;
                 if (AccessoryDesiredInstSet(1, &accessory) != 0) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_WARNING);
                 }
             }
             // Set Accessory 2
             if (settings.ChannelGroups.Accessory2 != MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                 accessory.AccessoryVal = settings.FailsafeChannel.Accessory2;
                 if (AccessoryDesiredInstSet(2, &accessory) != 0) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_WARNING);
                 }
             }
         } else if (valid_input_detected) {
-            AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
+            AlarmsClear(SYSTEMALARMS_ALARM_RECEIVER);
 
             // Scale channels to -1 -> +1 range
             cmd.Roll     = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL];
@@ -411,7 +411,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                 applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY0, &settings, dT);
 #endif
                 if (AccessoryDesiredInstSet(0, &accessory) != 0) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_WARNING);
                 }
             }
             // Set Accessory 1
@@ -421,7 +421,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                 applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY1, &settings, dT);
 #endif
                 if (AccessoryDesiredInstSet(1, &accessory) != 0) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_WARNING);
                 }
             }
             // Set Accessory 2
@@ -432,7 +432,7 @@ static void receiverTask(__attribute__((unused)) void *parameters)
 #endif
 
                 if (AccessoryDesiredInstSet(2, &accessory) != 0) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_WARNING);
                 }
             }
         }

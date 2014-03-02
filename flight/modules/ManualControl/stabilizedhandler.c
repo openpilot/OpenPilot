@@ -80,6 +80,7 @@ void stabilizedHandler(bool newinit)
         break;
     default:
         // Major error, this should not occur because only enter this block when one of these is true
+        AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
         stab_settings = cast_struct_to_array(settings.Stabilization1Settings, settings.Stabilization1Settings.Roll);
         return;
     }

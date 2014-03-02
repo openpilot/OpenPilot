@@ -122,7 +122,7 @@ void altitudeHandler(bool newinit)
 #else /* if defined(REVOLUTION) */
 void altitudeHandler(__attribute__((unused)) bool newinit)
 {
-    PIOS_Assert(0); // should not be called
+    AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL); // should not be called
 }
 #endif // REVOLUTION
 

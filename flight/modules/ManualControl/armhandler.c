@@ -64,15 +64,15 @@ static bool forcedDisArm(void);
  */
 void armHandler(bool newinit)
 {
-    static portTickType lastSysTime;
     static ArmState_t armState;
 
     if (newinit) {
         AccessoryDesiredInitialize();
-        lastSysTime = xTaskGetTickCount();
         setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
-        armState    = ARM_STATE_DISARMED;
+        armState = ARM_STATE_DISARMED;
     }
+
+    portTickType sysTime = xTaskGetTickCount();
 
     FlightModeSettingsData settings;
     FlightModeSettingsGet(&settings);
@@ -190,7 +190,7 @@ void armHandler(bool newinit)
 
         // only allow arming if it's OK too
         if (manualArm && okToArm()) {
-            armedDisarmStart = lastSysTime;
+            armedDisarmStart = sysTime;
             armState = ARM_STATE_ARMING_MANUAL;
         }
         break;
@@ -198,7 +198,7 @@ void armHandler(bool newinit)
     case ARM_STATE_ARMING_MANUAL:
         setArmedIfChanged(FLIGHTSTATUS_ARMED_ARMING);
 
-        if (manualArm && (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.ArmingSequenceTime)) {
+        if (manualArm && (timeDifferenceMs(armedDisarmStart, sysTime) > settings.ArmingSequenceTime)) {
             armState = ARM_STATE_ARMED;
         } else if (!manualArm) {
             armState = ARM_STATE_DISARMED;
@@ -208,27 +208,27 @@ void armHandler(bool newinit)
     case ARM_STATE_ARMED:
         // When we get here, the throttle is low,
         // we go immediately to disarming due to timeout, also when the disarming mechanism is not enabled
-        armedDisarmStart = lastSysTime;
+        armedDisarmStart = sysTime;
         armState = ARM_STATE_DISARMING_TIMEOUT;
         setArmedIfChanged(FLIGHTSTATUS_ARMED_ARMED);
         break;
 
     case ARM_STATE_DISARMING_TIMEOUT:
         // We get here when armed while throttle low, even when the arming timeout is not enabled
-        if ((settings.ArmedTimeout != 0) && (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.ArmedTimeout)) {
+        if ((settings.ArmedTimeout != 0) && (timeDifferenceMs(armedDisarmStart, sysTime) > settings.ArmedTimeout)) {
             armState = ARM_STATE_DISARMED;
         }
 
         // Switch to disarming due to manual control when needed
         if (manualDisarm) {
-            armedDisarmStart = lastSysTime;
+            armedDisarmStart = sysTime;
             armState = ARM_STATE_DISARMING_MANUAL;
         }
         break;
 
     case ARM_STATE_DISARMING_MANUAL:
         // arming switch disarms immediately,
-        if (manualDisarm && (armSwitch || (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.DisarmingSequenceTime))) {
+        if (manualDisarm && (armSwitch || (timeDifferenceMs(armedDisarmStart, sysTime) > settings.DisarmingSequenceTime))) {
             armState = ARM_STATE_DISARMED;
         } else if (!manualDisarm) {
             armState = ARM_STATE_ARMED;

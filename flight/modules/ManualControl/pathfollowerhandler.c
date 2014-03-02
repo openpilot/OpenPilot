@@ -120,7 +120,7 @@ void pathFollowerHandler(bool newinit)
 #else /* if defined(REVOLUTION) */
 void pathFollowerHandler(__attribute__((unused)) bool newinit)
 {
-    PIOS_Assert(0); // should not be called
+    AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL); // should not be called
 }
 #endif // REVOLUTION
 

@@ -49,6 +49,7 @@
 #include "gyrostate.h"
 #include "flightstatus.h"
 #include "manualcontrolsettings.h"
+#include "manualcontrolcommand.h"
 #include "flightmodesettings.h"
 #include "taskinfo.h"
 
@@ -596,8 +597,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         actuatorDesired.UpdateTime = dT * 1000;
         actuatorDesired.Thrust     = stabDesired.Thrust;
 
-        // Suppress desired output while disarmed or thrust low, for configured axis
-        if (flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED || throttleDesired < 0) {
+        // Suppress desired output while disarmed
+        if (flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED) {
             if (lowThrottleZeroAxis[ROLL]) {
                 actuatorDesired.Roll = 0.0f;
             }

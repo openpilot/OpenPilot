@@ -6,7 +6,7 @@
  * @{
  *
  * @file       manualcontrol.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @brief      ManualControl module. Handles safety R/C link and flight mode.
  *
  * @see        The GNU Public License (GPL) Version 3
@@ -30,30 +30,57 @@
 #ifndef MANUALCONTROL_H
 #define MANUALCONTROL_H
 
-#include "manualcontrolcommand.h"
+#include <openpilot.h>
+#include <flightstatus.h>
 
-typedef enum { FLIGHTMODE_UNDEFINED = 0, FLIGHTMODE_MANUAL = 1, FLIGHTMODE_STABILIZED = 2, FLIGHTMODE_GUIDANCE = 3, FLIGHTMODE_TUNING = 4 } flightmode_path;
+typedef void (*handlerFunc)(bool newinit);
 
-#define PARSE_FLIGHT_MODE(x) \
-    ( \
-        (x == FLIGHTSTATUS_FLIGHTMODE_MANUAL) ? FLIGHTMODE_MANUAL : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1) ? FLIGHTMODE_STABILIZED : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2) ? FLIGHTMODE_STABILIZED : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3) ? FLIGHTMODE_STABILIZED : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) ? FLIGHTMODE_GUIDANCE : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO) ? FLIGHTMODE_GUIDANCE : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL) ? FLIGHTMODE_GUIDANCE : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD) ? FLIGHTMODE_GUIDANCE : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) ? FLIGHTMODE_GUIDANCE : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE) ? FLIGHTMODE_GUIDANCE : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_LAND) ? FLIGHTMODE_GUIDANCE : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE) ? FLIGHTMODE_TUNING : \
-        (x == FLIGHTSTATUS_FLIGHTMODE_POI) ? FLIGHTMODE_GUIDANCE : \
-        FLIGHTMODE_UNDEFINED \
-    )
+typedef struct controlHandlerStruct {
+    FlightStatusControlChainData controlChain;
+    handlerFunc handler;
+} controlHandler;
 
-int32_t ManualControlInitialize();
+/**
+ * @brief Handler to interprete Command inputs in regards to arming/disarming (called in all flight modes)
+ * @input: ManualControlCommand, AccessoryDesired
+ * @output: FlightStatus.Arming
+ */
+void armHandler(bool newinit);
 
+/**
+ * @brief Handler to control Manual flightmode - input directly steers actuators
+ * @input: ManualControlCommand
+ * @output: ActuatorDesired
+ */
+void manualHandler(bool newinit);
+
+/**
+ * @brief Handler to control Stabilized flightmodes. FlightControl is governed by "Stabilization"
+ * @input: ManualControlCommand
+ * @output: StabilizationDesired
+ */
+void stabilizedHandler(bool newinit);
+
+/**
+ * @brief Handler to control deprecated flight modes controlled by AltitudeHold module
+ * @input: ManualControlCommand
+ * @output: AltitudeHoldDesired
+ */
+void altitudeHandler(bool newinit);
+
+/**
+ * @brief Handler to control Guided flightmodes. FlightControl is governed by PathFollower, control via PathDesired
+ * @input: NONE: fully automated mode -- TODO recursively call handler for advanced stick commands
+ * @output: PathDesired
+ */
+void pathFollowerHandler(bool newinit);
+
+/**
+ * @brief Handler to control Navigated flightmodes. FlightControl is governed by PathFollower, controlled indirectly via PathPlanner
+ * @input: NONE: fully automated mode -- TODO recursively call handler for advanced stick commands to affect navigation
+ * @output: NONE
+ */
+void pathPlannerHandler(bool newinit);
 
 /*
  * These are assumptions we make in the flight code about the order of settings and their consistency between
@@ -102,13 +129,5 @@ int32_t ManualControlInitialize();
         ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE == (int)FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE) && \
         ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI == (int)FLIGHTSTATUS_FLIGHTMODE_POI) \
     )
-
-#define assumptions_channelcount \
-    ( \
-        ((int)MANUALCONTROLCOMMAND_CHANNEL_NUMELEM == (int)MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM) && \
-        ((int)MANUALCONTROLCOMMAND_CHANNEL_NUMELEM == (int)MANUALCONTROLSETTINGS_CHANNELNUMBER_NUMELEM) && \
-        ((int)MANUALCONTROLCOMMAND_CHANNEL_NUMELEM == (int)MANUALCONTROLSETTINGS_CHANNELMIN_NUMELEM) && \
-        ((int)MANUALCONTROLCOMMAND_CHANNEL_NUMELEM == (int)MANUALCONTROLSETTINGS_CHANNELMAX_NUMELEM) && \
-        ((int)MANUALCONTROLCOMMAND_CHANNEL_NUMELEM == (int)MANUALCONTROLSETTINGS_CHANNELNEUTRAL_NUMELEM))
 
 #endif // MANUALCONTROL_H

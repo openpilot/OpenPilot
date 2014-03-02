@@ -34,6 +34,7 @@ ERASE_FLASH ?= NO
 MODULES += Attitude
 MODULES += Stabilization
 MODULES += Actuator
+MODULES += Receiver
 MODULES += ManualControl
 MODULES += FirmwareIAP
 MODULES += Telemetry

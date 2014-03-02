@@ -55,7 +55,7 @@
 #include "hwsettings.h"
 #include "pathdesired.h" // object that will be updated by the module
 #include "positionstate.h"
-#include "manualcontrol.h"
+#include "manualcontrolcommand.h"
 #include "flightstatus.h"
 #include "pathstatus.h"
 #include "gpsvelocitysensor.h"

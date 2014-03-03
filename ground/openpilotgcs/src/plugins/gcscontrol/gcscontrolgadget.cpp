@@ -94,12 +94,12 @@ ManualControlCommand *GCSControlGadget::getManualControlCommand()
     return dynamic_cast<ManualControlCommand *>(objManager->getObject(QString("ManualControlCommand")));
 }
 
-void GCSControlGadget::manualControlCommandUpdated(UAVObject *obj)
+void GCSControlGadget::manualControlCommandUpdated(UAVObject *manualControlCommand)
 {
-    double roll     = obj->getField("Roll")->getDouble();
-    double pitch    = obj->getField("Pitch")->getDouble();
-    double yaw      = obj->getField("Yaw")->getDouble();
-    double throttle = obj->getField("Throttle")->getDouble();
+    double roll     = manualControlCommand->getField("Roll")->getDouble();
+    double pitch    = manualControlCommand->getField("Pitch")->getDouble();
+    double yaw      = manualControlCommand->getField("Yaw")->getDouble();
+    double throttle = manualControlCommand->getField("Throttle")->getDouble();
 
     // necessary against having the wrong joystick profile chosen, which shows weird values
     if (throttle > -1.0 && throttle <= 1.0) {
@@ -140,11 +140,11 @@ void GCSControlGadget::manualControlCommandUpdated(UAVObject *obj)
  */
 void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double rightX, double rightY)
 {
-    ManualControlCommand *obj = getManualControlCommand();
-    double oldRoll     = obj->getField("Roll")->getDouble();
-    double oldPitch    = obj->getField("Pitch")->getDouble();
-    double oldYaw      = obj->getField("Yaw")->getDouble();
-    double oldThrottle = obj->getField("Throttle")->getDouble();
+    ManualControlCommand *manualControlCommand = getManualControlCommand();
+    double oldRoll     = manualControlCommand->getField("Roll")->getDouble();
+    double oldPitch    = manualControlCommand->getField("Pitch")->getDouble();
+    double oldYaw      = manualControlCommand->getField("Yaw")->getDouble();
+    double oldThrottle = manualControlCommand->getField("Throttle")->getDouble();
 
     double newRoll;
     double newPitch;
@@ -221,20 +221,20 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
 
     if ((newThrottle != oldThrottle) || (newPitch != oldPitch) || (newYaw != oldYaw) || (newRoll != oldRoll)) {
         if (buttonRollControl == 0) {
-            obj->getField("Roll")->setDouble(newRoll);
+            manualControlCommand->getField("Roll")->setDouble(newRoll);
         }
         if (buttonPitchControl == 0) {
-            obj->getField("Pitch")->setDouble(newPitch);
+            manualControlCommand->getField("Pitch")->setDouble(newPitch);
         }
         if (buttonYawControl == 0) {
-            obj->getField("Yaw")->setDouble(newYaw);
+            manualControlCommand->getField("Yaw")->setDouble(newYaw);
         }
         if (buttonThrottleControl == 0) {
-            obj->getField("Throttle")->setDouble(newThrottle);
-            obj->getField("Thrust")->setDouble(newThrottle);
+            manualControlCommand->getField("Throttle")->setDouble(newThrottle);
+            manualControlCommand->getField("Thrust")->setDouble(newThrottle);
         }
-        obj->getField("Connected")->setValue("True");
-        obj->updated();
+        manualControlCommand->getField("Connected")->setValue("True");
+        manualControlCommand->updated();
     }
 }
 
@@ -293,29 +293,29 @@ void GCSControlGadget::readUDPCommand()
             }
         }
         if (!badPack && ((GCSControlGadgetWidget *)m_widget)->getUDPControl()) {
-            ManualControlCommand *obj = getManualControlCommand();
+            ManualControlCommand *manualControlCommand = getManualControlCommand();
             bool update = false;
 
-            if (pitch != obj->getField("Pitch")->getDouble()) {
-                obj->getField("Pitch")->setDouble(constrain(pitch));
+            if (pitch != manualControlCommand->getField("Pitch")->getDouble()) {
+                manualControlCommand->getField("Pitch")->setDouble(constrain(pitch));
                 update = true;
             }
-            if (yaw != obj->getField("Yaw")->getDouble()) {
-                obj->getField("Yaw")->setDouble(constrain(yaw));
+            if (yaw != manualControlCommand->getField("Yaw")->getDouble()) {
+                manualControlCommand->getField("Yaw")->setDouble(constrain(yaw));
                 update = true;
             }
-            if (roll != obj->getField("Roll")->getDouble()) {
-                obj->getField("Roll")->setDouble(constrain(roll));
+            if (roll != manualControlCommand->getField("Roll")->getDouble()) {
+                manualControlCommand->getField("Roll")->setDouble(constrain(roll));
                 update = true;
             }
-            if (throttle != obj->getField("Throttle")->getDouble()) {
-                obj->getField("Throttle")->setDouble(constrain(throttle));
-                obj->getField("Thrust")->setDouble(constrain(throttle));
+            if (throttle != manualControlCommand->getField("Throttle")->getDouble()) {
+                manualControlCommand->getField("Throttle")->setDouble(constrain(throttle));
+                manualControlCommand->getField("Thrust")->setDouble(constrain(throttle));
                 update = true;
             }
             if (update) {
-                obj->getField("Connected")->setValue("True");
-                obj->updated();
+                manualControlCommand->getField("Connected")->setValue("True");
+                manualControlCommand->updated();
             }
         }
     }
@@ -337,9 +337,9 @@ double GCSControlGadget::constrain(double value)
 void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
 {
     if ((buttonSettings[number].ActionID > 0) && (buttonSettings[number].FunctionID > 0) && (pressed)) { // this button is configured
-        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        ExtensionSystem::PluginManager *pm  = ExtensionSystem::PluginManager::instance();
         UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-        UAVDataObject *obj     = dynamic_cast<UAVDataObject *>(objManager->getObject(QString("ManualControlCommand")));
+        UAVDataObject *manualControlCommand = dynamic_cast<UAVDataObject *>(objManager->getObject(QString("ManualControlCommand")));
         bool currentCGSControl = ((GCSControlGadgetWidget *)m_widget)->getGCSControl();
         bool currentUDPControl = ((GCSControlGadgetWidget *)m_widget)->getUDPControl();
 
@@ -348,17 +348,17 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
             if (currentCGSControl) {
                 switch (buttonSettings[number].FunctionID) {
                 case 1: // Roll
-                    obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble() + buttonSettings[number].Amount));
+                    manualControlCommand->getField("Roll")->setValue(bound(manualControlCommand->getField("Roll")->getValue().toDouble() + buttonSettings[number].Amount));
                     break;
                 case 2: // Pitch
-                    obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble() + buttonSettings[number].Amount));
+                    manualControlCommand->getField("Pitch")->setValue(bound(manualControlCommand->getField("Pitch")->getValue().toDouble() + buttonSettings[number].Amount));
                     break;
                 case 3: // Yaw
-                    obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble() + buttonSettings[number].Amount));
+                    manualControlCommand->getField("Yaw")->setValue(wrap(manualControlCommand->getField("Yaw")->getValue().toDouble() + buttonSettings[number].Amount));
                     break;
                 case 4: // Throttle
-                    obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble() + buttonSettings[number].Amount));
-                    obj->getField("Thrust")->setValue(bound(obj->getField("Thrust")->getValue().toDouble() + buttonSettings[number].Amount));
+                    manualControlCommand->getField("Throttle")->setValue(bound(manualControlCommand->getField("Throttle")->getValue().toDouble() + buttonSettings[number].Amount));
+                    manualControlCommand->getField("Thrust")->setValue(bound(manualControlCommand->getField("Thrust")->getValue().toDouble() + buttonSettings[number].Amount));
                     break;
                 }
             }
@@ -367,17 +367,17 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
             if (currentCGSControl) {
                 switch (buttonSettings[number].FunctionID) {
                 case 1: // Roll
-                    obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble() - buttonSettings[number].Amount));
+                    manualControlCommand->getField("Roll")->setValue(bound(manualControlCommand->getField("Roll")->getValue().toDouble() - buttonSettings[number].Amount));
                     break;
                 case 2: // Pitch
-                    obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble() - buttonSettings[number].Amount));
+                    manualControlCommand->getField("Pitch")->setValue(bound(manualControlCommand->getField("Pitch")->getValue().toDouble() - buttonSettings[number].Amount));
                     break;
                 case 3: // Yaw
-                    obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble() - buttonSettings[number].Amount));
+                    manualControlCommand->getField("Yaw")->setValue(wrap(manualControlCommand->getField("Yaw")->getValue().toDouble() - buttonSettings[number].Amount));
                     break;
                 case 4: // Throttle
-                    obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble() - buttonSettings[number].Amount));
-                    obj->getField("Thrust")->setValue(bound(obj->getField("Thrust")->getValue().toDouble() - buttonSettings[number].Amount));
+                    manualControlCommand->getField("Throttle")->setValue(bound(manualControlCommand->getField("Throttle")->getValue().toDouble() - buttonSettings[number].Amount));
+                    manualControlCommand->getField("Thrust")->setValue(bound(manualControlCommand->getField("Thrust")->getValue().toDouble() - buttonSettings[number].Amount));
                     break;
                 }
             }
@@ -409,8 +409,8 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
             break;
         }
 
-        obj->getField("Connected")->setValue("True");
-        obj->updated();
+        manualControlCommand->getField("Connected")->setValue("True");
+        manualControlCommand->updated();
     }
     // buttonSettings[number].ActionID NIDT
     // buttonSettings[number].FunctionID -RPYTAC

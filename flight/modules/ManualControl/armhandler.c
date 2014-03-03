@@ -228,7 +228,7 @@ void armHandler(bool newinit)
 
     case ARM_STATE_DISARMING_MANUAL:
         // arming switch disarms immediately,
-        if (manualDisarm && (armSwitch || (timeDifferenceMs(armedDisarmStart, sysTime) > settings.DisarmingSequenceTime))) {
+        if (manualDisarm && (timeDifferenceMs(armedDisarmStart, sysTime) > settings.DisarmingSequenceTime)) {
             armState = ARM_STATE_DISARMED;
         } else if (!manualDisarm) {
             armState = ARM_STATE_ARMED;

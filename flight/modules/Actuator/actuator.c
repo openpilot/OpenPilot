@@ -125,10 +125,12 @@ int32_t ActuatorInitialize()
     MixerSettingsConnectCallback(MixerSettingsUpdatedCb);
 
     // Listen for ActuatorDesired updates (Primary input to this module)
-    AccessoryDesiredInitialize();
     ActuatorDesiredInitialize();
     queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
     ActuatorDesiredConnectQueue(queue);
+
+    // Register AccessoryDesired (Secondary input to this module)
+    AccessoryDesiredInitialize();
 
     // Primary output of this module
     ActuatorCommandInitialize();

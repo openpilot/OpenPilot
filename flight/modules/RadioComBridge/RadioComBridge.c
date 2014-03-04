@@ -299,10 +299,12 @@ static void updateRadioComBridgeStats()
     // Get stats object data
     RadioComBridgeStatsGet(&radioComBridgeStats);
 
+    radioComBridgeStats.TelemetryTxRetries    = data->telemetryTxRetries;
+    radioComBridgeStats.RadioTxRetries    = data->radioTxRetries;
+
     // Update stats object
     radioComBridgeStats.TelemetryTxBytes      += telemetryUAVTalkStats.txBytes;
     radioComBridgeStats.TelemetryTxFailures   += telemetryUAVTalkStats.txErrors;
-    radioComBridgeStats.TelemetryTxRetries    += data->telemetryTxRetries;
 
     radioComBridgeStats.TelemetryRxBytes      += telemetryUAVTalkStats.rxBytes;
     radioComBridgeStats.TelemetryRxFailures   += telemetryUAVTalkStats.rxErrors;
@@ -311,7 +313,6 @@ static void updateRadioComBridgeStats()
 
     radioComBridgeStats.RadioTxBytes      += radioUAVTalkStats.txBytes;
     radioComBridgeStats.RadioTxFailures   += radioUAVTalkStats.txErrors;
-    radioComBridgeStats.RadioTxRetries    += data->radioTxRetries;
 
     radioComBridgeStats.RadioRxBytes      += radioUAVTalkStats.rxBytes;
     radioComBridgeStats.RadioRxFailures   += radioUAVTalkStats.rxErrors;

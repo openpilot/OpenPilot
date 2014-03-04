@@ -342,11 +342,11 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
                 updateRadioComBridgeStats();
             }
             // Send update (with retries)
+            int32_t ret = -1;
             uint32_t retries = 0;
-            int32_t success  = -1;
-            while (retries < MAX_RETRIES && success == -1) {
-                success = UAVTalkSendObject(data->telemUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS) == 0;
-                if (success == -1) {
+            while (retries <= MAX_RETRIES && ret == -1) {
+                ret = UAVTalkSendObject(data->telemUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS);
+                if (ret == -1) {
                     ++retries;
                 }
             }
@@ -376,11 +376,11 @@ static void radioTxTask(__attribute__((unused)) void *parameters)
         if (xQueueReceive(data->radioEventQueue, &ev, MAX_PORT_DELAY) == pdTRUE) {
             if ((ev.event == EV_UPDATED) || (ev.event == EV_UPDATE_REQ)) {
                 // Send update (with retries)
+                int32_t ret = -1;
                 uint32_t retries = 0;
-                int32_t success  = -1;
-                while (retries < MAX_RETRIES && success == -1) {
-                    success = UAVTalkSendObject(data->radioUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS) == 0;
-                    if (success == -1) {
+                while (retries <= MAX_RETRIES && ret == -1) {
+                    ret = UAVTalkSendObject(data->radioUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS);
+                    if (ret == -1) {
                         ++retries;
                     }
                 }

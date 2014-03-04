@@ -872,7 +872,7 @@ static int32_t sendObject(UAVTalkConnectionData *connection, uint8_t type, uint3
 {
     uint32_t numInst;
     uint32_t n;
-    uint32_t ret = -1;
+    int32_t ret = -1;
 
     // Important note : obj can be null (when type is NACK for example) so protect all obj dereferences.
 
@@ -890,8 +890,8 @@ static int32_t sendObject(UAVTalkConnectionData *connection, uint8_t type, uint3
             // This allows the receiver to detect when the last object has been received (i.e. when instance 0 is received)
             ret     = 0;
             for (n = 0; n < numInst; ++n) {
-                if (sendSingleObject(connection, type, objId, numInst - n - 1, obj) == -1) {
-                    ret = -1;
+                ret = sendSingleObject(connection, type, objId, numInst - n - 1, obj);
+                if (ret == -1) {
                     break;
                 }
             }
@@ -914,8 +914,7 @@ static int32_t sendObject(UAVTalkConnectionData *connection, uint8_t type, uint3
  * \param[in] connection UAVTalkConnection to be used
  * \param[in] type Transaction type
  * \param[in] objId The object ID
- * \param[in] instId The instance ID (can NOT be UAVOBJ_ALL_INSTANCES, use
-   () instead)
+ * \param[in] instId The instance ID (can NOT be UAVOBJ_ALL_INSTANCES, use () instead)
  * \param[in] obj Object handle to send (null when type is NACK)
  * \return 0 Success
  * \return -1 Failure
@@ -992,7 +991,7 @@ static int32_t sendSingleObject(UAVTalkConnectionData *connection, uint8_t type,
         connection->stats.txBytes += tx_msg_len;
     } else {
         connection->stats.txErrors++;
-        // TDOD rc == -1 connection not open, -2 buffer full should retry
+        // TODO rc == -1 connection not open, -2 buffer full should retry
         connection->stats.txBytes += (rc > 0) ? rc : 0;
         return -1;
     }

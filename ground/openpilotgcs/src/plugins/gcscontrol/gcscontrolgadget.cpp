@@ -246,7 +246,10 @@ void GCSControlGadget::gamepads(quint8 count)
 
 void GCSControlGadget::readUDPCommand()
 {
-    double pitch, yaw, roll, throttle;
+    double pitch    = 0.0;
+    double yaw      = 0.0;
+    double roll     = 0.0;
+    double throttle = 0.0;
 
     while (control_sock->hasPendingDatagrams()) {
         QByteArray datagram;

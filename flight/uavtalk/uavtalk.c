@@ -599,7 +599,7 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
  * \return 0 Success
  * \return -1 Failure
  */
-UAVTalkRxState UAVTalkRelayPacket(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle)
+int32_t UAVTalkRelayPacket(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle)
 {
     UAVTalkConnectionData *inConnection;
 
@@ -666,17 +666,17 @@ UAVTalkRxState UAVTalkRelayPacket(UAVTalkConnection inConnectionHandle, UAVTalkC
     outConnection->stats.txBytes += (rc > 0) ? rc : 0;
 
     // evaluate return value before releasing the lock
-    UAVTalkRxState rxState = 0;
+    int32_t ret = 0;
     if (rc != (int32_t)(headerLength + inIproc->length + UAVTALK_CHECKSUM_LENGTH)) {
         outConnection->stats.txErrors++;
-        rxState = -1;
+        ret = -1;
     }
 
     // Release lock
     xSemaphoreGiveRecursive(outConnection->lock);
 
     // Done
-    return rxState;
+    return ret;
 }
 
 /**

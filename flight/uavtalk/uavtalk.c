@@ -133,7 +133,7 @@ UAVTalkOutputStream UAVTalkGetOutputStream(UAVTalkConnection connectionHandle)
  * \param[in] connection UAVTalkConnection to be used
  * @param[out] statsOut Statistics counters
  */
-void UAVTalkGetStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut)
+void UAVTalkGetStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut, bool reset)
 {
     UAVTalkConnectionData *connection;
 
@@ -145,6 +145,11 @@ void UAVTalkGetStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut)
     // Copy stats
     memcpy(statsOut, &connection->stats, sizeof(UAVTalkStats));
 
+    if (reset) {
+        // Clear stats
+        memset(&connection->stats, 0, sizeof(UAVTalkStats));
+    }
+
     // Release lock
     xSemaphoreGiveRecursive(connection->lock);
 }
@@ -154,7 +159,7 @@ void UAVTalkGetStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut)
  * \param[in] connection UAVTalkConnection to be used
  * @param[out] statsOut Statistics counters
  */
-void UAVTalkAddStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut)
+void UAVTalkAddStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut, bool reset)
 {
     UAVTalkConnectionData *connection;
 
@@ -174,6 +179,11 @@ void UAVTalkAddStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut)
     statsOut->rxErrors      += connection->stats.rxErrors;
     statsOut->rxSyncErrors  += connection->stats.rxSyncErrors;
     statsOut->rxCrcErrors   += connection->stats.rxCrcErrors;
+
+    if (reset) {
+        // Clear stats
+        memset(&connection->stats, 0, sizeof(UAVTalkStats));
+    }
 
     // Release lock
     xSemaphoreGiveRecursive(connection->lock);

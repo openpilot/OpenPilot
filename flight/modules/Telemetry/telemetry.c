@@ -542,12 +542,10 @@ static void updateTelemetryStats()
     uint32_t timeNow;
 
     // Get stats
-    UAVTalkGetStats(uavTalkCon, &utalkStats);
+    UAVTalkGetStats(uavTalkCon, &utalkStats, true);
 #ifdef PIOS_INCLUDE_RFM22B
-    UAVTalkAddStats(radioUavTalkCon, &utalkStats);
-    UAVTalkResetStats(radioUavTalkCon);
+    UAVTalkAddStats(radioUavTalkCon, &utalkStats, true);
 #endif
-    UAVTalkResetStats(uavTalkCon);
 
     // Get object data
     FlightTelemetryStatsGet(&flightStats);

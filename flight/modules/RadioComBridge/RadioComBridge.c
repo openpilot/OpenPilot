@@ -289,12 +289,10 @@ static void updateRadioComBridgeStats()
     RadioComBridgeStatsData radioComBridgeStats;
 
     // Get telemetry stats
-    UAVTalkGetStats(data->telemUAVTalkCon, &telemetryUAVTalkStats);
-    UAVTalkResetStats(data->telemUAVTalkCon);
+    UAVTalkGetStats(data->telemUAVTalkCon, &telemetryUAVTalkStats, true);
 
     // Get radio stats
-    UAVTalkGetStats(data->radioUAVTalkCon, &radioUAVTalkStats);
-    UAVTalkResetStats(data->radioUAVTalkCon);
+    UAVTalkGetStats(data->radioUAVTalkCon, &radioUAVTalkStats, true);
 
     // Get stats object data
     RadioComBridgeStatsGet(&radioComBridgeStats);

@@ -404,7 +404,7 @@ void ConfigTaskWidget::widgetsContentsChanged()
 {
     QWidget *emitter = ((QWidget *)sender());
     emit widgetContentsChanged(emitter);
-    double scale;
+    double scale     = 1.0;
     QVariant value;
 
     foreach(WidgetBinding * binding, m_widgetBindingsPerWidget.values(emitter)) {

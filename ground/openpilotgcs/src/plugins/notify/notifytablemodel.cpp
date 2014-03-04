@@ -234,11 +234,9 @@ bool NotifyTableModel::dropMimeData(const QMimeData *data, Qt::DropAction action
             continue;
         }
 
-        bool success = insertRows(rows + direction, 1, QModelIndex());
-        Q_ASSERT(success);
+        insertRows(rows + direction, 1, QModelIndex());
         _list.replace(rows + direction, item);
-        success = removeRows(dragged, 1, QModelIndex());
-        Q_ASSERT(success);
+        removeRows(dragged, 1, QModelIndex());
         if (direction == UP_DIRECTION) {
             ++rows;
         }

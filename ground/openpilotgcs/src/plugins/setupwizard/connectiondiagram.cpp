@@ -155,7 +155,8 @@ void ConnectionDiagram::setupGraphicsScene()
 void ConnectionDiagram::setupGraphicsSceneItems(QList<QString> elementsToShow)
 {
     qreal z = 0;
-    //QRectF backgBounds = m_renderer->boundsOnElement("background");
+
+    // QRectF backgBounds = m_renderer->boundsOnElement("background");
 
     foreach(QString elementId, elementsToShow) {
         if (m_renderer->elementExists(elementId)) {

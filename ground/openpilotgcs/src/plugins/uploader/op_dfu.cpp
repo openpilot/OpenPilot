@@ -246,7 +246,7 @@ bool DFUObject::UploadData(qint32 const & numberOfBytes, QByteArray & data)
     buf[1] = OP_DFU::Upload; // DFU Command
     int packetsize;
     float percentage;
-    int laspercentage;
+    int laspercentage = 0;
     for (qint32 packetcount = 0; packetcount < numberOfPackets; ++packetcount) {
         percentage = (float)(packetcount + 1) / numberOfPackets * 100;
         if (laspercentage != (int)percentage) {
@@ -433,7 +433,7 @@ bool DFUObject::StartDownloadT(QByteArray *fw, qint32 const & numberOfBytes, Tra
         qDebug() << "StartDownload:" << numberOfPackets << "packets" << " Last Packet Size=" << lastPacketCount << " " << result << " bytes sent";
     }
     float percentage;
-    int laspercentage;
+    int laspercentage = 0;
 
     // Now get those packets:
     for (qint32 x = 0; x < numberOfPackets; ++x) {

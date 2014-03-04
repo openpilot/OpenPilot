@@ -146,10 +146,10 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
     double oldYaw      = obj->getField("Yaw")->getDouble();
     double oldThrottle = obj->getField("Throttle")->getDouble();
 
-    double newRoll;
-    double newPitch;
-    double newYaw;
-    double newThrottle;
+    double newRoll     = 0.0;
+    double newPitch    = 0.0;
+    double newYaw      = 0.0;
+    double newThrottle = 0.0;
 
     // Remap left X/Y and right X/Y to RPYT depending on mode
     switch (controlsMode) {

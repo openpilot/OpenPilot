@@ -641,7 +641,7 @@ void NotifyPluginOptionsPage::on_FinishedPlaying()
 void NotifyPluginOptionsPage::on_toggled_checkEnableSound(bool state)
 {
     Q_UNUSED(state);
-    //bool state1 = 1 ^ state;
+    // bool state1 = 1 ^ state;
 
     // QList<Phonon::Path> listOutputs  = _testSound->outputPaths();
     // Phonon::AudioOutput *audioOutput = (Phonon::AudioOutput *)listOutputs.last().sink();

@@ -412,8 +412,8 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
                     }
                 } else if (PIOS_COM_TELEMETRY) {
                     // Send the data straight to the telemetry port.
-                    // FIXME following call can fail (with -2 error code) if buffer is full
-                    // it is the caller responsibility to retry in such cases...
+                    // Following call can fail with -2 error code (buffer full) or -3 error code (could not acquire send mutex)
+                    // It is the caller responsibility to retry in such cases...
                     int32_t ret   = -2;
                     uint8_t count = 5;
                     while (count-- > 0 && ret < -1) {
@@ -512,8 +512,8 @@ static void serialRxTask(__attribute__((unused)) void *parameters)
 
             if (bytes_to_process > 0) {
                 // Send the data over the radio link.
-                // FIXME following call can fail (with -2 error code) if buffer is full
-                // it is the caller responsibility to retry in such cases...
+                // Following call can fail with -2 error code (buffer full) or -3 error code (could not acquire send mutex)
+                // It is the caller responsibility to retry in such cases...
                 int32_t ret   = -2;
                 uint8_t count = 5;
                 while (count-- > 0 && ret < -1) {
@@ -546,8 +546,8 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
     }
 #endif /* PIOS_INCLUDE_USB */
     if (outputPort) {
-        // FIXME following call can fail (with -2 error code) if buffer is full
-        // it is the caller responsibility to retry in such cases...
+        // Following call can fail with -2 error code (buffer full) or -3 error code (could not acquire send mutex)
+        // It is the caller responsibility to retry in such cases...
         ret = -2;
         uint8_t count = 5;
         while (count-- > 0 && ret < -1) {
@@ -576,8 +576,8 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
 
     // Don't send any data unless the radio port is available.
     if (outputPort && PIOS_COM_Available(outputPort)) {
-        // FIXME following call can fail (with -2 error code) if buffer is full
-        // it is the caller responsibility to retry in such cases...
+        // Following call can fail with -2 error code (buffer full) or -3 error code (could not acquire send mutex)
+        // It is the caller responsibility to retry in such cases...
         int32_t ret   = -2;
         uint8_t count = 5;
         while (count-- > 0 && ret < -1) {

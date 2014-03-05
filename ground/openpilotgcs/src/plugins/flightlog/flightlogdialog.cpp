@@ -35,11 +35,13 @@
 #include <QQmlContext>
 
 #include "flightlogmanager.h"
+#include "uavobject.h"
 
 FlightLogDialog::FlightLogDialog(QWidget *parent, FlightLogManager *flightLogManager) :
     QDialog(parent)
 {
     qmlRegisterType<ExtendedDebugLogEntry>("org.openpilot", 1, 0, "DebugLogEntry");
+    qmlRegisterUncreatableType<UAVObject>("org.openpilot", 1, 0, "UAVObject", "");
 
     setWindowIcon(QIcon(":/core/images/openpilot_logo_32.png"));
     setWindowTitle(tr("Manage flight side logs"));

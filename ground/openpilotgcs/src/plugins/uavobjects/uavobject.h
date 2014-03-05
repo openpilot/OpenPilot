@@ -54,6 +54,7 @@ class UAVOBJECTS_EXPORT UAVObject : public QObject {
     Q_OBJECT
 
 public:
+    Q_PROPERTY(QString Name READ getName)
 
     /**
      * Object update mode
@@ -129,6 +130,10 @@ public:
     QString toStringData();
     void emitTransactionCompleted(bool success);
     void emitNewInstance(UAVObject *);
+
+    virtual bool isSettingsObject();
+    virtual bool isDataObject();
+    virtual bool isMetaDataObject();
 
     // Metadata accessors
     static void MetadataInitialize(Metadata & meta);

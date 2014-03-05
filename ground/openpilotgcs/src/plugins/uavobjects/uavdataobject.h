@@ -38,19 +38,21 @@ class UAVOBJECTS_EXPORT UAVDataObject : public UAVObject {
     Q_OBJECT
 
 public:
-    UAVDataObject(quint32 objID, bool isSingleInst, bool isSet, const QString & name);
-    void initialize(quint32 instID, UAVMetaObject *mobj);
-    void initialize(UAVMetaObject *mobj);
-    bool isSettings();
+    UAVDataObject(quint32 objID, bool isSingleInst, bool isSettingsObject, const QString & name);
+    void initialize(quint32 instID, UAVMetaObject *metaObject);
+    void initialize(UAVMetaObject *metaObject);
     void setMetadata(const Metadata & mdata);
     Metadata getMetadata();
     UAVMetaObject *getMetaObject();
     virtual UAVDataObject *clone(quint32 instID = 0) = 0;
     virtual UAVDataObject *dirtyClone() = 0;
 
+    bool isSettingsObject();
+    bool isDataObject();
+
 private:
-    UAVMetaObject *mobj;
-    bool isSet;
+    UAVMetaObject *m_metaObject;
+    bool m_isSettings;
 };
 
 #endif // UAVDATAOBJECT_H

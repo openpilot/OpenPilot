@@ -517,7 +517,7 @@ bool VehicleConfigurationHelper::saveChangesToController(bool save)
         m_transactionOK = false;
         UAVDataObject *obj     = objPair->first;
         QString objDescription = objPair->second;
-        if (UAVObject::GetGcsAccess(obj->getMetadata()) != UAVObject::ACCESS_READONLY && obj->isSettings()) {
+        if (UAVObject::GetGcsAccess(obj->getMetadata()) != UAVObject::ACCESS_READONLY && obj->isSettingsObject()) {
             emit saveProgress(m_modifiedObjects.count() + 1, ++m_progress, objDescription);
 
             m_currentTransactionObjectID = obj->getObjID();

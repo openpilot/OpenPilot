@@ -57,6 +57,8 @@ FlightLogManager::FlightLogManager(QObject *parent) :
     Q_ASSERT(m_flightLogEntry);
 
     updateFlightEntries(m_flightLogStatus->getFlight());
+
+    updateUAVOS();
 }
 
 FlightLogManager::~FlightLogManager()
@@ -90,6 +92,32 @@ void clearLogEntries(QQmlListProperty<ExtendedDebugLogEntry> *list)
 QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries()
 {
     return QQmlListProperty<ExtendedDebugLogEntry>(this, &m_logEntries, &addLogEntries, &countLogEntries, &logEntryAt, &clearLogEntries);
+}
+
+void addUAVOEntries(QQmlListProperty<UAVObject> *list, UAVObject *entry)
+{
+    Q_UNUSED(list);
+    Q_UNUSED(entry);
+}
+
+int countUAVOEntries(QQmlListProperty<UAVObject> *list)
+{
+    return static_cast< QList<UAVObject *> *>(list->data)->size();
+}
+
+UAVObject *uavoEntryAt(QQmlListProperty<UAVObject> *list, int index)
+{
+    return static_cast< QList<UAVObject *> *>(list->data)->at(index);
+}
+
+void clearUAVOEntries(QQmlListProperty<UAVObject> *list)
+{
+    return static_cast< QList<UAVObject *> *>(list->data)->clear();
+}
+
+QQmlListProperty<UAVObject> FlightLogManager::uavoEntries()
+{
+    return QQmlListProperty<UAVObject>(this, &m_uavoEntries, &addUAVOEntries, &countUAVOEntries, &uavoEntryAt, &clearUAVOEntries);
 }
 
 QStringList FlightLogManager::flightEntries()
@@ -272,6 +300,18 @@ void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 
         emit flightEntriesChanged();
     }
+}
+
+void FlightLogManager::updateUAVOS()
+{
+    foreach(QList<UAVObject*> objectList , m_objectManager->getObjects()) {
+        UAVObject* object = objectList.at(0);
+        if (!object->isMetaDataObject() && !object->isSettingsObject()) {
+            m_uavoEntries.append(object);
+            qDebug() << objectList.at(0)->getName();
+        }
+    }
+    emit uavoEntriesChanged();
 }
 
 ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry(),

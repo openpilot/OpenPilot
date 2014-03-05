@@ -39,7 +39,8 @@
 #include "debuglogcontrol.h"
 
 class ExtendedDebugLogEntry : public DebugLogEntry {
-    Q_OBJECT Q_PROPERTY(QString LogString READ getLogString WRITE setLogString NOTIFY LogStringUpdated)
+    Q_OBJECT
+    Q_PROPERTY(QString LogString READ getLogString WRITE setLogString NOTIFY LogStringUpdated)
 
 public:
     explicit ExtendedDebugLogEntry();
@@ -67,18 +68,25 @@ private:
 };
 
 class FlightLogManager : public QObject {
-    Q_OBJECT Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
+    Q_OBJECT
+    Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
     Q_PROPERTY(QQmlListProperty<ExtendedDebugLogEntry> logEntries READ logEntries NOTIFY logEntriesChanged)
     Q_PROPERTY(QStringList flightEntries READ flightEntries NOTIFY flightEntriesChanged)
     Q_PROPERTY(bool disableControls READ disableControls WRITE setDisableControls NOTIFY disableControlsChanged)
     Q_PROPERTY(bool disableExport READ disableExport WRITE setDisableExport NOTIFY disableExportChanged)
     Q_PROPERTY(bool adjustExportedTimestamps READ adjustExportedTimestamps WRITE setAdjustExportedTimestamps NOTIFY adjustExportedTimestampsChanged)
 
+    Q_PROPERTY(QQmlListProperty<UAVObject> uavoEntries READ uavoEntries NOTIFY uavoEntriesChanged)
+    Q_PROPERTY(QStringList logSettings READ logSettings NOTIFY logSettingsChanged)
+
+
 public:
     explicit FlightLogManager(QObject *parent = 0);
     ~FlightLogManager();
 
     QQmlListProperty<ExtendedDebugLogEntry> logEntries();
+    QQmlListProperty<UAVObject> uavoEntries();
+
     QStringList flightEntries();
 
     DebugLogStatus *flightLogStatus() const
@@ -103,9 +111,18 @@ public:
         return m_adjustExportedTimestamps;
     }
 
+    QStringList logSettings() const
+    {
+        return m_logSettings;
+    }
+
 signals:
     void logEntriesChanged();
     void flightEntriesChanged();
+
+    void uavoEntriesChanged();
+    void logSettingsChanged();
+
     void disableControlsChanged(bool arg);
     void disableExportChanged(bool arg);
 
@@ -143,14 +160,19 @@ public slots:
 
 private slots:
     void updateFlightEntries(quint16 currentFlight);
+    void updateUAVOS();
 
 private:
     UAVObjectManager *m_objectManager;
     DebugLogControl *m_flightLogControl;
     DebugLogStatus *m_flightLogStatus;
     DebugLogEntry *m_flightLogEntry;
+
     QList<ExtendedDebugLogEntry *> m_logEntries;
     QStringList m_flightEntries;
+
+    QList<UAVObject *> m_uavoEntries;
+    QStringList m_logSettings;
 
     static const int UAVTALK_TIMEOUT = 4000;
     bool m_disableControls;

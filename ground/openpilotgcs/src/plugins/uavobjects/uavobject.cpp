@@ -535,6 +535,21 @@ void UAVObject::emitNewInstance(UAVObject *obj)
     emit newInstance(obj);
 }
 
+bool UAVObject::isSettingsObject()
+{
+    return false;
+}
+
+bool UAVObject::isDataObject()
+{
+    return false;
+}
+
+bool UAVObject::isMetaDataObject()
+{
+    return false;
+}
+
 /**
  * Initialize a UAVObjMetadata object.
  * \param[in] metadata The metadata object

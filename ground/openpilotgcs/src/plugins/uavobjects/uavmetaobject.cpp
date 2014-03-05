@@ -107,3 +107,8 @@ UAVObject::Metadata UAVMetaObject::getData()
 
     return parentMetadata;
 }
+
+bool UAVMetaObject::isMetaDataObject()
+{
+    return true;
+}

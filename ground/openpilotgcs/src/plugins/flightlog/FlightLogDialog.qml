@@ -20,8 +20,10 @@ Rectangle {
             border.width: 1
             radius: 4
             ColumnLayout {
+                id: exportTab
                 anchors.margins: 10
                 anchors.fill: parent
+                visible: true
                 Text {
                     Layout.fillWidth: true
                     text: "<b>" + qsTr("Log entries") + "</b>"
@@ -168,11 +170,64 @@ Rectangle {
                     }
                 }
             }
+            ColumnLayout {
+                id: settingsTab
+                visible: false
+                anchors.margins: 10
+                anchors.fill: parent
+                Text {
+                    Layout.fillWidth: true
+                    text: "<b>" + qsTr("Log entries") + "</b>"
+                }
+                TableView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.preferredHeight: 1000;
+                    model: logManager.uavoEntries
+
+                    TableViewColumn {
+                        role: "Name";
+                        title: qsTr("UAVObject");
+                        width: 150;
+                        delegate:
+                            Text {
+                                anchors.fill: parent
+                                anchors.margins: 2
+                                anchors.leftMargin: 5
+                                font.pixelSize: 12
+                                text: styleData.value
+                            }
+
+                    }
+                    /*
+                    TableViewColumn {
+                        role: "Setting"; title: qsTr("Settings"); width: 150;
+                        delegate:
+                            ComboBox {
+                                model: logManager.logSettings
+                            }
+                    }
+                    */
+                }
+            }
         }
 
         RowLayout {
             Layout.fillWidth: true
             height: 40
+            Button {
+                id: settingsButton
+                enabled: !logManager.disableControls
+                text: qsTr("Log settings...")
+                activeFocusOnPress: true
+                property bool showSettings: false
+                onClicked: {
+                    showSettings = !showSettings;
+                    settingsTab.visible = showSettings;
+                    exportTab.visible = !showSettings;
+                    text = (showSettings ? qsTr("View logs...") : qsTr("Log settings..."));
+                }
+            }
             Rectangle {
                 Layout.fillWidth: true
             }

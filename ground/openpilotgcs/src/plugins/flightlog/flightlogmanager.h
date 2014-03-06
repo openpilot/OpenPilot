@@ -38,6 +38,48 @@
 #include "debuglogstatus.h"
 #include "debuglogcontrol.h"
 
+class UAVOLogSettingsWrapper : public QObject {
+    Q_OBJECT
+    Q_ENUMS(UAVLogSetting)
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
+    Q_PROPERTY(UAVOLogSettingsWrapper::UAVLogSetting setting READ setting WRITE setSetting NOTIFY settingChanged)
+
+public:
+    enum UAVLogSetting {DISABLED = 0, ON_CHANGE, EVERY_10MS, EVERY_50MS, EVERY_100MS,
+                  EVERY_500MS, EVERY_1S, EVERY_5S, EVERY_10S, EVERY_30S, EVERY_1M};
+
+    explicit UAVOLogSettingsWrapper();
+    explicit UAVOLogSettingsWrapper(UAVObject* object);
+    ~UAVOLogSettingsWrapper();
+
+    QString name() const
+    {
+        return m_object->getName();
+    }
+
+    UAVOLogSettingsWrapper::UAVLogSetting setting() const
+    {
+        return m_setting;
+    }
+
+public slots:
+    void setSetting(UAVOLogSettingsWrapper::UAVLogSetting arg)
+    {
+        if (m_setting != arg) {
+            m_setting = arg;
+            emit settingChanged(arg);
+        }
+    }
+
+signals:
+    void settingChanged(UAVLogSetting arg);
+    void nameChanged();
+
+private:
+    UAVObject *m_object;
+    UAVLogSetting m_setting;
+};
+
 class ExtendedDebugLogEntry : public DebugLogEntry {
     Q_OBJECT
     Q_PROPERTY(QString LogString READ getLogString WRITE setLogString NOTIFY LogStringUpdated)
@@ -76,7 +118,7 @@ class FlightLogManager : public QObject {
     Q_PROPERTY(bool disableExport READ disableExport WRITE setDisableExport NOTIFY disableExportChanged)
     Q_PROPERTY(bool adjustExportedTimestamps READ adjustExportedTimestamps WRITE setAdjustExportedTimestamps NOTIFY adjustExportedTimestampsChanged)
 
-    Q_PROPERTY(QQmlListProperty<UAVObject> uavoEntries READ uavoEntries NOTIFY uavoEntriesChanged)
+    Q_PROPERTY(QQmlListProperty<UAVOLogSettingsWrapper> uavoEntries READ uavoEntries NOTIFY uavoEntriesChanged)
     Q_PROPERTY(QStringList logSettings READ logSettings NOTIFY logSettingsChanged)
 
 
@@ -85,9 +127,13 @@ public:
     ~FlightLogManager();
 
     QQmlListProperty<ExtendedDebugLogEntry> logEntries();
-    QQmlListProperty<UAVObject> uavoEntries();
+    QQmlListProperty<UAVOLogSettingsWrapper> uavoEntries();
 
     QStringList flightEntries();
+
+    QStringList logSettings() {
+        return m_logSettings;
+    }
 
     DebugLogStatus *flightLogStatus() const
     {
@@ -111,17 +157,12 @@ public:
         return m_adjustExportedTimestamps;
     }
 
-    QStringList logSettings() const
-    {
-        return m_logSettings;
-    }
-
 signals:
     void logEntriesChanged();
     void flightEntriesChanged();
+    void logSettingsChanged();
 
     void uavoEntriesChanged();
-    void logSettingsChanged();
 
     void disableControlsChanged(bool arg);
     void disableExportChanged(bool arg);
@@ -160,7 +201,8 @@ public slots:
 
 private slots:
     void updateFlightEntries(quint16 currentFlight);
-    void updateUAVOS();
+    void setupUAVOWrappers();
+    void setupLogSettings();
 
 private:
     UAVObjectManager *m_objectManager;
@@ -170,9 +212,9 @@ private:
 
     QList<ExtendedDebugLogEntry *> m_logEntries;
     QStringList m_flightEntries;
-
-    QList<UAVObject *> m_uavoEntries;
     QStringList m_logSettings;
+
+    QList<UAVOLogSettingsWrapper *> m_uavoEntries;
 
     static const int UAVTALK_TIMEOUT = 4000;
     bool m_disableControls;
@@ -180,5 +222,7 @@ private:
     bool m_cancelDownload;
     bool m_adjustExportedTimestamps;
 };
+
+Q_DECLARE_METATYPE(UAVOLogSettingsWrapper::UAVLogSetting)
 
 #endif // FLIGHTLOGMANAGER_H

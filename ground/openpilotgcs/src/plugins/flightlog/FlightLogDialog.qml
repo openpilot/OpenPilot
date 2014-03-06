@@ -34,11 +34,13 @@ Rectangle {
                     Layout.preferredHeight: 1000;
                     model: logManager.logEntries
 
+                    rowDelegate: Rectangle {
+                        height: 22
+                        color: styleData.selected ? "#ccc" : (styleData.alternate ? "#fff" : "#eee")
+                    }
+
                     itemDelegate: Text {
-                        anchors.fill: parent
-                        anchors.margins: 2
-                        anchors.leftMargin: 5
-                        font.pixelSize: 12
+                        verticalAlignment: Text.AlignVCenter
                         text: styleData.value
                     }
 
@@ -46,33 +48,24 @@ Rectangle {
                         role: "Flight"; title: qsTr("Flight"); width: 50;
                         delegate:
                             Text {
-                                anchors.fill: parent
-                                anchors.margins: 2
-                                anchors.leftMargin: 5
-                                font.pixelSize: 12
+                                verticalAlignment: Text.AlignVCenter
                                 text: styleData.value + 1
                             }
 
                     }
                     TableViewColumn {
-                        role: "FlightTime"; title: qsTr("Time"); width: 80;
+                        role: "FlightTime"; title: qsTr("Time"); width: 100;
                         delegate:
                             Text {
-                                anchors.fill: parent
-                                anchors.margins: 2
-                                anchors.leftMargin: 5
-                                font.pixelSize: 12
+                                verticalAlignment: Text.AlignVCenter
                                 text: Functions.millisToTime(styleData.value)
                             }
                     }
                     TableViewColumn {
-                        role: "Type"; title: "Type"; width: 50;
+                        role: "Type"; title: "Type"; width: 60;
                         delegate:
                             Text {
-                                anchors.fill: parent
-                                anchors.margins: 2
-                                anchors.leftMargin: 5
-                                font.pixelSize: 12
+                                verticalAlignment: Text.AlignVCenter
                                 text: {
                                     switch(styleData.value) {
                                     case 0 : text: qsTr("Empty"); break;
@@ -84,7 +77,11 @@ Rectangle {
                             }
 
                     }
-                    TableViewColumn { role: "LogString"; title: qsTr("Data"); width: 280}
+                    TableViewColumn {
+                        role: "LogString";
+                        title: qsTr("Data");
+                        width: 280
+                    }
                 }
 
                 RowLayout {
@@ -177,7 +174,7 @@ Rectangle {
                 anchors.fill: parent
                 Text {
                     Layout.fillWidth: true
-                    text: "<b>" + qsTr("Log entries") + "</b>"
+                    text: "<b>" + qsTr("Log settings") + "</b>"
                 }
                 TableView {
                     Layout.fillWidth: true
@@ -185,29 +182,37 @@ Rectangle {
                     Layout.preferredHeight: 1000;
                     model: logManager.uavoEntries
 
+                    rowDelegate: Rectangle {
+                        height: 22
+                        color: styleData.selected ? "#ccc" : (styleData.alternate ? "#fff" : "#eee")
+                    }
+
                     TableViewColumn {
-                        role: "Name";
+                        role: "name";
                         title: qsTr("UAVObject");
-                        width: 150;
+                        width: 200;
                         delegate:
                             Text {
-                                anchors.fill: parent
-                                anchors.margins: 2
+                                verticalAlignment: Text.AlignVCenter
                                 anchors.leftMargin: 5
-                                font.pixelSize: 12
                                 text: styleData.value
                             }
 
                     }
-                    /*
+
                     TableViewColumn {
-                        role: "Setting"; title: qsTr("Settings"); width: 150;
+                        role: "setting";
+                        title: qsTr("Settings");
+                        width: 200;
                         delegate:
                             ComboBox {
+                                anchors.leftMargin: 5
                                 model: logManager.logSettings
+                                currentIndex: styleData.value
+                                //onCurrentIndexChanged:
                             }
                     }
-                    */
+
                 }
             }
         }

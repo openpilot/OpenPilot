@@ -58,7 +58,9 @@ FlightLogManager::FlightLogManager(QObject *parent) :
 
     updateFlightEntries(m_flightLogStatus->getFlight());
 
-    updateUAVOS();
+    setupUAVOWrappers();
+
+    setupLogSettings();
 }
 
 FlightLogManager::~FlightLogManager()
@@ -94,30 +96,30 @@ QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries()
     return QQmlListProperty<ExtendedDebugLogEntry>(this, &m_logEntries, &addLogEntries, &countLogEntries, &logEntryAt, &clearLogEntries);
 }
 
-void addUAVOEntries(QQmlListProperty<UAVObject> *list, UAVObject *entry)
+void addUAVOEntries(QQmlListProperty<UAVOLogSettingsWrapper> *list, UAVOLogSettingsWrapper *entry)
 {
     Q_UNUSED(list);
     Q_UNUSED(entry);
 }
 
-int countUAVOEntries(QQmlListProperty<UAVObject> *list)
+int countUAVOEntries(QQmlListProperty<UAVOLogSettingsWrapper> *list)
 {
-    return static_cast< QList<UAVObject *> *>(list->data)->size();
+    return static_cast< QList<UAVOLogSettingsWrapper *> *>(list->data)->size();
 }
 
-UAVObject *uavoEntryAt(QQmlListProperty<UAVObject> *list, int index)
+UAVOLogSettingsWrapper *uavoEntryAt(QQmlListProperty<UAVOLogSettingsWrapper> *list, int index)
 {
-    return static_cast< QList<UAVObject *> *>(list->data)->at(index);
+    return static_cast< QList<UAVOLogSettingsWrapper *> *>(list->data)->at(index);
 }
 
-void clearUAVOEntries(QQmlListProperty<UAVObject> *list)
+void clearUAVOEntries(QQmlListProperty<UAVOLogSettingsWrapper> *list)
 {
-    return static_cast< QList<UAVObject *> *>(list->data)->clear();
+    return static_cast< QList<UAVOLogSettingsWrapper *> *>(list->data)->clear();
 }
 
-QQmlListProperty<UAVObject> FlightLogManager::uavoEntries()
+QQmlListProperty<UAVOLogSettingsWrapper> FlightLogManager::uavoEntries()
 {
-    return QQmlListProperty<UAVObject>(this, &m_uavoEntries, &addUAVOEntries, &countUAVOEntries, &uavoEntryAt, &clearUAVOEntries);
+    return QQmlListProperty<UAVOLogSettingsWrapper>(this, &m_uavoEntries, &addUAVOEntries, &countUAVOEntries, &uavoEntryAt, &clearUAVOEntries);
 }
 
 QStringList FlightLogManager::flightEntries()
@@ -302,16 +304,22 @@ void FlightLogManager::updateFlightEntries(quint16 currentFlight)
     }
 }
 
-void FlightLogManager::updateUAVOS()
+void FlightLogManager::setupUAVOWrappers()
 {
     foreach(QList<UAVObject*> objectList , m_objectManager->getObjects()) {
         UAVObject* object = objectList.at(0);
         if (!object->isMetaDataObject() && !object->isSettingsObject()) {
-            m_uavoEntries.append(object);
+            m_uavoEntries.append(new UAVOLogSettingsWrapper(object));
             qDebug() << objectList.at(0)->getName();
         }
     }
     emit uavoEntriesChanged();
+}
+
+void FlightLogManager::setupLogSettings()
+{
+    m_logSettings << tr("Disabled") << tr("When updated") << tr("Every 10ms") << tr("Every 50ms") << tr("Every 100ms")
+                  << tr("Every 500ms") << tr("Every second") << tr("Every 5s") << tr("Every 10s") << tr("Every 30s") << tr("Every minute");
 }
 
 ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry(),
@@ -348,3 +356,14 @@ void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVOb
         m_object->unpack(getData().Data);
     }
 }
+
+
+UAVOLogSettingsWrapper::UAVOLogSettingsWrapper() : QObject()
+{}
+
+UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVObject *object) : QObject(),
+    m_object(object), m_setting(EVERY_5S)
+{}
+
+UAVOLogSettingsWrapper::~UAVOLogSettingsWrapper()
+{}

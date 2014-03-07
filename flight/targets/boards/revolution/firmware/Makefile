@@ -49,7 +49,7 @@ MODULES += FixedWingPathFollower
 MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
-
+MODULES += FrskySPort
 OPTMODULES += ComUsbBridge
 
 # Include all camera options

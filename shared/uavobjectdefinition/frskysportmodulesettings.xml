@@ -1,0 +1,15 @@
+<xml>
+	<object name="FrskySportModuleSettings" singleinstance="true"
+		settings="true" category="Control">
+		<description>Settings for the FRSKY S.Port module</description>
+		<field name="SerialPort" units="SerialPort" type="enum"
+			elements="1"
+			options="Disabled,SerialPort 0,SerialPort 1,SerialPort 2,SerialPort 3,SerialPort 4,SerialPort 5"
+			defaultvalue="Disabled" />
+		<access gcs="readwrite" flight="readwrite" />
+		<telemetrygcs acked="true" updatemode="onchange" period="0" />
+		<telemetryflight acked="true" updatemode="onchange"
+			period="0" />
+		<logging updatemode="manual" period="0" />
+	</object>
+</xml>

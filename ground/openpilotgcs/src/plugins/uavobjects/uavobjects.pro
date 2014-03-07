@@ -126,6 +126,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/osdsettings.h \
     $$UAVOBJECT_SYNTHETICS/waypoint.h \
     $$UAVOBJECT_SYNTHETICS/waypointactive.h \
+    $$UAVOBJECT_SYNTHETICS/frskysportmodulesettings.h \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h
 
 SOURCES += \
@@ -226,4 +227,5 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/osdsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/waypoint.cpp \
     $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
+    $$UAVOBJECT_SYNTHETICS/frskysportmodulesettings.cpp \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.cpp

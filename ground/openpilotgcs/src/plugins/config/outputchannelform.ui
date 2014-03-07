@@ -495,7 +495,7 @@ margin:1px;</string>
     </widget>
    </item>
    <item row="1" column="11">
-    <widget class="QFrame" name="frame">
+    <widget class="QFrame" name="frame_1">
      <property name="minimumSize">
       <size>
        <width>45</width>

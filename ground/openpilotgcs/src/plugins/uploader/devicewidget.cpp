@@ -225,6 +225,7 @@ void DeviceWidget::dfuStatus(QString str)
 
 void DeviceWidget::confirmCB(int value)
 {
+    Q_UNUSED(value);
     updateButtons(true);
 }
 
@@ -277,7 +278,7 @@ void DeviceWidget::loadFirmware()
 
     QByteArray desc = loadedFW.right(100);
     QPixmap px;
-    if (loadedFW.length() > m_dfu->devices[deviceID].SizeOfCode) {
+    if (loadedFW.length() > (int)m_dfu->devices[deviceID].SizeOfCode) {
         myDevice->lblCRCL->setText(tr("Can't calculate, file too big for device"));
     } else {
         myDevice->lblCRCL->setText(QString::number(DFUObject::CRCFromQBArray(loadedFW, m_dfu->devices[deviceID].SizeOfCode)));

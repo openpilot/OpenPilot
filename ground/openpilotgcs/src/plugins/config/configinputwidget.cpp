@@ -910,7 +910,7 @@ void ConfigInputWidget::setMoveFromCommand(int command)
     // CHANNELNUMBER_ACCESSORY1=6,
     // CHANNELNUMBER_ACCESSORY2=7
 
-    txMovements movement;
+    txMovements movement = moveLeftVerticalStick;
 
     switch (command) {
     case ManualControlSettings::CHANNELNUMBER_ROLL:
@@ -1028,10 +1028,10 @@ void ConfigInputWidget::setTxMovement(txMovements movement)
 void ConfigInputWidget::moveTxControls()
 {
     QTransform trans;
-    QGraphicsItem *item;
-    txMovementType move;
-    int limitMax;
-    int limitMin;
+    QGraphicsItem *item = NULL;
+    txMovementType move = vertical;
+    int limitMax = 0;
+    int limitMin = 0;
     static bool auxFlag = false;
 
     switch (currentMovement) {

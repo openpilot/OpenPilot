@@ -162,6 +162,7 @@ void PfdQmlGadgetWidget::setAltitudeFactor(double factor)
 
 void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
 {
+    Q_UNUSED(arg);
     setTerrainEnabled(m_terrainEnabled);
 }
 

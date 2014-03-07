@@ -46,6 +46,7 @@ MonitorGadget::~MonitorGadget()
  */
 void MonitorGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
+    Q_UNUSED(config);
     // MonitorGadgetConfiguration *m = qobject_cast<MonitorGadgetConfiguration *>(config);
 
     // m_widget->setSystemFile(m->getSystemFile()); // Triggers widget repaint

@@ -214,6 +214,7 @@ void ConfigCCAttitudeWidget::openHelp()
 
 void ConfigCCAttitudeWidget::setAccelFiltering(bool active)
 {
+    Q_UNUSED(active);
     setDirty(true);
 }
 

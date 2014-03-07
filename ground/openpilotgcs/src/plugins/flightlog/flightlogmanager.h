@@ -40,9 +40,8 @@
 
 class UAVOLogSettingsWrapper : public QObject {
     Q_OBJECT
-    Q_ENUMS(UAVLogSetting)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
-    Q_PROPERTY(UAVOLogSettingsWrapper::UAVLogSetting setting READ setting WRITE setSetting NOTIFY settingChanged)
+    Q_PROPERTY(int setting READ setting WRITE setSetting NOTIFY settingChanged)
 
 public:
     enum UAVLogSetting {DISABLED = 0, ON_CHANGE, EVERY_10MS, EVERY_50MS, EVERY_100MS,
@@ -57,27 +56,27 @@ public:
         return m_object->getName();
     }
 
-    UAVOLogSettingsWrapper::UAVLogSetting setting() const
+    int setting() const
     {
         return m_setting;
     }
 
 public slots:
-    void setSetting(UAVOLogSettingsWrapper::UAVLogSetting arg)
+    void setSetting(int setting)
     {
-        if (m_setting != arg) {
-            m_setting = arg;
-            emit settingChanged(arg);
+        if (m_setting != (int)setting) {
+            m_setting = (int)setting;
+            emit settingChanged((int)setting);
         }
     }
 
 signals:
-    void settingChanged(UAVLogSetting arg);
+    void settingChanged(int setting);
     void nameChanged();
 
 private:
     UAVObject *m_object;
-    UAVLogSetting m_setting;
+    int m_setting;
 };
 
 class ExtendedDebugLogEntry : public DebugLogEntry {
@@ -222,7 +221,5 @@ private:
     bool m_cancelDownload;
     bool m_adjustExportedTimestamps;
 };
-
-Q_DECLARE_METATYPE(UAVOLogSettingsWrapper::UAVLogSetting)
 
 #endif // FLIGHTLOGMANAGER_H

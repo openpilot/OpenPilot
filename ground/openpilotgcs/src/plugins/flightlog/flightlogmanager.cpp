@@ -362,7 +362,7 @@ UAVOLogSettingsWrapper::UAVOLogSettingsWrapper() : QObject()
 {}
 
 UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVObject *object) : QObject(),
-    m_object(object), m_setting(EVERY_5S)
+    m_object(object), m_setting(DISABLED)
 {}
 
 UAVOLogSettingsWrapper::~UAVOLogSettingsWrapper()

@@ -176,7 +176,44 @@ Rectangle {
                     Layout.fillWidth: true
                     text: "<b>" + qsTr("Log settings") + "</b>"
                 }
+
+                Component {
+                    id: comboEditableDelegate
+                    Item {
+
+                        Text {
+                            width: parent.width
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            elide: styleData.elideMode
+                            text: styleData.value !== undefined ? logManager.logSettings[styleData.value] : ""
+                            color: styleData.textColor
+                            visible: !styleData.selected
+                        }
+                        Loader {
+                            id: loaderEditor
+                            anchors.fill: parent
+                            Connections {
+                                target: loaderEditor.item
+                                onCurrentIndexChanged: {
+                                    logManager.uavoEntries[styleData.row].setting = loaderEditor.item.currentIndex
+                                }
+                            }
+                            sourceComponent: styleData.selected ? editor : null
+                            Component {
+                                id: editor
+                                ComboBox {
+                                    id: combo
+                                    model: logManager.logSettings
+                                    currentIndex: styleData.value
+                                }
+                            }
+                        }
+                    }
+                }
+
                 TableView {
+                    id: settingsTable
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredHeight: 1000;
@@ -204,15 +241,8 @@ Rectangle {
                         role: "setting";
                         title: qsTr("Settings");
                         width: 200;
-                        delegate:
-                            ComboBox {
-                                anchors.leftMargin: 5
-                                model: logManager.logSettings
-                                currentIndex: styleData.value
-                                //onCurrentIndexChanged:
-                            }
+                        delegate: comboEditableDelegate
                     }
-
                 }
             }
         }

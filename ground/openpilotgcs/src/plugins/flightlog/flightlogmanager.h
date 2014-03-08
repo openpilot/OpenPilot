@@ -46,10 +46,10 @@ class UAVOLogSettingsWrapper : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(int setting READ setting WRITE setSetting NOTIFY settingChanged)
+    Q_PROPERTY(int period READ period WRITE setPeriod NOTIFY periodChanged)
 
 public:
-    enum UAVLogSetting {DISABLED = 0, ON_CHANGE, EVERY_10MS, EVERY_50MS, EVERY_100MS,
-                  EVERY_500MS, EVERY_1S, EVERY_5S, EVERY_10S, EVERY_30S, EVERY_1M};
+    enum UAVLogSetting {DISABLED = 0, ON_CHANGE, THROTTLED, PERIODICALLY};
 
     explicit UAVOLogSettingsWrapper();
     explicit UAVOLogSettingsWrapper(UAVObject* object);
@@ -65,22 +65,37 @@ public:
         return m_setting;
     }
 
+    int period() const
+    {
+        return m_period;
+    }
+
 public slots:
     void setSetting(int setting)
     {
-        if (m_setting != (int)setting) {
-            m_setting = (int)setting;
-            emit settingChanged((int)setting);
+        if (m_setting != setting) {
+            m_setting = setting;
+            emit settingChanged(setting);
+        }
+    }
+
+    void setPeriod(int arg)
+    {
+        if (m_period != arg) {
+            m_period = arg;
+            emit periodChanged(arg);
         }
     }
 
 signals:
     void settingChanged(int setting);
-    void nameChanged();
+    void nameChanged(QString name);
+    void periodChanged(int period);
 
 private:
     UAVObject *m_object;
     int m_setting;
+    int m_period;
 };
 
 class ExtendedDebugLogEntry : public DebugLogEntry {
@@ -203,6 +218,11 @@ public slots:
     void retrieveLogs(int flightToRetrieve = -1);
     void exportLogs();
     void cancelExportLogs();
+    void loadSettings();
+    void saveSettings();
+    void resetSettings();
+    void applySettingsToBoard();
+    void saveSettingsToBoard();
 
     void setDisableControls(bool arg)
     {

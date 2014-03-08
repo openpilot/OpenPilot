@@ -80,6 +80,9 @@ FlightLogManager::~FlightLogManager()
     while (!m_logEntries.isEmpty()) {
         delete m_logEntries.takeFirst();
     }
+    while (!m_uavoEntries.isEmpty()) {
+        delete m_uavoEntries.takeFirst();
+    }
 }
 
 void addLogEntries(QQmlListProperty<ExtendedDebugLogEntry> *list, ExtendedDebugLogEntry *entry)
@@ -377,6 +380,33 @@ void FlightLogManager::cancelExportLogs()
     m_cancelDownload = true;
 }
 
+void FlightLogManager::loadSettings()
+{
+
+}
+
+void FlightLogManager::saveSettings()
+{
+
+}
+
+void FlightLogManager::resetSettings()
+{
+    foreach (UAVOLogSettingsWrapper *wrapper, m_uavoEntries) {
+        wrapper->setSetting(UAVOLogSettingsWrapper::DISABLED);
+    }
+}
+
+void FlightLogManager::applySettingsToBoard()
+{
+
+}
+
+void FlightLogManager::saveSettingsToBoard()
+{
+
+}
+
 void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 {
     Q_UNUSED(currentFlight);
@@ -408,8 +438,7 @@ void FlightLogManager::setupUAVOWrappers()
 
 void FlightLogManager::setupLogSettings()
 {
-    m_logSettings << tr("Disabled") << tr("When updated") << tr("Every 10ms") << tr("Every 50ms") << tr("Every 100ms")
-                  << tr("Every 500ms") << tr("Every second") << tr("Every 5s") << tr("Every 10s") << tr("Every 30s") << tr("Every minute");
+    m_logSettings << tr("Disabled") << tr("When updated") << tr("Throttled") << tr("Periodically");
 }
 
 void FlightLogManager::setupLogStatuses()
@@ -495,7 +524,7 @@ UAVOLogSettingsWrapper::UAVOLogSettingsWrapper() : QObject()
 {}
 
 UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVObject *object) : QObject(),
-    m_object(object), m_setting(DISABLED)
+    m_object(object), m_setting(DISABLED), m_period(0)
 {}
 
 UAVOLogSettingsWrapper::~UAVOLogSettingsWrapper()

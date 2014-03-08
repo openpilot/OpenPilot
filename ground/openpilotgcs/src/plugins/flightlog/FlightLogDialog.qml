@@ -227,6 +227,47 @@ Rectangle {
                     }
                 }
 
+                Component {
+                    id: spinnerEditableDelegate
+                    Item {
+
+                        Text {
+                            width: parent.width
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            elide: styleData.elideMode
+                            text: styleData.value !== undefined && (logManager.uavoEntries[styleData.row].setting > 1) ?
+                                      parseInt(logManager.uavoEntries[styleData.row].period) + " ms" : "-"
+                            color: styleData.textColor
+                            //visible: !styleData.selected && (logManager.uavoEntries[styleData.row].setting <= 1)
+                            enabled: (logManager.uavoEntries[styleData.row].setting > 1)
+                        }
+                        Loader {
+                            id: loaderEditor
+                            anchors.fill: parent
+                            Connections {
+                                target: loaderEditor.item
+                                onValueChanged: {
+                                    logManager.uavoEntries[styleData.row].period = loaderEditor.item.value
+                                }
+                            }
+                            sourceComponent: styleData.selected && (logManager.uavoEntries[styleData.row].setting > 1) ? editor : null
+                            Component {
+                                id: editor
+                                SpinBox {
+                                    id: spinner
+                                    decimals: 0
+                                    minimumValue: 0
+                                    maximumValue: 1000 * 60 * 60 //1h
+                                    suffix: "ms"
+                                    stepSize: 10
+                                    value: styleData.value
+                                }
+                            }
+                        }
+                    }
+                }
+
                 TableView {
                     id: settingsTable
                     Layout.fillWidth: true
@@ -243,7 +284,7 @@ Rectangle {
                     TableViewColumn {
                         role: "name";
                         title: qsTr("UAVObject");
-                        width: 200;
+                        width: 250;
                         delegate:
                             Text {
                                 verticalAlignment: Text.AlignVCenter
@@ -256,8 +297,15 @@ Rectangle {
                     TableViewColumn {
                         role: "setting";
                         title: qsTr("Settings");
-                        width: 200;
+                        width: 160;
                         delegate: comboEditableDelegate
+                    }
+
+                    TableViewColumn {
+                        role: "period";
+                        title: qsTr("Period");
+                        width: 120;
+                        delegate: spinnerEditableDelegate
                     }
                 }
                 RowLayout {
@@ -268,16 +316,19 @@ Rectangle {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Load...")
                         activeFocusOnPress: true
+                        onClicked: logManager.loadSettings()
                     }
                     Button {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Save...")
                         activeFocusOnPress: true
+                        onClicked: logManager.saveSettings()
                     }
                     Button {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Reset")
                         activeFocusOnPress: true
+                        onClicked: logManager.resetSettings()
                     }
                     Rectangle {
                         Layout.fillWidth: true
@@ -286,11 +337,13 @@ Rectangle {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Apply to board")
                         activeFocusOnPress: true
+                        onClicked: logManager.applySettingsToBoard()
                     }
                     Button {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Save to board")
                         activeFocusOnPress: true
+                        onClicked: logManager.saveSettingsToBoard()
                     }
                 }
             }

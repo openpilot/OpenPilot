@@ -78,6 +78,7 @@ ConfigCustomWidget::~ConfigCustomWidget()
 
 void ConfigCustomWidget::setupUI(QString frameType)
 {
+    Q_UNUSED(frameType);
     Q_ASSERT(m_aircraft);
 }
 
@@ -91,7 +92,9 @@ void ConfigCustomWidget::registerWidgets(ConfigTaskWidget &parent)
 }
 
 void ConfigCustomWidget::resetActuators(GUIConfigDataUnion *configData)
-{}
+{
+    Q_UNUSED(configData);
+}
 
 /**
    Helper function to refresh the UI widget values
@@ -219,6 +222,7 @@ QString ConfigCustomWidget::updateConfigObjectsFromWidgets()
  */
 bool ConfigCustomWidget::throwConfigError(int numMotors)
 {
+    Q_UNUSED(numMotors);
     return false;
 }
 
@@ -265,6 +269,8 @@ SpinBoxDelegate::SpinBoxDelegate(QObject *parent) :
 QWidget *SpinBoxDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                                        const QModelIndex &index) const
 {
+    Q_UNUSED(option);
+    Q_UNUSED(index);
     QSpinBox *editor = new QSpinBox(parent);
 
     editor->setMinimum(-127);
@@ -295,5 +301,6 @@ void SpinBoxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, c
 void SpinBoxDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                                            const QModelIndex &index) const
 {
+    Q_UNUSED(index);
     editor->setGeometry(option.rect);
 }

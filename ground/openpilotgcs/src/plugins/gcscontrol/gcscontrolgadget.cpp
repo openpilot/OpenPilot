@@ -146,10 +146,10 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
     double oldYaw      = manualControlCommand->getField("Yaw")->getDouble();
     double oldThrottle = manualControlCommand->getField("Throttle")->getDouble();
 
-    double newRoll;
-    double newPitch;
-    double newYaw;
-    double newThrottle;
+    double newRoll     = 0.0;
+    double newPitch    = 0.0;
+    double newYaw      = 0.0;
+    double newThrottle = 0.0;
 
     // Remap left X/Y and right X/Y to RPYT depending on mode
     switch (controlsMode) {
@@ -248,7 +248,10 @@ void GCSControlGadget::gamepads(quint8 count)
 
 void GCSControlGadget::readUDPCommand()
 {
-    double pitch, yaw, roll, throttle;
+    double pitch    = 0.0;
+    double yaw      = 0.0;
+    double roll     = 0.0;
+    double throttle = 0.0;
 
     while (control_sock->hasPendingDatagrams()) {
         QByteArray datagram;

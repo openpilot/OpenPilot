@@ -28,7 +28,6 @@ GCS_LIBRARY_PATH
                   libQt5MultimediaWidgets.so.5 \
                   libQt5Quick.so.5 \
                   libQt5Qml.so.5 \
-                  libQt5V8.so.5 \
                   libQt5DBus.so.5 \
                   libQt5QuickParticles.so.5 \
                   libicui18n.so.51 \

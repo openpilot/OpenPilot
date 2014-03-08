@@ -317,7 +317,7 @@ define LINUX_QT_INSTALL_TEMPLATE
 .PHONY: $(addprefix qt_sdk_, install clean distclean)
 
 qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
-	if ! $(SEVENZIP) >/dev/null 2>&1; then \
+	$(V1) if ! $(SEVENZIP) >/dev/null 2>&1; then \
 		$(ECHO) $(MSG_NOTICE) "Please install the p7zip for your distribution. i.e.: sudo apt-get install p7zip." && \
 		exit 1; \
 	fi

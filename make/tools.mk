@@ -60,13 +60,13 @@ endif
 ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
         ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-amd64.tar.bz2
-        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.1/5.1.1/qt-linux-opensource-5.1.1-x86_64-offline.run
-        QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-linux-opensource-5.1.1-x86_64-offline.run.md5
+        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.2/5.2.1/qt-opensource-linux-x64-5.2.1.run
+        QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-linux-x64-5.2.1.run.md5
         QT_SDK_ARCH := gcc_64
     else
         ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-i686.tar.bz2
-        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.1/5.1.1/qt-linux-opensource-5.1.1-x86-offline.run
-        QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-linux-opensource-5.1.1-x86-offline.run.md5
+        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.2/5.2.1/qt-opensource-linux-x86-5.2.1.run
+        QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-linux-x86-5.2.1.md5
         QT_SDK_ARCH := gcc
     endif
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
@@ -90,7 +90,7 @@ GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0
 
 # Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
-QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.1.1
+QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.2.1
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
 PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin
 NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
@@ -333,16 +333,16 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0qt-project-url.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/1.0.0ThirdPartySoftware_Listing.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0readme.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1$(6)_qt5_essentials.7z" | grep -v Extracting
-	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
-	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1icu_path_patcher.sh.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).addons/5.1.1$(6)_qt5_addons.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.521.$(6).essentials/5.2.1$(6)_qt5_essentials.7z" | grep -v Extracting
+	$(V1) if [ -f "$(1)/qt.521.$(6).essentials/5.2.1icu_51_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.521.$(6).essentials/5.2.1icu_51_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
+	$(V1) if [ -f "$(1)/qt.521.$(6).essentials/5.2.1icu_51_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.521.$(6).essentials/5.2.1icu_51_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
+#	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.521.$(6).essentials/5.2.1icu_path_patcher.sh.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.521.$(6).addons/5.2.1$(6)_qt5_addons.7z" | grep -v Extracting
 # go to OpenPilot/tools/5.1.1/gcc_64 and call patcher.sh
 	@$(ECHO)
 	@$(ECHO) "Running patcher in" $$(call toprel, $(QT_SDK_PREFIX))
 	$(V1) $(CD) $(QT_SDK_PREFIX)
-	$(V1) "$(QT_SDK_PREFIX)/patcher.sh" $(QT_SDK_PREFIX)
+#	$(V1) "$(QT_SDK_PREFIX)/patcher.sh" $(QT_SDK_PREFIX)
 # call qmake patcher
 	@$(ECHO) "Executing QtPatch in" $$(call toprel, $(QT_SDK_PREFIX))
 	$(V1) $(DL_DIR)/$(5) --runoperation QtPatch linux $(QT_SDK_PREFIX) qt5
@@ -403,7 +403,6 @@ endef
 # Qt SDK
 #
 # Windows:  native binary package has been provided
-# Linux:    user should install native Qt SDK package
 # Mac OS X: user should install native Qt SDK package
 #
 ##############################
@@ -421,7 +420,7 @@ endef
     $(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_CONFIGURE_TEMPLATE)))
 
 else ifeq ($(UNAME), Linux)
-QT_SDK_PREFIX := "$(QT_SDK_DIR)/5.1.1/$(QT_SDK_ARCH)"
+QT_SDK_PREFIX := "$(QT_SDK_DIR)/5.2.1/$(QT_SDK_ARCH)"
 QT_BUILD_DIR := $(BUILD_DIR)/QT_BUILD
     $(eval $(call LINUX_QT_INSTALL_TEMPLATE,$(QT_BUILD_DIR),$(QT_SDK_DIR),$(QT_SDK_URL),$(QT_SDK_MD5_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_ARCH)))
 
@@ -432,7 +431,7 @@ QT_SDK_PREFIX := $(QT_SDK_DIR)
 .PHONY: qt_sdk_install
 qt_sdk_install:
 	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
-	@$(ECHO) $(MSG_NOTICE) Please install native Qt 5.1.x SDK using package manager
+	@$(ECHO) $(MSG_NOTICE) Please install native Qt 5.2.x SDK using package manager
 	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
 
 .PHONY: qt_sdk_clean

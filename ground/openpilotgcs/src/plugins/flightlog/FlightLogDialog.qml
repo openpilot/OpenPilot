@@ -175,7 +175,21 @@ Rectangle {
                 anchors.fill: parent
                 Text {
                     Layout.fillWidth: true
-                    text: "<b>" + qsTr("Log settings") + "</b>"
+                    text: "<b>" + qsTr("Settings") + "</b>"
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Text {
+                        text: qsTr("When to log: ")
+                    }
+                    ComboBox {
+                        enabled: !logManager.disableControls && logManager.boardConnected
+                        model: logManager.logStatuses
+                        currentIndex: logSettings.getLoggingEnabled()
+                    }
+
                 }
 
                 Component {
@@ -246,6 +260,39 @@ Rectangle {
                         delegate: comboEditableDelegate
                     }
                 }
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    Button {
+                        enabled: !logManager.disableControls && logManager.boardConnected
+                        text: qsTr("Load...")
+                        activeFocusOnPress: true
+                    }
+                    Button {
+                        enabled: !logManager.disableControls && logManager.boardConnected
+                        text: qsTr("Save...")
+                        activeFocusOnPress: true
+                    }
+                    Button {
+                        enabled: !logManager.disableControls && logManager.boardConnected
+                        text: qsTr("Reset")
+                        activeFocusOnPress: true
+                    }
+                    Rectangle {
+                        Layout.fillWidth: true
+                    }
+                    Button {
+                        enabled: !logManager.disableControls && logManager.boardConnected
+                        text: qsTr("Apply to board")
+                        activeFocusOnPress: true
+                    }
+                    Button {
+                        enabled: !logManager.disableControls && logManager.boardConnected
+                        text: qsTr("Save to board")
+                        activeFocusOnPress: true
+                    }
+                }
             }
         }
 
@@ -255,14 +302,14 @@ Rectangle {
             Button {
                 id: settingsButton
                 enabled: !logManager.disableControls
-                text: qsTr("Log settings...")
+                text: qsTr("Settings...")
                 activeFocusOnPress: true
                 property bool showSettings: false
                 onClicked: {
                     showSettings = !showSettings;
                     settingsTab.visible = showSettings;
                     exportTab.visible = !showSettings;
-                    text = (showSettings ? qsTr("View logs...") : qsTr("Log settings..."));
+                    text = (showSettings ? qsTr("Logs...") : qsTr("Settings..."));
                 }
             }
             Rectangle {

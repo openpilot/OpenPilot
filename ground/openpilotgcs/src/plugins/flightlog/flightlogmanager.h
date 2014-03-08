@@ -38,6 +38,7 @@
 #include "uavobjectmanager.h"
 #include "debuglogentry.h"
 #include "debuglogstatus.h"
+#include "debuglogsettings.h"
 #include "debuglogcontrol.h"
 #include "uavtalk/telemetrymanager.h"
 
@@ -116,6 +117,8 @@ private:
 class FlightLogManager : public QObject {
     Q_OBJECT
     Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
+    Q_PROPERTY(DebugLogControl *flightLogControl READ flightLogControl)
+    Q_PROPERTY(DebugLogSettings *flightLogSettings READ flightLogSettings)
     Q_PROPERTY(QQmlListProperty<ExtendedDebugLogEntry> logEntries READ logEntries NOTIFY logEntriesChanged)
     Q_PROPERTY(QStringList flightEntries READ flightEntries NOTIFY flightEntriesChanged)
     Q_PROPERTY(bool disableControls READ disableControls WRITE setDisableControls NOTIFY disableControlsChanged)
@@ -125,6 +128,7 @@ class FlightLogManager : public QObject {
 
     Q_PROPERTY(QQmlListProperty<UAVOLogSettingsWrapper> uavoEntries READ uavoEntries NOTIFY uavoEntriesChanged)
     Q_PROPERTY(QStringList logSettings READ logSettings NOTIFY logSettingsChanged)
+    Q_PROPERTY(QStringList logStatuses READ logStatuses NOTIFY logStatusesChanged)
 
 
 public:
@@ -167,6 +171,21 @@ public:
         return m_boardConnected;
     }
 
+    QStringList logStatuses() const
+    {
+        return m_logStatuses;
+    }
+
+    DebugLogControl * flightLogControl() const
+    {
+        return m_flightLogControl;
+    }
+
+    DebugLogSettings * flightLogSettings() const
+    {
+        return m_flightLogSettings;
+    }
+
 signals:
     void logEntriesChanged();
     void flightEntriesChanged();
@@ -176,6 +195,8 @@ signals:
     void disableExportChanged(bool arg);
     void adjustExportedTimestampsChanged(bool arg);
     void boardConnectedChanged(bool arg);
+
+    void logStatusesChanged(QStringList arg);
 
 public slots:
     void clearAllLogs();
@@ -219,6 +240,7 @@ private slots:
     void updateFlightEntries(quint16 currentFlight);
     void setupUAVOWrappers();
     void setupLogSettings();
+    void setupLogStatuses();
     void connectionStatusChanged();
 
 private:
@@ -227,10 +249,12 @@ private:
     DebugLogControl *m_flightLogControl;
     DebugLogStatus *m_flightLogStatus;
     DebugLogEntry *m_flightLogEntry;
+    DebugLogSettings * m_flightLogSettings;
 
     QList<ExtendedDebugLogEntry *> m_logEntries;
     QStringList m_flightEntries;
     QStringList m_logSettings;
+    QStringList m_logStatuses;
 
     QList<UAVOLogSettingsWrapper *> m_uavoEntries;
 
@@ -244,7 +268,6 @@ private:
     bool m_cancelDownload;
     bool m_adjustExportedTimestamps;
     bool m_boardConnected;
-
 };
 
 #endif // FLIGHTLOGMANAGER_H

@@ -65,11 +65,14 @@ FlightLogManager::FlightLogManager(QObject *parent) :
     m_flightLogEntry = DebugLogEntry::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogEntry);
 
+    m_flightLogSettings = DebugLogSettings::GetInstance(m_objectManager);
+    Q_ASSERT(m_flightLogSettings);
+
     updateFlightEntries(m_flightLogStatus->getFlight());
 
     setupUAVOWrappers();
-
     setupLogSettings();
+    setupLogStatuses();
 }
 
 FlightLogManager::~FlightLogManager()
@@ -407,6 +410,11 @@ void FlightLogManager::setupLogSettings()
 {
     m_logSettings << tr("Disabled") << tr("When updated") << tr("Every 10ms") << tr("Every 50ms") << tr("Every 100ms")
                   << tr("Every 500ms") << tr("Every second") << tr("Every 5s") << tr("Every 10s") << tr("Every 30s") << tr("Every minute");
+}
+
+void FlightLogManager::setupLogStatuses()
+{
+    m_logStatuses << tr("Never") << tr("Only when Armed") << tr("Always");
 }
 
 void FlightLogManager::connectionStatusChanged()

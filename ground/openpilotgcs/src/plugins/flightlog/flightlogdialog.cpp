@@ -51,6 +51,8 @@ FlightLogDialog::FlightLogDialog(QWidget *parent, FlightLogManager *flightLogMan
     QQuickView *view = new QQuickView();
     view->rootContext()->setContextProperty("dialog", this);
     view->rootContext()->setContextProperty("logStatus", flightLogManager->flightLogStatus());
+    view->rootContext()->setContextProperty("logControl", flightLogManager->flightLogControl());
+    view->rootContext()->setContextProperty("logSettings", flightLogManager->flightLogSettings());
     view->rootContext()->setContextProperty("logManager", flightLogManager);
     view->setResizeMode(QQuickView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/flightlog/FlightLogDialog.qml"));

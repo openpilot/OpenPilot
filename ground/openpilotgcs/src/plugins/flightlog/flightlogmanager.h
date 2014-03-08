@@ -39,6 +39,7 @@
 #include "debuglogentry.h"
 #include "debuglogstatus.h"
 #include "debuglogcontrol.h"
+#include "uavtalk/telemetrymanager.h"
 
 class UAVOLogSettingsWrapper : public QObject {
     Q_OBJECT
@@ -120,6 +121,7 @@ class FlightLogManager : public QObject {
     Q_PROPERTY(bool disableControls READ disableControls WRITE setDisableControls NOTIFY disableControlsChanged)
     Q_PROPERTY(bool disableExport READ disableExport WRITE setDisableExport NOTIFY disableExportChanged)
     Q_PROPERTY(bool adjustExportedTimestamps READ adjustExportedTimestamps WRITE setAdjustExportedTimestamps NOTIFY adjustExportedTimestampsChanged)
+    Q_PROPERTY(bool boardConnected READ boardConnected WRITE setBoardConnected NOTIFY boardConnectedChanged)
 
     Q_PROPERTY(QQmlListProperty<UAVOLogSettingsWrapper> uavoEntries READ uavoEntries NOTIFY uavoEntriesChanged)
     Q_PROPERTY(QStringList logSettings READ logSettings NOTIFY logSettingsChanged)
@@ -160,17 +162,20 @@ public:
         return m_adjustExportedTimestamps;
     }
 
+    bool boardConnected() const
+    {
+        return m_boardConnected;
+    }
+
 signals:
     void logEntriesChanged();
     void flightEntriesChanged();
     void logSettingsChanged();
-
     void uavoEntriesChanged();
-
     void disableControlsChanged(bool arg);
     void disableExportChanged(bool arg);
-
     void adjustExportedTimestampsChanged(bool arg);
+    void boardConnectedChanged(bool arg);
 
 public slots:
     void clearAllLogs();
@@ -202,13 +207,23 @@ public slots:
         }
     }
 
+    void setBoardConnected(bool arg)
+    {
+        if (m_boardConnected != arg) {
+            m_boardConnected = arg;
+            emit boardConnectedChanged(arg);
+        }
+    }
+
 private slots:
     void updateFlightEntries(quint16 currentFlight);
     void setupUAVOWrappers();
     void setupLogSettings();
+    void connectionStatusChanged();
 
 private:
     UAVObjectManager *m_objectManager;
+    TelemetryManager *m_telemtryManager;
     DebugLogControl *m_flightLogControl;
     DebugLogStatus *m_flightLogStatus;
     DebugLogEntry *m_flightLogEntry;
@@ -219,15 +234,16 @@ private:
 
     QList<UAVOLogSettingsWrapper *> m_uavoEntries;
 
+    void exportToOPL(QString fileName);
+    void exportToCSV(QString fileName);
+    void exportToXML(QString fileName);
+
     static const int UAVTALK_TIMEOUT = 4000;
     bool m_disableControls;
     bool m_disableExport;
     bool m_cancelDownload;
     bool m_adjustExportedTimestamps;
-
-    void exportToOPL(QString fileName);
-    void exportToCSV(QString fileName);
-    void exportToXML(QString fileName);
+    bool m_boardConnected;
 
 };
 

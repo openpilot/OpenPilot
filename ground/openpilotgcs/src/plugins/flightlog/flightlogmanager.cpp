@@ -35,16 +35,25 @@
 #include "uavobjecthelper.h"
 #include "uavtalk/uavtalk.h"
 #include "utils/logfile.h"
+#include <uavobjectutil/uavobjectutilmanager.h>
 
 FlightLogManager::FlightLogManager(QObject *parent) :
     QObject(parent), m_disableControls(false),
     m_disableExport(true), m_cancelDownload(false),
     m_adjustExportedTimestamps(true)
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pluginManager);
 
-    m_objectManager    = pm->getObject<UAVObjectManager>();
+    m_objectManager    = pluginManager->getObject<UAVObjectManager>();
     Q_ASSERT(m_objectManager);
+
+    m_telemtryManager = pluginManager->getObject<TelemetryManager>();
+    Q_ASSERT(m_telemtryManager);
+
+    connect(m_telemtryManager, SIGNAL(connected()), this, SLOT(connectionStatusChanged()));
+    connect(m_telemtryManager, SIGNAL(disconnected()), this, SLOT(connectionStatusChanged()));
+    connectionStatusChanged();
 
     m_flightLogControl = DebugLogControl::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogControl);
@@ -398,6 +407,17 @@ void FlightLogManager::setupLogSettings()
 {
     m_logSettings << tr("Disabled") << tr("When updated") << tr("Every 10ms") << tr("Every 50ms") << tr("Every 100ms")
                   << tr("Every 500ms") << tr("Every second") << tr("Every 5s") << tr("Every 10s") << tr("Every 30s") << tr("Every minute");
+}
+
+void FlightLogManager::connectionStatusChanged()
+{
+    if (m_telemtryManager->isConnected()) {
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
+        setBoardConnected(utilMngr->getBoardModel() == 0x0903);
+    } else {
+        setBoardConnected(false);
+    }
 }
 
 ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry(),

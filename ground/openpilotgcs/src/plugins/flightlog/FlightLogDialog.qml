@@ -33,6 +33,7 @@ Rectangle {
                     Layout.fillHeight: true
                     Layout.preferredHeight: 1000;
                     model: logManager.logEntries
+                    enabled: !logManager.disableControls && logManager.boardConnected
 
                     rowDelegate: Rectangle {
                         height: 22
@@ -104,7 +105,7 @@ Rectangle {
                         }
                         CheckBox {
                             id: exportRelativeTimeCB
-                            enabled: !logManager.disableControls && !logManager.disableExport
+                            enabled: !logManager.disableControls && !logManager.disableExport && logManager.boardConnected
                             text: qsTr("Adjust timestamps")
                             activeFocusOnPress: true
                             checked: logManager.adjustExportedTimestamps
@@ -126,7 +127,7 @@ Rectangle {
 
                             ComboBox {
                                 id: flightCombo
-                                enabled: !logManager.disableControls
+                                enabled: !logManager.disableControls && logManager.boardConnected
                                 model: logManager.flightEntries
                             }
                         }
@@ -137,7 +138,7 @@ Rectangle {
                             }
                             Button {
                                 text: qsTr("Download logs")
-                                enabled: !logManager.disableControls
+                                enabled: !logManager.disableControls && logManager.boardConnected
                                 activeFocusOnPress: true
                                 onClicked: logManager.retrieveLogs(flightCombo.currentIndex - 1)
                             }
@@ -151,14 +152,14 @@ Rectangle {
                             }
                             Button {
                                 id: clearButton
-                                enabled: !logManager.disableControls
+                                enabled: !logManager.disableControls && logManager.boardConnected
                                 text: qsTr("Clear all logs")
                                 activeFocusOnPress: true
                                 onClicked: logManager.clearAllLogs()
                             }
                             Button {
                                 id: exportButton
-                                enabled: !logManager.disableControls && !logManager.disableExport
+                                enabled: !logManager.disableControls && !logManager.disableExport && logManager.boardConnected
                                 text: qsTr("Export logs...")
                                 activeFocusOnPress: true
                                 onClicked: logManager.exportLogs()
@@ -218,6 +219,7 @@ Rectangle {
                     Layout.fillHeight: true
                     Layout.preferredHeight: 1000;
                     model: logManager.uavoEntries
+                    enabled: !logManager.disableControls && logManager.boardConnected
 
                     rowDelegate: Rectangle {
                         height: 22

@@ -105,6 +105,7 @@ void ConnectionManager::addWidget(QWidget *widget)
  */
 bool ConnectionManager::connectDevice(DevListItem device)
 {
+    Q_UNUSED(device);
     QString deviceName = m_availableDevList->itemData(m_availableDevList->currentIndex(), Qt::ToolTipRole).toString();
     DevListItem connection_device = findDevice(deviceName);
 

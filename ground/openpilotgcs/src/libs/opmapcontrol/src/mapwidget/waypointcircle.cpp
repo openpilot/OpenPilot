@@ -29,8 +29,8 @@
 #include "homeitem.h"
 
 namespace mapcontrol {
-WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius, bool clockwise, MapGraphicItem *map, QColor color) : my_center(center),
-    my_radius(radius), my_map(map), QGraphicsEllipseItem(map), myColor(color), myClockWise(clockwise)
+WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius, bool clockwise, MapGraphicItem *map, QColor color) : QGraphicsEllipseItem(map),
+    my_center(center), my_radius(radius), my_map(map), myColor(color), myClockWise(clockwise)
 {
     connect(center, SIGNAL(localPositionChanged(QPointF, WayPointItem *)), this, SLOT(refreshLocations()));
     connect(radius, SIGNAL(localPositionChanged(QPointF, WayPointItem *)), this, SLOT(refreshLocations()));
@@ -40,8 +40,8 @@ WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius, bool 
     connect(map, SIGNAL(childSetOpacity(qreal)), this, SLOT(setOpacitySlot(qreal)));
 }
 
-WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool clockwise, MapGraphicItem *map, QColor color) : my_center(center),
-    my_radius(radius), my_map(map), QGraphicsEllipseItem(map), myColor(color), myClockWise(clockwise)
+WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool clockwise, MapGraphicItem *map, QColor color) : QGraphicsEllipseItem(map),
+    my_center(center), my_radius(radius), my_map(map), myColor(color), myClockWise(clockwise)
 {
     connect(radius, SIGNAL(homePositionChanged(internals::PointLatLng, float)), this, SLOT(refreshLocations()));
     connect(center, SIGNAL(localPositionChanged(QPointF)), this, SLOT(refreshLocations()));

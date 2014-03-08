@@ -207,7 +207,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
         data.append(QString("[%1]").arg((field->getElementNames())[index]));
     }
 
-    FieldTreeItem *item;
+    FieldTreeItem *item = NULL;
     UAVObjectField::FieldType type = field->getType();
     switch (type) {
     case UAVObjectField::BITFIELD:

@@ -1447,7 +1447,7 @@ void ConfigCcpmWidget::setSwashplateLevel(int percent)
     ActuatorCommand::DataFields actuatorCommandData = actuatorCommand->getData();
 
     for (int i = 0; i < CCPM_MAX_SWASH_SERVOS; i++) {
-        double value;
+        double value = 0;
         if (level == 0) {
             value = newSwashLvlConfiguration.Neutral[i];
         } else if (level > 0) {

@@ -32,6 +32,8 @@
 #include <QList>
 #include <QQmlListProperty>
 #include <QSemaphore>
+#include <QXmlStreamWriter>
+#include <QTextStream>
 
 #include "uavobjectmanager.h"
 #include "debuglogentry.h"
@@ -88,6 +90,8 @@ public:
     ~ExtendedDebugLogEntry();
 
     QString getLogString();
+    void toXML(QXmlStreamWriter *xmlWriter, quint32 baseTime);
+    void toCSV(QTextStream *csvStream, quint32 baseTime);
     UAVDataObject *uavObject()
     {
         return m_object;
@@ -220,6 +224,11 @@ private:
     bool m_disableExport;
     bool m_cancelDownload;
     bool m_adjustExportedTimestamps;
+
+    void exportToOPL(QString fileName);
+    void exportToCSV(QString fileName);
+    void exportToXML(QString fileName);
+
 };
 
 #endif // FLIGHTLOGMANAGER_H

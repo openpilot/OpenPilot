@@ -223,6 +223,102 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
     setDisableControls(false);
 }
 
+void FlightLogManager::exportToOPL(QString fileName)
+{
+    // Fix the file name
+    fileName.replace(QString(".opl"), QString("%1.opl"));
+
+    // Loop and create a new file for each flight.
+    int currentEntry  = 0;
+    int currentFlight = 0;
+    quint32 adjustedBaseTime = 0;
+    // Continue until all entries are exported
+    while (currentEntry < m_logEntries.count()) {
+        if (m_adjustExportedTimestamps) {
+            adjustedBaseTime = m_logEntries[currentEntry]->getFlightTime();
+        }
+
+        // Get current flight
+        currentFlight = m_logEntries[currentEntry]->getFlight();
+
+        LogFile logFile;
+        logFile.useProvidedTimeStamp(true);
+
+        // Set the file name to contain flight number
+        logFile.setFileName(fileName.arg(tr("_flight-%1").arg(currentFlight + 1)));
+        logFile.open(QIODevice::WriteOnly);
+        UAVTalk uavTalk(&logFile, m_objectManager);
+
+        // Export entries until no more available or flight changes
+        while (currentEntry < m_logEntries.count() && m_logEntries[currentEntry]->getFlight() == currentFlight) {
+            ExtendedDebugLogEntry *entry = m_logEntries[currentEntry];
+
+            // Only log uavobjects
+            if (entry->getType() == ExtendedDebugLogEntry::TYPE_UAVOBJECT) {
+                // Set timestamp that should be logged for this entry
+                logFile.setNextTimeStamp(entry->getFlightTime() - adjustedBaseTime);
+
+                // Use UAVTalk to log complete message to file
+                uavTalk.sendObject(entry->uavObject(), false, false);
+                qDebug() << entry->getFlightTime() - adjustedBaseTime << "=" << entry->toStringBrief();
+            }
+            currentEntry++;
+        }
+
+        logFile.close();
+    }
+}
+
+void FlightLogManager::exportToCSV(QString fileName)
+{
+    QFile csvFile(fileName);
+    if (csvFile.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream csvStream(&csvFile);
+        quint32 baseTime = 0;
+        quint32 currentFlight = 0;
+        csvStream << "Flight" << '\t' << "Flight Time" << '\t' << "Entry" << '\t' << "Data" << '\n';
+        foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
+            if(m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
+                currentFlight = entry->getFlight();
+                baseTime = entry->getFlightTime();
+            }
+            entry->toCSV(&csvStream, baseTime);
+        }
+        csvStream.flush();
+        csvFile.flush();
+        csvFile.close();
+    }
+}
+
+void FlightLogManager::exportToXML(QString fileName)
+{
+    QFile xmlFile(fileName);
+    if (xmlFile.open(QFile::WriteOnly | QFile::Truncate)) {
+
+        QXmlStreamWriter xmlWriter(&xmlFile);
+        xmlWriter.setAutoFormatting(true);
+        xmlWriter.setAutoFormattingIndent(4);
+
+        xmlWriter.writeStartDocument("1.0", true);
+        xmlWriter.writeStartElement("logs");
+        xmlWriter.writeComment("This file was created by the flight log export in OpenPilot GCS.");
+
+        quint32 baseTime = 0;
+        quint32 currentFlight = 0;
+        foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
+            if(m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
+                currentFlight = entry->getFlight();
+                baseTime = entry->getFlightTime();
+            }
+            entry->toXML(&xmlWriter, baseTime);
+        }
+        xmlWriter.writeEndElement();
+        xmlWriter.writeEndDocument();
+        xmlFile.flush();
+        xmlFile.close();
+    }
+}
+
 void FlightLogManager::exportLogs()
 {
     if (m_logEntries.isEmpty()) {
@@ -232,49 +328,31 @@ void FlightLogManager::exportLogs()
     setDisableControls(true);
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log"),
-                                                    tr("OP-%0.opl").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
-                                                    tr("OpenPilot Log (*.opl)"));
+    QString oplFilter = tr("OpenPilot Log file %1").arg("(*.opl)");
+    QString csvFilter = tr("Text file %1").arg("(*.csv)");
+    QString xmlFilter = tr("XML file %1").arg("(*.xml)");
+
+    QString selectedFilter = csvFilter;
+
+    QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log Entries"),
+                                                    QString("OP-%1").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
+                                                    QString("%1;;%2;;%3").arg(oplFilter, csvFilter, xmlFilter), &selectedFilter);
     if (!fileName.isEmpty()) {
-        // Loop and create a new file for each flight.
-        fileName = fileName.replace(QString(".opl"), QString("%1.opl"));
-        int currentEntry  = 0;
-        int currentFlight = 0;
-        quint32 adjustedBaseTime = 0;
-        // Continue until all entries are exported
-        while (currentEntry < m_logEntries.count()) {
-            if (m_adjustExportedTimestamps) {
-                adjustedBaseTime = m_logEntries[currentEntry]->getFlightTime();
+        if (selectedFilter == oplFilter) {
+            if (!fileName.endsWith(".opl")) {
+                fileName.append(".opl");
             }
-
-            // Get current flight
-            currentFlight = m_logEntries[currentEntry]->getFlight();
-
-            LogFile logFile;
-            logFile.useProvidedTimeStamp(true);
-
-            // Set the file name to contain flight number
-            logFile.setFileName(fileName.arg(tr("_flight-%1").arg(currentFlight + 1)));
-            logFile.open(QIODevice::WriteOnly);
-            UAVTalk uavTalk(&logFile, m_objectManager);
-
-            // Export entries until no more available or flight changes
-            while (currentEntry < m_logEntries.count() && m_logEntries[currentEntry]->getFlight() == currentFlight) {
-                ExtendedDebugLogEntry *entry = m_logEntries[currentEntry];
-
-                // Only log uavobjects
-                if (entry->getType() == ExtendedDebugLogEntry::TYPE_UAVOBJECT) {
-                    // Set timestamp that should be logged for this entry
-                    logFile.setNextTimeStamp(entry->getFlightTime() - adjustedBaseTime);
-
-                    // Use UAVTalk to log complete message to file
-                    uavTalk.sendObject(entry->uavObject(), false, false);
-                    qDebug() << entry->getFlightTime() - adjustedBaseTime << "=" << entry->toStringBrief();
-                }
-                currentEntry++;
+            exportToOPL(fileName);
+        } else if (selectedFilter == csvFilter) {
+            if (!fileName.endsWith(".csv")) {
+                fileName.append(".csv");
             }
-
-            logFile.close();
+            exportToCSV(fileName);
+        } else if (selectedFilter == xmlFilter) {
+            if (!fileName.endsWith(".xml")) {
+                fileName.append(".xml");
+            }
+            exportToXML(fileName);
         }
     }
 
@@ -343,6 +421,33 @@ QString ExtendedDebugLogEntry::getLogString()
     } else {
         return "";
     }
+}
+
+void ExtendedDebugLogEntry::toXML(QXmlStreamWriter *xmlWriter, quint32 baseTime)
+{
+    xmlWriter->writeStartElement("entry");
+    xmlWriter->writeAttribute("flight", QString::number(getFlight() + 1));
+    xmlWriter->writeAttribute("flighttime", QString::number(getFlightTime() - baseTime));
+    xmlWriter->writeAttribute("entry", QString::number(getEntry()));
+    if (getType() == DebugLogEntry::TYPE_TEXT) {
+        xmlWriter->writeAttribute("type", "text");
+        xmlWriter->writeTextElement("message", QString((const char *)getData().Data));
+    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+        xmlWriter->writeAttribute("type", "uavobject");
+        m_object->toXML(xmlWriter);
+    }
+    xmlWriter->writeEndElement(); //entry
+}
+
+void ExtendedDebugLogEntry::toCSV(QTextStream *csvStream, quint32 baseTime)
+{
+    QString data;
+    if (getType() == DebugLogEntry::TYPE_TEXT) {
+        data = QString((const char *)getData().Data);
+    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+        data = m_object->toString().replace("\n", "").replace("\t", "");
+    }
+    *csvStream << QString::number(getFlight() + 1) << '\t' << QString::number(getFlightTime() - baseTime) << '\t' << QString::number(getEntry()) << '\t' << data << '\n';
 }
 
 void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVObjectManager *objectManager)

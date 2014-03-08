@@ -24133,7 +24133,7 @@ border-radius: 5;</string>
             </spacer>
            </item>
            <item>
-            <widget class="QGroupBox" name="gridGroupBox">
+            <widget class="QGroupBox" name="gridGroupBox_1">
              <property name="title">
               <string>Cruise Control</string>
              </property>

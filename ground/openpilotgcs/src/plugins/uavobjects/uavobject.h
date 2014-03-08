@@ -37,6 +37,7 @@
 #include <QList>
 #include <QFile>
 #include <stdint.h>
+#include <QXmlStreamWriter>
 #include "uavobjectfield.h"
 
 #define UAVOBJ_ACCESS_SHIFT                    0
@@ -128,6 +129,7 @@ public:
     QString toString();
     QString toStringBrief();
     QString toStringData();
+    void toXML(QXmlStreamWriter *xmlWriter);
     void emitTransactionCompleted(bool success);
     void emitNewInstance(UAVObject *);
 

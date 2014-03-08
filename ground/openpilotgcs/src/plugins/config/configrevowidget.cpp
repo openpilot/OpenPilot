@@ -896,11 +896,8 @@ void ConfigRevoWidget::doStartNoiseMeasurement()
 
     Q_UNUSED(lock);
 
-    RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
     HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
     Q_ASSERT(homeLocation);
-    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
     // check if Homelocation is set

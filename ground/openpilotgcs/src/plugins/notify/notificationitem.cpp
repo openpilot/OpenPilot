@@ -46,9 +46,9 @@ QStringList NotificationItem::retryValues;
 
 NotificationItem::NotificationItem(QObject *parent)
     : QObject(parent)
-    , _currentUpdatePlayed(false)
     , isNowPlaying(0)
     , _isPlayed(false)
+    , _currentUpdatePlayed(false)
     , _timer(NULL)
     , _expireTimer(NULL)
     , _soundCollectionPath("")

@@ -72,7 +72,7 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
 }
 void ThermalCalibrationModel::init()
 {
-    if(!m_initDone){
+    if (!m_initDone) {
         m_initDone = true;
         setStartEnabled(true);
         setEndEnabled(false);

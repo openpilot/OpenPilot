@@ -136,7 +136,7 @@ void DeviceWidget::populate()
     status("Ready...", STATUSICON_INFO);
     QString fwFileName = getDevFirmwarePath();
     QFile fwFile(fwFileName);
-    if(fwFile.exists()){
+    if (fwFile.exists()) {
         loadFirmware(fwFileName);
     }
 }
@@ -261,6 +261,7 @@ void DeviceWidget::status(QString str, StatusIcon ic)
 void DeviceWidget::loadFirmware()
 {
     QString file = setOpenFileName();
+
     loadFirmware(file);
 }
 
@@ -525,6 +526,7 @@ QString DeviceWidget::getDevFirmwarePath()
 {
     QDir fwDirectory;
     QString fwDirectoryStr;
+
     fwDirectoryStr = QCoreApplication::applicationDirPath();
     fwDirectory    = QDir(fwDirectoryStr);
 #ifdef Q_OS_WIN
@@ -553,6 +555,7 @@ QString DeviceWidget::setOpenFileName()
                                                     tr("Select firmware file"),
                                                     fwDirectoryStr,
                                                     tr("Firmware Files (*.opfw *.bin)"));
+
     return fileName;
 }
 

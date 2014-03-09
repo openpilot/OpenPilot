@@ -386,7 +386,39 @@ void FlightLogManager::loadSettings()
 {}
 
 void FlightLogManager::saveSettings()
-{}
+{
+    QString xmlFilter = tr("XML file %1").arg("(*.xml)");
+    QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log Settings"),
+                                                    QString("OP-FlightLogSettings"), QString("%1").arg(xmlFilter));
+    if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(".xml")) {
+            fileName.append(".xml");
+        }
+        QFile xmlFile(fileName);
+
+        if (xmlFile.open(QFile::WriteOnly | QFile::Truncate)) {
+            QXmlStreamWriter xmlWriter(&xmlFile);
+            xmlWriter.setAutoFormatting(true);
+            xmlWriter.setAutoFormattingIndent(4);
+
+            xmlWriter.writeStartDocument("1.0", true);
+            xmlWriter.writeComment("This file was created by the flight log settings function in OpenPilot GCS.");
+            xmlWriter.writeStartElement("settings");
+            xmlWriter.writeAttribute("enabled", QString::number(m_loggingEnabled));
+            foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
+                xmlWriter.writeStartElement("setting");
+                xmlWriter.writeAttribute("name", wrapper->name());
+                xmlWriter.writeAttribute("level", QString::number(wrapper->setting()));
+                xmlWriter.writeAttribute("period", QString::number(wrapper->period()));
+                xmlWriter.writeEndElement();
+            }
+            xmlWriter.writeEndElement();
+            xmlWriter.writeEndDocument();
+            xmlFile.flush();
+            xmlFile.close();
+        }
+    }
+}
 
 void FlightLogManager::resetSettings()
 {

@@ -43,7 +43,9 @@
 #include "uavtalk/telemetrymanager.h"
 
 class UAVOLogSettingsWrapper : public QObject {
-    Q_OBJECT Q_PROPERTY(QString name READ name NOTIFY nameChanged)
+    Q_OBJECT
+    Q_PROPERTY(UAVObject *object READ object NOTIFY objectChanged)
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(int setting READ setting WRITE setSetting NOTIFY settingChanged)
     Q_PROPERTY(int period READ period WRITE setPeriod NOTIFY periodChanged)
 
@@ -69,6 +71,11 @@ public:
         return m_period;
     }
 
+    UAVObject *object() const
+    {
+        return m_object;
+    }
+
 public slots:
     void setSetting(int setting)
     {
@@ -89,7 +96,8 @@ public slots:
 signals:
     void settingChanged(int setting);
     void nameChanged(QString name);
-    void periodChanged(int period);
+    void periodChanged(int period);    
+    void objectChanged(UAVObject * arg);
 
 private:
     UAVObject *m_object;
@@ -141,6 +149,7 @@ class FlightLogManager : public QObject {
     Q_PROPERTY(QQmlListProperty<UAVOLogSettingsWrapper> uavoEntries READ uavoEntries NOTIFY uavoEntriesChanged)
     Q_PROPERTY(QStringList logSettings READ logSettings NOTIFY logSettingsChanged)
     Q_PROPERTY(QStringList logStatuses READ logStatuses NOTIFY logStatusesChanged)
+    Q_PROPERTY(int loggingEnabled READ loggingEnabled WRITE setLoggingEnabled NOTIFY loggingEnabledChanged)
 
 
 public:
@@ -199,6 +208,11 @@ public:
         return m_flightLogSettings;
     }
 
+    int loggingEnabled() const
+    {
+        return m_loggingEnabled;
+    }
+
 signals:
     void logEntriesChanged();
     void flightEntriesChanged();
@@ -210,6 +224,8 @@ signals:
     void boardConnectedChanged(bool arg);
 
     void logStatusesChanged(QStringList arg);
+
+    void loggingEnabledChanged(int arg);
 
 public slots:
     void clearAllLogs();
@@ -254,6 +270,14 @@ public slots:
         }
     }
 
+    void setLoggingEnabled(int arg)
+    {
+        if (m_loggingEnabled != arg) {
+            m_loggingEnabled = arg;
+            emit loggingEnabledChanged(arg);
+        }
+    }
+
 private slots:
     void updateFlightEntries(quint16 currentFlight);
     void setupUAVOWrappers();
@@ -286,6 +310,7 @@ private:
     bool m_cancelDownload;
     bool m_adjustExportedTimestamps;
     bool m_boardConnected;
+    int m_loggingEnabled;
 };
 
 #endif // FLIGHTLOGMANAGER_H

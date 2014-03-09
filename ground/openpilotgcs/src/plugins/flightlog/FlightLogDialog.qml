@@ -187,7 +187,10 @@ Rectangle {
                     ComboBox {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         model: logManager.logStatuses
-                        currentIndex: logSettings.getLoggingEnabled()
+                        currentIndex: logSettings.loggingEnabled
+                        onCurrentIndexChanged: {
+                            logManager.setLoggingEnabled(currentIndex);
+                        }
                     }
 
                 }

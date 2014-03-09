@@ -42,7 +42,7 @@
 #include "velocitystate.h"
 #include "waypoint.h"
 #include "waypointactive.h"
-#include "manualcontrolsettings.h"
+#include "flightmodesettings.h"
 #include <pios_struct_helper.h>
 #include "paths.h"
 
@@ -139,7 +139,7 @@ static void pathPlannerTask()
 
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);
-    if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
+    if (flightStatus.ControlChain.PathPlanner != FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
         pathplanner_active = false;
         if (!validPathPlan) {
             // unverified path plans are only a warning while we are not in pathplanner mode
@@ -171,8 +171,8 @@ static void pathPlannerTask()
             // copy pasta: same calculation as in manualcontrol, set return to home coordinates
             PositionStateData positionState;
             PositionStateGet(&positionState);
-            ManualControlSettingsData settings;
-            ManualControlSettingsGet(&settings);
+            FlightModeSettingsData settings;
+            FlightModeSettingsGet(&settings);
 
             pathDesired.Start.North      = 0;
             pathDesired.Start.East       = 0;

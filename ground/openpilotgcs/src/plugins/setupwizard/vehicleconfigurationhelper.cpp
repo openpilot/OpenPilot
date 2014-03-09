@@ -33,6 +33,7 @@
 #include "mixersettings.h"
 #include "systemsettings.h"
 #include "manualcontrolsettings.h"
+#include "flightmodesettings.h"
 #include "stabilizationsettings.h"
 #include "revocalibration.h"
 #include "accelgyrosettings.h"
@@ -306,29 +307,34 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 
 void VehicleConfigurationHelper::applyFlighModeConfiguration()
 {
+    FlightModeSettings *modeSettings = FlightModeSettings::GetInstance(m_uavoManager);
     ManualControlSettings *controlSettings = ManualControlSettings::GetInstance(m_uavoManager);
 
+    Q_ASSERT(modeSettings);
     Q_ASSERT(controlSettings);
 
-    ManualControlSettings::DataFields data = controlSettings->getData();
-    data.Stabilization1Settings[0] = ManualControlSettings::STABILIZATION1SETTINGS_ATTITUDE;
-    data.Stabilization1Settings[1] = ManualControlSettings::STABILIZATION1SETTINGS_ATTITUDE;
-    data.Stabilization1Settings[2] = ManualControlSettings::STABILIZATION1SETTINGS_AXISLOCK;
-    data.Stabilization2Settings[0] = ManualControlSettings::STABILIZATION2SETTINGS_ATTITUDE;
-    data.Stabilization2Settings[1] = ManualControlSettings::STABILIZATION2SETTINGS_ATTITUDE;
-    data.Stabilization2Settings[2] = ManualControlSettings::STABILIZATION2SETTINGS_RATE;
-    data.Stabilization3Settings[0] = ManualControlSettings::STABILIZATION3SETTINGS_RATE;
-    data.Stabilization3Settings[1] = ManualControlSettings::STABILIZATION3SETTINGS_RATE;
-    data.Stabilization3Settings[2] = ManualControlSettings::STABILIZATION3SETTINGS_RATE;
-    data.FlightModeNumber = 3;
-    data.FlightModePosition[0]     = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED1;
-    data.FlightModePosition[1]     = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED2;
-    data.FlightModePosition[2]     = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED3;
-    data.FlightModePosition[3]     = ManualControlSettings::FLIGHTMODEPOSITION_ALTITUDEHOLD;
-    data.FlightModePosition[4]     = ManualControlSettings::FLIGHTMODEPOSITION_POSITIONHOLD;
-    data.FlightModePosition[5]     = ManualControlSettings::FLIGHTMODEPOSITION_MANUAL;
-    controlSettings->setData(data);
-    addModifiedObject(controlSettings, tr("Writing flight mode settings"));
+    FlightModeSettings::DataFields data     = modeSettings->getData();
+    ManualControlSettings::DataFields data2 = controlSettings->getData();
+    data.Stabilization1Settings[0] = FlightModeSettings::STABILIZATION1SETTINGS_ATTITUDE;
+    data.Stabilization1Settings[1] = FlightModeSettings::STABILIZATION1SETTINGS_ATTITUDE;
+    data.Stabilization1Settings[2] = FlightModeSettings::STABILIZATION1SETTINGS_AXISLOCK;
+    data.Stabilization2Settings[0] = FlightModeSettings::STABILIZATION2SETTINGS_ATTITUDE;
+    data.Stabilization2Settings[1] = FlightModeSettings::STABILIZATION2SETTINGS_ATTITUDE;
+    data.Stabilization2Settings[2] = FlightModeSettings::STABILIZATION2SETTINGS_RATE;
+    data.Stabilization3Settings[0] = FlightModeSettings::STABILIZATION3SETTINGS_RATE;
+    data.Stabilization3Settings[1] = FlightModeSettings::STABILIZATION3SETTINGS_RATE;
+    data.Stabilization3Settings[2] = FlightModeSettings::STABILIZATION3SETTINGS_RATE;
+    data2.FlightModeNumber = 3;
+    data.FlightModePosition[0]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED1;
+    data.FlightModePosition[1]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED2;
+    data.FlightModePosition[2]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED3;
+    data.FlightModePosition[3]     = FlightModeSettings::FLIGHTMODEPOSITION_ALTITUDEHOLD;
+    data.FlightModePosition[4]     = FlightModeSettings::FLIGHTMODEPOSITION_POSITIONHOLD;
+    data.FlightModePosition[5]     = FlightModeSettings::FLIGHTMODEPOSITION_MANUAL;
+    modeSettings->setData(data);
+    addModifiedObject(modeSettings, tr("Writing flight mode settings 1/2"));
+    controlSettings->setData(data2);
+    addModifiedObject(controlSettings, tr("Writing flight mode settings 2/2"));
 }
 
 void VehicleConfigurationHelper::applySensorBiasConfiguration()

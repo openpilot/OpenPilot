@@ -45,6 +45,8 @@ public:
     bool getGCSControl(void);
     void setUDPControl(bool newState);
     bool getUDPControl(void);
+    void setArmed(bool newState);
+    bool getArmed(void);
 
 signals:
     void sticksChanged(double leftX, double leftY, double rightX, double rightY);

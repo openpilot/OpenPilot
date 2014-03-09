@@ -34,6 +34,7 @@ ERASE_FLASH ?= NO
 MODULES += Attitude
 MODULES += Stabilization
 MODULES += Actuator
+MODULES += Receiver
 MODULES += ManualControl
 MODULES += FirmwareIAP
 MODULES += Telemetry
@@ -98,6 +99,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/i2cstats.c
     SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
     SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
+    SRC += $(OPUAVSYNTHDIR)/flightmodesettings.c
     SRC += $(OPUAVSYNTHDIR)/mixersettings.c
     SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
     SRC += $(OPUAVSYNTHDIR)/attitudesettings.c

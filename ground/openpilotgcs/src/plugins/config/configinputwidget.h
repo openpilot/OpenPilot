@@ -39,6 +39,7 @@
 #include <QRadioButton>
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "flightmodesettings.h"
 #include "receiveractivity.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
@@ -109,6 +110,9 @@ private:
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
     ManualControlSettings::DataFields previousManualSettingsData;
+    FlightModeSettings *flightModeSettingsObj;
+    FlightModeSettings::DataFields flightModeSettingsData;
+    FlightModeSettings::DataFields previousFlightModeSettingsData;
     ReceiverActivity *receiverActivityObj;
     ReceiverActivity::DataFields receiverActivityData;
 

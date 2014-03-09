@@ -72,6 +72,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/stabilizationbank.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.h \
+    $$UAVOBJECT_SYNTHETICS/flightmodesettings.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationdesired.h \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.h \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.h \
@@ -172,6 +173,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/stabilizationbank.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.cpp \
+    $$UAVOBJECT_SYNTHETICS/flightmodesettings.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.cpp \

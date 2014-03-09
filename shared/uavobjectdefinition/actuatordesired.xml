@@ -4,7 +4,7 @@
         <field name="Roll" units="%" type="float" elements="1"/>
         <field name="Pitch" units="%" type="float" elements="1"/>
         <field name="Yaw" units="%" type="float" elements="1"/>
-        <field name="Throttle" units="%" type="float" elements="1"/>
+        <field name="Thrust" units="%" type="float" elements="1"/>
         <field name="UpdateTime" units="ms" type="float" elements="1"/>
         <field name="NumLongUpdates" units="ms" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>

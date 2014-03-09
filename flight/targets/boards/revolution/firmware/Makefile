@@ -37,6 +37,7 @@ MODULES += AltitudeHold
 MODULES += Stabilization
 MODULES += VtolPathFollower
 MODULES += ManualControl
+MODULES += Receiver
 MODULES += Actuator
 MODULES += GPS
 MODULES += TxPID

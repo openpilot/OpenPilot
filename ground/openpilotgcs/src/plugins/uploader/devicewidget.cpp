@@ -524,25 +524,19 @@ QString DeviceWidget::getDevFirmwarePath()
 {
     QDir fwDirectory;
     QString fwDirectoryStr;
+    fwDirectoryStr = QCoreApplication::applicationDirPath();
+    fwDirectory    = QDir(fwDirectoryStr);
 #ifdef Q_OS_WIN
-    fwDirectoryStr = QCoreApplication::applicationDirPath();
-    fwDirectory    = QDir(fwDirectoryStr);
-    fwDirectory.cdUp();
-    fwDirectory.cd("firmware");
-    fwDirectoryStr = fwDirectory.absolutePath();
-#elif defined Q_OS_LINUX
-    fwDirectoryStr = QCoreApplication::applicationDirPath();
-    fwDirectory    = QDir(fwDirectoryStr);
     fwDirectory.cd("../..");
     fwDirectoryStr = fwDirectory.absolutePath();
-    fwDirectoryStr = fwDirectoryStr + "/fw_" + myDevice->lblBrdName->text().toLower() + "/fw_" + myDevice->lblBrdName->text().toLower() + ".opfw";
+#elif defined Q_OS_LINUX
+    fwDirectory.cd("../..");
+    fwDirectoryStr = fwDirectory.absolutePath();
 #elif defined Q_OS_MAC
-    fwDirectoryStr = QCoreApplication::applicationDirPath();
-    fwDirectory    = QDir(fwDirectoryStr);
     fwDirectory.cd("../../../../../..");
     fwDirectoryStr = fwDirectory.absolutePath();
-    fwDirectoryStr = fwDirectoryStr + "/fw_" + myDevice->lblBrdName->text().toLower() + "/fw_" + myDevice->lblBrdName->text().toLower() + ".opfw";
 #endif
+    fwDirectoryStr = fwDirectoryStr + "/fw_" + myDevice->lblBrdName->text().toLower() + "/fw_" + myDevice->lblBrdName->text().toLower() + ".opfw";
     return fwDirectoryStr;
 }
 

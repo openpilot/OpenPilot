@@ -242,13 +242,14 @@ void FlightLogManager::exportToOPL(QString fileName)
 void FlightLogManager::exportToCSV(QString fileName)
 {
     QFile csvFile(fileName);
+
     if (csvFile.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream csvStream(&csvFile);
         quint32 baseTime = 0;
         quint32 currentFlight = 0;
         csvStream << "Flight" << '\t' << "Flight Time" << '\t' << "Entry" << '\t' << "Data" << '\n';
-        foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
-            if(m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
+        foreach(ExtendedDebugLogEntry * entry, m_logEntries) {
+            if (m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
                 currentFlight = entry->getFlight();
                 baseTime = entry->getFlightTime();
             }
@@ -263,8 +264,8 @@ void FlightLogManager::exportToCSV(QString fileName)
 void FlightLogManager::exportToXML(QString fileName)
 {
     QFile xmlFile(fileName);
-    if (xmlFile.open(QFile::WriteOnly | QFile::Truncate)) {
 
+    if (xmlFile.open(QFile::WriteOnly | QFile::Truncate)) {
         QXmlStreamWriter xmlWriter(&xmlFile);
         xmlWriter.setAutoFormatting(true);
         xmlWriter.setAutoFormattingIndent(4);
@@ -275,8 +276,8 @@ void FlightLogManager::exportToXML(QString fileName)
 
         quint32 baseTime = 0;
         quint32 currentFlight = 0;
-        foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
-            if(m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
+        foreach(ExtendedDebugLogEntry * entry, m_logEntries) {
+            if (m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
                 currentFlight = entry->getFlight();
                 baseTime = entry->getFlightTime();
             }
@@ -388,12 +389,13 @@ void ExtendedDebugLogEntry::toXML(QXmlStreamWriter *xmlWriter, quint32 baseTime)
         xmlWriter->writeAttribute("type", "uavobject");
         m_object->toXML(xmlWriter);
     }
-    xmlWriter->writeEndElement(); //entry
+    xmlWriter->writeEndElement(); // entry
 }
 
 void ExtendedDebugLogEntry::toCSV(QTextStream *csvStream, quint32 baseTime)
 {
     QString data;
+
     if (getType() == DebugLogEntry::TYPE_TEXT) {
         data = QString((const char *)getData().Data);
     } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {

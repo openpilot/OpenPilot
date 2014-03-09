@@ -525,7 +525,7 @@ void UAVObject::toXML(QXmlStreamWriter *xmlWriter)
     xmlWriter->writeAttribute("name", getName());
     xmlWriter->writeAttribute("id", QString("%1-%2").arg(getObjID(), 1, 16).toUpper().arg(getInstID()));
     xmlWriter->writeStartElement("fields");
-    foreach(UAVObjectField* field , fields) {
+    foreach(UAVObjectField * field, fields) {
         field->toXML(xmlWriter);
     }
     xmlWriter->writeEndElement(); // fields

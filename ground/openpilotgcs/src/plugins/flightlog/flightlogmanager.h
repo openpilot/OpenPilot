@@ -286,6 +286,10 @@ private:
     bool m_cancelDownload;
     bool m_adjustExportedTimestamps;
     bool m_boardConnected;
+
+    void exportToOPL(QString fileName);
+    void exportToCSV(QString fileName);
+    void exportToXML(QString fileName);
 };
 
 #endif // FLIGHTLOGMANAGER_H

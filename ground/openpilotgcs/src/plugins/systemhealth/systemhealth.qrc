@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/systemhealth">
         <file>html/Actuator-Critical.html</file>
-        <file>html/ManualControl-Critical.html</file>
-        <file>html/ManualControl-Warning.html</file>
+        <file>html/Receiver-Critical.html</file>
+        <file>html/Receiver-Warning.html</file>
         <file>html/CPU-Critical.html</file>
         <file>html/CPU-Warning.html</file>
         <file>html/FlightTime-Error.html</file>
@@ -29,8 +29,8 @@
     </qresource>
     <qresource prefix="/systemhealth" lang="fr">
         <file alias="html/Actuator-Critical.html">html/fr/Actuator-Critical.html</file>
-        <file alias="html/ManualControl-Critical.html">html/fr/ManualControl-Critical.html</file>
-        <file alias="html/ManualControl-Warning.html">html/fr/ManualControl-Warning.html</file>
+        <file alias="html/Receiver-Critical.html">html/fr/Receiver-Critical.html</file>
+        <file alias="html/Receiver-Warning.html">html/fr/Receiver-Warning.html</file>
         <file alias="html/CPU-Critical.html">html/fr/CPU-Critical.html</file>
         <file alias="html/CPU-Warning.html">html/fr/CPU-Warning.html</file>
         <file alias="html/FlightTime-Error.html">html/fr/FlightTime-Error.html</file>

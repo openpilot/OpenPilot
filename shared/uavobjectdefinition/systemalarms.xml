@@ -10,6 +10,7 @@
 			<elementname>CPUOverload</elementname>
 			<elementname>EventSystem</elementname>
 			<elementname>Telemetry</elementname>
+			<elementname>Receiver</elementname>
 			<elementname>ManualControl</elementname>
 			<elementname>Actuator</elementname>
 			<elementname>Attitude</elementname>

@@ -35,6 +35,7 @@ MODULES += Altitude/revolution
 MODULES += Airspeed
 MODULES += AltitudeHold
 MODULES += Stabilization
+MODULES += Receiver
 MODULES += ManualControl
 MODULES += Actuator
 MODULES += GPS

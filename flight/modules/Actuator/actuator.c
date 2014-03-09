@@ -283,8 +283,14 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
-        bool positiveThrottle = throttleDesired >= 0.00f;
-        bool spinWhileArmed   = actuatorSettings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
+        bool activeThrottle;
+        // note: throttle==0 is an inactive throttle and turns motors off
+        if (allowReverseThrottle == SYSTEMSETTINGS_ALLOWREVERSETHROTTLE_TRUE) {
+            activeThrottle = throttleDesired > 0.00f || throttleDesired < 0.00f;
+        } else {
+            activeThrottle = throttleDesired > 0.00f;
+        }
+        bool spinWhileArmed = actuatorSettings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 
         float curve1 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
 
@@ -338,7 +344,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                 continue;
             }
 
-            if ((mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) || (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_SERVO)) {
+            if ((mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) || (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_REVERSABLEMOTOR) || (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_SERVO)) {
                 status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dTSeconds);
             } else {
                 status[ct] = -1;
@@ -348,15 +354,25 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             if (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
                 // If not armed or motors aren't meant to spin all the time
                 if (!armed ||
-                    (!spinWhileArmed && !positiveThrottle)) {
+                    (!spinWhileArmed && !activeThrottle)) {
                     filterAccumulator[ct] = 0;
                     lastResult[ct] = 0;
                     status[ct] = -1; // force min throttle
                 }
                 // If armed meant to keep spinning,
-                else if ((spinWhileArmed && !positiveThrottle) ||
+                else if ((spinWhileArmed && !activeThrottle) ||
                          (status[ct] < 0)) {
                     status[ct] = 0;
+                }
+            }
+
+            // Reversable Motors are like Motors but go to neutral instead of minimum
+            if (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_REVERSABLEMOTOR) {
+                // If not armed or motor is inactive - no "spinwhilearmed" for this engine type
+                if (!armed || !activeThrottle) {
+                    filterAccumulator[ct] = 0;
+                    lastResult[ct] = 0;
+                    status[ct] = 0; // force neutral throttle
                 }
             }
 
@@ -462,6 +478,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
                    (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_PITCH] / 128.0f) * desired->Pitch) +
                    (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_YAW] / 128.0f) * desired->Yaw);
 
+    // note: no feedforward for reversable motors yet for safety reasons
     if (mixer->type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
         if (result < 0.0f) { // idle throttle
             result = 0.0f;
@@ -580,7 +597,7 @@ static void setFailsafe(const ActuatorSettingsData *actuatorSettings, const Mixe
     for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n) {
         if (mixers[n].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
             Channel[n] = actuatorSettings->ChannelMin[n];
-        } else if (mixers[n].type == MIXERSETTINGS_MIXER1TYPE_SERVO) {
+        } else if (mixers[n].type == MIXERSETTINGS_MIXER1TYPE_SERVO || mixers[n].type == MIXERSETTINGS_MIXER1TYPE_REVERSABLEMOTOR) {
             Channel[n] = actuatorSettings->ChannelNeutral[n];
         } else {
             Channel[n] = 0;

@@ -91,6 +91,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/actuatordesired.c
     SRC += $(OPUAVSYNTHDIR)/actuatorsettings.c
     SRC += $(OPUAVSYNTHDIR)/accelstate.c
+    SRC += $(OPUAVSYNTHDIR)/accelgyrosettings.c
     SRC += $(OPUAVSYNTHDIR)/gyrostate.c
     SRC += $(OPUAVSYNTHDIR)/attitudestate.c
     SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c

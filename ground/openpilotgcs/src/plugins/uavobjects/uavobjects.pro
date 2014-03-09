@@ -30,6 +30,7 @@ OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += \
+    $$UAVOBJECT_SYNTHETICS/accelgyrosettings.h \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/barosensor.h \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.h \
@@ -129,6 +130,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h
 
 SOURCES += \
+    $$UAVOBJECT_SYNTHETICS/accelgyrosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/barosensor.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.cpp \

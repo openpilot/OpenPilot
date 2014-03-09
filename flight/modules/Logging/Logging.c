@@ -73,7 +73,12 @@ int32_t LoggingStart(void)
     FlightStatusConnectCallback(FlightStatusUpdatedCb);
     SettingsUpdatedCb(DebugLogSettingsHandle());
 
-    UAVObjEvent ev = { .obj = DebugLogSettingsHandle(), .instId = 0, .event = EV_UPDATED_PERIODIC };
+    UAVObjEvent ev = {
+            .obj = DebugLogSettingsHandle(),
+            .instId = 0,
+            .event = EV_UPDATED_PERIODIC,
+            .lowPriority = true,
+            };
     EventPeriodicCallbackCreate(&ev, StatusUpdatedCb, 1000);
     // invoke a periodic dispatcher callback - the event struct is a dummy, it could be filled with anything!
     StatusUpdatedCb(&ev);

@@ -664,7 +664,7 @@ void UAVObjectField::toXML(QXmlStreamWriter *xmlWriter)
     }
     for (unsigned int n = 0; n < numElements; ++n) {
         xmlWriter->writeStartElement("value");
-        if(getElementNames().size() > 1) {
+        if (getElementNames().size() > 1) {
             xmlWriter->writeAttribute("name", getElementNames().at(n));
         }
         xmlWriter->writeCharacters(getValue(n).toString());

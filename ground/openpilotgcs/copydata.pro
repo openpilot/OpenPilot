@@ -56,9 +56,6 @@ GCS_LIBRARY_PATH
                          imageformats/libqmng.so \
                          imageformats/libqsvg.so \
                          imageformats/libqtiff.so \
-                         mediaservice/libgstaudiodecoder.so \
-                         mediaservice/libgstcamerabin.so \
-                         mediaservice/libgstmediacapture.so \
                          mediaservice/libgstmediaplayer.so \
                          platforms/libqxcb.so \
                          sqldrivers/libqsqlite.so

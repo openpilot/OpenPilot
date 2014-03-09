@@ -170,7 +170,6 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
     MixerStatusData mixerStatus;
     FlightStatusData flightStatus;
     SystemSettingsThrustControlOptions thrustType;
-    SystemSettingsAllowReverseThrottleOptions allowReverseThrottle;
     float throttleDesired;
     float collectiveDesired;
 
@@ -228,7 +227,6 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         ActuatorDesiredGet(&desired);
         ActuatorCommandGet(&command);
         SystemSettingsThrustControlGet(&thrustType);
-        SystemSettingsAllowReverseThrottleGet(&allowReverseThrottle);
 
         // read in throttle and collective -demultiplex thrust
         switch (thrustType) {
@@ -248,12 +246,10 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
 
         // safety settings
-        if (allowReverseThrottle == SYSTEMSETTINGS_ALLOWREVERSETHROTTLE_FALSE && (throttleDesired < 0 || !armed)) {
-            throttleDesired = -1;
-        } else if (allowReverseThrottle == SYSTEMSETTINGS_ALLOWREVERSETHROTTLE_TRUE && !armed) {
+        if (!armed) {
             throttleDesired = 0;
         }
-        if (throttleDesired < 0 || !armed) {
+        if (throttleDesired <= 0.00f || !armed) {
             // force set all other controls to zero if throttle is cut (previously set in Stabilization)
             if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
                 desired.Roll = 0;
@@ -283,14 +279,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
-        bool activeThrottle;
-        // note: throttle==0 is an inactive throttle and turns motors off
-        if (allowReverseThrottle == SYSTEMSETTINGS_ALLOWREVERSETHROTTLE_TRUE) {
-            activeThrottle = throttleDesired > 0.00f || throttleDesired < 0.00f;
-        } else {
-            activeThrottle = throttleDesired > 0.00f;
-        }
-        bool spinWhileArmed = actuatorSettings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
+        bool activeThrottle   = (throttleDesired < 0.00f || throttleDesired > 0.00f);
+        bool positiveThrottle = (throttleDesired > 0.00f);
+        bool spinWhileArmed   = actuatorSettings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 
         float curve1 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
 
@@ -354,13 +345,13 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             if (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
                 // If not armed or motors aren't meant to spin all the time
                 if (!armed ||
-                    (!spinWhileArmed && !activeThrottle)) {
+                    (!spinWhileArmed && !positiveThrottle)) {
                     filterAccumulator[ct] = 0;
                     lastResult[ct] = 0;
                     status[ct] = -1; // force min throttle
                 }
                 // If armed meant to keep spinning,
-                else if ((spinWhileArmed && !activeThrottle) ||
+                else if ((spinWhileArmed && !positiveThrottle) ||
                          (status[ct] < 0)) {
                     status[ct] = 0;
                 }

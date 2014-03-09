@@ -40,7 +40,7 @@
 FlightLogDialog::FlightLogDialog(QWidget *parent, FlightLogManager *flightLogManager) :
     QDialog(parent)
 {
-    qmlRegisterType<ExtendedDebugLogEntry>("org.openpilot", 1, 0, "DebugLogEntry");    
+    qmlRegisterType<ExtendedDebugLogEntry>("org.openpilot", 1, 0, "DebugLogEntry");
     qmlRegisterType<UAVOLogSettingsWrapper>("org.openpilot", 1, 0, "UAVOLogSettingsWrapper");
 
     setWindowIcon(QIcon(":/core/images/openpilot_logo_32.png"));

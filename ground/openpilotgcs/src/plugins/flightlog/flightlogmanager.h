@@ -43,16 +43,15 @@
 #include "uavtalk/telemetrymanager.h"
 
 class UAVOLogSettingsWrapper : public QObject {
-    Q_OBJECT
-    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
+    Q_OBJECT Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(int setting READ setting WRITE setSetting NOTIFY settingChanged)
     Q_PROPERTY(int period READ period WRITE setPeriod NOTIFY periodChanged)
 
 public:
-    enum UAVLogSetting {DISABLED = 0, ON_CHANGE, THROTTLED, PERIODICALLY};
+    enum UAVLogSetting { DISABLED = 0, ON_CHANGE, THROTTLED, PERIODICALLY };
 
     explicit UAVOLogSettingsWrapper();
-    explicit UAVOLogSettingsWrapper(UAVObject* object);
+    explicit UAVOLogSettingsWrapper(UAVObject *object);
     ~UAVOLogSettingsWrapper();
 
     QString name() const
@@ -99,8 +98,7 @@ private:
 };
 
 class ExtendedDebugLogEntry : public DebugLogEntry {
-    Q_OBJECT
-    Q_PROPERTY(QString LogString READ getLogString WRITE setLogString NOTIFY LogStringUpdated)
+    Q_OBJECT Q_PROPERTY(QString LogString READ getLogString WRITE setLogString NOTIFY LogStringUpdated)
 
 public:
     explicit ExtendedDebugLogEntry();
@@ -130,10 +128,9 @@ private:
 };
 
 class FlightLogManager : public QObject {
-    Q_OBJECT
-    Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
-    Q_PROPERTY(DebugLogControl *flightLogControl READ flightLogControl)
-    Q_PROPERTY(DebugLogSettings *flightLogSettings READ flightLogSettings)
+    Q_OBJECT Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
+    Q_PROPERTY(DebugLogControl * flightLogControl READ flightLogControl)
+    Q_PROPERTY(DebugLogSettings * flightLogSettings READ flightLogSettings)
     Q_PROPERTY(QQmlListProperty<ExtendedDebugLogEntry> logEntries READ logEntries NOTIFY logEntriesChanged)
     Q_PROPERTY(QStringList flightEntries READ flightEntries NOTIFY flightEntriesChanged)
     Q_PROPERTY(bool disableControls READ disableControls WRITE setDisableControls NOTIFY disableControlsChanged)
@@ -155,7 +152,8 @@ public:
 
     QStringList flightEntries();
 
-    QStringList logSettings() {
+    QStringList logSettings()
+    {
         return m_logSettings;
     }
 
@@ -191,12 +189,12 @@ public:
         return m_logStatuses;
     }
 
-    DebugLogControl * flightLogControl() const
+    DebugLogControl *flightLogControl() const
     {
         return m_flightLogControl;
     }
 
-    DebugLogSettings * flightLogSettings() const
+    DebugLogSettings *flightLogSettings() const
     {
         return m_flightLogSettings;
     }
@@ -269,7 +267,7 @@ private:
     DebugLogControl *m_flightLogControl;
     DebugLogStatus *m_flightLogStatus;
     DebugLogEntry *m_flightLogEntry;
-    DebugLogSettings * m_flightLogSettings;
+    DebugLogSettings *m_flightLogSettings;
 
     QList<ExtendedDebugLogEntry *> m_logEntries;
     QStringList m_flightEntries;

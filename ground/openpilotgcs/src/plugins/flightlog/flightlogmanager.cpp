@@ -43,9 +43,10 @@ FlightLogManager::FlightLogManager(QObject *parent) :
     m_adjustExportedTimestamps(true)
 {
     ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
+
     Q_ASSERT(pluginManager);
 
-    m_objectManager    = pluginManager->getObject<UAVObjectManager>();
+    m_objectManager   = pluginManager->getObject<UAVObjectManager>();
     Q_ASSERT(m_objectManager);
 
     m_telemtryManager = pluginManager->getObject<TelemetryManager>();
@@ -62,7 +63,7 @@ FlightLogManager::FlightLogManager(QObject *parent) :
     Q_ASSERT(m_flightLogStatus);
     connect(m_flightLogStatus, SIGNAL(FlightChanged(quint16)), this, SLOT(updateFlightEntries(quint16)));
 
-    m_flightLogEntry = DebugLogEntry::GetInstance(m_objectManager);
+    m_flightLogEntry    = DebugLogEntry::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogEntry);
 
     m_flightLogSettings = DebugLogSettings::GetInstance(m_objectManager);
@@ -287,13 +288,14 @@ void FlightLogManager::exportToOPL(QString fileName)
 void FlightLogManager::exportToCSV(QString fileName)
 {
     QFile csvFile(fileName);
+
     if (csvFile.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream csvStream(&csvFile);
         quint32 baseTime = 0;
         quint32 currentFlight = 0;
         csvStream << "Flight" << '\t' << "Flight Time" << '\t' << "Entry" << '\t' << "Data" << '\n';
-        foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
-            if(m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
+        foreach(ExtendedDebugLogEntry * entry, m_logEntries) {
+            if (m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
                 currentFlight = entry->getFlight();
                 baseTime = entry->getFlightTime();
             }
@@ -308,8 +310,8 @@ void FlightLogManager::exportToCSV(QString fileName)
 void FlightLogManager::exportToXML(QString fileName)
 {
     QFile xmlFile(fileName);
-    if (xmlFile.open(QFile::WriteOnly | QFile::Truncate)) {
 
+    if (xmlFile.open(QFile::WriteOnly | QFile::Truncate)) {
         QXmlStreamWriter xmlWriter(&xmlFile);
         xmlWriter.setAutoFormatting(true);
         xmlWriter.setAutoFormattingIndent(4);
@@ -320,8 +322,8 @@ void FlightLogManager::exportToXML(QString fileName)
 
         quint32 baseTime = 0;
         quint32 currentFlight = 0;
-        foreach (ExtendedDebugLogEntry *entry , m_logEntries) {
-            if(m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
+        foreach(ExtendedDebugLogEntry * entry, m_logEntries) {
+            if (m_adjustExportedTimestamps && entry->getFlight() != currentFlight) {
                 currentFlight = entry->getFlight();
                 baseTime = entry->getFlightTime();
             }
@@ -381,31 +383,23 @@ void FlightLogManager::cancelExportLogs()
 }
 
 void FlightLogManager::loadSettings()
-{
-
-}
+{}
 
 void FlightLogManager::saveSettings()
-{
-
-}
+{}
 
 void FlightLogManager::resetSettings()
 {
-    foreach (UAVOLogSettingsWrapper *wrapper, m_uavoEntries) {
+    foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
         wrapper->setSetting(UAVOLogSettingsWrapper::DISABLED);
     }
 }
 
 void FlightLogManager::applySettingsToBoard()
-{
-
-}
+{}
 
 void FlightLogManager::saveSettingsToBoard()
-{
-
-}
+{}
 
 void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 {
@@ -426,8 +420,9 @@ void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 
 void FlightLogManager::setupUAVOWrappers()
 {
-    foreach(QList<UAVObject*> objectList , m_objectManager->getObjects()) {
-        UAVObject* object = objectList.at(0);
+    foreach(QList<UAVObject *> objectList, m_objectManager->getObjects()) {
+        UAVObject *object = objectList.at(0);
+
         if (!object->isMetaDataObject() && !object->isSettingsObject()) {
             m_uavoEntries.append(new UAVOLogSettingsWrapper(object));
             qDebug() << objectList.at(0)->getName();
@@ -493,12 +488,13 @@ void ExtendedDebugLogEntry::toXML(QXmlStreamWriter *xmlWriter, quint32 baseTime)
         xmlWriter->writeAttribute("type", "uavobject");
         m_object->toXML(xmlWriter);
     }
-    xmlWriter->writeEndElement(); //entry
+    xmlWriter->writeEndElement(); // entry
 }
 
 void ExtendedDebugLogEntry::toCSV(QTextStream *csvStream, quint32 baseTime)
 {
     QString data;
+
     if (getType() == DebugLogEntry::TYPE_TEXT) {
         data = QString((const char *)getData().Data);
     } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {

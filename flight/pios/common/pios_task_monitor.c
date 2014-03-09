@@ -169,8 +169,10 @@ uint8_t PIOS_TASK_MONITOR_GetIdlePercentage()
     xSemaphoreGiveRecursive(mLock);
     return running_time_percentage;
 
-#endif
+#else
     return 0;
+
+#endif
 }
 
 

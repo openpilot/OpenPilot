@@ -107,7 +107,6 @@ extern void PIOS_TASK_MONITOR_ForEachTask(TaskMonitorTaskInfoCallback callback, 
 /**
  * Return the idle task running time percentage.
  */
-
 extern uint8_t PIOS_TASK_MONITOR_GetIdlePercentage();
 
 #endif // PIOS_TASK_MONITOR_H

@@ -941,7 +941,7 @@ A setting of 0.00 disables the filter.</string>
        <property name="objrelation" stdset="0">
         <stringlist>
          <string>button:help</string>
-         <string>url:http://wiki.openpilot.org/display/Doc/Revo+Configuration</string>
+         <string>url:http://wiki.openpilot.org/display/Doc/Revolution+Manual+Sensor+Calibration</string>
         </stringlist>
        </property>
       </widget>

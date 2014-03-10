@@ -82,6 +82,10 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addWidgetBinding("HwSettings", "USB_VCPPort", m_telemetry->cbUsbVcp);
     addWidgetBinding("HwSettings", "TelemetrySpeed", m_telemetry->telemetrySpeed);
     addWidgetBinding("HwSettings", "GPSSpeed", m_telemetry->gpsSpeed);
+	/* OP-1250 : Add Gps protocol configuration to HwSettings --------------- */
+    addWidgetBinding("GPSSettings", "DataProtocol", m_telemetry->gpsProtocol);
+	/* OP-1250 : ending ----------------------------------------------------- */
+	
     addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_telemetry->comUsbBridgeSpeed);
     connect(m_telemetry->cchwHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
     enableSaveButtons(false);

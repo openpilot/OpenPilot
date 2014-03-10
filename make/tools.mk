@@ -70,12 +70,12 @@ ifeq ($(UNAME), Linux)
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Darwin)
-    ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
+    ARM_SDK_URL    := http://alessiomorale.com/OpenPilot/gcc-arm-none-eabi-4_8-2013q4-20131218-mac.tar.bz2
     QT_SDK_URL     := "Please install native Qt 5.1.x SDK using package manager"
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Windows)
-    ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
+    ARM_SDK_URL    := http://alessiomorale.com/OpenPilot/gcc-arm-none-eabi-4_8-2013q4-20131204-win32.zip
     QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-5.1.1-windows.tar.bz2
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
     OPENSSL_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2

@@ -57,12 +57,12 @@ endif
 
 ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
-        ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-amd64.tar.bz2
+        ARM_SDK_URL := http://alessiomorale.com/OpenPilot/gcc-arm-none-eabi-4_8-2013q4-20131204-linux.tar.bz2
         QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.2/5.2.1/qt-opensource-linux-x64-5.2.1.run
         QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-linux-x64-5.2.1.run.md5
         QT_SDK_ARCH := gcc_64
     else
-        ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-i686.tar.bz2
+        ARM_SDK_URL := http://alessiomorale.com/OpenPilot/gcc-arm-none-eabi-4_8-2013q4-20131204-linux.tar.bz2
         QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.2/5.2.1/qt-opensource-linux-x86-5.2.1.run
         QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-linux-x86-5.2.1.run.md5
         QT_SDK_ARCH := gcc
@@ -86,7 +86,7 @@ endif
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
 
 # Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
-ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
+ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_8-2013q4
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.2.1
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
 PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin

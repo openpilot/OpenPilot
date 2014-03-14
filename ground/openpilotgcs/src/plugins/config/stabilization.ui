@@ -95,7 +95,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -24004,7 +24004,7 @@ border-radius: 5;</string>
                   </spacer>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QDoubleSpinBox" name="RattitudeAntiWindup">
+                  <widget class="QDoubleSpinBox" name="RattitudeModeTransistion">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -24027,7 +24027,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Higher values will keep larger Ki terms and limits from winding up at partial stick.  Consider increasing this if you have high Ki values and limits and a sudden stick motion from one aircraft bank angle to another causes the aircraft to rotate and then slowly change rotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Percentage of full stick where the transition from Attitude to Rate occurs. This transition always occurs when the aircraft is exactly inverted (bank angle 180 degrees).  Small values are dangerous because they cause flips at small stick angles.  Values significantly over 100 act like attitude mode and can never flip.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24039,18 +24039,18 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="minimum">
-                    <double>0.000000000000000</double>
+                    <double>25.000000000000000</double>
                    </property>
                    <property name="maximum">
-                    <double>31.000000000000000</double>
+                    <double>255.000000000000000</double>
                    </property>
                    <property name="value">
-                    <double>10.000000000000000</double>
+                    <double>80.000000000000000</double>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:StabilizationSettings</string>
-                     <string>fieldname:RattitudeAntiWindup</string>
+                     <string>fieldname:RattitudeModeTransistion</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:15</string>
@@ -24090,7 +24090,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>Anti-Windup</string>
+                    <string>ModeTransition</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>

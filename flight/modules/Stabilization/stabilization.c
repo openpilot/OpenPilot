@@ -85,17 +85,9 @@
 // number of flight mode switch positions
 #define NUM_FMS_POSITIONS   6
 
-#if 0
-// The PID_RATE_ROLL set is used by Rate mode and the rate portion of Attitude mode
-// The PID_RATE set is used by the attitude portion of Attitude mode
-// The PID_RATEA_ROLL set is used by Rattitude mode because it needs to maintain
-// - two independant rate PIDs because it does rate and attitude simultaneously
-enum { PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_RATEA_ROLL, PID_RATEA_PITCH, PID_RATEA_YAW, PID_MAX };
-#else
 // The PID_RATE_ROLL set is used by Rate mode and the rate portion of Attitude mode
 // The PID_RATE set is used by the attitude portion of Attitude mode
 enum { PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_MAX };
-#endif
 enum { RATE_P, RATE_I, RATE_D, RATE_LIMIT, RATE_OFFSET };
 enum { ATT_P, ATT_I, ATT_LIMIT, ATT_OFFSET };
 
@@ -115,11 +107,7 @@ struct pid pids[PID_MAX];
 
 int cur_flight_mode = -1;
 
-#if 0
-static uint8_t rattitude_anti_windup;
-#else
 static float rattitude_mode_transition_stick_position;
-#endif
 static float cruise_control_min_thrust;
 static float cruise_control_max_thrust;
 static uint8_t cruise_control_max_angle;
@@ -136,11 +124,6 @@ static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent *ev);
 static void BankUpdatedCb(UAVObjEvent *ev);
 static void SettingsBankUpdatedCb(UAVObjEvent *ev);
-
-#if 0
-static float stab_log2f(float x);
-static float stab_powf(float x, uint8_t p);
-#endif
 
 /**
  * Module initialization
@@ -400,9 +383,6 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 if (reinit) {
                     pids[PID_ROLL + i].iAccumulator = 0;
                     pids[PID_RATE_ROLL + i].iAccumulator = 0;
-#if 0
-                    pids[PID_RATEA_ROLL + i].iAccumulator = 0;
-#endif
                 }
 
                 // Compute what Rate mode would give for this stick angle's rate
@@ -425,16 +405,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 float rateDesiredAxisAttitude;
                 rateDesiredAxisAttitude = pid_apply(&pids[PID_ROLL + i], attitude_error, dT);
                 rateDesiredAxisAttitude = bound(rateDesiredAxisAttitude,
-//it looks like P is degreespersecond per degree of angle error
-//so it is NOT high enough to ramp up like I thought it would
-//maybe I just need to measure the current stick angle for 179 bank angle
-#if 0
-                                                cast_struct_to_array(stabBank.MaximumRate,
-                                                                     stabBank.MaximumRate.Roll)[i]);
-#else
                                                 cast_struct_to_array(stabBank.ManualRate,
                                                                      stabBank.ManualRate.Roll)[i]);
-#endif
 
                 // Compute the weighted average rate desired
                 // Using max() rather than sqrt() for cpu speed;
@@ -445,8 +417,6 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 float magnitude;
                 magnitude = fmaxf(fabsf(stabDesired.Roll), fabsf(stabDesired.Pitch));
 
-#if 0
-#else
                 // modify magnitude to move the Att to Rate transition to the place
                 // specified by the user
                 // we are looking for where the stick angle == transition angle
@@ -477,83 +447,13 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 } else {
                     magnitude = (magnitude - rattitude_mode_transition_stick_position) * (1.0f-STICK_VALUE_AT_MODE_TRANSITION) / (1.0f - rattitude_mode_transition_stick_position) + STICK_VALUE_AT_MODE_TRANSITION;
                 }
-#endif
                 rateDesiredAxis[i] = (1.0f - magnitude) * rateDesiredAxisAttitude
                                      + magnitude * rateDesiredAxisRate;
 
-#if 0
-                // Compute the inner loop for both Rate mode and Attitude mode
-                // actuatorDesiredAxis[i] is the weighted average of the two PIDs from the two rates
-                actuatorDesiredAxis[i] =
-                    (1.0f - magnitude) * pid_apply_setpoint(&pids[PID_RATEA_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT)
-                    + magnitude * pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
-                actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
-
-                // settings.RattitudeAntiWindup controls the iAccumulator zeroing
-                // - so both iAccs don't wind up too far;
-                // - nor do both iAccs get held too close to zero at mid stick
-
-                // I suspect that there would be windup without it
-                // - since rate and attitude fight each other here
-                // - rate trying to pull it over the top and attitude trying to pull it back down
-
-                // Wind-up increases linearly with cycles for a fixed error.
-                // We must never increase the iAcc or we risk oscillation.
-
-                // Use the powf() function to make two anti-windup curves
-                // - one for zeroing rate close to center stick
-                // - the other for zeroing attitude close to max stick
-
-                // the bigger the dT      the more anti windup needed
-                // the bigger the PID[].i the more anti windup needed
-                // more anti windup is achieved with a lower powf() power
-                // a doubling of e.g. PID[].i should cause the runtime anti windup factor
-                // to get twice as far away from 1.0 (towards zero)
-                // e.g. from .90 to .80
-
-                // magic numbers
-                // these generate the inverted parabola like curves that go through [0,1] and [1,0]
-                // the higher the power, the closer the curve is to a straight line
-                // from [0,1] to [1,1] to [1,0] and the less anti windup is applied
-
-                // the UAVO RattitudeAntiWindup varies from 0 to 31
-                // 0 turns off anti windup
-                // 1 gives very little anti-windup because the power given to powf() is 31
-                // 31 gives a lot of anti-windup because the power given to powf() is 1
-                // the 32.1 is what does this
-                // the 7.966 and 17.668 cancel the default PID value and dT given to log2f()
-                // if these are non-default, tweaking is thus done so the user doesn't have to readjust
-                // the default value of 10 for UAVO RattitudeAntiWindup gives a power of 22
-                // these calculations are for magnitude = 0.5, so 22 corresponds to the number of bits
-                // used in the mantissa of the float
-                // i.e. 1.0-(0.5^22) almost underflows
-
-                // This may only be useful for aircraft with large Ki values and limits
-                if (dT > 0.0f && rattitude_anti_windup > 0.0f) {
-                    float factor;
-
-                    // At magnitudes close to one, the Attitude accumulators gets zeroed
-                    if (pids[PID_ROLL + i].i > 0.0f) {
-                        factor = 1.0f - stab_powf(magnitude, ((uint8_t)(32.1f - 7.966f - stab_log2f(dT * pids[PID_ROLL + i].i))) - rattitude_anti_windup);
-                        pids[PID_ROLL + i].iAccumulator *= factor;
-                    }
-                    if (pids[PID_RATEA_ROLL + i].i > 0.0f) {
-                        factor = 1.0f - stab_powf(magnitude, ((uint8_t)(32.1f - 17.668f - stab_log2f(dT * pids[PID_RATEA_ROLL + i].i))) - rattitude_anti_windup);
-                        pids[PID_RATEA_ROLL + i].iAccumulator *= factor;
-                    }
-
-                    // At magnitudes close to zero, the Rate accumulator gets zeroed
-                    if (pids[PID_RATE_ROLL + i].i > 0.0f) {
-                        factor = 1.0f - stab_powf(1.0f - magnitude, ((uint8_t)(32.1f - 17.668f - stab_log2f(dT * pids[PID_RATE_ROLL + i].i))) - rattitude_anti_windup);
-                        pids[PID_RATE_ROLL + i].iAccumulator *= factor;
-                    }
-                }
-#else
                 // Compute the inner loop for the averaged rate
                 // actuatorDesiredAxis[i] is the weighted average
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
                 actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
-#endif
 
                 break;
             }
@@ -778,43 +678,6 @@ static float bound(float val, float range)
 }
 
 
-#if 0
-// x small (0.0 < x < .01) so interpolation of fractional part is reasonable
-static float stab_log2f(float x)
-{
-    union {
-        volatile float    f;
-        volatile uint32_t i;
-        volatile unsigned char c[4];
-    } __attribute__((packed)) u1, u2;
-
-    u2.f   = u1.f = x;
-    u1.i <<= 1;
-    u2.i  &= 0xff800000;
-
-    // get and unbias the exponent, add in a linear interpolation of the fractional part
-    return (float)(u1.c[3] - 127) + (x / u2.f) - 1.0f;
-}
-
-
-// 0<=x<=1, 0<=p<=31
-static float stab_powf(float x, uint8_t p)
-{
-    float retval = 1.0f;
-
-    while (p) {
-        if (p & 1) {
-            retval *= x;
-        }
-        x  *= x;
-        p >>= 1;
-    }
-
-    return retval;
-}
-#endif
-
-
 static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     if (cur_flight_mode < 0 || cur_flight_mode >= NUM_FMS_POSITIONS) {
@@ -923,29 +786,6 @@ static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
                   bank.YawPI.Ki,
                   0,
                   bank.YawPI.ILimit);
-
-#if 0
-    // Set the Rattitude roll rate PID constants
-    pid_configure(&pids[PID_RATEA_ROLL],
-                  bank.RollRatePID.Kp,
-                  bank.RollRatePID.Ki,
-                  bank.RollRatePID.Kd,
-                  bank.RollRatePID.ILimit);
-
-    // Set the Rattitude pitch rate PID constants
-    pid_configure(&pids[PID_RATEA_PITCH],
-                  bank.PitchRatePID.Kp,
-                  bank.PitchRatePID.Ki,
-                  bank.PitchRatePID.Kd,
-                  bank.PitchRatePID.ILimit);
-
-    // Set the Rattitude yaw rate PID constants
-    pid_configure(&pids[PID_RATEA_YAW],
-                  bank.YawRatePID.Kp,
-                  bank.YawRatePID.Ki,
-                  bank.YawRatePID.Kd,
-                  bank.YawRatePID.ILimit);
-#endif
 }
 
 
@@ -986,12 +826,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     cur_flight_mode = -1;
 
     // Rattitude flight mode anti-windup factor
-#if 0
-    rattitude_anti_windup = settings.RattitudeAntiWindup;
-#else
     rattitude_mode_transition_stick_position = (float)settings.RattitudeModeTransistion / 100.0f;
-    //rattitude_mode_transition_stick_position = ((float)settings.RattitudeAntiWindup) / 31.0f;
-#endif
 
     cruise_control_min_thrust       = (float)settings.CruiseControlMinThrust / 100.0f;
     cruise_control_max_thrust       = (float)settings.CruiseControlMaxThrust / 100.0f;

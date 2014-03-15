@@ -30,6 +30,9 @@
 
 #include <QApplication>
 #include <QFileDialog>
+#include <QXmlStreamReader>
+#include <QMessageBox>
+#include <QDebug>
 
 #include "debuglogcontrol.h"
 #include "uavobjecthelper.h"
@@ -351,8 +354,7 @@ void FlightLogManager::exportLogs()
 
     QString selectedFilter = csvFilter;
 
-    QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log Entries"),
-                                                    QString("OP-%1").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
+    QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log Entries"), QDir::homePath(),
                                                     QString("%1;;%2;;%3").arg(oplFilter, csvFilter, xmlFilter), &selectedFilter);
     if (!fileName.isEmpty()) {
         if (selectedFilter == oplFilter) {
@@ -383,13 +385,68 @@ void FlightLogManager::cancelExportLogs()
 }
 
 void FlightLogManager::loadSettings()
-{}
+{
+    QString xmlFilter = tr("XML file %1").arg("(*.xml)");
+    QString fileName = QFileDialog::getOpenFileName(NULL, tr("Load Log Settings"), QDir::homePath(), QString("%1").arg(xmlFilter));
+    if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(".xml")) {
+            fileName.append(".xml");
+        }
+        QFile xmlFile(fileName);
+        QString errorString;
+        if (xmlFile.open(QFile::ReadOnly)) {
+            QXmlStreamReader xmlReader(&xmlFile);
+            while (xmlReader.readNextStartElement() && xmlReader.name() == "settings") {
+                bool ok;
+
+                int version = xmlReader.attributes().value("version").toInt(&ok);
+                if (!ok || version != LOG_SETTINGS_FILE_VERSION) {
+                    errorString = tr("The file has the wrong version or could not parse version information.");
+                    break;
+                }
+
+                setLoggingEnabled(xmlReader.attributes().value("enabled").toInt(&ok));
+                if (!ok) {
+                    errorString = tr("Could not parse enabled attribute.");
+                    break;
+                }
+
+                while (xmlReader.readNextStartElement()) {
+                    if (xmlReader.name() == "setting") {
+                        QString name = xmlReader.attributes().value("name").toString();
+                        int level = xmlReader.attributes().value("level").toInt(&ok);
+                        if (ok) {
+                            int period = xmlReader.attributes().value("period").toInt(&ok);
+                            if (ok && updateLogWrapper(name, level, period)) {
+                            } else {
+                                errorString = tr("Could not parse period attribute, or object with name '%1' could not be found.").arg(name);
+                                break;
+                            }
+                        } else {
+                            errorString = tr("Could not parse level attribute on setting '%1'").arg(name);
+                            break;
+                        }
+                    }
+                    xmlReader.skipCurrentElement();
+                }
+                xmlReader.skipCurrentElement();
+            }
+            if (!xmlReader.atEnd() && (xmlReader.hasError() || !errorString.isEmpty())) {
+                QMessageBox::warning(NULL, tr("Settings file corrupt."),
+                                     tr("The file loaded is not in the correct format.\nPlease check the file.\n%1")
+                                     .arg(xmlReader.hasError() ? xmlReader.errorString() : errorString),
+                                     QMessageBox::Ok);
+            }
+        }
+        xmlFile.close();
+    }
+}
 
 void FlightLogManager::saveSettings()
 {
     QString xmlFilter = tr("XML file %1").arg("(*.xml)");
     QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log Settings"),
-                                                    QString("OP-FlightLogSettings"), QString("%1").arg(xmlFilter));
+                                                    QDir::homePath(), QString("%1").arg(xmlFilter));
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(".xml")) {
             fileName.append(".xml");
@@ -404,6 +461,7 @@ void FlightLogManager::saveSettings()
             xmlWriter.writeStartDocument("1.0", true);
             xmlWriter.writeComment("This file was created by the flight log settings function in OpenPilot GCS.");
             xmlWriter.writeStartElement("settings");
+            xmlWriter.writeAttribute("version", QString::number(LOG_SETTINGS_FILE_VERSION));
             xmlWriter.writeAttribute("enabled", QString::number(m_loggingEnabled));
             foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
                 xmlWriter.writeStartElement("setting");
@@ -456,7 +514,9 @@ void FlightLogManager::setupUAVOWrappers()
         UAVObject *object = objectList.at(0);
 
         if (!object->isMetaDataObject() && !object->isSettingsObject()) {
-            m_uavoEntries.append(new UAVOLogSettingsWrapper(object));
+            UAVOLogSettingsWrapper *wrapper = new UAVOLogSettingsWrapper(object);
+            m_uavoEntries.append(wrapper);
+            m_uavoEntriesHash[wrapper->name()] = wrapper;
             qDebug() << objectList.at(0)->getName();
         }
     }
@@ -482,6 +542,18 @@ void FlightLogManager::connectionStatusChanged()
     } else {
         setBoardConnected(false);
     }
+}
+
+bool FlightLogManager::updateLogWrapper(QString name, int level, int period)
+{
+    UAVOLogSettingsWrapper *wrapper = m_uavoEntriesHash[name];
+    if (wrapper) {
+        wrapper->setSetting(level);
+        wrapper->setPeriod(period);
+        qDebug() << "Wrapper" << name << ", level" << level << ", period" << period;
+        return true;
+    }
+    return false;
 }
 
 ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry(),

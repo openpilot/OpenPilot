@@ -30,6 +30,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QHash>
 #include <QQmlListProperty>
 #include <QSemaphore>
 #include <QXmlStreamWriter>
@@ -284,6 +285,7 @@ private slots:
     void setupLogSettings();
     void setupLogStatuses();
     void connectionStatusChanged();
+    bool updateLogWrapper(QString name, int level, int period);
 
 private:
     UAVObjectManager *m_objectManager;
@@ -299,12 +301,14 @@ private:
     QStringList m_logStatuses;
 
     QList<UAVOLogSettingsWrapper *> m_uavoEntries;
+    QHash<QString, UAVOLogSettingsWrapper *> m_uavoEntriesHash;
 
     void exportToOPL(QString fileName);
     void exportToCSV(QString fileName);
     void exportToXML(QString fileName);
 
     static const int UAVTALK_TIMEOUT = 4000;
+    static const int LOG_SETTINGS_FILE_VERSION = 1;
     bool m_disableControls;
     bool m_disableExport;
     bool m_cancelDownload;

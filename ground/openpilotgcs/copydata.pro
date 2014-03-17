@@ -113,10 +113,8 @@ GCS_LIBRARY_PATH
         data_copy.target = FORCE
         QMAKE_EXTRA_TARGETS += data_copy
     }
-    # Windows release only, no debug target DLLs ending with 'd'
-    # It is assumed that SDL.dll can be found in the same directory as mingw32-make.exe
-    win32 {
 
+    win32 {
         # set debug suffix if needed
         CONFIG(debug, debug|release):DS = "d"
 
@@ -225,12 +223,6 @@ GCS_LIBRARY_PATH
 
         for(dll, QT_QUICK2_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_QML]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
-        }
-
-        # copy MinGW DLLs
-        MINGW_DLLS = SDL.dll
-        for(dll, MINGW_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
         # copy OpenSSL DLLs

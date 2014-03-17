@@ -78,6 +78,7 @@ else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
     QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-5.1.1-windows.tar.bz2
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
+    SDL_URL        := http://wiki.openpilot.org/download/attachments/18612236/SDL-devel-1.2.15-mingw32.tar.gz
     OPENSSL_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
@@ -91,6 +92,7 @@ QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.2.1
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
 PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin
 NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
+SDL_DIR         := $(TOOLS_DIR)/SDL-1.2.15
 OPENSSL_DIR     := $(TOOLS_DIR)/openssl-1.0.1e-win32
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
@@ -106,7 +108,7 @@ QT_SDK_PREFIX := $(QT_SDK_DIR)
 
 BUILD_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
-    BUILD_SDK_TARGETS += mingw python nsis openssl
+    BUILD_SDK_TARGETS += mingw sdl python nsis openssl
 endif
 ALL_SDK_TARGETS := $(BUILD_SDK_TARGETS) gtest uncrustify doxygen
 
@@ -401,7 +403,6 @@ endef
 #
 # Qt SDK
 #
-# Windows:  native binary package has been provided
 # Mac OS X: user should install native Qt SDK package
 #
 ##############################
@@ -553,6 +554,28 @@ endif
 nsis_version:
 	-$(V1) $(NSIS) | head -n1
 
+endif
+
+##############################
+#
+# SDL (Windows only)
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,sdl,$(SDL_DIR),$(SDL_URL),$(notdir $(SDL_URL))))
+
+ifeq ($(shell [ -d "$(SDL_DIR)" ] && $(ECHO) "exists"), exists)
+    export SDL_DIR := $(SDL_DIR)
+else
+    # not installed, hope it's in the path...
+    $(info $(EMPTY) WARNING     $(call toprel, $(SDL_DIR)) not found (make sdl_install), using system PATH)
+endif
+
+.PHONY: sdl_version
+sdl_version:
+	-$(V1) $(ECHO) "SDL 1.2.15 $(SDL_DIR)"
 endif
 
 ##############################

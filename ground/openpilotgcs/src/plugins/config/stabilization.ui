@@ -95,7 +95,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -13377,6 +13377,7 @@ border-radius: 5;</string>
                       </property>
                       <property name="decimals">
                        <number>5</number>
+
                       </property>
                       <property name="singleStep">
                        <double>0.000100000000000</double>
@@ -19417,6 +19418,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="autoFillBackground">
                     <bool>false</bool>
+
                    </property>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -19941,6 +19943,7 @@ border-radius: 5;</string>
                          <red>39</red>
                          <green>39</green>
                          <blue>39</blue>
+
                         </color>
                        </brush>
                       </colorrole>
@@ -21975,6 +21978,7 @@ border-radius: 5;</string>
                     </size>
                    </property>
                   </spacer>
+
                  </item>
                  <item row="1" column="3">
                   <widget class="QDoubleSpinBox" name="AccelKp">
@@ -26158,6 +26162,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>

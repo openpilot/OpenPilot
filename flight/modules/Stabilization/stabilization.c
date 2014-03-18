@@ -442,7 +442,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 // when a small number of degrees off of where it should be
 
                 // if below the transition angle (still in attitude mode)
-                if (magnitude < rattitude_mode_transition_stick_position) {
+                // '<=' instead of ',' keeps rattitude_mode_transition_stick_position==1.0 from causing DZ
+                if (magnitude <= rattitude_mode_transition_stick_position) {
                     magnitude *= STICK_VALUE_AT_MODE_TRANSITION / rattitude_mode_transition_stick_position;
                 } else {
                     magnitude = (magnitude - rattitude_mode_transition_stick_position) * (1.0f-STICK_VALUE_AT_MODE_TRANSITION) / (1.0f - rattitude_mode_transition_stick_position) + STICK_VALUE_AT_MODE_TRANSITION;
@@ -825,8 +826,12 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     // force flight mode update
     cur_flight_mode = -1;
 
-    // Rattitude flight mode anti-windup factor
-    rattitude_mode_transition_stick_position = (float)settings.RattitudeModeTransistion / 100.0f;
+    // Rattitude stick angle where the attitude to rate transition happens
+    if (settings.RattitudeModeTransistion < (uint8_t) 10) {
+        rattitude_mode_transition_stick_position = 10.0f / 100.0f;
+    } else {
+        rattitude_mode_transition_stick_position = (float)settings.RattitudeModeTransistion / 100.0f;
+    }
 
     cruise_control_min_thrust       = (float)settings.CruiseControlMinThrust / 100.0f;
     cruise_control_max_thrust       = (float)settings.CruiseControlMaxThrust / 100.0f;

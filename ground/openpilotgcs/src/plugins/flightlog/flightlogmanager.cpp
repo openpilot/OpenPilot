@@ -38,6 +38,7 @@
 #include "uavobjecthelper.h"
 #include "uavtalk/uavtalk.h"
 #include "utils/logfile.h"
+#include "uavdataobject.h"
 #include <uavobjectutil/uavobjectutilmanager.h>
 
 FlightLogManager::FlightLogManager(QObject *parent) :
@@ -55,10 +56,6 @@ FlightLogManager::FlightLogManager(QObject *parent) :
     m_telemtryManager = pluginManager->getObject<TelemetryManager>();
     Q_ASSERT(m_telemtryManager);
 
-    connect(m_telemtryManager, SIGNAL(connected()), this, SLOT(connectionStatusChanged()));
-    connect(m_telemtryManager, SIGNAL(disconnected()), this, SLOT(connectionStatusChanged()));
-    connectionStatusChanged();
-
     m_flightLogControl = DebugLogControl::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogControl);
 
@@ -74,9 +71,12 @@ FlightLogManager::FlightLogManager(QObject *parent) :
 
     updateFlightEntries(m_flightLogStatus->getFlight());
 
-    setupUAVOWrappers();
     setupLogSettings();
     setupLogStatuses();
+    setupUAVOWrappers();
+
+    connect(m_telemtryManager, SIGNAL(connected()), this, SLOT(connectionStatusChanged()));
+    connect(m_telemtryManager, SIGNAL(disconnected()), this, SLOT(connectionStatusChanged()));
 }
 
 FlightLogManager::~FlightLogManager()
@@ -478,10 +478,11 @@ void FlightLogManager::saveSettings()
     }
 }
 
-void FlightLogManager::resetSettings()
+void FlightLogManager::resetSettings(bool clear)
 {
+    setLoggingEnabled(clear ? 0 : m_flightLogSettings->getLoggingEnabled());
     foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
-        wrapper->setSetting(UAVOLogSettingsWrapper::DISABLED);
+        wrapper->reset(clear);
     }
 }
 
@@ -514,7 +515,7 @@ void FlightLogManager::setupUAVOWrappers()
         UAVObject *object = objectList.at(0);
 
         if (!object->isMetaDataObject() && !object->isSettingsObject()) {
-            UAVOLogSettingsWrapper *wrapper = new UAVOLogSettingsWrapper(object);
+            UAVOLogSettingsWrapper *wrapper = new UAVOLogSettingsWrapper(qobject_cast<UAVDataObject*>(object));
             m_uavoEntries.append(wrapper);
             m_uavoEntriesHash[wrapper->name()] = wrapper;
             qDebug() << objectList.at(0)->getName();
@@ -525,7 +526,15 @@ void FlightLogManager::setupUAVOWrappers()
 
 void FlightLogManager::setupLogSettings()
 {
-    m_logSettings << tr("Disabled") << tr("When updated") << tr("Throttled") << tr("Periodically");
+    // Corresponds to:
+    //    typedef enum {
+    //        UPDATEMODE_MANUAL    = 0,  /** Manually update object, by calling the updated() function */
+    //        UPDATEMODE_PERIODIC  = 1, /** Automatically update object at periodic intervals */
+    //        UPDATEMODE_ONCHANGE  = 2, /** Only update object when its data changes */
+    //        UPDATEMODE_THROTTLED = 3 /** Object is updated on change, but not more often than the interval time */
+    //    } UpdateMode;
+
+    m_logSettings << tr("Disabled") << tr("Periodically") << tr("When updated") << tr("Throttled");
 }
 
 void FlightLogManager::setupLogStatuses()
@@ -541,6 +550,9 @@ void FlightLogManager::connectionStatusChanged()
         setBoardConnected(utilMngr->getBoardModel() == 0x0903);
     } else {
         setBoardConnected(false);
+    }
+    if(boardConnected()) {
+        resetSettings(false);
     }
 }
 
@@ -623,9 +635,18 @@ void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVOb
 UAVOLogSettingsWrapper::UAVOLogSettingsWrapper() : QObject()
 {}
 
-UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVObject *object) : QObject(),
-    m_object(object), m_setting(DISABLED), m_period(0)
-{}
+UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVDataObject *object) : QObject(),
+    m_object(object), m_setting(DISABLED), m_period(0), m_dirty(0)
+{
+    reset(false);
+}
 
 UAVOLogSettingsWrapper::~UAVOLogSettingsWrapper()
 {}
+
+void UAVOLogSettingsWrapper::reset(bool clear)
+{
+    setSetting(clear ? 0 : m_object->GetLoggingUpdateMode(m_object->getMetadata()));
+    setPeriod(clear ? 0 : m_object->getMetadata().loggingUpdatePeriod);
+    setDirty(false);
+}

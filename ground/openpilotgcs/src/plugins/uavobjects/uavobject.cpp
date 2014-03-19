@@ -701,3 +701,23 @@ void UAVObject::SetGcsTelemetryUpdateMode(UAVObject::Metadata & metadata, UAVObj
 {
     SET_BITS(metadata.flags, UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
 }
+
+/**
+ * Get the UAVObject metadata logging update mode
+ * \param[in] metadata The metadata object
+ * \return the logging update mode
+ */
+UAVObject::UpdateMode UAVObject::GetLoggingUpdateMode(const UAVObject::Metadata & metadata)
+{
+    return UAVObject::UpdateMode((metadata.flags >> UAVOBJ_LOGGING_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK);
+}
+
+/**
+ * Set the UAVObject metadata logging update mode member
+ * \param[in] metadata The metadata object
+ * \param[in] val The logging update mode
+ */
+void UAVObject::SetLoggingUpdateMode(UAVObject::Metadata & metadata, UAVObject::UpdateMode val)
+{
+    SET_BITS(metadata.flags, UAVOBJ_LOGGING_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
+}

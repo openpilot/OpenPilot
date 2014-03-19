@@ -187,6 +187,7 @@ Rectangle {
                     ComboBox {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         model: logManager.logStatuses
+                        Layout.preferredWidth: 200
                         currentIndex: logSettings.loggingEnabled
                         onCurrentIndexChanged: {
                             logManager.setLoggingEnabled(currentIndex);
@@ -239,8 +240,9 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
                             elide: styleData.elideMode
-                            text: styleData.value !== undefined && (logManager.uavoEntries[styleData.row].setting > 1) ?
-                                      parseInt(logManager.uavoEntries[styleData.row].period) + " ms" : "-"
+                            text: styleData.value !== undefined &&
+                                  (logManager.uavoEntries[styleData.row].setting === 1 || logManager.uavoEntries[styleData.row].setting === 3) ?
+                                  parseInt(logManager.uavoEntries[styleData.row].period) + " ms" : "-"
                             color: styleData.textColor
                             //visible: !styleData.selected && (logManager.uavoEntries[styleData.row].setting <= 1)
                             enabled: (logManager.uavoEntries[styleData.row].setting > 1)
@@ -254,7 +256,8 @@ Rectangle {
                                     logManager.uavoEntries[styleData.row].period = loaderEditor.item.value
                                 }
                             }
-                            sourceComponent: styleData.selected && (logManager.uavoEntries[styleData.row].setting > 1) ? editor : null
+                            sourceComponent: styleData.selected &&
+                                             (logManager.uavoEntries[styleData.row].setting === 1 || logManager.uavoEntries[styleData.row].setting === 3) ? editor : null
                             Component {
                                 id: editor
                                 SpinBox {
@@ -292,6 +295,7 @@ Rectangle {
                             Text {
                                 verticalAlignment: Text.AlignVCenter
                                 anchors.leftMargin: 5
+                                color: logManager.uavoEntries[styleData.row].dirty ? "#f00" : "#000"
                                 text: styleData.value
                             }
 
@@ -331,7 +335,13 @@ Rectangle {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Reset")
                         activeFocusOnPress: true
-                        onClicked: logManager.resetSettings()
+                        onClicked: logManager.resetSettings(false)
+                    }
+                    Button {
+                        enabled: !logManager.disableControls && logManager.boardConnected
+                        text: qsTr("Clear")
+                        activeFocusOnPress: true
+                        onClicked: logManager.resetSettings(true)
                     }
                     Rectangle {
                         Layout.fillWidth: true

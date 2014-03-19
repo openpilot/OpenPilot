@@ -45,16 +45,17 @@
 
 class UAVOLogSettingsWrapper : public QObject {
     Q_OBJECT
-    Q_PROPERTY(UAVObject *object READ object NOTIFY objectChanged)
+    Q_PROPERTY(UAVDataObject *object READ object NOTIFY objectChanged)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(int setting READ setting WRITE setSetting NOTIFY settingChanged)
     Q_PROPERTY(int period READ period WRITE setPeriod NOTIFY periodChanged)
+    Q_PROPERTY(bool dirty READ dirty WRITE setDirty NOTIFY dirtyChanged)
 
 public:
     enum UAVLogSetting { DISABLED = 0, ON_CHANGE, THROTTLED, PERIODICALLY };
 
     explicit UAVOLogSettingsWrapper();
-    explicit UAVOLogSettingsWrapper(UAVObject *object);
+    explicit UAVOLogSettingsWrapper(UAVDataObject *object);
     ~UAVOLogSettingsWrapper();
 
     QString name() const
@@ -72,9 +73,14 @@ public:
         return m_period;
     }
 
-    UAVObject *object() const
+    UAVDataObject *object() const
     {
         return m_object;
+    }
+
+    bool dirty() const
+    {
+        return m_dirty;
     }
 
 public slots:
@@ -82,6 +88,7 @@ public slots:
     {
         if (m_setting != setting) {
             m_setting = setting;
+            setDirty(true);
             emit settingChanged(setting);
         }
     }
@@ -90,20 +97,34 @@ public slots:
     {
         if (m_period != arg) {
             m_period = arg;
+            setDirty(true);
             emit periodChanged(arg);
         }
     }
+
+    void setDirty(bool arg)
+    {
+        if (m_dirty != arg) {
+            m_dirty = arg;
+            emit dirtyChanged(arg);
+        }
+    }
+
+    void reset(bool clear);
 
 signals:
     void settingChanged(int setting);
     void nameChanged(QString name);
     void periodChanged(int period);    
-    void objectChanged(UAVObject * arg);
+    void objectChanged(UAVDataObject * arg);
+
+    void dirtyChanged(bool arg);
 
 private:
-    UAVObject *m_object;
+    UAVDataObject *m_object;
     int m_setting;
     int m_period;
+    bool m_dirty;
 };
 
 class ExtendedDebugLogEntry : public DebugLogEntry {
@@ -225,7 +246,6 @@ signals:
     void boardConnectedChanged(bool arg);
 
     void logStatusesChanged(QStringList arg);
-
     void loggingEnabledChanged(int arg);
 
 public slots:
@@ -235,7 +255,7 @@ public slots:
     void cancelExportLogs();
     void loadSettings();
     void saveSettings();
-    void resetSettings();
+    void resetSettings(bool clear);
     void applySettingsToBoard();
     void saveSettingsToBoard();
 

@@ -151,6 +151,8 @@ public:
     static void SetFlightTelemetryUpdateMode(Metadata & meta, UpdateMode val);
     static UpdateMode GetGcsTelemetryUpdateMode(const Metadata & meta);
     static void SetGcsTelemetryUpdateMode(Metadata & meta, UpdateMode val);
+    static UpdateMode GetLoggingUpdateMode(const Metadata & meta);
+    static void SetLoggingUpdateMode(Metadata & meta, UpdateMode val);
 
 public slots:
     void requestUpdate();

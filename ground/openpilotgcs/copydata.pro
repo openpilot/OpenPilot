@@ -139,7 +139,6 @@ GCS_LIBRARY_PATH
                   Qt5MultimediaWidgets$${DS}.dll \
                   Qt5Quick$${DS}.dll \
                   Qt5Qml$${DS}.dll \
-                  Qt5V8$${DS}.dll \
                   icuin51.dll \
                   icudt51.dll \
                   icuuc51.dll

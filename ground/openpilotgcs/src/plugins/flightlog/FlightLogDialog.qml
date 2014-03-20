@@ -206,7 +206,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             elide: styleData.elideMode
                             text: styleData.value !== undefined ? logManager.logSettings[styleData.value] : ""
-                            color: styleData.textColor
+                            color: logManager.uavoEntries[styleData.row].dirty ? "#f00" : styleData.textColor
                             visible: !styleData.selected
                         }
                         Loader {
@@ -243,7 +243,7 @@ Rectangle {
                             text: styleData.value !== undefined &&
                                   (logManager.uavoEntries[styleData.row].setting === 1 || logManager.uavoEntries[styleData.row].setting === 3) ?
                                   parseInt(logManager.uavoEntries[styleData.row].period) + " ms" : "-"
-                            color: styleData.textColor
+                            color: logManager.uavoEntries[styleData.row].dirty ? "#f00" : styleData.textColor
                             //visible: !styleData.selected && (logManager.uavoEntries[styleData.row].setting <= 1)
                             enabled: (logManager.uavoEntries[styleData.row].setting > 1)
                         }
@@ -295,7 +295,7 @@ Rectangle {
                             Text {
                                 verticalAlignment: Text.AlignVCenter
                                 anchors.leftMargin: 5
-                                color: logManager.uavoEntries[styleData.row].dirty ? "#f00" : "#000"
+                                color: logManager.uavoEntries[styleData.row].dirty ? "#f00" : styleData.textColor
                                 text: styleData.value
                             }
 
@@ -322,24 +322,28 @@ Rectangle {
                     Button {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Load...")
+                        tooltip: qsTr("Loads settings for all objects from a file.")
                         activeFocusOnPress: true
                         onClicked: logManager.loadSettings()
                     }
                     Button {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Save...")
+                        tooltip: qsTr("Saves settings for all objects in a file.")
                         activeFocusOnPress: true
                         onClicked: logManager.saveSettings()
                     }
                     Button {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Reset")
+                        tooltip: qsTr("Resets all settings to the values currently set on the board.")
                         activeFocusOnPress: true
                         onClicked: logManager.resetSettings(false)
                     }
                     Button {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Clear")
+                        tooltip: qsTr("Clears all settings to default values.")
                         activeFocusOnPress: true
                         onClicked: logManager.resetSettings(true)
                     }
@@ -349,6 +353,7 @@ Rectangle {
                     Button {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         text: qsTr("Save to board")
+                        tooltip: qsTr("Saves the logging configurations to the boards flash memory.")
                         activeFocusOnPress: true
                         onClicked: logManager.saveSettingsToBoard()
                     }

@@ -32,6 +32,9 @@ AbstractUAVObjectHelper::AbstractUAVObjectHelper(QObject *parent) :
     QObject(parent), m_transactionResult(false), m_transactionCompleted(false)
 {}
 
+AbstractUAVObjectHelper::~AbstractUAVObjectHelper()
+{}
+
 AbstractUAVObjectHelper::Result AbstractUAVObjectHelper::doObjectAndWait(UAVObject *object, int timeout)
 {
     // Lock, we can't call this twice from different threads
@@ -86,12 +89,18 @@ void AbstractUAVObjectHelper::transactionCompleted(UAVObject *object, bool succe
 UAVObjectUpdaterHelper::UAVObjectUpdaterHelper(QObject *parent) : AbstractUAVObjectHelper(parent)
 {}
 
+UAVObjectUpdaterHelper::~UAVObjectUpdaterHelper()
+{}
+
 void UAVObjectUpdaterHelper::doObjectAndWaitImpl()
 {
     m_object->updated();
 }
 
 UAVObjectRequestHelper::UAVObjectRequestHelper(QObject *parent) : AbstractUAVObjectHelper(parent)
+{}
+
+UAVObjectRequestHelper::~UAVObjectRequestHelper()
 {}
 
 void UAVObjectRequestHelper::doObjectAndWaitImpl()

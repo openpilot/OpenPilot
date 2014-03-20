@@ -188,7 +188,7 @@ Rectangle {
                         enabled: !logManager.disableControls && logManager.boardConnected
                         model: logManager.logStatuses
                         Layout.preferredWidth: 200
-                        currentIndex: logSettings.loggingEnabled
+                        currentIndex: logManager.loggingEnabled
                         onCurrentIndexChanged: {
                             logManager.setLoggingEnabled(currentIndex);
                         }
@@ -345,12 +345,6 @@ Rectangle {
                     }
                     Rectangle {
                         Layout.fillWidth: true
-                    }
-                    Button {
-                        enabled: !logManager.disableControls && logManager.boardConnected
-                        text: qsTr("Apply to board")
-                        activeFocusOnPress: true
-                        onClicked: logManager.applySettingsToBoard()
                     }
                     Button {
                         enabled: !logManager.disableControls && logManager.boardConnected

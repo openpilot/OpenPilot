@@ -41,6 +41,7 @@
 #include "debuglogstatus.h"
 #include "debuglogsettings.h"
 #include "debuglogcontrol.h"
+#include "objectpersistence.h"
 #include "uavtalk/telemetrymanager.h"
 
 class UAVOLogSettingsWrapper : public QObject {
@@ -55,7 +56,7 @@ public:
     enum UAVLogSetting { DISABLED = 0, ON_CHANGE, THROTTLED, PERIODICALLY };
 
     explicit UAVOLogSettingsWrapper();
-    explicit UAVOLogSettingsWrapper(UAVDataObject *object);
+    explicit UAVOLogSettingsWrapper(UAVDataObject *object, ObjectPersistence *persistence);
     ~UAVOLogSettingsWrapper();
 
     QString name() const
@@ -87,8 +88,11 @@ public slots:
     void setSetting(int setting)
     {
         if (m_setting != setting) {
-            m_setting = setting;
+            m_setting = setting;            
             setDirty(true);
+            if (m_setting != 1 && m_setting != 3) {
+                setPeriod(0);
+            }
             emit settingChanged(setting);
         }
     }
@@ -111,6 +115,8 @@ public slots:
     }
 
     void reset(bool clear);
+    void save();
+    void apply();
 
 signals:
     void settingChanged(int setting);
@@ -125,6 +131,9 @@ private:
     int m_setting;
     int m_period;
     bool m_dirty;
+    ObjectPersistence *m_objectPersistence;
+
+    UAVObject::UpdateMode settingAsUpdateMode();
 };
 
 class ExtendedDebugLogEntry : public DebugLogEntry {
@@ -256,7 +265,6 @@ public slots:
     void loadSettings();
     void saveSettings();
     void resetSettings(bool clear);
-    void applySettingsToBoard();
     void saveSettingsToBoard();
 
     void setDisableControls(bool arg)

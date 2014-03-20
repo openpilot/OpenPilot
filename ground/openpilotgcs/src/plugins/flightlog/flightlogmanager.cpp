@@ -50,10 +50,10 @@ FlightLogManager::FlightLogManager(QObject *parent) :
 
     Q_ASSERT(pluginManager);
 
-    m_objectManager   = pluginManager->getObject<UAVObjectManager>();
+    m_objectManager    = pluginManager->getObject<UAVObjectManager>();
     Q_ASSERT(m_objectManager);
 
-    m_telemtryManager = pluginManager->getObject<TelemetryManager>();
+    m_telemtryManager  = pluginManager->getObject<TelemetryManager>();
     Q_ASSERT(m_telemtryManager);
 
     m_flightLogControl = DebugLogControl::GetInstance(m_objectManager);
@@ -77,6 +77,7 @@ FlightLogManager::FlightLogManager(QObject *parent) :
 
     connect(m_telemtryManager, SIGNAL(connected()), this, SLOT(connectionStatusChanged()));
     connect(m_telemtryManager, SIGNAL(disconnected()), this, SLOT(connectionStatusChanged()));
+    connectionStatusChanged();
 }
 
 FlightLogManager::~FlightLogManager()
@@ -387,7 +388,8 @@ void FlightLogManager::cancelExportLogs()
 void FlightLogManager::loadSettings()
 {
     QString xmlFilter = tr("XML file %1").arg("(*.xml)");
-    QString fileName = QFileDialog::getOpenFileName(NULL, tr("Load Log Settings"), QDir::homePath(), QString("%1").arg(xmlFilter));
+    QString fileName  = QFileDialog::getOpenFileName(NULL, tr("Load Log Settings"), QDir::homePath(), QString("%1").arg(xmlFilter));
+
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(".xml")) {
             fileName.append(".xml");
@@ -414,11 +416,10 @@ void FlightLogManager::loadSettings()
                 while (xmlReader.readNextStartElement()) {
                     if (xmlReader.name() == "setting") {
                         QString name = xmlReader.attributes().value("name").toString();
-                        int level = xmlReader.attributes().value("level").toInt(&ok);
+                        int level    = xmlReader.attributes().value("level").toInt(&ok);
                         if (ok) {
                             int period = xmlReader.attributes().value("period").toInt(&ok);
-                            if (ok && updateLogWrapper(name, level, period)) {
-                            } else {
+                            if (ok && updateLogWrapper(name, level, period)) {} else {
                                 errorString = tr("Could not parse period attribute, or object with name '%1' could not be found.").arg(name);
                                 break;
                             }
@@ -445,8 +446,9 @@ void FlightLogManager::loadSettings()
 void FlightLogManager::saveSettings()
 {
     QString xmlFilter = tr("XML file %1").arg("(*.xml)");
-    QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log Settings"),
-                                                    QDir::homePath(), QString("%1").arg(xmlFilter));
+    QString fileName  = QFileDialog::getSaveFileName(NULL, tr("Save Log Settings"),
+                                                     QDir::homePath(), QString("%1").arg(xmlFilter));
+
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(".xml")) {
             fileName.append(".xml");
@@ -486,11 +488,12 @@ void FlightLogManager::resetSettings(bool clear)
     }
 }
 
-void FlightLogManager::applySettingsToBoard()
-{}
-
 void FlightLogManager::saveSettingsToBoard()
-{}
+{
+    foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
+        wrapper->save();
+    }
+}
 
 void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 {
@@ -511,14 +514,16 @@ void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 
 void FlightLogManager::setupUAVOWrappers()
 {
+    ObjectPersistence *objectPersistance = ObjectPersistence::GetInstance(m_objectManager);
+    Q_ASSERT(objectPersistance);
+
     foreach(QList<UAVObject *> objectList, m_objectManager->getObjects()) {
         UAVObject *object = objectList.at(0);
 
         if (!object->isMetaDataObject() && !object->isSettingsObject()) {
-            UAVOLogSettingsWrapper *wrapper = new UAVOLogSettingsWrapper(qobject_cast<UAVDataObject*>(object));
+            UAVOLogSettingsWrapper *wrapper = new UAVOLogSettingsWrapper(qobject_cast<UAVDataObject *>(object), objectPersistance);
             m_uavoEntries.append(wrapper);
             m_uavoEntriesHash[wrapper->name()] = wrapper;
-            qDebug() << objectList.at(0)->getName();
         }
     }
     emit uavoEntriesChanged();
@@ -527,12 +532,12 @@ void FlightLogManager::setupUAVOWrappers()
 void FlightLogManager::setupLogSettings()
 {
     // Corresponds to:
-    //    typedef enum {
-    //        UPDATEMODE_MANUAL    = 0,  /** Manually update object, by calling the updated() function */
-    //        UPDATEMODE_PERIODIC  = 1, /** Automatically update object at periodic intervals */
-    //        UPDATEMODE_ONCHANGE  = 2, /** Only update object when its data changes */
-    //        UPDATEMODE_THROTTLED = 3 /** Object is updated on change, but not more often than the interval time */
-    //    } UpdateMode;
+    // typedef enum {
+    // UPDATEMODE_MANUAL    = 0,  /** Manually update object, by calling the updated() function */
+    // UPDATEMODE_PERIODIC  = 1, /** Automatically update object at periodic intervals */
+    // UPDATEMODE_ONCHANGE  = 2, /** Only update object when its data changes */
+    // UPDATEMODE_THROTTLED = 3 /** Object is updated on change, but not more often than the interval time */
+    // } UpdateMode;
 
     m_logSettings << tr("Disabled") << tr("Periodically") << tr("When updated") << tr("Throttled");
 }
@@ -551,7 +556,7 @@ void FlightLogManager::connectionStatusChanged()
     } else {
         setBoardConnected(false);
     }
-    if(boardConnected()) {
+    if (boardConnected()) {
         resetSettings(false);
     }
 }
@@ -559,6 +564,7 @@ void FlightLogManager::connectionStatusChanged()
 bool FlightLogManager::updateLogWrapper(QString name, int level, int period)
 {
     UAVOLogSettingsWrapper *wrapper = m_uavoEntriesHash[name];
+
     if (wrapper) {
         wrapper->setSetting(level);
         wrapper->setPeriod(period);
@@ -635,8 +641,8 @@ void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVOb
 UAVOLogSettingsWrapper::UAVOLogSettingsWrapper() : QObject()
 {}
 
-UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVDataObject *object) : QObject(),
-    m_object(object), m_setting(DISABLED), m_period(0), m_dirty(0)
+UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVDataObject *object, ObjectPersistence *persistence) : QObject(),
+    m_object(object), m_setting(DISABLED), m_period(0), m_dirty(0), m_objectPersistence(persistence)
 {
     reset(false);
 }
@@ -649,4 +655,48 @@ void UAVOLogSettingsWrapper::reset(bool clear)
     setSetting(clear ? 0 : m_object->GetLoggingUpdateMode(m_object->getMetadata()));
     setPeriod(clear ? 0 : m_object->getMetadata().loggingUpdatePeriod);
     setDirty(false);
+}
+
+void UAVOLogSettingsWrapper::save()
+{
+    if(m_dirty) {
+        UAVObject::Metadata meta = m_object->getMetadata();
+        m_object->SetLoggingUpdateMode(meta, settingAsUpdateMode());
+        meta.loggingUpdatePeriod = m_period;
+        m_object->setMetadata(meta);
+
+        UAVObjectUpdaterHelper helper;
+        if (helper.doObjectAndWait(m_object->getMetaObject(), 1000) == UAVObjectUpdaterHelper::SUCCESS) {
+            ObjectPersistence::DataFields data;
+            data.Operation  = ObjectPersistence::OPERATION_SAVE;
+            data.Selection  = ObjectPersistence::SELECTION_SINGLEOBJECT;
+            data.ObjectID   = m_object->getMetaObject()->getObjID();
+            data.InstanceID = m_object->getMetaObject()->getInstID();
+            m_objectPersistence->setData(data);
+
+            if (helper.doObjectAndWait(m_objectPersistence, 1000) == UAVObjectUpdaterHelper::SUCCESS) {
+                setDirty(false);
+            } else {
+                qDebug() << "Storing failed!";
+            }
+        } else {
+            qDebug() << "Updating failed!";
+        }
+    }
+}
+
+UAVObject::UpdateMode UAVOLogSettingsWrapper::settingAsUpdateMode()
+{
+    switch (m_setting) {
+    case 0:
+        return UAVObject::UPDATEMODE_MANUAL;
+    case 1:
+        return UAVObject::UPDATEMODE_PERIODIC;
+    case 2:
+        return UAVObject::UPDATEMODE_ONCHANGE;
+    case 3:
+        return UAVObject::UPDATEMODE_THROTTLED;
+    default:
+        return UAVObject::UPDATEMODE_MANUAL;
+    }
 }

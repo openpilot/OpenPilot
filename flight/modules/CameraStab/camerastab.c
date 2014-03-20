@@ -128,6 +128,7 @@ int32_t CameraStabInitialize(void)
             .obj    = AttitudeStateHandle(),
             .instId = 0,
             .event  = 0,
+            .lowPriority = false,
         };
         EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 

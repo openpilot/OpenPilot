@@ -54,8 +54,8 @@ private:
     // Milliseconds between automatic 'Instant Updates'
     static const int AUTOMATIC_UPDATE_RATE = 500;
 
-    int m_pidBankCount;
     int boardModel;
+    int m_pidBankCount;
     int m_currentPIDBank;
 protected:
     QString mapObjectName(const QString objectName);

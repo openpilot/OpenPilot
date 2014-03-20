@@ -24133,7 +24133,7 @@ border-radius: 5;</string>
             </spacer>
            </item>
            <item>
-            <widget class="QGroupBox" name="gridGroupBox">
+            <widget class="QGroupBox" name="gridGroupBox_1">
              <property name="title">
               <string>Cruise Control</string>
              </property>
@@ -24195,7 +24195,7 @@ border-radius: 5;</string>
                  <item row="1" column="4">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrottle) when inverted.  1 says to use the unboosted throttle stick value.  -1 (DON'T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the throttle stick when inverted.
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle/collective stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrust) when inverted.  1 says to use the unboosted stick value.  -1 (DON'T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the collective stick when inverted.
 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
@@ -24271,7 +24271,7 @@ border-radius: 5;</string>
                  <item row="1" column="1">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle/collective stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24492,7 +24492,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>MinThrottle</string>
+                    <string>MinThrust</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -24502,7 +24502,7 @@ border-radius: 5;</string>
                  <item row="1" column="3">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle stick below this disables Cruise Control.  Also, by default Cruise Control forces the use of this value for throttle when the copter is inverted.  For safety, never set this so low that the trimmed throttle stick cannot get below it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle/Collective stick below this disables Cruise Control.  Also, by default Cruise Control forces the use of this value for thrust when the copter is inverted.  For safety, never set this so low that the trimmed throttle/collective stick cannot get below it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24519,7 +24519,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlMinThrottle</string>
+                     <string>fieldname:CruiseControlMinThrust</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
@@ -24580,7 +24580,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlMaxThrottle</string>
+                     <string>fieldname:CruiseControlMaxThrust</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
@@ -24614,7 +24614,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>MaxThrottle</string>
+                    <string>MaxThrust</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -26711,7 +26711,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:ThrottleRate</string>
+                     <string>fieldname:ThrustRate</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:99</string>
@@ -26784,7 +26784,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle exponential value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thrust exponential value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -26807,7 +26807,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:ThrottleExp</string>
+                     <string>fieldname:ThrustExp</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:99,10</string>
@@ -26881,7 +26881,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:ThrottleRate</string>
+                     <string>fieldname:ThrustRate</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:99,10</string>
@@ -26906,7 +26906,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:ThrottleExp</string>
+                     <string>fieldname:ThrustExp</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:99</string>
@@ -27457,7 +27457,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>Throttle Stick Response</string>
+                    <string>Throttle/Collective Stick Response</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>

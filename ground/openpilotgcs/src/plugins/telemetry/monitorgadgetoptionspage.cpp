@@ -32,7 +32,9 @@
 
 MonitorGadgetOptionsPage::MonitorGadgetOptionsPage(MonitorGadgetConfiguration *config, QObject *parent)
     : IOptionsPage(parent)
-{}
+{
+    Q_UNUSED(config);
+}
 
 MonitorGadgetOptionsPage::~MonitorGadgetOptionsPage()
 {}

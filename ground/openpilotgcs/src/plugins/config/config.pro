@@ -2,10 +2,15 @@ TEMPLATE = lib
 TARGET = Config
 DEFINES += CONFIG_LIBRARY
 QT += svg
+QT += opengl
+QT += qml quick
+
 include(config_dependencies.pri)
+
 INCLUDEPATH += ../../libs/eigen
 
-OTHER_FILES += Config.pluginspec
+OTHER_FILES += Config.pluginspec \
+    calibration/WizardStepIndicator.qml
 
 HEADERS += configplugin.h \
     configgadgetwidget.h \
@@ -36,7 +41,17 @@ HEADERS += configplugin.h \
     config_global.h \
     mixercurve.h \
     dblspindelegate.h \
-    configrevohwwidget.h
+    configrevohwwidget.h \
+    calibration/calibrationutils.h \
+    calibration/wizardstate.h \
+    calibration/wizardmodel.h \
+    calibration/thermal/thermalcalibration.h \
+    calibration/thermal/thermalcalibrationhelper.h \
+    calibration/thermal/thermalcalibrationmodel.h \
+    calibration/thermal/boardsetuptransition.h \
+    calibration/thermal/dataacquisitiontransition.h \
+    calibration/thermal/settingshandlingtransitions.h \
+    calibration/thermal/compensationcalculationtransition.h
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \
@@ -50,7 +65,6 @@ SOURCES += configplugin.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
     configpipxtremewidget.cpp \
-    legacy-calibration.cpp \
     defaultattitudewidget.cpp \
     defaulthwsettingswidget.cpp \
     inputchannelform.cpp \
@@ -66,7 +80,13 @@ SOURCES += configplugin.cpp \
     outputchannelform.cpp \
     mixercurve.cpp \
     dblspindelegate.cpp \
-    configrevohwwidget.cpp
+    configrevohwwidget.cpp \
+    calibration/calibrationutils.cpp \
+    calibration/wizardstate.cpp \
+    calibration/wizardmodel.cpp \
+    calibration/thermal/thermalcalibration.cpp \
+    calibration/thermal/thermalcalibrationhelper.cpp \
+    calibration/thermal/thermalcalibrationmodel.cpp
 
 FORMS += airframe.ui \
     airframe_ccpm.ui \

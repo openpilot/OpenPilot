@@ -410,14 +410,10 @@ void Simulator::updateUAVOs(Output2Hardware out)
         homeData.Latitude  = out.latitude;   // Already in *10^7 integer format
         homeData.Longitude = out.longitude; // Already in *10^7 integer format
         homeData.Altitude  = out.agl;
-        double LLA[3];
-        LLA[0] = out.latitude;
-        LLA[1] = out.longitude;
-        LLA[2] = out.altitude;
 
-        homeData.Be[0] = 0;
-        homeData.Be[1] = 0;
-        homeData.Be[2] = 0;
+        homeData.Be[0]     = 0;
+        homeData.Be[1]     = 0;
+        homeData.Be[2]     = 0;
         posHome->setData(homeData);
         posHome->updated();
 
@@ -498,13 +494,13 @@ void Simulator::updateUAVOs(Output2Hardware out)
 
         AttitudeSettings::DataFields attSettData = attSettings->getData();
         float accelKp     = attSettData.AccelKp * 0.1666666666666667;
-        float accelKi     = attSettData.AccelKp * 0.1666666666666667;
+        // float accelKi     = attSettData.AccelKp * 0.1666666666666667;
         float yawBiasRate = attSettData.YawBiasRate;
 
         // calibrate sensors on arming
         if (flightStatus->getData().Armed == FlightStatus::ARMED_ARMING) {
             accelKp = 2.0;
-            accelKi = 0.9;
+            // accelKi = 0.9;
         }
 
         float gyro[3] = { out.rollRate, out.pitchRate, out.yawRate };

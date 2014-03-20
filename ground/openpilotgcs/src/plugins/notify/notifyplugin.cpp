@@ -351,13 +351,6 @@ void SoundNotifyPlugin::stateChanged(QMediaPlayer::State newstate)
             playNotification(notification);
             qNotifyDebug() << "end playNotification";
         }
-    } else {
-        if (newstate == QMediaPlayer::ServiceMissingError) {
-            if (phonon.mo->error() == 0) {
-                qDebug() << "Phonon::ErrorState: ErrorType = " << phonon.mo->error();
-                phonon.mo->stop();
-            }
-        }
     }
 }
 

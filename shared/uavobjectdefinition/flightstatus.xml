@@ -6,6 +6,14 @@
 	<!-- Note these enumerated values should be the same as ManualControlSettings -->
         <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,AltitudeHold,AltitudeVario,VelocityControl,PositionHold,ReturnToBase,Land,PathPlanner,POI"/>
 
+	<field name="ControlChain" units="bool" type="enum" options="false,true">
+		<elementnames>
+			<elementname>Stabilization</elementname>
+			<elementname>PathFollower</elementname>
+			<elementname>PathPlanner</elementname>
+		</elementnames>
+	</field>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="onchange" period="5000"/>

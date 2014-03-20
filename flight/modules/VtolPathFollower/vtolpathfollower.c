@@ -55,7 +55,7 @@
 #include "hwsettings.h"
 #include "pathdesired.h" // object that will be updated by the module
 #include "positionstate.h"
-#include "manualcontrol.h"
+#include "manualcontrolcommand.h"
 #include "flightstatus.h"
 #include "pathstatus.h"
 #include "gpsvelocitysensor.h"
@@ -158,7 +158,7 @@ static float northPosIntegral = 0;
 static float eastPosIntegral  = 0;
 static float downPosIntegral  = 0;
 
-static float throttleOffset   = 0;
+static float thrustOffset     = 0;
 /**
  * Module thread, should not return.
  */
@@ -206,55 +206,53 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
         PathDesiredGet(&pathDesired);
 
         // Check the combinations of flightmode and pathdesired mode
-        switch (flightStatus.FlightMode) {
-        case FLIGHTSTATUS_FLIGHTMODE_LAND:
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-        case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-            if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
-                updateEndpointVelocity();
-                updateVtolDesiredAttitude(false);
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+        if (flightStatus.ControlChain.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+            if (flightStatus.ControlChain.PathPlanner == FLIGHTSTATUS_CONTROLCHAIN_FALSE) {
+                if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POI) {
+                    if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
+                        updateEndpointVelocity();
+                        updateVtolDesiredAttitude(true);
+                        updatePOIBearing();
+                    } else {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    }
+                } else {
+                    if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
+                        updateEndpointVelocity();
+                        updateVtolDesiredAttitude(false);
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    } else {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    }
+                }
             } else {
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                pathStatus.UID    = pathDesired.UID;
+                pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
+                switch (pathDesired.Mode) {
+                // TODO: Make updateVtolDesiredAttitude and velocity report success and update PATHSTATUS_STATUS accordingly
+                case PATHDESIRED_MODE_FLYENDPOINT:
+                case PATHDESIRED_MODE_FLYVECTOR:
+                case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+                case PATHDESIRED_MODE_FLYCIRCLELEFT:
+                    updatePathVelocity();
+                    updateVtolDesiredAttitude(false);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    break;
+                case PATHDESIRED_MODE_FIXEDATTITUDE:
+                    updateFixedAttitude(pathDesired.ModeParameters);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    break;
+                case PATHDESIRED_MODE_DISARMALARM:
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
+                    break;
+                default:
+                    pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    break;
+                }
+                PathStatusSet(&pathStatus);
             }
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
-            pathStatus.UID    = pathDesired.UID;
-            pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
-            switch (pathDesired.Mode) {
-            // TODO: Make updateVtolDesiredAttitude and velocity report success and update PATHSTATUS_STATUS accordingly
-            case PATHDESIRED_MODE_FLYENDPOINT:
-            case PATHDESIRED_MODE_FLYVECTOR:
-            case PATHDESIRED_MODE_FLYCIRCLERIGHT:
-            case PATHDESIRED_MODE_FLYCIRCLELEFT:
-                updatePathVelocity();
-                updateVtolDesiredAttitude(false);
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
-                break;
-            case PATHDESIRED_MODE_FIXEDATTITUDE:
-                updateFixedAttitude(pathDesired.ModeParameters);
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
-                break;
-            case PATHDESIRED_MODE_DISARMALARM:
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
-                break;
-            default:
-                pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
-                break;
-            }
-            PathStatusSet(&pathStatus);
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_POI:
-            if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
-                updateEndpointVelocity();
-                updateVtolDesiredAttitude(true);
-                updatePOIBearing();
-            } else {
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
-            }
-            break;
-        default:
+        } else {
             // Be cleaner and get rid of global variables
             northVelIntegral = 0;
             eastVelIntegral  = 0;
@@ -263,12 +261,10 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
             eastPosIntegral  = 0;
             downPosIntegral  = 0;
 
-            // Track throttle before engaging this mode.  Cheap system ident
+            // Track thrust before engaging this mode.  Cheap system ident
             StabilizationDesiredData stabDesired;
             StabilizationDesiredGet(&stabDesired);
-            throttleOffset = stabDesired.Throttle;
-
-            break;
+            thrustOffset = stabDesired.Thrust;
         }
 
         AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
@@ -550,10 +546,10 @@ static void updateFixedAttitude(float *attitude)
     StabilizationDesiredData stabDesired;
 
     StabilizationDesiredGet(&stabDesired);
-    stabDesired.Roll     = attitude[0];
-    stabDesired.Pitch    = attitude[1];
-    stabDesired.Yaw      = attitude[2];
-    stabDesired.Throttle = attitude[3];
+    stabDesired.Roll   = attitude[0];
+    stabDesired.Pitch  = attitude[1];
+    stabDesired.Yaw    = attitude[2];
+    stabDesired.Thrust = attitude[3];
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
@@ -653,13 +649,13 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
     downError = velocityDesired.Down - downVel;
     // Must flip this sign
     downError = -downError;
-    downVelIntegral = bound(downVelIntegral + downError * dT * vtolpathfollowerSettings.VerticalVelPID.Ki,
-                            -vtolpathfollowerSettings.VerticalVelPID.ILimit,
-                            vtolpathfollowerSettings.VerticalVelPID.ILimit);
-    downCommand     = (downError * vtolpathfollowerSettings.VerticalVelPID.Kp + downVelIntegral
-                       - nedAccel.Down * vtolpathfollowerSettings.VerticalVelPID.Kd);
+    downVelIntegral    = bound(downVelIntegral + downError * dT * vtolpathfollowerSettings.VerticalVelPID.Ki,
+                               -vtolpathfollowerSettings.VerticalVelPID.ILimit,
+                               vtolpathfollowerSettings.VerticalVelPID.ILimit);
+    downCommand        = (downError * vtolpathfollowerSettings.VerticalVelPID.Kp + downVelIntegral
+                          - nedAccel.Down * vtolpathfollowerSettings.VerticalVelPID.Kd);
 
-    stabDesired.Throttle = bound(downCommand + throttleOffset, 0, 1);
+    stabDesired.Thrust = bound(downCommand + thrustOffset, 0, 1);
 
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
     // craft should move similarly for 5 deg roll versus 5 deg pitch
@@ -670,11 +666,11 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
                               eastCommand * cosf(DEG2RAD(attitudeState.Yaw)),
                               -vtolpathfollowerSettings.MaxRollPitch, vtolpathfollowerSettings.MaxRollPitch);
 
-    if (vtolpathfollowerSettings.ThrottleControl == VTOLPATHFOLLOWERSETTINGS_THROTTLECONTROL_FALSE) {
-        // For now override throttle with manual control.  Disable at your risk, quad goes to China.
+    if (vtolpathfollowerSettings.ThrustControl == VTOLPATHFOLLOWERSETTINGS_THRUSTCONTROL_FALSE) {
+        // For now override thrust with manual control.  Disable at your risk, quad goes to China.
         ManualControlCommandData manualControl;
         ManualControlCommandGet(&manualControl);
-        stabDesired.Throttle = manualControl.Throttle;
+        stabDesired.Thrust = manualControl.Thrust;
     }
 
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

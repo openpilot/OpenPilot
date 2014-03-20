@@ -105,7 +105,7 @@ void LogFile::timerFired()
         // TODO: going back in time will be a problem
         while ((m_lastPlayed + ((time - m_timeOffset) * m_playbackSpeed) > m_lastTimeStamp)) {
             m_lastPlayed += ((time - m_timeOffset) * m_playbackSpeed);
-            if (m_file.bytesAvailable() < sizeof(dataSize)) {
+            if (m_file.bytesAvailable() < (qint64)sizeof(dataSize)) {
                 stopReplay();
                 return;
             }
@@ -129,7 +129,7 @@ void LogFile::timerFired()
 
             emit readyRead();
 
-            if (m_file.bytesAvailable() < sizeof(m_lastTimeStamp)) {
+            if (m_file.bytesAvailable() < (qint64)sizeof(m_lastTimeStamp)) {
                 stopReplay();
                 return;
             }

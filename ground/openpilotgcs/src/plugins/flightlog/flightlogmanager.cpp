@@ -69,6 +69,9 @@ FlightLogManager::FlightLogManager(QObject *parent) :
     m_flightLogSettings = DebugLogSettings::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogSettings);
 
+    m_objectPersistence = ObjectPersistence::GetInstance(m_objectManager);
+    Q_ASSERT(m_objectPersistence);
+
     updateFlightEntries(m_flightLogStatus->getFlight());
 
     setupLogSettings();
@@ -490,9 +493,38 @@ void FlightLogManager::resetSettings(bool clear)
 
 void FlightLogManager::saveSettingsToBoard()
 {
+
+    m_flightLogSettings->setLoggingEnabled(m_loggingEnabled);
+    saveUAVObjectToFlash(m_flightLogSettings);
+
     foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
-        wrapper->save();
+        if (wrapper->dirty()) {
+            UAVObject::Metadata meta = wrapper->object()->getMetadata();
+            wrapper->object()->SetLoggingUpdateMode(meta, wrapper->settingAsUpdateMode());
+            meta.loggingUpdatePeriod = wrapper->period();
+            wrapper->object()->setMetadata(meta);
+
+            if (saveUAVObjectToFlash(wrapper->object()->getMetaObject())) {
+                wrapper->setDirty(false);
+            }
+        }
     }
+}
+
+bool FlightLogManager::saveUAVObjectToFlash(UAVObject *object)
+{
+    UAVObjectUpdaterHelper helper;
+    if (helper.doObjectAndWait(object, 3000) == UAVObjectUpdaterHelper::SUCCESS) {
+        ObjectPersistence::DataFields data;
+        data.Operation  = ObjectPersistence::OPERATION_SAVE;
+        data.Selection  = ObjectPersistence::SELECTION_SINGLEOBJECT;
+        data.ObjectID   = object->getObjID();
+        data.InstanceID = object->getInstID();
+        m_objectPersistence->setData(data);
+
+        return (helper.doObjectAndWait(m_objectPersistence, 3000) == UAVObjectUpdaterHelper::SUCCESS);
+    }
+    return false;
 }
 
 void FlightLogManager::updateFlightEntries(quint16 currentFlight)
@@ -514,14 +546,10 @@ void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 
 void FlightLogManager::setupUAVOWrappers()
 {
-    ObjectPersistence *objectPersistance = ObjectPersistence::GetInstance(m_objectManager);
-    Q_ASSERT(objectPersistance);
-
     foreach(QList<UAVObject *> objectList, m_objectManager->getObjects()) {
         UAVObject *object = objectList.at(0);
-
         if (!object->isMetaDataObject() && !object->isSettingsObject()) {
-            UAVOLogSettingsWrapper *wrapper = new UAVOLogSettingsWrapper(qobject_cast<UAVDataObject *>(object), objectPersistance);
+            UAVOLogSettingsWrapper *wrapper = new UAVOLogSettingsWrapper(qobject_cast<UAVDataObject *>(object));
             m_uavoEntries.append(wrapper);
             m_uavoEntriesHash[wrapper->name()] = wrapper;
         }
@@ -641,8 +669,8 @@ void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVOb
 UAVOLogSettingsWrapper::UAVOLogSettingsWrapper() : QObject()
 {}
 
-UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVDataObject *object, ObjectPersistence *persistence) : QObject(),
-    m_object(object), m_setting(DISABLED), m_period(0), m_dirty(0), m_objectPersistence(persistence)
+UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVDataObject *object) : QObject(),
+    m_object(object), m_setting(DISABLED), m_period(0), m_dirty(0)
 {
     reset(false);
 }
@@ -655,34 +683,6 @@ void UAVOLogSettingsWrapper::reset(bool clear)
     setSetting(clear ? 0 : m_object->GetLoggingUpdateMode(m_object->getMetadata()));
     setPeriod(clear ? 0 : m_object->getMetadata().loggingUpdatePeriod);
     setDirty(false);
-}
-
-void UAVOLogSettingsWrapper::save()
-{
-    if(m_dirty) {
-        UAVObject::Metadata meta = m_object->getMetadata();
-        m_object->SetLoggingUpdateMode(meta, settingAsUpdateMode());
-        meta.loggingUpdatePeriod = m_period;
-        m_object->setMetadata(meta);
-
-        UAVObjectUpdaterHelper helper;
-        if (helper.doObjectAndWait(m_object->getMetaObject(), 1000) == UAVObjectUpdaterHelper::SUCCESS) {
-            ObjectPersistence::DataFields data;
-            data.Operation  = ObjectPersistence::OPERATION_SAVE;
-            data.Selection  = ObjectPersistence::SELECTION_SINGLEOBJECT;
-            data.ObjectID   = m_object->getMetaObject()->getObjID();
-            data.InstanceID = m_object->getMetaObject()->getInstID();
-            m_objectPersistence->setData(data);
-
-            if (helper.doObjectAndWait(m_objectPersistence, 1000) == UAVObjectUpdaterHelper::SUCCESS) {
-                setDirty(false);
-            } else {
-                qDebug() << "Storing failed!";
-            }
-        } else {
-            qDebug() << "Updating failed!";
-        }
-    }
 }
 
 UAVObject::UpdateMode UAVOLogSettingsWrapper::settingAsUpdateMode()

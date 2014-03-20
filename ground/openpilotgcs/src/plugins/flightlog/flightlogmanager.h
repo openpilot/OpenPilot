@@ -56,7 +56,7 @@ public:
     enum UAVLogSetting { DISABLED = 0, ON_CHANGE, THROTTLED, PERIODICALLY };
 
     explicit UAVOLogSettingsWrapper();
-    explicit UAVOLogSettingsWrapper(UAVDataObject *object, ObjectPersistence *persistence);
+    explicit UAVOLogSettingsWrapper(UAVDataObject *object);
     ~UAVOLogSettingsWrapper();
 
     QString name() const
@@ -68,6 +68,8 @@ public:
     {
         return m_setting;
     }
+
+    UAVObject::UpdateMode settingAsUpdateMode();
 
     int period() const
     {
@@ -115,8 +117,6 @@ public slots:
     }
 
     void reset(bool clear);
-    void save();
-    void apply();
 
 signals:
     void settingChanged(int setting);
@@ -131,9 +131,7 @@ private:
     int m_setting;
     int m_period;
     bool m_dirty;
-    ObjectPersistence *m_objectPersistence;
 
-    UAVObject::UpdateMode settingAsUpdateMode();
 };
 
 class ExtendedDebugLogEntry : public DebugLogEntry {
@@ -266,6 +264,7 @@ public slots:
     void saveSettings();
     void resetSettings(bool clear);
     void saveSettingsToBoard();
+    bool saveUAVObjectToFlash(UAVObject *object);
 
     void setDisableControls(bool arg)
     {
@@ -322,6 +321,7 @@ private:
     DebugLogStatus *m_flightLogStatus;
     DebugLogEntry *m_flightLogEntry;
     DebugLogSettings *m_flightLogSettings;
+    ObjectPersistence *m_objectPersistence;
 
     QList<ExtendedDebugLogEntry *> m_logEntries;
     QStringList m_flightEntries;

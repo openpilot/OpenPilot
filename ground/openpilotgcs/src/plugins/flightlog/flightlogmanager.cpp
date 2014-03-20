@@ -50,19 +50,19 @@ FlightLogManager::FlightLogManager(QObject *parent) :
 
     Q_ASSERT(pluginManager);
 
-    m_objectManager    = pluginManager->getObject<UAVObjectManager>();
+    m_objectManager     = pluginManager->getObject<UAVObjectManager>();
     Q_ASSERT(m_objectManager);
 
-    m_telemtryManager  = pluginManager->getObject<TelemetryManager>();
+    m_telemtryManager   = pluginManager->getObject<TelemetryManager>();
     Q_ASSERT(m_telemtryManager);
 
     m_objectUtilManager = pluginManager->getObject<UAVObjectUtilManager>();
     Q_ASSERT(m_objectUtilManager);
 
-    m_flightLogControl = DebugLogControl::GetInstance(m_objectManager);
+    m_flightLogControl  = DebugLogControl::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogControl);
 
-    m_flightLogStatus  = DebugLogStatus::GetInstance(m_objectManager);
+    m_flightLogStatus   = DebugLogStatus::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogStatus);
     connect(m_flightLogStatus, SIGNAL(FlightChanged(quint16)), this, SLOT(updateFlightEntries(quint16)));
 
@@ -544,6 +544,7 @@ void FlightLogManager::setupUAVOWrappers()
 {
     foreach(QList<UAVObject *> objectList, m_objectManager->getObjects()) {
         UAVObject *object = objectList.at(0);
+
         if (!object->isMetaDataObject() && !object->isSettingsObject()) {
             UAVOLogSettingsWrapper *wrapper = new UAVOLogSettingsWrapper(qobject_cast<UAVDataObject *>(object));
             m_uavoEntries.append(wrapper);
@@ -680,7 +681,7 @@ void UAVOLogSettingsWrapper::reset(bool clear)
     setPeriod(m_object->getMetadata().loggingUpdatePeriod);
     if (clear) {
         int oldSetting = setting();
-        int oldPeriod = period();
+        int oldPeriod  = period();
         setSetting(0);
         setPeriod(0);
         setDirty(oldSetting != setting() || oldPeriod != period());
@@ -694,12 +695,16 @@ UAVObject::UpdateMode UAVOLogSettingsWrapper::settingAsUpdateMode()
     switch (m_setting) {
     case 0:
         return UAVObject::UPDATEMODE_MANUAL;
+
     case 1:
         return UAVObject::UPDATEMODE_PERIODIC;
+
     case 2:
         return UAVObject::UPDATEMODE_ONCHANGE;
+
     case 3:
         return UAVObject::UPDATEMODE_THROTTLED;
+
     default:
         return UAVObject::UPDATEMODE_MANUAL;
     }

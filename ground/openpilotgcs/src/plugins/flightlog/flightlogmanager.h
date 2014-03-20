@@ -46,8 +46,7 @@
 #include "uavtalk/telemetrymanager.h"
 
 class UAVOLogSettingsWrapper : public QObject {
-    Q_OBJECT
-    Q_PROPERTY(UAVDataObject *object READ object NOTIFY objectChanged)
+    Q_OBJECT Q_PROPERTY(UAVDataObject *object READ object NOTIFY objectChanged)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(int setting READ setting WRITE setSetting NOTIFY settingChanged)
     Q_PROPERTY(int period READ period WRITE setPeriod NOTIFY periodChanged)
@@ -91,7 +90,7 @@ public slots:
     void setSetting(int setting)
     {
         if (m_setting != setting) {
-            m_setting = setting;            
+            m_setting = setting;
             setDirty(true);
             if (m_setting != 1 && m_setting != 3) {
                 setPeriod(0);
@@ -122,8 +121,8 @@ public slots:
 signals:
     void settingChanged(int setting);
     void nameChanged(QString name);
-    void periodChanged(int period);    
-    void objectChanged(UAVDataObject * arg);
+    void periodChanged(int period);
+    void objectChanged(UAVDataObject *arg);
 
     void dirtyChanged(bool arg);
 
@@ -132,7 +131,6 @@ private:
     int m_setting;
     int m_period;
     bool m_dirty;
-
 };
 
 class ExtendedDebugLogEntry : public DebugLogEntry {

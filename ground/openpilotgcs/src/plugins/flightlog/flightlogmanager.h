@@ -37,6 +37,7 @@
 #include <QTextStream>
 
 #include "uavobjectmanager.h"
+#include "uavobjectutilmanager.h"
 #include "debuglogentry.h"
 #include "debuglogstatus.h"
 #include "debuglogsettings.h"
@@ -316,6 +317,7 @@ private slots:
 
 private:
     UAVObjectManager *m_objectManager;
+    UAVObjectUtilManager *m_objectUtilManager;
     TelemetryManager *m_telemtryManager;
     DebugLogControl *m_flightLogControl;
     DebugLogStatus *m_flightLogStatus;

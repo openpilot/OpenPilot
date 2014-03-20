@@ -56,6 +56,9 @@ FlightLogManager::FlightLogManager(QObject *parent) :
     m_telemtryManager  = pluginManager->getObject<TelemetryManager>();
     Q_ASSERT(m_telemtryManager);
 
+    m_objectUtilManager = pluginManager->getObject<UAVObjectUtilManager>();
+    Q_ASSERT(m_objectUtilManager);
+
     m_flightLogControl = DebugLogControl::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogControl);
 
@@ -493,8 +496,8 @@ void FlightLogManager::resetSettings(bool clear)
 
 void FlightLogManager::saveSettingsToBoard()
 {
-
     m_flightLogSettings->setLoggingEnabled(m_loggingEnabled);
+    m_flightLogSettings->updated();
     saveUAVObjectToFlash(m_flightLogSettings);
 
     foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
@@ -502,6 +505,9 @@ void FlightLogManager::saveSettingsToBoard()
             UAVObject::Metadata meta = wrapper->object()->getMetadata();
             wrapper->object()->SetLoggingUpdateMode(meta, wrapper->settingAsUpdateMode());
             meta.loggingUpdatePeriod = wrapper->period();
+
+            // As metadata are set up to update via telemetry on change
+            // this call will send the update to the board.
             wrapper->object()->setMetadata(meta);
 
             if (saveUAVObjectToFlash(wrapper->object()->getMetaObject())) {
@@ -513,18 +519,8 @@ void FlightLogManager::saveSettingsToBoard()
 
 bool FlightLogManager::saveUAVObjectToFlash(UAVObject *object)
 {
-    UAVObjectUpdaterHelper helper;
-    if (helper.doObjectAndWait(object, 3000) == UAVObjectUpdaterHelper::SUCCESS) {
-        ObjectPersistence::DataFields data;
-        data.Operation  = ObjectPersistence::OPERATION_SAVE;
-        data.Selection  = ObjectPersistence::SELECTION_SINGLEOBJECT;
-        data.ObjectID   = object->getObjID();
-        data.InstanceID = object->getInstID();
-        m_objectPersistence->setData(data);
-
-        return (helper.doObjectAndWait(m_objectPersistence, 3000) == UAVObjectUpdaterHelper::SUCCESS);
-    }
-    return false;
+    m_objectUtilManager->saveObjectToSD(object);
+    return true;
 }
 
 void FlightLogManager::updateFlightEntries(quint16 currentFlight)
@@ -680,9 +676,17 @@ UAVOLogSettingsWrapper::~UAVOLogSettingsWrapper()
 
 void UAVOLogSettingsWrapper::reset(bool clear)
 {
-    setSetting(clear ? 0 : m_object->GetLoggingUpdateMode(m_object->getMetadata()));
-    setPeriod(clear ? 0 : m_object->getMetadata().loggingUpdatePeriod);
-    setDirty(false);
+    setSetting(m_object->GetLoggingUpdateMode(m_object->getMetadata()));
+    setPeriod(m_object->getMetadata().loggingUpdatePeriod);
+    if (clear) {
+        int oldSetting = setting();
+        int oldPeriod = period();
+        setSetting(0);
+        setPeriod(0);
+        setDirty(oldSetting != setting() || oldPeriod != period());
+    } else {
+        setDirty(false);
+    }
 }
 
 UAVObject::UpdateMode UAVOLogSettingsWrapper::settingAsUpdateMode()

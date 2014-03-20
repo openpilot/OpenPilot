@@ -45,6 +45,8 @@
 
 #include <openpilot.h>
 
+#include <callbackinfo.h>
+
 #include <math.h>
 #include <pid.h>
 #include <CoordinateConversions.h>
@@ -84,7 +86,7 @@ int32_t AltitudeHoldStart()
 {
     // Start main task
     SettingsUpdatedCb(NULL);
-    DelayedCallbackDispatch(altitudeHoldCBInfo);
+    PIOS_CALLBACKSCHEDULER_Dispatch(altitudeHoldCBInfo);
 
     return 0;
 }
@@ -101,7 +103,7 @@ int32_t AltitudeHoldInitialize()
 
     // Create object queue
 
-    altitudeHoldCBInfo = DelayedCallbackCreate(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, STACK_SIZE_BYTES);
+    altitudeHoldCBInfo = PIOS_CALLBACKSCHEDULER_Create(&altitudeHoldTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_ALTITUDEHOLD, STACK_SIZE_BYTES);
     AltitudeHoldSettingsConnectCallback(&SettingsUpdatedCb);
 
     return 0;
@@ -114,7 +116,7 @@ MODULE_INITCALL(AltitudeHoldInitialize, AltitudeHoldStart);
  */
 static void altitudeHoldTask(void)
 {
-    static float startThrottle = 0.5f;
+    static float startThrust = 0.5f;
 
     // make sure we run only when we are supposed to run
     FlightStatusData flightStatus;
@@ -127,8 +129,8 @@ static void altitudeHoldTask(void)
     default:
         pid_zero(&pid0);
         pid_zero(&pid1);
-        StabilizationDesiredThrottleGet(&startThrottle);
-        DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+        StabilizationDesiredThrustGet(&startThrust);
+        PIOS_CALLBACKSCHEDULER_Schedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
         return;
 
         break;
@@ -160,37 +162,37 @@ static void altitudeHoldTask(void)
 
     AltitudeHoldStatusSet(&altitudeHoldStatus);
 
-    float throttle;
+    float thrust;
     switch (altitudeHoldDesired.ControlMode) {
-    case ALTITUDEHOLDDESIRED_CONTROLMODE_THROTTLE:
-        throttle = altitudeHoldDesired.SetPoint;
+    case ALTITUDEHOLDDESIRED_CONTROLMODE_THRUST:
+        thrust = altitudeHoldDesired.SetPoint;
         break;
     default:
         // velocity control loop
-        throttle = startThrottle - pid_apply_setpoint(&pid1, 1.0f, altitudeHoldStatus.VelocityDesired, velocityStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
+        thrust = startThrust - pid_apply_setpoint(&pid1, 1.0f, altitudeHoldStatus.VelocityDesired, velocityStateDown, 1000.0f / DESIRED_UPDATE_RATE_MS);
 
-        if (throttle >= 1.0f) {
-            throttle = 1.0f;
+        if (thrust >= 1.0f) {
+            thrust = 1.0f;
         }
-        if (throttle <= 0.0f) {
-            throttle = 0.0f;
+        if (thrust <= 0.0f) {
+            thrust = 0.0f;
         }
         break;
     }
 
     StabilizationDesiredData stab;
     StabilizationDesiredGet(&stab);
-    stab.Roll     = altitudeHoldDesired.Roll;
-    stab.Pitch    = altitudeHoldDesired.Pitch;
-    stab.Yaw      = altitudeHoldDesired.Yaw;
-    stab.Throttle = throttle;
+    stab.Roll   = altitudeHoldDesired.Roll;
+    stab.Pitch  = altitudeHoldDesired.Pitch;
+    stab.Yaw    = altitudeHoldDesired.Yaw;
+    stab.Thrust = thrust;
     stab.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stab.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stab.StabilizationMode.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
 
     StabilizationDesiredSet(&stab);
 
-    DelayedCallbackSchedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
+    PIOS_CALLBACKSCHEDULER_Schedule(altitudeHoldCBInfo, DESIRED_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
 }
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)

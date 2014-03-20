@@ -263,6 +263,15 @@ int UAVObjectUtilManager::getBoardModel()
     return ret;
 }
 
+int UAVObjectUtilManager::getBootloaderRevision()
+{
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
+
+    int ret = firmwareIapData.BootloaderRevision;
+
+    return ret;
+}
+
 /**
  * Get the UAV Board CPU Serial Number, for anyone interested. Return format is a byte array
  */
@@ -316,12 +325,11 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 {
     double Be[3];
 
-    int result = Utils::HomeLocationUtil().getDetails(LLA, Be);
-
-    Q_ASSERT(result == 0);
+    Utils::HomeLocationUtil().getDetails(LLA, Be);
 
     // save the new settings
     HomeLocation *homeLocation = HomeLocation::GetInstance(obm);
+
     Q_ASSERT(homeLocation != NULL);
 
     HomeLocation::DataFields homeLocationData = homeLocation->getData();

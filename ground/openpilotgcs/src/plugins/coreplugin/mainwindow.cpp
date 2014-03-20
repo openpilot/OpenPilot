@@ -50,7 +50,9 @@
 #include "ioutputpane.h"
 #include "icorelistener.h"
 #include "iconfigurableplugin.h"
-#include "manhattanstyle.h"
+
+#include <qstylefactory.h>
+
 #include "rightpane.h"
 #include "settingsdialog.h"
 #include "threadmanager.h"
@@ -140,20 +142,7 @@ MainWindow::MainWindow() :
     QCoreApplication::setOrganizationName(QLatin1String("OpenPilot"));
     QCoreApplication::setOrganizationDomain(QLatin1String("openpilot.org"));
     QSettings::setDefaultFormat(XmlConfig::XmlSettingsFormat);
-    QString baseName = qApp->style()->objectName();
-#ifdef Q_WS_X11
-    if (baseName == QLatin1String("windows")) {
-        // Sometimes we get the standard windows 95 style as a fallback
-        // e.g. if we are running on a KDE4 desktop
-        QByteArray desktopEnvironment = qgetenv("DESKTOP_SESSION");
-        if (desktopEnvironment == "kde") {
-            baseName = QLatin1String("plastique");
-        } else {
-            baseName = QLatin1String("cleanlooks");
-        }
-    }
-#endif
-    qApp->setStyle(new ManhattanStyle(baseName));
+    qApp->setStyle(QStyleFactory::create("Fusion"));
 
     setDockNestingEnabled(true);
 

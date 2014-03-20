@@ -701,7 +701,7 @@
     <rect
        inkscape:label="#rect4000-8-0-9"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="ManualControl"
+       id="Receiver"
        width="13.893178"
        height="56.637238"
        x="576.71594"
@@ -1135,7 +1135,7 @@
   </g>
   <g
      style="display:none"
-     inkscape:label="ManualControl-OK"
+     inkscape:label="Receiver-OK"
      id="layer36"
      inkscape:groupmode="layer">
     <rect
@@ -1143,14 +1143,14 @@
        x="576.71594"
        height="56.637238"
        width="13.893178"
-       id="ManualControl-OK"
+       id="Receiver-OK"
        style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        inkscape:label="#rect4000-8-0-9"
        transform="translate(-497.66563,-344.28037)" />
   </g>
   <g
      style="display:none"
-     inkscape:label="ManualControl-Warning"
+     inkscape:label="Receiver-Warning"
      id="layer33"
      inkscape:groupmode="layer">
     <rect
@@ -1158,19 +1158,19 @@
        x="576.71594"
        height="56.637238"
        width="13.893178"
-       id="ManualControl-Warning"
+       id="Receiver-Warning"
        style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        inkscape:label="#rect4000-8-0-9"
        transform="translate(-497.66563,-344.28037)" />
   </g>
   <g
      style="display:none"
-     inkscape:label="ManualControl-Error"
+     inkscape:label="Receiver-Error"
      id="layer34"
      inkscape:groupmode="layer">
     <g
        transform="translate(78,0)"
-       id="ManualControl-Error"
+       id="Receiver-Error"
        style="stroke:#cf0e0e;stroke-opacity:1;display:inline"
        inkscape:label="#g3878">
       <path
@@ -1185,14 +1185,14 @@
   </g>
   <g
      style="display:none"
-     inkscape:label="ManualControl-Critical"
+     inkscape:label="Receiver-Critical"
      id="layer35"
      inkscape:groupmode="layer">
     <rect
        transform="translate(-497.66563,-344.28037)"
        inkscape:label="#rect4000-8-0-9"
        style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       id="ManualControl-Critical"
+       id="Receiver-Critical"
        width="13.893178"
        height="56.637238"
        x="576.71594"

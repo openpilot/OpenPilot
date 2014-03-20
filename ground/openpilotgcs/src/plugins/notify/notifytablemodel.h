@@ -45,6 +45,7 @@ public:
     NotifyTableModel(QList<NotificationItem *> & parentList, QObject *parent = 0);
     int rowCount(const QModelIndex & parent = QModelIndex()) const
     {
+        Q_UNUSED(parent);
         return _list.count();
     }
 

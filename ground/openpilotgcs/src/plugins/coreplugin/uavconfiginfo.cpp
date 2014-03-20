@@ -181,7 +181,7 @@ bool UAVConfigInfo::askToAbort(int compat, QString message)
     msgBox.setInformativeText(tr("Do you want to continue the import?"));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 
-    int result;
+    int result = QMessageBox::Abort;
 
     switch (compat) {
     case FullyCompatible:

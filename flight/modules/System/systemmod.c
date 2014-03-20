@@ -52,7 +52,7 @@
 #include <i2cstats.h>
 #include <taskinfo.h>
 #include <watchdogstatus.h>
-#include <taskinfo.h>
+#include <callbackinfo.h>
 #include <hwsettings.h>
 #include <pios_flashfs.h>
 #if defined(PIOS_INCLUDE_RFM22B)
@@ -96,7 +96,7 @@ static uint32_t idleCounter;
 static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
 static xQueueHandle objectPersistenceQueue;
-static bool stackOverflow;
+static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_CRITICAL = 3 } stackOverflow;
 static bool mallocFailed;
 static HwSettingsData bootHwSettings;
 static struct PIOS_FLASHFS_Stats fsStats;
@@ -105,6 +105,7 @@ static void objectUpdatedCb(UAVObjEvent *ev);
 static void hwSettingsUpdatedCb(UAVObjEvent *ev);
 #ifdef DIAG_TASKS
 static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_info *task_info, void *context);
+static void callbackSchedulerForEachCallback(int16_t callback_id, const struct pios_callback_info *callback_info, void *context);
 #endif
 static void updateStats();
 static void updateSystemAlarms();
@@ -124,7 +125,7 @@ extern uintptr_t pios_user_fs_id;
 int32_t SystemModStart(void)
 {
     // Initialize vars
-    stackOverflow = false;
+    stackOverflow = STACKOVERFLOW_NONE;
     mallocFailed  = false;
     // Create system task
     xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
@@ -147,6 +148,7 @@ int32_t SystemModInitialize(void)
     ObjectPersistenceInitialize();
 #ifdef DIAG_TASKS
     TaskInfoInitialize();
+    CallbackInfoInitialize();
 #endif
 #ifdef DIAG_I2C_WDG_STATS
     I2CStatsInitialize();
@@ -175,7 +177,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
     MODULE_TASKCREATE_ALL;
 
     /* start the delayed callback scheduler */
-    CallbackSchedulerStart();
+    PIOS_CALLBACKSCHEDULER_Start();
 
     if (mallocFailed) {
         /* We failed to malloc during task creation,
@@ -204,6 +206,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
 
 #ifdef DIAG_TASKS
     TaskInfoData taskInfoData;
+    CallbackInfoData callbackInfoData;
 #endif
 
     // Main system loop
@@ -223,6 +226,9 @@ static void systemTask(__attribute__((unused)) void *parameters)
         // Update the task status object
         PIOS_TASK_MONITOR_ForEachTask(taskMonitorForEachCallback, &taskInfoData);
         TaskInfoSet(&taskInfoData);
+        // Update the callback status object
+        PIOS_CALLBACKSCHEDULER_ForEachCallback(callbackSchedulerForEachCallback, &callbackInfoData);
+        CallbackInfoSet(&callbackInfoData);
 #endif
 
         // Flash the heartbeat LED
@@ -440,7 +446,26 @@ static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_
     ((uint16_t *)&taskData->StackRemaining)[task_id] = task_info->stack_remaining;
     ((uint8_t *)&taskData->RunningTime)[task_id]     = task_info->running_time_percentage;
 }
-#endif
+
+static void callbackSchedulerForEachCallback(int16_t callback_id, const struct pios_callback_info *callback_info, void *context)
+{
+    CallbackInfoData *callbackData = (CallbackInfoData *)context;
+
+    if (callback_id < 0) {
+        return;
+    }
+    // delayed callback scheduler reports callback stack overflows as remaininng: -1
+    if (callback_info->stack_remaining < 0 && stackOverflow == STACKOVERFLOW_NONE) {
+        stackOverflow = STACKOVERFLOW_WARNING;
+    }
+    // By convention, there is a direct mapping between (not negative) callback scheduler callback_id's and members
+    // of the CallbackInfoXXXXElem enums
+    PIOS_DEBUG_Assert(callback_id < CALLBACKINFO_RUNNING_NUMELEM);
+    ((uint8_t *)&callbackData->Running)[callback_id] = callback_info->is_running;
+    ((uint32_t *)&callbackData->RunningTime)[callback_id]   = callback_info->running_time_count;
+    ((int16_t *)&callbackData->StackRemaining)[callback_id] = callback_info->stack_remaining;
+}
+#endif /* ifdef DIAG_TASKS */
 
 /**
  * Called periodically to update the I2C statistics
@@ -602,10 +627,15 @@ static void updateSystemAlarms()
     }
 
     // Check for stack overflow
-    if (stackOverflow) {
-        AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_CRITICAL);
-    } else {
+    switch (stackOverflow) {
+    case STACKOVERFLOW_NONE:
         AlarmsClear(SYSTEMALARMS_ALARM_STACKOVERFLOW);
+        break;
+    case STACKOVERFLOW_WARNING:
+        AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_WARNING);
+        break;
+    default:
+        AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_CRITICAL);
     }
 
     // Check for event errors
@@ -650,7 +680,7 @@ void vApplicationIdleHook(void)
 void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle *pxTask,
                                    __attribute__((unused)) signed portCHAR *pcTaskName)
 {
-    stackOverflow = true;
+    stackOverflow = STACKOVERFLOW_CRITICAL;
 #if DEBUG_STACK_OVERFLOW
     static volatile bool wait_here = true;
     while (wait_here) {

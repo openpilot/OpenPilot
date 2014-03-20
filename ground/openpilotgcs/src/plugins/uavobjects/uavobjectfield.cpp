@@ -654,6 +654,24 @@ QString UAVObjectField::toString()
     return sout;
 }
 
+void UAVObjectField::toXML(QXmlStreamWriter *xmlWriter)
+{
+    xmlWriter->writeStartElement("field");
+    xmlWriter->writeAttribute("name", getName());
+    xmlWriter->writeAttribute("type", getTypeAsString());
+    if (!getUnits().isEmpty()) {
+        xmlWriter->writeAttribute("unit", getUnits());
+    }
+    for (unsigned int n = 0; n < numElements; ++n) {
+        xmlWriter->writeStartElement("value");
+        if (getElementNames().size() > 1) {
+            xmlWriter->writeAttribute("name", getElementNames().at(n));
+        }
+        xmlWriter->writeCharacters(getValue(n).toString());
+        xmlWriter->writeEndElement(); // value
+    }
+    xmlWriter->writeEndElement(); // field
+}
 
 qint32 UAVObjectField::pack(quint8 *dataOut)
 {

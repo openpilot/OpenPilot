@@ -52,12 +52,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkBoxArmed">
+      <widget class="QCheckBox" name="checkBoxArming">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <property name="text">
-        <string>Armed</string>
+        <string>Arm switch (Accessory0)</string>
        </property>
       </widget>
      </item>

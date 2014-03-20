@@ -82,6 +82,7 @@ SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_debuglog.c
+SRC += $(PIOSCOMMON)/pios_deltatime.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_rfm22b.c
 SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
@@ -96,6 +97,7 @@ SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 ## PIOS system code
 SRC += $(PIOSCOMMON)/pios_task_monitor.c
+SRC += $(PIOSCOMMON)/pios_callbackscheduler.c
 
 ## Misc library functions
 SRC += $(FLIGHTLIB)/fifo_buffer.c

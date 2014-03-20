@@ -34,6 +34,7 @@
 #include <QVariant>
 #include <QList>
 #include <QMap>
+#include <QXmlStreamWriter>
 
 class UAVObject;
 
@@ -72,6 +73,7 @@ public:
     bool isNumeric();
     bool isText();
     QString toString();
+    void toXML(QXmlStreamWriter *xmlWriter);
 
     bool isWithinLimits(QVariant var, quint32 index, int board = 0);
     QVariant getMaxLimit(quint32 index, int board = 0);

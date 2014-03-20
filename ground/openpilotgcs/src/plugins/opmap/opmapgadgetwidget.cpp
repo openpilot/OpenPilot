@@ -333,26 +333,30 @@ void OPMapGadgetWidget::wpDoubleClickEvent(WayPointItem *wp)
 }
 
 void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
-{ // the user has right clicked on the map - create the pop-up context menu and display it
-    QString s;
+{
+    // the user has right clicked on the map - create the pop-up context menu and display it
 
     if (!m_widget || !m_map) {
         return;
     }
 
     if (event->reason() != QContextMenuEvent::Mouse) {
-        return; // not a mouse click event
+        // not a mouse click event
+        return;
     }
+
     // current mouse position
     QPoint p = m_map->mapFromGlobal(event->globalPos());
     m_context_menu_lat_lon = m_map->GetFromLocalToLatLng(p);
 
     if (!m_map->contentsRect().contains(p)) {
-        return; // the mouse click was not on the map
+        // the mouse click was not on the map
+        return;
     }
+
     // show the mouse position
-    s = QString::number(m_context_menu_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_context_menu_lat_lon.Lng(), 'f', 7);
-    m_widget->labelMousePos->setText(s);
+    QString mousePosString = QString::number(m_context_menu_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_context_menu_lat_lon.Lng(), 'f', 7);
+    m_widget->labelMousePos->setText(mousePosString);
 
     // find out if we have a waypoint under the mouse cursor
     QGraphicsItem *item = m_map->itemAt(p);
@@ -364,11 +368,9 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
         waypoint_locked = (m_mouse_waypoint->flags() & QGraphicsItem::ItemIsMovable) == 0;
     }
 
-    // ****************
     // Dynamically create the popup menu
+    QMenu contextMenu;
 
-    contextMenu.addAction(closeAct1);
-    contextMenu.addSeparator();
     contextMenu.addAction(reloadAct);
     contextMenu.addSeparator();
     contextMenu.addAction(ripAct);
@@ -382,12 +384,20 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     contextMenu.addSeparator();
 
+    QString mapMode;
     switch (m_map_mode) {
-    case Normal_MapMode: s = tr(" (Normal)"); break;
-    case MagicWaypoint_MapMode: s = tr(" (Magic Waypoint)"); break;
-    default: s = tr(" (Unknown)"); break;
+    case Normal_MapMode:
+        mapMode = tr(" (Normal)");
+        break;
+    case MagicWaypoint_MapMode:
+        mapMode = tr(" (Magic Waypoint)");
+        break;
+    default:
+        mapMode = tr(" (Unknown)");
+        break;
     }
-    for (int i = 0; i < mapModeAct.count(); i++) { // set the menu to checked (or not)
+    for (int i = 0; i < mapModeAct.count(); i++) {
+        // set the menu to checked (or not)
         QAction *act = mapModeAct.at(i);
         if (!act) {
             continue;
@@ -396,7 +406,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
             act->setChecked(true);
         }
     }
-    QMenu mapModeSubMenu(tr("Map mode") + s, this);
+    QMenu mapModeSubMenu(tr("Map mode") + mapMode, this);
     for (int i = 0; i < mapModeAct.count(); i++) {
         mapModeSubMenu.addAction(mapModeAct.at(i));
     }
@@ -414,7 +424,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     contextMenu.addAction(changeDefaultLocalAndZoom);
     contextMenu.addSeparator();
 
-    QMenu safeArea("Safety Area definitions");
+    QMenu safeArea(tr("Safety Area definitions"));
     // menu.addAction(showSafeAreaAct);
     QMenu safeAreaSubMenu(tr("Safe Area Radius") + " (" + QString::number(m_map->Home->SafeArea()) + "m)", this);
     for (int i = 0; i < safeAreaAct.count(); i++) {
@@ -432,7 +442,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     contextMenu.addAction(showUAVInfo);
 
-    contextMenu.addSeparator()->setText(tr("Zoom"));
+    // Zoom section
+    contextMenu.addSection(tr("Zoom"));
 
     contextMenu.addAction(zoomInAct);
     contextMenu.addAction(zoomOutAct);
@@ -447,16 +458,16 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     contextMenu.addAction(goMouseClickAct);
 
-    contextMenu.addSeparator()->setText(tr("HOME"));
+    // Home section
+    contextMenu.addSection(tr("Home"));
 
     contextMenu.addAction(setHomeAct);
     contextMenu.addAction(showHomeAct);
     contextMenu.addAction(goHomeAct);
 
-    // ****
     // uav trails
     QMenu uav_menu(tr("UAV"));
-    uav_menu.addSeparator()->setText(tr("UAV Trail"));
+    uav_menu.addSection(tr("UAV Trail"));
     contextMenu.addMenu(&uav_menu);
     QMenu uavTrailTypeSubMenu(tr("UAV trail type") + " (" + mapcontrol::Helper::StrFromUAVTrailType(m_map->UAV->GetTrailType()) + ")", this);
     for (int i = 0; i < uavTrailTypeAct.count(); i++) {
@@ -482,22 +493,21 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     uav_menu.addAction(clearUAVtrailAct);
 
-    // ****
-
-    uav_menu.addSeparator()->setText(tr("UAV"));
+    // UAV section
+    uav_menu.addSection(tr("UAV"));
 
     uav_menu.addAction(showUAVAct);
     uav_menu.addAction(followUAVpositionAct);
     uav_menu.addAction(followUAVheadingAct);
     uav_menu.addAction(goUAVAct);
 
-    // *********
+    // waypoint section
 #ifdef USE_PATHPLANNER
     switch (m_map_mode) {
     case Normal_MapMode:
         // only show the waypoint stuff if not in 'magic waypoint' mode
 
-        contextMenu.addSeparator()->setText(tr("Waypoints"));
+        contextMenu.addSection(tr("Waypoints"));
 
         contextMenu.addAction(wayPointEditorAct);
         contextMenu.addAction(addWayPointActFromContextMenu);
@@ -515,30 +525,29 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
         }
 
         if (m_map->WPPresent()) {
-            contextMenu.addAction(clearWayPointsAct); // we have waypoints
+            // we have waypoints
+            contextMenu.addAction(clearWayPointsAct);
         }
         break;
 
     case MagicWaypoint_MapMode:
-        contextMenu.addSeparator()->setText(tr("Waypoints"));
+        contextMenu.addSection(tr("Waypoints"));
         contextMenu.addAction(homeMagicWaypointAct);
         break;
     }
 #endif // ifdef USE_PATHPLANNER
-       // *********
 
     QMenu overlaySubMenu(tr("&Overlay Opacity "), this);
     for (int i = 0; i < overlayOpacityAct.count(); i++) {
         overlaySubMenu.addAction(overlayOpacityAct.at(i));
     }
     contextMenu.addMenu(&overlaySubMenu);
-    contextMenu.addSeparator();
 
-    contextMenu.addAction(closeAct2);
+    // accept the event
+    event->accept();
 
-    contextMenu.exec(event->globalPos()); // popup the menu
-
-    // ****************
+    // popup the menu
+    contextMenu.exec(event->globalPos());
 }
 
 void OPMapGadgetWidget::closeEvent(QCloseEvent *event)
@@ -1299,12 +1308,6 @@ void OPMapGadgetWidget::createActions()
 
     // ***********************
     // create menu actions
-
-    closeAct1 = new QAction(tr("Close menu"), this);
-    closeAct1->setStatusTip(tr("Close the context menu"));
-
-    closeAct2 = new QAction(tr("Close menu"), this);
-    closeAct2->setStatusTip(tr("Close the context menu"));
 
     reloadAct = new QAction(tr("&Reload map"), this);
     reloadAct->setShortcut(tr("F5"));

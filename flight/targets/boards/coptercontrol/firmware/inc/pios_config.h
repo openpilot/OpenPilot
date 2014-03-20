@@ -43,6 +43,10 @@
 /* PIOS FreeRTOS support */
 #define PIOS_INCLUDE_FREERTOS
 
+
+/* PIOS CallbackScheduler support */
+#define PIOS_INCLUDE_CALLBACKSCHEDULER
+
 /* PIOS bootloader helper */
 #define PIOS_INCLUDE_BL_HELPER
 /* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
@@ -160,7 +164,6 @@
 #else
 #define PIOS_SYSTEM_STACK_SIZE          660
 #endif
-#define PIOS_STABILIZATION_STACK_SIZE   790
 #define PIOS_TELEM_STACK_SIZE           540
 #define PIOS_EVENTDISPATCHER_STACK_SIZE 160
 

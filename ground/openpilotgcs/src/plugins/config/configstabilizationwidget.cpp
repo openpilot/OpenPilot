@@ -117,9 +117,11 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(ui->pushButton_23);
 
     addWidget(ui->basicResponsivenessGroupBox);
-    connect(ui->basicResponsivenessGroupBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
+    addWidget(ui->basicResponsivenessCheckBox);
+    connect(ui->basicResponsivenessCheckBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
     addWidget(ui->advancedResponsivenessGroupBox);
-    connect(ui->advancedResponsivenessGroupBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
+    addWidget(ui->advancedResponsivenessCheckBox);
+    connect(ui->advancedResponsivenessCheckBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
 
     connect(this, SIGNAL(widgetContentsChanged(QWidget *)), this, SLOT(processLinkedWidgets(QWidget *)));
 
@@ -138,7 +140,7 @@ void ConfigStabilizationWidget::refreshWidgetsValues(UAVObject *o)
 {
     ConfigTaskWidget::refreshWidgetsValues(o);
 
-    ui->basicResponsivenessGroupBox->setChecked(ui->rateRollKp_3->value() == ui->ratePitchKp_4->value() &&
+    ui->basicResponsivenessCheckBox->setChecked(ui->rateRollKp_3->value() == ui->ratePitchKp_4->value() &&
                                                 ui->rateRollKi_3->value() == ui->ratePitchKi_4->value());
 }
 
@@ -169,14 +171,18 @@ void ConfigStabilizationWidget::linkCheckBoxes(bool value)
         ui->checkBox_2->setChecked(value);
     } else if (sender() == ui->checkBox_2) {
         ui->checkBox_8->setChecked(value);
-    } else if (sender() == ui->basicResponsivenessGroupBox) {
-        ui->advancedResponsivenessGroupBox->setChecked(!value);
+    } else if (sender() == ui->basicResponsivenessCheckBox) {
+        ui->advancedResponsivenessCheckBox->setChecked(!value);
+        ui->basicResponsivenessControls->setEnabled(value);
+        ui->advancedResponsivenessControls->setEnabled(!value);
         if (value) {
             processLinkedWidgets(ui->AttitudeResponsivenessSlider);
             processLinkedWidgets(ui->RateResponsivenessSlider);
         }
-    } else if (sender() == ui->advancedResponsivenessGroupBox) {
-        ui->basicResponsivenessGroupBox->setChecked(!value);
+    } else if (sender() == ui->advancedResponsivenessCheckBox) {
+        ui->basicResponsivenessCheckBox->setChecked(!value);
+        ui->basicResponsivenessControls->setEnabled(!value);
+        ui->advancedResponsivenessControls->setEnabled(value);
     }
 }
 
@@ -218,7 +224,7 @@ void ConfigStabilizationWidget::processLinkedWidgets(QWidget *widget)
         }
     }
 
-    if (ui->basicResponsivenessGroupBox->isChecked()) {
+    if (ui->basicResponsivenessCheckBox->isChecked()) {
         if (widget == ui->AttitudeResponsivenessSlider) {
             ui->ratePitchKp_4->setValue(ui->AttitudeResponsivenessSlider->value());
         } else if (widget == ui->RateResponsivenessSlider) {

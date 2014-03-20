@@ -30,6 +30,7 @@ OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += \
+    $$UAVOBJECT_SYNTHETICS/accelgyrosettings.h \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/barosensor.h \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.h \
@@ -71,6 +72,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/stabilizationbank.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.h \
+    $$UAVOBJECT_SYNTHETICS/flightmodesettings.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationdesired.h \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.h \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.h \
@@ -102,6 +104,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/i2cstats.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterysettings.h \
     $$UAVOBJECT_SYNTHETICS/taskinfo.h \
+    $$UAVOBJECT_SYNTHETICS/callbackinfo.h \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.h \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.h \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.h \
@@ -128,6 +131,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h
 
 SOURCES += \
+    $$UAVOBJECT_SYNTHETICS/accelgyrosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/barosensor.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.cpp \
@@ -169,6 +173,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/stabilizationbank.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.cpp \
+    $$UAVOBJECT_SYNTHETICS/flightmodesettings.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.cpp \
@@ -200,6 +205,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/i2cstats.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterysettings.cpp \
     $$UAVOBJECT_SYNTHETICS/taskinfo.cpp \
+    $$UAVOBJECT_SYNTHETICS/callbackinfo.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.cpp \

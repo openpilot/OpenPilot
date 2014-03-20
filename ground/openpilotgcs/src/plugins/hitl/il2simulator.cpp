@@ -104,7 +104,7 @@ void IL2Simulator::transmitUpdate()
     float ailerons = actData.Roll;
     float elevator = actData.Pitch;
     float rudder   = actData.Yaw;
-    float throttle = actData.Throttle * 2 - 1.0;
+    float throttle = actData.Thrust * 2 - 1.0;
 
     // Send update to Il2
     QString cmd;

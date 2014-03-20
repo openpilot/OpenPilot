@@ -35,6 +35,7 @@ MODULES += Altitude/revolution
 MODULES += Airspeed
 MODULES += AltitudeHold
 MODULES += Stabilization
+MODULES += Receiver
 MODULES += ManualControl
 MODULES += Actuator
 MODULES += GPS
@@ -71,7 +72,6 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     #ifeq ($(DEBUG), YES)
     SRC += $(OPSYSTEM)/dcc_stdio.c

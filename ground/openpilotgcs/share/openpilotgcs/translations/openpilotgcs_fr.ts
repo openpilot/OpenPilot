@@ -4,32 +4,31 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../../../src/app/main.cpp" line="+136"/>
-        <source>Failed to load core: %1</source>
-        <translatorcomment>[Platypus] core-&gt; noyau</translatorcomment>
-        <translation type="unfinished">Échec dans le chargement du noyau : %1</translation>
+        <location filename="../../../src/app/main.cpp" line="+203"/>
+        <source>Failed to load core plug-in, reason is: %1</source>
+        <translation>Échec du chargement du module complémentaire core, la raison est : %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Unable to send command line arguments to the already running instance. It appears to be not responding.</source>
-        <translation type="unfinished">Impossible de passer les arguments de la ligne de commande à l&apos;instance en cours d&apos;exécution. Elle semble ne pas répondre.</translation>
+        <translation>Impossible de passer les arguments de la ligne de commande à l&apos;instance en cours d&apos;exécution. Elle semble ne pas répondre.</translation>
     </message>
     <message>
-        <location line="+183"/>
+        <location line="+354"/>
         <source>Could not find &apos;Core.pluginspec&apos; in %1</source>
         <translatorcomment>[Platypus]Ajout de &quot;est&quot;</translatorcomment>
-        <translation type="unfinished">&apos;Core.pluginspec&apos; est introuvable dans %1</translation>
+        <translation>&apos;Core.pluginspec&apos; est introuvable dans %1</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+41"/>
         <source>OpenPilot GCS - Plugin loader messages</source>
-        <translation type="unfinished">OpenPilot GCS - Messages du chargeur de modules complémentaires</translation>
+        <translation>OpenPilot GCS - Messages du chargeur de modules complémentaires</translation>
     </message>
 </context>
 <context>
     <name>Core::Internal::ComboBox</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/sidebar.cpp" line="+370"/>
+        <location filename="../../../src/plugins/coreplugin/sidebar.cpp" line="+385"/>
         <source>Activate %1</source>
         <translation>Activer %1</translation>
     </message>
@@ -39,7 +38,7 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.ui"/>
         <source>General settings</source>
-        <translation type="unfinished">Paramètres généraux</translation>
+        <translation>Paramètres généraux</translation>
     </message>
     <message>
         <location/>
@@ -49,10 +48,11 @@
     <message>
         <location/>
         <source>R</source>
-        <translation>R</translation>
+        <translatorcomment>?</translatorcomment>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+63"/>
+        <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+62"/>
         <source>General</source>
         <translation>Général</translation>
     </message>
@@ -62,13 +62,13 @@
         <translation>Environnement</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+16"/>
         <source>&lt;System Language&gt;</source>
         <translatorcomment>Other languages aren&apos;t translated : English and dynamicaly generated... Check in ground/openpilotgcs/src/plugins/coreplugin/generalsettings.cpp</translatorcomment>
         <translation>&lt;Langue Système&gt;</translation>
     </message>
     <message>
-        <location line="+107"/>
+        <location line="+112"/>
         <source>Variables</source>
         <translation>Variables</translation>
     </message>
@@ -95,21 +95,23 @@
     <message>
         <location/>
         <source>Automatically connect an OpenPilot USB device:</source>
-        <translation>Connecter automatiquement un appareil OpenPilot USB :</translation>
+        <translation>Connecter automatiquement un périphérique USB OpenPilot :</translation>
     </message>
     <message>
         <location/>
         <source>Automatically select an OpenPilot USB device:</source>
-        <translation>Sélectionner automatiquement un appareil OpenPilot USB :</translation>
+        <translation>Sélectionner automatiquement un périphérique USB OpenPilot :</translation>
     </message>
     <message>
         <location/>
         <source>Use UDP Mirror</source>
-        <translation type="unfinished">Utiliser Miroir UDP</translation>
+        <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
+        <translation>Utiliser Miroir UDP</translation>
     </message>
     <message>
         <location/>
         <source>Expert Mode</source>
+        <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
         <translation>Mode Expert</translation>
     </message>
     <message>
@@ -121,7 +123,7 @@
 <context>
     <name>Core::Internal::MainWindow</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+473"/>
+        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+431"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
@@ -146,34 +148,24 @@
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <location line="-376"/>
+        <location line="-335"/>
         <source>OpenPilot GCS</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+493"/>
+        <location line="+452"/>
         <source>Ctrl+Shift+S</source>
         <translation type="unfinished">Ctrl+Maj+S</translation>
     </message>
     <message>
-        <location line="+168"/>
-        <source>About &amp;OpenPilot GCS</source>
-        <translation>A propos d&apos;&amp;OpenPilot GCS</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>About &amp;OpenPilot GCS...</source>
-        <translation>A propos d&apos;&amp;OpenPilot GCS...</translation>
-    </message>
-    <message>
-        <location line="-164"/>
+        <location line="+6"/>
         <source>E&amp;xit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
         <location line="-9"/>
         <source>Save &amp;GCS Default Settings</source>
-        <translation type="unfinished">Enregistrer les paramètres GCS par &amp;Défaut</translation>
+        <translation>Enregistrer Paramètres &amp;GCS par Défaut</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -230,12 +222,12 @@
     <message>
         <location line="+12"/>
         <source>Full Screen</source>
-        <translation>Plein écran</translation>
+        <translation>Plein Écran</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Edit Gadgets Mode</source>
-        <translation type="unfinished">Editer le Mode des Gadgets</translation>
+        <translation>Mode Éditeur Gadgets</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -256,7 +248,7 @@
     <message>
         <location line="+3"/>
         <source>Split</source>
-        <translation type="unfinished">Scinder</translation>
+        <translation>Scinder</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -266,7 +258,7 @@
     <message>
         <location line="+3"/>
         <source>Split Side by Side</source>
-        <translation type="unfinished">Scinder verticalement</translation>
+        <translation>Scinder verticalement</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -276,7 +268,7 @@
     <message>
         <location line="+3"/>
         <source>Close Current View</source>
-        <translation type="unfinished">Fermer la Vue Actuelle</translation>
+        <translation>Fermer la Vue Actuelle</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -296,7 +288,7 @@
     <message>
         <location line="+3"/>
         <source>Goto Next View</source>
-        <translation type="unfinished">Aller à la Vue Suivante</translation>
+        <translation>Aller Vue Suivante</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -309,18 +301,18 @@
         <translation>&amp;Aide...</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+27"/>
         <source>About &amp;Plugins...</source>
         <translatorcomment>[Platypus]Trop long ?</translatorcomment>
-        <translation type="unfinished">À propos des &amp;Modules complémentaires...</translation>
+        <translation>À propos des &amp;Modules complémentaires...</translation>
     </message>
     <message>
         <location line="+10"/>
-        <source>About &amp;Authors...</source>
-        <translation>A propos des &amp;Auteurs...</translation>
+        <source>About &amp;OpenPilot...</source>
+        <translation>À propos d&apos;&amp;OpenPilot...</translation>
     </message>
     <message>
-        <location line="+654"/>
+        <location line="+640"/>
         <source>Settings...</source>
         <translation>Paramètres...</translation>
     </message>
@@ -336,14 +328,14 @@
 <context>
     <name>Core::Internal::PluginDialog</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/plugindialog.cpp" line="+53"/>
+        <location filename="../../../src/plugins/coreplugin/plugindialog.cpp" line="+54"/>
         <source>Details</source>
         <translation>Détails</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Error Details</source>
-        <translation>Détails de l&apos;erreur</translation>
+        <translation>Détails de l&apos;Erreur</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -353,24 +345,24 @@
     <message>
         <location line="+15"/>
         <source>Installed Plugins</source>
-        <translation type="unfinished">Modules complémentaires installés</translation>
+        <translation>Modules Complémentaires Installés</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+38"/>
         <source>Plugin Details of %1</source>
         <translatorcomment>Détail sur le plugin %1 ?</translatorcomment>
-        <translation type="unfinished">Détails du module complémentaire %1</translation>
+        <translation>Détails du Module Complémentaire %1</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+22"/>
         <source>Plugin Errors of %1</source>
-        <translation type="unfinished">Erreurs du module complémentaire %1</translation>
+        <translation>Erreurs du Module Complémentaire %1</translation>
     </message>
 </context>
 <context>
     <name>Core::Internal::ShortcutSettings</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.cpp" line="+70"/>
+        <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.cpp" line="+68"/>
         <source>Keyboard</source>
         <translation>Clavier</translation>
     </message>
@@ -380,27 +372,26 @@
         <translation>Environnement</translation>
     </message>
     <message>
-        <location line="+157"/>
+        <location line="+162"/>
         <source>Import Keyboard Mapping Scheme</source>
-        <translatorcomment>[Platypus]Je pense qu&apos;il y a meilleure traduction pour mapping</translatorcomment>
-        <translation type="unfinished">Importer le Mapping Clavier</translation>
+        <translation>Importer Schéma Config Clavier</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+33"/>
+        <location line="+37"/>
         <source>Keyboard Mapping Scheme (*.kms)</source>
-        <translation>Schéma de mapping clavier (*.kms)</translation>
+        <translation>Schéma Config Clavier (*.kms)</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Export Keyboard Mapping Scheme</source>
-        <translation>Exporter le mapping clavier</translation>
+        <translation>Exporter Schéma Config Clavier</translation>
     </message>
 </context>
 <context>
     <name>Core::Internal::SideBarWidget</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/sidebar.cpp" line="-130"/>
+        <location filename="../../../src/plugins/coreplugin/sidebar.cpp" line="-136"/>
         <source>Split</source>
         <translation>Scinder</translation>
     </message>
@@ -413,20 +404,18 @@
 <context>
     <name>Core::Internal::VersionDialog</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/versiondialog.cpp" line="+57"/>
         <source>About OpenPilot GCS</source>
-        <translation>A propos d&apos;OpenPilot GCS</translation>
+        <translation type="obsolete">A propos d&apos;OpenPilot GCS</translation>
     </message>
     <message>
-        <location line="+27"/>
-        <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: %2&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation type="unfinished">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans GARANTIE DE QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
+        <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
+        <translation type="obsolete">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
     <name>Core::ModeManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/modemanager.cpp" line="+161"/>
+        <location filename="../../../src/plugins/coreplugin/modemanager.cpp" line="+169"/>
         <source>Switch to %1 mode</source>
         <translation>Basculer vers le mode %1</translation>
     </message>
@@ -452,25 +441,25 @@
 <context>
     <name>Utils::ClassNameValidatingLineEdit</name>
     <message>
-        <location filename="../../../src/libs/utils/classnamevalidatinglineedit.cpp" line="+83"/>
+        <location filename="../../../src/libs/utils/classnamevalidatinglineedit.cpp" line="+81"/>
         <source>The class name must not contain namespace delimiters.</source>
-        <translation type="unfinished">Le nom de la classe ne doit pas contenir de délimiteur d&apos;espace de nommage.</translation>
+        <translation>Le nom de la classe ne doit pas contenir de délimiteur d&apos;espace de nommage.</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Please enter a class name.</source>
         <translation>Veuillez entrer un nom de classe.</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>The class name contains invalid characters.</source>
-        <translation type="unfinished">Le nom de la classe contient des caractères invalides.</translation>
+        <translation>Le nom de la classe contient des caractères invalides.</translation>
     </message>
 </context>
 <context>
     <name>Utils::ConsoleProcess</name>
     <message>
-        <location filename="../../../src/libs/utils/consoleprocess.cpp" line="+48"/>
+        <location filename="../../../src/libs/utils/consoleprocess.cpp" line="+49"/>
         <source>Cannot set up communication channel: %1</source>
         <translation>Impossible d&apos;établir le canal de communication : %1</translation>
     </message>
@@ -492,8 +481,7 @@
     <message>
         <location line="+5"/>
         <source>Unexpected output from helper program.</source>
-        <translatorcomment>[Platypus]Helper = externe ?</translatorcomment>
-        <translation type="unfinished">Arrêt imprévu du logiciel externe.</translation>
+        <translation>Arrêt imprévu du programme d&apos;assistance.</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -503,32 +491,32 @@
     <message>
         <location line="+5"/>
         <source>Cannot execute &apos;%1&apos;: %2</source>
-        <translation type="unfinished">Impossible d&apos;exécuter &apos;%1&apos;: %2</translation>
+        <translation>Impossible d&apos;exécuter &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../../../src/libs/utils/consoleprocess_unix.cpp" line="+110"/>
+        <location filename="../../../src/libs/utils/consoleprocess_unix.cpp" line="+111"/>
         <source>Cannot start the terminal emulator &apos;%1&apos;.</source>
-        <translation type="unfinished">Impossible de démarrer le terminal de l&apos;émulateur &apos;%1&apos;.</translation>
+        <translation>Impossible de démarrer le terminal de l&apos;émulateur &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+55"/>
         <source>Cannot create socket &apos;%1&apos;: %2</source>
         <translation>Impossible de créer le socket &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../../../src/libs/utils/consoleprocess_win.cpp" line="+124"/>
+        <location filename="../../../src/libs/utils/consoleprocess_win.cpp" line="+126"/>
         <source>The process &apos;%1&apos; could not be started: %2</source>
         <translation>Le processus &apos;%1&apos; ne peut pas être démarré : %2</translation>
     </message>
     <message>
-        <location line="+70"/>
+        <location line="+72"/>
         <source>Cannot obtain a handle to the inferior: %1</source>
         <translation>Impossible d&apos;obtenir le descripteur du processus : %1</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Cannot obtain exit status from inferior: %1</source>
-        <translation type="unfinished">Impossible d&apos;obtenir l&apos;état de retour du processus : %1</translation>
+        <translation>Impossible d&apos;obtenir l&apos;état de retour du processus : %1</translation>
     </message>
 </context>
 <context>
@@ -536,22 +524,22 @@
     <message>
         <location filename="../../../src/libs/utils/filenamevalidatinglineedit.cpp" line="+94"/>
         <source>The name must not be empty</source>
-        <translation type="unfinished">Le nom ne doit pas être vide</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>The name must not contain any of the characters &apos;%1&apos;.</source>
-        <translation type="unfinished">Le nom ne doit pas contenir un des caractères suivants : &apos;%1&apos;.</translation>
+        <translation>Le nom ne doit pas être vide</translation>
     </message>
     <message>
         <location line="+9"/>
-        <source>The name must not contain &apos;%1&apos;.</source>
-        <translation type="unfinished">Le nom ne doit pas contenir &apos;%1&apos;.</translation>
+        <source>The name must not contain any of the characters &apos;%1&apos;.</source>
+        <translation>Le nom ne doit pas contenir un des caractères suivants : &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+11"/>
+        <source>The name must not contain &apos;%1&apos;.</source>
+        <translation>Le nom ne doit pas contenir &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>The name must not match that of a MS Windows device. (%1).</source>
-        <translation type="unfinished">Le nom ne doit pas correspondre à un périphérique MS Windows. (%1).</translation>
+        <translation>Le nom ne doit pas correspondre à un périphérique MS Windows. (%1).</translation>
     </message>
 </context>
 <context>
@@ -575,7 +563,7 @@
     <message numerus="yes">
         <location line="+8"/>
         <source>%1: %n occurrences found in %2 of %3 files.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 : %n occurence trouvée dans %2 de %3 fichiers.</numerusform>
             <numerusform>%1 : %n occurences trouvées dans %2 de %3 fichiers.</numerusform>
         </translation>
@@ -619,29 +607,29 @@
         <translation>Chemin :</translation>
     </message>
     <message>
-        <location filename="../../../src/libs/utils/newclasswidget.cpp" line="+416"/>
+        <location filename="../../../src/libs/utils/newclasswidget.cpp" line="+428"/>
         <source>Invalid base class name</source>
-        <translation type="unfinished">Nom de la classe parente incorrect</translation>
+        <translation>Nom de la classe parente incorrect</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>Invalid header file name: &apos;%1&apos;</source>
-        <translation type="unfinished">Nom du fichier d&apos;en-tête incorrect : &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Invalid source file name: &apos;%1&apos;</source>
-        <translation type="unfinished">Nom du fichier source incorrect : &apos;%1&apos;</translation>
+        <translation>Nom du fichier d&apos;en-tête incorrect : &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+7"/>
+        <source>Invalid source file name: &apos;%1&apos;</source>
+        <translation>Nom du fichier source incorrect : &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Invalid form file name: &apos;%1&apos;</source>
-        <translation type="unfinished">Nom du fichier d&apos;interface incorrect : &apos;%1&apos;</translation>
+        <translation>Nom du fichier d&apos;interface incorrect : &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.ui"/>
         <source>Inherits QObject</source>
-        <translation>hérite de QObject</translation>
+        <translation>Hérite de QObject</translation>
     </message>
     <message>
         <location/>
@@ -665,7 +653,7 @@
         <location filename="../../../src/libs/utils/pathchooser.cpp" line="+48"/>
         <source>Choose...</source>
         <translatorcomment>[Platypus]On utilise plus sélectionner en français je crois</translatorcomment>
-        <translation type="unfinished">Sélectionner...</translation>
+        <translation>Choisir...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -673,7 +661,7 @@
         <translation>Parcourir...</translation>
     </message>
     <message>
-        <location line="+126"/>
+        <location line="+125"/>
         <source>Choose a directory</source>
         <translatorcomment>[Platypus]Comme là en fait</translatorcomment>
         <translation>Sélectionner un répertoire</translation>
@@ -684,27 +672,27 @@
         <translation>Sélectionner un fichier</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+34"/>
         <source>The path must not be empty.</source>
-        <translation type="unfinished">Le chemin ne doit pas être vide.</translation>
+        <translation>Le chemin ne doit pas être vide.</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+14"/>
         <source>The path &apos;%1&apos; does not exist.</source>
         <translation>Le chemin &apos;%1&apos; n&apos;existe pas.</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+16"/>
         <source>The path &apos;%1&apos; is not a directory.</source>
         <translation>&apos;%1&apos; n&apos;est pas le chemin d&apos;un répertoire.</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>The path &apos;%1&apos; is not a file.</source>
         <translation>%1 n&apos;est pas le chemin d&apos;un fichier.</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+20"/>
         <source>Path:</source>
         <translation>Chemin :</translation>
     </message>
@@ -712,7 +700,7 @@
 <context>
     <name>Utils::PathListEditor</name>
     <message>
-        <location filename="../../../src/libs/utils/pathlisteditor.cpp" line="+118"/>
+        <location filename="../../../src/libs/utils/pathlisteditor.cpp" line="+117"/>
         <source>Insert...</source>
         <translation>Insérer...</translation>
     </message>
@@ -729,10 +717,10 @@
     <message>
         <location line="+1"/>
         <source>Clear</source>
-        <translation type="unfinished">Effacer</translation>
+        <translation>Effacer</translation>
     </message>
     <message>
-        <location line="+130"/>
+        <location line="+141"/>
         <source>From &quot;%1&quot;</source>
         <translation>Depuis &quot;%1&quot;</translation>
     </message>
@@ -755,27 +743,27 @@
         <translation>Créer dans :</translation>
     </message>
     <message>
-        <location filename="../../../src/libs/utils/projectintropage.cpp" line="+64"/>
+        <location filename="../../../src/libs/utils/projectintropage.cpp" line="+61"/>
         <source>&lt;Enter_Name&gt;</source>
         <translation>&lt;Entrer_Nom&gt;</translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+99"/>
         <source>The project already exists.</source>
         <translation>Le projet existe déjà.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>A file with that name already exists.</source>
-        <translation type="unfinished">Ce nom de fichier existe déjà.</translation>
+        <translation>Ce nom de fichier existe déjà.</translation>
     </message>
 </context>
 <context>
     <name>Utils::ProjectNameValidatingLineEdit</name>
     <message>
-        <location filename="../../../src/libs/utils/projectnamevalidatinglineedit.cpp" line="+49"/>
+        <location filename="../../../src/libs/utils/projectnamevalidatinglineedit.cpp" line="+48"/>
         <source>The name must not contain the &apos;.&apos;-character.</source>
-        <translation type="unfinished">Le nom ne doit pas contenir le caractère &apos;.&apos;.</translation>
+        <translation>Le nom ne doit pas contenir le caractère &apos;.&apos;.</translation>
     </message>
 </context>
 <context>
@@ -783,7 +771,7 @@
     <message>
         <location filename="../../../src/libs/utils/submiteditorwidget.ui"/>
         <source>Subversion Submit</source>
-        <translation type="unfinished">Soumettre la Subversion</translation>
+        <translation>Soumettre Subversion</translation>
     </message>
     <message>
         <location/>
@@ -801,7 +789,7 @@
     <message>
         <location filename="../../../src/libs/utils/filewizardpage.ui"/>
         <source>Choose the location</source>
-        <translation type="unfinished">Sélectionner l&apos;emplacement</translation>
+        <translation>Sélectionner l&apos;emplacement</translation>
     </message>
     <message>
         <location/>
@@ -817,7 +805,7 @@
 <context>
     <name>Utils::reloadPrompt</name>
     <message>
-        <location filename="../../../src/libs/utils/reloadpromptutils.cpp" line="+41"/>
+        <location filename="../../../src/libs/utils/reloadpromptutils.cpp" line="+39"/>
         <source>File Changed</source>
         <translation>Fichier Modifié</translation>
     </message>
@@ -874,7 +862,7 @@
     <message>
         <location/>
         <source>License:</source>
-        <translation type="unfinished">Licence :</translation>
+        <translation>Licence :</translation>
     </message>
     <message>
         <location/>
@@ -897,25 +885,25 @@
     <message>
         <location/>
         <source>Error Message:</source>
-        <translation>Message d&apos;erreur :</translation>
+        <translation>Message d&apos;Erreur :</translation>
     </message>
 </context>
 <context>
     <name>ExtensionSystem::Internal::PluginSpecPrivate</name>
     <message>
-        <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+414"/>
+        <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+412"/>
         <source>File does not exist: %1</source>
         <translation>Le fichier n&apos;existe pas : %1</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>Could not open file for read: %1</source>
         <translation>Impossible d&apos;ouvrir le fichier en lecture : %1</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+17"/>
         <source>Error parsing file %1: %2, at line %3, column %4</source>
-        <translation type="unfinished">Erreur pendant l&apos;analyse du fichier %1 : %2, à la ligne %3, et la colonne %4</translation>
+        <translation>Erreur d&apos;analyse du fichier %1 : %2, à la ligne %3, et la colonne %4</translation>
     </message>
 </context>
 <context>
@@ -949,14 +937,14 @@
 <context>
     <name>ExtensionSystem::PluginErrorView</name>
     <message>
-        <location filename="../../../src/libs/extensionsystem/pluginerrorview.cpp" line="+78"/>
+        <location filename="../../../src/libs/extensionsystem/pluginerrorview.cpp" line="+79"/>
         <source>Invalid</source>
         <translation>Invalide</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Description file found, but error on read</source>
-        <translation type="unfinished">Fichier de description trouvé, mais il y a des erreurs à la lecture</translation>
+        <translation>Fichier de description trouvé, mais il y a des erreurs à la lecture</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -999,7 +987,7 @@
     <message>
         <location line="+1"/>
         <source>Plugin&apos;s initialization method succeeded</source>
-        <translation type="unfinished">Méthode d&apos;initialisation du module complémentaire réussie</translation>
+        <translation>Méthode d&apos;initialisation du module complémentaire réussie</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1009,7 +997,7 @@
     <message>
         <location line="+1"/>
         <source>Plugin successfully loaded and running</source>
-        <translation type="unfinished">Module complémentaire correctement chargé et démarré</translation>
+        <translation>Module complémentaire correctement chargé et démarré</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1019,7 +1007,7 @@
     <message>
         <location line="+1"/>
         <source>Plugin was shut down</source>
-        <translation type="unfinished">Module complémentaire arrêté</translation>
+        <translation>Arrêt du module complémentaire</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1030,16 +1018,16 @@
         <location line="+1"/>
         <source>Plugin ended its life cycle and was deleted</source>
         <translatorcomment>[Platypus]Je pense qu&apos;il existe une meilleur traduction de cycle de vie</translatorcomment>
-        <translation type="unfinished">Le module complémentaire a terminé son cycle de vie et a été supprimé</translation>
+        <translation>Le module complémentaire a terminé son cycle de vie et a été supprimé</translation>
     </message>
 </context>
 <context>
     <name>ExtensionSystem::PluginManager</name>
     <message>
-        <location filename="../../../src/libs/extensionsystem/pluginmanager.cpp" line="+619"/>
+        <location filename="../../../src/libs/extensionsystem/pluginmanager.cpp" line="+629"/>
         <source>Circular dependency detected:
 </source>
-        <translation type="unfinished">Dépendance circulaire détectée :
+        <translation>Dépendance circulaire détectée :
 </translation>
     </message>
     <message>
@@ -1057,14 +1045,14 @@
     <message>
         <location line="+8"/>
         <source>Cannot load plugin because dependencies are not resolved</source>
-        <translation type="unfinished">Impossible de charger le module complémentaire car les dépendances ne sont pas résolues</translation>
+        <translation>Impossible de charger le module complémentaire car les dépendances ne sont pas résolues</translation>
     </message>
     <message>
         <location line="+8"/>
-        <location line="+29"/>
+        <location line="+30"/>
         <source>Cannot load plugin because dependency failed to load: %1(%2)
 Reason: %3</source>
-        <translation type="unfinished">Impossible de charger le module complémentaire car une des dépendances n&apos;a pas pu être chargée : %1(%2)
+        <translation>Impossible de charger le module complémentaire car une des dépendances n&apos;a pas pu être chargée : %1(%2)
 Raison : %3</translation>
     </message>
 </context>
@@ -1075,23 +1063,23 @@ Raison : %3</translation>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+274"/>
         <source>MainWindow</source>
-        <translation type="unfinished">Fenêtre Principale</translation>
+        <translation>Fenêtre Principale</translation>
     </message>
     <message>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <source>Go</source>
         <translatorcomment>[Platypus]Féminin peut-être ?</translatorcomment>
-        <translation type="unfinished">Y aller</translation>
+        <translation>Y aller</translation>
     </message>
     <message>
         <location/>
         <source>Current File:</source>
-        <translation type="unfinished">Fichier en cours :</translation>
+        <translation>Fichier en cours :</translation>
     </message>
     <message>
         <location/>
         <source>Current Path:</source>
-        <translation type="unfinished">Emplacement en cours :</translation>
+        <translation>Emplacement en cours :</translation>
     </message>
     <message>
         <location/>
@@ -1180,25 +1168,25 @@ Raison : %3</translation>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tourner</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Gauche</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Center</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Centré</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Droite</translation>
     </message>
     <message>
         <location/>
@@ -1234,7 +1222,7 @@ Raison : %3</translation>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Misc</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Divers</translation>
     </message>
     <message>
         <location/>
@@ -1258,7 +1246,7 @@ Raison : %3</translation>
 <context>
     <name>MyMain</name>
     <message>
-        <location filename="../../../src/libs/aggregation/examples/text/main.cpp" line="+56"/>
+        <location filename="../../../src/libs/aggregation/examples/text/main.cpp" line="+57"/>
         <location line="+1"/>
         <location line="+1"/>
         <source>N/A</source>
@@ -1268,46 +1256,47 @@ Raison : %3</translation>
 <context>
     <name>PluginDialog</name>
     <message>
-        <location filename="../../../src/libs/extensionsystem/test/manual/pluginview/plugindialog.cpp" line="+54"/>
+        <location filename="../../../src/libs/extensionsystem/test/manual/pluginview/plugindialog.cpp" line="+55"/>
         <source>Details</source>
         <translation>Détails</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Error Details</source>
-        <translation>Détails de l&apos;erreur</translation>
+        <translatorcomment>bouton</translatorcomment>
+        <translation>Détails Erreur</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Installed Plugins</source>
-        <translation>Plugins installés</translation>
+        <translation>Modules Complémentaires Installés</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+35"/>
         <source>Plugin Details of %1</source>
-        <translation>Détail sur plugin %1</translation>
+        <translation>Détails sur le Module Complémentaire %1</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+22"/>
         <source>Plugin Errors of %1</source>
-        <translation>Erreurs du plugins %1</translation>
+        <translation>Erreurs du Module Complémentaire %1</translation>
     </message>
 </context>
 <context>
     <name>PluginManager</name>
     <message>
-        <location filename="../../../src/libs/extensionsystem/optionsparser.cpp" line="+105"/>
-        <location line="+18"/>
+        <location filename="../../../src/libs/extensionsystem/optionsparser.cpp" line="+117"/>
+        <location line="+20"/>
         <source>The plugin &apos;%1&apos; does not exist.</source>
         <translation>Le plugin &apos;%1&apos; n&apos;existe pas.</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+51"/>
         <source>Unknown option %1</source>
         <translation>Option &apos;%1&apos; non reconnue</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>The option %1 requires an argument.</source>
         <translation>L&apos;option %1 requiert un argument.</translation>
     </message>
@@ -1315,7 +1304,7 @@ Raison : %3</translation>
 <context>
     <name>PluginSpec</name>
     <message>
-        <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+22"/>
+        <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+23"/>
         <source>&apos;%1&apos; misses attribute &apos;%2&apos;</source>
         <translation>L&apos;attribut &apos;%1&apos; est manquant pour &apos;%2&apos;</translation>
     </message>
@@ -1340,22 +1329,22 @@ Raison : %3</translation>
         <translation>Lexème inattendu</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Expected element &apos;%1&apos; as top level element</source>
         <translation>L&apos;élément &apos;%1&apos; devrait être un élément racine</translation>
     </message>
     <message>
-        <location line="+234"/>
+        <location line="+252"/>
         <source>Resolving dependencies failed because state != Read</source>
         <translation>La résolution des dépendances a échoué car l&apos;état courant est différent de &quot;Lecture&quot;</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+19"/>
         <source>Could not resolve dependency &apos;%1(%2)&apos;</source>
         <translation>Impossible de résoudre la dépendance &apos;%1(%2)&apos;</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+27"/>
         <source>Loading the library failed because state != Resolved</source>
         <translation>Le chargement de la bibliothèque a échoué car l&apos;état courant est différent de &quot;Résolu&quot;</translation>
     </message>
@@ -1365,7 +1354,7 @@ Raison : %3</translation>
         <translation>L&apos;extension n&apos;est pas valide (elle n&apos;est pas une sous-classe de IPlugin)</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+23"/>
         <source>Initializing the plugin failed because state != Loaded</source>
         <translation>L&apos;initialisation de l&apos;extension a échoué car l&apos;état courant est différent de &quot;chargé&quot;</translation>
     </message>
@@ -1380,14 +1369,14 @@ Raison : %3</translation>
         <translation>L&apos;initialisation de l&apos;extension a échoué: %1</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+21"/>
         <source>Cannot perform extensionsInitialized because state != Initialized</source>
         <translation>Impossible d&apos;exécuter extensionsInitialized car l&apos;état est différent de &quot;Initialisé&quot;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Internal error: have no plugin instance to perform extensionsInitialized</source>
-        <translation type="unfinished">Erreur interne : aucune instance de l&apos;extension sur laquelle exécuter extensionsInitialized</translation>
+        <translation>Erreur interne : aucune instance de l&apos;extension sur laquelle exécuter extensionsInitialized</translation>
     </message>
 </context>
 <context>
@@ -1497,7 +1486,7 @@ Raison : %3</translation>
 <context>
     <name>Welcome::WelcomeMode</name>
     <message>
-        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+90"/>
+        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+88"/>
         <source>Welcome</source>
         <translation>Accueil</translation>
     </message>
@@ -1507,13 +1496,13 @@ Raison : %3</translation>
     <message>
         <location filename="../../../src/libs/utils/detailsbutton.cpp" line="+47"/>
         <source>Show Details</source>
-        <translation>Afficher les détails</translation>
+        <translation>Afficher les Détails</translation>
     </message>
 </context>
 <context>
     <name>OpenWith::Editors</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/coreconstants.h" line="+110"/>
+        <location filename="../../../src/plugins/coreplugin/coreconstants.h" line="+85"/>
         <source>Plain Text Editor</source>
         <translation>Éditeur de texte</translation>
     </message>
@@ -1526,7 +1515,7 @@ Raison : %3</translation>
 <context>
     <name>Core::Internal::SettingsDialog</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.cpp" line="+88"/>
+        <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.cpp" line="+94"/>
         <source>Preferences</source>
         <translation>Préférences</translation>
     </message>
@@ -1573,7 +1562,7 @@ Raison : %3</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+60"/>
+        <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+57"/>
         <source>Workspaces</source>
         <translation>Espaces de travail</translation>
     </message>
@@ -1603,22 +1592,9 @@ Raison : %3</translation>
         <translation>Nom :</translation>
     </message>
     <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; A restart is needed for changes to number of workspaces to take effect.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Un redémarrage est nécessaire pour que le nombre des espaces de travail soit pris en compte.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+10"/>
-        <source>GCS</source>
-        <translation></translation>
+        <source>Environment</source>
+        <translation>Environnement</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -1632,11 +1608,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.ui"/>
-        <source>Workspace panel</source>
-        <translation>Barre des espaces de travail</translation>
-    </message>
-    <message>
-        <location/>
         <source>Placement:</source>
         <translation>Emplacement :</translation>
     </message>
@@ -1653,82 +1624,59 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Allow reordering:</source>
-        <translation>Autoriser réorganisation :</translation>
+        <translation>Autoriser la réorganisation :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>General</source>
+        <translation>Général</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Restore last selected workspace on startup</source>
+        <translation>Restaurer le dernier espace de travail au démarrage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Remember last used workspace on restart</source>
+        <translatorcomment>Typo need &quot;:&quot; or remove on others</translatorcomment>
+        <translation>Se rappeler du dernier espace de travail utilisé</translation>
     </message>
 </context>
 <context>
     <name>HITLOptionsPage</name>
     <message>
-        <location filename="../../../src/plugins/hitlnew/hitloptionspage.ui"/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
+        <location filename="../../../src/plugins/hitl/hitloptionspage.ui"/>
         <source>Form</source>
         <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
-        <source>Manual aircraft control (can be used when hardware is not available)</source>
-        <translation>Contrôle manuel de l&apos;appareil (peut être utilisé lorsque le matériel n&apos;est pas disponible)</translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Choose flight simulator:</source>
         <translation>Sélectionner un simulateur de vol :</translation>
     </message>
     <message>
         <location/>
-        <source>Latitude in degrees:</source>
-        <translation>Latitude en degrés :</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Longitude in degrees:</source>
-        <translation>Longitude en degrés :</translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Path executable:</source>
         <translation>Chemin de l&apos;exécutable :</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Data directory:</source>
         <translation>Dossier de données :</translation>
     </message>
     <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
-        <source>Output Port:</source>
-        <translation>Port de sortie :</translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
-        <source>Input Port:</source>
-        <translation>Port d&apos;entrée :</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/hitlnew/hitloptionspage.cpp" line="+65"/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.cpp" line="+56"/>
+        <location filename="../../../src/plugins/hitl/hitloptionspage.cpp" line="+64"/>
         <source>Choose flight simulator executable</source>
         <translation>Sélectionner l&apos;exécutable du simulateur de vol</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.cpp" line="+2"/>
         <source>Choose flight simulator data directory</source>
         <translation>Sélectionner le dossier de données du simulateur de vol</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/hitlnew/hitloptionspage.ui"/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
-        <source>For receiving data from sim</source>
-        <translation type="unfinished">Pour recevoir les données du simulateur</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../../../src/plugins/hitl/hitloptionspage.ui"/>
         <source>Check this box to start the simulator on the local computer</source>
         <translation>Cochez cette case pour démarrer le simulateur sur l&apos;ordinateur local</translation>
     </message>
@@ -1739,48 +1687,18 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
-        <source>Local interface (IP):</source>
-        <translation>Interface locale (IP) :</translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>For communication with sim computer via network. Should be the IP address of one of the interfaces of the GCS computer.</source>
-        <translation type="unfinished">Pour la communication avec l&apos;ordinateur de simulation via le réseau. Doit être l&apos;adresse IP d&apos;une des interfaces de l&apos;ordinateur avec GCS.</translation>
+        <translation>Pour la communication avec l&apos;ordinateur de simulation via le réseau. Doit être l&apos;adresse IP d&apos;une des interfaces de l&apos;ordinateur avec GCS.</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
-        <source>Remote interface (IP):</source>
-        <translation>Interface distante (IP) :</translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Only required if running simulator on remote machine. Should be the IP of the machine on which the simulator is running.</source>
         <translation>Seulement nécessaire si le simulateur est lancé sur une machine distante. Doit être l&apos;IP de la machine sur laquelle le simulateur est lancé.</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
-        <source>For sending data to sim</source>
-        <translation>Pour envoyer les données au simulateur</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
-        <source>Attitude data</source>
-        <translation>Données attitude</translation>
-    </message>
-    <message>
-        <location/>
         <source>AttitudeRaw (gyro, accels)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Refresh rate</source>
-        <translation type="unfinished">Fréquence de rafraîchissement</translation>
+        <translation>AttitudeRaw (gyroscopes, accéléromètres)</translation>
     </message>
     <message>
         <location/>
@@ -1789,33 +1707,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>AttitudeState</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>send raw data to board</source>
-        <translation>envoyer les données brutes vers la carte</translation>
-    </message>
-    <message>
-        <location/>
         <source>use values from simulator</source>
         <translation>utiliser les données du simulateur</translation>
-    </message>
-    <message>
-        <location/>
-        <source>calculate from AttitudeRaw</source>
-        <translation>calculer avec AttitudeRaw</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Other data</source>
-        <translation>Autres données</translation>
-    </message>
-    <message>
-        <location/>
-        <source>HomeLocation</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -1824,79 +1717,174 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>sec</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>GPSPositionSensor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>SonarAltitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Range detection</source>
-        <translation>Plage de détection</translation>
-    </message>
-    <message>
-        <location/>
         <source>m</source>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Map command from simulator</source>
+        <source>IP addresses</source>
+        <translation>Adresses IP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Local host:    </source>
+        <translation>Hôte local :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port:</source>
+        <translation>Port :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP port for receiving data from sim</source>
+        <translation>Port IP pour recevoir les données du simulateur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Remote host:</source>
+        <translation>Hôte distant :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP port for sending data to sim</source>
+        <translation>Port IP pour envoyer les données au simulateur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Program Parameters</source>
+        <translation>Paramètres Programme</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add noise to sensor simulation</source>
+        <translation>Ajouter du bruit à la simulation des capteurs</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add noise</source>
+        <translation>Ajout bruit</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial latitude (decimal):</source>
+        <translation>Latitude Initiale (décimale) :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude Data</source>
+        <translation>Données Attitude</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh rate:</source>
+        <translation>Intervalle d&apos;actualisation :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>send simulated inertial data to board</source>
+        <translation>envoyer les données inertielles simulées vers la carte</translation>
+    </message>
+    <message>
+        <location/>
+        <source>calculate from simulated sensor data</source>
+        <translation>calculer à partir des données de capteur simulées</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Spatial Data</source>
+        <translation>Données Spatiales</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ground truth position and velocity</source>
+        <translation>Position au sol et vitesse</translation>
+    </message>
+    <message>
+        <location/>
+        <source>GPS data</source>
+        <translation>Données GPS</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Other Data</source>
+        <translation>Autres Données</translation>
+    </message>
+    <message>
+        <location/>
+        <source>BaroAltitude</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>to GCSReciver</source>
+        <source>Range detection:</source>
+        <translation>Plage de détection :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Map transmitter commands...</source>
+        <translation>Lier les commandes transmetteur...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>from hardware to simulator (via ManualCtrl)</source>
+        <translation>du matériel vers le simulateur (via ManualCtrl)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>from simulator to hardware (via GCSReceiver)</source>
+        <translation>du simulateur vers le matériel (via GCSReceiver)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum GCS to hardware output rate:</source>
+        <translation>Vitesse maximale d&apos;envoi de GCS vers matériel :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the maximum rate at which GCS sends simulator data to the hardware</source>
+        <translation>Règle la vitesse maximale à laquelle GCS envoie les données simulateur vers le matériel</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial longitude (decimal):</source>
+        <translation>Longitude initiale (décimale) :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>AttitudeState</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>to ManualCtrll (not implemented)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Maximum output rate</source>
+        <source>AirspeedState</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>HITLWidget</name>
     <message>
-        <location filename="../../../src/plugins/hitlnew/hitlwidget.ui"/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
+        <location filename="../../../src/plugins/hitl/hitlwidget.ui"/>
         <source>Form</source>
         <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Request update</source>
         <translation>Demander mise à jour</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Send update</source>
         <translation>Envoyer mise à jour</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
@@ -1912,19 +1900,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Clear Log</source>
         <translation>Effacer le journal</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
-        <source>AP OFF</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sim OFF</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -1937,7 +1914,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Dial SVG: </source>
-        <translation>SVG Dial :</translation>
+        <translation>Cadran SVG :</translation>
     </message>
     <message>
         <location/>
@@ -1987,7 +1964,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Dial font:</source>
-        <translation>Police Dial :</translation>
+        <translation>Police Cadran :</translation>
     </message>
     <message>
         <location/>
@@ -2005,7 +1982,7 @@ p, li { white-space: pre-wrap; }
         <translation>Facteur :</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+61"/>
+        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+60"/>
         <source>SVG image (*.svg)</source>
         <translation>Image SVG (*.svg)</translation>
     </message>
@@ -2041,7 +2018,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>VBO allow for performance gains for GPUs that support it (most cards).  This may cause cards with faulty drivers to crash.</source>
         <translatorcomment>Les VBOs (de l&apos;anglais Vertex Buffer Object dont une traduction pourrait être objet tampon de vertex) @Wikipedia</translatorcomment>
-        <translation type="unfinished">VBO permet des gains de performance avec les cartes graphiques le supportant (la plupart). Cela peut entraîner des plantages avec des pilotes défectueux.</translation>
+        <translation>VBO permet des gains de performance avec les cartes graphiques le supportant (la plupart). Cela peut entraîner des plantages avec des pilotes défectueux.</translation>
     </message>
     <message>
         <location/>
@@ -2081,9 +2058,9 @@ Cela améliore les performances, mais c&apos;est à utiliser à vos risques et p
         <translation>Jouer</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+63"/>
+        <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+64"/>
         <source>Equal to</source>
-        <translation>Egal à</translation>
+        <translation>Égal à</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2098,7 +2075,7 @@ Cela améliore les performances, mais c&apos;est à utiliser à vos risques et p
     <message>
         <location line="+1"/>
         <source>In range</source>
-        <translation type="unfinished"></translation>
+        <translation>Dans l&apos;intervalle</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
@@ -2156,25 +2133,25 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>DataObject</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+21"/>
+        <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+20"/>
         <source>Choose sound collection directory</source>
         <translation>Choisir le dossier de la bibliothèque de sons</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/notify/notifypluginoptionspage.h" line="+67"/>
+        <location filename="../../../src/plugins/notify/notifypluginoptionspage.h" line="+69"/>
         <source>settings</source>
         <translation>Paramètres</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+8"/>
         <source>Notification</source>
         <translation>Notification</translation>
     </message>
@@ -2230,7 +2207,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMapPos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2242,13 +2219,13 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMousePos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
@@ -2258,17 +2235,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>london</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>new york</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>paris</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2278,7 +2255,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>New Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvel Item</translation>
     </message>
     <message>
         <location/>
@@ -2372,7 +2349,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Previous WP</source>
-        <translation>Précédent WP</translation>
+        <translatorcomment>Abbrégé : bouton</translatorcomment>
+        <translation>Préc. WP</translation>
     </message>
     <message>
         <location/>
@@ -2382,7 +2360,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Next WP</source>
-        <translation>WP Suivant</translation>
+        <translatorcomment>Abbrégé : bouton. Ignorer le Warning sur le point à la fin.</translatorcomment>
+        <translation type="unfinished">WP Suiv.</translation>
     </message>
     <message>
         <location/>
@@ -2392,7 +2371,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Go</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Y aller</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
@@ -2404,13 +2383,13 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelUAVPos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMapZoom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2456,7 +2435,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move to WP</source>
-        <translation type="unfinished">Déplacer au Waypoint</translation>
+        <translation>Déplacer au Waypoint</translation>
     </message>
     <message>
         <location/>
@@ -2551,7 +2530,7 @@ p, li { white-space: pre-wrap; }
         <translation>Utiliser Mémoire Cache</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.cpp" line="+97"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.cpp" line="+96"/>
         <source>Choose Cache Directory</source>
         <translation>Sélectionner le dossier de cache</translation>
     </message>
@@ -2616,7 +2595,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Update Interval:</source>
-        <translation type="unfinished">Intervalle de MAJ :</translation>
+        <translation>Intervalle Actualisation :</translation>
     </message>
     <message>
         <location/>
@@ -2627,26 +2606,13 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Add a new curve to the scope, or update it if the UAVObject and UAVField is the same.</source>
         <translatorcomment>Oscilloscope ?</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add
-Update</source>
-        <translation>Ajouter
-Mise à Jour</translation>
+        <translation>Ajoute une nouvelle courbe au graphique, ou l&apos;actualise si UAVObject et UAVField sont identiques.</translation>
     </message>
     <message>
         <location/>
         <source>Remove the curve from the scope.</source>
         <translatorcomment>Oscilloscope ?</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Remove
-</source>
-        <translation>Supprimer</translation>
+        <translation>Retire la courbe du graphique.</translation>
     </message>
     <message>
         <location/>
@@ -2661,13 +2627,14 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>Math window size</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Typo Should be fixed in code add &quot;:&quot; like others in form</translatorcomment>
+        <translation type="unfinished">Plage calcul :</translation>
     </message>
     <message>
         <location/>
         <source> samples</source>
         <translatorcomment>échantillons ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"> échantillons</translation>
     </message>
     <message>
         <location/>
@@ -2690,9 +2657,29 @@ Mise à Jour</translation>
         <translation>Chemin du journal</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/scope/scopegadgetoptionspage.cpp" line="+130"/>
+        <location filename="../../../src/plugins/scope/scopegadgetoptionspage.cpp" line="+132"/>
         <source>Choose Logging Directory</source>
         <translation>Choisir le dossier des journaux</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/scope/scopegadgetoptionspage.ui"/>
+        <source>Check this to have the curve drawn antialiased.</source>
+        <translation>Cocher ici pour avoir un tracé de courbe anticrénelé.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Draw Antialiased</source>
+        <translation>Tracé anticrénelé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add / Update</source>
+        <translation>Ajouter / Actualiser</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Remove</source>
+        <translation>Supprimer</translation>
     </message>
 </context>
 <context>
@@ -2708,7 +2695,7 @@ Mise à Jour</translation>
         <translation>Sous-système SVG :</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.cpp" line="+55"/>
+        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.cpp" line="+53"/>
         <source>SVG image (*.svg)</source>
         <translation>Image SVG (*.svg)</translation>
     </message>
@@ -2771,22 +2758,23 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>Recently updated color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Couleur données actualisées récemment :</translation>
     </message>
     <message>
         <location/>
         <source>Manually changed color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Couleur donnés changées manuellement :</translation>
     </message>
     <message>
         <location/>
         <source>Recently updated timeout (ms):</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps de repos données récemment actualisées (ms) :</translation>
     </message>
     <message>
         <location/>
         <source>Only highlight nodes when value actually changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Mettre en évidence les noeuds 
+uniquement lorsque les valeurs changent</translation>
     </message>
 </context>
 <context>
@@ -2798,3214 +2786,14 @@ Mise à Jour</translation>
     </message>
 </context>
 <context>
-    <name>QxtCommandOptions</name>
-    <message>
-        <location filename="../../../src/libs/libqxt/src/core/qxtcommandoptions.cpp" line="+101"/>
-        <source>sets the application GUI style</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>sets the application stylesheet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>restores the application from an earlier session</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>displays debugging information about widgets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>use right-to-left layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>never grab the mouse or keyboard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>grab the mouse/keyboard even in a debugger</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>run in synchronous mode for debugging</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>use Direct3D by default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>sets the X11 display</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>sets the geometry of the first window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>sets the default font</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>sets the default background color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>sets the default foreground color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>sets the default button color</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>sets the application name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>sets the application title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>sets the X11 visual type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>limit the number of colors on an 8-bit display</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>use a private color map</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>sets the input method server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>disable the X Input Method</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>sets the style used by the input method</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+104"/>
-        <location line="+14"/>
-        <source>option &quot;%1&quot; not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+135"/>
-        <source>Short options cannot have optional parameters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>positional() called before parse()</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>unrecognized() called before parse()</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>count() called before parse()</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>value() called before parse()</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>parameters() called before parse()</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+291"/>
-        <source>unrecognized parameters: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>%1 requires a parameter</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QxtLocale</name>
-    <message>
-        <location filename="../../../src/libs/libqxt/src/core/qxtlocale_data_p.h" line="+767"/>
-        <source>*No Currency*</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Afghani</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Algerian Dinar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Argentine Peso</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Armenian Dram</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Aruban Guilder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Australian Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Azerbaijanian Manat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bahamian Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bahraini Dinar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Baht</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Balboa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Barbados Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Belarussian Ruble</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Belize Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bermudian Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bolivar Fuerte</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Boliviano</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Brazilian Real</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Brunei Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bulgarian Lev</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Burundi Franc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CFA Franc BCEAO</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CFA Franc BEAC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CFP Franc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Canadian Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cape Verde Escudo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cayman Islands Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Chilean Peso</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Colombian Peso</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Comoro Franc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Convertible Marks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cordoba Oro</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Costa Rican Colon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Croatian Kuna</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cuban Peso</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cyprus Pound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Czech Koruna</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Dalasi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Danish Krone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Denar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Djibouti Franc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Dobra</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Dominican Peso</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Dong</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>East Caribbean Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Egyptian Pound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>El Salvador Colon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ethiopian Birr</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Euro</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Falkland Islands Pound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Fiji Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Forint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Franc Congolais</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ghana Cedi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Gibraltar Pound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Gourde</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guarani</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guinea-Bissau Peso</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guinea Franc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guyana Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Hong Kong Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Hryvnia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Iceland Krona</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Indian Rupee</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Iranian Rial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Iraqi Dinar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Jamaican Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Jordanian Dinar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kenyan Shilling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kina</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kroon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kuwaiti Dinar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kwanza</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kyat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lari</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Latvian Lats</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lebanese Pound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lek</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lempira</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Leone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Liberian Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Libyan Dinar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lilangeni</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lithuanian Litas</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Loti</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Malagasy Ariary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>MalawiKwacha</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Malaysian Ringgit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Maltese Lira</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Manat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mauritius Rupee</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Metical</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mexican Peso</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mexican Unidad de Inversion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Moldovan Leu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Moroccan Dirham</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mvdol</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Naira</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Nakfa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Namibia Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Nepalese Rupee</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Netherlands Antillian Guilder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>New Israeli Sheqel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>New Leu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>New Taiwan Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>New Turkish Lira</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>New Zealand Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ngultrum</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>North Korean Won</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Norwegian Krone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Nuevo Sol</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ouguiya</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Pa&apos;anga</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Pakistan Rupee</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Pataca</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Peso Uruguayo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Philippine Peso</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Pound Sterling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Pula</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Qatari Rial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Quetzal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Rand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Rial Omani</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Riel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Rufiyaa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Rupiah</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Russian Ruble</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Rwanda Franc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Saint Helena Pound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Saudi Riyal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Serbian Dinar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Seychelles Rupee</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Singapore Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Slovak Koruna</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Solomon Islands Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Som</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Somali Shilling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Somoni</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sri Lanka Rupee</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sudanese Pound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Surinam Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Swedish Krona</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Swiss Franc</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Syrian Pound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Taka</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tala</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tanzanian Shilling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tenge</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Trinidad and Tobago Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tugrik</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tunisian Dinar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>UAE Dirham</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>US Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Uganda Shilling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Unidad de Valor Real</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Unidades de fomento</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Uruguay Peso en Unidades Indexadas</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Uzbekistan Sum</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Vatu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Won</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Yemeni Rial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Yen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Yuan Renminbi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>ZambiaKwacha</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zimbabwe Dollar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zloty</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+345"/>
-        <source>None</source>
-        <translation type="unfinished">Aucune</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NorthAmerica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SouthAmerica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Europe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Africa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Asia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Australia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Antarctica</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QxtConfirmationMessage</name>
-    <message>
-        <location filename="../../../src/libs/libqxt/src/gui/qxtconfirmationmessage.cpp" line="+72"/>
-        <source>Do not show again.</source>
-        <translation>Ne plus afficher.</translation>
-    </message>
-</context>
-<context>
-    <name>QxtCountryComboBox</name>
-    <message>
-        <location filename="../../../src/libs/libqxt/src/gui/qxtcountrycombobox.cpp" line="+109"/>
-        <source>DESIGNER MODE  -  DESIGNER MODE</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QxtCountryModel</name>
-    <message>
-        <location filename="../../../src/libs/libqxt/src/gui/qxtcountrymodel.cpp" line="+196"/>
-        <source>Name</source>
-        <translation type="unfinished">Nom</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>ISO 3166 Alpha 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>QLocale</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>ISO 3166 Alpha 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Currency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Currency Code</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Currency Symbol</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Continent</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QxtFilterDialog</name>
-    <message>
-        <location filename="../../../src/libs/libqxt/src/gui/qxtfilterdialog.cpp" line="+115"/>
-        <source>Filter options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Match case</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Filter mode:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Fixed String (Default)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Wildcard</source>
-        <translation type="unfinished">Joker</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Regular Expression</source>
-        <translation type="unfinished">Expression régulière</translation>
+    <name>ConfigGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/config/configgadgetfactory.cpp" line="+36"/>
+        <source>Config</source>
+        <translation>Config</translation>
     </message>
     <message>
         <location line="+17"/>
-        <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QxtProgressLabel</name>
-    <message>
-        <location filename="../../../src/libs/libqxt/src/gui/qxtprogresslabel.cpp" line="+237"/>
-        <source>mm:ss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>ETA: %r</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QLocale</name>
-    <message>
-        <location filename="../../../src/libs/libqxt/translations/gen_qlocale.cpp" line="+32"/>
-        <source>C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Abkhazian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Afan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Afar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Afrikaans</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Albanian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Amharic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Arabic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Armenian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Assamese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Aymara</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Azerbaijani</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bashkir</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Basque</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bengali</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bhutani</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bihari</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bislama</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Breton</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bulgarian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Burmese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Byelorussian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cambodian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Catalan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Chinese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Corsican</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Croatian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Czech</source>
-        <translation type="unfinished">Tchèque</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Danish</source>
-        <translation>Danois</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Dutch</source>
-        <translation>Néerlandais</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>English</source>
-        <translation>Anglais</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Esperanto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Estonian</source>
-        <translation type="unfinished">Estonien</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Faroese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>FijiLanguage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Finnish</source>
-        <translation>Finnois</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>French</source>
-        <translation>Français</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Frisian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Gaelic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Galician</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Georgian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>German</source>
-        <translation>Allemand</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Greek</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Greenlandic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guarani</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Gujarati</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Hausa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Hebrew</source>
-        <translation>Hébreu</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Hindi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Hungarian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Icelandic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Indonesian</source>
-        <translation type="unfinished">Indonésien</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Interlingua</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Interlingue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Inuktitut</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Inupiak</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Irish</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Italian</source>
-        <translation>Italien</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Japanese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Javanese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kannada</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kashmiri</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kazakh</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kinyarwanda</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kirghiz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Korean</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kurdish</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kurundi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Laothian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Latin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Latvian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lingala</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lithuanian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Macedonian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Malagasy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Malay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Malayalam</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Maltese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Maori</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Marathi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Moldavian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mongolian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NauruLanguage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Nepali</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Norwegian</source>
-        <translation>Norvégien</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NorwegianBokmal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Occitan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Oriya</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Pashto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Persian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Polish</source>
-        <translation>Polonais</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Portuguese</source>
-        <translation>Portugais</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Punjabi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Quechua</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>RhaetoRomance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Romanian</source>
-        <translation type="unfinished">Roumain</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Russian</source>
-        <translation>Russe</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Samoan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sangho</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sanskrit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Serbian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SerboCroatian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sesotho</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Setswana</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Shona</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sindhi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Singhalese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Siswati</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Slovak</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Slovenian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Somali</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Spanish</source>
-        <translation>Espagnol</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sundanese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Swahili</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Swedish</source>
-        <translation>Suédois</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tagalog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tajik</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tamil</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tatar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Telugu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Thai</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tibetan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tigrinya</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>TongaLanguage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tsonga</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Turkish</source>
-        <translation>Turque</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Turkmen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Twi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Uigur</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ukrainian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Urdu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Uzbek</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Vietnamese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Volapuk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Welsh</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Wolof</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Xhosa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Yiddish</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Yoruba</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zhuang</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zulu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NorwegianNynorsk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Nynorsk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bosnian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Divehi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Manx</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cornish</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Akan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Konkani</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ga</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Igbo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kamba</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Syriac</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Blin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Geez</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Koro</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sidamo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Atsam</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tigre</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Jju</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Friulian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Venda</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ewe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Walamo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Hawaiian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tyap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>AnyCountry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Afghanistan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Albania</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Algeria</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>AmericanSamoa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Andorra</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Angola</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Anguilla</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Antarctica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>AntiguaAndBarbuda</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Argentina</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Armenia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Aruba</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Australia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Austria</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Azerbaijan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bahamas</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bahrain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bangladesh</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Barbados</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Belarus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Belgium</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Belize</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Benin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bermuda</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bhutan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bolivia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>BosniaAndHerzegowina</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Botswana</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>BouvetIsland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Brazil</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>BritishIndianOceanTerritory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>BruneiDarussalam</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Bulgaria</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>BurkinaFaso</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Burundi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cambodia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cameroon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Canada</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CapeVerde</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CaymanIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CentralAfricanRepublic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Chad</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Chile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>China</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>ChristmasIsland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CocosIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Colombia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Comoros</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>DemocraticRepublicOfCongo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>PeoplesRepublicOfCongo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CookIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CostaRica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>IvoryCoast</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Croatia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cuba</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cyprus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>CzechRepublic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Denmark</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Djibouti</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Dominica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>DominicanRepublic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>EastTimor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ecuador</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Egypt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>ElSalvador</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>EquatorialGuinea</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Eritrea</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Estonia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ethiopia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>FalklandIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>FaroeIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>FijiCountry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Finland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>France</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>MetropolitanFrance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>FrenchGuiana</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>FrenchPolynesia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>FrenchSouthernTerritories</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Gabon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Gambia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Georgia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Germany</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ghana</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Gibraltar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Greece</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Greenland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Grenada</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guadeloupe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guam</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guatemala</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guinea</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>GuineaBissau</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Guyana</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Haiti</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>HeardAndMcDonaldIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Honduras</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>HongKong</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Hungary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Iceland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>India</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Indonesia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Iran</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Iraq</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ireland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Israel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Italy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Jamaica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Japan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Jordan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kazakhstan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kenya</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kiribati</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>DemocraticRepublicOfKorea</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>RepublicOfKorea</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kuwait</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Kyrgyzstan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lao</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Latvia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lebanon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lesotho</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Liberia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>LibyanArabJamahiriya</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Liechtenstein</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Lithuania</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Luxembourg</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Macau</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Macedonia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Madagascar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Malawi</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Malaysia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Maldives</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mali</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Malta</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>MarshallIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Martinique</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mauritania</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mauritius</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mayotte</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mexico</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Micronesia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Moldova</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Monaco</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mongolia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Montserrat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Morocco</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Mozambique</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Myanmar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Namibia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NauruCountry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Nepal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Netherlands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NetherlandsAntilles</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NewCaledonia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NewZealand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Nicaragua</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Niger</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Nigeria</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Niue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NorfolkIsland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>NorthernMarianaIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Norway</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Oman</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Pakistan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Palau</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>PalestinianTerritory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Panama</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>PapuaNewGuinea</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Paraguay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Peru</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Philippines</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Pitcairn</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Poland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Portugal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>PuertoRico</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Qatar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Reunion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Romania</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>RussianFederation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Rwanda</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SaintKittsAndNevis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>StLucia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>StVincentAndTheGrenadines</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Samoa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SanMarino</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SaoTomeAndPrincipe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SaudiArabia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Senegal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Seychelles</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SierraLeone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Singapore</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Slovakia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Slovenia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SolomonIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Somalia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SouthAfrica</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SouthGeorgiaAndTheSouthSandwichIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Spain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SriLanka</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>StHelena</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>StPierreAndMiquelon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sudan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Suriname</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SvalbardAndJanMayenIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Swaziland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sweden</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Switzerland</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>SyrianArabRepublic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Taiwan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tajikistan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tanzania</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Thailand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Togo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tokelau</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>TongaCountry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>TrinidadAndTobago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tunisia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Turkey</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Turkmenistan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>TurksAndCaicosIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tuvalu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Uganda</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ukraine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>UnitedArabEmirates</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>UnitedKingdom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>UnitedStates</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>UnitedStatesMinorOutlyingIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Uruguay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Uzbekistan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Vanuatu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>VaticanCityState</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Venezuela</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>VietNam</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>BritishVirginIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>USVirginIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>WallisAndFutunaIslands</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>WesternSahara</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Yemen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Yugoslavia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zambia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zimbabwe</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ConfigGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/config/configgadgetfactory.cpp" line="+38"/>
-        <source>Config Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+22"/>
         <source>Radio Setup Wizard</source>
         <translation>Assistant Configuration Radio</translation>
     </message>
@@ -6030,19 +2818,19 @@ Mise à Jour</translation>
 <context>
     <name>Core::UAVGadgetInstanceManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+90"/>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+89"/>
         <source>Migrating UAVGadgetConfigurations from version 1.1.0 to </source>
-        <translation type="unfinished"></translation>
+        <translation>Migration des configurations UAVGadget depuis la version 1.1.0 vers </translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+7"/>
         <source>You might want to save your old config NOW since it might be replaced by broken one when you exit the GCS!</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous pourriez vouloir enregistrer votre ancienne configuration MAINTENANT car elle pourrait être remplacée par une autre défaillante lorsque vous quitterez GCS !</translation>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+51"/>
         <location line="+1"/>
-        <location line="+48"/>
+        <location line="+47"/>
         <location line="+1"/>
         <source>default</source>
         <translation>défaut</translation>
@@ -6051,10 +2839,10 @@ Mise à Jour</translation>
 <context>
     <name>Core::Internal::UAVGadgetView</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetview.cpp" line="+124"/>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetview.cpp" line="+121"/>
         <source>Active</source>
         <translatorcomment>Activé ?</translatorcomment>
-        <translation type="unfinished">Actif</translation>
+        <translation>Actif</translation>
     </message>
 </context>
 <context>
@@ -6083,26 +2871,21 @@ Mise à Jour</translation>
     <message>
         <location line="+1"/>
         <source>Maybe you first have to choose Edit Gadgets Mode in the Window menu.</source>
-        <translation>Peut-être avez-vous besoin de d&apos;abord cocher Editer Gadgets Mode dans le menu Fenêtre.</translation>
+        <translation>Peut-être avez-vous besoin de d&apos;abord cocher Mode Éditeur Gadgets dans le menu Fenêtre.</translation>
     </message>
 </context>
 <context>
     <name>HITLFactory</name>
     <message>
-        <location filename="../../../src/plugins/hitlnew/hitlfactory.cpp" line="+35"/>
+        <location filename="../../../src/plugins/hitl/hitlfactory.cpp" line="+35"/>
         <source>HITL Simulation</source>
-        <translation type="unfinished">Simulation HITL</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/hitlv2/hitlv2factory.cpp" line="+36"/>
-        <source>HITL Simulation (v2)</source>
-        <translation type="unfinished">Simulation HITL (v2)</translation>
+        <translation>Simulation HITL</translation>
     </message>
 </context>
 <context>
     <name>ModelViewGadgetOptionsPage</name>
     <message>
-        <location filename="../../../src/plugins/modelview/modelviewgadgetoptionspage.cpp" line="+47"/>
+        <location filename="../../../src/plugins/modelview/modelviewgadgetoptionspage.cpp" line="+46"/>
         <source>3D model (*.dae *.3ds)</source>
         <translation>Modèle 3D (*.dae *.3ds)</translation>
     </message>
@@ -6133,56 +2916,56 @@ Mise à Jour</translation>
 <context>
     <name>OPMapGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+434"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+440"/>
         <source>&amp;Zoom </source>
-        <translation type="unfinished">&amp;Zoom</translation>
+        <translation>&amp;Zoom</translation>
     </message>
     <message>
         <location line="-5"/>
         <source>Zoom</source>
-        <translation type="unfinished">Zoom</translation>
+        <translation>Zoom</translation>
     </message>
     <message>
-        <location line="-27"/>
+        <location line="-28"/>
         <source>Copy</source>
-        <translation type="unfinished">Copier</translation>
+        <translation>Copier</translation>
     </message>
     <message>
-        <location line="+89"/>
-        <location line="+22"/>
+        <location line="+93"/>
+        <location line="+23"/>
         <source>Waypoints</source>
-        <translation type="unfinished">Waypoints</translation>
+        <translation>Waypoints</translation>
     </message>
     <message>
-        <location line="+709"/>
+        <location line="+781"/>
         <location line="+3"/>
         <source>Close the context menu</source>
-        <translation type="unfinished">Fermer le menu contextuel</translation>
+        <translation>Fermer le menu contextuel</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Reload map</source>
-        <translation type="unfinished">&amp;Recharger carte</translation>
+        <translation>&amp;Recharger carte</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>F5</source>
-        <translation type="unfinished">F5</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Reload the map tiles</source>
-        <translation type="unfinished">Recharger les dalles de la carte</translation>
+        <translation>Recharger les dalles de la carte</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Mouse latitude and longitude</source>
-        <translation type="unfinished">Latitude et longitude de la souris</translation>
+        <translation>Latitude et longitude de la souris</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Copy the mouse latitude and longitude to the clipboard</source>
-        <translation type="unfinished">Copier la lat/long de la souris dans le presse-papier</translation>
+        <translation>Copier la lat/long de la souris dans le presse-papier</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -6193,17 +2976,17 @@ Mise à Jour</translation>
     <message>
         <location line="+1"/>
         <source>Copy the mouse latitude to the clipboard</source>
-        <translation type="unfinished">Copier la latitude de la souris dans le presse-papier</translation>
+        <translation>Copier la latitude de la souris dans le presse-papier</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Mouse longitude</source>
-        <translation type="unfinished">Longitude de la souris</translation>
+        <translation>Longitude de la souris</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Copy the mouse longitude to the clipboard</source>
-        <translation type="unfinished">Copier la longitude de saouris dans le presse-papier</translation>
+        <translation>Copier la longitude de souris dans le presse-papier</translation>
     </message>
     <message>
         <location line="+71"/>
@@ -6214,265 +2997,270 @@ Mise à Jour</translation>
     <message>
         <location line="-75"/>
         <source>Show compass</source>
-        <translation type="unfinished">Afficher la boussole</translation>
+        <translation>Afficher la boussole</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Zoom &amp;In</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom &amp;Avant</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Zoom the map in</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom avant de la carte</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Zoom &amp;Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom A&amp;rrière </translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Zoom the map out</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom arrière de la carte</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Go to where you right clicked the mouse</source>
-        <translation type="unfinished"></translation>
+        <translation>Aller où vous avez fait un clic droit de souris</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Go to &amp;Home location</source>
-        <translation type="unfinished"></translation>
+        <translation>Aller à la position &amp;Home</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Go to &amp;UAV location</source>
-        <translation type="unfinished"></translation>
+        <translation>Aller à la position &amp;UAV</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Follow UAV position</source>
-        <translation type="unfinished"></translation>
+        <translation>Suivre position UAV</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Follow UAV heading</source>
-        <translation type="unfinished"></translation>
+        <translation>Suivre orientation UAV</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Keep the map rotation to the UAV heading</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;orientation de la carte suit la direction de l&apos;appareil UAV</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>&amp;Waypoint editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Éditeur &amp;Waypoint</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Open the waypoint editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvre l&apos;éditeur de Waypoints</translation>
     </message>
     <message>
         <location line="-41"/>
         <source>Center the map onto where you right clicked the mouse</source>
-        <translation type="unfinished"></translation>
+        <translation>Centrer la carte à l&apos;endroit où vous avez fait un clic droit de souris</translation>
     </message>
     <message>
-        <location line="-852"/>
+        <location line="-927"/>
         <source>HOME</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
-        <location line="+26"/>
+        <location line="+29"/>
         <source>UAV</source>
-        <translation type="unfinished">Appareil</translation>
+        <translation>Appareil</translation>
     </message>
     <message>
-        <location line="+772"/>
+        <location line="+844"/>
         <source>Show/Hide the compass</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche/Cache la boussole</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Show Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche Home</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide the Home location</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche/Cache le point de départ</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Show UAV</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche UAV</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide the UAV</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche/Cache l&apos;appareil UAV</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Ctrl+H</source>
-        <translation type="unfinished">Ctrl+H</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Center the map onto the home location</source>
-        <translation type="unfinished"></translation>
+        <translation>Centrer la carte sur le point de départ</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Ctrl+U</source>
-        <translation type="unfinished">Ctrl+U</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Center the map onto the UAV location</source>
-        <translation type="unfinished"></translation>
+        <translation>Centrer la carte sur l&apos;appareil UAV</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Keep the map centered onto the UAV</source>
-        <translation type="unfinished"></translation>
+        <translation>Garder la carte centrée sur l&apos;appareil UAV</translation>
     </message>
     <message>
-        <location line="+166"/>
+        <location line="+161"/>
         <source>Clear UAV trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer parcours UAV</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clear the UAV trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Efface le parcours de l&apos;appareil UAV</translation>
     </message>
     <message>
-        <location line="-149"/>
+        <location line="-144"/>
         <source>Ctrl+W</source>
-        <translation type="unfinished">Ctrl+W</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-960"/>
+        <location line="-1040"/>
         <source>&amp;Max Update Rate </source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence d&apos;Actualisation &amp;Max</translation>
     </message>
     <message>
         <location line="+9"/>
         <source> (Normal)</source>
-        <translation type="unfinished"></translation>
+        <translation> (Normal)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source> (Magic Waypoint)</source>
-        <translation type="unfinished"></translation>
+        <translation> (Waypoint Magique)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source> (Unknown)</source>
-        <translation type="unfinished"></translation>
+        <translation> (Inconnu)</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+11"/>
         <source>Map mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode carte</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+18"/>
+        <source>Safety Area definitions</source>
+        <translation>Zone de Sécurité</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Safe Area Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Rayon Zone Sécurité</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+40"/>
         <source>UAV Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcours UAV</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>UAV trail type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type de parcours UAV</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>UAV trail time</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps de parcours UAV</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>UAV trail distance</source>
-        <translation type="unfinished"></translation>
+        <translation>Distance de parcours UAV</translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+57"/>
         <source>&amp;Overlay Opacity </source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Opacité Recouvrement</translation>
     </message>
     <message>
-        <location line="+701"/>
+        <location line="+773"/>
         <location line="+3"/>
         <source>Close menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer Menu</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Rip map</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Récupération carte</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rip the map tiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Récupérer les dalles de la carte</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Show Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher diagnostics</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide the diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche/Cache les diagnostics</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Show UAV Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher Info Appareil</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide the UAV info</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche/Cache les informations de l&apos;appareil UAV</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Set default zoom and location</source>
-        <translation type="unfinished"></translation>
+        <translation>Fixer le zoom et la position par défaut</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Changes the map default zoom and location to the current values</source>
-        <translation type="unfinished"></translation>
+        <translation>Changer le zoom et la position de la carte aux valeurs actuelles</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Set the home location</source>
-        <translation type="unfinished"></translation>
+        <translation>Fixer le point de départ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Set the home location to where you clicked</source>
-        <translation type="unfinished"></translation>
+        <translation>Fixer le point de départ à l&apos;endroit où vous avez cliqué</translation>
     </message>
     <message>
         <location line="+40"/>
         <location line="+5"/>
         <source>&amp;Add waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ajoute Waypoint</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -6484,12 +3272,12 @@ Mise à Jour</translation>
         <location line="-4"/>
         <location line="+5"/>
         <source>Add waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajoute waypoint</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>&amp;Edit waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Édite waypoint</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6499,117 +3287,117 @@ Mise à Jour</translation>
     <message>
         <location line="+1"/>
         <source>Edit waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Édite waypoint</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;Lock waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérroui&amp;lle waypoint</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Lock/Unlock a waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Verrouille / Déverrouille un waypoint</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Delete waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Supprime waypoint</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Ctrl+D</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+S</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprime waypoint</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;Clear waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation>E&amp;fface waypoints</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Ctrl+C</source>
-        <translation type="unfinished">Ctrl+C</translation>
+        <translation type="unfinished">Ctrl+F</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clear waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Efface waypoints</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+13"/>
         <source>Home magic waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Waypoint magique Home</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Move the magic waypoint to the home position</source>
-        <translation type="unfinished">Déplacer le Waypoint magique au point de départ</translation>
+        <translation>Déplacer le Waypoint magique au point de départ</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Magic Waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Waypoint Magique </translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+34"/>
         <source>Show Safe Area</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher Zone Sécurité</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide the Safe Area around the home location</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche/Cache la zone de sécurité autour du point de départ</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+34"/>
         <source>Show Trail dots</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher Points parcours</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide the Trail dots</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche / cache les points du parcours</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Show Trail lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher Lignes parcours</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide the Trail lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche / cache les lignes du parcours</translation>
     </message>
     <message>
-        <location line="+191"/>
+        <location line="+208"/>
         <source>Set home altitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Fixer altitude départ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>In [m], referenced to WGS84:</source>
-        <translation type="unfinished"></translation>
+        <translation>En [m], référencé par WGS84 :</translation>
     </message>
     <message>
-        <location line="+187"/>
+        <location line="+214"/>
         <source>Are you sure you want to clear waypoints?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous certain de vouloir supprimer tous les waypoints ?</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>All associated data will be lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes les données associées seront perdues.</translation>
     </message>
 </context>
 <context>
@@ -6617,7 +3405,7 @@ Mise à Jour</translation>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowserfactory.cpp" line="+35"/>
         <source>UAVObject Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Explorateur UAVObject</translation>
     </message>
 </context>
 <context>
@@ -6625,37 +3413,37 @@ Mise à Jour</translation>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjecttreemodel.cpp" line="+70"/>
         <source>Property</source>
-        <translation type="unfinished">Propriété</translation>
+        <translation>Propriété</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Value</source>
-        <translation type="unfinished">Valeur</translation>
+        <translation>Valeur</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Unit</source>
-        <translation type="unfinished"></translation>
+        <translation>Unité</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Settings</source>
-        <translation type="unfinished">Paramètres</translation>
+        <translation>Paramètres</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Data Objects</source>
-        <translation type="unfinished"></translation>
+        <translation>Objets Données</translation>
     </message>
     <message>
-        <location line="+72"/>
+        <location line="+74"/>
         <source>Meta Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Métadonnées</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Instance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Exemple</translation>
     </message>
 </context>
 <context>
@@ -6663,6 +3451,7 @@ Mise à Jour</translation>
     <message>
         <location filename="../../../src/plugins/uavobjects/uavmetaobject.cpp" line="+42"/>
         <source>FlightReadOnly</source>
+        <translatorcomment>Meta object : Not translated</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6701,6 +3490,16 @@ Mise à Jour</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="+0"/>
+        <source>LoggingUpdatePeriodic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>LoggingUpdateOnChange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+2"/>
         <source>Modes</source>
         <translation type="unfinished"></translation>
@@ -6720,7 +3519,7 @@ Mise à Jour</translation>
         <location line="+1"/>
         <location line="+1"/>
         <source>ms</source>
-        <translation type="unfinished">ms</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-1"/>
@@ -6736,17 +3535,16 @@ Mise à Jour</translation>
 <context>
     <name>Telemetry</name>
     <message>
-        <location filename="../../../src/plugins/uavtalk/telemetry.cpp" line="+333"/>
         <source>Telemetry: priority event queue is full, event lost (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Télémétrie : la file d&apos;attente d&apos;événements prioritaires est pleine, événement perdu (%1)</translation>
     </message>
 </context>
 <context>
     <name>TelemetryMonitor</name>
     <message>
-        <location filename="../../../src/plugins/uavtalk/telemetrymonitor.cpp" line="+107"/>
+        <location filename="../../../src/plugins/uavtalk/telemetrymonitor.cpp" line="+91"/>
         <source>Starting to retrieve meta and settings objects from the autopilot (%1 objects)</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrage de la récupération des objets meta et paramètres depuis l&apos;autopilote (%1 objets)</translation>
     </message>
 </context>
 <context>
@@ -6759,22 +3557,22 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>Dial SVG: </source>
-        <translation>SVG Dial :</translation>
+        <translation>Cadran SVG : </translation>
     </message>
     <message>
         <location/>
         <source>BackgroundID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ForegroundID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Dial font:</source>
-        <translation>Police Dial :</translation>
+        <translation>Police Cadran :</translation>
     </message>
     <message>
         <location/>
@@ -6832,7 +3630,7 @@ Mise à Jour</translation>
         <translation>Indicateur 3</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+86"/>
+        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+84"/>
         <source>SVG image (*.svg)</source>
         <translation>Image SVG (*.svg)</translation>
     </message>
@@ -6844,17 +3642,17 @@ Mise à Jour</translation>
     <message>
         <location filename="../../../src/plugins/dial/dialgadgetoptionspage.ui"/>
         <source>XML ID of the SVG source file used to display the dial background.</source>
-        <translation type="unfinished"></translation>
+        <translation>ID XML du fichier source SVG utilisé pour afficher l&apos;arrière plan du cadran.</translation>
     </message>
     <message>
         <location/>
         <source>XML ID of the SVG source file used to display the dial foreground (above everything else, needles included).</source>
-        <translation type="unfinished"></translation>
+        <translation>ID XML du fichier source SVG utilisé pour afficher l&apos;avant plan du cadran (par-dessus tout, les aiguilles incluses).</translation>
     </message>
     <message>
         <location/>
         <source>Use OpenGL for rendering. Will lower CPU usage, depending on the capabilities of your graphics card, but might slightly alter the look &amp; feel of the dial.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilise OpenGL pour le rendu. Cela diminue la charge processeur en fonction des performances de votre carte vidéo mais peut dégrader légèrement l&apos;apparence du cadran.</translation>
     </message>
     <message>
         <location/>
@@ -6864,17 +3662,17 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>When checked, the Dial plugin will make needle moves smoother by simulating inertia.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lorsque coché, le module Cadran affiche des mouvements d&apos;aiguilles plus doux en simulant leur inertie.</translation>
     </message>
     <message>
         <location/>
         <source>Smooth updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Mises à jour lissées</translation>
     </message>
     <message>
         <location/>
         <source>XML ID of the SVG source file used to display the first needle/indicator.</source>
-        <translation type="unfinished"></translation>
+        <translation>ID XML du fichier source SVG utilisé pour afficher la première aiguille / indicateur.</translation>
     </message>
 </context>
 <context>
@@ -6927,6 +3725,7 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>Timeout(ms):</source>
+        <translatorcomment>Typo (space missing)</translatorcomment>
         <translation>Temps de latence (ms) :</translation>
     </message>
     <message>
@@ -6970,7 +3769,7 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>Coord:</source>
-        <translation></translation>
+        <translation>Coord :</translation>
     </message>
     <message>
         <location/>
@@ -6986,7 +3785,7 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>H / V / P DOP:</source>
-        <translation></translation>
+        <translation>H / V / P DOP :</translation>
     </message>
     <message>
         <location/>
@@ -7015,7 +3814,7 @@ Satellite number (PRN) is displayed inside the green bar.
 Sat SNR is displayed above (in dBHz)</source>
         <translation>Affiche le SNR pour chaque satellite détecté.
 Le numéro du satellite (PRN) est affiché sur une barre verte.
-Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
+Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
     </message>
 </context>
 <context>
@@ -7043,10 +3842,11 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Host Name/Number</source>
+        <translatorcomment>Typo &quot;:&quot; needed, input on his right</translatorcomment>
         <translation>Nom d&apos;Hôte / Adresse IP</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.h" line="+53"/>
+        <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.h" line="+57"/>
         <source>settings</source>
         <translation>paramètres</translation>
     </message>
@@ -7061,162 +3861,159 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_edit_waypoint_dialog.ui"/>
         <source>OpenPilot GCS Edit Waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Éditeur Waypoint OpenPilot GCS</translation>
     </message>
     <message>
         <location/>
         <source>Number </source>
-        <translation type="unfinished"></translation>
+        <translation>Numéro </translation>
     </message>
     <message>
         <location/>
         <source>Latitude </source>
-        <translation type="unfinished"></translation>
+        <translation>Latitude </translation>
     </message>
     <message>
         <location/>
         <source>Longitude </source>
-        <translation type="unfinished"></translation>
+        <translation>Longitude </translation>
     </message>
     <message>
         <location/>
         <source>Altitude </source>
-        <translation type="unfinished"></translation>
+        <translation>Altitude </translation>
     </message>
     <message>
         <location/>
         <source>meters</source>
-        <translation type="unfinished"></translation>
+        <translation>mètres</translation>
     </message>
     <message>
         <location/>
         <source>Description </source>
-        <translation type="unfinished"></translation>
+        <translation>Description </translation>
     </message>
     <message>
         <location/>
         <source>Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Verrouillé</translation>
     </message>
     <message>
         <location/>
         <source>degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>degrés</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Apply</source>
-        <translation type="unfinished">Appliquer</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location/>
         <source>Position</source>
-        <translation type="unfinished">Position</translation>
+        <translation>Position</translation>
     </message>
     <message>
         <location/>
         <source>Relative to Home </source>
-        <translation type="unfinished"></translation>
+        <translation>Relatif au Home </translation>
     </message>
     <message>
         <location/>
         <source>Bearing </source>
-        <translation type="unfinished"></translation>
+        <translation>Azimut </translation>
     </message>
     <message>
         <location/>
         <source>Distance </source>
-        <translation type="unfinished"></translation>
+        <translation>Distance </translation>
     </message>
     <message>
         <location/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Velocity </source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse </translation>
     </message>
     <message>
         <location/>
         <source>Relative altitude </source>
-        <translation type="unfinished"></translation>
+        <translation>Altitude relative </translation>
     </message>
     <message>
         <location/>
         <source>m/s</source>
-        <translation type="unfinished"></translation>
+        <translation>m/s</translation>
     </message>
     <message>
         <location/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode</translation>
     </message>
     <message>
         <location/>
         <source>param1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>param2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>param3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>param4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>End condition</source>
-        <translation type="unfinished"></translation>
+        <translation>Condition Fin</translation>
     </message>
     <message>
         <location/>
         <source>Condition</source>
-        <translation type="unfinished"></translation>
+        <translation>Condition</translation>
     </message>
     <message>
         <location/>
         <source>Command</source>
-        <translation type="unfinished">Commande</translation>
+        <translation>Commande</translation>
     </message>
     <message>
         <location/>
         <source>Jump Destination</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Va à la Destination ?</translatorcomment>
+        <translation>Aller à la Destination</translation>
     </message>
     <message>
         <location/>
         <source>Error Destination</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Destination d&apos;Erreur ?</translatorcomment>
+        <translation type="unfinished">Destination d&apos;Erreur</translation>
     </message>
     <message>
         <location/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Précédent</translation>
     </message>
     <message>
         <location/>
         <source>Next</source>
-        <translation type="unfinished">Suivant</translation>
+        <translation>Suivant</translation>
     </message>
 </context>
 <context>
@@ -7224,17 +4021,19 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_overlay_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>labelStatus</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7242,17 +4041,19 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_statusbar_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>labelStatus</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7260,45 +4061,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_zoom_slider_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
-    </message>
-</context>
-<context>
-    <name>PFDGadgetOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.ui"/>
-        <source>Form</source>
         <translation>Formulaire</translation>
-    </message>
-    <message>
-        <location/>
-        <source>PFD SVG: </source>
-        <translation>QVG PFD :</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Use OpenGL for rendering</source>
-        <translation>Utiliser le rendu OpenGL</translation>
-    </message>
-    <message>
-        <location/>
-        <source>High Quality text (OpenGL)</source>
-        <translation>Texte Haute Qualité (OpenGL)</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.cpp" line="+61"/>
-        <source>SVG image (*.svg)</source>
-        <translation>Image SVG (*.svg)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Choose SVG image</source>
-        <translation>Choisir une image SVG</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.ui"/>
-        <source>Smooth updates</source>
-        <translation>Mises à jour lissées</translation>
     </message>
 </context>
 <context>
@@ -7324,22 +4087,32 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.ui"/>
         <source>MapRipper</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Currently ripping from:</source>
-        <translation type="unfinished"></translation>
+        <translation>Récupération en cours de : </translation>
     </message>
     <message>
         <location/>
         <source>Downloading tile</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement de la dalle</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.cpp" line="+49"/>
+        <source>Currently ripping from:%1 at Zoom level %2</source>
+        <translation>Récupération en cours de : %1 à un niveau de Zoom %2</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Downloading tile %1 of %2</source>
+        <translation>Téléchargement de la dalle %1 sur %2</translation>
     </message>
 </context>
 <context>
@@ -7350,74 +4123,23 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
         <translation>Formulaire</translation>
     </message>
     <message>
-        <location/>
         <source>Select aircraft type here</source>
-        <translation>Sélectionner ici le type d&apos;appareil</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Airplane type:</source>
-        <translation>Type d&apos;avion :</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Mixer OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel Assignment</source>
-        <translation>Affectation Canaux</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Engine</source>
-        <translation>Moteur</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Aileron 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Aileron 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Elevator 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Elevator 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Throttle Curve</source>
-        <translation>Courbe Gaz</translation>
+        <translation type="obsolete">Sélectionner ici le type d&apos;appareil</translation>
     </message>
     <message>
         <location/>
         <source>Feed Forward</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Accel Time Constant</source>
-        <translation type="unfinished"></translation>
+        <translation>Constante Temps Accélération  </translation>
     </message>
     <message>
         <location/>
         <source>Decel Time Constant</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 2</source>
-        <translation>Moteur 2</translation>
+        <translation>Constante Temps Décélération </translation>
     </message>
     <message>
         <location/>
@@ -7425,338 +4147,14 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
         <translation>Paramètres de Mixage</translation>
     </message>
     <message>
-        <location/>
         <source>Vehicle type:</source>
         <translatorcomment>véhicule / appareil ?</translatorcomment>
-        <translation>Type de Véhicule :</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Output Channel Assignments</source>
-        <translation>Affectation Canaux de Sortie</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for the engine</source>
-        <translation>Sélectionner le canal de sortie pour le moteur</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for the first aileron (or elevon)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for the second aileron (or elevon)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for the first elevator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for a secondary elevator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rudder 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for the first rudder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rudder 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for a secondary rudder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Elevon Mix</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rudder %</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>50</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Pitch %</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Frame Type</source>
-        <translation type="unfinished">Type de Châssis</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the Multirotor frame type here.</source>
-        <translation type="unfinished">Sélectionner ici le type de châssis de Multirotor.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Mix Level</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>100</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Weight of Roll mixing in percent.
-Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Roll</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Weight of Pitch mixing in percent.
-Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Pitch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Weight of Yaw mixing in percent.
-Typical value is 50% for + or X configuration on quads.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Yaw</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor output channels</source>
-        <translation>Canaux de sortie moteurs</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1</source>
-        <translation type="unfinished">1</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</source>
-        <translation>Affecter les canaux de sortie des moteurs en utilisant le dessin ci-dessus comme référence. Respectez le sens des moteurs.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>2</source>
-        <translation type="unfinished">2</translation>
-    </message>
-    <message>
-        <location/>
-        <source>3</source>
-        <translation type="unfinished">3</translation>
-    </message>
-    <message>
-        <location/>
-        <source>4</source>
-        <translation type="unfinished">4</translation>
-    </message>
-    <message>
-        <location/>
-        <source>5</source>
-        <translation type="unfinished">5</translation>
-    </message>
-    <message>
-        <location/>
-        <source>6</source>
-        <translation type="unfinished">6</translation>
-    </message>
-    <message>
-        <location/>
-        <source>7</source>
-        <translation type="unfinished">7</translation>
-    </message>
-    <message>
-        <location/>
-        <source>8</source>
-        <translation type="unfinished">8</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Multirotor Motor Direction</source>
-        <translation>Direction Moteur Multirotor</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tricopter Yaw Servo channel</source>
-        <translation>Canal de Servo Yaw Tricoptère</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reverse all motors</source>
-        <translation>Inverser tous les moteurs</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Output channel asignmets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor</source>
-        <translation>Moteur</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for the first motor</source>
-        <translation>Sélectionner le canal de sortie pour le premier moteur</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for a second motor</source>
-        <translation>Sélectionner le canal de sortie pour le deuxième moteur</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Front Steering</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for the first steering actuator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rear Steering</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select output channel for a second steering actuator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Differential Steering Mix</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Left %</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Right %</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Front throttle curve</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rear throttle curve</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Curve 1</source>
-        <translation>Courbe 1</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Curve 2</source>
-        <translation>Courbe 2</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Type</source>
-        <translation>Type</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ch 10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>-</source>
-        <translation>-</translation>
+        <translation type="obsolete">Type de Véhicule :</translation>
     </message>
     <message>
         <location/>
         <source>Feed Forward Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Feed Forward</translation>
     </message>
     <message>
         <location/>
@@ -7765,7 +4163,11 @@ under the level where the motor starts to undershoot
 its target speed when decelerating.
 
 Do it after accel time is setup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lors du réglage : Augmentez lentement temps de décélération de zéro jusqu&apos;à 
+arriver juste en dessous du niveau où le moteur commence à dépasser sa vitesse 
+de consigne lors de la décélération.
+
+A faire après avoir configuré la constante de temps d&apos;accélération.</translation>
     </message>
     <message>
         <location/>
@@ -7773,38 +4175,42 @@ Do it after accel time is setup.</source>
 When tuning: Slowly raise accel time from zero to just
 under the level where the motor starts to overshoot
 its target speed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">En millisecondes.
+
+Lors du réglage : Augmentez lentement le temps d&apos;accélération de zéro jusqu&apos;à arriver juste 
+en dessous du niveau où le moteur commence à dépasser sa vitesse de consigne.</translation>
     </message>
     <message>
         <location/>
         <source>1000</source>
-        <translation type="unfinished">1000</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Overall level of feed forward (in percentage).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Niveau global de Feed Forward (en pourcentage).</translation>
     </message>
     <message>
         <location/>
         <source>Limits how much the engines can accelerate or decelerate.
 In &apos;units per second&apos;, a sound default is 1000.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Limite de combien les moteurs peuvent accélérer ou ralentir.
+En &apos;unités par seconde&apos;, la valeur par défaut est 1000.</translation>
     </message>
     <message>
         <location/>
         <source>MaxAccel</source>
-        <translation type="unfinished"></translation>
+        <translation>AccélérationMaxi</translation>
     </message>
     <message>
         <location/>
         <source>000</source>
-        <translation type="unfinished">000</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>FeedForward </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7814,32 +4220,22 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Beware! Check &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:600;&quot;&gt;all three&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt; checkboxes to test Feed Forward.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;It will run only if your airframe armed.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Méfiez-vous ! Cochez &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:600;&quot;&gt;les trois&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt; cases pour essayer Feed Forward.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Cela fonctionnera uniquement si la carte est armée.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Enable FF tuning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;SETTING UP FEED FORWARD REQUIRES CAUTION&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beware: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le réglage de Feed Forward</translation>
     </message>
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
+        <translatorcomment>Typo : Need good link to Feed Forward page (English) : http://wiki.openpilot.org/x/EwO9</translatorcomment>
         <translation>Vous renvoie à la page wiki</translation>
     </message>
     <message>
@@ -7862,6 +4258,63 @@ p, li { white-space: pre-wrap; }
         <source>Save</source>
         <translation>Enregistrer</translation>
     </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;SETTING UP FEED FORWARD REQUIRES CAUTION&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Beware: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;LA MISE EN PLACE DE FEED FORWARD EXIGE DE LA PRUDENCE&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Attention : L&apos;activation du réglage Feed Forward lancera tous les moteurs à mi-gaz, vous avez été averti !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Dans un premier temps retirez vos hélices, puis pour affiner assurez-vous que le châssis est maintenu bien en place. Portez des lunettes et protégez-vous le visage et le corps.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;SETTING UP FEED FORWARD REQUIRES CAUTION&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Beware: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;LA MISE EN PLACE DE FEED FORWARD EXIGE DE LA PRUDENCE&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Attention : L&apos;activation du réglage Feed Forward lancera tous les moteurs à mi-gaz, vous avez été averti !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Dans un premier temps retirez vos hélices, puis pour affiner assurez-vous que le châssis est maintenu bien en place. Portez des lunettes et protégez-vous le visage et le corps.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>GCSControl</name>
@@ -7873,7 +4326,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>GCS Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle GCS</translation>
     </message>
     <message>
         <location/>
@@ -7888,7 +4341,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>UDP Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle UDP</translation>
     </message>
 </context>
 <context>
@@ -7914,12 +4367,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Items</source>
-        <translation>Eléments</translation>
+        <translation>Éléments</translation>
     </message>
     <message>
         <location/>
         <source>General (Workspace, Key-Bindings)</source>
-        <translation>Général (Espace de Travail, Raccourcis Clavier)</translation>
+        <translation>Généraux (Espace de Travail, Raccourcis Clavier)</translation>
     </message>
     <message>
         <location/>
@@ -7927,18 +4380,19 @@ p, li { white-space: pre-wrap; }
         <translation>Tous les Gadgets</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+75"/>
-        <location line="+77"/>
+        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+76"/>
+        <location line="+78"/>
         <source>GCS Settings file (*.xml)</source>
         <translation>Fichier Paramètres GCS (*.xml)</translation>
     </message>
     <message>
         <location line="-76"/>
         <source>Save GCS Settings too file ..</source>
-        <translation>Enregistre Paramètres GCS vers fichier ..</translation>
+        <translatorcomment>Typo too and ... on end without space ? Context ?</translatorcomment>
+        <translation type="unfinished">Enregistre Paramètres GCS vers fichier ..</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+17"/>
         <source>Can&apos;t write file </source>
         <translation>Impossible d&apos;écrire dans le fichier </translation>
     </message>
@@ -7968,7 +4422,7 @@ p, li { white-space: pre-wrap; }
         <translation>. Redémarrer le programme.</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+38"/>
         <source>All your settings will be deleted!</source>
         <translation>Tous vos réglages seront effacés !</translation>
     </message>
@@ -7980,7 +4434,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
         <source>Plugins</source>
-        <translation></translation>
+        <translation>Modules Complémentaires</translation>
     </message>
     <message>
         <location/>
@@ -8049,12 +4503,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Core::UAVConfigInfo</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+180"/>
+        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+181"/>
         <source>Do you want to continue the import?</source>
         <translation>Voulez-vous continuer l&apos;importation ?</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+10"/>
         <source>INFO: </source>
         <translation>INFO : </translation>
     </message>
@@ -8071,7 +4525,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+13"/>
         <source>Unknown compatibility level: </source>
-        <translation>Niveau de compatibilité inconnu :</translation>
+        <translation>Niveau de compatibilité inconnu : </translation>
     </message>
 </context>
 <context>
@@ -8155,12 +4609,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Azimuth</source>
-        <translation>Azimuth</translation>
+        <translation>Azimut</translation>
     </message>
     <message>
         <location/>
         <source>Elevation</source>
-        <translation>Elévation</translation>
+        <translation>Élévation</translation>
     </message>
     <message>
         <location/>
@@ -8183,7 +4637,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/autotune.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -8192,121 +4646,113 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:20pt; font-weight:600; color:#ff0000;&quot;&gt;WARNING:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;This is an experimental plugin for the GCS that is going to make your aircraft shake, etc, so test with lots of space and be &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:600;&quot;&gt;very very wary&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt; for it creating bad tuning values.  Basically there is no reason to think this will work at all.&lt;br /&gt;&lt;br /&gt;To use autotuning, here are the steps:&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;On the &lt;span style=&quot; font-style:italic;&quot;&gt;Input configuration&lt;/span&gt; tab, &lt;span style=&quot; font-style:italic;&quot;&gt;Flight Mode Switch Settings&lt;/span&gt;, set one of your flight modes to &amp;quot;Autotune&amp;quot;.&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Take off, change flight mode to autotune, keep it in the air while it&apos;s shaking.&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Land and disarm.  (note - you &lt;span style=&quot; font-weight:600;&quot;&gt;MUST&lt;/span&gt; stay in autotune mode through this point, leaving autotune before disarming aborts the process)&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We&apos;d recommend checking your stabilization settings before trying them out (ie: compare to what you currently use, if they are VASTLY different, probably a good indication bad things will happen).&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly the new settings.&lt;/li&gt;
-&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you&apos;re ready to proceed, click the &lt;span style=&quot; font-style:italic;&quot;&gt;Enable Autotune Module&lt;/span&gt; checkbox above this text, click &lt;span style=&quot; font-style:italic;&quot;&gt;save&lt;/span&gt; and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Module Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle du Module</translation>
     </message>
     <message>
         <location/>
         <source>Enable Autotune Module</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le module Autotune</translation>
     </message>
     <message>
         <location/>
         <source>Autotune Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Autotune</translation>
     </message>
     <message>
         <location/>
         <source>Tuning Aggressiveness</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglage Agressivité</translation>
     </message>
     <message>
         <location/>
         <source>Rate Tuning:</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglage Rate :</translation>
     </message>
     <message>
         <location/>
         <source>Attitude Tuning:</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglage Attitude :</translation>
     </message>
     <message>
         <location/>
         <source>objname:RelayTuningSettings</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RateGain</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.01</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:AttitudeGain</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Measured Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Propriétés Mesurées</translation>
     </message>
     <message>
         <location/>
         <source>Roll:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Typo the only with &quot;:&quot; on end in this form ?</translatorcomment>
+        <translation>Roll :</translation>
     </message>
     <message>
         <location/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>objname:RelayTuning</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Period</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Roll</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Gain</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Period (ms)</source>
-        <translation type="unfinished"></translation>
+        <translation>Période (ms)</translation>
     </message>
     <message>
         <location/>
         <source>Gain (deg/s) / output</source>
-        <translation type="unfinished"></translation>
+        <translation>Gain (deg/s) / sortie</translation>
     </message>
     <message>
         <location/>
@@ -8316,12 +4762,13 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>element:Pitch</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Computed Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Valeurs Calculées</translation>
     </message>
     <message>
         <location/>
@@ -8351,74 +4798,117 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Apply Computed Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser les Valeurs Calculées</translation>
     </message>
     <message>
         <location/>
         <source>Step Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille Sautillements</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Amplitude</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>The Apply and Save buttons below save the autotuning settings which
 will alter settings for the next autotuning flight</source>
-        <translation type="unfinished"></translation>
+        <translation>Les boutons Appliquer et Enregistrer ci-dessous enregistrent les paramètres de réglage automatique qui seront pris en compte pour le prochain vol en mode Autotune</translation>
     </message>
     <message>
         <location/>
         <source>Reloads the saved settings into GCS.
 Useful if you have accidentally changed some settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Recharge les donnés enregistrées, dans GCS. Utile si vous avez accidentellement modifié des paramètres.</translation>
     </message>
     <message>
         <location/>
         <source>Reload Board Data</source>
-        <translation type="unfinished">Recharger Données Carte</translation>
+        <translation>Recharger Données Carte</translation>
     </message>
     <message>
         <location/>
         <source>button:reload</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher </translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:10</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher </translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte sans enregistrer dans la mémoire</translation>
+        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire</translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">Appliquer</translation>
+        <translation>Appliquer</translation>
     </message>
     <message>
         <location/>
         <source>button:apply</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire</translation>
+        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">Enregistrer</translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location/>
         <source>button:save</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:20pt; font-weight:600; color:#ff0000;&quot;&gt;WARNING:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;This is an experimental plugin for the GCS that is going to make your aircraft shake, etc, so test with lots of space and be &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:600;&quot;&gt;very very wary&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt; for it creating bad tuning values.  Basically there is no reason to think this will work at all.&lt;br /&gt;&lt;br /&gt;To use autotuning, here are the steps:&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;On the &lt;span style=&quot; font-style:italic;&quot;&gt;Input configuration&lt;/span&gt; tab, &lt;span style=&quot; font-style:italic;&quot;&gt;Flight Mode Switch Settings&lt;/span&gt;, set one of your flight modes to &amp;quot;Autotune&amp;quot;.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Take off, change flight mode to autotune, keep it in the air while it&apos;s shaking.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Land and disarm.  (note - you &lt;span style=&quot; font-weight:600;&quot;&gt;MUST&lt;/span&gt; stay in autotune mode through this point, leaving autotune before disarming aborts the process)&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We&apos;d recommend checking your stabilization settings before trying them out (ie: compare to what you currently use, if they are VASTLY different, probably a good indication bad things will happen).&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly the new settings.&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you&apos;re ready to proceed, click the &lt;span style=&quot; font-style:italic;&quot;&gt;Enable Autotune Module&lt;/span&gt; checkbox above this text, click &lt;span style=&quot; font-style:italic;&quot;&gt;save&lt;/span&gt; and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:20pt; font-weight:600; color:#ff0000;&quot;&gt;ATTENTION :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Ceci est un module complémentaire expérimental de GCS qui va produire des secousses sur votre appareil, etc, donc à tester avec beaucoup d&apos;espace et être &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:600;&quot;&gt;très très prudent&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt; sur le fait qu&apos;il puisse créer de mauvaises valeurs de réglage. Normalement il n&apos;y a aucune raison que cela ne fonctionne pas.&lt;br /&gt;&lt;br /&gt;Pour utiliser le réglage automatique, voici les étapes :&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Dans l&apos;onglet &lt;span style=&quot; font-style:italic;&quot;&gt;Configuration Entrées&lt;/span&gt;, &lt;span style=&quot; font-style:italic;&quot;&gt;Inter. Mode Vol&lt;/span&gt;, régler un des modes de vol sur &amp;quot;Autotune&amp;quot;.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Décoller, changer le mode de vol sur autotune et garder l&apos;appareil en l&apos;air pendant qu&apos;il est secoué.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Atterrir et désarmer la carte.  (remarque - vous &lt;span style=&quot; font-weight:600;&quot;&gt;DEVEZ&lt;/span&gt; rester en mode autotune à partir de ce moment, le fait de quitter autotune avant de désarmer annule la procédure&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Nous vous recommandons de vérifier vos paramètres de stabilisation avant de les essayer (ex : comparer à ce que vous utilisez actuellement, si elles sont TRES différentes, c&apos;est probablement une bonne indication d&apos;un dysfonctionnement).&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Tester les nouveau paramètres en vol.&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Si vous êtes prêt à continuer, cochez &lt;span style=&quot; font-style:italic;&quot;&gt;Activer le module Autotune&lt;/span&gt; ci-dessus, &lt;span style=&quot; font-style:italic;&quot;&gt;enregistrez&lt;/span&gt; et passez à l&apos;onglet suivant.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>After enabling the module, you must power cycle before using and configuring.</source>
+        <translation>Après activation du module, vous devez redémarrer la carte avant de l&apos;utiliser et le configurer.</translation>
     </message>
 </context>
 <context>
@@ -8436,7 +4926,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Module Control</source>
-        <translation>Module de Contrôle</translation>
+        <translation>Contrôle du Module</translation>
     </message>
     <message>
         <location/>
@@ -8459,7 +4949,7 @@ Useful if you have accidentally changed some settings.</source>
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation>Angle caméra en Yaw pour une valeur de sortie de 100%, degrés.
+        <translation>Angle caméra en Yaw pour une valeur de sortie de 100%, en degrés.
 
 Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
@@ -8467,37 +4957,37 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
         <location/>
         <source>objname:CameraStabSettings</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:OutputRange</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Yaw</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:1</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:1</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8505,7 +4995,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation>Angle caméra en Pitch pour une valeur de sortie de 100%, degrés.
+        <translation>Angle caméra en Pitch pour une valeur de sortie de 100%, en degrés.
 
 Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
@@ -8513,7 +5003,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
         <location/>
         <source>element:Pitch</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8521,7 +5011,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation>Angle caméra en Roll pour une valeur de sortie de 100%, degrés.
+        <translation>Angle caméra en Roll pour une valeur de sortie de 100%, en degrés.
 
 Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
@@ -8529,7 +5019,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
         <location/>
         <source>element:Roll</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8559,26 +5049,21 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
     </message>
     <message>
         <location/>
-        <source>Output Range</source>
-        <translation>Plage Sortie</translation>
-    </message>
-    <message>
-        <location/>
         <source>Yaw</source>
         <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
         <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
         <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8598,7 +5083,7 @@ N&apos;oubliez pas de déclarer ce canal dans l&apos;onglet Input.</translation>
         <location/>
         <source>fieldname:Input</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8629,107 +5114,74 @@ N&apos;oubliez pas de déclarer ce canal dans l&apos;onglet Input.</translation>
 
 Attitude: camera tracks level for the axis. Input controls the deflection.
 AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode de stabilisation des axes
+
+Attitude: La caméra reste de niveau sur les axes. L&apos;entrée contrôle la déviation angulaire.
+AxisLock: La caméra se souvient de l&apos;orientation. L&apos;entrée contrôle la vitesse de la correction.</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:StabilizationMode</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Attitude</source>
         <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Attitude</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera yaw deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Déviation maximale de la caméra sur le Yaw pour une entrée de 100% en mode Attitude, en degrés.</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:InputRange</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse maximale sur le Yaw pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:InputRate</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Input low-pass filter response time for yaw axis, ms.
-
-This option smoothes the stick input. Zero value disables LPF.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:ResponseTime</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera pitch deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Déviation maximale de la caméra sur le Pitch pour une entrée de 100% en mode Attitude, en degrés.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera pitch rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Input low-pass filter response time for pitch axis, ms.
-
-This option smoothes the stick input. Zero value disables LPF.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse maximale sur le Pitch pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll deflection for 100% input in Attitude mode, deg.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Déviation maximale de la caméra sur le Roll pour une entrée de 100% en mode Attitude, en degrés.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum camera roll rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Input low-pass filter response time for roll axis, ms.
-
-This option smoothes the stick input. Zero value disables LPF.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse maximale sur le Roll pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
         <source>MaxAxisLockRate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Response Time</source>
-        <translation>Temps de Réponse</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Input Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Input Range</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8752,13 +5204,20 @@ rate depending on input value.
 
 If you have drift in your Tx controls, you may want to increase this
 value.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zone morte sur le manche pour tous les axes en mode AxisLock, degrés/s.
+
+Lorsque le manche est en dans la plage définie par MaxAxisLockRate, la caméra 
+son orientation actuelle. Autrement elle commence à bouger, avec une vitesse 
+dépendante de la valeur d&apos;entrée.
+
+Si vous avez une dérive dans vos contrôles Tx, vous pouvez augmenter cette
+valeur.</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAxisLockRate</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8774,12 +5233,13 @@ value.</source>
         <location/>
         <source>button:help</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/UoHWAQ</translation>
     </message>
     <message>
         <location/>
@@ -8787,7 +5247,10 @@ value.</source>
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Charge les paramètres par défaut du module, excepté les canaux de sortie dans GCS.
+
+Les paramètres chargés ne sont pas appliqués automatiquement. Vous devez cliquer
+sur Appliquer ou Enregistrer par la suite.</translation>
     </message>
     <message>
         <location/>
@@ -8798,7 +5261,7 @@ Apply or Save button afterwards.</source>
         <location/>
         <source>button:default</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8808,7 +5271,11 @@ settings.
 
 Loaded settings are not applied automatically. You have to click the
 Apply or Save button afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Recharge les paramètres du module enregistrés dans la carte, excepté les canaux de sortie.
+Utile si vous avez modifié quelques paramètres accidentellement.
+
+Les paramètres chargés ne sont pas appliqués automatiquement. Vous devez cliquer
+sur Appliquer ou Enregistrer par la suite.</translation>
     </message>
     <message>
         <location/>
@@ -8819,12 +5286,12 @@ Apply or Save button afterwards.</source>
         <location/>
         <source>button:reload</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non-volatile</translation>
+        <translation type="unfinished">Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -8835,12 +5302,12 @@ Apply or Save button afterwards.</source>
         <location/>
         <source>button:apply</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non-volatile</translation>
+        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile</translation>
     </message>
     <message>
         <location/>
@@ -8851,7 +5318,269 @@ Apply or Save button afterwards.</source>
         <location/>
         <source>button:save</source>
         <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Range (Angle)</source>
+        <translation type="unfinished">Plage Sortie (Angle)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch Or Servo2</source>
+        <translation type="unfinished">Pitch ou Servo2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll Or Servo1</source>
+        <translation type="unfinished">Roll ou Servo1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input Rate (Speed)</source>
+        <translation type="unfinished">Taux d&apos;Entrée (Vitesse)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input Range (Angle)</source>
+        <translation type="unfinished">Plage d&apos;Entrée (Angle)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Expert Settings (Attitude Filter and Feed Forward)</source>
+        <translation type="unfinished">Paramètres Avancés (Filtrage Attitude et Feed Forward)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude Filter RT</source>
+        <translation type="unfinished">Filtrage Attitude RT</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll axis attitude filter response time
+
+Range: 0-250ms, 0 disables the filter (default).
+
+Smoothes estimated airframe attitude used by camera stabilization.</source>
+        <translation type="unfinished">Temps de réponse filtrage sur l&apos;axe de Roll
+
+Plage : 0-250ms, 0 désactive le filtrage (défaut)
+
+Lisse l&apos;attitude estimée de l&apos;appareil utilisée par la stabilisation de la caméra.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch axis attitude filter response time
+
+Range: 0-250ms, 0 disables the filter (default).
+
+Smoothes estimated airframe attitude used by camera stabilization.</source>
+        <translation type="unfinished">Temps de réponse filtrage sur l&apos;axe de Pitch
+
+Plage : 0-250ms, 0 désactive le filtrage (défaut)
+
+Lisse l&apos;attitude estimée de l&apos;appareil utilisée par la stabilisation de la caméra.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw axis attitude filter response time
+
+Range: 0-250ms, 0 disables the filter (default).
+
+Smoothes estimated airframe attitude used by camera stabilization.</source>
+        <translation type="unfinished">Temps de réponse filtrage sur l&apos;axe de Yaw
+
+Plage : 0-250ms, 0 désactive le filtrage (défaut)
+
+Lisse l&apos;orientation estimée de l&apos;appareil utilisée par la stabilisation de la caméra.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>FF Servo Acceleration</source>
+        <translation type="unfinished">FF Accélération Servo</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll servo feed forward acceleration
+
+Range: 0-25, 0 disables feed forward for the axis (default).
+
+Good starting value is 2-7.
+Too high value may burn your servo!</source>
+        <translation type="unfinished">Accéleration feed forward du servo de Roll
+
+Plage : 0-25, 0 désactive feed forward sur l&apos;axe (defaut).
+
+2-7 est une bonne valeur de départ.
+Une valeur trop élevée peut griller votre servo !</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:FeedForward</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch servo feed forward acceleration
+
+Range: 0-25, 0 disables feed forward for the axis (default).
+
+Good starting value is 2-7.
+Too high value may burn your servo!</source>
+        <translation type="unfinished">Accéleration feed forward du servo de Pitch
+
+Plage : 0-25, 0 désactive feed forward sur l&apos;axe (defaut).
+
+2-7 est une bonne valeur de départ.
+Une valeur trop élevée peut griller votre servo !</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw servo feed forward acceleration
+
+Range: 0-25, 0 disables feed forward for the axis (default).
+
+Good starting value is 2-7.
+Too high value may burn your servo!</source>
+        <translation type="unfinished">Accéleration feed forward du servo de Yaw
+
+Plage : 0-25, 0 désactive feed forward sur l&apos;axe (defaut).
+
+2-7 est une bonne valeur de départ.
+Une valeur trop élevée peut griller votre servo !</translation>
+    </message>
+    <message>
+        <location/>
+        <source>FF Accel Time Constant</source>
+        <translation type="unfinished">FF Const. Tps Accélération</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll servo feed forward acceleration time constant
+
+Range: 0-50ms, default is 5.</source>
+        <translation type="unfinished">Constante de temps d&apos;accélération feed forward pour le servo de Roll
+
+Plage : 0-50ms, 5 par défaut.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:AccelTime</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch servo feed forward acceleration time constant
+
+Range: 0-50ms, default is 5.</source>
+        <translation type="unfinished">Constante de temps d&apos;accélération feed forward pour le servo de Pitch
+
+Plage : 0-50ms, 5 par défaut.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw servo feed forward acceleration time constant
+
+Range: 0-50ms, default is 5.</source>
+        <translation type="unfinished">Constante de temps d&apos;accélération feed forward pour le servo de Yaw
+
+Plage : 0-50ms, 5 par défaut.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>FF Decel Time Constant</source>
+        <translation type="unfinished">FF Const. Tps Décélération</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll servo feed forward deceleration time constant
+
+Range: 0-50ms, default is 5.</source>
+        <translation type="unfinished">Constante de temps de décélération feed forward pour le servo de Roll
+
+Plage : 0-50ms, 5 par défaut.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:DecelTime</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch servo feed forward deceleration time constant
+
+Range: 0-50ms, default is 5.</source>
+        <translation type="unfinished">Constante de temps de décélération feed forward pour le servo de Pitch
+
+Plage : 0-50ms, 5 par défaut.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw servo feed forward deceleration time constant
+
+Range: 0-50ms, default is 5.</source>
+        <translation type="unfinished">Constante de temps de décélération feed forward pour le servo de Yaw
+
+Plage : 0-50ms, 5 par défaut.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Gimbal Type:</source>
+        <translation type="unfinished">Type Nacelle :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Gimbal type
+
+Used to limit feed forward acceleration at extreme angles.
+Generic type provides no limit.</source>
+        <translation type="unfinished">Type de nacelle
+
+Utilisé pour limiter l&apos;accélération feed forward aux grands angles.
+Le type générique ne propose pas de limitation.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:GimbalType</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw-Roll-Pitch</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>FF Max Acceleration</source>
+        <translation type="unfinished">FF Accélération Maxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Feed forward maximum acceleration
+
+Range: 0-1000, default is 500.
+
+The same value is used for all axes.</source>
+        <translation type="unfinished">Accélération maximale feed forward
+
+Plage : 0-1000, 500 par défaut.
+
+La même valeur est utilisé pour tous les axes.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:MaxAccel</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input configuration also provides smoothing for controls. Look for RT options on the RC Input tab.</source>
+        <translation type="unfinished">La configuration des entrées fournit également un lissage des contrôles. Recherchez les options RT dans l&apos;onglet Entrées RC.</translation>
     </message>
 </context>
 <context>
@@ -8991,7 +5720,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Place aircraft very flat, and then click level to compute the accelerometer and gyro bias</source>
-        <translation>Placer l&apos;appareil bien à plat et cliquer ensuite sur Niveau pour calculer les ajustements des accéléromètres et gyroscopes </translation>
+        <translation>Placer l&apos;appareil bien à plat et cliquer ensuite sur Niveau pour calculer les ajustements des accéléromètres et gyroscopes</translation>
     </message>
     <message>
         <location/>
@@ -9015,11 +5744,6 @@ la carte est armée. Dans ce cas ne bougez pas l&apos;appareil lors de l&apos;ar
         <location/>
         <source>Zero gyros while arming aircraft</source>
         <translation>Mettre les gyros à zéro lors de l&apos;armement</translation>
-    </message>
-    <message>
-        <location/>
-        <source>AccelTau</source>
-        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9065,18 +5789,28 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
         <source>Save</source>
         <translation>Enregistrer</translation>
     </message>
+    <message>
+        <location/>
+        <source>Filtering</source>
+        <translation>Filtrage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accelerometers</source>
+        <translation>Accéléromètres</translation>
+    </message>
 </context>
 <context>
     <name>ccpmWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/ccpm.ui"/>
+        <location filename="../../../src/plugins/config/ccpm_old.ui"/>
         <source>Form</source>
         <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Swashplate config:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configuration plateau cyclique :</translation>
     </message>
     <message>
         <location/>
@@ -9090,13 +5824,8 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     </message>
     <message>
         <location/>
-        <source>Outputs</source>
-        <translation>Sorties</translation>
-    </message>
-    <message>
-        <location/>
         <source>Tail Rotor</source>
-        <translation>Rotor queue</translation>
+        <translation>Rotor Queue</translation>
     </message>
     <message>
         <location/>
@@ -9105,58 +5834,53 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     </message>
     <message>
         <location/>
-        <source>Swashplate Outputs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Servo W</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Servo X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Front</source>
-        <translation type="unfinished"></translation>
+        <translation>Avant</translation>
     </message>
     <message>
         <location/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Droite</translation>
     </message>
     <message>
         <location/>
         <source>Rear</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrière</translation>
     </message>
     <message>
         <location/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Gauche</translation>
     </message>
     <message>
         <location/>
         <source>1st Servo</source>
-        <translation type="unfinished"></translation>
+        <translation>1er Servo</translation>
     </message>
     <message>
         <location/>
         <source>Servo Z</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Servo Y</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Swashplate Servo Angles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Angles Servos Plateau</translation>
     </message>
     <message>
         <location/>
@@ -9181,12 +5905,12 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Correction Angle</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Angle Correction</translation>
     </message>
     <message>
         <location/>
         <source>CCPM Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Options CCPM</translation>
     </message>
     <message>
         <location/>
@@ -9196,17 +5920,17 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Link Roll/Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>Lier Roll/Pitch</translation>
     </message>
     <message>
         <location/>
         <source>Link Cyclic/Collective</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lier Cyclique/Collectif</translation>
     </message>
     <message>
         <location/>
         <source>Swashplate Layout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Agencement Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -9216,47 +5940,47 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>100%</source>
-        <translation type="unfinished">100%</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>0%</source>
-        <translation type="unfinished">0%</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>CCPM</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CCPM</translation>
     </message>
     <message>
         <location/>
         <source>Collective</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Collectif</translation>
     </message>
     <message>
         <location/>
         <source>Cyclic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cyclique</translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Swashplate Levelling</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Niveau Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
         <source>Commands</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Commandes</translation>
     </message>
     <message>
         <location/>
@@ -9311,7 +6035,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Swashplate Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réglage Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -9341,12 +6065,22 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>-</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor outputs</source>
+        <translation>Sorties moteurs</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate outputs</source>
+        <translation>Sorties plateau cyclique</translation>
     </message>
 </context>
 <context>
@@ -9361,19 +6095,19 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Attitude / INS calibration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This panel will be updated to provide the relevant controls to let you calibrate your OpenPilot INS or your CopterControl unit, depending on the board which is detected once telemetry is connected and running.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Attitude Calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This panel will be updated to provide the relevant controls to let you calibrate your OpenPilot unit, depending on the board which is detected once telemetry is connected and running.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Attitude / calibration INS&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ce panneau sera mis à jour pour vous fournir les contrôles pertinents afin de vous permettre de calibrer votre INS OpenPilot ou votre carte CopterControl, en fonction du matériel détecté, une fois que la télémétrie est connectée et en cours d&apos;exécution.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Calibration Attitude&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Ce panneau sera mis à jour pour vous fournir les contrôles pertinents afin de vous permettre de calibrer votre appareil OpenPilot, en fonction de la carte détectée, une fois que la télémétrie est connectée et en cours d&apos;exécution.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -9390,17 +6124,17 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Hardware Configuration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This panel will be updated to provide the relevant controls to let you configure your hardware once telemetry is connected and running.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Configuration Matérielle&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Ce panneau sera mis à jour pour vous fournir les contrôles pertinents afin de vous permettre de configurer votre matériel, une fois que la télémétrie est connectée et en cours d&apos;exécution.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -9461,9 +6195,8 @@ p, li { white-space: pre-wrap; }
         <translation>Inter. Mode Vol</translation>
     </message>
     <message>
-        <location/>
         <source>Configure each stabilization mode for each axis</source>
-        <translation>Configurer chaque mode de stabilisation, sur chaque axe</translation>
+        <translation type="obsolete">Configurer chaque mode de stabilisation, sur chaque axe</translation>
     </message>
     <message>
         <location/>
@@ -9472,14 +6205,12 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>Stabilized1</source>
-        <translation>Stabilisé 1</translation>
+        <translation type="obsolete">Stabilisé 1</translation>
     </message>
     <message>
-        <location/>
         <source>Stabilized2</source>
-        <translation>Stabilisé 2</translation>
+        <translation type="obsolete">Stabilisé 2</translation>
     </message>
     <message>
         <location/>
@@ -9494,14 +6225,12 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>Stabilized3</source>
-        <translation>Stabilisé 3</translation>
+        <translation type="obsolete">Stabilisé 3</translation>
     </message>
     <message>
-        <location/>
         <source>FlightMode Switch Positions</source>
-        <translation>Positions Inter Mode de Vol</translation>
+        <translation type="obsolete">Positions Inter Mode de Vol</translation>
     </message>
     <message>
         <location/>
@@ -9539,8 +6268,8 @@ p, li { white-space: pre-wrap; }
 on your remote. It shows currently active flight mode.
 
 Setup the flight mode channel on the RC Input tab if you have not done so already.</source>
-        <translation type="unfinished">Le curseur se déplace lorsque vous bougez l&apos;inter de mode de vol sur votre radiocommande.
-Il affiche le mode actif actuellement.
+        <translation>Le curseur se déplace lorsque vous bougez l&apos;inter de mode de vol sur votre radiocommande.
+Il affiche le mode actif en cours.
 
 Configurez le canal de mode de vol dans l&apos;onglet Entrées RC si vous ne l&apos;avez pas déjà fait.
 </translation>
@@ -9551,9 +6280,8 @@ Configurez le canal de mode de vol dans l&apos;onglet Entrées RC si vous ne l&a
         <translation>Sélectionner le mode de stabilisation dans cette position (manuel / stabilisé / auto)</translation>
     </message>
     <message>
-        <location/>
         <source>Number of flight modes:</source>
-        <translation>Nombre de modes de vol :</translation>
+        <translation type="obsolete">Nombre de modes de vol :</translation>
     </message>
     <message>
         <location/>
@@ -9565,7 +6293,7 @@ It will be 2 or 3 for most of setups, but it also can be up to 6.
 In that case you have to configure your radio mixers so the whole range
 from min to max is split into N equal intervals, and you may set arbitrary
 channel value for each flight mode.</source>
-        <translation type="unfinished">Nombre de positions de votre interrupteur Mode de Vol.
+        <translation>Nombre de positions de votre interrupteur Mode de Vol.
 
 La valeur par défaut est 3.
 
@@ -9577,7 +6305,7 @@ du canal de sortie pour chaque mode de vol.</translation>
     <message>
         <location/>
         <source>Avoid &quot;Manual&quot; for multirotors!</source>
-        <translation>Eviter &quot;Manuel&quot; pour les Multirotors !</translation>
+        <translation>Éviter &quot;Manuel&quot; pour les Multirotors !</translation>
     </message>
     <message>
         <location/>
@@ -9646,58 +6374,227 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <source>Save</source>
         <translation>Enregistrer</translation>
     </message>
+    <message>
+        <location/>
+        <source>Stabilization Modes Configuration</source>
+        <translation type="unfinished">Configuration des Modes de Stabilisation</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilized 1</source>
+        <translatorcomment>Typo Need translation in selection list above</translatorcomment>
+        <translation type="unfinished">Stabilisé 1   </translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilized 2</source>
+        <translatorcomment>Typo Need translation in selection list above</translatorcomment>
+        <translation type="unfinished">Stabilisé 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilized 3</source>
+        <translatorcomment>Typo Need translation in selection list above</translatorcomment>
+        <translation type="unfinished">Stabilisé 3</translation>
+    </message>
+    <message>
+        <location/>
+        <source>PID Bank</source>
+        <translatorcomment>Typo Need translation for &quot;Bank1&quot; &quot;Bank 2&quot;... in selection list below</translatorcomment>
+        <translation type="unfinished">Banque PID</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flight Mode Switch Positions</source>
+        <translation type="unfinished">Positions Inter Mode de Vol</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flight Mode Count</source>
+        <translation type="unfinished">Nombre de modes de vol</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cruise Control</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flight Mode</source>
+        <translation type="unfinished">Mode de Vol</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #1 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:StabilizationSettings</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlFlightModeSwitchPosEnable</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:0</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>haslimits:no</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:1</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:16</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #2.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #2 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:1</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #3.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #3 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:2</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #4.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #4 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:3</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #5.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #5 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:4</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #6.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #6 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>index:5</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionnez quels paramètres de vitesse / angle d&apos;inclinaison / PID vous souhaitez utiliser pour cette position d&apos;interrupteur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:FlightModeMap</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input Channel Configuration</source>
+        <translation type="unfinished">Configuration Canaux d&apos;Entrée</translation>
+    </message>
 </context>
 <context>
     <name>inputChannelForm</name>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.ui"/>
         <source>Form</source>
-        <translation>Formulaire</translation>
+        <translation type="obsolete">Formulaire</translation>
     </message>
     <message>
-        <location/>
         <source>Function</source>
-        <translation>Fonction</translation>
+        <translation type="obsolete">Fonction</translation>
     </message>
     <message>
-        <location/>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation type="obsolete">Type</translation>
     </message>
     <message>
-        <location/>
         <source>Number</source>
-        <translation>Nombre</translation>
+        <translation type="obsolete">Nombre</translation>
     </message>
     <message>
-        <location/>
         <source>Min</source>
-        <translation>Mini</translation>
+        <translation type="obsolete">Mini</translation>
     </message>
     <message>
-        <location/>
         <source>Neutral</source>
-        <translation>Neutre</translation>
+        <translation type="obsolete">Neutre</translation>
     </message>
     <message>
-        <location/>
         <source>Max</source>
-        <translation>Maxi</translation>
+        <translation type="obsolete">Maxi</translation>
     </message>
     <message>
-        <location/>
         <source>TextLabel</source>
-        <translation>Label de texte</translation>
+        <translation type="obsolete">Label de texte</translation>
     </message>
     <message>
-        <location/>
         <source>Rev</source>
-        <translation>Inv</translation>
+        <translation type="obsolete">Inv</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+130"/>
         <source>Chan %1</source>
-        <translation>Canal %1</translation>
+        <translation type="obsolete">Canal %1</translation>
+    </message>
+    <message>
+        <source>Optional input filter response time.
+
+Range: 0-999ms, 0 disables filter (default).
+
+Warning: this is an expert mode feature, mostly used for aerial video
+camera control (airframe yaw and camera gimbal accessory channels).
+Too high values for main controls can cause undesirable effects and
+even lead to crash. Use with caution.</source>
+        <translation type="obsolete">Filtrage optionnel du temps de réponse d&apos;entrée.
+
+Plage : 0-999ms; 0 désactive le filtre (défaut).
+
+Attention: Ceci est une fonctionnalité en mode expert, principalement utilisée pour le 
+contrôle de la caméra en vidéo aérienne (lacet de l&apos;appareil et canaux accessoires de la nacelle).
+Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des effets indésirables 
+et même conduire au crash. A utiliser avec prudence.</translation>
     </message>
 </context>
 <context>
@@ -9772,7 +6669,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Linear</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -9830,7 +6727,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Output Update Speed</source>
         <translatorcomment>Bof...</translatorcomment>
-        <translation>Fréquence Mise à Jour Sortie</translation>
+        <translation>Fréquence Mise à Jour Sorties</translation>
     </message>
     <message>
         <location/>
@@ -9845,13 +6742,13 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Update rate:</source>
-        <translation type="unfinished">Fréquence de rafraîchissement :</translation>
+        <translation>Fréquence de rafraîchissement :</translation>
     </message>
     <message>
         <location/>
         <source>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
 Leave at 50Hz for fixed wing.</source>
-        <translation>Configurer ici &quot;TurboPWM&quot;: valeur classique pour les multirotors.
+        <translation>Configurer ici &quot;TurboPWM&quot; : valeur classique pour les multirotors.
 Laisser à 50Hz pour une aile volante.</translation>
     </message>
     <message>
@@ -9899,7 +6796,7 @@ Laisser à 50Hz pour une aile volante.</translation>
         <source>Move the servos using the sliders. Two important things:
 - Take extra care if the output is connected to an motor controller!
 - Will only work if the RC receiver is working (failsafe)</source>
-        <translation type="unfinished">Déplacer les servos en utilisant les curseurs. Deux choses importantes :
+        <translation>Déplacer les servos en utilisant les curseurs. Deux choses importantes :
 - Faire très attention si la sortie est branchée sur un contrôleur de moteur !
 - Marche seulement si le récepteur RC est en fonctionnement (par sécurité)</translation>
     </message>
@@ -9936,6 +6833,16 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Save</source>
         <translation>Enregistrer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Channel Configuration</source>
+        <translation type="unfinished">Configuration Canaux de Sortie</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Live Testing</source>
+        <translation type="unfinished">Test en Temps Réel</translation>
     </message>
 </context>
 <context>
@@ -10011,432 +6918,18 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Mode de sortie</translation>
     </message>
     <message>
-        <location/>
         <source>Rev</source>
-        <translation>Inv</translation>
+        <translation type="obsolete">Inv</translation>
     </message>
     <message>
         <location/>
         <source>Maximum PWM value, beware of not overdriving your servo.</source>
         <translation>Valeur maximum PWM, attention de respecter les limites de votre servo.</translation>
     </message>
-</context>
-<context>
-    <name>PipXtremeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/pipxtreme.ui"/>
-        <source>Form</source>
-        <translation>Formulaire</translation>
-    </message>
-    <message>
-        <location/>
-        <source>button:help</source>
-        <translatorcomment>Pas toucher !</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>url:http://wiki.openpilot.org/x/dACrAQ</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Apply</source>
-        <translation>Appliquer</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save</source>
-        <translation>Enregistrer</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Pairing</source>
-        <translation>Appairage</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Broadcast</source>
-        <translation>Diffusion</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Broadcast Address</source>
-        <translation>Adresse Diffusion</translation>
-    </message>
-    <message>
-        <location/>
-        <source>12345678</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>%v dBm</source>
-        <translation>%v dBm</translation>
-    </message>
-    <message>
-        <location/>
-        <source>-100dB</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Status</source>
-        <translation>Statut</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Firmware Ver.</source>
-        <translation>Version Firm.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Serial Number</source>
-        <translation>Numéro Série</translation>
-    </message>
-    <message>
-        <location/>
-        <source>The modems serial number</source>
-        <translation>Le numéro de série du modem</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Device ID</source>
-        <translation>ID Appareil</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Pair ID</source>
-        <translation>ID Appairage</translation>
-    </message>
-    <message>
-        <location/>
-        <source>90ABCDEF</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Min Frequency</source>
-        <translation>Fréquence Mini</translation>
-    </message>
-    <message>
-        <location/>
-        <source>The modems minimum allowed frequency</source>
-        <translation>La fréquence modem minimale autorisée</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Max Frequency</source>
-        <translation>Fréquence Maxi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>The modems maximum allowed frequency</source>
-        <translation>La fréquence modem maximale autorisée</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Freq. Step Size</source>
-        <translation>Valeur Saut Fréquence</translation>
-    </message>
-    <message>
-        <location/>
-        <source>The modems minimum frequency step size</source>
-        <translation type="unfinished">La taille minimale du saut de fréquence du modem</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Freq. Band</source>
-        <translation>Bande Fréquence</translation>
-    </message>
-    <message>
-        <location/>
-        <source>The current frequency band</source>
-        <translation>La bande de fréquences actuelle</translation>
-    </message>
-    <message>
-        <location/>
-        <source>RSSI</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rx AFC</source>
-        <translation>AFC Rx</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TX Rate (B/s)</source>
-        <translation>Débit TX (B/s)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>RX Rate (B/s)</source>
-        <translation>Débit RX (B/s)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Link State</source>
-        <translation>Etat Liaison</translation>
-    </message>
-    <message>
-        <location/>
-        <source>The modems current state</source>
-        <translation>L&apos;état actuel du modem</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Disconnected</source>
-        <translation>Déconnecté</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Errors</source>
-        <translation>Erreurs</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Retries</source>
-        <translation>Essais</translation>
-    </message>
-    <message>
-        <location/>
-        <source>UAVTalk Errors</source>
-        <translation>Erreurs UAVTalk</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Resets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Dropped</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Configuration</source>
-        <translation>Configuration</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Telemetry Port Config.</source>
-        <translation>Config. Port Télémétrie</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set the telemetry port configuration</source>
-        <translation>Régler la configuration du port de télémétrie</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Telemetry Port Speed</source>
-        <translation>Vitesse Port Télémétrie</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set the telemetry port speed</source>
-        <translation>Régler la vitesse du port de télémétrie</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Flexi Port Configuration</source>
-        <translation>Configuration FlexiPort</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set the flexi port configuration</source>
-        <translation>Régler la configuration du FlexiPort</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Flexi Port Speed</source>
-        <translation>Vitesse FlexiPort</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set the flexi port speed</source>
-        <translation>Régler la vitesse du FlexiPort</translation>
-    </message>
-    <message>
-        <location/>
-        <source>VCP Configuration</source>
-        <translation>Configuration VCP</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set the virtual serial port configuration</source>
-        <translation>Régler la configuration du port série virtuel</translation>
-    </message>
-    <message>
-        <location/>
-        <source>VCP Speed</source>
-        <translation>Vitesse VCP</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set the virtual serial port speed</source>
-        <translation>Régler la vitesse du port série virtuel</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Max RF Datarate (bits/s)</source>
-        <translation>Débit Données Maxi HF (bits/s)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set the maximum RF datarate/channel bandwidth the modem will use</source>
-        <translation type="unfinished">Régler le débit de données HF maxi / canal bande-passante utilisée par le modem</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Max RF Tx Power(mW)</source>
-        <translation>Puissance HF Tx Maxi (mW)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set the maximum TX output power the modem will use</source>
-        <translation>Régler la puissance TX maximale utilisée par le modem</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send Timeout (ms)</source>
-        <translation>Temps de Latence Envoi (ms)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Calibrate the modems RF carrier frequency</source>
-        <translation>Ajuster la fréquence de porteuse du modem</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Min Packet Size</source>
-        <translation>Taille Paquet Mini</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Frequency Calibration</source>
-        <translation>Calibration Fréquence</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Frequency (Hz)</source>
-        <translation>Fréquence (Hz)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set the modems RF carrier frequency</source>
-        <translation>Régler la fréquence de la porteuse HF du modem</translation>
-    </message>
-    <message>
-        <location/>
-        <source>AES Encryption</source>
-        <translation>Cryptage AES</translation>
-    </message>
-    <message>
-        <location/>
-        <source>The AES encryption key - has to be the same key on the remote modem.</source>
-        <translation>La clé d&apos;encryptage AES - doit être la même clé sur le modem distant. </translation>
-    </message>
-    <message>
-        <location/>
-        <source>Radomise the AES encryption key</source>
-        <translation>Rendre aléatoire la clé de cryptage AES</translation>
-    </message>
-    <message>
-        <location/>
-        <source> Rand</source>
-        <translation> Aléatoire</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable/Disable AES encryption</source>
-        <translation>Active / Désactive le cryptage AES</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable</source>
-        <translation>Activé</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Scan whole band to see where their is interference and/or used channels</source>
-        <translation>Balayer toute la bande pour voir les interférences et/ou les canaux utilisés</translation>
-    </message>
-    <message>
-        <location/>
-        <source>    Scan Spectrum    </source>
-        <translation>Balayage Bande</translation>
-    </message>
-</context>
-<context>
-    <name>PRO_HW_Widget</name>
-    <message>
-        <location filename="../../../src/plugins/config/pro_hw_settings.ui"/>
-        <source>Form</source>
-        <translation>Formulaire</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Set the serial speed of your onboard telemetry modem here. It is the speed between the OpenPilot board and the onboard modem, and could be different from the radio link speed.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Beware of not locking yourself out! You should only modify this setting when the OpenPilot board is connected through the USB port.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Configurez ici la vitesse série de votre modem de télémétrie embarqué. Ceci correspond à la vitesse entre la carte OpenPilot et le modem embarqué, elle peut être différente de la vitesse sur le lien radio.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Méfiez-vous de ne pas vous verrouiller l&apos;accès distant ! Vous devriez seulement modifier ce paramètre lorsque la carte OpenPilot est connectée via le port USB.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Telemetry speed:</source>
-        <translation>Vitesse de télémétrie :</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the speed here.</source>
-        <translation>Sélectionner ici la vitesse.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send to OpenPilot but don&apos;t write in SD.
-Beware of not locking yourself out!</source>
-        <translation>Envoie vers l&apos;OpenPilot mais n&apos;écrit pas dans la SD.
-Méfiez-vous de ne pas vous verrouiller l&apos;accès distant !</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Apply</source>
-        <translation>Appliquer</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Applies and Saves all settings to SD.
-Beware of not locking yourself out!</source>
-        <translation>Applique et Enregistre tous les paramètres dans la SD.
-Méfiez-vous de ne pas vous verrouiller l&apos;accès distant !</translation>
-    </message>
-    <message>
         <location/>
-        <source>Save</source>
-        <translation>Enregistrer</translation>
+        <source>Reversed</source>
+        <translation>Inversé</translation>
     </message>
 </context>
 <context>
@@ -10450,11 +6943,6 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès distant !</translation>
         <location/>
         <source>Calibration</source>
         <translation>Calibration</translation>
-    </message>
-    <message>
-        <location/>
-        <source>#1: Multi-Point Calibration</source>
-        <translation>#1 : Calibration Multi-Points</translation>
     </message>
     <message>
         <location/>
@@ -10507,69 +6995,7 @@ Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
     <message>
         <location/>
         <source>#3: Accelerometer Bias calibration</source>
-        <translation>#3 : Calibration ajustement accéléromètres</translation>
-    </message>
-    <message>
-        <location/>
-        <source>#4 Gyro temperature drift calibration</source>
-        <translation>#4: Calibration dérive en température Gyro</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Temp:</source>
-        <translation>Temp :</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Min</source>
-        <translation>Mini</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Currently measured temperature on the system. This is actually the
-MB temperature, be careful if somehow you know that your INS
-temperature is very different from your MB temp...</source>
-        <translation>Température mesurée actuellement sur le système. C&apos;est actuellement 
-la température MB, soyez prudent si vous savez que votre température INS
-est très différente de votre température MB...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Max</source>
-        <translation>Maxi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Current drift:</source>
-        <translation>Dérive actuelle :</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Saved drift:</source>
-        <translation>Dérive enregistrée :</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start gathering data for temperature drift calibration.
-Avoid sudden moves once you have started gathering!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Launch drift measurement based on gathered data.
-
-TODO: is this necessary? Measurement could be auto updated every second or so, or done when we stop measuring...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Measure</source>
-        <translation>Mesurer</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Updates the XYZ drift values into the AHRS (saves to SD)</source>
-        <translation type="unfinished"></translation>
+        <translation>#3 : Calibration Ajustement Accéléromètres</translation>
     </message>
     <message>
         <location/>
@@ -10579,82 +7005,12 @@ TODO: is this necessary? Measurement could be auto updated every second or so, o
     <message>
         <location/>
         <source>Six Point Calibration instructions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Step #1 and #2 are really necessary. Steps #3 and #4 will help you achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;#1: Multi-Point calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute the scale for all sensors on the INS. Press &amp;quot;Start&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  Note that your HomeLocation must be set first, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;#2: Sensor noise calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute sensor variance under standard conditions. You can leave your engines running at low to mid throttle to take their vibration into account before pressing &amp;quot;Start&amp;quot;.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;#3: Accelerometer bias calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step will ensure that accelerometer bias is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;#4 Gyro temp drift calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Instructions de Calibration par Six Points</translation>
     </message>
     <message>
         <location/>
         <source>Settings</source>
         <translation>Paramètres</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Attitude Algorithm:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the sensor integration algorithm here.
-&quot;Simple&quot; only uses accelerometer values
-&quot;INSGPS&quot; the full featured algorithm integrating all sensors</source>
-        <translation>Sélectionner ici l&apos;algorithme d&apos;intégration des capteurs.
-&quot;Simple&quot; utilise seulement les valeurs des accéléromètres
-&quot;INSGPS&quot; l&apos;algorithme complet intégrant tous les capteurs</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Home Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Saves the Home Location. This is only enabled
-if the Home Location is set, i.e. if the GPS fix is
-successful.
-
-Disabled if there is no GPS fix.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set</source>
-        <translation type="unfinished">Régler</translation>
-    </message>
-    <message>
-        <location/>
-        <source>buttonGroup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Clears the HomeLocation: only makes sense if you save
-to SD. This will force the INS to use the next GPS fix as the
-new home location unless it is in indoor mode.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -10677,7 +7033,11 @@ new home location unless it is in indoor mode.</source>
 
 This does not save the calibration settings, this is done using the
 specific calibration button on top of the screen.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Typo : context &quot;calibration button on top of the screen&quot; ? Should be the &quot;Save&quot; button just on right ? Bouton en haut ou simplement bouton enregistrer à coté ?</translatorcomment>
+        <translation type="unfinished">Envoi des paramètres sur la carte (uniquement en mémoire).
+
+Cela n&apos;enregistre pas les paramètres de calibration qui seront effectifs 
+en utilisant le bouton spécifique de calibration en haut de l&apos;écran.  </translation>
     </message>
     <message>
         <location/>
@@ -10687,7 +7047,252 @@ specific calibration button on top of the screen.</source>
     <message>
         <location/>
         <source>Send settings to the board, and save to the non-volatile memory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>#1: Magnetometer calibration</source>
+        <translation>#1 : Calibration magnétomètre</translation>
+    </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Step #1 and #2 are really necessary. Step #3 will help you achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Multi-Point calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute the scale for all sensors on the INS. Press &amp;quot;Start&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  Note that your HomeLocation must be set first, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Sensor noise calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute sensor variance under standard conditions. You can leave your engines running at low to mid throttle to take their vibration into account before pressing &amp;quot;Start&amp;quot;.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Accelerometer bias calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step will ensure that accelerometer bias is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Les étapes #1 et #2 sont réellement nécessaires. L&apos;étape #3 vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Calibration Multipoints :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration va calculer l&apos;amplitude de tous les capteurs de la carte. Appuyez sur &amp;quot;Démarrer&amp;quot; pour commencer l&apos;étalonnage puis suivez les instructions qui sont affichées ici. Veuillez noter que votre position Home doit être définie en premier, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Calibration du bruit des capteurs :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration calcule les variations des capteurs dans des conditions normales. Vous pouvez laisser les moteurs tourner au mini ou à mi-gaz pour tenir compte de leurs vibrations avant d&apos;appuyer sur &amp;quot;Démarrer&amp;quot;.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Calibration de l&apos;ajustement des Accéléromètres :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette étape fera en sorte que l&apos;ajustement des accéléromètres soit parfait. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur Démarrer ci-dessus et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rotate virtual attitude relative to board</source>
+        <translation>Pivoter l&apos;attitude virtuelle par rapport à la carte</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Filtering</source>
+        <translation>Filtrage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accelerometers</source>
+        <translation>Accéléromètres</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accelerometer filtering.
+
+Sets the amount of lowpass filtering of accelerometer data 
+for the attitude estimation. Higher values apply a stronger 
+filter, which may help with drifting in attitude mode.
+
+Range: 0.00 - 0.20, Good starting value: 0.05 - 0.10
+Start low and raise until drift stops.
+
+A setting of 0.00 disables the filter.</source>
+        <translation>Filtrage accéléromètres.
+
+Ajuste le niveau de filtrage passe-bas des données d&apos;accéléromètres pour 
+l&apos;estimation de l&apos;inclinaison. Des valeurs élevées donnent un filtrage plus 
+important qui peut aider pour le glissement en mode stabilisé.
+
+Plage : 0.00 - 0.20, Bonne valeur de départ : 0.05 - 0.10
+Commencez à un niveau bas et augmentez jusqu&apos;à ce que le glissement s&apos;arrête.
+
+Une valeur de 0.00 désactive le filtre.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude Estimation Algorithm</source>
+        <translation>Algorithme d&apos;Évaluation de l&apos;Attitude</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Selects the sensor integration algorithm to be used by the Revolution board.</source>
+        <translation>Sélectionnez l&apos;algorithme d&apos;intégration du capteur utilisé par la carte Revolution.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Home Location</source>
+        <translation>Position Home</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Gravity acceleration:</source>
+        <translation>Accélération pesanteur : </translation>
+    </message>
+    <message>
+        <location/>
+        <source>Latitude:</source>
+        <translation>Latitude :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:HomeLocation</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:g_e</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:Latitude</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude:</source>
+        <translation>Altitude :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:Altitude</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Magnetic field vector:</source>
+        <translation>Vecteur champ magnétique : </translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This information must be set to enable calibration the Revolution controllers sensors. &lt;br/&gt;Set home location using context menu in the map widget.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette information doit être définie pour permettre la calibration des capteurs du contrôleur Revolution. &lt;br/&gt;Indiquez la position du home en utilisant le menu contextuel sur la carte.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:Longitude</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Is Set</source>
+        <translation>Est Réglé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:Set</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Longitude:</source>
+        <translation>Longitude :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:help</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>url:http://wiki.openpilot.org/display/Doc/Revo+Configuration</source>
+        <translatorcomment>Wiki FR Calib Revo</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/FQWJAQ</translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:apply</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:save</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Step #1 and #2 are really necessary. Step #3 will help you achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Multi-Point calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute the scale for all sensors on the INS. Press &amp;quot;Start&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  Note that your HomeLocation must be set first, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Sensor noise calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute sensor variance under standard conditions. You can leave your engines running at low to mid throttle to take their vibration into account before pressing &amp;quot;Start&amp;quot;.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Accelerometer bias calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step will ensure that accelerometer bias is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Les étapes #1 et #2 sont réellement nécessaires. L&apos;étape #3 vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Calibration Multipoints :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration va calculer l&apos;amplitude de tous les capteurs de la carte. Appuyez sur &amp;quot;Démarrer&amp;quot; pour commencer l&apos;étalonnage puis suivez les instructions qui sont affichées ici. Veuillez noter que votre position Home doit être définie en premier, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Calibration du bruit des capteurs :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration calcule les variations des capteurs dans des conditions normales. Vous pouvez laisser les moteurs tourner au mini ou à mi-gaz pour tenir compte de leurs vibrations avant d&apos;appuyer sur &amp;quot;Démarrer&amp;quot;.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Calibration de l&apos;ajustement des Accéléromètres :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette étape fera en sorte que l&apos;ajustement des accéléromètres soit parfait. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur Démarrer ci-dessus et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -10705,7 +7310,7 @@ specific calibration button on top of the screen.</source>
     <message>
         <location/>
         <source>Rate Stabilization (Inner Loop)</source>
-        <translation type="unfinished"></translation>
+        <translation>Stabilisation Rate (Boucle Intérieure)</translation>
     </message>
     <message>
         <location/>
@@ -10726,13 +7331,13 @@ specific calibration button on top of the screen.</source>
         <location/>
         <source>button:default</source>
         <translatorcomment>pas toucher ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:1</source>
         <translatorcomment>pas toucher ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10765,49 +7370,49 @@ oscillations claires en vol. Baissez ensuite la valeur de 5 ou plus.</translatio
         <location/>
         <source>objname:StabilizationSettings</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RollRatePID</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Kp</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:yes</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.0001</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:1,10</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:PitchRatePID</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:YawRatePID</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10825,53 +7430,48 @@ value as the Kp.</source>
         <location/>
         <source>element:Ki</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Attitude Stabilization (Outer Loop)</source>
-        <translation type="unfinished"></translation>
+        <translation>Stabilisation Attitude (Boucle Extérieure)</translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:2</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RollPI</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.1</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:2,10</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:PitchPI</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:YawPI</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>When the throttle is low, zero the intergral term to prevent intergral wind-up</source>
-        <translation type="unfinished">Quand les gaz sont faibles, mettre à zéro le terme intégral pour éviter les secousses</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10882,7 +7482,7 @@ value as the Kp.</source>
         <location/>
         <source>fieldname:LowThrottleZeroIntegral</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10891,63 +7491,33 @@ value as the Kp.</source>
     </message>
     <message>
         <location/>
-        <source>Rate Stabization Coefficients (Inner Loop)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>buttongroup:4</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Kd</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:1</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:4,20</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>As a rule of thumb, you can set the Ki at roughly the same
-value as the Kp.</source>
-        <translation>En règle générale, vous pouvez définir l&apos;intégrale 
-à peu près à la même valeur que Kp.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Slowly raise Kp until you start seeing clear oscillations when you fly.
-Then lower the value by 20% or so.
-
-You can usually go for higher values for Yaw factors.</source>
-        <translation>Augmentez doucement Proportionnel jusqu&apos;à commencer à observer des 
-oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.
-
-Vous pouvez généralement utiliser pour des valeurs plus élevées pour les facteurs de Yaw.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Slowly raise Kp until you start seeing clear oscillations when you fly.
-Then lower the value by 20% or so.</source>
-        <translation>Augmentez doucement Proportionnel jusqu&apos;à commencer à observer des 
-oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10956,99 +7526,79 @@ oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.</translat
     </message>
     <message>
         <location/>
-        <source>Attitude Stabization Coefficients (Outer Loop)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>buttongroup:5</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:5,20</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Stick Range and Limits</source>
-        <translation>Plage des Manches et Limites</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:6</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:PitchMax</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:6,20</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Max rate attitude (deg/s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse maxi Attitude (deg/s)</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaximumRate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Roll</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:ManualRate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Yaw</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:YawMax</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Pitch</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Full stick angle (deg)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RollMax</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Full stick rate (deg/s)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11064,7 +7614,7 @@ oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.</translat
         <location/>
         <source>buttongroup:10</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11090,53 +7640,53 @@ oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.</translat
         <location/>
         <source>fieldname:WeakLevelingKp</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxWeakLevelingRate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAxisLock</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAxisLockRate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Integral Limits</source>
-        <translation>Limites Intégrales</translation>
+        <translation>Limites Intégrale</translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:13</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:ILimit</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ILimit Attitude</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ILimit Rate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11147,30 +7697,25 @@ oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.</translat
         <location/>
         <source>buttongroup:8</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>The proportional term for the accelerometer, the higher this term the more weight the  accel is given</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>objname:AttitudeSettings</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:AccelKp</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:8,10</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11184,14 +7729,9 @@ oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.</translat
     </message>
     <message>
         <location/>
-        <source>GyroTau is a gyro filter, the higher the factor the more filtering is applied to the gyros</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>fieldname:GyroTau</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11200,31 +7740,9 @@ oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.</translat
     </message>
     <message>
         <location/>
-        <source>The intergral term for the accelerometer within the filter </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>fieldname:AccelKi</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Real Time Updates</source>
-        <translation type="unfinished">MAJ Temps Réel</translation>
-    </message>
-    <message>
-        <location/>
-        <source>If you check this, the GCS will udpate the stabilization factors
-automatically every 300ms, which will help for fast tuning.</source>
-        <translation>Si vous cochez, GCS mettra à jour les facteurs de stabilisation 
-automatiquement toutes les 300ms, ce qui aidera pour un réglage rapide. </translation>
-    </message>
-    <message>
-        <location/>
-        <source>Update in real time</source>
-        <translation>Mise à jour en temps réel</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11234,12 +7752,14 @@ automatiquement toutes les 300ms, ce qui aidera pour un réglage rapide. </trans
     <message>
         <location/>
         <source>button:help</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/DAO9</source>
-        <translation></translation>
+        <translatorcomment>Wiki FR</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/d4BqAQ</translation>
     </message>
     <message>
         <location/>
@@ -11255,7 +7775,8 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>button:reload</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11270,7 +7791,8 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>button:apply</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11285,7 +7807,547 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>button:save</source>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Responsiveness</source>
+        <translation>Réactivité</translation>
+    </message>
+    <message>
+        <location/>
+        <source>QGroupBox{border: 0px;}</source>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>This thing really can preform, it is a lot more responsive this way</source>
+        <translation>Peut vraiment réaliser des choses, il est beaucoup plus sensible de cette façon</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Snappy</source>
+        <translation>Dynamique</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Lazy Sunday afternoon flying, fly&apos;s nice and stable</source>
+        <translation>Vol tranquille du Dimanche, stable et agréable</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Moderate</source>
+        <translation>Modérée</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Damn this is insane how quick it moves. Mostly used by the Pro&apos;s</source>
+        <translation>Saperlipopette c&apos;est fou comment il se déplace rapidement. Principalement utilisé par les pros</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Insane</source>
+        <translation>Démentielle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude mode</source>
+        <translation>Mode Attitude</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rate mode</source>
+        <translation>Mode Rate</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Attitude Mode slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Mode Attitude peut être ajusté dans une plage de valeurs dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rate mode yaw</source>
+        <translation>Mode Rate yaw</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch sliders to move together, thus giving same value for both roll &amp;amp; pitch when setting up a symetrical vehicle that requires both to be the same&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les curseurs roll &amp;amp; pitch pour se déplacer ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci règle le niveau de stabilité utilisé en mode Rate (boucle interne). Une valeur trop élevée va produire des oscillations en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch sliders to move together, thus giving same value for both roll &amp;amp; pitch when setting up a symetrical vehicle that requires both to be the same.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les curseurs roll &amp;amp; pitch pour se déplacer ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Attitude mode (outer loop). Too much will make your vehicle oscillate in Attitude Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci règle le niveau de stabilité utilisé en mode Attitude (boucle externe). Une valeur trop élevée va produire des oscillations en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This function will avoid integral windup when at idle. Integral windup is an accumulation of over-correction and can make the vehicle flip during a slow takeoff.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translatorcomment>Traduction Windup ??</translatorcomment>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette fonction permet d&apos;annuler la saturation des corrections qui pourraient entraîner le retournement de l&apos;appareil lors de décollages lents.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Instant Update</source>
+        <translation>Actualisation Instantanée</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;L&apos;activation de cette option signifie que toutes les modifications apportées aux curseurs seront immédiatement envoyées et utilisées par le Contrôleur de Vol, utile lorsque deux personnes font les réglages où un vole normalement et l&apos;autre effectue des modifications dans GCS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Update flight controller in real time</source>
+        <translation>Mettre à jour le contrôleur de vol en temps réel</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude mode response (deg)</source>
+        <translation>Réponse mode Attitude (deg)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rate mode response (deg/s)</source>
+        <translation>Vitesse mode Rate (deg/s)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch values together, thus giving the same value for each when setting up a symetrical vehicle that requires both to be the same.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les valeurs roll &amp;amp; pitch ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In Weak Leveling mode, this setting acts like Attitude Kp. If you make this setting too high, it can cause oscillations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode Weak Leveling, ce paramètre se comporte comme Kp en mode Attitude. Si vous mettez une valeur trop haute, elle peut provoquer des oscillations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In Weak Leveling mode, this is the maximum number of degrees per second that weak leveling will move the vehicle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode Weak Leveling, correspond à la vitesse de rotation maximale en degrés par seconde de l&apos;appareil.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In AxisLock mode, this is the maximum number of degrees of correction. If movement by outside forces (eg Wind) are less than the set value your vehicle will return to centre. More than set amount and will only move your vehicle the set amount back to centre.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode AxisLock, cela correspond à la valeur maximale de correction en degrés. Si le mouvement provoqué par des forces extérieures (ex. Vent) est inférieure à la valeur indiquée, votre appareil reviendra à la position centrale. Si la valeur du mouvement dépasse la valeur indiquée, la correction se limitera à la valeur indiquée en direction de la position centrale.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In AxisLock mode, this setting controls how many degrees per second you can request with the stick before OpenPilot stops trying to gently hold its position and goes into normal rate mode. This setting works almost like a dead band. Default value should work fine.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode AxisLock, ce paramètre contrôle combien de degrés par seconde vous pouvez demander avec le manche avant qu&apos;OpenPilot cesse d&apos;essayer de tenir doucement sa position et passe en mode rate normal. Ce paramètre fonctionne presque comme une zone morte. La valeur par défaut devrait fonctionner correctement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The proportional term for the accelerometer, the higher this term the more weight the accel is given.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le terme proportionnel pour l&apos;accéléromètre, plus il est élevé et plus l&apos;accéléromètre aura de l&apos;importance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In effect, a vibrations filter for the gyro.  Default 0.005 - Max .020.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans les faits, un filtre de vibrations pour le gyroscope. Valeur par défaut 0.005 - 0.020 Maxi.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The intergral term for the accelerometer within the filter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le terme intégral de l&apos;accéléromètre dans le filtre.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude Hold</source>
+        <translation>Maintien Altitude</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tuning</source>
+        <translation>Réglages</translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:AltitudeHoldSettings</source>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:99</source>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Altitude</source>
+        <translation type="obsolete">Altitude</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Vario Altitude</source>
+        <translation>Altitude Vario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:ThrottleRate</source>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exponential</source>
+        <translation>Exponentiel</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle exponential value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Valeur exponentielle du manche des gaz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:ThrottleExp</source>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max Vertical Velocity</source>
+        <translation>Vitesse Verticale Maxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum allowed vertical velocity in m/s.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vitesse verticale maximale autorisée en m/s.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle Stick Response</source>
+        <translation>Réponse Manche Gaz</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate mode slider can be adjusted to value ranges whose responsiveness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Mode Rate peut être ajusté dans une plage de valeurs dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate mode Yaw slider can be adjusted to value ranges whose responsiveness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Mode Rate yaw peut être ajusté dans une plage de valeurs dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avançant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci fixe l&apos;inclinaison maximale de l&apos;appareil en degrés pour une entrée manche à fond lorsqu&apos;il est en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degrees per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci fixe la vitesse maximale en degrés par seconde sur un axe.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the degrees per second that your vehicle will tilt/rotate at full stick input when in all modes except Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci fixe la vitesse en degrés par seconde que votre appareil aura pour une entrée manche à fond dans tous les modes, excepté en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This
+                    makes the control output respond faster with fast stick movements or external disturbance like wind gusts. It also acts like a dampener, thus allowing higher KP settings. Only affects Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci rend la réponse du contrôle de sortie plus rapide lors de mouvements de manches rapides ou de perturbations externes comme des rafales de vent. Il agit également comme un amortisseur, permettant ainsi les paramètres Kp plus élevés. Ne concerne que le mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avançant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This makes the control output respond faster with fast stick movements or external disturbance like wind gusts. It also acts like a dampener, thus allowing higher KP settings. Only affects Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci rend la réponse du contrôle de sortie plus rapide lors de mouvements de manches rapides ou de perturbations externes comme des rafales de vent. Il agit également comme un amortisseur, permettant ainsi les paramètres Kp plus élevés. Ne concerne que le mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This makes the control output respond faster with fast stick movements or external disturbance like wind gusts.It also acts like a dampener, thus allowing higher KP settings. Only affects Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci rend la réponse du contrôle de sortie plus rapide lors de mouvements de manches rapides ou de perturbations externes comme des rafales de vent. Il agit également comme un amortisseur, permettant ainsi les paramètres Kp plus élevés. Ne concerne que le mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Attitude Mode. Adding Ki in Attitude when Ki is present in Rate is not recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avançant) en mode Attitude. Ajouter une valeur d&apos;intégrale en mode Attitude lorsque une intégrale est présente en mode Rate n&apos;est pas recommandé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KP) that is used in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KP) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:StabilizationSettingsBankX</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Misc</source>
+        <translation>Divers</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rattitude</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:15</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Higher values will keep larger Ki terms and limits from winding up at partial stick.  Consider increasing this if you have high Ki values and limits and a sudden stick motion from one aircraft bank angle to another causes the aircraft to rotate and then slowly change rotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translatorcomment>A revoir...</translatorcomment>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Des valeurs élevées préviennent la saturation de grandes valeurs de Ki/Limites.&lt;/p&gt;&lt;p&gt;Envisagez l&apos;augmentation de cette valeur si vous avez des valeurs élevées sur Ki/limites et qu&apos;un mouvement brusque de manche provoquant un changement d&apos;inclinaison entraine une rotation puis un changement lent de l&apos;inclinaison.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:RattitudeAntiWindup</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Anti-Windup</source>
+        <translatorcomment>Traduction Windup ?</translatorcomment>
+        <translation type="unfinished">Anti-Saturation</translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:98</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Velocity Proportional</source>
+        <translation type="unfinished">Proportionnel Vitesse Verticale</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude Proportional</source>
+        <translation type="unfinished">Proportionnel Altitude</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Velocity Integral</source>
+        <translation type="unfinished">Intégrale Vitesse Verticale</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:AltitudePI</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:0.01</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:VelocityPI</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:0.00001</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Control Coefficients</source>
+        <translation type="unfinished">Coefficients de Contrôle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cruise Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrottle) when inverted.  1 says to use the unboosted throttle stick value.  -1 (DON&apos;T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the throttle stick when inverted.
+&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, ou 1.  Cruise Control multiplie la position du manche des gaz par cette valeur si l&apos;angle d&apos;inclinaison a dépassé l&apos;AngleMaxi.&lt;/p&gt;&lt;p&gt;  La valeur par défaut 0 signifie l&apos;arrêt des moteurs (les basculer à la valeur de GazMini) lorsque l&apos;appareil est à l&apos;envers.&lt;/p&gt;
+&lt;p&gt;  La valeur 1 signifie qu&apos;il utilise la valeur du manche des gaz, non modifiée.&lt;/p&gt;&lt;p&gt;  -1 (NE PAS UTILISER, INCOMPLET, NON TESTÉ, pour les hélicoptères CP utilisant le iddle up) signifie une inversion du manche des gaz lorsque l&apos;hélicoptère est à l&apos;envers.
+&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlInvertedPowerSwitch</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:16</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the bank angle that CruiseControl goes into inverted / power disabled mode.  The power for inverted mode is controlled by CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci correspond à l&apos;angle d&apos;inclinaison où CruiseControl passe en inversé / mode puissance désactivé. La puissance en mode inversé est contrôlée par CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMaxAngle</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Juste une limitation de sécurité. 4.0 signifie qu&apos;il n&apos;utilisera pas plus de 4 fois la puissance demandée par le manche des gaz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMaxPowerFactor</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>PowerTrim</source>
+        <translation type="unfinished">AjustPuissance</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This needs to be 0 for all copters except CP helis that are using idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci doit être à 0 pour tous les hélicoptères sauf les hélicos CP qui utilisent l&apos;idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlNeutralThrust</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that banging the stick around a lot makes the copter climb a bit, adjust this number down a little.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si vous trouvez qu&apos;un petit mouvement de manche fait légèrement monter l&apos;hélicoptère, baissez un petit peu cette valeur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlPowerTrim</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MaxPowerFactor</source>
+        <translation type="unfinished">FacteurMaxiPuissance</translation>
+    </message>
+    <message>
+        <location/>
+        <source>MaxAngle</source>
+        <translation type="unfinished">AngleMaxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>MinThrottle</source>
+        <translation type="unfinished">GazMini</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle stick below this disables Cruise Control.  Also, by default Cruise Control forces the use of this value for throttle when the copter is inverted.  For safety, never set this so low that the trimmed throttle stick cannot get below it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsque le manche des gaz est en dessous de cette valeur, cela désactive Cruize Control. En outre, Cruize Control impose l&apos;utilisation de cette valeur de manche de gaz lorsque l&apos;hélicoptère est à l&apos;envers.&lt;/p&gt;&lt;p&gt; Par mesure de sécurité, ne jamais définir une valeur trop basse pour qu&apos;un manche de gaz baissé puisse descendre en dessous de cette valeur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMinThrottle</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>NeutralThrust</source>
+        <translation type="unfinished">PousséeNeutre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 90% to 95% to leave some headroom for stabilization.  CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les multicoptères devraient probablement utiliser une valeur de 90% à 95% afin de laisser une certaine marge pour la stabilisation. Les hélicos CP peuvent définir cette valeur à 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMaxThrottle</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MaxThrottle</source>
+        <translation type="unfinished">GazMaxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>InvertedPower</source>
+        <translation type="unfinished">PuissanceRenversé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:98,10</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:99,10</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use Basic Configuration</source>
+        <translation type="unfinished">Utiliser Configuration Basique</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use Advanced Configuration</source>
+        <translation type="unfinished">Utiliser Configuration Avancée</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference. higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle doit monter ou descendre le véhicule pour compenser une certaine différence d&apos;altitude. Des valeurs plus élevées pourraient entraîner un maintien d&apos;altitude plus précis mais aussi des réactions plus violentes, des valeurs inférieures sont plus sûres et donnent un vol plus doux. La valeur par défaut devrait être bonne pour la plupart des appareils.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How much the vehicle should throttle up or down to compensate or achieve a certain vertical speed. Higher values lead to more aggressive throttle changes and could lead to oscillations. This is the most likely candidate to change depending on the crafts engine thrust. Heavy craft with weak engines might require higher values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine de combien le véhicule augmente ou diminue les gaz pour compenser ou atteindre une certaine vitesse verticale. Des valeurs plus élevées entraînent des variations de gaz plus agressives qui peuvent produire des oscillations. C&apos;est le paramètre à changer en fonction de la poussée moteur de l&apos;appareil. Des appareils chargés avec des moteurs faibles peuvent demander des valeurs plus élevées.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle le véhicule doit ajuster son estimation de gaz au neutre. Le Maintien d&apos;Altitude suppose que lorsque il est activé, il est la plage nécessaire pour se maintenir en l&apos;air. Si les gaz est beaucoup plus élevé ou plus bas, il faut ajuster ce &quot;trim&quot;. Des valeurs plus élevées peuvent lui permettre de faire cet ajustement plus rapidement mais cela pourrait conduire à des oscillations. A laisser par défaut, à moins de savoir ce que vous faites.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -11399,7 +8461,7 @@ la plage PID [Mini..Maxi) définie pour ce réglage. Si les gaz dépassent
 les limites alors les valeurs PID Mini et Maxi seront utilisées en conséquence.
 
 Notez qu&apos;il est possible de définir un PID Mini &gt; Maxi. Dans ce cas en augmentant 
-la valeur de contrôle en entrée la valeur de loption PID diminue. Cela peut être
+la valeur de contrôle en entrée la valeur de l&apos;option PID diminue. Cela peut être
 utilisé par exemple pour diminuer la valeur PID lors de l&apos;augmentation des gaz.
 </translation>
     </message>
@@ -11484,7 +8546,8 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/DACiAQ</source>
-        <translation></translation>
+        <translatorcomment>Wiki FR</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/N4DWAQ</translation>
     </message>
     <message>
         <location/>
@@ -11506,6 +8569,11 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
         <source>Save</source>
         <translation>Enregistrer</translation>
     </message>
+    <message>
+        <location/>
+        <source>PID Bank</source>
+        <translation>Banque PID</translation>
+    </message>
 </context>
 <context>
     <name>VernierWidget</name>
@@ -11513,31 +8581,6 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
         <location filename="../../../src/plugins/config/vernier.ui"/>
         <source>Form</source>
         <translation>Formulaire</translation>
-    </message>
-</context>
-<context>
-    <name>importSettings</name>
-    <message>
-        <location filename="../../../src/plugins/coreplugin/dialogs/importsettings.ui"/>
-        <source>OpenPilotGCS</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>No configuration file could be found.
-Please choose from one of the default configurations</source>
-        <translation>Aucun fichier de configuration n&apos;a pu être trouvé.
-Veuillez en choisir un dans les configurations par défaut</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation>Label de texte</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Load</source>
-        <translation>Charger</translation>
     </message>
 </context>
 <context>
@@ -11593,7 +8636,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>Only joystick is implemented at this stage, so this control is disabled.</source>
-        <translation type="unfinished">Actuellement seulement le joystick est implémenté , donc ce contrôle est désactivé.</translation>
+        <translation>Actuellement seulement le joystick est implémenté , donc ce contrôle est désactivé.</translation>
     </message>
     <message>
         <location/>
@@ -11608,7 +8651,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>Available controllers</source>
-        <translation type="unfinished">Contrôleurs disponibles</translation>
+        <translation>Contrôleurs disponibles</translation>
     </message>
     <message>
         <location/>
@@ -11726,34 +8769,34 @@ Veuillez en choisir un dans les configurations par défaut</translation>
 <context>
     <name>Widget</name>
     <message>
-        <location filename="../../../src/plugins/hitlv2/aerosimrc/src/udptestwidget.ui"/>
+        <location filename="../../../src/plugins/hitl/aerosimrc/src/udptestwidget.ui"/>
         <source>send data</source>
-        <translation type="unfinished">envoi données</translation>
+        <translation>envoi données</translation>
     </message>
     <message>
         <location/>
         <source>Flight mode</source>
-        <translation type="unfinished">Mode de vol</translation>
+        <translation>Mode de vol</translation>
     </message>
     <message>
         <location/>
         <source>Armed state</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Disarmed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Arming</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Armed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11771,7 +8814,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>Scale:</source>
-        <translation>Echelle :</translation>
+        <translation>Échelle :</translation>
     </message>
 </context>
 <context>
@@ -11802,52 +8845,52 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location filename="../../../src/plugins/opmap/pathplanner.ui"/>
         <source>PathPlanner</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Add Leg</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajout Étape</translation>
     </message>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location/>
         <source>Delete Leg</source>
-        <translation type="unfinished"></translation>
+        <translation>Efface Étape</translation>
     </message>
     <message>
         <location/>
         <source>Insert Leg</source>
-        <translation type="unfinished"></translation>
+        <translation>Insère Étape</translation>
     </message>
     <message>
         <location/>
         <source>Read from file</source>
-        <translation type="unfinished"></translation>
+        <translation>Lire depuis un fichier</translation>
     </message>
     <message>
         <location/>
         <source>Save to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistre dans un fichier</translation>
     </message>
     <message>
         <location/>
         <source>Send to UAV</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoi vers UAV</translation>
     </message>
     <message>
         <location/>
         <source>Fetch from UAV</source>
-        <translation type="unfinished"></translation>
+        <translation>Récupération depuis UAV</translation>
     </message>
     <message>
         <location/>
         <source>Open Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvre Détails</translation>
     </message>
 </context>
 <context>
@@ -11880,7 +8923,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>Use actual location</source>
-        <translation>Utiliser position actuelle</translation>
+        <translation>Utiliser la position actuelle</translation>
     </message>
     <message>
         <location/>
@@ -11911,10 +8954,10 @@ les données en cache</translation>
     <message>
         <location/>
         <source>Pre seed terrain cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Précharger le cache terrain</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetoptionspage.cpp" line="+46"/>
+        <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetoptionspage.cpp" line="+45"/>
         <source>QML file (*.qml)</source>
         <translation>Fichier QML (*.qml)</translation>
     </message>
@@ -11932,6 +8975,16 @@ les données en cache</translation>
         <location line="+1"/>
         <source>Choose OsgEarth terrain file</source>
         <translation>Choisir un fichier de terrain OsgEarth</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetoptionspage.ui"/>
+        <source>Speed Unit:</source>
+        <translation>Unité de Vitesse :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude Unit:</source>
+        <translation>Unité d&apos;Altitude :</translation>
     </message>
 </context>
 <context>
@@ -11952,7 +9005,7 @@ les données en cache</translation>
         <translation>Fichier  QML :</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/qmlview/qmlviewgadgetoptionspage.cpp" line="+61"/>
+        <location filename="../../../src/plugins/qmlview/qmlviewgadgetoptionspage.cpp" line="+59"/>
         <source>QML file (*.qml)</source>
         <translation>Fichier QML (*.qml)</translation>
     </message>
@@ -11980,7 +9033,7 @@ les données en cache</translation>
         <translation>Vitesse télémétrie série :</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/serialconnection/serialpluginoptionspage.h" line="+57"/>
+        <location filename="../../../src/plugins/serialconnection/serialpluginoptionspage.h" line="+61"/>
         <source>settings</source>
         <translation>Paramètres</translation>
     </message>
@@ -12008,7 +9061,7 @@ les données en cache</translation>
         <translation>Diagramme de Connexion</translation>
     </message>
     <message>
-        <location line="+151"/>
+        <location line="+152"/>
         <source>Save File</source>
         <translation>Enregistrer Fichier</translation>
     </message>
@@ -12023,7 +9076,7 @@ les données en cache</translation>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12049,10 +9102,10 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Il est nécessaire d&apos;avoir la même version de firmware et de logiciel de station au sol (GCS).&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Pour mettre à jour la version correcte de firmware maintenant :&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Débrancher toutes les batteries et le cordon USB de la carte&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Débrancher toutes les batteries et le cordon USB de la carte,&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Vérifier que la carte n&apos;est pas alimentée et qu&apos;aucune LED n&apos;est allumée.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Lorsque vous êtes prêt vous pouvez démarrer la mise à jour en appuyant sur le bouton ci-dessous et suivre les intructions à l&apos;écran. Il est essentiel que rien ne vienne perturber le fonctionnement de la carte tant que le firmware est en cours d&apos;écriture.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Lorsque vous êtes prêt vous pouvez démarrer la mise à jour en appuyant sur le bouton ci-dessous et suivre les instructions à l&apos;écran. Il est essentiel que rien ne vienne perturber le fonctionnement de la carte tant que le firmware est en cours d&apos;écriture.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12075,7 +9128,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/controllerpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12106,8 +9159,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Connection device:</source>
-        <translatorcomment>device moyen  de connexion... bof à corriger si besoin dans le texte ci-dessus.</translatorcomment>
-        <translation>Moyen de connexion :</translation>
+        <translation>Périphérique de connexion :</translation>
     </message>
     <message>
         <location/>
@@ -12121,7 +9173,7 @@ p, li { white-space: pre-wrap; }
         <translation>Connecter</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/controllerpage.cpp" line="-73"/>
+        <location filename="../../../src/plugins/setupwizard/pages/controllerpage.cpp" line="-69"/>
         <source>&lt;Unknown&gt;</source>
         <translation>&lt;Inconnu&gt;</translation>
     </message>
@@ -12141,59 +9193,14 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>OpenPilot OPLink Radio Modem</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="+50"/>
         <source>Disconnect</source>
         <translation>Déconnecter</translation>
-    </message>
-</context>
-<context>
-    <name>EndPage</name>
-    <message>
-        <location filename="../../../src/plugins/setupwizard/pages/endpage.ui"/>
-        <source>WizardPage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Congratulations!&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Setup wizard is completed.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the setup procedure is now complete and you are one step away from completing the setup of your OpenPilot controller.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To complete the setup please click the Radio Setup Wizard button below to close this wizard and go directly to the Radio Setup Wizard.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Félicitations !&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;L&apos;Assistant de Configuration est terminé.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette partie de la procédure de configuration est maintenant terminée et il vous reste une étape pour arriver au terme de la configuration de votre contrôleur OpenPilot.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour terminer la configuration veuillez appuyer sur le bouton Aller à l&apos;Assistant des Entrées... ci-dessous pour fermer cet assistant et aller directement à l&apos;Assistant de Configuration Radio.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Go to Input Wizard...</source>
-        <translation>Aller à l&apos;Assistant des Entrées...</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/setupwizard/pages/endpage.cpp" line="+60"/>
-        <source>Unable to open Input Wizard since the Config Plugin is not
-loaded in the current workspace.</source>
-        <translation>Impossible d&apos;ouvrir l&apos;Assistant des Entrées car le Plugin de 
-Configuration n&apos;est pas chargé dans l&apos;espace de travail actuel.</translation>
     </message>
 </context>
 <context>
@@ -12201,7 +9208,7 @@ Configuration n&apos;est pas chargé dans l&apos;espace de travail actuel.</tran
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/fixedwingpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12224,7 +9231,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/helipage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12247,7 +9254,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/inputpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12260,7 +9267,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The OpenPilot controller supports many different types of input signals. Please select the type of input that matches your receiver configuration. If you are unsure, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Some input options require the OpenPilot controller to be rebooted before the changes can take place. If an option that requires a reboot is selected, you will be instructed to do so on the next page of this wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -12312,90 +9319,21 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>LevellingPage</name>
-    <message>
-        <location filename="../../../src/plugins/setupwizard/pages/levellingpage.ui"/>
-        <source>WizardPage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot controller leveling calibration procedure&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The wizard needs to get information from the controller to determine in which position the vehicle is normally considered to be level. To be able to successfully perform these measurements, you need to place the vehicle on a surface that is as flat and level as possible. Examples of such surfaces could be a table top or the floor. Be careful to ensure that the vehicle really is level, since this step will affect the accelerometer and gyro bias in the controller software.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To perform the leveling, please push the Calculate button and wait for the process to finish. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Procédure de calibration de la mise à niveau du contrôleur OpenPilot&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;L&apos;assistant a besoin de récupérer des informations du contrôleur pour déterminer dans quelle position le véhicule est habituellement considéré comme étant de niveau. Pour être en mesure de réaliser ces mesures correctement, vous devez placer le véhicule sur une surface aussi plane et horizontale que possible. De telles surfaces peut être une table ou le sol par exemple. Veillez à ce que le véhicule soit vraiment de niveau, car cette étape aura une incidence sur les ajustements de l&apos;accéléromètre et du gyroscope dans le logiciel de la carte.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Veuillez appuyer sur le bouton Calculer pour effectuer la mise à niveau et attendez la fin du processus. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Calculate gyro and accelerometer bias</source>
-        <translation>Calculer l&apos;ajustement des gyros et des accéléromètres</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Calculate</source>
-        <translation>Calculer</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/setupwizard/pages/levellingpage.cpp" line="+75"/>
-        <source>An OpenPilot controller must be connected to your computer to perform bias calculations.
-Please connect your OpenPilot controller to your computer and try again.</source>
-        <translation type="unfinished">Un contrôleur OpenPilot doit être connecté à votre PC pour calculer l&apos;ajustement du niveau.
-Connectez votre carte OpenPilot et essayez à nouveau.</translation>
-    </message>
-    <message>
-        <location line="+9"/>
-        <source>Retrieving data...</source>
-        <translation>Récupération des données...</translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <source>&lt;font color=&apos;green&apos;&gt;Done!&lt;/font&gt;</source>
-        <translation>&lt;font color=&apos;green&apos;&gt;Terminé !&lt;/font&gt;</translation>
-    </message>
-</context>
-<context>
     <name>MultiPage</name>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/multipage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot multirotor configuration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the wizard will set up the OpenPilot controller for use with a flying platform utilizing multiple rotors. The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom configuration options in the Configuration plugin in the GCS.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Please select the type of multirotor you want to create a configuration for below:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
         <source>Multirotor type:</source>
-        <translation>Type Multirotor :</translation>
+        <translation>Type de multirotor :</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/multipage.cpp" line="+84"/>
+        <location filename="../../../src/plugins/setupwizard/pages/multipage.cpp" line="+85"/>
         <source>Tricopter</source>
-        <translation></translation>
+        <translation>Tricoptère</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -12405,22 +9343,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+4"/>
         <source>Quadcopter X</source>
-        <translation>Quadricopter X</translation>
+        <translation>Quadricoptère X</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotate clockwise and two counter clockwise. The motors positioned diagonal to each other rotate in the same direction. This setup is perfect for sport flying and is also commonly used for FPV platforms.</source>
-        <translation>Le Quadricoptère X utilise quatre moteurs et c&apos;est la configuration la plus commune en multirotor. Deux des moteurs tournent dans le sens horaire et les deux dans le sens anti-horaire. Les moteurs situés en diagonale tournent dans le même sens. Cette configuration est idéale pour le vol sportif et couramment utilisé pour des plates-formes FPV.</translation>
+        <translation>Le Quadricoptère X utilise quatre moteurs et c&apos;est la configuration la plus commune en multirotor. Deux des moteurs tournent dans le sens horaire et les deux dans le sens antihoraire. Les moteurs situés en diagonale tournent dans le même sens. Cette configuration est idéale pour le vol sportif et couramment utilisé pour des plates-formes FPV.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Quadcopter +</source>
-        <translation>Quadricopter +</translation>
+        <translation>Quadricoptère +</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited for FPV since the fore rotor tend to be in the way of the camera.</source>
-        <translation type="unfinished">Le Quadricoptère (+) utilise quatre moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens anti-horaire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
+        <translation>Le Quadricoptère (+) utilise quatre moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens antihoraire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -12444,13 +9382,34 @@ p, li { white-space: pre-wrap; }
         <source>Hexacopter H</source>
         <translation>Hexacoptère H</translation>
     </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/multipage.ui"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Multirotor Configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the wizard will set up the OpenPilot controller for use with a flying platform utilizing multiple rotors. The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom configuration options in the Configuration plugin in the GCS.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Please select the type of multirotor you want to create a configuration for below:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Configuration Multirotor OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette partie de l&apos;assistant configure la carte OpenPilot avec une plate-forme de vol utilisant plusieurs rotors. L&apos;assistant reconnaît la plupart des types de multirotors. Les autres variantes de multirotors peuvent-être configurées en utilisant les options de configuration avancées dans l&apos;onglet Configuration de GCS.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Veuillez choisir ci-dessous le type de multirotor souhaité pour créer une configuration :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>NotYetImplementedPage</name>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/notyetimplementedpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12473,7 +9432,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12491,7 +9450,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Connect all components according to the illustration on the summary page, and provide power using an external power supply such as a battery before continuing.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Depending on what vehicle you have selected, both the motors controlled by ESCs and/or servos controlled directly by the OpenPilot controller may have to be calibrated. The following steps will guide you safely through this process. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -12502,16 +9461,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;En fonction du véhicule que vous avez sélectionné, les moteurs pilotés par des variateurs et/ou les servos contrôlés directement par la carte OpenPilot devront-être calibrés. Les étapes suivantes vous guideront en toute sécurité dans ce processus. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Plase pay attention to the details and in particular the motors position and its rotation direction.&lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stably. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+269"/>
-        <location line="+74"/>
-        <location line="+27"/>
-        <location line="+18"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+261"/>
+        <location line="+76"/>
+        <location line="+28"/>
+        <location line="+19"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
@@ -12531,15 +9489,15 @@ p, li { white-space: pre-wrap; }
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pour régler l&apos;angle maximum du servo, appuyez sur le bouton Démarrer ci-dessous, sélectionnez le curseur du haut puis bougez-le vers la droite jusqu&apos;à atteindre l&apos;angle maximum.&lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-119"/>
-        <location line="+74"/>
-        <location line="+27"/>
-        <location line="+18"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-123"/>
+        <location line="+76"/>
+        <location line="+28"/>
+        <location line="+19"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location line="-84"/>
+        <location line="-88"/>
         <source>The actuator module is in an error state.
 
 Please make sure the correct firmware version is used then restart the wizard and try again. If the problem persists please consult the openpilot.org support forum.</source>
@@ -12547,13 +9505,18 @@ Please make sure the correct firmware version is used then restart the wizard an
 
 Soyez certain d&apos;utiliser la bonne version de firmware puis redémarrer l&apos;assistant et essayez à nouveau. Si le problème persiste, consultez le forum openpilot.org.</translation>
     </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation. Soyez certain que les moteurs tournent dans le bon sens comme indiqué sur le diagramme. Permutez deux fils d&apos;un moteur pour changer son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>OutputPage</name>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12568,7 +9531,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Please select one of the options below. If you are unsure about the capabilities of your ESCs, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To read more regarding ESC refresh rates, please see &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/HIEu&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;this article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; in the OpenPilot Wiki&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -12578,7 +9541,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Veuillez sélectionner une des options ci-dessous. Si vous n&apos;êtes pas certain des capacités de vos variateurs laissez juste l&apos;option par défaut sélectionnée et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Pour en savoir plus à propos des fréquences de rafraîchissement des variateurs, veuillez consulter &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/HIEu&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;cet article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; sur le Wiki OpenPilot (en anglais)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Pour en savoir plus à propos des fréquences de rafraîchissement des variateurs, veuillez consulter &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/5IBwAQ&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;cet article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; sur le Wiki OpenPilot (en anglais)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12606,7 +9569,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/rebootpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12655,7 +9618,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/savepage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12691,7 +9654,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Write configuration to controller</source>
-        <translation type="unfinished">Ecrire la configuration dans le contrôleur</translation>
+        <translation>Écrire la configuration dans le contrôleur</translation>
     </message>
     <message>
         <location/>
@@ -12707,51 +9670,8 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/setupwizard/pages/savepage.cpp" line="+61"/>
         <source>An OpenPilot controller must be connected to your computer to save the configuration.
 Please connect your OpenPilot controller to your computer and try again.</source>
-        <translation type="unfinished">Un contrôleur OpenPilot doit être connecté à votre PC pour enregistrer la configuration.
+        <translation>Un contrôleur OpenPilot doit être connecté à votre PC pour enregistrer la configuration.
 Connectez votre carte OpenPilot et essayez à nouveau.</translation>
-    </message>
-</context>
-<context>
-    <name>StartPage</name>
-    <message>
-        <location filename="../../../src/plugins/setupwizard/pages/startpage.ui"/>
-        <source>WizardPage</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Welcome to the OpenPilot Setup Wizard&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This wizard will guide you through the basic steps required to setup your OpenPilot controller for the first time.  You will be asked questions about your platform (multirotor/heli/fixed-wing) which this wizard will use to configure your aircraft for your maiden flight. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This wizard does not configure all of the advanced settings available in the GCS Configuration. All basic and advanced configuration parameters can be modified later by using the GCS Configuration plugin.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;WARNING: YOU MUST REMOVE ALL PROPELLERS &lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;FROM THE VEHICLE BEFORE PROCEEDING!&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Disregarding this warning puts you at&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risk of very serious injury&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Now that your props are removed we can get started. Ready?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Bienvenue sur l&apos;assistant de configuration OpenPilot&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cet assistant va vous guider à travers les étapes de base nécessaires à la configuration de votre contrôleur OpenPilot pour la première fois. Des questions vous seront posées sur votre plate-forme (multirotor / hélicoptère / voilure fixe), cet assistant les utilisera afin de configurer votre appareil pour votre premier vol.  &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cet assistant ne configure pas tous les paramètres avancés disponibles dans le module Configuration de GCS. Tous les paramètres de configuration de base et avancés pourront être modifiés plus tard en utilisant le plugin de Configuration de GCS.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;ATTENTION : VOUS DEVEZ RETIRER TOUTES LES HELICES &lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;DU VEHICULE AVANT DE CONTINUER !&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Ne pas tenir compte de cet avertissement vous expose à des&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risques de blessures très graves&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; !&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Dès que vos hélices seront retirées nous pourrons continuer. Êtes-vous prêt ?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -12759,7 +9679,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/summarypage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12781,12 +9701,12 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Sommaire de configuration OpenPilot&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La première partie de cet assistant est maintenant terminée. Toutes les informations nécessaires à la création d&apos;une configuration de base du contrôleur OpenPilot pour un céhicule particulier ont été collectées.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La première partie de cet assistant est maintenant terminée. Toutes les informations nécessaires à la création d&apos;une configuration de base du contrôleur OpenPilot pour un véhicule particulier ont été collectées.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Vous trouverez ci-dessous un résumé de la configuration et un bouton vous renvoyant vers un diagramme décrivant comment brancher le matériel nécessaire avec le Contrôleur OpenPilot dans la configuration actuelle.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour continuer l&apos;assistant et passer par quelques étapes de configuration de base, veuillez passez à l&apos;étape suivante de l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les étapes suivantes requièrent que votre contrôleur OpenPilot soit mis en oeuvre comme sur le diagramme, &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;connecté à l&apos;ordinateur&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; par le port USB et que le véhicule soit&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt; alimenté par une batterie&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les étapes suivantes requièrent que votre contrôleur OpenPilot soit mis en œuvre comme sur le diagramme, &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;connecté à l&apos;ordinateur&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; par le port USB et que le véhicule soit&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt; alimenté par une batterie&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12800,7 +9720,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/surfacepage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12823,7 +9743,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/vehiclepage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12901,7 +9821,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Show MetaData</source>
-        <translation>Afficher Metadata</translation>
+        <translation>Afficher Métadonnées</translation>
     </message>
     <message>
         <location/>
@@ -12964,37 +9884,43 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>Device Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information Périphérique</translation>
     </message>
     <message>
         <location/>
         <source>lblDevName</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>DeviceID</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Champs. Pas toucher ?</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblHWRev</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>RW</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>BL Version</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>MaxCodeSize</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13008,13 +9934,8 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     </message>
     <message>
         <location/>
-        <source>I know what I&apos;m doing</source>
-        <translation>Je sais ce que je fais</translation>
-    </message>
-    <message>
-        <location/>
         <source>Write loaded firmware image to the board</source>
-        <translation>Ecrire l&apos;image du firmware chargé sur la carte</translation>
+        <translation>Écrire l&apos;image du firmware chargé sur la carte</translation>
     </message>
     <message>
         <location/>
@@ -13034,7 +9955,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>ic</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13079,32 +10000,38 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>lblBrdName</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblDescription</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblBuildDate</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblGitTag</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblCRC</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblCertified</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13114,12 +10041,14 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>lblDescritpionL</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblCertifiedL</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13127,78 +10056,9 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
         <translation>Description personnalisée :</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/uploader/devicewidget.cpp" line="+88"/>
-        <source>HW Revision: </source>
-        <translation>Révision Matériel :</translation>
-    </message>
-    <message>
-        <location line="+43"/>
-        <source>Custom Firmware Build</source>
-        <translation>Version Firmware Personnelle</translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <location line="+31"/>
-        <source>Tagged officially released firmware build</source>
-        <translation type="unfinished">Firmware certifié OpenPilot, publié officiellement</translation>
-    </message>
-    <message>
-        <location line="-23"/>
-        <location line="+31"/>
-        <source>Untagged or custom firmware build</source>
-        <translation>Firmware non-certifié ou version personnelle</translation>
-    </message>
-    <message>
-        <location line="+76"/>
-        <source>Can&apos;t calculate, file too big for device</source>
-        <translation>Ne peut calculer, fichier trop gros pour l&apos;appareil</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>The board has the same firmware as loaded. No need to update</source>
-        <translation>La carte a déjà le même firmware installé. Pas besoin de le mettre à jour</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>WARNING: the loaded firmware is for different hardware. Do not update!</source>
-        <translation>ATTENTION : le firmware chargé est destiné à une autre carte. Ne pas mettre à jour !</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>The board has newer firmware than loaded. Are you sure you want to update?</source>
-        <translation>La carte possède un firmware plus récent que celui sélectionné. Êtes-vous certain de vouloir mettre à jour ? </translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build)</source>
-        <translation>Le firmware chargé n&apos;est certifié ou est une version personnelle. Mettez à jour uniquement si
-vous l&apos;avez reçue d&apos;une source sûre (site web officiel ou votre propre version)</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>This is the tagged officially released OpenPilot firmware</source>
-        <translation type="unfinished">Ceci est un firmware certifié OpenPilot, publié officiellement</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>WARNING: the loaded firmware was not packaged with the OpenPilot format. Do not update unless you know what you are doing</source>
-        <translation type="unfinished">ATTENTION : le firmware chargé n&apos;est pas empaqueté avec le format OpenPilot. Ne le mettez pas à jour, à moins de savoir ce que vous faites</translation>
-    </message>
-    <message>
-        <location line="+212"/>
-        <location line="+16"/>
-        <source>Select firmware file</source>
-        <translation>Sélectionner le fichier de firmware</translation>
-    </message>
-    <message>
-        <location line="-14"/>
-        <source>Firmware Files (*.opfw *.bin)</source>
-        <translation>Fichiers Firmware (*.opfw *.bin)</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Firmware Files (*.bin)</source>
-        <translation>Fichiers Firmware (*.bin)</translation>
+        <location/>
+        <source>I know what I&apos;m doing!</source>
+        <translation>Je sais ce que je fais !</translation>
     </message>
 </context>
 <context>
@@ -13211,7 +10071,7 @@ vous l&apos;avez reçue d&apos;une source sûre (site web officiel ou votre prop
     <message>
         <location/>
         <source>Device Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information Périphérique</translation>
     </message>
     <message>
         <location/>
@@ -13228,38 +10088,13 @@ vous l&apos;avez reçue d&apos;une source sûre (site web officiel ou votre prop
         <source>Firmware Information</source>
         <translation>Information Firmware</translation>
     </message>
-    <message>
-        <location filename="../../../src/plugins/uploader/runningdevicewidget.cpp" line="+69"/>
-        <source>HW Revision: </source>
-        <translation>Révision Matériel :</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Firmware CRC: </source>
-        <translation>CRC Firmware : </translation>
-    </message>
-    <message>
-        <location line="+40"/>
-        <source>Tagged officially released firmware build</source>
-        <translation type="unfinished">Firmware certifié OpenPilot, publié officiellement</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Untagged or custom firmware build</source>
-        <translation>Firmware non-certifié ou version personnelle</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Custom Firmware Build</source>
-        <translation>Version Firmware Personnelle</translation>
-    </message>
 </context>
 <context>
     <name>UploaderWidget</name>
     <message>
         <location filename="../../../src/plugins/uploader/uploader.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -13267,12 +10102,13 @@ vous l&apos;avez reçue d&apos;une source sûre (site web officiel ou votre prop
 to bootloader mode.
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
-        <translation type="unfinished"></translation>
+        <translation>Indique à la carte principale de passer en mode bootloader.
+(Disponible uniquement si le lien de télémétrie est établi, soit par port série ou USB)</translation>
     </message>
     <message>
         <location/>
         <source>Halt</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêt</translation>
     </message>
     <message>
         <location/>
@@ -13282,12 +10118,16 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished"></translation>
+        <translation>Boote le système.
+Utile seulement si le système est arrêté
+(LED blue de la carte qui clignote lentement, LED verte allumée)
+
+Si la télémétrie n&apos;est pas en marche, sélectionner la connexion en utilisant le menu déroulant de droite.</translation>
     </message>
     <message>
         <location/>
         <source>Boot</source>
-        <translation type="unfinished"></translation>
+        <translation>Boot</translation>
     </message>
     <message>
         <location/>
@@ -13297,24 +10137,30 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished"></translation>
+        <translation>Boote le système en mode sans échec (c.-à-d. Paramètres Matériels par défaut).
+Seulement utile si le système est arrêté
+(LED blue de la carte qui clignote lentement, LED verte allumée)
+
+Si la télémétrie n&apos;est pas en marche, sélectionner la connexion en utilisant le 
+menu déroulant de droite. </translation>
     </message>
     <message>
         <location/>
         <source>Safe Boot</source>
-        <translation type="unfinished"></translation>
+        <translation>Boot Sans Échec</translation>
     </message>
     <message>
         <location/>
         <source>Reset the system.
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
-        <translation type="unfinished"></translation>
+        <translation>Remise à zéro du système.
+(Disponible uniquement si le lien de télémétrie est établi, soit par port série ou USB)</translation>
     </message>
     <message>
         <location/>
         <source>Reset</source>
-        <translation type="unfinished">Réinitialiser</translation>
+        <translation>Réinitialiser</translation>
     </message>
     <message>
         <location/>
@@ -13322,12 +10168,15 @@ through serial or USB)</source>
 recover a system which does not boot.
 
 Rescue is possible in USB mode only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Débuter une procédure assistée pour récupérer 
+manuellement un système qui ne boote pas.
+
+Le Sauvetage n&apos;est possible qu&apos;en mode USB seulement.</translation>
     </message>
     <message>
         <location/>
         <source>Rescue</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvetage</translation>
     </message>
     <message>
         <location/>
@@ -13337,51 +10186,112 @@ method using this combo box.
 You can use this to force a communication channel when doing
 a &quot;Boot&quot; (button on the left). It is updated automatically when
 halting a running board.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lorsque la télémétrie n&apos;est pas connectée, sélectionnez la 
+méthode de communication en utilisant cette liste déroulante.
+
+Vous pouvez l&apos;utiliser pour forcer un canal de communication lorsque
+vous faites un &quot;Boot&quot; (bouton situé à gauche). Il est actualisé 
+automatiquement lorsque vous arrêtez une carte en fonctionnement. </translation>
     </message>
     <message>
         <location/>
         <source>Refresh the list of serial ports</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualise la liste des ports série</translation>
     </message>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location/>
         <source>Running</source>
-        <translation type="unfinished">En cours d&apos;exécution</translation>
+        <translation>En cours d&apos;exécution</translation>
     </message>
     <message>
         <location/>
         <source>Mainboard</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Carte mère ?</translatorcomment>
+        <translation>Carte Principale</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and earlier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;
+&lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;
+&lt;p&gt;Utile si la carte n&apos;arrive pas à booter correctement.&lt;/p&gt;
+&lt;p&gt;La led Bleue clignote rapidement pendant 20-30 secondes lorsque la carte démarre normalement&lt;/p&gt;
+&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez la connexion dans la liste déroulante à droite.&lt;/p&gt;
+&lt;p&gt;A NOTER : Supporté par les bootloaders version 4 et supérieurs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Erase settings</source>
+        <translation>Effacer Paramètres </translation>
+    </message>
+    <message>
+        <location/>
+        <source>Auto Update</source>
+        <translation>Maj Auto</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Auto update</source>
+        <translation>Maj auto</translation>
+    </message>
+    <message>
+        <location/>
+        <source>OK</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Progress</source>
+        <translation>Progression</translation>
     </message>
     <message>
         <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;To upgrade the firmware in your boards, proceed as follows:&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Connect telemetry&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Once telemetry is running, press &amp;quot;Halt&amp;quot; above&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You will get a list of devices.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You can then upload/download to/from each board as you wish&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You can resume operations by pressing &amp;quot;Boot&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;To upgrade the firmware in your boards,&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;press Auto Update and follow instructions&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;or&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;proceed as follows:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Connect telemetry&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Once telemetry is running, press &amp;quot;Halt&amp;quot; above&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You will get a list of devices.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You can then upload/download to/from each board as you wish&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You can resume operations by pressing &amp;quot;Boot&amp;quot;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Pour actualiser le firmware sur vos cartes,&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;appuyez sur Maj Auto et suivez les instructions&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;ou&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;procédez comme suit :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Connecter la télémétrie&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Une fois que la télémétrie est en marche, appuyez sur &amp;quot;Arrêt&amp;quot; ci-dessus&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous obtiendrez une liste des périphériques.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous pourrez alors envoyer / récupérer vers / depuis chaque carte comme vous le voudrez&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous pouvez reprendre les opérations en appuyant sur &amp;quot;Boot&amp;quot;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -13409,8 +10319,8 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigMultiRotorWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+543"/>
-        <location line="+403"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+713"/>
+        <location line="+179"/>
         <source>Configuration OK</source>
         <translation>Configuration OK</translation>
     </message>
@@ -13418,18 +10328,23 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigCCHWWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/config_cc_hw_widget.cpp" line="+111"/>
+        <location filename="../../../src/plugins/config/config_cc_hw_widget.cpp" line="+112"/>
+        <source>Warning: you have configured more than one DebugConsole, this currently is not supported</source>
+        <translation>Attention : vous avez configuré plus d&apos;une DebugConsole, ce n&apos;est actuellement pas possible</translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Warning: you have configured both MainPort and FlexiPort for the same function, this currently is not supported</source>
         <translatorcomment>Attention</translatorcomment>
         <translation>Attention : vous avez configuré la même fonction sur les deux ports MainPort et FlexiPort, ce n&apos;est actuellement pas possible</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+3"/>
         <source>Warning: you have configured both USB HID Port and USB VCP Port for the same function, this currently is not supported</source>
         <translation>Attention : vous avez configuré la même fonction sur les deux ports USB HID et USB VCP, ce n&apos;est actuellement pas possible</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+3"/>
         <source>Warning: you have disabled USB Telemetry on both USB HID Port and USB VCP Port, this currently is not supported</source>
         <translation>Attention : vous avez désactivé la télémétrie USB sur les deux ports USB HID et USB VCP, ce n&apos;est actuellement pas possible</translation>
     </message>
@@ -13437,7 +10352,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigCCAttitudeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configccattitudewidget.cpp" line="+151"/>
+        <location filename="../../../src/plugins/config/configccattitudewidget.cpp" line="+154"/>
         <source>Calibration timed out before receiving required updates.</source>
         <translation>Temps d&apos;attente dépassé avant d&apos;avoir reçu les mises à jour demandées.</translation>
     </message>
@@ -13447,33 +10362,37 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+252"/>
         <source>Unsaved changes</source>
-        <translatorcomment>Modifications non-sauvegardées</translatorcomment>
-        <translation></translation>
+        <translation>Modifications non sauvegardées</translation>
     </message>
     <message>
         <location line="+0"/>
+        <source>The tab you are leaving has unsaved changes,if you proceed they will be lost.
+Do you still want to proceed?</source>
+        <translation>L&apos;onglet que vous quittez contient des modifications non sauvegardées, si vous continuez elles seront perdues.
+Voulez-vous toujours continuer ?</translation>
+    </message>
+    <message>
         <source>The tab you are leaving has unsaved changes,if you proceed they will be lost.Do you still want to proceed?</source>
-        <translatorcomment>L&apos;onglet que vous quittez contient des modifications non-sauvegardées, si  vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translatorcomment>
-        <translation></translation>
+        <translation type="obsolete">L&apos;onglet que vous quittez contient des modifications non sauvegardées, si vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translation>
     </message>
 </context>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+306"/>
-        <location line="+1072"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+351"/>
+        <location line="+1065"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
-        <translation type="unfinished">Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
+        <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1071"/>
+        <location line="-1064"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
-        <translation type="unfinished">Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
+        <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+166"/>
+        <location line="+169"/>
         <source>Welcome to the inputs configuration wizard.
 
 Please follow the instructions on the screen and only move your controls when asked to.
@@ -13481,7 +10400,7 @@ Make sure you already configured your hardware settings on the proper tab and re
 
 You can press &apos;back&apos; at any time to return to the previous screen or press &apos;Cancel&apos; to quit the wizard.
 </source>
-        <translation type="unfinished">Bienvenu(e) dans l&apos;assistant de configuration des entrées.
+        <translation>Bienvenu(e) dans l&apos;assistant de configuration des entrées.
 
 Veuillez suivre les instructions à l&apos;écran et bouger les commandes uniquement lorsque demandé.
 Vérifiez que vous avez déjà bien configuré vos paramètres matériels dans l&apos;onglet correspondant et redémarré votre carte.
@@ -13505,16 +10424,14 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
         <translation>Hélicoptère : avec pas collectif et commande des gaz</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
         <source>If selecting the Helicopter option, please engage throttle hold now.</source>
-        <translatorcomment>please engage throttle hold now... à confirmer ! [Platypus] Ca me semble bien</translatorcomment>
-        <translation type="unfinished">Si vous avez sélectionné l&apos;option Hélicoptère, veuillez enclencher et maintenir les gaz.</translation>
+        <translation>Si vous avez sélectionné l&apos;option Hélicoptère, veuillez enclencher et maintenir les gaz.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Please choose your transmitter mode:</source>
-        <translatorcomment>[Platypus] Préférence sur le mot sélectionner</translatorcomment>
-        <translation type="unfinished">Veuillez sélectionner votre mode de pilotage :</translation>
+        <translation>Veuillez sélectionner votre mode de pilotage :</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -13525,7 +10442,7 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
 3: Longitudinal, Latéral, à gauche et Moteur/Pas, Anti-couple, à droite
 4: Moteur/Pas, Latéral, à gauche et Longitudinal, Anti-couple, à droite
 </translatorcomment>
-        <translation type="unfinished">Mode 1 : Rotation Avant/Arrière et Anti-Couple à gauche, Gaz/Collectif et Rotation Droite/Gauche à droite</translation>
+        <translation>Mode 1 : Rotation Avant/Arrière et Anti-Couple à gauche, Gaz/Pas et Rotation Droite/Gauche à droite</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -13536,12 +10453,12 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
 3: Longitudinal, Latéral, à gauche et Moteur/Pas, Anti-couple, à droite
 4: Moteur/Pas, Latéral, à gauche et Longitudinal, Anti-couple, à droite
 </translatorcomment>
-        <translation type="unfinished">Mode 2 : Gaz/Collectif et Anti-Couple à gauche, Rotations à droite</translation>
+        <translation>Mode 2 : Gaz/Pas et Anti-Couple à gauche, Rotations à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 3: Cyclic on the left, Throttle/Collective and Yaw on the right</source>
-        <translation type="unfinished">Mode 3 : Rotations à gauche, Gaz/Collectif et Anti-couple à droite</translation>
+        <translation>Mode 3 : Rotations à gauche, Gaz/Pas et Anti-couple à droite</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -13552,37 +10469,37 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
 3: Longitudinal, Latéral, à gauche et Moteur/Pas, Anti-couple, à droite
 4: Moteur/Pas, Latéral, à gauche et Longitudinal, Anti-couple, à droite
 </translatorcomment>
-        <translation type="unfinished">Mode 4 : Gaz/Collectif et Rotation Droite/Gauche, Rotation Avant/Arrière et Anti-couple à droite</translation>
+        <translation>Mode 4 : Gaz/Pas et Rotation Droite/Gauche, Rotation Avant/Arrière et Anti-couple à droite</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Mode 1: Elevator and Rudder on the left, Throttle and Ailerons on the right</source>
         <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
-        <translation type="unfinished">Mode 1 : Profondeur et Dérive à gauche, Gaz et Ailerons à droite</translation>
+        <translation>Mode 1 : Profondeur et Dérive à gauche, Gaz et Ailerons à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 2: Throttle and Rudder on the left, Elevator and Ailerons on the right</source>
         <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
-        <translation type="unfinished">Mode 2 : Gaz et Dérive à gauche, Profondeur et Ailerons à la droite</translation>
+        <translation>Mode 2 : Gaz et Dérive à gauche, Profondeur et Ailerons à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 3: Elevator and Ailerons on the left, Throttle and Rudder on the right</source>
         <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
-        <translation type="unfinished">Mode 3 : Profondeur et Ailerons à gauche, Gaz et Dérive à droite</translation>
+        <translation>Mode 3 : Profondeur et Ailerons à gauche, Gaz et Dérive à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 4: Throttle and Ailerons on the left, Elevator and Rudder on the right</source>
         <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
-        <translation type="unfinished">Mode 4 : Gaz et Ailerons à gauche, Profondeur et Dérive à droite</translation>
+        <translation>Mode 4 : Gaz et Ailerons à gauche, Profondeur et Dérive à droite</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</source>
         <translatorcomment>Dérive / gouvernail ?</translatorcomment>
-        <translation type="unfinished">Pour un Quadricopter : Profondeur correspond à la Rotation Avant, Ailerons à Roulis et Dérive correspond à Lacet.</translation>
+        <translation>Pour un Quadricoptère : Profondeur correspond à la Rotation Avant, Ailerons à Roulis et Dérive correspond à Lacet.</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -13590,7 +10507,7 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
         <translatorcomment>compensateur (me parle pas bcp) Laisser Trim ? Répétition &apos;et&apos;.</translatorcomment>
-        <translation type="unfinished">Veuillez positionner tous les manches/trims en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
+        <translation>Veuillez positionner tous les manches/trims en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
 
 Si votre interrupteur de Mode de Vol a seulement deux positions, laissez-le dans n&apos;importe quelle position.</translation>
     </message>
@@ -13604,7 +10521,7 @@ Press Next when ready.</source>
 Appuyez sur Suivant lorsque vous êtes prêt.</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+37"/>
         <source>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</source>
         <translation>Veuillez vérifier l&apos;image ci-dessous et corriger les manches qui s&apos;affichent en sens inverse. Appuyer sur Suivant lorsque vous êtes prêt.</translation>
     </message>
@@ -13632,7 +10549,7 @@ Bougez le manche du Collectif de tangage.</translation>
         <source>Please toggle the Flight Mode switch.
 
 For switches you may have to repeat this rapidly.</source>
-        <translation type="unfinished">Veuillez activer l&apos;interrupteur de Mode de Vol.
+        <translation>Veuillez activer l&apos;interrupteur de Mode de Vol.
 
 Pour les interrupteurs vous pourriez avoir à répéter l&apos;opération rapidement.</translation>
     </message>
@@ -13651,102 +10568,56 @@ Bougez le manche des Gaz.</translation>
         <source>Please move each control one at a time according to the instructions and picture below.
 
 Move the %1 stick.</source>
-        <translation type="unfinished">Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous.
+        <translation>Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous.
 
 Bougez le manche %1.</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source> Alternatively, click Next to skip this channel.</source>
-        <translation type="unfinished"> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
+        <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+645"/>
+        <location line="+638"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
         <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
     </message>
 </context>
 <context>
-    <name>ConfigOutputWidget</name>
-    <message>
-        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+135"/>
-        <source>The actuator module is in an error state.  This can also occur because there are no inputs.  Please fix these before testing outputs.</source>
-        <translation>Le module de sortie est en erreur. Cela peut arriver parce-qu&apos;il n&apos;y a pas d&apos;entrées. Veuillez réparer ça avant de tester les sorties.</translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>This option will start your motors by the amount selected on the sliders regardless of transmitter.  It is recommended to remove any blades from motors.  Are you sure you want to do this?</source>
-        <translation>Cette option démarrera vos moteurs à un niveau sélectionné par les curseurs sans tenir compte de l&apos;émetteur. Il est recommandé d&apos;enlever toutes les hélices des moteurs. Êtes-vous certain de vouloir faire cela ?</translation>
-    </message>
-</context>
-<context>
-    <name>ConfigPlugin</name>
-    <message>
-        <location filename="../../../src/plugins/config/configplugin.cpp" line="+61"/>
-        <source>Erase all settings from board...</source>
-        <translation>Supprimer tous les paramètres sur la carte...</translation>
-    </message>
-    <message>
-        <location line="+67"/>
-        <source>Are you sure you want to erase all board settings?.</source>
-        <translation type="unfinished">Êtes-vous certain de vouloir supprimer tous les paramètres sur la carte ?</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>All settings stored in your board flash will be deleted.</source>
-        <translation>Tous les paramètres stockés sur la flash de votre carte seront supprimés.</translation>
-    </message>
-    <message>
-        <location line="+41"/>
-        <location line="+25"/>
-        <source>Error trying to erase settings.</source>
-        <translation>Erreur en essayant de supprimer les paramètres.</translation>
-    </message>
-    <message>
-        <location line="-24"/>
-        <location line="+25"/>
-        <source>Power-cycle your board after removing all blades. Settings might be inconsistent.</source>
-        <translation type="unfinished">Eteindre / Allumer votre carte après avoir enlevé toutes les hélices. Les paramètres peuvent-être incorrects.</translation>
-    </message>
-    <message>
-        <location line="-4"/>
-        <source>Settings are now erased.</source>
-        <translation>Les paramètres sont maintenant supprimés.</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Please wait for the status LED to begin flashing regularly (up to a minute) then power-cycle your board to complete reset.</source>
-        <translation>Veuillez attendre que la LED de statut commence à clignoter régulièrement (environ une minute) puis éteindre / allumer votre carte pour terminer la réinitialisation.</translation>
-    </message>
-</context>
-<context>
     <name>Core::Internal::AuthorsDialog</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/authorsdialog.cpp" line="+57"/>
-        <source>About OpenPilot Authors</source>
-        <translation>A propos des auteurs d&apos;OpenPilot</translation>
+        <source>About OpenPilot</source>
+        <translation type="obsolete">À propos d&apos;OpenPilot</translation>
     </message>
     <message>
-        <location line="+11"/>
         <source>From revision %1&lt;br/&gt;</source>
-        <extracomment>This gets conditionally inserted as argument %8 into the description string.</extracomment>
-        <translation>Depuis la révision %1&lt;br/&gt;</translation>
+        <translation type="obsolete">Depuis la révision %1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>&lt;h3&gt;The OpenPilot Project&lt;/h3&gt;Proudly brought to you by this fine team:&lt;br/&gt;</source>
-        <translation>&lt;h3&gt;Le Projet OpenPilot&lt;/h3&gt;Fièrement présenté par cette fine équipe :&lt;br/&gt;</translation>
+        <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
+        <translation type="obsolete">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
     <name>Core::ConnectionManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/connectionmanager.cpp" line="+60"/>
+        <location filename="../../../src/plugins/coreplugin/connectionmanager.cpp" line="+53"/>
+        <source>USB: OPLinkMini</source>
+        <translation>USB : OPLinkMini</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Connections:</source>
         <translation>Connexions :</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+71"/>
+        <source>Disconnect</source>
+        <translation>Déconnecter</translation>
+    </message>
+    <message>
+        <location line="-80"/>
+        <location line="+126"/>
         <source>Connect</source>
         <translation>Connecter</translation>
     </message>
@@ -13762,12 +10633,12 @@ Bougez le manche %1.</translation>
 <context>
     <name>DebugGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/debuggadget/debuggadgetwidget.cpp" line="+80"/>
+        <location filename="../../../src/plugins/debuggadget/debuggadgetwidget.cpp" line="+113"/>
         <source>Save log File As</source>
         <translation>Enregistrer Fichier Journal Sous</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Log Save</source>
         <translation>Enregistrer Journal</translation>
     </message>
@@ -13782,7 +10653,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/dial/dialgadgetfactory.cpp" line="+37"/>
         <source>Analog Dial</source>
-        <translation type="unfinished"></translation>
+        <translation>Cadran Analogique</translation>
     </message>
 </context>
 <context>
@@ -13790,7 +10661,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetfactory.cpp" line="+34"/>
         <source>Controller</source>
-        <translation type="unfinished">Contrôleur</translation>
+        <translation>Contrôleur</translation>
     </message>
 </context>
 <context>
@@ -13814,13 +10685,13 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetfactory.cpp" line="+36"/>
         <source>Bargraph Dial</source>
-        <translation type="unfinished"></translation>
+        <translation>Cadran Bargraph</translation>
     </message>
 </context>
 <context>
     <name>LoggingConnection</name>
     <message>
-        <location filename="../../../src/plugins/logging/loggingplugin.cpp" line="+79"/>
+        <location filename="../../../src/plugins/logging/loggingplugin.cpp" line="+76"/>
         <source>Open file</source>
         <translation>Ouvrir fichier</translation>
     </message>
@@ -13833,15 +10704,15 @@ Bougez le manche %1.</translation>
 <context>
     <name>LoggingThread</name>
     <message>
-        <location line="+166"/>
+        <location line="+162"/>
         <source>Logging: retrieve settings objects from the autopilot (%1 objects)</source>
-        <translation type="unfinished"></translation>
+        <translation>Journalisation : récupération des objets de configuration de l&apos;autopilote (%1 objets)</translation>
     </message>
 </context>
 <context>
     <name>LoggingPlugin</name>
     <message>
-        <location line="+120"/>
+        <location line="+114"/>
         <source>Start Log</source>
         <translation>Démarrer Journal</translation>
     </message>
@@ -13856,12 +10727,13 @@ Bougez le manche %1.</translation>
         <translation>Journal OpenPilot (*.opl)</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Stop logging</source>
         <translation>Arrêter enregistrement</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="-34"/>
+        <location line="+37"/>
         <source>Start logging...</source>
         <translation>Démarrer enregistrement...</translation>
     </message>
@@ -13871,7 +10743,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/magicwaypoint/magicwaypointgadgetfactory.cpp" line="+35"/>
         <source>Magic Waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Waypoint Magique </translation>
     </message>
 </context>
 <context>
@@ -13879,78 +10751,78 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/modelview/modelviewgadgetfactory.cpp" line="+36"/>
         <source>ModelView</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VueModèle</translation>
     </message>
 </context>
 <context>
     <name>NotificationItem</name>
     <message>
-        <location filename="../../../src/plugins/notify/notificationitem.cpp" line="+74"/>
+        <location filename="../../../src/plugins/notify/notificationitem.cpp" line="+70"/>
         <source>Never</source>
         <translation>Jamais</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Before first</source>
-        <translation type="unfinished"></translation>
+        <translation>Avant premier</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Before second</source>
-        <translation type="unfinished"></translation>
+        <translation>Avant deuxième</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>After second</source>
-        <translation type="unfinished"></translation>
+        <translation>Après deuxième</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Repeat Once</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter une fois</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat Once per update</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter une fois par mise à jour</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat Instantly</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter Immédiatement</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat 10 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter 10 secondes</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat 30 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter 30 secondes</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat 1 minute</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter 1 minute</translation>
     </message>
 </context>
 <context>
     <name>flightDataModel</name>
     <message>
-        <location filename="../../../src/plugins/opmap/flightdatamodel.cpp" line="+410"/>
+        <location filename="../../../src/plugins/opmap/flightdatamodel.cpp" line="+437"/>
         <source>Unable to open file</source>
         <translation>Impossible d&apos;ouvrir le fichier</translation>
     </message>
     <message>
-        <location line="+142"/>
+        <location line="+144"/>
         <source>File Parsing Failed.</source>
-        <translation>Echec Analyse Fichier.</translation>
+        <translation>Échec Analyse Fichier.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>This file is not a correct XML file</source>
-        <translation>Ce fichier n&apos;est pas un fichier XML valide</translation>
+        <source>This file is not a correct XML file:%0</source>
+        <translation>Ce fichier n&apos;est pas un fichier XML valide : %0</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -13974,30 +10846,14 @@ Bougez le manche %1.</translation>
 <context>
     <name>pathPlanner</name>
     <message>
-        <location filename="../../../src/plugins/opmap/pathplanner.cpp" line="+93"/>
+        <location filename="../../../src/plugins/opmap/pathplanner.cpp" line="+94"/>
         <source>Open File</source>
         <translation>Ouvrir Fichier</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>Save File</source>
         <translation>Enregistrer Fichier</translation>
-    </message>
-</context>
-<context>
-    <name>PFDGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetfactory.cpp" line="+36"/>
-        <source>Primary Flight Display</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PfdQmlGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetfactory.cpp" line="+25"/>
-        <source>PFD (qml)</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -14005,7 +10861,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/qmlview/qmlviewgadgetfactory.cpp" line="+36"/>
         <source>QML Viewer, QML</source>
-        <translation type="unfinished"></translation>
+        <translation>Visionneur QML, QML</translation>
     </message>
 </context>
 <context>
@@ -14013,39 +10869,31 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetfactory.cpp" line="+36"/>
         <source>Scope</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Graphique</translation>
     </message>
 </context>
 <context>
     <name>ScopeGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+221"/>
+        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+230"/>
         <source>Click legend to show/hide scope trace</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LevellingUtil</name>
-    <message>
-        <location filename="../../../src/plugins/setupwizard/levellingutil.cpp" line="+125"/>
-        <source>Calibration timed out before receiving required updates.</source>
-        <translation>Temps d&apos;attente dépassé avant d&apos;avoir reçu les mises à jour demandées.</translation>
+        <translation>Cliquer sur la légende pour afficher / cacher la tracé du graphique</translation>
     </message>
 </context>
 <context>
     <name>SetupWizard</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+56"/>
+        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+57"/>
         <source>OpenPilot Setup Wizard</source>
         <translation>Assistant Configuration OpenPilot</translation>
     </message>
     <message>
-        <location line="+82"/>
+        <location line="+106"/>
         <source>Controller type: </source>
         <translation>Type de contrôleur : </translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>OpenPilot CopterControl</source>
         <translation></translation>
     </message>
@@ -14066,20 +10914,20 @@ Bougez le manche %1.</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location line="+46"/>
+        <location line="+44"/>
         <location line="+15"/>
-        <location line="+26"/>
-        <location line="+14"/>
+        <location line="+25"/>
+        <location line="+13"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location line="-96"/>
+        <location line="-92"/>
         <source>Vehicle type: </source>
-        <translation>Type de véhicule :</translation>
+        <translation>Type de véhicule : </translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Multirotor</source>
         <translation>Multirotor</translation>
     </message>
@@ -14089,7 +10937,7 @@ Bougez le manche %1.</translation>
         <translation>Sous-type véhicule : </translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Tricopter</source>
         <translation>Tricoptère</translation>
     </message>
@@ -14156,10 +11004,10 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+7"/>
         <source>Input type: </source>
-        <translation>Type d&apos;entrée :</translation>
+        <translation>Type d&apos;entrée : </translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>PWM (One cable per channel)</source>
         <translation>PWM (Un câble par canal)</translation>
     </message>
@@ -14191,10 +11039,10 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+7"/>
         <source>ESC type: </source>
-        <translation>Type de variateur :</translation>
+        <translation>Type de variateur : </translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Legacy ESC (50 Hz)</source>
         <translation>Variateur Classique (50Hz)</translation>
     </message>
@@ -14207,7 +11055,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>SetupWizardPlugin</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/setupwizardplugin.cpp" line="+62"/>
+        <location filename="../../../src/plugins/setupwizard/setupwizardplugin.cpp" line="+60"/>
         <source>Vehicle Setup Wizard</source>
         <translation>Assistant Configuration Véhicule</translation>
     </message>
@@ -14215,7 +11063,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>VehicleConfigurationHelper</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+72"/>
+        <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+77"/>
         <location line="+12"/>
         <source>Done!</source>
         <translation>Terminé !</translation>
@@ -14224,57 +11072,58 @@ Bougez le manche %1.</translation>
         <location line="-12"/>
         <location line="+12"/>
         <source>Failed!</source>
-        <translation>Echoué !</translation>
+        <translation>Échoué !</translation>
     </message>
     <message>
-        <location line="+66"/>
+        <location line="+95"/>
         <source>Writing hardware settings</source>
-        <translation>Ecriture paramètres matériels</translation>
+        <translation>Écriture paramètres matériels</translation>
     </message>
     <message>
-        <location line="+104"/>
+        <location line="+109"/>
         <source>Writing actuator settings</source>
-        <translation>Ecriture paramètres actionneurs</translation>
+        <translation>Écriture paramètres actionneurs</translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+37"/>
         <source>Writing flight mode settings</source>
-        <translation>Ecriture paramètres mode vol</translation>
+        <translation>Écriture paramètres mode vol</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+33"/>
+        <location line="+20"/>
         <source>Writing gyro and accelerometer bias settings</source>
-        <translation>Ecriture paramètres d&apos;ajustement gyro et accéléromètres</translation>
+        <translation>Écriture paramètres d&apos;ajustement gyro et accéléromètres</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+19"/>
         <source>Writing stabilization settings</source>
-        <translation>Ecriture paramètres de stabilisation</translation>
+        <translation>Écriture paramètres de stabilisation</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+29"/>
         <source>Writing mixer settings</source>
-        <translation>Ecriture paramètres mixer</translation>
+        <translation>Écriture paramètres mixeur</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Writing vehicle settings</source>
-        <translation>Ecriture paramètres véhicule</translation>
+        <translation>Écriture paramètres véhicule</translation>
     </message>
     <message>
         <location line="+43"/>
         <source>Writing manual control defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Écriture contrôles manuels par défaut</translation>
     </message>
     <message>
-        <location line="+157"/>
+        <location line="+153"/>
         <source>Preparing mixer settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Préparation des paramètres de mixage</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+14"/>
         <source>Preparing vehicle settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Préparation des paramètres du véhicule</translation>
     </message>
 </context>
 <context>
@@ -14288,7 +11137,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>SystemHealthGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetwidget.cpp" line="+66"/>
+        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetwidget.cpp" line="+68"/>
         <source>Displays flight system errors. Click on an alarm for more information.</source>
         <translation>Affiche les erreurs du système de vol. Cliquer sur une alarme pour plus d&apos;informations.</translation>
     </message>
@@ -14296,20 +11145,20 @@ Bougez le manche %1.</translation>
 <context>
     <name>UAVObjectField</name>
     <message>
-        <location filename="../../../src/plugins/uavobjects/uavobjectfield.cpp" line="+91"/>
+        <location filename="../../../src/plugins/uavobjects/uavobjectfield.cpp" line="+89"/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>1</source>
-        <translation type="unfinished">1</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>PopupWidget</name>
     <message>
-        <location filename="../../../src/plugins/uavobjectwidgetutils/popupwidget.cpp" line="+17"/>
+        <location filename="../../../src/plugins/uavobjectwidgetutils/popupwidget.cpp" line="+21"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
@@ -14317,7 +11166,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>UAVSettingsImportExportFactory</name>
     <message>
-        <location filename="../../../src/plugins/uavsettingsimportexport/uavsettingsimportexportfactory.cpp" line="+69"/>
+        <location filename="../../../src/plugins/uavsettingsimportexport/uavsettingsimportexportfactory.cpp" line="+70"/>
         <source>Export UAV Settings...</source>
         <translation>Exporter Paramètres UAV...</translation>
     </message>
@@ -14334,17 +11183,17 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+10"/>
         <source>UAVObjects XML files (*.uav);; XML files (*.xml)</source>
-        <translation>Fichiers XML UAVObjects (*.uav;; Fichiers XML (*.xml)</translation>
+        <translation>Fichiers XML UAVObjects (*.uav);; Fichiers XML (*.xml)</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Import UAV Settings</source>
         <translation>Importer Paramètres UAV</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>File Parsing Failed.</source>
-        <translation>Echec Parsing Fichier.</translation>
+        <translation>Échec Analyse Fichier.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -14362,7 +11211,7 @@ Bougez le manche %1.</translation>
         <translation>Ce fichier ne contient pas de paramètres UAV corrects</translation>
     </message>
     <message>
-        <location line="+211"/>
+        <location line="+209"/>
         <location line="+51"/>
         <source>UAVObjects XML files (*.uav)</source>
         <translation>Fichiers XML UAVObjects (*.uav)</translation>
@@ -14380,7 +11229,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+1"/>
         <source>Unable to save settings: </source>
-        <translation>Impossible d&apos;enregistrer les paramètres :</translation>
+        <translation>Impossible d&apos;enregistrer les paramètres : </translation>
     </message>
     <message>
         <location line="+6"/>
@@ -14429,63 +11278,89 @@ Bougez le manche %1.</translation>
 <context>
     <name>UploaderGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+375"/>
+        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+391"/>
         <source>The controller board is armed and can not be halted.
 
 Please make sure the board is not armed and then press halt again to proceed
 or use the rescue option to force a firmware upgrade.</source>
-        <translation type="unfinished"></translation>
+        <translation>La carte contrôleur est armée et ne peut être arrêtée.
+
+Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau sur arrêt pour continuer ou utilisez l&apos;option sauvetage pour forcer la mise à jour du firmware.</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+31"/>
         <source>The controller board is armed and can not be reset.
 
 Please make sure the board is not armed and then press reset again to proceed
 or power cycle to force a board reset.</source>
-        <translation type="unfinished"></translation>
+        <translation>La carte contrôleur est armée et ne peut être réinitialisée.
+
+Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau sur réinitialiser pour continuer ou coupez/alimentez la carte pour forcer la réinitialisation.</translation>
     </message>
     <message>
-        <location line="+96"/>
-        <location line="+141"/>
+        <location line="+24"/>
+        <source>Erase Settings</source>
+        <translation>Effacer Paramètres</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Do you want to erase all settings from the board?
+Settings cannot be recovered after this operation.
+The board will be restarted and all the setting erased</source>
+        <translation>Voulez-vous effacer tous les paramètres sur la carte ?
+Les paramètres ne pourront être récupérés après cette opération.
+La carte sera redémarrée et tous les paramètres effacés</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>http://wiki.openpilot.org/display/Doc/Erase+board+settings</source>
+        <translatorcomment>Wiki FR - Uploader</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/SYBqAQ</translation>
+    </message>
+    <message>
+        <location line="+87"/>
+        <location line="+143"/>
+        <location line="+26"/>
         <source>OpenPilot Uploader</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Téléverseur OpenPilot ?</translatorcomment>
+        <translation type="unfinished">Uploader OpenPilot</translation>
     </message>
     <message>
-        <location line="-141"/>
-        <location line="+141"/>
+        <location line="-169"/>
+        <location line="+143"/>
         <source>Please disconnect your OpenPilot board</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez déconnecter votre carte OpenPilot</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+11"/>
         <source>Please connect your OpenPilot board (USB only!)</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez connecter votre carte OpenPilot (USB seulement !)</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <source>OpenPilot Uploader</source>
-        <translation type="unfinished"></translation>
+        <location line="+15"/>
+        <source></source>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>No board connection was detected!</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune connexion de carte n&apos;a été détectée !</translation>
     </message>
     <message>
-        <location line="+197"/>
+        <location line="+280"/>
         <source>GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. GCS version: %1 Firmware version: %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les versions de GCS et firmware des objets UAV ne correspondent pas ce qui peut causer des problèmes de configuration. Version GCS : %1 - Version firmware : %2.</translation>
     </message>
 </context>
 <context>
     <name>NewsPanel</name>
     <message>
-        <location filename="../../../src/plugins/welcome/qml/NewsPanel.qml" line="+13"/>
+        <location filename="../../../src/plugins/welcome/qml/NewsPanel.qml" line="+14"/>
         <source>Project News</source>
         <translation>Nouvelles du Projet</translation>
     </message>
@@ -14496,6 +11371,2381 @@ or power cycle to force a board reset.</source>
         <location filename="../../../src/plugins/welcome/qml/SitesPanel.qml" line="+13"/>
         <source>OpenPilot Websites</source>
         <translation>Sites Web OpenPilot</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Home</source>
+        <translation>Site Principal</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wiki</source>
+        <translation>Wiki</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Store</source>
+        <translation>Boutique</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Forums</source>
+        <translation>Forums</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Code Reviews</source>
+        <translation>Changements Code</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Progress Tracker</source>
+        <translation>Suivi Progression</translation>
+    </message>
+</context>
+<context>
+    <name>CcpmConfigWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/airframe_ccpm.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate config:</source>
+        <translation>Configuration plateau cyclique :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select aircraft type here</source>
+        <translation>Sélectionner ici le type d&apos;appareil</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Basic settings</source>
+        <translation>Paramètres de base</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor outputs</source>
+        <translation>Sorties moteurs</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tail Rotor</source>
+        <translation>Rotor queue</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Engine</source>
+        <translation>Moteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate outputs</source>
+        <translation type="unfinished">Sorties plateau cyclique</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo W</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo X</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Front</source>
+        <translation>Avant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Right</source>
+        <translation>Droite</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rear</source>
+        <translation>Arrière</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Left</source>
+        <translation>Gauche</translation>
+    </message>
+    <message>
+        <location/>
+        <source>1st Servo</source>
+        <translation>1er Servo</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate Servo Angles</source>
+        <translation type="unfinished">Angles Servos Plateau</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Angle W</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Angle X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Angle Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Angle Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Correction Angle</source>
+        <translation type="unfinished">Correction Angle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>CCPM Options</source>
+        <translation type="unfinished">Options CCPM</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Collective Pass through</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link Roll/Pitch</source>
+        <translation>Lier Roll/Pitch</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link Cyclic/Collective</source>
+        <translation type="unfinished">Lier Cyclique/collectif</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate Layout</source>
+        <translation type="unfinished">Agencement Plateau Cyclique</translation>
+    </message>
+    <message>
+        <location/>
+        <source>REVO</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>100%</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0%</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>CCPM</source>
+        <translation>CCPM</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Collective</source>
+        <translation type="unfinished">Collectif</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cyclic</source>
+        <translation type="unfinished">Cyclique</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate Levelling</source>
+        <translation type="unfinished">Niveau Plateau Cyclique</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Commands</source>
+        <translation>Commandes</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
+        <translation>Démarrer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Next</source>
+        <translation>Suivant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Finish</source>
+        <translation>Terminer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Status</source>
+        <translation>Statut</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Neutral</source>
+        <translation>Neutre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation>Maxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation>Mini</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Verify</source>
+        <translation>Vérifier</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Position</source>
+        <translation>Position</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate Adjustment</source>
+        <translation type="unfinished">Réglage Plateau Cyclique</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve settings</source>
+        <translation>Paramètres de la courbe</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Advanced settings</source>
+        <translation>Paramètres avancés</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel</source>
+        <translation>Canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 1</source>
+        <translation>Courbe 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 2</source>
+        <translation>Courbe 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>-</source>
+        <translation>-</translation>
+    </message>
+</context>
+<context>
+    <name>CustomConfigWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/airframe_custom.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 1</source>
+        <translation>Courbe 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 2</source>
+        <translation>Courbe 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Type</source>
+        <translation>Type</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translatorcomment>Tech : laisser tel quel?</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translatorcomment>Tech : laisser tel quel?</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translatorcomment>Tech : laisser tel quel?</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 3</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 4</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 5</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 6</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 7</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 8</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 9</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 10</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 11</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 12</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>-</source>
+        <translation>-</translation>
+    </message>
+</context>
+<context>
+    <name>FixedWingConfigWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/airframe_fixedwing.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Airplane type:</source>
+        <translation>Type d&apos;avion :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Channel Assignments</source>
+        <translation>Affectation Canaux de Sortie</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Engine</source>
+        <translation>Moteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the engine</source>
+        <translation>Sélectionner le canal de sortie pour le moteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aileron 1</source>
+        <translation>Aileron 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the first aileron (or elevon)</source>
+        <translation>Sélectionner le canal de sortie pour le premier aileron (ou élevon)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aileron 2</source>
+        <translation>Aileron 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the second aileron (or elevon)</source>
+        <translation>Sélectionner le canal de sortie pour le second aileron (ou élevon)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Elevator 1</source>
+        <translation>Profondeur 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the first elevator</source>
+        <translation>Sélectionner le canal de sortie pour la profondeur principale</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Elevator 2</source>
+        <translation>Profondeur 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for a secondary elevator</source>
+        <translation>Sélectionner le canal de sortie pour la profondeur secondaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rudder 1</source>
+        <translation>Dérive 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the first rudder</source>
+        <translation>Sélectionner le canal de sortie pour la dérive principale</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rudder 2</source>
+        <translation>Dérive 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for a secondary rudder</source>
+        <translation>Sélectionner le canal de sortie pour la dérive secondaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Elevon Mix</source>
+        <translation>Mixage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rudder %</source>
+        <translation>Dérive %</translation>
+    </message>
+    <message>
+        <location/>
+        <source>50</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch %</source>
+        <translation>Profondeur %</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle Curve</source>
+        <translation>Courbe Gaz</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mixer OK</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>GroundConfigWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/airframe_ground.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Vehicle type:</source>
+        <translation>Type de Véhicule :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output channel assignments</source>
+        <translation>Affectations sorties</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Engine</source>
+        <translation>Moteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the engine</source>
+        <translation>Sélectionner le canal de sortie pour le moteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aileron 1</source>
+        <translation>Aileron 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the first aileron (or elevon)</source>
+        <translation>Sélectionner le canal de sortie pour le premier aileron (ou élevon)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aileron 2</source>
+        <translation>Aileron 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the second aileron (or elevon)</source>
+        <translation>Sélectionner le canal de sortie pour le second aileron (ou élevon)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor</source>
+        <translation>Moteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the first motor</source>
+        <translation>Sélectionner le canal de sortie pour le premier moteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 2</source>
+        <translation>Moteur 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for a second motor</source>
+        <translation>Sélectionner le canal de sortie pour le deuxième moteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Front Steering</source>
+        <translation>Direction AV   </translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the first steering actuator</source>
+        <translation>Sélectionner le canal de sortie pour le premier actionneur de direction avant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rear Steering</source>
+        <translation>Direction AR </translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for a second steering actuator</source>
+        <translation>Sélectionner le canal de sortie pour le deuxième actionneur de direction</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Differential Steering Mix</source>
+        <translation>Mixage Différentiel Direction</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Left %</source>
+        <translation>Gauche %</translation>
+    </message>
+    <message>
+        <location/>
+        <source>50</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Right %</source>
+        <translation>Droite %</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Front throttle curve</source>
+        <translation>Courbe gaz AV</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rear throttle curve</source>
+        <translation>Courbe gaz AR</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mixer OK</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>MultiRotorConfigWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/airframe_multirotor.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frame</source>
+        <translation>Châssis</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle Curve</source>
+        <translation>Courbe Gaz</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mix Level</source>
+        <translation>Niveau Mixage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight of Roll mixing in percent.
+Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
+        <translation>Quantité de mixage Roll en pourcentage.
+Les valeurs classiques sont de 100% en configuration + et 50% en configuration X sur les quadricoptères.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>50</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight of Pitch mixing in percent.
+Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
+        <translation>Quantité de mixage Pitch en pourcentage.
+Les valeurs classiques sont de 100% en configuration + et 50% en configuration X sur les quadricoptères.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight of Yaw mixing in percent.
+Typical value is 50% for + or X configuration on quads.</source>
+        <translation>Quantité de mixage Yaw en pourcentage.
+Les valeurs classiques sont de 50% en configuration + et X sur les quadricoptères.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frame Type:</source>
+        <translation>Type Châssis :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the Multirotor frame type here.</source>
+        <translation>Sélectionner ici le type de châssis de Multirotor.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mixer OK</source>
+        <translation>Mixage OK</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor output channels</source>
+        <translation>Canaux de sortie moteurs</translation>
+    </message>
+    <message>
+        <location/>
+        <source>1</source>
+        <translation>1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</source>
+        <translation>Affecter les canaux de sortie des moteurs en utilisant le dessin ci-dessus comme référence. Respectez le sens des moteurs.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>2</source>
+        <translation>2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>3</source>
+        <translation>3</translation>
+    </message>
+    <message>
+        <location/>
+        <source>4</source>
+        <translation>4</translation>
+    </message>
+    <message>
+        <location/>
+        <source>5</source>
+        <translation>5</translation>
+    </message>
+    <message>
+        <location/>
+        <source>6</source>
+        <translation>6</translation>
+    </message>
+    <message>
+        <location/>
+        <source>7</source>
+        <translation>7</translation>
+    </message>
+    <message>
+        <location/>
+        <source>8</source>
+        <translation>8</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Multirotor Motor Direction</source>
+        <translation>Direction Moteur Multirotor</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tricopter Yaw Servo channel</source>
+        <translation>Canal de Servo Yaw Tricoptère</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reverse all motors</source>
+        <translation>Inverser tous les moteurs</translation>
+    </message>
+</context>
+<context>
+    <name>RevoHWWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configrevohwwidget.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HW settings</source>
+        <translation>Paramètres Matériels</translation>
+    </message>
+    <message>
+        <location/>
+        <source>USB HID Function</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speed</source>
+        <translation>Vitesse</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flexi Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sonar Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Receiver Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>USB VCP Function</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Changes on this page only take effect after board reset or power cycle</source>
+        <translation>Les changements sur cette page ne prendront effet qu&apos;après un reset ou une coupure d&apos;alimentation</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Takes you to the wiki page</source>
+        <translation>Vous renvoie à la page wiki</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send to OpenPilot but don&apos;t write in SD.
+Beware of not locking yourself out!</source>
+        <translation>Envoie vers l&apos;OpenPilot mais n&apos;écrit pas dans la SD.
+Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation>Appliquer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applies and Saves all settings to SD.
+Beware of not locking yourself out!</source>
+        <translation>Applique et Enregistre tous les paramètres dans la SD.
+Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation>Enregistrer</translation>
+    </message>
+</context>
+<context>
+    <name>OPLinkWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/pipxtreme.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:help</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>url:http://wiki.openpilot.org/x/dACrAQ</source>
+        <translatorcomment>Lien wiki FR </translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/AwCEAQ</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board but do not save to the non-volatile memory</source>
+        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non volatile</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation>Appliquer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board and save to the non-volatile memory</source>
+        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation>Enregistrer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Status</source>
+        <translation>Statut</translation>
+    </message>
+    <message>
+        <location/>
+        <source>12345678</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link State</source>
+        <translation>État Liaison</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The modems current state</source>
+        <translation>L&apos;état actuel du modem</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disconnected</source>
+        <translation>Déconnecté</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Firmware Ver.</source>
+        <translation>Version Firm.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Serial Number</source>
+        <translation>Numéro Série</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The modems serial number</source>
+        <translation>Le numéro de série du modem</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Device ID</source>
+        <translation>ID Périphérique</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link Quality</source>
+        <translation>Qualité Liaison</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RSSI</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The number of packets that were unable to be transmitted</source>
+        <translation>Le nombre de paquets qu&apos;il n&apos;a pas été possible de transmettre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TX Seq. No.</source>
+        <translation type="unfinished">Seq Tx N° </translation>
+    </message>
+    <message>
+        <location/>
+        <source>TX Rate (B/s)</source>
+        <translation>Débit TX (B/s)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RX Seq. No.</source>
+        <translation type="unfinished">Seq. Rx N° </translation>
+    </message>
+    <message>
+        <location/>
+        <source>RX Rate (B/s)</source>
+        <translation>Débit RX (B/s)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RX Good</source>
+        <translation>Rx Corrects</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The percentage of packets that were corrected with error correction</source>
+        <translation>Le pourcentage de paquets corrigés par la correction d&apos;erreurs</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RX Corrected</source>
+        <translation>Rx Corrigés</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RX Errors</source>
+        <translation>Erreurs RX</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The percentage of packets that could not be corrected with error correction</source>
+        <translation>Le pourcentage de paquets qui n&apos;ont pu être corrigés par la correction d&apos;erreurs</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RX Missed</source>
+        <translation>Rx Perdus</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The percentage of packets that were not received at all</source>
+        <translation>Le pourcentage de paquets qui n&apos;ont pas été reçus du tout</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TX Dropped</source>
+        <translation>Tx Perdus</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TX Resent</source>
+        <translation>TX Renvoyés</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tx Failure</source>
+        <translation>TX Défaillants</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Free Heap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UAVTalk Errors</source>
+        <translation>Erreurs UAVTalk</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Resets</source>
+        <translation type="unfinished">Réinitialisations</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Timeouts</source>
+        <translation type="unfinished">Temps Dépassé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RX Failure</source>
+        <translation>Rx Défaillants</translation>
+    </message>
+    <message>
+        <source>Remote Modems</source>
+        <translation type="obsolete">Modems Distants</translation>
+    </message>
+    <message>
+        <location/>
+        <source>-100dB</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>%v dBm</source>
+        <translation>%v dBm</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bind</source>
+        <translation>Associer</translation>
+    </message>
+    <message>
+        <source>Coord ID</source>
+        <translation type="obsolete">ID Coord</translation>
+    </message>
+    <message>
+        <location/>
+        <source>This modem will be a coordinator and other modems will bind to it.</source>
+        <translation>Ce modem sera coordinateur et les autres modems s&apos;associeront avec lui.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Coordinator</source>
+        <translation>Coordinateur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Configuration</source>
+        <translation>Configuration</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Com speed in bps.</source>
+        <translation>Vitesse com en bps.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Com Speed</source>
+        <translation>Vitesse Com</translation>
+    </message>
+    <message>
+        <location/>
+        <source>VCP Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Choose the function for the flexi port</source>
+        <translation>Choisir la fonction pour le flexi port</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Choose the function for the main port</source>
+        <translation>Choisir la fonction pour le main port</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the maximum TX output power the modem will use (mW)</source>
+        <translation>Ajuste la puissance maximale de sortie utilisée par le modem (mW)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max Power</source>
+        <translation>Puissance Maxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Choose the function for the USB virtual com port</source>
+        <translation>Choisir la fonction pour le USB virtual com port</translation>
+    </message>
+    <message>
+        <location/>
+        <source>FlexiIO Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flexi Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>If selected, data will only be transmitted from the coordinator to the Rx modem.</source>
+        <translation>Si coché, les données sont uniquement transmises du coordinateur vers le modem Rx.</translation>
+    </message>
+    <message>
+        <source>One-Way Link</source>
+        <translation type="obsolete">Liaison Unidirectionnelle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Only PPM packets will be transmitted.</source>
+        <translation>Seulement les paquets PPM seront transmis.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>PPM Only</source>
+        <translation>PPM Seul</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max Chan</source>
+        <translation>Canal Maxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 0 is 430 MHz, channel 249 is 440 MHz, and the channel spacing is 40 KHz.</source>
+        <translation>Canal 0 correspond à 430Mhz, canal 249 à 440Mhz, et l&apos;espacement des canaux est de 40KHz.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min Chan</source>
+        <translation>Canal Mini</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel Set</source>
+        <translation>Canal fixe</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sets the random sequence of channels to use for frequency hopping.</source>
+        <translation>Fixe une séquence aléatoire de canaux à utiliser pour les sauts de fréquence.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>PPM packets will be received by this modem.  Must be selected if Coordinator modem is configured for PPM.</source>
+        <translation>Les paquets PPM sont reçus par ce modem. Doit être sélectionné si le modem coordinateur est configuré en PPM.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>PPM</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>OPLink configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>One-Way</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Remote modems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Coordinator ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the coordinator id we currently are bound to.&lt;/p&gt;&lt;p&gt;To manually bind to a specific coordinator, just type&lt;/p&gt;&lt;p&gt;or paste its device id in this box and save.&lt;/p&gt;&lt;p&gt;The device must be rebooted for the binding to take place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OsgEarthview</name>
+    <message>
+        <location filename="../../../src/plugins/osgearthview/osgearthview.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+</context>
+<context>
+    <name>OsgEarthviewGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/osgearthview/osgearthviewgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>PFD SVG: </source>
+        <translation>SVG PFD : </translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use OpenGL for rendering</source>
+        <translation>Utiliser le rendu OpenGL</translation>
+    </message>
+    <message>
+        <location/>
+        <source>High Quality text (OpenGL)</source>
+        <translation>Texte Haute Qualité (OpenGL)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Smooth updates</source>
+        <translation>Mises à jour lissées</translation>
+    </message>
+</context>
+<context>
+    <name>PathActionEditor</name>
+    <message>
+        <location filename="../../../src/plugins/pathactioneditor/pathactioneditor.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>New PathAction</source>
+        <translatorcomment>PathAction ? à définir en Fr</translatorcomment>
+        <translation type="unfinished">Nouveau PathAction</translation>
+    </message>
+    <message>
+        <location/>
+        <source>New Waypoint</source>
+        <translation>Nouveau Waypoint</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to File</source>
+        <translation>Enregistre dans un fichier</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Load from File</source>
+        <translation>Charger depuis un Fichier</translation>
+    </message>
+</context>
+<context>
+    <name>BiasCalibrationPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/biascalibrationpage.ui"/>
+        <source>WizardPage</source>
+        <translation>Page d&apos;Assistant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot sensor calibration procedure&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The wizard needs to get information from the controller to determine in which position the vehicle is normally considered to be level. To be able to successfully perform these measurements, you need to place the vehicle on a surface that is as flat and level as possible. Examples of such surfaces could be a table top or the floor. Be careful to ensure that the vehicle really is level, since this step will affect the accelerometer and gyro bias in the controller software.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To perform the calibration, please push the Calculate button and wait for the process to finish. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Procédure d&apos;étalonnage des capteurs OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;L&apos;assistant a besoin de récupérer des informations du contrôleur pour déterminer dans quelle position l&apos;appareil est normalement considéré de niveau. Afin de réaliser avec succès ces mesures, vous devez placer le véhicule sur une surface aussi plane et horizontale que possible. Des exemples de ces surfaces pourraient être un dessus de table ou le sol. Veillez à ce que le véhicule soit vraiment de niveau puisque cette étape aura une incidence sur l&apos;ajustement des accéléromètres et des gyroscopes dans le logiciel du contrôleur.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour effectuer l&apos;étalonnage, veuillez appuyer sur le bouton Calculer et attendez la fin du processus. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate gyro and accelerometer bias</source>
+        <translation>Calculer l&apos;ajustement des gyros et des accéléromètres</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate</source>
+        <translation>Calculer</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/biascalibrationpage.cpp" line="+74"/>
+        <source>An OpenPilot controller must be connected to your computer to perform bias calculations.
+Please connect your OpenPilot controller to your computer and try again.</source>
+        <translation>Un contrôleur OpenPilot doit être connecté à votre PC pour calculer l&apos;ajustement du niveau.
+Connectez votre carte OpenPilot et essayez à nouveau.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Retrieving data...</source>
+        <translation>Récupération des données...</translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <source>&lt;font color=&apos;green&apos;&gt;Done!&lt;/font&gt;</source>
+        <translation>&lt;font color=&apos;green&apos;&gt;Terminé !&lt;/font&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>RevoCalibrationPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/revocalibrationpage.ui"/>
+        <source>WizardPage</source>
+        <translation>Page d&apos;Assistant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Revolution controller sensor calibration procedure&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The calibration procedure for the OpenPilot Revolution controller is not yet implemented in this setup wizard. To calibrate your OpenPilot Revolution controller please use the calibration utility found in the configuration plugin after you have finished this wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Future versions of will have an easy to use calibration procedure implemented.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Procédure calibration capteurs sur carte OpenPilot Revolution&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La procédure de calibration pour le contrôleur OpenPilot Revolution n&apos;est pas encore implémentée dans cet assistant  de configuration. Pour calibrer votre contrôleur OpenPilot Revolution veuillez utiliser l&apos;utilitaire de calibration que vous trouverez dans l&apos;onglet Configuration à la fin de cet assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les futures versions de cet assistant posséderont une procédure de calibration simplifiée.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>GCSSplashScreen</name>
+    <message>
+        <location filename="../../../src/app/gcssplashscreen.cpp" line="+46"/>
+        <source> The OpenPilot Project - All Rights Reserved</source>
+        <translation> Le Projet OpenPilot - Tous droits réservés</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>GCS Revision - </source>
+        <translation>Révision GCS - </translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Loading </source>
+        <translation>Chargement </translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../../../src/app/main.cpp" line="-59"/>
+        <source>Application starting...</source>
+        <translation>Démarrage application...</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigOutputWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+138"/>
+        <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
+        <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuillez corriger cela avant de tester les sorties.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>This option will start your motors by the amount selected on the sliders regardless of transmitter. It is recommended to remove any blades from motors. Are you sure you want to do this?</source>
+        <translation>Cette option démarre vos moteurs avec la valeur sélectionnée sur les curseurs, indépendamment de l&apos;émetteur. Il est recommandé d&apos;enlever les hélices des moteurs. Êtes-vous sûr de vouloir faire ça ?</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigRevoHWWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configrevohwwidget.cpp" line="+88"/>
+        <source>Disabled</source>
+        <translation>Désactivé</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigRevoWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+529"/>
+        <location line="+380"/>
+        <source>&lt;p&gt;HomeLocation not SET.&lt;/p&gt;&lt;p&gt;Please set your HomeLocation and try again. Aborting calibration!&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Position Home non définie.&lt;/p&gt;&lt;p&gt;Veuillez définir votre position Home et essayez à nouveau. Calibration abandonnée !&lt;/p&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>Core::UAVGadgetOptionsPageDecorator</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetoptionspagedecorator.cpp" line="+97"/>
+        <source>Delete this configuration</source>
+        <translation>Effacer cette configuration</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Cannot delete a configuration currently in use</source>
+        <translation>Impossible d&apos;effacer une configuration utilisée actuellement</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Cannot delete the last configuration</source>
+        <translation>Impossible d&apos;effacer la dernière configuration</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>DON&apos;T KNOW !</source>
+        <translation>JE NE SAIS PAS !</translation>
+    </message>
+</context>
+<context>
+    <name>OsgEarthviewGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/osgearthview/osgearthviewgadgetfactory.cpp" line="+34"/>
+        <source>Osg Earth View</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PathActionEditorGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/pathactioneditor/pathactioneditorgadgetfactory.cpp" line="+34"/>
+        <source>PathAction Editor</source>
+        <translatorcomment>PathAction ? à définir en Fr</translatorcomment>
+        <translation>Éditeur PathAction</translation>
+    </message>
+</context>
+<context>
+    <name>PathActionEditorTreeModel</name>
+    <message>
+        <location filename="../../../src/plugins/pathactioneditor/pathactioneditortreemodel.cpp" line="+74"/>
+        <source>Property</source>
+        <translation>Propriété</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Value</source>
+        <translation>Valeur</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Unit</source>
+        <translation>Unité</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>PathActions</source>
+        <translatorcomment>PathAction ? à définir en Fr</translatorcomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Waypoints</source>
+        <translation>Waypoints</translation>
+    </message>
+</context>
+<context>
+    <name>PfdQmlGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetfactory.cpp" line="+25"/>
+        <source>PFD</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>BiasCalibrationUtil</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/biascalibrationutil.cpp" line="+119"/>
+        <source>Calibration timed out before receiving required updates.</source>
+        <translation>Temps d&apos;attente dépassé avant d&apos;avoir reçu les mises à jour demandées.</translation>
+    </message>
+</context>
+<context>
+    <name>DeviceWidget</name>
+    <message>
+        <location filename="../../../src/plugins/uploader/devicewidget.cpp" line="+81"/>
+        <source>Device ID: </source>
+        <translation>ID Périphérique : </translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>HW Revision: </source>
+        <translation>Révision Matériel :</translation>
+    </message>
+    <message>
+        <location line="+31"/>
+        <source>Flash access: </source>
+        <translation>Accès flash : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Max code size: </source>
+        <translation>Taille maxi code : </translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>BL version: </source>
+        <translation>Version BL : </translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+3"/>
+        <location line="+1"/>
+        <location line="+1"/>
+        <source>Unknown</source>
+        <translation>Inconnu</translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <source>Custom Firmware Build</source>
+        <translation>Version Firmware Personnelle</translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <location line="+24"/>
+        <source>Tagged officially released firmware build</source>
+        <translation>Firmware certifié OpenPilot, publié officiellement</translation>
+    </message>
+    <message>
+        <location line="-20"/>
+        <location line="+25"/>
+        <source>Untagged or custom firmware build</source>
+        <translation>Firmware non certifié ou version personnelle</translation>
+    </message>
+    <message>
+        <location line="+72"/>
+        <source>Can&apos;t calculate, file too big for device</source>
+        <translation>Ne peut calculer, fichier trop gros pour le périphérique</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>The board has the same firmware as loaded. No need to update.</source>
+        <translation>La carte possède le même firmware chargé. Pas besoin de l&apos;actualiser.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>WARNING: the loaded firmware is for different hardware. Do not update!</source>
+        <translation>ATTENTION : le firmware chargé est destiné à une autre carte. Ne pas mettre à jour !</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The board has newer firmware than loaded. Are you sure you want to update?</source>
+        <translation>La carte possède un firmware plus récent que celui sélectionné. Êtes-vous certain de vouloir mettre à jour ? </translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build).</source>
+        <translation>Le firmware chargé n&apos;est pas certifié ou est une version personnelle. Ne mettez à jour que si il provient d&apos;une source de confiance (site officiel ou version personnelle).</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>This is the tagged officially released OpenPilot firmware.</source>
+        <translation>Ceci est un firmware certifié OpenPilot, publié officiellement.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>WARNING: the loaded firmware was not packaged with the OpenPilot format. Do not update unless you know what you are doing.</source>
+        <translation>ATTENTION : Le firmware chargé n&apos;est pas empaqueté avec le format OpenPilot. Ne mettez pas à jour sans savoir ce que vous faites.</translation>
+    </message>
+    <message>
+        <location line="+234"/>
+        <location line="+16"/>
+        <source>Select firmware file</source>
+        <translation>Sélectionner le fichier de firmware</translation>
+    </message>
+    <message>
+        <location line="-14"/>
+        <source>Firmware Files (*.opfw *.bin)</source>
+        <translation>Fichiers Firmware (*.opfw *.bin)</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Firmware Files (*.bin)</source>
+        <translation>Fichiers Firmware (*.bin)</translation>
+    </message>
+</context>
+<context>
+    <name>RunningDeviceWidget</name>
+    <message>
+        <location filename="../../../src/plugins/uploader/runningdevicewidget.cpp" line="+67"/>
+        <source>HW Revision: </source>
+        <translation>Révision Matériel : </translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Firmware CRC: </source>
+        <translation>CRC Firmware : </translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <location line="+4"/>
+        <location line="+8"/>
+        <source>Firmware tag: </source>
+        <translation>Tag firmware : </translation>
+    </message>
+    <message>
+        <location line="-10"/>
+        <source>Tagged officially released firmware build</source>
+        <translation>Firmware certifié OpenPilot, publié officiellement</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Untagged or custom firmware build</source>
+        <translation>Firmware non certifié ou version personnelle</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+7"/>
+        <source>Git commit hash: </source>
+        <translation>Hash de commit GIT : </translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <location line="+7"/>
+        <source>Firmware date: </source>
+        <translation>Date firmware : </translation>
+    </message>
+    <message>
+        <location line="-4"/>
+        <location line="+3"/>
+        <location line="+1"/>
+        <source>Unknown</source>
+        <translation>Inconnu</translation>
+    </message>
+    <message>
+        <location line="-2"/>
+        <source>Custom Firmware Build</source>
+        <translation>Version Firmware Personnelle</translation>
+    </message>
+</context>
+<context>
+    <name>mapcontrol::MapRipper</name>
+    <message>
+        <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripper.cpp" line="+49"/>
+        <location line="+2"/>
+        <source>No valid selection</source>
+        <translation type="unfinished">Sélection non valide</translation>
+    </message>
+    <message>
+        <location line="-2"/>
+        <source>This pre-caches map data.
+
+Please first select the area of the map to rip with &lt;COMMAND&gt;+Left mouse click</source>
+        <translation>Ceci précharge les données de la carte.
+
+Veuillez sélectionner une zone de la carte à télécharger avec &lt;COMMAND&gt;+Clic gauche de la souris</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>This pre-caches map data.
+
+Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse click</source>
+        <translation>Ceci précharge les données de la carte.
+
+Veuillez sélectionner une zone de la carte à télécharger avec &lt;CTRL&gt;+Clic gauche de la souris</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Continue Ripping at zoom level %1?</source>
+        <translation>Continuer le téléchargement du niveau de zoom %1 ?</translation>
+    </message>
+</context>
+<context>
+    <name>AboutDialog</name>
+    <message>
+        <source>OpenPilot GCS</source>
+        <translation type="obsolete">OpenPilot GCS</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/qml/AboutDialog.qml" line="+75"/>
+        <source>OpenPilot Ground Control Station</source>
+        <translation>Station de Contrôle au Sol OpenPilot (GCS)</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</source>
+        <translation>Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier dans le cadre des termes de la licence GNU General Public Licence publiée par la Free Software Foundation; soit à la version 3 de la Licence, ou (en option) à une version ultérieure. Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Contributors</source>
+        <translation>Contributeurs</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Ok</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>&lt;h4&gt;These people have been key contributors to the OpenPilot project. Without the work of the people in this list, OpenPilot would not be what it is today.&lt;/h4&gt;&lt;p&gt;This list is sorted alphabetically by name&lt;/p&gt;</source>
+        <translation type="obsolete">&lt;h4&gt;Ces personnes ont été des contributeurs déterminants pour le projet OpenPilot. Sans le travail des personnes figurant sur cette liste, OpenPilot ne serait pas ce qu&apos;il est aujourd&apos;hui.&lt;/h4&gt;&lt;p&gt;Cette liste est triée par ordre alphabétique&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/aboutdialog.cpp" line="+48"/>
+        <source>About OpenPilot</source>
+        <translation>À propos d&apos;OpenPilot</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;</source>
+        <translation>Révision : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>OPEndPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/opendpage.ui"/>
+        <source>WizardPage</source>
+        <translation>Page d&apos;Assistant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Congratulations!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Setup wizard is completed.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the setup procedure is now complete and you are one step away from completing the setup of your OpenPilot controller.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To complete the setup please click the Radio Setup Wizard button below to close this wizard and go directly to the Radio Setup Wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Félicitations !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;L&apos;Assistant de Configuration est terminé.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette partie de la procédure de configuration est maintenant terminée et il vous reste une étape pour arriver au terme de la configuration de votre contrôleur OpenPilot.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour terminer la configuration veuillez appuyer sur le bouton Aller à l&apos;Assistant des Entrées... ci-dessous pour fermer cet assistant et aller directement à l&apos;Assistant de Configuration Radio.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Go to Input Wizard...</source>
+        <translation>Aller à l&apos;Assistant des Entrées...</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/opendpage.cpp" line="+59"/>
+        <source>Unable to open Input Wizard since the Config Plugin is not
+loaded in the current workspace.</source>
+        <translation>Impossible d&apos;ouvrir l&apos;Assistant des Entrées car le Plugin de 
+Configuration n&apos;est pas chargé dans l&apos;espace de travail actuel.</translation>
+    </message>
+</context>
+<context>
+    <name>OPStartPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/opstartpage.ui"/>
+        <source>WizardPage</source>
+        <translation>Page d&apos;Assistant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Welcome to the OpenPilot Setup Wizard&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This wizard will guide you through the basic steps required to setup your OpenPilot controller for the first time.  You will be asked questions about your platform (multirotor/heli/fixed-wing) which this wizard will use to configure your controller for its first flight. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This wizard does not configure all of the advanced settings available in the GCS Configuration. All basic and advanced configuration parameters can be modified later by using the GCS Configuration plugin.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;WARNING: YOU MUST REMOVE ALL PROPELLERS &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;FROM THE VEHICLE BEFORE PROCEEDING!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Disregarding this warning puts you at&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risk of very serious injury&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Now that your props are removed we can get started. Ready?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Bienvenue sur l&apos;Assistant de Configuration d&apos;OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cet assistant va vous guider à travers les étapes de base nécessaires à la configuration de votre contrôleur OpenPilot pour la première fois. Des questions vous seront posées sur votre plate-forme (multirotor / hélicoptère / voilure fixe), cet assistant les utilisera afin de configurer votre appareil pour son premier vol. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cet assistant ne configure pas tous les paramètres avancés disponibles dans le module GCS Configuration. Tous les paramètres de base et avancés pourront être modifiés plus tard en utilisant l&apos;onglet Configuration de GCS.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;ATTENTION : VOUS DEVEZ RETIRER TOUTES LES HELICES&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;DU VEHICULE AVANT DE CONTINUER !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Ne pas tenir compte de cet avertissement vous expose à des&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risques de blessures très graves &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Maintenant que vos hélices sont retirées nous pouvons continuer. Êtes-vous prêt ?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>ActivityPanel</name>
+    <message>
+        <location filename="../../../src/plugins/welcome/qml/ActivityPanel.qml" line="+13"/>
+        <source>Project Activity</source>
+        <translation>Activité Projet</translation>
+    </message>
+    <message>
+        <location line="+130"/>
+        <source>Commented on </source>
+        <translation>Commenté sur </translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Created </source>
+        <translation>Créé </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Created and started </source>
+        <translation>Créé et démarré </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Completed </source>
+        <translation>Terminé </translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Closed </source>
+        <translation>Fermé </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Abandoned </source>
+        <translation>Abandonné </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Committed </source>
+        <translatorcomment>Traduction FR ? http://fr.wikipedia.org/wiki/Commit</translatorcomment>
+        <translation>Liste des modifications effectuées </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Resolved </source>
+        <translation>Résolu </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Started </source>
+        <translation>Démarré </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Started working on </source>
+        <translation>Débuté travaux sur </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Stopped working on </source>
+        <translation>Arrêté travaux sur </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Requested code review on </source>
+        <translation>Demandé relecture code le </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Requested testing of </source>
+        <translation>Demandé phase de tests sur </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Updated </source>
+        <translation>Mis à Jour </translation>
+    </message>
+</context>
+<context>
+    <name>Utils::FancyMainWindow</name>
+    <message>
+        <location filename="../../../src/libs/utils/fancymainwindow.cpp" line="+70"/>
+        <source>Locked</source>
+        <translation>Verrouillé</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Reset to Default Layout</source>
+        <translation>Retour à l&apos;Agencement par Défaut</translation>
+    </message>
+</context>
+<context>
+    <name>main</name>
+    <message>
+        <source>Flight Data</source>
+        <translation type="obsolete">Données de Vol</translation>
+    </message>
+    <message>
+        <source>Configuration</source>
+        <translation type="obsolete">Configuration</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="obsolete">Système</translation>
+    </message>
+    <message>
+        <source>Scopes</source>
+        <translation type="obsolete">Graphiques</translation>
+    </message>
+</context>
+<context>
+    <name>FlightLogDialog</name>
+    <message>
+        <location filename="../../../src/plugins/flightlog/FlightLogDialog.qml" line="+27"/>
+        <source>Log entries</source>
+        <translation>Entrées log</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Flight</source>
+        <translation>Vol</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Time</source>
+        <translation>Temps</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Empty</source>
+        <translation>Vide</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Text</source>
+        <translation>Texte</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>UAVO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Unknown</source>
+        <translation>Inconnu</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Data</source>
+        <translation>Données</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Flights recorded: </source>
+        <translation>Vols enregistrés : </translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Entries logged (free): </source>
+        <translation type="unfinished">Vols enregistrés (libres) : </translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Flight to download:</source>
+        <translation type="unfinished">Vols à télécharger :</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Download logs</source>
+        <translation>Télécharger logs</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Export...</source>
+        <translation>Exporter...</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Adjust timestamps</source>
+        <translation>Ajuster horodatage</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Clear all logs</source>
+        <translation>Effacer tous les logs</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/flightlog/flightlogdialog.cpp" line="+45"/>
+        <source>Manage flight side logs</source>
+        <translation>Gérer les logs de vol</translation>
+    </message>
+</context>
+<context>
+    <name>FlightLogManager</name>
+    <message>
+        <location filename="../../../src/plugins/flightlog/flightlogmanager.cpp" line="+205"/>
+        <source>Save Log</source>
+        <translation>Enregistrer Log</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OP-%0.opl</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot Log (*.opl)</source>
+        <translation>Journal OpenPilot (*.opl)</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>_flight-%1</source>
+        <translation>_vol-%1</translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <source>All</source>
+        <translation>Tout</translation>
+    </message>
+</context>
+<context>
+    <name>FlightLogPlugin</name>
+    <message>
+        <location filename="../../../src/plugins/flightlog/flightlogplugin.cpp" line="+60"/>
+        <source>Manage flight side logs...</source>
+        <translation>Gérer les logs de vol...</translation>
+    </message>
+</context>
+<context>
+    <name>MonitorGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/telemetry/monitorgadgetfactory.cpp" line="+39"/>
+        <source>Telemetry Monitor</source>
+        <translation>Moniteur de Télémétrie</translation>
+    </message>
+</context>
+<context>
+    <name>MonitorWidget</name>
+    <message>
+        <location filename="../../../src/plugins/telemetry/monitorwidget.cpp" line="+216"/>
+        <source>Connected</source>
+        <translation>Connecté</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Disconnected</source>
+        <translation>Déconnecté</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigPipXtremeWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configpipxtremewidget.cpp" line="+140"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <source>Unbind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-27"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <source>Bind</source>
+        <translation type="unfinished">Associer</translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <source>Unknown</source>
+        <translation>Inconnu</translation>
+    </message>
+    <message>
+        <location line="+107"/>
+        <source>Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>To apply the changes when binding/unbinding the board must be rebooted or power cycled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigStabilizationWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configstabilizationwidget.cpp" line="+63"/>
+        <source>PID Bank %1</source>
+        <translation>Banque PID %1</translation>
+    </message>
+</context>
+<context>
+    <name>ModelUavoProxy</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/modeluavoproxy.cpp" line="+80"/>
+        <source>Path Plan Upload Successful</source>
+        <translation>Téléversement Réussi du Projet de Trajet</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Path plan upload was successful.</source>
+        <translation>Le téléversement du projet de trajet est réussi.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+238"/>
+        <source>Path Plan Upload Failed</source>
+        <translation>Échec Téléversement Projet de Trajet</translation>
+    </message>
+    <message>
+        <location line="-238"/>
+        <source>Failed to upload the path plan !</source>
+        <translation>Échec du téléversement du projet de trajet !</translation>
+    </message>
+    <message>
+        <location line="+37"/>
+        <source>Path Plan Download Successful</source>
+        <translation>Téléchargement Projet de Trajet Réussi</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Path plan download was successful.</source>
+        <translation>Le téléchargement du projet de trajet est réussi.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+190"/>
+        <location line="+4"/>
+        <source>Path Plan Download Failed</source>
+        <translation>Échec Téléchargement Projet de Trajet</translation>
+    </message>
+    <message>
+        <location line="-194"/>
+        <source>Failed to download the path plan !</source>
+        <translation>Échec du téléchargement du projet de trajet !</translation>
+    </message>
+    <message>
+        <location line="+190"/>
+        <source>Path plan way point count error !</source>
+        <translation>Erreur sur le nombre de waypoints dans le projet de trajet !</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Path plan path action count error !</source>
+        <translatorcomment>Path actions ??</translatorcomment>
+        <translation>Erreur sur le nombre de path actions dans le projet de trajet !</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Path plan CRC error !</source>
+        <translation>Erreur de CRC dans le projet de trajet !</translation>
+    </message>
+</context>
+<context>
+    <name>InputChannelForm</name>
+    <message>
+        <location filename="../../../src/plugins/config/inputchannelform.ui"/>
+        <source>Form</source>
+        <translation>Formulaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel neutral</source>
+        <translation>Neutre canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Neutral</source>
+        <translation>Neutre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Response time</source>
+        <translation>Temps de réponse (RT)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel values are inverted</source>
+        <translation>Les valeurs du canal sont inversées</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reversed</source>
+        <translation>Inversé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel function</source>
+        <translation>Fonction canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Function</source>
+        <translation>Fonction</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel type</source>
+        <translation>Type canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Type</source>
+        <translation>Type</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel number</source>
+        <translation>Numéro canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Number</source>
+        <translation>Numéro</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel min</source>
+        <translation>Valeur mini canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation>Mini</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translatorcomment>Pas toucher ! ?</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel max</source>
+        <translation>Valeur maxi canal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation>Maxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Optional input filter response time.
+
+Range: 0-999ms, 0 disables filter (default).
+
+Warning: this is an expert mode feature, mostly used for aerial video
+camera control (airframe yaw and camera gimbal accessory channels).
+Too high values for main controls can cause undesirable effects and
+even lead to crash. Use with caution.</source>
+        <translation>Filtrage optionnel du temps de réponse d&apos;entrée.
+
+Plage : 0-999ms; 0 désactive le filtre (défaut).
+
+Attention : Ceci est une fonctionnalité en mode expert, principalement utilisée pour le 
+contrôle de la caméra en vidéo aérienne (lacet de l&apos;appareil et canaux accessoires de la nacelle).
+Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des effets indésirables 
+et même conduire au crash. A utiliser avec prudence.</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+171"/>
+        <source>Chan %1</source>
+        <translation>Canal %1</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigVehicleTypeWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+129"/>
+        <source>Multirotor</source>
+        <translation>Multirotor</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Fixed Wing</source>
+        <translation type="unfinished">Aile</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Helicopter</source>
+        <translation>Hélicoptère</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Ground</source>
+        <translation type="unfinished">Voiture</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Custom</source>
+        <translation type="unfinished">Personnalisé</translation>
     </message>
 </context>
 </TS>

@@ -138,6 +138,7 @@ void ConfigTaskWidget::doAddWidgetBinding(QString objectName, QString fieldName,
 
     if (!fieldName.isEmpty() && object) {
         field = object->getField(QString(fieldName));
+        Q_ASSERT(field);
     }
 
     WidgetBinding *binding = new WidgetBinding(widget, object, field, index, scale, isLimited);
@@ -403,7 +404,7 @@ void ConfigTaskWidget::widgetsContentsChanged()
 {
     QWidget *emitter = ((QWidget *)sender());
     emit widgetContentsChanged(emitter);
-    double scale;
+    double scale     = 1.0;
     QVariant value;
 
     foreach(WidgetBinding * binding, m_widgetBindingsPerWidget.values(emitter)) {

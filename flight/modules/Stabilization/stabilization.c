@@ -49,7 +49,8 @@
 #include "gyrostate.h"
 #include "flightstatus.h"
 #include "manualcontrolsettings.h"
-#include "manualcontrol.h" // Just to get a macro
+#include "manualcontrolcommand.h"
+#include "flightmodesettings.h"
 #include "taskinfo.h"
 
 // Math libraries
@@ -65,15 +66,20 @@
 #include "relay_tuning.h"
 
 // Private constants
+#define UPDATE_EXPECTED     (1.0f / 666.0f)
+#define UPDATE_MIN          1.0e-6f
+#define UPDATE_MAX          1.0f
+#define UPDATE_ALPHA        1.0e-2f
+
 #define MAX_QUEUE_SIZE      1
 
 #if defined(PIOS_STABILIZATION_STACK_SIZE)
 #define STACK_SIZE_BYTES    PIOS_STABILIZATION_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES    840
+#define STACK_SIZE_BYTES    860
 #endif
 
-#define TASK_PRIORITY       (tskIDLE_PRIORITY + 4)
+#define TASK_PRIORITY       (tskIDLE_PRIORITY + 3) // FLIGHT CONTROL priority
 #define FAILSAFE_TIMEOUT_MS 30
 
 // number of flight mode switch positions
@@ -98,15 +104,14 @@ uint8_t max_axislock_rate = 0;
 float weak_leveling_kp    = 0;
 uint8_t weak_leveling_max = 0;
 bool lowThrottleZeroIntegral;
-bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay    = 0.991f;
 struct pid pids[PID_MAX];
 
 int cur_flight_mode = -1;
 
 static uint8_t rattitude_anti_windup;
-static float cruise_control_min_throttle;
-static float cruise_control_max_throttle;
+static float cruise_control_min_thrust;
+static float cruise_control_max_thrust;
 static uint8_t cruise_control_max_angle;
 static float cruise_control_max_power_factor;
 static float cruise_control_power_trim;
@@ -163,9 +168,13 @@ int32_t StabilizationStart()
 int32_t StabilizationInitialize()
 {
     // stop the compile if the number of switch positions changes, but has not been changed here
-    PIOS_STATIC_ASSERT(NUM_FMS_POSITIONS == sizeof(((ManualControlSettingsData *)0)->FlightModePosition) / sizeof((((ManualControlSettingsData *)0)->FlightModePosition)[0]));
+    PIOS_STATIC_ASSERT(NUM_FMS_POSITIONS == sizeof(((FlightModeSettingsData *)0)->FlightModePosition) / sizeof((((FlightModeSettingsData *)0)->FlightModePosition)[0]));
 
     // Initialize variables
+    ManualControlCommandInitialize();
+    ManualControlSettingsInitialize();
+    FlightStatusInitialize();
+    StabilizationDesiredInitialize();
     StabilizationSettingsInitialize();
     StabilizationBankInitialize();
     StabilizationSettingsBank1Initialize();
@@ -194,10 +203,13 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart);
 static void stabilizationTask(__attribute__((unused)) void *parameters)
 {
     UAVObjEvent ev;
-    uint32_t timeval = PIOS_DELAY_GetRaw();
+    PiOSDeltatimeConfig timeval;
+
+    PIOS_DELTATIME_Init(&timeval, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
 
     ActuatorDesiredData actuatorDesired;
     StabilizationDesiredData stabDesired;
+    float throttleDesired;
     RateDesiredData rateDesired;
     AttitudeStateData attitudeState;
     GyroStateData gyroStateData;
@@ -226,11 +238,10 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
             continue;
         }
 
-        dT = PIOS_DELAY_DiffuS(timeval) * 1.0e-6f;
-        timeval = PIOS_DELAY_GetRaw();
-
+        dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
         FlightStatusGet(&flightStatus);
         StabilizationDesiredGet(&stabDesired);
+        ManualControlCommandThrottleGet(&throttleDesired);
         AttitudeStateGet(&attitudeState);
         GyroStateGet(&gyroStateData);
         StabilizationBankGet(&stabBank);
@@ -587,26 +598,11 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
         // Save dT
         actuatorDesired.UpdateTime = dT * 1000;
-        actuatorDesired.Throttle   = stabDesired.Throttle;
+        actuatorDesired.Thrust     = stabDesired.Thrust;
 
-        // Suppress desired output while disarmed or throttle low, for configured axis
-        if (flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED || stabDesired.Throttle < 0) {
-            if (lowThrottleZeroAxis[ROLL]) {
-                actuatorDesired.Roll = 0.0f;
-            }
-
-            if (lowThrottleZeroAxis[PITCH]) {
-                actuatorDesired.Pitch = 0.0f;
-            }
-
-            if (lowThrottleZeroAxis[YAW]) {
-                actuatorDesired.Yaw = 0.0f;
-            }
-        }
-
-        // modify throttle according to 1/cos(bank angle)
+        // modify thrust according to 1/cos(bank angle)
         // to maintain same altitdue with changing bank angle
-        // but without manually adjusting throttle
+        // but without manually adjusting thrust
         // do it here and all the various flight modes (e.g. Altitude Hold) can use it
         if (flight_mode_switch_position < NUM_FMS_POSITIONS
             && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t)0
@@ -640,7 +636,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                     // if inverted and they want negative boost
                     if (angle > 90.0f && cruise_control_inverted_power_switch == (int8_t)-1) {
                         factor = -factor;
-                        // as long as throttle is getting reversed
+                        // as long as thrust is getting reversed
                         // we may as well do pitch and yaw for a complete "invert switch"
                         actuatorDesired.Pitch = -actuatorDesired.Pitch;
                         actuatorDesired.Yaw   = -actuatorDesired.Yaw;
@@ -648,20 +644,20 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 }
             }
 
-            // also don't adjust throttle if <= 0, leaves neg alone and zero throttle stops motors
-            if (actuatorDesired.Throttle > cruise_control_min_throttle) {
+            // also don't adjust thrust if <= 0, leaves neg alone and zero thrust stops motors
+            if (actuatorDesired.Thrust > cruise_control_min_thrust) {
                 // quad    example factor of 2 at hover power of 40%: (0.4 - 0.0) * 2.0 + 0.0 = 0.8
                 // CP heli example factor of 2 at hover stick of 60%: (0.6 - 0.5) * 2.0 + 0.5 = 0.7
-                actuatorDesired.Throttle = (actuatorDesired.Throttle - cruise_control_neutral_thrust) * factor + cruise_control_neutral_thrust;
-                if (actuatorDesired.Throttle > cruise_control_max_throttle) {
-                    actuatorDesired.Throttle = cruise_control_max_throttle;
-                } else if (actuatorDesired.Throttle < cruise_control_min_throttle) {
-                    actuatorDesired.Throttle = cruise_control_min_throttle;
+                actuatorDesired.Thrust = (actuatorDesired.Thrust - cruise_control_neutral_thrust) * factor + cruise_control_neutral_thrust;
+                if (actuatorDesired.Thrust > cruise_control_max_thrust) {
+                    actuatorDesired.Thrust = cruise_control_max_thrust;
+                } else if (actuatorDesired.Thrust < cruise_control_min_thrust) {
+                    actuatorDesired.Thrust = cruise_control_min_thrust;
                 }
             }
         }
 
-        if (PARSE_FLIGHT_MODE(flightStatus.FlightMode) != FLIGHTMODE_MANUAL) {
+        if (flightStatus.ControlChain.Stabilization == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
             ActuatorDesiredSet(&actuatorDesired);
         } else {
             // Force all axes to reinitialize when engaged
@@ -671,7 +667,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         }
 
         if (flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED ||
-            (lowThrottleZeroIntegral && stabDesired.Throttle < 0)) {
+            (lowThrottleZeroIntegral && throttleDesired < 0)) {
             // Force all axes to reinitialize when engaged
             for (uint8_t i = 0; i < MAX_AXES; i++) {
                 previous_mode[i] = 255;
@@ -901,13 +897,8 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     weak_leveling_kp  = settings.WeakLevelingKp;
     weak_leveling_max = settings.MaxWeakLevelingRate;
 
-    // Whether to zero the PID integrals while throttle is low
-    lowThrottleZeroIntegral    = settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE;
-
-    // Whether to suppress (zero) the StabilizationDesired output for each axis while disarmed or throttle is low
-    lowThrottleZeroAxis[ROLL]  = settings.LowThrottleZeroAxis.Roll == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
-    lowThrottleZeroAxis[PITCH] = settings.LowThrottleZeroAxis.Pitch == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
-    lowThrottleZeroAxis[YAW]   = settings.LowThrottleZeroAxis.Yaw == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
+    // Whether to zero the PID integrals while thrust is low
+    lowThrottleZeroIntegral = settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE;
 
     // The dT has some jitter iteration to iteration that we don't want to
     // make thie result unpredictable.  Still, it's nicer to specify the constant
@@ -928,10 +919,10 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     cur_flight_mode = -1;
 
     // Rattitude flight mode anti-windup factor
-    rattitude_anti_windup = settings.RattitudeAntiWindup;
+    rattitude_anti_windup           = settings.RattitudeAntiWindup;
 
-    cruise_control_min_throttle     = (float)settings.CruiseControlMinThrottle / 100.0f;
-    cruise_control_max_throttle     = (float)settings.CruiseControlMaxThrottle / 100.0f;
+    cruise_control_min_thrust       = (float)settings.CruiseControlMinThrust / 100.0f;
+    cruise_control_max_thrust       = (float)settings.CruiseControlMaxThrust / 100.0f;
     cruise_control_max_angle        = settings.CruiseControlMaxAngle;
     cruise_control_max_power_factor = settings.CruiseControlMaxPowerFactor;
     cruise_control_power_trim       = settings.CruiseControlPowerTrim / 100.0f;

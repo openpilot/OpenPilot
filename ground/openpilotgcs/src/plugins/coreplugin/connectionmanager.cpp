@@ -60,8 +60,7 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow) :
     // put everything together
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(6);
-    // cheat a bit with the margin to "nicely" center things vertically
-    layout->setContentsMargins(6, 0, 4, 2);
+    layout->setContentsMargins(5, 2, 5, 2);
     setLayout(layout);
 
     layout->addWidget(new QLabel(tr("Connections:")), 0, Qt::AlignVCenter);
@@ -106,6 +105,7 @@ void ConnectionManager::addWidget(QWidget *widget)
  */
 bool ConnectionManager::connectDevice(DevListItem device)
 {
+    Q_UNUSED(device);
     QString deviceName = m_availableDevList->itemData(m_availableDevList->currentIndex(), Qt::ToolTipRole).toString();
     DevListItem connection_device = findDevice(deviceName);
 

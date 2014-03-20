@@ -93,6 +93,14 @@
 #include <pios_task_monitor.h>
 #endif
 
+/* PIOS CallbackScheduler */
+#ifdef PIOS_INCLUDE_CALLBACKSCHEDULER
+#ifndef PIOS_INCLUDE_FREERTOS
+#error PiOS CallbackScheduler requires PIOS_INCLUDE_FREERTOS to be defined
+#endif
+#include <pios_callbackscheduler.h>
+#endif
+
 /* PIOS bootloader helper */
 #ifdef PIOS_INCLUDE_BL_HELPER
 /* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
@@ -102,6 +110,7 @@
 /* PIOS system functions */
 #ifdef PIOS_INCLUDE_DELAY
 #include <pios_delay.h>
+#include <pios_deltatime.h>
 #endif
 
 #ifdef PIOS_INCLUDE_INITCALL

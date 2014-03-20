@@ -108,6 +108,7 @@ struct UAVOBase {
         bool isMeta        : 1;
         bool isSingle      : 1;
         bool isSettings    : 1;
+        bool isPriority    : 1;
     } flags;
 } __attribute__((packed));
 
@@ -339,7 +340,7 @@ static struct UAVOData *UAVObjAllocMulti(uint32_t num_bytes)
  * \return
  */
 UAVObjHandle UAVObjRegister(uint32_t id,
-                            int32_t isSingleInstance, int32_t isSettings,
+                            bool isSingleInstance, bool isSettings, bool isPriority,
                             uint32_t num_bytes,
                             UAVObjInitializeCallback initCb)
 {
@@ -368,8 +369,11 @@ UAVObjHandle UAVObjRegister(uint32_t id,
     uavo_data->instance_size = num_bytes;
     if (isSettings) {
         uavo_data->base.flags.isSettings = true;
+        // settings defaults to being sent with priority
+        uavo_data->base.flags.isPriority = true;
+    } else {
+        uavo_data->base.flags.isPriority = isPriority;
     }
-
     /* Initialize the embedded meta UAVO */
     UAVObjInitMetaData(&uavo_data->metaObj);
 
@@ -604,6 +608,22 @@ bool UAVObjIsSettings(UAVObjHandle obj_handle)
 
     return uavo_base->flags.isSettings;
 }
+
+/**
+ * Is this a prioritized object?
+ * \param[in] obj The object handle
+ * \return True (1) if this is a prioritized object
+ */
+bool UAVObjIsPriority(UAVObjHandle obj_handle)
+{
+    PIOS_Assert(obj_handle);
+
+    /* Recover the common object header */
+    struct UAVOBase *uavo_base = (struct UAVOBase *)obj_handle;
+
+    return uavo_base->flags.isPriority;
+}
+
 
 /**
  * Unpack an object from a byte array
@@ -1719,6 +1739,7 @@ static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType 
         .obj    = (UAVObjHandle)obj,
         .event  = triggered_event,
         .instId = instId,
+        .lowPriority = false,
     };
 
     // Go through each object and push the event message in the queue (if event is activated for the queue)

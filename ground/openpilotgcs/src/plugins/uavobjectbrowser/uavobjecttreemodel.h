@@ -110,12 +110,12 @@ private:
     TreeItem *m_rootItem;
     TopTreeItem *m_settingsTree;
     TopTreeItem *m_nonSettingsTree;
+    bool m_useScientificFloatNotation;
+    bool m_categorize;
     int m_recentlyUpdatedTimeout;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
     bool m_onlyHilightChangedValues;
-    bool m_useScientificFloatNotation;
-    bool m_categorize;
 
     // Highlight manager to handle highlighting of tree items.
     HighLightManager *m_highlightManager;

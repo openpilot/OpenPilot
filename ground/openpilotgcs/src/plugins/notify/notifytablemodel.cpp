@@ -186,6 +186,7 @@ QStringList NotifyTableModel::mimeTypes() const
 bool NotifyTableModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row,
                                     int column, const QModelIndex & parent)
 {
+    Q_UNUSED(column);
     if (action == Qt::IgnoreAction) {
         return true;
     }
@@ -233,11 +234,9 @@ bool NotifyTableModel::dropMimeData(const QMimeData *data, Qt::DropAction action
             continue;
         }
 
-        bool success = insertRows(rows + direction, 1, QModelIndex());
-        Q_ASSERT(success);
+        insertRows(rows + direction, 1, QModelIndex());
         _list.replace(rows + direction, item);
-        success = removeRows(dragged, 1, QModelIndex());
-        Q_ASSERT(success);
+        removeRows(dragged, 1, QModelIndex());
         if (direction == UP_DIRECTION) {
             ++rows;
         }

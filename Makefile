@@ -451,10 +451,23 @@ else
 endif
 
 .PHONY: openpilotgcs
-openpilotgcs: uavobjects_gcs
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/$@_$(GCS_BUILD_CONF)
-	$(V1) ( cd $(BUILD_DIR)/$@_$(GCS_BUILD_CONF) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
+openpilotgcs: uavobjects_gcs openpilotgcs_qmake openpilotgcs_make
+
+.PHONY: openpilotgcs_qmake
+openpilotgcs_qmake:
+ifeq ($(QMAKE_SKIP),)
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
+	)
+else
+	@$(ECHO) "skipping qmake"
+endif
+
+.PHONY: openpilotgcs_make
+openpilotgcs_make:
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/$(MAKE_DIR) && \
 	    $(MAKE) -w ; \
 	)
 

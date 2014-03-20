@@ -32,10 +32,10 @@
 #include <coreplugin/iuavgadget.h>
 #include "scopegadgetwidget.h"
 
-class IUAVGadget;
-// class QList<int>;
 class QWidget;
 class QString;
+class QSettings;
+class IUAVGadget;
 class ScopeGadgetWidget;
 
 using namespace Core;
@@ -52,20 +52,23 @@ public:
     {
         return m_context;
     }
+
     QWidget *widget()
     {
         return m_widget;
     }
+
     QString contextHelpId() const
     {
         return QString();
     }
 
+    void saveState(QSettings *qSettings);
+    void restoreState(QSettings *qSettings);
+
 private:
     ScopeGadgetWidget *m_widget;
     QList<int> m_context;
-
-    bool configLoaded;
 };
 
 

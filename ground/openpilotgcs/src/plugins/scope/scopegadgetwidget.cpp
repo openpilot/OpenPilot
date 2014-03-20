@@ -521,6 +521,7 @@ void ScopeGadgetWidget::saveState(QSettings *qSettings)
 
     foreach(PlotData * plotData, m_curvesData.values()) {
         bool plotVisible = plotData->curve->isVisible();
+
         if (!plotVisible) {
             qSettings->setValue(QString("plot%1").arg(i), plotVisible);
         }

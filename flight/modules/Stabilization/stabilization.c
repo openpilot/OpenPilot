@@ -442,7 +442,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 // when a small number of degrees off of where it should be
 
                 // if below the transition angle (still in attitude mode)
-                // '<=' instead of ',' keeps rattitude_mode_transition_stick_position==1.0 from causing DZ
+                // '<=' instead of '<' keeps rattitude_mode_transition_stick_position==1.0 from causing DZ
                 if (magnitude <= rattitude_mode_transition_stick_position) {
                     magnitude *= STICK_VALUE_AT_MODE_TRANSITION / rattitude_mode_transition_stick_position;
                 } else {

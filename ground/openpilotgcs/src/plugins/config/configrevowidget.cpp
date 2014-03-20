@@ -43,6 +43,7 @@
 #include <attitudesettings.h>
 #include <ekfconfiguration.h>
 #include <revocalibration.h>
+#include <accelgyrosettings.h>
 #include <homelocation.h>
 #include <accelstate.h>
 #include <gyrostate.h>
@@ -216,7 +217,26 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     addUAVObject("EKFConfiguration");
     addUAVObject("HomeLocation");
     addUAVObject("AttitudeSettings");
+    addUAVObject("RevoSettings");
+    addUAVObject("AccelGyroSettings");
     autoLoadWidgets();
+
+    // connect the thermalCalibration model to UI
+    m_thermalCalibrationModel = new OpenPilot::ThermalCalibrationModel(this);
+
+    connect(m_ui->ThermalBiasStart, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnStart()));
+    connect(m_ui->ThermalBiasEnd, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnEnd()));
+    connect(m_ui->ThermalBiasCancel, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnAbort()));
+
+    connect(m_thermalCalibrationModel, SIGNAL(startEnabledChanged(bool)), m_ui->ThermalBiasStart, SLOT(setEnabled(bool)));
+    connect(m_thermalCalibrationModel, SIGNAL(endEnabledChanged(bool)), m_ui->ThermalBiasEnd, SLOT(setEnabled(bool)));
+    connect(m_thermalCalibrationModel, SIGNAL(cancelEnabledChanged(bool)), m_ui->ThermalBiasCancel, SLOT(setEnabled(bool)));
+
+    connect(m_thermalCalibrationModel, SIGNAL(instructionsChanged(QString)), m_ui->label_thermalDescription, SLOT(setText(QString)));
+    connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(QString)), m_ui->textTemperature, SLOT(setText(QString)));
+    connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(QString)), m_ui->textThermalGradient, SLOT(setText(QString)));
+    connect(m_thermalCalibrationModel, SIGNAL(progressChanged(int)), m_ui->thermalBiasProgress, SLOT(setValue(int)));
+    // note: init for m_thermalCalibrationModel is done in showEvent to prevent cases wiht "Start" button not enabled due to some itming issue.
 
     // Connect the signals
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(doStartAccelGyroBiasCalibration()));
@@ -252,6 +272,8 @@ void ConfigRevoWidget::showEvent(QShowEvent *event)
     // the result is usually a sensorsBargraph that is way too small.
     m_ui->sensorsBargraph->fitInView(sensorsBargraph, Qt::KeepAspectRatio);
     m_ui->sixPointsHelp->fitInView(paperplane, Qt::KeepAspectRatio);
+
+    m_thermalCalibrationModel->init();
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
@@ -374,21 +396,29 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
 
         m_ui->accelBiasStart->setEnabled(true);
 
-        RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+        RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
         Q_ASSERT(revoCalibration);
-        RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+        AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
+        Q_ASSERT(accelGyroSettings);
+
+
+        RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
+        AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
+
         revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
 
         // Update the biases based on collected data
-        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] += listMean(accel_accum_x);
-        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] += listMean(accel_accum_y);
-        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] += (listMean(accel_accum_z) + GRAVITY);
-        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_X]   += listMean(gyro_accum_x);
-        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Y]   += listMean(gyro_accum_y);
-        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Z]   += listMean(gyro_accum_z);
+        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X] += listMean(accel_accum_x);
+        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y] += listMean(accel_accum_y);
+        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z] += (listMean(accel_accum_z) + GRAVITY);
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X]   += listMean(gyro_accum_x);
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y]   += listMean(gyro_accum_y);
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z]   += listMean(gyro_accum_z);
 
         revoCalibration->setData(revoCalibrationData);
         revoCalibration->updated();
+        accelGyroSettings->setData(accelGyroSettingsData);
+        accelGyroSettings->updated();
 
         AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
         Q_ASSERT(attitudeSettings);
@@ -515,13 +545,15 @@ void ConfigRevoWidget::doStartSixPointCalibration()
     isBoardRotationStored = false;
     storeAndClearBoardRotation();
 
-    RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+    RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
     HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
+    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
 
     Q_ASSERT(revoCalibration);
     Q_ASSERT(homeLocation);
-    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+    RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
+    AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
 
     // check if Homelocation is set
     if (!homeLocationData.Set) {
@@ -536,12 +568,12 @@ void ConfigRevoWidget::doStartSixPointCalibration()
 
 #ifdef SIX_POINT_CAL_ACCEL
     // Calibration accel
-    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] = 1;
-    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] = 1;
-    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] = 1;
-    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X]   = 0;
-    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y]   = 0;
-    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z]   = 0;
+    accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X] = 1;
+    accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y] = 1;
+    accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z] = 1;
+    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X]   = 0;
+    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y]   = 0;
+    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z]   = 0;
 
     accel_accum_x.clear();
     accel_accum_y.clear();
@@ -561,6 +593,7 @@ void ConfigRevoWidget::doStartSixPointCalibration()
     revoCalibrationData.MagBiasNullingRate = 0;
 
     revoCalibration->setData(revoCalibrationData);
+    accelGyroSettings->setData(accelGyroSettingsData);
 
     Thread::usleep(100000);
 
@@ -739,24 +772,26 @@ void ConfigRevoWidget::computeScaleBias()
 {
     double S[3], b[3];
     double Be_length;
-    RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
+    RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
     HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
 
     Q_ASSERT(revoCalibration);
     Q_ASSERT(homeLocation);
-    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+    AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
+    RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
 #ifdef SIX_POINT_CAL_ACCEL
     // Calibration accel
     SixPointInConstFieldCal(homeLocationData.g_e, accel_data_x, accel_data_y, accel_data_z, S, b);
-    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] = fabs(S[0]);
-    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] = fabs(S[1]);
-    revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] = fabs(S[2]);
+    accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X] = fabs(S[0]);
+    accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y] = fabs(S[1]);
+    accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z] = fabs(S[2]);
 
-    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X]   = -sign(S[0]) * b[0];
-    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y]   = -sign(S[1]) * b[1];
-    revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z]   = -sign(S[2]) * b[2];
+    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X]   = -sign(S[0]) * b[0];
+    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y]   = -sign(S[1]) * b[1];
+    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z]   = -sign(S[2]) * b[2];
 #endif
 
     // Calibration mag
@@ -791,23 +826,25 @@ void ConfigRevoWidget::computeScaleBias()
                         revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z];
 
     // Check the accel calibration is good
-    good_calibration &= revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] ==
-                        revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X];
-    good_calibration &= revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] ==
-                        revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y];
-    good_calibration &= revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] ==
-                        revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z];
-    good_calibration &= revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] ==
-                        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X];
-    good_calibration &= revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] ==
-                        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y];
-    good_calibration &= revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] ==
-                        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z];
+    good_calibration &= accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X] ==
+                        accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X];
+    good_calibration &= accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y] ==
+                        accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y];
+    good_calibration &= accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z] ==
+                        accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z];
+    good_calibration &= accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X] ==
+                        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X];
+    good_calibration &= accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y] ==
+                        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y];
+    good_calibration &= accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z] ==
+                        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z];
     if (good_calibration) {
         revoCalibration->setData(revoCalibrationData);
+        accelGyroSettings->setData(accelGyroSettingsData);
         m_ui->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
     } else {
-        revoCalibrationData = revoCalibration->getData();
+        revoCalibrationData   = revoCalibration->getData();
+        accelGyroSettingsData = accelGyroSettings->getData();
         m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
     }
 #else // ifdef SIX_POINT_CAL_ACCEL
@@ -826,9 +863,11 @@ void ConfigRevoWidget::computeScaleBias()
                         revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z];
     if (good_calibration) {
         revoCalibration->setData(revoCalibrationData);
+        accelGyroSettings->setData(accelGyroSettingsData);
         m_ui->sixPointCalibInstructions->append("Computed mag scale and bias...");
     } else {
-        revoCalibrationData = revoCalibration->getData();
+        revoCalibrationData   = revoCalibration->getData();
+        accelGyroSettingsData = accelGyroSettings->getData();
         m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
     }
 #endif // ifdef SIX_POINT_CAL_ACCEL

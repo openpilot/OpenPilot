@@ -49,7 +49,6 @@
 #include "attitudestate.h"
 #include "pathdesired.h" // object that will be updated by the module
 #include "positionstate.h"
-#include "manualcontrol.h"
 #include "flightstatus.h"
 #include "pathstatus.h"
 #include "airspeedstate.h"
@@ -182,52 +181,50 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
 
         uint8_t result;
         // Check the combinations of flightmode and pathdesired mode
-        switch (flightStatus.FlightMode) {
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-        case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-            if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
-                updatePathVelocity();
-                result = updateFixedDesiredAttitude();
-                if (result) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+        if (flightStatus.ControlChain.PathFollower == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+            if (flightStatus.ControlChain.PathPlanner == FLIGHTSTATUS_CONTROLCHAIN_FALSE) {
+                if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
+                    updatePathVelocity();
+                    result = updateFixedDesiredAttitude();
+                    if (result) {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    } else {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+                    }
                 } else {
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
                 }
             } else {
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
-            }
-            break;
-        case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
-            pathStatus.UID    = pathDesired.UID;
-            pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
-            switch (pathDesired.Mode) {
-            case PATHDESIRED_MODE_FLYENDPOINT:
-            case PATHDESIRED_MODE_FLYVECTOR:
-            case PATHDESIRED_MODE_FLYCIRCLERIGHT:
-            case PATHDESIRED_MODE_FLYCIRCLELEFT:
-                updatePathVelocity();
-                result = updateFixedDesiredAttitude();
-                if (result) {
+                pathStatus.UID    = pathDesired.UID;
+                pathStatus.Status = PATHSTATUS_STATUS_INPROGRESS;
+                switch (pathDesired.Mode) {
+                case PATHDESIRED_MODE_FLYENDPOINT:
+                case PATHDESIRED_MODE_FLYVECTOR:
+                case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+                case PATHDESIRED_MODE_FLYCIRCLELEFT:
+                    updatePathVelocity();
+                    result = updateFixedDesiredAttitude();
+                    if (result) {
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
+                    } else {
+                        pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+                    }
+                    break;
+                case PATHDESIRED_MODE_FIXEDATTITUDE:
+                    updateFixedAttitude(pathDesired.ModeParameters);
                     AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
-                } else {
+                    break;
+                case PATHDESIRED_MODE_DISARMALARM:
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
+                    break;
+                default:
                     pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    break;
                 }
-                break;
-            case PATHDESIRED_MODE_FIXEDATTITUDE:
-                updateFixedAttitude(pathDesired.ModeParameters);
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
-                break;
-            case PATHDESIRED_MODE_DISARMALARM:
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
-                break;
-            default:
-                pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
-                break;
             }
-            break;
-        default:
+        } else {
             // Be cleaner and get rid of global variables
             northVelIntegral = 0;
             eastVelIntegral  = 0;
@@ -235,8 +232,6 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
             courseIntegral   = 0;
             speedIntegral    = 0;
             powerIntegral    = 0;
-
-            break;
         }
         PathStatusSet(&pathStatus);
     }
@@ -357,10 +352,10 @@ static void updateFixedAttitude(float *attitude)
     StabilizationDesiredData stabDesired;
 
     StabilizationDesiredGet(&stabDesired);
-    stabDesired.Roll     = attitude[0];
-    stabDesired.Pitch    = attitude[1];
-    stabDesired.Yaw      = attitude[2];
-    stabDesired.Throttle = attitude[3];
+    stabDesired.Roll   = attitude[0];
+    stabDesired.Pitch  = attitude[1];
+    stabDesired.Yaw    = attitude[2];
+    stabDesired.Thrust = attitude[3];
     stabDesired.StabilizationMode.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
@@ -420,7 +415,7 @@ static uint8_t updateFixedDesiredAttitude()
 
 
     /**
-     * Compute speed error (required for throttle and pitch)
+     * Compute speed error (required for thrust and pitch)
      */
 
     // Current ground speed
@@ -474,9 +469,9 @@ static uint8_t updateFixedDesiredAttitude()
     }
 
     /**
-     * Compute desired throttle command
+     * Compute desired thrust command
      */
-    // compute saturated integral error throttle response. Make integral leaky for better performance. Approximately 30s time constant.
+    // compute saturated integral error thrust response. Make integral leaky for better performance. Approximately 30s time constant.
     if (fixedwingpathfollowerSettings.PowerPI.Ki > 0) {
         powerIntegral = bound(powerIntegral + -descentspeedError * dT,
                               -fixedwingpathfollowerSettings.PowerPI.ILimit / fixedwingpathfollowerSettings.PowerPI.Ki,
@@ -491,7 +486,7 @@ static uint8_t updateFixedDesiredAttitude()
         fixedwingpathfollowerSettings.AirspeedToPowerCrossFeed.Max
         );
 
-    // Compute final throttle response
+    // Compute final thrust response
     powerCommand = -descentspeedError * fixedwingpathfollowerSettings.PowerPI.Kp +
                    powerIntegral * fixedwingpathfollowerSettings.PowerPI.Ki +
                    speedErrorToPowerCommandComponent;
@@ -501,14 +496,14 @@ static uint8_t updateFixedDesiredAttitude()
     fixedwingpathfollowerStatus.ErrorInt.Power = powerIntegral;
     fixedwingpathfollowerStatus.Command.Power  = powerCommand;
 
-    // set throttle
-    stabDesired.Throttle = bound(fixedwingpathfollowerSettings.ThrottleLimit.Neutral + powerCommand,
-                                 fixedwingpathfollowerSettings.ThrottleLimit.Min,
-                                 fixedwingpathfollowerSettings.ThrottleLimit.Max);
+    // set thrust
+    stabDesired.Thrust = bound(fixedwingpathfollowerSettings.ThrustLimit.Neutral + powerCommand,
+                               fixedwingpathfollowerSettings.ThrustLimit.Min,
+                               fixedwingpathfollowerSettings.ThrustLimit.Max);
 
     // Error condition: plane cannot hold altitude at current speed.
     fixedwingpathfollowerStatus.Errors.Lowpower = 0;
-    if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit.Max && // throttle at maximum
+    if (powerCommand >= fixedwingpathfollowerSettings.ThrustLimit.Max && // thrust at maximum
         velocityState.Down > 0 && // we ARE going down
         descentspeedDesired < 0 && // we WANT to go up
         airspeedError > 0 && // we are too slow already
@@ -516,9 +511,9 @@ static uint8_t updateFixedDesiredAttitude()
         fixedwingpathfollowerStatus.Errors.Lowpower = 1;
         result = 0;
     }
-    // Error condition: plane keeps climbing despite minimum throttle (opposite of above)
+    // Error condition: plane keeps climbing despite minimum thrust (opposite of above)
     fixedwingpathfollowerStatus.Errors.Highpower = 0;
-    if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit.Min && // throttle at minimum
+    if (powerCommand >= fixedwingpathfollowerSettings.ThrustLimit.Min && // thrust at minimum
         velocityState.Down < 0 && // we ARE going up
         descentspeedDesired > 0 && // we WANT to go down
         airspeedError < 0 && // we are too fast already

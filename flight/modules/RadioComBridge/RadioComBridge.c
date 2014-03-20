@@ -268,6 +268,7 @@ static void registerObject(UAVObjHandle obj)
         .obj    = obj,
         .instId = UAVOBJ_ALL_INSTANCES,
         .event  = EV_UPDATED_PERIODIC,
+        .lowPriority = true,
     };
 
     // Get metadata

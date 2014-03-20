@@ -24,6 +24,7 @@
 # (all architectures)
 
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += accelgyrosettings
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired
@@ -61,6 +62,7 @@ UAVOBJSRCFILENAMES += homelocation
 UAVOBJSRCFILENAMES += i2cstats
 UAVOBJSRCFILENAMES += manualcontrolcommand
 UAVOBJSRCFILENAMES += manualcontrolsettings
+UAVOBJSRCFILENAMES += flightmodesettings
 UAVOBJSRCFILENAMES += mixersettings
 UAVOBJSRCFILENAMES += mixerstatus
 UAVOBJSRCFILENAMES += nedaccel

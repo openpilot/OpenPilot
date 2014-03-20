@@ -111,6 +111,7 @@ int32_t TxPIDInitialize(void)
             .obj    = AccessoryDesiredHandle(),
             .instId = 0,
             .event  = 0,
+            .lowPriority = false,
         };
         EventPeriodicCallbackCreate(&ev, updatePIDs, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 

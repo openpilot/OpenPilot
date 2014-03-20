@@ -58,6 +58,7 @@ public:
     int getGPSPositionSensor(double LLA[3]);
 
     int getBoardModel();
+    int getBootloaderRevision();
     QByteArray getBoardCPUSerial();
     quint32 getFirmwareCRC();
     QByteArray getBoardDescription();

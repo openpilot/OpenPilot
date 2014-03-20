@@ -6,6 +6,7 @@
         <field name="CPUSerial" units="" type="uint8" elements="12" /> 
         <field name="BoardRevision" units="" type="uint16" elements="1"/> 
         <field name="BoardType" units="" type="uint8" elements="1"/> 
+        <field name="BootloaderRevision" units="" type="uint8" elements="1"/>
         <field name="ArmReset" units="" type="uint8" elements="1"/> 
         <field name="crc" units="" type="uint32" elements="1"/> 
         <access gcs="readwrite" flight="readwrite"/> 

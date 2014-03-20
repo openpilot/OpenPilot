@@ -120,6 +120,7 @@ typedef struct {
     UAVObjHandle    obj;
     uint16_t        instId;
     UAVObjEventType event;
+    bool lowPriority; /* if true prevents raising warnings */
 } UAVObjEvent;
 
 /**

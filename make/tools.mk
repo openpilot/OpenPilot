@@ -485,8 +485,17 @@ endef
 ifeq ($(UNAME), Windows)
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)/5.2.1/$(QT_SDK_ARCH)
+
+# This additional configuration step should not be necessary
+# but it is needed as a workaround to https://bugreports.qt-project.org/browse/QTBUG-33254
+define QT_SDK_CONFIGURE_TEMPLATE
+	@$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(QT_SDK_DIR))
+	$(V1) $(ECHO) $(QUOTE)[Paths]$(QUOTE) > $(QT_SDK_PREFIX)/bin/qt.conf
+	$(V1) $(ECHO) $(QUOTE)Prefix = $(QT_SDK_PREFIX)$(QUOTE) >> $(QT_SDK_PREFIX)/bin/qt.conf
+endef
+
 QT_BUILD_DIR := $(BUILD_DIR)/QT_BUILD
-    $(eval $(call WIN_QT_INSTALL_TEMPLATE,$(QT_BUILD_DIR),$(QT_SDK_DIR),$(QT_SDK_URL),$(QT_SDK_MD5_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_ARCH)))
+    $(eval $(call WIN_QT_INSTALL_TEMPLATE,$(QT_BUILD_DIR),$(QT_SDK_DIR),$(QT_SDK_URL),$(QT_SDK_MD5_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_ARCH),$(QT_SDK_CONFIGURE_TEMPLATE)))
 
 else ifeq ($(UNAME), Linux)
 

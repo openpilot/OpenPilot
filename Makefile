@@ -864,8 +864,6 @@ help:
 	@$(ECHO) "   [Tool Installers]"
 	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
-	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
-	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
 	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
 	@$(ECHO) "     sdl_install          - Install the SDL library (Windows only)"
 	@$(ECHO) "     openssl_install      - Install the OpenSSL libraries (Windows only)"

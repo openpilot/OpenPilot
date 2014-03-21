@@ -265,7 +265,6 @@ define DOWNLOAD_TEMPLATE
 	)
 endef
 
-
 ##############################
 #
 # Common tool install template
@@ -548,36 +547,27 @@ qt_sdk_version:
 
 ifeq ($(UNAME), Windows)
 
-#$(eval $(call TOOL_INSTALL_TEMPLATE,mingw,$(MINGW_DIR),$(MINGW_URL),$(notdir $(MINGW_URL))))
-mingw_install:
-mingw_clean:
-mingw_distclean:
-
 ifeq ($(shell [ -d "$(MINGW_DIR)" ] && $(ECHO) "exists"), exists)
     # set MinGW binary and library paths (QTMINGW is used by qmake, do not rename)
     export QTMINGW := $(MINGW_DIR)/bin
     export PATH    := $(QTMINGW):$(PATH)
 else
     # not installed, use host gcc compiler
-    # $(info $(EMPTY) WARNING     $(call toprel, $(MINGW_DIR)) not found (make mingw_install), using system PATH)
+    # $(info $(EMPTY) WARNING     $(call toprel, $(MINGW_DIR)) not found, using system PATH)
 endif
 
 .PHONY: mingw_version
-mingw_version:
-	-$(V1) gcc --version | head -n1
-
-.PHONY: gcc_version
-gcc_version: mingw_version
+mingw_version: gcc_version
 
 else # Linux or Mac
 
 all_sdk_version: gcc_version
 
+endif
+
 .PHONY: gcc_version
 gcc_version:
 	-$(V1) gcc --version | head -n1
-
-endif
 
 ##############################
 #
@@ -585,25 +575,12 @@ endif
 #
 ##############################
 
-ifeq ($(UNAME), Windows)
-
-#$(eval $(call TOOL_INSTALL_TEMPLATE,python,$(PYTHON_DIR),$(PYTHON_URL),$(notdir $(PYTHON_URL))))
-python_install:
-python_clean:
-python_distclean:
-
-else # Linux or Mac
-
-all_sdk_version: python_version
-
-endif
-
 ifeq ($(shell [ -d "$(PYTHON_DIR)" ] && $(ECHO) "exists"), exists)
     export PYTHON := $(PYTHON_DIR)/python
     export PATH   := $(PYTHON_DIR):$(PATH)
 else
     # not installed, hope it's in the path...
-    # $(info $(EMPTY) WARNING     $(call toprel, $(PYTHON_DIR)) not found (make python_install), using system PATH)
+    # $(info $(EMPTY) WARNING     $(call toprel, $(PYTHON_DIR)) not found, using system PATH)
     export PYTHON := python
 endif
 
@@ -654,7 +631,8 @@ endif
 
 .PHONY: sdl_version
 sdl_version:
-	-$(V1) $(ECHO) "SDL 1.2.15 $(SDL_DIR)"
+	-$(V1) $(ECHO) "SDL 1.2.15"
+
 endif
 
 ##############################
@@ -678,6 +656,7 @@ endif
 .PHONY: openssl_version
 openssl_version:
 	-$(V1) $(ECHO) "OpenSSL `$(OPENSSL) version`"
+
 endif
 
 ##############################

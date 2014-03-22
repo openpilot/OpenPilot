@@ -13377,7 +13377,6 @@ border-radius: 5;</string>
                       </property>
                       <property name="decimals">
                        <number>5</number>
-
                       </property>
                       <property name="singleStep">
                        <double>0.000100000000000</double>
@@ -19418,7 +19417,6 @@ border-radius: 5;</string>
                    </property>
                    <property name="autoFillBackground">
                     <bool>false</bool>
-
                    </property>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -19943,7 +19941,6 @@ border-radius: 5;</string>
                          <red>39</red>
                          <green>39</green>
                          <blue>39</blue>
-
                         </color>
                        </brush>
                       </colorrole>
@@ -21978,7 +21975,6 @@ border-radius: 5;</string>
                     </size>
                    </property>
                   </spacer>
-
                  </item>
                  <item row="1" column="3">
                   <widget class="QDoubleSpinBox" name="AccelKp">
@@ -24199,7 +24195,7 @@ border-radius: 5;</string>
                  <item row="1" column="4">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle/collective stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrust) when inverted.  1 says to use the unboosted stick value.  -1 (DON'T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the collective stick when inverted.
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-3, -2, -1, 0, 1, or 2.  Cruise Control uses this to determine the inverted power mode which is used if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrust) when inverted.  1 says to use the unboosted stick value.  2 says use the boosted stick value.  -1  (UNTESTED, for use by CP helis using idle up) says to reverse the collective channel when inverted.  -2 is -1 but boosted.  -3 is -2 but with pitch and yaw also inverted.
 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
@@ -24212,10 +24208,10 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="minimum">
-                    <double>-1.000000000000000</double>
+                    <double>-3.000000000000000</double>
                    </property>
                    <property name="maximum">
-                    <double>1.000000000000000</double>
+                    <double>2.000000000000000</double>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -24345,7 +24341,7 @@ border-radius: 5;</string>
                  <item row="3" column="4">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This needs to be 0 for all copters except CP helis that are using idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The fraction of a second it takes for your vehicle to go from zero thrust (10%) for multis (full negative thrust (-90%) for CP helis) to full positive thrust (+90%).  Increase this if continuous left flips walk off to the left.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24354,12 +24350,21 @@ border-radius: 5;</string>
                     <bool>true</bool>
                    </property>
                    <property name="decimals">
-                    <number>0</number>
+                    <number>5</number>
+                   </property>
+                   <property name="maximum">
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.001000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.250000000000000</double>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlNeutralThrust</string>
+                     <string>fieldname:CruiseControlPowerDelayComp</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
@@ -24557,7 +24562,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>NeutralThrust</string>
+                    <string>PowerDelayComp</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -26162,7 +26167,6 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
-
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>

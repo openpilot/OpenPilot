@@ -40,7 +40,9 @@
 /* EP1  */
 /* rx/tx buffer base address */
 #define ENDP1_TXADDR   (0x60)
-#define ENDP1_RXADDR   (0x80)
+// fix the F1 USB issue
+//#define ENDP1_RXADDR   (0x80)
+#define ENDP1_RXADDR   (0xa0)
 
 /* EP2 */
 /* rx/tx buffer base address */

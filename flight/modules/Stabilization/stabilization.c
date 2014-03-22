@@ -111,7 +111,8 @@ static uint8_t cruise_control_max_angle;
 static float cruise_control_max_power_factor;
 static float cruise_control_power_trim;
 static int8_t cruise_control_inverted_power_switch;
-static float cruise_control_neutral_thrust;
+static float cruise_control_max_power_factor_angle;
+static float cruise_control_half_power_delay;
 static uint8_t cruise_control_flight_mode_switch_pos_enable[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
 
 // Private functions
@@ -558,55 +559,188 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         actuatorDesired.UpdateTime = dT * 1000;
         actuatorDesired.Thrust     = stabDesired.Thrust;
 
+        // Cruise Control
         // modify thrust according to 1/cos(bank angle)
-        // to maintain same altitdue with changing bank angle
+        // to maintain same altitude with changing bank angle
         // but without manually adjusting thrust
         // do it here and all the various flight modes (e.g. Altitude Hold) can use it
+        uint8_t previous_flight_mode_switch_position = 254; // something invalid
         if (flight_mode_switch_position < FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM
             && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t)0
             && cruise_control_max_power_factor > 0.0001f) {
-            static uint8_t toggle;
             static float factor;
+            static uint32_t previous_time;
+            static uint8_t calc_count;
             float angle;
+            uint32_t time;
+
+            // flight mode has changed.  there could be a time gap
+            if (flight_mode_switch_position != previous_flight_mode_switch_position) {
+                // flag to skip this loop because time diff may be invalid
+                previous_time = 0;
+            }
+
+            time = PIOS_DELAY_GetuS(); // good for 72 minutes, then it wraps (handled OK)
             // get attitude state and calculate angle
             // do it every 8th iteration to save CPU
-            if ((toggle++ & 7) == 0) {
+            if (time != previous_time && calc_count++ >= 8) {
+                static float previous_angle;
+                float rate;
+                // float thrust;
+
+                calc_count = 0;
+
                 // spherical right triangle
                 // 0 <= acosf() <= Pi
                 angle = RAD2DEG(acosf(cos_lookup_deg(attitudeState.Roll) * cos_lookup_deg(attitudeState.Pitch)));
-                // if past the cutoff angle (60 to 180 (180 means never))
-                if (angle > cruise_control_max_angle) {
-                    // -1 reversed collective, 0 zero power, or 1 normal power
-                    // these are all unboosted
-                    factor = cruise_control_inverted_power_switch;
+
+                // combined bank angle change rate in degrees per second
+                // rate is currently calculated over the most recent CALCCOUNT loops
+                // keeping the sign for rate is important, it can be negative
+                if (previous_time == 0UL) {
+                    rate = 0.0f;
                 } else {
-                    // avoid singularity
-                    if (angle > 89.999f && angle < 90.001f) {
-                        factor = cruise_control_max_power_factor;
-                    } else {
-                        factor = 1.0f / fabsf(cos_lookup_deg(angle));
-                        if (factor > cruise_control_max_power_factor) {
-                            factor = cruise_control_max_power_factor;
+                    // handle wrap around
+                    // the assumption here is that it's been less than 0x7fffffff since prev_time
+                    // and thus likewise since time
+                    // i.e. that casting prev_time to a signed type produces a negative
+                    if (time >= previous_time) { // the usual case
+                        rate = (angle - previous_angle) / ((float) (time - previous_time) / 1000000.0f);
+                    } else {                     // the wrap around case
+                        rate = (angle - previous_angle) / ((float) ((uint32_t) ((int32_t) time - (int32_t) previous_time)) / 1000000.0f);
+                    }
+                }
+                previous_time  = time;
+                previous_angle = angle;
+
+                // define "within range" to be those transitions that should be executing now
+                // - recall that each impulse transition is spread out over a range of time / angle
+
+                // there is only one transition and the high power level for it is either
+                // = full thrust
+                // = max power factor
+                // = 1/fabsf(cos(angle))
+                // OK, you could say there are two transitions in 360 degrees (90 and 270)
+
+                {
+                    float thrust;
+                    {
+                        float full_thrust_angle;
+                        // calculate angle where thrust is full (as limited by max_thrust)
+                        full_thrust_angle = RAD2DEG(acosf(cruise_control_max_thrust / actuatorDesired.Thrust));
+                        // if full thrust comes before the artificially limited max_power_factor
+                        if (full_thrust_angle < cruise_control_max_power_factor_angle) {
+                            thrust = cruise_control_max_thrust;
+                        } else {
+                            thrust = cruise_control_max_power_factor * actuatorDesired.Thrust;
+                            // 'full_thrust_angle' is now the angle that goes with 'thrust'
+                            full_thrust_angle = cruise_control_max_power_factor_angle;
+                        }
+                        // if the transition is outside the max thrust regions
+                        if (full_thrust_angle < cruise_control_max_angle
+                            || 180.0f - cruise_control_max_angle < full_thrust_angle ) {
+                            // max thrust is 1/cos(transition angle)
+                            thrust = 1.0f / fabsf(cos_lookup_deg(cruise_control_max_angle));
                         }
                     }
+
+                    // determine if we are in range of the transition
+
+                    // calculate the actual proportion of change in thrust
+                    switch (cruise_control_inverted_power_switch) {
+                    case -3:
+                    case -2:
+                        // CP heli case, stroke is max to -max
+                        // thrust = (thrust + thrust) / (cruise_control_max_thrust + cruise_control_max_thrust);
+                        thrust /= cruise_control_max_thrust;
+                        break;
+                    case -1:
+                        // CP heli case, stroke is max to -stick
+                        thrust = (thrust + actuatorDesired.Thrust) / (cruise_control_max_thrust + cruise_control_max_thrust);
+                        break;
+                    case 0:
+                        // normal multi-copter case, stroke is max to min
+                        thrust = (thrust - cruise_control_min_thrust) / (cruise_control_max_thrust - cruise_control_min_thrust);
+                        break;
+                    case 1:
+                        // simply turn off boost, stroke is max to stick
+                        thrust = (thrust - actuatorDesired.Thrust) / (cruise_control_max_thrust - cruise_control_min_thrust);
+                        break;
+                    case 2:
+                        // CP heli case, no transition, stroke is zero
+                        thrust = 0.0f;
+                        break;
+                    }
+                    // multiply this proportion of max stroke, times the max stroke time, to get this stroke time
+                    // we only want half of this time before the transition (and half after the transition)
+                    thrust *= cruise_control_half_power_delay;
+                    // times angular rate gives angle that this stroke will take to execute
+                    thrust *= fabsf(rate);
+                    // if the transition is within range we use it, else we just use the current calculated thrust
+                    if (cruise_control_max_angle - thrust < angle
+                        && angle < cruise_control_max_angle + thrust) {
+                        // default to a little above max angle
+                        angle = cruise_control_max_angle + 0.01f;
+                        // if roll direction is downward then thrust value is taken from below max angle
+                        if (rate < 0.0f) {
+                            angle -= 0.02f;
+                        }
+                    }
+                }
+
+                // avoid singularity
+                if (angle > 89.999f && angle < 90.001f) {
+                    factor = cruise_control_max_power_factor;
+                } else {
+                    // the simple bank angle boost calculation that Cruise Control revolves around
+                    factor = 1.0f / fabsf(cos_lookup_deg(angle));
                     // factor in the power trim, no effect at 1.0, linear effect increases with factor
                     factor = (factor - 1.0f) * cruise_control_power_trim + 1.0f;
-                    // if inverted and they want negative boost
-                    if (angle > 90.0f && cruise_control_inverted_power_switch == (int8_t)-1) {
-                        factor = -factor;
-                        // as long as thrust is getting reversed
-                        // we may as well do pitch and yaw for a complete "invert switch"
+                    // limit to user specified max power multiplier
+                    if (factor > cruise_control_max_power_factor) {
+                        factor = cruise_control_max_power_factor;
+                    }
+                }
+
+/*
+convert these to enums?  something like
+upright  power: zero, normal, boosted
+inverted thrust direction: unchanged, reversed
+inverted power: zero, normal, boosted
+inverted yaw/pitch reverse: off, on
+*/
+                // if past max angle and so needing to go into an inverted mode
+                if (angle >= cruise_control_max_angle) {
+                    // -3 inverted mode, -2 boosted reverse, -1 normal reverse, 0 zero power, 1 normal power, 2 boosted power
+                    switch (cruise_control_inverted_power_switch) {
+                    case -3: // reversed boosted thrust with pitch/yaw reverse
                         actuatorDesired.Pitch = -actuatorDesired.Pitch;
                         actuatorDesired.Yaw   = -actuatorDesired.Yaw;
+                        factor = -factor;
+                        break;
+                    case -2: // reversed boosted thrust
+                        factor = -factor;
+                        break;
+                    case -1: // reversed normal thrust
+                        factor = -1.0f;
+                        break;
+                    case  0: // no thrust
+                        factor = -0.0f;
+                        break;
+                    case 1:  // normal thrust
+                        factor = 1.0f;
+                        break;
+                    case 2:  // normal boosted thrust
+                        // no change to factor
+                        break;
                     }
                 }
             }
 
             // also don't adjust thrust if <= 0, leaves neg alone and zero thrust stops motors
             if (actuatorDesired.Thrust > cruise_control_min_thrust) {
-                // quad    example factor of 2 at hover power of 40%: (0.4 - 0.0) * 2.0 + 0.0 = 0.8
-                // CP heli example factor of 2 at hover stick of 60%: (0.6 - 0.5) * 2.0 + 0.5 = 0.7
-                actuatorDesired.Thrust = (actuatorDesired.Thrust - cruise_control_neutral_thrust) * factor + cruise_control_neutral_thrust;
+                actuatorDesired.Thrust *= factor;
+                // limit to user specified absolute max thrust
                 if (actuatorDesired.Thrust > cruise_control_max_thrust) {
                     actuatorDesired.Thrust = cruise_control_max_thrust;
                 } else if (actuatorDesired.Thrust < cruise_control_min_thrust) {
@@ -614,6 +748,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 }
             }
         }
+
+        previous_flight_mode_switch_position = flight_mode_switch_position;
 
         if (flightStatus.ControlChain.Stabilization == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
             ActuatorDesiredSet(&actuatorDesired);
@@ -827,13 +963,14 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         rattitude_mode_transition_stick_position = (float)settings.RattitudeModeTransistion / 100.0f;
     }
 
-    cruise_control_min_thrust       = (float)settings.CruiseControlMinThrust / 100.0f;
-    cruise_control_max_thrust       = (float)settings.CruiseControlMaxThrust / 100.0f;
-    cruise_control_max_angle        = settings.CruiseControlMaxAngle;
-    cruise_control_max_power_factor = settings.CruiseControlMaxPowerFactor;
-    cruise_control_power_trim       = settings.CruiseControlPowerTrim / 100.0f;
-    cruise_control_inverted_power_switch = settings.CruiseControlInvertedPowerSwitch;
-    cruise_control_neutral_thrust   = (float)settings.CruiseControlNeutralThrust / 100.0f;
+    cruise_control_min_thrust      = (float)settings.CruiseControlMinThrust / 100.0f;
+    cruise_control_max_thrust      = (float)settings.CruiseControlMaxThrust / 100.0f;
+    cruise_control_max_angle              = settings.CruiseControlMaxAngle;
+    cruise_control_max_power_factor       = settings.CruiseControlMaxPowerFactor;
+    cruise_control_power_trim             = settings.CruiseControlPowerTrim / 100.0f;
+    cruise_control_inverted_power_switch  = settings.CruiseControlInvertedPowerSwitch;
+    cruise_control_half_power_delay       = settings.CruiseControlPowerDelayComp / 2.0f;
+    cruise_control_max_power_factor_angle = RAD2DEG(acosf(1.0f / settings.CruiseControlMaxPowerFactor));
 
     memcpy(
         cruise_control_flight_mode_switch_pos_enable,

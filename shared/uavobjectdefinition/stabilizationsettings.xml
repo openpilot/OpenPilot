@@ -30,13 +30,13 @@
 
 	<field name="RattitudeModeTransistion" units="%" type="uint8" elements="1" defaultvalue="80"/>
 
-	<field name="CruiseControlMinThrust"         units="%"   type="uint8" elements="1" defaultvalue="5"/>
-	<field name="CruiseControlMaxThrust"         units="%"   type="uint8" elements="1" defaultvalue="90"/>
+	<field name="CruiseControlMinThrust"           units="%"   type="uint8" elements="1" defaultvalue="5"/>
+	<field name="CruiseControlMaxThrust"           units="%"   type="uint8" elements="1" defaultvalue="90"/>
 	<field name="CruiseControlMaxAngle"            units="deg" type="uint8" elements="1" defaultvalue="105"/>
 	<field name="CruiseControlMaxPowerFactor"      units="x"   type="float" elements="1" defaultvalue="3.0"/>
 	<field name="CruiseControlPowerTrim"           units="%"   type="float" elements="1" defaultvalue="100.0"/>
 	<field name="CruiseControlInvertedPowerSwitch" units=""    type="int8"  elements="1" defaultvalue="0"/>
-	<field name="CruiseControlNeutralThrust"       units="%"   type="uint8" elements="1" defaultvalue="0"/>
+	<field name="CruiseControlPowerDelayComp"      units="sec" type="float" elements="1" defaultvalue="0.25"/>
 	<field name="CruiseControlFlightModeSwitchPosEnable" units="" type="enum" elements="6" options="FALSE,TRUE" defaultvalue="FALSE"/>
 
 	<field name="LowThrottleZeroIntegral" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>

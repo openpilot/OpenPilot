@@ -82,9 +82,6 @@
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 3) // FLIGHT CONTROL priority
 #define FAILSAFE_TIMEOUT_MS 30
 
-// number of flight mode switch positions
-#define NUM_FMS_POSITIONS   6
-
 // The PID_RATE_ROLL set is used by Rate mode and the rate portion of Attitude mode
 // The PID_RATE set is used by the attitude portion of Attitude mode
 enum { PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_MAX };
@@ -115,7 +112,7 @@ static float cruise_control_max_power_factor;
 static float cruise_control_power_trim;
 static int8_t cruise_control_inverted_power_switch;
 static float cruise_control_neutral_thrust;
-static uint8_t cruise_control_flight_mode_switch_pos_enable[NUM_FMS_POSITIONS];
+static uint8_t cruise_control_flight_mode_switch_pos_enable[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
 
 // Private functions
 static void stabilizationTask(void *parameters);
@@ -162,9 +159,6 @@ int32_t StabilizationStart()
  */
 int32_t StabilizationInitialize()
 {
-    // stop the compile if the number of switch positions changes, but has not been changed here
-    PIOS_STATIC_ASSERT(NUM_FMS_POSITIONS == sizeof(((FlightModeSettingsData *)0)->FlightModePosition) / sizeof((((FlightModeSettingsData *)0)->FlightModePosition)[0]));
-
     // Initialize variables
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
@@ -568,7 +562,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         // to maintain same altitdue with changing bank angle
         // but without manually adjusting thrust
         // do it here and all the various flight modes (e.g. Altitude Hold) can use it
-        if (flight_mode_switch_position < NUM_FMS_POSITIONS
+        if (flight_mode_switch_position < FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM
             && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t)0
             && cruise_control_max_power_factor > 0.0001f) {
             static uint8_t toggle;
@@ -681,7 +675,7 @@ static float bound(float val, float range)
 
 static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    if (cur_flight_mode < 0 || cur_flight_mode >= NUM_FMS_POSITIONS) {
+    if (cur_flight_mode < 0 || cur_flight_mode >= FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM) {
         return;
     }
     if ((ev) && ((settings.FlightModeMap[cur_flight_mode] == 0 && ev->obj != StabilizationSettingsBank1Handle()) ||

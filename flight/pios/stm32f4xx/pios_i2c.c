@@ -94,26 +94,19 @@ static void go_bus_error(struct pios_i2c_adapter *i2c_adapter);
 static void go_stopping(struct pios_i2c_adapter *i2c_adapter);
 static void go_stopped(struct pios_i2c_adapter *i2c_adapter);
 static void go_starting(struct pios_i2c_adapter *i2c_adapter);
-static void go_r_any_txn_addr(struct pios_i2c_adapter *i2c_adapter);
-static void go_r_more_txn_pre_one(struct pios_i2c_adapter *i2c_adapter);
-static void go_r_any_txn_pre_first(struct pios_i2c_adapter *i2c_adapter);
-static void go_r_any_txn_pre_middle(struct pios_i2c_adapter *i2c_adapter);
-static void go_r_more_txn_pre_last(struct pios_i2c_adapter *i2c_adapter);
-static void go_r_any_txn_post_last(struct pios_i2c_adapter *i2c_adapter);
 
 static void go_r_any_txn_addr(struct pios_i2c_adapter *i2c_adapter);
+static void go_r_more_txn_pre_one(struct pios_i2c_adapter *i2c_adapter);
 static void go_r_last_txn_pre_one(struct pios_i2c_adapter *i2c_adapter);
 static void go_r_any_txn_pre_first(struct pios_i2c_adapter *i2c_adapter);
 static void go_r_any_txn_pre_middle(struct pios_i2c_adapter *i2c_adapter);
 static void go_r_last_txn_pre_last(struct pios_i2c_adapter *i2c_adapter);
+static void go_r_more_txn_pre_last(struct pios_i2c_adapter *i2c_adapter);
 static void go_r_any_txn_post_last(struct pios_i2c_adapter *i2c_adapter);
 
 static void go_w_any_txn_addr(struct pios_i2c_adapter *i2c_adapter);
 static void go_w_any_txn_middle(struct pios_i2c_adapter *i2c_adapter);
 static void go_w_more_txn_last(struct pios_i2c_adapter *i2c_adapter);
-
-static void go_w_any_txn_addr(struct pios_i2c_adapter *i2c_adapter);
-static void go_w_any_txn_middle(struct pios_i2c_adapter *i2c_adapter);
 static void go_w_last_txn_last(struct pios_i2c_adapter *i2c_adapter);
 
 static void go_nack(struct pios_i2c_adapter *i2c_adapter);
@@ -414,9 +407,17 @@ static void go_starting(struct pios_i2c_adapter *i2c_adapter)
     PIOS_DEBUG_Assert(i2c_adapter->active_txn >= i2c_adapter->first_txn);
     PIOS_DEBUG_Assert(i2c_adapter->active_txn <= i2c_adapter->last_txn);
 
-    i2c_adapter->active_byte = &(i2c_adapter->active_txn->buf[0]);
-    i2c_adapter->last_byte   = &(i2c_adapter->active_txn->buf[i2c_adapter->active_txn->len - 1]);
-
+    // check for an empty read/write
+    if (i2c_adapter->active_txn->buf != NULL && i2c_adapter->active_txn->len != 0) {
+        // Data available
+        i2c_adapter->active_byte = &(i2c_adapter->active_txn->buf[0]);
+        i2c_adapter->last_byte   = &(i2c_adapter->active_txn->buf[i2c_adapter->active_txn->len - 1]);
+    } else {
+        // No Data available => Empty read/write
+        i2c_adapter->last_byte   = NULL;
+        i2c_adapter->active_byte = i2c_adapter->last_byte + 1;
+    }
+    
     I2C_GenerateSTART(i2c_adapter->cfg->regs, ENABLE);
     if (i2c_adapter->active_txn->rw == PIOS_I2C_TXN_READ) {
         I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, ENABLE);

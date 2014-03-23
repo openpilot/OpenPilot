@@ -186,23 +186,23 @@ static int32_t RadioComBridgeStart(void)
         ObjectPersistenceConnectCallback(&objectPersistenceUpdatedCb);
 
         // Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
-        xTaskCreate(telemetryTxTask, (signed char *)"telemetryTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
-        xTaskCreate(telemetryRxTask, (signed char *)"telemetryRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryRxTaskHandle));
+        xTaskCreate(telemetryTxTask, (const char *)"telemetryTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
+        xTaskCreate(telemetryRxTask, (const char *)"telemetryRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryRxTaskHandle));
         if (PIOS_PPM_RECEIVER != 0) {
-            xTaskCreate(PPMInputTask, (signed char *)"PPMInputTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->PPMInputTaskHandle));
+            xTaskCreate(PPMInputTask, (const char *)"PPMInputTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->PPMInputTaskHandle));
 #ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_RegisterFlag(PIOS_WDG_PPMINPUT);
 #endif
         }
         if (!data->parseUAVTalk) {
             // If the user wants raw serial communication, we need to spawn another thread to handle it.
-            xTaskCreate(serialRxTask, (signed char *)"serialRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->serialRxTaskHandle));
+            xTaskCreate(serialRxTask, (const char *)"serialRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->serialRxTaskHandle));
 #ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_RegisterFlag(PIOS_WDG_SERIALRX);
 #endif
         }
-        xTaskCreate(radioTxTask, (signed char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
-        xTaskCreate(radioRxTask, (signed char *)"radioRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
+        xTaskCreate(radioTxTask, (const char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
+        xTaskCreate(radioRxTask, (const char *)"radioRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
 
         // Register the watchdog timers.
 #ifdef PIOS_INCLUDE_WDG

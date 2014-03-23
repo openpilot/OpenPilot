@@ -80,7 +80,7 @@ int32_t OPLinkModStart(void)
     stackOverflow = false;
     mallocFailed  = false;
     // Create oplink system task
-    xTaskCreate(systemTask, (signed char *)"OPLink", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
+    xTaskCreate(systemTask, (const char *)"OPLink", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
     // Register task
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
 

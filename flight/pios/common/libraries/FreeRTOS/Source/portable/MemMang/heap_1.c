@@ -1,5 +1,6 @@
 /*
-    FreeRTOS V7.5.2 - Copyright (C) 2013 Real Time Engineers Ltd.
+    FreeRTOS V8.0.0 - Copyright (C) 2014 Real Time Engineers Ltd. 
+    All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
 
@@ -82,64 +83,67 @@ task.h is included from an application file. */
 
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
+static size_t currentTOTAL_HEAP_SIZE = configTOTAL_HEAP_SIZE;
+/* A few bytes might be lost to byte aligning the heap start address. */
+#define configADJUSTED_HEAP_SIZE	( currentTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT )
 
 /* Allocate the memory for the heap. */
-static unsigned char ucHeap[ configTOTAL_HEAP_SIZE ]  __attribute__ ((section (".heap")));
+static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ] __attribute__ ((section (".heap")));
 static size_t xNextFreeByte = ( size_t ) 0;
 
-static size_t currentTOTAL_HEAP_SIZE = configTOTAL_HEAP_SIZE;
-void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment);
 
-/* A few bytes might be lost to byte aligning the heap start address. */
-#define configADJUSTED_HEAP_SIZE    (currentTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT)
 
 /*-----------------------------------------------------------*/
 
-void *pvPortMallocGeneric(size_t xWantedSize, size_t alignment) {
-    void *pvReturn = NULL;
-    static unsigned char *pucAlignedHeap = NULL;
-    size_t mask = alignment - 1;
-    /* Ensure that blocks are always aligned to the required number of bytes. */
-#if portBYTE_ALIGNMENT != 1
-    if (xWantedSize & mask) {
-        /* Byte alignment required. */
-        xWantedSize += (alignment - (xWantedSize & mask));
-    }
-#endif
+void *pvPortMalloc( size_t xWantedSize )
+{
+void *pvReturn = NULL;
+static uint8_t *pucAlignedHeap = NULL;
 
-    vTaskSuspendAll();
-    {
-        if (pucAlignedHeap == NULL ) {
-            /* Ensure the heap starts on a correctly aligned boundary. */
-            pucAlignedHeap = (unsigned char *) (((portPOINTER_SIZE_TYPE ) &ucHeap[alignment]) & ((portPOINTER_SIZE_TYPE ) ~mask));
-        }
+	/* Ensure that blocks are always aligned to the required number of bytes. */
+	#if portBYTE_ALIGNMENT != 1
+		if( xWantedSize & portBYTE_ALIGNMENT_MASK )
+		{
+			/* Byte alignment required. */
+			xWantedSize += ( portBYTE_ALIGNMENT - ( xWantedSize & portBYTE_ALIGNMENT_MASK ) );
+		}
+	#endif
 
-        /* Check there is enough room left for the allocation. */
-        if (((xNextFreeByte + xWantedSize) < configADJUSTED_HEAP_SIZE)&&
-        ( ( xNextFreeByte + xWantedSize ) > xNextFreeByte ) ){
-        /* Check for overflow. */
-        /* Return the next free byte then increment the index past this block. */
-        pvReturn = pucAlignedHeap + xNextFreeByte;
-        xNextFreeByte += xWantedSize;
-        }
-    }
-    xTaskResumeAll();
+	vTaskSuspendAll();
+	{
+		if( pucAlignedHeap == NULL )
+		{
+			/* Ensure the heap starts on a correctly aligned boundary. */
+			pucAlignedHeap = ( uint8_t * ) ( ( ( portPOINTER_SIZE_TYPE ) &ucHeap[ portBYTE_ALIGNMENT ] ) & ( ( portPOINTER_SIZE_TYPE ) ~portBYTE_ALIGNMENT_MASK ) );
+		}
 
-#if( configUSE_MALLOC_FAILED_HOOK == 1 )
-    {
-        if( pvReturn == NULL ) {
-            extern void vApplicationMallocFailedHook( void );
-            vApplicationMallocFailedHook();
-        }
-    }
-#endif
+		/* Check there is enough room left for the allocation. */
+		if( ( ( xNextFreeByte + xWantedSize ) < configADJUSTED_HEAP_SIZE ) &&
+			( ( xNextFreeByte + xWantedSize ) > xNextFreeByte )	)/* Check for overflow. */
+		{
+			/* Return the next free byte then increment the index past this
+			block. */
+			pvReturn = pucAlignedHeap + xNextFreeByte;
+			xNextFreeByte += xWantedSize;
+		}
 
-    return pvReturn;
+		traceMALLOC( pvReturn, xWantedSize );
+	}	
+	xTaskResumeAll();
+
+	#if( configUSE_MALLOC_FAILED_HOOK == 1 )
+	{
+		if( pvReturn == NULL )
+		{
+			extern void vApplicationMallocFailedHook( void );
+			vApplicationMallocFailedHook();
+		}
+	}
+	#endif
+
+	return pvReturn;
 }
 
-void *pvPortMalloc(size_t xWantedSize) {
-    return pvPortMallocGeneric(xWantedSize, portBYTE_HEAP_ALIGNMENT);
-}
 
 /*-----------------------------------------------------------*/
 
@@ -166,7 +170,6 @@ size_t xPortGetFreeHeapSize( void )
 {
 	return ( configADJUSTED_HEAP_SIZE - xNextFreeByte );
 }
-/*-----------------------------------------------------------*/
 
 void xPortIncreaseHeapSize( size_t bytes )
 {

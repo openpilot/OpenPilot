@@ -40,6 +40,7 @@
 #include <airspeedsensor.h>
 #include <gpspositionsensor.h>
 #include <gpsvelocitysensor.h>
+#include <homelocation.h>
 
 #include <gyrostate.h>
 #include <accelstate.h>
@@ -119,7 +120,7 @@ static DelayedCallbackInfo *stateEstimationCallback;
 
 static volatile RevoSettingsData revoSettings;
 static volatile sensorUpdates updatedSensors;
-static int32_t fusionAlgorithm     = -1;
+static volatile int32_t fusionAlgorithm = -1;
 static filterPipeline *filterChain = NULL;
 
 // different filters available to state estimation
@@ -213,6 +214,7 @@ static const filterPipeline *ekf13Queue = &(filterPipeline) {
 
 static void settingsUpdatedCb(UAVObjEvent *objEv);
 static void sensorUpdatedCb(UAVObjEvent *objEv);
+static void homeLocationUpdatedCb(UAVObjEvent *objEv);
 static void StateEstimationCb(void);
 
 static inline int32_t maxint32_t(int32_t a, int32_t b)
@@ -238,6 +240,8 @@ int32_t StateEstimationInitialize(void)
     GPSVelocitySensorInitialize();
     GPSPositionSensorInitialize();
 
+    HomeLocationInitialize();
+
     GyroStateInitialize();
     AccelStateInitialize();
     MagStateInitialize();
@@ -246,6 +250,8 @@ int32_t StateEstimationInitialize(void)
     VelocityStateInitialize();
 
     RevoSettingsConnectCallback(&settingsUpdatedCb);
+
+    HomeLocationConnectCallback(&homeLocationUpdatedCb);
 
     GyroSensorConnectCallback(&sensorUpdatedCb);
     AccelSensorConnectCallback(&sensorUpdatedCb);
@@ -476,6 +482,17 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     RevoSettingsGet((RevoSettingsData *)&revoSettings);
 }
+
+/**
+ * Callback for eventdispatcher when HomeLocation has been updated
+ */
+static void homeLocationUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    // Set fusionAlgorithm to -2 to force a filter init (necessary for LLA filter)
+    // This value force a filter init only when disarmed
+    fusionAlgorithm = -2;
+}
+
 
 /**
  * Callback for eventdispatcher when any sensor UAVObject has been updated

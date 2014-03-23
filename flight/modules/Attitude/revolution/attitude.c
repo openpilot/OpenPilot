@@ -231,7 +231,7 @@ int32_t AttitudeStart(void)
     gpsVelQueue   = xQueueCreate(1, sizeof(UAVObjEvent));
 
     // Start main task
-    xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
+    xTaskCreate(AttitudeTask, (const char *)"Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, attitudeTaskHandle);
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);

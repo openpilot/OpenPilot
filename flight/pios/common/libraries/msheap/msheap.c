@@ -36,6 +36,20 @@
 
 #include "msheap.h"
 
+#if defined(PIOS_INCLUDE_FREERTOS)
+
+#define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+
+#include "FreeRTOS.h"
+#include "task.h"
+
+#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+
+#else
+#define traceMALLOC(...)
+#define traceFREE(...)
+#endif
+
 /*
  * Integrity checking.
  *

@@ -139,7 +139,7 @@ int32_t PIOS_UDP_Init(uint32_t *udp_id, const struct pios_udp_cfg *cfg)
     /* Create transmit thread for this connection */
 #if defined(PIOS_INCLUDE_FREERTOS)
 // ( pdTASK_CODE pvTaskCode, const portCHAR * const pcName, unsigned portSHORT usStackDepth, void *pvParameters, unsigned portBASE_TYPE uxPriority, xTaskHandle *pvCreatedTask );
-    xTaskCreate((pdTASK_CODE)PIOS_UDP_RxThread, (const signed char *)"UDP_Rx_Thread", 1024, (void *)udp_dev, (tskIDLE_PRIORITY + 1), &udp_dev->rxThread);
+    xTaskCreate((pdTASK_CODE)PIOS_UDP_RxThread, (const char *)"UDP_Rx_Thread", 1024, (void *)udp_dev, (tskIDLE_PRIORITY + 1), &udp_dev->rxThread);
 #else
     pthread_create(&udp_dev->rxThread, NULL, PIOS_UDP_RxThread, (void *)udp_dev);
 #endif

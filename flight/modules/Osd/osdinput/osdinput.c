@@ -75,7 +75,7 @@ enum osd_pkt_type {
 int32_t osdinputStart(void)
 {
     // Start osdinput task
-    xTaskCreate(osdinputTask, (signed char *)"OSDINPUT", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdinputTaskHandle);
+    xTaskCreate(osdinputTask, (const char *)"OSDINPUT", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdinputTaskHandle);
 
     return 0;
 }

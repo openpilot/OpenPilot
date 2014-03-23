@@ -450,6 +450,7 @@ else
     GCS_SILENT := silent
 endif
 
+.NOTPARALLEL:
 .PHONY: openpilotgcs
 openpilotgcs: uavobjects_gcs openpilotgcs_qmake openpilotgcs_make
 

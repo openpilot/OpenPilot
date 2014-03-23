@@ -821,7 +821,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     cur_flight_mode = -1;
 
     // Rattitude stick angle where the attitude to rate transition happens
-    if (settings.RattitudeModeTransistion < (uint8_t) 10) {
+    if (settings.RattitudeModeTransition < (uint8_t) 10) {
         rattitude_mode_transition_stick_position = 10.0f / 100.0f;
     } else {
         rattitude_mode_transition_stick_position = (float)settings.RattitudeModeTransition / 100.0f;

@@ -145,7 +145,7 @@ static const struct pios_board_info *bdinfo = &pios_board_info_blob;
 int32_t AttitudeStart(void)
 {
     // Start main task
-    xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+    xTaskCreate(AttitudeTask, (const char *)"Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, taskHandle);
     PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 

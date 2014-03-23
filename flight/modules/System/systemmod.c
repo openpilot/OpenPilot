@@ -120,7 +120,7 @@ int32_t SystemModStart(void)
     stackOverflow = STACKOVERFLOW_NONE;
     mallocFailed  = false;
     // Create system task
-    xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
+    xTaskCreate(systemTask, (const char *)"System", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
     // Register task
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
 

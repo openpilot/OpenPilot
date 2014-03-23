@@ -124,13 +124,13 @@ int32_t TelemetryStart(void)
     GCSTelemetryStatsConnectQueue(priorityQueue);
 
     // Start telemetry tasks
-    xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_TX_BYTES / 4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
+    xTaskCreate(telemetryTxTask, (const char *)"TelTx", STACK_SIZE_TX_BYTES / 4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
-    xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_RX_BYTES / 4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
+    xTaskCreate(telemetryRxTask, (const char *)"TelRx", STACK_SIZE_RX_BYTES / 4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
 
 #ifdef PIOS_INCLUDE_RFM22B
-    xTaskCreate(radioRxTask, (signed char *)"RadioRx", STACK_SIZE_RADIO_RX_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
+    xTaskCreate(radioRxTask, (const char *)"RadioRx", STACK_SIZE_RADIO_RX_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIORX, radioRxTaskHandle);
 #endif
 

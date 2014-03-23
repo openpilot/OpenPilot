@@ -454,11 +454,11 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     mag_scale[2] = cal.mag_scale.Z;
 
     accel_temp_calibrated = (agcal.temp_calibrated_extent.max - agcal.temp_calibrated_extent.min > .1f) &&
-                            (abs(agcal.accel_temp_coeff.X) > 1e-9f || abs(agcal.accel_temp_coeff.Y) > 1e-9f || abs(agcal.accel_temp_coeff.Z) > 1e-9f);
+                            (fabsf(agcal.accel_temp_coeff.X) > 1e-9f || fabsf(agcal.accel_temp_coeff.Y) > 1e-9f || fabsf(agcal.accel_temp_coeff.Z) > 1e-9f);
 
     gyro_temp_calibrated  = (agcal.temp_calibrated_extent.max - agcal.temp_calibrated_extent.min > .1f) &&
-                            (abs(agcal.gyro_temp_coeff.X) > 1e-9f || abs(agcal.gyro_temp_coeff.Y) > 1e-9f ||
-                            abs(agcal.gyro_temp_coeff.Z) > 1e-9f || abs(agcal.gyro_temp_coeff.Z2) > 1e-9f);
+                            (fabsf(agcal.gyro_temp_coeff.X) > 1e-9f || fabsf(agcal.gyro_temp_coeff.Y) > 1e-9f ||
+                            fabsf(agcal.gyro_temp_coeff.Z) > 1e-9f || fabsf(agcal.gyro_temp_coeff.Z2) > 1e-9f);
 
 
     AttitudeSettingsData attitudeSettings;

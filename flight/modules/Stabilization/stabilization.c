@@ -824,7 +824,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     if (settings.RattitudeModeTransistion < (uint8_t) 10) {
         rattitude_mode_transition_stick_position = 10.0f / 100.0f;
     } else {
-        rattitude_mode_transition_stick_position = (float)settings.RattitudeModeTransistion / 100.0f;
+        rattitude_mode_transition_stick_position = (float)settings.RattitudeModeTransition / 100.0f;
     }
 
     cruise_control_min_thrust       = (float)settings.CruiseControlMinThrust / 100.0f;

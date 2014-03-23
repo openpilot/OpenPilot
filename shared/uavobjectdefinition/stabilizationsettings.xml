@@ -28,7 +28,7 @@
 	<field name="WeakLevelingKp" units="(deg/s)/deg" type="float" elements="1" defaultvalue="0.1"/>
 	<field name="MaxWeakLevelingRate" units="deg/s" type="uint8" elements="1" defaultvalue="5"/>
 
-	<field name="RattitudeModeTransistion" units="%" type="uint8" elements="1" defaultvalue="80"/>
+	<field name="RattitudeModeTransition" units="%" type="uint8" elements="1" defaultvalue="80"/>
 
 	<field name="CruiseControlMinThrust"         units="%"   type="uint8" elements="1" defaultvalue="5"/>
 	<field name="CruiseControlMaxThrust"         units="%"   type="uint8" elements="1" defaultvalue="90"/>

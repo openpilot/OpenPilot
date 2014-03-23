@@ -79,6 +79,7 @@
 /* Enable run time stats collection */
 #define configGENERATE_RUN_TIME_STATS                1
 #define INCLUDE_uxTaskGetRunTime                     1
+#define INCLUDE_xTaskGetIdleTaskHandle               1
 
 /*
  * Once we move to CMSIS2 we can at least use:

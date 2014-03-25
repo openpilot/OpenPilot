@@ -56,10 +56,14 @@
 #include "CoordinateConversions.h"
 
 // Private constants
-#define STACK_SIZE_BYTES  256
-#define CALLBACK_PRIORITY CALLBACK_PRIORITY_REGULAR
-#define TASK_PRIORITY     CALLBACK_TASK_FLIGHTCONTROL
-#define TIMEOUT_MS        10
+#define STACK_SIZE_BYTES        256
+#define CALLBACK_PRIORITY       CALLBACK_PRIORITY_REGULAR
+#define TASK_PRIORITY           CALLBACK_TASK_FLIGHTCONTROL
+#define TIMEOUT_MS              10
+
+// Private filter init const
+#define FILTER_INIT_FORCE       -1
+#define FILTER_INIT_IF_POSSIBLE -2
 
 // local macros, ONLY to be used in the middle of StateEstimationCb in section RUNSTATE_LOAD after the update of states updated!
 #define FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(sensorname, shortname, a1, a2, a3) \
@@ -335,7 +339,7 @@ static void StateEstimationCb(void)
         if (fusionAlgorithm != revoSettings.FusionAlgorithm) {
             FlightStatusData fs;
             FlightStatusGet(&fs);
-            if (fs.Armed == FLIGHTSTATUS_ARMED_DISARMED || fusionAlgorithm == -1) {
+            if (fs.Armed == FLIGHTSTATUS_ARMED_DISARMED || fusionAlgorithm == FILTER_INIT_FORCE) {
                 const filterPipeline *newFilterChain;
                 switch (revoSettings.FusionAlgorithm) {
                 case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
@@ -488,9 +492,9 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
  */
 static void homeLocationUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    // Set fusionAlgorithm to -2 to force a filter init (necessary for LLA filter)
-    // This value force a filter init only when disarmed
-    fusionAlgorithm = -2;
+    // Ask for a filter init (necessary for LLA filter)
+    // Only possible if disarmed
+    fusionAlgorithm = FILTER_INIT_IF_POSSIBLE;
 }
 
 

@@ -41,6 +41,7 @@
 #include "hwsettings.h"
 #include "airspeedsettings.h"
 #include "airspeedsensor.h" // object that will be updated by the module
+#include "baro_airspeed_ms4525do.h"
 #include "baro_airspeed_etasv3.h"
 #include "baro_airspeed_mpxv.h"
 #include "gps_airspeed.h"
@@ -164,6 +165,12 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_EAGLETREEAIRSPEEDV3:
             // Eagletree Airspeed v3
             baro_airspeedGetETASV3(&airspeedData, &airspeedSettings);
+            break;
+#endif
+#if defined(PIOS_INCLUDE_MS4525DO)
+        case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_PIXHAWKAIRSPEEDMS4525DO:
+            // PixHawk Airpeed based on MS4525DO
+            baro_airspeedGetMS4525DO(&airspeedData, &airspeedSettings);
             break;
 #endif
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:

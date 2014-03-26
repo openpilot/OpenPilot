@@ -6,6 +6,9 @@
 class AntennaTrackGadgetFactory;
 
 class AntennaTrackPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                                   Q_PLUGIN_METADATA(IID "OpenPilot.AntennaTrack")
+
 public:
     AntennaTrackPlugin();
     ~AntennaTrackPlugin();

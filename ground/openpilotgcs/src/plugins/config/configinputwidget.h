@@ -32,13 +32,14 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QList>
 #include "inputchannelform.h"
 #include "ui_inputchannelform.h"
 #include <QRadioButton>
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "flightmodesettings.h"
 #include "receiveractivity.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
@@ -109,6 +110,9 @@ private:
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
     ManualControlSettings::DataFields previousManualSettingsData;
+    FlightModeSettings *flightModeSettingsObj;
+    FlightModeSettings::DataFields flightModeSettingsData;
+    FlightModeSettings::DataFields previousFlightModeSettingsData;
     ReceiverActivity *receiverActivityObj;
     ReceiverActivity::DataFields receiverActivityData;
 

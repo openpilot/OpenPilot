@@ -80,7 +80,7 @@ bool GLC_TsrMover::move(const GLC_UserInput& userInput)
 		qDebug() << "Pas cool";
 		if (!userInput.translation().isNull())
 		{
-			m_PreviousVector= GLC_Vector3d(userInput.translation().getX(), userInput.translation().getY(), 0.0) + m_PreviousVector;			
+			m_PreviousVector= GLC_Vector3d(userInput.translation().x(), userInput.translation().y(), 0.0) + m_PreviousVector;			
 		}
 	}
 	
@@ -97,7 +97,7 @@ bool GLC_TsrMover::move(const GLC_UserInput& userInput)
 		m_pViewport->setDistMinAndMax(dummy.boundingBox());
 
 		GLC_Point2d nPos= m_pViewport->mapNormalyzeToOpenGLScreen(x, y);
-		GLC_Point3d nPos3D(nPos.getX(), nPos.getY(), 1.0);
+		GLC_Point3d nPos3D(nPos.x(), nPos.y(), 1.0);
 		GLC_Point3d projected= m_pViewport->compositionMatrix().inverted() * nPos3D;
 
 		m_pViewport->cameraHandle()->zoom(userInput.scaleFactor());
@@ -114,7 +114,7 @@ bool GLC_TsrMover::move(const GLC_UserInput& userInput)
 		m_pViewport->setDistMinAndMax(dummy.boundingBox());
 
 		GLC_Point2d nPos= m_pViewport->mapNormalyzeToOpenGLScreen(x, y);
-		GLC_Point3d nPos3D(nPos.getX(), nPos.getY(), 1.0);
+		GLC_Point3d nPos3D(nPos.x(), nPos.y(), 1.0);
 		GLC_Point3d center= m_pViewport->compositionMatrix().inverted() * nPos3D;
 
 		GLC_Vector3d axis= m_pViewport->cameraHandle()->forward();
@@ -124,8 +124,8 @@ bool GLC_TsrMover::move(const GLC_UserInput& userInput)
 
 	if (!userInput.translation().isNull())
 	{
-		double transX= userInput.translation().getX() * m_pViewport->viewHSize();
-		double transY= userInput.translation().getY() * m_pViewport->viewVSize();
+		double transX= userInput.translation().x() * m_pViewport->viewHSize();
+		double transY= userInput.translation().y() * m_pViewport->viewVSize();
 
 		GLC_Vector3d mappedTranslation(-transX, -transY, 0.0);
 		// Compute the length of camera's field of view

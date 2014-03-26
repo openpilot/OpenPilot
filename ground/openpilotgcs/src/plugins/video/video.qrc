@@ -1,24 +1,30 @@
 <RCC>
     <qresource prefix="/video" >
-    	// 22x22
- 		<file>resources/22x22/media-eject.png</file>
- 		<file>resources/22x22/media-playback-pause.png</file>
- 		<file>resources/22x22/media-playback-start.png</file>
- 		<file>resources/22x22/media-playback-stop.png</file>
- 		<file>resources/22x22/media-record.png</file>
- 		<file>resources/22x22/media-seek-backward.png</file>
- 		<file>resources/22x22/media-seek-forward.png</file>
- 		<file>resources/22x22/media-skip-backward.png</file>
- 		<file>resources/22x22/media-skip-forward.png</file>
- 		// 32x32
- 		<file>resources/32x32/media-eject.png</file>
- 		<file>resources/32x32/media-playback-pause.png</file>
- 		<file>resources/32x32/media-playback-start.png</file>
- 		<file>resources/32x32/media-playback-stop.png</file>
- 		<file>resources/32x32/media-record.png</file>
- 		<file>resources/32x32/media-seek-backward.png</file>
- 		<file>resources/32x32/media-seek-forward.png</file>
- 		<file>resources/32x32/media-skip-backward.png</file>
- 		<file>resources/32x32/media-skip-forward.png</file>
-     </qresource>
+        <file>resources/22x22/media-eject.png</file>
+        <file>resources/32x32/media-eject.png</file>
+
+        <file>resources/22x22/media-playback-pause.png</file>
+        <file>resources/32x32/media-playback-pause.png</file>
+
+        <file>resources/22x22/media-playback-start.png</file>
+        <file>resources/32x32/media-playback-start.png</file>
+
+        <file>resources/22x22/media-playback-stop.png</file>
+        <file>resources/32x32/media-playback-stop.png</file>
+
+        <file>resources/22x22/media-record.png</file>
+        <file>resources/32x32/media-record.png</file>
+
+        <file>resources/22x22/media-seek-backward.png</file>
+        <file>resources/32x32/media-seek-backward.png</file>
+
+        <file>resources/22x22/media-seek-forward.png</file>
+        <file>resources/32x32/media-seek-forward.png</file>
+
+        <file>resources/22x22/media-skip-backward.png</file>
+        <file>resources/32x32/media-skip-backward.png</file>
+
+        <file>resources/22x22/media-skip-forward.png</file>
+        <file>resources/32x32/media-skip-forward.png</file>
+    </qresource>
 </RCC>

@@ -29,7 +29,7 @@
 #include <cmath>
 #include <qwaitcondition.h>
 #include <QMetaType>
-#include <QApplication>
+#include <QtWidgets/QApplication>
 
 using namespace OP_DFU;
 
@@ -42,14 +42,7 @@ DFUObject::DFUObject(bool _debug, bool _use_serial, QString portname) :
     qRegisterMetaType<OP_DFU::Status>("Status");
 
     if (use_serial) {
-        PortSettings settings;
-        settings.BaudRate    = BAUD57600;
-        settings.DataBits    = DATA_8;
-        settings.FlowControl = FLOW_OFF;
-        settings.Parity = PAR_NONE;
-        settings.StopBits    = STOP_1;
-        settings.Timeout_Millisec = 1000;
-        info = new port(settings, portname);
+        info = new port(portname);
         info->rxBuf      = sspRxBuf;
         info->rxBufSize  = MAX_PACKET_DATA_LEN;
         info->txBuf      = sspTxBuf;
@@ -253,7 +246,7 @@ bool DFUObject::UploadData(qint32 const & numberOfBytes, QByteArray & data)
     buf[1] = OP_DFU::Upload; // DFU Command
     int packetsize;
     float percentage;
-    int laspercentage;
+    int laspercentage = 0;
     for (qint32 packetcount = 0; packetcount < numberOfPackets; ++packetcount) {
         percentage = (float)(packetcount + 1) / numberOfPackets * 100;
         if (laspercentage != (int)percentage) {
@@ -316,7 +309,7 @@ OP_DFU::Status DFUObject::UploadDescription(QVariant desc)
             padding.fill(' ', pad);
             description.append(padding);
         }
-        array = description.toAscii();
+        array = description.toLatin1();
     } else if (desc.type() == QMetaType::QByteArray) {
         array = desc.toByteArray();
     }
@@ -349,8 +342,9 @@ QString DFUObject::DownloadDescription(int const & numberOfChars)
     QByteArray arr;
 
     StartDownloadT(&arr, numberOfChars, OP_DFU::Descript);
-    QString str(arr);
-    return str;
+
+    int index = arr.indexOf(255);
+    return QString((index == -1) ? arr : arr.left(index));
 }
 
 QByteArray DFUObject::DownloadDescriptionAsBA(int const & numberOfChars)
@@ -358,6 +352,7 @@ QByteArray DFUObject::DownloadDescriptionAsBA(int const & numberOfChars)
     QByteArray arr;
 
     StartDownloadT(&arr, numberOfChars, OP_DFU::Descript);
+
     return arr;
 }
 
@@ -438,7 +433,7 @@ bool DFUObject::StartDownloadT(QByteArray *fw, qint32 const & numberOfBytes, Tra
         qDebug() << "StartDownload:" << numberOfPackets << "packets" << " Last Packet Size=" << lastPacketCount << " " << result << " bytes sent";
     }
     float percentage;
-    int laspercentage;
+    int laspercentage = 0;
 
     // Now get those packets:
     for (qint32 x = 0; x < numberOfPackets; ++x) {
@@ -642,8 +637,8 @@ bool DFUObject::findDevices()
             buf[7] = 0;
             buf[8] = 0;
             buf[9] = 0;
-            int result = sendData(buf, BUF_LEN);
-            result = receiveData(buf, BUF_LEN);
+            sendData(buf, BUF_LEN);
+            receiveData(buf, BUF_LEN);
             devices[x].ID = buf[14];
             devices[x].ID = devices[x].ID << 8 | (quint8)buf[15];
             devices[x].BL_Version = buf[7];
@@ -754,7 +749,7 @@ OP_DFU::Status DFUObject::UploadFirmwareT(const QString &sfile, const bool &veri
         pad = pad - arr.length();
         arr.append(QByteArray(pad, 255));
     }
-    if (devices[device].SizeOfCode < arr.length()) {
+    if (devices[device].SizeOfCode < (quint32)arr.length()) {
         if (debug) {
             qDebug() << "ERROR file to big for device";
         }

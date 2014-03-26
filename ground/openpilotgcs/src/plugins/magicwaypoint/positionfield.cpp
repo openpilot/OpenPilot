@@ -29,11 +29,11 @@
 #include "extensionsystem/pluginmanager.h"
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QMessageBox>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QtGlobal>
 
@@ -48,9 +48,8 @@ PositionField::PositionField(QWidget *parent) :
     setScene(new QGraphicsScene(this));
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 
-    m_renderer = new QSvgRenderer();
-    bool success = m_renderer->load(QString(":/magicwaypoint/images/positionfield.svg"));
-    Q_ASSERT(success);
+    m_renderer   = new QSvgRenderer();
+    m_renderer->load(QString(":/magicwaypoint/images/positionfield.svg"));
 
     m_background = new QGraphicsSvgItem();
     m_background->setSharedRenderer(m_renderer);

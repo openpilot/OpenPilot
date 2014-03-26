@@ -32,10 +32,10 @@
 
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include <QBrush>
 #include <QMessageBox>
 
@@ -321,7 +321,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleMotorcycle(QString airframeTyp
 
     // motor
     int channel = m_aircraft->gvMotor2ChannelBox->currentIndex() - 1;
-    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_REVERSABLEMOTOR);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
 
@@ -371,13 +371,13 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleDifferential(QString airframeT
 
     // left motor
     int channel = m_aircraft->gvMotor1ChannelBox->currentIndex() - 1;
-    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_REVERSABLEMOTOR);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
 
     // right motor
     channel = m_aircraft->gvMotor2ChannelBox->currentIndex() - 1;
-    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_REVERSABLEMOTOR);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -127);
 
@@ -424,11 +424,11 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -127);
 
     channel = m_aircraft->gvMotor1ChannelBox->currentIndex() - 1;
-    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_REVERSABLEMOTOR);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
 
     channel = m_aircraft->gvMotor2ChannelBox->currentIndex() - 1;
-    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_REVERSABLEMOTOR);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 127);
 
     // Output success message

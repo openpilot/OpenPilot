@@ -27,7 +27,8 @@
 
 #ifndef UPLOADERGADGETOPTIONSPAGE_H
 #define UPLOADERGADGETOPTIONSPAGE_H
-#include <qextserialport/src/qextserialenumerator.h>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include "coreplugin/dialogs/ioptionspage.h"
 #include "QString"
 #include <QStringList>
@@ -62,15 +63,6 @@ private:
     QComboBox *m_parityCB;
     QComboBox *m_stopbitsCB;
     QSpinBox *m_timeoutSpin;
-    QStringList BaudRateTypeString;
-    QStringList BaudRateTypeStringALL;
-    QStringList DataBitsTypeStringALL;
-    QStringList ParityTypeStringALL;
-    QStringList StopBitsTypeStringALL;
-    QStringList DataBitsTypeString;
-    QStringList ParityTypeString;
-    QStringList StopBitsTypeString;
-    QStringList FlowTypeString;
 };
 
 #endif // UPLOADERGADGETOPTIONSPAGE_H

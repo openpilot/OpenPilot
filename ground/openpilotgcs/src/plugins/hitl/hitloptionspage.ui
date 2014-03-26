@@ -510,12 +510,12 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="attActualCheckbox">
+          <widget class="QGroupBox" name="attStateCheckbox">
            <property name="enabled">
             <bool>true</bool>
            </property>
            <property name="title">
-            <string>AttitudeActual</string>
+            <string>AttitudeState</string>
            </property>
            <property name="flat">
             <bool>true</bool>
@@ -760,7 +760,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QGroupBox" name="airspeedActualCheckbox">
+          <widget class="QGroupBox" name="airspeedStateCheckbox">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -768,7 +768,7 @@
             </size>
            </property>
            <property name="title">
-            <string>AirspeedActual</string>
+            <string>AirspeedState</string>
            </property>
            <property name="flat">
             <bool>true</bool>

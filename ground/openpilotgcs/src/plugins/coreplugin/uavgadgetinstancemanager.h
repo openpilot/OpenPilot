@@ -32,7 +32,7 @@
 #include <QSettings>
 #include <QtCore/QMap>
 #include <QtCore/QStringList>
-#include <QtGui/QIcon>
+#include <QIcon>
 #include "core_global.h"
 #include "uavconfiginfo.h"
 

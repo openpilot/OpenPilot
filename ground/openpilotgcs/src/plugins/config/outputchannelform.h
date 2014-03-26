@@ -56,10 +56,10 @@ signals:
     void channelChanged(int index, int value);
 
 private:
+    Ui::outputChannelForm ui;
     /// Channel index
     int m_index;
     bool m_inChannelTest;
-    Ui::outputChannelForm ui;
 
 private slots:
     void linkToggled(bool state);

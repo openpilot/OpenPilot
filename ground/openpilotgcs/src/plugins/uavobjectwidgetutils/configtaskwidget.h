@@ -27,13 +27,12 @@
 #ifndef CONFIGTASKWIDGET_H
 #define CONFIGTASKWIDGET_H
 
-
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavobjectutilmanager.h"
 #include <QQueue>
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QList>
 #include <QLabel>
 #include "smartsavebutton.h"
@@ -48,53 +47,57 @@
 #include <QUrl>
 #include <QEvent>
 
+class ShadowWidgetBinding : public QObject {
+    Q_OBJECT
+public:
+    ShadowWidgetBinding(QWidget *widget, double scale, bool isLimited);
+    ~ShadowWidgetBinding();
+    QWidget *widget() const;
+    double scale() const;
+    bool isLimited() const;
+
+protected:
+    QWidget *m_widget;
+    double m_scale;
+    bool m_isLimited;
+};
+
+class WidgetBinding : public ShadowWidgetBinding {
+    Q_OBJECT
+public:
+    WidgetBinding(QWidget *widget, UAVObject *object, UAVObjectField *field, int index, double scale, bool isLimited);
+    ~WidgetBinding();
+
+    QString units() const;
+    UAVObject *object() const;
+    UAVObjectField *field() const;
+    int index() const;
+    QList<ShadowWidgetBinding *> shadows() const;
+
+    void addShadow(QWidget *widget, double scale, bool isLimited);
+    bool matches(QString objectName, QString fieldName, int index, quint32 instanceId);
+
+    bool isEnabled() const;
+    void setIsEnabled(bool isEnabled);
+
+    QVariant value() const;
+    void setValue(const QVariant &value);
+
+    void updateObjectFieldFromValue();
+
+private:
+    UAVObject *m_object;
+    UAVObjectField *m_field;
+    int m_index;
+    bool m_isEnabled;
+    QList<ShadowWidgetBinding *> m_shadows;
+    QVariant m_value;
+};
+
 class UAVOBJECTWIDGETUTILS_EXPORT ConfigTaskWidget : public QWidget {
     Q_OBJECT
 
 public:
-    struct shadow {
-        QWidget *widget;
-        double  scale;
-        bool    isLimited;
-    };
-    struct objectToWidget {
-        UAVObject *object;
-        UAVObjectField *field;
-        QWidget   *widget;
-        int index;
-        double    scale;
-        bool isLimited;
-        QList<shadow *> shadowsList;
-        QString   getUnits() const
-        {
-            if (field) {
-                return field->getUnits();
-            }
-            return QString("");
-        }
-    };
-
-    struct temphelper {
-        quint32 objid;
-        quint32 objinstid;
-        bool operator==(const temphelper & lhs)
-        {
-            return lhs.objid == this->objid && lhs.objinstid == this->objinstid;
-        }
-    };
-
-    enum buttonTypeEnum { none, save_button, apply_button, reload_button, default_button, help_button };
-    struct uiRelationAutomation {
-        QString objname;
-        QString fieldname;
-        QString element;
-        QString url;
-        buttonTypeEnum buttonType;
-        QList<int>     buttonGroup;
-        double  scale;
-        bool    haslimits;
-    };
-
     ConfigTaskWidget(QWidget *parent = 0);
     virtual ~ConfigTaskWidget();
 
@@ -111,25 +114,27 @@ public:
 
     void addWidget(QWidget *widget);
 
-    void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, int index = 0, double scale = 1, bool isLimited = false, QList<int> *defaultReloadGroups = 0, quint32 instID = 0);
-    void addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField *field, QWidget *widget, int index = 0, double scale = 1, bool isLimited = false, QList<int> *defaultReloadGroups = 0, quint32 instID = 0);
+    void addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index = 0, double scale = 1,
+                          bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
+    void addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, int index = 0, double scale = 1,
+                          bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
 
-    void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString element, double scale, bool isLimited = false, QList<int> *defaultReloadGroups = 0, quint32 instID = 0);
-    void addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField *field, QWidget *widget, QString element, double scale, bool isLimited = false, QList<int> *defaultReloadGroups = 0, quint32 instID = 0);
+    void addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, QString elementName, double scale,
+                          bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
+    void addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, QString elementName, double scale,
+                          bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
 
-    void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
-    void addUAVObjectToWidgetRelation(UAVObject *obj, UAVObjectField *field, QWidget *widget, QString index);
+    void addWidgetBinding(QString objectName, QString fieldName, QWidget *widget, QString elementName);
+    void addWidgetBinding(UAVObject *object, UAVObjectField *field, QWidget *widget, QString elementName);
 
-    // BUTTONS//
     void addApplySaveButtons(QPushButton *update, QPushButton *save);
     void addReloadButton(QPushButton *button, int buttonGroup);
     void addDefaultButton(QPushButton *button, int buttonGroup);
-    //////////
 
-    void addWidgetToDefaultReloadGroups(QWidget *widget, QList<int> *groups);
+    void addWidgetToReloadGroups(QWidget *widget, QList<int> *reloadGroupIDs);
 
-    bool addShadowWidget(QWidget *masterWidget, QWidget *shadowWidget, double shadowScale = 1, bool shadowIsLimited = false);
-    bool addShadowWidget(QString object, QString field, QWidget *widget, int index = 0, double scale = 1, bool isLimited = false, QList<int> *defaultReloadGroups = NULL, quint32 instID = 0);
+    bool addShadowWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index = 0, double scale = 1,
+                                bool isLimited = false, QList<int> *m_reloadGroups = NULL, quint32 instID = 0);
 
     void autoLoadWidgets();
 
@@ -139,17 +144,21 @@ public:
     bool allObjectsUpdated();
     void setOutOfLimitsStyle(QString style)
     {
-        outOfLimitsStyle = style;
+        m_outOfLimitsStyle = style;
     }
     void addHelpButton(QPushButton *button, QString url);
     void forceShadowUpdates();
     void forceConnectedState();
+    virtual bool shouldObjectBeSaved(UAVObject *object);
+
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
     void invalidateObjects();
     void apply();
     void save();
+    void setWidgetBindingObjectEnabled(QString objectName, bool enabled);
+
 signals:
     // fired when a widgets contents changes
     void widgetContentsChanged(QWidget *widget);
@@ -164,48 +173,84 @@ signals:
     // fired when the autopilot disconnects
     void autoPilotDisconnected();
     void defaultRequested(int group);
+
 private slots:
-    void objectUpdated(UAVObject *);
+    void objectUpdated(UAVObject *object);
     void defaultButtonClicked();
     void reloadButtonClicked();
+
 private:
-    int currentBoard;
-    bool isConnected;
-    bool allowWidgetUpdates;
-    QStringList objectsList;
-    QList <objectToWidget *> objOfInterest;
-    ExtensionSystem::PluginManager *pm;
-    UAVObjectManager *objManager;
-    UAVObjectUtilManager *utilMngr;
-    smartSaveButton *smartsave;
-    QMap<UAVObject *, bool> objectUpdates;
-    QMap<int, QList<objectToWidget *> *> defaultReloadGroups;
-    QMap<QWidget *, objectToWidget *> shadowsList;
-    QMap<QPushButton *, QString> helpButtonList;
-    QList<QPushButton *> reloadButtonList;
-    bool dirty;
-    bool setFieldFromWidget(QWidget *widget, UAVObjectField *field, int index, double scale);
+    struct objectComparator {
+        quint32 objid;
+        quint32 objinstid;
+        bool operator==(const objectComparator & lhs)
+        {
+            return lhs.objid == this->objid && lhs.objinstid == this->objinstid;
+        }
+    };
+
+    enum buttonTypeEnum { none, save_button, apply_button, reload_button, default_button, help_button };
+    struct bindingStruct {
+        QString objectName;
+        QString fieldName;
+        QString elementName;
+        int     index;
+        QString url;
+        buttonTypeEnum buttonType;
+        QList<int>     buttonGroup;
+        double  scale;
+        bool    haslimits;
+    };
+
+    int m_currentBoardId;
+    bool m_isConnected;
+    bool m_isWidgetUpdatesAllowed;
+    QStringList m_objects;
+
+    QMultiHash<int, WidgetBinding *> m_reloadGroups;
+    QMultiHash<QWidget *, WidgetBinding *> m_widgetBindingsPerWidget;
+    QMultiHash<UAVObject *, WidgetBinding *> m_widgetBindingsPerObject;
+
+    ExtensionSystem::PluginManager *m_pluginManager;
+    UAVObjectUtilManager *m_objectUtilManager;
+    SmartSaveButton *m_saveButton;
+    QHash<UAVObject *, bool> m_updatedObjects;
+    QHash<QPushButton *, QString> m_helpButtons;
+    QList<QPushButton *> m_reloadButtons;
+    bool m_isDirty;
+    QString m_outOfLimitsStyle;
+    QTimer *m_realtimeUpdateTimer;
+
     bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, double scale, bool hasLimits);
-    QVariant getVariantFromWidget(QWidget *widget, double scale, QString units);
+
+    QVariant getVariantFromWidget(QWidget *widget, double scale, const QString units);
     bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale, QString units);
     bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale);
+
     void connectWidgetUpdatesToSlot(QWidget *widget, const char *function);
     void disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function);
+
     void loadWidgetLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, double sclale);
-    QString outOfLimitsStyle;
-    QTimer *timeOut;
+
+    int fieldIndexFromElementName(QString objectName, QString fieldName, QString elementName);
+
+    void doAddWidgetBinding(QString objectName, QString fieldName, QWidget *widget, int index = 0, double scale = 1,
+                            bool isLimited = false, QList<int> *reloadGroupIDs = 0, quint32 instID = 0);
 
 protected slots:
-    virtual void disableObjUpdates();
-    virtual void enableObjUpdates();
+    virtual void disableObjectUpdates();
+    virtual void enableObjectUpdates();
     virtual void clearDirty();
     virtual void widgetsContentsChanged();
     virtual void populateWidgets();
     virtual void refreshWidgetsValues(UAVObject *obj = NULL);
     virtual void updateObjectsFromWidgets();
     virtual void helpButtonPressed();
+
 protected:
     virtual void enableControls(bool enable);
+    virtual QString mapObjectName(const QString objectName);
+    virtual UAVObject *getObject(const QString name, quint32 instId = 0);
     void checkWidgetsLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, QVariant value, double scale);
     void updateEnableControls();
 };

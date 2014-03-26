@@ -1,7 +1,8 @@
 <xml>
-    <object name="TxPIDSettings" singleinstance="true" settings="true">
+    <object name="TxPIDSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings used by @ref TxPID optional module to tune PID settings using R/C transmitter</description>
         <field name="UpdateMode" units="option" type="enum" elements="1" options="Never,When Armed,Always" defaultvalue="When Armed"/>
+	<field name="BankNumber" units="" type="enum" options="Bank1,Bank2,Bank3" elements="1" defaultvalue="Bank1"/>
         <field name="Inputs" units="channel" type="enum"
 		elementnames="Instance1,Instance2,Instance3"
 		options="Throttle,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5"
@@ -10,7 +11,7 @@
         <field name="PIDs" units="option" type="enum"
 		elementnames="Instance1,Instance2,Instance3"
 		options="Disabled,
-			Roll Rate.Kp, Pitch Rate.Kp, Roll+Pitch Rate.Kp, Yaw Rate.Kp, 
+			Roll Rate.Kp, Pitch Rate.Kp, Roll+Pitch Rate.Kp, Yaw Rate.Kp,
 			Roll Rate.Ki, Pitch Rate.Ki, Roll+Pitch Rate.Ki, Yaw Rate.Ki,
 			Roll Rate.Kd, Pitch Rate.Kd, Roll+Pitch Rate.Kd, Yaw Rate.Kd,
 			Roll Rate.ILimit, Pitch Rate.ILimit, Roll+Pitch Rate.ILimit, Yaw Rate.ILimit,

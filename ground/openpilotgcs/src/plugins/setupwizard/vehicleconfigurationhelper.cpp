@@ -33,8 +33,10 @@
 #include "mixersettings.h"
 #include "systemsettings.h"
 #include "manualcontrolsettings.h"
+#include "flightmodesettings.h"
 #include "stabilizationsettings.h"
 #include "revocalibration.h"
+#include "accelgyrosettings.h"
 
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE = 50;
 const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE  = 400;
@@ -305,29 +307,34 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 
 void VehicleConfigurationHelper::applyFlighModeConfiguration()
 {
+    FlightModeSettings *modeSettings = FlightModeSettings::GetInstance(m_uavoManager);
     ManualControlSettings *controlSettings = ManualControlSettings::GetInstance(m_uavoManager);
 
+    Q_ASSERT(modeSettings);
     Q_ASSERT(controlSettings);
 
-    ManualControlSettings::DataFields data = controlSettings->getData();
-    data.Stabilization1Settings[0] = ManualControlSettings::STABILIZATION1SETTINGS_ATTITUDE;
-    data.Stabilization1Settings[1] = ManualControlSettings::STABILIZATION1SETTINGS_ATTITUDE;
-    data.Stabilization1Settings[2] = ManualControlSettings::STABILIZATION1SETTINGS_AXISLOCK;
-    data.Stabilization2Settings[0] = ManualControlSettings::STABILIZATION2SETTINGS_ATTITUDE;
-    data.Stabilization2Settings[1] = ManualControlSettings::STABILIZATION2SETTINGS_ATTITUDE;
-    data.Stabilization2Settings[2] = ManualControlSettings::STABILIZATION2SETTINGS_RATE;
-    data.Stabilization3Settings[0] = ManualControlSettings::STABILIZATION3SETTINGS_RATE;
-    data.Stabilization3Settings[1] = ManualControlSettings::STABILIZATION3SETTINGS_RATE;
-    data.Stabilization3Settings[2] = ManualControlSettings::STABILIZATION3SETTINGS_RATE;
-    data.FlightModeNumber = 3;
-    data.FlightModePosition[0]     = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED1;
-    data.FlightModePosition[1]     = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED2;
-    data.FlightModePosition[2]     = ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED3;
-    data.FlightModePosition[3]     = ManualControlSettings::FLIGHTMODEPOSITION_ALTITUDEHOLD;
-    data.FlightModePosition[4]     = ManualControlSettings::FLIGHTMODEPOSITION_POSITIONHOLD;
-    data.FlightModePosition[5]     = ManualControlSettings::FLIGHTMODEPOSITION_MANUAL;
-    controlSettings->setData(data);
-    addModifiedObject(controlSettings, tr("Writing flight mode settings"));
+    FlightModeSettings::DataFields data     = modeSettings->getData();
+    ManualControlSettings::DataFields data2 = controlSettings->getData();
+    data.Stabilization1Settings[0] = FlightModeSettings::STABILIZATION1SETTINGS_ATTITUDE;
+    data.Stabilization1Settings[1] = FlightModeSettings::STABILIZATION1SETTINGS_ATTITUDE;
+    data.Stabilization1Settings[2] = FlightModeSettings::STABILIZATION1SETTINGS_AXISLOCK;
+    data.Stabilization2Settings[0] = FlightModeSettings::STABILIZATION2SETTINGS_ATTITUDE;
+    data.Stabilization2Settings[1] = FlightModeSettings::STABILIZATION2SETTINGS_ATTITUDE;
+    data.Stabilization2Settings[2] = FlightModeSettings::STABILIZATION2SETTINGS_RATE;
+    data.Stabilization3Settings[0] = FlightModeSettings::STABILIZATION3SETTINGS_RATE;
+    data.Stabilization3Settings[1] = FlightModeSettings::STABILIZATION3SETTINGS_RATE;
+    data.Stabilization3Settings[2] = FlightModeSettings::STABILIZATION3SETTINGS_RATE;
+    data2.FlightModeNumber = 3;
+    data.FlightModePosition[0]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED1;
+    data.FlightModePosition[1]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED2;
+    data.FlightModePosition[2]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED3;
+    data.FlightModePosition[3]     = FlightModeSettings::FLIGHTMODEPOSITION_ALTITUDEHOLD;
+    data.FlightModePosition[4]     = FlightModeSettings::FLIGHTMODEPOSITION_POSITIONHOLD;
+    data.FlightModePosition[5]     = FlightModeSettings::FLIGHTMODEPOSITION_MANUAL;
+    modeSettings->setData(data);
+    addModifiedObject(modeSettings, tr("Writing flight mode settings 1/2"));
+    controlSettings->setData(data2);
+    addModifiedObject(controlSettings, tr("Writing flight mode settings 2/2"));
 }
 
 void VehicleConfigurationHelper::applySensorBiasConfiguration()
@@ -336,31 +343,33 @@ void VehicleConfigurationHelper::applySensorBiasConfiguration()
         accelGyroBias bias = m_configSource->getCalibrationBias();
         float G = 9.81f;
 
+        AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(m_uavoManager);
+        Q_ASSERT(accelGyroSettings);
+        AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
+
+        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X] += bias.m_accelerometerXBias;
+        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y] += bias.m_accelerometerYBias;
+        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z] += bias.m_accelerometerZBias + G;
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X]    = bias.m_gyroXBias;
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y]    = bias.m_gyroYBias;
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z]    = bias.m_gyroZBias;
+
+        accelGyroSettings->setData(accelGyroSettingsData);
+        addModifiedObject(accelGyroSettings, tr("Writing gyro and accelerometer bias settings"));
+
         switch (m_configSource->getControllerType()) {
         case VehicleConfigurationSource::CONTROLLER_CC:
         case VehicleConfigurationSource::CONTROLLER_CC3D:
         {
-            const float ACCELERATION_SCALE = 0.004f * G;
-            const float GYRO_SCALE = 100.0f;
-
             AttitudeSettings *copterControlCalibration = AttitudeSettings::GetInstance(m_uavoManager);
             Q_ASSERT(copterControlCalibration);
             AttitudeSettings::DataFields data = copterControlCalibration->getData();
 
             data.AccelTau = DEFAULT_ENABLED_ACCEL_TAU;
-
-            data.AccelBias[AttitudeSettings::ACCELBIAS_X] += bias.m_accelerometerXBias / ACCELERATION_SCALE;
-            data.AccelBias[AttitudeSettings::ACCELBIAS_Y] += bias.m_accelerometerYBias / ACCELERATION_SCALE;
-            data.AccelBias[AttitudeSettings::ACCELBIAS_Z] += (bias.m_accelerometerZBias + G) / ACCELERATION_SCALE;
-
-            data.GyroBias[AttitudeSettings::GYROBIAS_X]    = -(bias.m_gyroXBias * GYRO_SCALE);
-            data.GyroBias[AttitudeSettings::GYROBIAS_Y]    = -(bias.m_gyroYBias * GYRO_SCALE);
-            data.GyroBias[AttitudeSettings::GYROBIAS_Z]    = -(bias.m_gyroZBias * GYRO_SCALE);
-
             data.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
 
             copterControlCalibration->setData(data);
-            addModifiedObject(copterControlCalibration, tr("Writing gyro and accelerometer bias settings"));
+            addModifiedObject(copterControlCalibration, tr("Writing board settings"));
             break;
         }
         case VehicleConfigurationSource::CONTROLLER_REVO:
@@ -371,16 +380,8 @@ void VehicleConfigurationHelper::applySensorBiasConfiguration()
 
             data.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
 
-            data.accel_bias[RevoCalibration::ACCEL_BIAS_X] += bias.m_accelerometerXBias;
-            data.accel_bias[RevoCalibration::ACCEL_BIAS_Y] += bias.m_accelerometerYBias;
-            data.accel_bias[RevoCalibration::ACCEL_BIAS_Z] += bias.m_accelerometerZBias + G;
-
-            data.gyro_bias[RevoCalibration::GYRO_BIAS_X]    = bias.m_gyroXBias;
-            data.gyro_bias[RevoCalibration::GYRO_BIAS_Y]    = bias.m_gyroYBias;
-            data.gyro_bias[RevoCalibration::GYRO_BIAS_Z]    = bias.m_gyroZBias;
-
             revolutionCalibration->setData(data);
-            addModifiedObject(revolutionCalibration, tr("Writing gyro and accelerometer bias settings"));
+            addModifiedObject(revolutionCalibration, tr("Writing board settings"));
             break;
         }
         default:
@@ -392,10 +393,9 @@ void VehicleConfigurationHelper::applySensorBiasConfiguration()
 
 void VehicleConfigurationHelper::applyStabilizationConfiguration()
 {
-    StabilizationSettings *stabSettings    = StabilizationSettings::GetInstance(m_uavoManager);
+    StabilizationSettings *stabSettings = StabilizationSettings::GetInstance(m_uavoManager);
 
     Q_ASSERT(stabSettings);
-    StabilizationSettings::DataFields data = stabSettings->getData();
 
     StabilizationSettings defaultSettings;
     stabSettings->setData(defaultSettings.getData());
@@ -709,11 +709,6 @@ GUIConfigDataUnion VehicleConfigurationHelper::getGUIConfigData()
 {
     GUIConfigDataUnion configData;
 
-    SystemSettings *systemSettings = SystemSettings::GetInstance(m_uavoManager);
-
-    Q_ASSERT(systemSettings);
-    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
-
     for (int i = 0; i < (int)(SystemSettings::GUICONFIGDATA_NUMELEM); i++) {
         configData.UAVObject[i] = 0; // systemSettingsData.GUIConfigData[i];
     }
@@ -725,7 +720,7 @@ void VehicleConfigurationHelper::setupQuadCopter()
 {
     mixerChannelSettings channels[10];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
-    SystemSettings::AirframeTypeOptions frame;
+    SystemSettings::AirframeTypeOptions frame = SystemSettings::AIRFRAMETYPE_QUADX;
 
     switch (m_configSource->getVehicleSubType()) {
     case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
@@ -815,7 +810,7 @@ void VehicleConfigurationHelper::setupHexaCopter()
 {
     mixerChannelSettings channels[10];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
-    SystemSettings::AirframeTypeOptions frame;
+    SystemSettings::AirframeTypeOptions frame = SystemSettings::AIRFRAMETYPE_HEXA;
 
     switch (m_configSource->getVehicleSubType()) {
     case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
@@ -994,7 +989,7 @@ void VehicleConfigurationHelper::setupOctoCopter()
 {
     mixerChannelSettings channels[10];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
-    SystemSettings::AirframeTypeOptions frame;
+    SystemSettings::AirframeTypeOptions frame = SystemSettings::AIRFRAMETYPE_OCTO;
 
     switch (m_configSource->getVehicleSubType()) {
     case VehicleConfigurationSource::MULTI_ROTOR_OCTO:

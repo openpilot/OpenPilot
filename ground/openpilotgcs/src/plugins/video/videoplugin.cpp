@@ -26,10 +26,12 @@
  */
 #include "videoplugin.h"
 #include "videogadgetfactory.h"
+
+#include <extensionsystem/pluginmanager.h>
+
 #include <QDebug>
 #include <QtPlugin>
 #include <QStringList>
-#include <extensionsystem/pluginmanager.h>
 
 VideoPlugin::VideoPlugin()
 {
@@ -60,5 +62,3 @@ void VideoPlugin::shutdown()
 {
     // Do nothing
 }
-
-Q_EXPORT_PLUGIN(VideoPlugin)

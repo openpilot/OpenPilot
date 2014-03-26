@@ -38,7 +38,7 @@
 
 // parse incoming character stream for messages in UBX binary format
 
-int parse_ubx_stream(uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData, struct GPS_RX_STATS *gpsRxStats)
+int parse_ubx_stream(uint8_t c, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
 {
     enum proto_states {
         START,
@@ -193,10 +193,10 @@ bool checksum_ubx_message(struct UBXPacket *ubx)
     }
 }
 
-void parse_ubx_nav_posllh(struct UBX_NAV_POSLLH *posllh, GPSPositionData *GpsPosition)
+void parse_ubx_nav_posllh(struct UBX_NAV_POSLLH *posllh, GPSPositionSensorData *GpsPosition)
 {
     if (check_msgtracker(posllh->iTOW, POSLLH_RECEIVED)) {
-        if (GpsPosition->Status != GPSPOSITION_STATUS_NOFIX) {
+        if (GpsPosition->Status != GPSPOSITIONSENSOR_STATUS_NOFIX) {
             GpsPosition->Altitude  = (float)posllh->hMSL * 0.001f;
             GpsPosition->GeoidSeparation = (float)(posllh->height - posllh->hMSL) * 0.001f;
             GpsPosition->Latitude  = posllh->lat;
@@ -205,7 +205,7 @@ void parse_ubx_nav_posllh(struct UBX_NAV_POSLLH *posllh, GPSPositionData *GpsPos
     }
 }
 
-void parse_ubx_nav_sol(struct UBX_NAV_SOL *sol, GPSPositionData *GpsPosition)
+void parse_ubx_nav_sol(struct UBX_NAV_SOL *sol, GPSPositionSensorData *GpsPosition)
 {
     if (check_msgtracker(sol->iTOW, SOL_RECEIVED)) {
         GpsPosition->Satellites = sol->numSV;
@@ -213,20 +213,20 @@ void parse_ubx_nav_sol(struct UBX_NAV_SOL *sol, GPSPositionData *GpsPosition)
         if (sol->flags & STATUS_FLAGS_GPSFIX_OK) {
             switch (sol->gpsFix) {
             case STATUS_GPSFIX_2DFIX:
-                GpsPosition->Status = GPSPOSITION_STATUS_FIX2D;
+                GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_FIX2D;
                 break;
             case STATUS_GPSFIX_3DFIX:
-                GpsPosition->Status = GPSPOSITION_STATUS_FIX3D;
+                GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_FIX3D;
                 break;
-            default: GpsPosition->Status = GPSPOSITION_STATUS_NOFIX;
+            default: GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_NOFIX;
             }
         } else { // fix is not valid so we make sure to treat is as NOFIX
-            GpsPosition->Status = GPSPOSITION_STATUS_NOFIX;
+            GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_NOFIX;
         }
     }
 }
 
-void parse_ubx_nav_dop(struct UBX_NAV_DOP *dop, GPSPositionData *GpsPosition)
+void parse_ubx_nav_dop(struct UBX_NAV_DOP *dop, GPSPositionSensorData *GpsPosition)
 {
     if (check_msgtracker(dop->iTOW, DOP_RECEIVED)) {
         GpsPosition->HDOP = (float)dop->hDOP * 0.01f;
@@ -235,16 +235,16 @@ void parse_ubx_nav_dop(struct UBX_NAV_DOP *dop, GPSPositionData *GpsPosition)
     }
 }
 
-void parse_ubx_nav_velned(struct UBX_NAV_VELNED *velned, GPSPositionData *GpsPosition)
+void parse_ubx_nav_velned(struct UBX_NAV_VELNED *velned, GPSPositionSensorData *GpsPosition)
 {
-    GPSVelocityData GpsVelocity;
+    GPSVelocitySensorData GpsVelocity;
 
     if (check_msgtracker(velned->iTOW, VELNED_RECEIVED)) {
-        if (GpsPosition->Status != GPSPOSITION_STATUS_NOFIX) {
+        if (GpsPosition->Status != GPSPOSITIONSENSOR_STATUS_NOFIX) {
             GpsVelocity.North        = (float)velned->velN / 100.0f;
             GpsVelocity.East         = (float)velned->velE / 100.0f;
             GpsVelocity.Down         = (float)velned->velD / 100.0f;
-            GPSVelocitySet(&GpsVelocity);
+            GPSVelocitySensorSet(&GpsVelocity);
             GpsPosition->Groundspeed = (float)velned->gSpeed * 0.01f;
             GpsPosition->Heading     = (float)velned->heading * 1.0e-5f;
         }
@@ -302,7 +302,7 @@ void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
 // UBX message parser
 // returns UAVObjectID if a UAVObject structure is ready for further processing
 
-uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionData *GpsPosition)
+uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
     uint32_t id = 0;
 
@@ -333,9 +333,9 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionData *GpsPosition)
         break;
     }
     if (msgtracker.msg_received == ALL_RECEIVED) {
-        GPSPositionSet(GpsPosition);
+        GPSPositionSensorSet(GpsPosition);
         msgtracker.msg_received = NONE_RECEIVED;
-        id = GPSPOSITION_OBJID;
+        id = GPSPOSITIONSENSOR_OBJID;
     }
     return id;
 }

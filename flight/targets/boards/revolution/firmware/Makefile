@@ -29,13 +29,15 @@ USE_DSP_LIB ?= NO
 
 # List of mandatory modules to include
 MODULES += Sensors
-MODULES += Attitude/revolution
+#MODULES += Attitude/revolution
+MODULES += StateEstimation # use instead of Attitude
 MODULES += Altitude/revolution
-MODULES += Airspeed/revolution
+MODULES += Airspeed
 MODULES += AltitudeHold
 MODULES += Stabilization
 MODULES += VtolPathFollower
 MODULES += ManualControl
+MODULES += Receiver
 MODULES += Actuator
 MODULES += GPS
 MODULES += TxPID
@@ -46,6 +48,7 @@ MODULES += Radio
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
 MODULES += Osd/osdoutout
+MODULES += Logging
 MODULES += Telemetry
 
 OPTMODULES += ComUsbBridge
@@ -71,7 +74,6 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     #ifeq ($(DEBUG), YES)
     SRC += $(OPSYSTEM)/dcc_stdio.c

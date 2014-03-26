@@ -12,17 +12,23 @@
 TEMPLATE = lib
 TARGET = Qwt
 DEFINES += QWT_LIBRARY
+
+QT += printsupport
+
 include(../../../openpilotgcslibrary.pri)
 include( ../qwtconfig.pri )
 
 #VVERSION = $$[QT_VERSION]
 contains(QWT_CONFIG, QwtDll) {
-CONFIG += dll
-win32|symbian: DEFINES += QT_DLL QWT_DLL QWT_MAKEDLL
+    CONFIG += dll
+    win32|symbian: DEFINES += QT_DLL QWT_DLL QWT_MAKEDLL
 }
 else {
-CONFIG += staticlib
+    CONFIG += staticlib
 }
+
+# disable all warnings (no need for warnings as qwt sources are imported)
+CONFIG += exceptions warn_off
 
 unix:!mac:LIBS += -lrt
 

@@ -28,14 +28,13 @@
 #ifndef VIDEOGADGETWIDGET_H_
 #define VIDEOGADGETWIDGET_H_
 
-#include <QtGui/QFrame>
+#include "pipeline.h"
+#include "ui_video.h"
+
+#include <QFrame>
 #include <QtCore/QEvent>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QPaintEvent>
-
-#include "ui_video.h"
-
-#include "pipeline.h"
 
 class VideoGadgetConfiguration;
 

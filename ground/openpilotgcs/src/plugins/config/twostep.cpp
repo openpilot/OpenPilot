@@ -28,10 +28,8 @@
 
 #include <calibration.h>
 #include <assertions.h>
+#include <Eigen/Eigen2Support>
 
-#include <Eigen/Cholesky>
-#include <Eigen/QR>
-#include <Eigen/LU>
 #include <cstdlib>
 
 #undef PRINTF_DEBUGGING
@@ -126,7 +124,7 @@ Vector3f twostep_bias_only(const Vector3f samples[],
                            const float noise)
 {
     // \tilde{H}
-    Vector3f centeredSamples[n_samples];
+    Vector3f *centeredSamples = new Vector3f[n_samples];
     // z_k
     float sampleDeltaMag[n_samples];
     // eq 7 and 8 applied to samples
@@ -172,6 +170,7 @@ Vector3f twostep_bias_only(const Vector3f samples[],
         // Note that the negative has been done twice
         estimate += neg_increment;
     }
+    delete[] centeredSamples;
     return estimate;
 }
 

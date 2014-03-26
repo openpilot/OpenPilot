@@ -5,7 +5,9 @@ Pedro Assuncao
 Fredrik Arvidsson
 Werner Backes
 Jose Barros
+Mikael Blomqvist
 Pete  Boehl
+Glenn Campigli
 David Carlson
 James Cotton
 Steve Doll
@@ -13,7 +15,9 @@ Piotr Esden-Tempski
 Richard Flay
 Peter Farnworth
 Ed Faulkner
+Andrew Finegan
 Darren Furniss
+Cliff Geerdes
 Frederic Goddeeris
 Daniel Godin
 Anthony Gomez
@@ -24,15 +28,18 @@ Peter Gunnarsson
 Dean Hall
 Joe Hlebasko
 Andy Honecker
+Patrick Huebner
 Ryan Hunt
 Mark James
-Sami Korhonen
-Thorsten Klose
 Ricky King
+Thorsten Klose
+Sami Korhonen
 Hallvard Kristiansen
+Alan Krum
 Edouard Lafargue
 Mike Labranche
 Fredrik Larsson
+Richard von Lehe
 Pablo Lema
 David Llama
 Matt Lipski
@@ -64,6 +71,7 @@ Troy Schultz
 Dr. Erhard Siegl
 Dusty Anne Smith
 Mike Smith
+Bertrand Songis
 Alex Sowa
 Pete Stapley
 Vova Starikh
@@ -81,3 +89,13 @@ Mat Wellington
 Kendal Wells
 David Willis
 Dmitriy Zaitsev
+Bertrand Songis
+Andre Bernet
+Anthony Gomes
+Cliff Geerdes
+Jörg-D Rothfuchs
+Jonathan Rodgers
+Laurent Lalanne
+Patrick Huebner
+Rich von Lehe
+Stefan Cenkov

@@ -39,9 +39,10 @@
  */
 
 #include <openpilot.h>
-
+#include <pios_struct_helper.h>
 // private includes
 #include "inc/systemmod.h"
+
 
 // UAVOs
 #include <objectpersistence.h>
@@ -51,9 +52,12 @@
 #include <i2cstats.h>
 #include <taskinfo.h>
 #include <watchdogstatus.h>
-#include <taskinfo.h>
+#include <callbackinfo.h>
 #include <hwsettings.h>
 #include <pios_flashfs.h>
+#if defined(PIOS_INCLUDE_RFM22B)
+#include <oplinkstatus.h>
+#endif
 
 // Flight Libraries
 #include <sanitycheck.h>
@@ -80,7 +84,7 @@
 #if defined(PIOS_SYSTEM_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_SYSTEM_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES 924
+#define STACK_SIZE_BYTES 1024
 #endif
 
 #define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
@@ -92,7 +96,7 @@ static uint32_t idleCounter;
 static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
 static xQueueHandle objectPersistenceQueue;
-static bool stackOverflow;
+static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_CRITICAL = 3 } stackOverflow;
 static bool mallocFailed;
 static HwSettingsData bootHwSettings;
 static struct PIOS_FLASHFS_Stats fsStats;
@@ -101,6 +105,7 @@ static void objectUpdatedCb(UAVObjEvent *ev);
 static void hwSettingsUpdatedCb(UAVObjEvent *ev);
 #ifdef DIAG_TASKS
 static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_info *task_info, void *context);
+static void callbackSchedulerForEachCallback(int16_t callback_id, const struct pios_callback_info *callback_info, void *context);
 #endif
 static void updateStats();
 static void updateSystemAlarms();
@@ -120,7 +125,7 @@ extern uintptr_t pios_user_fs_id;
 int32_t SystemModStart(void)
 {
     // Initialize vars
-    stackOverflow = false;
+    stackOverflow = STACKOVERFLOW_NONE;
     mallocFailed  = false;
     // Create system task
     xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
@@ -143,6 +148,7 @@ int32_t SystemModInitialize(void)
     ObjectPersistenceInitialize();
 #ifdef DIAG_TASKS
     TaskInfoInitialize();
+    CallbackInfoInitialize();
 #endif
 #ifdef DIAG_I2C_WDG_STATS
     I2CStatsInitialize();
@@ -165,11 +171,13 @@ MODULE_INITCALL(SystemModInitialize, 0);
  */
 static void systemTask(__attribute__((unused)) void *parameters)
 {
-    /* start the delayed callback scheduler */
-    CallbackSchedulerStart();
     uint8_t cycleCount = 0;
+
     /* create all modules thread */
     MODULE_TASKCREATE_ALL;
+
+    /* start the delayed callback scheduler */
+    PIOS_CALLBACKSCHEDULER_Start();
 
     if (mallocFailed) {
         /* We failed to malloc during task creation,
@@ -198,6 +206,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
 
 #ifdef DIAG_TASKS
     TaskInfoData taskInfoData;
+    CallbackInfoData callbackInfoData;
 #endif
 
     // Main system loop
@@ -217,6 +226,9 @@ static void systemTask(__attribute__((unused)) void *parameters)
         // Update the task status object
         PIOS_TASK_MONITOR_ForEachTask(taskMonitorForEachCallback, &taskInfoData);
         TaskInfoSet(&taskInfoData);
+        // Update the callback status object
+        PIOS_CALLBACKSCHEDULER_ForEachCallback(callbackSchedulerForEachCallback, &callbackInfoData);
+        CallbackInfoSet(&callbackInfoData);
 #endif
 
         // Flash the heartbeat LED
@@ -248,6 +260,61 @@ static void systemTask(__attribute__((unused)) void *parameters)
 
         UAVObjEvent ev;
         int delayTime = SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2);
+
+#if defined(PIOS_INCLUDE_RFM22B)
+
+        // Update the OPLinkStatus UAVO
+        OPLinkStatusData oplinkStatus;
+        OPLinkStatusGet(&oplinkStatus);
+
+        if (pios_rfm22b_id) {
+            // Get the other device stats.
+            PIOS_RFM2B_GetPairStats(pios_rfm22b_id, oplinkStatus.PairIDs, oplinkStatus.PairSignalStrengths, OPLINKSTATUS_PAIRIDS_NUMELEM);
+
+            // Get the stats from the radio device
+            struct rfm22b_stats radio_stats;
+            PIOS_RFM22B_GetStats(pios_rfm22b_id, &radio_stats);
+
+            // Update the OPLInk status
+            static bool first_time = true;
+            static uint16_t prev_tx_count = 0;
+            static uint16_t prev_rx_count = 0;
+            oplinkStatus.HeapRemaining = xPortGetFreeHeapSize();
+            oplinkStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
+            oplinkStatus.RxGood = radio_stats.rx_good;
+            oplinkStatus.RxCorrected   = radio_stats.rx_corrected;
+            oplinkStatus.RxErrors = radio_stats.rx_error;
+            oplinkStatus.RxMissed = radio_stats.rx_missed;
+            oplinkStatus.RxFailure     = radio_stats.rx_failure;
+            oplinkStatus.TxDropped     = radio_stats.tx_dropped;
+            oplinkStatus.TxResent = radio_stats.tx_resent;
+            oplinkStatus.TxFailure     = radio_stats.tx_failure;
+            oplinkStatus.Resets      = radio_stats.resets;
+            oplinkStatus.Timeouts    = radio_stats.timeouts;
+            oplinkStatus.RSSI        = radio_stats.rssi;
+            oplinkStatus.LinkQuality = radio_stats.link_quality;
+            if (first_time) {
+                first_time = false;
+            } else {
+                uint16_t tx_count = radio_stats.tx_byte_count;
+                uint16_t rx_count = radio_stats.rx_byte_count;
+                uint16_t tx_bytes = (tx_count < prev_tx_count) ? (0xffff - prev_tx_count + tx_count) : (tx_count - prev_tx_count);
+                uint16_t rx_bytes = (rx_count < prev_rx_count) ? (0xffff - prev_rx_count + rx_count) : (rx_count - prev_rx_count);
+                oplinkStatus.TXRate = (uint16_t)((float)(tx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
+                oplinkStatus.RXRate = (uint16_t)((float)(rx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
+                prev_tx_count = tx_count;
+                prev_rx_count = rx_count;
+            }
+            oplinkStatus.TXSeq     = radio_stats.tx_seq;
+            oplinkStatus.RXSeq     = radio_stats.rx_seq;
+
+            oplinkStatus.LinkState = radio_stats.link_state;
+        } else {
+            oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_DISABLED;
+        }
+        OPLinkStatusSet(&oplinkStatus);
+
+#endif /* if defined(PIOS_INCLUDE_RFM22B) */
 
         if (xQueueReceive(objectPersistenceQueue, &ev, delayTime) == pdTRUE) {
             // If object persistence is updated call the callback
@@ -375,11 +442,30 @@ static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_
     // By convention, there is a direct mapping between task monitor task_id's and members
     // of the TaskInfoXXXXElem enums
     PIOS_DEBUG_Assert(task_id < TASKINFO_RUNNING_NUMELEM);
-    taskData->Running[task_id]        = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
-    taskData->StackRemaining[task_id] = task_info->stack_remaining;
-    taskData->RunningTime[task_id]    = task_info->running_time_percentage;
+    cast_struct_to_array(taskData->Running, taskData->Running.System)[task_id] = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
+    ((uint16_t *)&taskData->StackRemaining)[task_id] = task_info->stack_remaining;
+    ((uint8_t *)&taskData->RunningTime)[task_id]     = task_info->running_time_percentage;
 }
-#endif
+
+static void callbackSchedulerForEachCallback(int16_t callback_id, const struct pios_callback_info *callback_info, void *context)
+{
+    CallbackInfoData *callbackData = (CallbackInfoData *)context;
+
+    if (callback_id < 0) {
+        return;
+    }
+    // delayed callback scheduler reports callback stack overflows as remaininng: -1
+    if (callback_info->stack_remaining < 0 && stackOverflow == STACKOVERFLOW_NONE) {
+        stackOverflow = STACKOVERFLOW_WARNING;
+    }
+    // By convention, there is a direct mapping between (not negative) callback scheduler callback_id's and members
+    // of the CallbackInfoXXXXElem enums
+    PIOS_DEBUG_Assert(callback_id < CALLBACKINFO_RUNNING_NUMELEM);
+    ((uint8_t *)&callbackData->Running)[callback_id] = callback_info->is_running;
+    ((uint32_t *)&callbackData->RunningTime)[callback_id]   = callback_info->running_time_count;
+    ((int16_t *)&callbackData->StackRemaining)[callback_id] = callback_info->stack_remaining;
+}
+#endif /* ifdef DIAG_TASKS */
 
 /**
  * Called periodically to update the I2C statistics
@@ -460,12 +546,14 @@ static void updateStats()
 
     // Get stats and update
     SystemStatsGet(&stats);
-    stats.FlightTime    = xTaskGetTickCount() * portTICK_RATE_MS;
+    stats.FlightTime = xTaskGetTickCount() * portTICK_RATE_MS;
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
     // POSIX port of FreeRTOS doesn't have xPortGetFreeHeapSize()
+    stats.SystemModStackRemaining = 128;
     stats.HeapRemaining = 10240;
 #else
     stats.HeapRemaining = xPortGetFreeHeapSize();
+    stats.SystemModStackRemaining = uxTaskGetStackHighWaterMark(NULL) * 4;
 #endif
 
     // Get Irq stack status
@@ -494,19 +582,9 @@ static void updateStats()
     } // else: TickCount has wrapped, do not calc now
     lastTickCount    = now;
     idleCounterClear = 1;
-
 #if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)
-#if defined(STM32F4XX)
-    float temp_voltage = 3.3f * PIOS_ADC_PinGet(3) / ((1 << 12) - 1);
-    const float STM32_TEMP_V25 = 0.76f; /* V */
-    const float STM32_TEMP_AVG_SLOPE = 2.5f; /* mV/C */
-    stats.CPUTemp = (temp_voltage - STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
-#else
-    float temp_voltage = 3.3f * PIOS_ADC_PinGet(0) / ((1 << 12) - 1);
-    const float STM32_TEMP_V25 = 1.43f; /* V */
-    const float STM32_TEMP_AVG_SLOPE = 4.3f; /* mV/C */
-    stats.CPUTemp = (temp_voltage - STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
-#endif
+    float temp_voltage = PIOS_ADC_PinGetVolt(PIOS_ADC_TEMPERATURE_PIN);
+    stats.CPUTemp    = PIOS_CONVERT_VOLT_TO_CPU_TEMP(temp_voltage);;
 #endif
     SystemStatsSet(&stats);
 }
@@ -549,10 +627,15 @@ static void updateSystemAlarms()
     }
 
     // Check for stack overflow
-    if (stackOverflow) {
-        AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_CRITICAL);
-    } else {
+    switch (stackOverflow) {
+    case STACKOVERFLOW_NONE:
         AlarmsClear(SYSTEMALARMS_ALARM_STACKOVERFLOW);
+        break;
+    case STACKOVERFLOW_WARNING:
+        AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_WARNING);
+        break;
+    default:
+        AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_CRITICAL);
     }
 
     // Check for event errors
@@ -597,7 +680,7 @@ void vApplicationIdleHook(void)
 void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle *pxTask,
                                    __attribute__((unused)) signed portCHAR *pcTaskName)
 {
-    stackOverflow = true;
+    stackOverflow = STACKOVERFLOW_CRITICAL;
 #if DEBUG_STACK_OVERFLOW
     static volatile bool wait_here = true;
     while (wait_here) {

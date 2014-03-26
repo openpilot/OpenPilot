@@ -1,5 +1,5 @@
 <xml>
-    <object name="SonarAltitude" singleinstance="true" settings="false">
+    <object name="SonarAltitude" singleinstance="true" settings="false" category="Sensors">
         <description>The raw data from the ultrasound sonar sensor with altitude estimate.</description>
         <field name="Altitude" units="m" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>

@@ -31,7 +31,7 @@
 #if defined(PIOS_INCLUDE_LED)
 
 #include <pios_led_priv.h>
-static const struct pios_led pios_leds_cc[] = {
+static const struct pios_gpio pios_leds_cc[] = {
     [PIOS_LED_HEARTBEAT] = {
         .pin                =             {
             .gpio = GPIOA,
@@ -41,15 +41,16 @@ static const struct pios_led pios_leds_cc[] = {
                 .GPIO_Speed = GPIO_Speed_50MHz,
             },
         },
+        .active_low         = true
     },
 };
 
-static const struct pios_led_cfg pios_led_cfg_cc = {
-    .leds     = pios_leds_cc,
-    .num_leds = NELEMENTS(pios_leds_cc),
+static const struct pios_gpio_cfg pios_led_cfg_cc = {
+    .gpios     = pios_leds_cc,
+    .num_gpios = NELEMENTS(pios_leds_cc),
 };
 
-static const struct pios_led pios_leds_cc3d[] = {
+static const struct pios_gpio pios_leds_cc3d[] = {
     [PIOS_LED_HEARTBEAT] = {
         .pin                =             {
             .gpio = GPIOB,
@@ -60,15 +61,16 @@ static const struct pios_led pios_leds_cc3d[] = {
             },
         },
         .remap              = GPIO_Remap_SWJ_JTAGDisable,
+        .active_low         = true
     },
 };
 
-static const struct pios_led_cfg pios_led_cfg_cc3d = {
-    .leds     = pios_leds_cc3d,
-    .num_leds = NELEMENTS(pios_leds_cc3d),
+static const struct pios_gpio_cfg pios_led_cfg_cc3d = {
+    .gpios     = pios_leds_cc3d,
+    .num_gpios = NELEMENTS(pios_leds_cc3d),
 };
 
-const struct pios_led_cfg *PIOS_BOARD_HW_DEFS_GetLedCfg(uint32_t board_revision)
+const struct pios_gpio_cfg *PIOS_BOARD_HW_DEFS_GetLedCfg(uint32_t board_revision)
 {
     switch (board_revision) {
     case BOARD_REVISION_CC:         return &pios_led_cfg_cc;

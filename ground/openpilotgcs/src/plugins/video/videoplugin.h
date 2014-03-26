@@ -33,14 +33,20 @@
 class VideoGadgetFactory;
 
 class VideoPlugin: public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                         Q_PLUGIN_METADATA(IID "OpenPilot.Video")
 public:
+
     VideoPlugin();
     ~VideoPlugin();
 
     void extensionsInitialized();
     bool initialize(const QStringList &arguments, QString *errorString);
     void shutdown();
+
 private:
     VideoGadgetFactory *mf;
+
 };
+
 #endif /* VIDEOPLUGIN_H_ */

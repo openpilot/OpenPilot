@@ -27,7 +27,6 @@
 #ifndef SMARTSAVEBUTTON_H
 #define SMARTSAVEBUTTON_H
 
-#include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
@@ -38,13 +37,15 @@
 #include <QObject>
 #include <QDebug>
 
-class smartSaveButton : public QObject {
+class ConfigTaskWidget;
+
+class SmartSaveButton : public QObject {
     enum buttonTypeEnum { save_button, apply_button };
 public:
     Q_OBJECT
 
 public:
-    smartSaveButton();
+    SmartSaveButton(ConfigTaskWidget *configTaskWidget);
     void addButtons(QPushButton *save, QPushButton *apply);
     void setObjects(QList<UAVDataObject *>);
     void addObject(UAVDataObject *);
@@ -79,6 +80,7 @@ private:
     QEventLoop loop;
     QList<UAVDataObject *> objects;
     QMap<QPushButton *, buttonTypeEnum> buttonList;
+    ConfigTaskWidget *configWidget;
 
 public slots:
     void enableControls(bool value);

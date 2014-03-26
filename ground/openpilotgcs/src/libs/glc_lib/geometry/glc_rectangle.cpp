@@ -130,9 +130,6 @@ void GLC_Rectangle::createMeshAndWire()
 	GLfloatVector normalsVector;
 	GLfloatVector texelVector;
 
-	// Wire data
-	GLfloatVector wireData;
-
 	// the unique face of this rectangle
 	verticeVector << -lgX; verticeVector << -lgY; verticeVector << 0.0f;
 	normalsVector << 0.0f; normalsVector << 0.0f; normalsVector << 1.0f;

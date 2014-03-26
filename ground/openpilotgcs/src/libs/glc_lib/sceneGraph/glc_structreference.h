@@ -210,9 +210,9 @@ public:
 	/*! The representation must exists*/
 	bool unloadRepresentation();
 
-	//! Add the given occurence as a child
-	/*! Return true on success*/
-	bool addChild(GLC_StructOccurence* pOccurence);
+	//! Add the given occurence as a child of all occurrences of this reference
+	/*! Return the list of added occurence*/
+	QList<GLC_StructOccurence*> addChild(GLC_StructOccurence* pOccurence);
 
 
 //@}

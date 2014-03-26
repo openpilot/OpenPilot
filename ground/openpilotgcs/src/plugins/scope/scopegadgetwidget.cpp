@@ -25,12 +25,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-#include <QDir>
 #include "scopegadgetwidget.h"
 #include "utils/stylehelper.h"
 
-#include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
@@ -45,22 +42,19 @@
 #include <iostream>
 #include <math.h>
 #include <QDebug>
+#include <QDir>
 #include <QColor>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include <QMutexLocker>
 #include <QWheelEvent>
-
-// using namespace Core;
-
-// ******************************************************************
 
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
     setMouseTracking(true);
-// canvas()->setMouseTracking(true);
+    // canvas()->setMouseTracking(true);
 
     // Setup the timer that replots data
     replotTimer = new QTimer(this);
@@ -109,8 +103,6 @@ ScopeGadgetWidget::~ScopeGadgetWidget()
 
     clearCurvePlots();
 }
-
-// ******************************************************************
 
 void ScopeGadgetWidget::mousePressEvent(QMouseEvent *e)
 {
@@ -215,7 +207,6 @@ void ScopeGadgetWidget::deleteLegend()
     disconnect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), this, 0);
 
     insertLegend(NULL, QwtPlot::TopLegend);
-// insertLegend(NULL, QwtPlot::ExternalLegend);
 }
 
 void ScopeGadgetWidget::addLegend()
@@ -228,27 +219,19 @@ void ScopeGadgetWidget::addLegend()
     QwtLegend *legend = new QwtLegend();
     legend->setItemMode(QwtLegend::CheckableItem);
     legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
-    legend->setToolTip(tr("Click legend to show/hide scope trace"));
+    legend->setToolTip(tr("Click legend to show/hide scope trace.\nDouble click legend or plot to show/hide legend."));
 
+    // set colors
     QPalette pal = legend->palette();
-    pal.setColor(legend->backgroundRole(), QColor(100, 100, 100)); // background colour
-// pal.setColor(legend->backgroundRole(), Qt::transparent);		// background colour
-// pal.setColor(QPalette::Text, QColor(255, 255, 255));			// text colour
-    pal.setColor(QPalette::Text, QColor(0, 0, 0)); // text colour
+    pal.setColor(legend->backgroundRole(), QColor(100, 100, 100));
+    pal.setColor(QPalette::Text, QColor(0, 0, 0));
     legend->setPalette(pal);
 
     insertLegend(legend, QwtPlot::TopLegend);
-// insertLegend(legend, QwtPlot::ExternalLegend);
-
-//// Show a legend at the bottom
-// QwtLegend *legend = new QwtLegend();
-// legend->setItemMode(QwtLegend::CheckableItem);
-// legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
-// insertLegend(legend, QwtPlot::BottomLegend);
 
     // Update the checked/unchecked state of the legend items
     // -> this is necessary when hiding a legend where some plots are
-    // not visible, and the un-hiding it.
+    // not visible, and then un-hiding it.
     foreach(QwtPlotItem * item, this->itemList()) {
         bool on    = item->isVisible();
         QWidget *w = legend->find(item);
@@ -270,15 +253,6 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-// setMargin(1);
-
-// QPalette pal = palette();
-// QPalette::ColorRole cr = backgroundRole();
-// pal.setColor(cr, QColor(128, 128, 128));				// background colour
-// pal.setColor(QPalette::Text, QColor(255, 255, 255));	// text colour
-// setPalette(pal);
-
-// setCanvasBackground(Utils::StyleHelper::baseColor());
     setCanvasBackground(QColor(64, 64, 64));
 
     // Add grid lines
@@ -287,9 +261,6 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     grid->setMinPen(QPen(Qt::lightGray, 0, Qt::DotLine));
     grid->setPen(QPen(Qt::darkGray, 1, Qt::DotLine));
     grid->attach(this);
-
-    // Add the legend
-    addLegend();
 
     // Only start the timer if we are already connected
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
@@ -305,9 +276,11 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 void ScopeGadgetWidget::showCurve(QwtPlotItem *item, bool on)
 {
     item->setVisible(!on);
-    QWidget *w = legend()->find(item);
-    if (w && w->inherits("QwtLegendItem")) {
-        ((QwtLegendItem *)w)->setChecked(on);
+    if (legend()) {
+        QWidget *w = legend()->find(item);
+        if (w && w->inherits("QwtLegendItem")) {
+            ((QwtLegendItem *)w)->setChecked(on);
+        }
     }
 
     mutex.lock();
@@ -541,6 +514,42 @@ void ScopeGadgetWidget::clearCurvePlots()
     m_curvesData.clear();
 }
 
+void ScopeGadgetWidget::saveState(QSettings *qSettings)
+{
+    // plot state
+    int i = 1;
+
+    foreach(PlotData * plotData, m_curvesData.values()) {
+        bool plotVisible = plotData->curve->isVisible();
+
+        if (!plotVisible) {
+            qSettings->setValue(QString("plot%1").arg(i), plotVisible);
+        }
+        i++;
+    }
+    // legend state
+    qSettings->setValue("legendVisible", legend() != NULL);
+}
+
+void ScopeGadgetWidget::restoreState(QSettings *qSettings)
+{
+    // plot state
+    int i = 1;
+
+    foreach(PlotData * plotData, m_curvesData.values()) {
+        bool visible = qSettings->value(QString("plot%1").arg(i), true).toBool();
+
+        showCurve(plotData->curve, !visible);
+        i++;
+    }
+    // legend state
+    bool legendVisible = qSettings->value("legendVisible", true).toBool();
+    if (legendVisible) {
+        addLegend();
+    } else {
+        deleteLegend();
+    }
+}
 
 /*
    int csvLoggingEnable;
@@ -604,7 +613,7 @@ int ScopeGadgetWidget::csvLoggingInsertHeader()
     }
 
     m_csvLoggingHeaderSaved = 1;
-    if (m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append) == FALSE) {
+    if (m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append) == false) {
         qDebug() << "Unable to open " << m_csvLoggingFile.fileName() << " for csv logging Header";
     } else {
         QTextStream ts(&m_csvLoggingFile);
@@ -673,7 +682,7 @@ int ScopeGadgetWidget::csvLoggingInsertData()
     }
     m_csvLoggingDataSaved = 1;
 
-    if (m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append) == FALSE) {
+    if (m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append) == false) {
         qDebug() << "Unable to open " << m_csvLoggingFile.fileName() << " for csv logging Data";
     } else {
         QTextStream ts(&m_csvLoggingFile);
@@ -698,6 +707,7 @@ void ScopeGadgetWidget::csvLoggingConnect()
         csvLoggingStart();
     }
 }
+
 void ScopeGadgetWidget::csvLoggingDisconnect()
 {
     m_csvLoggingHeaderSaved = 0;

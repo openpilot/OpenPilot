@@ -30,7 +30,6 @@
 #define PIOS_BOARD_H
 
 #include <stdbool.h>
-
 // ------------------------
 // Timers and Channels Used
 // ------------------------
@@ -178,7 +177,7 @@ extern uint32_t pios_packet_handler;
 // TELEMETRY
 // ------------------------
 #define TELEM_QUEUE_SIZE        80
-#define PIOS_TELEM_STACK_SIZE   624
+#define PIOS_TELEM_STACK_SIZE   800
 
 // -------------------------
 // System Settings
@@ -229,6 +228,7 @@ extern uint32_t pios_packet_handler;
 #define PIOS_RCVR_MAX_CHANNELS       12
 #define PIOS_GCSRCVR_TIMEOUT_MS      100
 #define PIOS_RFM22B_RCVR_TIMEOUT_MS  200
+#define PIOS_OPLINK_RCVR_TIMEOUT_MS  100
 
 // -------------------------
 // Receiver PPM input
@@ -292,8 +292,9 @@ extern uint32_t pios_packet_handler;
 #define PIOS_ADC_NUM_CHANNELS     4
 #define PIOS_ADC_MAX_OVERSAMPLING 2
 #define PIOS_ADC_USE_ADC2         0
-#define PIOS_ADC_VOLTAGE_SCALE    3.30f / 4096.0f
-#define PIOS_ADC_USE_TEMP_SENSOR  1
+
+#define PIOS_ADC_USE_TEMP_SENSOR
+#define PIOS_ADC_TEMPERATURE_PIN  3
 
 // -------------------------
 // USB

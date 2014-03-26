@@ -33,8 +33,8 @@
 #include "uavmetaobject.h"
 #include "uavobjectfield.h"
 #include "extensionsystem/pluginmanager.h"
-#include <QtGui/QColor>
-// #include <QtGui/QIcon>
+#include <QColor>
+// #include <QIcon>
 #include <QMessageBox>
 #include <QtCore/QSignalMapper>
 #include <QtCore/QDebug>
@@ -153,7 +153,7 @@ void PathActionEditorTreeModel::addSingleField(int index, UAVObjectField *field,
         data.append(QString("[%1]").arg((field->getElementNames())[index]));
     }
 
-    FieldTreeItem *item;
+    FieldTreeItem *item = NULL;
     UAVObjectField::FieldType type = field->getType();
     // hack: list available actions in an enum
     if (field->getName().compare("Action") == 0 && type == UAVObjectField::UINT8) {
@@ -423,8 +423,9 @@ void PathActionEditorTreeModel::newInstance(UAVObject *obj)
 
 void PathActionEditorTreeModel::objUpdated(UAVObject *obj)
 {
-    quint16 index = m_objManager->getObject("WaypointActive")->getField("Index")->getValue().toInt();
-    quint16 action;
+    Q_UNUSED(obj);
+    quint16 index  = m_objManager->getObject("WaypointActive")->getField("Index")->getValue().toInt();
+    quint16 action = 0;
 
     foreach(TreeItem * child, m_waypointsTree->treeChildren()) {
         ObjectTreeItem *objItem = dynamic_cast<ObjectTreeItem *>(child);

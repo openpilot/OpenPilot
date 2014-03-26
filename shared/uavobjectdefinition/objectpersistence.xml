@@ -1,6 +1,6 @@
 <xml>
-    <object name="ObjectPersistence" singleinstance="true" settings="false">
-        <description>Someone who knows please enter this</description>
+    <object name="ObjectPersistence" singleinstance="true" settings="false" category="System" priority="true">
+        <description>Used by gcs to handle object persistence to flash memory</description>
         <field name="Operation" units="" type="enum" elements="1" options="NOP,Load,Save,Delete,FullErase,Completed,Error"/>
         <field name="Selection" units="" type="enum" elements="1" options="SingleObject,AllSettings,AllMetaObjects,AllObjects"/>
         <field name="ObjectID" units="" type="uint32" elements="1"/>

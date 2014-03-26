@@ -32,17 +32,17 @@
 
 #include <QDebug>
 #include <QtPlugin>
-#include <QtGui/QColorDialog>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QWindowsStyle>
-#include <QtGui/QPainter>
-#include <QtGui/QSplitter>
-#include <QtGui/QStackedLayout>
-#include <QtGui/QStatusBar>
-#include <QtGui/QToolButton>
-#include <QtGui/QToolTip>
+#include <QColorDialog>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QMouseEvent>
+// #include <QWindowsStyle>
+#include <QPainter>
+#include <QSplitter>
+#include <QStackedLayout>
+#include <QStatusBar>
+#include <QToolButton>
+#include <QToolTip>
 
 const int FancyTabBar::m_rounding    = 22;
 const int FancyTabBar::m_textPadding = 4;
@@ -59,7 +59,7 @@ FancyTabBar::FancyTabBar(QWidget *parent, bool isVertical)
     } else {
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     }
-    setStyle(new QWindowsStyle);
+    // setStyle(new QWindowsStyle);
     setMinimumWidth(qMax(2 * m_rounding, 40));
     setAttribute(Qt::WA_Hover, true);
     setFocusPolicy(Qt::NoFocus);
@@ -123,7 +123,6 @@ void FancyTabBar::mouseMoveEvent(QMouseEvent *e)
         m_hoverRect  = QRect();
 
         if (m_hoverIndex >= 0) {
-            QRect oldHoverRect = m_hoverRect;
             m_hoverRect = tabRect(m_hoverIndex);
             m_hoverControl.start();
         }

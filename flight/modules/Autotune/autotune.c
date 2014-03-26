@@ -182,8 +182,8 @@ static void AutotuneTask(__attribute__((unused)) void *parameters)
         }
 
         stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
-        stabDesired.Yaw = manualControl.Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
-        stabDesired.Throttle = manualControl.Throttle;
+        stabDesired.Yaw    = manualControl.Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
+        stabDesired.Thrust = manualControl.Thrust;
 
         switch (state) {
         case AT_INIT:
@@ -191,7 +191,7 @@ static void AutotuneTask(__attribute__((unused)) void *parameters)
             lastUpdateTime = xTaskGetTickCount();
 
             // Only start when armed and flying
-            if (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED && stabDesired.Throttle > 0) {
+            if (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED && stabDesired.Thrust > 0) {
                 state = AT_START;
             }
             break;
@@ -236,7 +236,7 @@ static void AutotuneTask(__attribute__((unused)) void *parameters)
         case AT_FINISHED:
 
             // Wait until disarmed and landed before updating the settings
-            if (flightStatus.Armed == FLIGHTSTATUS_ARMED_DISARMED && stabDesired.Throttle <= 0) {
+            if (flightStatus.Armed == FLIGHTSTATUS_ARMED_DISARMED && stabDesired.Thrust <= 0) {
                 state = AT_SET;
             }
 

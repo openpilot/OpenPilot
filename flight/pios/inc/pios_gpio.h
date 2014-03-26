@@ -32,11 +32,9 @@
 #define PIOS_GPIO_H
 
 /* Public Functions */
-extern void PIOS_GPIO_Init(void);
-extern void PIOS_GPIO_Enable(uint8_t Pin);
-extern void PIOS_GPIO_On(uint8_t Pin);
-extern void PIOS_GPIO_Off(uint8_t Pin);
-extern void PIOS_GPIO_Toggle(uint8_t Pin);
+extern void PIOS_GPIO_On(uint32_t gpios_dev_id, uint8_t gpio_id);
+extern void PIOS_GPIO_Off(uint32_t gpios_dev_id, uint8_t gpio_id);
+extern void PIOS_GPIO_Toggle(uint32_t gpios_dev_id, uint8_t gpio_id);
 
 #endif /* PIOS_GPIO_H */
 

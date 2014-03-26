@@ -43,6 +43,9 @@
 /* PIOS FreeRTOS support */
 #define PIOS_INCLUDE_FREERTOS
 
+/* PIOS CallbackScheduler support */
+#define PIOS_INCLUDE_CALLBACKSCHEDULER
+
 /* PIOS bootloader helper */
 #define PIOS_INCLUDE_BL_HELPER
 /* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
@@ -61,7 +64,7 @@
 #define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_SPI
-/* #define PIOS_INCLUDE_GPIO */
+#define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
 #define PIOS_INCLUDE_WDG
 
@@ -93,6 +96,7 @@
 /* #define PIOS_INCLUDE_DSM */
 /* #define PIOS_INCLUDE_SBUS */
 /* #define PIOS_INCLUDE_GCSRCVR */
+/* #define PIOS_INCLUDE_OPLINKRCVR */
 
 /* PIOS abstract receiver interface */
 /* #define PIOS_INCLUDE_RCVR */
@@ -116,7 +120,6 @@
 /* PIOS radio modules */
 /* #define PIOS_INCLUDE_RFM22B */
 /* #define PIOS_INCLUDE_RFM22B_COM */
-/* #define PIOS_INCLUDE_RFM22B_RCVR */
 /* #define PIOS_INCLUDE_PPM_OUT */
 /* #define PIOS_RFM22B_DEBUG_ON_TELEM */
 

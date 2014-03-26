@@ -1,5 +1,5 @@
 <xml>
-    <object name="PathDesired" singleinstance="true" settings="false">
+    <object name="PathDesired" singleinstance="true" settings="false" category="Navigation">
         <description>The endpoint or path the craft is trying to achieve.  Can come from @ref ManualControl or @ref PathPlanner </description>
 
 	<field name="Start" units="m" type="float" elementnames="North,East,Down" default="0"/>

@@ -31,6 +31,7 @@
 #include <QThread>
 #include <QQueue>
 #include <QWaitCondition>
+#include <QMutex>
 class qsspt : public qssp, public QThread {
 public:
     qsspt(port *info, bool debug);
@@ -46,8 +47,8 @@ private:
     QQueue<QByteArray> queue;
     QMutex mutex;
     QMutex sendbufmutex;
-    bool datapending;
     bool endthread;
+    bool datapending;
     uint16_t sendstatus;
     uint16_t receivestatus;
     QWaitCondition sendwait;

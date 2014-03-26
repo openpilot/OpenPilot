@@ -4,7 +4,7 @@
 # Makefile for OpenPilot UAVObject code
 #
 # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2011.
-# 
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
@@ -24,22 +24,23 @@
 # (all architectures)
 
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += accelgyrosettings
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired
 UAVOBJSRCFILENAMES += actuatorsettings
-UAVOBJSRCFILENAMES += altholdsmoothed
 UAVOBJSRCFILENAMES += attitudesettings
-UAVOBJSRCFILENAMES += attitudeactual
-UAVOBJSRCFILENAMES += gyros
-UAVOBJSRCFILENAMES += gyrosbias
-UAVOBJSRCFILENAMES += accels
-UAVOBJSRCFILENAMES += magnetometer
-UAVOBJSRCFILENAMES += magbias
-UAVOBJSRCFILENAMES += baroaltitude
+UAVOBJSRCFILENAMES += attitudestate
+UAVOBJSRCFILENAMES += gyrostate
+UAVOBJSRCFILENAMES += gyrosensor
+UAVOBJSRCFILENAMES += accelstate
+UAVOBJSRCFILENAMES += accelsensor
+UAVOBJSRCFILENAMES += magstate
+UAVOBJSRCFILENAMES += magsensor
+UAVOBJSRCFILENAMES += barosensor
 UAVOBJSRCFILENAMES += airspeedsensor
 UAVOBJSRCFILENAMES += airspeedsettings
-UAVOBJSRCFILENAMES += airspeedactual
+UAVOBJSRCFILENAMES += airspeedstate
 UAVOBJSRCFILENAMES += flightbatterysettings
 UAVOBJSRCFILENAMES += firmwareiapobj
 UAVOBJSRCFILENAMES += flightbatterystate
@@ -49,10 +50,11 @@ UAVOBJSRCFILENAMES += flightplanstatus
 UAVOBJSRCFILENAMES += flighttelemetrystats
 UAVOBJSRCFILENAMES += gcstelemetrystats
 UAVOBJSRCFILENAMES += gcsreceiver
-UAVOBJSRCFILENAMES += gpsposition
+UAVOBJSRCFILENAMES += gpspositionsensor
 UAVOBJSRCFILENAMES += gpssatellites
 UAVOBJSRCFILENAMES += gpstime
-UAVOBJSRCFILENAMES += gpsvelocity
+UAVOBJSRCFILENAMES += gpsvelocitysensor
+UAVOBJSRCFILENAMES += gpssettings
 UAVOBJSRCFILENAMES += fixedwingpathfollowersettings
 UAVOBJSRCFILENAMES += fixedwingpathfollowerstatus
 UAVOBJSRCFILENAMES += vtolpathfollowersettings
@@ -60,6 +62,7 @@ UAVOBJSRCFILENAMES += homelocation
 UAVOBJSRCFILENAMES += i2cstats
 UAVOBJSRCFILENAMES += manualcontrolcommand
 UAVOBJSRCFILENAMES += manualcontrolsettings
+UAVOBJSRCFILENAMES += flightmodesettings
 UAVOBJSRCFILENAMES += mixersettings
 UAVOBJSRCFILENAMES += mixerstatus
 UAVOBJSRCFILENAMES += nedaccel
@@ -68,8 +71,9 @@ UAVOBJSRCFILENAMES += overosyncstats
 UAVOBJSRCFILENAMES += overosyncsettings
 UAVOBJSRCFILENAMES += pathaction
 UAVOBJSRCFILENAMES += pathdesired
+UAVOBJSRCFILENAMES += pathplan
 UAVOBJSRCFILENAMES += pathstatus
-UAVOBJSRCFILENAMES += positionactual
+UAVOBJSRCFILENAMES += positionstate
 UAVOBJSRCFILENAMES += ratedesired
 UAVOBJSRCFILENAMES += relaytuning
 UAVOBJSRCFILENAMES += relaytuningsettings
@@ -80,11 +84,16 @@ UAVOBJSRCFILENAMES += revosettings
 UAVOBJSRCFILENAMES += sonaraltitude
 UAVOBJSRCFILENAMES += stabilizationdesired
 UAVOBJSRCFILENAMES += stabilizationsettings
+UAVOBJSRCFILENAMES += stabilizationsettingsbank1
+UAVOBJSRCFILENAMES += stabilizationsettingsbank2
+UAVOBJSRCFILENAMES += stabilizationsettingsbank3
+UAVOBJSRCFILENAMES += stabilizationbank
 UAVOBJSRCFILENAMES += systemalarms
 UAVOBJSRCFILENAMES += systemsettings
 UAVOBJSRCFILENAMES += systemstats
 UAVOBJSRCFILENAMES += taskinfo
-UAVOBJSRCFILENAMES += velocityactual
+UAVOBJSRCFILENAMES += callbackinfo
+UAVOBJSRCFILENAMES += velocitystate
 UAVOBJSRCFILENAMES += velocitydesired
 UAVOBJSRCFILENAMES += watchdogstatus
 UAVOBJSRCFILENAMES += flightstatus
@@ -92,8 +101,10 @@ UAVOBJSRCFILENAMES += hwsettings
 UAVOBJSRCFILENAMES += receiveractivity
 UAVOBJSRCFILENAMES += cameradesired
 UAVOBJSRCFILENAMES += camerastabsettings
-UAVOBJSRCFILENAMES += altitudeholdsettings                                                                                                            
+UAVOBJSRCFILENAMES += altitudeholdsettings
+UAVOBJSRCFILENAMES += altitudefiltersettings
 UAVOBJSRCFILENAMES += altitudeholddesired
+UAVOBJSRCFILENAMES += altitudeholdstatus
 UAVOBJSRCFILENAMES += waypoint
 UAVOBJSRCFILENAMES += waypointactive
 UAVOBJSRCFILENAMES += poilocation

@@ -139,7 +139,7 @@ extern uint32_t pios_com_hkosd_id;
 // TELEMETRY
 // ------------------------
 #define TELEM_QUEUE_SIZE      80
-#define PIOS_TELEM_STACK_SIZE 624
+#define PIOS_TELEM_STACK_SIZE 800
 
 // -------------------------
 // System Settings
@@ -254,8 +254,9 @@ extern uint32_t pios_com_hkosd_id;
 #define PIOS_ADC_NUM_CHANNELS     4
 #define PIOS_ADC_MAX_OVERSAMPLING 2
 #define PIOS_ADC_USE_ADC2         0
-#define PIOS_ADC_VOLTAGE_SCALE    3.30f / 4096.0f
-#define PIOS_ADC_USE_TEMP_SENSOR  1
+
+#define PIOS_ADC_USE_TEMP_SENSOR
+#define PIOS_ADC_TEMPERATURE_PIN  3          /* V */
 
 // -------------------------
 // USB

@@ -31,7 +31,7 @@
 #ifndef UBX_H
 #define UBX_H
 #include "openpilot.h"
-#include "gpsposition.h"
+#include "gpspositionsensor.h"
 #include "GPS.h"
 
 
@@ -218,7 +218,7 @@ struct UBXPacket {
 };
 
 bool checksum_ubx_message(struct UBXPacket *);
-uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionData *);
-int parse_ubx_stream(uint8_t, char *, GPSPositionData *, struct GPS_RX_STATS *);
+uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionSensorData *);
+int parse_ubx_stream(uint8_t, char *, GPSPositionSensorData *, struct GPS_RX_STATS *);
 
 #endif /* UBX_H */

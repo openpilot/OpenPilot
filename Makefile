@@ -451,10 +451,23 @@ else
 endif
 
 .PHONY: openpilotgcs
-openpilotgcs: uavobjects_gcs
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/$@_$(GCS_BUILD_CONF)
-	$(V1) ( cd $(BUILD_DIR)/$@_$(GCS_BUILD_CONF) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
+openpilotgcs: uavobjects_gcs openpilotgcs_qmake openpilotgcs_make
+
+.PHONY: openpilotgcs_qmake
+openpilotgcs_qmake:
+ifeq ($(QMAKE_SKIP),)
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
+	)
+else
+	@$(ECHO) "skipping qmake"
+endif
+
+.PHONY: openpilotgcs_make
+openpilotgcs_make:
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/$(MAKE_DIR) && \
 	    $(MAKE) -w ; \
 	)
 
@@ -859,12 +872,15 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   Here is a summary of the available targets:"
 	@$(ECHO)
+	@$(ECHO) "   [Source tree preparation]"
+	@$(ECHO) "     prepare              - Install GIT commit message template"
 	@$(ECHO) "   [Tool Installers]"
 	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
 	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
 	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
+	@$(ECHO) "     openssl_install      - Install the OpenSSL libraries (Windows only)"
 	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     doxygen_install      - Install the Doxygen documentation generator"
 	@$(ECHO) "     gtest_install        - Install the GoogleTest framework"
@@ -945,6 +961,9 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   [GCS]"
 	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application (debug|release)"
+	@$(ECHO) "                            Skip qmake: QMAKE_SKIP=1"
+	@$(ECHO) "                            Compile specific directory: MAKE_DIR=<dir>"
+	@$(ECHO) "                            Example: make gcs QMAKE_SKIP=1 MAKE_DIR=src/plugins/coreplugin"
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO)

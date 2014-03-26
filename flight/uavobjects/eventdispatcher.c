@@ -26,7 +26,7 @@
 
 #include <openpilot.h>
 
-#include <taskinfo.h>
+#include <callbackinfo.h>
 
 // Private constants
 #if defined(PIOS_EVENTDISAPTCHER_QUEUE)
@@ -41,7 +41,8 @@
 #define STACK_SIZE           configMINIMAL_STACK_SIZE
 #endif /* PIOS_EVENTDISPATCHER_STACK_SIZE */
 
-#define TASK_PRIORITY        (tskIDLE_PRIORITY + 3)
+#define CALLBACK_PRIORITY    CALLBACK_PRIORITY_CRITICAL
+#define TASK_PRIORITY        CALLBACK_TASK_FLIGHTCONTROL
 #define MAX_UPDATE_PERIOD_MS 1000
 
 // Private types
@@ -54,6 +55,7 @@ typedef struct {
     UAVObjEvent  ev; /** The actual event */
     UAVObjEventCallback cb; /** The callback function, or zero if none */
     xQueueHandle queue; /** The queue or zero if none */
+    bool lowpriority; /** set to true for telemetry and other low priority stuffs, prevent raising warning */
 } EventCallbackInfo;
 
 /**
@@ -70,7 +72,7 @@ typedef struct PeriodicObjectListStruct PeriodicObjectList;
 // Private variables
 static PeriodicObjectList *mObjList;
 static xQueueHandle mQueue;
-static xTaskHandle mEventTaskHandle;
+static DelayedCallbackInfo *eventSchedulerCallback;
 static xSemaphoreHandle mMutex;
 static EventStats mStats;
 
@@ -101,8 +103,9 @@ int32_t EventDispatcherInitialize()
     // Create event queue
     mQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(EventCallbackInfo));
 
-    // Create task
-    xTaskCreate(eventTask, (signed char *)"Event", STACK_SIZE, NULL, TASK_PRIORITY, &mEventTaskHandle);
+    // Create callback
+    eventSchedulerCallback = PIOS_CALLBACKSCHEDULER_Create(&eventTask, CALLBACK_PRIORITY, TASK_PRIORITY, CALLBACKINFO_RUNNING_EVENTDISPATCHER, STACK_SIZE * 4);
+    PIOS_CALLBACKSCHEDULER_Dispatch(eventSchedulerCallback);
 
     // Done
     return 0;
@@ -145,7 +148,9 @@ int32_t EventCallbackDispatch(UAVObjEvent *ev, UAVObjEventCallback cb)
     evInfo.cb    = cb;
     evInfo.queue = 0;
     // Push to queue
-    return xQueueSend(mQueue, &evInfo, 0); // will not block if queue is full
+    int32_t result = xQueueSend(mQueue, &evInfo, 0); // will not block if queue is full
+    PIOS_CALLBACKSCHEDULER_Dispatch(eventSchedulerCallback);
+    return result;
 }
 
 /**
@@ -276,38 +281,33 @@ static int32_t eventPeriodicUpdate(UAVObjEvent *ev, UAVObjEventCallback cb, xQue
 }
 
 /**
- * Event task, responsible of invoking callbacks.
+ * Delayed event callback, responsible of invoking (event) callbacks.
  */
 static void eventTask()
 {
-    uint32_t timeToNextUpdateMs;
-    uint32_t delayMs;
+    static uint32_t timeToNextUpdateMs = 0;
     EventCallbackInfo evInfo;
 
-    /* Must do this in task context to ensure that TaskMonitor has already finished its init */
-    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_EVENTDISPATCHER, mEventTaskHandle);
+    // Wait for queue message
+    int limit = MAX_QUEUE_SIZE;
 
-    // Initialize time
-    timeToNextUpdateMs = xTaskGetTickCount() * portTICK_RATE_MS;
-
-    // Loop forever
-    while (1) {
-        // Calculate delay time
-        delayMs = timeToNextUpdateMs - (xTaskGetTickCount() * portTICK_RATE_MS);
-
-        // Wait for queue message
-        if (xQueueReceive(mQueue, &evInfo, delayMs / portTICK_RATE_MS) == pdTRUE) {
-            // Invoke callback, if one
-            if (evInfo.cb != 0) {
-                evInfo.cb(&evInfo.ev); // the function is expected to copy the event information
-            }
+    while (xQueueReceive(mQueue, &evInfo, 0) == pdTRUE) {
+        // Invoke callback, if any
+        if (evInfo.cb != 0) {
+            evInfo.cb(&evInfo.ev); // the function is expected to copy the event information
         }
-
-        // Process periodic updates
-        if ((xTaskGetTickCount() * portTICK_RATE_MS) >= timeToNextUpdateMs) {
-            timeToNextUpdateMs = processPeriodicUpdates();
+        // limit loop to max queue size to slightly reduce the impact of recursive events
+        if (!--limit) {
+            break;
         }
     }
+
+    // Process periodic updates
+    if ((xTaskGetTickCount() * portTICK_RATE_MS) >= timeToNextUpdateMs) {
+        timeToNextUpdateMs = processPeriodicUpdates();
+    }
+
+    PIOS_CALLBACKSCHEDULER_Schedule(eventSchedulerCallback, timeToNextUpdateMs - (xTaskGetTickCount() * portTICK_RATE_MS), CALLBACK_UPDATEMODE_SOONER);
 }
 
 /**
@@ -342,7 +342,7 @@ static int32_t processPeriodicUpdates()
                 }
                 // Push event to queue, if one
                 if (objEntry->evInfo.queue != 0) {
-                    if (xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0) != pdTRUE) { // do not block if queue is full
+                    if (xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0) != pdTRUE && !objEntry->evInfo.ev.lowPriority) { // do not block if queue is full
                         if (objEntry->evInfo.ev.obj != NULL) {
                             mStats.lastErrorID = UAVObjGetID(objEntry->evInfo.ev.obj);
                         }

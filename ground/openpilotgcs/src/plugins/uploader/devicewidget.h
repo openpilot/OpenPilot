@@ -72,6 +72,7 @@ private:
     bool populateBoardStructuredDescription(QByteArray arr);
     bool populateLoadedStructuredDescription(QByteArray arr);
     void updateButtons(bool enabled);
+    QString getDevFirmwarePath();
 
 signals:
     void uploadStarted();
@@ -82,6 +83,7 @@ signals:
 public slots:
     void uploadFirmware();
     void loadFirmware();
+    void loadFirmware(QString fwfilename);
     void downloadFirmware();
     void setProgress(int);
     void downloadFinished();

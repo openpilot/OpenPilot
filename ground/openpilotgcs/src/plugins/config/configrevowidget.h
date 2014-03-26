@@ -34,13 +34,13 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QList>
 #include <QTimer>
 #include <QMutex>
-
+#include "calibration/thermal/thermalcalibrationmodel.h"
 class Ui_Widget;
 
 class ConfigRevoWidget : public ConfigTaskWidget {
@@ -57,6 +57,7 @@ private:
     // ! Computes the scale and bias of the mag based on collected data
     void computeScaleBias();
 
+    OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
     Ui_RevoSensorsWidget *m_ui;
     QGraphicsSvgItem *paperplane;
     QGraphicsSvgItem *sensorsBargraph;
@@ -90,10 +91,10 @@ private:
     double accel_data_x[6], accel_data_y[6], accel_data_z[6];
     double mag_data_x[6], mag_data_y[6], mag_data_z[6];
 
-    UAVObject::Metadata initialAccelsMdata;
-    UAVObject::Metadata initialGyrosMdata;
-    UAVObject::Metadata initialMagMdata;
-    UAVObject::Metadata initialBaroMdata;
+    UAVObject::Metadata initialAccelStateMdata;
+    UAVObject::Metadata initialGyroStateMdata;
+    UAVObject::Metadata initialMagStateMdata;
+    UAVObject::Metadata initialBaroSensorMdata;
     float initialMagCorrectionRate;
 
     int position;

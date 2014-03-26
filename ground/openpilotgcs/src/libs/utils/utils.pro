@@ -6,7 +6,8 @@ QT += gui \
     xml \
     svg \
     opengl \
-    declarative
+    qml quick \
+    widgets
 
 DEFINES += QTCREATOR_UTILS_LIB
 
@@ -51,9 +52,11 @@ SOURCES += reloadpromptutils.cpp \
 	homelocationutil.cpp \
     mytabbedstackwidget.cpp \
     mytabwidget.cpp \
-    mylistwidget.cpp \
     cachedsvgitem.cpp \
-    svgimageprovider.cpp
+    svgimageprovider.cpp \
+    hostosinfo.cpp \
+    logfile.cpp \
+    crc.cpp
 
 SOURCES += xmlconfig.cpp
 
@@ -108,9 +111,11 @@ HEADERS += utils_global.h \
 	homelocationutil.h \
     mytabbedstackwidget.h \
     mytabwidget.h \
-    mylistwidget.h \
     cachedsvgitem.h \
-    svgimageprovider.h
+    svgimageprovider.h \
+    hostosinfo.h \
+    logfile.h \
+    crc.h
 
 
 HEADERS += xmlconfig.h

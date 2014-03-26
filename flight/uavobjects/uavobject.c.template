@@ -65,7 +65,7 @@ int32_t $(NAME)Initialize(void)
 
     // Register object with the object manager
     handle = UAVObjRegister($(NAMEUC)_OBJID,
-        $(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_NUMBYTES, &$(NAME)SetDefaults);
+        $(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_ISPRIORITY, $(NAMEUC)_NUMBYTES, &$(NAME)SetDefaults);
 
     // Done
     return handle ? 0 : -1;
@@ -94,7 +94,8 @@ $(INITFIELDS)
         $(FLIGHTTELEM_ACKED) << UAVOBJ_TELEMETRY_ACKED_SHIFT |
         $(GCSTELEM_ACKED) << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
         $(FLIGHTTELEM_UPDATEMODE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
-        $(GCSTELEM_UPDATEMODE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT;
+        $(GCSTELEM_UPDATEMODE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT |
+        $(LOGGING_UPDATEMODE) << UAVOBJ_LOGGING_UPDATE_MODE_SHIFT;
     metadata.telemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
     metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
     metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);

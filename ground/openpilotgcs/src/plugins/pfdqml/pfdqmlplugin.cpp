@@ -51,4 +51,3 @@ void PfdQmlPlugin::shutdown()
 {
     // Do nothing
 }
-Q_EXPORT_PLUGIN(PfdQmlPlugin)

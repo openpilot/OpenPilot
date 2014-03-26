@@ -1,12 +1,11 @@
-import Qt 4.7
-import "."
+import QtQuick 2.0
 
 Rectangle {
     color: "#666666"
 
     SvgElementImage {
         id: background
-        elementName: "background"
+        elementName: "pfd-window"
         fillMode: Image.PreserveAspectFit
         anchors.fill: parent
 
@@ -14,6 +13,8 @@ Rectangle {
 
         Item {
             id: sceneItem
+            property variant viewportSize : Qt.size(width, height)
+
             width: parent.paintedWidth
             height: parent.paintedHeight
             anchors.centerIn: parent
@@ -25,25 +26,23 @@ Rectangle {
                 source: qmlWidget.terrainEnabled ? "PfdTerrainView.qml" : "PfdWorldView.qml"
             }
 
-            SvgElementImage {
-                id: rollscale
-                elementName: "rollscale"
-                sceneSize: background.sceneSize
+            HorizontCenter {
+                id: horizontCenterItem
+                sceneSize: sceneItem.viewportSize
+                anchors.fill: parent
+            }
 
-                smooth: true
-                anchors.centerIn: parent
-                //rotate it around the center of scene
-                transform: Rotation {
-                    angle: -AttitudeActual.Roll
-                    origin.x : sceneItem.width/2 - x
-                    origin.y : sceneItem.height/2 - y
-                }
+            RollScale {
+                id: rollscale
+                sceneSize: sceneItem.viewportSize
+                horizontCenter: horizontCenterItem.horizontCenter
+                anchors.fill: parent
             }
 
             SvgElementImage {
                 id: foreground
                 elementName: "foreground"
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
 
                 anchors.centerIn: parent
             }
@@ -51,10 +50,10 @@ Rectangle {
             SvgElementImage {
                 id: side_slip
                 elementName: "sideslip"
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
                 smooth: true
 
-                property real sideSlip: Accels.y
+                property real sideSlip: AccelState.y
                 //smooth side slip changes, a low pass filter replacement
                 //accels are updated once per second
                 Behavior on sideSlip {
@@ -72,27 +71,37 @@ Rectangle {
 
             Compass {
                 anchors.fill: parent
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
             }
 
             SpeedScale {
                 anchors.fill: parent
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
             }
 
             AltitudeScale {
                 anchors.fill: parent
-                sceneSize: background.sourceSize
+                sceneSize: sceneItem.viewportSize
             }
 
             VsiScale {
                 anchors.fill: parent
-                sceneSize: background.sourceSize
+                sceneSize: sceneItem.viewportSize
             }
 
             PfdIndicators {
                 anchors.fill: parent
-                sceneSize: background.sourceSize
+                sceneSize: sceneItem.viewportSize
+            }
+
+            Info {
+                anchors.fill: parent
+                sceneSize: sceneItem.viewportSize
+            }
+
+            Warnings {
+                anchors.fill: parent
+                sceneSize: sceneItem.viewportSize
             }
         }
     }

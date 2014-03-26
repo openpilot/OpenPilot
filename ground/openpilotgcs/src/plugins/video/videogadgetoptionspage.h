@@ -29,8 +29,9 @@
 #define VIDEOGADGETOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
-#include <QtGui/QLabel>
-#include <QtGui/QPlainTextEdit>
+
+#include <QLabel>
+#include <QPlainTextEdit>
 
 class VideoGadgetConfiguration;
 

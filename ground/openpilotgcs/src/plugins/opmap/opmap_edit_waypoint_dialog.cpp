@@ -126,7 +126,7 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
         ui->modeParam1->setText("pitch");
         ui->modeParam2->setText("roll");
         ui->modeParam3->setText("yaw");
-        ui->modeParam4->setText("throttle");
+        ui->modeParam4->setText("thrust");
         ui->modeParam1->setVisible(true);
         ui->modeParam2->setVisible(true);
         ui->modeParam3->setVisible(true);
@@ -176,7 +176,7 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam2->setVisible(false);
         ui->dsb_condParam3->setVisible(false);
         ui->dsb_condParam4->setVisible(false);
-        ui->condParam1->setText("Timeout(ms)");
+        ui->condParam1->setText("Timeout(s)");
         break;
     case MapDataDelegate::ENDCONDITION_DISTANCETOTARGET:
         ui->condParam1->setVisible(true);

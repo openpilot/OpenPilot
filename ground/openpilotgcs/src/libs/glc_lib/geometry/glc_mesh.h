@@ -123,6 +123,9 @@ public:
 	/*! The specified LOD must exists and uses the specified material id*/
 	QVector<GLuint> getTrianglesIndex(int lod, GLC_uint materialId) const;
 
+	//! Return the equivalent triangle index of (triangle, strip and fan)
+	IndexList getEquivalentTrianglesStripsFansIndex(int lod, GLC_uint materialId);
+
 	//! Return the number of triangles in the specified LOD
 	int numberOfTriangles(int lod, GLC_uint materialId) const;
 
@@ -168,6 +171,12 @@ public:
 	//! Return the next primitive local id
 	inline GLC_uint nextPrimitiveLocalId() const
 	{return m_NextPrimitiveLocalId;}
+
+    //! Return the GLC_Material applyed on the given primitive id of the given lod
+    GLC_Material* MaterialOfPrimitiveId(GLC_uint id, int lod= 0) const;
+
+	//! Return the set of primitives id
+	QSet<GLC_uint> setOfPrimitiveId() const;
 
 	//! Return true if the mesh position data is empty
 	inline bool isEmpty() const

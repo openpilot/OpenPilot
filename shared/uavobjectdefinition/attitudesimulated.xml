@@ -1,5 +1,5 @@
 <xml>
-    <object name="AttitudeSimulated" singleinstance="true" settings="false">
+    <object name="AttitudeSimulated" singleinstance="true" settings="false" category="State">
         <description>The simulated Attitude estimation from @ref Sensors.</description>
         <field name="q1" units="" type="float" elements="1"/>
         <field name="q2" units="" type="float" elements="1"/>

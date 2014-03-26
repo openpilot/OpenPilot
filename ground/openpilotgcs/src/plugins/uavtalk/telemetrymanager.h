@@ -50,12 +50,14 @@ public:
 signals:
     void connected();
     void disconnected();
+    void telemetryUpdated(double txRate, double rxRate);
     void myStart();
     void myStop();
 
 private slots:
     void onConnect();
     void onDisconnect();
+    void onTelemetryUpdate(double txRate, double rxRate);
     void onStart();
     void onStop();
 
@@ -66,6 +68,19 @@ private:
     TelemetryMonitor *telemetryMon;
     QIODevice *device;
     bool autopilotConnected;
+    QThread readerThread;
+};
+
+
+class IODeviceReader : public QObject {
+    Q_OBJECT
+public:
+    IODeviceReader(UAVTalk *uavTalk);
+
+    UAVTalk *uavTalk;
+
+public slots:
+    void read();
 };
 
 #endif // TELEMETRYMANAGER_H

@@ -55,12 +55,14 @@ public:
     int setHomeLocation(double LLA[3], bool save_to_sdcard);
     int getHomeLocation(bool &set, double LLA[3]);
 
-    int getGPSPosition(double LLA[3]);
+    int getGPSPositionSensor(double LLA[3]);
 
     int getBoardModel();
+    int getBootloaderRevision();
     QByteArray getBoardCPUSerial();
     quint32 getFirmwareCRC();
     QByteArray getBoardDescription();
+    QString getBoardDescriptionString();
     deviceDescriptorStruct getBoardDescriptionStruct();
     static bool descriptionToStructure(QByteArray desc, deviceDescriptorStruct & struc);
     UAVObjectManager *getObjectManager();

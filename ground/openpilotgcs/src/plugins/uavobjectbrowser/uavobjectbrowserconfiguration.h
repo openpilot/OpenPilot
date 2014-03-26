@@ -29,7 +29,7 @@
 #define UAVOBJECTBROWSERCONFIGURATION_H
 
 #include <coreplugin/iuavgadgetconfiguration.h>
-#include <QtGui/QColor>
+#include <QColor>
 
 using namespace Core;
 
@@ -111,8 +111,8 @@ public slots:
 private:
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
-    int m_recentlyUpdatedTimeout;
     bool m_onlyHilightChangedValues;
+    int m_recentlyUpdatedTimeout;
     bool m_useCategorizedView;
     bool m_useScientificView;
     bool m_showMetaData;

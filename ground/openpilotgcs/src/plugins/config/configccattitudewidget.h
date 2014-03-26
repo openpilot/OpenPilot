@@ -32,7 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QTimer>
 
 class Ui_Widget;
@@ -56,8 +56,8 @@ private slots:
 private:
     Ui_ccattitude *ui;
     QTimer timer;
-    UAVObject::Metadata initialAccelsMdata;
-    UAVObject::Metadata initialGyrosMdata;
+    UAVObject::Metadata initialAccelStateMdata;
+    UAVObject::Metadata initialGyroStateMdata;
 
     int accelUpdates;
     int gyroUpdates;
@@ -67,7 +67,6 @@ private:
 
     static const float DEFAULT_ENABLED_ACCEL_TAU = 0.1;
     static const int NUM_SENSOR_UPDATES = 300;
-    static const float ACCEL_SCALE = 0.004f * 9.81f;
 protected:
     virtual void enableControls(bool enable);
 };

@@ -25,17 +25,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "scopeplugin.h"
 #include "scopegadget.h"
 #include "scopegadgetconfiguration.h"
 #include "scopegadgetwidget.h"
 
-#include <QtGui/qcolor.h>
+#include <qcolor.h>
 
 ScopeGadget::ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent) :
-    IUAVGadget(classId, parent),
-    m_widget(widget),
-    configLoaded(false)
+    IUAVGadget(classId, parent), m_widget(widget)
 {}
 
 void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration *config)
@@ -86,10 +83,19 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 }
 
 /**
-   Scope gadget destructor: should delete the associated
-   scope gadget widget too!
+   Scope gadget destructor: should delete the associated scope gadget widget too!
  */
 ScopeGadget::~ScopeGadget()
 {
     delete m_widget;
+}
+
+void ScopeGadget::saveState(QSettings *qSettings)
+{
+    m_widget->saveState(qSettings);
+}
+
+void ScopeGadget::restoreState(QSettings *qSettings)
+{
+    m_widget->restoreState(qSettings);
 }

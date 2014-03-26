@@ -92,19 +92,14 @@ modelMapProxy::overlayType modelMapProxy::overlayTranslate(int type)
     case MapDataDelegate::MODE_DRIVEVECTOR:
         return OVERLAY_LINE;
 
-        break;
     case MapDataDelegate::MODE_FLYCIRCLERIGHT:
     case MapDataDelegate::MODE_DRIVECIRCLERIGHT:
         return OVERLAY_CIRCLE_RIGHT;
 
-        break;
     case MapDataDelegate::MODE_FLYCIRCLELEFT:
     case MapDataDelegate::MODE_DRIVECIRCLELEFT:
-        return OVERLAY_CIRCLE_LEFT;
-
-        break;
     default:
-        break;
+        return OVERLAY_CIRCLE_LEFT;
     }
 }
 
@@ -297,7 +292,11 @@ void modelMapProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &b
 void modelMapProxy::rowsInserted(const QModelIndex &parent, int first, int last)
 {
     Q_UNUSED(parent);
-    for (int x = first; x < last + 1; x++) {
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+
+    /*
+       for (int x = first; x < last + 1; x++) {
         QModelIndex index;
         WayPointItem *item;
         internals::PointLatLng latlng;
@@ -325,7 +324,8 @@ void modelMapProxy::rowsInserted(const QModelIndex &parent, int first, int last)
         } else {
             item = myMap->WPInsert(latlng, altitude, desc, x);
         }
-    }
+       }
+     */
     refreshOverlays();
 }
 void modelMapProxy::deleteWayPoint(int number)
@@ -345,7 +345,10 @@ void modelMapProxy::createWayPoint(internals::PointLatLng coord)
     index = model->index(model->rowCount() - 1, flightDataModel::ERRORDESTINATION, QModelIndex());
     model->setData(index, 1, Qt::EditRole);
 }
+
 void modelMapProxy::deleteAll()
 {
-    model->removeRows(0, model->rowCount(), QModelIndex());
+    if (model->rowCount() > 0) {
+        model->removeRows(0, model->rowCount(), QModelIndex());
+    }
 }

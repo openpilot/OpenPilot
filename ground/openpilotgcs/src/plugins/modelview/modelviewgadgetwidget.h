@@ -28,7 +28,7 @@
 #ifndef MODELVIEWGADGETWIDGET_H_
 #define MODELVIEWGADGETWIDGET_H_
 
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 #include <QTimer>
 
 #include "glc_factory.h"
@@ -39,7 +39,7 @@
 #include "glc_exception.h"
 
 #include "uavobjectmanager.h"
-#include "attitudeactual.h"
+#include "attitudestate.h"
 
 
 class ModelViewGadgetWidget : public QGLWidget {
@@ -89,7 +89,7 @@ private:
     QString bgFilename;
     bool vboEnable;
 
-    AttitudeActual *attActual;
+    AttitudeState *attState;
 };
 
 #endif /* MODELVIEWGADGETWIDGET_H_ */

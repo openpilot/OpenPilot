@@ -43,6 +43,9 @@
 /* PIOS FreeRTOS support */
 #define PIOS_INCLUDE_FREERTOS
 
+/* PIOS CallbackScheduler support */
+#define PIOS_INCLUDE_CALLBACKSCHEDULER
+
 /* PIOS bootloader helper */
 #define PIOS_INCLUDE_BL_HELPER
 /* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
@@ -87,12 +90,13 @@
 /* #define PIOS_INCLUDE_HCSR04 */
 
 /* PIOS receiver drivers */
-/* #define PIOS_INCLUDE_PWM */
+#define PIOS_INCLUDE_PWM
 #define PIOS_INCLUDE_PPM
 /* #define PIOS_INCLUDE_PPM_FLEXI */
 /* #define PIOS_INCLUDE_DSM */
 /* #define PIOS_INCLUDE_SBUS */
-#define PIOS_INCLUDE_GCSRCVR
+/* #define PIOS_INCLUDE_GCSRCVR */
+/* #define PIOS_INCLUDE_OPLINKRCVR */
 
 /* PIOS abstract receiver interface */
 #define PIOS_INCLUDE_RCVR
@@ -100,7 +104,7 @@
 /* PIOS common peripherals */
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
-/* #define PIOS_INCLUDE_SERVO */
+#define PIOS_INCLUDE_SERVO
 /* #define PIOS_INCLUDE_I2C_ESC */
 /* #define PIOS_INCLUDE_OVERO */
 /* #define PIOS_OVERO_SPI */
@@ -115,7 +119,6 @@
 /* PIOS radio modules */
 #define PIOS_INCLUDE_RFM22B
 #define PIOS_INCLUDE_RFM22B_COM
-/* #define PIOS_INCLUDE_RFM22B_RCVR */
 #define PIOS_INCLUDE_PPM_OUT
 /* #define PIOS_RFM22B_DEBUG_ON_TELEM */
 
@@ -157,7 +160,7 @@
 #define PIOS_MANUAL_STACK_SIZE          724
 #define PIOS_SYSTEM_STACK_SIZE          460
 #define PIOS_STABILIZATION_STACK_SIZE   524
-#define PIOS_TELEM_STACK_SIZE           500
+#define PIOS_TELEM_STACK_SIZE           800
 #define PIOS_EVENTDISPATCHER_STACK_SIZE 130
 
 /* This can't be too high to stop eventdispatcher thread overflowing */

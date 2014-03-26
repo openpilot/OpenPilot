@@ -9,6 +9,8 @@ LIBS += -L$$DESTDIR
 INCLUDEPATH += $$GCS_SOURCE_TREE/src/plugins
 DEPENDPATH += $$GCS_SOURCE_TREE/src/plugins
 
+QT += widgets
+
 # copy the plugin spec
 isEmpty(TARGET) {
     error("qtcreatorplugin.pri: You must provide a TARGET")
@@ -29,7 +31,7 @@ macx {
         QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/$${PROVIDER}/
 } else:linux-* {
     #do the rpath by hand since it's not possible to use ORIGIN in QMAKE_RPATHDIR
-    QMAKE_RPATHDIR += \$\$ORIGIN
+    QMAKE_RPATHDIR = \$\$ORIGIN
     QMAKE_RPATHDIR += \$\$ORIGIN/..
     QMAKE_RPATHDIR += \$\$ORIGIN/../..
     GCS_PLUGIN_RPATH = $$join(QMAKE_RPATHDIR, ":")
@@ -43,7 +45,7 @@ contains(QT_CONFIG, reduce_exports):CONFIG += hGCS_symbols
 CONFIG += plugin plugin_with_soname
 
 !macx {
-    target.path = /$$GCS_LIBRARY_BASENAME/opnepilotgcs/plugins/$$PROVIDER
+    target.path = /$$GCS_LIBRARY_BASENAME/openpilotgcs/plugins/$$PROVIDER
     pluginspec.files += $${TARGET}.pluginspec
     pluginspec.path = /$$GCS_LIBRARY_BASENAME/openpilotgcs/plugins/$$PROVIDER
     INSTALLS += target pluginspec

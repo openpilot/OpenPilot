@@ -51,11 +51,15 @@
  */
 
 #include "openpilot.h"
-
+#include <pios_struct_helper.h>
 #include "txpidsettings.h"
 #include "accessorydesired.h"
 #include "manualcontrolcommand.h"
 #include "stabilizationsettings.h"
+#include "stabilizationbank.h"
+#include "stabilizationsettingsbank1.h"
+#include "stabilizationsettingsbank2.h"
+#include "stabilizationsettingsbank3.h"
 #include "flightstatus.h"
 #include "hwsettings.h"
 
@@ -88,12 +92,12 @@ static float scale(float val, float inMin, float inMax, float outMin, float outM
 int32_t TxPIDInitialize(void)
 {
     bool txPIDEnabled;
-    uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+    HwSettingsOptionalModulesData optionalModules;
 
     HwSettingsInitialize();
-    HwSettingsOptionalModulesGet(optionalModules);
+    HwSettingsOptionalModulesGet(&optionalModules);
 
-    if (optionalModules[HWSETTINGS_OPTIONALMODULES_TXPID] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    if (optionalModules.TxPID == HWSETTINGS_OPTIONALMODULES_ENABLED) {
         txPIDEnabled = true;
     } else {
         txPIDEnabled = false;
@@ -107,6 +111,7 @@ int32_t TxPIDInitialize(void)
             .obj    = AccessoryDesiredHandle(),
             .instId = 0,
             .event  = 0,
+            .lowPriority = false,
         };
         EventPeriodicCallbackCreate(&ev, updatePIDs, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
@@ -163,130 +168,171 @@ static void updatePIDs(UAVObjEvent *ev)
         return;
     }
 
+    StabilizationBankData bank;
+    switch (inst.BankNumber) {
+    case 0:
+        StabilizationSettingsBank1Get((StabilizationSettingsBank1Data *)&bank);
+        break;
+
+    case 1:
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *)&bank);
+        break;
+
+    case 2:
+        StabilizationSettingsBank2Get((StabilizationSettingsBank2Data *)&bank);
+        break;
+
+    default:
+        return;
+    }
     StabilizationSettingsData stab;
     StabilizationSettingsGet(&stab);
     AccessoryDesiredData accessory;
 
-    uint8_t needsUpdate = 0;
+    uint8_t needsUpdateBank = 0;
+    uint8_t needsUpdateStab = 0;
 
     // Loop through every enabled instance
     for (uint8_t i = 0; i < TXPIDSETTINGS_PIDS_NUMELEM; i++) {
-        if (inst.PIDs[i] != TXPIDSETTINGS_PIDS_DISABLED) {
+        if (cast_struct_to_array(inst.PIDs, inst.PIDs.Instance1)[i] != TXPIDSETTINGS_PIDS_DISABLED) {
             float value;
-            if (inst.Inputs[i] == TXPIDSETTINGS_INPUTS_THROTTLE) {
+            if (cast_struct_to_array(inst.Inputs, inst.Inputs.Instance1)[i] == TXPIDSETTINGS_INPUTS_THROTTLE) {
                 ManualControlCommandThrottleGet(&value);
                 value = scale(value,
-                              inst.ThrottleRange[TXPIDSETTINGS_THROTTLERANGE_MIN],
-                              inst.ThrottleRange[TXPIDSETTINGS_THROTTLERANGE_MAX],
-                              inst.MinPID[i], inst.MaxPID[i]);
-            } else if (AccessoryDesiredInstGet(inst.Inputs[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0) {
-                value = scale(accessory.AccessoryVal, -1.0f, 1.0f, inst.MinPID[i], inst.MaxPID[i]);
+                              inst.ThrottleRange.Min,
+                              inst.ThrottleRange.Max,
+                              cast_struct_to_array(inst.MinPID, inst.MinPID.Instance1)[i],
+                              cast_struct_to_array(inst.MaxPID, inst.MaxPID.Instance1)[i]);
+            } else if (AccessoryDesiredInstGet(
+                           cast_struct_to_array(inst.Inputs, inst.Inputs.Instance1)[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0,
+                           &accessory) == 0) {
+                value = scale(accessory.AccessoryVal, -1.0f, 1.0f,
+                              cast_struct_to_array(inst.MinPID, inst.MinPID.Instance1)[i],
+                              cast_struct_to_array(inst.MaxPID, inst.MaxPID.Instance1)[i]);
             } else {
                 continue;
             }
 
-            switch (inst.PIDs[i]) {
+            switch (cast_struct_to_array(inst.PIDs, inst.PIDs.Instance1)[i]) {
             case TXPIDSETTINGS_PIDS_ROLLRATEKP:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], value);
+                needsUpdateBank |= update(&bank.RollRatePID.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATEKI:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI], value);
+                needsUpdateBank |= update(&bank.RollRatePID.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATEKD:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
+                needsUpdateBank |= update(&bank.RollRatePID.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATEILIMIT:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT], value);
+                needsUpdateBank |= update(&bank.RollRatePID.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEKP:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
+                needsUpdateBank |= update(&bank.RollPI.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEKI:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
+                needsUpdateBank |= update(&bank.RollPI.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEILIMIT:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT], value);
+                needsUpdateBank |= update(&bank.RollPI.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKP:
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKI:
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI], value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKD:
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEILIMIT:
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT], value);
+                needsUpdateBank |= update(&bank.PitchRatePID.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEKP:
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
+                needsUpdateBank |= update(&bank.PitchPI.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEKI:
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
+                needsUpdateBank |= update(&bank.PitchPI.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEILIMIT:
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT], value);
+                needsUpdateBank |= update(&bank.PitchPI.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKP:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], value);
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], value);
+                needsUpdateBank |= update(&bank.RollRatePID.Kp, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKI:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI], value);
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI], value);
+                needsUpdateBank |= update(&bank.RollRatePID.Ki, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKD:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
+                needsUpdateBank |= update(&bank.RollRatePID.Kd, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEILIMIT:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT], value);
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT], value);
+                needsUpdateBank |= update(&bank.RollRatePID.ILimit, value);
+                needsUpdateBank |= update(&bank.PitchRatePID.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKP:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
+                needsUpdateBank |= update(&bank.RollPI.Kp, value);
+                needsUpdateBank |= update(&bank.PitchPI.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKI:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
+                needsUpdateBank |= update(&bank.RollPI.Ki, value);
+                needsUpdateBank |= update(&bank.PitchPI.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEILIMIT:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT], value);
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT], value);
+                needsUpdateBank |= update(&bank.RollPI.ILimit, value);
+                needsUpdateBank |= update(&bank.PitchPI.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKP:
-                needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP], value);
+                needsUpdateBank |= update(&bank.YawRatePID.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKI:
-                needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI], value);
+                needsUpdateBank |= update(&bank.YawRatePID.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKD:
-                needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD], value);
+                needsUpdateBank |= update(&bank.YawRatePID.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEILIMIT:
-                needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ILIMIT], value);
+                needsUpdateBank |= update(&bank.YawRatePID.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEKP:
-                needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KP], value);
+                needsUpdateBank |= update(&bank.YawPI.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEKI:
-                needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KI], value);
+                needsUpdateBank |= update(&bank.YawPI.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEILIMIT:
-                needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT], value);
+                needsUpdateBank |= update(&bank.YawPI.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_GYROTAU:
-                needsUpdate |= update(&stab.GyroTau, value);
+                needsUpdateStab |= update(&stab.GyroTau, value);
                 break;
             default:
                 PIOS_Assert(0);
             }
         }
     }
-    if (needsUpdate) {
+    if (needsUpdateStab) {
         StabilizationSettingsSet(&stab);
+    }
+    if (needsUpdateBank) {
+        switch (inst.BankNumber) {
+        case 0:
+            StabilizationSettingsBank1Set((StabilizationSettingsBank1Data *)&bank);
+            break;
+
+        case 1:
+            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *)&bank);
+            break;
+
+        case 2:
+            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *)&bank);
+            break;
+
+        default:
+            return;
+        }
     }
 }
 

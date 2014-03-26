@@ -75,6 +75,7 @@ uint32_t pios_com_telem_rf_id  = 0;
 uint32_t pios_com_bridge_id    = 0;
 
 uintptr_t pios_uavo_settings_fs_id;
+uintptr_t pios_user_fs_id;
 
 /*
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
@@ -118,10 +119,20 @@ void PIOS_Board_Init(void)
     /* Delay system */
     PIOS_DELAY_Init();
 
+    // Initialize dosfs fake flash logfs
+    if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, NULL, NULL, 0)) {
+        PIOS_DEBUG_Assert(0);
+    }
+    pios_user_fs_id = pios_uavo_settings_fs_id;
+
+
     /* Initialize the task monitor */
     if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
         PIOS_Assert(0);
     }
+
+    /* Initialize the delayed callback library */
+    PIOS_CALLBACKSCHEDULER_Initialize();
 
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
@@ -133,9 +144,6 @@ void PIOS_Board_Init(void)
 
     /* Initialize the alarms library */
     AlarmsInitialize();
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
     /* Configure IO ports */
 

@@ -26,6 +26,11 @@
  */
 
 #include <QtGui>
+#include <QtWidgets/QWidget>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QLineEdit>
+#include <QTableWidget>
 #include "notifyitemdelegate.h"
 #include "notifytablemodel.h"
 #include "notifylogging.h"
@@ -139,6 +144,7 @@ void NotifyItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 
 void NotifyItemDelegate::selectRow(const QString & text)
 {
+    Q_UNUSED(text);
     QComboBox *combo    = qobject_cast<QComboBox *>(sender());
     QTableWidget *table = new QTableWidget;
 

@@ -28,7 +28,7 @@
 #ifndef LoggingGADGETWIDGET_H_
 #define LoggingGADGETWIDGET_H_
 
-#include <QtGui/QLabel>
+#include <QLabel>
 #include "extensionsystem/pluginmanager.h"
 #include "scope/scopeplugin.h"
 #include "scope/scopegadgetfactory.h"

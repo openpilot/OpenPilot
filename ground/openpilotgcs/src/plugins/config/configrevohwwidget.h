@@ -32,7 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QList>
 
 
@@ -57,7 +57,6 @@ private slots:
     void usbHIDPortChanged(int index);
     void flexiPortChanged(int index);
     void mainPortChanged(int index);
-    void modemPortChanged(int index);
     void openHelp();
 };
 

@@ -30,16 +30,16 @@
 
 #include "ui_runningdevicewidget.h"
 
-#include <QWidget>
-#include <QErrorMessage>
-#include <QtSvg/QGraphicsSvgItem>
-#include <QtSvg/QSvgRenderer>
-#include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavobjectutilmanager.h"
 #include "uploader_global.h"
+
+#include <QWidget>
+#include <QErrorMessage>
+#include <QtSvg/QGraphicsSvgItem>
+#include <QtSvg/QSvgRenderer>
 
 class UPLOADER_EXPORT RunningDeviceWidget : public QWidget {
     Q_OBJECT

@@ -1,17 +1,15 @@
-TEMPLATE  = subdirs
-CONFIG   += ordered
+TEMPLATE = subdirs
+CONFIG += ordered
 
-SUBDIRS   = \
+SUBDIRS = \
     version_info \
     qscispinbox\
     qtconcurrent \
     aggregation \
     extensionsystem \
+    glc_lib \
+    gst_lib \
     utils \
     opmapcontrol \
     qwt \
-    qextserialport \
-    glc_lib\
-    gst_lib \
-    sdlgamepad \
-    libqxt
+    sdlgamepad

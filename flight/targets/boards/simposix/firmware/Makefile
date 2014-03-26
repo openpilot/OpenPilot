@@ -37,7 +37,12 @@ MODULES += FixedWingPathFollower
 MODULES += VtolPathFollower
 MODULES += CameraStab
 MODULES += Telemetry
+MODULES += Logging
 MODULES += FirmwareIAP
+MODULES += StateEstimation
+#MODULES += Sensors/simulated/Sensors
+MODULES += Airspeed
+MODULES += AltitudeHold
 #MODULES += OveroSync
 
 # Paths
@@ -64,7 +69,7 @@ UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
 include $(PIOS)/common/libraries/FreeRTOS/library.mk
-include $(FLIGHTLIB)/PyMite/pymite.mk
+#include $(FLIGHTLIB)/PyMite/pymite.mk
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -80,7 +85,6 @@ SRC += $(FLIGHTLIB)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(OPUAVOBJ)/callbackscheduler.c
 SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
@@ -94,6 +98,10 @@ SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
+SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
+SRC += $(PIOSCORECOMMON)/pios_debuglog.c
+SRC += $(PIOSCORECOMMON)/pios_callbackscheduler.c
+SRC += $(PIOSCORECOMMON)/pios_deltatime.c
 
 ## PIOS Hardware
 include $(PIOS)/posix/library.mk

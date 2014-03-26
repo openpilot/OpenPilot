@@ -118,19 +118,19 @@
           <dialNeedleID2>needle</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>AttitudeActual</needle1DataObject>
+          <needle1DataObject>AttitudeState</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Roll</needle1ObjectField>
-          <needle2DataObject>AttitudeActual</needle2DataObject>
+          <needle2DataObject>AttitudeState</needle2DataObject>
           <needle2Factor>75</needle2Factor>
           <needle2MaxValue>20</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Vertical</needle2Move>
           <needle2ObjectField>Pitch</needle2ObjectField>
-          <needle3DataObject>AttitudeActual</needle3DataObject>
+          <needle3DataObject>AttitudeState</needle3DataObject>
           <needle3Factor>-1</needle3Factor>
           <needle3MaxValue>360</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -153,19 +153,19 @@
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>BaroAltitude</needle1DataObject>
+          <needle1DataObject>BaroSensor</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>10</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Altitude</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -185,19 +185,19 @@
           <dialFile>%%DATAPATH%%dials/default/barometer.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>BaroAltitude</needle1DataObject>
+          <needle1DataObject>BaroSensor</needle1DataObject>
           <needle1Factor>10</needle1Factor>
           <needle1MaxValue>1120</needle1MaxValue>
           <needle1MinValue>1000</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Pressure</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -217,19 +217,19 @@
           <dialFile>%%DATAPATH%%dials/default/vsi.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>VelocityActual</needle1DataObject>
+          <needle1DataObject>VelocityState</needle1DataObject>
           <needle1Factor>0.01</needle1Factor>
           <needle1MaxValue>12</needle1MaxValue>
           <needle1MinValue>-12</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Down</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -250,19 +250,19 @@
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>AttitudeActual</needle1DataObject>
+          <needle1DataObject>AttitudeState</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Yaw</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -285,19 +285,19 @@
           <dialNeedleID2>needle</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>AttitudeActual</needle1DataObject>
+          <needle1DataObject>AttitudeState</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Roll</needle1ObjectField>
-          <needle2DataObject>AttitudeActual</needle2DataObject>
+          <needle2DataObject>AttitudeState</needle2DataObject>
           <needle2Factor>75</needle2Factor>
           <needle2MaxValue>20</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Vertical</needle2Move>
           <needle2ObjectField>Pitch</needle2ObjectField>
-          <needle3DataObject>AttitudeActual</needle3DataObject>
+          <needle3DataObject>AttitudeState</needle3DataObject>
           <needle3Factor>-1</needle3Factor>
           <needle3MaxValue>360</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -320,19 +320,19 @@
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>BaroAltitude</needle1DataObject>
+          <needle1DataObject>BaroSensor</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>10</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Altitude</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -353,19 +353,19 @@
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>BaroAltitude</needle1DataObject>
+          <needle1DataObject>BaroSensor</needle1DataObject>
           <needle1Factor>10</needle1Factor>
           <needle1MaxValue>1120</needle1MaxValue>
           <needle1MinValue>1000</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Pressure</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -386,19 +386,19 @@
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>VelocityActual</needle1DataObject>
+          <needle1DataObject>VelocityState</needle1DataObject>
           <needle1Factor>0.01</needle1Factor>
           <needle1MaxValue>11.2</needle1MaxValue>
           <needle1MinValue>-11.2</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Down</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -419,19 +419,19 @@
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>AttitudeActual</needle1DataObject>
+          <needle1DataObject>AttitudeState</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Yaw</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -452,19 +452,19 @@
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>GPSPosition</needle1DataObject>
+          <needle1DataObject>GPSPositionSensor</needle1DataObject>
           <needle1Factor>3.6</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Groundspeed</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -487,19 +487,19 @@
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>BaroAltitude</needle1DataObject>
+          <needle1DataObject>BaroSensor</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Temperature</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -522,19 +522,19 @@
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle2</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>AttitudeActual</needle1DataObject>
+          <needle1DataObject>AttitudeState</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Roll</needle1ObjectField>
-          <needle2DataObject>Accels</needle2DataObject>
+          <needle2DataObject>AccelState</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>20</needle2MaxValue>
           <needle2MinValue>-20</needle2MinValue>
           <needle2Move>Horizontal</needle2Move>
           <needle2ObjectField>x</needle2ObjectField>
-          <needle3DataObject>Accels</needle3DataObject>
+          <needle3DataObject>AccelState</needle3DataObject>
           <needle3Factor>-1</needle3Factor>
           <needle3MaxValue>360</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -554,19 +554,19 @@
           <dialFile>%%DATAPATH%%dials/default/speed.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>GPSPosition</needle1DataObject>
+          <needle1DataObject>GPSPositionSensor</needle1DataObject>
           <needle1Factor>3.6</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Groundspeed</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -589,19 +589,19 @@
           <dialNeedleID2>needle</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>AttitudeActual</needle1DataObject>
+          <needle1DataObject>AttitudeState</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Roll</needle1ObjectField>
-          <needle2DataObject>AttitudeActual</needle2DataObject>
+          <needle2DataObject>AttitudeState</needle2DataObject>
           <needle2Factor>75</needle2Factor>
           <needle2MaxValue>20</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Vertical</needle2Move>
           <needle2ObjectField>Pitch</needle2ObjectField>
-          <needle3DataObject>AttitudeActual</needle3DataObject>
+          <needle3DataObject>AttitudeState</needle3DataObject>
           <needle3Factor>-1</needle3Factor>
           <needle3MaxValue>360</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -624,19 +624,19 @@
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>BaroAltitude</needle1DataObject>
+          <needle1DataObject>BaroSensor</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>10</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Altitude</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -656,19 +656,19 @@
           <dialFile>%%DATAPATH%%dials/hi-contrast/barometer.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>BaroAltitude</needle1DataObject>
+          <needle1DataObject>BaroSensor</needle1DataObject>
           <needle1Factor>10</needle1Factor>
           <needle1MaxValue>1120</needle1MaxValue>
           <needle1MinValue>1000</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Pressure</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -688,19 +688,19 @@
           <dialFile>%%DATAPATH%%dials/hi-contrast/vsi.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>VelocityActual</needle1DataObject>
+          <needle1DataObject>VelocityState</needle1DataObject>
           <needle1Factor>0.01</needle1Factor>
           <needle1MaxValue>12</needle1MaxValue>
           <needle1MinValue>-12</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Down</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -721,19 +721,19 @@
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>AttitudeActual</needle1DataObject>
+          <needle1DataObject>AttitudeState</needle1DataObject>
           <needle1Factor>-1</needle1Factor>
           <needle1MaxValue>360</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Yaw</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -753,19 +753,19 @@
           <dialFile>%%DATAPATH%%dials/hi-contrast/speed.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>GPSPosition</needle1DataObject>
+          <needle1DataObject>GPSPositionSensor</needle1DataObject>
           <needle1Factor>3.6</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Groundspeed</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -787,19 +787,19 @@
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>BaroAltitude</needle1DataObject>
+          <needle1DataObject>BaroSensor</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Temperature</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -827,13 +827,13 @@
           <needle1MinValue>1000</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Channel-3</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -855,19 +855,19 @@
           <dialNeedleID2>needle2</dialNeedleID2>
           <dialNeedleID3>needle3</dialNeedleID3>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>BaroAltitude</needle1DataObject>
+          <needle1DataObject>BaroSensor</needle1DataObject>
           <needle1Factor>1</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
           <needle1Move>Rotate</needle1Move>
           <needle1ObjectField>Temperature</needle1ObjectField>
-          <needle2DataObject>BaroAltitude</needle2DataObject>
+          <needle2DataObject>BaroSensor</needle2DataObject>
           <needle2Factor>1</needle2Factor>
           <needle2MaxValue>100</needle2MaxValue>
           <needle2MinValue>0</needle2MinValue>
           <needle2Move>Rotate</needle2Move>
           <needle2ObjectField>Altitude</needle2ObjectField>
-          <needle3DataObject>BaroAltitude</needle3DataObject>
+          <needle3DataObject>BaroSensor</needle3DataObject>
           <needle3Factor>1</needle3Factor>
           <needle3MaxValue>1000</needle3MaxValue>
           <needle3MinValue>0</needle3MinValue>
@@ -968,7 +968,7 @@
             <attActCalc>false</attActCalc>
             <attActHW>false</attActHW>
             <attActSim>true</attActSim>
-            <attActualEnabled>true</attActualEnabled>
+            <attStateEnabled>true</attStateEnabled>
             <attRawEnabled>true</attRawEnabled>
             <attRawRate>20</attRawRate>
             <baroAltRate>50</baroAltRate>
@@ -1004,7 +1004,7 @@
             <attActCalc>false</attActCalc>
             <attActHW>false</attActHW>
             <attActSim>true</attActSim>
-            <attActualEnabled>true</attActualEnabled>
+            <attStateEnabled>true</attStateEnabled>
             <attRawEnabled>true</attRawEnabled>
             <attRawRate>20</attRawRate>
             <baroAltRate>50</baroAltRate>
@@ -1040,7 +1040,7 @@
             <attActCalc>false</attActCalc>
             <attActHW>false</attActHW>
             <attActSim>true</attActSim>
-            <attActualEnabled>true</attActualEnabled>
+            <attStateEnabled>true</attStateEnabled>
             <attRawEnabled>true</attRawEnabled>
             <attRawRate>20</attRawRate>
             <baroAltRate>50</baroAltRate>
@@ -1084,7 +1084,7 @@
           <minValue>-11</minValue>
           <redMax>11</redMax>
           <redMin>-11</redMin>
-          <sourceDataObject>Accels</sourceDataObject>
+          <sourceDataObject>AccelState</sourceDataObject>
           <sourceObjectField>x</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>-5</yellowMax>
@@ -1107,7 +1107,7 @@
           <minValue>-11</minValue>
           <redMax>11</redMax>
           <redMin>-11</redMin>
-          <sourceDataObject>Accels</sourceDataObject>
+          <sourceDataObject>AccelState</sourceDataObject>
           <sourceObjectField>y</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>-5</yellowMax>
@@ -1130,7 +1130,7 @@
           <minValue>-11</minValue>
           <redMax>11</redMax>
           <redMin>-11</redMin>
-          <sourceDataObject>Accels</sourceDataObject>
+          <sourceDataObject>AccelState</sourceDataObject>
           <sourceObjectField>z</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>-5</yellowMax>
@@ -1222,7 +1222,7 @@
           <minValue>0</minValue>
           <redMax>0</redMax>
           <redMin>0</redMin>
-          <sourceDataObject>GPSPosition</sourceDataObject>
+          <sourceDataObject>GPSPositionSensor</sourceDataObject>
           <sourceObjectField>Satellites</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>0</yellowMax>
@@ -1245,7 +1245,7 @@
           <minValue>0</minValue>
           <redMax>33</redMax>
           <redMin>0</redMin>
-          <sourceDataObject>GPSPosition</sourceDataObject>
+          <sourceDataObject>GPSPositionSensor</sourceDataObject>
           <sourceObjectField>Status</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>66</yellowMax>
@@ -1321,7 +1321,7 @@
           <yellowMin>-0.8</yellowMin>
         </data>
       </Pitch>
-      <PitchActual>
+      <PitchState>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -1337,13 +1337,13 @@
           <minValue>-90</minValue>
           <redMax>1</redMax>
           <redMin>0</redMin>
-          <sourceDataObject>AttitudeActual</sourceDataObject>
+          <sourceDataObject>AttitudeState</sourceDataObject>
           <sourceObjectField>Pitch</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>0.9</yellowMax>
           <yellowMin>0.1</yellowMin>
         </data>
-      </PitchActual>
+      </PitchState>
       <Roll__PCT__20Desired>
         <configInfo>
           <locked>false</locked>
@@ -1888,7 +1888,7 @@
             <color>4294901760</color>
             <mathFunction>None</mathFunction>
             <uavField>x</uavField>
-            <uavObject>Accels</uavObject>
+            <uavObject>AccelState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -1898,7 +1898,7 @@
             <color>4283782655</color>
             <mathFunction>None</mathFunction>
             <uavField>y</uavField>
-            <uavObject>Accels</uavObject>
+            <uavObject>AccelState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -1908,7 +1908,7 @@
             <color>4283804160</color>
             <mathFunction>None</mathFunction>
             <uavField>z</uavField>
-            <uavObject>Accels</uavObject>
+            <uavObject>AccelState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -1988,7 +1988,7 @@
             <color>4283760895</color>
             <mathFunction>None</mathFunction>
             <uavField>Roll</uavField>
-            <uavObject>AttitudeActual</uavObject>
+            <uavObject>AttitudeState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -1998,7 +1998,7 @@
             <color>4278233600</color>
             <mathFunction>None</mathFunction>
             <uavField>Yaw</uavField>
-            <uavObject>AttitudeActual</uavObject>
+            <uavObject>AttitudeState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2008,7 +2008,7 @@
             <color>4294901760</color>
             <mathFunction>None</mathFunction>
             <uavField>Pitch</uavField>
-            <uavObject>AttitudeActual</uavObject>
+            <uavObject>AttitudeState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2033,7 +2033,7 @@
             <color>4278190080</color>
             <mathFunction>None</mathFunction>
             <uavField>Pressure</uavField>
-            <uavObject>BaroAltitude</uavObject>
+            <uavObject>BaroSensor</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2139,7 +2139,7 @@
           <refreshInterval>200</refreshInterval>
         </data>
       </Inputs>
-      <Raw__PCT__20Accels>
+      <Raw__PCT__20AccelState>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -2153,7 +2153,7 @@
             <color>4294901760</color>
             <mathFunction>None</mathFunction>
             <uavField>x</uavField>
-            <uavObject>Accels</uavObject>
+            <uavObject>AccelState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2163,7 +2163,7 @@
             <color>4283782655</color>
             <mathFunction>None</mathFunction>
             <uavField>y</uavField>
-            <uavObject>Accels</uavObject>
+            <uavObject>AccelState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2173,7 +2173,7 @@
             <color>4283804160</color>
             <mathFunction>None</mathFunction>
             <uavField>z</uavField>
-            <uavObject>Accels</uavObject>
+            <uavObject>AccelState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2183,8 +2183,8 @@
           <plotType>1</plotType>
           <refreshInterval>500</refreshInterval>
         </data>
-      </Raw__PCT__20Accels>
-      <Raw__PCT__20Gyros>
+      </Raw__PCT__20AccelState>
+      <Raw__PCT__20GyroState>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -2198,7 +2198,7 @@
             <color>4283804160</color>
             <mathFunction>None</mathFunction>
             <uavField>z</uavField>
-            <uavObject>Gyros</uavObject>
+            <uavObject>GyroState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2208,7 +2208,7 @@
             <color>4283782655</color>
             <mathFunction>None</mathFunction>
             <uavField>y</uavField>
-            <uavObject>Gyros</uavObject>
+            <uavObject>GyroState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2218,7 +2218,7 @@
             <color>4294901760</color>
             <mathFunction>None</mathFunction>
             <uavField>x</uavField>
-            <uavObject>Gyros</uavObject>
+            <uavObject>GyroState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2228,7 +2228,7 @@
           <plotType>1</plotType>
           <refreshInterval>500</refreshInterval>
         </data>
-      </Raw__PCT__20Gyros>
+      </Raw__PCT__20GyroState>
       <Raw__PCT__20magnetometers>
         <configInfo>
           <locked>false</locked>
@@ -2243,7 +2243,7 @@
             <color>4294901760</color>
             <mathFunction>None</mathFunction>
             <uavField>x</uavField>
-            <uavObject>Magnetometer</uavObject>
+            <uavObject>MagState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2253,7 +2253,7 @@
             <color>4283782655</color>
             <mathFunction>None</mathFunction>
             <uavField>y</uavField>
-            <uavObject>Magnetometer</uavObject>
+            <uavObject>MagState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2263,7 +2263,7 @@
             <color>4283804160</color>
             <mathFunction>None</mathFunction>
             <uavField>z</uavField>
-            <uavObject>Magnetometer</uavObject>
+            <uavObject>MagState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2285,7 +2285,7 @@
           <configurationStreamVersion>1000</configurationStreamVersion>
           <dataSize>240</dataSize>
           <plotCurve0>
-            <color>4294945280</color>
+            <color>4294901760</color>
             <mathFunction>None</mathFunction>
             <uavField>StackRemaining-System</uavField>
             <uavObject>TaskInfo</uavObject>
@@ -2297,37 +2297,17 @@
           <plotCurve1>
             <color>4294945280</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-Actuator</uavField>
+            <uavField>StackRemaining-CallbackScheduler0</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve1>
-          <plotCurve10>
-            <color>4294945280</color>
-            <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-Guidance</uavField>
-            <uavObject>TaskInfo</uavObject>
-            <yMaximum>0</yMaximum>
-            <yMeanSamples>1</yMeanSamples>
-            <yMinimum>0</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve10>
-          <plotCurve11>
-            <color>4294945280</color>
-            <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-Watchdog</uavField>
-            <uavObject>TaskInfo</uavObject>
-            <yMaximum>0</yMaximum>
-            <yMeanSamples>1</yMeanSamples>
-            <yMinimum>0</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve11>
           <plotCurve2>
-            <color>4294945280</color>
+            <color>4278190335</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-TelemetryTx</uavField>
+            <uavField>StackRemaining-CallbackScheduler1</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2335,9 +2315,9 @@
             <yScalePower>0</yScalePower>
           </plotCurve2>
           <plotCurve3>
-            <color>4294945280</color>
+            <color>4294967040</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-TelemetryTxPri</uavField>
+            <uavField>StackRemaining-ManualControl</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2345,9 +2325,9 @@
             <yScalePower>0</yScalePower>
           </plotCurve3>
           <plotCurve4>
-            <color>4294945280</color>
+            <color>4278255615</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-TelemetryRx</uavField>
+            <uavField>StackRemaining-Stabilization</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2355,9 +2335,9 @@
             <yScalePower>0</yScalePower>
           </plotCurve4>
           <plotCurve5>
-            <color>4294945280</color>
+            <color>4294923775</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-GPS</uavField>
+            <uavField>StackRemaining-Actuator</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2365,9 +2345,9 @@
             <yScalePower>0</yScalePower>
           </plotCurve5>
           <plotCurve6>
-            <color>4294945280</color>
+            <color>4289331327</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-ManualControl</uavField>
+            <uavField>StackRemaining-Sensors</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2385,9 +2365,9 @@
             <yScalePower>0</yScalePower>
           </plotCurve7>
           <plotCurve8>
-            <color>4294945280</color>
+            <color>4283760767</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-AHRSComms</uavField>
+            <uavField>StackRemaining-TelemetryTx</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2395,15 +2375,25 @@
             <yScalePower>0</yScalePower>
           </plotCurve8>
           <plotCurve9>
-            <color>4294945280</color>
+            <color>4294901760</color>
             <mathFunction>None</mathFunction>
-            <uavField>StackRemaining-Stabilization</uavField>
+            <uavField>StackRemaining-TelemetryRx</uavField>
             <uavObject>TaskInfo</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve9>
+          <plotCurve10>
+            <color>4283782527</color>
+            <mathFunction>None</mathFunction>
+            <uavField>StackRemaining-RadioRx</uavField>
+            <uavObject>TaskInfo</uavObject>
+            <yMaximum>0</yMaximum>
+            <yMeanSamples>1</yMeanSamples>
+            <yMinimum>0</yMinimum>
+            <yScalePower>0</yScalePower>
+          </plotCurve10>
           <plotCurveCount>12</plotCurveCount>
           <plotType>1</plotType>
           <refreshInterval>1000</refreshInterval>
@@ -2491,6 +2481,17 @@
         </data>
       </default>
     </SystemHealthGadget>
+    <TelemetryMonitorGadget>
+      <default>
+        <configInfo>
+          <locked>true</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <diagram>%%DATAPATH%%diagrams/default/system-health.svg</diagram>
+        </data>
+      </default>
+    </TelemetryMonitorGadget>
     <UAVObjectBrowser>
       <default>
         <configInfo>
@@ -2788,7 +2789,7 @@ videomixer name=vmix
           <side1>
             <classId>ScopeGadget</classId>
             <gadget>
-              <activeConfiguration>Raw Gyros</activeConfiguration>
+              <activeConfiguration>Raw GyroState</activeConfiguration>
             </gadget>
             <type>uavGadget</type>
           </side1>

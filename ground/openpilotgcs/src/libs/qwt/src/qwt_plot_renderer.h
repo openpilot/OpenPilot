@@ -70,7 +70,10 @@ public:
         //! Use the default layout without margins and frames
         DefaultLayout   = 0x00,
 
-        //! Render all frames of the plot
+        /*! 
+          Render all frames of the plot
+          \note Not supported yet
+         */
         KeepFrames      = 0x01,
 
         /*!
@@ -98,11 +101,11 @@ public:
     void setLayoutFlags( LayoutFlags flags );
     LayoutFlags layoutFlags() const;
 
-    void renderDocument( QwtPlot *, const QString &format,
+    void renderDocument( QwtPlot *, const QString &fileName,
         const QSizeF &sizeMM, int resolution = 85 );
 
     void renderDocument( QwtPlot *,
-        const QString &title, const QString &format,
+        const QString &fileName, const QString &format,
         const QSizeF &sizeMM, int resolution = 85 );
 
 #ifndef QWT_NO_SVG

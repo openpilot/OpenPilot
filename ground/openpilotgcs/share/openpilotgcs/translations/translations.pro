@@ -12,8 +12,11 @@ defineReplace(prependAll) {
 }
 
 XMLPATTERNS = $$targetPath($$[QT_INSTALL_BINS]/xmlpatterns)
-LUPDATE = $$targetPath($$[QT_INSTALL_BINS]/lupdate) -locations relative -no-ui-lines -no-sort -noobsolete
+LUPDATE = $$targetPath($$[QT_INSTALL_BINS]/lupdate) -locations relative -no-ui-lines -no-sort
 LRELEASE = $$targetPath($$[QT_INSTALL_BINS]/lrelease)
+LCONVERT = $$targetPath($$[QT_INSTALL_BINS]/lconvert)
+
+wd = $$replace(GCS_SOURCE_TREE, /, $$QMAKE_DIR_SEP)
 
 TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/openpilotgcs_,.ts)
 
@@ -34,7 +37,7 @@ QMAKE_EXTRA_TARGETS += ts
 
 TEMPLATE = app
 TARGET = phony_target2
-CONFIG -= qt
+CONFIG -= qt sdk separate_debug_info gdb_dwarf_index
 QT =
 LIBS =
 
@@ -68,22 +71,20 @@ qmfiles.CONFIG += no_check_exist
 INSTALLS += qmfiles
 
 #========= begin block copying qt_*.qm files ==========
-win32 {
-    defineReplace(QtQmExists) {
-        for(lang,$$1) {
-            qm_file = $$[QT_INSTALL_TRANSLATIONS]/qt_$${lang}.qm
-            exists($$qm_file) : result += $$qm_file
-        }
-        return($$result)
+defineReplace(QtQmExists) {
+    for(lang,$$1) {
+        qm_file = $$[QT_INSTALL_TRANSLATIONS]/qt_$${lang}.qm
+        exists($$qm_file) : result += $$qm_file
     }
-    QT_TRANSLATIONS = $$QtQmExists(LANGUAGES)
-
-    copyQT_QMs.input = QT_TRANSLATIONS
-    copyQT_QMs.output = $$GCS_DATA_PATH/translations/${QMAKE_FILE_BASE}.qm
-    isEmpty(vcproj):copyQT_QMs.variable_out = PRE_TARGETDEPS
-    copyQT_QMs.commands = $(COPY_FILE) ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
-    copyQT_QMs.name = Copy ${QMAKE_FILE_IN}
-    copyQT_QMs.CONFIG += no_link
-    QMAKE_EXTRA_COMPILERS += copyQT_QMs
+    return($$result)
 }
+QT_TRANSLATIONS = $$QtQmExists(LANGUAGES)
+
+copyQT_QMs.input = QT_TRANSLATIONS
+copyQT_QMs.output = $$GCS_DATA_PATH/translations/${QMAKE_FILE_BASE}.qm
+isEmpty(vcproj):copyQT_QMs.variable_out = PRE_TARGETDEPS
+copyQT_QMs.commands = $(COPY_FILE) ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
+copyQT_QMs.name = Copy ${QMAKE_FILE_IN}
+copyQT_QMs.CONFIG += no_link
+QMAKE_EXTRA_COMPILERS += copyQT_QMs
 #========= end block copying qt_*.qm files ============

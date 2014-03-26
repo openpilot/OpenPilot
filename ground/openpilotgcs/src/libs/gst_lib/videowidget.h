@@ -28,7 +28,7 @@
 #ifndef VIDEOWIDGET_H_
 #define VIDEOWIDGET_H_
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QMouseEvent>

@@ -27,9 +27,9 @@
 #ifndef PathActionEditorGADGETWIDGET_H_
 #define PathActionEditorGADGETWIDGET_H_
 
-#include <QtGui/QLabel>
-#include <QtGui/QWidget>
-#include <QtGui/QTreeView>
+#include <QLabel>
+#include <QWidget>
+#include <QTreeView>
 #include "pathaction.h"
 #include "waypoint.h"
 #include "pathactioneditortreemodel.h"

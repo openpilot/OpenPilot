@@ -28,6 +28,8 @@
 
 #include "helpdialog.h"
 
+#include "gst_global.h"
+
 //#include <extensionsystem/pluginmanager.h>
 //#include "icore.h"
 //#include "coreplugin/uavgadgetinstancemanager.h"
@@ -36,11 +38,9 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QSettings>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-
-#include "gst_global.h"
+#include <QHeaderView>
+#include <QLabel>
+#include <QPushButton>
 
 //namespace {
 //    struct PageData {

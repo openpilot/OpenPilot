@@ -1,5 +1,5 @@
 <xml>
-    <object name="AirspeedSensor" singleinstance="true" settings="false">
+    <object name="AirspeedSensor" singleinstance="true" settings="false" category="Sensors">
         <description>The raw data from the dynamic pressure sensor with pressure, temperature and airspeed.</description>
         <field name="SensorConnected" units="" type="enum" elements="1" options="False,True"/>
         <field name="SensorValue" units="raw" type="uint16" elements="1"/>

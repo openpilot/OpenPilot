@@ -32,7 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QList>
 #include "smartsavebutton.h"
 
@@ -46,6 +46,7 @@ private slots:
     void openHelp();
     void refreshValues();
     void widgetsContentsChanged();
+    void enableSaveButtons(bool enable);
 
 private:
     Ui_CC_HW_Widget *m_telemetry;

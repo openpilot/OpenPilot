@@ -34,9 +34,9 @@
 #ifndef GPS_H
 #define GPS_H
 
-#include "gpsvelocity.h"
+#include "gpsvelocitysensor.h"
 #include "gpssatellites.h"
-#include "gpsposition.h"
+#include "gpspositionsensor.h"
 #include "gpstime.h"
 
 #define NO_PARSER         -3 // no parser available

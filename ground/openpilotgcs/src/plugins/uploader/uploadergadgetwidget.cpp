@@ -26,11 +26,16 @@
  */
 #include "uploadergadgetwidget.h"
 #include "version_info/version_info.h"
-#include <coreplugin/coreconstants.h>
-#include <QDebug>
 #include "flightstatus.h"
 
+#include <coreplugin/coreconstants.h>
+#include <uavtalk/telemetrymanager.h>
+
+#include <QDebug>
+
 #define DFU_DEBUG true
+
+const int UploaderGadgetWidget::AUTOUPDATE_CLOSE_TIMEOUT = 7000;
 
 UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 {
@@ -82,9 +87,9 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 }
 
 
-bool sortPorts(const QextPortInfo &s1, const QextPortInfo &s2)
+bool sortPorts(const QSerialPortInfo &s1, const QSerialPortInfo &s2)
 {
-    return s1.portName < s2.portName;
+    return s1.portName() < s2.portName();
 }
 
 /**
@@ -98,12 +103,12 @@ void UploaderGadgetWidget::getSerialPorts()
     m_config->telemetryLink->clear();
 
     list.append(QString("USB"));
-    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
 
     // sort the list by port number (nice idea from PT_Dreamer :))
     qSort(ports.begin(), ports.end(), sortPorts);
-    foreach(QextPortInfo port, ports) {
-        list.append(port.friendName);
+    foreach(QSerialPortInfo port, ports) {
+        list.append(port.portName());
     }
 
     m_config->telemetryLink->addItems(list);
@@ -112,14 +117,11 @@ void UploaderGadgetWidget::getSerialPorts()
 
 QString UploaderGadgetWidget::getPortDevice(const QString &friendName)
 {
-    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
-    foreach(QextPortInfo port, ports) {
-        if (port.friendName == friendName)
-#ifdef Q_OS_WIN
-        { return port.portName; }
-#else
-        { return port.physName; }
-#endif
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    foreach(QSerialPortInfo port, ports) {
+        if (port.portName() == friendName) {
+            return port.portName();
+        }
     }
     return "";
 }
@@ -358,16 +360,10 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             dw->populate();
             m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
         }
-        /*
-           m_config->haltButton->setEnabled(false);
-           m_config->resetButton->setEnabled(false);
-         */
+
         // Need to re-enable in case we were not connected
         bootButtonsSetEnable(true);
-        /*
-           m_config->telemetryLink->setEnabled(false);
-           m_config->rescueButton->setEnabled(false);
-         */
+
         if (resetOnly) {
             resetOnly = false;
             delay::msleep(3500);
@@ -835,10 +831,14 @@ void UploaderGadgetWidget::finishAutoUpdate()
 {
     disconnect(this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::AutoUpdateStep, QVariant)));
     m_config->autoUpdateOkButton->setEnabled(true);
+    connect(&autoUpdateCloseTimer, SIGNAL(timeout()), this, SLOT(closeAutoUpdate()));
+    autoUpdateCloseTimer.start(AUTOUPDATE_CLOSE_TIMEOUT);
 }
 
 void UploaderGadgetWidget::closeAutoUpdate()
 {
+    autoUpdateCloseTimer.stop();
+    disconnect(&autoUpdateCloseTimer, SIGNAL(timeout()), this, SLOT(closeAutoUpdate()));
     m_config->autoUpdateGroupBox->setVisible(false);
     m_config->buttonFrame->setEnabled(true);
     m_config->splitter->setEnabled(true);
@@ -958,6 +958,7 @@ void UploaderGadgetWidget::versionMatchCheck()
     deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
     QByteArray uavoHashArray;
     QString uavoHash = VersionInfo::uavoHashArray();
+
 
     uavoHash.chop(2);
     uavoHash.remove(0, 2);

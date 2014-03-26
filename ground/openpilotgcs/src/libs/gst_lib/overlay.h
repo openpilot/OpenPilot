@@ -8,8 +8,6 @@
 #ifndef OVERLAY_H_
 #define OVERLAY_H_
 
-#include <QtGui/QWidget>
-
 class Overlay {
 public:
     Overlay()

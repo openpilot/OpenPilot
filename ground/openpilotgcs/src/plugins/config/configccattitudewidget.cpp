@@ -33,8 +33,9 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>
-#include "accels.h"
-#include "gyros.h"
+#include "accelstate.h"
+#include "accelgyrosettings.h"
+#include "gyrostate.h"
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
 
@@ -54,16 +55,17 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
 
     addApplySaveButtons(ui->applyButton, ui->saveButton);
     addUAVObject("AttitudeSettings");
+    addUAVObject("AccelGyroSettings");
 
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
-    addUAVObjectToWidgetRelation("AttitudeSettings", "ZeroDuringArming", ui->zeroGyroBiasOnArming);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "AccelTau", ui->accelTauSpinbox);
+    addWidgetBinding("AttitudeSettings", "ZeroDuringArming", ui->zeroGyroBiasOnArming);
+    addWidgetBinding("AttitudeSettings", "AccelTau", ui->accelTauSpinbox);
 
-    addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", ui->rollBias, AttitudeSettings::BOARDROTATION_ROLL);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", ui->pitchBias, AttitudeSettings::BOARDROTATION_PITCH);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", ui->yawBias, AttitudeSettings::BOARDROTATION_YAW);
+    addWidgetBinding("AttitudeSettings", "BoardRotation", ui->rollBias, AttitudeSettings::BOARDROTATION_ROLL);
+    addWidgetBinding("AttitudeSettings", "BoardRotation", ui->pitchBias, AttitudeSettings::BOARDROTATION_PITCH);
+    addWidgetBinding("AttitudeSettings", "BoardRotation", ui->yawBias, AttitudeSettings::BOARDROTATION_YAW);
     addWidget(ui->zeroBias);
     refreshWidgetsValues();
 }
@@ -80,26 +82,26 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject *obj)
         return;
     }
 
-    Accels *accels = Accels::GetInstance(getObjectManager());
-    Gyros *gyros   = Gyros::GetInstance(getObjectManager());
+    AccelState *accelState = AccelState::GetInstance(getObjectManager());
+    GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
 
     // Accumulate samples until we have _at least_ NUM_SENSOR_UPDATES samples
     // for both gyros and accels.
     // Note that, at present, we stash the samples and then compute the bias
     // at the end, even though the mean could be accumulated as we go.
     // In future, a better algorithm could be used.
-    if (obj->getObjID() == Accels::OBJID) {
+    if (obj->getObjID() == AccelState::OBJID) {
         accelUpdates++;
-        Accels::DataFields accelsData = accels->getData();
-        x_accum.append(accelsData.x);
-        y_accum.append(accelsData.y);
-        z_accum.append(accelsData.z);
-    } else if (obj->getObjID() == Gyros::OBJID) {
+        AccelState::DataFields accelStateData = accelState->getData();
+        x_accum.append(accelStateData.x);
+        y_accum.append(accelStateData.y);
+        z_accum.append(accelStateData.z);
+    } else if (obj->getObjID() == GyroState::OBJID) {
         gyroUpdates++;
-        Gyros::DataFields gyrosData = gyros->getData();
-        x_gyro_accum.append(gyrosData.x);
-        y_gyro_accum.append(gyrosData.y);
-        z_gyro_accum.append(gyrosData.z);
+        GyroState::DataFields gyroStateData = gyroState->getData();
+        x_gyro_accum.append(gyroStateData.x);
+        y_gyro_accum.append(gyroStateData.y);
+        z_gyro_accum.append(gyroStateData.z);
     }
 
     // update the progress indicator
@@ -111,26 +113,28 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject *obj)
         disconnect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sensorsUpdated(UAVObject *)));
         disconnect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
 
-        float x_bias = listMean(x_accum) / ACCEL_SCALE;
-        float y_bias = listMean(y_accum) / ACCEL_SCALE;
-        float z_bias = (listMean(z_accum) + 9.81) / ACCEL_SCALE;
+        float x_bias = listMean(x_accum);
+        float y_bias = listMean(y_accum);
+        float z_bias = (listMean(z_accum) + 9.81);
 
-        float x_gyro_bias = listMean(x_gyro_accum) * 100.0f;
-        float y_gyro_bias = listMean(y_gyro_accum) * 100.0f;
-        float z_gyro_bias = listMean(z_gyro_accum) * 100.0f;
-        accels->setMetadata(initialAccelsMdata);
-        gyros->setMetadata(initialGyrosMdata);
+        float x_gyro_bias = listMean(x_gyro_accum);
+        float y_gyro_bias = listMean(y_gyro_accum);
+        float z_gyro_bias = listMean(z_gyro_accum);
+        accelState->setMetadata(initialAccelStateMdata);
+        gyroState->setMetadata(initialGyroStateMdata);
 
-        AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
+        AccelGyroSettings::DataFields accelGyroSettingsData = AccelGyroSettings::GetInstance(getObjectManager())->getData();
+        AttitudeSettings::DataFields attitudeSettingsData   = AttitudeSettings::GetInstance(getObjectManager())->getData();
         // We offset the gyro bias by current bias to help precision
-        attitudeSettingsData.AccelBias[0]   += x_bias;
-        attitudeSettingsData.AccelBias[1]   += y_bias;
-        attitudeSettingsData.AccelBias[2]   += z_bias;
-        attitudeSettingsData.GyroBias[0]     = -x_gyro_bias;
-        attitudeSettingsData.GyroBias[1]     = -y_gyro_bias;
-        attitudeSettingsData.GyroBias[2]     = -z_gyro_bias;
+        accelGyroSettingsData.accel_bias[0] += x_bias;
+        accelGyroSettingsData.accel_bias[1] += y_bias;
+        accelGyroSettingsData.accel_bias[2] += z_bias;
+        accelGyroSettingsData.gyro_bias[0]   = -x_gyro_bias;
+        accelGyroSettingsData.gyro_bias[1]   = -y_gyro_bias;
+        accelGyroSettingsData.gyro_bias[2]   = -z_gyro_bias;
         attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
+        AccelGyroSettings::GetInstance(getObjectManager())->setData(accelGyroSettingsData);
         this->setDirty(true);
 
         // reenable controls
@@ -140,15 +144,15 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject *obj)
 
 void ConfigCCAttitudeWidget::timeout()
 {
-    UAVDataObject *obj = Accels::GetInstance(getObjectManager());
+    UAVDataObject *obj = AccelState::GetInstance(getObjectManager());
 
     disconnect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sensorsUpdated(UAVObject *)));
     disconnect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
 
-    Accels *accels = Accels::GetInstance(getObjectManager());
-    Gyros *gyros   = Gyros::GetInstance(getObjectManager());
-    accels->setMetadata(initialAccelsMdata);
-    gyros->setMetadata(initialGyrosMdata);
+    AccelState *accelState = AccelState::GetInstance(getObjectManager());
+    GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
+    accelState->setMetadata(initialAccelStateMdata);
+    gyroState->setMetadata(initialGyroStateMdata);
 
     QMessageBox msgBox;
     msgBox.setText(tr("Calibration timed out before receiving required updates."));
@@ -182,28 +186,28 @@ void ConfigCCAttitudeWidget::startAccelCalibration()
     AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 
     // Set up to receive updates
-    UAVDataObject *accels = Accels::GetInstance(getObjectManager());
-    UAVDataObject *gyros  = Gyros::GetInstance(getObjectManager());
-    connect(accels, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sensorsUpdated(UAVObject *)));
-    connect(gyros, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sensorsUpdated(UAVObject *)));
+    UAVDataObject *accelState = AccelState::GetInstance(getObjectManager());
+    UAVDataObject *gyroState  = GyroState::GetInstance(getObjectManager());
+    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sensorsUpdated(UAVObject *)));
+    connect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sensorsUpdated(UAVObject *)));
 
     // Speed up updates
-    initialAccelsMdata = accels->getMetadata();
-    UAVObject::Metadata accelsMdata = initialAccelsMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(accelsMdata, UAVObject::UPDATEMODE_PERIODIC);
-    accelsMdata.flightTelemetryUpdatePeriod = 30; // ms
-    accels->setMetadata(accelsMdata);
+    initialAccelStateMdata = accelState->getMetadata();
+    UAVObject::Metadata accelStateMdata = initialAccelStateMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(accelStateMdata, UAVObject::UPDATEMODE_PERIODIC);
+    accelStateMdata.flightTelemetryUpdatePeriod = 30; // ms
+    accelState->setMetadata(accelStateMdata);
 
-    initialGyrosMdata = gyros->getMetadata();
-    UAVObject::Metadata gyrosMdata = initialGyrosMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(gyrosMdata, UAVObject::UPDATEMODE_PERIODIC);
-    gyrosMdata.flightTelemetryUpdatePeriod = 30; // ms
-    gyros->setMetadata(gyrosMdata);
+    initialGyroStateMdata = gyroState->getMetadata();
+    UAVObject::Metadata gyroStateMdata = initialGyroStateMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(gyroStateMdata, UAVObject::UPDATEMODE_PERIODIC);
+    gyroStateMdata.flightTelemetryUpdatePeriod = 30; // ms
+    gyroState->setMetadata(gyroStateMdata);
 
     // Set up timeout timer
     timer.setSingleShot(true);
-    timer.start(5000 + (NUM_SENSOR_UPDATES * qMax(accelsMdata.flightTelemetryUpdatePeriod,
-                                                  gyrosMdata.flightTelemetryUpdatePeriod)));
+    timer.start(5000 + (NUM_SENSOR_UPDATES * qMax(accelStateMdata.flightTelemetryUpdatePeriod,
+                                                  gyroStateMdata.flightTelemetryUpdatePeriod)));
     connect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
@@ -214,6 +218,7 @@ void ConfigCCAttitudeWidget::openHelp()
 
 void ConfigCCAttitudeWidget::setAccelFiltering(bool active)
 {
+    Q_UNUSED(active);
     setDirty(true);
 }
 

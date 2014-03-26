@@ -24,16 +24,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include <QtCore>
-#include <QDebug>
-#include <QStringList>
-#include <QtGui/QTextEdit>
-#include <QtGui/QPushButton>
-#include <QtGui/QWidget>
-
 #include "videogadgetconfiguration.h"
 #include "videogadgetwidget.h"
 #include "pipeline.h"
+
+#include <QtCore>
+#include <QDebug>
+#include <QStringList>
+#include <QTextEdit>
+#include <QPushButton>
+#include <QWidget>
 
 VideoGadgetWidget::VideoGadgetWidget(QWidget *parent) :
         QFrame(parent)

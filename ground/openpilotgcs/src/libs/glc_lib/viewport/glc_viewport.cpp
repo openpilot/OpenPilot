@@ -39,7 +39,7 @@ using namespace glc;
 // Constructor Destructor
 //////////////////////////////////////////////////////////////////////
 
-GLC_Viewport::GLC_Viewport(QGLWidget *GLWidget)
+GLC_Viewport::GLC_Viewport()
 // Camera definition
 : m_pViewCam(new GLC_Camera())				// Camera
 , m_DistanceMax(500.0)			// Camera Maximum distance
@@ -51,7 +51,6 @@ GLC_Viewport::GLC_Viewport(QGLWidget *GLWidget)
 , m_WindowHSize(0)				// Horizontal OpenGL viewport size
 , m_WindowVSize(0)				// Vertical OpenGL viewport size
 , m_AspectRatio(1.0)
-, m_pQGLWidget(GLWidget)		// Attached QGLWidget
 // the default backgroundColor
 , m_BackgroundColor(Qt::black)
 , m_SelectionSquareSize(4)
@@ -108,14 +107,14 @@ GLC_Point2d GLC_Viewport::mapToOpenGLScreen(int x, int y)
 {
 	GLC_Point2d nPos= normalyseMousePosition(x, y);
 
-	return mapNormalyzeToOpenGLScreen(nPos.getX(), nPos.getY());
+	return mapNormalyzeToOpenGLScreen(nPos.x(), nPos.y());
 }
 
 GLC_Point2d GLC_Viewport::mapNormalyzeToOpenGLScreen(double x, double y)
 {
 	GLC_Point2d pos(x, y);
 	pos= pos * 2.0;
-	pos.setY(pos.getY() * -1.0);
+	pos.setY(pos.y() * -1.0);
 	pos= pos + GLC_Point2d(-1.0, 1.0);
 	return pos;
 }
@@ -153,7 +152,7 @@ GLC_Vector3d GLC_Viewport::mapNormalyzePosMouse(double Posx, double Posy) const
 
 void GLC_Viewport::initGl()
 {
-	m_pQGLWidget->qglClearColor(m_BackgroundColor);       // Background
+	glClearColor(m_BackgroundColor.redF(), m_BackgroundColor.greenF(), m_BackgroundColor.blueF(), 1.0f);
 	glClearDepth(1.0f);                                   // Depth Buffer Setup
 	glShadeModel(GL_SMOOTH);                              // Enable Smooth Shading
 	glEnable(GL_DEPTH_TEST);                              // Enables Depth Testing
@@ -324,31 +323,34 @@ void GLC_Viewport::render3DWidget()
 
 void GLC_Viewport::setWinGLSize(int HSize, int VSize)
 {
-	m_WindowHSize= HSize;
-	m_WindowVSize= VSize;
-
-	// from NeHe's Tutorial 3
-	if (m_WindowVSize == 0)								// Prevent A Divide By Zero By
+	if ((m_WindowHSize != HSize) || (m_WindowVSize != VSize))
 	{
-		m_WindowVSize= 1;									// Making Height Equal One
+		m_WindowHSize= HSize;
+		m_WindowVSize= VSize;
+
+		// from NeHe's Tutorial 3
+		if (m_WindowVSize == 0)								// Prevent A Divide By Zero By
+		{
+			m_WindowVSize= 1;									// Making Height Equal One
+		}
+
+		glViewport(0,0,m_WindowHSize,m_WindowVSize);			// Reset The Current Viewport
+
+		updateAspectRatio();
+
+		updateProjectionMat();
+
+		updateMinimumRatioSize();
 	}
-
-	glViewport(0,0,m_WindowHSize,m_WindowVSize);			// Reset The Current Viewport
-
-	updateAspectRatio();
-
-	updateProjectionMat();
-
-	updateMinimumRatioSize();
 }
 
 GLC_uint GLC_Viewport::renderAndSelect(int x, int y)
 {
-
-	m_pQGLWidget->qglClearColor(Qt::black);
+	const QColor clearColor(Qt::black);
+	glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
 	GLC_State::setSelectionMode(true);
 	// Draw the scene
-	m_pQGLWidget->updateGL();
+	emit updateOpenGL();
 	GLC_State::setSelectionMode(false);
 
 	return selectOnPreviousRender(x, y);
@@ -359,7 +361,7 @@ GLC_uint GLC_Viewport::selectOnPreviousRender(int x, int y)
 	GLsizei width= m_SelectionSquareSize;
 	GLsizei height= width;
 	GLint newX= x - width / 2;
-	GLint newY= (m_pQGLWidget->size().height() - y) - height / 2;
+	GLint newY= (m_WindowVSize - y) - height / 2;
 	if (newX < 0) newX= 0;
 	if (newY < 0) newY= 0;
 
@@ -367,7 +369,8 @@ GLC_uint GLC_Viewport::selectOnPreviousRender(int x, int y)
 }
 GLC_uint GLC_Viewport::selectBody(GLC_3DViewInstance* pInstance, int x, int y)
 {
-	m_pQGLWidget->qglClearColor(Qt::black);
+	const QColor clearColor(Qt::black);
+	glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
 	GLC_State::setSelectionMode(true);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	GLC_Context::current()->glcLoadIdentity();
@@ -385,7 +388,7 @@ GLC_uint GLC_Viewport::selectBody(GLC_3DViewInstance* pInstance, int x, int y)
 	GLsizei width= 6;
 	GLsizei height= width;
 	GLint newX= x - width / 2;
-	GLint newY= (m_pQGLWidget->size().height() - y) - height / 2;
+	GLint newY= (m_WindowVSize - y) - height / 2;
 	if (newX < 0) newX= 0;
 	if (newY < 0) newY= 0;
 
@@ -396,7 +399,8 @@ QPair<int, GLC_uint> GLC_Viewport::selectPrimitive(GLC_3DViewInstance* pInstance
 {
 	QPair<int, GLC_uint> result;
 
-	m_pQGLWidget->qglClearColor(Qt::black);
+	const QColor clearColor(Qt::black);
+	glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
 	GLC_State::setSelectionMode(true);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	GLC_Context::current()->glcLoadIdentity();
@@ -414,7 +418,7 @@ QPair<int, GLC_uint> GLC_Viewport::selectPrimitive(GLC_3DViewInstance* pInstance
 	GLsizei width= 6;
 	GLsizei height= width;
 	GLint newX= x - width / 2;
-	GLint newY= (m_pQGLWidget->size().height() - y) - height / 2;
+	GLint newY= (m_WindowVSize - y) - height / 2;
 	if (newX < 0) newX= 0;
 	if (newY < 0) newY= 0;
 
@@ -449,16 +453,17 @@ QSet<GLC_uint> GLC_Viewport::selectInsideSquare(int x1, int y1, int x2, int y2)
 		y1= y2;
 		y2= yTemp;
 	}
-	m_pQGLWidget->qglClearColor(Qt::black);
+	const QColor clearColor(Qt::black);
+	glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
 	GLC_State::setSelectionMode(true);
 	// Draw the scene
-	m_pQGLWidget->updateGL();
+	updateOpenGL();
 	GLC_State::setSelectionMode(false);
 
 	GLsizei width= x2 - x1;
 	GLsizei height= y1 - y2;
 	GLint newX= x1;
-	GLint newY= (m_pQGLWidget->size().height() - y1);
+	GLint newY= (m_WindowVSize - y1);
 	if (newX < 0) newX= 0;
 	if (newY < 0) newY= 0;
 
@@ -475,7 +480,7 @@ GLC_uint GLC_Viewport::meaningfulIdInsideSquare(GLint x, GLint y, GLsizei width,
 	glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, colorId.data());
 
 	// Restore Background color
-	m_pQGLWidget->qglClearColor(m_BackgroundColor);
+	glClearColor(m_BackgroundColor.redF(), m_BackgroundColor.greenF(), m_BackgroundColor.blueF(), 1.0f);
 
 	QHash<GLC_uint, int> idHash;
 	QList<int> idWeight;
@@ -522,7 +527,7 @@ QSet<GLC_uint> GLC_Viewport::listOfIdInsideSquare(GLint x, GLint y, GLsizei widt
 	glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, colorId.data());
 
 	// Restore Background color
-	m_pQGLWidget->qglClearColor(m_BackgroundColor);
+	glClearColor(m_BackgroundColor.redF(), m_BackgroundColor.greenF(), m_BackgroundColor.blueF(), 1.0f);
 
 	QSet<GLC_uint> idSet;
 
@@ -562,6 +567,11 @@ void GLC_Viewport::deleteBackGroundImage()
 	m_pImagePlane= NULL;
 }
 
+void GLC_Viewport::clearBackground(const QColor& color) const
+{
+	glClearColor(color.redF(), color.greenF(), color.blueF(), 1.0f);
+}
+
 void GLC_Viewport::setToOrtho(bool useOrtho)
 {
 	if (m_UseParallelProjection != useOrtho)
@@ -580,7 +590,7 @@ void GLC_Viewport::reframe(const GLC_BoundingBox& box)
 	const GLC_Vector3d deltaVector(box.center() - m_pViewCam->target());
 	m_pViewCam->translate(deltaVector);
 
-	double cameraCover= box.boundingSphereRadius() * 2.0;
+    double cameraCover= box.boundingSphereRadius() * 2.2;
 
 	// Compute Camera distance
 	const double distance = cameraCover / m_ViewTangent;
@@ -680,7 +690,7 @@ void GLC_Viewport::setDistMinAndMax(const GLC_BoundingBox& bBox)
 void GLC_Viewport::setBackgroundColor(QColor setColor)
 {
 	m_BackgroundColor= setColor;
-	m_pQGLWidget->qglClearColor(m_BackgroundColor);
+	glClearColor(m_BackgroundColor.redF(), m_BackgroundColor.greenF(), m_BackgroundColor.blueF(), 1.0f);
 }
 
 void GLC_Viewport::addClipPlane(GLenum planeGlEnum,GLC_Plane* pPlane)

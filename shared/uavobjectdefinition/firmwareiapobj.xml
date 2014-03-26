@@ -1,11 +1,12 @@
 <xml> 
-    <object name="FirmwareIAPObj" singleinstance="true" settings="false"> 
+    <object name="FirmwareIAPObj" singleinstance="true" settings="false" category="System" priority="true"> 
         <description>Queries board for SN, model, revision, and sends reset command</description> 
         <field name="Command" units="" type="uint16" elements="1"/> 
         <field name="Description" units="" type="uint8" elements="100"/> 
         <field name="CPUSerial" units="" type="uint8" elements="12" /> 
         <field name="BoardRevision" units="" type="uint16" elements="1"/> 
         <field name="BoardType" units="" type="uint8" elements="1"/> 
+        <field name="BootloaderRevision" units="" type="uint8" elements="1"/>
         <field name="ArmReset" units="" type="uint8" elements="1"/> 
         <field name="crc" units="" type="uint32" elements="1"/> 
         <access gcs="readwrite" flight="readwrite"/> 

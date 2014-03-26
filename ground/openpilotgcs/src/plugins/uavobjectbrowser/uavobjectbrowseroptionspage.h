@@ -29,7 +29,7 @@
 #define UAVOBJECTBROWSEROPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
-#include <QtGui/QColor>
+#include <QColor>
 #include <utils/qtcolorbutton.h>
 
 

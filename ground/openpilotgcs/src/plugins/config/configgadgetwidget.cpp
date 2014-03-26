@@ -42,12 +42,14 @@
 #include "defaulthwsettingswidget.h"
 #include "uavobjectutilmanager.h"
 
+#include <uavtalk/telemetrymanager.h>
+
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
 
 ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
@@ -248,7 +250,7 @@ void ConfigGadgetWidget::tabAboutToChange(int i, bool *proceed)
     }
     if (wid->isDirty()) {
         int ans = QMessageBox::warning(this, tr("Unsaved changes"), tr("The tab you are leaving has unsaved changes,"
-                                                                       "if you proceed they will be lost."
+                                                                       "if you proceed they will be lost.\n"
                                                                        "Do you still want to proceed?"), QMessageBox::Yes, QMessageBox::No);
         if (ans == QMessageBox::No) {
             *proceed = false;

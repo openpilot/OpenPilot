@@ -43,6 +43,10 @@
 /* PIOS FreeRTOS support */
 #define PIOS_INCLUDE_FREERTOS
 
+
+/* PIOS CallbackScheduler support */
+#define PIOS_INCLUDE_CALLBACKSCHEDULER
+
 /* PIOS bootloader helper */
 #define PIOS_INCLUDE_BL_HELPER
 /* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
@@ -93,6 +97,7 @@
 #define PIOS_INCLUDE_DSM
 #define PIOS_INCLUDE_SBUS
 #define PIOS_INCLUDE_GCSRCVR
+/* #define PIOS_INCLUDE_OPLINKRCVR */
 
 /* PIOS abstract receiver interface */
 #define PIOS_INCLUDE_RCVR
@@ -115,7 +120,6 @@
 /* PIOS radio modules */
 /* #define PIOS_INCLUDE_RFM22B */
 /* #define PIOS_INCLUDE_RFM22B_COM */
-/* #define PIOS_INCLUDE_RFM22B_RCVR */
 /* #define PIOS_INCLUDE_PPM_OUT */
 /* #define PIOS_RFM22B_DEBUG_ON_TELEM */
 
@@ -154,11 +158,14 @@
 
 /* Task stack sizes */
 #define PIOS_ACTUATOR_STACK_SIZE        1020
-#define PIOS_MANUAL_STACK_SIZE          800
+#define PIOS_MANUAL_STACK_SIZE          850
+#ifdef DIAG_TASKS
+#define PIOS_SYSTEM_STACK_SIZE          720
+#else
 #define PIOS_SYSTEM_STACK_SIZE          660
-#define PIOS_STABILIZATION_STACK_SIZE   524
-#define PIOS_TELEM_STACK_SIZE           500
-#define PIOS_EVENTDISPATCHER_STACK_SIZE 130
+#endif
+#define PIOS_TELEM_STACK_SIZE           540
+#define PIOS_EVENTDISPATCHER_STACK_SIZE 160
 
 /* This can't be too high to stop eventdispatcher thread overflowing */
 #define PIOS_EVENTDISAPTCHER_QUEUE      10

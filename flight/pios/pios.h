@@ -69,6 +69,7 @@
 /* #define DEBUG_LEVEL 0 */
 /* #define PIOS_ENABLE_DEBUG_PINS */
 #include <pios_debug.h>
+#include <pios_debuglog.h>
 
 /* PIOS common functions */
 #include <pios_crc.h>
@@ -81,11 +82,23 @@
 #include "semphr.h"
 #endif
 
+#include <stdbool.h>
+
+#include <pios_architecture.h>
+
 #ifdef PIOS_INCLUDE_TASK_MONITOR
 #ifndef PIOS_INCLUDE_FREERTOS
 #error PiOS Task Monitor requires PIOS_INCLUDE_FREERTOS to be defined
 #endif
 #include <pios_task_monitor.h>
+#endif
+
+/* PIOS CallbackScheduler */
+#ifdef PIOS_INCLUDE_CALLBACKSCHEDULER
+#ifndef PIOS_INCLUDE_FREERTOS
+#error PiOS CallbackScheduler requires PIOS_INCLUDE_FREERTOS to be defined
+#endif
+#include <pios_callbackscheduler.h>
 #endif
 
 /* PIOS bootloader helper */
@@ -97,6 +110,7 @@
 /* PIOS system functions */
 #ifdef PIOS_INCLUDE_DELAY
 #include <pios_delay.h>
+#include <pios_deltatime.h>
 #endif
 
 #ifdef PIOS_INCLUDE_INITCALL
@@ -241,10 +255,6 @@
 #include <pios_sbus.h>
 #endif
 
-#ifdef PIOS_INCLUDE_GCSRCVR
-/* only priv header */
-#endif
-
 /* PIOS abstract receiver interface */
 #ifdef PIOS_INCLUDE_RCVR
 #include <pios_rcvr.h>
@@ -299,9 +309,6 @@
 #include <pios_rfm22b.h>
 #ifdef PIOS_INCLUDE_RFM22B_COM
 #include <pios_rfm22b_com.h>
-#endif
-#ifdef PIOS_INCLUDE_RFM22B_RCVR
-#include <pios_rfm22b_rcvr.h>
 #endif
 #endif /* PIOS_INCLUDE_RFM22B */
 

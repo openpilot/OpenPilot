@@ -650,7 +650,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         if (airspeedSensor.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE) {
             // we have airspeed available
             airspeed.CalibratedAirspeed = airspeedSensor.CalibratedAirspeed;
-            airspeed.TrueAirspeed = airspeed.CalibratedAirspeed * IAS2TAS(homeLocation.Altitude - positionState.Down);
+            airspeed.TrueAirspeed = (airspeedSensor.TrueAirspeed < 0.f) ? airspeed.CalibratedAirspeed * IAS2TAS(homeLocation.Altitude - positionState.Down) : airspeedSensor.TrueAirspeed;
             AirspeedStateSet(&airspeed);
         }
     }
@@ -1078,7 +1078,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
         AirspeedStateGet(&airspeed);
 
         airspeed.CalibratedAirspeed = airspeedData.CalibratedAirspeed;
-        airspeed.TrueAirspeed = airspeed.CalibratedAirspeed * IAS2TAS(homeLocation.Altitude - Nav.Pos[2]);
+        airspeed.TrueAirspeed = (airspeedSensor.TrueAirspeed < 0.f) ? airspeed.CalibratedAirspeed * IAS2TAS(homeLocation.Altitude - positionState.Down) : airspeedSensor.TrueAirspeed;
+        
         AirspeedStateSet(&airspeed);
 
         if (!gps_vel_updated && !gps_updated) {

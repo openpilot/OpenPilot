@@ -13378,6 +13378,7 @@ border-radius: 5;</string>
                       <property name="decimals">
                        <number>5</number>
 
+
                       </property>
                       <property name="singleStep">
                        <double>0.000100000000000</double>
@@ -15942,6 +15943,7 @@ border-radius: 5;</string>
                         <string>element:Kp</string>
                         <string>haslimits:no</string>
                         <string>scale:1</string>
+
                         <string>buttongroup:5,20</string>
                        </stringlist>
                       </property>
@@ -17353,6 +17355,7 @@ border-radius: 5;</string>
                             <red>26</red>
                             <green>26</green>
                             <blue>26</blue>
+
                            </color>
                           </brush>
                          </colorrole>
@@ -24307,6 +24310,7 @@ border-radius: 5;</string>
                      <string>buttongroup:16</string>
                     </stringlist>
                    </property>
+
                   </widget>
                  </item>
                  <item row="2" column="1">

@@ -432,7 +432,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 #define STICK_VALUE_AT_MODE_TRANSITION 0.618033989f
 
                 // the following assumes the transition would otherwise be at 0.618033989f
-                // and that assumes that Att ramps up to max roll rate
+                // and THAT assumes that Att ramps up to max roll rate
                 // when a small number of degrees off of where it should be
 
                 // if below the transition angle (still in attitude mode)
@@ -440,21 +440,24 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 if (magnitude <= rattitude_mode_transition_stick_position) {
                     magnitude *= STICK_VALUE_AT_MODE_TRANSITION / rattitude_mode_transition_stick_position;
                 } else {
-                    magnitude = (magnitude - rattitude_mode_transition_stick_position) * (1.0f-STICK_VALUE_AT_MODE_TRANSITION) / (1.0f - rattitude_mode_transition_stick_position) + STICK_VALUE_AT_MODE_TRANSITION;
+                    magnitude = (magnitude - rattitude_mode_transition_stick_position)
+                                * (1.0f-STICK_VALUE_AT_MODE_TRANSITION)
+                                / (1.0f - rattitude_mode_transition_stick_position)
+                                + STICK_VALUE_AT_MODE_TRANSITION;
                 }
                 rateDesiredAxis[i] = (1.0f - magnitude) * rateDesiredAxisAttitude
                                      + magnitude * rateDesiredAxisRate;
 
                 // Compute the inner loop for the averaged rate
                 // actuatorDesiredAxis[i] is the weighted average
-                actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
+                actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor,
+                                                            rateDesiredAxis[i], gyro_filtered[i], dT);
                 actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
                 break;
             }
 
             case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
-
                 // Store for debugging output
                 rateDesiredAxis[i] = stabDesiredAxis[i];
 

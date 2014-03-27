@@ -39,6 +39,8 @@ INCLUDEPATH += \
 LIBS += -L$(GSTREAMER_SDK_DIR)/lib
 LIBS += -lgobject-2.0 -lglib-2.0 -lgstreamer-0.10 -lgstinterfaces-0.10
 
+include(copydata.pro)
+
 #win32 {
 #    # compile missing winscreencap plugin
 #    include(gst-plugins-bad/gst-plugins-bad.pro)

@@ -118,7 +118,7 @@ int32_t AirspeedInitialize()
             airspeedADCPin = i;
         }
     }
-    
+
     lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
 
     AirspeedSensorInitialize();
@@ -155,21 +155,21 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         // Update the airspeed object
         AirspeedSensorGet(&airspeedData);
 
-        // if sensor type changed and the last sensor was 
+        // if sensor type changed and the last sensor was
         // either Eagletree or PixHawk, reset I2C alarms
-        if(airspeedSettings.AirspeedSensorType != lastAirspeedSensorType){
+        if (airspeedSettings.AirspeedSensorType != lastAirspeedSensorType) {
             switch (lastAirspeedSensorType) {
-                // Eagletree or PixHawk => Reset I2C alams
-                case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_EAGLETREEAIRSPEEDV3:
-                case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_PIXHAWKAIRSPEEDMS4525DO:
-                     AlarmsDefault(SYSTEMALARMS_ALARM_I2C);
-                     break;
-                // else do not reset I2C alarms
-                default: break;
+            // Eagletree or PixHawk => Reset I2C alams
+            case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_EAGLETREEAIRSPEEDV3:
+            case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_PIXHAWKAIRSPEEDMS4525DO:
+                AlarmsDefault(SYSTEMALARMS_ALARM_I2C);
+                break;
+            // else do not reset I2C alarms
+            default: break;
             }
             lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
         }
-        
+
         switch (airspeedSettings.AirspeedSensorType) {
 #if defined(PIOS_INCLUDE_MPXV)
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV7002:

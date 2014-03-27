@@ -40,7 +40,6 @@ static int8_t PIOS_MS4525DO_WriteI2C(uint8_t *buffer, uint8_t len);
 static bool pios_ms4525do_requested = false;
 
 
-
 static int8_t PIOS_MS4525DO_ReadI2C(uint8_t *buffer, uint8_t len)
 {
     const struct pios_i2c_txn txn_list[] = {
@@ -73,15 +72,15 @@ static int8_t PIOS_MS4525DO_WriteI2C(uint8_t *buffer, uint8_t len)
 }
 
 
-
 int8_t PIOS_MS4525DO_Request(void)
 {
-    // MS4525DO expects a zero length write. 
+    // MS4525DO expects a zero length write.
     // Sending one byte is a workaround that works for the moment
-    uint8_t data=0;
-    int8_t retVal=PIOS_MS4525DO_WriteI2C(&data,sizeof(data));
-    /* requested only when transfer worked */ 
-    pios_ms4525do_requested = ( retVal == 0 );
+    uint8_t data  = 0;
+    int8_t retVal = PIOS_MS4525DO_WriteI2C(&data, sizeof(data));
+
+    /* requested only when transfer worked */
+    pios_ms4525do_requested = (retVal == 0);
 
     return retVal;
 }
@@ -98,28 +97,28 @@ int8_t PIOS_MS4525DO_Read(uint16_t *values)
     }
 
     uint8_t data[4];
-    int8_t retVal=PIOS_MS4525DO_ReadI2C(data, sizeof(data));
+    int8_t retVal  = PIOS_MS4525DO_ReadI2C(data, sizeof(data));
 
     uint8_t status = data[0] & 0xC0;
     if (status == 0x80) {
-        /* stale data */ 
+        /* stale data */
         return -5;
     } else if (status == 0xC0) {
         /* device probably broken */
         return -6;
     }
 
-    /* differential pressure */ 
+    /* differential pressure */
     values[0]  = (data[0] << 8);
-    values[0] +=  data[1];
-    
+    values[0] += data[1];
+
     /* temperature */
     values[1]  = (data[2] << 8);
-    values[1] +=  data[3];
+    values[1] += data[3];
     values[1]  = (values[1] >> 5);
-    
-    /* not requested anymore, only when transfer worked */ 
-    pios_ms4525do_requested = !( retVal == 0 );
+
+    /* not requested anymore, only when transfer worked */
+    pios_ms4525do_requested = !(retVal == 0);
 
     return retVal;
 }

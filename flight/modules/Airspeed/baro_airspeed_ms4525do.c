@@ -45,15 +45,15 @@
 #if defined(PIOS_INCLUDE_MS4525DO)
 
 #define CALIBRATION_IDLE_MS  0              // Time to wait before calibrating, in [ms]
-#define CALIBRATION_COUNT_MS 4000           // Time to spend calibrating, in [ms]
-#define FILTER_SHIFT 5                      // Barry Dorr filter parameter k
+#define CALIBRATION_COUNT_MS 4000 // Time to spend calibrating, in [ms]
+#define FILTER_SHIFT         5                      // Barry Dorr filter parameter k
 
-#define P0              101325.0f           // standard pressure
-#define CCEXPONENT      0.2857142857f       // exponent of compressibility correction 2/7
-#define CASFACTOR       760.8802669f        // sqrt(5) * speed of sound at standard
-#define TASFACTOR       0.05891022589f      // 1/sqrt(T0)
+#define P0                   101325.0f           // standard pressure
+#define CCEXPONENT           0.2857142857f       // exponent of compressibility correction 2/7
+#define CASFACTOR            760.8802669f        // sqrt(5) * speed of sound at standard
+#define TASFACTOR            0.05891022589f      // 1/sqrt(T0)
 
-#define max(x,y) ((x)>=(y) ? (x) : (y))
+#define max(x, y) ((x) >= (y) ? (x) : (y))
 
 // Private types
 
@@ -62,38 +62,38 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
 
 
 // Private variables
-static uint16_t calibrationCount  = 0;
-static uint32_t filter_reg        = 0;      // Barry Dorr filter register
+static uint16_t calibrationCount = 0;
+static uint32_t filter_reg = 0; // Barry Dorr filter register
 
 void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings)
 {
     // request measurement first
     int8_t retVal = PIOS_MS4525DO_Request();
-    
-    if( retVal !=0 ){
+
+    if (retVal != 0) {
         AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_ERROR);
         return;
     }
-    
+
     // Datasheet of MS4525DO: conversion needs 0.5 ms + 20% more when status bit used
     // delay by one Tick or at least 2 ms
     const portTickType xDelay = max(2 / portTICK_RATE_MS, 1);
-    vTaskDelay( xDelay );
-    
+    vTaskDelay(xDelay);
+
     // read the sensor
-    retVal = baro_airspeedReadMS4525DO(airspeedSensor,airspeedSettings);
-    
-    switch( retVal ){
-        case  0 :   AlarmsClear(SYSTEMALARMS_ALARM_I2C); 
-                    break;
-        case -4 :   
-        case -5 :   AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_WARNING);
-                    break;
-        case -1 :
-        case -2 :
-        case -3 :
-        case -6 :   
-        default :    AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_ERROR);
+    retVal = baro_airspeedReadMS4525DO(airspeedSensor, airspeedSettings);
+
+    switch (retVal) {
+    case  0:   AlarmsClear(SYSTEMALARMS_ALARM_I2C);
+        break;
+    case -4:
+    case -5:   AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_WARNING);
+        break;
+    case -1:
+    case -2:
+    case -3:
+    case -6:
+    default:    AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_ERROR);
     }
 }
 
@@ -103,38 +103,38 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
 {
     // Check to see if airspeed sensor is returning airspeedSensor
     uint16_t values[2];
-    int8_t retVal=PIOS_MS4525DO_Read(values);
-    
-    if( retVal == 0 ){
-        airspeedSensor->SensorValue            = values[0];
+    int8_t retVal = PIOS_MS4525DO_Read(values);
+
+    if (retVal == 0) {
+        airspeedSensor->SensorValue = values[0];
         airspeedSensor->SensorValueTemperature = values[1];
     } else {
         airspeedSensor->SensorValue            = -1;
         airspeedSensor->SensorValueTemperature = -1;
-        airspeedSensor->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
-        airspeedSensor->CalibratedAirspeed = 0;
+        airspeedSensor->SensorConnected        = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+        airspeedSensor->CalibratedAirspeed     = 0;
         return retVal;
     }
-    
+
     // only calibrate if no stored calibration is available
-    if ( !airspeedSettings->ZeroPoint ) {
+    if (!airspeedSettings->ZeroPoint) {
         // Calibrate sensor by averaging zero point value
         if (calibrationCount <= CALIBRATION_IDLE_MS / airspeedSettings->SamplePeriod) {
             calibrationCount++;
-            filter_reg = (airspeedSensor->SensorValue << FILTER_SHIFT );
-                        
+            filter_reg = (airspeedSensor->SensorValue << FILTER_SHIFT);
+
             return retVal;
         } else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) {
             calibrationCount++;
             // update filter register
-            filter_reg = filter_reg - ( filter_reg >> FILTER_SHIFT ) + airspeedSensor->SensorValue;
+            filter_reg = filter_reg - (filter_reg >> FILTER_SHIFT) + airspeedSensor->SensorValue;
 
             if (calibrationCount > (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) {
-                // Scale output for unity gain. 
-                airspeedSettings->ZeroPoint = (uint16_t)( filter_reg >> FILTER_SHIFT );
-                
+                // Scale output for unity gain.
+                airspeedSettings->ZeroPoint = (uint16_t)(filter_reg >> FILTER_SHIFT);
+
                 AirspeedSettingsZeroPointSet(&airspeedSettings->ZeroPoint);
-                calibrationCount  = 0;
+                calibrationCount = 0;
             }
             return retVal;
         }
@@ -149,19 +149,19 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
         Datasheet temperature: output = (T+50)*2047 / 200
         Inversion: T = (200*out - 102350)/2047 in C
         T = (200*out - 102350)/2047 + 273.15 in K
-    */
-    const float dP = ( 10*(int32_t)(airspeedSensor->SensorValue-airspeedSettings->ZeroPoint) ) * 0.1052120688f;
-    const float T  = (float)( 200*(int32_t)airspeedSensor->SensorValueTemperature - 102350) / 2047 + 273.15f;
-    
+     */
+    const float dP = (10 * (int32_t)(airspeedSensor->SensorValue - airspeedSettings->ZeroPoint)) * 0.1052120688f;
+    const float T  = (float)(200 * (int32_t)airspeedSensor->SensorValueTemperature - 102350) / 2047 + 273.15f;
+
     airspeedSensor->DifferentialPressure = dP;
-    airspeedSensor->Temperature          = T;
+    airspeedSensor->Temperature = T;
     // CAS  = Csound * sqrt( 5 *( (dP/P0 +1)^(2/7) - 1) )
     // TAS  = Csound * sqrt( 5 T/T0 *( (dP/P0 +1)^(2/7) - 1) )
     // where Csound = 340.276 m/s at standard condition T0=288.15 K and P0 = 101315 Pa
-    airspeedSensor->CalibratedAirspeed = airspeedSettings->Scale * CASFACTOR * sqrtf( powf( fabsf(dP) / P0 + 1.0f , CCEXPONENT ) - 1.0f );
-    airspeedSensor->TrueAirspeed       = airspeedSensor->CalibratedAirspeed * TASFACTOR * sqrtf( T );
+    airspeedSensor->CalibratedAirspeed = airspeedSettings->Scale * CASFACTOR * sqrtf(powf(fabsf(dP) / P0 + 1.0f, CCEXPONENT) - 1.0f);
+    airspeedSensor->TrueAirspeed = airspeedSensor->CalibratedAirspeed * TASFACTOR * sqrtf(T);
     airspeedSensor->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
-    
+
     return retVal;
 }
 

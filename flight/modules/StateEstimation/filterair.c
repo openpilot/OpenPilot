@@ -78,7 +78,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         this->altitude = state->baro[0];
     }
     // calculate true airspeed estimation
-    if (IS_SET(state->updated, SENSORUPDATES_airspeed) && (state->airspeed[1]<0.f) ) {
+    if (IS_SET(state->updated, SENSORUPDATES_airspeed) && (state->airspeed[1] < 0.f)) {
         state->airspeed[1] = state->airspeed[0] * IAS2TAS(this->altitude);
     }
 

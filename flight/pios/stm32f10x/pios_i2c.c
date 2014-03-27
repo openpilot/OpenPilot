@@ -414,8 +414,8 @@ static void go_starting(struct pios_i2c_adapter *i2c_adapter)
         i2c_adapter->last_byte   = NULL;
         i2c_adapter->active_byte = i2c_adapter->last_byte + 1;
     }
-    
-    
+
+
     I2C_GenerateSTART(i2c_adapter->cfg->regs, ENABLE);
     if (i2c_adapter->active_txn->rw == PIOS_I2C_TXN_READ) {
         I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, ENABLE);

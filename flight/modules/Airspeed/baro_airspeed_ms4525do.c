@@ -44,9 +44,9 @@
 
 #if defined(PIOS_INCLUDE_MS4525DO)
 
-#define CALIBRATION_IDLE_MS  0   // Time to wait before calibrating, in [ms]
-#define CALIBRATION_COUNT_MS 4000 // Time to spend calibrating, in [ms]
-#define FILTER_SHIFT 5              // Barry Dorr filter parameter k
+#define CALIBRATION_IDLE_MS  0              // Time to wait before calibrating, in [ms]
+#define CALIBRATION_COUNT_MS 4000           // Time to spend calibrating, in [ms]
+#define FILTER_SHIFT 5                      // Barry Dorr filter parameter k
 
 #define P0              101325.0f           // standard pressure
 #define CCEXPONENT      0.2857142857f       // exponent of compressibility correction 2/7
@@ -57,14 +57,13 @@
 
 // Private types
 
-// Private functions
+// Private functions definitions
 static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings);
 
 
 // Private variables
 static uint16_t calibrationCount  = 0;
-static uint32_t filter_reg;                 // Barry Dorr filter register
-
+static uint32_t filter_reg        = 0;      // Barry Dorr filter register
 
 void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings)
 {
@@ -99,6 +98,7 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
 }
 
 
+// Private functions
 static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings)
 {
     // Check to see if airspeed sensor is returning airspeedSensor

@@ -74,6 +74,7 @@
             UNSET_MASK(states.updated, SENSORUPDATES_##shortname); \
         } \
     }
+    
 #define FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(sensorname, shortname, a1, EXTRACHECK) \
     if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
         sensorname##Data s; \
@@ -85,6 +86,7 @@
             UNSET_MASK(states.updated, SENSORUPDATES_##shortname); \
         } \
     }
+    
 #define FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_2_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(sensorname, shortname, a1, a2, EXTRACHECK) \
     if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
         sensorname##Data s; \
@@ -108,6 +110,7 @@
         s.a3 = states.shortname[2]; \
         statename##Set(&s); \
     }
+    
 #define EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_2_DIMENSIONS(statename, shortname, a1, a2) \
     if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
         statename##Data s; \
@@ -117,8 +120,8 @@
         statename##Set(&s); \
     }
 
-// Private types
 
+// Private types
 struct filterPipelineStruct;
 
 typedef const struct filterPipelineStruct {
@@ -392,8 +395,6 @@ static void StateEstimationCb(void)
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GPSVelocitySensor, vel, North, East, Down);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(BaroSensor, baro, Altitude, true);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_2_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(AirspeedSensor, airspeed, CalibratedAirspeed, TrueAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
-//         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(AirspeedSensor, airspeed, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
-//         states.airspeed[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter, set to zero for now
         
         // GPS position data (LLA) is not fetched here since it does not contain floats. The filter must do all checks itself
 

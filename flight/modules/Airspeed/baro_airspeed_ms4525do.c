@@ -87,7 +87,8 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
     case  0:   AlarmsClear(SYSTEMALARMS_ALARM_I2C);
         break;
     case -4:
-    case -5:   AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_WARNING);
+    case -5:
+    case -7:    AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_WARNING);
         break;
     case -1:
     case -2:
@@ -122,8 +123,7 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
         if (calibrationCount <= CALIBRATION_IDLE_MS / airspeedSettings->SamplePeriod) {
             calibrationCount++;
             filter_reg = (airspeedSensor->SensorValue << FILTER_SHIFT);
-
-            return retVal;
+            return -7;
         } else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) {
             calibrationCount++;
             // update filter register
@@ -136,7 +136,7 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
                 AirspeedSettingsZeroPointSet(&airspeedSettings->ZeroPoint);
                 calibrationCount = 0;
             }
-            return retVal;
+            return -7;
         }
     }
 

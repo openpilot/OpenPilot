@@ -156,15 +156,15 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         AirspeedSensorGet(&airspeedData);
 
         // if sensor type changed and the last sensor was
-        // either Eagletree or PixHawk, reset I2C alarms
+        // either Eagletree or PixHawk, reset Airspeed alarm
         if (airspeedSettings.AirspeedSensorType != lastAirspeedSensorType) {
             switch (lastAirspeedSensorType) {
-            // Eagletree or PixHawk => Reset I2C alams
+            // Eagletree or PixHawk => Reset Airspeed alams
             case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_EAGLETREEAIRSPEEDV3:
             case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_PIXHAWKAIRSPEEDMS4525DO:
-                AlarmsDefault(SYSTEMALARMS_ALARM_I2C);
+                AlarmsDefault(SYSTEMALARMS_ALARM_AIRSPEED);
                 break;
-            // else do not reset I2C alarms
+            // else do not reset Airspeed alarm
             default: break;
             }
             lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
@@ -193,6 +193,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
             gps_airspeedGet(&airspeedData, &airspeedSettings);
             break;
+        case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:
         default:
             airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
         }

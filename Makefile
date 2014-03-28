@@ -450,6 +450,7 @@ else
     GCS_SILENT := silent
 endif
 
+.NOTPARALLEL:
 .PHONY: openpilotgcs
 openpilotgcs: uavobjects_gcs openpilotgcs_qmake openpilotgcs_make
 
@@ -960,6 +961,9 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   [GCS]"
 	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application (debug|release)"
+	@$(ECHO) "                            Skip qmake: QMAKE_SKIP=1"
+	@$(ECHO) "                            Compile specific directory: MAKE_DIR=<dir>"
+	@$(ECHO) "                            Example: make gcs QMAKE_SKIP=1 MAKE_DIR=src/plugins/coreplugin"
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO)

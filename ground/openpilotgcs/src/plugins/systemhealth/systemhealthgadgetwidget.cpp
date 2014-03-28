@@ -97,7 +97,7 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject *systemAlarm)
         delete item; // removeItem does _not_ delete the item.
     }
 
-    QMatrix backgroundMatrix = m_renderer->matrixForElement(background->elementId());
+    QMatrix backgroundMatrix = (m_renderer->matrixForElement(background->elementId())).inverted();
 
     QString alarm = systemAlarm->getName();
     foreach(UAVObjectField * field, systemAlarm->getFields()) {
@@ -111,17 +111,16 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject *systemAlarm)
                         if (m_renderer->elementExists(element2)) {
                             // element2 is in global coordinates
                             // transform its matrix into the coordinates of background
-                            QMatrix blockMatrix = backgroundMatrix.inverted() * m_renderer->matrixForElement(element2);
+                            QMatrix blockMatrix = backgroundMatrix * m_renderer->matrixForElement(element2);
                             // use this composed projection to get the position in background coordinates
-                            qreal startX = blockMatrix.mapRect(m_renderer->boundsOnElement(element2)).x();
-                            qreal startY = blockMatrix.mapRect(m_renderer->boundsOnElement(element2)).y();
+                            QRectF rectProjected = blockMatrix.mapRect(m_renderer->boundsOnElement(element2));
 
                             QGraphicsSvgItem *ind = new QGraphicsSvgItem();
                             ind->setSharedRenderer(m_renderer);
                             ind->setElementId(element2);
                             ind->setParentItem(background);
                             QTransform matrix;
-                            matrix.translate(startX, startY);
+                            matrix.translate(rectProjected.x(), rectProjected.y());
                             ind->setTransform(matrix, false);
                         } else {
                             if (value.compare("Uninitialised") != 0) {

@@ -97,6 +97,8 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject *systemAlarm)
         delete item; // removeItem does _not_ delete the item.
     }
 
+    QMatrix backgroundMatrix = m_renderer->matrixForElement(background->elementId());
+
     QString alarm = systemAlarm->getName();
     foreach(UAVObjectField * field, systemAlarm->getFields()) {
         for (uint i = 0; i < field->getNumElements(); ++i) {
@@ -104,12 +106,16 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject *systemAlarm)
             QString value   = field->getValue(i).toString();
             if (!missingElements->contains(element)) {
                 if (m_renderer->elementExists(element)) {
-                    QMatrix blockMatrix = m_renderer->matrixForElement(element);
-                    qreal startX = blockMatrix.mapRect(m_renderer->boundsOnElement(element)).x();
-                    qreal startY = blockMatrix.mapRect(m_renderer->boundsOnElement(element)).y();
-                    QString element2    = element + "-" + value;
+                    QString element2 = element + "-" + value;
                     if (!missingElements->contains(element2)) {
                         if (m_renderer->elementExists(element2)) {
+                            // element2 is in global coordinates
+                            // transform its matrix into the coordinates of background
+                            QMatrix blockMatrix = backgroundMatrix.inverted() * m_renderer->matrixForElement(element2);
+                            // use this composed projection to get the position in background corrdinates
+                            qreal startX = blockMatrix.mapRect(m_renderer->boundsOnElement(element2)).x();
+                            qreal startY = blockMatrix.mapRect(m_renderer->boundsOnElement(element2)).y();
+
                             QGraphicsSvgItem *ind = new QGraphicsSvgItem();
                             ind->setSharedRenderer(m_renderer);
                             ind->setElementId(element2);

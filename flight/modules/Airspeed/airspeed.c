@@ -45,6 +45,7 @@
 #include "baro_airspeed_etasv3.h"
 #include "baro_airspeed_mpxv.h"
 #include "gps_airspeed.h"
+#include "airspeedalarm.h"
 #include "taskinfo.h"
 
 // Private constants
@@ -155,18 +156,9 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         // Update the airspeed object
         AirspeedSensorGet(&airspeedData);
 
-        // if sensor type changed and the last sensor was
-        // either Eagletree or PixHawk, reset Airspeed alarm
+        // if sensor type changed reset Airspeed alarm
         if (airspeedSettings.AirspeedSensorType != lastAirspeedSensorType) {
-            switch (lastAirspeedSensorType) {
-            // Eagletree or PixHawk => Reset Airspeed alams
-            case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_EAGLETREEAIRSPEEDV3:
-            case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_PIXHAWKAIRSPEEDMS4525DO:
-                AlarmsDefault(SYSTEMALARMS_ALARM_AIRSPEED);
-                break;
-            // else do not reset Airspeed alarm
-            default: break;
-            }
+            AirspeedAlarm(SYSTEMALARMS_ALARM_DEFAULT);
             lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
         }
 
@@ -196,6 +188,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:
         default:
             airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            break;
         }
 
         // Set the UAVO

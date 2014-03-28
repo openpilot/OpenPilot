@@ -40,6 +40,7 @@
 #include "hwsettings.h"
 #include "airspeedsettings.h"
 #include "airspeedsensor.h" // object that will be updated by the module
+#include "airspeedalarm.h"
 #include "taskinfo.h"
 
 #if defined(PIOS_INCLUDE_MS4525DO)
@@ -71,7 +72,8 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
     int8_t retVal = PIOS_MS4525DO_Request();
 
     if (retVal != 0) {
-        AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_ERROR);
+        AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
+        
         return;
     }
 
@@ -84,17 +86,17 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
     retVal = baro_airspeedReadMS4525DO(airspeedSensor, airspeedSettings);
 
     switch (retVal) {
-    case  0:   AlarmsClear(SYSTEMALARMS_ALARM_AIRSPEED);
+    case  0:    AirspeedAlarm(SYSTEMALARMS_ALARM_OK);
         break;
     case -4:
     case -5:
-    case -7:    AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_WARNING);
+    case -7:    AirspeedAlarm(SYSTEMALARMS_ALARM_WARNING);
         break;
     case -1:
     case -2:
     case -3:
     case -6:
-    default:    AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_ERROR);
+    default:    AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
     }
 }
 

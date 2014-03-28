@@ -37,6 +37,7 @@
 #include "airspeedsettings.h"
 #include "gps_airspeed.h"
 #include "CoordinateConversions.h"
+#include "airspeedalarm.h"
 #include <pios_math.h>
 
 
@@ -127,6 +128,7 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
         if (gpsVelData.North * gpsVelData.North + gpsVelData.East * gpsVelData.East + gpsVelData.Down * gpsVelData.Down < 1.0f) {
             airspeedData->CalibratedAirspeed = 0;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
             return; // do not calculate if gps velocity is insufficient...
         }
 
@@ -141,11 +143,13 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
         if (!IS_REAL(airspeedData->CalibratedAirspeed)) {
             airspeedData->CalibratedAirspeed = 0;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
         } else {
             // need a low pass filter to filter out spikes in non coordinated maneuvers
             airspeedData->CalibratedAirspeed = (1.0f - airspeedSettings->GroundSpeedBasedEstimationLowPassAlpha) * gps->oldAirspeed + airspeedSettings->GroundSpeedBasedEstimationLowPassAlpha * airspeed;
             gps->oldAirspeed = airspeedData->CalibratedAirspeed;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
+            AirspeedAlarm(SYSTEMALARMS_ALARM_OK);
         }
 
         // Save old variables for next pass

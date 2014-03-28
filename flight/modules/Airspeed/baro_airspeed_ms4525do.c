@@ -71,7 +71,7 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
     int8_t retVal = PIOS_MS4525DO_Request();
 
     if (retVal != 0) {
-        AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_ERROR);
+        AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_ERROR);
         return;
     }
 
@@ -84,16 +84,17 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
     retVal = baro_airspeedReadMS4525DO(airspeedSensor, airspeedSettings);
 
     switch (retVal) {
-    case  0:   AlarmsClear(SYSTEMALARMS_ALARM_I2C);
+    case  0:   AlarmsClear(SYSTEMALARMS_ALARM_AIRSPEED);
         break;
     case -4:
-    case -5:   AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_WARNING);
+    case -5:
+    case -7:    AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_WARNING);
         break;
     case -1:
     case -2:
     case -3:
     case -6:
-    default:    AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_ERROR);
+    default:    AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_ERROR);
     }
 }
 
@@ -122,8 +123,7 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
         if (calibrationCount <= CALIBRATION_IDLE_MS / airspeedSettings->SamplePeriod) {
             calibrationCount++;
             filter_reg = (airspeedSensor->SensorValue << FILTER_SHIFT);
-
-            return retVal;
+            return -7;
         } else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) {
             calibrationCount++;
             // update filter register
@@ -136,7 +136,7 @@ static int8_t baro_airspeedReadMS4525DO(AirspeedSensorData *airspeedSensor, Airs
                 AirspeedSettingsZeroPointSet(&airspeedSettings->ZeroPoint);
                 calibrationCount = 0;
             }
-            return retVal;
+            return -7;
         }
     }
 

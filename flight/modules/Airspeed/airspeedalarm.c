@@ -49,17 +49,14 @@ static SystemAlarmsAlarmOptions severitySet = SYSTEMALARMS_ALARM_UNINITIALISED;
  */
 bool AirspeedAlarm(SystemAlarmsAlarmOptions severity)
 {
-    if( severity == severitySet ){
+    if (severity == severitySet) {
         return false;
     }
-    
+
     severitySet = severity;
-    
-    return ( AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, severity) == 0);
+
+    return AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, severity) == 0;
 }
-
-
-
 
 
 /**

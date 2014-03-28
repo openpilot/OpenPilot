@@ -73,7 +73,7 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
 
     if (retVal != 0) {
         AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
-        
+
         return;
     }
 

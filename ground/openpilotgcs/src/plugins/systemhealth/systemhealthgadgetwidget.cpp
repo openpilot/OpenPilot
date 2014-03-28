@@ -112,7 +112,7 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject *systemAlarm)
                             // element2 is in global coordinates
                             // transform its matrix into the coordinates of background
                             QMatrix blockMatrix = backgroundMatrix.inverted() * m_renderer->matrixForElement(element2);
-                            // use this composed projection to get the position in background corrdinates
+                            // use this composed projection to get the position in background coordinates
                             qreal startX = blockMatrix.mapRect(m_renderer->boundsOnElement(element2)).x();
                             qreal startY = blockMatrix.mapRect(m_renderer->boundsOnElement(element2)).y();
 

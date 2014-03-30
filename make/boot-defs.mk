@@ -37,6 +37,8 @@ ifeq ($(MCU),cortex-m3)
     include $(PIOS)/stm32f10x/library.mk
 else ifeq ($(MCU),cortex-m4)
     include $(PIOS)/stm32f4xx/library.mk
+else ifeq ($(MCU),cortex-m0)
+    include $(PIOS)/stm32f0x/library.mk
 else
     $(error Unsupported MCU: $(MCU))
 endif

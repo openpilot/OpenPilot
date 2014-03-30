@@ -292,11 +292,9 @@ void modelMapProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &b
 void modelMapProxy::rowsInserted(const QModelIndex &parent, int first, int last)
 {
     Q_UNUSED(parent);
-    Q_UNUSED(first);
-    Q_UNUSED(last);
 
-    /*
-       for (int x = first; x < last + 1; x++) {
+
+    for (int x = first; x < last + 1; x++) {
         QModelIndex index;
         WayPointItem *item;
         internals::PointLatLng latlng;
@@ -324,8 +322,8 @@ void modelMapProxy::rowsInserted(const QModelIndex &parent, int first, int last)
         } else {
             item = myMap->WPInsert(latlng, altitude, desc, x);
         }
-       }
-     */
+    }
+
     refreshOverlays();
 }
 void modelMapProxy::deleteWayPoint(int number)

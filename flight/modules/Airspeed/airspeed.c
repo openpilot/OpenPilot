@@ -148,6 +148,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
 
     airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
 
+
     // Main task loop
     portTickType lastSysTime = xTaskGetTickCount();
     while (1) {

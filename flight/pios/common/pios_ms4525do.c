@@ -34,10 +34,6 @@
 #ifdef PIOS_INCLUDE_MS4525DO
 
 /* Local Defs and Variables */
-static int8_t PIOS_MS4525DO_ReadI2C(uint8_t *buffer, uint8_t len);
-static int8_t PIOS_MS4525DO_WriteI2C(uint8_t *buffer, uint8_t len);
-
-static bool pios_ms4525do_requested = false;
 
 
 static int8_t PIOS_MS4525DO_ReadI2C(uint8_t *buffer, uint8_t len)
@@ -56,46 +52,10 @@ static int8_t PIOS_MS4525DO_ReadI2C(uint8_t *buffer, uint8_t len)
 }
 
 
-static int8_t PIOS_MS4525DO_WriteI2C(uint8_t *buffer, uint8_t len)
-{
-    const struct pios_i2c_txn txn_list[] = {
-        {
-            .info = __func__,
-            .addr = MS4525DO_I2C_ADDR,
-            .rw   = PIOS_I2C_TXN_WRITE,
-            .len  = len,
-            .buf  = buffer,
-        }
-    };
-
-    return PIOS_I2C_Transfer(PIOS_I2C_MS4525DO_ADAPTER, txn_list, NELEMENTS(txn_list));
-}
-
-
-int8_t PIOS_MS4525DO_Request(void)
-{
-    // MS4525DO expects a zero length write.
-    // Sending one byte is a workaround that works for the moment
-    uint8_t data  = 0;
-    int8_t retVal = PIOS_MS4525DO_WriteI2C(&data, sizeof(data));
-
-    /* requested only when transfer worked */
-    pios_ms4525do_requested = (retVal == 0);
-
-    return retVal;
-}
-
-
 // values has to ba an arrray with two elements
 // values stay untouched on error
 int8_t PIOS_MS4525DO_Read(uint16_t *values)
 {
-    if (!pios_ms4525do_requested) {
-        /* Do not try to read when not requested */
-        /* else probably stale data will be obtained */
-        return -4;
-    }
-
     uint8_t data[4];
     int8_t retVal  = PIOS_MS4525DO_ReadI2C(data, sizeof(data));
 
@@ -116,9 +76,6 @@ int8_t PIOS_MS4525DO_Read(uint16_t *values)
     values[1]  = (data[2] << 8);
     values[1] += data[3];
     values[1]  = (values[1] >> 5);
-
-    /* not requested anymore, only when transfer worked */
-    pios_ms4525do_requested = !(retVal == 0);
 
     return retVal;
 }

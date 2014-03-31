@@ -60,6 +60,7 @@ int8_t PIOS_MS4525DO_Read(uint16_t *values)
     int8_t retVal  = PIOS_MS4525DO_ReadI2C(data, sizeof(data));
 
     uint8_t status = data[0] & 0xC0;
+
     if (status == 0x80) {
         /* stale data */
         return -5;

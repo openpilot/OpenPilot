@@ -92,12 +92,12 @@ struct pios_i2c_adapter {
     uint8_t busy;
 #endif
 
-    /* variables for transfer timeouts */ 
-    uint32_t transfer_delay_uS;          // approx time to transfer one byte, calculated later basen on setting use here time based on 100 kbits/s
-    uint32_t transfer_timeout_ticks;    // take something tha makes sense for small transaction, calculated later based upon transmission desired
-    
-    bool    bus_error;
-    bool    nack;
+    /* variables for transfer timeouts */
+    uint32_t transfer_delay_uS; // approx time to transfer one byte, calculated later basen on setting use here time based on 100 kbits/s
+    uint32_t transfer_timeout_ticks; // take something tha makes sense for small transaction, calculated later based upon transmission desired
+
+    bool     bus_error;
+    bool     nack;
 
     volatile enum i2c_adapter_state curr_state;
     const struct pios_i2c_txn *first_txn;

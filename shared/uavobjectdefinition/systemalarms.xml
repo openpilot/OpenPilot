@@ -15,6 +15,7 @@
 			<elementname>Actuator</elementname>
 			<elementname>Attitude</elementname>
 			<elementname>Sensors</elementname>
+			<elementname>Airspeed</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>Guidance</elementname>
 			<elementname>PathPlan</elementname>

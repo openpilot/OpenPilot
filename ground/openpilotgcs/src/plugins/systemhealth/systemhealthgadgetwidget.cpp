@@ -111,9 +111,9 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject *systemAlarm)
                         if (m_renderer->elementExists(element2)) {
                             // element2 is in global coordinates
                             // transform its matrix into the coordinates of background
-                            QMatrix blockMatrix = backgroundMatrix * m_renderer->matrixForElement(element2);
+                            QMatrix blockMatrix   = backgroundMatrix * m_renderer->matrixForElement(element2);
                             // use this composed projection to get the position in background coordinates
-                            QRectF rectProjected = blockMatrix.mapRect(m_renderer->boundsOnElement(element2));
+                            QRectF rectProjected  = blockMatrix.mapRect(m_renderer->boundsOnElement(element2));
 
                             QGraphicsSvgItem *ind = new QGraphicsSvgItem();
                             ind->setSharedRenderer(m_renderer);

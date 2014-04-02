@@ -797,7 +797,7 @@ static bool i2c_adapter_callback_handler(struct pios_i2c_adapter *i2c_adapter)
     /* Spin waiting for the transfer to finish */
     while (!i2c_adapter_fsm_terminated(i2c_adapter)) {
         // sleep 1 byte, as FSM can't be faster
-        // FIXME: clock delay could make problems, but citing NPX: alsmost no slave device implements clock delay
+        // FIXME: clock stretching could make problems, but citing NPX: alsmost no slave device implements clock stretching
         // three times the expected time should cover clock delay
         PIOS_DELAY_WaituS(i2c_adapter->transfer_delay_uS);
 
@@ -982,13 +982,9 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
-
-    if (!valid) {
+    if (!PIOS_I2C_validate(i2c_adapter)) {
         return -1;
     }
-
-    PIOS_Assert(valid)
 
     PIOS_DEBUG_Assert(txn_list);
     PIOS_DEBUG_Assert(num_txns);
@@ -1023,14 +1019,13 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
     semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
 #endif
 
-    // used in the i2c_adapter_callback_handler function
     // Estimate bytes of transmission. Per txns: 1 adress byte + length
     i2c_adapter->transfer_timeout_ticks = num_txns;
     for (uint32_t i = 0; i < num_txns; i++) {
         i2c_adapter->transfer_timeout_ticks += txn_list[i].len;
     }
-    // timeout if it takes three times the expected time
-    i2c_adapter->transfer_timeout_ticks *= 3;
+    // timeout if it takes eight times the expected time
+    i2c_adapter->transfer_timeout_ticks <<= 3;
 
     i2c_adapter->callback  = NULL;
     i2c_adapter->bus_error = false;
@@ -1046,7 +1041,7 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
     /* Spin waiting for the transfer to finish */
     while (!i2c_adapter_fsm_terminated(i2c_adapter)) {
         /* sleep 9 clock ticks (1 byte), because FSM can't be faster than one byte
-           FIXME: clock delay could make problems, but citing NPX: alsmost no slave device implements clock delay
+           FIXME: clock stretching could make problems, but citing NPX: alsmost no slave device implements clock stretching
            three times the expected time should cover clock delay */
         PIOS_DELAY_WaituS(i2c_adapter->transfer_delay_uS);
 
@@ -1084,13 +1079,10 @@ int32_t PIOS_I2C_Transfer_Callback(uint32_t i2c_id, const struct pios_i2c_txn tx
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
-
-    if (!valid) {
+    if (!PIOS_I2C_validate(i2c_adapter)) {
         return -1;
     }
 
-    PIOS_Assert(valid)
     PIOS_Assert(callback);
 
     PIOS_DEBUG_Assert(txn_list);
@@ -1129,8 +1121,8 @@ int32_t PIOS_I2C_Transfer_Callback(uint32_t i2c_id, const struct pios_i2c_txn tx
     for (uint32_t i = 0; i < num_txns; i++) {
         i2c_adapter->transfer_timeout_ticks += txn_list[i].len;
     }
-    // timeout if it takes three times the expected time
-    i2c_adapter->transfer_timeout_ticks *= 3;
+    // timeout if it takes eight times the expected time
+    i2c_adapter->transfer_timeout_ticks <<= 3;
 
     i2c_adapter->callback  = callback;
     i2c_adapter->bus_error = false;
@@ -1143,13 +1135,9 @@ void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
-
-    if (!valid) {
+    if (!PIOS_I2C_validate(i2c_adapter)) {
         return;
     }
-
-    PIOS_Assert(valid)
 
     uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
@@ -1280,13 +1268,9 @@ void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
-
-    if (!valid) {
+    if (!PIOS_I2C_validate(i2c_adapter)) {
         return;
     }
-
-    PIOS_Assert(valid)
 
     uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 

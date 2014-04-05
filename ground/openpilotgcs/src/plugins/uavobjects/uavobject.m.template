@@ -59,60 +59,79 @@ $(INSTANTIATIONCODE)
 
 
 fid = fopen(logfile);
-buffer=fread(fid,Inf,'uchar=>uchar');
+buffer=fread(fid,Inf,'uchar=>uint8');
 fseek(fid, 0, 'bof');
-
-bufferIdx=1;
+bufferlen = size(buffer);
 
 correctMsgByte=hex2dec('20');
 correctTimestampedByte=hex2dec('A0');
 correctSyncByte=hex2dec('3C');
 unknownObjIDList=zeros(1,2);
-
-% Parse log file, entry by entry
-% prebuf = buffer(1:12);
+headerLen = 1 + 1 + 2 + 4 + 2; % sync type len id inst
+timestampLen = 4;
+crcLen = 1;
+oplHeaderLen = 8 + 4;
 
 last_print = -1e10;
+
+bufferIdx=1;
+headerIdx=oplHeaderLen + 1;
 
 startTime=clock;
 
 while (1)
-	if (feof(fid)); break; end
-
 	try
 	%% Read message header
 	% get sync field (0x3C, 1 byte)
-	sync = fread(fid, 1, 'uint8');
+	if (bufferlen < headerIdx + 12); break; end
+	sync = buffer(headerIdx);
+	% printf('%x ', sync);
+	headerIdx += 1;
 	if sync ~= correctSyncByte
-		prebuf = [prebuf(2:end); sync];
 		wrongSyncByte = wrongSyncByte + 1;
 		continue
 	end
-    
-	% get msg type (quint8 1 byte ) should be 0x20, ignore the rest?
-	msgType = fread(fid, 1, 'uint8');
-	if msgType ~= correctMsgByte && msgType ~= hex2dec('A0')
-		wrongMessageByte = wrongMessageByte + 1;	
+
+	% printf('\n %u:',headerIdx - 1);
+	% get the opl timestamp and datablock size
+	oplTimestamp = typecast(uint8(buffer(headerIdx - 1 - 8 - 4:headerIdx - 1 - 8 - 1)), 'uint32'); 
+	oplSize = typecast(uint8(buffer(headerIdx - 1 - 8:headerIdx - 1 - 1)), 'uint64'); 
+
+	% get msg type (quint8 1 byte ) should be 0x20/0xA0, ignore the rest
+	msgType = buffer(headerIdx);
+	headerIdx += 1;
+	if msgType ~= correctMsgByte && msgType ~= correctTimestampedByte
+		% fixme: it should read the whole message payload instead of skipping and blindly searching for next sync byte.
+		fprintf('\nSkipping message type: %x \n', msgType);
 		continue
 	end
 
 	% get msg size (quint16 2 bytes) excludes crc, include msg header and data payload
-	msgSize = fread(fid, 1, 'uint16');
+	msgSize = uint32(typecast(buffer(headerIdx:headerIdx + 1), 'uint16'));
+	headerIdx += 2;
+
 	% get obj id (quint32 4 bytes)
-	objID = fread(fid, 1, 'uint32');
+	objID = typecast(uint8(buffer(headerIdx:headerIdx + 3)), 'uint32'); 
+	headerIdx += 4;
 
+	% get instance id (quint16 2 bytes)
+	instID = typecast(uint8(buffer(headerIdx:headerIdx + 1)),  'uint16');
+	% printf('Id %x type %x size %u Inst %x ', objID, msgType, msgSize, instID);
+	headerIdx += 2;
+
+	% get timestamp if needed (quint32 4 bytes)
 	if msgType == correctMsgByte
-		%% Process header if we are aligned
-		timestamp = typecast(uint8(prebuf(1:4)), 'uint32');
-		datasize = typecast(uint8(prebuf(5:12)), 'uint64');
+		datasize = msgSize - headerLen;
 	elseif msgType == correctTimestampedByte
-		timestamp = fread(fid,1,'uint16');
+		timestamp = typecast(uint8(buffer(headerIdx:headerIdx + 3)),  'uint32');
+	%	printf('ts %u');
+		headerIdx += 4;
+		datasize = msgSize - headerLen - timestampLen;
 	end
+	% printf('\n');
+	bufferIdx = headerIdx;
+	headerIdx += datasize + crcLen + oplHeaderLen;
 
-	if (isempty(objID)) 	%End of file
-		break;
-	end
-	
 	%% Read object
 
 	switch objID
@@ -124,10 +143,8 @@ $(SWITCHCODE)
 			else
 				unknownObjIDList(unknownObjIDListIdx,2)=unknownObjIDList(unknownObjIDListIdx,2)+1; 
 			end
-			
-			datasize = typecast(buffer(datasizeBufferIdx + 4:datasizeBufferIdx + 12-1), 'uint64');
 
-			msgBytesLeft = datasize - 1 - 1 - 2 - 4;
+			msgBytesLeft = msgSize - 1 - 1 - 2 - 4;
 			if msgBytesLeft > 255
 				msgBytesLeft = 0;
 			end

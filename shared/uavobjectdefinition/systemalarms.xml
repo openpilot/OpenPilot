@@ -26,6 +26,31 @@
 			<elementname>Power</elementname>
 		</elementnames>
 	</field>
+        <field name="LastChange" units="ms" type="uint32">
+		<elementnames>
+			<elementname>SystemConfiguration</elementname>
+			<elementname>BootFault</elementname>
+			<elementname>OutOfMemory</elementname>
+			<elementname>StackOverflow</elementname>
+			<elementname>CPUOverload</elementname>
+			<elementname>EventSystem</elementname>
+			<elementname>Telemetry</elementname>
+			<elementname>Receiver</elementname>
+			<elementname>ManualControl</elementname>
+			<elementname>Actuator</elementname>
+			<elementname>Attitude</elementname>
+			<elementname>Sensors</elementname>
+			<elementname>Airspeed</elementname>
+			<elementname>Stabilization</elementname>
+			<elementname>Guidance</elementname>
+			<elementname>PathPlan</elementname>
+			<elementname>Battery</elementname>
+			<elementname>FlightTime</elementname>
+			<elementname>I2C</elementname>
+			<elementname>GPS</elementname>
+			<elementname>Power</elementname>
+		</elementnames>
+	</field>
 	<field name="ExtendedAlarmStatus" units="" type="enum" defaultvalue="None">
 		<elementnames>
 			<elementname>SystemConfiguration</elementname>
@@ -45,7 +70,7 @@
 	</field>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="manual" period="0"/>
-        <telemetryflight acked="true" updatemode="throttled" period="100"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
 	<logging updatemode="manual" period="0"/>
     </object>
 </xml>

@@ -711,11 +711,11 @@ static void updateSettings()
  * Determine input/output com port as highest priority available
  * @param[in] input Returns the approproate input com port if true, else the appropriate output com port
  */
-// #ifdef PIOS_INCLUDE_RFM22B
-// static uint32_t getComPort( bool input)
-// #else
+#ifdef PIOS_INCLUDE_RFM22B
+static uint32_t getComPort(bool input)
+#else
 static uint32_t getComPort(__attribute__((unused)) bool input)
-// #endif
+#endif
 {
 #if defined(PIOS_INCLUDE_USB)
     // if USB is connected, USB takes precedence for telemetry

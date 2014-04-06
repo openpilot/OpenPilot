@@ -32,6 +32,11 @@
 #include "inc/alarms.h"
 
 // Private constants
+#ifndef PIOS_ALARM_GRACETIME
+// alarm cannot be turned off for at least 1000 milliseconds
+// to prevent event system overload through flapping alarms
+        #define PIOS_ALARM_GRACETIME 1000
+#endif // PIOS_ALARM_GRACETIME
 
 // Private types
 
@@ -77,7 +82,7 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
     uint16_t flightTime = xTaskGetTickCount() * portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
-    if ((flightTime - lastAlarmChange[alarm] > 1000 &&
+    if ((flightTime - lastAlarmChange[alarm] > PIOS_ALARM_GRACETIME &&
          cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] != severity)
         || cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] < severity) {
         cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] = severity;
@@ -116,7 +121,7 @@ int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm,
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
     uint16_t flightTime = xTaskGetTickCount() * portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
-    if ((flightTime - lastAlarmChange[alarm] > 1000 &&
+    if ((flightTime - lastAlarmChange[alarm] > PIOS_ALARM_GRACETIME &&
          cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] != severity)
         || cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] < severity) {
         cast_struct_to_array(alarms.ExtendedAlarmStatus, alarms.ExtendedAlarmStatus.BootFault)[alarm]    = status;

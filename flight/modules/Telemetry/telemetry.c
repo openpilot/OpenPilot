@@ -40,7 +40,9 @@
 #include "taskinfo.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE         TELEM_QUEUE_SIZE
+#define MAX_QUEUE_SIZE            TELEM_QUEUE_SIZE
+// Three different stack size parameter are accepted for Telemetry(RX PIOS_TELEM_RX_STACK_SIZE)
+// Tx(PIOS_TELEM_TX_STACK_SIZE) and Radio RX(PIOS_TELEM_RADIO_RX_STACK_SIZE)
 #ifdef PIOS_TELEM_RX_STACK_SIZE
 #define STACK_SIZE_RX_BYTES       PIOS_TELEM_RX_STACK_SIZE
 #define STACK_SIZE_TX_BYTES       PIOS_TELEM_TX_STACK_SIZE
@@ -48,13 +50,19 @@
 #define STACK_SIZE_RX_BYTES       PIOS_TELEM_STACK_SIZE
 #define STACK_SIZE_TX_BYTES       PIOS_TELEM_STACK_SIZE
 #endif
-#define TASK_PRIORITY_RX       (tskIDLE_PRIORITY + 2)
-#define TASK_PRIORITY_TX       (tskIDLE_PRIORITY + 2)
-#define TASK_PRIORITY_RADRX    (tskIDLE_PRIORITY + 2)
-#define REQ_TIMEOUT_MS         250
-#define MAX_RETRIES            2
-#define STATS_UPDATE_PERIOD_MS 4000
-#define CONNECTION_TIMEOUT_MS  8000
+
+#ifdef PIOS_TELEM_RADIO_RX_STACK_SIZE
+#define STACK_SIZE_RADIO_RX_BYTES PIOS_TELEM_RADIO_RX_STACK_SIZE
+#else
+#define STACK_SIZE_RADIO_RX_BYTES STACK_SIZE_RX_BYTES
+#endif
+#define TASK_PRIORITY_RX          (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY_TX          (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY_RADRX       (tskIDLE_PRIORITY + 2)
+#define REQ_TIMEOUT_MS            250
+#define MAX_RETRIES               2
+#define STATS_UPDATE_PERIOD_MS    4000
+#define CONNECTION_TIMEOUT_MS     8000
 
 // Private types
 
@@ -122,7 +130,7 @@ int32_t TelemetryStart(void)
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
 
 #ifdef PIOS_INCLUDE_RFM22B
-    xTaskCreate(radioRxTask, (signed char *)"RadioRx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
+    xTaskCreate(radioRxTask, (signed char *)"RadioRx", STACK_SIZE_RADIO_RX_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIORX, radioRxTaskHandle);
 #endif
 

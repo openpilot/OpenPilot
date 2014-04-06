@@ -69,7 +69,7 @@ int32_t AlarmsInitialize(void)
  */
 int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity)
 {
-    SystemAlarmsData alarms;
+    SystemAlarmsAlarmData alarms;
 
     // Check that this is a valid alarm
     if (alarm >= SYSTEMALARMS_ALARM_NUMELEM) {
@@ -80,14 +80,14 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
     xSemaphoreTakeRecursive(lock, portMAX_DELAY);
 
     // Read alarm and update its severity only if it was changed
-    SystemAlarmsGet(&alarms);
-    uint16_t flightTime = xTaskGetTickCount() * portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
+    SystemAlarmsAlarmGet(&alarms);
+    uint16_t flightTime = (uint16_t)xTaskGetTickCount() * (uint16_t)portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
     if ((flightTime - lastAlarmChange[alarm] > PIOS_ALARM_GRACETIME &&
-         cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] != severity)
-        || cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] < severity) {
-        cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] = severity;
+         cast_struct_to_array(alarms, alarms.Actuator)[alarm] != severity)
+        || cast_struct_to_array(alarms, alarms.Actuator)[alarm] < severity) {
+        cast_struct_to_array(alarms, alarms.Actuator)[alarm] = severity;
         lastAlarmChange[alarm] = flightTime;
-        SystemAlarmsSet(&alarms);
+        SystemAlarmsAlarmSet(&alarms);
     }
 
     // Release lock
@@ -120,7 +120,7 @@ int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm,
 
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
-    uint16_t flightTime = xTaskGetTickCount() * portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
+    uint16_t flightTime = (uint16_t)xTaskGetTickCount() * (uint16_t)portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
     if ((flightTime - lastAlarmChange[alarm] > PIOS_ALARM_GRACETIME &&
          cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] != severity)
         || cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] < severity) {
@@ -143,7 +143,7 @@ int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm,
  */
 SystemAlarmsAlarmOptions AlarmsGet(SystemAlarmsAlarmElem alarm)
 {
-    SystemAlarmsData alarms;
+    SystemAlarmsAlarmData alarms;
 
     // Check that this is a valid alarm
     if (alarm >= SYSTEMALARMS_ALARM_NUMELEM) {
@@ -151,8 +151,8 @@ SystemAlarmsAlarmOptions AlarmsGet(SystemAlarmsAlarmElem alarm)
     }
 
     // Read alarm
-    SystemAlarmsGet(&alarms);
-    return cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm];
+    SystemAlarmsAlarmGet(&alarms);
+    return cast_struct_to_array(alarms, alarms.Actuator)[alarm];
 }
 
 /**
@@ -234,17 +234,17 @@ int32_t AlarmsHasCritical()
  */
 static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
 {
-    SystemAlarmsData alarms;
+    SystemAlarmsAlarmData alarms;
 
     // Lock
     xSemaphoreTakeRecursive(lock, portMAX_DELAY);
 
     // Read alarms
-    SystemAlarmsGet(&alarms);
+    SystemAlarmsAlarmGet(&alarms);
 
     // Go through alarms and check if any are of the given severity or higher
     for (uint32_t n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
-        if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[n] >= severity) {
+        if (cast_struct_to_array(alarms, alarms.Actuator)[n] >= severity) {
             xSemaphoreGiveRecursive(lock);
             return 1;
         }

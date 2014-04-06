@@ -157,16 +157,19 @@
 #define CPULOAD_LIMIT_CRITICAL          95
 
 /* Task stack sizes */
-#define PIOS_ACTUATOR_STACK_SIZE        1020
-#define PIOS_MANUAL_STACK_SIZE          850
+#define PIOS_ACTUATOR_STACK_SIZE        820
+#define PIOS_MANUAL_STACK_SIZE          635
+#define PIOS_RECEIVER_STACK_SIZE        620
+#define PIOS_STABILIZATION_STACK_SIZE   780
+
 #ifdef DIAG_TASKS
-#define PIOS_SYSTEM_STACK_SIZE          720
+#define PIOS_SYSTEM_STACK_SIZE          740
 #else
 #define PIOS_SYSTEM_STACK_SIZE          660
 #endif
 #define PIOS_TELEM_RX_STACK_SIZE        410
 #define PIOS_TELEM_TX_STACK_SIZE        560
-#define PIOS_EVENTDISPATCHER_STACK_SIZE 160
+#define PIOS_EVENTDISPATCHER_STACK_SIZE 100
 
 /* This can't be too high to stop eventdispatcher thread overflowing */
 #define PIOS_EVENTDISAPTCHER_QUEUE      10

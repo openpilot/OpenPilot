@@ -144,7 +144,7 @@
 
 /* Stabilization options */
 /* #define PIOS_QUATERNION_STABILIZATION */
-
+#define PIOS_EXCLUDE_ADVANCED_FEATURES
 /* Performance counters */
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD  1995998
 

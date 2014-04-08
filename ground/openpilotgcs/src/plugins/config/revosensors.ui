@@ -65,14 +65,11 @@
          <item row="1" column="0">
           <widget class="QGroupBox" name="groupBox_5">
            <property name="title">
-            <string>#2: Magnetometer calibration</string>
+            <string>#2: Accelerometer/Magnetometer calibration</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_sixPointCalib">
             <item>
              <widget class="QGraphicsView" name="sixPointsHelp">
-              <property name="toolTip">
-               <string>Nice paper plane, eh?</string>
-              </property>
              </widget>
             </item>
             <item>
@@ -297,6 +294,20 @@ p, li { white-space: pre-wrap; }
             <string>#3: Board level calibration</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+             <widget class="QGraphicsView" name="levelingHelp">
+             </widget>
+            </item>
+            <item>
+             <widget class="QProgressBar" name="accelBiasProgress">
+              <property name="value">
+               <number>0</number>
+              </property>
+              <property name="textVisible">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
@@ -310,12 +321,12 @@ p, li { white-space: pre-wrap; }
                </widget>
               </item>
               <item>
-               <widget class="QProgressBar" name="accelBiasProgress">
-                <property name="value">
-                 <number>0</number>
-                </property>
-                <property name="textVisible">
+               <widget class="QPushButton" name="accelBiasSavePos">
+                <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Save Position</string>
                 </property>
                </widget>
               </item>

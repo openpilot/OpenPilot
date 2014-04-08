@@ -58,7 +58,6 @@ private:
 
     OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
     Ui_RevoSensorsWidget *m_ui;
-    QGraphicsSvgItem *paperplane;
     QMutex sensorsUpdateLock;
     double maxBarHeight;
     int phaseCounter;

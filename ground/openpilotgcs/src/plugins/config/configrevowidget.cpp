@@ -83,13 +83,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // Initialization of the Paper plane widget
     m_ui->sixPointsHelp->setScene(new QGraphicsScene(this));
-
-    paperplane = new QGraphicsSvgItem();
-    paperplane->setSharedRenderer(new QSvgRenderer());
-    paperplane->renderer()->load(QString(":/configgadget/images/paper-plane.svg"));
-    paperplane->setElementId("plane-horizontal");
-    m_ui->sixPointsHelp->scene()->addItem(paperplane);
-    m_ui->sixPointsHelp->setSceneRect(paperplane->boundingRect());
+    displayPlane("plane-horizontal");
 
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
@@ -149,14 +143,14 @@ void ConfigRevoWidget::showEvent(QShowEvent *event)
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a sensorsBargraph that is way too small.
-    m_ui->sixPointsHelp->fitInView(paperplane, Qt::KeepAspectRatio);
+    m_ui->sixPointsHelp->fitInView(m_ui->sixPointsHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
     m_thermalCalibrationModel->init();
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event)
-    m_ui->sixPointsHelp->fitInView(paperplane, Qt::KeepAspectRatio);
+    m_ui->sixPointsHelp->fitInView(m_ui->sixPointsHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
 }
 
 /**
@@ -796,9 +790,11 @@ void ConfigRevoWidget::recallBoardRotation()
  */
 void ConfigRevoWidget::displayPlane(QString elementID)
 {
-    paperplane->setElementId(elementID);
-    m_ui->sixPointsHelp->setSceneRect(paperplane->boundingRect());
-    m_ui->sixPointsHelp->fitInView(paperplane, Qt::KeepAspectRatio);
+    m_ui->sixPointsHelp->scene()->clear();
+    QPixmap pixmap = QPixmap(":/configgadget/images/calibration/" + elementID + ".png");
+    m_ui->sixPointsHelp->scene()->addPixmap(pixmap);
+    m_ui->sixPointsHelp->setSceneRect(pixmap.rect());
+    //m_ui->sixPointsHelp->fitInView(pixmap, Qt::KeepAspectRatio);
 }
 
 

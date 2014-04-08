@@ -51,7 +51,6 @@ public:
     ~ConfigRevoWidget();
 
 private:
-    void drawVariancesGraph();
     void displayPlane(QString elementID);
 
     // ! Computes the scale and bias of the mag based on collected data
@@ -60,16 +59,6 @@ private:
     OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
     Ui_RevoSensorsWidget *m_ui;
     QGraphicsSvgItem *paperplane;
-    QGraphicsSvgItem *sensorsBargraph;
-    QGraphicsSvgItem *accel_x;
-    QGraphicsSvgItem *accel_y;
-    QGraphicsSvgItem *accel_z;
-    QGraphicsSvgItem *gyro_x;
-    QGraphicsSvgItem *gyro_y;
-    QGraphicsSvgItem *gyro_z;
-    QGraphicsSvgItem *mag_x;
-    QGraphicsSvgItem *mag_y;
-    QGraphicsSvgItem *mag_z;
     QMutex sensorsUpdateLock;
     double maxBarHeight;
     int phaseCounter;
@@ -120,10 +109,6 @@ private slots:
     // Slots for calibrating the accel and gyro
     void doStartAccelGyroBiasCalibration();
     void doGetAccelGyroBiasData(UAVObject *);
-
-    // Slots for measuring the sensor noise
-    void doStartNoiseMeasurement();
-    void doGetNoiseSample(UAVObject *);
 
     // Slot for clearing home location
     void clearHomeLocation();

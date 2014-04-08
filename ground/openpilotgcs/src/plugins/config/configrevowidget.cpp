@@ -57,7 +57,7 @@
 
 // Uncomment this to enable 6 point calibration on the accels
 #define SIX_POINT_CAL_ACCEL
-
+#define SAMPLE_SIZE 40
 const double ConfigRevoWidget::maxVarValue = 0.1;
 
 // *****************
@@ -91,126 +91,6 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_ui->sixPointsHelp->scene()->addItem(paperplane);
     m_ui->sixPointsHelp->setSceneRect(paperplane->boundingRect());
 
-    // Initialization of the Revo sensor noise bargraph graph
-    m_ui->sensorsBargraph->setScene(new QGraphicsScene(this));
-
-    QSvgRenderer *renderer = new QSvgRenderer();
-    sensorsBargraph = new QGraphicsSvgItem();
-    renderer->load(QString(":/configgadget/images/ahrs-calib.svg"));
-    sensorsBargraph->setSharedRenderer(renderer);
-    sensorsBargraph->setElementId("background");
-    sensorsBargraph->setObjectName("background");
-    m_ui->sensorsBargraph->scene()->addItem(sensorsBargraph);
-    m_ui->sensorsBargraph->setSceneRect(sensorsBargraph->boundingRect());
-
-    // Initialize the 9 bargraph values:
-
-    QMatrix lineMatrix = renderer->matrixForElement("accel_x");
-    QRectF rect  = lineMatrix.mapRect(renderer->boundsOnElement("accel_x"));
-    qreal startX = rect.x();
-    qreal startY = rect.y() + rect.height();
-    // maxBarHeight will be used for scaling it later.
-    maxBarHeight = rect.height();
-    // Then once we have the initial location, we can put it
-    // into a QGraphicsSvgItem which we will display at the same
-    // place: we do this so that the heading scale can be clipped to
-    // the compass dial region.
-    accel_x = new QGraphicsSvgItem();
-    accel_x->setSharedRenderer(renderer);
-    accel_x->setElementId("accel_x");
-    m_ui->sensorsBargraph->scene()->addItem(accel_x);
-    accel_x->setPos(startX, startY);
-    accel_x->setTransform(QTransform::fromScale(1, 0), true);
-
-    lineMatrix = renderer->matrixForElement("accel_y");
-    rect = lineMatrix.mapRect(renderer->boundsOnElement("accel_y"));
-    startX     = rect.x();
-    startY     = rect.y() + rect.height();
-    accel_y    = new QGraphicsSvgItem();
-    accel_y->setSharedRenderer(renderer);
-    accel_y->setElementId("accel_y");
-    m_ui->sensorsBargraph->scene()->addItem(accel_y);
-    accel_y->setPos(startX, startY);
-    accel_y->setTransform(QTransform::fromScale(1, 0), true);
-
-    lineMatrix = renderer->matrixForElement("accel_z");
-    rect = lineMatrix.mapRect(renderer->boundsOnElement("accel_z"));
-    startX     = rect.x();
-    startY     = rect.y() + rect.height();
-    accel_z    = new QGraphicsSvgItem();
-    accel_z->setSharedRenderer(renderer);
-    accel_z->setElementId("accel_z");
-    m_ui->sensorsBargraph->scene()->addItem(accel_z);
-    accel_z->setPos(startX, startY);
-    accel_z->setTransform(QTransform::fromScale(1, 0), true);
-
-    lineMatrix = renderer->matrixForElement("gyro_x");
-    rect = lineMatrix.mapRect(renderer->boundsOnElement("gyro_x"));
-    startX     = rect.x();
-    startY     = rect.y() + rect.height();
-    gyro_x     = new QGraphicsSvgItem();
-    gyro_x->setSharedRenderer(renderer);
-    gyro_x->setElementId("gyro_x");
-    m_ui->sensorsBargraph->scene()->addItem(gyro_x);
-    gyro_x->setPos(startX, startY);
-    gyro_x->setTransform(QTransform::fromScale(1, 0), true);
-
-    lineMatrix = renderer->matrixForElement("gyro_y");
-    rect = lineMatrix.mapRect(renderer->boundsOnElement("gyro_y"));
-    startX     = rect.x();
-    startY     = rect.y() + rect.height();
-    gyro_y     = new QGraphicsSvgItem();
-    gyro_y->setSharedRenderer(renderer);
-    gyro_y->setElementId("gyro_y");
-    m_ui->sensorsBargraph->scene()->addItem(gyro_y);
-    gyro_y->setPos(startX, startY);
-    gyro_y->setTransform(QTransform::fromScale(1, 0), true);
-
-
-    lineMatrix = renderer->matrixForElement("gyro_z");
-    rect = lineMatrix.mapRect(renderer->boundsOnElement("gyro_z"));
-    startX     = rect.x();
-    startY     = rect.y() + rect.height();
-    gyro_z     = new QGraphicsSvgItem();
-    gyro_z->setSharedRenderer(renderer);
-    gyro_z->setElementId("gyro_z");
-    m_ui->sensorsBargraph->scene()->addItem(gyro_z);
-    gyro_z->setPos(startX, startY);
-    gyro_z->setTransform(QTransform::fromScale(1, 0), true);
-
-    lineMatrix = renderer->matrixForElement("mag_x");
-    rect = lineMatrix.mapRect(renderer->boundsOnElement("mag_x"));
-    startX     = rect.x();
-    startY     = rect.y() + rect.height();
-    mag_x = new QGraphicsSvgItem();
-    mag_x->setSharedRenderer(renderer);
-    mag_x->setElementId("mag_x");
-    m_ui->sensorsBargraph->scene()->addItem(mag_x);
-    mag_x->setPos(startX, startY);
-    mag_x->setTransform(QTransform::fromScale(1, 0), true);
-
-    lineMatrix = renderer->matrixForElement("mag_y");
-    rect = lineMatrix.mapRect(renderer->boundsOnElement("mag_y"));
-    startX     = rect.x();
-    startY     = rect.y() + rect.height();
-    mag_y = new QGraphicsSvgItem();
-    mag_y->setSharedRenderer(renderer);
-    mag_y->setElementId("mag_y");
-    m_ui->sensorsBargraph->scene()->addItem(mag_y);
-    mag_y->setPos(startX, startY);
-    mag_y->setTransform(QTransform::fromScale(1, 0), true);
-
-    lineMatrix = renderer->matrixForElement("mag_z");
-    rect = lineMatrix.mapRect(renderer->boundsOnElement("mag_z"));
-    startX     = rect.x();
-    startY     = rect.y() + rect.height();
-    mag_z = new QGraphicsSvgItem();
-    mag_z->setSharedRenderer(renderer);
-    mag_z->setElementId("mag_z");
-    m_ui->sensorsBargraph->scene()->addItem(mag_z);
-    mag_z->setPos(startX, startY);
-    mag_z->setTransform(QTransform::fromScale(1, 0), true);
-
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
     addUAVObject("RevoCalibration");
@@ -242,7 +122,6 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(doStartAccelGyroBiasCalibration()));
     connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibration()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
-    connect(m_ui->noiseMeasurementStart, SIGNAL(clicked()), this, SLOT(doStartNoiseMeasurement()));
 
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
 
@@ -270,16 +149,13 @@ void ConfigRevoWidget::showEvent(QShowEvent *event)
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a sensorsBargraph that is way too small.
-    m_ui->sensorsBargraph->fitInView(sensorsBargraph, Qt::KeepAspectRatio);
     m_ui->sixPointsHelp->fitInView(paperplane, Qt::KeepAspectRatio);
-
     m_thermalCalibrationModel->init();
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event)
-    m_ui->sensorsBargraph->fitInView(sensorsBargraph, Qt::KeepAspectRatio);
     m_ui->sixPointsHelp->fitInView(paperplane, Qt::KeepAspectRatio);
 }
 
@@ -704,9 +580,9 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
     }
 
 #ifdef SIX_POINT_CAL_ACCEL
-    if (accel_accum_x.size() >= 20 && mag_accum_x.size() >= 20 && collectingData == true) {
+    if (accel_accum_x.size() >= SAMPLE_SIZE && mag_accum_x.size() >= SAMPLE_SIZE && collectingData == true) {
 #else
-    if (mag_accum_x.size() >= 20 && collectingData == true) {
+    if (mag_accum_x.size() >= SAMPLE_SIZE && collectingData == true) {
 #endif
         collectingData = false;
 
@@ -925,223 +801,8 @@ void ConfigRevoWidget::displayPlane(QString elementID)
     m_ui->sixPointsHelp->fitInView(paperplane, Qt::KeepAspectRatio);
 }
 
-/*********** Noise measurement functions **************/
-/**
- * Connect sensor updates and timeout for measuring the noise
- */
-void ConfigRevoWidget::doStartNoiseMeasurement()
-{
-    QMutexLocker lock(&sensorsUpdateLock);
-
-    // Store and reset board rotation before calibration starts
-    isBoardRotationStored = false;
-    storeAndClearBoardRotation();
-
-    Q_UNUSED(lock);
-
-    HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
-    Q_ASSERT(homeLocation);
-    HomeLocation::DataFields homeLocationData = homeLocation->getData();
-
-    // check if Homelocation is set
-    if (!homeLocationData.Set) {
-        QMessageBox msgBox;
-        msgBox.setInformativeText(tr("<p>HomeLocation not SET.</p><p>Please set your HomeLocation and try again. Aborting calibration!</p>"));
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
-        return;
-    }
-
-    accel_accum_x.clear();
-    accel_accum_y.clear();
-    accel_accum_z.clear();
-    gyro_accum_x.clear();
-    gyro_accum_y.clear();
-    gyro_accum_z.clear();
-    mag_accum_x.clear();
-    mag_accum_y.clear();
-    mag_accum_z.clear();
-
-    /* Need to get as many accel, mag and gyro updates as possible */
-    AccelState *accelState = AccelState::GetInstance(getObjectManager());
-    Q_ASSERT(accelState);
-    GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
-    Q_ASSERT(gyroState);
-    MagState *mag = MagState::GetInstance(getObjectManager());
-    Q_ASSERT(mag);
-
-    UAVObject::Metadata mdata;
-
-    initialAccelStateMdata = accelState->getMetadata();
-    mdata = initialAccelStateMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 100;
-    accelState->setMetadata(mdata);
-
-    initialGyroStateMdata = gyroState->getMetadata();
-    mdata = initialGyroStateMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 100;
-    gyroState->setMetadata(mdata);
-
-    initialMagStateMdata = mag->getMetadata();
-    mdata = initialMagStateMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 100;
-    mag->setMetadata(mdata);
-
-    /* Connect for updates */
-    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
-    connect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
-    connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
-}
-
-/**
- * Called when any of the sensors are updated.  Stores the sample for measuring the
- * variance at the end
- */
-void ConfigRevoWidget::doGetNoiseSample(UAVObject *obj)
-{
-    QMutexLocker lock(&sensorsUpdateLock);
-
-    Q_UNUSED(lock);
-
-    Q_ASSERT(obj);
-
-    switch (obj->getObjID()) {
-    case GyroState::OBJID:
-    {
-        GyroState *gyroState = GyroState::GetInstance(getObjectManager());
-        Q_ASSERT(gyroState);
-        GyroState::DataFields gyroData = gyroState->getData();
-        gyro_accum_x.append(gyroData.x);
-        gyro_accum_y.append(gyroData.y);
-        gyro_accum_z.append(gyroData.z);
-        break;
-    }
-    case AccelState::OBJID:
-    {
-        AccelState *accelState = AccelState::GetInstance(getObjectManager());
-        Q_ASSERT(accelState);
-        AccelState::DataFields accelStateData = accelState->getData();
-        accel_accum_x.append(accelStateData.x);
-        accel_accum_y.append(accelStateData.y);
-        accel_accum_z.append(accelStateData.z);
-        break;
-    }
-    case MagState::OBJID:
-    {
-        MagState *mags = MagState::GetInstance(getObjectManager());
-        Q_ASSERT(mags);
-        MagState::DataFields magData = mags->getData();
-        mag_accum_x.append(magData.x);
-        mag_accum_y.append(magData.y);
-        mag_accum_z.append(magData.z);
-        break;
-    }
-    default:
-        Q_ASSERT(0);
-    }
-
-    float p1   = (float)mag_accum_x.length() / (float)NOISE_SAMPLES;
-    float p2   = (float)gyro_accum_x.length() / (float)NOISE_SAMPLES;
-    float p3   = (float)accel_accum_x.length() / (float)NOISE_SAMPLES;
-
-    float prog = (p1 < p2) ? p1 : p2;
-    prog = (prog < p3) ? prog : p3;
-
-    m_ui->noiseMeasurementProgress->setValue(prog * 100);
-
-    if (mag_accum_x.length() >= NOISE_SAMPLES &&
-        gyro_accum_x.length() >= NOISE_SAMPLES &&
-        accel_accum_x.length() >= NOISE_SAMPLES) {
-        // No need to for more updates
-        MagState *mags = MagState::GetInstance(getObjectManager());
-        AccelState *accelState = AccelState::GetInstance(getObjectManager());
-        GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
-        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
-        disconnect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
-        disconnect(mags, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));
-
-        EKFConfiguration *ekfConfiguration = EKFConfiguration::GetInstance(getObjectManager());
-        Q_ASSERT(ekfConfiguration);
-        if (ekfConfiguration) {
-            EKFConfiguration::DataFields revoCalData = ekfConfiguration->getData();
-            revoCalData.Q[EKFConfiguration::Q_ACCELX] = listVar(accel_accum_x);
-            revoCalData.Q[EKFConfiguration::Q_ACCELY] = listVar(accel_accum_y);
-            revoCalData.Q[EKFConfiguration::Q_ACCELZ] = listVar(accel_accum_z);
-            revoCalData.Q[EKFConfiguration::Q_GYROX]  = listVar(gyro_accum_x);
-            revoCalData.Q[EKFConfiguration::Q_GYROY]  = listVar(gyro_accum_y);
-            revoCalData.Q[EKFConfiguration::Q_GYROZ]  = listVar(gyro_accum_z);
-            revoCalData.R[EKFConfiguration::R_MAGX]   = listVar(mag_accum_x);
-            revoCalData.R[EKFConfiguration::R_MAGY]   = listVar(mag_accum_y);
-            revoCalData.R[EKFConfiguration::R_MAGZ]   = listVar(mag_accum_z);
-            ekfConfiguration->setData(revoCalData);
-        }
-
-        // Recall saved board rotation
-        recallBoardRotation();
-    }
-}
 
 /********** UI Functions *************/
-/**
-   Draws the sensor variances bargraph
- */
-void ConfigRevoWidget::drawVariancesGraph()
-{
-    EKFConfiguration *ekfConfiguration = EKFConfiguration::GetInstance(getObjectManager());
-
-    Q_ASSERT(ekfConfiguration);
-    if (!ekfConfiguration) {
-        return;
-    }
-    EKFConfiguration::DataFields ekfConfigurationData = ekfConfiguration->getData();
-
-    // The expected range is from 1E-6 to 1E-1
-    double steps = 6; // 6 bars on the graph
-    float accel_x_var = -1 / steps * (1 + steps + log10(ekfConfigurationData.Q[EKFConfiguration::Q_ACCELX]));
-    if (accel_x) {
-        accel_x->setTransform(QTransform::fromScale(1, accel_x_var), false);
-    }
-    float accel_y_var = -1 / steps * (1 + steps + log10(ekfConfigurationData.Q[EKFConfiguration::Q_ACCELY]));
-    if (accel_y) {
-        accel_y->setTransform(QTransform::fromScale(1, accel_y_var), false);
-    }
-    float accel_z_var = -1 / steps * (1 + steps + log10(ekfConfigurationData.Q[EKFConfiguration::Q_ACCELZ]));
-    if (accel_z) {
-        accel_z->setTransform(QTransform::fromScale(1, accel_z_var), false);
-    }
-
-    float gyro_x_var = -1 / steps * (1 + steps + log10(ekfConfigurationData.Q[EKFConfiguration::Q_GYROX]));
-    if (gyro_x) {
-        gyro_x->setTransform(QTransform::fromScale(1, gyro_x_var), false);
-    }
-    float gyro_y_var = -1 / steps * (1 + steps + log10(ekfConfigurationData.Q[EKFConfiguration::Q_GYROY]));
-    if (gyro_y) {
-        gyro_y->setTransform(QTransform::fromScale(1, gyro_y_var), false);
-    }
-    float gyro_z_var = -1 / steps * (1 + steps + log10(ekfConfigurationData.Q[EKFConfiguration::Q_GYROZ]));
-    if (gyro_z) {
-        gyro_z->setTransform(QTransform::fromScale(1, gyro_z_var), false);
-    }
-
-    // Scale by 1e-3 because mag vars are much higher.
-    float mag_x_var = -1 / steps * (1 + steps + log10(1e-3 * ekfConfigurationData.R[EKFConfiguration::R_MAGX]));
-    if (mag_x) {
-        mag_x->setTransform(QTransform::fromScale(1, mag_x_var), false);
-    }
-    float mag_y_var = -1 / steps * (1 + steps + log10(1e-3 * ekfConfigurationData.R[EKFConfiguration::R_MAGY]));
-    if (mag_y) {
-        mag_y->setTransform(QTransform::fromScale(1, mag_y_var), false);
-    }
-    float mag_z_var = -1 / steps * (1 + steps + log10(1e-3 * ekfConfigurationData.R[EKFConfiguration::R_MAGZ]));
-    if (mag_z) {
-        mag_z->setTransform(QTransform::fromScale(1, mag_z_var), false);
-    }
-}
 
 /**
  * Called by the ConfigTaskWidget parent when RevoCalibration is updated
@@ -1151,9 +812,6 @@ void ConfigRevoWidget::refreshWidgetsValues(UAVObject *object)
 {
     ConfigTaskWidget::refreshWidgetsValues(object);
 
-    drawVariancesGraph();
-
-    m_ui->noiseMeasurementStart->setEnabled(true);
     m_ui->sixPointsStart->setEnabled(true);
     m_ui->accelBiasStart->setEnabled(true);
     m_ui->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));

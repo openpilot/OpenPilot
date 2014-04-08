@@ -153,9 +153,13 @@ JAR			:= jar
 CD			:= cd
 GREP		:= grep
 ifneq ($(UNAME), Windows)
-	SEVENZIP	:= 7zr
+	SEVENZIP	:= 7za
 else
 	SEVENZIP	:= 7za.exe
+ifneq ($(shell $(SEVENZIP) --version >/dev/null 2>&1 && $(ECHO) "found"), found)
+#	no $(SEVENZIP) found in path. hope is in bin... 
+    SEVENZIP = $(TOOLS_DIR)/bin/7za.exe
+endif
 endif
 
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.

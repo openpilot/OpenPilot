@@ -39,7 +39,7 @@
 /* EP1 (HID) */
 /* rx/tx buffer base address */
 #define ENDP1_TXADDR   (0x60)
-#define ENDP1_RXADDR   (0x80)
+#define ENDP1_RXADDR   (0xA0)
 
 /* EP2 (CDC Call Control) */
 /* rx/tx buffer base address */

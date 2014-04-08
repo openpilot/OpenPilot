@@ -200,12 +200,10 @@ static void PIOS_USBHOOK_Reset(void)
 #if defined(PIOS_INCLUDE_USB_HID)
     /* Initialize Endpoint 1 (HID) */
     SetEPType(ENDP1, EP_INTERRUPT);
-    // TODO Validate that address and length are consistent
     SetEPTxAddr(ENDP1, ENDP1_TXADDR);
     SetEPTxCount(ENDP1, PIOS_USB_BOARD_HID_DATA_LENGTH);
     SetEPTxStatus(ENDP1, EP_TX_NAK);
 
-    // TODO Validate that address and length are consistent
     SetEPRxAddr(ENDP1, ENDP1_RXADDR);
     SetEPRxCount(ENDP1, PIOS_USB_BOARD_HID_DATA_LENGTH);
     SetEPRxStatus(ENDP1, EP_RX_VALID);

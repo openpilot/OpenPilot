@@ -22,14 +22,12 @@
 #include "sdlgamepad.h"
 
 #include <SDL/SDL.h>
-//#undef main
+// #undef main
 
-class SDLGamepadPrivate
-{
+class SDLGamepadPrivate {
 public:
     SDLGamepadPrivate() : gamepad(0)
-    {
-    }
+    {}
 
     /**
      * SDL_Joystick object.
@@ -37,7 +35,6 @@ public:
      * This represents the currently opened SDL_Joystick object.
      */
     SDL_Joystick *gamepad;
-
 };
 
 /**********************************************************************/
@@ -48,7 +45,7 @@ SDLGamepad::SDLGamepad()
     index   = -1;
     loop    = false;
     tick    = MIN_RATE;
-    priv = new SDLGamepadPrivate;
+    priv    = new SDLGamepadPrivate;
 }
 
 /**********************************************************************/

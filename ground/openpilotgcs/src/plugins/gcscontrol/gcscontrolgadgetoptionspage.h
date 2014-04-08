@@ -31,7 +31,6 @@
 #include "coreplugin/dialogs/ioptionspage.h"
 #include "gcscontrolplugin.h"
 #include "sdlgamepad/sdlgamepad.h"
-#include <SDL/SDL.h>
 
 #include <QDebug>
 #include <QCheckBox>

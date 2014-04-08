@@ -181,6 +181,8 @@ QString ConfigCustomWidget::updateConfigObjectsFromWidgets()
             setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
         } else if (q->currentText() == "Motor") {
             setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
+        } else if (q->currentText() == "ReversableMotor") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_REVERSABLEMOTOR);
         } else if (q->currentText() == "Servo") {
             setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
         } else if (q->currentText() == "CameraRoll") {

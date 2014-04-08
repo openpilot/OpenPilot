@@ -54,6 +54,9 @@
 
 // Private variables
 static uint32_t telemetryPort;
+#ifdef PIOS_INCLUDE_RFM22B
+static uint32_t radioPort;
+#endif
 static xQueueHandle queue;
 
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
@@ -80,6 +83,7 @@ static void telemetryTxTask(void *parameters);
 static void telemetryRxTask(void *parameters);
 #ifdef PIOS_INCLUDE_RFM22B
 static void radioRxTask(void *parameters);
+static int32_t transmitRadioData(uint8_t *data, int32_t length);
 #endif
 static int32_t transmitData(uint8_t *data, int32_t length);
 static void registerObject(UAVObjHandle obj);
@@ -140,13 +144,16 @@ int32_t TelemetryInitialize(void)
 
     // Update telemetry settings
     telemetryPort = PIOS_COM_TELEM_RF;
+#ifdef PIOS_INCLUDE_RFM22B
+    radioPort     = PIOS_COM_RF;
+#endif
     HwSettingsInitialize();
     updateSettings();
 
     // Initialise UAVTalk
     uavTalkCon = UAVTalkInitialize(&transmitData);
 #ifdef PIOS_INCLUDE_RFM22B
-    radioUavTalkCon = UAVTalkInitialize(&transmitData);
+    radioUavTalkCon = UAVTalkInitialize(&transmitRadioData);
 #endif
 
     // Create periodic event that will be used to update the telemetry stats
@@ -375,17 +382,28 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
          * Tries to empty the high priority queue before handling any standard priority item
          */
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
-        // Loop forever
-        while (xQueueReceive(priorityQueue, &ev, 1) == pdTRUE) {
+        // empty priority queue, non-blocking
+        while (xQueueReceive(priorityQueue, &ev, 0) == pdTRUE) {
             // Process event
             processObjEvent(&ev);
         }
-#endif
-        // Wait for queue message
+        // check regular queue and process update - non-blocking
         if (xQueueReceive(queue, &ev, 0) == pdTRUE) {
             // Process event
             processObjEvent(&ev);
+
+            // if both queues are empty, wait on priority queue for updates (1 tick) then repeat cycle
+        } else if (xQueueReceive(priorityQueue, &ev, 1) == pdTRUE) {
+            // Process event
+            processObjEvent(&ev);
         }
+#else
+        // wait on queue for updates (1 tick) then repeat cycle
+        if (xQueueReceive(queue, &ev, 1) == pdTRUE) {
+            // Process event
+            processObjEvent(&ev);
+        }
+#endif /* if defined(PIOS_TELEM_PRIORITY_QUEUE) */
     }
 }
 
@@ -424,12 +442,12 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
 {
     // Task loop
     while (1) {
-        if (telemetryPort) {
+        if (radioPort) {
             // Block until data are available
             uint8_t serial_data[1];
             uint16_t bytes_to_process;
 
-            bytes_to_process = PIOS_COM_ReceiveBuffer(telemetryPort, serial_data, sizeof(serial_data), 500);
+            bytes_to_process = PIOS_COM_ReceiveBuffer(radioPort, serial_data, sizeof(serial_data), 500);
             if (bytes_to_process > 0) {
                 for (uint8_t i = 0; i < bytes_to_process; i++) {
                     UAVTalkProcessInputStream(radioUavTalkCon, serial_data[i]);
@@ -439,6 +457,23 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
             vTaskDelay(5);
         }
     }
+}
+
+
+/**
+ * Transmit data buffer to the radioport.
+ * \param[in] data Data buffer to send
+ * \param[in] length Length of buffer
+ * \return -1 on failure
+ * \return number of bytes transmitted on success
+ */
+static int32_t transmitRadioData(uint8_t *data, int32_t length)
+{
+    if (radioPort) {
+        return PIOS_COM_SendBuffer(radioPort, data, length);
+    }
+
+    return -1;
 }
 #endif /* PIOS_INCLUDE_RFM22B */
 
@@ -476,6 +511,7 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
     ev.obj    = obj;
     ev.instId = UAVOBJ_ALL_INSTANCES;
     ev.event  = EV_UPDATED_PERIODIC;
+    ev.lowPriority = true;
 
     xQueueHandle targetQueue = UAVObjIsPriority(obj) ? priorityQueue : queue;
 
@@ -502,6 +538,7 @@ static int32_t setLoggingPeriod(UAVObjHandle obj, int32_t updatePeriodMs)
     ev.obj    = obj;
     ev.instId = UAVOBJ_ALL_INSTANCES;
     ev.event  = EV_LOGGING_PERIODIC;
+    ev.lowPriority = true;
 
     xQueueHandle targetQueue = UAVObjIsPriority(obj) ? priorityQueue : queue;
 
@@ -542,12 +579,10 @@ static void updateTelemetryStats()
     uint32_t timeNow;
 
     // Get stats
-    UAVTalkGetStats(uavTalkCon, &utalkStats);
+    UAVTalkGetStats(uavTalkCon, &utalkStats, true);
 #ifdef PIOS_INCLUDE_RFM22B
-    UAVTalkAddStats(radioUavTalkCon, &utalkStats);
-    UAVTalkResetStats(radioUavTalkCon);
+    UAVTalkAddStats(radioUavTalkCon, &utalkStats, true);
 #endif
-    UAVTalkResetStats(uavTalkCon);
 
     // Get object data
     FlightTelemetryStatsGet(&flightStats);
@@ -676,17 +711,25 @@ static void updateSettings()
  * Determine input/output com port as highest priority available
  * @param[in] input Returns the approproate input com port if true, else the appropriate output com port
  */
+#ifdef PIOS_INCLUDE_RFM22B
 static uint32_t getComPort(bool input)
-{
-#ifndef PIOS_INCLUDE_RFM22B
-    input = false;
+#else
+static uint32_t getComPort(__attribute__((unused)) bool input)
 #endif
+{
 #if defined(PIOS_INCLUDE_USB)
+    // if USB is connected, USB takes precedence for telemetry
     if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
         return PIOS_COM_TELEM_USB;
     } else
 #endif /* PIOS_INCLUDE_USB */
-    if (!input && PIOS_COM_Available(telemetryPort)) {
+#ifdef PIOS_INCLUDE_RFM22B
+    // PIOS_COM_RF input is handled by a separate RX thread and therefore must be ignored
+    if (input && telemetryPort == PIOS_COM_RF) {
+        return 0;
+    } else
+#endif /* PIOS_INCLUDE_RFM22B */
+    if (PIOS_COM_Available(telemetryPort)) {
         return telemetryPort;
     } else {
         return 0;

@@ -525,7 +525,7 @@ void UAVObject::toXML(QXmlStreamWriter *xmlWriter)
     xmlWriter->writeAttribute("name", getName());
     xmlWriter->writeAttribute("id", QString("%1-%2").arg(getObjID(), 1, 16).toUpper().arg(getInstID()));
     xmlWriter->writeStartElement("fields");
-    foreach(UAVObjectField* field , fields) {
+    foreach(UAVObjectField * field, fields) {
         field->toXML(xmlWriter);
     }
     xmlWriter->writeEndElement(); // fields
@@ -546,6 +546,21 @@ void UAVObject::emitTransactionCompleted(bool success)
 void UAVObject::emitNewInstance(UAVObject *obj)
 {
     emit newInstance(obj);
+}
+
+bool UAVObject::isSettingsObject()
+{
+    return false;
+}
+
+bool UAVObject::isDataObject()
+{
+    return false;
+}
+
+bool UAVObject::isMetaDataObject()
+{
+    return false;
 }
 
 /**
@@ -685,4 +700,24 @@ UAVObject::UpdateMode UAVObject::GetGcsTelemetryUpdateMode(const UAVObject::Meta
 void UAVObject::SetGcsTelemetryUpdateMode(UAVObject::Metadata & metadata, UAVObject::UpdateMode val)
 {
     SET_BITS(metadata.flags, UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
+}
+
+/**
+ * Get the UAVObject metadata logging update mode
+ * \param[in] metadata The metadata object
+ * \return the logging update mode
+ */
+UAVObject::UpdateMode UAVObject::GetLoggingUpdateMode(const UAVObject::Metadata & metadata)
+{
+    return UAVObject::UpdateMode((metadata.flags >> UAVOBJ_LOGGING_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK);
+}
+
+/**
+ * Set the UAVObject metadata logging update mode member
+ * \param[in] metadata The metadata object
+ * \param[in] val The logging update mode
+ */
+void UAVObject::SetLoggingUpdateMode(UAVObject::Metadata & metadata, UAVObject::UpdateMode val)
+{
+    SET_BITS(metadata.flags, UAVOBJ_LOGGING_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
 }

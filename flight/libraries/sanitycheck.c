@@ -34,6 +34,7 @@
 
 // UAVOs
 #include <manualcontrolsettings.h>
+#include <flightmodesettings.h>
 #include <systemsettings.h>
 #include <systemalarms.h>
 #include <taskinfo.h>
@@ -85,47 +86,47 @@ int32_t configuration_check()
     // For each available flight mode position sanity check the available
     // modes
     uint8_t num_modes;
-    uint8_t modes[MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_NUMELEM];
+    uint8_t modes[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
     ManualControlSettingsFlightModeNumberGet(&num_modes);
-    ManualControlSettingsFlightModePositionGet(modes);
+    FlightModeSettingsFlightModePositionGet(modes);
 
     for (uint32_t i = 0; i < num_modes; i++) {
         switch (modes[i]) {
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_MANUAL:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
             if (multirotor) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
             severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(1, multirotor) : severity;
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
             severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(2, multirotor) : severity;
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
             severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : severity;
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
             if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE)) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEVARIO:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ALTITUDEVARIO:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
             // TODO: put check equivalent to TASK_MONITOR_IsRunning
             // here as soon as available for delayed callbacks
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
@@ -133,7 +134,7 @@ int32_t configuration_check()
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_LAND:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
@@ -141,7 +142,7 @@ int32_t configuration_check()
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POI:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
@@ -149,7 +150,7 @@ int32_t configuration_check()
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else {
@@ -163,7 +164,7 @@ int32_t configuration_check()
                 }
             }
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
             if (coptercontrol) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
@@ -201,23 +202,23 @@ int32_t configuration_check()
 static int32_t check_stabilization_settings(int index, bool multirotor)
 {
     // Make sure the modes have identical sizes
-    if (MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_NUMELEM ||
-        MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_NUMELEM) {
+    if (FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM != FLIGHTMODESETTINGS_STABILIZATION2SETTINGS_NUMELEM ||
+        FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM != FLIGHTMODESETTINGS_STABILIZATION3SETTINGS_NUMELEM) {
         return SYSTEMALARMS_ALARM_ERROR;
     }
 
-    uint8_t modes[MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM];
+    uint8_t modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM];
 
     // Get the different axis modes for this switch position
     switch (index) {
     case 1:
-        ManualControlSettingsStabilization1SettingsArrayGet(modes);
+        FlightModeSettingsStabilization1SettingsArrayGet(modes);
         break;
     case 2:
-        ManualControlSettingsStabilization2SettingsArrayGet(modes);
+        FlightModeSettingsStabilization2SettingsArrayGet(modes);
         break;
     case 3:
-        ManualControlSettingsStabilization3SettingsArrayGet(modes);
+        FlightModeSettingsStabilization3SettingsArrayGet(modes);
         break;
     default:
         return SYSTEMALARMS_ALARM_ERROR;
@@ -226,14 +227,14 @@ static int32_t check_stabilization_settings(int index, bool multirotor)
     // For multirotors verify that nothing is set to "none"
     if (multirotor) {
         for (uint32_t i = 0; i < NELEMENTS(modes); i++) {
-            if (modes[i] == MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NONE) {
+            if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NONE) {
                 return SYSTEMALARMS_ALARM_ERROR;
             }
         }
     }
 
     // Warning: This assumes that certain conditions in the XML file are met.  That
-    // MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NONE has the same numeric value for each channel
+    // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NONE has the same numeric value for each channel
     // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_NONE
 
     return SYSTEMALARMS_ALARM_OK;

@@ -1,0 +1,17 @@
+<xml>
+    <object name="AccelGyroSettings" singleinstance="true" settings="true" category="Sensors">
+        <description>Settings for Accelerometer and Gyroscope calibration </description>
+        <!-- Sensor calibration -->
+        <field name="accel_bias" units="m/s" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
+        <field name="accel_scale" units="gain" type="float" elementnames="X,Y,Z" defaultvalue="1,1,1"/>
+        <field name="accel_temp_coeff" units="" type="float" elementnames="X,Y,Z" defaultvalue="0"/>
+        <field name="gyro_bias" units="deg/s" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
+        <field name="gyro_scale" units="gain" type="float" elementnames="X,Y,Z" defaultvalue="1,1,1"/>
+        <field name="gyro_temp_coeff" units="" type="float" elementnames="X,X2,Y,Y2,Z,Z2" defaultvalue="0"/>
+        <field name="temp_calibrated_extent" units="deg C" type="float" elementnames="min,max" defaultvalue="0"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

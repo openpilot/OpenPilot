@@ -13377,6 +13377,8 @@ border-radius: 5;</string>
                       </property>
                       <property name="decimals">
                        <number>5</number>
+
+
                       </property>
                       <property name="singleStep">
                        <double>0.000100000000000</double>
@@ -15941,6 +15943,7 @@ border-radius: 5;</string>
                         <string>element:Kp</string>
                         <string>haslimits:no</string>
                         <string>scale:1</string>
+
                         <string>buttongroup:5,20</string>
                        </stringlist>
                       </property>
@@ -17352,6 +17355,7 @@ border-radius: 5;</string>
                             <red>26</red>
                             <green>26</green>
                             <blue>26</blue>
+
                            </color>
                           </brush>
                          </colorrole>
@@ -19417,6 +19421,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="autoFillBackground">
                     <bool>false</bool>
+
                    </property>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -19941,6 +19946,7 @@ border-radius: 5;</string>
                          <red>39</red>
                          <green>39</green>
                          <blue>39</blue>
+
                         </color>
                        </brush>
                       </colorrole>
@@ -21975,6 +21981,7 @@ border-radius: 5;</string>
                     </size>
                    </property>
                   </spacer>
+
                  </item>
                  <item row="1" column="3">
                   <widget class="QDoubleSpinBox" name="AccelKp">
@@ -24004,7 +24011,7 @@ border-radius: 5;</string>
                   </spacer>
                  </item>
                  <item row="1" column="1">
-                  <widget class="QDoubleSpinBox" name="RattitudeAntiWindup">
+                  <widget class="QDoubleSpinBox" name="RattitudeModeTransition">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -24027,7 +24034,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Higher values will keep larger Ki terms and limits from winding up at partial stick.  Consider increasing this if you have high Ki values and limits and a sudden stick motion from one aircraft bank angle to another causes the aircraft to rotate and then slowly change rotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Percentage of full stick where the transition from Attitude to Rate occurs. This transition always occurs when the aircraft is exactly inverted (bank angle 180 degrees).  Small values are dangerous because they cause flips at small stick angles.  Values significantly over 100 act like attitude mode and can never flip.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24039,18 +24046,18 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="minimum">
-                    <double>0.000000000000000</double>
+                    <double>25.000000000000000</double>
                    </property>
                    <property name="maximum">
-                    <double>31.000000000000000</double>
+                    <double>255.000000000000000</double>
                    </property>
                    <property name="value">
-                    <double>10.000000000000000</double>
+                    <double>80.000000000000000</double>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:StabilizationSettings</string>
-                     <string>fieldname:RattitudeAntiWindup</string>
+                     <string>fieldname:RattitudeModeTransition</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:15</string>
@@ -24090,7 +24097,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>Anti-Windup</string>
+                    <string>ModeTransition</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -24195,7 +24202,7 @@ border-radius: 5;</string>
                  <item row="1" column="4">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrottle) when inverted.  1 says to use the unboosted throttle stick value.  -1 (DON'T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the throttle stick when inverted.
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle/collective stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrust) when inverted.  1 says to use the unboosted stick value.  -1 (DON'T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the collective stick when inverted.
 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
@@ -24271,7 +24278,7 @@ border-radius: 5;</string>
                  <item row="1" column="1">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle/collective stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24303,6 +24310,7 @@ border-radius: 5;</string>
                      <string>buttongroup:16</string>
                     </stringlist>
                    </property>
+
                   </widget>
                  </item>
                  <item row="2" column="1">
@@ -24492,7 +24500,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>MinThrottle</string>
+                    <string>MinThrust</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -24502,7 +24510,7 @@ border-radius: 5;</string>
                  <item row="1" column="3">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle stick below this disables Cruise Control.  Also, by default Cruise Control forces the use of this value for throttle when the copter is inverted.  For safety, never set this so low that the trimmed throttle stick cannot get below it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle/Collective stick below this disables Cruise Control.  Also, by default Cruise Control forces the use of this value for thrust when the copter is inverted.  For safety, never set this so low that the trimmed throttle/collective stick cannot get below it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24519,7 +24527,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlMinThrottle</string>
+                     <string>fieldname:CruiseControlMinThrust</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
@@ -24580,7 +24588,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlMaxThrottle</string>
+                     <string>fieldname:CruiseControlMaxThrust</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
@@ -24614,7 +24622,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>MaxThrottle</string>
+                    <string>MaxThrust</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -26158,6 +26166,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -26711,7 +26720,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:ThrottleRate</string>
+                     <string>fieldname:ThrustRate</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:99</string>
@@ -26784,7 +26793,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle exponential value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thrust exponential value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -26807,7 +26816,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:ThrottleExp</string>
+                     <string>fieldname:ThrustExp</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:99,10</string>
@@ -26881,7 +26890,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:ThrottleRate</string>
+                     <string>fieldname:ThrustRate</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:99,10</string>
@@ -26906,7 +26915,7 @@ border-radius: 5;</string>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
-                     <string>fieldname:ThrottleExp</string>
+                     <string>fieldname:ThrustExp</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:99</string>
@@ -27457,7 +27466,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>Throttle Stick Response</string>
+                    <string>Throttle/Collective Stick Response</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>

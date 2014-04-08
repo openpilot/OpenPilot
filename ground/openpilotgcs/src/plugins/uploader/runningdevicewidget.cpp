@@ -99,8 +99,9 @@ void RunningDeviceWidget::populate()
 
     QString serial = utilMngr->getBoardCPUSerial().toHex();
     myDevice->CPUSerial->setText(serial);
-
+    myDevice->lblBLRev->setText(tr("BL version: ") + QString::number(utilMngr->getBootloaderRevision()));
     QByteArray description = utilMngr->getBoardDescription();
+
     deviceDescriptorStruct devDesc;
     if (UAVObjectUtilManager::descriptionToStructure(description, devDesc)) {
         if (devDesc.gitTag.startsWith("RELEASE", Qt::CaseSensitive)) {

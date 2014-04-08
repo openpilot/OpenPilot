@@ -116,8 +116,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>624</width>
-            <height>516</height>
+            <width>622</width>
+            <height>519</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
@@ -227,14 +227,14 @@
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <layout class="QGridLayout" name="gridLayout_2">
-               <item row="0" column="0">
-                <widget class="QLabel" name="telemetrySpeedLabel">
-                 <property name="text">
-                  <string>Telemetry speed:</string>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="telemetrySpeed">
+                 <property name="toolTip">
+                  <string>Select the speed here.</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="2" column="0">
                 <widget class="QLabel" name="GpsSpeedLabel">
                  <property name="minimumSize">
                   <size>
@@ -247,7 +247,28 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
+               <item row="0" column="0">
+                <widget class="QLabel" name="telemetrySpeedLabel">
+                 <property name="text">
+                  <string>Telemetry speed:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="comUsbBridgeSpeed">
+                 <property name="toolTip">
+                  <string>Select the speed here.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QComboBox" name="gpsSpeed">
+                 <property name="toolTip">
+                  <string>Select the speed here.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
                 <widget class="QLabel" name="ComUsbBridgeSpeedLabel">
                  <property name="minimumSize">
                   <size>
@@ -260,26 +281,15 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
-                <widget class="QComboBox" name="telemetrySpeed">
-                 <property name="toolTip">
-                  <string>Select the speed here.</string>
+               <item row="3" column="0">
+                <widget class="QLabel" name="GpsProtocolLabel">
+                 <property name="text">
+                  <string>GPS protocol :</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
-                <widget class="QComboBox" name="gpsSpeed">
-                 <property name="toolTip">
-                  <string>Select the speed here.</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QComboBox" name="comUsbBridgeSpeed">
-                 <property name="toolTip">
-                  <string>Select the speed here.</string>
-                 </property>
-                </widget>
+               <item row="3" column="1">
+                <widget class="QComboBox" name="gpsProtocol"/>
                </item>
               </layout>
              </item>

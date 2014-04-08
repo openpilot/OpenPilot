@@ -263,6 +263,15 @@ int UAVObjectUtilManager::getBoardModel()
     return ret;
 }
 
+int UAVObjectUtilManager::getBootloaderRevision()
+{
+    FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
+
+    int ret = firmwareIapData.BootloaderRevision;
+
+    return ret;
+}
+
 /**
  * Get the UAV Board CPU Serial Number, for anyone interested. Return format is a byte array
  */

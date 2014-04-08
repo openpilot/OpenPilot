@@ -92,8 +92,6 @@
 // Private types
 
 // Private variables
-static uint32_t idleCounter;
-static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
 static xQueueHandle objectPersistenceQueue;
 static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_CRITICAL = 3 } stackOverflow;
@@ -131,6 +129,7 @@ int32_t SystemModStart(void)
     xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
     // Register task
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
+
 
     return 0;
 }
@@ -186,15 +185,12 @@ static void systemTask(__attribute__((unused)) void *parameters)
          */
         PIOS_SYS_Reset();
     }
-
 #if defined(PIOS_INCLUDE_IAP)
     /* Record a successful boot */
     PIOS_IAP_WriteBootCount(0);
 #endif
 
     // Initialize vars
-    idleCounter = 0;
-    idleCounterClear = 0;
 
     // Listen for SettingPersistance object updates, connect a callback function
     ObjectPersistenceConnectQueue(objectPersistenceQueue);
@@ -212,9 +208,10 @@ static void systemTask(__attribute__((unused)) void *parameters)
     // Main system loop
     while (1) {
         // Update the system statistics
-        updateStats();
-        cycleCount = cycleCount > 0 ? cycleCount - 1 : 7;
 
+        cycleCount = cycleCount > 0 ? cycleCount - 1 : 7;
+// if(cycleCount == 1){
+        updateStats();
         // Update the system alarms
         updateSystemAlarms();
 #ifdef DIAG_I2C_WDG_STATS
@@ -227,10 +224,12 @@ static void systemTask(__attribute__((unused)) void *parameters)
         PIOS_TASK_MONITOR_ForEachTask(taskMonitorForEachCallback, &taskInfoData);
         TaskInfoSet(&taskInfoData);
         // Update the callback status object
+// if(FALSE){
         PIOS_CALLBACKSCHEDULER_ForEachCallback(callbackSchedulerForEachCallback, &callbackInfoData);
         CallbackInfoSet(&callbackInfoData);
+// }
 #endif
-
+// }
         // Flash the heartbeat LED
 #if defined(PIOS_LED_HEARTBEAT)
         uint8_t armingStatus;
@@ -541,7 +540,6 @@ static uint16_t GetFreeIrqStackSize(void)
  */
 static void updateStats()
 {
-    static portTickType lastTickCount = 0;
     SystemStatsData stats;
 
     // Get stats and update
@@ -559,10 +557,6 @@ static void updateStats()
     // Get Irq stack status
     stats.IRQStackRemaining = GetFreeIrqStackSize();
 
-    // When idleCounterClear was not reset by the idle-task, it means the idle-task did not run
-    if (idleCounterClear) {
-        idleCounter = 0;
-    }
 #if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
     if (pios_uavo_settings_fs_id) {
         PIOS_FLASHFS_GetStats(pios_uavo_settings_fs_id, &fsStats);
@@ -575,16 +569,11 @@ static void updateStats()
         stats.UsrSlotsActive = fsStats.num_active_slots;
     }
 #endif
-    portTickType now = xTaskGetTickCount();
-    if (now > lastTickCount) {
-        uint32_t dT = (xTaskGetTickCount() - lastTickCount) * portTICK_RATE_MS; // in ms
-        stats.CPULoad = 100 - (uint8_t)roundf(100.0f * ((float)idleCounter / ((float)dT / 1000.0f)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
-    } // else: TickCount has wrapped, do not calc now
-    lastTickCount    = now;
-    idleCounterClear = 1;
+    stats.CPULoad = 100 - PIOS_TASK_MONITOR_GetIdlePercentage();
+
 #if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)
     float temp_voltage = PIOS_ADC_PinGetVolt(PIOS_ADC_TEMPERATURE_PIN);
-    stats.CPUTemp    = PIOS_CONVERT_VOLT_TO_CPU_TEMP(temp_voltage);;
+    stats.CPUTemp = PIOS_CONVERT_VOLT_TO_CPU_TEMP(temp_voltage);;
 #endif
     SystemStatsSet(&stats);
 }
@@ -663,15 +652,7 @@ static void updateSystemAlarms()
  * Called by the RTOS when the CPU is idle, used to measure the CPU idle time.
  */
 void vApplicationIdleHook(void)
-{
-    // Called when the scheduler has no tasks to run
-    if (idleCounterClear == 0) {
-        ++idleCounter;
-    } else {
-        idleCounter = 0;
-        idleCounterClear = 0;
-    }
-}
+{}
 
 /**
  * Called by the RTOS when a stack overflow is detected.

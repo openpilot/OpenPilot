@@ -404,8 +404,17 @@ static void go_starting(struct pios_i2c_adapter *i2c_adapter)
     PIOS_DEBUG_Assert(i2c_adapter->active_txn >= i2c_adapter->first_txn);
     PIOS_DEBUG_Assert(i2c_adapter->active_txn <= i2c_adapter->last_txn);
 
-    i2c_adapter->active_byte = &(i2c_adapter->active_txn->buf[0]);
-    i2c_adapter->last_byte   = &(i2c_adapter->active_txn->buf[i2c_adapter->active_txn->len - 1]);
+    // check for an empty read/write
+    if (i2c_adapter->active_txn->buf != NULL && i2c_adapter->active_txn->len != 0) {
+        // Data available
+        i2c_adapter->active_byte = &(i2c_adapter->active_txn->buf[0]);
+        i2c_adapter->last_byte   = &(i2c_adapter->active_txn->buf[i2c_adapter->active_txn->len - 1]);
+    } else {
+        // No Data available => Empty read/write
+        i2c_adapter->last_byte   = NULL;
+        i2c_adapter->active_byte = i2c_adapter->last_byte + 1;
+    }
+
 
     I2C_GenerateSTART(i2c_adapter->cfg->regs, ENABLE);
     if (i2c_adapter->active_txn->rw == PIOS_I2C_TXN_READ) {

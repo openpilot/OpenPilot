@@ -32,7 +32,7 @@
                 <!-- proportional coefficient for adjusting vertical speed error for power calculation
                      in relation to airspeed error IASerror -->
         <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.01,0.05,0.5"/>
-                <!-- proportional coefficient for desired throttle
+                <!-- proportional coefficient for desired thrust
                      in relation to vertical speed error (absolute but including crossfeed) -->
 
         <!-- output limits -->
@@ -40,8 +40,8 @@
                 <!-- maximum allowed bank angles in navigates flight -->
         <field name="PitchLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-10,5,20" />
                 <!-- maximum allowed pitch angles and setpoint for neutral pitch -->
-        <field name="ThrottleLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.1,0.5,0.9" />
-                <!-- minimum and maximum allowed throttle and setpoint for cruise speed -->
+        <field name="ThrustLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.1,0.5,0.9" />
+                <!-- minimum and maximum allowed thrust and setpoint for cruise speed -->
         <field name="Safetymargins" units="" type="float"
                 elementnames="Wind, Stallspeed, Lowspeed, Highspeed, Overspeed, Lowpower, Highpower, Pitchcontrol"
                 defaultvalue="90, 1.0, 0.5, 1.5, 1.0, 1, 1, 1" />

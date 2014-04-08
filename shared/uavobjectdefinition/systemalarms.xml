@@ -10,10 +10,12 @@
 			<elementname>CPUOverload</elementname>
 			<elementname>EventSystem</elementname>
 			<elementname>Telemetry</elementname>
+			<elementname>Receiver</elementname>
 			<elementname>ManualControl</elementname>
 			<elementname>Actuator</elementname>
 			<elementname>Attitude</elementname>
 			<elementname>Sensors</elementname>
+			<elementname>Airspeed</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>Guidance</elementname>
 			<elementname>PathPlan</elementname>
@@ -42,7 +44,7 @@
 		</elementnames>
 	</field>
         <access gcs="readwrite" flight="readwrite"/>
-        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetrygcs acked="true" updatemode="manual" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>
 	<logging updatemode="manual" period="0"/>
     </object>

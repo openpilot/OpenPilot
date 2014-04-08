@@ -35,11 +35,13 @@
 #include <QQmlContext>
 
 #include "flightlogmanager.h"
+#include "uavobject.h"
 
 FlightLogDialog::FlightLogDialog(QWidget *parent, FlightLogManager *flightLogManager) :
     QDialog(parent)
 {
     qmlRegisterType<ExtendedDebugLogEntry>("org.openpilot", 1, 0, "DebugLogEntry");
+    qmlRegisterType<UAVOLogSettingsWrapper>("org.openpilot", 1, 0, "UAVOLogSettingsWrapper");
 
     setWindowIcon(QIcon(":/core/images/openpilot_logo_32.png"));
     setWindowTitle(tr("Manage flight side logs"));
@@ -49,6 +51,8 @@ FlightLogDialog::FlightLogDialog(QWidget *parent, FlightLogManager *flightLogMan
     QQuickView *view = new QQuickView();
     view->rootContext()->setContextProperty("dialog", this);
     view->rootContext()->setContextProperty("logStatus", flightLogManager->flightLogStatus());
+    view->rootContext()->setContextProperty("logControl", flightLogManager->flightLogControl());
+    view->rootContext()->setContextProperty("logSettings", flightLogManager->flightLogSettings());
     view->rootContext()->setContextProperty("logManager", flightLogManager);
     view->setResizeMode(QQuickView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/flightlog/FlightLogDialog.qml"));

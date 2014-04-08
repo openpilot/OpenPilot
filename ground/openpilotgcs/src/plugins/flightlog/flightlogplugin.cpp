@@ -75,6 +75,8 @@ void FlightLogPlugin::ShowLogManagementDialog()
         m_logDialog = new FlightLogDialog(0, new FlightLogManager());
         connect(m_logDialog, SIGNAL(finished(int)), this, SLOT(LogManagementDialogClosed()));
         m_logDialog->show();
+    } else {
+        m_logDialog->raise();
     }
 }
 

@@ -1,202 +1,242 @@
 // This file is part of Eigen, a lightweight C++ template library
-// for linear algebra. Eigen itself is part of the KDE project.
+// for linear algebra.
 //
-// Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
-// Copyright (C) 2008 Gael Guennebaud <g.gael@free.fr>
+// Copyright (C) 2007-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
+// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
-// Eigen is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// Alternatively, you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as
-// published by the Free Software Foundation; either version 2 of
-// the License, or (at your option) any later version.
-//
-// Eigen is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-// FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License or the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License and a copy of the GNU General Public License along with
-// Eigen. If not, see <http://www.gnu.org/licenses/>.
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MAPBASE_H
 #define EIGEN_MAPBASE_H
 
+#define EIGEN_STATIC_ASSERT_INDEX_BASED_ACCESS(Derived) \
+      EIGEN_STATIC_ASSERT((int(internal::traits<Derived>::Flags) & LinearAccessBit) || Derived::IsVectorAtCompileTime, \
+                          YOU_ARE_TRYING_TO_USE_AN_INDEX_BASED_ACCESSOR_ON_AN_EXPRESSION_THAT_DOES_NOT_SUPPORT_THAT)
+
+namespace Eigen { 
+
 /** \class MapBase
+  * \ingroup Core_Module
   *
   * \brief Base class for Map and Block expression with direct access
   *
-  * Expression classes inheriting MapBase must define the constant \c PacketAccess,
-  * and type \c AlignedDerivedType in their respective ei_traits<> specialization structure.
-  * The value of \c PacketAccess can be either:
-  *  - \b ForceAligned which enforces both aligned loads and stores
-  *  - \b AsRequested which is the default behavior
-  * The type \c AlignedDerivedType should correspond to the equivalent expression type
-  * with \c PacketAccess being \c ForceAligned.
-  *
   * \sa class Map, class Block
   */
-template<typename Derived> class MapBase
-  : public MatrixBase<Derived>
+template<typename Derived> class MapBase<Derived, ReadOnlyAccessors>
+  : public internal::dense_xpr_base<Derived>::type
 {
   public:
 
-    typedef MatrixBase<Derived> Base;
+    typedef typename internal::dense_xpr_base<Derived>::type Base;
     enum {
-      IsRowMajor = (int(ei_traits<Derived>::Flags) & RowMajorBit) ? 1 : 0,
-      PacketAccess = ei_traits<Derived>::PacketAccess,
-      RowsAtCompileTime = ei_traits<Derived>::RowsAtCompileTime,
-      ColsAtCompileTime = ei_traits<Derived>::ColsAtCompileTime,
+      RowsAtCompileTime = internal::traits<Derived>::RowsAtCompileTime,
+      ColsAtCompileTime = internal::traits<Derived>::ColsAtCompileTime,
       SizeAtCompileTime = Base::SizeAtCompileTime
     };
 
-    typedef typename ei_traits<Derived>::AlignedDerivedType AlignedDerivedType;
-    typedef typename ei_traits<Derived>::Scalar Scalar;
-    typedef typename Base::PacketScalar PacketScalar;
+    typedef typename internal::traits<Derived>::StorageKind StorageKind;
+    typedef typename internal::traits<Derived>::Index Index;
+    typedef typename internal::traits<Derived>::Scalar Scalar;
+    typedef typename internal::packet_traits<Scalar>::type PacketScalar;
+    typedef typename NumTraits<Scalar>::Real RealScalar;
+    typedef typename internal::conditional<
+                         bool(internal::is_lvalue<Derived>::value),
+                         Scalar *,
+                         const Scalar *>::type
+                     PointerType;
+
     using Base::derived;
+//    using Base::RowsAtCompileTime;
+//    using Base::ColsAtCompileTime;
+//    using Base::SizeAtCompileTime;
+    using Base::MaxRowsAtCompileTime;
+    using Base::MaxColsAtCompileTime;
+    using Base::MaxSizeAtCompileTime;
+    using Base::IsVectorAtCompileTime;
+    using Base::Flags;
+    using Base::IsRowMajor;
 
-    inline int rows() const { return m_rows.value(); }
-    inline int cols() const { return m_cols.value(); }
+    using Base::rows;
+    using Base::cols;
+    using Base::size;
+    using Base::coeff;
+    using Base::coeffRef;
+    using Base::lazyAssign;
+    using Base::eval;
 
-    inline int stride() const { return derived().stride(); }
+    using Base::innerStride;
+    using Base::outerStride;
+    using Base::rowStride;
+    using Base::colStride;
+
+    // bug 217 - compile error on ICC 11.1
+    using Base::operator=;
+
+    typedef typename Base::CoeffReturnType CoeffReturnType;
+
+    inline Index rows() const { return m_rows.value(); }
+    inline Index cols() const { return m_cols.value(); }
+
+    /** Returns a pointer to the first coefficient of the matrix or vector.
+      *
+      * \note When addressing this data, make sure to honor the strides returned by innerStride() and outerStride().
+      *
+      * \sa innerStride(), outerStride()
+      */
     inline const Scalar* data() const { return m_data; }
 
-    template<bool IsForceAligned,typename Dummy> struct force_aligned_impl {
-      static AlignedDerivedType run(MapBase& a) { return a.derived(); }
-    };
-
-    template<typename Dummy> struct force_aligned_impl<false,Dummy> {
-      static AlignedDerivedType run(MapBase& a) { return a.derived()._convertToForceAligned(); }
-    };
-
-    /** \returns an expression equivalent to \c *this but having the \c PacketAccess constant
-      * set to \c ForceAligned. Must be reimplemented by the derived class. */
-    AlignedDerivedType forceAligned()
+    inline const Scalar& coeff(Index rowId, Index colId) const
     {
-      return force_aligned_impl<int(PacketAccess)==int(ForceAligned),Derived>::run(*this);
+      return m_data[colId * colStride() + rowId * rowStride()];
     }
 
-    inline const Scalar& coeff(int row, int col) const
+    inline const Scalar& coeff(Index index) const
     {
-      if(IsRowMajor)
-        return m_data[col + row * stride()];
-      else // column-major
-        return m_data[row + col * stride()];
+      EIGEN_STATIC_ASSERT_INDEX_BASED_ACCESS(Derived)
+      return m_data[index * innerStride()];
     }
 
-    inline Scalar& coeffRef(int row, int col)
+    inline const Scalar& coeffRef(Index rowId, Index colId) const
     {
-      if(IsRowMajor)
-        return const_cast<Scalar*>(m_data)[col + row * stride()];
-      else // column-major
-        return const_cast<Scalar*>(m_data)[row + col * stride()];
+      return this->m_data[colId * colStride() + rowId * rowStride()];
     }
 
-    inline const Scalar coeff(int index) const
+    inline const Scalar& coeffRef(Index index) const
     {
-      ei_assert(Derived::IsVectorAtCompileTime || (ei_traits<Derived>::Flags & LinearAccessBit));
-      if ( ((RowsAtCompileTime == 1) == IsRowMajor) || !int(Derived::IsVectorAtCompileTime) )
-        return m_data[index];
-      else
-        return m_data[index*stride()];
-    }
-
-    inline Scalar& coeffRef(int index)
-    {
-      ei_assert(Derived::IsVectorAtCompileTime || (ei_traits<Derived>::Flags & LinearAccessBit));
-      if ( ((RowsAtCompileTime == 1) == IsRowMajor)  || !int(Derived::IsVectorAtCompileTime) )
-        return const_cast<Scalar*>(m_data)[index];
-      else
-        return const_cast<Scalar*>(m_data)[index*stride()];
+      EIGEN_STATIC_ASSERT_INDEX_BASED_ACCESS(Derived)
+      return this->m_data[index * innerStride()];
     }
 
     template<int LoadMode>
-    inline PacketScalar packet(int row, int col) const
+    inline PacketScalar packet(Index rowId, Index colId) const
     {
-      return ei_ploadt<Scalar, int(PacketAccess) == ForceAligned ? Aligned : LoadMode>
-               (m_data + (IsRowMajor ? col + row * stride()
-                                     : row + col * stride()));
+      return internal::ploadt<PacketScalar, LoadMode>
+               (m_data + (colId * colStride() + rowId * rowStride()));
     }
 
     template<int LoadMode>
-    inline PacketScalar packet(int index) const
+    inline PacketScalar packet(Index index) const
     {
-      return ei_ploadt<Scalar, int(PacketAccess) == ForceAligned ? Aligned : LoadMode>(m_data + index);
+      EIGEN_STATIC_ASSERT_INDEX_BASED_ACCESS(Derived)
+      return internal::ploadt<PacketScalar, LoadMode>(m_data + index * innerStride());
     }
 
-    template<int StoreMode>
-    inline void writePacket(int row, int col, const PacketScalar& x)
-    {
-      ei_pstoret<Scalar, PacketScalar, int(PacketAccess) == ForceAligned ? Aligned : StoreMode>
-               (const_cast<Scalar*>(m_data) + (IsRowMajor ? col + row * stride()
-                                                          : row + col * stride()), x);
-    }
-
-    template<int StoreMode>
-    inline void writePacket(int index, const PacketScalar& x)
-    {
-      ei_pstoret<Scalar, PacketScalar, int(PacketAccess) == ForceAligned ? Aligned : StoreMode>
-        (const_cast<Scalar*>(m_data) + index, x);
-    }
-
-    inline MapBase(const Scalar* data) : m_data(data), m_rows(RowsAtCompileTime), m_cols(ColsAtCompileTime)
+    inline MapBase(PointerType dataPtr) : m_data(dataPtr), m_rows(RowsAtCompileTime), m_cols(ColsAtCompileTime)
     {
       EIGEN_STATIC_ASSERT_FIXED_SIZE(Derived)
+      checkSanity();
     }
 
-    inline MapBase(const Scalar* data, int size)
-            : m_data(data),
-              m_rows(RowsAtCompileTime == Dynamic ? size : RowsAtCompileTime),
-              m_cols(ColsAtCompileTime == Dynamic ? size : ColsAtCompileTime)
+    inline MapBase(PointerType dataPtr, Index vecSize)
+            : m_data(dataPtr),
+              m_rows(RowsAtCompileTime == Dynamic ? vecSize : Index(RowsAtCompileTime)),
+              m_cols(ColsAtCompileTime == Dynamic ? vecSize : Index(ColsAtCompileTime))
     {
       EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
-      ei_assert(size > 0 || data == 0);
-      ei_assert(SizeAtCompileTime == Dynamic || SizeAtCompileTime == size);
+      eigen_assert(vecSize >= 0);
+      eigen_assert(dataPtr == 0 || SizeAtCompileTime == Dynamic || SizeAtCompileTime == vecSize);
+      checkSanity();
     }
 
-    inline MapBase(const Scalar* data, int rows, int cols)
-            : m_data(data), m_rows(rows), m_cols(cols)
+    inline MapBase(PointerType dataPtr, Index nbRows, Index nbCols)
+            : m_data(dataPtr), m_rows(nbRows), m_cols(nbCols)
     {
-      ei_assert( (data == 0)
-              || (   rows > 0 && (RowsAtCompileTime == Dynamic || RowsAtCompileTime == rows)
-                  && cols > 0 && (ColsAtCompileTime == Dynamic || ColsAtCompileTime == cols)));
+      eigen_assert( (dataPtr == 0)
+              || (   nbRows >= 0 && (RowsAtCompileTime == Dynamic || RowsAtCompileTime == nbRows)
+                  && nbCols >= 0 && (ColsAtCompileTime == Dynamic || ColsAtCompileTime == nbCols)));
+      checkSanity();
     }
+
+  protected:
+
+    void checkSanity() const
+    {
+      EIGEN_STATIC_ASSERT(EIGEN_IMPLIES(internal::traits<Derived>::Flags&PacketAccessBit,
+                                        internal::inner_stride_at_compile_time<Derived>::ret==1),
+                          PACKET_ACCESS_REQUIRES_TO_HAVE_INNER_STRIDE_FIXED_TO_1);
+      eigen_assert(EIGEN_IMPLIES(internal::traits<Derived>::Flags&AlignedBit, (size_t(m_data) % 16) == 0)
+                   && "data is not aligned");
+    }
+
+    PointerType m_data;
+    const internal::variable_if_dynamic<Index, RowsAtCompileTime> m_rows;
+    const internal::variable_if_dynamic<Index, ColsAtCompileTime> m_cols;
+};
+
+template<typename Derived> class MapBase<Derived, WriteAccessors>
+  : public MapBase<Derived, ReadOnlyAccessors>
+{
+  public:
+
+    typedef MapBase<Derived, ReadOnlyAccessors> Base;
+
+    typedef typename Base::Scalar Scalar;
+    typedef typename Base::PacketScalar PacketScalar;
+    typedef typename Base::Index Index;
+    typedef typename Base::PointerType PointerType;
+
+    using Base::derived;
+    using Base::rows;
+    using Base::cols;
+    using Base::size;
+    using Base::coeff;
+    using Base::coeffRef;
+
+    using Base::innerStride;
+    using Base::outerStride;
+    using Base::rowStride;
+    using Base::colStride;
+
+    typedef typename internal::conditional<
+                    internal::is_lvalue<Derived>::value,
+                    Scalar,
+                    const Scalar
+                  >::type ScalarWithConstIfNotLvalue;
+
+    inline const Scalar* data() const { return this->m_data; }
+    inline ScalarWithConstIfNotLvalue* data() { return this->m_data; } // no const-cast here so non-const-correct code will give a compile error
+
+    inline ScalarWithConstIfNotLvalue& coeffRef(Index row, Index col)
+    {
+      return this->m_data[col * colStride() + row * rowStride()];
+    }
+
+    inline ScalarWithConstIfNotLvalue& coeffRef(Index index)
+    {
+      EIGEN_STATIC_ASSERT_INDEX_BASED_ACCESS(Derived)
+      return this->m_data[index * innerStride()];
+    }
+
+    template<int StoreMode>
+    inline void writePacket(Index row, Index col, const PacketScalar& val)
+    {
+      internal::pstoret<Scalar, PacketScalar, StoreMode>
+               (this->m_data + (col * colStride() + row * rowStride()), val);
+    }
+
+    template<int StoreMode>
+    inline void writePacket(Index index, const PacketScalar& val)
+    {
+      EIGEN_STATIC_ASSERT_INDEX_BASED_ACCESS(Derived)
+      internal::pstoret<Scalar, PacketScalar, StoreMode>
+                (this->m_data + index * innerStride(), val);
+    }
+
+    explicit inline MapBase(PointerType dataPtr) : Base(dataPtr) {}
+    inline MapBase(PointerType dataPtr, Index vecSize) : Base(dataPtr, vecSize) {}
+    inline MapBase(PointerType dataPtr, Index nbRows, Index nbCols) : Base(dataPtr, nbRows, nbCols) {}
 
     Derived& operator=(const MapBase& other)
     {
-      return Base::operator=(other);
+      Base::Base::operator=(other);
+      return derived();
     }
 
-    template<typename OtherDerived>
-    Derived& operator=(const MatrixBase<OtherDerived>& other)
-    {
-      return Base::operator=(other);
-    }
-    
-    using Base::operator*=;
-
-    template<typename OtherDerived>
-    Derived& operator+=(const MatrixBase<OtherDerived>& other)
-    { return derived() = forceAligned() + other; }
-
-    template<typename OtherDerived>
-    Derived& operator-=(const MatrixBase<OtherDerived>& other)
-    { return derived() = forceAligned() - other; }
-
-    Derived& operator*=(const Scalar& other)
-    { return derived() = forceAligned() * other; }
-
-    Derived& operator/=(const Scalar& other)
-    { return derived() = forceAligned() / other; }
-
-  protected:
-    const Scalar* EIGEN_RESTRICT m_data;
-    const ei_int_if_dynamic<RowsAtCompileTime> m_rows;
-    const ei_int_if_dynamic<ColsAtCompileTime> m_cols;
+    using Base::Base::operator=;
 };
+
+} // end namespace Eigen
 
 #endif // EIGEN_MAPBASE_H

@@ -123,6 +123,7 @@ static filterPipeline *filterChain = NULL;
 // different filters available to state estimation
 static stateFilter magFilter;
 static stateFilter baroFilter;
+static stateFilter baroiFilter;
 static stateFilter altitudeFilter;
 static stateFilter airFilter;
 static stateFilter stationaryFilter;
@@ -138,15 +139,28 @@ static filterPipeline *cfQueue = &(filterPipeline) {
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &llaFilter,
+            .filter = &baroiFilter,
             .next   = &(filterPipeline) {
-                .filter = &baroFilter,
+                .filter = &altitudeFilter,
                 .next   = &(filterPipeline) {
-                    .filter = &altitudeFilter,
-                    .next   = &(filterPipeline) {
-                        .filter = &cfFilter,
-                        .next   = NULL,
-                    }
+                    .filter = &cfFilter,
+                    .next   = NULL,
+                }
+            }
+        }
+    }
+};
+static const filterPipeline *cfmiQueue = &(filterPipeline) {
+    .filter = &magFilter,
+    .next   = &(filterPipeline) {
+        .filter = &airFilter,
+        .next   = &(filterPipeline) {
+            .filter = &baroiFilter,
+            .next   = &(filterPipeline) {
+                .filter = &altitudeFilter,
+                .next   = &(filterPipeline) {
+                    .filter = &cfmFilter,
+                    .next   = NULL,
                 }
             }
         }
@@ -176,15 +190,12 @@ static const filterPipeline *ekf13iQueue = &(filterPipeline) {
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &llaFilter,
+            .filter = &baroiFilter,
             .next   = &(filterPipeline) {
-                .filter = &baroFilter,
+                .filter = &stationaryFilter,
                 .next   = &(filterPipeline) {
-                    .filter = &stationaryFilter,
-                    .next   = &(filterPipeline) {
-                        .filter = &ekf13iFilter,
-                        .next   = NULL,
-                    }
+                    .filter = &ekf13iFilter,
+                    .next   = NULL,
                 }
             }
         }
@@ -256,6 +267,7 @@ int32_t StateEstimationInitialize(void)
     uint32_t stack_required = STACK_SIZE_BYTES;
     // Initialize Filters
     stack_required = maxint32_t(stack_required, filterMagInitialize(&magFilter));
+    stack_required = maxint32_t(stack_required, filterBaroiInitialize(&baroiFilter));
     stack_required = maxint32_t(stack_required, filterBaroInitialize(&baroFilter));
     stack_required = maxint32_t(stack_required, filterAltitudeInitialize(&altitudeFilter));
     stack_required = maxint32_t(stack_required, filterAirInitialize(&airFilter));
@@ -334,12 +346,15 @@ static void StateEstimationCb(void)
                     newFilterChain = cfQueue;
                     break;
                 case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAG:
+                    newFilterChain = cfmiQueue;
+                    break;
+                case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAGGPSOUTDOOR:
                     newFilterChain = cfmQueue;
                     break;
                 case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
                     newFilterChain = ekf13iQueue;
                     break;
-                case REVOSETTINGS_FUSIONALGORITHM_INS13OUTDOOR:
+                case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
                     newFilterChain = ekf13Queue;
                     break;
                 default:

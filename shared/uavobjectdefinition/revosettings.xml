@@ -1,7 +1,7 @@
 <xml>
     <object name="RevoSettings" singleinstance="true" settings="true" category="State">
         <description>Settings for the revo to control the algorithm and what is updated</description>
-        <field name="FusionAlgorithm" units="" type="enum" elements="1" options="None,Complementary,Complementary+Mag,INS13Indoor,INS13Outdoor" defaultvalue="Complementary"/>
+        <field name="FusionAlgorithm" units="" type="enum" elements="1" options="None,Complementary,Complementary+Mag,Complementary+Mag+GPSOutdoor,INS13Indoor,INS13GPSOutdoor" defaultvalue="Complementary"/>
 
         <!-- Low pass filter configuration to calculate offset of barometric altitude sensor.
         Defaults: updates at 5 Hz, tau = 300s settle time, exp(-(1/f)/tau) ~= 0.9993335555062

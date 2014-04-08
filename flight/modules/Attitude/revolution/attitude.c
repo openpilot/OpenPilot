@@ -278,7 +278,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
         case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
             ret_val = updateAttitudeComplementary(first_run);
             break;
-        case REVOSETTINGS_FUSIONALGORITHM_INS13OUTDOOR:
+        case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
             ret_val = updateAttitudeINSGPS(first_run, true);
             break;
         case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:

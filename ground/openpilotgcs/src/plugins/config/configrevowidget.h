@@ -51,7 +51,7 @@ public:
     ~ConfigRevoWidget();
 
 private:
-    void displayPlane(QString elementID);
+    void displayPlane(QGraphicsView *view, QString elementID);
 
     // ! Computes the scale and bias of the mag based on collected data
     void computeScaleBias();

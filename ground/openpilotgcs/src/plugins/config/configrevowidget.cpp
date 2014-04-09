@@ -83,8 +83,10 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // Initialization of the Paper plane widget
     m_ui->sixPointsHelp->setScene(new QGraphicsScene(this));
-    displayPlane("plane-horizontal");
+    displayPlane(m_ui->sixPointsHelp, "snow");
 
+    m_ui->levelingHelp->setScene(new QGraphicsScene(this));
+    displayPlane(m_ui->levelingHelp, "snow");
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
     addUAVObject("RevoCalibration");
@@ -145,6 +147,7 @@ void ConfigRevoWidget::showEvent(QShowEvent *event)
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a sensorsBargraph that is way too small.
     m_ui->sixPointsHelp->fitInView(m_ui->sixPointsHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    m_ui->levelingHelp->fitInView(m_ui->levelingHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
     m_thermalCalibrationModel->init();
 }
 
@@ -152,6 +155,7 @@ void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event)
     m_ui->sixPointsHelp->fitInView(m_ui->sixPointsHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    m_ui->levelingHelp->fitInView(m_ui->levelingHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
 }
 
 /**
@@ -512,7 +516,7 @@ void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateaccel, bool cali
     /* Show instructions and enable controls */
     m_ui->sixPointCalibInstructions->clear();
     m_ui->sixPointCalibInstructions->append("Place horizontally and click save position...");
-    displayPlane("plane-horizontal");
+    displayPlane(m_ui->sixPointsHelp, "plane-horizontal");
     m_ui->sixPointsStartAccel->setEnabled(false);
     m_ui->sixPointsStartMag->setEnabled(false);
     m_ui->sixPointsSave->setEnabled(true);
@@ -612,27 +616,28 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
         position = (position + 1) % 6;
         if (position == 1) {
             m_ui->sixPointCalibInstructions->append("Place with left side down and click save position...");
-            displayPlane("plane-left");
+            displayPlane(m_ui->sixPointsHelp, "plane-left");
         }
         if (position == 2) {
             m_ui->sixPointCalibInstructions->append("Place upside down and click save position...");
-            displayPlane("plane-flip");
+            displayPlane(m_ui->sixPointsHelp, "plane-flip");
         }
         if (position == 3) {
             m_ui->sixPointCalibInstructions->append("Place with right side down and click save position...");
-            displayPlane("plane-right");
+            displayPlane(m_ui->sixPointsHelp, "plane-right");
         }
         if (position == 4) {
             m_ui->sixPointCalibInstructions->append("Place with nose up and click save position...");
-            displayPlane("plane-up");
+            displayPlane(m_ui->sixPointsHelp, "plane-up");
         }
         if (position == 5) {
             m_ui->sixPointCalibInstructions->append("Place with nose down and click save position...");
-            displayPlane("plane-down");
+            displayPlane(m_ui->sixPointsHelp, "plane-down");
         }
         if (position == 0) {
             computeScaleBias();
-            m_ui->sixPointsStart->setEnabled(true);
+            m_ui->sixPointsStartAccel->setEnabled(true);
+            m_ui->sixPointsStartMag->setEnabled(true);
             m_ui->sixPointsSave->setEnabled(false);
 
             /* Cleanup original settings */
@@ -797,13 +802,13 @@ void ConfigRevoWidget::recallBoardRotation()
 /**
    Rotate the paper plane
  */
-void ConfigRevoWidget::displayPlane(QString elementID)
+void ConfigRevoWidget::displayPlane(QGraphicsView *view, QString elementID)
 {
-    m_ui->sixPointsHelp->scene()->clear();
+    view->scene()->clear();
     QPixmap pixmap = QPixmap(":/configgadget/images/calibration/" + elementID + ".png");
-    m_ui->sixPointsHelp->scene()->addPixmap(pixmap);
-    m_ui->sixPointsHelp->setSceneRect(pixmap.rect());
-    //m_ui->sixPointsHelp->fitInView(pixmap, Qt::KeepAspectRatio);
+    view->scene()->addPixmap(pixmap);
+    view->setSceneRect(pixmap.rect());
+    view->fitInView(view->scene()->sceneRect(), Qt::IgnoreAspectRatio);
 }
 
 

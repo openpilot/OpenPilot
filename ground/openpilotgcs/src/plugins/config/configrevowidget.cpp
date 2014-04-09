@@ -56,7 +56,6 @@
 #define sign(x) ((x < 0) ? -1 : 1)
 
 // Uncomment this to enable 6 point calibration on the accels
-#define SIX_POINT_CAL_ACCEL
 #define SAMPLE_SIZE 40
 const double ConfigRevoWidget::maxVarValue = 0.1;
 
@@ -421,8 +420,10 @@ void ConfigRevoWidget::doStartSixPointCalibrationAccel(){
  * accel) to compute the scale and bias of this sensor based on the current
  * home location magnetic strength.
  */
-void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateaccel, bool calibratemag)
+void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateAccel, bool calibrateMag)
 {
+    calibratingAccel = calibrateAccel;
+    calibratingMag = calibrateMag;
     // Store and reset board rotation before calibration starts
     isBoardRotationStored = false;
     storeAndClearBoardRotation();
@@ -448,7 +449,6 @@ void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateaccel, bool cali
         return;
     }
 
-#ifdef SIX_POINT_CAL_ACCEL
     // Calibration accel
     accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X] = 1;
     accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y] = 1;
@@ -460,7 +460,6 @@ void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateaccel, bool cali
     accel_accum_x.clear();
     accel_accum_y.clear();
     accel_accum_z.clear();
-#endif
 
     // Calibration mag
     // Reset the transformation matrix to identity
@@ -492,7 +491,6 @@ void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateaccel, bool cali
 
     UAVObject::Metadata mdata;
 
-#ifdef SIX_POINT_CAL_ACCEL
     /* Need to get as many accel updates as possible */
     AccelState *accelState = AccelState::GetInstance(getObjectManager());
     Q_ASSERT(accelState);
@@ -502,7 +500,6 @@ void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateaccel, bool cali
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     accelState->setMetadata(mdata);
-#endif
 
     /* Need to get as many mag updates as possible */
     MagState *mag = MagState::GetInstance(getObjectManager());
@@ -566,14 +563,13 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
     // This is necessary to prevent a race condition on disconnect signal and another update
     if (collectingData == true) {
         if (obj->getObjID() == AccelState::OBJID) {
-#ifdef SIX_POINT_CAL_ACCEL
             AccelState *accelState = AccelState::GetInstance(getObjectManager());
             Q_ASSERT(accelState);
             AccelState::DataFields accelStateData = accelState->getData();
             accel_accum_x.append(accelStateData.x);
             accel_accum_y.append(accelStateData.y);
             accel_accum_z.append(accelStateData.z);
-#endif
+
         } else if (obj->getObjID() == MagState::OBJID) {
             MagState *mag = MagState::GetInstance(getObjectManager());
             Q_ASSERT(mag);
@@ -586,16 +582,12 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
         }
     }
 
-#ifdef SIX_POINT_CAL_ACCEL
     if (accel_accum_x.size() >= SAMPLE_SIZE && mag_accum_x.size() >= SAMPLE_SIZE && collectingData == true) {
-#else
-    if (mag_accum_x.size() >= SAMPLE_SIZE && collectingData == true) {
-#endif
+
         collectingData = false;
 
         m_ui->sixPointsSave->setEnabled(true);
 
-#ifdef SIX_POINT_CAL_ACCEL
         // Store the mean for this position for the accel
         AccelState *accelState = AccelState::GetInstance(getObjectManager());
         Q_ASSERT(accelState);
@@ -603,7 +595,6 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
         accel_data_x[position] = listMean(accel_accum_x);
         accel_data_y[position] = listMean(accel_accum_y);
         accel_data_z[position] = listMean(accel_accum_z);
-#endif
 
         // Store the mean for this position for the mag
         MagState *mag = MagState::GetInstance(getObjectManager());
@@ -635,15 +626,14 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
             displayPlane(m_ui->sixPointsHelp, "plane-down");
         }
         if (position == 0) {
-            computeScaleBias();
+            computeScaleBias(calibratingMag, calibratingAccel);
             m_ui->sixPointsStartAccel->setEnabled(true);
             m_ui->sixPointsStartMag->setEnabled(true);
             m_ui->sixPointsSave->setEnabled(false);
 
             /* Cleanup original settings */
-#ifdef SIX_POINT_CAL_ACCEL
             accelState->setMetadata(initialAccelStateMdata);
-#endif
+
             mag->setMetadata(initialMagStateMdata);
 
             // Recall saved board rotation
@@ -656,7 +646,7 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
  * Computes the scale and bias for the magnetomer and (compile option)
  * for the accel once all the data has been collected in 6 positions.
  */
-void ConfigRevoWidget::computeScaleBias()
+void ConfigRevoWidget::computeScaleBias(bool mag, bool accel)
 {
     double S[3], b[3];
     double Be_length;
@@ -670,96 +660,75 @@ void ConfigRevoWidget::computeScaleBias()
     RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
-#ifdef SIX_POINT_CAL_ACCEL
     // Calibration accel
-    SixPointInConstFieldCal(homeLocationData.g_e, accel_data_x, accel_data_y, accel_data_z, S, b);
-    accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X] = fabs(S[0]);
-    accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y] = fabs(S[1]);
-    accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z] = fabs(S[2]);
+    if(accel) {
+        SixPointInConstFieldCal(homeLocationData.g_e, accel_data_x, accel_data_y, accel_data_z, S, b);
+        accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X] = fabs(S[0]);
+        accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y] = fabs(S[1]);
+        accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z] = fabs(S[2]);
 
-    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X]   = -sign(S[0]) * b[0];
-    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y]   = -sign(S[1]) * b[1];
-    accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z]   = -sign(S[2]) * b[2];
-#endif
+        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X]   = -sign(S[0]) * b[0];
+        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y]   = -sign(S[1]) * b[1];
+        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z]   = -sign(S[2]) * b[2];
+    }
 
     // Calibration mag
-    Be_length = sqrt(pow(homeLocationData.Be[0], 2) + pow(homeLocationData.Be[1], 2) + pow(homeLocationData.Be[2], 2));
-    SixPointInConstFieldCal(Be_length, mag_data_x, mag_data_y, mag_data_z, S, b);
-    revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] = fabs(S[0]);
-    revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] = fabs(S[1]);
-    revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] = fabs(S[2]);
+    if(mag){
+        Be_length = sqrt(pow(homeLocationData.Be[0], 2) + pow(homeLocationData.Be[1], 2) + pow(homeLocationData.Be[2], 2));
+        SixPointInConstFieldCal(Be_length, mag_data_x, mag_data_y, mag_data_z, S, b);
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] = fabs(S[0]);
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] = fabs(S[1]);
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] = fabs(S[2]);
 
-    revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X]   = -sign(S[0]) * b[0];
-    revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y]   = -sign(S[1]) * b[1];
-    revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z]   = -sign(S[2]) * b[2];
-
+        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X]   = -sign(S[0]) * b[0];
+        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y]   = -sign(S[1]) * b[1];
+        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z]   = -sign(S[2]) * b[2];
+    }
     // Restore the previous setting
     revoCalibrationData.MagBiasNullingRate = initialMagCorrectionRate;
 
-#ifdef SIX_POINT_CAL_ACCEL
+
     bool good_calibration = true;
 
     // Check the mag calibration is good
-    good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] ==
-                        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0];
-    good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] ==
-                        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1];
-    good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] ==
-                        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2];
-    good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] ==
-                        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X];
-    good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] ==
-                        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y];
-    good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] ==
-                        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z];
-
+    if(mag){
+        good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] ==
+                            revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0];
+        good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] ==
+                            revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1];
+        good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] ==
+                            revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2];
+        good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] ==
+                            revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X];
+        good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] ==
+                            revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y];
+        good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] ==
+                            revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z];
+    }
     // Check the accel calibration is good
-    good_calibration &= accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X] ==
-                        accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X];
-    good_calibration &= accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y] ==
-                        accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y];
-    good_calibration &= accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z] ==
-                        accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z];
-    good_calibration &= accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X] ==
-                        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X];
-    good_calibration &= accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y] ==
-                        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y];
-    good_calibration &= accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z] ==
-                        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z];
+    if(accel){
+        good_calibration &= accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X] ==
+                            accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X];
+        good_calibration &= accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y] ==
+                            accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y];
+        good_calibration &= accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z] ==
+                            accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z];
+        good_calibration &= accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X] ==
+                            accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X];
+        good_calibration &= accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y] ==
+                            accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y];
+        good_calibration &= accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z] ==
+                            accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z];
+    }
     if (good_calibration) {
         revoCalibration->setData(revoCalibrationData);
         accelGyroSettings->setData(accelGyroSettingsData);
-        m_ui->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
+        m_ui->sixPointCalibInstructions->append("Computed sensor scale and bias...");
     } else {
         revoCalibrationData   = revoCalibration->getData();
         accelGyroSettingsData = accelGyroSettings->getData();
         m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
     }
-#else // ifdef SIX_POINT_CAL_ACCEL
-    bool good_calibration = true;
-    good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] ==
-                        revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X];
-    good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] ==
-                        revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y];
-    good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] ==
-                        revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z];
-    good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] ==
-                        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X];
-    good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] ==
-                        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y];
-    good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] ==
-                        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z];
-    if (good_calibration) {
-        revoCalibration->setData(revoCalibrationData);
-        accelGyroSettings->setData(accelGyroSettingsData);
-        m_ui->sixPointCalibInstructions->append("Computed mag scale and bias...");
-    } else {
-        revoCalibrationData   = revoCalibration->getData();
-        accelGyroSettingsData = accelGyroSettings->getData();
-        m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
-    }
-#endif // ifdef SIX_POINT_CAL_ACCEL
-
     position = -1; // set to run again
 }
 

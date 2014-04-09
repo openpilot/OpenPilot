@@ -54,7 +54,7 @@ private:
     void displayPlane(QGraphicsView *view, QString elementID);
 
     // ! Computes the scale and bias of the mag based on collected data
-    void computeScaleBias();
+    void computeScaleBias(bool mag, bool accel);
 
     OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
     Ui_RevoSensorsWidget *m_ui;
@@ -78,6 +78,9 @@ private:
 
     double accel_data_x[6], accel_data_y[6], accel_data_z[6];
     double mag_data_x[6], mag_data_y[6], mag_data_z[6];
+
+    bool calibratingMag = false;
+    bool calibratingAccel = false;
 
     UAVObject::Metadata initialAccelStateMdata;
     UAVObject::Metadata initialGyroStateMdata;
@@ -103,7 +106,7 @@ private slots:
     // Slots for calibrating the mags
     void doStartSixPointCalibrationMag();
     void doStartSixPointCalibrationAccel();
-    void doStartSixPointCalibration(bool calibrateaccel, bool calibratemag);
+    void doStartSixPointCalibration(bool calibrateAccel, bool calibrateMag);
     void doGetSixPointCalibrationMeasurement(UAVObject *obj);
     void savePositionData();
 

@@ -393,7 +393,7 @@ p, li { white-space: pre-wrap; }
              </spacer>
             </item>
             <item row="1" column="3">
-             <widget class="QSpinBox" name="pitchRotation">
+             <widget class="QDoubleSpinBox" name="pitchRotation">
               <property name="minimum">
                <number>-90</number>
               </property>
@@ -475,7 +475,7 @@ margin:1px;</string>
              </spacer>
             </item>
             <item row="1" column="1">
-             <widget class="QSpinBox" name="rollRotation">
+             <widget class="QDoubleSpinBox" name="rollRotation">
               <property name="minimum">
                <number>-180</number>
               </property>
@@ -508,7 +508,7 @@ margin:1px;</string>
              </widget>
             </item>
             <item row="1" column="5">
-             <widget class="QSpinBox" name="yawRotation">
+             <widget class="QDoubleSpinBox" name="yawRotation">
               <property name="minimum">
                <number>-180</number>
               </property>

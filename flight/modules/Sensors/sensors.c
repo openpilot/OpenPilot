@@ -458,8 +458,9 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     AttitudeSettingsGet(&attitudeSettings);
 
     // Indicates not to expend cycles on rotation
-    if (attitudeSettings.BoardRotation.Roll == 0 && attitudeSettings.BoardRotation.Pitch == 0 &&
-        attitudeSettings.BoardRotation.Yaw == 0) {
+    if (fabsf(attitudeSettings.BoardRotation.Roll) < 0.00001f
+            && fabsf(attitudeSettings.BoardRotation.Pitch) < 0.00001f &&
+            fabsf(attitudeSettings.BoardRotation.Yaw) <0.00001f ) {
         rotate = 0;
     } else {
         rotate = 1;

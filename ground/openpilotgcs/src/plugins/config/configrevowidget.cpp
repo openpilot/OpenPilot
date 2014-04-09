@@ -435,8 +435,10 @@ void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateAccel, bool cali
     Q_ASSERT(revoCalibration);
     Q_ASSERT(homeLocation);
     RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
+    savedSettings.revoCalibration = revoCalibration->getData();
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
     AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
+    savedSettings.accelGyroSettings = accelGyroSettings->getData();
 
     // check if Homelocation is set
     if (!homeLocationData.Set) {
@@ -721,14 +723,22 @@ void ConfigRevoWidget::computeScaleBias(bool mag, bool accel)
                             accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z];
     }
     if (good_calibration) {
-        revoCalibration->setData(revoCalibrationData);
-        accelGyroSettings->setData(accelGyroSettingsData);
+        if(mag){
+            revoCalibration->setData(revoCalibrationData);
+        } else {
+            revoCalibration->setData(savedSettings.revoCalibration);
+        }
+
+        if(accel){
+            accelGyroSettings->setData(accelGyroSettingsData);
+        } else {
+            accelGyroSettings->setData(savedSettings.accelGyroSettings);
+        }
         m_ui->sixPointCalibInstructions->append("Computed sensor scale and bias...");
-    } else {
-        revoCalibrationData   = revoCalibration->getData();
-        accelGyroSettingsData = accelGyroSettings->getData();
-        m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
     }
+
+    m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
+
     position = -1; // set to run again
 }
 

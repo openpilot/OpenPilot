@@ -43,9 +43,13 @@
 #include "calibration/thermal/thermalcalibrationmodel.h"
 class Ui_Widget;
 
+
 class ConfigRevoWidget : public ConfigTaskWidget {
     Q_OBJECT
-
+    typedef struct {
+        RevoCalibration::DataFields revoCalibration;
+        AccelGyroSettings::DataFields accelGyroSettings;
+    } SavedSettings;
 public:
     ConfigRevoWidget(QWidget *parent = 0);
     ~ConfigRevoWidget();
@@ -55,6 +59,8 @@ private:
 
     // ! Computes the scale and bias of the mag based on collected data
     void computeScaleBias(bool mag, bool accel);
+
+    SavedSettings savedSettings;
 
     OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
     Ui_RevoSensorsWidget *m_ui;

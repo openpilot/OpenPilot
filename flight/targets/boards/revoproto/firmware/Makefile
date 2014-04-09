@@ -29,25 +29,26 @@ USE_DSP_LIB ?= NO
 
 # List of mandatory modules to include
 MODULES += Sensors
-MODULES += Attitude/revolution
-#MODULES += StateEstimation # use instead of Attitude
+#MODULES += Attitude/revolution
+MODULES += StateEstimation # use instead of Attitude
 MODULES += Altitude/revolution
 MODULES += Airspeed
 MODULES += AltitudeHold
 MODULES += Stabilization
-MODULES += Receiver
+MODULES += VtolPathFollower
 MODULES += ManualControl
+MODULES += Receiver
 MODULES += Actuator
 MODULES += GPS
+MODULES += TxPID
 MODULES += CameraStab
+MODULES += Battery
 MODULES += FirmwareIAP
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
-#MODULES += OveroSync ## OveroSync disabled until OP292 is fixed
+MODULES += Osd/osdoutout
+MODULES += Logging
 MODULES += Telemetry
-#MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
-#MODULES += Battery
-#MODULES += TxPID
 
 OPTMODULES += ComUsbBridge
 

@@ -229,6 +229,12 @@
 #include <pios_etasv3.h>
 #endif
 
+#ifdef PIOS_INCLUDE_MS4525DO
+/* PixHawk Airspeed Sensor based on MS4525DO */
+#include <pios_ms4525do.h>
+#endif
+
+
 #ifdef PIOS_INCLUDE_HCSR04
 /* HC-SR04 Ultrasonic Sensor */
 #include <pios_hcsr04.h>

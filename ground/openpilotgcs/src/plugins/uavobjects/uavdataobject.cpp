@@ -30,40 +30,40 @@
 /**
  * Constructor
  */
-UAVDataObject::UAVDataObject(quint32 objID, bool isSingleInst, bool isSet, const QString & name) :
+UAVDataObject::UAVDataObject(quint32 objID, bool isSingleInst, bool isSettings, const QString & name) :
     UAVObject(objID, isSingleInst, name)
 {
-    mobj = NULL;
-    this->isSet = isSet;
+    m_metaObject = NULL;
+    this->m_isSettings = isSettings;
 }
 
 /**
  * Initialize instance ID and assign a metaobject
  */
-void UAVDataObject::initialize(quint32 instID, UAVMetaObject *mobj)
+void UAVDataObject::initialize(quint32 instID, UAVMetaObject *metaObject)
 {
     QMutexLocker locker(mutex);
 
-    this->mobj = mobj;
+    this->m_metaObject = metaObject;
     UAVObject::initialize(instID);
 }
 
 /**
  * Assign a metaobject
  */
-void UAVDataObject::initialize(UAVMetaObject *mobj)
+void UAVDataObject::initialize(UAVMetaObject *metaObject)
 {
     QMutexLocker locker(mutex);
 
-    this->mobj = mobj;
+    this->m_metaObject = metaObject;
 }
 
 /**
  * Returns true if this is a data object holding module settings
  */
-bool UAVDataObject::isSettings()
+bool UAVDataObject::isSettingsObject()
 {
-    return isSet;
+    return m_isSettings;
 }
 
 /**
@@ -71,8 +71,8 @@ bool UAVDataObject::isSettings()
  */
 void UAVDataObject::setMetadata(const Metadata & mdata)
 {
-    if (mobj != NULL) {
-        mobj->setData(mdata);
+    if (m_metaObject != NULL) {
+        m_metaObject->setData(mdata);
     }
 }
 
@@ -81,8 +81,8 @@ void UAVDataObject::setMetadata(const Metadata & mdata)
  */
 UAVObject::Metadata UAVDataObject::getMetadata(void)
 {
-    if (mobj != NULL) {
-        return mobj->getData();
+    if (m_metaObject != NULL) {
+        return m_metaObject->getData();
     } else {
         return getDefaultMetadata();
     }
@@ -93,5 +93,10 @@ UAVObject::Metadata UAVDataObject::getMetadata(void)
  */
 UAVMetaObject *UAVDataObject::getMetaObject()
 {
-    return mobj;
+    return m_metaObject;
+}
+
+bool UAVDataObject::isDataObject()
+{
+    return true;
 }

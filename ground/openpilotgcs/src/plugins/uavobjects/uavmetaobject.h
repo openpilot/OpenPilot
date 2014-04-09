@@ -43,6 +43,8 @@ public:
     void setData(const Metadata & mdata);
     Metadata getData();
 
+    bool isMetaDataObject();
+
 private:
     UAVObject *parent;
     Metadata ownMetadata;

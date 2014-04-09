@@ -450,6 +450,7 @@ else
     GCS_SILENT := silent
 endif
 
+.NOTPARALLEL:
 .PHONY: openpilotgcs
 openpilotgcs: uavobjects_gcs openpilotgcs_qmake openpilotgcs_make
 
@@ -722,7 +723,7 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 
 # If opfw_resource or all firmware are requested, GCS should depend on the resource
 ifneq ($(strip $(filter opfw_resource all all_fw all_flight,$(MAKECMDGOALS))),)
-    $(eval openpilotgcs: $(OPFW_RESOURCE))
+    $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
 endif
 
 # Packaging targets: package, clean_package
@@ -877,9 +878,8 @@ help:
 	@$(ECHO) "   [Tool Installers]"
 	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
-	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
-	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
 	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
+	@$(ECHO) "     sdl_install          - Install the SDL library (Windows only)"
 	@$(ECHO) "     openssl_install      - Install the OpenSSL libraries (Windows only)"
 	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     doxygen_install      - Install the Doxygen documentation generator"

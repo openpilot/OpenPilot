@@ -101,12 +101,16 @@ private slots:
     virtual void refreshWidgetsValues(UAVObject *object = NULL);
 
     // Slots for calibrating the mags
-    void doStartSixPointCalibration();
+    void doStartSixPointCalibrationMag();
+    void doStartSixPointCalibrationAccel();
+    void doStartSixPointCalibration(bool calibrateaccel, bool calibratemag);
     void doGetSixPointCalibrationMeasurement(UAVObject *obj);
     void savePositionData();
 
     // Slots for calibrating the accel and gyro
     void doStartAccelGyroBiasCalibration();
+
+
     void doGetAccelGyroBiasData(UAVObject *);
 
     // Slot for clearing home location

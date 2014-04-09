@@ -114,7 +114,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // Connect the signals
     connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(doStartAccelGyroBiasCalibration()));
-    connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibration()));
+    connect(m_ui->sixPointsStartAccel, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibrationAccel()));
+    connect(m_ui->sixPointsStartMag, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibrationMag()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
 
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
@@ -403,13 +404,20 @@ int SixPointInConstFieldCal(double ConstMag, double x[6], double y[6], double z[
 
 /********** Functions for six point calibration **************/
 
+void ConfigRevoWidget::doStartSixPointCalibrationMag(){
+    doStartSixPointCalibration(false, true);
+}
+void ConfigRevoWidget::doStartSixPointCalibrationAccel(){
+    doStartSixPointCalibration(true, false);
+}
+
 /**
  * Called by the "Start" button.  Sets up the meta data and enables the
  * buttons to perform six point calibration of the magnetometer (optionally
  * accel) to compute the scale and bias of this sensor based on the current
  * home location magnetic strength.
  */
-void ConfigRevoWidget::doStartSixPointCalibration()
+void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateaccel, bool calibratemag)
 {
     // Store and reset board rotation before calibration starts
     isBoardRotationStored = false;
@@ -505,7 +513,8 @@ void ConfigRevoWidget::doStartSixPointCalibration()
     m_ui->sixPointCalibInstructions->clear();
     m_ui->sixPointCalibInstructions->append("Place horizontally and click save position...");
     displayPlane("plane-horizontal");
-    m_ui->sixPointsStart->setEnabled(false);
+    m_ui->sixPointsStartAccel->setEnabled(false);
+    m_ui->sixPointsStartMag->setEnabled(false);
     m_ui->sixPointsSave->setEnabled(true);
     position = 0;
 }
@@ -808,7 +817,8 @@ void ConfigRevoWidget::refreshWidgetsValues(UAVObject *object)
 {
     ConfigTaskWidget::refreshWidgetsValues(object);
 
-    m_ui->sixPointsStart->setEnabled(true);
+    m_ui->sixPointsStartAccel->setEnabled(true);
+    m_ui->sixPointsStartMag->setEnabled(true);
     m_ui->accelBiasStart->setEnabled(true);
     m_ui->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 

@@ -40,33 +40,24 @@
 #include <QTimer>
 #include <QMutex>
 #include "calibration/thermal/thermalcalibrationmodel.h"
-#include "calibration/calibrationutils.h"
+#include "calibration/sixpointcalibrationmodel.h"
 
 class Ui_Widget;
 
 
 class ConfigRevoWidget : public ConfigTaskWidget {
     Q_OBJECT
-    typedef struct {
-        RevoCalibration::DataFields revoCalibration;
-        AccelGyroSettings::DataFields accelGyroSettings;
-    } SavedSettings;
+
 public:
     ConfigRevoWidget(QWidget *parent = 0);
     ~ConfigRevoWidget();
 
 private:
-    void displayVisualHelp(QString elementID);
-
-    // ! Computes the scale and bias of the mag based on collected data
-    void sixPointCalibrationCompute(bool mag, bool accel);
-
-    SavedSettings savedSettings;
-
+    OpenPilot::SixPointCalibrationModel *m_sixPointCalibrationModel;
     OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
     Ui_RevoSensorsWidget *m_ui;
     QMutex sensorsUpdateLock;
-    double maxBarHeight;
+
     int phaseCounter;
     const static double maxVarValue;
     const static int calibrationDelay = 10;
@@ -76,32 +67,17 @@ private:
     QList<double> gyro_accum_x;
     QList<double> gyro_accum_y;
     QList<double> gyro_accum_z;
-    QList<double> accel_accum_x;
-    QList<double> accel_accum_y;
-    QList<double> accel_accum_z;
-    QList<double> mag_accum_x;
-    QList<double> mag_accum_y;
-    QList<double> mag_accum_z;
 
     QList<double> rot_accum_roll;
     QList<double> rot_accum_pitch;
 
 
-
-    double accel_data_x[6], accel_data_y[6], accel_data_z[6];
-    double mag_data_x[6], mag_data_y[6], mag_data_z[6];
-
     double rot_data_roll;
     double rot_data_pitch;
 
-    bool calibratingMag;
-    bool calibratingAccel;
 
     UAVObject::Metadata initialAttitudeStateMdata;
-    UAVObject::Metadata initialAccelStateMdata;
     UAVObject::Metadata initialGyroStateMdata;
-    UAVObject::Metadata initialMagStateMdata;
-    float initialMagCorrectionRate;
 
     int position;
 
@@ -110,21 +86,15 @@ private:
     // Board rotation store/recall
     qint16 storedBoardRotation[3];
     bool isBoardRotationStored;
+
+private slots:
+    void displayVisualHelp(QString elementID);
     void storeAndClearBoardRotation();
     void recallBoardRotation();
     void displayInstructions(QString instructions = QString(), bool replace = false);
 
-
-private slots:
     // ! Overriden method from the configTaskWidget to update UI
     virtual void refreshWidgetsValues(UAVObject *object = NULL);
-
-    // Slots for calibrating the mags
-    void sixPointCalibrationMagStart();
-    void sixPointCalibrationAccelStart();
-    void sixPointCalibrationStart(bool calibrateAccel, bool calibrateMag);
-    void sixPointCalibrationGetSample(UAVObject *obj);
-    void sixPointCalibrationSavePositionData();
 
     // Slots for calibrating the accel and gyro
     void levelCalibrationStart();

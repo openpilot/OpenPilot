@@ -32,7 +32,7 @@
 #include <Eigen/Eigenvalues>
 #include <Eigen/Dense>
 #include <Eigen/LU>
-
+#include <QList>
 namespace OpenPilot {
 class CalibrationUtils {
 public:
@@ -48,7 +48,8 @@ public:
     static float ComputeSigma(Eigen::VectorXf *samplesY);
 
     static int SixPointInConstFieldCal(double ConstMag, double x[6], double y[6], double z[6], double S[3], double b[3]);
-
+    static double listMean(QList<double> list);
+    static double listVar(QList<double> list);
 private:
     static void EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
                              Eigen::Vector3f *center,

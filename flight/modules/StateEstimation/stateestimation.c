@@ -139,8 +139,8 @@ static DelayedCallbackInfo *stateEstimationCallback;
 
 static volatile RevoSettingsData revoSettings;
 static volatile sensorUpdates updatedSensors;
-static volatile int32_t fusionAlgorithm = -1;
-static filterPipeline *filterChain = NULL;
+static volatile int32_t fusionAlgorithm  = -1;
+static const filterPipeline *filterChain = NULL;
 
 // different filters available to state estimation
 static stateFilter magFilter;
@@ -156,7 +156,7 @@ static stateFilter ekf13iFilter;
 static stateFilter ekf13Filter;
 
 // preconfigured filter chains selectable via revoSettings.FusionAlgorithm
-static filterPipeline *cfQueue = &(filterPipeline) {
+static const filterPipeline *cfQueue = &(filterPipeline) {
     .filter = &magFilter,
     .next   = &(filterPipeline) {
         .filter = &airFilter,
@@ -336,7 +336,7 @@ static void StateEstimationCb(void)
     static int8_t alarm     = 0;
     static int8_t lastAlarm = -1;
     static uint16_t alarmcounter = 0;
-    static filterPipeline *current;
+    static const filterPipeline *current;
     static stateEstimation states;
     static uint32_t last_time;
     static uint16_t bootDelay = 64;
@@ -388,7 +388,7 @@ static void StateEstimationCb(void)
                     newFilterChain = NULL;
                 }
                 // initialize filters in chain
-                current = (filterPipeline *)newFilterChain;
+                current = newFilterChain;
                 bool error = 0;
                 while (current != NULL) {
                     int32_t result = current->filter->init((stateFilter *)current->filter);
@@ -403,7 +403,7 @@ static void StateEstimationCb(void)
                     return;
                 } else {
                     // set new fusion algortithm
-                    filterChain     = (filterPipeline *)newFilterChain;
+                    filterChain     = newFilterChain;
                     fusionAlgorithm = revoSettings.FusionAlgorithm;
                 }
             }
@@ -426,7 +426,7 @@ static void StateEstimationCb(void)
         // at this point sensor state is stored in "states" with some rudimentary filtering applied
 
         // apply all filters in the current filter chain
-        current  = (filterPipeline *)filterChain;
+        current  = filterChain;
 
         // we are not done, re-dispatch self execution
         runState = RUNSTATE_FILTER;

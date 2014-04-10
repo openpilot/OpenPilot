@@ -41,7 +41,7 @@
 #include <QMutex>
 #include "calibration/thermal/thermalcalibrationmodel.h"
 #include "calibration/sixpointcalibrationmodel.h"
-
+#include "calibration/levelcalibrationmodel.h"
 class Ui_Widget;
 
 
@@ -55,11 +55,12 @@ public:
 private:
     OpenPilot::SixPointCalibrationModel *m_sixPointCalibrationModel;
     OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
+    OpenPilot::LevelCalibrationModel *m_levelCalibrationModel;
+
     Ui_RevoSensorsWidget *m_ui;
     QMutex sensorsUpdateLock;
 
     int phaseCounter;
-    const static double maxVarValue;
     const static int calibrationDelay = 10;
 
     bool collectingData;
@@ -68,20 +69,8 @@ private:
     QList<double> gyro_accum_y;
     QList<double> gyro_accum_z;
 
-    QList<double> rot_accum_roll;
-    QList<double> rot_accum_pitch;
-
-
-    double rot_data_roll;
-    double rot_data_pitch;
-
-
-    UAVObject::Metadata initialAttitudeStateMdata;
     UAVObject::Metadata initialGyroStateMdata;
 
-    int position;
-
-    static const int NOISE_SAMPLES = 50;
 
     // Board rotation store/recall
     qint16 storedBoardRotation[3];

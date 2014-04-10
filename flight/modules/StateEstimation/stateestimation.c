@@ -139,12 +139,13 @@ static DelayedCallbackInfo *stateEstimationCallback;
 
 static volatile RevoSettingsData revoSettings;
 static volatile sensorUpdates updatedSensors;
-static volatile int32_t fusionAlgorithm = -1;
-static filterPipeline *filterChain = NULL;
+static volatile int32_t fusionAlgorithm  = -1;
+static const filterPipeline *filterChain = NULL;
 
 // different filters available to state estimation
 static stateFilter magFilter;
 static stateFilter baroFilter;
+static stateFilter baroiFilter;
 static stateFilter altitudeFilter;
 static stateFilter airFilter;
 static stateFilter stationaryFilter;
@@ -155,20 +156,33 @@ static stateFilter ekf13iFilter;
 static stateFilter ekf13Filter;
 
 // preconfigured filter chains selectable via revoSettings.FusionAlgorithm
-static filterPipeline *cfQueue = &(filterPipeline) {
+static const filterPipeline *cfQueue = &(filterPipeline) {
     .filter = &magFilter,
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &llaFilter,
+            .filter = &baroiFilter,
             .next   = &(filterPipeline) {
-                .filter = &baroFilter,
+                .filter = &altitudeFilter,
                 .next   = &(filterPipeline) {
-                    .filter = &altitudeFilter,
-                    .next   = &(filterPipeline) {
-                        .filter = &cfFilter,
-                        .next   = NULL,
-                    }
+                    .filter = &cfFilter,
+                    .next   = NULL,
+                }
+            }
+        }
+    }
+};
+static const filterPipeline *cfmiQueue = &(filterPipeline) {
+    .filter = &magFilter,
+    .next   = &(filterPipeline) {
+        .filter = &airFilter,
+        .next   = &(filterPipeline) {
+            .filter = &baroiFilter,
+            .next   = &(filterPipeline) {
+                .filter = &altitudeFilter,
+                .next   = &(filterPipeline) {
+                    .filter = &cfmFilter,
+                    .next   = NULL,
                 }
             }
         }
@@ -198,15 +212,12 @@ static const filterPipeline *ekf13iQueue = &(filterPipeline) {
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &llaFilter,
+            .filter = &baroiFilter,
             .next   = &(filterPipeline) {
-                .filter = &baroFilter,
+                .filter = &stationaryFilter,
                 .next   = &(filterPipeline) {
-                    .filter = &stationaryFilter,
-                    .next   = &(filterPipeline) {
-                        .filter = &ekf13iFilter,
-                        .next   = NULL,
-                    }
+                    .filter = &ekf13iFilter,
+                    .next   = NULL,
                 }
             }
         }
@@ -283,6 +294,7 @@ int32_t StateEstimationInitialize(void)
     uint32_t stack_required = STACK_SIZE_BYTES;
     // Initialize Filters
     stack_required = maxint32_t(stack_required, filterMagInitialize(&magFilter));
+    stack_required = maxint32_t(stack_required, filterBaroiInitialize(&baroiFilter));
     stack_required = maxint32_t(stack_required, filterBaroInitialize(&baroFilter));
     stack_required = maxint32_t(stack_required, filterAltitudeInitialize(&altitudeFilter));
     stack_required = maxint32_t(stack_required, filterAirInitialize(&airFilter));
@@ -324,7 +336,7 @@ static void StateEstimationCb(void)
     static int8_t alarm     = 0;
     static int8_t lastAlarm = -1;
     static uint16_t alarmcounter = 0;
-    static filterPipeline *current;
+    static const filterPipeline *current;
     static stateEstimation states;
     static uint32_t last_time;
     static uint16_t bootDelay = 64;
@@ -361,19 +373,22 @@ static void StateEstimationCb(void)
                     newFilterChain = cfQueue;
                     break;
                 case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAG:
+                    newFilterChain = cfmiQueue;
+                    break;
+                case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAGGPSOUTDOOR:
                     newFilterChain = cfmQueue;
                     break;
                 case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
                     newFilterChain = ekf13iQueue;
                     break;
-                case REVOSETTINGS_FUSIONALGORITHM_INS13OUTDOOR:
+                case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
                     newFilterChain = ekf13Queue;
                     break;
                 default:
                     newFilterChain = NULL;
                 }
                 // initialize filters in chain
-                current = (filterPipeline *)newFilterChain;
+                current = newFilterChain;
                 bool error = 0;
                 while (current != NULL) {
                     int32_t result = current->filter->init((stateFilter *)current->filter);
@@ -388,7 +403,7 @@ static void StateEstimationCb(void)
                     return;
                 } else {
                     // set new fusion algortithm
-                    filterChain     = (filterPipeline *)newFilterChain;
+                    filterChain     = newFilterChain;
                     fusionAlgorithm = revoSettings.FusionAlgorithm;
                 }
             }
@@ -411,7 +426,7 @@ static void StateEstimationCb(void)
         // at this point sensor state is stored in "states" with some rudimentary filtering applied
 
         // apply all filters in the current filter chain
-        current  = (filterPipeline *)filterChain;
+        current  = filterChain;
 
         // we are not done, re-dispatch self execution
         runState = RUNSTATE_FILTER;

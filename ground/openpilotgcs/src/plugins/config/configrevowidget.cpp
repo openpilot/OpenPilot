@@ -75,17 +75,16 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     ConfigTaskWidget(parent),
     m_ui(new Ui_RevoSensorsWidget()),
     collectingData(false),
+    calibratingMag(false),
+    calibratingAccel(false),
     position(-1),
     isBoardRotationStored(false)
 {
     m_ui->setupUi(this);
 
     // Initialization of the Paper plane widget
-    m_ui->sixPointsHelp->setScene(new QGraphicsScene(this));
-    displayPlane(m_ui->sixPointsHelp, "snow");
-
-    m_ui->levelingHelp->setScene(new QGraphicsScene(this));
-    displayPlane(m_ui->levelingHelp, "snow");
+    m_ui->calibrationVisualHelp->setScene(new QGraphicsScene(this));
+    displayVisualHelp("snow");
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
     addUAVObject("RevoCalibration");
@@ -114,10 +113,16 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // note: init for m_thermalCalibrationModel is done in showEvent to prevent cases wiht "Start" button not enabled due to some itming issue.
 
     // Connect the signals
-    connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(doStartAccelGyroBiasCalibration()));
-    connect(m_ui->sixPointsStartAccel, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibrationAccel()));
-    connect(m_ui->sixPointsStartMag, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibrationMag()));
-    connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
+    // gyro zero calibration
+    connect(m_ui->gyroBiasStart, SIGNAL(clicked()), this, SLOT(levelCalibrationStart()));
+
+    // level calibration
+    connect(m_ui->boardLevelStart, SIGNAL(clicked()), this, SLOT(levelCalibrationStart()));
+
+    // six point calibrations
+    connect(m_ui->sixPointsStartAccel, SIGNAL(clicked()), this, SLOT(sixPointCalibrationAccelStart()));
+    connect(m_ui->sixPointsStartMag, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMagStart()));
+    connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(sixPointCalibrationSavePositionData()));
 
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
 
@@ -131,6 +136,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     populateWidgets();
     refreshWidgetsValues();
     m_ui->tabWidget->setCurrentIndex(0);
+    enableAllCalibrations();
 }
 
 ConfigRevoWidget::~ConfigRevoWidget()
@@ -141,33 +147,33 @@ ConfigRevoWidget::~ConfigRevoWidget()
 
 void ConfigRevoWidget::showEvent(QShowEvent *event)
 {
-    Q_UNUSED(event)
+    Q_UNUSED(event);
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a sensorsBargraph that is way too small.
-    m_ui->sixPointsHelp->fitInView(m_ui->sixPointsHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
-    m_ui->levelingHelp->fitInView(m_ui->levelingHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
     m_thermalCalibrationModel->init();
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
-    Q_UNUSED(event)
-    m_ui->sixPointsHelp->fitInView(m_ui->sixPointsHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
-    m_ui->levelingHelp->fitInView(m_ui->levelingHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    Q_UNUSED(event);
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
 }
 
+
+/******* Level calibration *******/
 /**
  * Starts an accelerometer bias calibration.
  */
-void ConfigRevoWidget::doStartAccelGyroBiasCalibration()
+void ConfigRevoWidget::levelCalibrationStart()
 {
     // Store and reset board rotation before calibration starts
     isBoardRotationStored = false;
     storeAndClearBoardRotation();
 
-    m_ui->accelBiasStart->setEnabled(false);
-    m_ui->accelBiasProgress->setValue(0);
+    disableAllCalibrations();
+    m_ui->boardLevelProgress->setValue(0);
 
     RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
@@ -212,14 +218,14 @@ void ConfigRevoWidget::doStartAccelGyroBiasCalibration()
 
     // Now connect to the accels and mag updates, gather for 100 samples
     collectingData = true;
-    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
-    connect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
+    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
+    connect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
 }
 
 /**
    Updates the accel bias raw values
  */
-void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
+void ConfigRevoWidget::levelCalibrationGetSample(UAVObject *obj)
 {
     QMutexLocker lock(&sensorsUpdateLock);
 
@@ -255,7 +261,7 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
     // Work out the progress based on whichever has less
     double p1 = (double)accel_accum_x.size() / (double)NOISE_SAMPLES;
     double p2 = (double)accel_accum_y.size() / (double)NOISE_SAMPLES;
-    m_ui->accelBiasProgress->setValue(((p1 < p2) ? p1 : p2) * 100);
+    m_ui->boardLevelProgress->setValue(((p1 < p2) ? p1 : p2) * 100);
 
     if (accel_accum_x.size() >= NOISE_SAMPLES &&
         gyro_accum_y.size() >= NOISE_SAMPLES &&
@@ -265,10 +271,10 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
         AccelState *accelState = AccelState::GetInstance(getObjectManager());
         GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
 
-        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
-        disconnect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetAccelGyroBiasData(UAVObject *)));
+        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
+        disconnect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
 
-        m_ui->accelBiasStart->setEnabled(true);
+        enableAllCalibrations();
 
         RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
         Q_ASSERT(revoCalibration);
@@ -309,109 +315,13 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
     }
 }
 
+/********** Six point calibration **************/
 
-int LinearEquationsSolving(int nDim, double *pfMatr, double *pfVect, double *pfSolution)
-{
-    double fMaxElem;
-    double fAcc;
-
-    int i, j, k, m;
-
-    for (k = 0; k < (nDim - 1); k++) { // base row of matrix
-        // search of line with max element
-        fMaxElem = fabs(pfMatr[k * nDim + k]);
-        m = k;
-        for (i = k + 1; i < nDim; i++) {
-            if (fMaxElem < fabs(pfMatr[i * nDim + k])) {
-                fMaxElem = pfMatr[i * nDim + k];
-                m = i;
-            }
-        }
-
-        // permutation of base line (index k) and max element line(index m)
-        if (m != k) {
-            for (i = k; i < nDim; i++) {
-                fAcc = pfMatr[k * nDim + i];
-                pfMatr[k * nDim + i] = pfMatr[m * nDim + i];
-                pfMatr[m * nDim + i] = fAcc;
-            }
-            fAcc = pfVect[k];
-            pfVect[k] = pfVect[m];
-            pfVect[m] = fAcc;
-        }
-
-        if (pfMatr[k * nDim + k] == 0.) {
-            return 0; // needs improvement !!!
-        }
-        // triangulation of matrix with coefficients
-        for (j = (k + 1); j < nDim; j++) { // current row of matrix
-            fAcc = -pfMatr[j * nDim + k] / pfMatr[k * nDim + k];
-            for (i = k; i < nDim; i++) {
-                pfMatr[j * nDim + i] = pfMatr[j * nDim + i] + fAcc * pfMatr[k * nDim + i];
-            }
-            pfVect[j] = pfVect[j] + fAcc * pfVect[k]; // free member recalculation
-        }
-    }
-
-    for (k = (nDim - 1); k >= 0; k--) {
-        pfSolution[k] = pfVect[k];
-        for (i = (k + 1); i < nDim; i++) {
-            pfSolution[k] -= (pfMatr[k * nDim + i] * pfSolution[i]);
-        }
-        pfSolution[k] = pfSolution[k] / pfMatr[k * nDim + k];
-    }
-
-    return 1;
+void ConfigRevoWidget::sixPointCalibrationMagStart(){
+    sixPointCalibrationStart(false, true);
 }
-
-
-int SixPointInConstFieldCal(double ConstMag, double x[6], double y[6], double z[6], double S[3], double b[3])
-{
-    int i;
-    double A[5][5];
-    double f[5], c[5];
-    double xp, yp, zp, Sx;
-
-    // Fill in matrix A -
-    // write six difference-in-magnitude equations of the form
-    // Sx^2(x2^2-x1^2) + 2*Sx*bx*(x2-x1) + Sy^2(y2^2-y1^2) + 2*Sy*by*(y2-y1) + Sz^2(z2^2-z1^2) + 2*Sz*bz*(z2-z1) = 0
-    // or in other words
-    // 2*Sx*bx*(x2-x1)/Sx^2  + Sy^2(y2^2-y1^2)/Sx^2  + 2*Sy*by*(y2-y1)/Sx^2  + Sz^2(z2^2-z1^2)/Sx^2  + 2*Sz*bz*(z2-z1)/Sx^2  = (x1^2-x2^2)
-    for (i = 0; i < 5; i++) {
-        A[i][0] = 2.0 * (x[i + 1] - x[i]);
-        A[i][1] = y[i + 1] * y[i + 1] - y[i] * y[i];
-        A[i][2] = 2.0 * (y[i + 1] - y[i]);
-        A[i][3] = z[i + 1] * z[i + 1] - z[i] * z[i];
-        A[i][4] = 2.0 * (z[i + 1] - z[i]);
-        f[i]    = x[i] * x[i] - x[i + 1] * x[i + 1];
-    }
-
-    // solve for c0=bx/Sx, c1=Sy^2/Sx^2; c2=Sy*by/Sx^2, c3=Sz^2/Sx^2, c4=Sz*bz/Sx^2
-    if (!LinearEquationsSolving(5, (double *)A, f, c)) {
-        return 0;
-    }
-
-    // use one magnitude equation and c's to find Sx - doesn't matter which - all give the same answer
-    xp   = x[0]; yp = y[0]; zp = z[0];
-    Sx   = sqrt(ConstMag * ConstMag / (xp * xp + 2 * c[0] * xp + c[0] * c[0] + c[1] * yp * yp + 2 * c[2] * yp + c[2] * c[2] / c[1] + c[3] * zp * zp + 2 * c[4] * zp + c[4] * c[4] / c[3]));
-
-    S[0] = Sx;
-    b[0] = Sx * c[0];
-    S[1] = sqrt(c[1] * Sx * Sx);
-    b[1] = c[2] * Sx * Sx / S[1];
-    S[2] = sqrt(c[3] * Sx * Sx);
-    b[2] = c[4] * Sx * Sx / S[2];
-
-    return 1;
-}
-
-/********** Functions for six point calibration **************/
-
-void ConfigRevoWidget::doStartSixPointCalibrationMag(){
-    doStartSixPointCalibration(false, true);
-}
-void ConfigRevoWidget::doStartSixPointCalibrationAccel(){
-    doStartSixPointCalibration(true, false);
+void ConfigRevoWidget::sixPointCalibrationAccelStart(){
+    sixPointCalibrationStart(true, false);
 }
 
 /**
@@ -420,7 +330,7 @@ void ConfigRevoWidget::doStartSixPointCalibrationAccel(){
  * accel) to compute the scale and bias of this sensor based on the current
  * home location magnetic strength.
  */
-void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateAccel, bool calibrateMag)
+void ConfigRevoWidget::sixPointCalibrationStart(bool calibrateAccel, bool calibrateMag)
 {
     calibratingAccel = calibrateAccel;
     calibratingMag = calibrateMag;
@@ -515,9 +425,8 @@ void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateAccel, bool cali
     /* Show instructions and enable controls */
     m_ui->sixPointCalibInstructions->clear();
     m_ui->sixPointCalibInstructions->append("Place horizontally and click save position...");
-    displayPlane(m_ui->sixPointsHelp, "plane-horizontal");
-    m_ui->sixPointsStartAccel->setEnabled(false);
-    m_ui->sixPointsStartMag->setEnabled(false);
+    displayVisualHelp("plane-horizontal");
+    disableAllCalibrations();
     m_ui->sixPointsSave->setEnabled(true);
     position = 0;
 }
@@ -527,7 +436,7 @@ void ConfigRevoWidget::doStartSixPointCalibration(bool calibrateAccel, bool cali
  * This is called when they click "save position" and starts
  * averaging data for this position.
  */
-void ConfigRevoWidget::savePositionData()
+void ConfigRevoWidget::sixPointCalibrationSavePositionData()
 {
     QMutexLocker lock(&sensorsUpdateLock);
 
@@ -547,8 +456,8 @@ void ConfigRevoWidget::savePositionData()
     MagState *mag = MagState::GetInstance(getObjectManager());
     Q_ASSERT(mag);
 
-    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
-    connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
+    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sixPointCalibrationGetSample(UAVObject *)));
+    connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sixPointCalibrationGetSample(UAVObject *)));
 
     m_ui->sixPointCalibInstructions->append("Hold...");
 }
@@ -558,7 +467,7 @@ void ConfigRevoWidget::savePositionData()
  * store it for averaging.  When sufficient points are collected advance
  * to the next position (give message to user) or compute the scale and bias
  */
-void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
+void ConfigRevoWidget::sixPointCalibrationGetSample(UAVObject *obj)
 {
     QMutexLocker lock(&sensorsUpdateLock);
 
@@ -593,7 +502,7 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
         // Store the mean for this position for the accel
         AccelState *accelState = AccelState::GetInstance(getObjectManager());
         Q_ASSERT(accelState);
-        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
+        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sixPointCalibrationGetSample(UAVObject *)));
         accel_data_x[position] = listMean(accel_accum_x);
         accel_data_y[position] = listMean(accel_accum_y);
         accel_data_z[position] = listMean(accel_accum_z);
@@ -601,7 +510,7 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
         // Store the mean for this position for the mag
         MagState *mag = MagState::GetInstance(getObjectManager());
         Q_ASSERT(mag);
-        disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
+        disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sixPointCalibrationGetSample(UAVObject *)));
         mag_data_x[position] = listMean(mag_accum_x);
         mag_data_y[position] = listMean(mag_accum_y);
         mag_data_z[position] = listMean(mag_accum_z);
@@ -609,29 +518,29 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
         position = (position + 1) % 6;
         if (position == 1) {
             m_ui->sixPointCalibInstructions->append("Place with left side down and click save position...");
-            displayPlane(m_ui->sixPointsHelp, "plane-left");
+            displayVisualHelp("plane-left");
         }
         if (position == 2) {
             m_ui->sixPointCalibInstructions->append("Place upside down and click save position...");
-            displayPlane(m_ui->sixPointsHelp, "plane-flip");
+            displayVisualHelp("plane-flip");
         }
         if (position == 3) {
             m_ui->sixPointCalibInstructions->append("Place with right side down and click save position...");
-            displayPlane(m_ui->sixPointsHelp, "plane-right");
+            displayVisualHelp("plane-right");
         }
         if (position == 4) {
             m_ui->sixPointCalibInstructions->append("Place with nose up and click save position...");
-            displayPlane(m_ui->sixPointsHelp, "plane-up");
+            displayVisualHelp("plane-up");
         }
         if (position == 5) {
             m_ui->sixPointCalibInstructions->append("Place with nose down and click save position...");
-            displayPlane(m_ui->sixPointsHelp, "plane-down");
+            displayVisualHelp("plane-down");
         }
         if (position == 0) {
-            computeScaleBias(calibratingMag, calibratingAccel);
-            m_ui->sixPointsStartAccel->setEnabled(true);
-            m_ui->sixPointsStartMag->setEnabled(true);
+            sixPointCalibrationCompute(calibratingMag, calibratingAccel);
             m_ui->sixPointsSave->setEnabled(false);
+
+            enableAllCalibrations();
 
             /* Cleanup original settings */
             accelState->setMetadata(initialAccelStateMdata);
@@ -648,7 +557,7 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
  * Computes the scale and bias for the magnetomer and (compile option)
  * for the accel once all the data has been collected in 6 positions.
  */
-void ConfigRevoWidget::computeScaleBias(bool mag, bool accel)
+void ConfigRevoWidget::sixPointCalibrationCompute(bool mag, bool accel)
 {
     double S[3], b[3];
     double Be_length;
@@ -664,7 +573,7 @@ void ConfigRevoWidget::computeScaleBias(bool mag, bool accel)
 
     // Calibration accel
     if(accel) {
-        SixPointInConstFieldCal(homeLocationData.g_e, accel_data_x, accel_data_y, accel_data_z, S, b);
+        OpenPilot::CalibrationUtils::SixPointInConstFieldCal(homeLocationData.g_e, accel_data_x, accel_data_y, accel_data_z, S, b);
         accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_X] = fabs(S[0]);
         accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Y] = fabs(S[1]);
         accelGyroSettingsData.accel_scale[AccelGyroSettings::ACCEL_SCALE_Z] = fabs(S[2]);
@@ -677,7 +586,7 @@ void ConfigRevoWidget::computeScaleBias(bool mag, bool accel)
     // Calibration mag
     if(mag){
         Be_length = sqrt(pow(homeLocationData.Be[0], 2) + pow(homeLocationData.Be[1], 2) + pow(homeLocationData.Be[2], 2));
-        SixPointInConstFieldCal(Be_length, mag_data_x, mag_data_y, mag_data_z, S, b);
+        OpenPilot::CalibrationUtils::SixPointInConstFieldCal(Be_length, mag_data_x, mag_data_y, mag_data_z, S, b);
         revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] = fabs(S[0]);
         revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] = fabs(S[1]);
         revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] = fabs(S[2]);
@@ -779,15 +688,15 @@ void ConfigRevoWidget::recallBoardRotation()
 }
 
 /**
-   Rotate the paper plane
+   Show the selected visual aid
  */
-void ConfigRevoWidget::displayPlane(QGraphicsView *view, QString elementID)
+void ConfigRevoWidget::displayVisualHelp(QString elementID)
 {
-    view->scene()->clear();
+    m_ui->calibrationVisualHelp->scene()->clear();
     QPixmap pixmap = QPixmap(":/configgadget/images/calibration/" + elementID + ".png");
-    view->scene()->addPixmap(pixmap);
-    view->setSceneRect(pixmap.rect());
-    view->fitInView(view->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    m_ui->calibrationVisualHelp->scene()->addPixmap(pixmap);
+    m_ui->calibrationVisualHelp->setSceneRect(pixmap.rect());
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
 }
 
 
@@ -801,9 +710,7 @@ void ConfigRevoWidget::refreshWidgetsValues(UAVObject *object)
 {
     ConfigTaskWidget::refreshWidgetsValues(object);
 
-    m_ui->sixPointsStartAccel->setEnabled(true);
-    m_ui->sixPointsStartMag->setEnabled(true);
-    m_ui->accelBiasStart->setEnabled(true);
+
     m_ui->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 
     m_ui->isSetCheckBox->setEnabled(false);
@@ -831,4 +738,22 @@ void ConfigRevoWidget::clearHomeLocation()
     homeLocationData.g_e = 9.81f;
     homeLocationData.Set = HomeLocation::SET_FALSE;
     homeLocation->setData(homeLocationData);
+}
+
+void ConfigRevoWidget::disableAllCalibrations()
+{
+    m_ui->sixPointsStartAccel->setEnabled(false);
+    m_ui->sixPointsStartMag->setEnabled(false);
+    m_ui->boardLevelStart->setEnabled(false);
+    m_ui->gyroBiasStart->setEnabled(false);
+    m_ui->ThermalBiasStart->setEnabled(false);
+}
+
+void ConfigRevoWidget::enableAllCalibrations()
+{
+    m_ui->sixPointsStartAccel->setEnabled(true);
+    m_ui->sixPointsStartMag->setEnabled(true);
+    m_ui->boardLevelStart->setEnabled(true);
+    m_ui->gyroBiasStart->setEnabled(true);
+    m_ui->ThermalBiasStart->setEnabled(true);
 }

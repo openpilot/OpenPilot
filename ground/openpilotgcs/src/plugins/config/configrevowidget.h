@@ -29,7 +29,6 @@
 
 #include "ui_revosensors.h"
 #include "configtaskwidget.h"
-
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -41,6 +40,8 @@
 #include <QTimer>
 #include <QMutex>
 #include "calibration/thermal/thermalcalibrationmodel.h"
+#include "calibration/calibrationutils.h"
+
 class Ui_Widget;
 
 
@@ -55,10 +56,10 @@ public:
     ~ConfigRevoWidget();
 
 private:
-    void displayPlane(QGraphicsView *view, QString elementID);
+    void displayVisualHelp(QString elementID);
 
     // ! Computes the scale and bias of the mag based on collected data
-    void computeScaleBias(bool mag, bool accel);
+    void sixPointCalibrationCompute(bool mag, bool accel);
 
     SavedSettings savedSettings;
 
@@ -85,13 +86,12 @@ private:
     double accel_data_x[6], accel_data_y[6], accel_data_z[6];
     double mag_data_x[6], mag_data_y[6], mag_data_z[6];
 
-    bool calibratingMag = false;
-    bool calibratingAccel = false;
+    bool calibratingMag;
+    bool calibratingAccel;
 
     UAVObject::Metadata initialAccelStateMdata;
     UAVObject::Metadata initialGyroStateMdata;
     UAVObject::Metadata initialMagStateMdata;
-    UAVObject::Metadata initialBaroSensorMdata;
     float initialMagCorrectionRate;
 
     int position;
@@ -110,20 +110,22 @@ private slots:
     virtual void refreshWidgetsValues(UAVObject *object = NULL);
 
     // Slots for calibrating the mags
-    void doStartSixPointCalibrationMag();
-    void doStartSixPointCalibrationAccel();
-    void doStartSixPointCalibration(bool calibrateAccel, bool calibrateMag);
-    void doGetSixPointCalibrationMeasurement(UAVObject *obj);
-    void savePositionData();
+    void sixPointCalibrationMagStart();
+    void sixPointCalibrationAccelStart();
+    void sixPointCalibrationStart(bool calibrateAccel, bool calibrateMag);
+    void sixPointCalibrationGetSample(UAVObject *obj);
+    void sixPointCalibrationSavePositionData();
 
     // Slots for calibrating the accel and gyro
-    void doStartAccelGyroBiasCalibration();
+    void levelCalibrationStart();
 
-
-    void doGetAccelGyroBiasData(UAVObject *);
+    void levelCalibrationGetSample(UAVObject *);
 
     // Slot for clearing home location
     void clearHomeLocation();
+
+    void disableAllCalibrations();
+    void enableAllCalibrations();
 
 protected:
     void showEvent(QShowEvent *event);

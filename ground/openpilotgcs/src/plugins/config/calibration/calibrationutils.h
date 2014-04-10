@@ -47,11 +47,15 @@ public:
     static void ComputePoly(Eigen::VectorXf *samplesX, Eigen::VectorXf *polynomial, Eigen::VectorXf *polyY);
     static float ComputeSigma(Eigen::VectorXf *samplesY);
 
+    static int SixPointInConstFieldCal(double ConstMag, double x[6], double y[6], double z[6], double S[3], double b[3]);
+
 private:
     static void EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
                              Eigen::Vector3f *center,
                              Eigen::VectorXf *radii,
                              Eigen::MatrixXf *evecs);
+
+    static int LinearEquationsSolve(int nDim, double *pfMatr, double *pfVect, double *pfSolution);
 };
 }
 #endif // CALIBRATIONUTILS_H

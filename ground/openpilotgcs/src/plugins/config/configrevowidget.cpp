@@ -643,11 +643,10 @@ void ConfigRevoWidget::sixPointCalibrationCompute(bool mag, bool accel)
         } else {
             accelGyroSettings->setData(savedSettings.accelGyroSettings);
         }
-        m_ui->sixPointCalibInstructions->append("Computed sensor scale and bias...");
+        displayInstructions("Computed sensor scale and bias...", true);
+    } else {
+        displayInstructions("Bad calibration. Please repeat.", true);
     }
-
-    m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
-
     position = -1; // set to run again
 }
 

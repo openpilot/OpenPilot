@@ -36,7 +36,7 @@
         <file>images/calibration/plane-left.png</file>
         <file>images/calibration/plane-right.png</file>
         <file>images/calibration/plane-up.png</file>
-        <file>images/calibration/plane-down-rotated.png</file>
+        <file>images/calibration/plane-horizontal-rotated.png</file>
         <file>images/calibration/snow.png</file>
     </qresource>
 </RCC>

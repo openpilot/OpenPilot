@@ -83,12 +83,21 @@ private:
     QList<double> mag_accum_y;
     QList<double> mag_accum_z;
 
+    QList<double> rot_accum_roll;
+    QList<double> rot_accum_pitch;
+
+
+
     double accel_data_x[6], accel_data_y[6], accel_data_z[6];
     double mag_data_x[6], mag_data_y[6], mag_data_z[6];
+
+    double rot_data_roll;
+    double rot_data_pitch;
 
     bool calibratingMag;
     bool calibratingAccel;
 
+    UAVObject::Metadata initialAttitudeStateMdata;
     UAVObject::Metadata initialAccelStateMdata;
     UAVObject::Metadata initialGyroStateMdata;
     UAVObject::Metadata initialMagStateMdata;
@@ -96,13 +105,14 @@ private:
 
     int position;
 
-    static const int NOISE_SAMPLES = 100;
+    static const int NOISE_SAMPLES = 50;
 
     // Board rotation store/recall
     qint16 storedBoardRotation[3];
     bool isBoardRotationStored;
     void storeAndClearBoardRotation();
     void recallBoardRotation();
+    void displayInstructions(QString instructions = QString(), bool replace = false);
 
 
 private slots:
@@ -118,8 +128,13 @@ private slots:
 
     // Slots for calibrating the accel and gyro
     void levelCalibrationStart();
-
+    void levelCalibrationSavePosition();
+    void levelCalibrationCompute();
     void levelCalibrationGetSample(UAVObject *);
+
+    // Slots for gyro bias zero
+    void gyroCalibrationStart();
+    void gyroBiasCalibrationGetSample(UAVObject *obj);
 
     // Slot for clearing home location
     void clearHomeLocation();

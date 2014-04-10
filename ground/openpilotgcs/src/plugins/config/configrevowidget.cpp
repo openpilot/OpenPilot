@@ -40,6 +40,7 @@
 #include <iostream>
 #include <QDesktopServices>
 #include <QUrl>
+#include <attitudestate.h>
 #include <attitudesettings.h>
 #include <ekfconfiguration.h>
 #include <revocalibration.h>
@@ -114,10 +115,11 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // Connect the signals
     // gyro zero calibration
-    connect(m_ui->gyroBiasStart, SIGNAL(clicked()), this, SLOT(levelCalibrationStart()));
+    connect(m_ui->gyroBiasStart, SIGNAL(clicked()), this, SLOT(gyroCalibrationStart()));
 
     // level calibration
     connect(m_ui->boardLevelStart, SIGNAL(clicked()), this, SLOT(levelCalibrationStart()));
+    connect(m_ui->boardLevelSavePos, SIGNAL(clicked()), this, SLOT(levelCalibrationSavePosition()));
 
     // six point calibrations
     connect(m_ui->sixPointsStartAccel, SIGNAL(clicked()), this, SLOT(sixPointCalibrationAccelStart()));
@@ -151,29 +153,25 @@ void ConfigRevoWidget::showEvent(QShowEvent *event)
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a sensorsBargraph that is way too small.
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatioByExpanding);
     m_thermalCalibrationModel->init();
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatioByExpanding);
 }
 
-
-/******* Level calibration *******/
-/**
- * Starts an accelerometer bias calibration.
- */
-void ConfigRevoWidget::levelCalibrationStart()
+/******* gyro bias zero ******/
+void ConfigRevoWidget::gyroCalibrationStart()
 {
     // Store and reset board rotation before calibration starts
     isBoardRotationStored = false;
     storeAndClearBoardRotation();
 
     disableAllCalibrations();
-    m_ui->boardLevelProgress->setValue(0);
+    m_ui->gyroBiasProgress->setValue(0);
 
     RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
@@ -190,23 +188,11 @@ void ConfigRevoWidget::levelCalibrationStart()
     attitudeSettings->setData(attitudeSettingsData);
     attitudeSettings->updated();
 
-    accel_accum_x.clear();
-    accel_accum_y.clear();
-    accel_accum_z.clear();
     gyro_accum_x.clear();
     gyro_accum_y.clear();
     gyro_accum_z.clear();
 
     UAVObject::Metadata mdata;
-
-    /* Need to get as many accel updates as possible */
-    AccelState *accelState = AccelState::GetInstance(getObjectManager());
-    Q_ASSERT(accelState);
-    initialAccelStateMdata = accelState->getMetadata();
-    mdata = initialAccelStateMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 100;
-    accelState->setMetadata(mdata);
 
     GyroState *gyroState = GyroState::GetInstance(getObjectManager());
     Q_ASSERT(gyroState);
@@ -218,31 +204,19 @@ void ConfigRevoWidget::levelCalibrationStart()
 
     // Now connect to the accels and mag updates, gather for 100 samples
     collectingData = true;
-    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
-    connect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
+    connect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(gyroBiasCalibrationGetSample(UAVObject *)));
 }
 
 /**
-   Updates the accel bias raw values
+   Updates the gyro bias raw values
  */
-void ConfigRevoWidget::levelCalibrationGetSample(UAVObject *obj)
+void ConfigRevoWidget::gyroBiasCalibrationGetSample(UAVObject *obj)
 {
     QMutexLocker lock(&sensorsUpdateLock);
 
     Q_UNUSED(lock);
 
     switch (obj->getObjID()) {
-    case AccelState::OBJID:
-    {
-        AccelState *accelState = AccelState::GetInstance(getObjectManager());
-        Q_ASSERT(accelState);
-        AccelState::DataFields accelStateData = accelState->getData();
-
-        accel_accum_x.append(accelStateData.x);
-        accel_accum_y.append(accelStateData.y);
-        accel_accum_z.append(accelStateData.z);
-        break;
-    }
     case GyroState::OBJID:
     {
         GyroState *gyroState = GyroState::GetInstance(getObjectManager());
@@ -259,19 +233,16 @@ void ConfigRevoWidget::levelCalibrationGetSample(UAVObject *obj)
     }
 
     // Work out the progress based on whichever has less
-    double p1 = (double)accel_accum_x.size() / (double)NOISE_SAMPLES;
-    double p2 = (double)accel_accum_y.size() / (double)NOISE_SAMPLES;
-    m_ui->boardLevelProgress->setValue(((p1 < p2) ? p1 : p2) * 100);
+    double p1 = (double)gyro_accum_x.size() / (double)NOISE_SAMPLES;
+    double p2 = (double)gyro_accum_y.size() / (double)NOISE_SAMPLES;
+    m_ui->gyroBiasProgress->setValue(((p1 < p2) ? p1 : p2) * 50);
 
-    if (accel_accum_x.size() >= NOISE_SAMPLES &&
-        gyro_accum_y.size() >= NOISE_SAMPLES &&
+    if (gyro_accum_y.size() >= 2 * NOISE_SAMPLES &&
         collectingData == true) {
         collectingData = false;
 
-        AccelState *accelState = AccelState::GetInstance(getObjectManager());
         GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
 
-        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
         disconnect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
 
         enableAllCalibrations();
@@ -281,16 +252,12 @@ void ConfigRevoWidget::levelCalibrationGetSample(UAVObject *obj)
         AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
         Q_ASSERT(accelGyroSettings);
 
-
         RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
         AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
 
         revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
 
-        // Update the biases based on collected data
-        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_X] += listMean(accel_accum_x);
-        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Y] += listMean(accel_accum_y);
-        accelGyroSettingsData.accel_bias[AccelGyroSettings::ACCEL_BIAS_Z] += (listMean(accel_accum_z) + GRAVITY);
+        // Update biases based on collected data
         accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X]   += listMean(gyro_accum_x);
         accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y]   += listMean(gyro_accum_y);
         accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z]   += listMean(gyro_accum_z);
@@ -307,12 +274,143 @@ void ConfigRevoWidget::levelCalibrationGetSample(UAVObject *obj)
         attitudeSettings->setData(attitudeSettingsData);
         attitudeSettings->updated();
 
-        accelState->setMetadata(initialAccelStateMdata);
         gyroState->setMetadata(initialGyroStateMdata);
 
         // Recall saved board rotation
         recallBoardRotation();
     }
+}
+
+
+
+/******* Level calibration *******/
+/**
+ * Starts an accelerometer bias calibration.
+ */
+void ConfigRevoWidget::levelCalibrationStart()
+{
+
+
+    // Store and reset board rotation before calibration starts
+
+    disableAllCalibrations();
+    m_ui->boardLevelProgress->setValue(0);
+
+    rot_data_pitch = 0;
+    rot_data_roll = 0;
+    UAVObject::Metadata mdata;
+
+    AttitudeState *attitudeState = AttitudeState::GetInstance(getObjectManager());
+    Q_ASSERT(attitudeState);
+    initialAttitudeStateMdata = attitudeState->getMetadata();
+    mdata = initialAttitudeStateMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    attitudeState->setMetadata(mdata);
+
+    /* Show instructions and enable controls */
+    displayInstructions("Place horizontally and click save position...", true);
+    displayVisualHelp("plane-horizontal");
+    disableAllCalibrations();
+    m_ui->boardLevelSavePos->setEnabled(true);
+    position = 0;
+
+}
+
+void ConfigRevoWidget::levelCalibrationSavePosition(){
+    QMutexLocker lock(&sensorsUpdateLock);
+    Q_UNUSED(lock);
+
+    m_ui->boardLevelSavePos->setEnabled(false);
+
+    rot_accum_pitch.clear();
+    rot_accum_roll.clear();
+
+    collectingData = true;
+
+    AttitudeState *attitudeState = AttitudeState::GetInstance(getObjectManager());
+    Q_ASSERT(attitudeState);
+    connect(attitudeState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
+
+    displayInstructions("Hold...");
+}
+
+/**
+   Updates the accel bias raw values
+ */
+void ConfigRevoWidget::levelCalibrationGetSample(UAVObject *obj)
+{
+    QMutexLocker lock(&sensorsUpdateLock);
+    Q_UNUSED(lock);
+
+    switch (obj->getObjID()) {
+    case AttitudeState::OBJID:
+    {
+        AttitudeState *attitudeState = AttitudeState::GetInstance(getObjectManager());
+        Q_ASSERT(attitudeState);
+        AttitudeState::DataFields attitudeStateData = attitudeState->getData();
+        rot_accum_roll.append(attitudeStateData.Roll);
+        rot_accum_pitch.append(attitudeStateData.Pitch);
+        break;
+    }
+    default:
+        Q_ASSERT(0);
+    }
+
+    // Work out the progress based on whichever has less
+    double p1 = (double)rot_accum_roll.size() / (double)NOISE_SAMPLES;
+    m_ui->boardLevelProgress->setValue(p1 * 100);
+
+    if (rot_accum_roll.size() >= NOISE_SAMPLES &&
+        collectingData == true) {
+        collectingData = false;
+
+        AttitudeState *attitudeState = AttitudeState::GetInstance(getObjectManager());
+
+        disconnect(attitudeState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
+
+        position++;
+        switch(position){
+        case 1:
+            rot_data_pitch = listMean(rot_accum_pitch);
+            rot_data_roll = listMean(rot_accum_roll);
+
+            displayInstructions("Leave horizontally, rotate 180° along yaw axis and click save position...", true);
+            displayVisualHelp("plane-horizontal-rotated");
+
+            disableAllCalibrations();
+
+            m_ui->boardLevelSavePos->setEnabled(true);
+            break;
+        case 2:
+            rot_data_pitch += listMean(rot_accum_pitch);
+            rot_data_pitch /= 2;
+            rot_data_roll += listMean(rot_accum_roll);
+            rot_data_roll /= 2;
+            attitudeState->setMetadata(initialAttitudeStateMdata);
+            levelCalibrationCompute();
+            enableAllCalibrations();
+            break;
+        }
+
+    }
+}
+void ConfigRevoWidget::levelCalibrationCompute(){
+    enableAllCalibrations();
+
+    AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
+    Q_ASSERT(attitudeSettings);
+    AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
+
+    // Update the biases based on collected data
+    // "rotate" the board in the opposite direction as the calculated offset
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] -= rot_data_pitch;
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] -= rot_data_roll;
+
+    attitudeSettings->setData(attitudeSettingsData);
+    attitudeSettings->updated();
+
+
 }
 
 /********** Six point calibration **************/
@@ -423,8 +521,7 @@ void ConfigRevoWidget::sixPointCalibrationStart(bool calibrateAccel, bool calibr
     mag->setMetadata(mdata);
 
     /* Show instructions and enable controls */
-    m_ui->sixPointCalibInstructions->clear();
-    m_ui->sixPointCalibInstructions->append("Place horizontally and click save position...");
+    displayInstructions("Place horizontally and click save position...", true);
     displayVisualHelp("plane-horizontal");
     disableAllCalibrations();
     m_ui->sixPointsSave->setEnabled(true);
@@ -459,7 +556,7 @@ void ConfigRevoWidget::sixPointCalibrationSavePositionData()
     connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sixPointCalibrationGetSample(UAVObject *)));
     connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(sixPointCalibrationGetSample(UAVObject *)));
 
-    m_ui->sixPointCalibInstructions->append("Hold...");
+    displayInstructions("Hold...");
 }
 
 /**
@@ -517,23 +614,23 @@ void ConfigRevoWidget::sixPointCalibrationGetSample(UAVObject *obj)
 
         position = (position + 1) % 6;
         if (position == 1) {
-            m_ui->sixPointCalibInstructions->append("Place with left side down and click save position...");
+            displayInstructions("Place with left side down and click save position...");
             displayVisualHelp("plane-left");
         }
         if (position == 2) {
-            m_ui->sixPointCalibInstructions->append("Place upside down and click save position...");
+            displayInstructions("Place upside down and click save position...");
             displayVisualHelp("plane-flip");
         }
         if (position == 3) {
-            m_ui->sixPointCalibInstructions->append("Place with right side down and click save position...");
+            displayInstructions("Place with right side down and click save position...");
             displayVisualHelp("plane-right");
         }
         if (position == 4) {
-            m_ui->sixPointCalibInstructions->append("Place with nose up and click save position...");
+            displayInstructions("Place with nose up and click save position...");
             displayVisualHelp("plane-up");
         }
         if (position == 5) {
-            m_ui->sixPointCalibInstructions->append("Place with nose down and click save position...");
+            displayInstructions("Place with nose down and click save position...");
             displayVisualHelp("plane-down");
         }
         if (position == 0) {
@@ -695,9 +792,17 @@ void ConfigRevoWidget::displayVisualHelp(QString elementID)
     QPixmap pixmap = QPixmap(":/configgadget/images/calibration/" + elementID + ".png");
     m_ui->calibrationVisualHelp->scene()->addPixmap(pixmap);
     m_ui->calibrationVisualHelp->setSceneRect(pixmap.rect());
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatioByExpanding);
 }
 
+void ConfigRevoWidget::displayInstructions(QString instructions, bool replace){
+    if(replace || instructions.isNull()){
+        m_ui->calibrationInstructions->clear();
+    }
+    if(!instructions.isNull()){
+        m_ui->calibrationInstructions->append(instructions);
+    }
+}
 
 /********** UI Functions *************/
 

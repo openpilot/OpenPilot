@@ -3,9 +3,8 @@
         <description>Flight Battery configuration.</description>
         
         <field name="Type" units="" type="enum" elements="1" options="LiPo,A123,LiCo,LiFeSO4,None" defaultvalue="LiPo"/>
-        <field name="NbCells" units=""  type="uint8"  elements="1" defaultvalue="3"/>
+        <field name="NbCells" units=""  type="uint8"  elements="1" defaultvalue="0"/>
         <field name="Capacity" units="mAh"  type="uint32"  elements="1" defaultvalue="2200"/>
-
         <field name="CellVoltageThresholds" units="V"  type="float" elementnames="Warning, Alarm" defaultvalue="3.4,3.1"/>
         <field name="SensorCalibrations" units="" type="float" elementnames="VoltageFactor, CurrentFactor, VoltageZero, CurrentZero" defaultvalue="1.0, 1.0, 0.0, 0.0"/>
         <access gcs="readwrite" flight="readwrite"/>

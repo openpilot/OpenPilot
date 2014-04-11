@@ -94,6 +94,7 @@ private:
     QList<double> mag_accum_x;
     QList<double> mag_accum_y;
     QList<double> mag_accum_z;
+    void showHelp(QString image);
 };
 }
 #endif // SIXPOINTCALIBRATIONMODEL_H

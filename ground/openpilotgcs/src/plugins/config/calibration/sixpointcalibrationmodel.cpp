@@ -151,7 +151,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
 
     /* Show instructions and enable controls */
     displayInstructions("Place horizontally and click save position...", true);
-    displayVisualHelp("plane-horizontal");
+    showHelp("horizontal");
     disableAllCalibrations();
     savePositionEnabledChanged(true);
     position = 0;
@@ -242,23 +242,23 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
         position = (position + 1) % 6;
         if (position == 1) {
             displayInstructions("Place with left side down and click save position...", false);
-            displayVisualHelp("plane-left");
+            showHelp("left");
         }
         if (position == 2) {
             displayInstructions("Place upside down and click save position...", false);
-            displayVisualHelp("plane-flip");
+            showHelp("flip");
         }
         if (position == 3) {
             displayInstructions("Place with right side down and click save position...", false);
-            displayVisualHelp("plane-right");
+            showHelp("right");
         }
         if (position == 4) {
             displayInstructions("Place with nose up and click save position...", false);
-            displayVisualHelp("plane-up");
+            showHelp("up");
         }
         if (position == 5) {
             displayInstructions("Place with nose down and click save position...", false);
-            displayVisualHelp("plane-down");
+            showHelp("down");
         }
         if (position == 0) {
             compute(calibratingMag, calibratingAccel);
@@ -381,4 +381,13 @@ UAVObjectManager *SixPointCalibrationModel::getObjectManager()
     Q_ASSERT(objMngr);
     return objMngr;
 }
+void SixPointCalibrationModel::showHelp(QString image){
+
+    if(calibratingAccel){
+        displayVisualHelp("revo-" + image);
+    }else {
+        displayVisualHelp("plane-" + image);
+    }
+}
+
 }

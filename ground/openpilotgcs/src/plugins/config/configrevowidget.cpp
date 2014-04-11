@@ -47,7 +47,7 @@
 #include <accelgyrosettings.h>
 #include <homelocation.h>
 #include <accelstate.h>
-#include <gyrostate.h>
+
 #include <magstate.h>
 
 #include "assertions.h"
@@ -74,7 +74,6 @@ public:
 ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     ConfigTaskWidget(parent),
     m_ui(new Ui_RevoSensorsWidget()),
-    collectingData(false),
     isBoardRotationStored(false)
 {
     m_ui->setupUi(this);
@@ -123,11 +122,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_sixPointCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_sixPointCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->sixPointsSave, SLOT(setEnabled(bool)));
 
-    // Connect the signals
-    // gyro zero calibration
-    connect(m_ui->gyroBiasStart, SIGNAL(clicked()), this, SLOT(gyroCalibrationStart()));
-
-    m_levelCalibrationModel = new OpenPilot::LevelCalibrationModel();
+    m_levelCalibrationModel = new OpenPilot::LevelCalibrationModel(this);
     // level calibration
     connect(m_ui->boardLevelStart, SIGNAL(clicked()), m_levelCalibrationModel, SLOT(start()));
     connect(m_ui->boardLevelSavePos, SIGNAL(clicked()), m_levelCalibrationModel, SLOT(savePosition()));
@@ -138,6 +133,20 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_levelCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_levelCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->boardLevelSavePos, SLOT(setEnabled(bool)));
     connect(m_levelCalibrationModel, SIGNAL(progressChanged(int)), this->m_ui->boardLevelProgress, SLOT(setValue(int)));
+
+    // Connect the signals
+    // gyro zero calibration
+    m_gyroBiasCalibrationModel = new OpenPilot::GyroBiasCalibrationModel(this);
+    connect(m_ui->gyroBiasStart, SIGNAL(clicked()), m_gyroBiasCalibrationModel, SLOT(start()));
+
+    connect(m_gyroBiasCalibrationModel , SIGNAL(progressChanged(int)), this->m_ui->gyroBiasProgress, SLOT(setValue(int)));
+
+    connect(m_gyroBiasCalibrationModel, SIGNAL(disableAllCalibrations()), this, SLOT(disableAllCalibrations()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(enableAllCalibrations()), this, SLOT(enableAllCalibrations()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(displayInstructions(QString, bool)), this, SLOT(displayInstructions(QString, bool)));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
 
 
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
@@ -175,124 +184,6 @@ void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
     m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatioByExpanding);
-}
-
-/******* gyro bias zero ******/
-void ConfigRevoWidget::gyroCalibrationStart()
-{
-    // Store and reset board rotation before calibration starts
-    isBoardRotationStored = false;
-    storeAndClearBoardRotation();
-
-    disableAllCalibrations();
-    m_ui->gyroBiasProgress->setValue(0);
-
-    RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
-    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
-    revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_FALSE;
-    revoCalibration->setData(revoCalibrationData);
-    revoCalibration->updated();
-
-    // Disable gyro bias correction while calibrating
-    AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
-    Q_ASSERT(attitudeSettings);
-    AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
-    attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
-    attitudeSettings->setData(attitudeSettingsData);
-    attitudeSettings->updated();
-
-    gyro_accum_x.clear();
-    gyro_accum_y.clear();
-    gyro_accum_z.clear();
-
-    UAVObject::Metadata mdata;
-
-    GyroState *gyroState = GyroState::GetInstance(getObjectManager());
-    Q_ASSERT(gyroState);
-    initialGyroStateMdata = gyroState->getMetadata();
-    mdata = initialGyroStateMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 100;
-    gyroState->setMetadata(mdata);
-
-    // Now connect to the accels and mag updates, gather for 100 samples
-    collectingData = true;
-    connect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(gyroBiasCalibrationGetSample(UAVObject *)));
-}
-
-/**
-   Updates the gyro bias raw values
- */
-void ConfigRevoWidget::gyroBiasCalibrationGetSample(UAVObject *obj)
-{
-    QMutexLocker lock(&sensorsUpdateLock);
-
-    Q_UNUSED(lock);
-
-    switch (obj->getObjID()) {
-    case GyroState::OBJID:
-    {
-        GyroState *gyroState = GyroState::GetInstance(getObjectManager());
-        Q_ASSERT(gyroState);
-        GyroState::DataFields gyroStateData = gyroState->getData();
-
-        gyro_accum_x.append(gyroStateData.x);
-        gyro_accum_y.append(gyroStateData.y);
-        gyro_accum_z.append(gyroStateData.z);
-        break;
-    }
-    default:
-        Q_ASSERT(0);
-    }
-
-    // Work out the progress based on whichever has less
-    double p1 = (double)gyro_accum_x.size() / (double)NOISE_SAMPLES;
-    double p2 = (double)gyro_accum_y.size() / (double)NOISE_SAMPLES;
-    m_ui->gyroBiasProgress->setValue(((p1 < p2) ? p1 : p2) * 100);
-
-    if (gyro_accum_y.size() >= NOISE_SAMPLES &&
-        collectingData == true) {
-        collectingData = false;
-
-        GyroState *gyroState = GyroState::GetInstance(getObjectManager());
-
-        disconnect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(levelCalibrationGetSample(UAVObject *)));
-
-        enableAllCalibrations();
-
-        RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
-        Q_ASSERT(revoCalibration);
-        AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
-        Q_ASSERT(accelGyroSettings);
-
-        RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
-        AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
-
-        revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
-
-        // Update biases based on collected data
-        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X] += OpenPilot::CalibrationUtils::listMean(gyro_accum_x);
-        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y] += OpenPilot::CalibrationUtils::listMean(gyro_accum_y);
-        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z] += OpenPilot::CalibrationUtils::listMean(gyro_accum_z);
-
-        revoCalibration->setData(revoCalibrationData);
-        revoCalibration->updated();
-        accelGyroSettings->setData(accelGyroSettingsData);
-        accelGyroSettings->updated();
-
-        AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
-        Q_ASSERT(attitudeSettings);
-        AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
-        attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
-        attitudeSettings->setData(attitudeSettingsData);
-        attitudeSettings->updated();
-
-        gyroState->setMetadata(initialGyroStateMdata);
-
-        // Recall saved board rotation
-        recallBoardRotation();
-    }
 }
 
 

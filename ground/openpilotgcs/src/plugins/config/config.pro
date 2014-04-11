@@ -53,7 +53,8 @@ HEADERS += configplugin.h \
     calibration/thermal/settingshandlingtransitions.h \
     calibration/thermal/compensationcalculationtransition.h \
     calibration/sixpointcalibrationmodel.h \
-    calibration/levelcalibrationmodel.h
+    calibration/levelcalibrationmodel.h \
+    calibration/gyrobiascalibrationmodel.h
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \
@@ -90,7 +91,8 @@ SOURCES += configplugin.cpp \
     calibration/thermal/thermalcalibrationhelper.cpp \
     calibration/thermal/thermalcalibrationmodel.cpp \
     calibration/sixpointcalibrationmodel.cpp \
-    calibration/levelcalibrationmodel.cpp
+    calibration/levelcalibrationmodel.cpp \
+    calibration/gyrobiascalibrationmodel.cpp
 
 FORMS += airframe.ui \
     airframe_ccpm.ui \

@@ -42,6 +42,7 @@
 #include "calibration/thermal/thermalcalibrationmodel.h"
 #include "calibration/sixpointcalibrationmodel.h"
 #include "calibration/levelcalibrationmodel.h"
+#include "calibration/gyrobiascalibrationmodel.h"
 class Ui_Widget;
 
 
@@ -56,21 +57,9 @@ private:
     OpenPilot::SixPointCalibrationModel *m_sixPointCalibrationModel;
     OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
     OpenPilot::LevelCalibrationModel *m_levelCalibrationModel;
+    OpenPilot::GyroBiasCalibrationModel *m_gyroBiasCalibrationModel;
 
     Ui_RevoSensorsWidget *m_ui;
-    QMutex sensorsUpdateLock;
-
-    int phaseCounter;
-    const static int calibrationDelay = 10;
-
-    bool collectingData;
-
-    QList<double> gyro_accum_x;
-    QList<double> gyro_accum_y;
-    QList<double> gyro_accum_z;
-
-    UAVObject::Metadata initialGyroStateMdata;
-
 
     // Board rotation store/recall
     qint16 storedBoardRotation[3];
@@ -84,16 +73,6 @@ private slots:
 
     // ! Overriden method from the configTaskWidget to update UI
     virtual void refreshWidgetsValues(UAVObject *object = NULL);
-
-    // Slots for calibrating the accel and gyro
-    void levelCalibrationStart();
-    void levelCalibrationSavePosition();
-    void levelCalibrationCompute();
-    void levelCalibrationGetSample(UAVObject *);
-
-    // Slots for gyro bias zero
-    void gyroCalibrationStart();
-    void gyroBiasCalibrationGetSample(UAVObject *obj);
 
     // Slot for clearing home location
     void clearHomeLocation();

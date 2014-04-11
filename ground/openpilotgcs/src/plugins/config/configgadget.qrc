@@ -30,7 +30,6 @@
         <file>images/pipx-normal.png</file>
         <file>images/revolution_top.png</file>
         <file>calibration/WizardStepIndicator.qml</file>
-        <file>images/calibration/plane-down.png</file>
         <file>images/calibration/plane-flip.png</file>
         <file>images/calibration/plane-horizontal.png</file>
         <file>images/calibration/plane-left.png</file>
@@ -38,5 +37,13 @@
         <file>images/calibration/plane-up.png</file>
         <file>images/calibration/plane-horizontal-rotated.png</file>
         <file>images/calibration/snow.png</file>
+        <file>images/calibration/plane-down.png</file>
+        <file>images/calibration/revo-down.png</file>
+        <file>images/calibration/revo-flip.png</file>
+        <file>images/calibration/revo-horizontal-rotated.png</file>
+        <file>images/calibration/revo-horizontal.png</file>
+        <file>images/calibration/revo-left.png</file>
+        <file>images/calibration/revo-right.png</file>
+        <file>images/calibration/revo-up.png</file>
     </qresource>
 </RCC>

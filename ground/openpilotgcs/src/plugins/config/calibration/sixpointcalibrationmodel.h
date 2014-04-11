@@ -79,8 +79,6 @@ private:
     bool calibratingMag;
     bool calibratingAccel;
 
-    bool isBoardRotationStored;
-
     double accel_data_x[6], accel_data_y[6], accel_data_z[6];
     double mag_data_x[6], mag_data_y[6], mag_data_z[6];
 

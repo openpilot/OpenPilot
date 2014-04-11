@@ -66,7 +66,6 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     calibratingAccel = calibrateAccel;
     calibratingMag   = calibrateMag;
     // Store and reset board rotation before calibration starts
-    isBoardRotationStored = false;
     storeAndClearBoardRotation();
 
     RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());

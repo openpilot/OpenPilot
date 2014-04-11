@@ -42,7 +42,6 @@
 #include <QUrl>
 #include <attitudestate.h>
 #include <attitudesettings.h>
-#include <ekfconfiguration.h>
 #include <revocalibration.h>
 #include <accelgyrosettings.h>
 #include <homelocation.h>
@@ -84,7 +83,6 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
     addUAVObject("RevoCalibration");
-    addUAVObject("EKFConfiguration");
     addUAVObject("HomeLocation");
     addUAVObject("AttitudeSettings");
     addUAVObject("RevoSettings");

@@ -79,6 +79,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // Initialization of the Paper plane widget
     m_ui->calibrationVisualHelp->setScene(new QGraphicsScene(this));
+    m_ui->calibrationVisualHelp->setRenderHint(QPainter::HighQualityAntialiasing, true);
+    m_ui->calibrationVisualHelp->setRenderHint(QPainter::SmoothPixmapTransform, true);
     displayVisualHelp("snow");
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
@@ -171,17 +173,14 @@ ConfigRevoWidget::~ConfigRevoWidget()
 void ConfigRevoWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
-    // Thit fitInView method should only be called now, once the
-    // widget is shown, otherwise it cannot compute its values and
-    // the result is usually a sensorsBargraph that is way too small.
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatioByExpanding);
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
     m_thermalCalibrationModel->init();
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatioByExpanding);
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
 }
 
 
@@ -230,7 +229,7 @@ void ConfigRevoWidget::displayVisualHelp(QString elementID)
     QPixmap pixmap = QPixmap(":/configgadget/images/calibration/" + elementID + ".png");
     m_ui->calibrationVisualHelp->scene()->addPixmap(pixmap);
     m_ui->calibrationVisualHelp->setSceneRect(pixmap.rect());
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatioByExpanding);
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
 }
 
 void ConfigRevoWidget::displayInstructions(QString instructions, bool replace)

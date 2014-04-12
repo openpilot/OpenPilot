@@ -72,22 +72,65 @@
 #endif
 
 // Private constants
-#define SYSTEM_UPDATE_PERIOD_MS        1000
-#define LED_BLINK_RATE_HZ              5
-
-#ifndef IDLE_COUNTS_PER_SEC_AT_NO_LOAD
-#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 // calibrated by running tests/test_cpuload.c
-// must be updated if the FreeRTOS or compiler
-// optimisation options are changed.
-#endif
+#define SYSTEM_UPDATE_PERIOD_MS 500
+#define LED_BLINK_PERIOD_MS     200
 
 #if defined(PIOS_SYSTEM_STACK_SIZE)
-#define STACK_SIZE_BYTES PIOS_SYSTEM_STACK_SIZE
+#define STACK_SIZE_BYTES        PIOS_SYSTEM_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES 1024
+#define STACK_SIZE_BYTES        1024
 #endif
 
-#define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
+#ifdef PIOS_LED_ALARM
+#define ALARM_LED_ON()  PIOS_LED_On(PIOS_LED_ALARM)
+#define ALARM_LED_OFF() PIOS_LED_Off(PIOS_LED_ALARM)
+#else
+#define ALARM_LED_ON()
+#define ALARM_LED_OFF()
+#endif
+
+#ifdef PIOS_LED_HEARTBEAT
+#define HEARTBEAT_LED_ON()  PIOS_LED_On(PIOS_LED_HEARTBEAT)
+#define HEARTBEAT_LED_OFF() PIOS_LED_Off(PIOS_LED_HEARTBEAT)
+#else
+#define HEARTBEAT_LED_ON()
+#define HEARTBEAT_LED_OFF()
+#endif
+
+#define ALARM_BLINK_COUNT(x) \
+    (x == SYSTEMALARMS_ALARM_OK ? 0 : \
+     x == SYSTEMALARMS_ALARM_WARNING ? 1 : \
+     x == SYSTEMALARMS_ALARM_ERROR ? 2 : \
+     x == SYSTEMALARMS_ALARM_CRITICAL ? 0 : 0)
+
+
+#define BLINK_COUNT(x) \
+    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 2 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 3 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 4 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 2 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 2 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 2 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 3 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 4 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 4 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 3 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 3 : 1)
+
+#define BLINK_RED(x) \
+    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? false : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? false : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? false : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? true : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? true : \
+     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? true : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? true : \
+     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? true : \
+     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? true : \
+     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? true : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POI ? true : false)
+
+#define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
 // Private types
 
@@ -98,6 +141,12 @@ static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_C
 static bool mallocFailed;
 static HwSettingsData bootHwSettings;
 static struct PIOS_FLASHFS_Stats fsStats;
+
+// led notification handling
+static volatile SystemAlarmsAlarmOptions currentAlarmLevel = SYSTEMALARMS_ALARM_OK;
+static volatile FlightStatusData currentFlightStatus;
+static volatile bool started = false;
+
 // Private functions
 static void objectUpdatedCb(UAVObjEvent *ev);
 static void hwSettingsUpdatedCb(UAVObjEvent *ev);
@@ -170,8 +219,6 @@ MODULE_INITCALL(SystemModInitialize, 0);
  */
 static void systemTask(__attribute__((unused)) void *parameters)
 {
-    uint8_t cycleCount = 0;
-
     /* create all modules thread */
     MODULE_TASKCREATE_ALL;
 
@@ -189,9 +236,6 @@ static void systemTask(__attribute__((unused)) void *parameters)
     /* Record a successful boot */
     PIOS_IAP_WriteBootCount(0);
 #endif
-
-    // Initialize vars
-
     // Listen for SettingPersistance object updates, connect a callback function
     ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
@@ -204,13 +248,13 @@ static void systemTask(__attribute__((unused)) void *parameters)
     TaskInfoData taskInfoData;
     CallbackInfoData callbackInfoData;
 #endif
-
+    started = true;
     // Main system loop
     while (1) {
+        // get values to be used for led handling
+        FlightStatusGet((FlightStatusData *)&currentFlightStatus);
+        currentAlarmLevel = AlarmsGetHighestSeverity();
         // Update the system statistics
-
-        cycleCount = cycleCount > 0 ? cycleCount - 1 : 7;
-// if(cycleCount == 1){
         updateStats();
         // Update the system alarms
         updateSystemAlarms();
@@ -230,35 +274,10 @@ static void systemTask(__attribute__((unused)) void *parameters)
 // }
 #endif
 // }
-        // Flash the heartbeat LED
-#if defined(PIOS_LED_HEARTBEAT)
-        uint8_t armingStatus;
-        FlightStatusArmedGet(&armingStatus);
-        if ((armingStatus == FLIGHTSTATUS_ARMED_ARMED && (cycleCount & 0x1)) ||
-            (armingStatus != FLIGHTSTATUS_ARMED_ARMED && (cycleCount & 0x4))) {
-            PIOS_LED_On(PIOS_LED_HEARTBEAT);
-        } else {
-            PIOS_LED_Off(PIOS_LED_HEARTBEAT);
-        }
-
-        DEBUG_MSG("+ 0x%08x\r\n", 0xDEADBEEF);
-#endif /* PIOS_LED_HEARTBEAT */
-
-        // Turn on the error LED if an alarm is set
-#if defined(PIOS_LED_ALARM)
-        if (AlarmsHasCritical()) {
-            PIOS_LED_On(PIOS_LED_ALARM);
-        } else if ((AlarmsHasErrors() && (cycleCount & 0x1)) ||
-                   (!AlarmsHasErrors() && AlarmsHasWarnings() && (cycleCount & 0x4))) {
-            PIOS_LED_On(PIOS_LED_ALARM);
-        } else {
-            PIOS_LED_Off(PIOS_LED_ALARM);
-        }
-#endif /* PIOS_LED_ALARM */
 
 
         UAVObjEvent ev;
-        int delayTime = SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2);
+        int delayTime = SYSTEM_UPDATE_PERIOD_MS;
 
 #if defined(PIOS_INCLUDE_RFM22B)
 
@@ -649,43 +668,146 @@ static void updateSystemAlarms()
 }
 
 /**
- * Called by the RTOS when the CPU is idle, used to measure the CPU idle time.
+ * Called by the RTOS when the CPU is idle,
  */
 void vApplicationIdleHook(void)
-{}
+{
+    static portTickType lastRunTimestamp;
 
+    if (!started || (xTaskGetTickCount() - lastRunTimestamp) < (LED_BLINK_PERIOD_MS * portTICK_RATE_MS / 2)) {
+        return;
+    }
+    lastRunTimestamp = xTaskGetTickCount();
+    // the led will show various status information, subdivided in three phases
+    // - Notification
+    // - Alarm
+    // - Flight status
+    // they are shown using the above priority
+    // a phase last exactly 8 cycles (so bit 1<<4 is used to determine if a phase end
+
+    static enum {
+        STATUS_NOTIFY,
+        STATUS_ALARM,
+        STATUS_FLIGHTMODE,
+        STATUS_LENGHT
+    } status;
+
+    static uint8_t cycleCount;
+    cycleCount++;
+    // a blink last 2 cycles.
+    static uint8_t blinkCount;
+    blinkCount = (cycleCount & 0xF) >> 1;
+
+    if (cycleCount & 0x08) {
+        // add a short pause between each phase
+        if (cycleCount > 0xA) {
+            cycleCount = 0xFF;
+            status     = (status + 1) % STATUS_LENGHT;
+        }
+        HEARTBEAT_LED_OFF();
+        ALARM_LED_OFF();
+        return;
+    }
+
+    if (status == STATUS_NOTIFY) {
+        // Not implemented yet
+        status++;
+    }
+
+    // Handles Alarm display
+    if (status == STATUS_ALARM) {
+#if defined(PIOS_LED_ALARM)
+        if (currentAlarmLevel > SYSTEMALARMS_ALARM_OK) {
+            if (currentAlarmLevel == SYSTEMALARMS_ALARM_CRITICAL) {
+                // Slow blink
+                ALARM_LED_OFF();
+                if (cycleCount & 0x4) {
+                    ALARM_LED_OFF();
+                } else {
+                    ALARM_LED_ON();
+                }
+            } else {
+                if ((blinkCount < (ALARM_BLINK_COUNT(currentAlarmLevel))) &&
+                    (cycleCount & 0x1)) {
+                    ALARM_LED_ON();
+                } else {
+                    ALARM_LED_OFF();
+                }
+            }
+        } else {
+            status++;
+        }
+#else /* if defined(PIOS_LED_ALARM) */
+        // no alarms, handle next phase
+        status++;
+        // #endif
+#endif /* PIOS_LED_ALARM */
+    }
+
+    // **** Handles flightmode display
+    if (status == STATUS_FLIGHTMODE) {
+        uint8_t flightmode = currentFlightStatus.FlightMode;
+
+        // Flash the heartbeat LED
+#if defined(PIOS_LED_HEARTBEAT)
+
+        if (currentFlightStatus.Armed == FLIGHTSTATUS_ARMED_DISARMED) {
+            // Slow blink
+            if (blinkCount < 3) {
+                HEARTBEAT_LED_ON();
+            } else {
+                HEARTBEAT_LED_OFF();
+            }
+        } else {
+            if ((blinkCount < BLINK_COUNT(flightmode)) &&
+                (cycleCount & 0x1)) {
+                // red led will be active active in last or last two (4 blinks case) blinks
+                if (BLINK_RED(flightmode) &&
+                    ((blinkCount == BLINK_COUNT(flightmode) - 1) ||
+                     blinkCount > 1)) {
+                    ALARM_LED_ON();
+                }
+                HEARTBEAT_LED_ON();
+            } else {
+                HEARTBEAT_LED_OFF();
+                ALARM_LED_OFF();
+            }
+        }
+    }
+#endif /* PIOS_LED_HEARTBEAT */
+    }
 /**
  * Called by the RTOS when a stack overflow is detected.
  */
 #define DEBUG_STACK_OVERFLOW 0
-void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle *pxTask,
-                                   __attribute__((unused)) signed portCHAR *pcTaskName)
-{
-    stackOverflow = STACKOVERFLOW_CRITICAL;
+    void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle *pxTask,
+                                       __attribute__((unused)) signed portCHAR *pcTaskName)
+    {
+        stackOverflow = STACKOVERFLOW_CRITICAL;
 #if DEBUG_STACK_OVERFLOW
-    static volatile bool wait_here = true;
-    while (wait_here) {
-        ;
-    }
-    wait_here = true;
+        static volatile bool wait_here = true;
+        while (wait_here) {
+            ;
+        }
+        wait_here = true;
 #endif
-}
+    }
 
 /**
  * Called by the RTOS when a malloc call fails.
  */
 #define DEBUG_MALLOC_FAILURES 0
-void vApplicationMallocFailedHook(void)
-{
-    mallocFailed = true;
+    void vApplicationMallocFailedHook(void)
+    {
+        mallocFailed = true;
 #if DEBUG_MALLOC_FAILURES
-    static volatile bool wait_here = true;
-    while (wait_here) {
-        ;
-    }
-    wait_here = true;
+        static volatile bool wait_here = true;
+        while (wait_here) {
+            ;
+        }
+        wait_here = true;
 #endif
-}
+    }
 
 /**
  * @}

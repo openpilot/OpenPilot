@@ -254,7 +254,7 @@ void parse_ubx_nav_velned(struct UBX_NAV_VELNED *velned, GPSPositionSensorData *
 #if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_nav_timeutc(struct UBX_NAV_TIMEUTC *timeutc)
 {
-    if (!(timeutc->valid & TIMEUTC_VALIDUTC)) {
+    if (!(timeutc->valid & TIMEUTC_VALIDTOW) || !(timeutc->valid & TIMEUTC_VALIDWKN)) {
         return;
     }
 

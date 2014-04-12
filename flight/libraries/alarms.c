@@ -244,7 +244,7 @@ static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
 
     // Go through alarms and check if any are of the given severity or higher
     for (uint32_t n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
-        if (cast_struct_to_array(alarms, alarms.Actuator)[n] >= severity) {
+        if (n != SYSTEMALARMS_ALARM_TELEMETRY && cast_struct_to_array(alarms, alarms.Actuator)[n] >= severity) {
             xSemaphoreGiveRecursive(lock);
             return 1;
         }
@@ -272,7 +272,8 @@ SystemAlarmsAlarmOptions AlarmsGetHighestSeverity()
     // Go through alarms and find the highest severity
     uint32_t n = 0;
     while (n < SYSTEMALARMS_ALARM_NUMELEM && highest != SYSTEMALARMS_ALARM_CRITICAL) {
-        if (cast_struct_to_array(alarmsData, alarmsData.Actuator)[n] > highest) {
+        if (n != SYSTEMALARMS_ALARM_TELEMETRY &&
+            cast_struct_to_array(alarmsData, alarmsData.Actuator)[n] > highest) {
             highest = cast_struct_to_array(alarmsData, alarmsData.Actuator)[n];
         }
         n++;

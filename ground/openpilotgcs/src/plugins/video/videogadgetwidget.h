@@ -36,13 +36,6 @@
 #include <QtGui/QResizeEvent>
 #include <QtGui/QPaintEvent>
 
-<<<<<<< HEAD
-=======
-#include "ui_video.h"
-
-#include "pipeline.h"
-
->>>>>>> 9bc03ffca82b2c41658cce9bf644bb735d193c28
 class VideoGadgetConfiguration;
 
 class VideoGadgetWidget : public QFrame

@@ -48,8 +48,12 @@ OPTMODULES += Osd/osdoutput
 #OPTMODULES += Altitude
 #OPTMODULES += Fault
 
+SRC += $(FLIGHTLIB)/notification.c
+
 # Include all camera options
 CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF
+
+
 
 # Erase flash firmware should be buildable from command line
 ifeq ($(ERASE_FLASH), YES)

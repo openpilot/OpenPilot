@@ -45,6 +45,8 @@ MODULES += Airspeed
 MODULES += AltitudeHold
 #MODULES += OveroSync
 
+SRC += $(FLIGHTLIB)/notification.c
+
 # Paths
 OPSYSTEM = .
 BOARDINC = ..

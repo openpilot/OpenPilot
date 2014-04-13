@@ -1,14 +1,15 @@
 /**
  ******************************************************************************
- * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup PIOS_USB_BOARD Board specific USB definitions
- * @brief Board specific USB definitions
+ * @addtogroup AirspeedModule Airspeed Module
+ * @brief Calculate airspeed from measurements of differential pressure from a MS4525DO (PixHawk airspeed sensor)
  * @{
  *
- * @file       pios_usb_board_data.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Board specific USB definitions
+ * @file       baro_airspeed_mas4525do.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      Airspeed module, reads temperature and pressure from MS4525DO
+ *
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,21 +28,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef BARO_AIRSPEED_MS4525DO_H
+#define BARO_AIRSPEED_MS4525DO_H
+#if defined(PIOS_INCLUDE_MS4525DO)
 
-#ifndef PIOS_USB_BOARD_DATA_H
-#define PIOS_USB_BOARD_DATA_H
+void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings);
 
-// Note : changing below length will require changes to the USB buffer setup
-#define PIOS_USB_BOARD_CDC_DATA_LENGTH 64
-#define PIOS_USB_BOARD_CDC_MGMT_LENGTH 32
-#define PIOS_USB_BOARD_HID_DATA_LENGTH 64
+#endif /* PIOS_INCLUDE_MS4525DO */
+#endif // BARO_AIRSPEED_MS4525DO_H
 
-#define PIOS_USB_BOARD_EP_NUM          4
-
-#include <pios_usb_defs.h> /* USB_* macros */
-
-#define PIOS_USB_BOARD_PRODUCT_ID      USB_PRODUCT_ID_OSD
-#define PIOS_USB_BOARD_DEVICE_VER      USB_OP_DEVICE_VER(USB_OP_BOARD_ID_OSD, USB_OP_BOARD_MODE_FW)
-#define PIOS_USB_BOARD_SN_SUFFIX       "+FW"
-
-#endif /* PIOS_USB_BOARD_DATA_H */
+/**
+ * @}
+ * @}
+ */

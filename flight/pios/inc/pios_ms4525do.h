@@ -2,16 +2,16 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup PIOS_USB_BOARD Board specific USB definitions
- * @brief Board specific USB definitions
+ * @addtogroup PIOS_MS4525DO MS4525DO Functions
+ * @brief Hardware functions to deal with the PixHawk Airspeed Sensor based on MS4525DO
  * @{
  *
- * @file       pios_usb_board_data.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Board specific USB definitions
+ * @file       pios_ms4525do.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      PixHawk MS4525DO Airspeed Sensor Driver
  * @see        The GNU Public License (GPL) Version 3
  *
- *****************************************************************************/
+ ******************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,20 +28,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_USB_BOARD_DATA_H
-#define PIOS_USB_BOARD_DATA_H
+#ifndef PIOS_MS4525DO_H
+#define PIOS_MS4525DO_H
 
-// Note : changing below length will require changes to the USB buffer setup
-#define PIOS_USB_BOARD_CDC_DATA_LENGTH 64
-#define PIOS_USB_BOARD_CDC_MGMT_LENGTH 32
-#define PIOS_USB_BOARD_HID_DATA_LENGTH 64
+// Interface Type I chip
+#define MS4525DO_I2C_ADDR 0x28
+// Interface Type J chip
+/* #define MS4525DO_I2C_ADDR 0x36 */
+// Interface Type K chip
+/* #define MS4525DO_I2C_ADDR 0x46 */
 
-#define PIOS_USB_BOARD_EP_NUM          4
 
-#include <pios_usb_defs.h> /* USB_* macros */
+extern int8_t PIOS_MS4525DO_Request(void);
+extern int8_t PIOS_MS4525DO_Read(uint16_t *values);
 
-#define PIOS_USB_BOARD_PRODUCT_ID      USB_PRODUCT_ID_OSD
-#define PIOS_USB_BOARD_DEVICE_VER      USB_OP_DEVICE_VER(USB_OP_BOARD_ID_OSD, USB_OP_BOARD_MODE_FW)
-#define PIOS_USB_BOARD_SN_SUFFIX       "+FW"
-
-#endif /* PIOS_USB_BOARD_DATA_H */
+#endif /* PIOS_MS4525DO_H */

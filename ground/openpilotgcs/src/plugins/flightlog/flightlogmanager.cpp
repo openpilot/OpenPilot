@@ -30,39 +30,69 @@
 
 #include <QApplication>
 #include <QFileDialog>
+#include <QXmlStreamReader>
+#include <QMessageBox>
+#include <QDebug>
 
 #include "debuglogcontrol.h"
 #include "uavobjecthelper.h"
 #include "uavtalk/uavtalk.h"
 #include "utils/logfile.h"
+#include "uavdataobject.h"
+#include <uavobjectutil/uavobjectutilmanager.h>
 
 FlightLogManager::FlightLogManager(QObject *parent) :
     QObject(parent), m_disableControls(false),
     m_disableExport(true), m_cancelDownload(false),
     m_adjustExportedTimestamps(true)
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
 
-    m_objectManager    = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(pluginManager);
+
+    m_objectManager     = pluginManager->getObject<UAVObjectManager>();
     Q_ASSERT(m_objectManager);
 
-    m_flightLogControl = DebugLogControl::GetInstance(m_objectManager);
+    m_telemtryManager   = pluginManager->getObject<TelemetryManager>();
+    Q_ASSERT(m_telemtryManager);
+
+    m_objectUtilManager = pluginManager->getObject<UAVObjectUtilManager>();
+    Q_ASSERT(m_objectUtilManager);
+
+    m_flightLogControl  = DebugLogControl::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogControl);
 
-    m_flightLogStatus  = DebugLogStatus::GetInstance(m_objectManager);
+    m_flightLogStatus   = DebugLogStatus::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogStatus);
     connect(m_flightLogStatus, SIGNAL(FlightChanged(quint16)), this, SLOT(updateFlightEntries(quint16)));
 
-    m_flightLogEntry = DebugLogEntry::GetInstance(m_objectManager);
+    m_flightLogEntry    = DebugLogEntry::GetInstance(m_objectManager);
     Q_ASSERT(m_flightLogEntry);
 
+    m_flightLogSettings = DebugLogSettings::GetInstance(m_objectManager);
+    Q_ASSERT(m_flightLogSettings);
+
+    m_objectPersistence = ObjectPersistence::GetInstance(m_objectManager);
+    Q_ASSERT(m_objectPersistence);
+
     updateFlightEntries(m_flightLogStatus->getFlight());
+
+    setupLogSettings();
+    setupLogStatuses();
+    setupUAVOWrappers();
+
+    connect(m_telemtryManager, SIGNAL(connected()), this, SLOT(connectionStatusChanged()));
+    connect(m_telemtryManager, SIGNAL(disconnected()), this, SLOT(connectionStatusChanged()));
+    connectionStatusChanged();
 }
 
 FlightLogManager::~FlightLogManager()
 {
     while (!m_logEntries.isEmpty()) {
         delete m_logEntries.takeFirst();
+    }
+    while (!m_uavoEntries.isEmpty()) {
+        delete m_uavoEntries.takeFirst();
     }
 }
 
@@ -90,6 +120,32 @@ void clearLogEntries(QQmlListProperty<ExtendedDebugLogEntry> *list)
 QQmlListProperty<ExtendedDebugLogEntry> FlightLogManager::logEntries()
 {
     return QQmlListProperty<ExtendedDebugLogEntry>(this, &m_logEntries, &addLogEntries, &countLogEntries, &logEntryAt, &clearLogEntries);
+}
+
+void addUAVOEntries(QQmlListProperty<UAVOLogSettingsWrapper> *list, UAVOLogSettingsWrapper *entry)
+{
+    Q_UNUSED(list);
+    Q_UNUSED(entry);
+}
+
+int countUAVOEntries(QQmlListProperty<UAVOLogSettingsWrapper> *list)
+{
+    return static_cast< QList<UAVOLogSettingsWrapper *> *>(list->data)->size();
+}
+
+UAVOLogSettingsWrapper *uavoEntryAt(QQmlListProperty<UAVOLogSettingsWrapper> *list, int index)
+{
+    return static_cast< QList<UAVOLogSettingsWrapper *> *>(list->data)->at(index);
+}
+
+void clearUAVOEntries(QQmlListProperty<UAVOLogSettingsWrapper> *list)
+{
+    return static_cast< QList<UAVOLogSettingsWrapper *> *>(list->data)->clear();
+}
+
+QQmlListProperty<UAVOLogSettingsWrapper> FlightLogManager::uavoEntries()
+{
+    return QQmlListProperty<UAVOLogSettingsWrapper>(this, &m_uavoEntries, &addUAVOEntries, &countUAVOEntries, &uavoEntryAt, &clearUAVOEntries);
 }
 
 QStringList FlightLogManager::flightEntries()
@@ -305,8 +361,7 @@ void FlightLogManager::exportLogs()
 
     QString selectedFilter = csvFilter;
 
-    QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log Entries"),
-                                                    QString("OP-%1").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
+    QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Log Entries"), QDir::homePath(),
                                                     QString("%1;;%2;;%3").arg(oplFilter, csvFilter, xmlFilter), &selectedFilter);
     if (!fileName.isEmpty()) {
         if (selectedFilter == oplFilter) {
@@ -336,6 +391,138 @@ void FlightLogManager::cancelExportLogs()
     m_cancelDownload = true;
 }
 
+void FlightLogManager::loadSettings()
+{
+    QString xmlFilter = tr("XML file %1").arg("(*.xml)");
+    QString fileName  = QFileDialog::getOpenFileName(NULL, tr("Load Log Settings"), QDir::homePath(), QString("%1").arg(xmlFilter));
+
+    if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(".xml")) {
+            fileName.append(".xml");
+        }
+        QFile xmlFile(fileName);
+        QString errorString;
+        if (xmlFile.open(QFile::ReadOnly)) {
+            QXmlStreamReader xmlReader(&xmlFile);
+            while (xmlReader.readNextStartElement() && xmlReader.name() == "settings") {
+                bool ok;
+
+                int version = xmlReader.attributes().value("version").toInt(&ok);
+                if (!ok || version != LOG_SETTINGS_FILE_VERSION) {
+                    errorString = tr("The file has the wrong version or could not parse version information.");
+                    break;
+                }
+
+                setLoggingEnabled(xmlReader.attributes().value("enabled").toInt(&ok));
+                if (!ok) {
+                    errorString = tr("Could not parse enabled attribute.");
+                    break;
+                }
+
+                while (xmlReader.readNextStartElement()) {
+                    if (xmlReader.name() == "setting") {
+                        QString name = xmlReader.attributes().value("name").toString();
+                        int level    = xmlReader.attributes().value("level").toInt(&ok);
+                        if (ok) {
+                            int period = xmlReader.attributes().value("period").toInt(&ok);
+                            if (ok && updateLogWrapper(name, level, period)) {} else {
+                                errorString = tr("Could not parse period attribute, or object with name '%1' could not be found.").arg(name);
+                                break;
+                            }
+                        } else {
+                            errorString = tr("Could not parse level attribute on setting '%1'").arg(name);
+                            break;
+                        }
+                    }
+                    xmlReader.skipCurrentElement();
+                }
+                xmlReader.skipCurrentElement();
+            }
+            if (!xmlReader.atEnd() && (xmlReader.hasError() || !errorString.isEmpty())) {
+                QMessageBox::warning(NULL, tr("Settings file corrupt."),
+                                     tr("The file loaded is not in the correct format.\nPlease check the file.\n%1")
+                                     .arg(xmlReader.hasError() ? xmlReader.errorString() : errorString),
+                                     QMessageBox::Ok);
+            }
+        }
+        xmlFile.close();
+    }
+}
+
+void FlightLogManager::saveSettings()
+{
+    QString xmlFilter = tr("XML file %1").arg("(*.xml)");
+    QString fileName  = QFileDialog::getSaveFileName(NULL, tr("Save Log Settings"),
+                                                     QDir::homePath(), QString("%1").arg(xmlFilter));
+
+    if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(".xml")) {
+            fileName.append(".xml");
+        }
+        QFile xmlFile(fileName);
+
+        if (xmlFile.open(QFile::WriteOnly | QFile::Truncate)) {
+            QXmlStreamWriter xmlWriter(&xmlFile);
+            xmlWriter.setAutoFormatting(true);
+            xmlWriter.setAutoFormattingIndent(4);
+
+            xmlWriter.writeStartDocument("1.0", true);
+            xmlWriter.writeComment("This file was created by the flight log settings function in OpenPilot GCS.");
+            xmlWriter.writeStartElement("settings");
+            xmlWriter.writeAttribute("version", QString::number(LOG_SETTINGS_FILE_VERSION));
+            xmlWriter.writeAttribute("enabled", QString::number(m_loggingEnabled));
+            foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
+                xmlWriter.writeStartElement("setting");
+                xmlWriter.writeAttribute("name", wrapper->name());
+                xmlWriter.writeAttribute("level", QString::number(wrapper->setting()));
+                xmlWriter.writeAttribute("period", QString::number(wrapper->period()));
+                xmlWriter.writeEndElement();
+            }
+            xmlWriter.writeEndElement();
+            xmlWriter.writeEndDocument();
+            xmlFile.flush();
+            xmlFile.close();
+        }
+    }
+}
+
+void FlightLogManager::resetSettings(bool clear)
+{
+    setLoggingEnabled(clear ? 0 : m_flightLogSettings->getLoggingEnabled());
+    foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
+        wrapper->reset(clear);
+    }
+}
+
+void FlightLogManager::saveSettingsToBoard()
+{
+    m_flightLogSettings->setLoggingEnabled(m_loggingEnabled);
+    m_flightLogSettings->updated();
+    saveUAVObjectToFlash(m_flightLogSettings);
+
+    foreach(UAVOLogSettingsWrapper * wrapper, m_uavoEntries) {
+        if (wrapper->dirty()) {
+            UAVObject::Metadata meta = wrapper->object()->getMetadata();
+            wrapper->object()->SetLoggingUpdateMode(meta, wrapper->settingAsUpdateMode());
+            meta.loggingUpdatePeriod = wrapper->period();
+
+            // As metadata are set up to update via telemetry on change
+            // this call will send the update to the board.
+            wrapper->object()->setMetadata(meta);
+
+            if (saveUAVObjectToFlash(wrapper->object()->getMetaObject())) {
+                wrapper->setDirty(false);
+            }
+        }
+    }
+}
+
+bool FlightLogManager::saveUAVObjectToFlash(UAVObject *object)
+{
+    m_objectUtilManager->saveObjectToSD(object);
+    return true;
+}
+
 void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 {
     Q_UNUSED(currentFlight);
@@ -351,6 +538,65 @@ void FlightLogManager::updateFlightEntries(quint16 currentFlight)
 
         emit flightEntriesChanged();
     }
+}
+
+void FlightLogManager::setupUAVOWrappers()
+{
+    foreach(QList<UAVObject *> objectList, m_objectManager->getObjects()) {
+        UAVObject *object = objectList.at(0);
+
+        if (!object->isMetaDataObject() && !object->isSettingsObject()) {
+            UAVOLogSettingsWrapper *wrapper = new UAVOLogSettingsWrapper(qobject_cast<UAVDataObject *>(object));
+            m_uavoEntries.append(wrapper);
+            m_uavoEntriesHash[wrapper->name()] = wrapper;
+        }
+    }
+    emit uavoEntriesChanged();
+}
+
+void FlightLogManager::setupLogSettings()
+{
+    // Corresponds to:
+    // typedef enum {
+    // UPDATEMODE_MANUAL    = 0,  /** Manually update object, by calling the updated() function */
+    // UPDATEMODE_PERIODIC  = 1, /** Automatically update object at periodic intervals */
+    // UPDATEMODE_ONCHANGE  = 2, /** Only update object when its data changes */
+    // UPDATEMODE_THROTTLED = 3 /** Object is updated on change, but not more often than the interval time */
+    // } UpdateMode;
+
+    m_logSettings << tr("Disabled") << tr("Periodically") << tr("When updated") << tr("Throttled");
+}
+
+void FlightLogManager::setupLogStatuses()
+{
+    m_logStatuses << tr("Never") << tr("Only when Armed") << tr("Always");
+}
+
+void FlightLogManager::connectionStatusChanged()
+{
+    if (m_telemtryManager->isConnected()) {
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
+        setBoardConnected(utilMngr->getBoardModel() == 0x0903);
+    } else {
+        setBoardConnected(false);
+    }
+    if (boardConnected()) {
+        resetSettings(false);
+    }
+}
+
+bool FlightLogManager::updateLogWrapper(QString name, int level, int period)
+{
+    UAVOLogSettingsWrapper *wrapper = m_uavoEntriesHash[name];
+
+    if (wrapper) {
+        wrapper->setSetting(level);
+        wrapper->setPeriod(period);
+        qDebug() << "Wrapper" << name << ", level" << level << ", period" << period;
+        return true;
+    }
+    return false;
 }
 
 ExtendedDebugLogEntry::ExtendedDebugLogEntry() : DebugLogEntry(),
@@ -413,5 +659,53 @@ void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVOb
         Q_ASSERT(object);
         m_object = object->clone(getInstanceID());
         m_object->unpack(getData().Data);
+    }
+}
+
+
+UAVOLogSettingsWrapper::UAVOLogSettingsWrapper() : QObject()
+{}
+
+UAVOLogSettingsWrapper::UAVOLogSettingsWrapper(UAVDataObject *object) : QObject(),
+    m_object(object), m_setting(DISABLED), m_period(0), m_dirty(0)
+{
+    reset(false);
+}
+
+UAVOLogSettingsWrapper::~UAVOLogSettingsWrapper()
+{}
+
+void UAVOLogSettingsWrapper::reset(bool clear)
+{
+    setSetting(m_object->GetLoggingUpdateMode(m_object->getMetadata()));
+    setPeriod(m_object->getMetadata().loggingUpdatePeriod);
+    if (clear) {
+        int oldSetting = setting();
+        int oldPeriod  = period();
+        setSetting(0);
+        setPeriod(0);
+        setDirty(oldSetting != setting() || oldPeriod != period());
+    } else {
+        setDirty(false);
+    }
+}
+
+UAVObject::UpdateMode UAVOLogSettingsWrapper::settingAsUpdateMode()
+{
+    switch (m_setting) {
+    case 0:
+        return UAVObject::UPDATEMODE_MANUAL;
+
+    case 1:
+        return UAVObject::UPDATEMODE_PERIODIC;
+
+    case 2:
+        return UAVObject::UPDATEMODE_ONCHANGE;
+
+    case 3:
+        return UAVObject::UPDATEMODE_THROTTLED;
+
+    default:
+        return UAVObject::UPDATEMODE_MANUAL;
     }
 }

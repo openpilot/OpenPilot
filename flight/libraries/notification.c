@@ -116,13 +116,11 @@ void NotificationOnboardLedsRun()
         STATUS_LENGHT
     } status;
 
-
     if (!started || (xTaskGetTickCount() - lastRunTimestamp) < (LED_BLINK_PERIOD_MS * portTICK_RATE_MS / 2)) {
         return;
     }
 
     lastRunTimestamp = xTaskGetTickCount();
-
     // the led will show various status information, subdivided in three phases
     // - Notification
     // - Alarm
@@ -131,25 +129,24 @@ void NotificationOnboardLedsRun()
     // a phase last exactly 8 cycles (so bit 1<<4 is used to determine if a phase end
 
     cycleCount++;
-
     // Notifications are "modal" to other statuses so they takes precedence
     if (status != STATUS_NOTIFY && nextNotification != NOTIFY_NONE) {
-        // Force a notification status
+        // read next notification to show
         runningNotification = nextNotification;
         nextNotification    = NOTIFY_NONE;
-
+        // Force a notification status
         status     = STATUS_NOTIFY;
         cycleCount = 0; // instantly start a notify cycle
     }
 
     // check if a phase has just finished
     if (cycleCount & 0x08) {
-        // add a short pause between each phase
+        // add a pause between each phase
         if (cycleCount > 0x8 + LED_PAUSE_BETWEEN_PHASES) {
             // ready to start a new phase
             cycleCount = 0x0;
 
-            // Notification has been already shown, so clear the running one
+            // Notification has been just shown, cleanup
             if (status == STATUS_NOTIFY) {
                 runningNotification = NOTIFY_NONE;
             }
@@ -161,11 +158,12 @@ void NotificationOnboardLedsRun()
         }
     }
 
-    // a blink last 2 cycles.
+    // a blink last 2 cycles(on and off cycle).
     blinkCount = (cycleCount & 0xF) >> 1;
 
     if (status == STATUS_NOTIFY) {
         if (!handleNotifications(cycleCount, runningNotification)) {
+            // no notifications, advance
             status++;
         }
     }
@@ -174,12 +172,15 @@ void NotificationOnboardLedsRun()
     if (status == STATUS_ALARM) {
 #ifdef PIOS_LED_ALARM
         if (!handleAlarms(cycleCount, blinkCount)) {
+            // no alarms, advance
             status++;
         }
 #else
+        // no alarms leds, advance
         status++;
 #endif // PIOS_LED_ALARM
     }
+
     // **** Handles flightmode display
     if (status == STATUS_FLIGHTMODE) {
         handleStatus(cycleCount, blinkCount);
@@ -189,27 +190,27 @@ void NotificationOnboardLedsRun()
 #if defined(PIOS_LED_ALARM)
 static bool handleAlarms(uint8_t cycleCount, uint8_t blinkCount)
 {
-    if (currentAlarmLevel > SYSTEMALARMS_ALARM_OK) {
-        if (currentAlarmLevel == SYSTEMALARMS_ALARM_CRITICAL) {
-            // Slow blink
-            ALARM_LED_OFF();
-            if (cycleCount & 0x4) {
-                ALARM_LED_OFF();
-            } else {
-                ALARM_LED_ON();
-            }
-        } else {
-            if ((blinkCount < (ALARM_BLINK_COUNT(currentAlarmLevel))) &&
-                (cycleCount & 0x1)) {
-                ALARM_LED_ON();
-            } else {
-                ALARM_LED_OFF();
-            }
-        }
-        return true;
-    } else {
+    if (currentAlarmLevel == SYSTEMALARMS_ALARM_OK) {
         return false;
     }
+
+    if (currentAlarmLevel == SYSTEMALARMS_ALARM_CRITICAL) {
+        // Slow blink
+        ALARM_LED_OFF();
+        if (cycleCount & 0x4) {
+            ALARM_LED_OFF();
+        } else {
+            ALARM_LED_ON();
+        }
+    } else {
+        if ((blinkCount < (ALARM_BLINK_COUNT(currentAlarmLevel))) &&
+            (cycleCount & 0x1)) {
+            ALARM_LED_ON();
+        } else {
+            ALARM_LED_OFF();
+        }
+    }
+    return true;
 }
 #endif /* PIOS_LED_ALARM */
 
@@ -244,7 +245,7 @@ static void handleStatus(uint8_t cycleCount, uint8_t blinkCount)
     } else {
         if ((blinkCount < BLINK_COUNT(flightmode)) &&
             (cycleCount & 0x1)) {
-            // red led will be active active in last or last two (4 blinks case) blinks
+            // red led will be active active on last (1-3 blinks) or last two (4 blinks case) blinks
             if (BLINK_RED(flightmode) &&
                 ((blinkCount == BLINK_COUNT(flightmode) - 1) ||
                  blinkCount > 1)) {

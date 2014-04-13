@@ -213,9 +213,10 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
 static int8_t GetNbCells(const FlightBatterySettingsData *batterySettings, FlightBatteryStateData *flightBatteryData)
 {
     // get flight status to check for armed
-    uint8_t armed=0;
+    uint8_t armed = 0;
+
     FlightStatusArmedGet(&armed);
-    
+
 
     // check only if not armed
     if (armed == FLIGHTSTATUS_ARMED_ARMED) {

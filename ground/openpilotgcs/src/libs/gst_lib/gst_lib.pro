@@ -20,7 +20,8 @@ HEADERS += \
     overlay.h \
     videowidget.h
 
-SOURCES += gst_global.cpp \
+SOURCES += \
+    gst_global.cpp \
     videowidget.cpp
 
 OTHER_FILES += \

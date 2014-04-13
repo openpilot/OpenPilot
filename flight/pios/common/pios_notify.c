@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       notification.h
+ * @file       pios_notify.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      notification library
+ * @brief      Handles user notifications.
  *             --
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -23,18 +23,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef NOTIFICATION_H
-#define NOTIFICATION_H
 
-// period of each blink phase
-#define LED_BLINK_PERIOD_MS      200
-// Define the pause in half blink periods to be added between phases
-#define LED_PAUSE_BETWEEN_PHASES 3
+#include "pios_notify.h"
 
-// update the status snapshot used by notifcations
-void NotificationUpdateStatus();
+static volatile pios_notify_notification currentNotification = NOTIFY_NONE;
+static volatile pios_notify_priority currentPriority;
 
-// run the led notifications
-void NotificationOnboardLedsRun();
 
-#endif /* NOTIFICATION_H */
+void PIOS_NOTIFY_StartNotification(pios_notify_notification notification, pios_notify_priority priority)
+{
+    if (currentNotification == NOTIFY_NONE || currentPriority < priority) {
+        currentPriority     = priority;
+        currentNotification = notification;
+    }
+}
+
+pios_notify_notification PIOS_NOTIFY_GetActiveNotification(bool clear)
+{
+    pios_notify_notification ret = currentNotification;
+
+    if (clear && ret != NOTIFY_NONE) {
+        currentNotification = NOTIFY_NONE;
+    }
+    return ret;
+}

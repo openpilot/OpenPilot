@@ -72,7 +72,7 @@
 #endif
 
 // Private constants
-#define SYSTEM_UPDATE_PERIOD_MS 500
+#define SYSTEM_UPDATE_PERIOD_MS 250
 
 #if defined(PIOS_SYSTEM_STACK_SIZE)
 #define STACK_SIZE_BYTES        PIOS_SYSTEM_STACK_SIZE
@@ -80,7 +80,7 @@
 #define STACK_SIZE_BYTES        1024
 #endif
 
-#define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY           (tskIDLE_PRIORITY + 1)
 
 // Private types
 
@@ -620,34 +620,34 @@ void vApplicationIdleHook(void)
  * Called by the RTOS when a stack overflow is detected.
  */
 #define DEBUG_STACK_OVERFLOW 0
-    void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle *pxTask,
-                                       __attribute__((unused)) signed portCHAR *pcTaskName)
-    {
-        stackOverflow = STACKOVERFLOW_CRITICAL;
+void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle *pxTask,
+                                   __attribute__((unused)) signed portCHAR *pcTaskName)
+{
+    stackOverflow = STACKOVERFLOW_CRITICAL;
 #if DEBUG_STACK_OVERFLOW
-        static volatile bool wait_here = true;
-        while (wait_here) {
-            ;
-        }
-        wait_here = true;
-#endif
+    static volatile bool wait_here = true;
+    while (wait_here) {
+        ;
     }
+    wait_here = true;
+#endif
+}
 
 /**
  * Called by the RTOS when a malloc call fails.
  */
 #define DEBUG_MALLOC_FAILURES 0
-    void vApplicationMallocFailedHook(void)
-    {
-        mallocFailed = true;
+void vApplicationMallocFailedHook(void)
+{
+    mallocFailed = true;
 #if DEBUG_MALLOC_FAILURES
-        static volatile bool wait_here = true;
-        while (wait_here) {
-            ;
-        }
-        wait_here = true;
-#endif
+    static volatile bool wait_here = true;
+    while (wait_here) {
+        ;
     }
+    wait_here = true;
+#endif
+}
 
 /**
  * @}

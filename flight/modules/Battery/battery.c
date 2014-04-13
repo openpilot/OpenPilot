@@ -149,7 +149,7 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
     GetNbCells(&batterySettings, &flightBatteryData);
 
     // ad a plausibility check: zero voltage => zero current
-    if (currentADCPin >= 0 /*&& flightBatteryData.Voltage <= 0.f*/) {
+    if (currentADCPin >= 0 && flightBatteryData.Voltage > 0.f) {
         flightBatteryData.Current = (PIOS_ADC_PinGetVolt(currentADCPin) - batterySettings.SensorCalibrations.CurrentZero) * batterySettings.SensorCalibrations.CurrentFactor; // in Amps
         if (flightBatteryData.Current > flightBatteryData.PeakCurrent) {
             flightBatteryData.PeakCurrent = flightBatteryData.Current; // in Amps
@@ -213,12 +213,12 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
 static int8_t GetNbCells(const FlightBatterySettingsData *batterySettings, FlightBatteryStateData *flightBatteryData)
 {
     // get flight status to check for armed
-    FlightStatusData flightStatus;
-
-    FlightStatusGet(&flightStatus);
+    uint8_t armed=0;
+    FlightStatusArmedGet(&armed);
+    
 
     // check only if not armed
-    if (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) {
+    if (armed == FLIGHTSTATUS_ARMED_ARMED) {
         return -2;
     }
 

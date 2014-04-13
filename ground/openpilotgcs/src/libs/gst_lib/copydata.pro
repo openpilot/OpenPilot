@@ -1,5 +1,67 @@
 equals(copydata, 1) {
 
+    linux {
+
+        # copy useful executables
+        GCS_EXES = \
+            gst-inspect-0.10 \
+            gst-launch-0.10
+
+        for(exe, GCS_EXES) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(GSTREAMER_SDK_DIR)/bin/$$exe\") \
+                $$targetPath(\"$$GCS_APP_PATH/$$lib\") $$addNewline()
+        }
+
+        # copy core libraries
+        GCS_LIBS = \
+            libffi.so.6 \
+            libglib-2.0.so \
+            libgmodule-2.0.so \
+            libgobject-2.0.so \
+            libgstreamer-0.10.so \
+            libgstinterfaces-0.10.so \
+            libxml2.so.2 \
+            libz.so
+
+        # copy LIBS needed by plugins
+        GCS_LIBS += \
+            libgstapp-0.10.so \
+            libgstaudio-0.10.so \
+            libgstbase-0.10.so \
+            libgstcontroller-0.10.so \
+            libgstpbutils-0.10.so \
+            libgstvideo-0.10.so \
+            liborc-0.4.so
+
+        for(lib, GCS_LIBS) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(GSTREAMER_SDK_DIR)/lib/$$lib\") \
+                $$targetPath(\"$$GCS_LIBRARY_PATH/$$lib\") $$addNewline()
+        }
+
+        # copy plugin LIBS
+        GCS_PLUGIN_LIBS = \
+            libgstapp.so \
+            libgstautoconvert.so \
+            libgstautodetect.so \
+            libgstcoreelements.so \
+            libgstdecodebin2.so \
+            libgstdeinterlace.so \
+            libgstffmpegcolorspace.so \
+            libgstrawparse.so \
+            libgstvideomixer.so \
+            libgstvideoparsersbad.so \
+            libgstvideorate.so \
+            libgstvideoscale.so \
+            libgstvideotestsrc.so 
+
+        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/gstreamer-0.10/$$lib\") $$addNewline()
+        for(lib, GCS_PLUGIN_LIBS) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(GSTREAMER_SDK_DIR)/lib/gstreamer-0.10/$$lib\") \
+                $$targetPath(\"$$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/gstreamer-0.10/$$lib\") $$addNewline()
+        }
+
+    }
+
     win32 {
 
         # copy core DLLs
@@ -64,10 +126,11 @@ equals(copydata, 1) {
                 $$targetPath(\"$$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/gstreamer-0.10/$$dll\") $$addNewline()
         }
 
-        # add make target
-        POST_TARGETDEPS += copydata
-
-        data_copy.target = copydata
-        QMAKE_EXTRA_TARGETS += data_copy
     }
+
+    # add make target
+    POST_TARGETDEPS += copydata
+
+    data_copy.target = copydata
+    QMAKE_EXTRA_TARGETS += data_copy
 }

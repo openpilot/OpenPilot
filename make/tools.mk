@@ -102,7 +102,8 @@ OPENSSL_DIR     := $(TOOLS_DIR)/openssl-1.0.1e-win32
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
-GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk-x86-2013.6/0.10/x86
+#GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk-x86-2013.6/0.10/x86
+GSTREAMER_SDK_DIR :=  /opt/gstreamer-sdk
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
 
@@ -659,7 +660,7 @@ all_sdk_version: gstreamer_version
 endif
 
 ifeq ($(shell [ -d "$(GSTREAMER_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-	export GSTREAMER_SDK_DIR
+    export GSTREAMER_SDK_DIR
     export GSTREAMER := $(GSTREAMER_SDK_DIR)/bin/gst-launch-0.10
     export PATH := $(GSTREAMER_SDK_DIR/bin):$(PATH)
 else

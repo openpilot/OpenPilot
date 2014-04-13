@@ -17,6 +17,7 @@
 #    uncrustify_install
 #    doxygen_install
 #    gtest_install
+#    gstreamer_install
 #
 # TODO:
 #    openocd_install
@@ -27,8 +28,6 @@
 #    stm32flash_install
 #    dfuutil_install
 #    android_sdk_install
-#    marble_install
-#    gstreamer_install
 #
 # TODO:
 #    help in the top Makefile
@@ -157,9 +156,13 @@ JAR			:= jar
 CD			:= cd
 GREP		:= grep
 ifneq ($(UNAME), Windows)
-	SEVENZIP	:= 7zr
+	SEVENZIP	:= 7za
 else
 	SEVENZIP	:= 7za.exe
+ifneq ($(shell $(SEVENZIP) --version >/dev/null 2>&1 && $(ECHO) "found"), found)
+#	no $(SEVENZIP) found in path. hope is in bin... 
+    SEVENZIP = $(TOOLS_DIR)/bin/7za.exe
+endif
 endif
 
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
@@ -641,6 +644,38 @@ endif
 
 ##############################
 #
+# gstreamer
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,gstreamer,$(GSTREAMER_SDK_DIR),$(GSTREAMER_URL),$(notdir $(GSTREAMER_URL))))
+
+else # Linux or Mac
+
+all_sdk_version: gstreamer_version
+
+endif
+
+ifeq ($(shell [ -d "$(GSTREAMER_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+	export GSTREAMER_SDK_DIR
+    export GSTREAMER := $(GSTREAMER_SDK_DIR)/bin/gst-launch-0.10
+    export PATH := $(GSTREAMER_SDK_DIR/bin):$(PATH)
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(GSTREAMER_SDK_DIR)) not found (make gstreamer_install), using system PATH)
+    export GSTREAMER := gst-launch-0.10
+endif
+
+.PHONY: gstreamer_version
+gstreamer_version:
+	-$(V1) $(GSTREAMER) --version
+
+
+
+##############################
+#
 # OpenSSL (Windows only)
 #
 ##############################
@@ -775,35 +810,6 @@ gtest_version:
 
 
 
-##############################
-#
-# gstreamer
-#
-##############################
-
-ifeq ($(UNAME), Windows)
-
-$(eval $(call TOOL_INSTALL_TEMPLATE,gstreamer,$(GSTREAMER_SDK_DIR),$(GSTREAMER_URL),$(notdir $(GSTREAMER_URL))))
-
-else # Linux or Mac
-
-all_sdk_version: gstreamer_version
-
-endif
-
-ifeq ($(shell [ -d "$(GSTREAMER_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-	export GSTREAMER_SDK_DIR
-    export GSTREAMER := $(GSTREAMER_SDK_DIR)/bin/gst-launch-0.10
-    export PATH := $(GSTREAMER_SDK_DIR/bin):$(PATH)
-else
-    # not installed, hope it's in the path...
-    # $(info $(EMPTY) WARNING     $(call toprel, $(GSTREAMER_SDK_DIR)) not found (make gstreamer_install), using system PATH)
-    export GSTREAMER := gst-launch-0.10
-endif
-
-.PHONY: gstreamer_version
-gstreamer_version:
-	-$(V1) $(GSTREAMER) --version
 
 
 ##############################

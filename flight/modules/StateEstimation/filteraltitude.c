@@ -38,11 +38,8 @@
 
 // Private constants
 
-// Acceldrift ki value used at startup to let it quickly converge
-// to its target value
-#define INITIALIZATION_ACCELDRIFT_KI 0.2f
-// lenght of accel bias initialization phase
-#define INITIALIZATION_DURATION 5000
+// duration of accel bias initialization phase
+#define INITIALIZATION_DURATION_MS 5000
 
 #define STACK_REQUIRED 128
 
@@ -152,9 +149,9 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
             // low pass filter accelerometers
             this->accelState = (1.0f - this->settings.AccelLowPassKp) * this->accelState + this->settings.AccelLowPassKp * current;
-            if (((xTaskGetTickCount() - this->initTimer) / portTICK_RATE_MS) < INITIALIZATION_DURATION) {
+            if (((xTaskGetTickCount() - this->initTimer) / portTICK_RATE_MS) < INITIALIZATION_DURATION_MS) {
                 // allow the offset to reach quickly the target value in case of small AccelDriftKi
-                this->accelBiasState = (1.0f - INITIALIZATION_ACCELDRIFT_KI) * this->accelBiasState + INITIALIZATION_ACCELDRIFT_KI * this->accelState;
+                this->accelBiasState = (1.0f - this->settings.InitializationAccelDriftKi) * this->accelBiasState + this->settings.InitializationAccelDriftKi * this->accelState;
             } else {
                 // correct accel offset (low pass zeroing)
                 this->accelBiasState = (1.0f - this->settings.AccelDriftKi) * this->accelBiasState + this->settings.AccelDriftKi * this->accelState;

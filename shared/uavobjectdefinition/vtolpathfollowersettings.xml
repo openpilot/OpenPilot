@@ -10,8 +10,7 @@
         <field name="VerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.1,0.01,0,1"/>
         <field name="VelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="2"/>
         <field name="ThrustControl" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
-        <field name="VelocitySource" units="" type="enum" elements="1" options="EKF,NEDVEL,GPSPOS" defaultvalue="EKF"/>
-        <field name="PositionSource" units="" type="enum" elements="1" options="EKF,GPSPOS" defaultvalue="EKF"/>
+        <field name="VelocitySource" units="" type="enum" elements="1" options="STATE_ESTIMATION,GPS_VELNED,GPS_GROUNDSPEED" defaultvalue="STATE_ESTIMATION"/>
         <field name="MaxRollPitch" units="deg" type="float" elements="1" defaultvalue="20"/>
         <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="50"/>
         <access gcs="readwrite" flight="readwrite"/>

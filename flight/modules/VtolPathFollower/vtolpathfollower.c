@@ -470,48 +470,14 @@ void updateEndpointVelocity()
     float eastCommand;
     float downCommand;
 
-    float northPos = 0, eastPos = 0, downPos = 0;
-    switch (vtolpathfollowerSettings.PositionSource) {
-    case VTOLPATHFOLLOWERSETTINGS_POSITIONSOURCE_EKF:
-        northPos = positionState.North;
-        eastPos  = positionState.East;
-        downPos  = positionState.Down;
-        break;
-    case VTOLPATHFOLLOWERSETTINGS_POSITIONSOURCE_GPSPOS:
-    {
-        // this used to work with the NEDposition UAVObject
-        // however this UAVObject has been removed
-        GPSPositionSensorData gpsPosition;
-        GPSPositionSensorGet(&gpsPosition);
-        HomeLocationData homeLocation;
-        HomeLocationGet(&homeLocation);
-        float lat    = DEG2RAD(homeLocation.Latitude / 10.0e6f);
-        float alt    = homeLocation.Altitude;
-        float T[3]   = { alt + 6.378137E6f,
-                         cosf(lat) * (alt + 6.378137E6f),
-                         -1.0f };
-        float NED[3] = { T[0] * (DEG2RAD((gpsPosition.Latitude - homeLocation.Latitude) / 10.0e6f)),
-                         T[1] * (DEG2RAD((gpsPosition.Longitude - homeLocation.Longitude) / 10.0e6f)),
-                         T[2] * ((gpsPosition.Altitude + gpsPosition.GeoidSeparation - homeLocation.Altitude)) };
-
-        northPos = NED[0];
-        eastPos  = NED[1];
-        downPos  = NED[2];
-    }
-    break;
-    default:
-        PIOS_Assert(0);
-        break;
-    }
-
     // Compute desired north command
-    northError = pathDesired.End.North - northPos;
+    northError = pathDesired.End.North - positionState.North;
     northPosIntegral = bound(northPosIntegral + northError * dT * vtolpathfollowerSettings.HorizontalPosPI.Ki,
                              -vtolpathfollowerSettings.HorizontalPosPI.ILimit,
                              vtolpathfollowerSettings.HorizontalPosPI.ILimit);
     northCommand     = (northError * vtolpathfollowerSettings.HorizontalPosPI.Kp + northPosIntegral);
 
-    eastError = pathDesired.End.East - eastPos;
+    eastError = pathDesired.End.East - positionState.East;
     eastPosIntegral  = bound(eastPosIntegral + eastError * dT * vtolpathfollowerSettings.HorizontalPosPI.Ki,
                              -vtolpathfollowerSettings.HorizontalPosPI.ILimit,
                              vtolpathfollowerSettings.HorizontalPosPI.ILimit);
@@ -527,7 +493,7 @@ void updateEndpointVelocity()
     velocityDesired.North = northCommand * scale;
     velocityDesired.East  = eastCommand * scale;
 
-    downError = pathDesired.End.Down - downPos;
+    downError = pathDesired.End.Down - positionState.Down;
     downPosIntegral = bound(downPosIntegral + downError * dT * vtolpathfollowerSettings.VerticalPosPI.Ki,
                             -vtolpathfollowerSettings.VerticalPosPI.ILimit,
                             vtolpathfollowerSettings.VerticalPosPI.ILimit);
@@ -595,12 +561,12 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
 
     float northVel = 0, eastVel = 0, downVel = 0;
     switch (vtolpathfollowerSettings.VelocitySource) {
-    case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_EKF:
+    case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_STATE_ESTIMATION:
         northVel = velocityState.North;
         eastVel  = velocityState.East;
         downVel  = velocityState.Down;
         break;
-    case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_NEDVEL:
+    case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_GPS_VELNED:
     {
         GPSVelocitySensorData gpsVelocity;
         GPSVelocitySensorGet(&gpsVelocity);
@@ -609,7 +575,7 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
         downVel  = gpsVelocity.Down;
     }
     break;
-    case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_GPSPOS:
+    case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_GPS_GROUNDSPEED:
     {
         GPSPositionSensorData gpsPosition;
         GPSPositionSensorGet(&gpsPosition);

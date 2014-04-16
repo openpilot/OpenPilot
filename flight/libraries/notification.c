@@ -46,38 +46,82 @@
 #define HEARTBEAT_LED_OFF()
 #endif
 
-#define ALARM_BLINK_COUNT(x) \
+#define BLINK_R_ALARM_PATTERN(x) \
     (x == SYSTEMALARMS_ALARM_OK ? 0 : \
-     x == SYSTEMALARMS_ALARM_WARNING ? 1 : \
-     x == SYSTEMALARMS_ALARM_ERROR ? 2 : \
+     x == SYSTEMALARMS_ALARM_WARNING ? 0b0000000001000000 : \
+     x == SYSTEMALARMS_ALARM_ERROR ? 0b0000001000100000 : \
+     x == SYSTEMALARMS_ALARM_CRITICAL ? 0b0111111111111110 : 0)
+#define BLINK_B_ALARM_PATTERN(x) \
+    (x == SYSTEMALARMS_ALARM_OK ? 0 : \
+     x == SYSTEMALARMS_ALARM_WARNING ? 0 : \
+     x == SYSTEMALARMS_ALARM_ERROR ? 0 : \
      x == SYSTEMALARMS_ALARM_CRITICAL ? 0 : 0)
 
 
-#define BLINK_COUNT(x) \
-    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 1 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 2 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 3 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 2 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 2 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 2 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 3 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 4 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 4 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 3 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 3 : 1)
+#define BLINK_B_FM_ARMED_PATTERN(x) \
+    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0b0000000000000001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0b0000000000100001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0b0000010000100001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 0b0000000000100001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 0b0000000000100001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 0b0000000000100001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0b0000010000100001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0b0001000100010001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0b0001000100010001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 0b0000010000100001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 0b0000010000100001 : 0b0000000000000001)
 
-#define BLINK_RED(x) \
-    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? false : \
-     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? false : \
-     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? false : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? true : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? true : \
-     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? true : \
-     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? true : \
-     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? true : \
-     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? true : \
-     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? true : \
-     x == FLIGHTSTATUS_FLIGHTMODE_POI ? true : false)
+#define BLINK_R_FM_ARMED_PATTERN(x) \
+    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0b0000000000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0b0000000000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0b0000000000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 0b0000000000100000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 0b0000000000100000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 0b0000000000100000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0b0000010000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0b0001000100000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0b0001000100000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 0b0000010000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 0b0000010000000000 : 0b0000010000000000)
+
+#define BLINK_B_FM_DISARMED_PATTERN(x) \
+    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 0b0001111111111111 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 0b0001111111111111 : 0b0001111111111111)
+
+#define BLINK_R_FM_DISARMED_PATTERN(x) \
+    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 0 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 0 : 0)
+
+
+#define BLINK_B_NOTIFY_PATTERN(x) \
+    (x == NOTIFY_NONE ? 0 : \
+     x == NOTIFY_OK ? 0b0000100100111111 : \
+     x == NOTIFY_NOK ? 0b0000000000111111 : \
+     x == NOTIFY_DRAW_ATTENTION ? 0b0101010101010101 : 0b0101010101010101)
+
+#define BLINK_R_NOTIFY_PATTERN(x) \
+    (x == NOTIFY_NONE ? 0 : \
+     x == NOTIFY_OK ? 0b0000000000001111 : \
+     x == NOTIFY_NOK ? 0b0011000011001111 : \
+     x == NOTIFY_DRAW_ATTENTION ? 0b1010101010101010 : 0b1010101010101010)
 
 // led notification handling
 static volatile SystemAlarmsAlarmOptions currentAlarmLevel = SYSTEMALARMS_ALARM_OK;
@@ -86,10 +130,10 @@ static volatile bool started = false;
 static volatile pios_notify_notification nextNotification = NOTIFY_NONE;
 
 #ifdef PIOS_LED_ALARM
-static bool handleAlarms(uint8_t cycleCount, uint8_t blinkCount);
+static bool handleAlarms(uint16_t *r_pattern, uint16_t *b_pattern);
 #endif // PIOS_LED_ALARM
-static bool handleNotifications(uint8_t cycleCount, pios_notify_notification runningNotification);
-static void handleStatus(uint8_t cycleCount, uint8_t blinkCount);
+static bool handleNotifications(pios_notify_notification runningNotification, uint16_t *r_pattern, uint16_t *b_pattern);
+static void handleStatus(uint16_t *r_pattern, uint16_t *b_pattern);
 
 void NotificationUpdateStatus()
 {
@@ -105,8 +149,9 @@ void NotificationUpdateStatus()
 void NotificationOnboardLedsRun()
 {
     static portTickType lastRunTimestamp;
-    static uint8_t blinkCount; // number of blinks since phase start
-    static uint8_t cycleCount; // cound the number of cycles (half of a blink)
+    static uint16_t r_pattern;
+    static uint16_t b_pattern;
+    static uint8_t cycleCount; // count the number of cycles
     static pios_notify_notification runningNotification = NOTIFY_NONE;
 
     static enum {
@@ -116,7 +161,7 @@ void NotificationOnboardLedsRun()
         STATUS_LENGHT
     } status;
 
-    if (!started || (xTaskGetTickCount() - lastRunTimestamp) < (LED_BLINK_PERIOD_MS * portTICK_RATE_MS / 2)) {
+    if (!started || (xTaskGetTickCount() - lastRunTimestamp) < (LED_BLINK_PERIOD_MS * portTICK_RATE_MS / 4)) {
         return;
     }
 
@@ -140,29 +185,19 @@ void NotificationOnboardLedsRun()
     }
 
     // check if a phase has just finished
-    if (cycleCount & 0x08) {
-        // add a pause between each phase
-        if (cycleCount > 0x8 + LED_PAUSE_BETWEEN_PHASES) {
-            // ready to start a new phase
-            cycleCount = 0x0;
-
-            // Notification has been just shown, cleanup
-            if (status == STATUS_NOTIFY) {
-                runningNotification = NOTIFY_NONE;
-            }
-            status = (status + 1) % STATUS_LENGHT;
-        } else {
-            HEARTBEAT_LED_OFF();
-            ALARM_LED_OFF();
-            return;
+    if (cycleCount & 0x10) {
+        HEARTBEAT_LED_OFF();
+        ALARM_LED_OFF();
+        cycleCount = 0x0;
+        // Notification has been just shown, cleanup
+        if (status == STATUS_NOTIFY) {
+            runningNotification = NOTIFY_NONE;
         }
+        status = (status + 1) % STATUS_LENGHT;
     }
 
-    // a blink last 2 cycles(on and off cycle).
-    blinkCount = (cycleCount & 0xF) >> 1;
-
     if (status == STATUS_NOTIFY) {
-        if (!handleNotifications(cycleCount, runningNotification)) {
+        if (!cycleCount && !handleNotifications(runningNotification, &r_pattern, &b_pattern)) {
             // no notifications, advance
             status++;
         }
@@ -171,7 +206,7 @@ void NotificationOnboardLedsRun()
     // Handles Alarm display
     if (status == STATUS_ALARM) {
 #ifdef PIOS_LED_ALARM
-        if (!handleAlarms(cycleCount, blinkCount)) {
+        if (!cycleCount && !handleAlarms(&r_pattern, &b_pattern)) {
             // no alarms, advance
             status++;
         }
@@ -182,80 +217,58 @@ void NotificationOnboardLedsRun()
     }
 
     // **** Handles flightmode display
-    if (status == STATUS_FLIGHTMODE) {
-        handleStatus(cycleCount, blinkCount);
+    if (status == STATUS_FLIGHTMODE && !cycleCount) {
+        handleStatus(&r_pattern, &b_pattern);
     }
+
+    // led output
+    if (b_pattern & 0x1) {
+        HEARTBEAT_LED_ON();
+    } else {
+        HEARTBEAT_LED_OFF();
+    }
+    if (r_pattern & 0x1) {
+        ALARM_LED_ON();
+    } else {
+        ALARM_LED_OFF();
+    }
+    r_pattern >>= 1;
+    b_pattern >>= 1;
 }
 
 #if defined(PIOS_LED_ALARM)
-static bool handleAlarms(uint8_t cycleCount, uint8_t blinkCount)
+static bool handleAlarms(uint16_t *r_pattern, uint16_t *b_pattern)
 {
     if (currentAlarmLevel == SYSTEMALARMS_ALARM_OK) {
         return false;
     }
-
-    if (currentAlarmLevel == SYSTEMALARMS_ALARM_CRITICAL) {
-        // Slow blink
-        ALARM_LED_OFF();
-        if (cycleCount & 0x4) {
-            ALARM_LED_OFF();
-        } else {
-            ALARM_LED_ON();
-        }
-    } else {
-        if ((blinkCount < (ALARM_BLINK_COUNT(currentAlarmLevel))) &&
-            (cycleCount & 0x1)) {
-            ALARM_LED_ON();
-        } else {
-            ALARM_LED_OFF();
-        }
-    }
+    *b_pattern = BLINK_B_ALARM_PATTERN(currentAlarmLevel);
+    *r_pattern = BLINK_R_ALARM_PATTERN(currentAlarmLevel);
     return true;
 }
 #endif /* PIOS_LED_ALARM */
 
 
-static bool handleNotifications(uint8_t cycleCount, pios_notify_notification runningNotification)
+static bool handleNotifications(pios_notify_notification runningNotification, uint16_t *r_pattern, uint16_t *b_pattern)
 {
     if (runningNotification == NOTIFY_NONE) {
         return false;
     }
-    if (cycleCount & 0x1) {
-        ALARM_LED_OFF();
-        HEARTBEAT_LED_ON();
-    } else {
-        ALARM_LED_ON();
-        HEARTBEAT_LED_OFF();
-    }
+    *b_pattern = BLINK_B_NOTIFY_PATTERN(runningNotification);
+    *r_pattern = BLINK_R_NOTIFY_PATTERN(runningNotification);
     return true;
 }
 
-static void handleStatus(uint8_t cycleCount, uint8_t blinkCount)
+static void handleStatus(uint16_t *r_pattern, uint16_t *b_pattern)
 {
     // Flash the heartbeat LED
-#if defined(PIOS_LED_HEARTBEAT)
     uint8_t flightmode = currentFlightStatus.FlightMode;
+
     if (currentFlightStatus.Armed == FLIGHTSTATUS_ARMED_DISARMED) {
-        // Slow blink
-        if (blinkCount < 3) {
-            HEARTBEAT_LED_ON();
-        } else {
-            HEARTBEAT_LED_OFF();
-        }
+        *b_pattern = BLINK_B_FM_DISARMED_PATTERN(flightmode);
+        *r_pattern = BLINK_R_FM_DISARMED_PATTERN(flightmode);
     } else {
-        if ((blinkCount < BLINK_COUNT(flightmode)) &&
-            (cycleCount & 0x1)) {
-            // red led will be active active on last (1-3 blinks) or last two (4 blinks case) blinks
-            if (BLINK_RED(flightmode) &&
-                ((blinkCount == BLINK_COUNT(flightmode) - 1) ||
-                 blinkCount > 1)) {
-                ALARM_LED_ON();
-            }
-            HEARTBEAT_LED_ON();
-        } else {
-            HEARTBEAT_LED_OFF();
-            ALARM_LED_OFF();
-        }
+        *b_pattern = BLINK_B_FM_ARMED_PATTERN(flightmode);
+        *r_pattern = BLINK_R_FM_ARMED_PATTERN(flightmode);
     }
-#endif /* PIOS_LED_HEARTBEAT */
 }

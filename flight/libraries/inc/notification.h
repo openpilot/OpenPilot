@@ -27,9 +27,7 @@
 #define NOTIFICATION_H
 
 // period of each blink phase
-#define LED_BLINK_PERIOD_MS      200
-// Define the pause in half blink periods to be added between phases
-#define LED_PAUSE_BETWEEN_PHASES 3
+#define LED_BLINK_PERIOD_MS 200
 
 // update the status snapshot used by notifcations
 void NotificationUpdateStatus();

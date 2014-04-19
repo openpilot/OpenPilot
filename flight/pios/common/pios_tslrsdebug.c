@@ -164,8 +164,18 @@ static void scan_value_set(struct pios_tslrsdebug_state *state) {
             state->BadPacketsDelta = scan_value - state->BadPackets;
             state->BadPackets = scan_value;
         break;
+        case TSRX_RSSI_SCAN:
+            state->RSSI = scan_value;
+        break;
+        case TSRX_LINKQUALITY_SCAN:
+            state->LinkQuality = scan_value;
+        break;
     }
-    state->scan_value_percent = (uint8_t) ((1.0f - (float) state->BadPacketsDelta / (float) (state->GoodPacketsDelta + state->BadPacketsDelta)) * 100.0f + 0.5f);
+    if ((state->GoodPacketsDelta + state->BadPacketsDelta) != 0) {
+        state->scan_value_percent = (uint8_t) ((1.0f - (float) state->BadPacketsDelta / (float) (state->GoodPacketsDelta + state->BadPacketsDelta)) * 100.0f + 0.5f);
+    } else {
+        state->scan_value_percent = 0;
+    }
 }
 
 
@@ -190,9 +200,14 @@ static void tsrxtalk_parse(struct pios_tslrsdebug_state *state, uint8_t c)
             }
         break;
         case TSRX_VERSION_CHECK:
+// TODO needs refactoring, make it configurable, currently on hold
+#ifdef PIOS_INCLUDE_OPLM_OPOSD
+            state->version = TSRX_IDLE_FROM_V25;
+#else
             if (detect_str_eeprom(c) && detect_str_contact(c)) {
                 state->version = TSRX_IDLE_FROM_V25;
             }
+#endif
             state->state = state->version;
             tsrxtalk_parse(state, c);
         break;
@@ -220,6 +235,12 @@ static void tsrxtalk_parse(struct pios_tslrsdebug_state *state, uint8_t c)
                 case TOKEN_BAD:
                     state->state = TSRX_BAD_START;
                 break;
+                case TOKEN_RSSI:
+                    state->state = TSRX_RSSI_START;
+                break;
+                case TOKEN_LINKQUALITY:
+                    state->state = TSRX_LINKQUALITY_START;
+                break;
                 case TOKEN_VALUE:
                     state->state = TSRX_VALUE_START;
                 break;
@@ -228,6 +249,8 @@ static void tsrxtalk_parse(struct pios_tslrsdebug_state *state, uint8_t c)
         case TSRX_FAILSAVE_START:
         case TSRX_GOOD_START:
         case TSRX_BAD_START:
+        case TSRX_RSSI_START:
+        case TSRX_LINKQUALITY_START:
             switch (c) {
                 case SUBTOKEN_FGB:
                     state->state++;
@@ -240,6 +263,8 @@ static void tsrxtalk_parse(struct pios_tslrsdebug_state *state, uint8_t c)
         case TSRX_FAILSAVE_SCAN:
         case TSRX_GOOD_SCAN:
         case TSRX_BAD_SCAN:
+        case TSRX_RSSI_SCAN:
+        case TSRX_LINKQUALITY_SCAN:
             if (c >= '0' && c <= '9') {
                 scan_value_add(c);
             } else {
@@ -371,6 +396,8 @@ static void PIOS_TSLRSdebug_ResetState(struct pios_tslrsdebug_state *state)
     state->BadPacketsDelta = 0;
     state->GoodPackets = 0;
     state->GoodPacketsDelta = 0;
+    state->RSSI = 255;
+    state->LinkQuality = 255;
     LastPacketTime = xTaskGetTickCount();
 }
 
@@ -460,6 +487,10 @@ static void PIOS_TSLRSdebug_Supervisor(uint32_t tslrsdebug_id)
     struct pios_tslrsdebug_state *state = &(tslrsdebug_dev->state);
 
     /* simulate bad channel if no packet was received for PacketTimeout ms */
+// TODO needs refactoring, make it configurable, currently on hold
+#ifdef PIOS_INCLUDE_OPLM_OPOSD
+    state->BadChannelTime = 0;
+#else
     if (state->state >= TSRX_IDLE_FROM_V25 && xTaskGetTickCount() > LastPacketTime + PacketTimeout) {
         LastPacketTime = xTaskGetTickCount();
         packet_window_set(PACKED_BAD, 1);
@@ -467,6 +498,7 @@ static void PIOS_TSLRSdebug_Supervisor(uint32_t tslrsdebug_id)
         state->BadChannelDelta++;
         state->BadChannelTime = xTaskGetTickCount();
     }
+#endif
 }
 
 #endif /* PIOS_INCLUDE_TSLRSDEBUG */

@@ -141,6 +141,9 @@
 /* Stabilization options */
 /* #define PIOS_QUATERNION_STABILIZATION */
 
+/* special OPLM-OPOSD options */
+//#define PIOS_INCLUDE_OPLM_OPOSD
+
 /* Performance counters */
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD  1995998
 

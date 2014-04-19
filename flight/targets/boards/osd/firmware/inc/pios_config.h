@@ -141,6 +141,12 @@
 /* Stabilization options */
 // #define PIOS_QUATERNION_STABILIZATION
 
+/* special OPLM-OPOSD options */
+//#define PIOS_INCLUDE_OPLM_OPOSD
+#ifdef PIOS_INCLUDE_OPLM_OPOSD
+#define PIOS_INCLUDE_TSLRSDEBUG
+#endif
+
 /* special OSD options */
 #define PIOS_INCLUDE_TSLRSDEBUG
 #define PIOS_INCLUDE_PACKETRXOK

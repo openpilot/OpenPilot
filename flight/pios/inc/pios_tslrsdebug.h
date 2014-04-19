@@ -48,6 +48,10 @@ typedef enum {
   TSRX_GOOD_SCAN,                   // read data
   TSRX_BAD_START,                   // waits for :
   TSRX_BAD_SCAN,                    // read data
+  TSRX_RSSI_START,                  // waits for :
+  TSRX_RSSI_SCAN,                   // read data
+  TSRX_LINKQUALITY_START,           // waits for :
+  TSRX_LINKQUALITY_SCAN,            // read data
   TSRX_VALUE_START,                 // waits for d or T
   TSRX_VALUE_READ_1,                // read data hi
   TSRX_VALUE_NEXT,                  // waits for D
@@ -71,6 +75,8 @@ struct pios_tslrsdebug_state {
     uint16_t        BadPacketsDelta;
     uint32_t        GoodPackets;
     uint16_t        GoodPacketsDelta;
+    uint16_t        RSSI;
+    uint16_t        LinkQuality;
 };
 
 extern struct pios_tslrsdebug_state *tslrsdebug_state;

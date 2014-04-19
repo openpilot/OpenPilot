@@ -57,6 +57,8 @@
 #define TOKEN_FAILSAVE              'F'
 #define TOKEN_GOOD                  'G'
 #define TOKEN_BAD                   'B'
+#define TOKEN_RSSI                  'r'         // OPLM PairSignalStrengths[0]
+#define TOKEN_LINKQUALITY           'l'         // OPLM LinkQuality
 #define TOKEN_VALUE                 '*'
 
 #define SUBTOKEN_FGB                ':'

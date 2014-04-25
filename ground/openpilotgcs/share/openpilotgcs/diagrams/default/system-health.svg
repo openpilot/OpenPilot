@@ -29,12 +29,12 @@
      inkscape:pageshadow="2"
      inkscape:zoom="7.4629555"
      inkscape:cx="49.128572"
-     inkscape:cy="35.389159"
-     inkscape:current-layer="layer34"
+     inkscape:cy="46.308281"
+     inkscape:current-layer="foreground"
      id="namedview3608"
      showgrid="true"
-     inkscape:window-width="1600"
-     inkscape:window-height="831"
+     inkscape:window-width="1366"
+     inkscape:window-height="712"
      inkscape:window-x="-4"
      inkscape:window-y="-4"
      inkscape:window-maximized="1"
@@ -1992,10 +1992,10 @@
   <g
      inkscape:groupmode="layer"
      id="layer3"
-     inkscape:label="AirSpeed-Error"
+     inkscape:label="Airspeed-Error"
      style="display:none">
     <g
-       id="AirSpeed-Error"
+       id="Airspeed-Error"
        inkscape:label="#g3398">
       <path
          inkscape:connector-curvature="0"

@@ -949,7 +949,13 @@ void PIOS_Board_Init(void)
 
 #ifdef PIOS_INCLUDE_WS2811
 #include <pios_ws2811.h>
-    PIOS_WS2811_Init(&pios_ws2811_cfg, &pios_ws2811_pin_cfg);
+    HwSettingsWS2811LED_OutOptions ws2811_pin_settings;
+    HwSettingsWS2811LED_OutGet(&ws2811_pin_settings);
+
+    if (ws2811_pin_settings != HWSETTINGS_WS2811LED_OUT_DISABLED && ws2811_pin_settings < NELEMENTS(pios_ws2811_pin_cfg)) {
+        PIOS_WS2811_Init(&pios_ws2811_cfg, &pios_ws2811_pin_cfg[ws2811_pin_settings]);
+    }
+
 #endif // PIOS_INCLUDE_WS2811
 }
 

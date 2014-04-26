@@ -1965,23 +1965,88 @@ const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
 
 #ifdef PIOS_INCLUDE_WS2811
 #include <pios_ws2811.h>
+#include <hwsettings.h>
 #define PIOS_WS2811_TIM_DIVIDER (PIOS_PERIPHERAL_APB2_CLOCK / (800000 * PIOS_WS2811_TIM_PERIOD))
 
 void DMA2_Stream1_IRQHandler(void) __attribute__((alias("PIOS_WS2811_irq_handler")));
 
-const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg = {
-    .gpio     = GPIOA,
-    .gpioInit = {
-        .GPIO_Pin   = GPIO_Pin_3,
-        .GPIO_Speed = GPIO_Speed_50MHz,
-        .GPIO_Mode  = GPIO_Mode_OUT,
-        .GPIO_OType = GPIO_OType_PP,
+const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT1] = {
+        .gpio     = GPIOB,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_0,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT2] = {
+        .gpio     = GPIOB,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_1,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT3] = {
+        .gpio     = GPIOA,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_3,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT4] = {
+        .gpio     = GPIOA,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_2,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT5] = {
+        .gpio     = GPIOA,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_1,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT6] = {
+        .gpio     = GPIOA,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_0,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_FLEXIPIN3] = {
+        .gpio     = GPIOB,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_12,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_FLEXIPIN4] = {
+        .gpio     = GPIOB,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_13,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
     },
 };
 
 const struct pios_ws2811_cfg pios_ws2811_cfg = {
     // master mode selection Note: configure TIM_CR2_MMS_2 master mode selection
-
     .timer     = TIM1,
     .timerInit = {
         .TIM_Prescaler         = PIOS_WS2811_TIM_DIVIDER - 1,

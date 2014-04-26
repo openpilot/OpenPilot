@@ -3,13 +3,12 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup StabilizationModule Stabilization Module
- * @brief Stabilization PID loops in an airframe type independent manner
- * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the
- * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeState "Attitude State"
+ * @brief innerloop mode
+ * @note This file implements the logic for a innerloop
  * @{
  *
- * @file       stabilization.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       innerloop.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @brief      Attitude stabilization module.
  *
  * @see        The GNU Public License (GPL) Version 3
@@ -30,25 +29,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef STABILIZATION_H
-#define STABILIZATION_H
 
-#include <stabilizationsettings.h>
+#ifndef INNERLOOP_H
+#define INNERLOOP_H
 
-int32_t StabilizationInitialize();
+void stabilizationInnerloopInit();
 
-typedef struct {
-    StabilizationSettingsData settings;
-    float gyro_alpha;
-} StabilizationData;
-
-
-extern StabilizationData stabSettings;
-
-
-#endif // STABILIZATION_H
-
-/**
- * @}
- * @}
- */
+#endif /* INNERLOOP_H */

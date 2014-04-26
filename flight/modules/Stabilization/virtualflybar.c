@@ -37,7 +37,7 @@
 #include "stabilizationsettings.h"
 
 // ! Private variables
-static float vbar_integral[MAX_AXES];
+static float vbar_integral[3];
 static float vbar_decay = 0.991f;
 
 int stabilization_virtual_flybar(float gyro, float command, float *output, float dT, bool reinit, uint32_t axis, StabilizationSettingsData *settings)
@@ -61,15 +61,15 @@ int stabilization_virtual_flybar(float gyro, float command, float *output, float
 
     // Get the settings for the correct axis
     switch (axis) {
-    case ROLL:
+    case 0:
         kp = settings->VbarRollPI.Kp;
         ki = settings->VbarRollPI.Ki;
         break;
-    case PITCH:
+    case 1:
         kp = settings->VbarPitchPI.Kp;
         ki = settings->VbarPitchPI.Ki;;
         break;
-    case YAW:
+    case 2:
         kp = settings->VbarYawPI.Kp;
         ki = settings->VbarYawPI.Ki;
         break;

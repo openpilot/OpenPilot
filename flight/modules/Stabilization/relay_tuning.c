@@ -63,7 +63,7 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 
     portTickType thisTime = xTaskGetTickCount();
 
-    static bool rateRelayRunning[MAX_AXES];
+    static bool rateRelayRunning[3];
 
     // This indicates the current estimate of the smoothed error.  So when it is high
     // we are waiting for it to go low.

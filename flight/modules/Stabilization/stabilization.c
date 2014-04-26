@@ -71,6 +71,8 @@
 #define UPDATE_MAX          1.0f
 #define UPDATE_ALPHA        1.0e-2f
 
+typedef enum { ROLL = 0, PITCH = 1, YAW = 2, MAX_AXES = 3 } blaenum;
+
 #define MAX_QUEUE_SIZE      1
 
 #if defined(PIOS_STABILIZATION_STACK_SIZE)

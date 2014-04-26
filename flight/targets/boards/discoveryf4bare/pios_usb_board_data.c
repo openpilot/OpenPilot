@@ -37,7 +37,7 @@ static const uint8_t usb_product_id[24] = {
     sizeof(usb_product_id),
     USB_DESC_TYPE_STRING,
     'D',                   0,
-    'y',                   0,
+    'i',                   0,
     's',                   0,
     'c',                   0,
     'o',                   0,

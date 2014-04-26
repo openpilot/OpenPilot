@@ -40,9 +40,6 @@
 static float vbar_integral[MAX_AXES];
 static float vbar_decay = 0.991f;
 
-// ! Private methods
-static float bound(float val, float range);
-
 int stabilization_virtual_flybar(float gyro, float command, float *output, float dT, bool reinit, uint32_t axis, StabilizationSettingsData *settings)
 {
     float gyro_gain = 1.0f;
@@ -54,7 +51,7 @@ int stabilization_virtual_flybar(float gyro, float command, float *output, float
 
     // Track the angle of the virtual flybar which includes a slow decay
     vbar_integral[axis] = vbar_integral[axis] * vbar_decay + gyro * dT;
-    vbar_integral[axis] = bound(vbar_integral[axis], settings->VbarMaxAngle);
+    vbar_integral[axis] = boundf(vbar_integral[axis], -settings->VbarMaxAngle, settings->VbarMaxAngle);
 
     // Command signal can indicate how much to disregard the gyro feedback (fast flips)
     if (settings->VbarGyroSuppress > 0) {
@@ -104,17 +101,4 @@ int stabilization_virtual_flybar_pirocomp(float z_gyro, float dT)
     vbar_integral[0] = vbar_roll;
 
     return 0;
-}
-
-/**
- * Bound input value between limits
- */
-static float bound(float val, float range)
-{
-    if (val < -range) {
-        val = -range;
-    } else if (val > range) {
-        val = range;
-    }
-    return val;
 }

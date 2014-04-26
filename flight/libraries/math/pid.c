@@ -30,10 +30,8 @@
 
 #include "openpilot.h"
 #include "pid.h"
+#include <mathmisc.h>
 #include <pios_math.h>
-
-// ! Private method
-static float bound(float val, float range);
 
 // ! Store the shared time constant for the derivative cutoff.
 static float deriv_tau   = 7.9577e-3f;
@@ -52,7 +50,7 @@ float pid_apply(struct pid *pid, const float err, float dT)
 {
     // Scale up accumulator by 1000 while computing to avoid losing precision
     pid->iAccumulator += err * (pid->i * dT * 1000.0f);
-    pid->iAccumulator  = bound(pid->iAccumulator, pid->iLim * 1000.0f);
+    pid->iAccumulator  = boundf(pid->iAccumulator, pid->iLim * -1000.0f, pid->iLim * 1000.0f);
 
     // Calculate DT1 term
     float diff  = (err - pid->lastErr);
@@ -84,7 +82,7 @@ float pid_apply_setpoint(struct pid *pid, const float factor, const float setpoi
 
     // Scale up accumulator by 1000 while computing to avoid losing precision
     pid->iAccumulator += err * (factor * pid->i * dT * 1000.0f);
-    pid->iAccumulator  = bound(pid->iAccumulator, pid->iLim * 1000.0f);
+    pid->iAccumulator  = boundf(pid->iAccumulator, pid->iLim * -1000.0f, pid->iLim * 1000.0f);
 
     // Calculate DT1 term,
     float dterm = 0;
@@ -141,17 +139,4 @@ void pid_configure(struct pid *pid, float p, float i, float d, float iLim)
     pid->i    = i;
     pid->d    = d;
     pid->iLim = iLim;
-}
-
-/**
- * Bound input value between limits
- */
-static float bound(float val, float range)
-{
-    if (val < -range) {
-        val = -range;
-    } else if (val > range) {
-        val = range;
-    }
-    return val;
 }

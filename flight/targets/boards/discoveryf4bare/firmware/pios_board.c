@@ -36,7 +36,7 @@
 #include <pios_oplinkrcvr_priv.h>
 #include <taskinfo.h>
 #include <pios_callbackscheduler.h>
-
+#include <pios_ws2811.h>
 /*
  * Pull in the board-specific static HW definitions.
  * Including .c files is a bit ugly but this allows all of
@@ -932,6 +932,7 @@ void PIOS_Board_Init(void)
     PIOS_MPU6000_Init(pios_spi_gyro_id, 0, &pios_mpu6000_cfg);
     PIOS_MPU6000_CONFIG_Configure();
 #endif
+    PIOS_WS2811_Init(&pios_ws2811_cfg,&pios_ws2811_pin_cfg);
 }
 
 /**

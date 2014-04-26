@@ -62,6 +62,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/overosyncstats.h \
     $$UAVOBJECT_SYNTHETICS/overosyncsettings.h \
     $$UAVOBJECT_SYNTHETICS/systemsettings.h \
+    $$UAVOBJECT_SYNTHETICS/stabilizationstatus.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettingsbank1.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettingsbank2.h \
@@ -163,6 +164,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/overosyncstats.cpp \
     $$UAVOBJECT_SYNTHETICS/overosyncsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/systemsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/stabilizationstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettingsbank1.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettingsbank2.cpp \

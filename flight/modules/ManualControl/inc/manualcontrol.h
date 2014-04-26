@@ -62,13 +62,6 @@ void manualHandler(bool newinit);
 void stabilizedHandler(bool newinit);
 
 /**
- * @brief Handler to control deprecated flight modes controlled by AltitudeHold module
- * @input: ManualControlCommand
- * @output: AltitudeHoldDesired
- */
-void altitudeHandler(bool newinit);
-
-/**
  * @brief Handler to control Guided flightmodes. FlightControl is governed by PathFollower, control via PathDesired
  * @input: NONE: fully automated mode -- TODO recursively call handler for advanced stick commands
  * @output: PathDesired
@@ -119,9 +112,6 @@ void pathPlannerHandler(bool newinit);
         ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1 == (int)FLIGHTSTATUS_FLIGHTMODE_STABILIZED1) && \
         ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED2 == (int)FLIGHTSTATUS_FLIGHTMODE_STABILIZED2) && \
         ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED3 == (int)FLIGHTSTATUS_FLIGHTMODE_STABILIZED3) && \
-        ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD == (int)FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) && \
-        ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ALTITUDEVARIO == (int)FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO) && \
-        ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL == (int)FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL) && \
         ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD == (int)FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD) && \
         ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER == (int)FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) && \
         ((int)FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE == (int)FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE) && \

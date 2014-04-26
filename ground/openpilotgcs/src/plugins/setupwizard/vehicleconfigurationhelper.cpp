@@ -328,8 +328,8 @@ void VehicleConfigurationHelper::applyFlighModeConfiguration()
     data.FlightModePosition[0]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED1;
     data.FlightModePosition[1]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED2;
     data.FlightModePosition[2]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED3;
-    data.FlightModePosition[3]     = FlightModeSettings::FLIGHTMODEPOSITION_ALTITUDEHOLD;
-    data.FlightModePosition[4]     = FlightModeSettings::FLIGHTMODEPOSITION_POSITIONHOLD;
+    data.FlightModePosition[3]     = FlightModeSettings::FLIGHTMODEPOSITION_MANUAL;
+    data.FlightModePosition[4]     = FlightModeSettings::FLIGHTMODEPOSITION_MANUAL;
     data.FlightModePosition[5]     = FlightModeSettings::FLIGHTMODEPOSITION_MANUAL;
     modeSettings->setData(data);
     addModifiedObject(modeSettings, tr("Writing flight mode settings 1/2"));

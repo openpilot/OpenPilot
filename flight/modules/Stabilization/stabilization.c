@@ -838,10 +838,10 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     cruise_control_inverted_power_switch = settings.CruiseControlInvertedPowerSwitch;
     cruise_control_neutral_thrust   = (float)settings.CruiseControlNeutralThrust / 100.0f;
 
-    memcpy(
-        cruise_control_flight_mode_switch_pos_enable,
-        settings.CruiseControlFlightModeSwitchPosEnable,
-        sizeof(cruise_control_flight_mode_switch_pos_enable));
+    // memcpy(  // disabled because removed from uavobject for refactoring (CRITICAL! doesnt fly, just to make it compile!!!)
+    // cruise_control_flight_mode_switch_pos_enable,
+    // settings.CruiseControlFlightModeSwitchPosEnable,
+    // sizeof(cruise_control_flight_mode_switch_pos_enable));
 }
 
 /**

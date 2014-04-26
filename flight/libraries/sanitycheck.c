@@ -213,7 +213,7 @@ static int32_t check_stabilization_settings(int index, bool multirotor, bool cop
     // (why not? might be fun to test ones reactions ;) if you dare, set your frame to "custom"!
     if (multirotor) {
         for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST; i++) {
-            if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NONE) {
+            if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL) {
                 return SYSTEMALARMS_ALARM_ERROR;
             }
         }
@@ -221,7 +221,7 @@ static int32_t check_stabilization_settings(int index, bool multirotor, bool cop
 
     // coptercontrol cannot do altitude holding
     if (coptercontrol) {
-        if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDE
+        if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
             || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_VERTICALVELOCITY
             ) {
             return SYSTEMALARMS_ALARM_ERROR;
@@ -230,22 +230,23 @@ static int32_t check_stabilization_settings(int index, bool multirotor, bool cop
 
     // check that thrust modes are only set to thrust axis
     for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST; i++) {
-        if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDE
+        if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
             || modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_VERTICALVELOCITY
             ) {
             return SYSTEMALARMS_ALARM_ERROR;
         }
     }
-    if (!(modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NONE
-          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDE
+    if (!(modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL
+          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
           || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_VERTICALVELOCITY
           )) {
         return SYSTEMALARMS_ALARM_ERROR;
     }
 
     // Warning: This assumes that certain conditions in the XML file are met.  That
-    // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NONE has the same numeric value for each channel
-    // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_NONE
+    // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL has the same numeric value for each channel
+    // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL
+    // (this is checked at compile time by static constraint manualcontrol.h)
 
     return SYSTEMALARMS_ALARM_OK;
 }

@@ -545,7 +545,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                 break;
 
-            case STABILIZATIONDESIRED_STABILIZATIONMODE_NONE:
+            case STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL:
                 actuatorDesiredAxis[i] = boundf(stabDesiredAxis[i], -1.0f, 1.0f);
                 break;
             default:

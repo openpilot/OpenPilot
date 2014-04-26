@@ -318,12 +318,15 @@ void VehicleConfigurationHelper::applyFlighModeConfiguration()
     data.Stabilization1Settings[0] = FlightModeSettings::STABILIZATION1SETTINGS_ATTITUDE;
     data.Stabilization1Settings[1] = FlightModeSettings::STABILIZATION1SETTINGS_ATTITUDE;
     data.Stabilization1Settings[2] = FlightModeSettings::STABILIZATION1SETTINGS_AXISLOCK;
+    data.Stabilization1Settings[3] = FlightModeSettings::STABILIZATION1SETTINGS_MANUAL;
     data.Stabilization2Settings[0] = FlightModeSettings::STABILIZATION2SETTINGS_ATTITUDE;
     data.Stabilization2Settings[1] = FlightModeSettings::STABILIZATION2SETTINGS_ATTITUDE;
     data.Stabilization2Settings[2] = FlightModeSettings::STABILIZATION2SETTINGS_RATE;
+    data.Stabilization2Settings[3] = FlightModeSettings::STABILIZATION1SETTINGS_MANUAL;
     data.Stabilization3Settings[0] = FlightModeSettings::STABILIZATION3SETTINGS_RATE;
     data.Stabilization3Settings[1] = FlightModeSettings::STABILIZATION3SETTINGS_RATE;
     data.Stabilization3Settings[2] = FlightModeSettings::STABILIZATION3SETTINGS_RATE;
+    data.Stabilization3Settings[3] = FlightModeSettings::STABILIZATION1SETTINGS_MANUAL;
     data2.FlightModeNumber = 3;
     data.FlightModePosition[0]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED1;
     data.FlightModePosition[1]     = FlightModeSettings::FLIGHTMODEPOSITION_STABILIZED2;

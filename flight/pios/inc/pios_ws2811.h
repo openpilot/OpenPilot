@@ -38,11 +38,11 @@
 
 
 #define sign(x) ((x > 0) - (x < 0))
-#define PIOS_WS2811_NUMLEDS 2
-#define PIOS_WS2811_BUFFER_SIZE (((PIOS_WS2811_NUMLEDS) * 24))
+#define PIOS_WS2811_NUMLEDS            2
+#define PIOS_WS2811_BUFFER_SIZE        (((PIOS_WS2811_NUMLEDS) * 24))
 #define PIOS_WS2811_MEMORYDATASIZE     DMA_MemoryDataSize_HalfWord
 #define PIOS_WS2811_PERIPHERALDATASIZE DMA_PeripheralDataSize_HalfWord
-#define PIOS_WS2811_TIM_PERIOD   20
+#define PIOS_WS2811_TIM_PERIOD         20
 
 typedef uint16_t ledbuf_t;
 
@@ -52,7 +52,7 @@ struct Color {
     uint8_t G;
     uint8_t B;
 };
-struct pios_ws2811_pin_cfg{
+struct pios_ws2811_pin_cfg {
     GPIO_TypeDef     *gpio;
     GPIO_InitTypeDef gpioInit;
 };
@@ -64,17 +64,17 @@ struct pios_ws2811_cfg {
 
     DMA_InitTypeDef    dmaInitCh1;
     DMA_Stream_TypeDef *streamCh1;
-    uint32_t dmaItCh1;
+    uint32_t           dmaItCh1;
 
     DMA_InitTypeDef    dmaInitCh2;
     DMA_Stream_TypeDef *streamCh2;
-    uint32_t dmaItCh2;
+    uint32_t           dmaItCh2;
 
     DMA_InitTypeDef    dmaInitUpdate;
     DMA_Stream_TypeDef *streamUpdate;
-    uint32_t dmaItUpdate;
-    uint16_t dmaSource;
-    struct stm32_irq irq;
+    uint32_t           dmaItUpdate;
+    uint16_t           dmaSource;
+    struct stm32_irq   irq;
 };
 
 void PIOS_WS2811_Init(const struct pios_ws2811_cfg *ws2811_cfg, const struct pios_ws2811_pin_cfg *ws2811_pin_cfg);

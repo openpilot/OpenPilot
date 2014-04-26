@@ -48,15 +48,15 @@ static void setupTimer();
 static void setupDMA();
 
 // generic wrapper around corresponding SPL functions
-static void genericTIM_OCxInit(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct, uint8_t ch);
-static void genericTIM_OCxPreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload, uint8_t ch);
+static void genericTIM_OCxInit(TIM_TypeDef *TIMx, const TIM_OCInitTypeDef *TIM_OCInitStruct, uint8_t ch);
+static void genericTIM_OCxPreloadConfig(TIM_TypeDef *TIMx, uint16_t TIM_OCPreload, uint8_t ch);
 
 // timer creates a 1.25 uS signal, with duty cycle controlled by frame buffer values
 
 /* Example configuration for REVOLUTION
 
 
-*/
+ */
 
 /*
  * How it works:
@@ -89,20 +89,24 @@ void PIOS_WS2811_Init(const struct pios_ws2811_cfg *ws2811_cfg, const struct pio
     assert_param(ws2811_pin_cfg);
 
     pios_ws2811_pin_cfg = ws2811_pin_cfg;
-    pios_ws2811_cfg = ws2811_cfg;
+    pios_ws2811_cfg     = ws2811_cfg;
     GPIO_Init(pios_ws2811_pin_cfg->gpio, &pios_ws2811_pin_cfg->gpioInit);
 
     dmaSource = (ledbuf_t)pios_ws2811_pin_cfg->gpioInit.GPIO_Pin;
 
-    fb =(ledbuf_t *) pvPortMalloc(PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
+    fb = (ledbuf_t *)pvPortMalloc(PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
     memset(fb, 0, PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
-
-    //Setup timers
+    Color ledoff = { 0, 0, 0 };
+    for (uint8_t i = 0; i < PIOS_WS2811_NUMLEDS; i++) {
+        PIOS_WS2811_setColorRGB(ledoff, i, false);
+    }
+    // Setup timers
     setupTimer();
     setupDMA();
 }
 
-void setupTimer(){
+void setupTimer()
+{
     // Stop timer
     TIM_Cmd(pios_ws2811_cfg->timer, DISABLE);
     // Configure timebase and internal clock
@@ -114,7 +118,7 @@ void setupTimer(){
     TIM_ARRPreloadConfig(pios_ws2811_cfg->timer, ENABLE);
 
     // enable outputs
-    //TIM_CtrlPWMOutputs(pios_ws2811_cfg->timer, ENABLE);
+    // TIM_CtrlPWMOutputs(pios_ws2811_cfg->timer, ENABLE);
 
     TIM_DMACmd(pios_ws2811_cfg->timer, pios_ws2811_cfg->dmaSource, ENABLE);
 
@@ -137,59 +141,61 @@ void setupTimer(){
     genericTIM_OCxInit(pios_ws2811_cfg->timer, &oc, pios_ws2811_cfg->timerCh2);
 }
 
-void genericTIM_OCxInit(TIM_TypeDef* TIMx, const TIM_OCInitTypeDef* TIM_OCInitStruct, uint8_t ch){
-    switch (ch){
-        case 1:
-            TIM_OC1Init(TIMx, TIM_OCInitStruct);
-            break;
-        case 2:
-            TIM_OC2Init(TIMx, TIM_OCInitStruct);
-            break;
-        case 3:
-            TIM_OC3Init(TIMx, TIM_OCInitStruct);
-            break;
-        case 4:
-            TIM_OC4Init(TIMx, TIM_OCInitStruct);
-            break;
+void genericTIM_OCxInit(TIM_TypeDef *TIMx, const TIM_OCInitTypeDef *TIM_OCInitStruct, uint8_t ch)
+{
+    switch (ch) {
+    case 1:
+        TIM_OC1Init(TIMx, TIM_OCInitStruct);
+        break;
+    case 2:
+        TIM_OC2Init(TIMx, TIM_OCInitStruct);
+        break;
+    case 3:
+        TIM_OC3Init(TIMx, TIM_OCInitStruct);
+        break;
+    case 4:
+        TIM_OC4Init(TIMx, TIM_OCInitStruct);
+        break;
     }
 }
 
-void genericTIM_OCxPreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload, uint8_t ch){
-    switch (ch){
-        case 1:
-            TIM_OC1PreloadConfig(TIMx, TIM_OCPreload);
-            break;
-        case 2:
-            TIM_OC2PreloadConfig(TIMx, TIM_OCPreload);
-            break;
-        case 3:
-            TIM_OC3PreloadConfig(TIMx, TIM_OCPreload);
-            break;
-        case 4:
-            TIM_OC4PreloadConfig(TIMx, TIM_OCPreload);
-            break;
+void genericTIM_OCxPreloadConfig(TIM_TypeDef *TIMx, uint16_t TIM_OCPreload, uint8_t ch)
+{
+    switch (ch) {
+    case 1:
+        TIM_OC1PreloadConfig(TIMx, TIM_OCPreload);
+        break;
+    case 2:
+        TIM_OC2PreloadConfig(TIMx, TIM_OCPreload);
+        break;
+    case 3:
+        TIM_OC3PreloadConfig(TIMx, TIM_OCPreload);
+        break;
+    case 4:
+        TIM_OC4PreloadConfig(TIMx, TIM_OCPreload);
+        break;
     }
 }
 
 
-
-void setupDMA(){
+void setupDMA()
+{
     // Configure Ch1
     DMA_Init(pios_ws2811_cfg->streamCh1, (DMA_InitTypeDef *)&pios_ws2811_cfg->dmaInitCh1);
-    pios_ws2811_cfg->streamCh1->PAR = (uint32_t)&pios_ws2811_pin_cfg->gpio->BSRRH;
-    pios_ws2811_cfg->streamCh1->M0AR= (uint32_t)fb;
+    pios_ws2811_cfg->streamCh1->PAR  = (uint32_t)&pios_ws2811_pin_cfg->gpio->BSRRH;
+    pios_ws2811_cfg->streamCh1->M0AR = (uint32_t)fb;
 
     NVIC_Init((NVIC_InitTypeDef *)&(pios_ws2811_cfg->irq.init));
     DMA_ITConfig(pios_ws2811_cfg->streamCh1, DMA_IT_TC, ENABLE);
 
 
     DMA_Init(pios_ws2811_cfg->streamCh2, (DMA_InitTypeDef *)&pios_ws2811_cfg->dmaInitCh2);
-    pios_ws2811_cfg->streamCh2->PAR = (uint32_t)&pios_ws2811_pin_cfg->gpio->BSRRH;
-    pios_ws2811_cfg->streamCh2->M0AR= (uint32_t)&dmaSource;
+    pios_ws2811_cfg->streamCh2->PAR     = (uint32_t)&pios_ws2811_pin_cfg->gpio->BSRRH;
+    pios_ws2811_cfg->streamCh2->M0AR    = (uint32_t)&dmaSource;
 
     DMA_Init(pios_ws2811_cfg->streamUpdate, (DMA_InitTypeDef *)&pios_ws2811_cfg->dmaInitUpdate);
-    pios_ws2811_cfg->streamUpdate->PAR = (uint32_t)&pios_ws2811_pin_cfg->gpio->BSRRL;
-    pios_ws2811_cfg->streamUpdate->M0AR= (uint32_t)&dmaSource;
+    pios_ws2811_cfg->streamUpdate->PAR  = (uint32_t)&pios_ws2811_pin_cfg->gpio->BSRRL;
+    pios_ws2811_cfg->streamUpdate->M0AR = (uint32_t)&dmaSource;
 
     DMA_ClearITPendingBit(pios_ws2811_cfg->streamCh1, pios_ws2811_cfg->dmaItCh1);
     DMA_ClearITPendingBit(pios_ws2811_cfg->streamCh2, pios_ws2811_cfg->dmaItCh2);
@@ -198,11 +204,12 @@ void setupDMA(){
     DMA_Cmd(pios_ws2811_cfg->streamCh2, ENABLE);
     DMA_Cmd(pios_ws2811_cfg->streamCh1, ENABLE);
     DMA_Cmd(pios_ws2811_cfg->streamUpdate, ENABLE);
-
 }
 
-void setColor(uint8_t color, ledbuf_t *buf) {
+void setColor(uint8_t color, ledbuf_t *buf)
+{
     uint8_t i;
+
     for (i = 0; i < 8; i++) {
         buf[i] = ((color << i) & 0b10000000 ? 0x0 : dmaSource);
     }
@@ -214,14 +221,15 @@ void setColor(uint8_t color, ledbuf_t *buf) {
  * @param led led number
  * @param update Perform an update after changing led color
  */
-void PIOS_WS2811_setColorRGB(Color c, uint8_t led, bool update) {
-    if(led > PIOS_WS2811_NUMLEDS) {
+void PIOS_WS2811_setColorRGB(Color c, uint8_t led, bool update)
+{
+    if (led > PIOS_WS2811_NUMLEDS) {
         return;
     }
     setColor(c.R, fb + (led * 24));
     setColor(c.G, fb + 8 + (led * 24));
     setColor(c.B, fb + 16 + (led * 24));
-    if(update){
+    if (update) {
         PIOS_WS2811_Update();
     }
 }
@@ -229,9 +237,10 @@ void PIOS_WS2811_setColorRGB(Color c, uint8_t led, bool update) {
 /**
  * trigger an update cycle if not already running
  */
-void PIOS_WS2811_Update(){
+void PIOS_WS2811_Update()
+{
     // does not start if framebuffer is not allocated (init has not been called yet) or a transfer is still on going
-    if(!fb || (pios_ws2811_cfg->timer->CR1 & TIM_CR1_CEN)){
+    if (!fb || (pios_ws2811_cfg->timer->CR1 & TIM_CR1_CEN)) {
         return;
     }
 
@@ -245,9 +254,10 @@ void PIOS_WS2811_Update(){
  * Stop timer once the complete framebuffer has been sent
  */
 
-void PIOS_WS2811_DMA_irq_handler(){
+void PIOS_WS2811_DMA_irq_handler()
+{
     TIM_Cmd(pios_ws2811_cfg->timer, DISABLE);
-    DMA_ClearFlag(pios_ws2811_cfg->streamCh1,pios_ws2811_cfg->irq.flags);
+    DMA_ClearFlag(pios_ws2811_cfg->streamCh1, pios_ws2811_cfg->irq.flags);
 }
 
-#endif //PIOS_INCLUDE_WS2811
+#endif // PIOS_INCLUDE_WS2811

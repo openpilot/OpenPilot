@@ -26,11 +26,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include <pios.h>
+
+#ifdef PIOS_INCLUDE_WS2811
+
 #include "pios_ws2811.h"
 #include <stm32f4xx_rcc.h>
 #include <pios_stm32.h>
 #include "FreeRTOS.h"
 #include "task.h"
+
 
 // framebuffer
 static ledbuf_t *fb = 0;
@@ -246,3 +250,4 @@ void PIOS_WS2811_DMA_irq_handler(){
     DMA_ClearFlag(pios_ws2811_cfg->streamCh1,pios_ws2811_cfg->irq.flags);
 }
 
+#endif //PIOS_INCLUDE_WS2811

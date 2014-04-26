@@ -1810,7 +1810,8 @@ const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
     .data_tx_ep = 1,
 };
 #endif /* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_USB_CDC */
-
+#ifdef PIOS_INCLUDE_WS2811
+#include <pios_ws2811.h>
 #define PIOS_WS2811_TIM_DIVIDER  (PIOS_PERIPHERAL_APB2_CLOCK / (800000 * PIOS_WS2811_TIM_PERIOD))
 
 void DMA2_Stream1_IRQHandler(void) __attribute__((alias("PIOS_WS2811_irq_handler")));
@@ -1922,3 +1923,4 @@ void PIOS_WS2811_irq_handler(void)
     /* Call into the generic code to handle the IRQ for this specific device */
     PIOS_WS2811_DMA_irq_handler();
 }
+#endif //PIOS_INCLUDE_WS2811

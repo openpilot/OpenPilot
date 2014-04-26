@@ -699,7 +699,7 @@ endif
 
 # Firmware files to package
 PACKAGE_FW_TARGETS  := $(filter-out fw_simposix fw_discoveryf4bare, $(FW_TARGETS))
-PACKAGE_ELF_TARGETS := $(filter     fw_simposix fw_discoveryf4bare, $(FW_TARGETS))
+PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.
 # They are used later by the vehicle setup wizard to update board firmware.

@@ -37,14 +37,14 @@
 #include <callbackinfo.h>
 #include <ratedesired.h>
 #include <stabilizationdesired.h>
-// #include <gyrostate.h>
-// #include <airspeedstate.h>
+#include <attitudestate.h>
 #include <stabilizationstatus.h>
-// #include <flightstatus.h>
 #include <stabilizationbank.h>
+
 
 #include <stabilization.h>
 #include <cruisecontrol.h>
+#include <CoordinateConversions.h>
 
 // Private constants
 #define STACK_SIZE_BYTES  256
@@ -63,6 +63,8 @@
 static DelayedCallbackInfo *callbackHandle;
 static struct pid pids[3];
 static AttitudeStateData attitude;
+static StabilizationBankData stabBank;
+
 static uint8_t previous_mode[AXES] = { 255, 255, 255, 255 };
 static PiOSDeltatimeConfig timeval;
 
@@ -94,6 +96,7 @@ void stabilizationOuterloopInit()
  */
 static void stabilizationOuterloopTask()
 {
+    AttitudeStateData attitudeState;
     RateDesiredData rateDesired;
     StabilizationDesiredData stabilizationDesired;
     StabilizationStatusOuterLoopData enabled;
@@ -104,7 +107,41 @@ static void stabilizationOuterloopTask()
     float *stabilizationDesiredAxis = &stabilizationDesired.Roll;
     float *rateDesiredAxis = &rateDesired.Roll;
     int t;
-    // float dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
+    float dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
+
+    float local_error[3];
+    {
+#if defined(PIOS_QUATERNION_STABILIZATION)
+        // Quaternion calculation of error in each axis.  Uses more memory.
+        float rpy_desired[3];
+        float q_desired[4];
+        float q_error[4];
+
+        rpy_desired[0] = stabilizationDesiredAxis[0];
+        rpy_desired[1] = stabilizationDesiredAxis[1];
+        rpy_desired[2] = stabilizationDesiredAxis[2];
+
+        RPY2Quaternion(rpy_desired, q_desired);
+        quat_inverse(q_desired);
+        quat_mult(q_desired, &attitudeState.q1, q_error);
+        quat_inverse(q_error);
+        Quaternion2RPY(q_error, local_error);
+
+#else /* if defined(PIOS_QUATERNION_STABILIZATION) */
+        // Simpler algorithm for CC, less memory
+        local_error[0] = stabilizationDesiredAxis[0] - attitudeState.Roll;
+        local_error[1] = stabilizationDesiredAxis[1] - attitudeState.Pitch;
+        local_error[2] = stabilizationDesiredAxis[2] - attitudeState.Yaw;
+
+        // find shortest way
+        float modulo = fmodf(local_error[2] + 180.0f, 360.0f);
+        if (modulo < 0) {
+            local_error[2] = modulo + 180.0f;
+        } else {
+            local_error[2] = modulo - 180.0f;
+        }
+#endif /* if defined(PIOS_QUATERNION_STABILIZATION) */
+    }
 
     for (t = 0; t < AXES; t++) {
         bool reinit = (cast_struct_to_array(enabled, enabled.Roll)[t] != previous_mode[t]);
@@ -115,7 +152,81 @@ static void stabilizationOuterloopTask()
                 pids[t].iAccumulator = 0;
             }
             switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
-            case STABILIZATIONSTATUS_OUTERLOOP_MANUAL:
+            case STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE:
+                rateDesiredAxis[t] = pid_apply(&pids[t], local_error[t], dT);
+                break;
+            case STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE:
+            {
+                float stickinput[3];
+                stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabBank.RollMax, -1.0f, 1.0f);
+                stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabBank.PitchMax, -1.0f, 1.0f);
+                stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabBank.YawMax, -1.0f, 1.0f);
+                float rateDesiredAxisRate = stickinput[t] * cast_struct_to_array(stabBank.ManualRate, stabBank.ManualRate.Roll)[t];
+                rateDesiredAxis[t] = pid_apply(&pids[t], local_error[t], dT);
+                // Compute the weighted average rate desired
+                // Using max() rather than sqrt() for cpu speed;
+                // - this makes the stick region into a square;
+                // - this is a feature!
+                // - hold a roll angle and add just pitch without the stick sensitivity changing
+                float magnitude = stickinput[t];
+                if (t < 2) {
+                    magnitude = fmaxf(fabsf(stickinput[0]), fabsf(stickinput[1]));
+                }
+
+                // modify magnitude to move the Att to Rate transition to the place
+                // specified by the user
+                // we are looking for where the stick angle == transition angle
+                // and the Att rate equals the Rate rate
+                // that's where Rate x (1-StickAngle) [Attitude pulling down max X Ratt proportion]
+                // == Rate x StickAngle [Rate pulling up according to stick angle]
+                // * StickAngle [X Ratt proportion]
+                // so 1-x == x*x or x*x+x-1=0 where xE(0,1)
+                // (-1+-sqrt(1+4))/2 = (-1+sqrt(5))/2
+                // and quadratic formula says that is 0.618033989f
+                // I tested 14.01 and came up with .61 without even remembering this number
+                // I thought that moving the P,I, and maxangle terms around would change this value
+                // and that I would have to take these into account, but varying
+                // all P's and I's by factors of 1/2 to 2 didn't change it noticeably
+                // and varying maxangle from 4 to 120 didn't either.
+                // so for now I'm not taking these into account
+                // while working with this, it occurred to me that Attitude mode,
+                // set up with maxangle=190 would be similar to Ratt, and it is.
+                #define STICK_VALUE_AT_MODE_TRANSITION 0.618033989f
+
+                // the following assumes the transition would otherwise be at 0.618033989f
+                // and THAT assumes that Att ramps up to max roll rate
+                // when a small number of degrees off of where it should be
+
+                // if below the transition angle (still in attitude mode)
+                // '<=' instead of '<' keeps rattitude_mode_transition_stick_position==1.0 from causing DZ
+                if (magnitude <= stabSettings.rattitude_mode_transition_stick_position) {
+                    magnitude *= STICK_VALUE_AT_MODE_TRANSITION / stabSettings.rattitude_mode_transition_stick_position;
+                } else {
+                    magnitude = (magnitude - stabSettings.rattitude_mode_transition_stick_position)
+                                * (1.0f - STICK_VALUE_AT_MODE_TRANSITION)
+                                / (1.0f - stabSettings.rattitude_mode_transition_stick_position)
+                                + STICK_VALUE_AT_MODE_TRANSITION;
+                }
+                rateDesiredAxis[t] = (1.0f - magnitude) * rateDesiredAxis[t] + magnitude * rateDesiredAxisRate;
+            }
+            break;
+            case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
+                // FIXME: local_error[] is rate - attitude for Weak Leveling
+                // The only ramifications are:
+                // Weak Leveling Kp is off by a factor of 3 to 12 and may need a different default in GCS
+                // Changing Rate mode max rate currently requires a change to Kp
+                // That would be changed to Attitude mode max angle affecting Kp
+                // Also does not take dT into account
+            {
+                float rate_input    = cast_struct_to_array(stabBank.ManualRate, stabBank.ManualRate.Roll)[t] * stabilizationDesiredAxis[t] / cast_struct_to_array(stabBank, stabBank.RollMax)[t];
+                float weak_leveling = local_error[t] * stabSettings.settings.WeakLevelingKp;
+                weak_leveling = boundf(weak_leveling, -stabSettings.settings.MaxWeakLevelingRate, stabSettings.settings.MaxWeakLevelingRate);
+
+                // Compute desired rate as input biased towards leveling
+                rateDesiredAxis[t] = rate_input + weak_leveling;
+            }
+            break;
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
             default:
                 rateDesiredAxis[t] = stabilizationDesiredAxis[t];
                 break;
@@ -130,6 +241,9 @@ static void stabilizationOuterloopTask()
     }
 
     RateDesiredSet(&rateDesired);
+
+    // update cruisecontrol based on attitude
+    cruisecontrol_compute_factor(&attitudeState);
 }
 
 
@@ -143,27 +257,25 @@ static void AttitudeStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
 static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    StabilizationBankData bank;
-
-    StabilizationBankGet(&bank);
+    StabilizationBankGet(&stabBank);
 
     // Set the roll rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_OUTERLOOP_ROLL], bank.RollRatePID.Kp,
-                  bank.RollRatePID.Ki,
-                  bank.RollRatePID.Kd,
-                  bank.RollRatePID.ILimit);
+    pid_configure(&pids[STABILIZATIONSTATUS_OUTERLOOP_ROLL], stabBank.RollRatePID.Kp,
+                  stabBank.RollRatePID.Ki,
+                  stabBank.RollRatePID.Kd,
+                  stabBank.RollRatePID.ILimit);
 
     // Set the pitch rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_OUTERLOOP_PITCH], bank.PitchRatePID.Kp,
-                  bank.PitchRatePID.Ki,
-                  bank.PitchRatePID.Kd,
-                  bank.PitchRatePID.ILimit);
+    pid_configure(&pids[STABILIZATIONSTATUS_OUTERLOOP_PITCH], stabBank.PitchRatePID.Kp,
+                  stabBank.PitchRatePID.Ki,
+                  stabBank.PitchRatePID.Kd,
+                  stabBank.PitchRatePID.ILimit);
 
     // Set the yaw rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_OUTERLOOP_YAW], bank.YawRatePID.Kp,
-                  bank.YawRatePID.Ki,
-                  bank.YawRatePID.Kd,
-                  bank.YawRatePID.ILimit);
+    pid_configure(&pids[STABILIZATIONSTATUS_OUTERLOOP_YAW], stabBank.YawRatePID.Kp,
+                  stabBank.YawRatePID.Ki,
+                  stabBank.YawRatePID.Kd,
+                  stabBank.YawRatePID.ILimit);
 }
 
 /**

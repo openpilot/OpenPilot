@@ -49,7 +49,8 @@ typedef struct {
         float  cruise_control_power_trim;
         int8_t cruise_control_inverted_power_switch; // WARNING: currently -1 is not fully implemented !!!
         float  cruise_control_neutral_thrust;
-    } cruiseControl;
+    }     cruiseControl;
+    float rattitude_mode_transition_stick_position;
 } StabilizationData;
 
 

@@ -65,9 +65,11 @@
 static DelayedCallbackInfo *callbackHandle;
 static struct pid pids[3];
 static float gyro_filtered[3] = { 0, 0, 0 };
+static float axis_lock_accum[3] = { 0, 0, 0 };
 static uint8_t previous_mode[AXES] = { 255, 255, 255, 255 };
 static PiOSDeltatimeConfig timeval;
 static float speedScaleFactor = 1.0f;
+static StabilizationBankData stabBank;
 
 // Private functions
 static void stabilizationInnerloopTask();
@@ -133,9 +135,30 @@ static void stabilizationInnerloopTask()
                 stabilization_virtual_flybar(gyro_filtered[t], rate[t], &actuatorDesiredAxis[t], dT, reinit, t, &stabSettings.settings);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_RELAYTUNING:
+                rate[t] = boundf(rate[t],
+                                 -cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[t],
+                                 cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[t]
+                                 );
                 stabilization_relay_rate(rate[t] - gyro_filtered[t], &actuatorDesiredAxis[t], t, reinit);
                 break;
+            case STABILIZATIONSTATUS_INNERLOOP_AXISLOCK:
+                if (fabsf(rate[t]) > stabSettings.settings.MaxAxisLockRate) {
+                    // While getting strong commands act like rate mode
+                    axis_lock_accum[t] = 0;
+                } else {
+                    // For weaker commands or no command simply attitude lock (almost) on no gyro change
+                    axis_lock_accum[t] += (rate[t] - gyro_filtered[t]) * dT;
+                    axis_lock_accum[t]  = boundf(axis_lock_accum[t], -stabSettings.settings.MaxAxisLock, stabSettings.settings.MaxAxisLock);
+                    rate[t] = axis_lock_accum[t] * stabSettings.settings.AxisLockKp;
+                }
+            // IMPORTANT: deliberately no "break;" here, execution continues with regular RATE control loop to avoid code duplication!
+            // keep order as it is, RATE must follow!
             case STABILIZATIONSTATUS_INNERLOOP_RATE:
+                // limit rate to maximum configured limits (once here instead of 5 times in outer loop)
+                rate[t] = boundf(rate[t],
+                                 -cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[t],
+                                 cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[t]
+                                 );
                 actuatorDesiredAxis[t] = pid_apply_setpoint(&pids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
@@ -186,27 +209,25 @@ static void GyroStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
 static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    StabilizationBankData bank;
-
-    StabilizationBankGet(&bank);
+    StabilizationBankGet(&stabBank);
 
     // Set the roll rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_INNERLOOP_ROLL], bank.RollRatePID.Kp,
-                  bank.RollRatePID.Ki,
-                  bank.RollRatePID.Kd,
-                  bank.RollRatePID.ILimit);
+    pid_configure(&pids[STABILIZATIONSTATUS_INNERLOOP_ROLL], stabBank.RollRatePID.Kp,
+                  stabBank.RollRatePID.Ki,
+                  stabBank.RollRatePID.Kd,
+                  stabBank.RollRatePID.ILimit);
 
     // Set the pitch rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_INNERLOOP_PITCH], bank.PitchRatePID.Kp,
-                  bank.PitchRatePID.Ki,
-                  bank.PitchRatePID.Kd,
-                  bank.PitchRatePID.ILimit);
+    pid_configure(&pids[STABILIZATIONSTATUS_INNERLOOP_PITCH], stabBank.PitchRatePID.Kp,
+                  stabBank.PitchRatePID.Ki,
+                  stabBank.PitchRatePID.Kd,
+                  stabBank.PitchRatePID.ILimit);
 
     // Set the yaw rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_INNERLOOP_YAW], bank.YawRatePID.Kp,
-                  bank.YawRatePID.Ki,
-                  bank.YawRatePID.Kd,
-                  bank.YawRatePID.ILimit);
+    pid_configure(&pids[STABILIZATIONSTATUS_INNERLOOP_YAW], stabBank.YawRatePID.Kp,
+                  stabBank.YawRatePID.Ki,
+                  stabBank.YawRatePID.Kd,
+                  stabBank.YawRatePID.ILimit);
 }
 
 #ifdef REVOLUTION

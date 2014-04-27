@@ -33,6 +33,10 @@
 #ifndef CRUISECONTROL_H
 #define CRUISECONTROL_H
 
+#include <openpilot.h>
+#include <attitudestate.h>
+
+void cruisecontrol_compute_factor(AttitudeStateData *attitude);
 float cruisecontrol_apply_factor(float raw);
 
 #endif /* CRUISECONTROL_H */

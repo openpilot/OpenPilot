@@ -8,7 +8,7 @@
  * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeState "Attitude State"
  * @{
  *
- * @file       rateloop.c
+ * @file       innerloop.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @brief      Attitude stabilization module.
  *
@@ -157,6 +157,9 @@ static void stabilizationInnerloopTask()
 
         actuatorDesiredAxis[t] = boundf(actuatorDesiredAxis[t], -1.0f, 1.0f);
     }
+
+    actuator.UpdateTime = dT * 1000;
+
     if (cchain.Stabilization == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
         ActuatorDesiredSet(&actuator);
     } else {

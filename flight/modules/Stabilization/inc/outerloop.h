@@ -3,13 +3,12 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup StabilizationModule Stabilization Module
- * @brief Stabilization PID loops in an airframe type independent manner
- * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the
- * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeState "Attitude State"
+ * @brief outerloop mode
+ * @note This file implements the logic for a outerloop
  * @{
  *
- * @file       stabilization.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       outerloop.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @brief      Attitude stabilization module.
  *
  * @see        The GNU Public License (GPL) Version 3
@@ -30,35 +29,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef STABILIZATION_H
-#define STABILIZATION_H
 
-#include <openpilot.h>
-#include <stabilizationsettings.h>
+#ifndef OUTERLOOP_H
+#define OUTERLOOP_H
 
-int32_t StabilizationInitialize();
+void stabilizationOuterloopInit();
 
-typedef struct {
-    StabilizationSettingsData settings;
-    float gyro_alpha;
-    struct {
-        float  cruise_control_min_thrust;
-        float  cruise_control_max_thrust;
-        float  cruise_control_max_angle_cosine;
-        float  cruise_control_max_power_factor;
-        float  cruise_control_power_trim;
-        int8_t cruise_control_inverted_power_switch; // WARNING: currently -1 is not fully implemented !!!
-        float  cruise_control_neutral_thrust;
-    } cruiseControl;
-} StabilizationData;
-
-
-extern StabilizationData stabSettings;
-
-
-#endif // STABILIZATION_H
-
-/**
- * @}
- * @}
- */
+#endif /* OUTERLOOP_H */

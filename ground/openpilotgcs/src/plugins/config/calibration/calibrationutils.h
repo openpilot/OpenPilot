@@ -41,7 +41,10 @@ public:
         Eigen::Vector3f Scale;
         Eigen::Vector3f Bias;
     };
-    static bool EllipsoidCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ, float nominalRange, EllipsoidCalibrationResult *result);
+    static bool EllipsoidCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
+                                     float nominalRange,
+                                     EllipsoidCalibrationResult *result,
+                                     bool fitAlongXYZ);
     static bool PolynomialCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, int degree, Eigen::Ref<Eigen::VectorXf> result, const double maxRelativeError);
 
     static void ComputePoly(Eigen::VectorXf *samplesX, Eigen::VectorXf *polynomial, Eigen::VectorXf *polyY);
@@ -54,7 +57,7 @@ private:
     static void EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
                              Eigen::Vector3f *center,
                              Eigen::VectorXf *radii,
-                             Eigen::MatrixXf *evecs);
+                             Eigen::MatrixXf *evecs, bool fitAlongXYZ);
 
     static int LinearEquationsSolve(int nDim, double *pfMatr, double *pfVect, double *pfSolution);
 };

@@ -42,13 +42,16 @@ float CalibrationUtils::ComputeSigma(Eigen::VectorXf *samplesY)
  * The following ellipsoid calibration code is based on RazorImu calibration samples that can be found here:
  * https://github.com/ptrbrtz/razor-9dof-ahrs/tree/master/Matlab/magnetometer_calibration
  */
-bool CalibrationUtils::EllipsoidCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ, float nominalRange, EllipsoidCalibrationResult *result)
+bool CalibrationUtils::EllipsoidCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
+                                            float nominalRange,
+                                            EllipsoidCalibrationResult *result,
+                                            bool fitAlongXYZ)
 {
     Eigen::VectorXf radii;
     Eigen::Vector3f center;
     Eigen::MatrixXf evecs;
 
-    EllipsoidFit(samplesX, samplesY, samplesZ, &center, &radii, &evecs);
+    EllipsoidFit(samplesX, samplesY, samplesZ, &center, &radii, &evecs, fitAlongXYZ);
 
     result->Scale.setZero();
 
@@ -280,26 +283,36 @@ void CalibrationUtils::ComputePoly(VectorXf *samplesX, Eigen::VectorXf *polynomi
 
  */
 
-
 void CalibrationUtils::EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
                                     Eigen::Vector3f *center,
                                     Eigen::VectorXf *radii,
-                                    Eigen::MatrixXf *evecs)
+                                    Eigen::MatrixXf *evecs,
+                                    bool fitAlongXYZ)
 {
     int numSamples = (*samplesX).rows();
-    Eigen::MatrixXf D(numSamples, 9);
+    Eigen::MatrixXf D;
 
-    D.setZero();
-    D.col(0) = (*samplesX).cwiseProduct(*samplesX);
-    D.col(1) = (*samplesY).cwiseProduct(*samplesY);
-    D.col(2) = (*samplesZ).cwiseProduct(*samplesZ);
-    D.col(3) = (*samplesX).cwiseProduct(*samplesY) * 2;
-    D.col(4) = (*samplesX).cwiseProduct(*samplesZ) * 2;
-    D.col(5) = (*samplesY).cwiseProduct(*samplesZ) * 2;
-    D.col(6) = 2 * (*samplesX);
-    D.col(7) = 2 * (*samplesY);
-    D.col(8) = 2 * (*samplesZ);
-
+    if (!fitAlongXYZ) {
+        D.setZero(numSamples, 9);
+        D.col(0) = (*samplesX).cwiseProduct(*samplesX);
+        D.col(1) = (*samplesY).cwiseProduct(*samplesY);
+        D.col(2) = (*samplesZ).cwiseProduct(*samplesZ);
+        D.col(3) = (*samplesX).cwiseProduct(*samplesY) * 2;
+        D.col(4) = (*samplesX).cwiseProduct(*samplesZ) * 2;
+        D.col(5) = (*samplesY).cwiseProduct(*samplesZ) * 2;
+        D.col(6) = 2 * (*samplesX);
+        D.col(7) = 2 * (*samplesY);
+        D.col(8) = 2 * (*samplesZ);
+    } else {
+        D.setZero(numSamples, 6);
+        D.setZero();
+        D.col(0) = (*samplesX).cwiseProduct(*samplesX);
+        D.col(1) = (*samplesY).cwiseProduct(*samplesY);
+        D.col(2) = (*samplesZ).cwiseProduct(*samplesZ);
+        D.col(3) = 2 * (*samplesX);
+        D.col(4) = 2 * (*samplesY);
+        D.col(5) = 2 * (*samplesZ);
+    }
     Eigen::VectorXf ones(numSamples);
     ones.setOnes(numSamples);
 
@@ -307,26 +320,40 @@ void CalibrationUtils::EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *
     Eigen::MatrixXf dt2 = (D.transpose() * ones);
     Eigen::VectorXf v   = dt1.inverse() * dt2;
 
-    Eigen::Matrix4f A;
-    A << v.coeff(0), v.coeff(3), v.coeff(4), v.coeff(6),
-        v.coeff(3), v.coeff(1), v.coeff(5), v.coeff(7),
-        v.coeff(4), v.coeff(5), v.coeff(2), v.coeff(8),
-        v.coeff(6), v.coeff(7), v.coeff(8), -1;
+    if (!fitAlongXYZ) {
+        Eigen::Matrix4f A;
+        A << v.coeff(0), v.coeff(3), v.coeff(4), v.coeff(6),
+            v.coeff(3), v.coeff(1), v.coeff(5), v.coeff(7),
+            v.coeff(4), v.coeff(5), v.coeff(2), v.coeff(8),
+            v.coeff(6), v.coeff(7), v.coeff(8), -1;
 
-    (*center) = -1 * A.block(0, 0, 3, 3).inverse() * v.segment(6, 3);
+        (*center) = -1 * A.block(0, 0, 3, 3).inverse() * v.segment(6, 3);
 
-    Eigen::Matrix4f t     = Eigen::Matrix4f::Identity();
-    t.block(3, 0, 1, 3) = center->transpose();
+        Eigen::Matrix4f t     = Eigen::Matrix4f::Identity();
+        t.block(3, 0, 1, 3) = center->transpose();
 
-    Eigen::Matrix4f r     = t * A * t.transpose();
+        Eigen::Matrix4f r     = t * A * t.transpose();
 
-    Eigen::Matrix3f tmp2  = r.block(0, 0, 3, 3) * -1 / r.coeff(3, 3);
-    Eigen::EigenSolver<Eigen::Matrix3f> es(tmp2);
-    Eigen::VectorXf evals = es.eigenvalues().real();
-    (*evecs) = es.eigenvectors().real();
-    radii->setZero(3);
+        Eigen::Matrix3f tmp2  = r.block(0, 0, 3, 3) * -1 / r.coeff(3, 3);
+        Eigen::EigenSolver<Eigen::Matrix3f> es(tmp2);
+        Eigen::VectorXf evals = es.eigenvalues().real();
 
-    (*radii) = (evals.segment(0, 3)).cwiseInverse().cwiseSqrt();
+        (*evecs) = es.eigenvectors().real();
+        radii->setZero(3);
+        (*radii) = (evals.segment(0, 3)).cwiseInverse().cwiseSqrt();
+    } else {
+        Eigen::VectorXf v1(9);
+
+        v1 << v.coeff(0), v.coeff(1), v.coeff(2), 0.0f, 0.0f, 0.0f, v.coeff(3), v.coeff(4), v.coeff(5);
+        (*center) = (-1) * v1.segment(6, 3).cwiseProduct(v1.segment(0, 3).cwiseInverse());
+
+        float gam = 1 + (v1.coeff(6) * v1.coeff(6) / v1.coeff(0) +
+                         v1.coeff(7) * v1.coeff(7) / v1.coeff(1) +
+                         v1.coeff(8) * v1.coeff(8) / v1.coeff(2));
+        radii->setZero(3);
+        (*radii) = (v1.segment(0, 3).cwiseInverse() * gam).cwiseSqrt();
+        evecs->setIdentity(3, 3);
+    }
 }
 
 int CalibrationUtils::SixPointInConstFieldCal(double ConstMag, double x[6], double y[6], double z[6], double S[3], double b[3])

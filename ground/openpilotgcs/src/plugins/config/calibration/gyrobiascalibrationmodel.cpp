@@ -68,7 +68,7 @@ void GyroBiasCalibrationModel::start()
     attitudeSettings->setData(attitudeSettingsData);
     attitudeSettings->updated();
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
-    displayInstructions("Calibrating the gyroscopes. Keep the copter/plane steady...", true);
+    displayInstructions(tr("Calibrating the gyroscopes. Keep the copter/plane steady..."), true);
 
     gyro_accum_x.clear();
     gyro_accum_y.clear();
@@ -158,8 +158,9 @@ void GyroBiasCalibrationModel::getSample(UAVObject *obj)
 
         gyroState->setMetadata(initialGyroStateMdata);
 
-        displayInstructions("Calibration done!", false);
+        displayInstructions(tr("Gyroscope calibration computed succesfully."), false);
         displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
+
         // Recall saved board rotation
         recallBoardRotation();
     }

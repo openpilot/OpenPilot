@@ -151,7 +151,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     mag->setMetadata(mdata);
 
     /* Show instructions and enable controls */
-    displayInstructions("Place horizontally, nose pointing north and click save position...", true);
+    displayInstructions(tr("Place horizontally, nose pointing north and click save position..."), true);
     showHelp(CALIBRATION_HELPER_IMAGE_NED);
     disableAllCalibrations();
     savePositionEnabledChanged(true);
@@ -186,7 +186,7 @@ void SixPointCalibrationModel::savePositionData()
     connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
     connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
 
-    displayInstructions("Hold...", false);
+    displayInstructions(tr("Hold..."), false);
 }
 
 /**
@@ -242,23 +242,23 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
 
         position = (position + 1) % 6;
         if (position == 1) {
-            displayInstructions("Place with nose down, right side west and click save position...", false);
+            displayInstructions(tr("Place with nose down, right side west and click save position..."), false);
             showHelp(CALIBRATION_HELPER_IMAGE_DWN);
         }
         if (position == 2) {
-            displayInstructions("Place right side down, nose west and click save position...", false);
+            displayInstructions(tr("Place right side down, nose west and click save position..."), false);
             showHelp(CALIBRATION_HELPER_IMAGE_WDS);
         }
         if (position == 3) {
-            displayInstructions("Place upside down, nose east and click save position...", false);
+            displayInstructions(tr("Place upside down, nose east and click save position..."), false);
             showHelp(CALIBRATION_HELPER_IMAGE_ENU);
         }
         if (position == 4) {
-            displayInstructions("Place with nose up, left side north and click save position...", false);
+            displayInstructions(tr("Place with nose up, left side north and click save position..."), false);
             showHelp(CALIBRATION_HELPER_IMAGE_USE);
         }
         if (position == 5) {
-            displayInstructions("Place with left side down, nose south and click save position...", false);
+            displayInstructions(tr("Place with left side down, nose south and click save position..."), false);
             showHelp(CALIBRATION_HELPER_IMAGE_SUW);
         }
         if (position == 0) {
@@ -267,7 +267,6 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
 
             enableAllCalibrations();
             showHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
-
             /* Cleanup original settings */
             accelState->setMetadata(initialAccelStateMdata);
 
@@ -369,9 +368,9 @@ void SixPointCalibrationModel::compute(bool mag, bool accel)
         } else {
             accelGyroSettings->setData(savedSettings.accelGyroSettings);
         }
-        displayInstructions("Computed sensor scale and bias...", true);
+        displayInstructions(tr("Sensor scale and bias computed succesfully."), true);
     } else {
-        displayInstructions("Bad calibration. Please repeat.", true);
+        displayInstructions(tr("Bad calibration. Please review the instructions and repeat."), true);
     }
     position = -1; // set to run again
 }

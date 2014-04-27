@@ -62,7 +62,7 @@ void LevelCalibrationModel::start()
     attitudeState->setMetadata(mdata);
 
     /* Show instructions and enable controls */
-    displayInstructions("Place horizontally and click save position...", true);
+    displayInstructions(tr("Place horizontally and click save position..."), true);
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
     disableAllCalibrations();
     savePositionEnabledChanged(true);
@@ -86,7 +86,7 @@ void LevelCalibrationModel::savePosition()
     Q_ASSERT(attitudeState);
     connect(attitudeState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
 
-    displayInstructions("Hold...",false);
+    displayInstructions(tr("Hold..."), false);
 }
 
 /**
@@ -130,7 +130,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             rot_data_pitch = OpenPilot::CalibrationUtils::listMean(rot_accum_pitch);
             rot_data_roll  = OpenPilot::CalibrationUtils::listMean(rot_accum_roll);
 
-            displayInstructions("Leave horizontally, rotate 180° along yaw axis and click save position...", true);
+            displayInstructions(tr("Leave horizontally, rotate 180° along yaw axis and click save position..."), false);
             displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_SWD);
 
             disableAllCalibrations();
@@ -146,6 +146,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             compute();
             enableAllCalibrations();
             displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
+            displayInstructions(tr("Board leveling computed successfully."), false);
             break;
         }
     }

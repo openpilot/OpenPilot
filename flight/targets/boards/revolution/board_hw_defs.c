@@ -1969,7 +1969,9 @@ const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
 #define PIOS_WS2811_TIM_DIVIDER (PIOS_PERIPHERAL_APB2_CLOCK / (800000 * PIOS_WS2811_TIM_PERIOD))
 
 void DMA2_Stream1_IRQHandler(void) __attribute__((alias("PIOS_WS2811_irq_handler")));
-
+// list of pin configurable as ws281x outputs.
+// this will not clash with PWM in or servo output as
+// pins will be reconfigured as _OUT so the alternate function is disabled.
 const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
     [HWSETTINGS_WS2811LED_OUT_SERVOOUT1] = {
         .gpio     = GPIOB,
@@ -2046,7 +2048,6 @@ const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
 };
 
 const struct pios_ws2811_cfg pios_ws2811_cfg = {
-    // master mode selection Note: configure TIM_CR2_MMS_2 master mode selection
     .timer     = TIM1,
     .timerInit = {
         .TIM_Prescaler         = PIOS_WS2811_TIM_DIVIDER - 1,
@@ -2059,13 +2060,12 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
 
     .timerCh1     = 1,
     .streamCh1    = DMA2_Stream1,
-
     .timerCh2     = 3,
     .streamCh2    = DMA2_Stream6,
-
     .streamUpdate = DMA2_Stream5,
 
-    // DMA ch1, triggered by channel3 pwm signal. if FB indicates, reset output value early to indicate "0" bit to ws2812
+    // DMA streamCh1, triggered by timerCh1 pwm signal.
+    // if FrameBuffer indicates, reset output value early to indicate "0" bit to ws2812
     .dmaInitCh1   = {
         .DMA_BufferSize         = PIOS_WS2811_BUFFER_SIZE,
         .DMA_Channel            = DMA_Channel_6,
@@ -2084,8 +2084,9 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
         .DMA_Priority           = DMA_Priority_VeryHigh,
     },
     .dmaItCh1   = DMA_IT_TEIF1 | DMA_IT_TCIF1,
-    // DMA stream 6, triggered by channel1 update event. reset output value late to indicate "1" bit to ws2812.
 
+    // DMA streamCh2, triggered by timerCh2 pwm signal.
+    // Reset output value late to indicate "1" bit to ws2812.
     .dmaInitCh2 = {
         .DMA_BufferSize         = 1,
         .DMA_Channel            = DMA_Channel_6,
@@ -2103,8 +2104,10 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
         .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
         .DMA_Priority           = DMA_Priority_VeryHigh,
     },
-    .dmaItCh2                                  = DMA_IT_TEIF2 | DMA_IT_TCIF2,
-    // triggered by pwm update event. output high at beginning of signal
+    .dmaItCh2 = DMA_IT_TEIF2 | DMA_IT_TCIF2,
+
+    // DMA streamUpdate Triggered by timer update event
+    // Outputs a high logic level at beginning of a cycle
     .dmaInitUpdate                             = {
         .DMA_BufferSize         = 1,
         .DMA_Channel            = DMA_Channel_6,
@@ -2124,8 +2127,9 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
     },
     .dmaItUpdate = DMA_IT_TEIF6 | DMA_IT_TCIF6,
     .dmaSource   = TIM_DMA_CC1 | TIM_DMA_CC3 | TIM_DMA_Update,
-    .irq                                       = {
-        // Note this is the stream ID that triggers interrupts (in this case TX)
+
+    // DMAInitCh1 interrupt vector, used to block timer at end of framebuffer transfer
+    .irq = {
         .flags = (DMA_IT_TCIF1),
         .init  = {
             .NVIC_IRQChannel    = DMA2_Stream1_IRQn,
@@ -2138,7 +2142,6 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
 
 void PIOS_WS2811_irq_handler(void)
 {
-    /* Call into the generic code to handle the IRQ for this specific device */
     PIOS_WS2811_DMA_irq_handler();
 }
 #endif // PIOS_INCLUDE_WS2811

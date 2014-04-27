@@ -223,11 +223,11 @@ void setColor(uint8_t color, ledbuf_t *buf)
  */
 void PIOS_WS2811_setColorRGB(Color c, uint8_t led, bool update)
 {
-    if (led > PIOS_WS2811_NUMLEDS) {
+    if (led >= PIOS_WS2811_NUMLEDS) {
         return;
     }
-    setColor(c.R, fb + (led * 24));
-    setColor(c.G, fb + 8 + (led * 24));
+    setColor(c.G, fb + (led * 24));
+    setColor(c.R, fb + 8 + (led * 24));
     setColor(c.B, fb + 16 + (led * 24));
     if (update) {
         PIOS_WS2811_Update();

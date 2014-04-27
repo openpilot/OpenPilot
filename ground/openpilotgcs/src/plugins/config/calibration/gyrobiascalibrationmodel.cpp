@@ -33,14 +33,15 @@
 #include <accelgyrosettings.h>
 #include "calibration/gyrobiascalibrationmodel.h"
 #include "calibration/calibrationutils.h"
+#include "calibration/calibrationuiutils.h"
+
 static const int LEVEL_SAMPLES = 100;
 #include "gyrobiascalibrationmodel.h"
 namespace OpenPilot {
 GyroBiasCalibrationModel::GyroBiasCalibrationModel(QObject *parent) :
     QObject(parent),
     collectingData(false)
-{
-}
+{}
 
 
 /******* gyro bias zero ******/
@@ -66,7 +67,7 @@ void GyroBiasCalibrationModel::start()
     attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
     attitudeSettings->setData(attitudeSettingsData);
     attitudeSettings->updated();
-    displayVisualHelp("plane-ned");
+    displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
     displayInstructions("Calibrating the gyroscopes. Keep the copter/plane steady...", true);
 
     gyro_accum_x.clear();
@@ -158,6 +159,7 @@ void GyroBiasCalibrationModel::getSample(UAVObject *obj)
         gyroState->setMetadata(initialGyroStateMdata);
 
         displayInstructions("Calibration done!", false);
+        displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
         // Recall saved board rotation
         recallBoardRotation();
     }

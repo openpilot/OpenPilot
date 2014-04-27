@@ -34,8 +34,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 namespace OpenPilot {
-class GyroBiasCalibrationModel : public QObject
-{
+class GyroBiasCalibrationModel : public QObject {
     Q_OBJECT
 public:
     explicit GyroBiasCalibrationModel(QObject *parent = 0);

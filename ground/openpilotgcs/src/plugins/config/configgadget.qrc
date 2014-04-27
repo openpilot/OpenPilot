@@ -30,22 +30,20 @@
         <file>images/pipx-normal.png</file>
         <file>images/revolution_top.png</file>
         <file>calibration/WizardStepIndicator.qml</file>
-        <file>images/calibration/plane-horizontal.png</file>
-        <file>images/calibration/plane-horizontal-rotated.png</file>
-        <file>images/calibration/dwn.png</file>
-        <file>images/calibration/enu.png</file>
+        <file>images/calibration/board-dwn.png</file>
+        <file>images/calibration/board-enu.png</file>
         <file>images/calibration/plane-dwn.png</file>
         <file>images/calibration/plane-enu.png</file>
         <file>images/calibration/plane-ned.png</file>
         <file>images/calibration/plane-suw.png</file>
         <file>images/calibration/plane-use.png</file>
         <file>images/calibration/plane-wds.png</file>
-        <file>images/calibration/ned.png</file>
-        <file>images/calibration/suw.png</file>
-        <file>images/calibration/use.png</file>
-        <file>images/calibration/wds.png</file>
+        <file>images/calibration/board-ned.png</file>
+        <file>images/calibration/board-suw.png</file>
+        <file>images/calibration/board-use.png</file>
+        <file>images/calibration/board-wds.png</file>
         <file>images/calibration/empty.png</file>
         <file>images/calibration/plane-swd.png</file>
-        <file>images/calibration/swd.png</file>
+        <file>images/calibration/board-swd.png</file>
     </qresource>
 </RCC>

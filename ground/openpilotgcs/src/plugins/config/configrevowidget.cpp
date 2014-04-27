@@ -139,7 +139,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_gyroBiasCalibrationModel = new OpenPilot::GyroBiasCalibrationModel(this);
     connect(m_ui->gyroBiasStart, SIGNAL(clicked()), m_gyroBiasCalibrationModel, SLOT(start()));
 
-    connect(m_gyroBiasCalibrationModel , SIGNAL(progressChanged(int)), this->m_ui->gyroBiasProgress, SLOT(setValue(int)));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(progressChanged(int)), this->m_ui->gyroBiasProgress, SLOT(setValue(int)));
 
     connect(m_gyroBiasCalibrationModel, SIGNAL(disableAllCalibrations()), this, SLOT(disableAllCalibrations()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(enableAllCalibrations()), this, SLOT(enableAllCalibrations()));

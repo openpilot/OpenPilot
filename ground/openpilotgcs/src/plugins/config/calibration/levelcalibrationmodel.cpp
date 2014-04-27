@@ -29,13 +29,13 @@
 #include <attitudestate.h>
 #include <attitudesettings.h>
 #include "extensionsystem/pluginmanager.h"
+#include "calibration/calibrationuiutils.h"
 
 static const int LEVEL_SAMPLES = 100;
 namespace OpenPilot {
 LevelCalibrationModel::LevelCalibrationModel(QObject *parent) :
     QObject(parent)
-{
-}
+{}
 
 
 /******* Level calibration *******/
@@ -63,7 +63,7 @@ void LevelCalibrationModel::start()
 
     /* Show instructions and enable controls */
     displayInstructions("Place horizontally and click save position...", true);
-    displayVisualHelp("plane-ned");
+    displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
     disableAllCalibrations();
     savePositionEnabledChanged(true);
     position = 0;
@@ -131,7 +131,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             rot_data_roll  = OpenPilot::CalibrationUtils::listMean(rot_accum_roll);
 
             displayInstructions("Leave horizontally, rotate 180° along yaw axis and click save position...", true);
-            displayVisualHelp("plane-swd");
+            displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_SWD);
 
             disableAllCalibrations();
 
@@ -145,6 +145,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             attitudeState->setMetadata(initialAttitudeStateMdata);
             compute();
             enableAllCalibrations();
+            displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
             break;
         }
     }

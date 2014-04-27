@@ -39,8 +39,7 @@
 #include <accelstate.h>
 #include <magstate.h>
 namespace OpenPilot {
-class LevelCalibrationModel : public QObject
-{
+class LevelCalibrationModel : public QObject {
     Q_OBJECT
 public:
     explicit LevelCalibrationModel(QObject *parent = 0);

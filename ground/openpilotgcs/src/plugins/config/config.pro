@@ -54,7 +54,8 @@ HEADERS += configplugin.h \
     calibration/thermal/compensationcalculationtransition.h \
     calibration/sixpointcalibrationmodel.h \
     calibration/levelcalibrationmodel.h \
-    calibration/gyrobiascalibrationmodel.h
+    calibration/gyrobiascalibrationmodel.h \
+    calibration/calibrationuiutils.h
 
 SOURCES += configplugin.cpp \
     configgadgetwidget.cpp \

@@ -30,6 +30,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include <QMessageBox>
 #include "math.h"
+#include "calibration/calibrationuiutils.h"
 
 #define POINT_SAMPLE_SIZE 50
 #define GRAVITY           9.81f
@@ -151,7 +152,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
 
     /* Show instructions and enable controls */
     displayInstructions("Place horizontally, nose pointing north and click save position...", true);
-    showHelp("ned");
+    showHelp(CALIBRATION_HELPER_IMAGE_NED);
     disableAllCalibrations();
     savePositionEnabledChanged(true);
     position = 0;
@@ -242,29 +243,30 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
         position = (position + 1) % 6;
         if (position == 1) {
             displayInstructions("Place with nose down, right side west and click save position...", false);
-            showHelp("dwn");
+            showHelp(CALIBRATION_HELPER_IMAGE_DWN);
         }
         if (position == 2) {
             displayInstructions("Place right side down, nose west and click save position...", false);
-            showHelp("wds");
+            showHelp(CALIBRATION_HELPER_IMAGE_WDS);
         }
         if (position == 3) {
             displayInstructions("Place upside down, nose east and click save position...", false);
-            showHelp("enu");
+            showHelp(CALIBRATION_HELPER_IMAGE_ENU);
         }
         if (position == 4) {
             displayInstructions("Place with nose up, left side north and click save position...", false);
-            showHelp("use");
+            showHelp(CALIBRATION_HELPER_IMAGE_USE);
         }
         if (position == 5) {
             displayInstructions("Place with left side down, nose south and click save position...", false);
-            showHelp("suw");
+            showHelp(CALIBRATION_HELPER_IMAGE_SUW);
         }
         if (position == 0) {
             compute(calibratingMag, calibratingAccel);
             savePositionEnabledChanged(false);
 
             enableAllCalibrations();
+            showHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
 
             /* Cleanup original settings */
             accelState->setMetadata(initialAccelStateMdata);
@@ -381,13 +383,16 @@ UAVObjectManager *SixPointCalibrationModel::getObjectManager()
     Q_ASSERT(objMngr);
     return objMngr;
 }
-void SixPointCalibrationModel::showHelp(QString image){
-
-    if(calibratingAccel){
+void SixPointCalibrationModel::showHelp(QString image)
+{
+    if (image == CALIBRATION_HELPER_IMAGE_EMPTY) {
         displayVisualHelp(image);
-    }else {
-        displayVisualHelp("plane-" + image);
+    } else {
+        if (calibratingAccel) {
+            displayVisualHelp(CALIBRATION_HELPER_BOARD_PREFIX + image);
+        } else {
+            displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + image);
+        }
     }
 }
-
 }

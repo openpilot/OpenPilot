@@ -31,18 +31,20 @@
 #include <QMessageBox>
 #include "math.h"
 #include "calibration/calibrationuiutils.h"
-
+#include "QDebug"
 #define POINT_SAMPLE_SIZE 50
 #define GRAVITY           9.81f
 #define sign(x) ((x < 0) ? -1 : 1)
 
+#define FITTING_USING_CONTINOUS_ACQUISITION
 namespace OpenPilot {
 SixPointCalibrationModel::SixPointCalibrationModel(QObject *parent) :
     QObject(parent),
-    collectingData(false),
+    position(-1),
     calibratingMag(false),
     calibratingAccel(false),
-    position(-1)
+    collectingData(false)
+
 {}
 
 /********** Six point calibration **************/
@@ -134,28 +136,34 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     /* Need to get as many accel updates as possible */
     AccelState *accelState = AccelState::GetInstance(getObjectManager());
     Q_ASSERT(accelState);
-
     initialAccelStateMdata = accelState->getMetadata();
-    mdata = initialAccelStateMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 100;
-    accelState->setMetadata(mdata);
 
+    if (calibrateAccel) {
+        mdata = initialAccelStateMdata;
+        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+        mdata.flightTelemetryUpdatePeriod = 100;
+        accelState->setMetadata(mdata);
+    }
     /* Need to get as many mag updates as possible */
     MagState *mag = MagState::GetInstance(getObjectManager());
     Q_ASSERT(mag);
     initialMagStateMdata = mag->getMetadata();
-    mdata = initialMagStateMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 100;
-    mag->setMetadata(mdata);
 
+    if (calibrateMag) {
+        mdata = initialMagStateMdata;
+        UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+        mdata.flightTelemetryUpdatePeriod = 100;
+        mag->setMetadata(mdata);
+    }
     /* Show instructions and enable controls */
     displayInstructions(tr("Place horizontally, nose pointing north and click save position..."), true);
     showHelp(CALIBRATION_HELPER_IMAGE_NED);
     disableAllCalibrations();
     savePositionEnabledChanged(true);
     position = 0;
+    mag_fit_x.clear();
+    mag_fit_y.clear();
+    mag_fit_z.clear();
 }
 
 /**
@@ -183,8 +191,18 @@ void SixPointCalibrationModel::savePositionData()
     MagState *mag = MagState::GetInstance(getObjectManager());
     Q_ASSERT(mag);
 
-    connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
-    connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
+    if (calibratingMag) {
+#ifdef FITTING_USING_CONTINOUS_ACQUISITION
+        // Mag samples are acquired during the whole calibration session, to be used for ellipsoid fit.
+        if (!position) {
+            connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(continouslyGetMagSamples(UAVObject *)));
+        }
+#endif // FITTING_USING_CONTINOUS_ACQUISITION
+        connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
+    }
+    if (calibratingAccel) {
+        connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
+    }
 
     displayInstructions(tr("Hold..."), false);
 }
@@ -214,12 +232,19 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
             mag_accum_x.append(magData.x);
             mag_accum_y.append(magData.y);
             mag_accum_z.append(magData.z);
+#ifndef FITTING_USING_CONTINOUS_ACQUISITION
+            mag_fit_x.append(magData.x);
+            mag_fit_y.append(magData.y);
+            mag_fit_z.append(magData.z);
+#endif // FITTING_USING_CONTINOUS_ACQUISITION
         } else {
             Q_ASSERT(0);
         }
     }
 
-    if (accel_accum_x.size() >= POINT_SAMPLE_SIZE && mag_accum_x.size() >= POINT_SAMPLE_SIZE && collectingData == true) {
+    if ((!calibratingAccel || (accel_accum_x.size() >= POINT_SAMPLE_SIZE)) &&
+        (!calibratingMag || (mag_accum_x.size() >= POINT_SAMPLE_SIZE / 10)) &&
+        (collectingData == true)) {
         collectingData = false;
 
         savePositionEnabledChanged(true);
@@ -227,18 +252,21 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
         // Store the mean for this position for the accel
         AccelState *accelState = AccelState::GetInstance(getObjectManager());
         Q_ASSERT(accelState);
-        disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
-        accel_data_x[position] = CalibrationUtils::listMean(accel_accum_x);
-        accel_data_y[position] = CalibrationUtils::listMean(accel_accum_y);
-        accel_data_z[position] = CalibrationUtils::listMean(accel_accum_z);
-
+        if (calibratingAccel) {
+            disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
+            accel_data_x[position] = CalibrationUtils::listMean(accel_accum_x);
+            accel_data_y[position] = CalibrationUtils::listMean(accel_accum_y);
+            accel_data_z[position] = CalibrationUtils::listMean(accel_accum_z);
+        }
         // Store the mean for this position for the mag
         MagState *mag = MagState::GetInstance(getObjectManager());
         Q_ASSERT(mag);
-        disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
-        mag_data_x[position] = CalibrationUtils::listMean(mag_accum_x);
-        mag_data_y[position] = CalibrationUtils::listMean(mag_accum_y);
-        mag_data_z[position] = CalibrationUtils::listMean(mag_accum_z);
+        if (calibratingMag) {
+            disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
+            mag_data_x[position] = CalibrationUtils::listMean(mag_accum_x);
+            mag_data_y[position] = CalibrationUtils::listMean(mag_accum_y);
+            mag_data_z[position] = CalibrationUtils::listMean(mag_accum_z);
+        }
 
         position = (position + 1) % 6;
         if (position == 1) {
@@ -262,6 +290,11 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
             showHelp(CALIBRATION_HELPER_IMAGE_SUW);
         }
         if (position == 0) {
+#ifdef FITTING_USING_CONTINOUS_ACQUISITION
+            if (calibratingMag) {
+                disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(continouslyGetMagSamples(UAVObject *)));
+            }
+#endif // FITTING_USING_CONTINOUS_ACQUISITION
             compute(calibratingMag, calibratingAccel);
             savePositionEnabledChanged(false);
 
@@ -275,6 +308,20 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
             // Recall saved board rotation
             recallBoardRotation();
         }
+    }
+}
+
+void SixPointCalibrationModel::continouslyGetMagSamples(UAVObject *obj)
+{
+    QMutexLocker lock(&sensorsUpdateLock);
+
+    if (obj->getObjID() == MagState::OBJID) {
+        MagState *mag = MagState::GetInstance(getObjectManager());
+        Q_ASSERT(mag);
+        MagState::DataFields magData = mag->getData();
+        mag_fit_x.append(magData.x);
+        mag_fit_y.append(magData.y);
+        mag_fit_z.append(magData.z);
     }
 }
 
@@ -311,14 +358,45 @@ void SixPointCalibrationModel::compute(bool mag, bool accel)
     // Calibration mag
     if (mag) {
         Be_length = sqrt(pow(homeLocationData.Be[0], 2) + pow(homeLocationData.Be[1], 2) + pow(homeLocationData.Be[2], 2));
-        OpenPilot::CalibrationUtils::SixPointInConstFieldCal(Be_length, mag_data_x, mag_data_y, mag_data_z, S, b);
-        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] = fabs(S[0]);
-        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] = fabs(S[1]);
-        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] = fabs(S[2]);
+        int vectSize = mag_fit_x.count();
+        Eigen::VectorXf samples_x(vectSize);
+        Eigen::VectorXf samples_y(vectSize);
+        Eigen::VectorXf samples_z(vectSize);
+        for (int i = 0; i < vectSize; i++) {
+            samples_x(i) = mag_fit_x[i];
+            samples_y(i) = mag_fit_y[i];
+            samples_z(i) = mag_fit_z[i];
+        }
+        OpenPilot::CalibrationUtils::EllipsoidCalibrationResult result;
+        OpenPilot::CalibrationUtils::EllipsoidCalibration(&samples_x, &samples_y, &samples_z, Be_length, &result, true);
+        qDebug() << "-----------------------------------";
+        qDebug() << "Mag Calibration results: Fit";
+        qDebug() << "scale(" << result.Scale.coeff(0) << ", " << result.Scale.coeff(1) << ", " << result.Scale.coeff(2) << ")";
+        qDebug() << "bias(" << result.Bias.coeff(0) << ", " << result.Bias.coeff(1) << ", " << result.Bias.coeff(2) << ")";
 
-        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] = -sign(S[0]) * b[0];
-        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = -sign(S[1]) * b[1];
-        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = -sign(S[2]) * b[2];
+        OpenPilot::CalibrationUtils::SixPointInConstFieldCal(Be_length, mag_data_x, mag_data_y, mag_data_z, S, b);
+
+        qDebug() << "-----------------------------------";
+        qDebug() << "Mag Calibration results: Six Point";
+        qDebug() << "scale(" << S[0] << ", " << S[1] << ", " << S[2] << ")";
+        qDebug() << "bias(" << -sign(S[0]) * b[0] << ", " << -sign(S[1]) * b[1] << ", " << -sign(S[2]) * b[2] << ")";
+        qDebug() << "-----------------------------------";
+
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] = result.CalibrationMatrix.coeff(0, 0);
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C1] = result.CalibrationMatrix.coeff(0, 1);
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C2] = result.CalibrationMatrix.coeff(0, 2);
+
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C0] = result.CalibrationMatrix.coeff(1, 0);
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] = result.CalibrationMatrix.coeff(1, 1);
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C2] = result.CalibrationMatrix.coeff(1, 2);
+
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C0] = result.CalibrationMatrix.coeff(2, 0);
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C1] = result.CalibrationMatrix.coeff(2, 1);
+        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] = result.CalibrationMatrix.coeff(2, 2);
+
+        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] = result.Bias.coeff(0);
+        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = result.Bias.coeff(1);
+        revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = result.Bias.coeff(2);
     }
     // Restore the previous setting
     revoCalibrationData.MagBiasNullingRate = initialMagCorrectionRate;
@@ -330,10 +408,25 @@ void SixPointCalibrationModel::compute(bool mag, bool accel)
     if (mag) {
         good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] ==
                             revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0];
+        good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C1] ==
+                            revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C1];
+        good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C2] ==
+                            revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C2];
+
+        good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C0] ==
+                            revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C0];
         good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] ==
                             revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1];
+        good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C2] ==
+                            revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C2];
+
+        good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C0] ==
+                            revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C0];
+        good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C1] ==
+                            revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C1];
         good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] ==
                             revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2];
+
         good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] ==
                             revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X];
         good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] ==

@@ -64,6 +64,7 @@ public slots:
     void savePositionData();
 private slots:
     void getSample(UAVObject *obj);
+    void continouslyGetMagSamples(UAVObject *obj);
 private:
     void start(bool calibrateAccel, bool calibrateMag);
     UAVObjectManager *getObjectManager();
@@ -94,6 +95,9 @@ private:
     QList<double> mag_accum_x;
     QList<double> mag_accum_y;
     QList<double> mag_accum_z;
+    QList<float> mag_fit_x;
+    QList<float> mag_fit_y;
+    QList<float> mag_fit_z;
     void showHelp(QString image);
 };
 }

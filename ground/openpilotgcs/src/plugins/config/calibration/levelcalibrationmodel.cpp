@@ -63,7 +63,7 @@ void LevelCalibrationModel::start()
 
     /* Show instructions and enable controls */
     displayInstructions("Place horizontally and click save position...", true);
-    displayVisualHelp("plane-horizontal");
+    displayVisualHelp("plane-ned");
     disableAllCalibrations();
     savePositionEnabledChanged(true);
     position = 0;
@@ -131,7 +131,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             rot_data_roll  = OpenPilot::CalibrationUtils::listMean(rot_accum_roll);
 
             displayInstructions("Leave horizontally, rotate 180° along yaw axis and click save position...", true);
-            displayVisualHelp("plane-horizontal-rotated");
+            displayVisualHelp("plane-swd");
 
             disableAllCalibrations();
 

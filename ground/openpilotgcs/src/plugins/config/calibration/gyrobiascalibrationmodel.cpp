@@ -66,7 +66,7 @@ void GyroBiasCalibrationModel::start()
     attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
     attitudeSettings->setData(attitudeSettingsData);
     attitudeSettings->updated();
-    displayVisualHelp("plane-horizontal");
+    displayVisualHelp("plane-ned");
     displayInstructions("Calibrating the gyroscopes. Keep the copter/plane steady...", true);
 
     gyro_accum_x.clear();

@@ -150,8 +150,8 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     mag->setMetadata(mdata);
 
     /* Show instructions and enable controls */
-    displayInstructions("Place horizontally and click save position...", true);
-    showHelp("horizontal");
+    displayInstructions("Place horizontally, nose pointing north and click save position...", true);
+    showHelp("ned");
     disableAllCalibrations();
     savePositionEnabledChanged(true);
     position = 0;
@@ -241,24 +241,24 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
 
         position = (position + 1) % 6;
         if (position == 1) {
-            displayInstructions("Place with left side down and click save position...", false);
-            showHelp("left");
+            displayInstructions("Place with nose down, right side west and click save position...", false);
+            showHelp("dwn");
         }
         if (position == 2) {
-            displayInstructions("Place upside down and click save position...", false);
-            showHelp("flip");
+            displayInstructions("Place right side down, nose west and click save position...", false);
+            showHelp("wds");
         }
         if (position == 3) {
-            displayInstructions("Place with right side down and click save position...", false);
-            showHelp("right");
+            displayInstructions("Place upside down, nose east and click save position...", false);
+            showHelp("enu");
         }
         if (position == 4) {
-            displayInstructions("Place with nose up and click save position...", false);
-            showHelp("up");
+            displayInstructions("Place with nose up, left side north and click save position...", false);
+            showHelp("use");
         }
         if (position == 5) {
-            displayInstructions("Place with nose down and click save position...", false);
-            showHelp("down");
+            displayInstructions("Place with left side down, nose south and click save position...", false);
+            showHelp("suw");
         }
         if (position == 0) {
             compute(calibratingMag, calibratingAccel);
@@ -384,7 +384,7 @@ UAVObjectManager *SixPointCalibrationModel::getObjectManager()
 void SixPointCalibrationModel::showHelp(QString image){
 
     if(calibratingAccel){
-        displayVisualHelp("revo-" + image);
+        displayVisualHelp(image);
     }else {
         displayVisualHelp("plane-" + image);
     }

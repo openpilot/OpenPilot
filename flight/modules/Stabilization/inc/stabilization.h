@@ -53,7 +53,11 @@ typedef struct {
         float  cruise_control_power_trim;
         int8_t cruise_control_inverted_power_switch; // WARNING: currently -1 is not fully implemented !!!
         float  cruise_control_neutral_thrust;
-    }     cruiseControl;
+    } cruiseControl;
+    struct {
+        int8_t gyroupdates;
+        int8_t rateupdates;
+    }     monitor;
     float rattitude_mode_transition_stick_position;
     struct pid innerPids[3], outerPids[3];
 } StabilizationData;
@@ -61,7 +65,8 @@ typedef struct {
 
 extern StabilizationData stabSettings;
 
-#define AXES 4
+#define AXES                4
+#define FAILSAFE_TIMEOUT_MS 30
 
 
 #endif // STABILIZATION_H

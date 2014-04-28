@@ -254,6 +254,7 @@ static void stabilizationOuterloopTask()
 
     // update cruisecontrol based on attitude
     cruisecontrol_compute_factor(&attitudeState);
+    stabSettings.monitor.rateupdates = 0;
 }
 
 

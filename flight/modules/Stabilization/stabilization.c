@@ -82,7 +82,7 @@ int32_t StabilizationStart()
     FlightModeSwitchUpdatedCb(ManualControlCommandHandle());
 
 #ifdef PIOS_INCLUDE_WDG
-// PIOS_WDG_RegisterFlag(PIOS_WDG_STABILIZATION);
+    PIOS_WDG_RegisterFlag(PIOS_WDG_STABILIZATION);
 #endif
     return 0;
 }

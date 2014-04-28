@@ -91,6 +91,9 @@ void stabilizationInnerloopInit()
 
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&stabilizationInnerloopTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_STABILIZATION1, STACK_SIZE_BYTES);
     GyroStateConnectCallback(GyroStateUpdatedCb);
+
+    // schedule dead calls every FAILSAFE_TIMEOUT_MS to have the watchdog cleared
+    PIOS_CALLBACKSCHEDULER_Schedule(callbackHandle, FAILSAFE_TIMEOUT_MS, CALLBACK_UPDATEMODE_LATER);
 }
 
 
@@ -101,6 +104,51 @@ void stabilizationInnerloopInit()
  */
 static void stabilizationInnerloopTask()
 {
+    // watchdog and error handling
+    {
+#ifdef PIOS_INCLUDE_WDG
+        PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
+#endif
+        uint8_t errorlevel = 0;
+        // check if outer loop keeps executing
+        if (stabSettings.monitor.rateupdates > -64) {
+            stabSettings.monitor.rateupdates--;
+        }
+        if (stabSettings.monitor.rateupdates < -3) {
+            // warning if rate loop skipped more than 2 beats
+            errorlevel |= 1;
+        }
+        if (stabSettings.monitor.rateupdates < -7) {
+            // error if rate loop skipped more than 7 beats
+            errorlevel |= 2;
+        }
+        // check if gyro keeps updating
+        if (stabSettings.monitor.gyroupdates < 1) {
+            // critical if gyro didn't update at all!
+            errorlevel |= 4;
+        }
+        if (stabSettings.monitor.gyroupdates > 1) {
+            // warning if we missed a gyro update
+            errorlevel |= 1;
+        }
+        if (stabSettings.monitor.gyroupdates > 3) {
+            // error if we missed 3 gyro updates
+            errorlevel |= 2;
+        }
+        stabSettings.monitor.gyroupdates = 0;
+
+        if (errorlevel & 4) {
+            AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION, SYSTEMALARMS_ALARM_CRITICAL);
+        } else if (errorlevel & 2) {
+            AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION, SYSTEMALARMS_ALARM_ERROR);
+        } else if (errorlevel & 1) {
+            AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION, SYSTEMALARMS_ALARM_WARNING);
+        } else {
+            AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);
+        }
+    }
+
+
     RateDesiredData rateDesired;
     ActuatorDesiredData actuator;
     StabilizationStatusInnerLoopData enabled;
@@ -198,6 +246,7 @@ static void stabilizationInnerloopTask()
             }
         }
     }
+    PIOS_CALLBACKSCHEDULER_Schedule(callbackHandle, FAILSAFE_TIMEOUT_MS, CALLBACK_UPDATEMODE_LATER);
 }
 
 
@@ -212,6 +261,7 @@ static void GyroStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     gyro_filtered[2] = gyro_filtered[2] * stabSettings.gyro_alpha + gyroState.z * (1 - stabSettings.gyro_alpha);
 
     PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
+    stabSettings.monitor.gyroupdates++;
 }
 
 #ifdef REVOLUTION

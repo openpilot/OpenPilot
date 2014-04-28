@@ -87,6 +87,7 @@ UAVOBJSRCFILENAMES += stabilizationsettings
 UAVOBJSRCFILENAMES += stabilizationsettingsbank1
 UAVOBJSRCFILENAMES += stabilizationsettingsbank2
 UAVOBJSRCFILENAMES += stabilizationsettingsbank3
+UAVOBJSRCFILENAMES += stabilizationstatus
 UAVOBJSRCFILENAMES += stabilizationbank
 UAVOBJSRCFILENAMES += systemalarms
 UAVOBJSRCFILENAMES += systemsettings

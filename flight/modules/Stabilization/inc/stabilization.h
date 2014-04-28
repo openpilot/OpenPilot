@@ -34,12 +34,16 @@
 #define STABILIZATION_H
 
 #include <openpilot.h>
+#include <pid.h>
 #include <stabilizationsettings.h>
+#include <stabilizationbank.h>
+
 
 int32_t StabilizationInitialize();
 
 typedef struct {
     StabilizationSettingsData settings;
+    StabilizationBankData     stabBank;
     float gyro_alpha;
     struct {
         float  cruise_control_min_thrust;
@@ -51,10 +55,13 @@ typedef struct {
         float  cruise_control_neutral_thrust;
     }     cruiseControl;
     float rattitude_mode_transition_stick_position;
+    struct pid innerPids[3], outerPids[3];
 } StabilizationData;
 
 
 extern StabilizationData stabSettings;
+
+#define AXES 4
 
 
 #endif // STABILIZATION_H

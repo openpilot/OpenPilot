@@ -41,6 +41,7 @@
 #include <airspeedstate.h>
 #include <stabilizationstatus.h>
 #include <flightstatus.h>
+#include <manualcontrolcommand.h>
 #include <stabilizationbank.h>
 
 #include <stabilization.h>
@@ -59,22 +60,17 @@
 #define UPDATE_MAX        1.0f
 #define UPDATE_ALPHA      1.0e-2f
 
-#define AXES              4
-
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
-static struct pid pids[3];
 static float gyro_filtered[3] = { 0, 0, 0 };
 static float axis_lock_accum[3] = { 0, 0, 0 };
 static uint8_t previous_mode[AXES] = { 255, 255, 255, 255 };
 static PiOSDeltatimeConfig timeval;
 static float speedScaleFactor = 1.0f;
-static StabilizationBankData stabBank;
 
 // Private functions
 static void stabilizationInnerloopTask();
 static void GyroStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
-static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
 #ifdef REVOLUTION
 static void AirSpeedUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
 #endif
@@ -86,7 +82,7 @@ void stabilizationInnerloopInit()
     GyroStateInitialize();
     StabilizationStatusInitialize();
     FlightStatusInitialize();
-    StabilizationBankInitialize();
+    ManualControlCommandInitialize();
 #ifdef REVOLUTION
     AirspeedStateInitialize();
     AirspeedStateConnectCallback(AirSpeedUpdatedCb);
@@ -95,8 +91,6 @@ void stabilizationInnerloopInit()
 
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&stabilizationInnerloopTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_STABILIZATION1, STACK_SIZE_BYTES);
     GyroStateConnectCallback(GyroStateUpdatedCb);
-    StabilizationBankConnectCallback(BankUpdatedCb);
-    BankUpdatedCb(NULL);
 }
 
 
@@ -128,7 +122,7 @@ static void stabilizationInnerloopTask()
 
         if (t < STABILIZATIONSTATUS_INNERLOOP_THRUST) {
             if (reinit) {
-                pids[t].iAccumulator = 0;
+                stabSettings.innerPids[t].iAccumulator = 0;
             }
             switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
             case STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR:
@@ -136,8 +130,8 @@ static void stabilizationInnerloopTask()
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_RELAYTUNING:
                 rate[t] = boundf(rate[t],
-                                 -cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[t],
-                                 cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[t]
+                                 -cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t],
+                                 cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t]
                                  );
                 stabilization_relay_rate(rate[t] - gyro_filtered[t], &actuatorDesiredAxis[t], t, reinit);
                 break;
@@ -156,10 +150,10 @@ static void stabilizationInnerloopTask()
             case STABILIZATIONSTATUS_INNERLOOP_RATE:
                 // limit rate to maximum configured limits (once here instead of 5 times in outer loop)
                 rate[t] = boundf(rate[t],
-                                 -cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[t],
-                                 cast_struct_to_array(stabBank.MaximumRate, stabBank.MaximumRate.Roll)[t]
+                                 -cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t],
+                                 cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t]
                                  );
-                actuatorDesiredAxis[t] = pid_apply_setpoint(&pids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT);
+                actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
             default:
@@ -191,6 +185,19 @@ static void stabilizationInnerloopTask()
             previous_mode[t] = 255;
         }
     }
+    {
+        uint8_t armed;
+        FlightStatusArmedGet(&armed);
+        float throttleDesired;
+        ManualControlCommandThrottleGet(&throttleDesired);
+        if (armed != FLIGHTSTATUS_ARMED_ARMED ||
+            ((stabSettings.settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE) && throttleDesired < 0)) {
+            // Force all axes to reinitialize when engaged
+            for (t = 0; t < AXES; t++) {
+                previous_mode[t] = 255;
+            }
+        }
+    }
 }
 
 
@@ -205,29 +212,6 @@ static void GyroStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     gyro_filtered[2] = gyro_filtered[2] * stabSettings.gyro_alpha + gyroState.z * (1 - stabSettings.gyro_alpha);
 
     PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
-}
-
-static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
-{
-    StabilizationBankGet(&stabBank);
-
-    // Set the roll rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_INNERLOOP_ROLL], stabBank.RollRatePID.Kp,
-                  stabBank.RollRatePID.Ki,
-                  stabBank.RollRatePID.Kd,
-                  stabBank.RollRatePID.ILimit);
-
-    // Set the pitch rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_INNERLOOP_PITCH], stabBank.PitchRatePID.Kp,
-                  stabBank.PitchRatePID.Ki,
-                  stabBank.PitchRatePID.Kd,
-                  stabBank.PitchRatePID.ILimit);
-
-    // Set the yaw rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_INNERLOOP_YAW], stabBank.YawRatePID.Kp,
-                  stabBank.YawRatePID.Ki,
-                  stabBank.YawRatePID.Kd,
-                  stabBank.YawRatePID.ILimit);
 }
 
 #ifdef REVOLUTION

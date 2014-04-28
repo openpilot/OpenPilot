@@ -39,6 +39,8 @@
 #include <stabilizationdesired.h>
 #include <attitudestate.h>
 #include <stabilizationstatus.h>
+#include <flightstatus.h>
+#include <manualcontrolcommand.h>
 #include <stabilizationbank.h>
 
 
@@ -57,13 +59,9 @@
 #define UPDATE_MAX        1.0f
 #define UPDATE_ALPHA      1.0e-2f
 
-#define AXES              4
-
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
-static struct pid pids[3];
 static AttitudeStateData attitude;
-static StabilizationBankData stabBank;
 
 static uint8_t previous_mode[AXES] = { 255, 255, 255, 255 };
 static PiOSDeltatimeConfig timeval;
@@ -71,7 +69,6 @@ static PiOSDeltatimeConfig timeval;
 // Private functions
 static void stabilizationOuterloopTask();
 static void AttitudeStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
-static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev);
 
 void stabilizationOuterloopInit()
 {
@@ -79,13 +76,13 @@ void stabilizationOuterloopInit()
     StabilizationDesiredInitialize();
     AttitudeStateInitialize();
     StabilizationStatusInitialize();
-    StabilizationBankInitialize();
+    FlightStatusInitialize();
+    ManualControlCommandInitialize();
+
     PIOS_DELTATIME_Init(&timeval, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
 
     callbackHandle = PIOS_CALLBACKSCHEDULER_Create(&stabilizationOuterloopTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_STABILIZATION0, STACK_SIZE_BYTES);
     AttitudeStateConnectCallback(AttitudeStateUpdatedCb);
-    StabilizationBankConnectCallback(BankUpdatedCb);
-    BankUpdatedCb(NULL);
 }
 
 
@@ -149,20 +146,20 @@ static void stabilizationOuterloopTask()
 
         if (t < STABILIZATIONSTATUS_OUTERLOOP_THRUST) {
             if (reinit) {
-                pids[t].iAccumulator = 0;
+                stabSettings.outerPids[t].iAccumulator = 0;
             }
             switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
             case STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE:
-                rateDesiredAxis[t] = pid_apply(&pids[t], local_error[t], dT);
+                rateDesiredAxis[t] = pid_apply(&stabSettings.outerPids[t], local_error[t], dT);
                 break;
             case STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE:
             {
                 float stickinput[3];
-                stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabBank.RollMax, -1.0f, 1.0f);
-                stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabBank.PitchMax, -1.0f, 1.0f);
-                stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabBank.YawMax, -1.0f, 1.0f);
-                float rateDesiredAxisRate = stickinput[t] * cast_struct_to_array(stabBank.ManualRate, stabBank.ManualRate.Roll)[t];
-                rateDesiredAxis[t] = pid_apply(&pids[t], local_error[t], dT);
+                stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
+                stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
+                stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
+                float rateDesiredAxisRate = stickinput[t] * cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t];
+                rateDesiredAxis[t] = pid_apply(&stabSettings.outerPids[t], local_error[t], dT);
                 // Compute the weighted average rate desired
                 // Using max() rather than sqrt() for cpu speed;
                 // - this makes the stick region into a square;
@@ -218,7 +215,7 @@ static void stabilizationOuterloopTask()
                 // That would be changed to Attitude mode max angle affecting Kp
                 // Also does not take dT into account
             {
-                float rate_input    = cast_struct_to_array(stabBank.ManualRate, stabBank.ManualRate.Roll)[t] * stabilizationDesiredAxis[t] / cast_struct_to_array(stabBank, stabBank.RollMax)[t];
+                float rate_input    = cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t] * stabilizationDesiredAxis[t] / cast_struct_to_array(stabSettings.stabBank, stabSettings.stabBank.RollMax)[t];
                 float weak_leveling = local_error[t] * stabSettings.settings.WeakLevelingKp;
                 weak_leveling = boundf(weak_leveling, -stabSettings.settings.MaxWeakLevelingRate, stabSettings.settings.MaxWeakLevelingRate);
 
@@ -241,6 +238,19 @@ static void stabilizationOuterloopTask()
     }
 
     RateDesiredSet(&rateDesired);
+    {
+        uint8_t armed;
+        FlightStatusArmedGet(&armed);
+        float throttleDesired;
+        ManualControlCommandThrottleGet(&throttleDesired);
+        if (armed != FLIGHTSTATUS_ARMED_ARMED ||
+            ((stabSettings.settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE) && throttleDesired < 0)) {
+            // Force all axes to reinitialize when engaged
+            for (t = 0; t < AXES; t++) {
+                previous_mode[t] = 255;
+            }
+        }
+    }
 
     // update cruisecontrol based on attitude
     cruisecontrol_compute_factor(&attitudeState);
@@ -253,29 +263,6 @@ static void AttitudeStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     AttitudeStateGet(&attitude);
 
     PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
-}
-
-static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
-{
-    StabilizationBankGet(&stabBank);
-
-    // Set the roll rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_OUTERLOOP_ROLL], stabBank.RollRatePID.Kp,
-                  stabBank.RollRatePID.Ki,
-                  stabBank.RollRatePID.Kd,
-                  stabBank.RollRatePID.ILimit);
-
-    // Set the pitch rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_OUTERLOOP_PITCH], stabBank.PitchRatePID.Kp,
-                  stabBank.PitchRatePID.Ki,
-                  stabBank.PitchRatePID.Kd,
-                  stabBank.PitchRatePID.ILimit);
-
-    // Set the yaw rate PID constants
-    pid_configure(&pids[STABILIZATIONSTATUS_OUTERLOOP_YAW], stabBank.YawRatePID.Kp,
-                  stabBank.YawRatePID.Ki,
-                  stabBank.YawRatePID.Kd,
-                  stabBank.YawRatePID.ILimit);
 }
 
 /**

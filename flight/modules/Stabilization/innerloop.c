@@ -50,9 +50,7 @@
 #include <cruisecontrol.h>
 
 // Private constants
-#define STACK_SIZE_BYTES  256
 
-#define CBTASK_PRIORITY   CALLBACK_TASK_FLIGHTCONTROL
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_CRITICAL
 
 #define UPDATE_EXPECTED   (1.0f / 666.0f)
@@ -116,12 +114,12 @@ static void stabilizationInnerloopTask()
         if (stabSettings.monitor.rateupdates > -64) {
             stabSettings.monitor.rateupdates--;
         }
-        if (stabSettings.monitor.rateupdates < -3) {
-            // warning if rate loop skipped more than 2 beats
+        if (stabSettings.monitor.rateupdates < -(2 * OUTERLOOP_SKIPCOUNT)) {
+            // warning if rate loop skipped more than 2 execution
             warn = true;
         }
-        if (stabSettings.monitor.rateupdates < -7) {
-            // error if rate loop skipped more than 7 beats
+        if (stabSettings.monitor.rateupdates < -(4 * OUTERLOOP_SKIPCOUNT)) {
+            // error if rate loop skipped more than 4 executions
             error = true;
         }
         // check if gyro keeps updating

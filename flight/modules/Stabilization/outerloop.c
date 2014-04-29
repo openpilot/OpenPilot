@@ -49,9 +49,7 @@
 #include <CoordinateConversions.h>
 
 // Private constants
-#define STACK_SIZE_BYTES  256
 
-#define CBTASK_PRIORITY   CALLBACK_TASK_FLIGHTCONTROL
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_REGULAR
 
 #define UPDATE_EXPECTED   (1.0f / 666.0f)
@@ -260,10 +258,14 @@ static void stabilizationOuterloopTask()
 
 static void AttitudeStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    // this does not need mutex protection as both eventdispatcher and stabi run in same callback task!
-    AttitudeStateGet(&attitude);
+    // to reduce CPU utilisation, outer loop is not executed every state update
+    static uint8_t cpusafer = 0;
 
-    PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
+    if ((cpusafer++ % OUTERLOOP_SKIPCOUNT) == 0) {
+        // this does not need mutex protection as both eventdispatcher and stabi run in same callback task!
+        AttitudeStateGet(&attitude);
+        PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
+    }
 }
 
 /**

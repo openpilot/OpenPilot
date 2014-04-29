@@ -38,6 +38,12 @@ static float cruisecontrol_factor = 1.0f;
 
 void cruisecontrol_compute_factor(AttitudeStateData *attitude)
 {
+    // safe CPU, only execute every 8th attitude update
+    static uint8_t cpusafer = 0;
+
+    if (cpusafer++ % (8 / OUTERLOOP_SKIPCOUNT)) {
+        return;
+    }
     float angleCosine;
 
     // get attitude state and calculate angle

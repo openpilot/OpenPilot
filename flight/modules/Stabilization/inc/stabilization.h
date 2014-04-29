@@ -68,6 +68,17 @@ extern StabilizationData stabSettings;
 #define AXES                4
 #define FAILSAFE_TIMEOUT_MS 30
 
+#ifndef PIOS_STABILIZATION_STACK_SIZE
+#define STACK_SIZE_BYTES    800
+#else
+#define STACK_SIZE_BYTES    PIOS_STABILIZATION_STACK_SIZE
+#endif
+
+// must be same as eventdispatcher to avoid needing additional mutexes
+#define CBTASK_PRIORITY     CALLBACK_TASK_FLIGHTCONTROL
+
+// outer loop only executes every 4th uavobject update to safe CPU
+#define OUTERLOOP_SKIPCOUNT 4
 
 #endif // STABILIZATION_H
 

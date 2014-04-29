@@ -27,15 +27,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.4629555"
-     inkscape:cx="49.128572"
-     inkscape:cy="46.308281"
-     inkscape:current-layer="foreground"
+     inkscape:zoom="14.925911"
+     inkscape:cx="31.919641"
+     inkscape:cy="57.332322"
+     inkscape:current-layer="layer24"
      id="namedview3608"
      showgrid="true"
-     inkscape:window-width="1366"
-     inkscape:window-height="712"
-     inkscape:window-x="-4"
+     inkscape:window-width="1280"
+     inkscape:window-height="988"
+     inkscape:window-x="1596"
      inkscape:window-y="-4"
      inkscape:window-maximized="1"
      showguides="true"
@@ -1913,10 +1913,11 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="GPS-Error"
-     style="display:none">
+     style="display:inline">
     <g
        id="GPS-Error"
-       inkscape:label="#g3406">
+       inkscape:label="#g3406"
+       transform="matrix(1.0377771,0,0,1,-0.27728602,0)">
       <path
          inkscape:connector-curvature="0"
          id="path6233-9-9"
@@ -1993,10 +1994,11 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Airspeed-Error"
-     style="display:none">
+     style="display:inline">
     <g
        id="Airspeed-Error"
-       inkscape:label="#g3398">
+       inkscape:label="#g3398"
+       transform="matrix(1.0309004,0,0,1,-1.5754528,0)">
       <path
          inkscape:connector-curvature="0"
          id="path6233-9-9-79"
@@ -2033,10 +2035,11 @@
      inkscape:groupmode="layer"
      id="layer33"
      inkscape:label="Telemetry-Error"
-     style="display:none">
+     style="display:inline">
     <g
        id="Telemetry-Error"
-       inkscape:label="#g3422">
+       inkscape:label="#g3422"
+       transform="matrix(1.0343732,0,0,1,-0.69422115,0)">
       <path
          inkscape:connector-curvature="0"
          id="path6233-9-9-86-4"
@@ -2073,10 +2076,11 @@
      inkscape:groupmode="layer"
      id="layer34"
      inkscape:label="Actuator-Error"
-     style="display:none">
+     style="display:inline">
     <g
        id="Actuator-Error"
-       inkscape:label="#g3434">
+       inkscape:label="#g3434"
+       transform="matrix(1.1116053,0,0,1,-9.4404355,0)">
       <path
          inkscape:connector-curvature="0"
          id="path6223-8"
@@ -2173,10 +2177,11 @@
      inkscape:groupmode="layer"
      id="layer24"
      inkscape:label="Attitude-Error"
-     style="display:none">
+     style="display:inline">
     <g
        id="Attitude-Error"
-       inkscape:label="#g3382">
+       inkscape:label="#g3382"
+       transform="matrix(1.0376867,0,0,1,-0.27616141,0)">
       <path
          inkscape:connector-curvature="0"
          id="path6233-9-9-8"
@@ -2213,7 +2218,7 @@
      inkscape:groupmode="layer"
      id="layer28"
      inkscape:label="I2C-Error"
-     style="display:none">
+     style="display:inline">
     <g
        id="I2C-Error"
        inkscape:label="#g3454">

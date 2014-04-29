@@ -29,21 +29,4 @@
  */
 
 
-// returns min(boundary1,boundary2) if val<min(boundary1,boundary2)
-// returns max(boundary1,boundary2) if val>max(boundary1,boundary2)
-// returns val if min(boundary1,boundary2)<=val<=max(boundary1,boundary2)
-float boundf(float val, float boundary1, float boundary2)
-{
-    if (boundary1 > boundary2) {
-        float tmp = boundary2;
-        boundary2 = boundary1;
-        boundary1 = tmp;
-    }
-    if (!(val >= boundary1)) {
-        val = boundary1;
-    }
-    if (!(val <= boundary2)) {
-        val = boundary2;
-    }
-    return val;
-}
+// space deliberately left empty, any non inline misc math functions can go here

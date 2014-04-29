@@ -37,15 +37,17 @@
 static inline float boundf(float val, float boundary1, float boundary2)
 {
     if (boundary1 > boundary2) {
-        float tmp = boundary2;
-        boundary2 = boundary1;
-        boundary1 = tmp;
-    }
-    if (!(val >= boundary1)) {
-        val = boundary1;
-    }
-    if (!(val <= boundary2)) {
-        val = boundary2;
+        if (!(val >= boundary2)) {
+            return boundary2;
+        } else if (!(val <= boundary1)) {
+            return boundary1;
+        }
+    } else {
+        if (!(val >= boundary1)) {
+            return boundary1;
+        } else if (!(val <= boundary2)) {
+            return boundary2;
+        }
     }
     return val;
 }

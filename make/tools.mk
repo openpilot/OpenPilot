@@ -115,7 +115,7 @@ QT_SDK_PREFIX := $(QT_SDK_DIR)
 
 BUILD_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
-    BUILD_SDK_TARGETS += mingw sdl python nsis openssl
+    BUILD_SDK_TARGETS += sdl nsis openssl
 endif
 ALL_SDK_TARGETS := $(BUILD_SDK_TARGETS) gtest uncrustify doxygen
 

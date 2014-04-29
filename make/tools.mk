@@ -71,17 +71,13 @@ ifeq ($(UNAME), Linux)
         QT_SDK_ARCH := gcc
     endif
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
-    UNCRUSTIFY_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz.md5
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
-    DOXYGEN_MD5_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz.md5
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2/+md5
     QT_SDK_URL     := "Please install native Qt 5.1.x SDK using package manager"
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
-    UNCRUSTIFY_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz.md5
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
-    DOXYGEN_MD5_URL:= http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz.md5
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip/+md5
@@ -89,15 +85,10 @@ else ifeq ($(UNAME), Windows)
     QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-windows-x86-mingw48_opengl-5.2.1.exe.md5
     QT_SDK_ARCH    := mingw48_32
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
-    NSIS_MD5_URL	 := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2.md5
     SDL_URL        := http://wiki.openpilot.org/download/attachments/18612236/SDL-devel-1.2.15-mingw32.tar.gz
-    SDL_MD5_URL        := http://wiki.openpilot.org/download/attachments/18612236/SDL-devel-1.2.15-mingw32.tar.gz.md5
     OPENSSL_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2
-    OPENSSL_MD5_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2.md5
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
-    UNCRUSTIFY_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2.md5
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
-    DOXYGEN_MD5_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2.md5
 endif
 
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
@@ -288,12 +279,14 @@ endef
 #  $(1) = tool name
 #  $(2) = tool extract/build directory
 #  $(3) = tool distribution URL
-#  $(4)= tool distribution MD5 URL
+#  $(4) = tool distribution MD5 URL
 #  $(5) = tool distribution file
 #  $(6) = optional extra build recipes template
 #  $(7) = optional extra clean recipes template
 #
 ##############################
+
+
 
 define TOOL_INSTALL_TEMPLATE
 
@@ -301,8 +294,8 @@ define TOOL_INSTALL_TEMPLATE
 
 $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	
-	$(call DOWNLOAD_TEMPLATE,$(3),$(5),$(4))
-
+	$(if $(4), $(call DOWNLOAD_TEMPLATE,$(3),$(5),$(4)),$(call DOWNLOAD_TEMPLATE,$(3),$(5),"$(3).md5"))
+	
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
 	$(if $(filter $(suffix $(5)), .zip),
@@ -614,7 +607,7 @@ python_version:
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,nsis,$(NSIS_DIR),$(NSIS_URL),$(NSIS_MD5_URL),$(notdir $(NSIS_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,nsis,$(NSIS_DIR),$(NSIS_URL),,$(notdir $(NSIS_URL))))
 
 ifeq ($(shell [ -d "$(NSIS_DIR)" ] && $(ECHO) "exists"), exists)
     export NSIS := $(NSIS_DIR)/makensis
@@ -638,7 +631,7 @@ endif
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,sdl,$(SDL_DIR),$(SDL_URL),$(SDL_MD5_URL),$(notdir $(SDL_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,sdl,$(SDL_DIR),$(SDL_URL),,$(notdir $(SDL_URL))))
 
 ifeq ($(shell [ -d "$(SDL_DIR)" ] && $(ECHO) "exists"), exists)
     export SDL_DIR := $(SDL_DIR)
@@ -661,7 +654,7 @@ endif
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,openssl,$(OPENSSL_DIR),$(OPENSSL_URL),$(OPENSSL_MD5_URL),$(notdir $(OPENSSL_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,openssl,$(OPENSSL_DIR),$(OPENSSL_URL),,$(notdir $(OPENSSL_URL))))
 
 ifeq ($(shell [ -d "$(OPENSSL_DIR)" ] && $(ECHO) "exists"), exists)
     export OPENSSL := "$(OPENSSL_DIR)/bin/openssl"    
@@ -685,7 +678,7 @@ endif
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_DIR),$(UNCRUSTIFY_URL),$(UNCRUSTIFY_MD5_URL),$(notdir $(UNCRUSTIFY_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_DIR),$(UNCRUSTIFY_URL),,$(notdir $(UNCRUSTIFY_URL))))
 
 else # Linux or Mac
 
@@ -709,7 +702,7 @@ define UNCRUSTIFY_CLEAN_TEMPLATE
 	-$(V1) [ ! -d "$(UNCRUSTIFY_DIR)" ] || $(RM) -rf "$(UNCRUSTIFY_DIR)"
 endef
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_BUILD_DIR),$(UNCRUSTIFY_URL),$(UNCRUSTIFY_MD5_URL),$(notdir $(UNCRUSTIFY_URL)),$(UNCRUSTIFY_BUILD_TEMPLATE),$(UNCRUSTIFY_CLEAN_TEMPLATE)))
+$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_BUILD_DIR),$(UNCRUSTIFY_URL),,$(notdir $(UNCRUSTIFY_URL)),$(UNCRUSTIFY_BUILD_TEMPLATE),$(UNCRUSTIFY_CLEAN_TEMPLATE)))
 
 endif
 
@@ -733,7 +726,7 @@ uncrustify_version:
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_DIR),$(DOXYGEN_URL),$(DOXYGEN_MD5_URL),$(notdir $(DOXYGEN_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_DIR),$(DOXYGEN_URL),,$(notdir $(DOXYGEN_URL))))
 
 else # Linux or Mac
 
@@ -757,7 +750,7 @@ define DOXYGEN_CLEAN_TEMPLATE
 	-$(V1) [ ! -d "$(DOXYGEN_DIR)" ] || $(RM) -rf "$(DOXYGEN_DIR)"
 endef
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_BUILD_DIR),$(DOXYGEN_URL),$(DOXYGEN_MD5_URL),$(notdir $(DOXYGEN_URL)),$(DOXYGEN_BUILD_TEMPLATE),$(DOXYGEN_CLEAN_TEMPLATE)))
+$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_BUILD_DIR),$(DOXYGEN_URL),,$(notdir $(DOXYGEN_URL)),$(DOXYGEN_BUILD_TEMPLATE),$(DOXYGEN_CLEAN_TEMPLATE)))
 
 endif
 
@@ -779,7 +772,7 @@ doxygen_version:
 #
 ##############################
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,gtest,$(GTEST_DIR),$(GTEST_URL),$(GTEST_MD5_URL),$(notdir $(GTEST_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,gtest,$(GTEST_DIR),$(GTEST_URL),,$(notdir $(GTEST_URL))))
 
 export GTEST_DIR
 

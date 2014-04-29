@@ -109,39 +109,41 @@ static void stabilizationInnerloopTask()
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
 #endif
-        uint8_t errorlevel = 0;
+        bool warn  = false;
+        bool error = false;
+        bool crit  = false;
         // check if outer loop keeps executing
         if (stabSettings.monitor.rateupdates > -64) {
             stabSettings.monitor.rateupdates--;
         }
         if (stabSettings.monitor.rateupdates < -3) {
             // warning if rate loop skipped more than 2 beats
-            errorlevel |= 1;
+            warn = true;
         }
         if (stabSettings.monitor.rateupdates < -7) {
             // error if rate loop skipped more than 7 beats
-            errorlevel |= 2;
+            error = true;
         }
         // check if gyro keeps updating
         if (stabSettings.monitor.gyroupdates < 1) {
             // critical if gyro didn't update at all!
-            errorlevel |= 4;
+            crit = true;
         }
         if (stabSettings.monitor.gyroupdates > 1) {
             // warning if we missed a gyro update
-            errorlevel |= 1;
+            warn = true;
         }
         if (stabSettings.monitor.gyroupdates > 3) {
             // error if we missed 3 gyro updates
-            errorlevel |= 2;
+            error = true;
         }
         stabSettings.monitor.gyroupdates = 0;
 
-        if (errorlevel & 4) {
+        if (crit) {
             AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION, SYSTEMALARMS_ALARM_CRITICAL);
-        } else if (errorlevel & 2) {
+        } else if (error) {
             AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION, SYSTEMALARMS_ALARM_ERROR);
-        } else if (errorlevel & 1) {
+        } else if (warn) {
             AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION, SYSTEMALARMS_ALARM_WARNING);
         } else {
             AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);

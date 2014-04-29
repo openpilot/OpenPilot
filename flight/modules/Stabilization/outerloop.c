@@ -98,6 +98,7 @@ static void stabilizationOuterloopTask()
     StabilizationDesiredData stabilizationDesired;
     StabilizationStatusOuterLoopData enabled;
 
+    AttitudeStateGet(&attitudeState);
     StabilizationDesiredGet(&stabilizationDesired);
     RateDesiredGet(&rateDesired);
     StabilizationStatusOuterLoopGet(&enabled);
@@ -139,7 +140,6 @@ static void stabilizationOuterloopTask()
         }
 #endif /* if defined(PIOS_QUATERNION_STABILIZATION) */
     }
-
     for (t = 0; t < AXES; t++) {
         bool reinit = (cast_struct_to_array(enabled, enabled.Roll)[t] != previous_mode[t]);
         previous_mode[t] = cast_struct_to_array(enabled, enabled.Roll)[t];

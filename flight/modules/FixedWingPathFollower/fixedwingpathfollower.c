@@ -192,7 +192,7 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
                         AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
                     }
                 } else {
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                 }
             } else {
                 pathStatus.UID    = pathDesired.UID;
@@ -220,7 +220,7 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
                     break;
                 default:
                     pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                     break;
                 }
             }

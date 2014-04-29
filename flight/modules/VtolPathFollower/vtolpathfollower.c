@@ -214,7 +214,7 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
                         updateVtolDesiredAttitude(true);
                         updatePOIBearing();
                     } else {
-                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                     }
                 } else {
                     if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
@@ -222,7 +222,7 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
                         updateVtolDesiredAttitude(false);
                         AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
                     } else {
-                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                     }
                 }
             } else {
@@ -247,7 +247,7 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
                     break;
                 default:
                     pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                     break;
                 }
                 PathStatusSet(&pathStatus);

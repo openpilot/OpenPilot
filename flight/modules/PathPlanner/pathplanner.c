@@ -185,7 +185,7 @@ static void pathPlannerTask()
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
             PathDesiredSet(&pathDesired);
         }
-        AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_ERROR);
+        AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_CRITICAL);
 
         return;
     }

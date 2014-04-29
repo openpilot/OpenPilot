@@ -32,6 +32,17 @@
 
 #include <openpilot.h>
 
+
+// Enumeration for filter result
+typedef enum {
+	FILTERRESULT_UNINITIALISED=-1,
+    FILTERRESULT_OK=0,
+    FILTERRESULT_WARNING=1,
+    FILTERRESULT_CRITICAL=2,
+    FILTERRESULT_ERROR=3,
+} filterResult;
+
+
 typedef enum {
     SENSORUPDATES_gyro         = 1 << 0,
         SENSORUPDATES_accel    = 1 << 1,
@@ -58,7 +69,7 @@ typedef struct {
 
 typedef struct stateFilterStruct {
     int32_t (*init)(struct stateFilterStruct *self);
-    int32_t (*filter)(struct stateFilterStruct *self, stateEstimation *state);
+    filterResult (*filter)(struct stateFilterStruct *self, stateEstimation *state);
     void *localdata;
 } stateFilter;
 

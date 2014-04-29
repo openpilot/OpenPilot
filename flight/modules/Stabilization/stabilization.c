@@ -638,7 +638,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         // Clear or set alarms.  Done like this to prevent toggline each cycle
         // and hammering system alarms
         if (error) {
-            AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION, SYSTEMALARMS_ALARM_ERROR);
+            AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION, SYSTEMALARMS_ALARM_CRITICAL);
         } else {
             AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);
         }

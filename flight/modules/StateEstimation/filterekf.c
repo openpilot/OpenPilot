@@ -82,7 +82,7 @@ static bool initialized = 0;
 static int32_t init13i(stateFilter *self);
 static int32_t init13(stateFilter *self);
 static int32_t maininit(stateFilter *self);
-static int32_t filter(stateFilter *self, stateEstimation *state);
+static filterResult filter(stateFilter *self, stateEstimation *state);
 static inline bool invalid_var(float data);
 
 static void globalInit(void);
@@ -192,7 +192,7 @@ static int32_t maininit(stateFilter *self)
 /**
  * Collect all required state variables, then run complementary filter
  */
-static int32_t filter(stateFilter *self, stateEstimation *state)
+static filterResult filter(stateFilter *self, stateEstimation *state)
 {
     struct data *this    = (struct data *)self->localdata;
 
@@ -221,7 +221,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         UNSET_MASK(state->updated, SENSORUPDATES_vel);
         UNSET_MASK(state->updated, SENSORUPDATES_attitude);
         UNSET_MASK(state->updated, SENSORUPDATES_gyro);
-        return 0;
+        return FILTERRESULT_OK;
     }
 
     dT = PIOS_DELTATIME_GetAverageSeconds(&this->dtconfig);
@@ -315,11 +315,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             this->inited = true;
         }
 
-        return 0;
+        return FILTERRESULT_OK;
     }
 
     if (!this->inited) {
-        return 3;
+        return FILTERRESULT_CRITICAL;
     }
 
     float gyros[3] = { DEG2RAD(this->work.gyro[0]), DEG2RAD(this->work.gyro[1]), DEG2RAD(this->work.gyro[2]) };
@@ -427,9 +427,9 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     this->work.updated = 0;
 
     if (this->init_stage < 0) {
-        return 1;
+        return FILTERRESULT_WARNING;
     } else {
-        return 0;
+        return FILTERRESULT_OK;
     }
 }
 

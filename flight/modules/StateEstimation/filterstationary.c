@@ -42,7 +42,7 @@
 // Private functions
 
 static int32_t init(stateFilter *self);
-static int32_t filter(stateFilter *self, stateEstimation *state);
+static filterResult filter(stateFilter *self, stateEstimation *state);
 
 
 int32_t filterStationaryInitialize(stateFilter *handle)
@@ -58,7 +58,7 @@ static int32_t init(__attribute__((unused)) stateFilter *self)
     return 0;
 }
 
-static int32_t filter(__attribute__((unused)) stateFilter *self, stateEstimation *state)
+static filterResult filter(__attribute__((unused)) stateFilter *self, stateEstimation *state)
 {
     state->pos[0]   = 0.0f;
     state->pos[1]   = 0.0f;
@@ -70,7 +70,7 @@ static int32_t filter(__attribute__((unused)) stateFilter *self, stateEstimation
     state->vel[2]   = 0.0f;
     state->updated |= SENSORUPDATES_vel;
 
-    return 0;
+    return FILTERRESULT_OK;
 }
 
 /**

@@ -246,10 +246,10 @@ static void systemTask(__attribute__((unused)) void *parameters)
 
         // Turn on the error LED if an alarm is set
 #if defined(PIOS_LED_ALARM)
-        if (AlarmsHasCritical()) {
+        if (AlarmsHasErrors()) {
             PIOS_LED_On(PIOS_LED_ALARM);
-        } else if ((AlarmsHasErrors() && (cycleCount & 0x1)) ||
-                   (!AlarmsHasErrors() && AlarmsHasWarnings() && (cycleCount & 0x4))) {
+        } else if ((AlarmsHasCritical() && (cycleCount & 0x1)) ||
+                   (!AlarmsHasCritical() && AlarmsHasWarnings() && (cycleCount & 0x4))) {
             PIOS_LED_On(PIOS_LED_ALARM);
         } else {
             PIOS_LED_Off(PIOS_LED_ALARM);
@@ -429,7 +429,7 @@ static void hwSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     HwSettingsGet(&currentHwSettings);
     // check whether the Hw Configuration has changed from the one used at boot time
     if (memcmp(&bootHwSettings, &currentHwSettings, sizeof(HwSettingsData)) != 0) {
-        ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_ERROR, SYSTEMALARMS_EXTENDEDALARMSTATUS_REBOOTREQUIRED, 0);
+        ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL, SYSTEMALARMS_EXTENDEDALARMSTATUS_REBOOTREQUIRED, 0);
     }
 }
 

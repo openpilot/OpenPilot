@@ -94,7 +94,7 @@ int32_t configuration_check()
         switch (modes[i]) {
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
             if (multirotor) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
@@ -108,51 +108,51 @@ int32_t configuration_check()
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
             if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE)) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ALTITUDEVARIO:
             if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             }
             // TODO: put check equivalent to TASK_MONITOR_IsRunning
             // here as soon as available for delayed callbacks
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
             if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
             if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                 // Revo supports Position Hold
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
             if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                 // Revo supports AutoLand Mode
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
             if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                 // Revo supports POI Mode
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
             if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             } else {
                 // Revo supports PathPlanner and that must be OK or we are not sane
                 // PathPlan alarm is uninitialized if not running
@@ -160,21 +160,21 @@ int32_t configuration_check()
                 SystemAlarmsAlarmData alarms;
                 SystemAlarmsAlarmGet(&alarms);
                 if (alarms.PathPlan != SYSTEMALARMS_ALARM_OK) {
-                    severity = SYSTEMALARMS_ALARM_ERROR;
+                    severity = SYSTEMALARMS_ALARM_CRITICAL;
                 }
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
             if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                 // Revo supports ReturnToBase
-                severity = SYSTEMALARMS_ALARM_ERROR;
+                severity = SYSTEMALARMS_ALARM_CRITICAL;
             }
             break;
         default:
             // Uncovered modes are automatically an error
-            severity = SYSTEMALARMS_ALARM_ERROR;
+            severity = SYSTEMALARMS_ALARM_CRITICAL;
         }
         // mark the first encountered erroneous setting in status and substatus
         if ((severity != SYSTEMALARMS_ALARM_OK) && (alarmstatus == SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE)) {
@@ -197,14 +197,14 @@ int32_t configuration_check()
  * Checks the stabiliation settings for a paritcular mode and makes
  * sure it is appropriate for the airframe
  * @param[in] index Which stabilization mode to check
- * @returns SYSTEMALARMS_ALARM_OK or SYSTEMALARMS_ALARM_ERROR
+ * @returns SYSTEMALARMS_ALARM_OK or SYSTEMALARMS_ALARM_CRITICAL
  */
 static int32_t check_stabilization_settings(int index, bool multirotor)
 {
     // Make sure the modes have identical sizes
     if (FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM != FLIGHTMODESETTINGS_STABILIZATION2SETTINGS_NUMELEM ||
         FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM != FLIGHTMODESETTINGS_STABILIZATION3SETTINGS_NUMELEM) {
-        return SYSTEMALARMS_ALARM_ERROR;
+        return SYSTEMALARMS_ALARM_CRITICAL;
     }
 
     uint8_t modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM];
@@ -221,14 +221,14 @@ static int32_t check_stabilization_settings(int index, bool multirotor)
         FlightModeSettingsStabilization3SettingsArrayGet(modes);
         break;
     default:
-        return SYSTEMALARMS_ALARM_ERROR;
+        return SYSTEMALARMS_ALARM_CRITICAL;
     }
 
     // For multirotors verify that nothing is set to "none"
     if (multirotor) {
         for (uint32_t i = 0; i < NELEMENTS(modes); i++) {
             if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NONE) {
-                return SYSTEMALARMS_ALARM_ERROR;
+                return SYSTEMALARMS_ALARM_CRITICAL;
             }
         }
     }

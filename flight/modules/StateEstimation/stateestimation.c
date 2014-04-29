@@ -223,6 +223,7 @@ static const filterPipeline *ekf13iQueue = &(filterPipeline) {
         }
     }
 };
+
 static const filterPipeline *ekf13Queue = &(filterPipeline) {
     .filter = &magFilter,
     .next   = &(filterPipeline) {
@@ -333,8 +334,8 @@ MODULE_INITCALL(StateEstimationInitialize, StateEstimationStart);
 static void StateEstimationCb(void)
 {
     static enum { RUNSTATE_LOAD = 0, RUNSTATE_FILTER = 1, RUNSTATE_SAVE = 2 } runState = RUNSTATE_LOAD;
-    static int8_t alarm     = 0;
-    static int8_t lastAlarm = -1;
+    static filterResult alarm = FILTERRESULT_OK;
+    static filterResult lastAlarm = FILTERRESULT_UNINITIALISED;
     static uint16_t alarmcounter = 0;
     static const filterPipeline *current;
     static stateEstimation states;
@@ -351,12 +352,12 @@ static void StateEstimationCb(void)
     switch (runState) {
     case RUNSTATE_LOAD:
 
-        alarm = 0;
+        alarm = FILTERRESULT_OK;
 
         // set alarm to warning if called through timeout
         if (updatedSensors == 0) {
             if (PIOS_DELAY_DiffuS(last_time) > 1000 * TIMEOUT_MS) {
-                alarm = 1;
+                alarm = FILTERRESULT_WARNING;
             }
         } else {
             last_time = PIOS_DELAY_GetRaw();
@@ -436,7 +437,7 @@ static void StateEstimationCb(void)
     case RUNSTATE_FILTER:
 
         if (current != NULL) {
-            int32_t result = current->filter->filter((stateFilter *)current->filter, &states);
+            filterResult result = current->filter->filter((stateFilter *)current->filter, &states);
             if (result > alarm) {
                 alarm = result;
             }
@@ -487,12 +488,12 @@ static void StateEstimationCb(void)
         }
 
         // clear alarms if everything is alright, then schedule callback execution after timeout
-        if (lastAlarm == 1) {
+        if (lastAlarm == FILTERRESULT_WARNING) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
-        } else if (lastAlarm == 2) {
-            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-        } else if (lastAlarm >= 3) {
+        } else if (lastAlarm == FILTERRESULT_CRITICAL) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
+        } else if (lastAlarm >= FILTERRESULT_ERROR) {
+            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
         } else {
             AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
         }

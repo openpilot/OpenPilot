@@ -65,6 +65,7 @@ ifndef TESTAPP
 	## OSD specials 
 	SRC += $(PIOSCOMMON)/pios_tslrsdebug.c
 	SRC += $(PIOSCOMMON)/pios_packetrxok.c
+	SRC += $(PIOSCOMMON)/pios_msp.c
 
     #ifeq ($(DEBUG), YES)
     SRC += $(OPSYSTEM)/dcc_stdio.c

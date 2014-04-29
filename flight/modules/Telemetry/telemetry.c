@@ -38,6 +38,9 @@
 #include "gcstelemetrystats.h"
 #include "hwsettings.h"
 #include "taskinfo.h"
+#ifdef PIOS_INCLUDE_MSP
+#include "pios_msp.h"
+#endif
 
 // Private constants
 #define TELEMETRY_FLIGHT       0
@@ -396,7 +399,15 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
         // Wait for queue message
         if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
             // Process event
+#ifdef PIOS_INCLUDE_MSP
+            uint32_t outputPort = getComPort(false);
+            if (outputPort == PIOS_COM_TELEM_USB)
+                processObjEvent(&ev);
+            else
+                MSPRequests(outputPort);
+#else
             processObjEvent(&ev);
+#endif
         }
     }
 }
@@ -437,7 +448,14 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
             bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
             if (bytes_to_process > 0) {
                 for (uint8_t i = 0; i < bytes_to_process; i++) {
+#ifdef PIOS_INCLUDE_MSP
+                    if (inputPort == PIOS_COM_TELEM_USB)
+                        UAVTalkProcessInputStream(uavTalkCon, serial_data[i]);
+                    else
+                        MSPInputStream(serial_data[i]);
+#else
                     UAVTalkProcessInputStream(uavTalkCon, serial_data[i]);
+#endif
                 }
             }
         } else {

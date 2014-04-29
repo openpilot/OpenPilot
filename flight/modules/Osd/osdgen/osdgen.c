@@ -74,6 +74,10 @@
 #include "pios_packetrxok.h"
 #endif
 
+#ifdef PIOS_INCLUDE_MSP
+#include "pios_msp.h"
+#endif
+
 #include "fonts.h"
 #include "font12x18.h"
 #include "font8x10.h"
@@ -2173,6 +2177,17 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
     case FLIGHTSTATUS_FLIGHTMODE_MANUAL:
         sprintf(temp, "Man");
         break;
+#ifdef PIOS_INCLUDE_MSP
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
+        sprintf(temp, "Acro");
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
+        sprintf(temp, "Angle");
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+        sprintf(temp, "Horizon");
+        break;
+#else
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
         sprintf(temp, "Stab1");
         break;
@@ -2182,6 +2197,7 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
         sprintf(temp, "Stab3");
         break;
+#endif
     case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:
         sprintf(temp, "Tune");
         break;
@@ -2413,6 +2429,16 @@ void updateGraphics()
         uint32_t WarnMask = 0;
         Unit *convert;
         bool GCSconnected = PIOS_COM_Available(PIOS_COM_TELEM_USB);
+
+#ifdef PIOS_INCLUDE_MSP
+        status.Armed = MSPGetArmed() ? FLIGHTSTATUS_ARMED_ARMED : FLIGHTSTATUS_ARMED_DISARMED;
+        status.FlightMode = MSPGetMode() + FLIGHTSTATUS_FLIGHTMODE_STABILIZED1;
+        mcc.Throttle = (float)(MSPGetRC(3) - 968) / 1103.0f;                                       // TODO assumes channel 3 and 968 - 2071 µs
+        mcc.Connected = 1;
+        mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] = MSPGetRC(5);                      // TODO assumes channel 5
+        attitude.Roll  =  0.1f * ((int16_t)MSPGetAngle(0));
+        attitude.Pitch = -0.1f * ((int16_t)MSPGetAngle(1));
+#endif
 
 #ifdef TEMP_GPS_STATUS_WORKAROUND
         static uint8_t gps_status = 0;

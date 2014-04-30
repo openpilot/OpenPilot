@@ -41,12 +41,12 @@
 // duration of accel bias initialization phase
 #define INITIALIZATION_DURATION_MS 5000
 
-#define STACK_REQUIRED 128
+#define STACK_REQUIRED             128
 
-#define DT_ALPHA       1e-2f
-#define DT_MIN         1e-6f
-#define DT_MAX         1.0f
-#define DT_AVERAGE     1e-3f
+#define DT_ALPHA                   1e-2f
+#define DT_MIN                     1e-6f
+#define DT_MAX                     1.0f
+#define DT_AVERAGE                 1e-3f
 static volatile bool reloadSettings;
 
 // Private types

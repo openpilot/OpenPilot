@@ -45,7 +45,6 @@
 #include "baro_airspeed_etasv3.h"
 #include "baro_airspeed_mpxv.h"
 #include "gps_airspeed.h"
-#include "airspeedalarm.h"
 #include "taskinfo.h"
 
 // Private constants
@@ -159,7 +158,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
 
         // if sensor type changed reset Airspeed alarm
         if (airspeedSettings.AirspeedSensorType != lastAirspeedSensorType) {
-            AirspeedAlarm(SYSTEMALARMS_ALARM_DEFAULT);
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_DEFAULT);
             lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
         }
 

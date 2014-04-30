@@ -40,7 +40,6 @@
 #include "hwsettings.h"
 #include "airspeedsettings.h"
 #include "airspeedsensor.h" // object that will be updated by the module
-#include "airspeedalarm.h"
 #include "taskinfo.h"
 
 #if defined(PIOS_INCLUDE_MS4525DO)
@@ -75,7 +74,7 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
         airspeedSensor->SensorValueTemperature = -1;
         airspeedSensor->SensorConnected        = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
         airspeedSensor->CalibratedAirspeed     = 0;
-        AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
+        AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_ERROR);
         return;
     }
 
@@ -88,7 +87,7 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
         if (calibrationCount <= CALIBRATION_IDLE_MS / airspeedSettings->SamplePeriod) {
             calibrationCount++;
             filter_reg = (airspeedSensor->SensorValue << FILTER_SHIFT);
-            AirspeedAlarm(SYSTEMALARMS_ALARM_WARNING);
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_WARNING);
             return;
         } else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) {
             calibrationCount++;
@@ -102,7 +101,7 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
                 AirspeedSettingsZeroPointSet(&airspeedSettings->ZeroPoint);
                 calibrationCount = 0;
             }
-            AirspeedAlarm(SYSTEMALARMS_ALARM_WARNING);
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_WARNING);
             return;
         }
     }
@@ -129,7 +128,7 @@ void baro_airspeedGetMS4525DO(AirspeedSensorData *airspeedSensor, AirspeedSettin
     airspeedSensor->TrueAirspeed = airspeedSensor->CalibratedAirspeed * TASFACTOR * sqrtf(T);
     airspeedSensor->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
     // everything is fine so set ALARM_OK
-    AirspeedAlarm(SYSTEMALARMS_ALARM_OK);
+    AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_OK);
 }
 
 #endif /* if defined(PIOS_INCLUDE_MS4525DO) */

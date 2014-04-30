@@ -105,16 +105,18 @@ struct pid pids[PID_MAX];
 int cur_flight_mode = -1;
 
 static float rattitude_mode_transition_stick_position;
-static float cruise_control_min_thrust;
-static float cruise_control_max_thrust;
-static uint8_t cruise_control_max_angle;
-static float cruise_control_max_power_factor;
-static float cruise_control_power_trim;
-static int8_t cruise_control_inverted_power_switch;
-static float cruise_control_max_power_factor_angle;
-static float cruise_control_half_power_delay;
-static float cruise_control_thrust_difference;
+
+static float   cruise_control_min_thrust;
+static float   cruise_control_max_thrust;
+static float   cruise_control_thrust_difference;
+static float   cruise_control_max_angle;
+static float   cruise_control_max_power_factor;
+static float   cruise_control_power_trim;
+static float   cruise_control_max_power_factor_angle;
+static float   cruise_control_half_power_delay;
 static uint8_t cruise_control_flight_mode_switch_pos_enable[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
+static uint8_t cruise_control_inverted_thrust_reversing;
+static uint8_t cruise_control_inverted_power_output;
 
 // Private functions
 static void stabilizationTask(void *parameters);
@@ -566,22 +568,41 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         actuatorDesired.UpdateTime = dT * 1000;
         actuatorDesired.Thrust     = stabDesired.Thrust;
 
+        ///////////////////////////////////////////////////////////////////////
         // Cruise Control
         // modify thrust according to 1/cos(bank angle)
         // to maintain same altitude with changing bank angle
         // but without manually adjusting thrust
         // do it here and all the various flight modes (e.g. Altitude Hold) can use it
+        ///////////////////////////////////////////////////////////////////////
+
+        // Detect if the flight mode switch has changed.  If it has, there
+        // could be a time gap.  E.g. enabled, then disabled for 30 seconds
+        // then enabled again.  Previous_angle will also be invalid because
+        // of the time spent with Cruise Control off.
+        static bool previous_time_valid; // initially false
+        static uint8_t previous_flight_mode_switch_position = 250;
+        if (flight_mode_switch_position != previous_flight_mode_switch_position) {
+            previous_flight_mode_switch_position = flight_mode_switch_position;
+            // Force calculations on this pass (usually every 8th pass),
+            // but ignore rate calculations (uses time, previous_time, angle,
+            // previous_angle)
+            previous_time_valid = false;
+        }
+
         if (flight_mode_switch_position < FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM
             && cruise_control_flight_mode_switch_pos_enable[flight_mode_switch_position] != (uint8_t)0
             && cruise_control_max_power_factor > 0.0001f) {
             static float factor;
             static float previous_angle;
             static uint32_t previous_time;
-            static bool previous_time_valid; // initially false
-            static bool inverted_flight_mode;
             static uint8_t calc_count;
-            static uint8_t previous_flight_mode_switch_position = 250;
             uint32_t time;
+
+            // For multiple, speedy flips this mainly strives to address the
+            // fact that (due to thrust delay) thrust didn't average straight
+            // down, but at an angle.  For less speedy flips it acts like it
+            // used to.  It can be turned off by setting power delay to 0.
 
             // It takes significant time for the motors of a multi-copter to
             // spin up.  It takes significant time for the collective servo of
@@ -596,17 +617,22 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
             // before 90 degrees (36 degrees at 360 deg/sec) and it will be
             // complete 0.1 seconds after 90 degrees.
 
-            // Detect if the flight mode switch has changed.  If it has, there
-            // could be a time gap.  E.g. enabled, then disabled for 30 seconds
-            // then enabled again.  Previous_angle will also be invalid because
-            // of the time spent with Cruise Control off.
-            if (flight_mode_switch_position != previous_flight_mode_switch_position) {
-                previous_flight_mode_switch_position = flight_mode_switch_position;
-                // Force calculations on this pass (usually every 8th pass),
-                // but ignore rate calculations (uses time, previous_time, angle,
-                // previous_angle)
-                previous_time_valid = false;
-            }
+            // Note that this code only handles the transition to/from inverted
+            // thrust.  It doesn't handle the case where thrust is changed a
+            // lot in a small angle range when that range is close to 90 degrees.
+            // It doesn't handle the small constant "system delay" caused by the
+            // delay between reading sensors and actuators beginning to respond.
+            // It also assumes that the pilot is holding the throttle constant;
+            // when the pilot does change the throttle, the compensation is
+            // simply recalculated.
+
+            // This implementation of future thrust isn't perfect.  That would
+            // probably require an iterative procedure for solving a
+            // transcendental equation of the form linear(x) = 1/cos(x).  It's
+            // shortcomings generally don't hurt anything and work better than
+            // without it.  It is designed to work perfectly if the pilot is
+            // using full thrust during flips and it is only activated if 70% or
+            // greater thrust is used.
 
             time = PIOS_DELAY_GetuS();
 
@@ -631,7 +657,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 if (previous_time_valid) {
                     float rate;
 
-                    // Keeping the sign for rate is important.  It can be negative.
+                    // rate can be negative.
                     rate = (angle - previous_angle) / ((float) (time - previous_time) / 1000000.0f);
 
                     // Define "within range" to be those transitions that should
@@ -640,166 +666,126 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                     // There is only one transition and the high power level for
                     // it is either:
-                    // = 1/fabsf(cos(angle)) * current thrust
-                    // = max power factor * current thrust
-                    // = full thrust
-                    // You can hit it with angle either increasing or decreasing
-                    // (rate positive or negative).
+                    // 1/fabsf(cos(angle)) * current thrust
+                    // or max power factor * current thrust
+                    // or full thrust
+                    // You can cross the transition with angle either increasing
+                    // or decreasing (rate positive or negative).
 
                     // Thrust is never boosted for negative values of
-                    // actuatorDesired.Thrust
+                    // actuatorDesired.Thrust (negative stick values)
+                    //
                     // When the aircraft is upright, thrust is always boosted
-                    // for positive values of actuatorDesired.Thrust
+                    // . for positive values of actuatorDesired.Thrust
                     // When the aircraft is inverted, thrust is sometimes
-                    // boosted or reversed (or combinations thereof) or zeroed
-                    // for positive values of actuatorDesired.Thrust
-                    // It depends on the inverted power switch mode.
+                    // . boosted or reversed (or combinations thereof) or zeroed
+                    // . for positive values of actuatorDesired.Thrust
+                    // It depends on the inverted power settings.
                     // Of course, you can set MaxPowerFactor to 1.0 to
-                    // effectively disable boost.
-
-                    // Only perform boost calculations for stick values > 0.0
+                    // . effectively disable boost.
                     if (actuatorDesired.Thrust > 0.0f) {
-                        float thrust;
+                        // to enable the future thrust calculations, make sure
+                        // there is a large enough transition that the result
+                        // will be roughly on vs. off; without that, it can
+                        // exaggerate the length of time the inverted to upright
+                        // transition holds full throttle and reduce the length
+                        // of time for full throttle when going upright to inverted.
+                        if (actuatorDesired.Thrust > 0.95f) {
+// change this to 0.7
+                            float thrust;
 
-                        thrust = CruiseControlFactorToThrust(CruiseControlAngleToFactor(cruise_control_max_angle), actuatorDesired.Thrust);
+                            thrust = CruiseControlFactorToThrust(CruiseControlAngleToFactor(cruise_control_max_angle), actuatorDesired.Thrust);
 
-/*
-revisit all the GCS settings
-51 <= maxt <= 100
-No  (0  <= mint <= 49 plus -51 -> -100)
-0  <= mint <= 49 or maybe -100 -> 49
-1  <= mpf  <= 50
-50 <= trim <= 200
-?? <= maxa <= 255?
-0  <= pdc  <= 2?
-*/
+                            // determine if we are in range of the transition
 
-                        // determine if we are in range of the transition
-
-                        // given the thrust at max_angle and actuatorDesired.Thrust
-                        // (typically close to 1.0), change variable 'thrust' to
-                        // be the proportion of the largest thrust change possible
-                        // that occurs when going into inverted mode.
-                        // Example: 'thrust' is 0.8  A quad has min_thrust set
-                        // to 0.05  The difference is 0.75.  The largest possible
-                        // difference with this setup is 0.9 - 0.05 = 0.85, so
-                        // the proportion is 0.75/0.85
-                        // That is nearly a full throttle stroke.
-                        switch (cruise_control_inverted_power_switch) {
-                        // reversed and boosted with servo reversing on pitch and yaw too
-                        case -3:
-                        // reversed and boosted
-                        case -2:
-                            // CP heli case, stroke is max to min
-                            thrust = (thrust - CruiseControlFactorToThrust(-CruiseControlAngleToFactor(cruise_control_max_angle), actuatorDesired.Thrust)) / cruise_control_thrust_difference;
-                            break;
-                        // reversed, but not boosted
-                        case -1:
-                            // CP heli case, stroke is max to -stick
-                            thrust = (thrust + CruiseControlLimitThrust(actuatorDesired.Thrust)) / cruise_control_thrust_difference;
-                            break;
-                        // zeroed
-                        case 0:
-                            // normal multi-copter case, stroke is max to zero
-                            // technically max to constant min_thrust
-                            // can be used by CP
-                            thrust = (thrust - CruiseControlLimitThrust(0.0f)) / cruise_control_thrust_difference;
-//should this be changed to "max to 0.0f"
-// that would mean min is only used for enable
-// and that a large min, like 0.5 would make delay inaccurate
-//that would allow CP to set min to -0.5 like for mode=1or2?
-
-//do we need two settings?  min_inverted_thrust and min_enabled_thrust
-
-//shit, cruise_control_thrust_difference is a problem, maybe remove it
-//thrust_difference is always max-min, and now for CP it needs to be max+max here
-//maybe not a problem since we don't limit thrust on the negative side any more
-//CP: max=1.0, min=-1.0 diff=2.0
-//CP: max=1.0, min=-0.1 diff=1.1
-//CP: max=1.0, min= 0.0 diff=1.0
-//CP: max=1.0, min= 0.1 diff=0.9
-//MR: max=0.9, min= 0.1 diff=0.8
-/*
-as long as the calculated diff is <= diff it is OK
-- that means that stroke must always be to min or smaller magnitude
-- e.g. min=-0.5 stroke can't go to -1.0
-- so -factor*throttle must be limited to -0.5
-- but throttle alone can got to -1.0
-maybe we need a CP flag
-some CP combinations are dangerous?
-do not allow thrust to change direction with a small stick change
-min=-0.5
-
-Hmmm stroke is max to min, except that we haven't gotten to max yet
-- it is really current to min (with current taken from the first time the transition was in range)
-*/
-                            break;
-                        // unreversed, unboosted
-                        case 1:
-                            // simply turn off boost, stroke is max to +stick
-                            thrust = (thrust - CruiseControlLimitThrust(actuatorDesired.Thrust)) / cruise_control_thrust_difference;
-                            break;
-                        // unreversed, boosted
-                        case 2:
-                            // CP heli case, no transition, stroke is zero
-                            thrust = 0.0f;
-                            break;
-                        }
-                        // multiply this proportion of max stroke, times the max stroke time, to get this stroke time
-                        // we only want half of this time before the transition (and half after the transition)
-                        thrust *= cruise_control_half_power_delay;
-                        // times angular rate gives angle that this stroke will take to execute
-                        thrust *= fabsf(rate);
-                        // if the transition is within range we use it, else we just use the current calculated thrust
-                        if (cruise_control_max_angle - thrust < angle
-                            && angle < cruise_control_max_angle + thrust) {
-// this may need rework in case max_angle is close to 0 or 180
-
-// wrong, need stuff below for factor? above / below transition and AtoF doesn't do transition
-// where is the transition angle taken into account
-                            // default to a little above max angle
-                            angle = cruise_control_max_angle + 0.01f;
-                            // if roll direction is downward then thrust value is taken from below max angle
-                            if (rate < 0.0f) {
-                                angle -= 0.02f;
+                            // given the thrust at max_angle and actuatorDesired.Thrust
+                            // (typically close to 1.0), change variable 'thrust' to
+                            // be the proportion of the largest thrust change possible
+                            // that occurs when going into inverted mode.
+                            // Example: 'thrust' is 0.8  A quad has min_thrust set
+                            // to 0.05  The difference is 0.75.  The largest possible
+                            // difference with this setup is 0.9 - 0.05 = 0.85, so
+                            // the proportion is 0.75/0.85
+                            // That is nearly a full throttle stroke.
+                            // the 'thrust' variable is non-negative here
+                            switch (cruise_control_inverted_power_output) {
+                            case STABILIZATIONSETTINGS_CRUISECONTROLINVERTEDPOWEROUTPUT_ZERO:
+                                // normal multi-copter case, stroke is max to zero
+                                // technically max to constant min_thrust
+                                // can be used by CP
+                                thrust = (thrust - CruiseControlLimitThrust(0.0f)) / cruise_control_thrust_difference;
+                                break;
+                            case STABILIZATIONSETTINGS_CRUISECONTROLINVERTEDPOWEROUTPUT_NORMAL:
+                                // reversed but not boosted
+                                // : CP heli case, stroke is max to -stick
+                                // : thrust = (thrust - CruiseControlLimitThrust(-actuatorDesired.Thrust)) / cruise_control_thrust_difference;
+                                // else it is both unreversed and unboosted
+                                // : simply turn off boost, stroke is max to +stick
+                                // : thrust = (thrust - CruiseControlLimitThrust(actuatorDesired.Thrust)) / cruise_control_thrust_difference;
+                                thrust = (thrust - CruiseControlLimitThrust(
+                                    (cruise_control_inverted_thrust_reversing
+                                    == STABILIZATIONSETTINGS_CRUISECONTROLINVERTEDTHRUSTREVERSING_REVERSED)
+                                    ? -actuatorDesired.Thrust
+                                    : actuatorDesired.Thrust)) / cruise_control_thrust_difference;
+                                break;
+                            case STABILIZATIONSETTINGS_CRUISECONTROLINVERTEDPOWEROUTPUT_BOOSTED:
+                                // if boosted and reversed
+                                if (cruise_control_inverted_thrust_reversing
+                                    == STABILIZATIONSETTINGS_CRUISECONTROLINVERTEDTHRUSTREVERSING_REVERSED) {
+                                    // CP heli case, stroke is max to min
+                                    thrust = (thrust - CruiseControlFactorToThrust(-CruiseControlAngleToFactor(cruise_control_max_angle), actuatorDesired.Thrust)) / cruise_control_thrust_difference;
+                                }
+                                // else it is boosted and unreversed so the throttle doesn't change
+                                else {
+                                    // CP heli case, no transition, so stroke is zero
+                                    thrust = 0.0f;
+                                }
+                                break;
                             }
-                        }
+
+                            // 'thrust' is now the proportion of max stroke
+                            // multiply this proportion of max stroke,
+                            // times the max stroke time, to get this stroke time
+                            // we only want half of this time before the transition
+                            // (and half after the transition)
+                            thrust *= cruise_control_half_power_delay;
+                            // 'thrust' is now the length of time for this stroke
+                            // multiply that times angular rate to get the lead angle
+                            thrust *= fabsf(rate);
+                            // if the transition is within range we use it,
+                            // else we just use the current calculated thrust
+                            if (cruise_control_max_angle - thrust <= angle
+                                && angle <= cruise_control_max_angle + thrust) {
+                                // default to a little above max angle
+                                angle = cruise_control_max_angle + 0.01f;
+                                // if roll direction is downward
+                                // then thrust value is taken from below max angle
+                                // by the code that knows about the transition angle
+                                if (rate < 0.0f) {
+                                    angle -= 0.02f;
+                                }
+                            }
+                        } // if thrust > 0.7; else just use the angle we already calculated
                         factor = CruiseControlAngleToFactor(angle);
                     } else { // if thrust > 0 set factor from angle; else
                         factor = 1.0f;
                     }
 
-/*
-convert these to enums?  something like
-upright  power: zero, normal, boosted
-inverted thrust direction: unchanged, reversed
-inverted power: zero, normal, boosted
-inverted yaw/pitch reverse: off, on
-*/
-                    inverted_flight_mode = false;
-                    // if past max angle and so needing to go into an inverted mode
                     if (angle >= cruise_control_max_angle) {
-                        // -3 inverted mode, -2 boosted reverse, -1 normal reverse, 0 zero power, 1 normal power, 2 boosted power
-                        switch (cruise_control_inverted_power_switch) {
-                        case -3: // reversed boosted thrust with pitch/yaw reverse
-                            inverted_flight_mode = true;
-                            factor = -factor;
-                            break;
-                        case -2: // reversed boosted thrust
-                            factor = -factor;
-                            break;
-                        case -1: // reversed normal thrust
-                            factor = -1.0f;
-                            break;
-                        case  0: // no thrust
+                        switch (cruise_control_inverted_power_output) {
+                        case STABILIZATIONSETTINGS_CRUISECONTROLINVERTEDPOWEROUTPUT_ZERO:
                             factor = 0.0f;
                             break;
-                        case 1:  // normal thrust
+                        case STABILIZATIONSETTINGS_CRUISECONTROLINVERTEDPOWEROUTPUT_NORMAL:
                             factor = 1.0f;
                             break;
-                        case 2:  // normal boosted thrust
-                            // no change to factor
+                        case STABILIZATIONSETTINGS_CRUISECONTROLINVERTEDPOWEROUTPUT_BOOSTED:
+                            // no change, leave factor >= 1.0 alone
                             break;
+                        }
+                        if (cruise_control_inverted_thrust_reversing
+                            == STABILIZATIONSETTINGS_CRUISECONTROLINVERTEDTHRUSTREVERSING_REVERSED) {
+                            factor = -factor;
                         }
                     }
                 } // if previous_time_valid i.e. we've got a rate; else leave (angle and) factor alone
@@ -809,12 +795,9 @@ inverted yaw/pitch reverse: off, on
             } // every 8th time
 
             // don't touch thrust if it's less than min_thrust
-            // without this test, props will spin up to min thrust even at zero throttle stick
+            // without that	 test, quadcopter props will spin up
+            // to min thrust even at zero throttle stick
             actuatorDesired.Thrust = CruiseControlFactorToThrust(factor, actuatorDesired.Thrust);
-            if (inverted_flight_mode) {
-                actuatorDesired.Pitch = -actuatorDesired.Pitch;
-                actuatorDesired.Yaw   = -actuatorDesired.Yaw;
-            }
         } // if Cruise Control is enabled on this flight switch position
 
         if (flightStatus.ControlChain.Stabilization == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
@@ -1008,9 +991,15 @@ static float CruiseControlAngleToFactor(float angle)
 
 // assumes 1.0 <= factor <= 100.0
 // a factor of less than 1.0 could make it return a value less than cruise_control_min_thrust
+// CP helis need to have min_thrust=-1
+//
+// multicopters need to have min_thrust=0.05 or so
+// values below that will not be subject to max / min limiting
+// that means thrust can be less than min
+// that means multicopter motors stop spinning at low stick
 static float CruiseControlFactorToThrust(float factor, float thrust)
 {
-    // don't touch if below min_thrust or we never get to full down stick
+    // don't touch if below min_thrust so we don't limit to min of min_thrust
     // e.g. multicopter motors always spin
     if (thrust > cruise_control_min_thrust) {
         thrust = CruiseControlLimitThrust(thrust * factor);
@@ -1019,9 +1008,6 @@ static float CruiseControlFactorToThrust(float factor, float thrust)
 }
 
 
-// we don't want to limit it to cruise_control_min_thrust on the low side
-// because that is always close to zero, and CP helis need to run down to -1
-// but CP needs to have min=-1
 static float CruiseControlLimitThrust(float thrust)
 {
     // limit to user specified absolute max thrust
@@ -1077,15 +1063,18 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
         rattitude_mode_transition_stick_position = (float)settings.RattitudeModeTransition / 100.0f;
     }
 
-    cruise_control_min_thrust      = (float)settings.CruiseControlMinThrust / 100.0f;
-    cruise_control_max_thrust      = (float)settings.CruiseControlMaxThrust / 100.0f;
-    cruise_control_max_angle              = settings.CruiseControlMaxAngle;
-    cruise_control_max_power_factor       = settings.CruiseControlMaxPowerFactor;
-    cruise_control_power_trim             = settings.CruiseControlPowerTrim / 100.0f;
-    cruise_control_inverted_power_switch  = settings.CruiseControlInvertedPowerSwitch;
-    cruise_control_half_power_delay       = settings.CruiseControlPowerDelayComp / 2.0f;
-    cruise_control_max_power_factor_angle = RAD2DEG(acosf(1.0f / settings.CruiseControlMaxPowerFactor));
-    cruise_control_thrust_difference      = cruise_control_max_thrust - cruise_control_min_thrust;
+    cruise_control_min_thrust                 = (float)settings.CruiseControlMinThrust / 100.0f;
+    cruise_control_max_thrust                 = (float)settings.CruiseControlMaxThrust / 100.0f;
+    cruise_control_thrust_difference          = cruise_control_max_thrust - cruise_control_min_thrust;
+
+    cruise_control_max_angle                  = (float) settings.CruiseControlMaxAngle;
+    cruise_control_max_power_factor           = settings.CruiseControlMaxPowerFactor;
+    cruise_control_power_trim                 = settings.CruiseControlPowerTrim / 100.0f;
+    cruise_control_half_power_delay           = settings.CruiseControlPowerDelayComp / 2.0f;
+    cruise_control_max_power_factor_angle     = RAD2DEG(acosf(1.0f / settings.CruiseControlMaxPowerFactor));
+
+    cruise_control_inverted_thrust_reversing  = settings.CruiseControlInvertedThrustReversing;
+    cruise_control_inverted_power_output      = settings.CruiseControlInvertedPowerOutput;
 
     memcpy(
         cruise_control_flight_mode_switch_pos_enable,

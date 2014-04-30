@@ -167,9 +167,9 @@ static int32_t maininit(stateFilter *self)
  */
 static filterResult filter(stateFilter *self, stateEstimation *state)
 {
-    struct data *this = (struct data *)self->localdata;
+    struct data *this   = (struct data *)self->localdata;
 
-    filterResult result    = FILTERRESULT_OK;
+    filterResult result = FILTERRESULT_OK;
 
     if (IS_SET(state->updated, SENSORUPDATES_mag)) {
         this->magUpdated    = 1;

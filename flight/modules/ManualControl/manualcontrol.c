@@ -113,7 +113,7 @@ static const controlHandler handler_PATHPLANNER = {
     .handler           = &pathPlannerHandler,
 };
 
-#endif
+#endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
 

@@ -334,9 +334,9 @@ MODULE_INITCALL(StateEstimationInitialize, StateEstimationStart);
 static void StateEstimationCb(void)
 {
     static enum { RUNSTATE_LOAD = 0, RUNSTATE_FILTER = 1, RUNSTATE_SAVE = 2 } runState = RUNSTATE_LOAD;
-    static filterResult alarm = FILTERRESULT_OK;
+    static filterResult alarm     = FILTERRESULT_OK;
     static filterResult lastAlarm = FILTERRESULT_UNINITIALISED;
-    static uint16_t alarmcounter = 0;
+    static uint16_t alarmcounter  = 0;
     static const filterPipeline *current;
     static stateEstimation states;
     static uint32_t last_time;

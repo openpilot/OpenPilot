@@ -28,9 +28,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.4629556"
-     inkscape:cx="49.946716"
+     inkscape:cx="32.393349"
      inkscape:cy="37.450437"
-     inkscape:current-layer="background"
+     inkscape:current-layer="foreground"
      id="namedview3608"
      showgrid="true"
      inkscape:window-width="1366"
@@ -2795,15 +2795,15 @@
     <text
        xml:space="preserve"
        style="font-size:4px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="10.182916"
-       y="37.609917"
+       x="14.453424"
+       y="37.585503"
        id="text5330-7-7-9-8"
        sodipodi:linespacing="125%"
        transform="scale(0.83127393,1.2029729)"><tspan
          sodipodi:role="line"
-         id="tspan3508"
-         x="10.182916"
-         y="37.609917">RECEIVER</tspan></text>
+         id="tspan3410"
+         x="14.453424"
+         y="37.585503">INPUT</tspan></text>
     <rect
        inkscape:label="#rect4550-8-1-4-21-5-33"
        ry="1"
@@ -2825,15 +2825,15 @@
     <text
        xml:space="preserve"
        style="font-size:4px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="12.23565"
-       y="49.195126"
+       x="12.280572"
+       y="49.196102"
        id="text5330-7-7-9-8-1"
        sodipodi:linespacing="125%"
        transform="scale(0.83127393,1.2029729)"><tspan
          sodipodi:role="line"
-         id="tspan4588"
-         x="12.23565"
-         y="49.195126">SERVOS</tspan></text>
+         id="tspan3412"
+         x="12.280572"
+         y="49.196102">OUTPUT</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"

@@ -690,8 +690,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                         // exaggerate the length of time the inverted to upright
                         // transition holds full throttle and reduce the length
                         // of time for full throttle when going upright to inverted.
-                        if (actuatorDesired.Thrust > 0.95f) {
-// change this to 0.7
+                        if (actuatorDesired.Thrust > 0.7f) {
                             float thrust;
 
                             thrust = CruiseControlFactorToThrust(CruiseControlAngleToFactor(cruise_control_max_angle), actuatorDesired.Thrust);

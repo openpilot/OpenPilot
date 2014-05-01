@@ -424,7 +424,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 // and the Att rate equals the Rate rate
                 // that's where Rate x (1-StickAngle) [Attitude pulling down max X Ratt proportion]
                 // == Rate x StickAngle [Rate pulling up according to stick angle]
-                //    * StickAngle [X Ratt proportion]
+                // * StickAngle [X Ratt proportion]
                 // so 1-x == x*x or x*x+x-1=0 where xE(0,1)
                 // (-1+-sqrt(1+4))/2 = (-1+sqrt(5))/2
                 // and quadratic formula says that is 0.618033989f
@@ -448,7 +448,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                     magnitude *= STICK_VALUE_AT_MODE_TRANSITION / rattitude_mode_transition_stick_position;
                 } else {
                     magnitude = (magnitude - rattitude_mode_transition_stick_position)
-                                * (1.0f-STICK_VALUE_AT_MODE_TRANSITION)
+                                * (1.0f - STICK_VALUE_AT_MODE_TRANSITION)
                                 / (1.0f - rattitude_mode_transition_stick_position)
                                 + STICK_VALUE_AT_MODE_TRANSITION;
                 }
@@ -1056,7 +1056,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     cur_flight_mode = -1;
 
     // Rattitude stick angle where the attitude to rate transition happens
-    if (settings.RattitudeModeTransition < (uint8_t) 10) {
+    if (settings.RattitudeModeTransition < (uint8_t)10) {
         rattitude_mode_transition_stick_position = 10.0f / 100.0f;
     } else {
         rattitude_mode_transition_stick_position = (float)settings.RattitudeModeTransition / 100.0f;

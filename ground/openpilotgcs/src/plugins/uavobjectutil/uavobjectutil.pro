@@ -7,9 +7,11 @@ include(uavobjectutil_dependencies.pri)
 HEADERS += uavobjectutil_global.h \
 	uavobjectutilmanager.h \
     uavobjectutilplugin.h \
-   devicedescriptorstruct.h
+   devicedescriptorstruct.h \
+    uavobjecthelper.h
 
 SOURCES += uavobjectutilmanager.cpp \
-    uavobjectutilplugin.cpp
+    uavobjectutilplugin.cpp \
+    uavobjecthelper.cpp
 
 OTHER_FILES += UAVObjectUtil.pluginspec

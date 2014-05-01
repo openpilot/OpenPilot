@@ -122,9 +122,6 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo *info, int numBytes)
     matlabSwitchCode.append("\t\t\t" + tableIdxName + " = " + tableIdxName + " + 1;\n");
     matlabSwitchCode.append("\t\t\t" + objectTableName + "FidIdx(" + tableIdxName + ") = bufferIdx; %#ok<*AGROW>\n");
     matlabSwitchCode.append("\t\t\tbufferIdx=bufferIdx + " + objectTableName.toUpper() + "_NUMBYTES+1; %+1 is for CRC\n");
-    if (!info->isSingleInst) {
-        matlabSwitchCode.append("\t\t\tbufferIdx = bufferIdx + 2; %An extra two bytes for the instance ID\n");
-    }
     matlabSwitchCode.append("\t\t\tif " + tableIdxName + " >= length(" + objectTableName + "FidIdx) %Check to see if pre-allocated memory is exhausted\n");
     matlabSwitchCode.append("\t\t\t\t" + objectTableName + "FidIdx(" + tableIdxName + "*2) = 0;\n");
     matlabSwitchCode.append("\t\t\tend\n");
@@ -145,16 +142,15 @@ bool UAVObjectGeneratorMatlab::process_object(ObjectInfo *info, int numBytes)
     // Add timestamp
     allocationFields.append("\t" + objectName + ".timestamp = " +
                             "double(typecast(buffer(mcolon(" + objectName + "FidIdx "
-                            "- 20, " + objectName + "FidIdx + 4-1 -20)), 'uint32'))';\n");
+                            "- headerLen - oplHeaderLen, " + objectName + "FidIdx + 3 - headerLen - oplHeaderLen)), 'uint32'))';\n");
 
     int currentIdx = 0;
 
     // Add Instance ID, if necessary
     if (!info->isSingleInst) {
         allocationFields.append("\t" + objectName + ".instanceID = " +
-                                "double(typecast(buffer(mcolon(" + objectName + "FidIdx "
-                                ", " + objectName + "FidIdx + 2-1)), 'uint16'))';\n");
-        currentIdx += 2;
+                                "double(typecast(buffer(mcolon(" + objectName + "FidIdx - 2"
+                                ", " + objectName + "FidIdx - 2 + 1)), 'uint16'))';\n");
     }
 
     for (int n = 0; n < info->fields.length(); ++n) {

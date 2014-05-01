@@ -276,8 +276,8 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
     QList< QList<UAVDataObject *> > objList = objManager->getDataObjects();
     foreach(QList<UAVDataObject *> list, objList) {
         foreach(UAVDataObject * obj, list) {
-            if (((what == Settings) && obj->isSettings()) ||
-                ((what == Data) && !obj->isSettings()) ||
+            if (((what == Settings) && obj->isSettingsObject()) ||
+                ((what == Data) && !obj->isSettingsObject()) ||
                 (what == Both)) {
                 // add each object to the XML
                 QDomElement o = doc.createElement("object");
@@ -319,7 +319,7 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
                 }
 
                 // append to the settings or data element
-                if (obj->isSettings()) {
+                if (obj->isSettingsObject()) {
                     settings.appendChild(o);
                 } else {
                     data.appendChild(o);

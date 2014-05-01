@@ -230,7 +230,7 @@ void LoggingThread::retrieveSettings()
     QList< QList<UAVDataObject *> > objs = objMngr->getDataObjects();
     for (int n = 0; n < objs.length(); ++n) {
         UAVDataObject *obj = objs[n][0];
-        if (obj->isSettings()) {
+        if (obj->isSettingsObject()) {
             queue.enqueue(obj);
         }
     }

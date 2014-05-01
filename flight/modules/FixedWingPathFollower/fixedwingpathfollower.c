@@ -503,7 +503,7 @@ static uint8_t updateFixedDesiredAttitude()
 
     // Error condition: plane cannot hold altitude at current speed.
     fixedwingpathfollowerStatus.Errors.Lowpower = 0;
-    if (powerCommand >= fixedwingpathfollowerSettings.ThrustLimit.Max && // thrust at maximum
+    if (fixedwingpathfollowerSettings.ThrustLimit.Neutral + powerCommand >= fixedwingpathfollowerSettings.ThrustLimit.Max && // thrust at maximum
         velocityState.Down > 0 && // we ARE going down
         descentspeedDesired < 0 && // we WANT to go up
         airspeedError > 0 && // we are too slow already
@@ -513,7 +513,7 @@ static uint8_t updateFixedDesiredAttitude()
     }
     // Error condition: plane keeps climbing despite minimum thrust (opposite of above)
     fixedwingpathfollowerStatus.Errors.Highpower = 0;
-    if (powerCommand >= fixedwingpathfollowerSettings.ThrustLimit.Min && // thrust at minimum
+    if (fixedwingpathfollowerSettings.ThrustLimit.Neutral + powerCommand <= fixedwingpathfollowerSettings.ThrustLimit.Min && // thrust at minimum
         velocityState.Down < 0 && // we ARE going up
         descentspeedDesired > 0 && // we WANT to go down
         airspeedError < 0 && // we are too fast already
@@ -555,7 +555,7 @@ static uint8_t updateFixedDesiredAttitude()
 
     // Error condition: high speed dive
     fixedwingpathfollowerStatus.Errors.Pitchcontrol = 0;
-    if (pitchCommand >= fixedwingpathfollowerSettings.PitchLimit.Max && // pitch demand is full up
+    if (fixedwingpathfollowerSettings.PitchLimit.Neutral + pitchCommand >= fixedwingpathfollowerSettings.PitchLimit.Max && // pitch demand is full up
         velocityState.Down > 0 && // we ARE going down
         descentspeedDesired < 0 && // we WANT to go up
         airspeedError < 0 && // we are too fast already

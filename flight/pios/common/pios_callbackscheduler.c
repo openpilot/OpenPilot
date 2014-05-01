@@ -33,7 +33,7 @@
 
 // Private constants
 #define STACK_SAFETYCOUNT 16
-#define STACK_SIZE        (384 + STACK_SAFETYSIZE)
+#define STACK_SIZE        (190 + STACK_SAFETYSIZE)
 #define STACK_SAFETYSIZE  8
 #define MAX_SLEEP         1000
 

@@ -27,14 +27,19 @@ SCRIPT_NAME="`basename \"$SCRIPT_PATH\"`"
 SCRIPT_DIR="`dirname \"$SCRIPT_PATH\"`"
 ROOT_DIR="`pushd \"$SCRIPT_DIR/../..\" >/dev/null && pwd && popd >/dev/null`"
 TOOLS_DIR="$ROOT_DIR/tools"
+if [ -x "$1" ]; then
+    TOOLS_DIR="$1"
+fi
 
 # Tools URLs to fetch
 WGET_URL="http://wiki.openpilot.org/download/attachments/18612236/wget.exe"
 MAKE_URL="http://wiki.openpilot.org/download/attachments/18612236/make.exe"
+SEVENZIP_URL="http://wiki.openpilot.org/download/attachments/18612236/7za.exe"
 
 # Expected tools paths
 WGET="$TOOLS_DIR/bin/`basename \"$WGET_URL\"`"
 MAKE="$TOOLS_DIR/bin/`basename \"$MAKE_URL\"`"
+SEVENZIP="$TOOLS_DIR/bin/`basename \"$SEVENZIP_URL\"`"
 
 # wget is necessary to fetch other files
 WGET_NAME="`basename \"$WGET\"`"
@@ -78,7 +83,6 @@ EOF
 fi
 
 # make is necessary to fetch all SDKs
-MAKE_NAME="`basename \"$MAKE\"`"
 if [ ! -x "$MAKE" ]; then
     echo "$SCRIPT_NAME: $MAKE_NAME not found, fetching from $MAKE_URL"
     MAKE_DIR="`dirname \"$MAKE\"`"
@@ -86,7 +90,21 @@ if [ ! -x "$MAKE" ]; then
     $WGET -N --content-disposition -P "$MAKE_DIR" "$MAKE_URL"
     if [ $? -ne 0 ]; then
         echo "$SCRIPT_NAME: $MAKE_NAME fetch error, hope it's in the path..."
+        MAKE_NAME="`basename \"$MAKE\"`"
         MAKE="$MAKE_NAME"
+    fi
+fi
+
+# 7-Zip is necessary to install some SDKs
+if [ ! -x "$SEVENZIP" ]; then
+    echo "$SCRIPT_NAME: $SEVENZIP_NAME not found, fetching from $SEVENZIP_URL"
+    SEVENZIP_DIR="`dirname \"$SEVENZIP\"`"
+    mkdir -p "$SEVENZIP_DIR"
+    $WGET -N --content-disposition -P "$SEVENZIP_DIR" "$SEVENZIP_URL"
+    if [ $? -ne 0 ]; then
+        echo "$SCRIPT_NAME: $SEVENZIP_NAME fetch error, hope it's in the path..."
+        SEVENZIP_NAME="`basename \"$SEVENZIP\"`"
+        SEVENZIP="$SEVENZIP_NAME"
     fi
 fi
 

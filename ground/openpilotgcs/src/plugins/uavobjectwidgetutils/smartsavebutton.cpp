@@ -114,7 +114,7 @@ void SmartSaveButton::processOperation(QPushButton *button, bool save)
 
         sv_result = false;
         current_objectID = obj->getObjID();
-        if (save && (obj->isSettings())) {
+        if (save && (obj->isSettingsObject())) {
             for (int i = 0; i < 3; ++i) {
                 qDebug() << "Saving" << obj->getName() << "to board.";
                 connect(utilMngr, SIGNAL(saveCompleted(int, bool)), this, SLOT(saving_finished(int, bool)));

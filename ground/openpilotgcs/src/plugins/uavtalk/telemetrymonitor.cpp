@@ -78,7 +78,7 @@ void TelemetryMonitor::startRetrievingObjects()
         if (mobj != NULL) {
             queue.enqueue(obj);
         } else if (dobj != NULL) {
-            if (dobj->isSettings()) {
+            if (dobj->isSettingsObject()) {
                 queue.enqueue(obj);
             } else {
                 if (UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE) {

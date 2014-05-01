@@ -18,11 +18,14 @@
 # mail.nalla@gmail.com
 #
 
-TEMPLATE     = lib
-TARGET      = sdlgamepad
-DEFINES     += SDLGAMEPAD_LIBRARY
+TEMPLATE = lib
+TARGET = sdlgamepad
+DEFINES += SDLGAMEPAD_LIBRARY
+
+include(../../openpilotgcslibrary.pri)
+
 macx {
-    # Workaround to ensure that SDL framework and associated header files are found
+    # Ensures that SDL framework and header files are found when compiled with Qt5.2.1
     INCLUDEPATH += /Library/Frameworks/SDL.framework/Headers
     SDL = -F/Library/Frameworks
     # Add SDL to CFLAGS fixes build problems on mac
@@ -30,18 +33,27 @@ macx {
     QMAKE_CXXFLAGS += $$SDL
     # Let the linker know where to find the frameworks
     LIBS += $$SDL
+    LIBS += -framework OpenGL -framework SDL -framework Cocoa
 }
 
-include(../../openpilotgcslibrary.pri)
+win32 {
+    INCLUDEPATH += $(SDL_DIR)/include
+    LIBS += -L$(SDL_DIR)/lib
+}
 
-SOURCES     += sdlgamepad.cpp
-HEADERS     += sdlgamepad.h \
-               sdlgamepad_global.h
+!mac:LIBS += -lSDL
 
-macx:LIBS   += -framework OpenGL -framework SDL -framework Cocoa
-!macx:LIBS  += -lSDL
+SOURCES += \
+    sdlgamepad.cpp
 
-OTHER_FILES += COPYING \
-               README \
-               sdlgamepad.dox \
-               sdlgamepad.doc
+HEADERS += \
+    sdlgamepad.h \
+    sdlgamepad_global.h
+
+OTHER_FILES += \
+	COPYING \
+    README \
+    sdlgamepad.dox \
+    sdlgamepad.doc
+
+include(copydata.pro)

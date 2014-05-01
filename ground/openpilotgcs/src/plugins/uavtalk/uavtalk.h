@@ -105,8 +105,6 @@ private:
 
     static const int TX_BUFFER_SIZE     = 2 * 1024;
 
-    static const quint8 crc_table[256];
-
     // Types
     typedef enum {
         STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS, STATE_COMPLETE, STATE_ERROR

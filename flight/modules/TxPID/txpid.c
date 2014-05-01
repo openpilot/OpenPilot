@@ -327,7 +327,7 @@ static void updatePIDs(UAVObjEvent *ev)
             break;
 
         case 2:
-            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *)&bank);
+            StabilizationSettingsBank3Set((StabilizationSettingsBank3Data *)&bank);
             break;
 
         default:

@@ -73,7 +73,7 @@ uint16_t PIOS_WDG_Init()
         delay = 0x0fff;
     }
 #if defined(PIOS_INCLUDE_WDG)
-    DBGMCU_Config(DBGMCU_IWDG_STOP, ENABLE); // make the watchdog stop counting in debug mode
+    DBGMCU_APB1PeriphConfig(DBGMCU_IWDG_STOP, ENABLE); // OP-1272 : write in APB1 register
     IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
     IWDG_SetPrescaler(IWDG_Prescaler_16);
     IWDG_SetReload(delay);

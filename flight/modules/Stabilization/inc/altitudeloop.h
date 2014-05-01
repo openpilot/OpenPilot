@@ -1,9 +1,15 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{
+ * @addtogroup StabilizationModule Stabilization Module
+ * @brief altitudeloop mode
+ * @note This file implements the logic for a altitudeloop
+ * @{
  *
- * @file       examplemodperiodic.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Example module to be used as a template for actual modules.
+ * @file       altitudeloop.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      Attitude stabilization module.
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -23,9 +29,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef EXAMPLEMODPERIODIC_H
-#define EXAMPLEMODPERIODIC_H
 
-int32_t ExampleModPeriodicInitialize();
-int32_t GuidanceInitialize(void);
-#endif // EXAMPLEMODPERIODIC_H
+#ifndef ALTITUDELOOP_H
+#define ALTITUDELOOP_H
+
+typedef enum { ALTITUDEHOLD = 0, ALTITUDEVARIO = 1, DIRECT = 2 } ThrustModeType;
+
+void stabilizationAltitudeloopInit();
+float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit);
+
+#endif /* ALTITUDELOOP_H */

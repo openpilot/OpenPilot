@@ -106,7 +106,6 @@ UAVOBJSRCFILENAMES += altitudeholdsettings
 UAVOBJSRCFILENAMES += oplinksettings
 UAVOBJSRCFILENAMES += oplinkstatus
 UAVOBJSRCFILENAMES += altitudefiltersettings
-UAVOBJSRCFILENAMES += altitudeholddesired
 UAVOBJSRCFILENAMES += altitudeholdstatus
 UAVOBJSRCFILENAMES += waypoint
 UAVOBJSRCFILENAMES += waypointactive

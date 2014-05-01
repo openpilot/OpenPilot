@@ -50,6 +50,7 @@
 #include <stabilization.h>
 #include <innerloop.h>
 #include <outerloop.h>
+#include <altitudeloop.h>
 
 
 // Public variables
@@ -109,6 +110,9 @@ int32_t StabilizationInitialize()
 
     stabilizationOuterloopInit();
     stabilizationInnerloopInit();
+#ifdef REVOLUTION
+    stabilizationAltitudeloopInit();
+#endif
     pid_zero(&stabSettings.outerPids[0]);
     pid_zero(&stabSettings.outerPids[1]);
     pid_zero(&stabSettings.outerPids[2]);

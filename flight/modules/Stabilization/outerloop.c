@@ -46,6 +46,7 @@
 
 #include <stabilization.h>
 #include <cruisecontrol.h>
+#include <altitudeloop.h>
 #include <CoordinateConversions.h>
 
 // Private constants
@@ -228,6 +229,13 @@ static void stabilizationOuterloopTask()
             }
         } else {
             switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
+            case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE:
+                rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEHOLD, reinit);
+                break;
+            case STABILIZATIONSTATUS_OUTERLOOP_VERTICALVELOCITY:
+                rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEVARIO, reinit);
+                break;
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
             default:
                 rateDesiredAxis[t] = stabilizationDesiredAxis[t];
                 break;

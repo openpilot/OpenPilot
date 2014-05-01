@@ -108,7 +108,6 @@ UAVOBJSRCFILENAMES += camerastabsettings
 UAVOBJSRCFILENAMES += altitudeholdsettings
 UAVOBJSRCFILENAMES += altitudefiltersettings
 UAVOBJSRCFILENAMES += revosettings
-UAVOBJSRCFILENAMES += altitudeholddesired
 UAVOBJSRCFILENAMES += altitudeholdstatus
 UAVOBJSRCFILENAMES += ekfconfiguration
 UAVOBJSRCFILENAMES += ekfstatevariance

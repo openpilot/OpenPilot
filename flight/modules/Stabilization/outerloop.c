@@ -160,8 +160,8 @@ static void stabilizationOuterloopTask()
                 float rateDesiredAxisRate = stickinput[t] * cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t];
                 // limit corrective rate to maximum rates to not give it overly large impact over manual rate when joined together
                 rateDesiredAxis[t] = boundf(pid_apply(&stabSettings.outerPids[t], local_error[t], dT),
-                                            -cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t],
-                                            cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t]
+                                            -cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t],
+                                            cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t]
                                             );
                 // Compute the weighted average rate desired
                 // Using max() rather than sqrt() for cpu speed;

@@ -719,6 +719,8 @@ void UploaderGadgetWidget::systemRescue()
     log("** Follow those instructions to attempt a system rescue **");
     log("**********************************************************");
     log("You will be prompted to first connect USB, then system power");
+
+    // Check if board is connected and, if yes, prompt user to disconnect board
     if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
         QString labelText = QString("<p align=\"left\">%1</p>").arg(tr("Please disconnect your OpenPilot board."));
         TimedDialog progressDlg(tr("System Rescue"), labelText, 20);
@@ -735,13 +737,7 @@ void UploaderGadgetWidget::systemRescue()
         }
     }
 
-    // Now we're good to go
-    clearLog();
-    log("**********************************************************");
-    log("** Follow those instructions to attempt a system rescue **");
-    log("**********************************************************");
-    log("You will be prompted to first connect USB, then system power");
-
+    // Now prompt user to connect board
     QString labelText = QString("<p align=\"left\">%1<br>%2</p>").arg(tr("Please connect your OpenPilot board.")).arg(tr("Board must be connected by USB!"));
     TimedDialog progressDlg(tr("System Rescue"), labelText, 20);
     connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), &progressDlg, SLOT(accept()));
@@ -756,8 +752,7 @@ void UploaderGadgetWidget::systemRescue()
         return;
     }
 
-    log("... Detecting First Board...");
-    repaint();
+    log("Detecting first board...");
     dfu = new DFUObject(DFU_DEBUG, false, QString());
     dfu->AbortOperation();
     if (!dfu->enterDFU(0)) {
@@ -776,7 +771,7 @@ void UploaderGadgetWidget::systemRescue()
         m_config->rescueButton->setEnabled(true);
         return;
     }
-    log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
+    log(QString("Found %1 device(s).").arg(dfu->numberOfDevices));
 
     if (dfu->numberOfDevices > 5) {
         log("Inconsistent number of devices, aborting!");
@@ -798,6 +793,7 @@ void UploaderGadgetWidget::systemRescue()
     m_config->resetButton->setEnabled(false);
     bootButtonsSetEnable(true);
     m_config->rescueButton->setEnabled(false);
+
     // So that we can boot from the GUI afterwards.
     currentStep = IAP_STATE_BOOTLOADER;
 }
@@ -920,9 +916,8 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVa
  */
 void UploaderGadgetWidget::log(QString str)
 {
-    qDebug() << str;
+    qDebug() << "UploaderGadgetWidget -" << str;
     m_config->textBrowser->append(str);
-    m_config->textBrowser->repaint();
 }
 
 void UploaderGadgetWidget::clearLog()

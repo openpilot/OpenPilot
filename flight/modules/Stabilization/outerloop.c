@@ -158,13 +158,17 @@ static void stabilizationOuterloopTask()
                 stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
                 stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
                 float rateDesiredAxisRate = stickinput[t] * cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t];
-                rateDesiredAxis[t] = pid_apply(&stabSettings.outerPids[t], local_error[t], dT);
+                // limit corrective rate to maximum rates to not give it overly large impact over manual rate when joined together
+                rateDesiredAxis[t] = boundf(pid_apply(&stabSettings.outerPids[t], local_error[t], dT),
+                                            -cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t],
+                                            cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t]
+                                            );
                 // Compute the weighted average rate desired
                 // Using max() rather than sqrt() for cpu speed;
                 // - this makes the stick region into a square;
                 // - this is a feature!
                 // - hold a roll angle and add just pitch without the stick sensitivity changing
-                float magnitude = stickinput[t];
+                float magnitude = fabsf(stickinput[t]);
                 if (t < 2) {
                     magnitude = fmaxf(fabsf(stickinput[0]), fabsf(stickinput[1]));
                 }

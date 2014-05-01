@@ -100,7 +100,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->eraseBootButton, SIGNAL(clicked()), this, SLOT(systemEraseBoot()));
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(onPhisicalHWConnect()));
+    connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(onPhysicalHWConnect()));
     getSerialPorts();
 
     m_config->autoUpdateButton->setEnabled(autoUpdateCapable());
@@ -189,14 +189,12 @@ void UploaderGadgetWidget::bootButtonsSetEnable(bool enabled)
     m_config->bootButton->setEnabled(enabled);
     m_config->safeBootButton->setEnabled(enabled);
 
-
-    m_config->eraseBootButton->setEnabled(
-        enabled &&
-        // this feature is supported only on BL revision >= 4
-        ((dfu != NULL) && (dfu->devices[0].BL_Version >= 4)));
+    // this feature is supported only on BL revision >= 4
+    bool isBL4 = ((dfu != NULL) && (dfu->devices[0].BL_Version >= 4));
+    m_config->eraseBootButton->setEnabled(isBL4 && enabled);
 }
 
-void UploaderGadgetWidget::onPhisicalHWConnect()
+void UploaderGadgetWidget::onPhysicalHWConnect()
 {
     bootButtonsSetEnable(false);
     m_config->rescueButton->setEnabled(false);

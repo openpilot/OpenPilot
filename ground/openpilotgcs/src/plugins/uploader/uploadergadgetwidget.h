@@ -121,7 +121,7 @@ private:
     static const int AUTOUPDATE_CLOSE_TIMEOUT;
     QTimer autoUpdateCloseTimer;
 private slots:
-    void onPhisicalHWConnect();
+    void onPhysicalHWConnect();
     void versionMatchCheck();
     void error(QString errorString, int errorNumber);
     void info(QString infoString, int infoNumber);

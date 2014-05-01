@@ -246,6 +246,13 @@ void UploaderGadgetWidget::onAutopilotDisconnect()
     }
 }
 
+static void sleep(int ms)
+{
+    QEventLoop eventloop;
+    QTimer::singleShot(ms, &eventloop, SLOT(quit()));
+    eventloop.exec();
+}
+
 /**
    Tell the mainboard to go to bootloader:
    - Send the relevant IAP commands
@@ -283,8 +290,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             m_config->haltButton->setEnabled(true);
             break;
         }
-        QTimer::singleShot(600, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(600);
         fwIAP->getField("Command")->setValue("2233");
         currentStep = IAP_STATE_STEP_2;
         log(QString("IAP Step 2"));
@@ -299,8 +305,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             m_config->haltButton->setEnabled(true);
             break;
         }
-        QTimer::singleShot(600, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(600);
         fwIAP->getField("Command")->setValue("3344");
         currentStep = IAP_STEP_RESET;
         log(QString("IAP Step 3"));
@@ -322,12 +327,10 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
         QString dli = cm->getCurrentDevice().getConName();
         QString dlj = cm->getCurrentDevice().getConName();
         cm->disconnectDevice();
-        QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(200);
         // Tell connections to stop their polling threads: otherwise it will mess up DFU
         cm->suspendPolling();
-        QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(200);
         log("Board Halt");
         m_config->boardStatus->setText("Bootloader");
         if (dlj.startsWith("USB")) {
@@ -371,8 +374,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
         }
         // dfu.StatusRequest();
 
-        QTimer::singleShot(500, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(500);
         dfu->findDevices();
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
         if (dfu->numberOfDevices < 0 || dfu->numberOfDevices > 3) {
@@ -577,8 +579,7 @@ bool UploaderGadgetWidget::autoUpdate()
             emit autoUpdateSignal(FAILURE, QVariant());
             return false;
         }
-        timer.start(500);
-        loop.exec();
+        sleep(500);
     }
     emit autoUpdateSignal(WAITING_CONNECT, 0);
     autoUpdateConnectTimeout = 0;

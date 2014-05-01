@@ -963,11 +963,13 @@ UploaderGadgetWidget::~UploaderGadgetWidget()
 void UploaderGadgetWidget::error(QString errorString, int errorNumber)
 {
     Q_UNUSED(errorNumber);
+
+    m_config->boardStatus->setText(errorString);
+
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.setText(errorString);
     msgBox.exec();
-    m_config->boardStatus->setText(errorString);
 }
 
 /**

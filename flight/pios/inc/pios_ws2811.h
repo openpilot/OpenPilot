@@ -44,6 +44,60 @@
 #define PIOS_WS2811_PERIPHERALDATASIZE DMA_PeripheralDataSize_HalfWord
 #define PIOS_WS2811_TIM_PERIOD         20
 
+#define PIOS_WS2811_DMA_CH1_CONFIG(channel) \
+    { \
+        .DMA_BufferSize         = 4, \
+        .DMA_Channel            = channel, \
+        .DMA_DIR = DMA_DIR_MemoryToPeripheral, \
+        .DMA_FIFOMode           = DMA_FIFOMode_Enable, \
+        .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full, \
+        .DMA_Memory0BaseAddr    = 0, \
+        .DMA_MemoryBurst        = DMA_MemoryBurst_INC4, \
+        .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE, \
+        .DMA_MemoryInc          = DMA_MemoryInc_Enable, \
+        .DMA_Mode = DMA_Mode_Circular, \
+        .DMA_PeripheralBaseAddr = 0, \
+        .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single, \
+        .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE, \
+        .DMA_PeripheralInc      = DMA_PeripheralInc_Disable, \
+        .DMA_Priority           = DMA_Priority_VeryHigh, }
+
+#define PIOS_WS2811_DMA_CH2_CONFIG(channel) \
+    { \
+        .DMA_BufferSize         = 4, \
+        .DMA_Channel            = channel, \
+        .DMA_DIR = DMA_DIR_MemoryToPeripheral, \
+        .DMA_FIFOMode           = DMA_FIFOMode_Enable, \
+        .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full, \
+        .DMA_Memory0BaseAddr    = 0, \
+        .DMA_MemoryBurst        = DMA_MemoryBurst_INC4, \
+        .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE, \
+        .DMA_MemoryInc          = DMA_MemoryInc_Enable, \
+        .DMA_Mode = DMA_Mode_Circular, \
+        .DMA_PeripheralBaseAddr = 0, \
+        .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single, \
+        .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE, \
+        .DMA_PeripheralInc      = DMA_PeripheralInc_Disable, \
+        .DMA_Priority           = DMA_Priority_High }
+
+#define PIOS_WS2811_DMA_UPDATE_CONFIG(channel) \
+    { \
+        .DMA_BufferSize         = PIOS_WS2811_BUFFER_SIZE, \
+        .DMA_Channel            = channel, \
+        .DMA_DIR = DMA_DIR_MemoryToPeripheral, \
+        .DMA_FIFOMode           = DMA_FIFOMode_Enable, \
+        .DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull, \
+        .DMA_Memory0BaseAddr    = 0, \
+        .DMA_MemoryBurst        = DMA_MemoryBurst_INC4, \
+        .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE, \
+        .DMA_MemoryInc          = DMA_MemoryInc_Enable, \
+        .DMA_Mode = DMA_Mode_Circular, \
+        .DMA_PeripheralBaseAddr = 0, \
+        .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single, \
+        .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE, \
+        .DMA_PeripheralInc      = DMA_PeripheralInc_Disable, \
+        .DMA_Priority           = DMA_Priority_VeryHigh, }
+
 typedef uint16_t ledbuf_t;
 
 typedef struct Color Color;

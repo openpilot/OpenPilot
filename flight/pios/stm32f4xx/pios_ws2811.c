@@ -39,7 +39,7 @@
 // framebuffer
 static ledbuf_t *fb = 0;
 // bitmask with pin to be set/reset using dma
-static ledbuf_t dmaSource;
+static ledbuf_t dmaSource[4];
 
 static const struct pios_ws2811_cfg *pios_ws2811_cfg;
 static const struct pios_ws2811_pin_cfg *pios_ws2811_pin_cfg;
@@ -55,15 +55,15 @@ static void genericTIM_OCxPreloadConfig(TIM_TypeDef *TIMx, uint16_t TIM_OCPreloa
 
 /* Example configuration fragment for REVOLUTION
 
-#ifdef PIOS_INCLUDE_WS2811
-#include <pios_ws2811.h>
-#include <hwsettings.h>
-#define PIOS_WS2811_TIM_DIVIDER (PIOS_PERIPHERAL_APB2_CLOCK / (800000 * PIOS_WS2811_TIM_PERIOD))
+   #ifdef PIOS_INCLUDE_WS2811
+   #include <pios_ws2811.h>
+   #include <hwsettings.h>
+   #define PIOS_WS2811_TIM_DIVIDER (PIOS_PERIPHERAL_APB2_CLOCK / (800000 * PIOS_WS2811_TIM_PERIOD))
 
-// interrupt vector for DMA streamCh1
-void DMA2_Stream1_IRQHandler(void) __attribute__((alias("PIOS_WS2811_irq_handler")));
+   // interrupt vector for DMA streamCh1
+   void DMA2_Stream1_IRQHandler(void) __attribute__((alias("PIOS_WS2811_irq_handler")));
 
-const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
+   const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
     [HWSETTINGS_WS2811LED_OUT_SERVOOUT1] = {
         .gpio     = GPIOB,
         .gpioInit =                        {
@@ -83,9 +83,9 @@ const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-};
+   };
 
-const struct pios_ws2811_cfg pios_ws2811_cfg = {
+   const struct pios_ws2811_cfg pios_ws2811_cfg = {
     .timer     = TIM1,
     .timerInit = {
         .TIM_Prescaler         = PIOS_WS2811_TIM_DIVIDER - 1,
@@ -104,67 +104,19 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
 
     // DMA streamCh1, triggered by timerCh1 pwm signal.
     // if FrameBuffer indicates, reset output value early to indicate "0" bit to ws2812
-    .dmaInitCh1   = {
-        .DMA_BufferSize         = PIOS_WS2811_BUFFER_SIZE,
-        .DMA_Channel            = DMA_Channel_6,
-        .DMA_DIR                               = DMA_DIR_MemoryToPeripheral,
-        .DMA_FIFOMode           = DMA_FIFOMode_Enable,
-        .DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull,
-        .DMA_Memory0BaseAddr    = 0,
-        .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-        .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE,
-        .DMA_MemoryInc          = DMA_MemoryInc_Enable,
-        .DMA_Mode                              = DMA_Mode_Circular,
-        .DMA_PeripheralBaseAddr = 0,
-        .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-        .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE,
-        .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-        .DMA_Priority           = DMA_Priority_VeryHigh,
-    },
+    .dmaInitCh1 = PIOS_WS2811_DMA_UPDATE_CONFIG(DMA_Channel_6),
     .dmaItCh1   = DMA_IT_TEIF1 | DMA_IT_TCIF1,
 
     // DMA streamCh2, triggered by timerCh2 pwm signal.
     // Reset output value late to indicate "1" bit to ws2812.
-    .dmaInitCh2 = {
-        .DMA_BufferSize         = 1,
-        .DMA_Channel            = DMA_Channel_6,
-        .DMA_DIR                               = DMA_DIR_MemoryToPeripheral,
-        .DMA_FIFOMode           = DMA_FIFOMode_Enable,
-        .DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull,
-        .DMA_Memory0BaseAddr    = 0,
-        .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-        .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE,
-        .DMA_MemoryInc          = DMA_MemoryInc_Disable,
-        .DMA_Mode                              = DMA_Mode_Circular,
-        .DMA_PeripheralBaseAddr = 0,
-        .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-        .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE,
-        .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-        .DMA_Priority           = DMA_Priority_VeryHigh,
-    },
-    .dmaItCh2 = DMA_IT_TEIF2 | DMA_IT_TCIF2,
+    .dmaInitCh2 = PIOS_WS2811_DMA_CH1_CONFIG(DMA_Channel_6),
+    .dmaItCh2   = DMA_IT_TEIF6 | DMA_IT_TCIF6,
 
     // DMA streamUpdate Triggered by timer update event
     // Outputs a high logic level at beginning of a cycle
-    .dmaInitUpdate                             = {
-        .DMA_BufferSize         = 1,
-        .DMA_Channel            = DMA_Channel_6,
-        .DMA_DIR                               = DMA_DIR_MemoryToPeripheral,
-        .DMA_FIFOMode           = DMA_FIFOMode_Enable,
-        .DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull,
-        .DMA_Memory0BaseAddr    = 0,
-        .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-        .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE,
-        .DMA_MemoryInc          = DMA_MemoryInc_Disable,
-        .DMA_Mode                              = DMA_Mode_Circular,
-        .DMA_PeripheralBaseAddr = 0,
-        .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-        .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE,
-        .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-        .DMA_Priority           = DMA_Priority_High
-    },
-    .dmaItUpdate = DMA_IT_TEIF6 | DMA_IT_TCIF6,
-    .dmaSource   = TIM_DMA_CC1 | TIM_DMA_CC3 | TIM_DMA_Update,
+    .dmaInitUpdate = PIOS_WS2811_DMA_CH2_CONFIG(DMA_Channel_6),
+    .dmaItUpdate   = DMA_IT_TEIF5 | DMA_IT_TCIF5,
+    .dmaSource     = TIM_DMA_CC1 | TIM_DMA_CC3 | TIM_DMA_Update,
 
     // DMA streamCh1 interrupt vector, used to block timer at end of framebuffer transfer
     .irq = {
@@ -176,15 +128,15 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
-};
+   };
 
-void PIOS_WS2811_irq_handler(void)
-{
+   void PIOS_WS2811_irq_handler(void)
+   {
     PIOS_WS2811_DMA_irq_handler();
-}
-#endif // PIOS_INCLUDE_WS2811
+   }
+   #endif // PIOS_INCLUDE_WS2811
 
-*/
+ */
 
 /*
  * How it works:
@@ -219,8 +171,9 @@ void PIOS_WS2811_Init(const struct pios_ws2811_cfg *ws2811_cfg, const struct pio
     pios_ws2811_pin_cfg = ws2811_pin_cfg;
     pios_ws2811_cfg     = ws2811_cfg;
     GPIO_Init(pios_ws2811_pin_cfg->gpio, &pios_ws2811_pin_cfg->gpioInit);
-
-    dmaSource = (ledbuf_t)pios_ws2811_pin_cfg->gpioInit.GPIO_Pin;
+    for (uint8_t i = 0; i < 4; i++) {
+        dmaSource[i] = (ledbuf_t)pios_ws2811_pin_cfg->gpioInit.GPIO_Pin;
+    }
 
     fb = (ledbuf_t *)pvPortMalloc(PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
     memset(fb, 0, PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
@@ -319,11 +272,11 @@ void setupDMA()
 
     DMA_Init(pios_ws2811_cfg->streamCh2, (DMA_InitTypeDef *)&pios_ws2811_cfg->dmaInitCh2);
     pios_ws2811_cfg->streamCh2->PAR     = (uint32_t)&pios_ws2811_pin_cfg->gpio->BSRRH;
-    pios_ws2811_cfg->streamCh2->M0AR    = (uint32_t)&dmaSource;
+    pios_ws2811_cfg->streamCh2->M0AR    = (uint32_t)dmaSource;
 
     DMA_Init(pios_ws2811_cfg->streamUpdate, (DMA_InitTypeDef *)&pios_ws2811_cfg->dmaInitUpdate);
     pios_ws2811_cfg->streamUpdate->PAR  = (uint32_t)&pios_ws2811_pin_cfg->gpio->BSRRL;
-    pios_ws2811_cfg->streamUpdate->M0AR = (uint32_t)&dmaSource;
+    pios_ws2811_cfg->streamUpdate->M0AR = (uint32_t)dmaSource;
 
     DMA_ClearITPendingBit(pios_ws2811_cfg->streamCh1, pios_ws2811_cfg->dmaItCh1);
     DMA_ClearITPendingBit(pios_ws2811_cfg->streamCh2, pios_ws2811_cfg->dmaItCh2);
@@ -339,7 +292,7 @@ void setColor(uint8_t color, ledbuf_t *buf)
     uint8_t i;
 
     for (i = 0; i < 8; i++) {
-        buf[i] = ((color << i) & 0b10000000 ? 0x0 : dmaSource);
+        buf[i] = ((color << i) & 0b10000000 ? 0x0 : dmaSource[0]);
     }
 }
 

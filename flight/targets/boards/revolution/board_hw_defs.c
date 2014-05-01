@@ -2066,70 +2066,22 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
 
     // DMA streamCh1, triggered by timerCh1 pwm signal.
     // if FrameBuffer indicates, reset output value early to indicate "0" bit to ws2812
-    .dmaInitCh1   = {
-        .DMA_BufferSize         = PIOS_WS2811_BUFFER_SIZE,
-        .DMA_Channel            = DMA_Channel_6,
-        .DMA_DIR                               = DMA_DIR_MemoryToPeripheral,
-        .DMA_FIFOMode           = DMA_FIFOMode_Enable,
-        .DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull,
-        .DMA_Memory0BaseAddr    = 0,
-        .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-        .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE,
-        .DMA_MemoryInc          = DMA_MemoryInc_Enable,
-        .DMA_Mode                              = DMA_Mode_Circular,
-        .DMA_PeripheralBaseAddr = 0,
-        .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-        .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE,
-        .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-        .DMA_Priority           = DMA_Priority_VeryHigh,
-    },
+    .dmaInitCh1 = PIOS_WS2811_DMA_UPDATE_CONFIG(DMA_Channel_6),
     .dmaItCh1   = DMA_IT_TEIF1 | DMA_IT_TCIF1,
 
     // DMA streamCh2, triggered by timerCh2 pwm signal.
     // Reset output value late to indicate "1" bit to ws2812.
-    .dmaInitCh2 = {
-        .DMA_BufferSize         = 1,
-        .DMA_Channel            = DMA_Channel_6,
-        .DMA_DIR                               = DMA_DIR_MemoryToPeripheral,
-        .DMA_FIFOMode           = DMA_FIFOMode_Enable,
-        .DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull,
-        .DMA_Memory0BaseAddr    = 0,
-        .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-        .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE,
-        .DMA_MemoryInc          = DMA_MemoryInc_Disable,
-        .DMA_Mode                              = DMA_Mode_Circular,
-        .DMA_PeripheralBaseAddr = 0,
-        .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-        .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE,
-        .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-        .DMA_Priority           = DMA_Priority_VeryHigh,
-    },
-    .dmaItCh2 = DMA_IT_TEIF2 | DMA_IT_TCIF2,
+    .dmaInitCh2 = PIOS_WS2811_DMA_CH1_CONFIG(DMA_Channel_6),
+    .dmaItCh2   = DMA_IT_TEIF6 | DMA_IT_TCIF6,
 
     // DMA streamUpdate Triggered by timer update event
     // Outputs a high logic level at beginning of a cycle
-    .dmaInitUpdate                             = {
-        .DMA_BufferSize         = 1,
-        .DMA_Channel            = DMA_Channel_6,
-        .DMA_DIR                               = DMA_DIR_MemoryToPeripheral,
-        .DMA_FIFOMode           = DMA_FIFOMode_Enable,
-        .DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull,
-        .DMA_Memory0BaseAddr    = 0,
-        .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-        .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE,
-        .DMA_MemoryInc          = DMA_MemoryInc_Disable,
-        .DMA_Mode                              = DMA_Mode_Circular,
-        .DMA_PeripheralBaseAddr = 0,
-        .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
-        .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE,
-        .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-        .DMA_Priority           = DMA_Priority_High
-    },
-    .dmaItUpdate = DMA_IT_TEIF6 | DMA_IT_TCIF6,
-    .dmaSource   = TIM_DMA_CC1 | TIM_DMA_CC3 | TIM_DMA_Update,
+    .dmaInitUpdate = PIOS_WS2811_DMA_CH2_CONFIG(DMA_Channel_6),
+    .dmaItUpdate   = DMA_IT_TEIF5 | DMA_IT_TCIF5,
+    .dmaSource     = TIM_DMA_CC1 | TIM_DMA_CC3 | TIM_DMA_Update,
 
     // DMAInitCh1 interrupt vector, used to block timer at end of framebuffer transfer
-    .irq = {
+    .irq                                       = {
         .flags = (DMA_IT_TCIF1),
         .init  = {
             .NVIC_IRQChannel    = DMA2_Stream1_IRQn,

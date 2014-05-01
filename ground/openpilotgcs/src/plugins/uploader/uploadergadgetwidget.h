@@ -134,8 +134,6 @@ public slots:
     bool autoUpdate();
     void autoUpdateDisconnectProgress(int);
     void autoUpdateConnectProgress(int);
-    // autoUpdateProgress is deprecated: use autoUpdateFlashProgress instead
-    void autoUpdateProgress(int);
     void autoUpdateFlashProgress(int);
 
 signals:

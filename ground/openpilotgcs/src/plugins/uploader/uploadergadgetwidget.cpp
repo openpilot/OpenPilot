@@ -289,9 +289,9 @@ void UploaderGadgetWidget::onAutopilotDisconnect()
 
 static void sleep(int ms)
 {
-    QEventLoop eventloop;
-    QTimer::singleShot(ms, &eventloop, SLOT(quit()));
-    eventloop.exec();
+    QEventLoop eventLoop;
+    QTimer::singleShot(ms, &eventLoop, SLOT(quit()));
+    eventLoop.exec();
 }
 
 /**
@@ -692,7 +692,7 @@ bool UploaderGadgetWidget::autoUpdate()
     }
     QEventLoop eventLoop;
     firmware = file.readAll();
-    connect(dfu, SIGNAL(progressUpdated(int)), this, SLOT(autoUpdateProgress(int)));
+    connect(dfu, SIGNAL(progressUpdated(int)), this, SLOT(autoUpdateFlashProgress(int)));
     connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &eventLoop, SLOT(quit()));
     emit autoUpdateSignal(UPLOADING_FW, QVariant());
     if (!dfu->enterDFU(0)) {
@@ -729,11 +729,6 @@ void UploaderGadgetWidget::autoUpdateConnectProgress(int value)
 void UploaderGadgetWidget::autoUpdateFlashProgress(int value)
 {
     emit autoUpdateSignal(UPLOADING_FW, value);
-}
-
-void UploaderGadgetWidget::autoUpdateProgress(int value)
-{
-    autoUpdateFlashProgress(value);
 }
 
 /**

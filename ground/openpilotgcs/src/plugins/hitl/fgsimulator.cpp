@@ -174,7 +174,7 @@ void FGSimulator::transmitUpdate()
         ailerons = actData.Roll;
         elevator = -actData.Pitch;
         rudder   = actData.Yaw;
-        throttle = actData.Throttle;
+        throttle = actData.Thrust;
     }
 
     int allowableDifference = 10;
@@ -209,10 +209,10 @@ void FGSimulator::transmitUpdate()
     }
 
     if (settings.manualControlEnabled) {
-        actData.Roll     = ailerons;
-        actData.Pitch    = -elevator;
-        actData.Yaw      = rudder;
-        actData.Throttle = throttle;
+        actData.Roll   = ailerons;
+        actData.Pitch  = -elevator;
+        actData.Yaw    = rudder;
+        actData.Thrust = throttle;
         // actData.NumLongUpdates = (float)udpCounterFGrecv;
         // actData.UpdateTime = (float)udpCounterGCSsend;
         actDesired->setData(actData);
@@ -247,15 +247,15 @@ void FGSimulator::processUpdate(const QByteArray & inp)
     // Get rollRate (deg/s)
     float rollRate = fields[9].toFloat();
     // Get yaw (deg)
-    float yaw          = fields[10].toFloat();
+    float yaw       = fields[10].toFloat();
     // Get yawRate (deg/s)
-    float yawRate      = fields[11].toFloat();
+    float yawRate   = fields[11].toFloat();
     // Get latitude (deg)
-    float latitude     = fields[12].toFloat();
+    float latitude  = fields[12].toFloat();
     // Get longitude (deg)
-    float longitude    = fields[13].toFloat();
+    float longitude = fields[13].toFloat();
     // Get heading (deg)
-    float heading      = fields[14].toFloat();
+    // float heading      = fields[14].toFloat();
     // Get altitude (m)
     float altitude_msl = fields[15].toFloat() * FT2M;
     // Get altitudeAGL (m)

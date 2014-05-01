@@ -47,6 +47,7 @@ IUAVGadgetConfiguration *MonitorGadgetConfiguration::clone()
  */
 void MonitorGadgetConfiguration::saveConfig(QSettings *qSettings) const
 {
+    Q_UNUSED(qSettings);
 // qSettings->setValue("acFilename", Utils::PathUtils().RemoveDataPath(m_acFilename));
 // qSettings->setValue("bgFilename", Utils::PathUtils().RemoveDataPath(m_bgFilename));
 // qSettings->setValue("enableVbo", m_enableVbo);

@@ -37,6 +37,7 @@
 #include <QList>
 #include <QFile>
 #include <stdint.h>
+#include <QXmlStreamWriter>
 #include "uavobjectfield.h"
 
 #define UAVOBJ_ACCESS_SHIFT                    0
@@ -54,6 +55,7 @@ class UAVOBJECTS_EXPORT UAVObject : public QObject {
     Q_OBJECT
 
 public:
+    Q_PROPERTY(QString Name READ getName)
 
     /**
      * Object update mode
@@ -109,6 +111,7 @@ public:
     quint32 getNumBytes();
     qint32 pack(quint8 *dataOut);
     qint32 unpack(const quint8 *dataIn);
+    quint8 updateCRC(quint8 crc = 0);
     bool save();
     bool save(QFile & file);
     bool load();
@@ -126,8 +129,13 @@ public:
     QString toString();
     QString toStringBrief();
     QString toStringData();
+    void toXML(QXmlStreamWriter *xmlWriter);
     void emitTransactionCompleted(bool success);
     void emitNewInstance(UAVObject *);
+
+    virtual bool isSettingsObject();
+    virtual bool isDataObject();
+    virtual bool isMetaDataObject();
 
     // Metadata accessors
     static void MetadataInitialize(Metadata & meta);
@@ -143,18 +151,22 @@ public:
     static void SetFlightTelemetryUpdateMode(Metadata & meta, UpdateMode val);
     static UpdateMode GetGcsTelemetryUpdateMode(const Metadata & meta);
     static void SetGcsTelemetryUpdateMode(Metadata & meta, UpdateMode val);
+    static UpdateMode GetLoggingUpdateMode(const Metadata & meta);
+    static void SetLoggingUpdateMode(Metadata & meta, UpdateMode val);
 
 public slots:
     void requestUpdate();
+    void requestUpdateAll();
     void updated();
+    void updatedAll();
 
 signals:
     void objectUpdated(UAVObject *obj);
     void objectUpdatedAuto(UAVObject *obj);
-    void objectUpdatedManual(UAVObject *obj);
+    void objectUpdatedManual(UAVObject *obj, bool all = false);
     void objectUpdatedPeriodic(UAVObject *obj);
     void objectUnpacked(UAVObject *obj);
-    void updateRequested(UAVObject *obj);
+    void updateRequested(UAVObject *obj, bool all = false);
     void transactionCompleted(UAVObject *obj, bool success);
     void newInstance(UAVObject *obj);
 

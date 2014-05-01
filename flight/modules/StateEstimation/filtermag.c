@@ -152,7 +152,7 @@ static void checkMagValidity(struct data *this, float mag[3])
             }
         } else {
             if (this->errorcount > ALARM_THRESHOLD) {
-                AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_ERROR);
+                AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_CRITICAL);
             } else {
                 this->errorcount++;
             }

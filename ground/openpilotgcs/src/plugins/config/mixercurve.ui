@@ -272,16 +272,6 @@
        </spacer>
       </item>
      </layout>
-     <zorder>GenerateCurve</zorder>
-     <zorder>CurveSettings</zorder>
-     <zorder>CurveType</zorder>
-     <zorder>CurveMin</zorder>
-     <zorder>minLabel</zorder>
-     <zorder>CurveMax</zorder>
-     <zorder>maxLabel</zorder>
-     <zorder>CurveStep</zorder>
-     <zorder>stepLabel</zorder>
-     <zorder>verticalSpacer</zorder>
     </widget>
    </item>
    <item row="0" column="1">

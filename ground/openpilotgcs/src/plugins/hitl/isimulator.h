@@ -1,12 +1,6 @@
 #ifndef ISIMULATOR_H
 #define ISIMULATOR_H
 
-
-#include <QObject>
-#include <QUdpSocket>
-#include <QTimer>
-#include <math.h>
-#include "uavtalk/telemetrymanager.h"
 #include "uavobjectmanager.h"
 #include "actuatordesired.h"
 #include "altitudestate.h"
@@ -14,6 +8,11 @@
 #include "velocitystate.h"
 #include "positionstate.h"
 #include "gcstelemetrystats.h"
+
+#include <QObject>
+#include <QUdpSocket>
+#include <QTimer>
+#include <math.h>
 
 class Simulator : public QObject {
     Q_OBJECT

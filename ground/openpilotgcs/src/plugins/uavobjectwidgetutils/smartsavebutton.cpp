@@ -27,27 +27,27 @@
 #include "smartsavebutton.h"
 #include "configtaskwidget.h"
 
-smartSaveButton::smartSaveButton(ConfigTaskWidget *configTaskWidget) : configWidget(configTaskWidget)
+SmartSaveButton::SmartSaveButton(ConfigTaskWidget *configTaskWidget) : configWidget(configTaskWidget)
 {}
 
-void smartSaveButton::addButtons(QPushButton *save, QPushButton *apply)
+void SmartSaveButton::addButtons(QPushButton *save, QPushButton *apply)
 {
     buttonList.insert(save, save_button);
     buttonList.insert(apply, apply_button);
     connect(save, SIGNAL(clicked()), this, SLOT(processClick()));
     connect(apply, SIGNAL(clicked()), this, SLOT(processClick()));
 }
-void smartSaveButton::addApplyButton(QPushButton *apply)
+void SmartSaveButton::addApplyButton(QPushButton *apply)
 {
     buttonList.insert(apply, apply_button);
     connect(apply, SIGNAL(clicked()), this, SLOT(processClick()));
 }
-void smartSaveButton::addSaveButton(QPushButton *save)
+void SmartSaveButton::addSaveButton(QPushButton *save)
 {
     buttonList.insert(save, save_button);
     connect(save, SIGNAL(clicked()), this, SLOT(processClick()));
 }
-void smartSaveButton::processClick()
+void SmartSaveButton::processClick()
 {
     emit beginOp();
     bool save = false;
@@ -62,7 +62,7 @@ void smartSaveButton::processClick()
     processOperation(button, save);
 }
 
-void smartSaveButton::processOperation(QPushButton *button, bool save)
+void SmartSaveButton::processOperation(QPushButton *button, bool save)
 {
     emit preProcessOperations();
 
@@ -114,7 +114,7 @@ void smartSaveButton::processOperation(QPushButton *button, bool save)
 
         sv_result = false;
         current_objectID = obj->getObjID();
-        if (save && (obj->isSettings())) {
+        if (save && (obj->isSettingsObject())) {
             for (int i = 0; i < 3; ++i) {
                 qDebug() << "Saving" << obj->getName() << "to board.";
                 connect(utilMngr, SIGNAL(saveCompleted(int, bool)), this, SLOT(saving_finished(int, bool)));
@@ -157,33 +157,33 @@ void smartSaveButton::processOperation(QPushButton *button, bool save)
     emit endOp();
 }
 
-void smartSaveButton::setObjects(QList<UAVDataObject *> list)
+void SmartSaveButton::setObjects(QList<UAVDataObject *> list)
 {
     objects = list;
 }
 
-void smartSaveButton::addObject(UAVDataObject *obj)
+void SmartSaveButton::addObject(UAVDataObject *obj)
 {
     Q_ASSERT(obj);
     if (!objects.contains(obj)) {
         objects.append(obj);
     }
 }
-void smartSaveButton::removeObject(UAVDataObject *obj)
+void SmartSaveButton::removeObject(UAVDataObject *obj)
 {
     if (objects.contains(obj)) {
         objects.removeAll(obj);
     }
 }
-void smartSaveButton::removeAllObjects()
+void SmartSaveButton::removeAllObjects()
 {
     objects.clear();
 }
-void smartSaveButton::clearObjects()
+void SmartSaveButton::clearObjects()
 {
     objects.clear();
 }
-void smartSaveButton::transaction_finished(UAVObject *obj, bool result)
+void SmartSaveButton::transaction_finished(UAVObject *obj, bool result)
 {
     if (current_object == obj) {
         up_result = result;
@@ -191,32 +191,32 @@ void smartSaveButton::transaction_finished(UAVObject *obj, bool result)
     }
 }
 
-void smartSaveButton::saving_finished(int id, bool result)
+void SmartSaveButton::saving_finished(int id, bool result)
 {
-    if (id == current_objectID) {
+    if (id == (int)current_objectID) {
         sv_result = result;
         loop.quit();
     }
 }
 
-void smartSaveButton::enableControls(bool value)
+void SmartSaveButton::enableControls(bool value)
 {
     foreach(QPushButton * button, buttonList.keys())
     button->setEnabled(value);
 }
 
-void smartSaveButton::resetIcons()
+void SmartSaveButton::resetIcons()
 {
     foreach(QPushButton * button, buttonList.keys())
     button->setIcon(QIcon());
 }
 
-void smartSaveButton::apply()
+void SmartSaveButton::apply()
 {
     processOperation(NULL, false);
 }
 
-void smartSaveButton::save()
+void SmartSaveButton::save()
 {
     processOperation(NULL, true);
 }

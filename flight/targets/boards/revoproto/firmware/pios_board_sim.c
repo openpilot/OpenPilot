@@ -132,7 +132,7 @@ void PIOS_Board_Init(void)
     PIOS_DELAY_Init();
 
     /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
+    PIOS_CALLBACKSCHEDULER_Initialize();
 
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();

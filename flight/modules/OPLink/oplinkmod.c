@@ -63,8 +63,6 @@
 // Private types
 
 // Private variables
-static uint32_t idleCounter;
-static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
 static bool stackOverflow;
 static bool mallocFailed;
@@ -119,7 +117,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
     MODULE_TASKCREATE_ALL;
 
     /* start the delayed callback scheduler */
-    CallbackSchedulerStart();
+    PIOS_CALLBACKSCHEDULER_Start();
 
     if (mallocFailed) {
         /* We failed to malloc during task creation,
@@ -130,8 +128,6 @@ static void systemTask(__attribute__((unused)) void *parameters)
     }
 
     // Initialize vars
-    idleCounter = 0;
-    idleCounterClear = 0;
     lastSysTime = xTaskGetTickCount();
 
     // Main system loop
@@ -205,15 +201,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
  * Called by the RTOS when the CPU is idle, used to measure the CPU idle time.
  */
 void vApplicationIdleHook(void)
-{
-    // Called when the scheduler has no tasks to run
-    if (idleCounterClear == 0) {
-        ++idleCounter;
-    } else {
-        idleCounter = 0;
-        idleCounterClear = 0;
-    }
-}
+{}
 
 /**
  * Called by the RTOS when a stack overflow is detected.

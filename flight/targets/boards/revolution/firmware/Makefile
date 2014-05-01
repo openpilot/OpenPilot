@@ -37,6 +37,7 @@ MODULES += AltitudeHold
 MODULES += Stabilization
 MODULES += VtolPathFollower
 MODULES += ManualControl
+MODULES += Receiver
 MODULES += Actuator
 MODULES += GPS
 MODULES += TxPID
@@ -73,7 +74,6 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     #ifeq ($(DEBUG), YES)
     SRC += $(OPSYSTEM)/dcc_stdio.c

@@ -129,7 +129,7 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 #if defined(PIOS_INCLUDE_MS5611)
 #include "pios_ms5611.h"
 static const struct pios_ms5611_cfg pios_ms5611_cfg = {
-    .oversampling = MS5611_OSR_512,
+    .oversampling = MS5611_OSR_4096,
 };
 #endif /* PIOS_INCLUDE_MS5611 */
 
@@ -444,7 +444,7 @@ void PIOS_Board_Init(void)
     }
 
     /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
+    PIOS_CALLBACKSCHEDULER_Initialize();
 
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();

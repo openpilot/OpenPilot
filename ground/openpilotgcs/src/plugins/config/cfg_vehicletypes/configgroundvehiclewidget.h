@@ -33,7 +33,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include "uavtalk/telemetrymanager.h"
+
 #include <QWidget>
 #include <QList>
 #include <QItemDelegate>

@@ -47,8 +47,8 @@ private:
     QQueue<QByteArray> queue;
     QMutex mutex;
     QMutex sendbufmutex;
-    bool datapending;
     bool endthread;
+    bool datapending;
     uint16_t sendstatus;
     uint16_t receivestatus;
     QWaitCondition sendwait;

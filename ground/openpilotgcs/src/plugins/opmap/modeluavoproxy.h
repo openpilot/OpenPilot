@@ -27,24 +27,50 @@
 #ifndef MODELUAVOPROXY_H
 #define MODELUAVOPROXY_H
 
-#include <QObject>
 #include "flightdatamodel.h"
+
+#include "pathplan.h"
 #include "pathaction.h"
 #include "waypoint.h"
 
-class modelUavoProxy : public QObject {
+#include <QObject>
+
+class ModelUavoProxy : public QObject {
     Q_OBJECT
+
 public:
-    explicit modelUavoProxy(QObject *parent, flightDataModel *model);
-    int addAction(PathAction *actionObj, PathAction::DataFields actionFields, int lastaction);
+    explicit ModelUavoProxy(QObject *parent, flightDataModel *model);
+
 public slots:
-    void modelToObjects();
-    void objectsToModel();
+    void sendPathPlan();
+    void receivePathPlan();
+
 private:
-    UAVObjectManager *objManager;
-    Waypoint *waypointObj;
-    PathAction *pathactionObj;
+    UAVObjectManager *objMngr;
     flightDataModel *myModel;
+
+    uint completionCountdown;
+    uint successCountdown;
+
+    bool modelToObjects();
+    bool objectsToModel();
+
+    Waypoint *createWaypoint(int index, Waypoint *newWaypoint);
+    PathAction *createPathAction(int index, PathAction *newAction);
+
+    PathAction *findPathAction(const PathAction::DataFields & actionFields, int actionCount);
+
+    void modelToWaypoint(int i, Waypoint::DataFields &data);
+    void modelToPathAction(int i, PathAction::DataFields &data);
+
+    void waypointToModel(int i, Waypoint::DataFields &data);
+    void pathActionToModel(int i, PathAction::DataFields &data);
+
+    quint8 computePathPlanCrc(int waypointCount, int actionCount);
+
+private slots:
+    void pathPlanElementSent(UAVObject *, bool success);
+    void pathPlanElementReceived(UAVObject *, bool success);
 };
 
 #endif // MODELUAVOPROXY_H

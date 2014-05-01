@@ -108,6 +108,7 @@ struct UAVOBase {
         bool isMeta        : 1;
         bool isSingle      : 1;
         bool isSettings    : 1;
+        bool isPriority    : 1;
     } flags;
 } __attribute__((packed));
 
@@ -167,22 +168,19 @@ struct UAVOMulti {
 #define MetaObjectPtr(obj)               ((struct UAVODataMeta *)&((obj)->metaObj))
 #define MetaDataPtr(obj)                 ((UAVObjMetadata *)&((obj)->instance0))
 #define LinkedMetaDataPtr(obj)           ((UAVObjMetadata *)&((obj)->metaObj.instance0))
-#define MetaObjectId(id)                 ((id) + 1)
 
 /** all information about instances are dependant on object type **/
 #define ObjSingleInstanceDataOffset(obj) ((void *)(&(((struct UAVOSingle *)obj)->instance0)))
 #define InstanceDataOffset(inst)         ((void *)&(((struct UAVOMultiInst *)inst)->instance))
-#define InstanceData(instance)           (void *)instance
+#define InstanceData(instance)           ((void *)instance)
 
 // Private functions
-static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId,
-                         UAVObjEventType event);
+static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType event);
 static InstanceHandle createInstance(struct UAVOData *obj, uint16_t instId);
 static InstanceHandle getInstance(struct UAVOData *obj, uint16_t instId);
-static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue,
-                          UAVObjEventCallback cb, uint8_t eventMask);
-static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue,
-                             UAVObjEventCallback cb);
+static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue, UAVObjEventCallback cb, uint8_t eventMask);
+static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue, UAVObjEventCallback cb);
+static void instanceAutoUpdated(UAVObjHandle obj_handle, uint16_t instId);
 
 // Private variables
 static xSemaphoreHandle mutex;
@@ -342,7 +340,7 @@ static struct UAVOData *UAVObjAllocMulti(uint32_t num_bytes)
  * \return
  */
 UAVObjHandle UAVObjRegister(uint32_t id,
-                            int32_t isSingleInstance, int32_t isSettings,
+                            bool isSingleInstance, bool isSettings, bool isPriority,
                             uint32_t num_bytes,
                             UAVObjInitializeCallback initCb)
 {
@@ -371,8 +369,11 @@ UAVObjHandle UAVObjRegister(uint32_t id,
     uavo_data->instance_size = num_bytes;
     if (isSettings) {
         uavo_data->base.flags.isSettings = true;
+        // settings defaults to being sent with priority
+        uavo_data->base.flags.isPriority = true;
+    } else {
+        uavo_data->base.flags.isPriority = isPriority;
     }
-
     /* Initialize the embedded meta UAVO */
     UAVObjInitMetaData(&uavo_data->metaObj);
 
@@ -390,8 +391,8 @@ UAVObjHandle UAVObjRegister(uint32_t id,
     }
 
     // fire events for outer object and its embedded meta object
-    UAVObjInstanceUpdated((UAVObjHandle)uavo_data, 0);
-    UAVObjInstanceUpdated((UAVObjHandle) & (uavo_data->metaObj), 0);
+    instanceAutoUpdated((UAVObjHandle)uavo_data, 0);
+    instanceAutoUpdated((UAVObjHandle) & (uavo_data->metaObj), 0);
 
 unlock_exit:
     xSemaphoreGiveRecursive(mutex);
@@ -609,14 +610,29 @@ bool UAVObjIsSettings(UAVObjHandle obj_handle)
 }
 
 /**
+ * Is this a prioritized object?
+ * \param[in] obj The object handle
+ * \return True (1) if this is a prioritized object
+ */
+bool UAVObjIsPriority(UAVObjHandle obj_handle)
+{
+    PIOS_Assert(obj_handle);
+
+    /* Recover the common object header */
+    struct UAVOBase *uavo_base = (struct UAVOBase *)obj_handle;
+
+    return uavo_base->flags.isPriority;
+}
+
+
+/**
  * Unpack an object from a byte array
  * \param[in] obj The object handle
  * \param[in] instId The instance ID
  * \param[in] dataIn The byte array
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjUnpack(UAVObjHandle obj_handle, uint16_t instId,
-                     const uint8_t *dataIn)
+int32_t UAVObjUnpack(UAVObjHandle obj_handle, uint16_t instId, const uint8_t *dataIn)
 {
     PIOS_Assert(obj_handle);
 
@@ -704,6 +720,45 @@ unlock_exit:
     return rc;
 }
 
+/**
+ * Update a CRC with an object data
+ * \param[in] obj The object handle
+ * \param[in] instId The instance ID
+ * \param[in] crc The crc to update
+ * \return the updated crc
+ */
+uint8_t UAVObjUpdateCRC(UAVObjHandle obj_handle, uint16_t instId, uint8_t crc)
+{
+    PIOS_Assert(obj_handle);
+
+    // Lock
+    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+    if (UAVObjIsMetaobject(obj_handle)) {
+        if (instId != 0) {
+            goto unlock_exit;
+        }
+        // TODO
+    } else {
+        struct UAVOData *obj;
+        InstanceHandle instEntry;
+
+        // Cast handle to object
+        obj = (struct UAVOData *)obj_handle;
+
+        // Get the instance
+        instEntry = getInstance(obj, instId);
+        if (instEntry == NULL) {
+            goto unlock_exit;
+        }
+        // Update crc
+        crc = PIOS_CRC_updateCRC(crc, (uint8_t *)InstanceData(instEntry), (int32_t)obj->instance_size);
+    }
+
+unlock_exit:
+    xSemaphoreGiveRecursive(mutex);
+    return crc;
+}
 
 /**
  * Actually write the object's data to the logfile
@@ -1582,8 +1637,8 @@ void UAVObjRequestUpdate(UAVObjHandle obj_handle)
 }
 
 /**
- * Request an update of the object's data from the GCS. The call will not wait for the response, a EV_UPDATED event
- * will be generated as soon as the object is updated.
+ * Request an update of the object's data from the GCS.
+ * The call will not wait for the response, a EV_UPDATED event will be generated as soon as the object is updated.
  * \param[in] obj The object handle
  * \param[in] instId Object instance ID to update
  */
@@ -1596,7 +1651,7 @@ void UAVObjRequestInstanceUpdate(UAVObjHandle obj_handle, uint16_t instId)
 }
 
 /**
- * Send the object's data to the GCS (triggers a EV_UPDATED_MANUAL event on this object).
+ * Trigger a EV_UPDATED_MANUAL event for an object.
  * \param[in] obj The object handle
  */
 void UAVObjUpdated(UAVObjHandle obj_handle)
@@ -1605,7 +1660,7 @@ void UAVObjUpdated(UAVObjHandle obj_handle)
 }
 
 /**
- * Send the object's data to the GCS (triggers a EV_UPDATED_MANUAL event on this object).
+ * Trigger a EV_UPDATED_MANUAL event for an object instance.
  * \param[in] obj The object handle
  * \param[in] instId The object instance ID
  */
@@ -1618,6 +1673,19 @@ void UAVObjInstanceUpdated(UAVObjHandle obj_handle, uint16_t instId)
 }
 
 /**
+ * Trigger a EV_UPDATED event for an object instance.
+ * \param[in] obj The object handle
+ * \param[in] instId The object instance ID
+ */
+static void instanceAutoUpdated(UAVObjHandle obj_handle, uint16_t instId)
+{
+    PIOS_Assert(obj_handle);
+    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+    sendEvent((struct UAVOBase *)obj_handle, instId, EV_UPDATED);
+    xSemaphoreGiveRecursive(mutex);
+}
+
+/*
  * Log the object's data (triggers a EV_LOGGING_MANUAL event on this object).
  * \param[in] obj The object handle
  */
@@ -1664,28 +1732,27 @@ xSemaphoreGiveRecursive(mutex);
 /**
  * Send a triggered event to all event queues registered on the object.
  */
-static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId,
-                         UAVObjEventType triggered_event)
+static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType triggered_event)
 {
     /* Set up the message that will be sent to all registered listeners */
     UAVObjEvent msg = {
         .obj    = (UAVObjHandle)obj,
         .event  = triggered_event,
         .instId = instId,
+        .lowPriority = false,
     };
 
     // Go through each object and push the event message in the queue (if event is activated for the queue)
     struct ObjectEventEntry *event;
 
     LL_FOREACH(obj->next_event, event) {
-        if (event->eventMask == 0
-            || (event->eventMask & triggered_event) != 0) {
+        if (event->eventMask == 0 || (event->eventMask & triggered_event) != 0) {
             // Send to queue if a valid queue is registered
             if (event->queue) {
                 // will not block
                 if (xQueueSend(event->queue, &msg, 0) != pdTRUE) {
-                    stats.lastQueueErrorID = UAVObjGetID(obj);
                     ++stats.eventQueueErrors;
+                    stats.lastQueueErrorID = UAVObjGetID(obj);
                 }
             }
 
@@ -1745,7 +1812,7 @@ static InstanceHandle createInstance(struct UAVOData *obj, uint16_t instId)
     ((struct UAVOMulti *)obj)->num_instances++;
 
     // Fire event
-    UAVObjInstanceUpdated((UAVObjHandle)obj, instId);
+    instanceAutoUpdated((UAVObjHandle)obj, instId);
 
     // Done
     return InstanceDataOffset(instEntry);

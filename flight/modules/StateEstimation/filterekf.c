@@ -46,6 +46,8 @@
 
 #define STACK_REQUIRED 2048
 #define DT_ALPHA       1e-3f
+#define DT_MIN         1e-6f
+#define DT_MAX         1.0f
 #define DT_INIT        (1.0f / 666.0f) // initialize with 666 Hz (default sensor update rate on revo)
 
 #define IMPORT_SENSOR_IF_UPDATED(shortname, num) \
@@ -67,10 +69,9 @@ struct data {
 
     stateEstimation work;
 
-    uint32_t ins_last_time;
-    bool     inited;
+    bool inited;
 
-    float    dTa;
+    PiOSDeltatimeConfig dtconfig;
 };
 
 // Private variables
@@ -155,11 +156,10 @@ static int32_t maininit(stateFilter *self)
 {
     struct data *this = (struct data *)self->localdata;
 
-    this->inited        = false;
-    this->init_stage    = 0;
-    this->work.updated  = 0;
-    this->ins_last_time = PIOS_DELAY_GetRaw();
-    this->dTa = DT_INIT;
+    this->inited       = false;
+    this->init_stage   = 0;
+    this->work.updated = 0;
+    PIOS_DELTATIME_Init(&this->dtconfig, DT_INIT, DT_MIN, DT_MAX, DT_ALPHA);
 
     EKFConfigurationGet(&this->ekfConfiguration);
     int t;
@@ -225,17 +225,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         return 0;
     }
 
-    dT = PIOS_DELAY_DiffuS(this->ins_last_time) / 1.0e6f;
-    this->ins_last_time = PIOS_DELAY_GetRaw();
-
-    // This should only happen at start up or at mode switches
-    if (dT > 0.01f) {
-        dT = 0.01f;
-    } else if (dT <= 0.001f) {
-        dT = 0.001f;
-    }
-
-    this->dTa = this->dTa * (1.0f - DT_ALPHA) + dT * DT_ALPHA; // low pass for average dT, compensate timing jitter from scheduler
+    dT = PIOS_DELTATIME_GetAverageSeconds(&this->dtconfig);
 
     if (!this->inited && IS_SET(this->work.updated, SENSORUPDATES_mag) && IS_SET(this->work.updated, SENSORUPDATES_baro) && IS_SET(this->work.updated, SENSORUPDATES_pos)) {
         // Don't initialize until all sensors are read
@@ -301,7 +291,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             // Run prediction a bit before any corrections
 
             float gyros[3] = { DEG2RAD(this->work.gyro[0]), DEG2RAD(this->work.gyro[1]), DEG2RAD(this->work.gyro[2]) };
-            INSStatePrediction(gyros, this->work.accel, this->dTa);
+            INSStatePrediction(gyros, this->work.accel, dT);
 
             // Copy the attitude into the state
             // NOTE: updating gyr correctly is valid, because this code is reached only when SENSORUPDATES_gyro is already true
@@ -336,7 +326,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     float gyros[3] = { DEG2RAD(this->work.gyro[0]), DEG2RAD(this->work.gyro[1]), DEG2RAD(this->work.gyro[2]) };
 
     // Advance the state estimate
-    INSStatePrediction(gyros, this->work.accel, this->dTa);
+    INSStatePrediction(gyros, this->work.accel, dT);
 
     // Copy the attitude into the state
     // NOTE: updating gyr correctly is valid, because this code is reached only when SENSORUPDATES_gyro is already true
@@ -356,7 +346,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     state->updated |= SENSORUPDATES_attitude | SENSORUPDATES_pos | SENSORUPDATES_vel;
 
     // Advance the covariance estimate
-    INSCovariancePrediction(this->dTa);
+    INSCovariancePrediction(dT);
 
     if (IS_SET(this->work.updated, SENSORUPDATES_mag)) {
         SystemAlarmsAlarmData alarms;

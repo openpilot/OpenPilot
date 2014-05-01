@@ -47,6 +47,14 @@
 #include <pios_task_monitor.h>
 #endif
 
+/* PIOS CallbackScheduler */
+#ifdef PIOS_INCLUDE_CALLBACKSCHEDULER
+#ifndef PIOS_INCLUDE_FREERTOS
+#error PiOS CallbackScheduler requires PIOS_INCLUDE_FREERTOS to be defined
+#endif
+#include <pios_callbackscheduler.h>
+#endif
+
 /* C Lib Includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,6 +87,7 @@ extern void PIOS_LED_Init(void);
 #include <pios_wdg.h>
 #include <pios_debug.h>
 #include <pios_debuglog.h>
+#include <pios_deltatime.h>
 #include <pios_crc.h>
 #include <pios_rcvr.h>
 #include <pios_flash.h>

@@ -49,21 +49,25 @@ ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     addApplySaveButtons(m_ui->saveTelemetryToRAM, m_ui->saveTelemetryToSD);
 
-    addUAVObjectToWidgetRelation("HwSettings", "RM_FlexiPort", m_ui->cbFlexi);
-    addUAVObjectToWidgetRelation("HwSettings", "RM_MainPort", m_ui->cbMain);
-    addUAVObjectToWidgetRelation("HwSettings", "RM_RcvrPort", m_ui->cbRcvr);
+    addWidgetBinding("HwSettings", "RM_FlexiPort", m_ui->cbFlexi);
+    addWidgetBinding("HwSettings", "RM_MainPort", m_ui->cbMain);
+    addWidgetBinding("HwSettings", "RM_RcvrPort", m_ui->cbRcvr);
 
-    addUAVObjectToWidgetRelation("HwSettings", "USB_HIDPort", m_ui->cbUSBHIDFunction);
-    addUAVObjectToWidgetRelation("HwSettings", "USB_VCPPort", m_ui->cbUSBVCPFunction);
-    addUAVObjectToWidgetRelation("HwSettings", "ComUsbBridgeSpeed", m_ui->cbUSBVCPSpeed);
+    addWidgetBinding("HwSettings", "USB_HIDPort", m_ui->cbUSBHIDFunction);
+    addWidgetBinding("HwSettings", "USB_VCPPort", m_ui->cbUSBVCPFunction);
+    addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_ui->cbUSBVCPSpeed);
 
-    addUAVObjectToWidgetRelation("HwSettings", "TelemetrySpeed", m_ui->cbFlexiTelemSpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "GPSSpeed", m_ui->cbFlexiGPSSpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "ComUsbBridgeSpeed", m_ui->cbFlexiComSpeed);
+    addWidgetBinding("HwSettings", "TelemetrySpeed", m_ui->cbFlexiTelemSpeed);
+    addWidgetBinding("HwSettings", "GPSSpeed", m_ui->cbFlexiGPSSpeed);
+    addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_ui->cbFlexiComSpeed);
 
-    addUAVObjectToWidgetRelation("HwSettings", "TelemetrySpeed", m_ui->cbMainTelemSpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "GPSSpeed", m_ui->cbMainGPSSpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "ComUsbBridgeSpeed", m_ui->cbMainComSpeed);
+    addWidgetBinding("HwSettings", "TelemetrySpeed", m_ui->cbMainTelemSpeed);
+    addWidgetBinding("HwSettings", "GPSSpeed", m_ui->cbMainGPSSpeed);
+    addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_ui->cbMainComSpeed);
+
+    // Add Gps protocol configuration
+    addWidgetBinding("GPSSettings", "DataProtocol", m_ui->cbMainGPSProtocol);
+    addWidgetBinding("GPSSettings", "DataProtocol", m_ui->cbFlexiGPSProtocol);
 
     connect(m_ui->cchwHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
@@ -191,6 +195,10 @@ void ConfigRevoHWWidget::flexiPortChanged(int index)
     m_ui->cbFlexiComSpeed->setVisible(false);
     m_ui->lblFlexiSpeed->setVisible(true);
 
+    // Add Gps protocol configuration
+    m_ui->cbFlexiGPSProtocol->setVisible(false);
+    m_ui->lbFlexiGPSProtocol->setVisible(false);
+
     switch (m_ui->cbFlexi->currentIndex()) {
     case HwSettings::RM_FLEXIPORT_TELEMETRY:
         m_ui->cbFlexiTelemSpeed->setVisible(true);
@@ -199,6 +207,10 @@ void ConfigRevoHWWidget::flexiPortChanged(int index)
         }
         break;
     case HwSettings::RM_FLEXIPORT_GPS:
+        // Add Gps protocol configuration
+        m_ui->cbFlexiGPSProtocol->setVisible(true);
+        m_ui->lbFlexiGPSProtocol->setVisible(true);
+
         m_ui->cbFlexiGPSSpeed->setVisible(true);
         if (m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_GPS) {
             m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
@@ -234,6 +246,10 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
     m_ui->cbMainComSpeed->setVisible(false);
     m_ui->lblMainSpeed->setVisible(true);
 
+    // Add Gps protocol configuration
+    m_ui->cbMainGPSProtocol->setVisible(false);
+    m_ui->lbMainGPSProtocol->setVisible(false);
+
     switch (m_ui->cbMain->currentIndex()) {
     case HwSettings::RM_MAINPORT_TELEMETRY:
         m_ui->cbMainTelemSpeed->setVisible(true);
@@ -242,6 +258,10 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
         }
         break;
     case HwSettings::RM_MAINPORT_GPS:
+        // Add Gps protocol configuration
+        m_ui->cbMainGPSProtocol->setVisible(true);
+        m_ui->lbMainGPSProtocol->setVisible(true);
+
         m_ui->cbMainGPSSpeed->setVisible(true);
         if (m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_GPS) {
             m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);

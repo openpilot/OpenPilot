@@ -84,6 +84,7 @@ typedef struct  {
     quint32    id;
     bool       isSingleInst;
     bool       isSettings;
+    bool       isPriority;
     AccessMode gcsAccess;
     AccessMode flightAccess;
     bool       flightTelemetryAcked;

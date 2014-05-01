@@ -33,7 +33,6 @@
 #include "uavobjectfield.h"
 #include "extensionsystem/pluginmanager.h"
 #include <QColor>
-// #include <QIcon>
 #include <QtCore/QTimer>
 #include <QtCore/QSignalMapper>
 #include <QtCore/QDebug>
@@ -41,6 +40,7 @@
 UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent, bool categorize, bool useScientificNotation) :
     QAbstractItemModel(parent),
     m_useScientificFloatNotation(useScientificNotation),
+    m_categorize(categorize),
     m_recentlyUpdatedTimeout(500), // ms
     m_recentlyUpdatedColor(QColor(255, 230, 230)),
     m_manuallyChangedColor(QColor(230, 230, 255))
@@ -54,7 +54,7 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent, bool categorize, bool us
     connect(objManager, SIGNAL(newInstance(UAVObject *)), this, SLOT(newObject(UAVObject *)));
 
     TreeItem::setHighlightTime(m_recentlyUpdatedTimeout);
-    setupModelData(objManager, categorize);
+    setupModelData(objManager);
 }
 
 UAVObjectTreeModel::~UAVObjectTreeModel()
@@ -63,7 +63,7 @@ UAVObjectTreeModel::~UAVObjectTreeModel()
     delete m_rootItem;
 }
 
-void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager, bool categorize)
+void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager)
 {
     // root
     QList<QVariant> rootData;
@@ -83,7 +83,7 @@ void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager, bool categ
     QList< QList<UAVDataObject *> > objList = objManager->getDataObjects();
     foreach(QList<UAVDataObject *> list, objList) {
         foreach(UAVDataObject * obj, list) {
-            addDataObject(obj, categorize);
+            addDataObject(obj);
         }
     }
 }
@@ -97,13 +97,13 @@ void UAVObjectTreeModel::newObject(UAVObject *obj)
     }
 }
 
-void UAVObjectTreeModel::addDataObject(UAVDataObject *obj, bool categorize)
+void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
 {
-    TopTreeItem *root = obj->isSettings() ? m_settingsTree : m_nonSettingsTree;
+    TopTreeItem *root = obj->isSettingsObject() ? m_settingsTree : m_nonSettingsTree;
 
     TreeItem *parent  = root;
 
-    if (categorize && obj->getCategory() != 0 && !obj->getCategory().isEmpty()) {
+    if (m_categorize && obj->getCategory() != 0 && !obj->getCategory().isEmpty()) {
         QStringList categoryPath = obj->getCategory().split('/');
         parent = createCategoryItems(categoryPath, root);
     }
@@ -207,7 +207,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
         data.append(QString("[%1]").arg((field->getElementNames())[index]));
     }
 
-    FieldTreeItem *item;
+    FieldTreeItem *item = NULL;
     UAVObjectField::FieldType type = field->getType();
     switch (type) {
     case UAVObjectField::BITFIELD:
@@ -228,7 +228,11 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
     case UAVObjectField::UINT32:
         data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new IntFieldTreeItem(field, index, data);
+        if (field->getUnits().toLower() == "hex") {
+            item = new HexFieldTreeItem(field, index, data);
+        } else {
+            item = new IntFieldTreeItem(field, index, data);
+        }
         break;
     case UAVObjectField::FLOAT32:
         data.append(field->getValue(index));
@@ -351,9 +355,6 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
         return item->data(index.column());
     }
 
-// if (role == Qt::DecorationRole)
-// return QIcon(":/core/images/openpilot_logo_128.png");
-
     if (role == Qt::ToolTipRole) {
         TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
         return item->description();
@@ -460,7 +461,7 @@ ObjectTreeItem *UAVObjectTreeModel::findObjectTreeItem(UAVObject *object)
 
 DataObjectTreeItem *UAVObjectTreeModel::findDataObjectTreeItem(UAVDataObject *obj)
 {
-    TopTreeItem *root = obj->isSettings() ? m_settingsTree : m_nonSettingsTree;
+    TopTreeItem *root = obj->isSettingsObject() ? m_settingsTree : m_nonSettingsTree;
 
     return root->findDataObjectTreeItemByObjectId(obj->getObjID());
 }
@@ -470,7 +471,7 @@ MetaObjectTreeItem *UAVObjectTreeModel::findMetaObjectTreeItem(UAVMetaObject *ob
     UAVDataObject *dataObject = qobject_cast<UAVDataObject *>(obj->getParentObject());
 
     Q_ASSERT(dataObject);
-    TopTreeItem *root = dataObject->isSettings() ? m_settingsTree : m_nonSettingsTree;
+    TopTreeItem *root = dataObject->isSettingsObject() ? m_settingsTree : m_nonSettingsTree;
     return root->findMetaObjectTreeItemByObjectId(obj->getObjID());
 }
 

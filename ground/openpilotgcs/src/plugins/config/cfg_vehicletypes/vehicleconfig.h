@@ -121,18 +121,19 @@ public:
 
     /* Enumeration options for field MixerType */
     typedef enum {
-        MIXERTYPE_DISABLED    = 0,
-        MIXERTYPE_MOTOR       = 1,
-        MIXERTYPE_SERVO       = 2,
-        MIXERTYPE_CAMERAROLL  = 3,
-        MIXERTYPE_CAMERAPITCH = 4,
-        MIXERTYPE_CAMERAYAW   = 5,
-        MIXERTYPE_ACCESSORY0  = 6,
-        MIXERTYPE_ACCESSORY1  = 7,
-        MIXERTYPE_ACCESSORY2  = 8,
-        MIXERTYPE_ACCESSORY3  = 9,
-        MIXERTYPE_ACCESSORY4  = 10,
-        MIXERTYPE_ACCESSORY5  = 11
+        MIXERTYPE_DISABLED        = 0,
+        MIXERTYPE_MOTOR           = 1,
+        MIXERTYPE_REVERSABLEMOTOR = 2,
+        MIXERTYPE_SERVO           = 3,
+        MIXERTYPE_CAMERAROLL      = 4,
+        MIXERTYPE_CAMERAPITCH     = 5,
+        MIXERTYPE_CAMERAYAW       = 6,
+        MIXERTYPE_ACCESSORY0      = 7,
+        MIXERTYPE_ACCESSORY1      = 8,
+        MIXERTYPE_ACCESSORY2      = 9,
+        MIXERTYPE_ACCESSORY3      = 10,
+        MIXERTYPE_ACCESSORY4      = 11,
+        MIXERTYPE_ACCESSORY5      = 12
     } MixerTypeElem;
 
     /* Array element names for field MixerVector */

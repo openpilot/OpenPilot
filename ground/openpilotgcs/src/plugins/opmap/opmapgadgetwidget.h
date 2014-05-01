@@ -233,11 +233,9 @@ private:
     QPointer<opmap_edit_waypoint_dialog> waypoint_edit_dialog;
     QStandardItemModel wayPoint_treeView_model;
     mapcontrol::WayPointItem *m_mouse_waypoint;
-    QPointer<modelUavoProxy> UAVProxy;
+    QPointer<ModelUavoProxy> UAVProxy;
     QMutex m_map_mutex;
     bool m_telemetry_connected;
-    QAction *closeAct1;
-    QAction *closeAct2;
     QAction *reloadAct;
     QAction *ripAct;
     QAction *copyMouseLatLonToClipAct;
@@ -310,7 +308,6 @@ private:
     void setMapFollowingMode();
 
     bool setHomeLocationObject();
-    QMenu contextMenu;
     internals::PointLatLng lastLatLngMouse;
     WayPointItem *magicWayPoint;
 

@@ -42,7 +42,7 @@ VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
         channelNames << QString("Channel%1").arg(i + 1);
     }
 
-    mixerTypeDescriptions << "Disabled" << "Motor" << "Servo" << "CameraRoll" << "CameraPitch" << "CameraYaw"
+    mixerTypeDescriptions << "Disabled" << "Motor" << "ReversableMotor" << "Servo" << "CameraRoll" << "CameraPitch" << "CameraYaw"
                           << "Accessory0" << "Accessory1" << "Accessory2" << "Accessory3" << "Accessory4" << "Accessory5";
 
     // This is needed because new style tries to compact things as much as possible in grid
@@ -86,7 +86,6 @@ void VehicleConfig::setConfigData(GUIConfigDataUnion configData)
     // get an instance of systemsettings
     SystemSettings *systemSettings = SystemSettings::GetInstance(getUAVObjectManager());
     Q_ASSERT(systemSettings);
-    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
 
     UAVObjectField *guiConfig = systemSettings->getField("GUIConfigData");
     Q_ASSERT(guiConfig);
@@ -225,7 +224,7 @@ void VehicleConfig::resetMotorAndServoMixers(UAVDataObject *mixer)
 {
     for (int channel = 0; channel < (int)VehicleConfig::CHANNEL_NUMELEM; channel++) {
         QString type = getMixerType(mixer, channel);
-        if ((type == "Disabled") || (type == "Motor") || (type == "Servo")) {
+        if ((type == "Disabled") || (type == "Motor") || (type == "ReversableMotor") || (type == "Servo")) {
             setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
             resetMixerVector(mixer, channel);
         }

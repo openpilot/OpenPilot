@@ -1,0 +1,23 @@
+<xml>
+    <object name="StabilizationSettingsBank3" singleinstance="true" settings="true" category="Control">
+        <description>Currently selected PID bank</description>
+
+	<field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="42" limits="%BE:0:180"/>
+	<field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="42" limits="%BE:0:180"/>
+	<field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="42" limits="%BE:0:180"/>
+	<field name="ManualRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="150,150,175" limits="%BE:0:500; %BE:0:500; %BE:0:500"/>
+	<field name="MaximumRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="300,300,50" limits="%BE:0:500; %BE:0:500; %BE:0:500"/>
+
+	<field name="RollRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.003,0.003,0.00002,0.3" limits="%BE:0:0.01; %BE:0:0.01; ; "/>
+	<field name="PitchRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.003,0.003,0.00002,0.3" limits="%BE:0:0.01; %BE:0:0.01; ; "/>
+	<field name="YawRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.0035,0.0035,0,0.3" limits="%BE:0:0.01; %BE:0:0.01 ; ; "/>
+	<field name="RollPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
+	<field name="PitchPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
+	<field name="YawPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
+	<access gcs="readwrite" flight="readwrite"/>
+	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+	<telemetryflight acked="true" updatemode="onchange" period="0"/>
+	<logging updatemode="manual" period="0"/>
+</object>
+
+</xml>

@@ -115,7 +115,7 @@ public:
     // DFUObject(bool debug);
     DFUObject(bool debug, bool use_serial, QString port);
 
-    ~DFUObject();
+    virtual ~DFUObject();
 
     // Service commands:
     bool enterDFU(int const &devNumber);

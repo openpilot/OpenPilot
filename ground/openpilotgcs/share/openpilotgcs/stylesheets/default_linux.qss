@@ -1,19 +1,5 @@
 /* Linux styles */
 
-QGroupBox {
-    border: 1px solid gray;
-    border-radius: 5px;
-    margin-top: 1ex;
-    font-size: 11px;
-    font-weight: bold;
-}
-
-QGroupBox::title {
-    subcontrol-origin: margin;
-    subcontrol-position: top left;
-    padding: 0 3px;
-}
-
-MixerCurveWidget {
-    font-size: 12px;
-}
+QToolTip {
+    color: black;
+ }

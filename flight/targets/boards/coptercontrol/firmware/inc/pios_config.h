@@ -43,6 +43,10 @@
 /* PIOS FreeRTOS support */
 #define PIOS_INCLUDE_FREERTOS
 
+
+/* PIOS CallbackScheduler support */
+#define PIOS_INCLUDE_CALLBACKSCHEDULER
+
 /* PIOS bootloader helper */
 #define PIOS_INCLUDE_BL_HELPER
 /* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
@@ -140,7 +144,7 @@
 
 /* Stabilization options */
 /* #define PIOS_QUATERNION_STABILIZATION */
-
+#define PIOS_EXCLUDE_ADVANCED_FEATURES
 /* Performance counters */
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD  1995998
 
@@ -153,12 +157,19 @@
 #define CPULOAD_LIMIT_CRITICAL          95
 
 /* Task stack sizes */
-#define PIOS_ACTUATOR_STACK_SIZE        1020
-#define PIOS_MANUAL_STACK_SIZE          800
+#define PIOS_ACTUATOR_STACK_SIZE        820
+#define PIOS_MANUAL_STACK_SIZE          635
+#define PIOS_RECEIVER_STACK_SIZE        620
+#define PIOS_STABILIZATION_STACK_SIZE   780
+
+#ifdef DIAG_TASKS
+#define PIOS_SYSTEM_STACK_SIZE          740
+#else
 #define PIOS_SYSTEM_STACK_SIZE          660
-#define PIOS_STABILIZATION_STACK_SIZE   524
-#define PIOS_TELEM_STACK_SIZE           800
-#define PIOS_EVENTDISPATCHER_STACK_SIZE 130
+#endif
+#define PIOS_TELEM_RX_STACK_SIZE        410
+#define PIOS_TELEM_TX_STACK_SIZE        560
+#define PIOS_EVENTDISPATCHER_STACK_SIZE 95
 
 /* This can't be too high to stop eventdispatcher thread overflowing */
 #define PIOS_EVENTDISAPTCHER_QUEUE      10

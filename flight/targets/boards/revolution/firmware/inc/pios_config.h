@@ -43,6 +43,9 @@
 /* PIOS FreeRTOS support */
 #define PIOS_INCLUDE_FREERTOS
 
+/* PIOS Callback Scheduler support */
+#define PIOS_INCLUDE_CALLBACKSCHEDULER
+
 /* PIOS bootloader helper */
 #define PIOS_INCLUDE_BL_HELPER
 /* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
@@ -84,6 +87,8 @@
 #define PIOS_INCLUDE_MS5611
 #define PIOS_INCLUDE_MPXV
 #define PIOS_INCLUDE_ETASV3
+#define PIOS_INCLUDE_MS4525DO
+
 /* #define PIOS_INCLUDE_HCSR04 */
 
 /* PIOS receiver drivers */

@@ -25,14 +25,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "monitorgadgetfactory.h"
-#include "uavtalk/telemetrymanager.h"
-#include "extensionsystem/pluginmanager.h"
+
 #include "monitorgadgetconfiguration.h"
 #include "monitorgadget.h"
 #include "monitorgadgetoptionspage.h"
 
+#include <extensionsystem/pluginmanager.h>
 #include <coreplugin/connectionmanager.h>
 #include <coreplugin/icore.h>
+#include <uavtalk/telemetrymanager.h>
 
 MonitorGadgetFactory::MonitorGadgetFactory(QObject *parent) :
     IUAVGadgetFactory(QString("TelemetryMonitorGadget"), tr("Telemetry Monitor"), parent)
@@ -80,5 +81,6 @@ IUAVGadgetConfiguration *MonitorGadgetFactory::createConfiguration(QSettings *qS
 
 IOptionsPage *MonitorGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new MonitorGadgetOptionsPage(qobject_cast<MonitorGadgetConfiguration *>(config));
+    Q_UNUSED(config);
+    return 0; // new MonitorGadgetOptionsPage(qobject_cast<MonitorGadgetConfiguration *>(config));
 }

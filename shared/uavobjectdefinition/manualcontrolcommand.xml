@@ -7,7 +7,9 @@
         <field name="Pitch" units="%" type="float" elements="1"/>
         <field name="Yaw" units="%" type="float" elements="1"/>
         <field name="Collective" units="%" type="float" elements="1"/>
+        <field name="Thrust" units="%" type="float" elements="1"/>
 	<field name="Channel" units="us" type="uint16" elements="9"/>
+	<field name="FlightModeSwitchPosition" units="" type="uint8" elements="1" defaultvalue="0"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="2000"/>

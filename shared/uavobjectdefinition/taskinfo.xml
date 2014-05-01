@@ -3,72 +3,68 @@
         <description>Task information</description>
         <field name="StackRemaining" units="bytes" type="uint16">
 		<elementnames>
+			<!-- system -->
 			<elementname>System</elementname>
-			<elementname>Actuator</elementname>
-			<elementname>Attitude</elementname>
-			<elementname>Sensors</elementname>
-			<elementname>TelemetryTx</elementname>
-			<elementname>TelemetryTxPri</elementname>
-			<elementname>TelemetryRx</elementname>
-			<elementname>RadioRx</elementname>
-			<elementname>GPS</elementname>
-			<elementname>ManualControl</elementname>
-			<elementname>Altitude</elementname>
-			<elementname>Airspeed</elementname>
-			<elementname>Stabilization</elementname>
-			<elementname>AltitudeHold</elementname>
-			<elementname>PathPlanner</elementname>
-			<elementname>PathFollower</elementname>
-			<elementname>FlightPlan</elementname>
-			<elementname>Com2UsbBridge</elementname>
-			<elementname>Usb2ComBridge</elementname>
-			<elementname>OveroSync</elementname>
-			<elementname>ModemRx</elementname>
-			<elementname>ModemTx</elementname>
-			<elementname>ModemStat</elementname>
-			<elementname>Autotune</elementname>
-			<elementname>EventDispatcher</elementname>
-			<elementname>MagBaro</elementname>
-			<elementname>OSDGen</elementname>
 			<elementname>CallbackScheduler0</elementname>
 			<elementname>CallbackScheduler1</elementname>
 			<elementname>CallbackScheduler2</elementname>
 			<elementname>CallbackScheduler3</elementname>
+			<!-- fligth -->
+			<elementname>Receiver</elementname>
+			<elementname>Stabilization</elementname>
+			<elementname>Actuator</elementname>
+			<elementname>Sensors</elementname>
+			<elementname>Attitude</elementname>
+			<elementname>Altitude</elementname>
+			<elementname>Airspeed</elementname>
+			<elementname>MagBaro</elementname>
+			<!-- navigation -->
+			<elementname>PathFollower</elementname>
+			<elementname>FlightPlan</elementname>
+			<!-- telemetry -->
+			<elementname>TelemetryTx</elementname>
+			<elementname>TelemetryRx</elementname>
+			<!-- com -->
+			<elementname>RadioRx</elementname>
+			<elementname>Com2UsbBridge</elementname>
+			<elementname>Usb2ComBridge</elementname>
+			<!-- optional -->
+			<elementname>GPS</elementname>
+			<elementname>OSDGen</elementname>
+			<elementname>Autotune</elementname>
 		</elementnames>
 	</field> 
 	<field name="Running" units="bool" type="enum">
 		<elementnames>
+			<!-- system -->
 			<elementname>System</elementname>
-			<elementname>Actuator</elementname>
-			<elementname>Attitude</elementname>
-			<elementname>Sensors</elementname>
-			<elementname>TelemetryTx</elementname>
-			<elementname>TelemetryTxPri</elementname>
-			<elementname>TelemetryRx</elementname>
-			<elementname>RadioRx</elementname>
-			<elementname>GPS</elementname>
-			<elementname>ManualControl</elementname>
-			<elementname>Altitude</elementname>
-			<elementname>Airspeed</elementname>
-			<elementname>Stabilization</elementname>
-			<elementname>AltitudeHold</elementname>
-			<elementname>PathPlanner</elementname>
-			<elementname>PathFollower</elementname>
-			<elementname>FlightPlan</elementname>
-			<elementname>Com2UsbBridge</elementname>
-			<elementname>Usb2ComBridge</elementname>
-			<elementname>OveroSync</elementname>
-			<elementname>ModemRx</elementname>
-			<elementname>ModemTx</elementname>
-			<elementname>ModemStat</elementname>
-			<elementname>Autotune</elementname>
-			<elementname>EventDispatcher</elementname>
-			<elementname>MagBaro</elementname>
-			<elementname>OSDGen</elementname>
 			<elementname>CallbackScheduler0</elementname>
 			<elementname>CallbackScheduler1</elementname>
 			<elementname>CallbackScheduler2</elementname>
 			<elementname>CallbackScheduler3</elementname>
+			<!-- fligth -->
+			<elementname>Receiver</elementname>
+			<elementname>Stabilization</elementname>
+			<elementname>Actuator</elementname>
+			<elementname>Sensors</elementname>
+			<elementname>Attitude</elementname>
+			<elementname>Altitude</elementname>
+			<elementname>Airspeed</elementname>
+			<elementname>MagBaro</elementname>
+			<!-- navigation -->
+			<elementname>PathFollower</elementname>
+			<elementname>FlightPlan</elementname>
+			<!-- telemetry -->
+			<elementname>TelemetryTx</elementname>
+			<elementname>TelemetryRx</elementname>
+			<!-- com -->
+			<elementname>RadioRx</elementname>
+			<elementname>Com2UsbBridge</elementname>
+			<elementname>Usb2ComBridge</elementname>
+			<!-- optional -->
+			<elementname>GPS</elementname>
+			<elementname>OSDGen</elementname>
+			<elementname>Autotune</elementname>
 		</elementnames>
 		<options>
 			<option>False</option>
@@ -77,42 +73,40 @@
 	</field>
 	<field name="RunningTime" units="%" type="uint8">
 		<elementnames>
+			<!-- system -->
 			<elementname>System</elementname>
-			<elementname>Actuator</elementname>
-			<elementname>Attitude</elementname>
-			<elementname>Sensors</elementname>
-			<elementname>TelemetryTx</elementname>
-			<elementname>TelemetryTxPri</elementname>
-			<elementname>TelemetryRx</elementname>
-			<elementname>RadioRx</elementname>
-			<elementname>GPS</elementname>
-			<elementname>ManualControl</elementname>
-			<elementname>Altitude</elementname>
-			<elementname>Airspeed</elementname>
-			<elementname>Stabilization</elementname>
-			<elementname>AltitudeHold</elementname>
-			<elementname>PathPlanner</elementname>
-			<elementname>PathFollower</elementname>
-			<elementname>FlightPlan</elementname>
-			<elementname>Com2UsbBridge</elementname>
-			<elementname>Usb2ComBridge</elementname>
-			<elementname>OveroSync</elementname>
-			<elementname>ModemRx</elementname>
-			<elementname>ModemTx</elementname>
-			<elementname>ModemStat</elementname>
-			<elementname>Autotune</elementname>
-			<elementname>EventDispatcher</elementname>
-			<elementname>MagBaro</elementname>
-			<elementname>OSDGen</elementname>
 			<elementname>CallbackScheduler0</elementname>
 			<elementname>CallbackScheduler1</elementname>
 			<elementname>CallbackScheduler2</elementname>
 			<elementname>CallbackScheduler3</elementname>
+			<!-- fligth -->
+			<elementname>Receiver</elementname>
+			<elementname>Stabilization</elementname>
+			<elementname>Actuator</elementname>
+			<elementname>Sensors</elementname>
+			<elementname>Attitude</elementname>
+			<elementname>Altitude</elementname>
+			<elementname>Airspeed</elementname>
+			<elementname>MagBaro</elementname>
+			<!-- navigation -->
+			<elementname>PathFollower</elementname>
+			<elementname>FlightPlan</elementname>
+			<!-- telemetry -->
+			<elementname>TelemetryTx</elementname>
+			<elementname>TelemetryRx</elementname>
+			<!-- com -->
+			<elementname>RadioRx</elementname>
+			<elementname>Com2UsbBridge</elementname>
+			<elementname>Usb2ComBridge</elementname>
+			<!-- optional -->
+			<elementname>GPS</elementname>
+			<elementname>OSDGen</elementname>
+			<elementname>Autotune</elementname>
 		</elementnames>
 	</field> 
-        <access gcs="readwrite" flight="readwrite"/>
-        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
-        <telemetryflight acked="true" updatemode="periodic" period="10000"/>
+        <access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="onchange" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="10000"/>
 	<logging updatemode="manual" period="0"/>
     </object>
 </xml>

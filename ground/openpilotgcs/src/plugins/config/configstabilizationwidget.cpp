@@ -35,17 +35,44 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QList>
+#include <QTabBar>
+#include <QMessageBox>
 
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
 #include "altitudeholdsettings.h"
+#include "stabilizationsettings.h"
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
-    boardModel(0)
+    boardModel(0), m_pidBankCount(0), m_currentPIDBank(0)
 {
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
 
+    StabilizationSettings *stabSettings = qobject_cast<StabilizationSettings *>(getObject("StabilizationSettings"));
+    Q_ASSERT(stabSettings);
+
+    m_pidBankCount = stabSettings->getField("FlightModeMap")->getOptions().count();
+
+    // Set up fake tab widget stuff for pid banks support
+    m_pidTabBars.append(ui->basicPIDBankTabBar);
+    m_pidTabBars.append(ui->advancedPIDBankTabBar);
+    m_pidTabBars.append(ui->expertPIDBankTabBar);
+    foreach(QTabBar * tabBar, m_pidTabBars) {
+        for (int i = 0; i < m_pidBankCount; i++) {
+            tabBar->addTab(tr("PID Bank %1").arg(i + 1));
+            tabBar->setTabData(i, QString("StabilizationSettingsBank%1").arg(i + 1));
+        }
+        tabBar->setExpanding(false);
+        connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
+    }
+
+    for (int i = 0; i < m_pidBankCount; i++) {
+        if (i > 0) {
+            m_stabilizationObjectsString.append(",");
+        }
+        m_stabilizationObjectsString.append(m_pidTabBars.at(0)->tabData(i).toString());
+    }
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
@@ -65,6 +92,10 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(ui->realTimeUpdates_8);
     connect(ui->realTimeUpdates_12, SIGNAL(toggled(bool)), this, SLOT(realtimeUpdatesSlot(bool)));
     addWidget(ui->realTimeUpdates_12);
+    connect(ui->realTimeUpdates_7, SIGNAL(toggled(bool)), this, SLOT(realtimeUpdatesSlot(bool)));
+    addWidget(ui->realTimeUpdates_7);
+    connect(ui->realTimeUpdates_9, SIGNAL(toggled(bool)), this, SLOT(realtimeUpdatesSlot(bool)));
+    addWidget(ui->realTimeUpdates_9);
 
     connect(ui->checkBox_7, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
     addWidget(ui->checkBox_7);
@@ -86,9 +117,11 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(ui->pushButton_23);
 
     addWidget(ui->basicResponsivenessGroupBox);
-    connect(ui->basicResponsivenessGroupBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
+    addWidget(ui->basicResponsivenessCheckBox);
+    connect(ui->basicResponsivenessCheckBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
     addWidget(ui->advancedResponsivenessGroupBox);
-    connect(ui->advancedResponsivenessGroupBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
+    addWidget(ui->advancedResponsivenessCheckBox);
+    connect(ui->advancedResponsivenessCheckBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
 
     connect(this, SIGNAL(widgetContentsChanged(QWidget *)), this, SLOT(processLinkedWidgets(QWidget *)));
 
@@ -107,7 +140,7 @@ void ConfigStabilizationWidget::refreshWidgetsValues(UAVObject *o)
 {
     ConfigTaskWidget::refreshWidgetsValues(o);
 
-    ui->basicResponsivenessGroupBox->setChecked(ui->rateRollKp_3->value() == ui->ratePitchKp_4->value() &&
+    ui->basicResponsivenessCheckBox->setChecked(ui->rateRollKp_3->value() == ui->ratePitchKp_4->value() &&
                                                 ui->rateRollKi_3->value() == ui->ratePitchKi_4->value());
 }
 
@@ -116,6 +149,8 @@ void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)
     ui->realTimeUpdates_6->setChecked(value);
     ui->realTimeUpdates_8->setChecked(value);
     ui->realTimeUpdates_12->setChecked(value);
+    ui->realTimeUpdates_7->setChecked(value);
+    ui->realTimeUpdates_9->setChecked(value);
 
     if (value && !realtimeUpdates->isActive()) {
         realtimeUpdates->start(AUTOMATIC_UPDATE_RATE);
@@ -136,14 +171,18 @@ void ConfigStabilizationWidget::linkCheckBoxes(bool value)
         ui->checkBox_2->setChecked(value);
     } else if (sender() == ui->checkBox_2) {
         ui->checkBox_8->setChecked(value);
-    } else if (sender() == ui->basicResponsivenessGroupBox) {
-        ui->advancedResponsivenessGroupBox->setChecked(!value);
+    } else if (sender() == ui->basicResponsivenessCheckBox) {
+        ui->advancedResponsivenessCheckBox->setChecked(!value);
+        ui->basicResponsivenessControls->setEnabled(value);
+        ui->advancedResponsivenessControls->setEnabled(!value);
         if (value) {
             processLinkedWidgets(ui->AttitudeResponsivenessSlider);
             processLinkedWidgets(ui->RateResponsivenessSlider);
         }
-    } else if (sender() == ui->advancedResponsivenessGroupBox) {
-        ui->basicResponsivenessGroupBox->setChecked(!value);
+    } else if (sender() == ui->advancedResponsivenessCheckBox) {
+        ui->basicResponsivenessCheckBox->setChecked(!value);
+        ui->basicResponsivenessControls->setEnabled(!value);
+        ui->advancedResponsivenessControls->setEnabled(value);
     }
 }
 
@@ -185,7 +224,7 @@ void ConfigStabilizationWidget::processLinkedWidgets(QWidget *widget)
         }
     }
 
-    if (ui->basicResponsivenessGroupBox->isChecked()) {
+    if (ui->basicResponsivenessCheckBox->isChecked()) {
         if (widget == ui->AttitudeResponsivenessSlider) {
             ui->ratePitchKp_4->setValue(ui->AttitudeResponsivenessSlider->value());
         } else if (widget == ui->RateResponsivenessSlider) {
@@ -205,6 +244,23 @@ void ConfigStabilizationWidget::onBoardConnected()
     ui->AltitudeHold->setEnabled((boardModel & 0xff00) == 0x0900);
 }
 
+void ConfigStabilizationWidget::pidBankChanged(int index)
+{
+    foreach(QTabBar * tabBar, m_pidTabBars) {
+        disconnect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
+        tabBar->setCurrentIndex(index);
+        connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
+    }
+
+    for (int i = 0; i < m_pidTabBars.at(0)->count(); i++) {
+        setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(i).toString(), false);
+    }
+
+    setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(index).toString(), true);
+
+    m_currentPIDBank = index;
+}
+
 bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
 {
     // AltitudeHoldSettings should only be saved for Revolution board to avoid error.
@@ -213,4 +269,12 @@ bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
     } else {
         return true;
     }
+}
+
+QString ConfigStabilizationWidget::mapObjectName(const QString objectName)
+{
+    if (objectName == "StabilizationSettingsBankX") {
+        return m_stabilizationObjectsString;
+    }
+    return ConfigTaskWidget::mapObjectName(objectName);
 }

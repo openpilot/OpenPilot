@@ -26,7 +26,6 @@
  */
 #include "config_cc_hw_widget.h"
 #include "hwsettings.h"
-
 #include <QDebug>
 #include <QStringList>
 #include <QWidget>
@@ -75,14 +74,26 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
         break;
     }
     addApplySaveButtons(m_telemetry->saveTelemetryToRAM, m_telemetry->saveTelemetryToSD);
-    addUAVObjectToWidgetRelation("HwSettings", "CC_FlexiPort", m_telemetry->cbFlexi);
-    addUAVObjectToWidgetRelation("HwSettings", "CC_MainPort", m_telemetry->cbTele);
-    addUAVObjectToWidgetRelation("HwSettings", "CC_RcvrPort", m_telemetry->cbRcvr);
-    addUAVObjectToWidgetRelation("HwSettings", "USB_HIDPort", m_telemetry->cbUsbHid);
-    addUAVObjectToWidgetRelation("HwSettings", "USB_VCPPort", m_telemetry->cbUsbVcp);
-    addUAVObjectToWidgetRelation("HwSettings", "TelemetrySpeed", m_telemetry->telemetrySpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "GPSSpeed", m_telemetry->gpsSpeed);
-    addUAVObjectToWidgetRelation("HwSettings", "ComUsbBridgeSpeed", m_telemetry->comUsbBridgeSpeed);
+    addWidgetBinding("HwSettings", "CC_FlexiPort", m_telemetry->cbFlexi);
+    addWidgetBinding("HwSettings", "CC_MainPort", m_telemetry->cbTele);
+    addWidgetBinding("HwSettings", "CC_RcvrPort", m_telemetry->cbRcvr);
+    addWidgetBinding("HwSettings", "USB_HIDPort", m_telemetry->cbUsbHid);
+    addWidgetBinding("HwSettings", "USB_VCPPort", m_telemetry->cbUsbVcp);
+    addWidgetBinding("HwSettings", "TelemetrySpeed", m_telemetry->telemetrySpeed);
+    addWidgetBinding("HwSettings", "GPSSpeed", m_telemetry->gpsSpeed);
+    // Add Gps protocol configuration
+
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings::DataFields hwSettingsData = hwSettings->getData();
+
+    if (hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_GPS] != HwSettings::OPTIONALMODULES_ENABLED) {
+        m_telemetry->gpsProtocol->setEnabled(false);
+        m_telemetry->gpsProtocol->setToolTip(tr("Enable GPS module and reboot the board to be able to select GPS protocol"));
+    } else {
+        addWidgetBinding("GPSSettings", "DataProtocol", m_telemetry->gpsProtocol);
+    }
+
+    addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_telemetry->comUsbBridgeSpeed);
     connect(m_telemetry->cchwHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
     enableSaveButtons(false);
     populateWidgets();

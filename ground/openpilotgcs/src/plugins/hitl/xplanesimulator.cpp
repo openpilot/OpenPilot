@@ -102,7 +102,7 @@ void XplaneSimulator::transmitUpdate()
         float ailerons = actData.Roll;
         float elevator = actData.Pitch;
         float rudder   = actData.Yaw;
-        float throttle = actData.Throttle > 0 ? actData.Throttle : 0;
+        float throttle = actData.Thrust > 0 ? actData.Thrust : 0;
         float none     = -999;
         // quint32 none = *((quint32*)&tmp); // get float as 4 bytes
 
@@ -318,10 +318,10 @@ void XplaneSimulator::processUpdate(const QByteArray & dataBuf)
         out.velEast   = velX;
         out.velDown   = -velZ;
 
-        // Update gyroscope sensor data
-        out.rollRate  = rollRate_rad;
-        out.pitchRate = pitchRate_rad;
-        out.yawRate   = yawRate_rad;
+        // Update gyroscope sensor data - convert from rad/s to deg/s
+        out.rollRate  = rollRate_rad * (180.0 / M_PI);
+        out.pitchRate = pitchRate_rad * (180.0 / M_PI);
+        out.yawRate   = yawRate_rad * (180.0 / M_PI);
 
         // Update accelerometer sensor data
         out.accX      = accX;

@@ -623,9 +623,19 @@ QString UAVObjectParser::processObjectAttributes(QDomNode & node, ObjectInfo *in
     } else if (attr.nodeValue().compare(QString("false")) == 0) {
         info->isSettings = false;
     } else {
-        return QString("Object:settings attribute value is invalid");
+        return QString("Object:settings attribute value is invalid (true|false)");
     }
 
+    // Get priority attribute
+    attr = attributes.namedItem("priority");
+    info->isPriority = false;
+    if (!attr.isNull()) {
+        if (attr.nodeValue().compare(QString("true")) == 0) {
+            info->isPriority = true;
+        } else if (attr.nodeValue().compare(QString("false")) != 0) {
+            return QString("Object:priority attribute value is invalid (true|false)");
+        }
+    }
 
     // Settings objects can only have a single instance
     if (info->isSettings && !info->isSingleInst) {

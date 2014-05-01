@@ -41,9 +41,11 @@
 #include "hwsettings.h"
 #include "airspeedsettings.h"
 #include "airspeedsensor.h" // object that will be updated by the module
+#include "baro_airspeed_ms4525do.h"
 #include "baro_airspeed_etasv3.h"
 #include "baro_airspeed_mpxv.h"
 #include "gps_airspeed.h"
+#include "airspeedalarm.h"
 #include "taskinfo.h"
 
 // Private constants
@@ -59,7 +61,7 @@
 static xTaskHandle taskHandle;
 static bool airspeedEnabled  = false;
 static AirspeedSettingsData airspeedSettings;
-
+static AirspeedSettingsAirspeedSensorTypeOptions lastAirspeedSensorType = 0;
 static int8_t airspeedADCPin = -1;
 
 
@@ -118,6 +120,8 @@ int32_t AirspeedInitialize()
         }
     }
 
+    lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
+
     AirspeedSensorInitialize();
     AirspeedSettingsInitialize();
 
@@ -144,6 +148,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
 
     airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
 
+
     // Main task loop
     portTickType lastSysTime = xTaskGetTickCount();
     while (1) {
@@ -151,6 +156,12 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
 
         // Update the airspeed object
         AirspeedSensorGet(&airspeedData);
+
+        // if sensor type changed reset Airspeed alarm
+        if (airspeedSettings.AirspeedSensorType != lastAirspeedSensorType) {
+            AirspeedAlarm(SYSTEMALARMS_ALARM_DEFAULT);
+            lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
+        }
 
         switch (airspeedSettings.AirspeedSensorType) {
 #if defined(PIOS_INCLUDE_MPXV)
@@ -166,11 +177,19 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
             baro_airspeedGetETASV3(&airspeedData, &airspeedSettings);
             break;
 #endif
+#if defined(PIOS_INCLUDE_MS4525DO)
+        case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_PIXHAWKAIRSPEEDMS4525DO:
+            // PixHawk Airpeed based on MS4525DO
+            baro_airspeedGetMS4525DO(&airspeedData, &airspeedSettings);
+            break;
+#endif
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
             gps_airspeedGet(&airspeedData, &airspeedSettings);
             break;
+        case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:
         default:
             airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            break;
         }
 
         // Set the UAVO

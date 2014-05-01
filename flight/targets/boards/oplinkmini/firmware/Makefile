@@ -46,13 +46,13 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/oplinkstatus.c
     SRC += $(OPUAVSYNTHDIR)/oplinksettings.c
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
     SRC += $(OPUAVSYNTHDIR)/oplinkreceiver.c
+    SRC += $(OPUAVSYNTHDIR)/radiocombridgestats.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

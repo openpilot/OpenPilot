@@ -21,6 +21,7 @@ macx {
     QMAKE_CC = /usr/bin/gcc
     QMAKE_CXX = /usr/bin/g++ 
     QMAKE_LINK = /usr/bin/g++
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 }
 
 include(openpilotgcs.pri)

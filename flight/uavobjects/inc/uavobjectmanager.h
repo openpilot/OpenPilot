@@ -49,6 +49,8 @@
 
 typedef void *UAVObjHandle;
 
+#define MetaObjectId(id) ((id) + 1)
+
 /**
  * Object update mode, used by multiple modules (e.g. telemetry and logger)
  */
@@ -118,6 +120,7 @@ typedef struct {
     UAVObjHandle    obj;
     uint16_t        instId;
     UAVObjEventType event;
+    bool lowPriority; /* if true prevents raising warnings */
 } UAVObjEvent;
 
 /**
@@ -145,8 +148,7 @@ typedef struct {
 int32_t UAVObjInitialize();
 void UAVObjGetStats(UAVObjStats *statsOut);
 void UAVObjClearStats();
-UAVObjHandle UAVObjRegister(uint32_t id,
-                            int32_t isSingleInstance, int32_t isSettings, uint32_t numBytes, UAVObjInitializeCallback initCb);
+UAVObjHandle UAVObjRegister(uint32_t id, bool isSingleInstance, bool isSettings, bool isPriority, uint32_t num_bytes, UAVObjInitializeCallback initCb);
 UAVObjHandle UAVObjGetByID(uint32_t id);
 uint32_t UAVObjGetID(UAVObjHandle obj);
 uint32_t UAVObjGetNumBytes(UAVObjHandle obj);
@@ -156,8 +158,10 @@ uint16_t UAVObjCreateInstance(UAVObjHandle obj_handle, UAVObjInitializeCallback 
 bool UAVObjIsSingleInstance(UAVObjHandle obj);
 bool UAVObjIsMetaobject(UAVObjHandle obj);
 bool UAVObjIsSettings(UAVObjHandle obj);
+bool UAVObjIsPriority(UAVObjHandle obj);
 int32_t UAVObjUnpack(UAVObjHandle obj_handle, uint16_t instId, const uint8_t *dataIn);
 int32_t UAVObjPack(UAVObjHandle obj_handle, uint16_t instId, uint8_t *dataOut);
+uint8_t UAVObjUpdateCRC(UAVObjHandle obj_handle, uint16_t instId, uint8_t crc);
 int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId);

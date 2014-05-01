@@ -35,6 +35,7 @@
 
 #define DFU_DEBUG true
 
+const int UploaderGadgetWidget::BOARD_EVENT_TIMEOUT = 20000;
 const int UploaderGadgetWidget::AUTOUPDATE_CLOSE_TIMEOUT = 7000;
 
 TimedDialog::TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent, Qt::WindowFlags flags) :
@@ -75,6 +76,48 @@ void TimedDialog::perform()
     }
 }
 
+ConnectionWaiter::ConnectionWaiter(int targetDeviceCount, int timeout, QWidget *parent) : QObject(parent), eventLoop(this), timer(this), timeout(timeout), elapsed(0), targetDeviceCount(targetDeviceCount), result(ConnectionWaiter::Ok)
+{
+}
+
+int ConnectionWaiter::exec() {
+    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(deviceEvent()));
+    connect(USBMonitor::instance(), SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(deviceEvent()));
+
+    connect(&timer, SIGNAL(timeout()), this, SLOT(perform()));
+    timer.start(1000);
+
+    emit timeChanged(0);
+    eventLoop.exec();
+
+    return result;
+}
+
+void ConnectionWaiter::quit() {
+    disconnect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(deviceEvent()));
+    disconnect(USBMonitor::instance(), SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(deviceEvent()));
+    timer.stop();
+    eventLoop.exit();
+}
+
+void ConnectionWaiter::perform()
+{
+    ++elapsed;
+    emit timeChanged(elapsed);
+    int remaining = timeout - elapsed * 1000;
+    if (remaining <= 0) {
+        result = ConnectionWaiter::TimedOut;
+        quit();
+    }
+}
+
+void ConnectionWaiter::deviceEvent()
+{
+    if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() == targetDeviceCount) {
+        quit();
+    }
+}
+
 UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     m_config    = new Ui_UploaderWidget();
@@ -82,9 +125,8 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     currentStep = IAP_STATE_READY;
     resetOnly   = false;
     dfu = NULL;
-    m_timer     = 0;
-    m_progress  = 0;
     msg = new QErrorMessage(this);
+
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
@@ -123,7 +165,6 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
         versionMatchCheck();
     }
 }
-
 
 bool sortPorts(const QSerialPortInfo &s1, const QSerialPortInfo &s2)
 {
@@ -569,31 +610,25 @@ bool UploaderGadgetWidget::autoUpdate()
         delete dfu;
         dfu = NULL;
     }
-    QEventLoop loop;
-    QTimer timer;
-    timer.setSingleShot(true);
-    connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-    while (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
-        emit autoUpdateSignal(WAITING_DISCONNECT, QVariant());
-        if (QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("Please disconnect your OpenPilot board"), QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
-            emit autoUpdateSignal(FAILURE, QVariant());
+
+    if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
+        // wait for all boards to be disconnected
+        ConnectionWaiter waiter(0, BOARD_EVENT_TIMEOUT);
+        connect(&waiter, SIGNAL(timeChanged(int)), this, SLOT(autoUpdateDisconnectProgress(int)));
+        if (waiter.exec() == ConnectionWaiter::TimedOut) {
+            emit autoUpdateSignal(FAILURE, QVariant(tr("Timed out while waiting for all boards to be disconnected!")));
             return false;
         }
-        sleep(500);
     }
-    emit autoUpdateSignal(WAITING_CONNECT, 0);
-    autoUpdateConnectTimeout = 0;
-    m_timer = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(performAuto()));
-    m_timer->start(1000);
-    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), &m_eventloop, SLOT(quit()));
-    m_eventloop.exec();
-    if (!m_timer->isActive()) {
-        m_timer->stop();
-        emit autoUpdateSignal(FAILURE, QVariant());
+
+    // wait for a board to connect
+    ConnectionWaiter waiter(1, BOARD_EVENT_TIMEOUT);
+    connect(&waiter, SIGNAL(timeChanged(int)), this, SLOT(autoUpdateConnectProgress(int)));
+    if (waiter.exec() == ConnectionWaiter::TimedOut) {
+        emit autoUpdateSignal(FAILURE, QVariant(tr("Timed out while waiting for a board to be connected!")));
         return false;
     }
-    m_timer->stop();
+
     dfu = new DFUObject(DFU_DEBUG, false, QString());
     dfu->AbortOperation();
     emit autoUpdateSignal(JUMP_TO_BL, QVariant());
@@ -618,6 +653,7 @@ bool UploaderGadgetWidget::autoUpdate()
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;
     }
+
     QString filename;
     emit autoUpdateSignal(LOADING_FW, QVariant());
     switch (dfu->devices[0].ID) {
@@ -654,9 +690,10 @@ bool UploaderGadgetWidget::autoUpdate()
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;
     }
+    QEventLoop eventLoop;
     firmware = file.readAll();
     connect(dfu, SIGNAL(progressUpdated(int)), this, SLOT(autoUpdateProgress(int)));
-    connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &m_eventloop, SLOT(quit()));
+    connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &eventLoop, SLOT(quit()));
     emit autoUpdateSignal(UPLOADING_FW, QVariant());
     if (!dfu->enterDFU(0)) {
         emit autoUpdateSignal(FAILURE, QVariant());
@@ -667,7 +704,7 @@ bool UploaderGadgetWidget::autoUpdate()
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;
     }
-    m_eventloop.exec();
+    eventLoop.exec();
     QByteArray desc = firmware.right(100);
     emit autoUpdateSignal(UPLOADING_DESC, QVariant());
     if (dfu->UploadDescription(desc) != OP_DFU::Last_operation_Success) {
@@ -679,9 +716,24 @@ bool UploaderGadgetWidget::autoUpdate()
     return true;
 }
 
-void UploaderGadgetWidget::autoUpdateProgress(int value)
+void UploaderGadgetWidget::autoUpdateDisconnectProgress(int value)
+{
+    emit autoUpdateSignal(WAITING_DISCONNECT, value);
+}
+
+void UploaderGadgetWidget::autoUpdateConnectProgress(int value)
+{
+    emit autoUpdateSignal(WAITING_CONNECT, value);
+}
+
+void UploaderGadgetWidget::autoUpdateFlashProgress(int value)
 {
     emit autoUpdateSignal(UPLOADING_FW, value);
+}
+
+void UploaderGadgetWidget::autoUpdateProgress(int value)
+{
+    autoUpdateFlashProgress(value);
 }
 
 /**
@@ -798,16 +850,6 @@ void UploaderGadgetWidget::systemRescue()
     currentStep = IAP_STATE_BOOTLOADER;
 }
 
-void UploaderGadgetWidget::performAuto()
-{
-    ++autoUpdateConnectTimeout;
-    emit autoUpdateSignal(WAITING_CONNECT, autoUpdateConnectTimeout * 5);
-    if (autoUpdateConnectTimeout == 20) {
-        m_timer->stop();
-        m_eventloop.exit();
-    }
-}
-
 void UploaderGadgetWidget::uploadStarted()
 {
     m_config->haltButton->setEnabled(false);
@@ -852,6 +894,7 @@ void UploaderGadgetWidget::startAutoUpdate()
     m_config->splitter->setEnabled(false);
     m_config->autoUpdateGroupBox->setVisible(true);
     m_config->autoUpdateOkButton->setEnabled(false);
+
     connect(this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::AutoUpdateStep, QVariant)));
     autoUpdate();
 }
@@ -860,14 +903,13 @@ void UploaderGadgetWidget::finishAutoUpdate()
 {
     disconnect(this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::AutoUpdateStep, QVariant)));
     m_config->autoUpdateOkButton->setEnabled(true);
-    connect(&autoUpdateCloseTimer, SIGNAL(timeout()), this, SLOT(closeAutoUpdate()));
-    autoUpdateCloseTimer.start(AUTOUPDATE_CLOSE_TIMEOUT);
+
+    // wait a bit and "close" auto update
+    QTimer::singleShot(AUTOUPDATE_CLOSE_TIMEOUT, this, SLOT(closeAutoUpdate()));
 }
 
 void UploaderGadgetWidget::closeAutoUpdate()
 {
-    autoUpdateCloseTimer.stop();
-    disconnect(&autoUpdateCloseTimer, SIGNAL(timeout()), this, SLOT(closeAutoUpdate()));
     m_config->autoUpdateGroupBox->setVisible(false);
     m_config->buttonFrame->setEnabled(true);
     m_config->splitter->setEnabled(true);
@@ -875,13 +917,22 @@ void UploaderGadgetWidget::closeAutoUpdate()
 
 void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value)
 {
+    QString msg;
+    int remaining;
     switch (status) {
     case uploader::WAITING_DISCONNECT:
         m_config->autoUpdateLabel->setText("Waiting for all OpenPilot boards to be disconnected from USB.");
+        m_config->autoUpdateProgressBar->setMaximum(BOARD_EVENT_TIMEOUT / 1000);
+        m_config->autoUpdateProgressBar->setValue(value.toInt());
+        remaining = m_config->autoUpdateProgressBar->maximum() - m_config->autoUpdateProgressBar->value();
+        m_config->autoUpdateProgressBar->setFormat(tr("Timing out in %1 seconds").arg(remaining));
         break;
     case uploader::WAITING_CONNECT:
         m_config->autoUpdateLabel->setText("Please connect the OpenPilot board to the USB port.");
+        m_config->autoUpdateProgressBar->setMaximum(BOARD_EVENT_TIMEOUT / 1000);
         m_config->autoUpdateProgressBar->setValue(value.toInt());
+        remaining = m_config->autoUpdateProgressBar->maximum() - m_config->autoUpdateProgressBar->value();
+        m_config->autoUpdateProgressBar->setFormat(tr("Timing out in %1 seconds").arg(remaining));
         break;
     case uploader::JUMP_TO_BL:
         m_config->autoUpdateProgressBar->setValue(0);
@@ -892,6 +943,8 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVa
         break;
     case uploader::UPLOADING_FW:
         m_config->autoUpdateLabel->setText("Uploading firmware to the board.");
+        m_config->autoUpdateProgressBar->setFormat("%p%");
+        m_config->autoUpdateProgressBar->setMaximum(100);
         m_config->autoUpdateProgressBar->setValue(value.toInt());
         break;
     case uploader::UPLOADING_DESC:
@@ -901,11 +954,18 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVa
         m_config->autoUpdateLabel->setText("Rebooting the board.");
         break;
     case uploader::SUCCESS:
-        m_config->autoUpdateLabel->setText("<font color='green'>Board was updated successfully, press OK to finish.</font>");
+        m_config->autoUpdateProgressBar->setValue(m_config->autoUpdateProgressBar->maximum());
+        msg = tr("Board was updated successfully.") + " " + tr("Press OK to finish.");
+        m_config->autoUpdateLabel->setText(QString("<font color='green'>%1</font>").arg(msg));
         finishAutoUpdate();
         break;
     case uploader::FAILURE:
-        m_config->autoUpdateLabel->setText("<font color='red'>Something went wrong, you will have to manually upgrade the board. Press OK to continue.</font>");
+        QString msg = value.toString();
+        if (msg.isEmpty()) {
+            msg = "Something went wrong, you will have to manually upgrade the board.";
+        }
+        msg += " " + tr("Press OK to finish.");
+        m_config->autoUpdateLabel->setText(QString("<font color='red'>%1</font>").arg(msg));
         finishAutoUpdate();
         break;
     }
@@ -936,16 +996,7 @@ UploaderGadgetWidget::~UploaderGadgetWidget()
         delete qw;
         qw = 0;
     }
-    if (m_progress) {
-        delete m_progress;
-        m_progress = 0;
-    }
-    if (m_timer) {
-        delete m_timer;
-        m_timer = 0;
-    }
 }
-
 
 /**
    Shows a message box with an error string.

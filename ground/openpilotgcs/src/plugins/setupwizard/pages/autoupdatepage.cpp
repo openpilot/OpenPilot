@@ -40,8 +40,13 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
     switch (status) {
     case uploader::WAITING_DISCONNECT:
         getWizard()->setWindowFlags(getWizard()->windowFlags() & ~Qt::WindowStaysOnTopHint);
+        getWizard()->setWindowIcon(qApp->windowIcon());
         disableButtons();
+        getWizard()->show();
         ui->statusLabel->setText("Waiting for all OP boards to be disconnected");
+        // TODO get rid of magic number 20s
+        ui->levellinProgressBar->setMaximum(20);
+        ui->levellinProgressBar->setValue(value.toInt());
         break;
     case uploader::WAITING_CONNECT:
         getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -49,6 +54,8 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         disableButtons();
         getWizard()->show();
         ui->statusLabel->setText("Please connect the board to the USB port (don't use external supply)");
+        // TODO get rid of magic number 20s
+        ui->levellinProgressBar->setMaximum(20);
         ui->levellinProgressBar->setValue(value.toInt());
         break;
     case uploader::JUMP_TO_BL:
@@ -60,6 +67,7 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         break;
     case uploader::UPLOADING_FW:
         ui->statusLabel->setText("Uploading firmware");
+        ui->levellinProgressBar->setMaximum(100);
         ui->levellinProgressBar->setValue(value.toInt());
         break;
     case uploader::UPLOADING_DESC:
@@ -77,7 +85,11 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         getWizard()->setWindowIcon(qApp->windowIcon());
         enableButtons(true);
         getWizard()->show();
-        ui->statusLabel->setText("Something went wrong, you will have to manually upgrade the board using the uploader plugin");
+        QString msg = value.toString();
+        if (msg.isEmpty()) {
+            msg = "Something went wrong, you will have to manually upgrade the board using the uploader plugin";
+        }
+        ui->statusLabel->setText(msg);
         break;
     }
 }

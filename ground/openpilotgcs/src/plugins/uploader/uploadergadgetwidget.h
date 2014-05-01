@@ -81,6 +81,38 @@ private:
     QProgressBar *bar;
 };
 
+// A helper class to wait for board connection and disconnection events
+// until a the desired number of connected boards is found
+// or until a timeout is reached
+class ConnectionWaiter: public QObject {
+    Q_OBJECT
+
+public:
+    ConnectionWaiter(int targetDeviceCount, int timeout, QWidget *parent = 0);
+
+    enum DialogCode { Ok, TimedOut };
+
+public slots:
+    int exec();
+    void quit();
+
+signals:
+    void timeChanged(int elapsed);
+
+private slots:
+    void perform();
+    void deviceEvent();
+
+private:
+    QEventLoop eventLoop;
+    QTimer timer;
+    // timeour in ms
+    int timeout;
+    // elapsed time in seconds
+    int elapsed;
+    int targetDeviceCount;
+    int result;
+};
 
 class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget {
     Q_OBJECT
@@ -88,6 +120,9 @@ class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget {
 public:
     UploaderGadgetWidget(QWidget *parent = 0);
     ~UploaderGadgetWidget();
+
+    static const int BOARD_EVENT_TIMEOUT;
+
     void log(QString str);
     bool autoUpdateCapable();
 
@@ -97,7 +132,11 @@ public slots:
     void populate();
     void openHelp();
     bool autoUpdate();
+    void autoUpdateDisconnectProgress(int);
+    void autoUpdateConnectProgress(int);
+    // autoUpdateProgress is deprecated: use autoUpdateFlashProgress instead
     void autoUpdateProgress(int);
+    void autoUpdateFlashProgress(int);
 
 signals:
     void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
@@ -109,17 +148,13 @@ private:
     bool resetOnly;
     void clearLog();
     QString getPortDevice(const QString &friendName);
-    QProgressDialog *m_progress;
-    QTimer *m_timer;
     QLineEdit *openFileNameLE;
-    QEventLoop m_eventloop;
     QErrorMessage *msg;
     void connectSignalSlot(QWidget *widget);
-    int autoUpdateConnectTimeout;
     FlightStatus *getFlightStatus();
     void bootButtonsSetEnable(bool enabled);
     static const int AUTOUPDATE_CLOSE_TIMEOUT;
-    QTimer autoUpdateCloseTimer;
+
 private slots:
     void onPhysicalHWConnect();
     void versionMatchCheck();
@@ -134,7 +169,6 @@ private slots:
     void commonSystemBoot(bool safeboot = false, bool erase = false);
     void systemRescue();
     void getSerialPorts();
-    void performAuto();
     void uploadStarted();
     void uploadEnded(bool succeed);
     void downloadStarted();

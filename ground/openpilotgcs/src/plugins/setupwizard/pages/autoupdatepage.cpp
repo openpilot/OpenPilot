@@ -39,8 +39,6 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
 {
     switch (status) {
     case uploader::WAITING_DISCONNECT:
-        getWizard()->setWindowFlags(getWizard()->windowFlags() & ~Qt::WindowStaysOnTopHint);
-        getWizard()->setWindowIcon(qApp->windowIcon());
         disableButtons();
         getWizard()->show();
         ui->statusLabel->setText("Waiting for all OP boards to be disconnected");
@@ -49,8 +47,15 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         ui->levellinProgressBar->setValue(value.toInt());
         break;
     case uploader::WAITING_CONNECT:
-        getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
-        getWizard()->setWindowIcon(qApp->windowIcon());
+        // Note:
+        // following two lines of code were probably added to fix an issue when uploader opened a popup requesting
+        // user to disconnect all boards
+        // Side effect is that the wizard dialog flickers
+        // the uploader was changed to avoid popups alltogether and that fix is not need anymore
+        // same commented fix can be found in FAILURE case and they are kept for future ref.
+        //getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
+        //getWizard()->setWindowIcon(qApp->windowIcon());
+        // End of Note
         disableButtons();
         getWizard()->show();
         ui->statusLabel->setText("Please connect the board to the USB port (don't use external supply)");
@@ -81,8 +86,8 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         ui->statusLabel->setText("Board updated, please press 'Next' to continue");
         break;
     case uploader::FAILURE:
-        getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
-        getWizard()->setWindowIcon(qApp->windowIcon());
+        //getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
+        //getWizard()->setWindowIcon(qApp->windowIcon());
         enableButtons(true);
         getWizard()->show();
         QString msg = value.toString();

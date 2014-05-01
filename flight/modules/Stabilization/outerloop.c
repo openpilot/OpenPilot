@@ -151,7 +151,7 @@ static void stabilizationOuterloopTask()
             case STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE:
                 rateDesiredAxis[t] = pid_apply(&stabSettings.outerPids[t], local_error[t], dT);
                 break;
-            case STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE:
+            case STABILIZATIONSTATUS_OUTERLOOP_RATTITUDE:
             {
                 float stickinput[3];
                 stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
@@ -210,7 +210,7 @@ static void stabilizationOuterloopTask()
                 rateDesiredAxis[t] = (1.0f - magnitude) * rateDesiredAxis[t] + magnitude * rateDesiredAxisRate;
             }
             break;
-            case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
+            case STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING:
                 // FIXME: local_error[] is rate - attitude for Weak Leveling
                 // The only ramifications are:
                 // Weak Leveling Kp is off by a factor of 3 to 12 and may need a different default in GCS

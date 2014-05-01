@@ -151,7 +151,11 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
 
         // Airspeed magnitude is the ratio between the two difference norms
         float airspeed = sqrtf(normDiffGPS2 / normDiffAttitude2);
-        if (!IS_REAL(airspeed)) {
+        if (!IS_REAL(airspeedData->CalibratedAirspeed)) {
+            airspeedData->CalibratedAirspeed = 0;
+            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_ERROR);
+        } else if (!IS_REAL(airspeed)) {
             airspeedData->CalibratedAirspeed = 0;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
             AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_WARNING);

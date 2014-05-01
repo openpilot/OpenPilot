@@ -37,6 +37,44 @@
 
 const int UploaderGadgetWidget::AUTOUPDATE_CLOSE_TIMEOUT = 7000;
 
+TimedDialog::TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent, Qt::WindowFlags flags) :
+        QProgressDialog(labelText, tr("Cancel"), 0, timeout, parent, flags), bar(new QProgressBar(this))
+{
+    setWindowTitle(title);
+    setAutoReset(false);
+    // open immediately...
+    setMinimumDuration(0);
+    // setup progress bar
+    bar->setRange(0, timeout);
+    bar->setFormat(tr("Timing out in %1 seconds").arg(timeout));
+    setBar(bar);
+}
+
+int TimedDialog::exec() {
+    QTimer timer(this);
+    connect(&timer, SIGNAL(timeout()), this, SLOT(perform()));
+
+    setValue(0);
+
+    timer.start(1000);
+    int result = QProgressDialog::exec();
+    timer.stop();
+
+    return result;
+}
+
+void TimedDialog::perform()
+{
+    setValue(value() + 1);
+    int remaining = bar->maximum() - bar->value();
+    if (remaining > 0) {
+        bar->setFormat(tr("Timing out in %1 seconds").arg(remaining));
+    } else {
+        setResult(TimedDialog::TimedOut);
+        close();
+    }
+}
+
 UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     m_config    = new Ui_UploaderWidget();
@@ -658,60 +696,67 @@ void UploaderGadgetWidget::systemRescue()
     cm->disconnectDevice();
     // stop the polling thread: otherwise it will mess up DFU
     cm->suspendPolling();
+
     // Delete all previous tabs:
     while (m_config->systemElements->count()) {
         QWidget *qw = m_config->systemElements->widget(0);
         m_config->systemElements->removeTab(0);
         delete qw;
     }
+
     // Existing DFU objects will have a handle over USB and will
     // disturb everything for the rescue process:
     if (dfu) {
         delete dfu;
         dfu = NULL;
     }
+
     // Avoid users pressing Rescue twice.
     m_config->rescueButton->setEnabled(false);
 
-    // Now we're good to go:
+    // Now we're good to go
     clearLog();
     log("**********************************************************");
     log("** Follow those instructions to attempt a system rescue **");
     log("**********************************************************");
     log("You will be prompted to first connect USB, then system power");
     if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
-        if (QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("Please disconnect your OpenPilot board"), QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
+        QString labelText = QString("<p align=\"left\">%1</p>").arg(tr("Please disconnect your OpenPilot board."));
+        TimedDialog progressDlg(tr("System Rescue"), labelText, 20);
+        connect(USBMonitor::instance(), SIGNAL(deviceRemoved(USBPortInfo)), &progressDlg, SLOT(accept()));
+        switch(progressDlg.exec()) {
+        case TimedDialog::Rejected:
+            // user canceled dialog
+            m_config->rescueButton->setEnabled(true);
+            return;
+        case TimedDialog::TimedOut:
+            QMessageBox::warning(this, tr("System Rescue"), tr("No board disconnection was detected!"));
             m_config->rescueButton->setEnabled(true);
             return;
         }
     }
-    // Now we're good to go:
+
+    // Now we're good to go
     clearLog();
     log("**********************************************************");
     log("** Follow those instructions to attempt a system rescue **");
     log("**********************************************************");
     log("You will be prompted to first connect USB, then system power");
-    m_progress = new QProgressDialog(tr("Please connect your OpenPilot board (USB only!)"), tr("Cancel"), 0, 20);
-    QProgressBar *bar = new QProgressBar(m_progress);
-    bar->setFormat("Timeout");
-    m_progress->setBar(bar);
-    m_progress->setMinimumDuration(0);
-    m_progress->setRange(0, 20);
-    connect(m_progress, SIGNAL(canceled()), this, SLOT(cancel()));
-    m_timer = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(perform()));
-    m_timer->start(1000);
-    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), &m_eventloop, SLOT(quit()));
-    m_eventloop.exec();
-    if (!m_timer->isActive()) {
-        m_progress->close();
-        m_timer->stop();
-        QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("No board connection was detected!"));
+
+    QString labelText = QString("<p align=\"left\">%1<br>%2</p>").arg(tr("Please connect your OpenPilot board.")).arg(tr("Board must be connected by USB!"));
+    TimedDialog progressDlg(tr("System Rescue"), labelText, 20);
+    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), &progressDlg, SLOT(accept()));
+    switch(progressDlg.exec()) {
+    case TimedDialog::Rejected:
+        // user canceled dialog
+        m_config->rescueButton->setEnabled(true);
+        return;
+    case TimedDialog::TimedOut:
+        QMessageBox::warning(this, tr("System Rescue"), tr("No board connection was detected!"));
         m_config->rescueButton->setEnabled(true);
         return;
     }
-    m_progress->close();
-    m_timer->stop();
+
     log("... Detecting First Board...");
     repaint();
     dfu = new DFUObject(DFU_DEBUG, false, QString());
@@ -733,6 +778,7 @@ void UploaderGadgetWidget::systemRescue()
         return;
     }
     log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
+
     if (dfu->numberOfDevices > 5) {
         log("Inconsistent number of devices, aborting!");
         delete dfu;
@@ -753,17 +799,10 @@ void UploaderGadgetWidget::systemRescue()
     m_config->resetButton->setEnabled(false);
     bootButtonsSetEnable(true);
     m_config->rescueButton->setEnabled(false);
-    currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
+    // So that we can boot from the GUI afterwards.
+    currentStep = IAP_STATE_BOOTLOADER;
 }
 
-void UploaderGadgetWidget::perform()
-{
-    if (m_progress->value() == 19) {
-        m_timer->stop();
-        m_eventloop.exit();
-    }
-    m_progress->setValue(m_progress->value() + 1);
-}
 void UploaderGadgetWidget::performAuto()
 {
     ++autoUpdateConnectTimeout;
@@ -772,11 +811,6 @@ void UploaderGadgetWidget::performAuto()
         m_timer->stop();
         m_eventloop.exit();
     }
-}
-void UploaderGadgetWidget::cancel()
-{
-    m_timer->stop();
-    m_eventloop.exit();
 }
 
 void UploaderGadgetWidget::uploadStarted()

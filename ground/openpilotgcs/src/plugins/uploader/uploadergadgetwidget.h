@@ -56,20 +56,41 @@
 #include <QDesktopServices>
 #include "uploader_global.h"
 #include "enums.h"
+
 using namespace OP_DFU;
 using namespace uploader;
 
 class FlightStatus;
 
-class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget {
+// A dialog that will time out and close after a given delay
+class TimedDialog: public QProgressDialog {
     Q_OBJECT
 
+public:
+    TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+
+    enum DialogCode { Rejected, Accepted, TimedOut };
+
+public slots:
+    int exec();
+
+private slots:
+    void perform();
+
+private:
+    QProgressBar *bar;
+};
+
+
+class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget {
+    Q_OBJECT
 
 public:
     UploaderGadgetWidget(QWidget *parent = 0);
     ~UploaderGadgetWidget();
     void log(QString str);
     bool autoUpdateCapable();
+
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
@@ -77,8 +98,10 @@ public slots:
     void openHelp();
     bool autoUpdate();
     void autoUpdateProgress(int);
+
 signals:
     void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
+
 private:
     Ui_UploaderWidget *m_config;
     DFUObject *dfu;
@@ -111,9 +134,7 @@ private slots:
     void commonSystemBoot(bool safeboot = false, bool erase = false);
     void systemRescue();
     void getSerialPorts();
-    void perform();
     void performAuto();
-    void cancel();
     void uploadStarted();
     void uploadEnded(bool succeed);
     void downloadStarted();
@@ -122,6 +143,7 @@ private slots:
     void finishAutoUpdate();
     void closeAutoUpdate();
     void autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value);
+
 };
 
 #endif // UPLOADERGADGETWIDGET_H

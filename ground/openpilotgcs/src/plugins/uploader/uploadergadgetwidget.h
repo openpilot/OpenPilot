@@ -62,17 +62,11 @@ using namespace uploader;
 
 class FlightStatus;
 
-// A dialog that will time out and close after a given delay
 class TimedDialog: public QProgressDialog {
     Q_OBJECT
 
 public:
     TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-
-    enum DialogCode { Rejected, Accepted, TimedOut };
-
-public slots:
-    int exec();
 
 private slots:
     void perform();
@@ -90,11 +84,14 @@ class ConnectionWaiter: public QObject {
 public:
     ConnectionWaiter(int targetDeviceCount, int timeout, QWidget *parent = 0);
 
-    enum DialogCode { Ok, TimedOut };
+    enum ResultCode { Ok, Canceled, TimedOut };
 
 public slots:
     int exec();
+    void cancel();
     void quit();
+
+    static int openDialog(const QString &title, const QString &labelText, int targetDeviceCount, int timeout, QWidget *parent = 0, Qt::WindowFlags flags = 0);
 
 signals:
     void timeChanged(int elapsed);
@@ -106,7 +103,7 @@ private slots:
 private:
     QEventLoop eventLoop;
     QTimer timer;
-    // timeour in ms
+    // timeout in ms
     int timeout;
     // elapsed time in seconds
     int elapsed;

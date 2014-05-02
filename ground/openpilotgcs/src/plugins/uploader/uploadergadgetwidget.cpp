@@ -31,6 +31,7 @@
 #include <coreplugin/coreconstants.h>
 #include <uavtalk/telemetrymanager.h>
 
+#include <QProgressBar>
 #include <QDebug>
 
 #define DFU_DEBUG true
@@ -51,19 +52,6 @@ TimedDialog::TimedDialog(const QString &title, const QString &labelText, int tim
     setBar(bar);
 }
 
-int TimedDialog::exec() {
-    QTimer timer(this);
-    connect(&timer, SIGNAL(timeout()), this, SLOT(perform()));
-
-    setValue(0);
-
-    timer.start(1000);
-    int result = QProgressDialog::exec();
-    timer.stop();
-
-    return result;
-}
-
 void TimedDialog::perform()
 {
     setValue(value() + 1);
@@ -71,8 +59,7 @@ void TimedDialog::perform()
     if (remaining > 0) {
         bar->setFormat(tr("Timing out in %1 seconds").arg(remaining));
     } else {
-        setResult(TimedDialog::TimedOut);
-        close();
+        bar->setFormat(tr("Timed out after %1 seconds").arg(bar->maximum()));
     }
 }
 
@@ -91,6 +78,11 @@ int ConnectionWaiter::exec() {
     eventLoop.exec();
 
     return result;
+}
+
+void ConnectionWaiter::cancel() {
+    quit();
+    result = ConnectionWaiter::Canceled;
 }
 
 void ConnectionWaiter::quit() {
@@ -116,6 +108,14 @@ void ConnectionWaiter::deviceEvent()
     if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() == targetDeviceCount) {
         quit();
     }
+}
+
+int ConnectionWaiter::openDialog(const QString &title, const QString &labelText, int targetDeviceCount, int timeout, QWidget *parent, Qt::WindowFlags flags) {
+    TimedDialog dlg(title, labelText, timeout / 1000, parent, flags);
+    ConnectionWaiter waiter(targetDeviceCount, timeout, parent);
+    connect(&dlg, SIGNAL(canceled()), &waiter, SLOT(cancel()));
+    connect(&waiter, SIGNAL(timeChanged(int)), &dlg, SLOT(perform()));
+    return waiter.exec();
 }
 
 UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
@@ -770,14 +770,12 @@ void UploaderGadgetWidget::systemRescue()
     // Check if boards are connected and, if yes, prompt user to disconnect them all
     if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
         QString labelText = QString("<p align=\"left\">%1</p>").arg(tr("Please disconnect your OpenPilot board."));
-        TimedDialog progressDlg(tr("System Rescue"), labelText, BOARD_EVENT_TIMEOUT / 1000);
-        connect(USBMonitor::instance(), SIGNAL(deviceRemoved(USBPortInfo)), &progressDlg, SLOT(accept()));
-        switch(progressDlg.exec()) {
-        case TimedDialog::Rejected:
-            // user canceled dialog
+        int result = ConnectionWaiter::openDialog(tr("System Rescue"), labelText, 0, BOARD_EVENT_TIMEOUT, this);
+        switch(result) {
+        case ConnectionWaiter::Canceled:
             m_config->rescueButton->setEnabled(true);
             return;
-        case TimedDialog::TimedOut:
+        case ConnectionWaiter::TimedOut:
             QMessageBox::warning(this, tr("System Rescue"), tr("Timed out while waiting for all boards to be disconnected!"));
             m_config->rescueButton->setEnabled(true);
             return;
@@ -786,14 +784,12 @@ void UploaderGadgetWidget::systemRescue()
 
     // Now prompt user to connect board
     QString labelText = QString("<p align=\"left\">%1<br>%2</p>").arg(tr("Please connect your OpenPilot board.")).arg(tr("Board must be connected to the USB port!"));
-    TimedDialog progressDlg(tr("System Rescue"), labelText, BOARD_EVENT_TIMEOUT / 1000);
-    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), &progressDlg, SLOT(accept()));
-    switch(progressDlg.exec()) {
-    case TimedDialog::Rejected:
-        // user canceled dialog
+    int result = ConnectionWaiter::openDialog(tr("System Rescue"), labelText, 1, BOARD_EVENT_TIMEOUT, this);
+    switch(result) {
+    case ConnectionWaiter::Canceled:
         m_config->rescueButton->setEnabled(true);
         return;
-    case TimedDialog::TimedOut:
+    case ConnectionWaiter::TimedOut:
         QMessageBox::warning(this, tr("System Rescue"), tr("Timed out while waiting for a board to be connected!"));
         m_config->rescueButton->setEnabled(true);
         return;

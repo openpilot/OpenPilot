@@ -7,7 +7,8 @@
  * @{
  * @addtogroup OpenPilotCore OpenPilot Core
  * @{
- * @brief Defines board specific static initializers for hardware for the Revolution board.
+ * @brief Defines board specific static initializers for hardware for the Discovery F4
+ * (bare, no sensor) board.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +24,25 @@
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+/* Bare discovery F4 target (no sensors)
+ * Pin allocation:
+ * - Mainport
+ * PB6 USART1 TX
+ * PB7 USART1 RX
+ * - FlexyPort
+ * PB11 USART3 TX / I2C2 SCL
+ * PB10 USART3 RX / I2C2 SDA
+ * - LEDs
+ * PD15 HeartBeat
+ * PD14 Alarm
+ * PD13 D1
+ * PD12 D2
+ * - Servo
+ * PB0 PB1 PA3 PA2 PA1 PA0
+ * - Recv
+ * PB15 PC6 PC7 PC8 PC9 PB14
  */
 
 #if defined(PIOS_INCLUDE_LED)
@@ -627,9 +647,9 @@ static const struct pios_usart_cfg pios_usart_main_cfg = {
         },
     },
     .rx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Pin   = GPIO_Pin_7,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -637,9 +657,9 @@ static const struct pios_usart_cfg pios_usart_main_cfg = {
         },
     },
     .tx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_9,
+            .GPIO_Pin   = GPIO_Pin_6,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -672,9 +692,9 @@ static const struct pios_usart_cfg pios_usart_dsm_main_cfg = {
         },
     },
     .rx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Pin   = GPIO_Pin_7,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -682,9 +702,9 @@ static const struct pios_usart_cfg pios_usart_dsm_main_cfg = {
         },
     },
     .tx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_9,
+            .GPIO_Pin   = GPIO_Pin_6,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -698,9 +718,9 @@ static const struct pios_usart_cfg pios_usart_dsm_main_cfg = {
 // compatibility but protect the pins
 static const struct pios_dsm_cfg pios_dsm_main_cfg = {
     .bind               = {
-        .gpio = GPIOA,
+        .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Pin   = GPIO_Pin_7,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_IN,
             .GPIO_OType = GPIO_OType_PP,
@@ -738,9 +758,9 @@ static const struct pios_usart_cfg pios_usart_sbus_main_cfg = {
         },
     },
     .rx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Pin   = GPIO_Pin_7,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -748,9 +768,9 @@ static const struct pios_usart_cfg pios_usart_sbus_main_cfg = {
         },
     },
     .tx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_9,
+            .GPIO_Pin   = GPIO_Pin_6,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_OUT,
             .GPIO_OType = GPIO_OType_PP,
@@ -911,9 +931,9 @@ static const struct pios_usart_cfg pios_usart_hkosd_main_cfg = {
         },
     },
     .rx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_10,
+            .GPIO_Pin   = GPIO_Pin_7,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,
@@ -921,9 +941,9 @@ static const struct pios_usart_cfg pios_usart_hkosd_main_cfg = {
         },
     },
     .tx                                        = {
-        .gpio = GPIOA,
+        .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_9,
+            .GPIO_Pin   = GPIO_Pin_6,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_OType = GPIO_OType_PP,

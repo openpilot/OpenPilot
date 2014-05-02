@@ -43,8 +43,9 @@ static uint8_t dataSize;
 static uint8_t rcvChecksum;
 static uint8_t readIndex;
 
-static uint8_t  MwArmed = 0;
-static uint8_t  MwMode  = 0;
+static uint8_t  MwProfile   = 0;
+static uint8_t  MwArmed     = 0;
+static uint8_t  MwMode      = 0;
 static uint16_t MwRcData[8] = {1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500};
 static uint16_t MwAngle[2]  = {0, 0};
 
@@ -81,6 +82,7 @@ void serialMSPCheck(uint8_t cmdMSP)
         MwSensorActive = read16();      // dummy read
         MwSensorActive = read32();      // dummy read
         MwSensorActive = read32();
+        MwProfile = read8() + 1;
         MwArmed = MwSensorActive & MSP_MASK_BOXARM;
         MwMode  = MwSensorActive & MSP_MASK_BOXHORIZON ? 2 : MwSensorActive & MSP_MASK_BOXANGLE ? 1 : 0;
     }
@@ -170,6 +172,12 @@ void MSPInputStream(uint8_t c)
             serialBuffer[receiverIndex++] = c;
         }
     }
+}
+
+
+uint8_t MSPGetProfile(void)
+{
+    return MwProfile;
 }
 
 

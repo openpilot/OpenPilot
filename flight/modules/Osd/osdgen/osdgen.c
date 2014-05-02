@@ -76,6 +76,7 @@
 
 #ifdef PIOS_INCLUDE_MSP
 #include "pios_msp.h"
+static uint8_t MSPProfile = 0;
 #endif
 
 #include "fonts.h"
@@ -2179,13 +2180,13 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
         break;
 #ifdef PIOS_INCLUDE_MSP
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
-        sprintf(temp, "Acro");
+        sprintf(temp, "P%d Acro", MSPProfile);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
-        sprintf(temp, "Angle");
+        sprintf(temp, "P%d Angle", MSPProfile);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
-        sprintf(temp, "Horizon");
+        sprintf(temp, "P%d Horizon", MSPProfile);
         break;
 #else
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
@@ -2431,6 +2432,7 @@ void updateGraphics()
         bool GCSconnected = PIOS_COM_Available(PIOS_COM_TELEM_USB);
 
 #ifdef PIOS_INCLUDE_MSP
+        MSPProfile = MSPGetProfile();
         status.Armed = MSPGetArmed() ? FLIGHTSTATUS_ARMED_ARMED : FLIGHTSTATUS_ARMED_DISARMED;
         status.FlightMode = MSPGetMode() + FLIGHTSTATUS_FLIGHTMODE_STABILIZED1;
         mcc.Throttle = (float)(MSPGetRC(3) - 968) / 1103.0f;                                       // TODO assumes channel 3 and 968 - 2071 µs

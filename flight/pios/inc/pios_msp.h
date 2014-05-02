@@ -36,6 +36,7 @@
 void MSPRequests(uint32_t port);
 void MSPInputStream(uint8_t data);
 
+uint8_t  MSPGetProfile(void);
 uint8_t  MSPGetArmed(void);
 uint8_t  MSPGetMode(void);
 uint16_t MSPGetRC(uint8_t i);

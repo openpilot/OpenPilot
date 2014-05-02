@@ -37,6 +37,7 @@ void AutoUpdatePage::enableButtons(bool enable = false)
 
 void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant value)
 {
+    QString msg;
     switch (status) {
     case uploader::WAITING_DISCONNECT:
         disableButtons();
@@ -94,7 +95,7 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         if (msg.isEmpty()) {
             msg = tr("Something went wrong, you will have to manually upgrade the board using the uploader plugin.");
         }
-        ui->statusLabel->setText(msg);
+        ui->statusLabel->setText(QString("<font color='red'>%1</font>").arg(msg));
         break;
     }
 }

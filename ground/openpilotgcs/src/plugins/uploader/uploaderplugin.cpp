@@ -26,11 +26,21 @@
  */
 #include "uploaderplugin.h"
 #include "uploadergadgetfactory.h"
-#include <QtPlugin>
-#include <QStringList>
-#include <extensionsystem/pluginmanager.h>
 
-UploaderPlugin::UploaderPlugin()
+#include "version_info/version_info.h"
+#include "devicedescriptorstruct.h"
+#include "uavobjectutilmanager.h"
+
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/icore.h>
+#include <uavtalk/telemetrymanager.h>
+
+#include <QStringList>
+#include <QErrorMessage>
+#include <QWidget>
+#include <QMainWindow>
+
+UploaderPlugin::UploaderPlugin() : errorMsg(0)
 {
     // Do nothing
 }
@@ -44,8 +54,15 @@ bool UploaderPlugin::initialize(const QStringList & args, QString *errMsg)
 {
     Q_UNUSED(args);
     Q_UNUSED(errMsg);
+
     mf = new UploaderGadgetFactory(this);
     addAutoReleasedObject(mf);
+
+    // Listen to autopilot connection events
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
+    connect(telMngr, SIGNAL(connected()), this, SLOT(versionMatchCheck()));
+
     return true;
 }
 
@@ -56,5 +73,52 @@ void UploaderPlugin::extensionsInitialized()
 
 void UploaderPlugin::shutdown()
 {
-    // Do nothing
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
+    disconnect(telMngr, SIGNAL(connected()), this, SLOT(versionMatchCheck()));
+}
+
+void UploaderPlugin::versionMatchCheck()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
+    deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
+
+    QString uavoHash = VersionInfo::uavoHashArray();
+    uavoHash.chop(2);
+    uavoHash.remove(0, 2);
+    uavoHash = uavoHash.trimmed();
+
+    QByteArray uavoHashArray;
+    bool ok;
+    foreach(QString str, uavoHash.split(",")) {
+        uavoHashArray.append(str.toInt(&ok, 16));
+    }
+
+    QByteArray fwVersion = 0;//boardDescription.uavoHash;
+    if (fwVersion != uavoHashArray) {
+        QString gcsDescription = VersionInfo::revision();
+        QString gcsGitHash     = gcsDescription.mid(gcsDescription.indexOf(":") + 1, 8);
+        gcsGitHash.remove(QRegExp("^[0]*"));
+        QString gcsGitDate     = gcsDescription.mid(gcsDescription.indexOf(" ") + 1, 14);
+
+        QString gcsUavoHashStr;
+        QString fwUavoHashStr;
+        foreach(char i, fwVersion) {
+            fwUavoHashStr.append(QString::number(i, 16).right(2));
+        }
+        foreach(char i, uavoHashArray) {
+            gcsUavoHashStr.append(QString::number(i, 16).right(2));
+        }
+        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-" + gcsUavoHashStr.left(8) + ")";
+        QString fwVersion  = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.left(8) + ")";
+
+        QString warning    = QString(tr(
+                                         "GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. "
+                                         "GCS version: %1 Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
+        if (!errorMsg) {
+            errorMsg = new QErrorMessage(Core::ICore::instance()->mainWindow());
+        }
+        errorMsg->showMessage(warning);
+    }
 }

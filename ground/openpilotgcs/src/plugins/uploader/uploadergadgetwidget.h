@@ -29,38 +29,18 @@
 #define UPLOADERGADGETWIDGET_H
 
 #include "ui_uploader.h"
-#include "delay.h"
-#include "devicewidget.h"
-#include "runningdevicewidget.h"
-#include "op_dfu.h"
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
-
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-
-#include "coreplugin/icore.h"
-#include "coreplugin/connectionmanager.h"
-
-#include "ophid/inc/ophid_plugin.h"
-#include <QWidget>
-#include <QLabel>
-#include <QLineEdit>
-#include <QThread>
-#include <QMessageBox>
-#include <QTimer>
-#include "devicedescriptorstruct.h"
-#include <QProgressDialog>
-#include <QErrorMessage>
-#include <QDesktopServices>
 #include "uploader_global.h"
+
 #include "enums.h"
+#include "op_dfu.h"
+
+#include <QProgressDialog>
 
 using namespace OP_DFU;
 using namespace uploader;
 
 class FlightStatus;
+class UAVObject;
 
 class TimedDialog: public QProgressDialog {
     Q_OBJECT
@@ -119,6 +99,7 @@ public:
     ~UploaderGadgetWidget();
 
     static const int BOARD_EVENT_TIMEOUT;
+    static const int AUTOUPDATE_CLOSE_TIMEOUT;
 
     void log(QString str);
     bool autoUpdateCapable();
@@ -144,15 +125,12 @@ private:
     void clearLog();
     QString getPortDevice(const QString &friendName);
     QLineEdit *openFileNameLE;
-    QErrorMessage *msg;
     void connectSignalSlot(QWidget *widget);
     FlightStatus *getFlightStatus();
     void bootButtonsSetEnable(bool enabled);
-    static const int AUTOUPDATE_CLOSE_TIMEOUT;
 
 private slots:
     void onPhysicalHWConnect();
-    void versionMatchCheck();
     void error(QString errorString, int errorNumber);
     void info(QString infoString, int infoNumber);
     void goToBootloader(UAVObject * = NULL, bool = false);

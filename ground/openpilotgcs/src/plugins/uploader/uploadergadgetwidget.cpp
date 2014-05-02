@@ -25,12 +25,20 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uploadergadgetwidget.h"
-#include "version_info/version_info.h"
-#include "flightstatus.h"
 
+#include "flightstatus.h"
+//#include "delay.h"
+#include "devicewidget.h"
+#include "runningdevicewidget.h"
+
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/icore.h>
 #include <coreplugin/coreconstants.h>
+#include <coreplugin/connectionmanager.h>
 #include <uavtalk/telemetrymanager.h>
 
+#include <QDesktopServices>
+#include <QMessageBox>
 #include <QProgressBar>
 #include <QDebug>
 
@@ -125,14 +133,11 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     currentStep = IAP_STATE_READY;
     resetOnly   = false;
     dfu = NULL;
-    msg = new QErrorMessage(this);
 
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
-    connect(telMngr, SIGNAL(connected()), this, SLOT(versionMatchCheck()));
-
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
 
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(systemHalt()));
@@ -162,7 +167,6 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     // And check whether by any chance we are not already connected
     if (telMngr->isConnected()) {
         onAutopilotConnect();
-        versionMatchCheck();
     }
 }
 
@@ -459,10 +463,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
 
 void UploaderGadgetWidget::systemHalt()
 {
-    FlightStatus *status = getFlightStatus();
-
     // The board can not be halted when in armed state.
     // If board is armed, or arming. Show message with notice.
+    FlightStatus *status = getFlightStatus();
     if (status->getArmed() == FlightStatus::ARMED_DISARMED) {
         goToBootloader();
     } else {
@@ -1022,48 +1025,6 @@ void UploaderGadgetWidget::info(QString infoString, int infoNumber)
 {
     Q_UNUSED(infoNumber);
     m_config->boardStatus->setText(infoString);
-}
-
-void UploaderGadgetWidget::versionMatchCheck()
-{
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
-    deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
-    QByteArray uavoHashArray;
-    QString uavoHash = VersionInfo::uavoHashArray();
-
-
-    uavoHash.chop(2);
-    uavoHash.remove(0, 2);
-    uavoHash = uavoHash.trimmed();
-    bool ok;
-    foreach(QString str, uavoHash.split(",")) {
-        uavoHashArray.append(str.toInt(&ok, 16));
-    }
-
-    QByteArray fwVersion = boardDescription.uavoHash;
-    if (fwVersion != uavoHashArray) {
-        QString gcsDescription = VersionInfo::revision();
-        QString gcsGitHash     = gcsDescription.mid(gcsDescription.indexOf(":") + 1, 8);
-        gcsGitHash.remove(QRegExp("^[0]*"));
-        QString gcsGitDate     = gcsDescription.mid(gcsDescription.indexOf(" ") + 1, 14);
-
-        QString gcsUavoHashStr;
-        QString fwUavoHashStr;
-        foreach(char i, fwVersion) {
-            fwUavoHashStr.append(QString::number(i, 16).right(2));
-        }
-        foreach(char i, uavoHashArray) {
-            gcsUavoHashStr.append(QString::number(i, 16).right(2));
-        }
-        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-" + gcsUavoHashStr.left(8) + ")";
-        QString fwVersion  = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.left(8) + ")";
-
-        QString warning    = QString(tr(
-                                         "GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. "
-                                         "GCS version: %1 Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
-        msg->showMessage(warning);
-    }
 }
 
 void UploaderGadgetWidget::openHelp()

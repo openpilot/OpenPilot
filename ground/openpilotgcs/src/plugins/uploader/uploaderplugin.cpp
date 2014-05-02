@@ -95,7 +95,7 @@ void UploaderPlugin::versionMatchCheck()
         uavoHashArray.append(str.toInt(&ok, 16));
     }
 
-    QByteArray fwVersion = 0;//boardDescription.uavoHash;
+    QByteArray fwVersion = boardDescription.uavoHash;
     if (fwVersion != uavoHashArray) {
         QString gcsDescription = VersionInfo::revision();
         QString gcsGitHash     = gcsDescription.mid(gcsDescription.indexOf(":") + 1, 8);

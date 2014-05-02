@@ -155,6 +155,10 @@ static stateFilter cfmFilter;
 static stateFilter ekf13iFilter;
 static stateFilter ekf13Filter;
 
+// this is a hack to provide a computational shortcut for faster gyro state progression
+static float gyroRaw[3];
+static float gyroDelta[3];
+
 // preconfigured filter chains selectable via revoSettings.FusionAlgorithm
 static const filterPipeline *cfQueue = &(filterPipeline) {
     .filter = &magFilter,
@@ -415,6 +419,11 @@ static void StateEstimationCb(void)
 
         // fetch sensors, check values, and load into state struct
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GyroSensor, gyro, x, y, z);
+        if (IS_SET(states.updated, SENSORUPDATES_gyro)) {
+            gyroRaw[0] = states.gyro[0];
+            gyroRaw[1] = states.gyro[1];
+            gyroRaw[2] = states.gyro[2];
+        }
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AccelSensor, accel, x, y, z);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(MagSensor, mag, x, y, z);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GPSVelocitySensor, vel, North, East, Down);
@@ -453,7 +462,12 @@ static void StateEstimationCb(void)
     case RUNSTATE_SAVE:
 
         // the final output of filters is saved in state variables
-        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(GyroState, gyro, x, y, z);
+        // EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(GyroState, gyro, x, y, z) // replaced by performance shortcut
+        if (IS_SET(states.updated, SENSORUPDATES_gyro)) {
+            gyroDelta[0] = states.gyro[0] - gyroRaw[0];
+            gyroDelta[1] = states.gyro[1] - gyroRaw[1];
+            gyroDelta[2] = states.gyro[2] - gyroRaw[2];
+        }
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(AccelState, accel, x, y, z);
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(MagState, mag, x, y, z);
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(PositionState, pos, North, East, Down);
@@ -540,6 +554,14 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
 
     if (ev->obj == GyroSensorHandle()) {
         updatedSensors |= SENSORUPDATES_gyro;
+        // shortcut - update GyroState right away
+        GyroSensorData s;
+        GyroStateData t;
+        GyroSensorGet(&s);
+        t.x = s.x + gyroDelta[0];
+        t.y = s.y + gyroDelta[1];
+        t.z = s.z + gyroDelta[2];
+        GyroStateSet(&t);
     }
 
     if (ev->obj == AccelSensorHandle()) {

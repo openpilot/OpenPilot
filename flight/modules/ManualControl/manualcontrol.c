@@ -85,16 +85,6 @@ static const controlHandler handler_AUTOTUNE = {
 };
 
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-// TODO: move the altitude handling into stabi
-static const controlHandler handler_ALTITUDE = {
-    .controlChain      = {
-        .Stabilization = true,
-        .PathFollower  = false,
-        .PathPlanner   = false,
-    },
-    .handler           = &altitudeHandler,
-};
-
 static const controlHandler handler_PATHFOLLOWER = {
     .controlChain      = {
         .Stabilization = true,
@@ -206,7 +196,6 @@ static void manualControlTask(void)
         handler = &handler_STABILIZED;
         break;
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-    case FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL:
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
@@ -215,10 +204,6 @@ static void manualControlTask(void)
         break;
     case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
         handler = &handler_PATHPLANNER;
-        break;
-    case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
-    case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO:
-        handler = &handler_ALTITUDE;
         break;
 #endif
     case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:

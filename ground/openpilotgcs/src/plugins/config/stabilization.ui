@@ -8444,7 +8444,7 @@ border-radius: 5;</string>
                        <string notr="true"/>
                       </property>
                       <property name="text">
-                       <string>Max rate attitude (deg/s)</string>
+                       <string>Max rate limit (all modes) (deg/s)</string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

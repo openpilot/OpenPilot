@@ -38,6 +38,39 @@
 			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity,\
 			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity;"
 			/>
+        <field name="Stabilization4Settings" units="" type="enum"
+		elementnames="Roll,Pitch,Yaw,Thrust"
+		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,VerticalVelocity,CruiseControl"
+		defaultvalue="Attitude,Attitude,AxisLock,CruiseControl"
+		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity:CruiseControl; \
+			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude,\
+			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity,\
+			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity;"
+			/>
+        <field name="Stabilization5Settings" units="" type="enum"
+		elementnames="Roll,Pitch,Yaw,Thrust"
+		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,VerticalVelocity,CruiseControl"
+		defaultvalue="Attitude,Attitude,Rate,CruiseControl"
+		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity:CruiseControl; \
+			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude,\
+			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity,\
+			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity;"
+			/>
+        <field name="Stabilization6Settings" units="" type="enum"
+		elementnames="Roll,Pitch,Yaw,Thrust"
+		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,VerticalVelocity,CruiseControl"
+		defaultvalue="Rate,Rate,Rate,CruiseControl"
+		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity:CruiseControl; \
+			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude,\
+			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity,\
+			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:VerticalVelocity;"
+			/>
 
 	<!-- Note these options values should be identical to those defined in FlightMode -->
         <!-- Currently only some modes are enabled for UI using limits attribute per board. Update when more modes will be operational -->
@@ -45,8 +78,8 @@
                units=""
                type="enum"
                elements="6"
-               options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,PositionHold,ReturnToBase,Land,PathPlanner,POI"
-               defaultvalue="Stabilized1,Stabilized2,Stabilized3,Manual,Manual,Manual"
+               options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,Autotune,PositionHold,ReturnToBase,Land,PathPlanner,POI"
+               defaultvalue="Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6"
                limits="\
                        %0401NE:Autotune:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
                        %0402NE:Autotune:PositionHold:ReturnToBase:Land:PathPlanner:POI,\

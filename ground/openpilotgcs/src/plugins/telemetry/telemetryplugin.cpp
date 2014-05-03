@@ -28,22 +28,27 @@
 #include "telemetryplugin.h"
 #include "monitorgadgetfactory.h"
 
-#include "extensionsystem/pluginmanager.h"
+#include "version_info/version_info.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include "coreplugin/icore.h"
-#include "coreplugin/connectionmanager.h"
+#include "uavobjectutilmanager.h"
 
-#include <QDebug>
-#include <QtPlugin>
-#include <QStringList>
-
+#include <extensionsystem/pluginmanager.h>
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/icore.h>
 #include <coreplugin/iuavgadget.h>
+#include <coreplugin/connectionmanager.h>
+#include <uavtalk/telemetrymanager.h>
 
-TelemetryPlugin::TelemetryPlugin()
-{}
+#include <QDebug>
+#include <QStringList>
+#include <QErrorMessage>
+#include <QWidget>
+#include <QMainWindow>
+
+TelemetryPlugin::TelemetryPlugin() : errorMsg(0)
+{
+}
 
 TelemetryPlugin::~TelemetryPlugin()
 {
@@ -81,166 +86,70 @@ bool TelemetryPlugin::initialize(const QStringList & args, QString *errMsg)
 
     // add monitor widget to connection manager
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-// connect(cm, SIGNAL(deviceConnected(QIODevice *)), w, SLOT(telemetryConnected()));
-// connect(cm, SIGNAL(deviceDisconnected()), w, SLOT(telemetryDisconnected()));
 
     cm->addWidget(w);
+
+    // Listen to autopilot connection events
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
+    connect(telMngr, SIGNAL(connected()), this, SLOT(versionMatchCheck()));
 
     return true;
 }
 
 void TelemetryPlugin::extensionsInitialized()
 {
-// Core::ICore::instance()->readSettings(this);
-
-    // ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-
-// connect(pm, SIGNAL(objectAdded(QObject *)), this, SLOT(onTelemetryManagerAdded(QObject *)));
-// _toRemoveNotifications.clear();
-// connectNotifications();
-}
-
-// void TelemetryPlugin::saveConfig(QSettings *settings, UAVConfigInfo *configInfo)
-// {
-// configInfo->setVersion(VERSION);
-//
-// settings->beginWriteArray("Current");
-// settings->setArrayIndex(0);
-// currentNotification.saveState(settings);
-// settings->endArray();
-//
-// settings->beginGroup("listNotifies");
-// settings->remove("");
-// settings->endGroup();
-//
-// settings->beginWriteArray("listNotifies");
-// for (int i = 0; i < _notificationList.size(); i++) {
-// settings->setArrayIndex(i);
-// _notificationList.at(i)->saveState(settings);
-// }
-// settings->endArray();
-// settings->setValue(QLatin1String("Enable"), enable);
-// }
-
-// void TelemetryPlugin::readConfig(QSettings *settings, UAVConfigInfo * /* configInfo */)
-// {
-//// Just for migration to the new format.
-//// Q_ASSERT(configInfo->version() == UAVConfigVersion());
-//
-// settings->beginReadArray("Current");
-// settings->setArrayIndex(0);
-// currentNotification.restoreState(settings);
-// settings->endArray();
-//
-//// read list of notifications from settings
-// int size = settings->beginReadArray("listNotifies");
-// for (int i = 0; i < size; ++i) {
-// settings->setArrayIndex(i);
-// NotificationItem *notification = new NotificationItem;
-// notification->restoreState(settings);
-// _notificationList.append(notification);
-// }
-// settings->endArray();
-// setEnable(settings->value(QLatin1String("Enable"), 0).toBool());
-// }
-
-// void TelemetryPlugin::onTelemetryManagerAdded(QObject *obj)
-// {
-// telMngr = qobject_cast<TelemetryManager *>(obj);
-// if (telMngr) {
-// connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
-// }
-// }
-
-void TelemetryPlugin::shutdown()
-{
     // Do nothing
 }
 
-// void TelemetryPlugin::onAutopilotDisconnect()
-// {
-// connectNotifications();
-// }
+void TelemetryPlugin::shutdown()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
+    disconnect(telMngr, SIGNAL(connected()), this, SLOT(versionMatchCheck()));
+}
 
-///*!
-// clear any telemetry timers from previous flight;
-// reset will be perform on start of option page
-// */
-// void TelemetryPlugin::resetNotification(void)
-// {
-//// first, reject empty args and unknown fields.
-// foreach(NotificationItem * ntf, _notificationList) {
-// ntf->disposeTimer();
-// disconnect(ntf->getTimer(), SIGNAL(timeout()), this, SLOT(on_timerRepeated_Notification()));
-// ntf->disposeExpireTimer();
-// disconnect(ntf->getExpireTimer(), SIGNAL(timeout()), this, SLOT(on_timerRepeated_Notification()));
-// }
-// }
+void TelemetryPlugin::versionMatchCheck()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
+    deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
 
-// void TelemetryPlugin::connectNotifications()
-// {
-// foreach(UAVDataObject * obj, lstNotifiedUAVObjects) {
-// if (obj != NULL) {
-// disconnect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(on_arrived_Notification(UAVObject *)));
-// }
-// }
-// if (phonon.mo != NULL) {
-// delete phonon.mo;
-// phonon.mo = NULL;
-// }
-//
-// if (!enable) {
-// return;
-// }
-//
-// ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-// UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-//
-// lstNotifiedUAVObjects.clear();
-// _pendingNotifications.clear();
-// _notificationList.append(_toRemoveNotifications);
-// _toRemoveNotifications.clear();
-//
-//// first, reject empty args and unknown fields.
-// foreach(NotificationItem * telemetry, _notificationList) {
-// telemetry->_isPlayed    = false;
-// telemetry->isNowPlaying = false;
-//
-// if (telemetry->mute()) {
-// continue;
-// }
-//// check is all sounds presented for notification,
-//// if not - we must not subscribe to it at all
-// if (telemetry->toList().isEmpty()) {
-// continue;
-// }
-//
-// UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject(telemetry->getDataObject()));
-// if (obj != NULL) {
-// if (!lstNotifiedUAVObjects.contains(obj)) {
-// lstNotifiedUAVObjects.append(obj);
-//
-// connect(obj, SIGNAL(objectUpdated(UAVObject *)),
-// this, SLOT(on_arrived_Notification(UAVObject *)),
-// Qt::QueuedConnection);
-// }
-// } else {
-// qTelemetryDebug() << "Error: Object is unknown (" << telemetry->getDataObject() << ").";
-// }
-// }
-//
-// if (_notificationList.isEmpty()) {
-// return;
-// }
-//// set notification message to current event
-// phonon.mo = Phonon::createPlayer(Phonon::NotificationCategory);
-// phonon.mo->clearQueue();
-// phonon.firstPlay = true;
-// QList<Phonon::AudioOutputDevice> audioOutputDevices =
-// Phonon::BackendCapabilities::availableAudioOutputDevices();
-// foreach(Phonon::AudioOutputDevice dev, audioOutputDevices) {
-// qTelemetryDebug() << "Telemetry: Audio Output device: " << dev.name() << " - " << dev.description();
-// }
-// connect(phonon.mo, SIGNAL(stateChanged(Phonon::State, Phonon::State)),
-// this, SLOT(stateChanged(Phonon::State, Phonon::State)));
-// }
+    QString uavoHash = VersionInfo::uavoHashArray();
+    uavoHash.chop(2);
+    uavoHash.remove(0, 2);
+    uavoHash = uavoHash.trimmed();
+
+    QByteArray uavoHashArray;
+    bool ok;
+    foreach(QString str, uavoHash.split(",")) {
+        uavoHashArray.append(str.toInt(&ok, 16));
+    }
+
+    QByteArray fwVersion = boardDescription.uavoHash;
+    if (fwVersion != uavoHashArray) {
+        QString gcsDescription = VersionInfo::revision();
+        QString gcsGitHash     = gcsDescription.mid(gcsDescription.indexOf(":") + 1, 8);
+        gcsGitHash.remove(QRegExp("^[0]*"));
+        QString gcsGitDate     = gcsDescription.mid(gcsDescription.indexOf(" ") + 1, 14);
+
+        QString gcsUavoHashStr;
+        QString fwUavoHashStr;
+        foreach(char i, fwVersion) {
+            fwUavoHashStr.append(QString::number(i, 16).right(2));
+        }
+        foreach(char i, uavoHashArray) {
+            gcsUavoHashStr.append(QString::number(i, 16).right(2));
+        }
+        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-" + gcsUavoHashStr.left(8) + ")";
+        QString fwVersion  = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.left(8) + ")";
+
+        QString warning    = QString(tr(
+                                         "GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. "
+                                         "GCS version: %1 Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
+        if (!errorMsg) {
+            errorMsg = new QErrorMessage(Core::ICore::instance()->mainWindow());
+        }
+        errorMsg->showMessage(warning);
+    }
+}

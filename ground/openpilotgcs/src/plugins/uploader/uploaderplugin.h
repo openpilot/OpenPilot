@@ -32,7 +32,6 @@
 #include "uploader_global.h"
 
 class UploaderGadgetFactory;
-class QErrorMessage;
 
 class UPLOADER_EXPORT UploaderPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
@@ -46,12 +45,8 @@ public:
     bool initialize(const QStringList & arguments, QString *errorString);
     void shutdown();
 
-private slots:
-    void versionMatchCheck();
-
 private:
     UploaderGadgetFactory *mf;
-    QErrorMessage *errorMsg;
 };
 
 #endif // UPLOADERPLUGIN_H

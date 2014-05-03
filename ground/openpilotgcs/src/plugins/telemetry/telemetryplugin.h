@@ -29,6 +29,7 @@
 
 #include <extensionsystem/iplugin.h>
 
+class QErrorMessage;
 class MonitorGadgetFactory;
 
 class TelemetryPlugin : public ExtensionSystem::IPlugin {
@@ -44,8 +45,12 @@ public:
     bool initialize(const QStringList &arguments, QString *errorString);
     void shutdown();
 
+private slots:
+    void versionMatchCheck();
+
 private:
     MonitorGadgetFactory *mf;
+    QErrorMessage *errorMsg;
 };
 
 #endif // TELEMETRYPLUGIN_H

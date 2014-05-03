@@ -40,12 +40,44 @@
 namespace OpenPilot {
 SixPointCalibrationModel::SixPointCalibrationModel(QObject *parent) :
     QObject(parent),
+    calibrationStepsMag(),
+    calibrationStepsAccelOnly(),
+    currentSteps(0),
     position(-1),
     calibratingMag(false),
     calibratingAccel(false),
     collectingData(false)
 
-{}
+{
+    calibrationStepsMag.clear();
+    calibrationStepsMag
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_NED,
+       tr("Place horizontally, nose pointing north and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
+       tr("Place with nose down, right side west and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
+       tr("Place right side down, nose west and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
+       tr("Place upside down, nose east and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
+       tr("Place with nose up, left side north and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
+       tr("Place with left side down, nose south and click save position..."));
+
+    calibrationStepsAccelOnly.clear();
+    calibrationStepsAccelOnly << CalibrationStep(CALIBRATION_HELPER_IMAGE_NED,
+       tr("Place horizontally and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
+       tr("Place with nose down and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
+       tr("Place right side down and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
+       tr("Place upside down and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
+       tr("Place with nose up and click save position..."))
+    << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
+       tr("Place with left side down and click save position..."));
+}
 
 /********** Six point calibration **************/
 
@@ -70,6 +102,12 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     calibratingMag   = calibrateMag;
     // Store and reset board rotation before calibration starts
     storeAndClearBoardRotation();
+
+    if(calibrateMag){
+        currentSteps = &calibrationStepsMag;
+    } else {
+        currentSteps = &calibrationStepsAccelOnly;
+    }
 
     RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
     HomeLocation *homeLocation = HomeLocation::GetInstance(getObjectManager());
@@ -155,9 +193,11 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
         mdata.flightTelemetryUpdatePeriod = 100;
         mag->setMetadata(mdata);
     }
+
     /* Show instructions and enable controls */
-    displayInstructions(tr("Place horizontally, nose pointing north and click save position..."), true);
-    showHelp(CALIBRATION_HELPER_IMAGE_NED);
+    displayInstructions((*currentSteps)[0].instructions, true);
+    showHelp((*currentSteps)[0].visualHelp);
+
     disableAllCalibrations();
     savePositionEnabledChanged(true);
     position = 0;
@@ -269,27 +309,10 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
         }
 
         position = (position + 1) % 6;
-        if (position == 1) {
-            displayInstructions(tr("Place with nose down, right side west and click save position..."), false);
-            showHelp(CALIBRATION_HELPER_IMAGE_DWN);
-        }
-        if (position == 2) {
-            displayInstructions(tr("Place right side down, nose west and click save position..."), false);
-            showHelp(CALIBRATION_HELPER_IMAGE_WDS);
-        }
-        if (position == 3) {
-            displayInstructions(tr("Place upside down, nose east and click save position..."), false);
-            showHelp(CALIBRATION_HELPER_IMAGE_ENU);
-        }
-        if (position == 4) {
-            displayInstructions(tr("Place with nose up, left side north and click save position..."), false);
-            showHelp(CALIBRATION_HELPER_IMAGE_USE);
-        }
-        if (position == 5) {
-            displayInstructions(tr("Place with left side down, nose south and click save position..."), false);
-            showHelp(CALIBRATION_HELPER_IMAGE_SUW);
-        }
-        if (position == 0) {
+        if (position != 0) {
+            displayInstructions((*currentSteps)[position].instructions, false);
+            showHelp((*currentSteps)[position].visualHelp);
+        } else {
 #ifdef FITTING_USING_CONTINOUS_ACQUISITION
             if (calibratingMag) {
                 disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(continouslyGetMagSamples(UAVObject *)));

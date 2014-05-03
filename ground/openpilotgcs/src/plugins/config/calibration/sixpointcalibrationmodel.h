@@ -31,7 +31,7 @@
 #include <QObject>
 #include <QList>
 #include "calibration/calibrationutils.h"
-
+#include <QString>
 #include <revocalibration.h>
 #include <accelgyrosettings.h>
 #include <homelocation.h>
@@ -40,6 +40,17 @@
 namespace OpenPilot {
 class SixPointCalibrationModel : public QObject {
     Q_OBJECT
+
+    class CalibrationStep{
+    public:
+        CalibrationStep(QString newVisualHelp, QString newInstructions){
+            visualHelp = newVisualHelp;
+            instructions = newInstructions;
+        }
+        QString visualHelp;
+        QString instructions;
+
+    };
 
     typedef struct {
         RevoCalibration::DataFields   revoCalibration;
@@ -68,8 +79,9 @@ private slots:
 private:
     void start(bool calibrateAccel, bool calibrateMag);
     UAVObjectManager *getObjectManager();
-
-
+    QList<CalibrationStep> calibrationStepsMag;
+    QList<CalibrationStep> calibrationStepsAccelOnly;
+    QList<CalibrationStep> *currentSteps;
     UAVObject::Metadata initialAccelStateMdata;
     UAVObject::Metadata initialMagStateMdata;
     float initialMagCorrectionRate;

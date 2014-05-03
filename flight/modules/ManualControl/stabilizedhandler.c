@@ -78,6 +78,15 @@ void stabilizedHandler(bool newinit)
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
         stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization3Settings.Roll);
         break;
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
+        stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization4Settings.Roll);
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
+        stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization5Settings.Roll);
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
+        stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization6Settings.Roll);
+        break;
     default:
         // Major error, this should not occur because only enter this block when one of these is true
         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);

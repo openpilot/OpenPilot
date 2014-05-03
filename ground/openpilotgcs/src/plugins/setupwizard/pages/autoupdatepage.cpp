@@ -41,26 +41,25 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
     switch (status) {
     case uploader::WAITING_DISCONNECT:
         disableButtons();
-        getWizard()->show();
         ui->statusLabel->setText(tr("Waiting for all OP boards to be disconnected."));
-        // TODO get rid of magic number 20s
+        // TODO get rid of magic number 20s (should use UploaderGadgetWidget::BOARD_EVENT_TIMEOUT)
         ui->levellinProgressBar->setMaximum(20);
         ui->levellinProgressBar->setValue(value.toInt());
         break;
     case uploader::WAITING_CONNECT:
         // Note:
-        // following two lines of code were probably added to fix an issue when uploader opened a popup requesting
+        // the following commented out lines were probably added to fix an issue when uploader opened a popup requesting
         // user to disconnect all boards
         // Side effect is that the wizard dialog flickers
         // the uploader was changed to avoid popups alltogether and that fix is not need anymore
         // same commented fix can be found in FAILURE case and they are kept for future ref.
         //getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
         //getWizard()->setWindowIcon(qApp->windowIcon());
+        //getWizard()->show();
         // End of Note
         disableButtons();
-        getWizard()->show();
         ui->statusLabel->setText(tr("Please connect the board to the USB port (don't use external supply)."));
-        // TODO get rid of magic number 20s
+        // TODO get rid of magic number 20s (should use UploaderGadgetWidget::BOARD_EVENT_TIMEOUT)
         ui->levellinProgressBar->setMaximum(20);
         ui->levellinProgressBar->setValue(value.toInt());
         break;
@@ -90,7 +89,6 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         //getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
         //getWizard()->setWindowIcon(qApp->windowIcon());
         enableButtons(true);
-        getWizard()->show();
         QString msg = value.toString();
         if (msg.isEmpty()) {
             msg = tr("Something went wrong, you will have to manually upgrade the board using the uploader plugin.");

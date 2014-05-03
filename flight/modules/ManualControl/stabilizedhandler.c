@@ -133,6 +133,7 @@ void stabilizedHandler(bool newinit)
     }
 
     stabilization.Thrust = cmd.Thrust;
+    stabilization.StabilizationMode.Thrust = stab_settings[3];
     StabilizationDesiredSet(&stabilization);
 }
 

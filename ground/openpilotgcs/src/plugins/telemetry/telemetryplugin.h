@@ -29,7 +29,7 @@
 
 #include <extensionsystem/iplugin.h>
 
-class QErrorMessage;
+class QMessageBox;
 class MonitorGadgetFactory;
 
 class TelemetryPlugin : public ExtensionSystem::IPlugin {
@@ -50,7 +50,7 @@ private slots:
 
 private:
     MonitorGadgetFactory *mf;
-    QErrorMessage *errorMsg;
+    QMessageBox *firmwareWarningMessageBox;
 };
 
 #endif // TELEMETRYPLUGIN_H

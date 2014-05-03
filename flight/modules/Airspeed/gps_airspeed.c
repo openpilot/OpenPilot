@@ -37,7 +37,6 @@
 #include "airspeedsettings.h"
 #include "gps_airspeed.h"
 #include "CoordinateConversions.h"
-#include "airspeedalarm.h"
 #include <pios_math.h>
 
 
@@ -46,6 +45,7 @@
 #define GPS_AIRSPEED_BIAS_KI          0.1f   // Needs to be settable in a UAVO
 #define SAMPLING_DELAY_MS_GPS         100    // Needs to be settable in a UAVO
 #define GPS_AIRSPEED_TIME_CONSTANT_MS 500.0f // Needs to be settable in a UAVO
+#define COSINE_OF_5_DEG               0.9961947f
 
 // Private types
 struct GPSGlobals {
@@ -60,6 +60,12 @@ struct GPSGlobals {
 static struct GPSGlobals *gps;
 
 // Private functions
+// a simple square inline function based on multiplication faster than powf(x,2.0f)
+static inline float Sq(float x)
+{
+    return x * x;
+}
+
 
 /*
  * Initialize function loads first data sets, and allocates memory for structure.
@@ -103,6 +109,11 @@ void gps_airspeedInitialize()
  *  where "f" is the fuselage vector in earth coordinates.
  *  We then solve for |V| = |V_gps_2-V_gps_1|/ |f_2 - f1|.
  */
+/* Remark regarding "IMU Wind Estimation": The approach includes errors when |V| is
+ * not constant, i.e. when the change in V_gps does not solely come from a reorientation
+ * this error depends strongly on the time scale considered. Is the time between t1 and t2 too
+ * small, "spikes" absorving unconsidred acceleration will arise
+ */
 void gps_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *airspeedSettings)
 {
     float Rbe[3][3];
@@ -121,35 +132,39 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
     float cosDiff = (Rbe[0][0] * gps->RbeCol1_old[0]) + (Rbe[0][1] * gps->RbeCol1_old[1]) + (Rbe[0][2] * gps->RbeCol1_old[2]);
 
     // If there's more than a 5 degree difference between two fuselage measurements, then we have sufficient delta to continue.
-    if (fabsf(cosDiff) < cosf(DEG2RAD(5.0f))) {
+    if (fabsf(cosDiff) < COSINE_OF_5_DEG) {
         VelocityStateData gpsVelData;
         VelocityStateGet(&gpsVelData);
 
         if (gpsVelData.North * gpsVelData.North + gpsVelData.East * gpsVelData.East + gpsVelData.Down * gpsVelData.Down < 1.0f) {
             airspeedData->CalibratedAirspeed = 0;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
-            AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_WARNING);
             return; // do not calculate if gps velocity is insufficient...
         }
 
         // Calculate the norm^2 of the difference between the two GPS vectors
-        float normDiffGPS2 = powf(gpsVelData.North - gps->gpsVelOld_N, 2.0f) + powf(gpsVelData.East - gps->gpsVelOld_E, 2.0f) + powf(gpsVelData.Down - gps->gpsVelOld_D, 2.0f);
+        float normDiffGPS2 = Sq(gpsVelData.North - gps->gpsVelOld_N) + Sq(gpsVelData.East - gps->gpsVelOld_E) + Sq(gpsVelData.Down - gps->gpsVelOld_D);
 
         // Calculate the norm^2 of the difference between the two fuselage vectors
-        float normDiffAttitude2 = powf(Rbe[0][0] - gps->RbeCol1_old[0], 2.0f) + powf(Rbe[0][1] - gps->RbeCol1_old[1], 2.0f) + powf(Rbe[0][2] - gps->RbeCol1_old[2], 2.0f);
+        float normDiffAttitude2 = Sq(Rbe[0][0] - gps->RbeCol1_old[0]) + Sq(Rbe[0][1] - gps->RbeCol1_old[1]) + Sq(Rbe[0][2] - gps->RbeCol1_old[2]);
 
         // Airspeed magnitude is the ratio between the two difference norms
         float airspeed = sqrtf(normDiffGPS2 / normDiffAttitude2);
         if (!IS_REAL(airspeedData->CalibratedAirspeed)) {
             airspeedData->CalibratedAirspeed = 0;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
-            AirspeedAlarm(SYSTEMALARMS_ALARM_ERROR);
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_ERROR);
+        } else if (!IS_REAL(airspeed)) {
+            airspeedData->CalibratedAirspeed = 0;
+            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_WARNING);
         } else {
             // need a low pass filter to filter out spikes in non coordinated maneuvers
             airspeedData->CalibratedAirspeed = (1.0f - airspeedSettings->GroundSpeedBasedEstimationLowPassAlpha) * gps->oldAirspeed + airspeedSettings->GroundSpeedBasedEstimationLowPassAlpha * airspeed;
             gps->oldAirspeed = airspeedData->CalibratedAirspeed;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
-            AirspeedAlarm(SYSTEMALARMS_ALARM_OK);
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_OK);
         }
 
         // Save old variables for next pass

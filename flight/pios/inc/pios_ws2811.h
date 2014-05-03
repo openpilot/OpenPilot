@@ -46,11 +46,11 @@
 
 #define PIOS_WS2811_DMA_CH1_CONFIG(channel) \
     { \
-        .DMA_BufferSize         = 4, \
+        .DMA_BufferSize         = PIOS_WS2811_BUFFER_SIZE, \
         .DMA_Channel            = channel, \
         .DMA_DIR = DMA_DIR_MemoryToPeripheral, \
         .DMA_FIFOMode           = DMA_FIFOMode_Enable, \
-        .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full, \
+        .DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull, \
         .DMA_Memory0BaseAddr    = 0, \
         .DMA_MemoryBurst        = DMA_MemoryBurst_INC4, \
         .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE, \
@@ -78,15 +78,15 @@
         .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single, \
         .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE, \
         .DMA_PeripheralInc      = DMA_PeripheralInc_Disable, \
-        .DMA_Priority           = DMA_Priority_High }
+        .DMA_Priority           = DMA_Priority_VeryHigh, }
 
 #define PIOS_WS2811_DMA_UPDATE_CONFIG(channel) \
     { \
-        .DMA_BufferSize         = PIOS_WS2811_BUFFER_SIZE, \
+        .DMA_BufferSize         = 4, \
         .DMA_Channel            = channel, \
         .DMA_DIR = DMA_DIR_MemoryToPeripheral, \
         .DMA_FIFOMode           = DMA_FIFOMode_Enable, \
-        .DMA_FIFOThreshold      = DMA_FIFOThreshold_HalfFull, \
+        .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full, \
         .DMA_Memory0BaseAddr    = 0, \
         .DMA_MemoryBurst        = DMA_MemoryBurst_INC4, \
         .DMA_MemoryDataSize     = PIOS_WS2811_MEMORYDATASIZE, \
@@ -96,7 +96,8 @@
         .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single, \
         .DMA_PeripheralDataSize = PIOS_WS2811_PERIPHERALDATASIZE, \
         .DMA_PeripheralInc      = DMA_PeripheralInc_Disable, \
-        .DMA_Priority           = DMA_Priority_VeryHigh, }
+        .DMA_Priority           = DMA_Priority_High }
+
 
 typedef uint16_t ledbuf_t;
 

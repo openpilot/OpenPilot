@@ -1845,17 +1845,17 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
 
     // DMA streamCh1, triggered by timerCh1 pwm signal.
     // if FrameBuffer indicates, reset output value early to indicate "0" bit to ws2812
-    .dmaInitCh1 = PIOS_WS2811_DMA_UPDATE_CONFIG(DMA_Channel_6),
+    .dmaInitCh1 = PIOS_WS2811_DMA_CH1_CONFIG(DMA_Channel_6),
     .dmaItCh1   = DMA_IT_TEIF1 | DMA_IT_TCIF1,
 
     // DMA streamCh2, triggered by timerCh2 pwm signal.
     // Reset output value late to indicate "1" bit to ws2812.
-    .dmaInitCh2 = PIOS_WS2811_DMA_CH1_CONFIG(DMA_Channel_6),
+    .dmaInitCh2 = PIOS_WS2811_DMA_CH2_CONFIG(DMA_Channel_6),
     .dmaItCh2   = DMA_IT_TEIF6 | DMA_IT_TCIF6,
 
     // DMA streamUpdate Triggered by timer update event
     // Outputs a high logic level at beginning of a cycle
-    .dmaInitUpdate = PIOS_WS2811_DMA_CH2_CONFIG(DMA_Channel_6),
+    .dmaInitUpdate = PIOS_WS2811_DMA_UPDATE_CONFIG(DMA_Channel_6),
     .dmaItUpdate   = DMA_IT_TEIF5 | DMA_IT_TCIF5,
     .dmaSource     = TIM_DMA_CC1 | TIM_DMA_CC3 | TIM_DMA_Update,
 

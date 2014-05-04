@@ -38,6 +38,7 @@ void AutoUpdatePage::enableButtons(bool enable = false)
 void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant value)
 {
     QString msg;
+
     switch (status) {
     case uploader::WAITING_DISCONNECT:
         disableButtons();
@@ -53,9 +54,9 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         // Side effect is that the wizard dialog flickers
         // the uploader was changed to avoid popups alltogether and that fix is not need anymore
         // same commented fix can be found in FAILURE case and they are kept for future ref.
-        //getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
-        //getWizard()->setWindowIcon(qApp->windowIcon());
-        //getWizard()->show();
+        // getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
+        // getWizard()->setWindowIcon(qApp->windowIcon());
+        // getWizard()->show();
         // End of Note
         disableButtons();
         ui->statusLabel->setText(tr("Please connect the board to the USB port (don't use external supply)."));
@@ -86,8 +87,8 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         ui->statusLabel->setText(tr("Board updated, please press 'Next' to continue."));
         break;
     case uploader::FAILURE:
-        //getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
-        //getWizard()->setWindowIcon(qApp->windowIcon());
+        // getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
+        // getWizard()->setWindowIcon(qApp->windowIcon());
         enableButtons(true);
         QString msg = value.toString();
         if (msg.isEmpty()) {

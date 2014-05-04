@@ -42,7 +42,7 @@ using namespace uploader;
 class FlightStatus;
 class UAVObject;
 
-class TimedDialog: public QProgressDialog {
+class TimedDialog : public QProgressDialog {
     Q_OBJECT
 
 public:
@@ -58,7 +58,7 @@ private:
 // A helper class to wait for board connection and disconnection events
 // until a the desired number of connected boards is found
 // or until a timeout is reached
-class ConnectionWaiter: public QObject {
+class ConnectionWaiter : public QObject {
     Q_OBJECT
 
 public:
@@ -151,7 +151,6 @@ private slots:
     void finishAutoUpdate();
     void closeAutoUpdate();
     void autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value);
-
 };
 
 #endif // UPLOADERGADGETWIDGET_H

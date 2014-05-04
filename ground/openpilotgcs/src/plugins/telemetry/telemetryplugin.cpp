@@ -48,8 +48,7 @@
 #include <QCheckBox>
 
 TelemetryPlugin::TelemetryPlugin() : firmwareWarningMessageBox(0)
-{
-}
+{}
 
 TelemetryPlugin::~TelemetryPlugin()
 {
@@ -107,6 +106,7 @@ void TelemetryPlugin::shutdown()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
+
     disconnect(telMngr, SIGNAL(connected()), this, SLOT(versionMatchCheck()));
 
     if (firmwareWarningMessageBox) {
@@ -121,6 +121,7 @@ void TelemetryPlugin::versionMatchCheck()
     deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
 
     QString uavoHash = VersionInfo::uavoHashArray();
+
     uavoHash.chop(2);
     uavoHash.remove(0, 2);
     uavoHash = uavoHash.trimmed();
@@ -132,7 +133,7 @@ void TelemetryPlugin::versionMatchCheck()
     }
 
     QByteArray fwVersion = boardDescription.uavoHash;
-    if (true) {//fwVersion != uavoHashArray) {
+    if (fwVersion != uavoHashArray) {
         QString gcsDescription = VersionInfo::revision();
         QString gcsGitHash     = gcsDescription.mid(gcsDescription.indexOf(":") + 1, 8);
         gcsGitHash.remove(QRegExp("^[0]*"));
@@ -147,8 +148,8 @@ void TelemetryPlugin::versionMatchCheck()
             gcsUavoHashStr.append(QString::number(i, 16).right(2));
         }
         QString versionFormat = "%1 (%2-%3)";
-        QString gcsVersion = versionFormat.arg(gcsGitDate, gcsGitHash, gcsUavoHashStr.left(8));
-        QString fwVersion  = versionFormat.arg(boardDescription.gitDate, boardDescription.gitHash, fwUavoHashStr.left(8));
+        QString gcsVersion    = versionFormat.arg(gcsGitDate, gcsGitHash, gcsUavoHashStr.left(8));
+        QString fwVersion     = versionFormat.arg(boardDescription.gitDate, boardDescription.gitHash, fwUavoHashStr.left(8));
 
         if (!firmwareWarningMessageBox) {
             firmwareWarningMessageBox = new QMessageBox(Core::ICore::instance()->mainWindow());
@@ -158,7 +159,7 @@ void TelemetryPlugin::versionMatchCheck()
             firmwareWarningMessageBox->setStandardButtons(QMessageBox::Ok);
             firmwareWarningMessageBox->setText(tr("GCS and firmware versions of the UAV objects set do not match which can cause configuration problems."));
             // should we want to re-introduce the checkbox
-            //firmwareWarningMessageBox->setCheckBox(new QCheckBox(tr("&Don't show this message again.")));
+            // firmwareWarningMessageBox->setCheckBox(new QCheckBox(tr("&Don't show this message again.")));
         }
         QString detailTxt = tr("GCS version: %1").arg(gcsVersion) + "\n" + tr("Firmware version: %1").arg(fwVersion);
         firmwareWarningMessageBox->setDetailedText(detailTxt);

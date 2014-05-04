@@ -27,7 +27,7 @@
 #include "uploadergadgetwidget.h"
 
 #include "flightstatus.h"
-//#include "delay.h"
+#include "delay.h"
 #include "devicewidget.h"
 #include "runningdevicewidget.h"
 
@@ -48,7 +48,7 @@ const int UploaderGadgetWidget::BOARD_EVENT_TIMEOUT = 20000;
 const int UploaderGadgetWidget::AUTOUPDATE_CLOSE_TIMEOUT = 7000;
 
 TimedDialog::TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent, Qt::WindowFlags flags) :
-        QProgressDialog(labelText, tr("Cancel"), 0, timeout, parent, flags), bar(new QProgressBar(this))
+    QProgressDialog(labelText, tr("Cancel"), 0, timeout, parent, flags), bar(new QProgressBar(this))
 {
     setWindowTitle(title);
     setAutoReset(false);
@@ -72,10 +72,10 @@ void TimedDialog::perform()
 }
 
 ConnectionWaiter::ConnectionWaiter(int targetDeviceCount, int timeout, QWidget *parent) : QObject(parent), eventLoop(this), timer(this), timeout(timeout), elapsed(0), targetDeviceCount(targetDeviceCount), result(ConnectionWaiter::Ok)
-{
-}
+{}
 
-int ConnectionWaiter::exec() {
+int ConnectionWaiter::exec()
+{
     connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(deviceEvent()));
     connect(USBMonitor::instance(), SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(deviceEvent()));
 
@@ -88,12 +88,14 @@ int ConnectionWaiter::exec() {
     return result;
 }
 
-void ConnectionWaiter::cancel() {
+void ConnectionWaiter::cancel()
+{
     quit();
     result = ConnectionWaiter::Canceled;
 }
 
-void ConnectionWaiter::quit() {
+void ConnectionWaiter::quit()
+{
     disconnect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(deviceEvent()));
     disconnect(USBMonitor::instance(), SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(deviceEvent()));
     timer.stop();
@@ -118,9 +120,11 @@ void ConnectionWaiter::deviceEvent()
     }
 }
 
-int ConnectionWaiter::openDialog(const QString &title, const QString &labelText, int targetDeviceCount, int timeout, QWidget *parent, Qt::WindowFlags flags) {
+int ConnectionWaiter::openDialog(const QString &title, const QString &labelText, int targetDeviceCount, int timeout, QWidget *parent, Qt::WindowFlags flags)
+{
     TimedDialog dlg(title, labelText, timeout / 1000, parent, flags);
     ConnectionWaiter waiter(targetDeviceCount, timeout, parent);
+
     connect(&dlg, SIGNAL(canceled()), &waiter, SLOT(cancel()));
     connect(&waiter, SIGNAL(timeChanged(int)), &dlg, SLOT(perform()));
     return waiter.exec();
@@ -140,24 +144,24 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
 
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(onPhysicalHWConnect()));
+
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(systemHalt()));
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
     connect(m_config->safeBootButton, SIGNAL(clicked()), this, SLOT(systemSafeBoot()));
     connect(m_config->eraseBootButton, SIGNAL(clicked()), this, SLOT(systemEraseBoot()));
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(onPhysicalHWConnect()));
+
     getSerialPorts();
 
-    m_config->autoUpdateButton->setEnabled(autoUpdateCapable());
     connect(m_config->autoUpdateButton, SIGNAL(clicked()), this, SLOT(startAutoUpdate()));
     connect(m_config->autoUpdateOkButton, SIGNAL(clicked()), this, SLOT(closeAutoUpdate()));
+    m_config->autoUpdateButton->setEnabled(autoUpdateCapable());
     m_config->autoUpdateGroupBox->setVisible(false);
 
-    QIcon rbi;
-    rbi.addFile(QString(":uploader/images/view-refresh.svg"));
-    m_config->refreshPorts->setIcon(rbi);
+    m_config->refreshPorts->setIcon(QIcon(":uploader/images/view-refresh.svg"));
 
     bootButtonsSetEnable(false);
 
@@ -295,6 +299,7 @@ static void sleep(int ms)
 {
     QEventLoop eventLoop;
     QTimer::singleShot(ms, &eventLoop, SLOT(quit()));
+
     eventLoop.exec();
 }
 
@@ -466,6 +471,7 @@ void UploaderGadgetWidget::systemHalt()
     // The board can not be halted when in armed state.
     // If board is armed, or arming. Show message with notice.
     FlightStatus *status = getFlightStatus();
+
     if (status->getArmed() == FlightStatus::ARMED_DISARMED) {
         goToBootloader();
     } else {
@@ -510,7 +516,7 @@ void UploaderGadgetWidget::systemSafeBoot()
 
 void UploaderGadgetWidget::systemEraseBoot()
 {
-    switch(confirmEraseSettingsMessageBox()) {
+    switch (confirmEraseSettingsMessageBox()) {
     case QMessageBox::Ok:
         commonSystemBoot(true, true);
         break;
@@ -759,10 +765,11 @@ void UploaderGadgetWidget::systemRescue()
     if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
         QString labelText = QString("<p align=\"left\">%1</p>").arg(tr("Please disconnect your OpenPilot board."));
         int result = ConnectionWaiter::openDialog(tr("System Rescue"), labelText, 0, BOARD_EVENT_TIMEOUT, this);
-        switch(result) {
+        switch (result) {
         case ConnectionWaiter::Canceled:
             m_config->rescueButton->setEnabled(true);
             return;
+
         case ConnectionWaiter::TimedOut:
             QMessageBox::warning(this, tr("System Rescue"), tr("Timed out while waiting for all boards to be disconnected!"));
             m_config->rescueButton->setEnabled(true);
@@ -773,10 +780,11 @@ void UploaderGadgetWidget::systemRescue()
     // Now prompt user to connect board
     QString labelText = QString("<p align=\"left\">%1<br>%2</p>").arg(tr("Please connect your OpenPilot board.")).arg(tr("Board must be connected to the USB port!"));
     int result = ConnectionWaiter::openDialog(tr("System Rescue"), labelText, 1, BOARD_EVENT_TIMEOUT, this);
-    switch(result) {
+    switch (result) {
     case ConnectionWaiter::Canceled:
         m_config->rescueButton->setEnabled(true);
         return;
+
     case ConnectionWaiter::TimedOut:
         QMessageBox::warning(this, tr("System Rescue"), tr("Timed out while waiting for a board to be connected!"));
         m_config->rescueButton->setEnabled(true);
@@ -898,6 +906,7 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVa
 {
     QString msg;
     int remaining;
+
     switch (status) {
     case uploader::WAITING_DISCONNECT:
         m_config->autoUpdateLabel->setText(tr("Waiting for all OpenPilot boards to be disconnected from USB."));
@@ -934,7 +943,7 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVa
         break;
     case uploader::SUCCESS:
         m_config->autoUpdateProgressBar->setValue(m_config->autoUpdateProgressBar->maximum());
-        msg = tr("Board was updated successfully.");
+        msg  = tr("Board was updated successfully.");
         msg += " " + tr("Press OK to finish.");
         m_config->autoUpdateLabel->setText(QString("<font color='green'>%1</font>").arg(msg));
         finishAutoUpdate();
@@ -986,6 +995,7 @@ void UploaderGadgetWidget::openHelp()
 int UploaderGadgetWidget::confirmEraseSettingsMessageBox()
 {
     QMessageBox msgBox(this);
+
     msgBox.setWindowTitle(tr("Confirm Settings Erase?"));
     msgBox.setIcon(QMessageBox::Question);
     msgBox.setText(tr("Do you want to erase all settings from the board?"));
@@ -997,6 +1007,7 @@ int UploaderGadgetWidget::confirmEraseSettingsMessageBox()
 int UploaderGadgetWidget::cannotHaltMessageBox()
 {
     QMessageBox msgBox(this);
+
     msgBox.setWindowTitle(tr("Cannot Halt Board!"));
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setText(tr("The controller board is armed and can not be halted."));
@@ -1008,6 +1019,7 @@ int UploaderGadgetWidget::cannotHaltMessageBox()
 int UploaderGadgetWidget::cannotResetMessageBox()
 {
     QMessageBox msgBox(this);
+
     msgBox.setWindowTitle(tr("Cannot Reset Board!"));
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setText(tr("The controller board is armed and can not be reset."));

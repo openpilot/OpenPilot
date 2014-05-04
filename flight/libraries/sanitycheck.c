@@ -106,6 +106,15 @@ int32_t configuration_check()
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
             severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor, coptercontrol) : severity;
             break;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED4:
+            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(4, multirotor, coptercontrol) : severity;
+            break;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED5:
+            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(5, multirotor, coptercontrol) : severity;
+            break;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED6:
+            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(6, multirotor, coptercontrol) : severity;
+            break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
             if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE)) {
                 severity = SYSTEMALARMS_ALARM_ERROR;
@@ -204,6 +213,15 @@ static int32_t check_stabilization_settings(int index, bool multirotor, bool cop
         break;
     case 3:
         FlightModeSettingsStabilization3SettingsArrayGet(modes);
+        break;
+    case 4:
+        FlightModeSettingsStabilization4SettingsArrayGet(modes);
+        break;
+    case 5:
+        FlightModeSettingsStabilization5SettingsArrayGet(modes);
+        break;
+    case 6:
+        FlightModeSettingsStabilization6SettingsArrayGet(modes);
         break;
     default:
         return SYSTEMALARMS_ALARM_ERROR;

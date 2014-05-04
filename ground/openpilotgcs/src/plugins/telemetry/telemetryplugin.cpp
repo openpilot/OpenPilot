@@ -153,7 +153,7 @@ void TelemetryPlugin::versionMatchCheck()
         if (!firmwareWarningMessageBox) {
             firmwareWarningMessageBox = new QMessageBox(Core::ICore::instance()->mainWindow());
             firmwareWarningMessageBox->setWindowModality(Qt::NonModal);
-            firmwareWarningMessageBox->setWindowTitle(Core::ICore::instance()->mainWindow()->windowTitle());
+            firmwareWarningMessageBox->setWindowTitle(tr("Firmware Version Mismatch!"));
             firmwareWarningMessageBox->setIcon(QMessageBox::Warning);
             firmwareWarningMessageBox->setStandardButtons(QMessageBox::Ok);
             firmwareWarningMessageBox->setText(tr("GCS and firmware versions of the UAV objects set do not match which can cause configuration problems."));

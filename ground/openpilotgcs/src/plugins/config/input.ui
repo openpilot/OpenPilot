@@ -771,6 +771,36 @@ margin:1px;</string>
                    </property>
                   </widget>
                  </item>
+                 <item>
+                  <widget class="QLabel" name="label_114">
+                   <property name="text">
+                    <string>Stabilized 4</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_121">
+                   <property name="text">
+                    <string>Stabilized 5</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_122">
+                   <property name="text">
+                    <string>Stabilized 6</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
               </item>

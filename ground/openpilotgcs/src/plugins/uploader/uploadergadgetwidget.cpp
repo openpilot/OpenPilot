@@ -469,13 +469,7 @@ void UploaderGadgetWidget::systemHalt()
     if (status->getArmed() == FlightStatus::ARMED_DISARMED) {
         goToBootloader();
     } else {
-        QMessageBox mbox(this);
-        mbox.setText(tr("The controller board is armed and can not be halted.\n\n"
-                                "Please make sure the board is not armed and then press halt again to proceed\n"
-                                "or use the rescue option to force a firmware upgrade."));
-        mbox.setStandardButtons(QMessageBox::Ok);
-        mbox.setIcon(QMessageBox::Warning);
-        mbox.exec();
+        cannotHaltMessageBox();
     }
 }
 
@@ -500,13 +494,7 @@ void UploaderGadgetWidget::systemReset()
         log("Board Reset initiated.");
         goToBootloader();
     } else {
-        QMessageBox mbox(this);
-        mbox.setText(tr("The controller board is armed and can not be reset.\n\n"
-                                "Please make sure the board is not armed and then press reset again to proceed\n"
-                                "or power cycle to force a board reset."));
-        mbox.setStandardButtons(QMessageBox::Ok);
-        mbox.setIcon(QMessageBox::Warning);
-        mbox.exec();
+        cannotResetMessageBox();
     }
 }
 
@@ -522,19 +510,16 @@ void UploaderGadgetWidget::systemSafeBoot()
 
 void UploaderGadgetWidget::systemEraseBoot()
 {
-    QMessageBox msgBox;
-    int result;
-
-    msgBox.setWindowTitle(tr("Erase Settings"));
-    msgBox.setInformativeText(tr("Do you want to erase all settings from the board?\nSettings cannot be recovered after this operation.\nThe board will be restarted and all the setting erased"));
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel | QMessageBox::Help);
-    result = msgBox.exec();
-    if (result == QMessageBox::Ok) {
+    switch(confirmEraseSettingsMessageBox()) {
+    case QMessageBox::Ok:
         commonSystemBoot(true, true);
-    } else if (result == QMessageBox::Help) {
+        break;
+    case QMessageBox::Help:
         QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/display/Doc/Erase+board+settings"), QUrl::StrictMode));
+        break;
     }
 }
+
 
 /**
  * Tells the system to boot (from Bootloader state)
@@ -993,41 +978,40 @@ UploaderGadgetWidget::~UploaderGadgetWidget()
     }
 }
 
-/**
-   Shows a message box with an error string.
-
-   @param errorString	The error string to display.
-
-   @param errorNumber      Not used
-
- */
-void UploaderGadgetWidget::error(QString errorString, int errorNumber)
-{
-    Q_UNUSED(errorNumber);
-
-    m_config->boardStatus->setText(errorString);
-
-    QMessageBox msgBox;
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.setText(errorString);
-    msgBox.exec();
-}
-
-/**
-   Shows a message box with an information string.
-
-   @param infoString	The information string to display.
-
-   @param infoNumber       Not used
-
- */
-void UploaderGadgetWidget::info(QString infoString, int infoNumber)
-{
-    Q_UNUSED(infoNumber);
-    m_config->boardStatus->setText(infoString);
-}
-
 void UploaderGadgetWidget::openHelp()
 {
     QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/AoBZ", QUrl::StrictMode));
+}
+
+int UploaderGadgetWidget::confirmEraseSettingsMessageBox()
+{
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Confirm Settings Erase?"));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(tr("Do you want to erase all settings from the board?"));
+    msgBox.setInformativeText(tr("Settings cannot be recovered after this operation.\nThe board will be restarted and all settings erased."));
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel | QMessageBox::Help);
+    return msgBox.exec();
+}
+
+int UploaderGadgetWidget::cannotHaltMessageBox()
+{
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Cannot Halt Board!"));
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(tr("The controller board is armed and can not be halted."));
+    msgBox.setInformativeText(tr("Please make sure the board is not armed and then press Halt again to proceed or use Rescue to force a firmware upgrade."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    return msgBox.exec();
+}
+
+int UploaderGadgetWidget::cannotResetMessageBox()
+{
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(tr("Cannot Reset Board!"));
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(tr("The controller board is armed and can not be reset."));
+    msgBox.setInformativeText(tr("Please make sure the board is not armed and then press reset again to proceed or power cycle to force a board reset."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    return msgBox.exec();
 }

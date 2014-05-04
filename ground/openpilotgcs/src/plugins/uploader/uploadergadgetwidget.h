@@ -122,17 +122,18 @@ private:
     DFUObject *dfu;
     IAPStep currentStep;
     bool resetOnly;
+
     void clearLog();
     QString getPortDevice(const QString &friendName);
-    QLineEdit *openFileNameLE;
     void connectSignalSlot(QWidget *widget);
     FlightStatus *getFlightStatus();
     void bootButtonsSetEnable(bool enabled);
+    int confirmEraseSettingsMessageBox();
+    int cannotHaltMessageBox();
+    int cannotResetMessageBox();
 
 private slots:
     void onPhysicalHWConnect();
-    void error(QString errorString, int errorNumber);
-    void info(QString infoString, int infoNumber);
     void goToBootloader(UAVObject * = NULL, bool = false);
     void systemHalt();
     void systemReset();

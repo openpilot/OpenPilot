@@ -139,6 +139,7 @@ int32_t VtolPathFollowerInitialize()
         AccessoryDesiredInitialize();
         PoiLearnSettingsInitialize();
         PoiLocationInitialize();
+        HomeLocationInitialize();
         vtolpathfollower_enabled = true;
     } else {
         vtolpathfollower_enabled = false;
@@ -158,6 +159,7 @@ static float eastPosIntegral  = 0;
 static float downPosIntegral  = 0;
 
 static float thrustOffset     = 0;
+static float gravity;
 /**
  * Module thread, should not return.
  */
@@ -181,6 +183,7 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
         // 2. Flight mode is PositionHold and PathDesired.Mode is Endpoint  OR
         // FlightMode is PathPlanner and PathDesired.Mode is Endpoint or Path
 
+        HomeLocationg_eGet(&gravity);
         SystemSettingsGet(&systemSettings);
         if ((systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_QUADP)
             && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXX) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_QUADX)
@@ -683,7 +686,7 @@ static void updateNedAccel()
             accel_ned[i] += Rbe[j][i] * accel[j];
         }
     }
-    accel_ned[2] += 9.81f;
+    accel_ned[2] += gravity;
 
     NedAccelData accelData;
     NedAccelGet(&accelData);

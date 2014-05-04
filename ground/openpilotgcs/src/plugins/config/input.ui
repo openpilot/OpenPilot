@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="RCInput">
       <attribute name="title">
@@ -116,8 +116,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>488</width>
-            <height>281</height>
+            <width>772</width>
+            <height>751</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">

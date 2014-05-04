@@ -33,6 +33,7 @@
 #include "inc/stateestimation.h"
 #include <attitudestate.h>
 #include <altitudefiltersettings.h>
+#include <homelocation.h>
 
 #include <CoordinateConversions.h>
 
@@ -65,6 +66,7 @@ struct data {
     bool  first_run;
     portTickType initTimer;
     AltitudeFilterSettingsData settings;
+    float gravity;
 };
 
 // Private variables
@@ -81,6 +83,7 @@ int32_t filterAltitudeInitialize(stateFilter *handle)
     handle->init      = &init;
     handle->filter    = &filter;
     handle->localdata = pvPortMalloc(sizeof(struct data));
+    HomeLocationInitialize();
     AttitudeStateInitialize();
     AltitudeFilterSettingsInitialize();
     AltitudeFilterSettingsConnectCallback(&settingsUpdatedCb);
@@ -107,6 +110,7 @@ static int32_t init(stateFilter *self)
     this->baroLast  = 0.0f;
     this->accelLast = 0.0f;
     this->first_run = 1;
+    HomeLocationg_eGet(&this->gravity);
     return 0;
 }
 
@@ -145,7 +149,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             AttitudeStateGet(&att);
             float Rbe[3][3];
             Quaternion2R(&att.q1, Rbe);
-            float current = -(Rbe[0][2] * state->accel[0] + Rbe[1][2] * state->accel[1] + Rbe[2][2] * state->accel[2] + 9.81f);
+            float current = -(Rbe[0][2] * state->accel[0] + Rbe[1][2] * state->accel[1] + Rbe[2][2] * state->accel[2] + this->gravity);
 
             // low pass filter accelerometers
             this->accelState = (1.0f - this->settings.AccelLowPassKp) * this->accelState + this->settings.AccelLowPassKp * current;

@@ -195,12 +195,6 @@ int32_t configuration_check()
  */
 static int32_t check_stabilization_settings(int index, bool multirotor, bool coptercontrol)
 {
-    // Make sure the modes have identical sizes
-    if (FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM != FLIGHTMODESETTINGS_STABILIZATION2SETTINGS_NUMELEM ||
-        FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM != FLIGHTMODESETTINGS_STABILIZATION3SETTINGS_NUMELEM) {
-        return SYSTEMALARMS_ALARM_ERROR;
-    }
-
     uint8_t modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM];
 
     // Get the different axis modes for this switch position

@@ -113,7 +113,7 @@ static void commandUpdatedCb(UAVObjEvent *ev);
 
 static void manualControlTask(void);
 
-#define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions_flightmode)
+#define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions_flightmode)
 
 /**
  * Module starting

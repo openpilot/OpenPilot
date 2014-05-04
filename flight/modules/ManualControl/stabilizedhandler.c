@@ -79,13 +79,13 @@ void stabilizedHandler(bool newinit)
         stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization3Settings.Roll);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
-        stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization4Settings.Roll);
+        stab_settings = cast_struct_to_array(settings.Stabilization4Settings, settings.Stabilization4Settings.Roll);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
-        stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization5Settings.Roll);
+        stab_settings = cast_struct_to_array(settings.Stabilization5Settings, settings.Stabilization5Settings.Roll);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-        stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization6Settings.Roll);
+        stab_settings = cast_struct_to_array(settings.Stabilization6Settings, settings.Stabilization6Settings.Roll);
         break;
     default:
         // Major error, this should not occur because only enter this block when one of these is true

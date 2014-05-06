@@ -597,7 +597,11 @@ ifeq ($(shell [ -d "$(PYTHON_DIR)" ] && $(ECHO) "exists"), exists)
 else
     # not installed, hope it's in the path...
     # $(info $(EMPTY) WARNING     $(call toprel, $(PYTHON_DIR)) not found, using system PATH)
-    export PYTHON := python
+    ifeq ($(findstring Python 2,$(shell python --version)), Python 2) 
+        export PYTHON := python
+    else
+	export PYTHON := python2
+    endif
 endif
 
 .PHONY: python_version

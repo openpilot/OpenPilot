@@ -29,7 +29,6 @@
 
 #include "ui_revosensors.h"
 #include "configtaskwidget.h"
-
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -41,7 +40,11 @@
 #include <QTimer>
 #include <QMutex>
 #include "calibration/thermal/thermalcalibrationmodel.h"
+#include "calibration/sixpointcalibrationmodel.h"
+#include "calibration/levelcalibrationmodel.h"
+#include "calibration/gyrobiascalibrationmodel.h"
 class Ui_Widget;
+
 
 class ConfigRevoWidget : public ConfigTaskWidget {
     Q_OBJECT
@@ -51,82 +54,31 @@ public:
     ~ConfigRevoWidget();
 
 private:
-    void drawVariancesGraph();
-    void displayPlane(QString elementID);
-
-    // ! Computes the scale and bias of the mag based on collected data
-    void computeScaleBias();
-
+    OpenPilot::SixPointCalibrationModel *m_sixPointCalibrationModel;
     OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
+    OpenPilot::LevelCalibrationModel *m_levelCalibrationModel;
+    OpenPilot::GyroBiasCalibrationModel *m_gyroBiasCalibrationModel;
+
     Ui_RevoSensorsWidget *m_ui;
-    QGraphicsSvgItem *paperplane;
-    QGraphicsSvgItem *sensorsBargraph;
-    QGraphicsSvgItem *accel_x;
-    QGraphicsSvgItem *accel_y;
-    QGraphicsSvgItem *accel_z;
-    QGraphicsSvgItem *gyro_x;
-    QGraphicsSvgItem *gyro_y;
-    QGraphicsSvgItem *gyro_z;
-    QGraphicsSvgItem *mag_x;
-    QGraphicsSvgItem *mag_y;
-    QGraphicsSvgItem *mag_z;
-    QMutex sensorsUpdateLock;
-    double maxBarHeight;
-    int phaseCounter;
-    const static double maxVarValue;
-    const static int calibrationDelay = 10;
-
-    bool collectingData;
-
-    QList<double> gyro_accum_x;
-    QList<double> gyro_accum_y;
-    QList<double> gyro_accum_z;
-    QList<double> accel_accum_x;
-    QList<double> accel_accum_y;
-    QList<double> accel_accum_z;
-    QList<double> mag_accum_x;
-    QList<double> mag_accum_y;
-    QList<double> mag_accum_z;
-
-    double accel_data_x[6], accel_data_y[6], accel_data_z[6];
-    double mag_data_x[6], mag_data_y[6], mag_data_z[6];
-
-    UAVObject::Metadata initialAccelStateMdata;
-    UAVObject::Metadata initialGyroStateMdata;
-    UAVObject::Metadata initialMagStateMdata;
-    UAVObject::Metadata initialBaroSensorMdata;
-    float initialMagCorrectionRate;
-
-    int position;
-
-    static const int NOISE_SAMPLES = 100;
 
     // Board rotation store/recall
     qint16 storedBoardRotation[3];
     bool isBoardRotationStored;
-    void storeAndClearBoardRotation();
-    void recallBoardRotation();
-
 
 private slots:
+    void displayVisualHelp(QString elementID);
+    void storeAndClearBoardRotation();
+    void recallBoardRotation();
+    void displayInstructions(QString instructions = QString(), bool replace = false);
+
     // ! Overriden method from the configTaskWidget to update UI
     virtual void refreshWidgetsValues(UAVObject *object = NULL);
 
-    // Slots for calibrating the mags
-    void doStartSixPointCalibration();
-    void doGetSixPointCalibrationMeasurement(UAVObject *obj);
-    void savePositionData();
-
-    // Slots for calibrating the accel and gyro
-    void doStartAccelGyroBiasCalibration();
-    void doGetAccelGyroBiasData(UAVObject *);
-
-    // Slots for measuring the sensor noise
-    void doStartNoiseMeasurement();
-    void doGetNoiseSample(UAVObject *);
-
     // Slot for clearing home location
     void clearHomeLocation();
+
+    void disableAllCalibrations();
+    void enableAllCalibrations();
 
 protected:
     void showEvent(QShowEvent *event);

@@ -1,14 +1,13 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
+ * @addtogroup OpenPilot Math Utilities
  * @{
- * @addtogroup AirspeedModule Airspeed Module
- * @brief Handle locally airspeed alarms issue changes to PIOS only when necessary
+ * @addtogroup Reuseable math functions
  * @{
  *
- * @file       airspeedalarm.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      Airspeed module, reads temperature and pressure from MS4525DO
+ * @file       mathmisc.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Reuseable math functions
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -28,18 +27,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef AIRSPEEDALARM_H
-#define AIRSPEEDALARM_H
-
-#include <openpilot.h>
-#include "alarms.h"
 
 
-bool AirspeedAlarm(SystemAlarmsAlarmOptions severity);
-
-#endif // AIRSPEEDALARM_H
-
-/**
- * @}
- * @}
- */
+// space deliberately left empty, any non inline misc math functions can go here

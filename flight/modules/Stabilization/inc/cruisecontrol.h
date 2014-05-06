@@ -2,13 +2,14 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup AirspeedModule Airspeed Module
- * @brief Handle locally airspeed alarms issue changes to PIOS only when necessary
+ * @addtogroup StabilizationModule Stabilization Module
+ * @brief cruisecontrol mode
+ * @note This file implements the logic for a cruisecontrol
  * @{
  *
- * @file       airspeedalarm.c
+ * @file       cruisecontrol.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      Airspeed module
+ * @brief      Attitude stabilization module.
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -29,37 +30,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/**
- * Output object: none
- *
- * Handle locally airspeed alarms issue changes to PIOS only when necessary
- *
- */
+#ifndef CRUISECONTROL_H
+#define CRUISECONTROL_H
 
-#include "airspeedalarm.h"
+#include <openpilot.h>
+#include <attitudestate.h>
 
-// local variable
+void cruisecontrol_compute_factor(AttitudeStateData *attitude, float thrustDemand);
+float cruisecontrol_apply_factor(float raw);
 
-static SystemAlarmsAlarmOptions severitySet = SYSTEMALARMS_ALARM_UNINITIALISED;
-
-// functions
-
-/**
- * Handle airspeed alarms and isuue an Alarm to PIOS only if necessary
- */
-bool AirspeedAlarm(SystemAlarmsAlarmOptions severity)
-{
-    if (severity == severitySet) {
-        return false;
-    }
-
-    severitySet = severity;
-
-    return AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, severity) == 0;
-}
-
-
-/**
- * @}
- * @}
- */
+#endif /* CRUISECONTROL_H */

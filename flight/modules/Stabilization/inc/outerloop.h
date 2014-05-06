@@ -1,12 +1,16 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotSystem OpenPilot System
+ * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup OpenPilotCore OpenPilot Core
+ * @addtogroup StabilizationModule Stabilization Module
+ * @brief outerloop mode
+ * @note This file implements the logic for a outerloop
  * @{
- * @file       openpilot.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Main OpenPilot header.
+ *
+ * @file       outerloop.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      Attitude stabilization module.
+ *
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -26,26 +30,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OPENPILOT_H
-#define OPENPILOT_H
+#ifndef OUTERLOOP_H
+#define OUTERLOOP_H
 
-/* PIOS Includes */
-#include <pios.h>
+void stabilizationOuterloopInit();
 
-/* OpenPilot Libraries */
-#include <utlist.h>
-#include <uavobjectmanager.h>
-#include <eventdispatcher.h>
-#include <uavtalk.h>
-
-#include "alarms.h"
-#include <mathmisc.h>
-
-/* Global Functions */
-void OpenPilotInit(void);
-
-#endif /* OPENPILOT_H */
-/**
- * @}
- * @}
- */
+#endif /* OUTERLOOP_H */

@@ -106,6 +106,7 @@ SRC += $(FLIGHTLIB)/sanitycheck.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
+SRC += $(MATHLIB)/mathmisc.c
 SRC += $(FLIGHTLIB)/printf-stdarg.c
 
 ## Modules

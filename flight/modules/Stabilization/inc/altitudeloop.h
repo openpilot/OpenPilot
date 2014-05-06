@@ -1,12 +1,16 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotSystem OpenPilot System
+ * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup OpenPilotCore OpenPilot Core
+ * @addtogroup StabilizationModule Stabilization Module
+ * @brief altitudeloop mode
+ * @note This file implements the logic for a altitudeloop
  * @{
- * @file       openpilot.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Main OpenPilot header.
+ *
+ * @file       altitudeloop.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      Attitude stabilization module.
+ *
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -26,26 +30,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OPENPILOT_H
-#define OPENPILOT_H
+#ifndef ALTITUDELOOP_H
+#define ALTITUDELOOP_H
 
-/* PIOS Includes */
-#include <pios.h>
+typedef enum { ALTITUDEHOLD = 0, ALTITUDEVARIO = 1, DIRECT = 2 } ThrustModeType;
 
-/* OpenPilot Libraries */
-#include <utlist.h>
-#include <uavobjectmanager.h>
-#include <eventdispatcher.h>
-#include <uavtalk.h>
+void stabilizationAltitudeloopInit();
+float stabilizationAltitudeHold(float setpoint, ThrustModeType mode, bool reinit);
 
-#include "alarms.h"
-#include <mathmisc.h>
-
-/* Global Functions */
-void OpenPilotInit(void);
-
-#endif /* OPENPILOT_H */
-/**
- * @}
- * @}
- */
+#endif /* ALTITUDELOOP_H */

@@ -361,6 +361,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     }
 
     INSSetMagNorth(this->homeLocation.Be);
+    INSSetG(this->homeLocation.g_e);
 
     if (!this->usePos) {
         // position and velocity variance used in indoor mode

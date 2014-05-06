@@ -1,9 +1,15 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{
+ * @addtogroup StabilizationModule Stabilization Module
+ * @brief innerloop mode
+ * @note This file implements the logic for a innerloop
+ * @{
  *
- * @file       examplemodperiodic.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Example module to be used as a template for actual modules.
+ * @file       innerloop.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      Attitude stabilization module.
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -23,9 +29,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef EXAMPLEMODPERIODIC_H
-#define EXAMPLEMODPERIODIC_H
 
-int32_t ExampleModPeriodicInitialize();
-int32_t GuidanceInitialize(void);
-#endif // EXAMPLEMODPERIODIC_H
+#ifndef INNERLOOP_H
+#define INNERLOOP_H
+
+void stabilizationInnerloopInit();
+
+#endif /* INNERLOOP_H */

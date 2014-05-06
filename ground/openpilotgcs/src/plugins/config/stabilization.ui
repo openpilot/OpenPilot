@@ -8444,7 +8444,7 @@ border-radius: 5;</string>
                        <string notr="true"/>
                       </property>
                       <property name="text">
-                       <string>Max rate attitude (deg/s)</string>
+                       <string>Max rate limit (all modes) (deg/s)</string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -13377,8 +13377,6 @@ border-radius: 5;</string>
                       </property>
                       <property name="decimals">
                        <number>5</number>
-
-
                       </property>
                       <property name="singleStep">
                        <double>0.000100000000000</double>
@@ -15943,7 +15941,6 @@ border-radius: 5;</string>
                         <string>element:Kp</string>
                         <string>haslimits:no</string>
                         <string>scale:1</string>
-
                         <string>buttongroup:5,20</string>
                        </stringlist>
                       </property>
@@ -17355,7 +17352,6 @@ border-radius: 5;</string>
                             <red>26</red>
                             <green>26</green>
                             <blue>26</blue>
-
                            </color>
                           </brush>
                          </colorrole>
@@ -19421,7 +19417,6 @@ border-radius: 5;</string>
                    </property>
                    <property name="autoFillBackground">
                     <bool>false</bool>
-
                    </property>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -19946,7 +19941,6 @@ border-radius: 5;</string>
                          <red>39</red>
                          <green>39</green>
                          <blue>39</blue>
-
                         </color>
                        </brush>
                       </colorrole>
@@ -21981,7 +21975,6 @@ border-radius: 5;</string>
                     </size>
                    </property>
                   </spacer>
-
                  </item>
                  <item row="1" column="3">
                   <widget class="QDoubleSpinBox" name="AccelKp">
@@ -24186,6 +24179,12 @@ border-radius: 5;</string>
               </item>
               <item row="1" column="0" colspan="2">
                <widget class="QFrame" name="gridFrame">
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
                 <layout class="QGridLayout" name="gridLayout_25">
                  <property name="leftMargin">
                   <number>9</number>
@@ -24200,34 +24199,60 @@ border-radius: 5;</string>
                   <number>9</number>
                  </property>
                  <item row="1" column="4">
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+                  <widget class="QComboBox" name="comboBox">
+                   <property name="minimumSize">
+                    <size>
+                     <width>75</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle/collective stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrust) when inverted.  1 says to use the unboosted stick value.  -1 (DON'T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the collective stick when inverted.
-&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="accelerated">
-                    <bool>true</bool>
-                   </property>
-                   <property name="decimals">
-                    <number>0</number>
-                   </property>
-                   <property name="minimum">
-                    <double>-1.000000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>1.000000000000000</double>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;CP helis can set this to Reversed to automatically reverse the direction of thrust when inverted. Fixed pitch copters, including multicopters, should leave this set at Unreversed. Unreversed direction with Boosted power may be dangerous because it adds power and the thrust direction moves the aircraft towards the ground.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlInvertedPowerSwitch</string>
+                     <string>fieldname:CruiseControlInvertedThrustReversing</string>
                      <string>haslimits:no</string>
                      <string>scale:1</string>
                      <string>buttongroup:16</string>
                     </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <widget class="QLabel" name="label_10">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>145</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                   </property>
+                   <property name="text">
+                    <string>InvrtdThrustRev</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -24247,7 +24272,7 @@ border-radius: 5;</string>
                  <item row="1" column="2">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the bank angle that CruiseControl goes into inverted / power disabled mode.  The power for inverted mode is controlled by CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The bank angle where CruiseControl goes into inverted power mode.  InvertedThrustReverse and InvertedPower control the direction and amount of power when in inverted mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24259,7 +24284,7 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="maximum">
-                    <double>180.000000000000000</double>
+                    <double>255.000000000000000</double>
                    </property>
                    <property name="value">
                     <double>105.000000000000000</double>
@@ -24278,7 +24303,7 @@ border-radius: 5;</string>
                  <item row="1" column="1">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle/collective stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 3.0 means it will not use more than 3 times the power the throttle/collective stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24290,13 +24315,13 @@ border-radius: 5;</string>
                     <number>2</number>
                    </property>
                    <property name="minimum">
-                    <double>0.000000000000000</double>
+                    <double>1.000000000000000</double>
                    </property>
                    <property name="maximum">
                     <double>50.000000000000000</double>
                    </property>
                    <property name="singleStep">
-                    <double>0.250000000000000</double>
+                    <double>0.100000000000000</double>
                    </property>
                    <property name="value">
                     <double>3.000000000000000</double>
@@ -24310,11 +24335,10 @@ border-radius: 5;</string>
                      <string>buttongroup:16</string>
                     </stringlist>
                    </property>
-
                   </widget>
                  </item>
                  <item row="2" column="1">
-                  <widget class="QLabel" name="label_6">
+                  <widget class="QLabel" name="label_11">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -24323,7 +24347,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>140</width>
+                     <width>155</width>
                      <height>16</height>
                     </size>
                    </property>
@@ -24339,72 +24363,10 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>PowerTrim</string>
+                    <string>PowerDelayComp</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="4">
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This needs to be 0 for all copters except CP helis that are using idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="accelerated">
-                    <bool>true</bool>
-                   </property>
-                   <property name="decimals">
-                    <number>0</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlNeutralThrust</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                     <string>buttongroup:16</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that banging the stick around a lot makes the copter climb a bit, adjust this number down a little.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="accelerated">
-                    <bool>true</bool>
-                   </property>
-                   <property name="decimals">
-                    <number>2</number>
-                   </property>
-                   <property name="minimum">
-                    <double>80.000000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>120.000000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.250000000000000</double>
-                   </property>
-                   <property name="value">
-                    <double>100.000000000000000</double>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlPowerTrim</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                     <string>buttongroup:16</string>
-                    </stringlist>
                    </property>
                   </widget>
                  </item>
@@ -24451,7 +24413,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>140</width>
+                     <width>90</width>
                      <height>16</height>
                     </size>
                    </property>
@@ -24484,7 +24446,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>140</width>
+                     <width>92</width>
                      <height>16</height>
                     </size>
                    </property>
@@ -24510,7 +24472,7 @@ border-radius: 5;</string>
                  <item row="1" column="3">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle/Collective stick below this disables Cruise Control.  Also, by default Cruise Control forces the use of this value for thrust when the copter is inverted.  For safety, never set this so low that the trimmed throttle/collective stick cannot get below it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle/Collective stick below this amount disables Cruise Control. Also, by default Cruise Control forces the use of this value for thrust when InvertedPower setting is Zero and the copter is inverted. CP helis probably want this set to -100%. For safety with fixed pitch copters (including multicopters), never set this so low that the trimmed throttle stick cannot get below it or your motor(s) will still run with the throttle stick all the way down. Fixed pitch throttle sticks go from -100 to 0 in the first tiny bit of throttle stick (and then up to 100 using the rest of the throttle range), so for example, a lot of &amp;quot;high throttle trim&amp;quot; will keep the stick from ever commanding less than 5% so it won't be possible to stop the motors with the throttle stick. Banking the copter in your hand in this state will make the motors speed up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24520,6 +24482,12 @@ border-radius: 5;</string>
                    </property>
                    <property name="decimals">
                     <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>-100.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>49.000000000000000</double>
                    </property>
                    <property name="value">
                     <double>5.000000000000000</double>
@@ -24535,43 +24503,10 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="4">
-                  <widget class="QLabel" name="label_11">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>140</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;</string>
-                   </property>
-                   <property name="text">
-                    <string>NeutralThrust</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="3" column="3">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 90% to 95% to leave some headroom for stabilization.  CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 80% to 90% to leave some headroom for stabilization. CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -24581,6 +24516,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="decimals">
                     <number>0</number>
+                   </property>
+                   <property name="minimum">
+                    <double>51.000000000000000</double>
                    </property>
                    <property name="value">
                     <double>90.000000000000000</double>
@@ -24606,7 +24544,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>140</width>
+                     <width>97</width>
                      <height>16</height>
                     </size>
                    </property>
@@ -24629,8 +24567,24 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="4">
-                  <widget class="QLabel" name="label_10">
+                 <item row="1" column="0">
+                  <spacer name="horizontalSpacer_60">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Fixed</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>90</width>
+                     <height>11</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="2" column="2">
+                  <widget class="QLabel" name="label_6">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -24639,7 +24593,68 @@ border-radius: 5;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>140</width>
+                     <width>97</width>
+                     <height>16</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                   </property>
+                   <property name="text">
+                    <string>PowerTrim</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moves the inverted mode power switching this fraction of a second into the future to compensate for slow responding power systems.  Used to more accurately time the changing of power when entering/exiting inverted mode.  Set this to equal the fraction of a second it takes for your vehicle to go from full negative thrust (10% positive thrust for multis, full negative thrust (-90%) for CP helis) to full positive thrust (+90%).  Increase this if for example continuous left flips &amp;quot;walk off&amp;quot; to the left because power is changed too late.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="accelerated">
+                    <bool>true</bool>
+                   </property>
+                   <property name="decimals">
+                    <number>5</number>
+                   </property>
+                   <property name="maximum">
+                    <double>2.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.001000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.250000000000000</double>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlPowerDelayComp</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="4">
+                  <widget class="QLabel" name="label_12">
+                   <property name="minimumSize">
+                    <size>
+                     <width>120</width>
                      <height>16</height>
                     </size>
                    </property>
@@ -24662,21 +24677,58 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="0">
-                  <spacer name="horizontalSpacer_60">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
+                 <item row="3" column="2">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that quickly moving the stick around a lot makes the copter climb a bit, adjust this number down a little.  It will be a compromise between climbing a little with lots of stick motion and descending a little with minimal stick motion.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
-                   <property name="sizeType">
-                    <enum>QSizePolicy::Fixed</enum>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>90</width>
-                     <height>11</height>
-                    </size>
+                   <property name="accelerated">
+                    <bool>true</bool>
                    </property>
-                  </spacer>
+                   <property name="decimals">
+                    <number>2</number>
+                   </property>
+                   <property name="minimum">
+                    <double>50.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>200.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.250000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>100.000000000000000</double>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlPowerTrim</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="4">
+                  <widget class="QComboBox" name="comboBox_2">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The amount of power used when in inverted mode. Zero (min throttle stick for fixed pitch copters includding multicopters, neutral collective for CP), Normal (uses stick value), or Boosted (boosted according to bank angle). Beginning multicopter pilots should leave this set to Zero to automatically reduce throttle during flips.   Boosted power with Unreversed direction may be dangerous because it adds power and the thrust direction moves the aircraft towards the ground.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="objrelation" stdset="0">
+                    <stringlist>
+                     <string>objname:StabilizationSettings</string>
+                     <string>fieldname:CruiseControlInvertedPowerOutput</string>
+                     <string>haslimits:no</string>
+                     <string>scale:1</string>
+                     <string>buttongroup:16</string>
+                    </stringlist>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -26166,7 +26218,6 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
-
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>

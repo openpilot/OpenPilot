@@ -181,8 +181,9 @@ static void AutotuneTask(__attribute__((unused)) void *parameters)
             stabDesired.Pitch = manualControl.Pitch * stabSettings.PitchMax;
         }
 
-        stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
-        stabDesired.Yaw    = manualControl.Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
+        stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW]    = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
+        stabDesired.Yaw = manualControl.Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
+        stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_THRUST] = STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL;
         stabDesired.Thrust = manualControl.Thrust;
 
         switch (state) {

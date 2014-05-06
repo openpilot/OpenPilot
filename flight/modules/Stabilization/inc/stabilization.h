@@ -33,9 +33,51 @@
 #ifndef STABILIZATION_H
 #define STABILIZATION_H
 
-enum { ROLL, PITCH, YAW, MAX_AXES };
+#include <openpilot.h>
+#include <pid.h>
+#include <stabilizationsettings.h>
+#include <stabilizationbank.h>
+
 
 int32_t StabilizationInitialize();
+
+typedef struct {
+    StabilizationSettingsData settings;
+    StabilizationBankData     stabBank;
+    float gyro_alpha;
+    struct {
+        float min_thrust;
+        float max_thrust;
+        float thrust_difference;
+        float power_trim;
+        float half_power_delay;
+        float max_power_factor_angle;
+    } cruiseControl;
+    struct {
+        int8_t gyroupdates;
+        int8_t rateupdates;
+    }     monitor;
+    float rattitude_mode_transition_stick_position;
+    struct pid innerPids[3], outerPids[3];
+} StabilizationData;
+
+
+extern StabilizationData stabSettings;
+
+#define AXES                4
+#define FAILSAFE_TIMEOUT_MS 30
+
+#ifndef PIOS_STABILIZATION_STACK_SIZE
+#define STACK_SIZE_BYTES    800
+#else
+#define STACK_SIZE_BYTES    PIOS_STABILIZATION_STACK_SIZE
+#endif
+
+// must be same as eventdispatcher to avoid needing additional mutexes
+#define CBTASK_PRIORITY     CALLBACK_TASK_FLIGHTCONTROL
+
+// outer loop only executes every 4th uavobject update to safe CPU
+#define OUTERLOOP_SKIPCOUNT 4
 
 #endif // STABILIZATION_H
 

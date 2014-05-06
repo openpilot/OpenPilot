@@ -1,12 +1,14 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotSystem OpenPilot System
+ * @addtogroup OpenPilot Math Utilities
  * @{
- * @addtogroup OpenPilotCore OpenPilot Core
+ * @addtogroup Reuseable math functions
  * @{
- * @file       openpilot.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Main OpenPilot header.
+ *
+ * @file       mathmisc.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Reuseable math functions
+ *
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -26,26 +28,28 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OPENPILOT_H
-#define OPENPILOT_H
+#ifndef MATHMISC_H
+#define MATHMISC_H
 
-/* PIOS Includes */
-#include <pios.h>
+// returns min(boundary1,boundary2) if val<min(boundary1,boundary2)
+// returns max(boundary1,boundary2) if val>max(boundary1,boundary2)
+// returns val if min(boundary1,boundary2)<=val<=max(boundary1,boundary2)
+static inline float boundf(float val, float boundary1, float boundary2)
+{
+    if (boundary1 > boundary2) {
+        if (!(val >= boundary2)) {
+            return boundary2;
+        } else if (!(val <= boundary1)) {
+            return boundary1;
+        }
+    } else {
+        if (!(val >= boundary1)) {
+            return boundary1;
+        } else if (!(val <= boundary2)) {
+            return boundary2;
+        }
+    }
+    return val;
+}
 
-/* OpenPilot Libraries */
-#include <utlist.h>
-#include <uavobjectmanager.h>
-#include <eventdispatcher.h>
-#include <uavtalk.h>
-
-#include "alarms.h"
-#include <mathmisc.h>
-
-/* Global Functions */
-void OpenPilotInit(void);
-
-#endif /* OPENPILOT_H */
-/**
- * @}
- * @}
- */
+#endif /* MATHMISC_H */

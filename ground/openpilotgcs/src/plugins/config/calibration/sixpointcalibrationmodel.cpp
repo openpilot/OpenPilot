@@ -52,31 +52,31 @@ SixPointCalibrationModel::SixPointCalibrationModel(QObject *parent) :
     calibrationStepsMag.clear();
     calibrationStepsMag
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_NED,
-       tr("Place horizontally, nose pointing north and click save position..."))
+       tr("Place horizontally, nose pointing north and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
-       tr("Place with nose down, right side west and click save position..."))
+       tr("Place with nose down, right side west and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
-       tr("Place right side down, nose west and click save position..."))
+       tr("Place right side down, nose west and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
-       tr("Place upside down, nose east and click save position..."))
+       tr("Place upside down, nose east and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
-       tr("Place with nose up, left side north and click save position..."))
+       tr("Place with nose up, left side north and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
-       tr("Place with left side down, nose south and click save position..."));
+       tr("Place with left side down, nose south and click Save Position button..."));
 
     calibrationStepsAccelOnly.clear();
     calibrationStepsAccelOnly << CalibrationStep(CALIBRATION_HELPER_IMAGE_NED,
-       tr("Place horizontally and click save position..."))
+       tr("Place horizontally and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
-       tr("Place with nose down and click save position..."))
+       tr("Place with nose down and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
-       tr("Place right side down and click save position..."))
+       tr("Place right side down and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
-       tr("Place upside down and click save position..."))
+       tr("Place upside down and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
-       tr("Place with nose up and click save position..."))
+       tr("Place with nose up and click Save Position button..."))
     << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
-       tr("Place with left side down and click save position..."));
+       tr("Place with left side down and click Save Position button..."));
 }
 
 /********** Six point calibration **************/

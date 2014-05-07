@@ -81,6 +81,7 @@ int32_t StabilizationStart()
     SettingsUpdatedCb(StabilizationSettingsHandle());
     StabilizationDesiredUpdatedCb(StabilizationDesiredHandle());
     FlightModeSwitchUpdatedCb(ManualControlCommandHandle());
+    BankUpdatedCb(StabilizationBankHandle());
 
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_STABILIZATION);

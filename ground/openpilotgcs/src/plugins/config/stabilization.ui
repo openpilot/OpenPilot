@@ -7837,7 +7837,7 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>784</width>
+            <width>565</width>
             <height>733</height>
            </rect>
           </property>
@@ -16299,8 +16299,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>798</width>
-            <height>705</height>
+            <width>829</width>
+            <height>691</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -16734,7 +16734,7 @@ border-radius: 5;</string>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
-                        <height>16</height>
+                        <height>20</height>
                        </size>
                       </property>
                       <property name="palette">
@@ -17263,7 +17263,9 @@ border-radius: 5;</string>
                       <property name="styleSheet">
                        <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                       </property>
                       <property name="text">
                        <string>Roll</string>
@@ -17284,7 +17286,7 @@ border-radius: 5;</string>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
-                        <height>16</height>
+                        <height>20</height>
                        </size>
                       </property>
                       <property name="palette">
@@ -17813,7 +17815,9 @@ border-radius: 5;</string>
                       <property name="styleSheet">
                        <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                       </property>
                       <property name="text">
                        <string>Yaw</string>
@@ -18088,7 +18092,7 @@ border-radius: 5;</string>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
-                        <height>16</height>
+                        <height>20</height>
                        </size>
                       </property>
                       <property name="palette">
@@ -18617,7 +18621,9 @@ border-radius: 5;</string>
                       <property name="styleSheet">
                        <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                       </property>
                       <property name="text">
                        <string>Pitch</string>
@@ -18878,21 +18884,15 @@ border-radius: 5;</string>
                  <item row="0" column="1">
                   <widget class="QLabel" name="label_50">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>144</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>175</width>
-                     <height>16777215</height>
+                     <width>162</width>
+                     <height>20</height>
                     </size>
                    </property>
                    <property name="palette">
@@ -19421,7 +19421,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                    </property>
                    <property name="text">
                     <string>Weak Leveling Kp </string>
@@ -19434,21 +19436,15 @@ border-radius: 5;</string>
                  <item row="0" column="3">
                   <widget class="QLabel" name="label_49">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>144</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>175</width>
-                     <height>16777215</height>
+                     <width>179</width>
+                     <height>20</height>
                     </size>
                    </property>
                    <property name="palette">
@@ -19977,7 +19973,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                    </property>
                    <property name="text">
                     <string>Weak Leveling Rate </string>
@@ -19990,21 +19988,15 @@ border-radius: 5;</string>
                  <item row="0" column="5">
                   <widget class="QLabel" name="label_51">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>144</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>175</width>
-                     <height>16777215</height>
+                     <width>132</width>
+                     <height>20</height>
                     </size>
                    </property>
                    <property name="palette">
@@ -20533,7 +20525,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                    </property>
                    <property name="text">
                     <string>Max Axis Lock </string>
@@ -20546,21 +20540,15 @@ border-radius: 5;</string>
                  <item row="0" column="7">
                   <widget class="QLabel" name="label_52">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>144</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>175</width>
-                     <height>16777215</height>
+                     <width>176</width>
+                     <height>20</height>
                     </size>
                    </property>
                    <property name="palette">
@@ -21089,7 +21077,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                    </property>
                    <property name="text">
                     <string>Max Axis Lock Rate </string>
@@ -21125,7 +21115,7 @@ border-radius: 5;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>5</width>
+                     <width>25</width>
                      <height>22</height>
                     </size>
                    </property>
@@ -22039,7 +22029,7 @@ border-radius: 5;</string>
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>16</height>
+                     <height>20</height>
                     </size>
                    </property>
                    <property name="palette">
@@ -22568,7 +22558,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                    </property>
                    <property name="text">
                     <string>GyroTau</string>
@@ -22589,7 +22581,7 @@ border-radius: 5;</string>
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>16</height>
+                     <height>20</height>
                     </size>
                    </property>
                    <property name="palette">
@@ -23118,7 +23110,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                    </property>
                    <property name="text">
                     <string>AccelKp</string>
@@ -23204,7 +23198,7 @@ border-radius: 5;</string>
                    <property name="minimumSize">
                     <size>
                      <width>90</width>
-                     <height>16</height>
+                     <height>20</height>
                     </size>
                    </property>
                    <property name="palette">
@@ -23733,7 +23727,9 @@ border-radius: 5;</string>
                    <property name="styleSheet">
                     <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
-border-radius: 5;</string>
+border-radius: 5;
+margin:1px;
+font:bold;</string>
                    </property>
                    <property name="text">
                     <string>AccelKi</string>
@@ -23916,8 +23912,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>798</width>
-            <height>705</height>
+            <width>665</width>
+            <height>435</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -24822,8 +24818,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>798</width>
-            <height>705</height>
+            <width>478</width>
+            <height>518</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">

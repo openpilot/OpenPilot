@@ -116,8 +116,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>772</width>
-            <height>751</height>
+            <width>774</width>
+            <height>748</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -546,8 +546,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>772</width>
-            <height>751</height>
+            <width>774</width>
+            <height>748</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7" rowstretch="1,0,0,0">
@@ -660,8 +660,8 @@
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Thrust</string>
@@ -689,8 +689,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Yaw</string>
@@ -718,8 +718,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Pitch</string>
@@ -763,8 +763,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Roll</string>
@@ -1228,8 +1228,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>PID Bank</string>
@@ -1243,7 +1243,7 @@ margin:1px;</string>
                <widget class="QLabel" name="label_16">
                 <property name="minimumSize">
                  <size>
-                  <width>132</width>
+                  <width>138</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -1257,8 +1257,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Flight Mode Count</string>
@@ -1270,12 +1270,6 @@ margin:1px;</string>
               </item>
               <item row="1" column="10">
                <widget class="QSpinBox" name="fmsPosNum">
-                <property name="maximumSize">
-                 <size>
-                  <width>151</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
                 <property name="toolTip">
                  <string>Number of positions your FlightMode switch has.
 
@@ -1307,12 +1301,13 @@ channel value for each flight mode.</string>
                 </property>
                 <property name="font">
                  <font>
+                  <pointsize>10</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
                 <property name="text">
-                 <string>Avoid &quot;Manual&quot; for multirotors! Never select &quot;Altitude&quot;, &quot;VelocityControl&quot; or &quot;CruiseControl&quot; on a fixed wing!</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;ALtitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -1395,8 +1390,8 @@ channel value for each flight mode.</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Flight Mode</string>
@@ -2053,8 +2048,8 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>407</width>
-            <height>138</height>
+            <width>504</width>
+            <height>156</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

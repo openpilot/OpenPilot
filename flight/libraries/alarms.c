@@ -82,7 +82,7 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
     // Read alarm and update its severity only if it was changed
     SystemAlarmsAlarmGet(&alarms);
     uint16_t flightTime = (uint16_t)xTaskGetTickCount() * (uint16_t)portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
-    if ((flightTime - lastAlarmChange[alarm] > PIOS_ALARM_GRACETIME &&
+    if (((uint16_t)(flightTime - lastAlarmChange[alarm]) > PIOS_ALARM_GRACETIME &&
          cast_struct_to_array(alarms, alarms.Actuator)[alarm] != severity)
         || cast_struct_to_array(alarms, alarms.Actuator)[alarm] < severity) {
         cast_struct_to_array(alarms, alarms.Actuator)[alarm] = severity;
@@ -121,7 +121,7 @@ int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm,
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
     uint16_t flightTime = (uint16_t)xTaskGetTickCount() * (uint16_t)portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
-    if ((flightTime - lastAlarmChange[alarm] > PIOS_ALARM_GRACETIME &&
+    if (((uint16_t)(flightTime - lastAlarmChange[alarm]) > PIOS_ALARM_GRACETIME &&
          cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] != severity)
         || cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] < severity) {
         cast_struct_to_array(alarms.ExtendedAlarmStatus, alarms.ExtendedAlarmStatus.BootFault)[alarm]    = status;

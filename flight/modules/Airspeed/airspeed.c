@@ -160,7 +160,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         }
         if(airspeedSettings.AirspeedSensorType == AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE){
 			// no need to check so often until a sensor is enabled
-            AirspeedAlarm(SYSTEMALARMS_ALARM_DEFAULT);
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_DEFAULT);
 			vTaskDelay(5000/ portTICK_RATE_MS);
 			continue;
 		}

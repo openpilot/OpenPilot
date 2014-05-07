@@ -64,7 +64,10 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // Private constants
 
 #define GPS_TIMEOUT_MS           500
-
+// delay from detecting HomeLocation.Set == False before setting new homelocation
+// this prevent that a save with homelocation.Set = false triggered by gps ends saving
+// the new location with Set = true.
+#define HOMELOCATIONSETDELAY  5000
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
@@ -199,7 +202,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 {
     portTickType xDelay = 100 / portTICK_RATE_MS;
     uint32_t timeNowMs  = xTaskGetTickCount() * portTICK_RATE_MS;
-
+    portTickType homelocationSetDelay = 0;
     GPSPositionSensorData gpspositionsensor;
     GPSSettingsData gpsSettings;
 
@@ -260,7 +263,13 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                 HomeLocationGet(&home);
 
                 if (home.Set == HOMELOCATION_SET_FALSE) {
-                    setHomeLocation(&gpspositionsensor);
+                	if(homelocationSetDelay == 0){
+                		homelocationSetDelay = xTaskGetTickCount();
+                	}
+                	if(xTaskGetTickCount() - homelocationSetDelay > HOMELOCATIONSETDELAY){
+                		setHomeLocation(&gpspositionsensor);
+                		homelocationSetDelay = 0;
+                	}
                 }
 #endif
             } else if ((gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&

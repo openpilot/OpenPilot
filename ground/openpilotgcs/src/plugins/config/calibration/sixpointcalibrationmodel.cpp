@@ -47,36 +47,35 @@ SixPointCalibrationModel::SixPointCalibrationModel(QObject *parent) :
     calibratingMag(false),
     calibratingAccel(false),
     collectingData(false)
-
 {
     calibrationStepsMag.clear();
     calibrationStepsMag
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_NED,
-       tr("Place horizontally, nose pointing north and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
-       tr("Place with nose down, right side west and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
-       tr("Place right side down, nose west and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
-       tr("Place upside down, nose east and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
-       tr("Place with nose up, left side north and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
-       tr("Place with left side down, nose south and click Save Position button..."));
+        << CalibrationStep(CALIBRATION_HELPER_IMAGE_NED,
+                           tr("Place horizontally, nose pointing north and click Save Position button..."))
+        << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
+                       tr("Place with nose down, right side west and click Save Position button..."))
+        << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
+                       tr("Place right side down, nose west and click Save Position button..."))
+        << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
+                       tr("Place upside down, nose east and click Save Position button..."))
+        << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
+                       tr("Place with nose up, left side north and click Save Position button..."))
+        << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
+                       tr("Place with left side down, nose south and click Save Position button..."));
 
     calibrationStepsAccelOnly.clear();
     calibrationStepsAccelOnly << CalibrationStep(CALIBRATION_HELPER_IMAGE_NED,
-       tr("Place horizontally and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
-       tr("Place with nose down and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
-       tr("Place right side down and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
-       tr("Place upside down and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
-       tr("Place with nose up and click Save Position button..."))
-    << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
-       tr("Place with left side down and click Save Position button..."));
+                                                 tr("Place horizontally and click Save Position button..."))
+                              << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
+                       tr("Place with nose down and click Save Position button..."))
+                              << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
+                       tr("Place right side down and click Save Position button..."))
+                              << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
+                       tr("Place upside down and click Save Position button..."))
+                              << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
+                       tr("Place with nose up and click Save Position button..."))
+                              << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
+                       tr("Place with left side down and click Save Position button..."));
 }
 
 /********** Six point calibration **************/
@@ -103,7 +102,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     // Store and reset board rotation before calibration starts
     storeAndClearBoardRotation();
 
-    if(calibrateMag){
+    if (calibrateMag) {
         currentSteps = &calibrationStepsMag;
     } else {
         currentSteps = &calibrationStepsAccelOnly;

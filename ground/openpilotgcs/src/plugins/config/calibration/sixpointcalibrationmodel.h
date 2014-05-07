@@ -41,15 +41,15 @@ namespace OpenPilot {
 class SixPointCalibrationModel : public QObject {
     Q_OBJECT
 
-    class CalibrationStep{
-    public:
-        CalibrationStep(QString newVisualHelp, QString newInstructions){
-            visualHelp = newVisualHelp;
+    class CalibrationStep {
+public:
+        CalibrationStep(QString newVisualHelp, QString newInstructions)
+        {
+            visualHelp   = newVisualHelp;
             instructions = newInstructions;
         }
         QString visualHelp;
         QString instructions;
-
     };
 
     typedef struct {

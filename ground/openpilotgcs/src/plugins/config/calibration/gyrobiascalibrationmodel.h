@@ -61,7 +61,11 @@ private:
     QList<double> gyro_accum_x;
     QList<double> gyro_accum_y;
     QList<double> gyro_accum_z;
+    QList<double> gyro_state_accum_x;
+    QList<double> gyro_state_accum_y;
+    QList<double> gyro_state_accum_z;
     UAVObject::Metadata initialGyroStateMdata;
+    UAVObject::Metadata initialGyroSensorMdata;
     UAVObjectManager *getObjectManager();
 };
 }

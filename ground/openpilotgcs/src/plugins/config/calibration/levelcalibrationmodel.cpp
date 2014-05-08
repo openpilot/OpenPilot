@@ -62,7 +62,7 @@ void LevelCalibrationModel::start()
     attitudeState->setMetadata(mdata);
 
     /* Show instructions and enable controls */
-    displayInstructions(tr("Place horizontally and click save position..."), true);
+    displayInstructions(tr("Place horizontally and click Save Position button..."), true);
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
     disableAllCalibrations();
     savePositionEnabledChanged(true);
@@ -130,7 +130,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             rot_data_pitch = OpenPilot::CalibrationUtils::listMean(rot_accum_pitch);
             rot_data_roll  = OpenPilot::CalibrationUtils::listMean(rot_accum_roll);
 
-            displayInstructions(tr("Leave horizontally, rotate 180° along yaw axis and click save position..."), false);
+            displayInstructions(tr("Leave horizontally, rotate 180° along yaw axis and click Save Position button..."), false);
             displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_SWD);
 
             disableAllCalibrations();

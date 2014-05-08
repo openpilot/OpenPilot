@@ -29,79 +29,111 @@
 #define UPLOADERGADGETWIDGET_H
 
 #include "ui_uploader.h"
-#include "delay.h"
-#include "devicewidget.h"
-#include "runningdevicewidget.h"
-#include "op_dfu.h"
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
-
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-
-#include "coreplugin/icore.h"
-#include "coreplugin/connectionmanager.h"
-
-#include "ophid/inc/ophid_plugin.h"
-#include <QWidget>
-#include <QLabel>
-#include <QLineEdit>
-#include <QThread>
-#include <QMessageBox>
-#include <QTimer>
-#include "devicedescriptorstruct.h"
-#include <QProgressDialog>
-#include <QErrorMessage>
-#include <QDesktopServices>
 #include "uploader_global.h"
+
 #include "enums.h"
+#include "op_dfu.h"
+
+#include <QProgressDialog>
+
 using namespace OP_DFU;
 using namespace uploader;
 
 class FlightStatus;
+class UAVObject;
+
+class TimedDialog : public QProgressDialog {
+    Q_OBJECT
+
+public:
+    TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+
+private slots:
+    void perform();
+
+private:
+    QProgressBar *bar;
+};
+
+// A helper class to wait for board connection and disconnection events
+// until a the desired number of connected boards is found
+// or until a timeout is reached
+class ConnectionWaiter : public QObject {
+    Q_OBJECT
+
+public:
+    ConnectionWaiter(int targetDeviceCount, int timeout, QWidget *parent = 0);
+
+    enum ResultCode { Ok, Canceled, TimedOut };
+
+public slots:
+    int exec();
+    void cancel();
+    void quit();
+
+    static int openDialog(const QString &title, const QString &labelText, int targetDeviceCount, int timeout, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+
+signals:
+    void timeChanged(int elapsed);
+
+private slots:
+    void perform();
+    void deviceEvent();
+
+private:
+    QEventLoop eventLoop;
+    QTimer timer;
+    // timeout in ms
+    int timeout;
+    // elapsed time in seconds
+    int elapsed;
+    int targetDeviceCount;
+    int result;
+};
 
 class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget {
     Q_OBJECT
 
-
 public:
     UploaderGadgetWidget(QWidget *parent = 0);
     ~UploaderGadgetWidget();
+
+    static const int BOARD_EVENT_TIMEOUT;
+    static const int AUTOUPDATE_CLOSE_TIMEOUT;
+
     void log(QString str);
     bool autoUpdateCapable();
+
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
     void populate();
     void openHelp();
     bool autoUpdate();
-    void autoUpdateProgress(int);
+    void autoUpdateDisconnectProgress(int);
+    void autoUpdateConnectProgress(int);
+    void autoUpdateFlashProgress(int);
+
 signals:
     void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
+
 private:
     Ui_UploaderWidget *m_config;
     DFUObject *dfu;
     IAPStep currentStep;
     bool resetOnly;
+
     void clearLog();
     QString getPortDevice(const QString &friendName);
-    QProgressDialog *m_progress;
-    QTimer *m_timer;
-    QLineEdit *openFileNameLE;
-    QEventLoop m_eventloop;
-    QErrorMessage *msg;
     void connectSignalSlot(QWidget *widget);
-    int autoUpdateConnectTimeout;
     FlightStatus *getFlightStatus();
     void bootButtonsSetEnable(bool enabled);
-    static const int AUTOUPDATE_CLOSE_TIMEOUT;
-    QTimer autoUpdateCloseTimer;
+    int confirmEraseSettingsMessageBox();
+    int cannotHaltMessageBox();
+    int cannotResetMessageBox();
+
 private slots:
-    void onPhisicalHWConnect();
-    void versionMatchCheck();
-    void error(QString errorString, int errorNumber);
-    void info(QString infoString, int infoNumber);
+    void onPhysicalHWConnect();
     void goToBootloader(UAVObject * = NULL, bool = false);
     void systemHalt();
     void systemReset();
@@ -111,9 +143,6 @@ private slots:
     void commonSystemBoot(bool safeboot = false, bool erase = false);
     void systemRescue();
     void getSerialPorts();
-    void perform();
-    void performAuto();
-    void cancel();
     void uploadStarted();
     void uploadEnded(bool succeed);
     void downloadStarted();

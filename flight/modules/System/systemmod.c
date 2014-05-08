@@ -633,7 +633,7 @@ static void updateSystemAlarms()
     UAVObjClearStats();
     EventClearStats();
     if (objStats.eventCallbackErrors > 0 || objStats.eventQueueErrors > 0 || evStats.eventErrors > 0) {
-        AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_WARNING);
+        AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_ERROR);
     } else {
         AlarmsClear(SYSTEMALARMS_ALARM_EVENTSYSTEM);
     }

@@ -42,13 +42,16 @@ float CalibrationUtils::ComputeSigma(Eigen::VectorXf *samplesY)
  * The following ellipsoid calibration code is based on RazorImu calibration samples that can be found here:
  * https://github.com/ptrbrtz/razor-9dof-ahrs/tree/master/Matlab/magnetometer_calibration
  */
-bool CalibrationUtils::EllipsoidCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ, float nominalRange, EllipsoidCalibrationResult *result)
+bool CalibrationUtils::EllipsoidCalibration(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
+                                            float nominalRange,
+                                            EllipsoidCalibrationResult *result,
+                                            bool fitAlongXYZ)
 {
     Eigen::VectorXf radii;
     Eigen::Vector3f center;
     Eigen::MatrixXf evecs;
 
-    EllipsoidFit(samplesX, samplesY, samplesZ, &center, &radii, &evecs);
+    EllipsoidFit(samplesX, samplesY, samplesZ, &center, &radii, &evecs, fitAlongXYZ);
 
     result->Scale.setZero();
 
@@ -280,26 +283,36 @@ void CalibrationUtils::ComputePoly(VectorXf *samplesX, Eigen::VectorXf *polynomi
 
  */
 
-
 void CalibrationUtils::EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *samplesY, Eigen::VectorXf *samplesZ,
                                     Eigen::Vector3f *center,
                                     Eigen::VectorXf *radii,
-                                    Eigen::MatrixXf *evecs)
+                                    Eigen::MatrixXf *evecs,
+                                    bool fitAlongXYZ)
 {
     int numSamples = (*samplesX).rows();
-    Eigen::MatrixXf D(numSamples, 9);
+    Eigen::MatrixXf D;
 
-    D.setZero();
-    D.col(0) = (*samplesX).cwiseProduct(*samplesX);
-    D.col(1) = (*samplesY).cwiseProduct(*samplesY);
-    D.col(2) = (*samplesZ).cwiseProduct(*samplesZ);
-    D.col(3) = (*samplesX).cwiseProduct(*samplesY) * 2;
-    D.col(4) = (*samplesX).cwiseProduct(*samplesZ) * 2;
-    D.col(5) = (*samplesY).cwiseProduct(*samplesZ) * 2;
-    D.col(6) = 2 * (*samplesX);
-    D.col(7) = 2 * (*samplesY);
-    D.col(8) = 2 * (*samplesZ);
-
+    if (!fitAlongXYZ) {
+        D.setZero(numSamples, 9);
+        D.col(0) = (*samplesX).cwiseProduct(*samplesX);
+        D.col(1) = (*samplesY).cwiseProduct(*samplesY);
+        D.col(2) = (*samplesZ).cwiseProduct(*samplesZ);
+        D.col(3) = (*samplesX).cwiseProduct(*samplesY) * 2;
+        D.col(4) = (*samplesX).cwiseProduct(*samplesZ) * 2;
+        D.col(5) = (*samplesY).cwiseProduct(*samplesZ) * 2;
+        D.col(6) = 2 * (*samplesX);
+        D.col(7) = 2 * (*samplesY);
+        D.col(8) = 2 * (*samplesZ);
+    } else {
+        D.setZero(numSamples, 6);
+        D.setZero();
+        D.col(0) = (*samplesX).cwiseProduct(*samplesX);
+        D.col(1) = (*samplesY).cwiseProduct(*samplesY);
+        D.col(2) = (*samplesZ).cwiseProduct(*samplesZ);
+        D.col(3) = 2 * (*samplesX);
+        D.col(4) = 2 * (*samplesY);
+        D.col(5) = 2 * (*samplesZ);
+    }
     Eigen::VectorXf ones(numSamples);
     ones.setOnes(numSamples);
 
@@ -307,25 +320,163 @@ void CalibrationUtils::EllipsoidFit(Eigen::VectorXf *samplesX, Eigen::VectorXf *
     Eigen::MatrixXf dt2 = (D.transpose() * ones);
     Eigen::VectorXf v   = dt1.inverse() * dt2;
 
-    Eigen::Matrix4f A;
-    A << v.coeff(0), v.coeff(3), v.coeff(4), v.coeff(6),
-        v.coeff(3), v.coeff(1), v.coeff(5), v.coeff(7),
-        v.coeff(4), v.coeff(5), v.coeff(2), v.coeff(8),
-        v.coeff(6), v.coeff(7), v.coeff(8), -1;
+    if (!fitAlongXYZ) {
+        Eigen::Matrix4f A;
+        A << v.coeff(0), v.coeff(3), v.coeff(4), v.coeff(6),
+            v.coeff(3), v.coeff(1), v.coeff(5), v.coeff(7),
+            v.coeff(4), v.coeff(5), v.coeff(2), v.coeff(8),
+            v.coeff(6), v.coeff(7), v.coeff(8), -1;
 
-    (*center) = -1 * A.block(0, 0, 3, 3).inverse() * v.segment(6, 3);
+        (*center) = -1 * A.block(0, 0, 3, 3).inverse() * v.segment(6, 3);
 
-    Eigen::Matrix4f t     = Eigen::Matrix4f::Identity();
-    t.block(3, 0, 1, 3) = center->transpose();
+        Eigen::Matrix4f t     = Eigen::Matrix4f::Identity();
+        t.block(3, 0, 1, 3) = center->transpose();
 
-    Eigen::Matrix4f r     = t * A * t.transpose();
+        Eigen::Matrix4f r     = t * A * t.transpose();
 
-    Eigen::Matrix3f tmp2  = r.block(0, 0, 3, 3) * -1 / r.coeff(3, 3);
-    Eigen::EigenSolver<Eigen::Matrix3f> es(tmp2);
-    Eigen::VectorXf evals = es.eigenvalues().real();
-    (*evecs) = es.eigenvectors().real();
-    radii->setZero(3);
+        Eigen::Matrix3f tmp2  = r.block(0, 0, 3, 3) * -1 / r.coeff(3, 3);
+        Eigen::EigenSolver<Eigen::Matrix3f> es(tmp2);
+        Eigen::VectorXf evals = es.eigenvalues().real();
 
-    (*radii) = (evals.segment(0, 3)).cwiseInverse().cwiseSqrt();
+        (*evecs) = es.eigenvectors().real();
+        radii->setZero(3);
+        (*radii) = (evals.segment(0, 3)).cwiseInverse().cwiseSqrt();
+    } else {
+        Eigen::VectorXf v1(9);
+
+        v1 << v.coeff(0), v.coeff(1), v.coeff(2), 0.0f, 0.0f, 0.0f, v.coeff(3), v.coeff(4), v.coeff(5);
+        (*center) = (-1) * v1.segment(6, 3).cwiseProduct(v1.segment(0, 3).cwiseInverse());
+
+        float gam = 1 + (v1.coeff(6) * v1.coeff(6) / v1.coeff(0) +
+                         v1.coeff(7) * v1.coeff(7) / v1.coeff(1) +
+                         v1.coeff(8) * v1.coeff(8) / v1.coeff(2));
+        radii->setZero(3);
+        (*radii) = (v1.segment(0, 3).cwiseInverse() * gam).cwiseSqrt();
+        evecs->setIdentity(3, 3);
+    }
+}
+
+int CalibrationUtils::SixPointInConstFieldCal(double ConstMag, double x[6], double y[6], double z[6], double S[3], double b[3])
+{
+    int i;
+    double A[5][5];
+    double f[5], c[5];
+    double xp, yp, zp, Sx;
+
+    // Fill in matrix A -
+    // write six difference-in-magnitude equations of the form
+    // Sx^2(x2^2-x1^2) + 2*Sx*bx*(x2-x1) + Sy^2(y2^2-y1^2) + 2*Sy*by*(y2-y1) + Sz^2(z2^2-z1^2) + 2*Sz*bz*(z2-z1) = 0
+    // or in other words
+    // 2*Sx*bx*(x2-x1)/Sx^2  + Sy^2(y2^2-y1^2)/Sx^2  + 2*Sy*by*(y2-y1)/Sx^2  + Sz^2(z2^2-z1^2)/Sx^2  + 2*Sz*bz*(z2-z1)/Sx^2  = (x1^2-x2^2)
+    for (i = 0; i < 5; i++) {
+        A[i][0] = 2.0 * (x[i + 1] - x[i]);
+        A[i][1] = y[i + 1] * y[i + 1] - y[i] * y[i];
+        A[i][2] = 2.0 * (y[i + 1] - y[i]);
+        A[i][3] = z[i + 1] * z[i + 1] - z[i] * z[i];
+        A[i][4] = 2.0 * (z[i + 1] - z[i]);
+        f[i]    = x[i] * x[i] - x[i + 1] * x[i + 1];
+    }
+
+    // solve for c0=bx/Sx, c1=Sy^2/Sx^2; c2=Sy*by/Sx^2, c3=Sz^2/Sx^2, c4=Sz*bz/Sx^2
+    if (!LinearEquationsSolve(5, (double *)A, f, c)) {
+        return 0;
+    }
+
+    // use one magnitude equation and c's to find Sx - doesn't matter which - all give the same answer
+    xp   = x[0]; yp = y[0]; zp = z[0];
+    Sx   = sqrt(ConstMag * ConstMag / (xp * xp + 2 * c[0] * xp + c[0] * c[0] + c[1] * yp * yp + 2 * c[2] * yp + c[2] * c[2] / c[1] + c[3] * zp * zp + 2 * c[4] * zp + c[4] * c[4] / c[3]));
+
+    S[0] = Sx;
+    b[0] = Sx * c[0];
+    S[1] = sqrt(c[1] * Sx * Sx);
+    b[1] = c[2] * Sx * Sx / S[1];
+    S[2] = sqrt(c[3] * Sx * Sx);
+    b[2] = c[4] * Sx * Sx / S[2];
+
+    return 1;
+}
+
+
+int CalibrationUtils::LinearEquationsSolve(int nDim, double *pfMatr, double *pfVect, double *pfSolution)
+{
+    double fMaxElem;
+    double fAcc;
+
+    int i, j, k, m;
+
+    for (k = 0; k < (nDim - 1); k++) { // base row of matrix
+        // search of line with max element
+        fMaxElem = fabs(pfMatr[k * nDim + k]);
+        m = k;
+        for (i = k + 1; i < nDim; i++) {
+            if (fMaxElem < fabs(pfMatr[i * nDim + k])) {
+                fMaxElem = pfMatr[i * nDim + k];
+                m = i;
+            }
+        }
+
+        // permutation of base line (index k) and max element line(index m)
+        if (m != k) {
+            for (i = k; i < nDim; i++) {
+                fAcc = pfMatr[k * nDim + i];
+                pfMatr[k * nDim + i] = pfMatr[m * nDim + i];
+                pfMatr[m * nDim + i] = fAcc;
+            }
+            fAcc = pfVect[k];
+            pfVect[k] = pfVect[m];
+            pfVect[m] = fAcc;
+        }
+
+        if (pfMatr[k * nDim + k] == 0.) {
+            return 0; // needs improvement !!!
+        }
+        // triangulation of matrix with coefficients
+        for (j = (k + 1); j < nDim; j++) { // current row of matrix
+            fAcc = -pfMatr[j * nDim + k] / pfMatr[k * nDim + k];
+            for (i = k; i < nDim; i++) {
+                pfMatr[j * nDim + i] = pfMatr[j * nDim + i] + fAcc * pfMatr[k * nDim + i];
+            }
+            pfVect[j] = pfVect[j] + fAcc * pfVect[k]; // free member recalculation
+        }
+    }
+
+    for (k = (nDim - 1); k >= 0; k--) {
+        pfSolution[k] = pfVect[k];
+        for (i = (k + 1); i < nDim; i++) {
+            pfSolution[k] -= (pfMatr[k * nDim + i] * pfSolution[i]);
+        }
+        pfSolution[k] = pfSolution[k] / pfMatr[k * nDim + k];
+    }
+
+    return 1;
+}
+
+double CalibrationUtils::listMean(QList<double> list)
+{
+    double accum = 0;
+
+    for (int i = 0; i < list.size(); i++) {
+        accum += list[i];
+    }
+    return accum / list.size();
+}
+
+double CalibrationUtils::listVar(QList<double> list)
+{
+    double mean_accum = 0;
+    double var_accum  = 0;
+    double mean;
+
+    for (int i = 0; i < list.size(); i++) {
+        mean_accum += list[i];
+    }
+    mean = mean_accum / list.size();
+
+    for (int i = 0; i < list.size(); i++) {
+        var_accum += (list[i] - mean) * (list[i] - mean);
+    }
+
+    // Use unbiased estimator
+    return var_accum / (list.size() - 1);
 }
 }

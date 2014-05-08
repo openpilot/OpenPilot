@@ -157,13 +157,11 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         if (airspeedSettings.AirspeedSensorType != lastAirspeedSensorType) {
             AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_DEFAULT);
             lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
+            if (airspeedSettings.AirspeedSensorType == AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE) {
+                airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+                AirspeedSensorSet(&airspeedData);
+            }
         }
-        if(airspeedSettings.AirspeedSensorType == AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE){
-			// no need to check so often until a sensor is enabled
-            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_DEFAULT);
-			vTaskDelay(5000/ portTICK_RATE_MS);
-			continue;
-		}
         switch (airspeedSettings.AirspeedSensorType) {
 #if defined(PIOS_INCLUDE_MPXV)
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV7002:
@@ -185,13 +183,17 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
             break;
 #endif
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
-        	if(!gpsAirspeedInitialized){
-        		gpsAirspeedInitialized = true;
-        		gps_airspeedInitialize();
-        	}
+            if (!gpsAirspeedInitialized) {
+                gpsAirspeedInitialized = true;
+                gps_airspeedInitialize();
+            }
             gps_airspeedGet(&airspeedData, &airspeedSettings);
             break;
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:
+            // no need to check so often until a sensor is enabled
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_DEFAULT);
+            vTaskDelay(2000 / portTICK_RATE_MS);
+            continue;
         default:
             airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
             break;

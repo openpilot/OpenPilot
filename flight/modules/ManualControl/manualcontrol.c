@@ -57,7 +57,7 @@
 
 // defined handlers
 
-static controlHandler handler_MANUAL = {
+static const controlHandler handler_MANUAL = {
     .controlChain      = {
         .Stabilization = false,
         .PathFollower  = false,
@@ -65,7 +65,7 @@ static controlHandler handler_MANUAL = {
     },
     .handler           = &manualHandler,
 };
-static controlHandler handler_STABILIZED = {
+static const controlHandler handler_STABILIZED = {
     .controlChain      = {
         .Stabilization = true,
         .PathFollower  = false,
@@ -74,16 +74,8 @@ static controlHandler handler_STABILIZED = {
     .handler           = &stabilizedHandler,
 };
 
-// TODO: move the altitude handling into stabi
-static controlHandler handler_ALTITUDE = {
-    .controlChain      = {
-        .Stabilization = true,
-        .PathFollower  = false,
-        .PathPlanner   = false,
-    },
-    .handler           = &altitudeHandler,
-};
-static controlHandler handler_AUTOTUNE = {
+
+static const controlHandler handler_AUTOTUNE = {
     .controlChain      = {
         .Stabilization = false,
         .PathFollower  = false,
@@ -92,7 +84,8 @@ static controlHandler handler_AUTOTUNE = {
     .handler           = NULL,
 };
 
-static controlHandler handler_PATHFOLLOWER = {
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+static const controlHandler handler_PATHFOLLOWER = {
     .controlChain      = {
         .Stabilization = true,
         .PathFollower  = true,
@@ -101,7 +94,7 @@ static controlHandler handler_PATHFOLLOWER = {
     .handler           = &pathFollowerHandler,
 };
 
-static controlHandler handler_PATHPLANNER = {
+static const controlHandler handler_PATHPLANNER = {
     .controlChain      = {
         .Stabilization = true,
         .PathFollower  = true,
@@ -110,7 +103,7 @@ static controlHandler handler_PATHPLANNER = {
     .handler           = &pathPlannerHandler,
 };
 
-
+#endif /* ifndef PIOS_EXCLUDE_ADVANCED_FEATURES */
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
 
@@ -120,7 +113,7 @@ static void commandUpdatedCb(UAVObjEvent *ev);
 
 static void manualControlTask(void);
 
-#define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions_flightmode)
+#define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions_flightmode)
 
 /**
  * Module starting
@@ -192,7 +185,7 @@ static void manualControlTask(void)
     }
 
     // Depending on the mode update the Stabilization or Actuator objects
-    controlHandler *handler = &handler_MANUAL;
+    const controlHandler *handler = &handler_MANUAL;
     switch (newMode) {
     case FLIGHTSTATUS_FLIGHTMODE_MANUAL:
         handler = &handler_MANUAL;
@@ -200,9 +193,12 @@ static void manualControlTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
         handler = &handler_STABILIZED;
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL:
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
@@ -212,10 +208,7 @@ static void manualControlTask(void)
     case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
         handler = &handler_PATHPLANNER;
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
-    case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO:
-        handler = &handler_ALTITUDE;
-        break;
+#endif
     case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:
         handler = &handler_AUTOTUNE;
         break;

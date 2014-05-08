@@ -40,15 +40,29 @@
 #include "taskinfo.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE         TELEM_QUEUE_SIZE
-#define STACK_SIZE_BYTES       PIOS_TELEM_STACK_SIZE
-#define TASK_PRIORITY_RX       (tskIDLE_PRIORITY + 2)
-#define TASK_PRIORITY_TX       (tskIDLE_PRIORITY + 2)
-#define TASK_PRIORITY_RADRX    (tskIDLE_PRIORITY + 2)
-#define REQ_TIMEOUT_MS         250
-#define MAX_RETRIES            2
-#define STATS_UPDATE_PERIOD_MS 4000
-#define CONNECTION_TIMEOUT_MS  8000
+#define MAX_QUEUE_SIZE            TELEM_QUEUE_SIZE
+// Three different stack size parameter are accepted for Telemetry(RX PIOS_TELEM_RX_STACK_SIZE)
+// Tx(PIOS_TELEM_TX_STACK_SIZE) and Radio RX(PIOS_TELEM_RADIO_RX_STACK_SIZE)
+#ifdef PIOS_TELEM_RX_STACK_SIZE
+#define STACK_SIZE_RX_BYTES       PIOS_TELEM_RX_STACK_SIZE
+#define STACK_SIZE_TX_BYTES       PIOS_TELEM_TX_STACK_SIZE
+#else
+#define STACK_SIZE_RX_BYTES       PIOS_TELEM_STACK_SIZE
+#define STACK_SIZE_TX_BYTES       PIOS_TELEM_STACK_SIZE
+#endif
+
+#ifdef PIOS_TELEM_RADIO_RX_STACK_SIZE
+#define STACK_SIZE_RADIO_RX_BYTES PIOS_TELEM_RADIO_RX_STACK_SIZE
+#else
+#define STACK_SIZE_RADIO_RX_BYTES STACK_SIZE_RX_BYTES
+#endif
+#define TASK_PRIORITY_RX          (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY_TX          (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY_RADRX       (tskIDLE_PRIORITY + 2)
+#define REQ_TIMEOUT_MS            250
+#define MAX_RETRIES               2
+#define STATS_UPDATE_PERIOD_MS    4000
+#define CONNECTION_TIMEOUT_MS     8000
 
 // Private types
 
@@ -110,13 +124,13 @@ int32_t TelemetryStart(void)
     GCSTelemetryStatsConnectQueue(priorityQueue);
 
     // Start telemetry tasks
-    xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
+    xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_TX_BYTES / 4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
-    xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
+    xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_RX_BYTES / 4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
 
 #ifdef PIOS_INCLUDE_RFM22B
-    xTaskCreate(radioRxTask, (signed char *)"RadioRx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
+    xTaskCreate(radioRxTask, (signed char *)"RadioRx", STACK_SIZE_RADIO_RX_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIORX, radioRxTaskHandle);
 #endif
 
@@ -391,7 +405,6 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
         if (xQueueReceive(queue, &ev, 0) == pdTRUE) {
             // Process event
             processObjEvent(&ev);
-
             // if both queues are empty, wait on priority queue for updates (1 tick) then repeat cycle
         } else if (xQueueReceive(priorityQueue, &ev, 1) == pdTRUE) {
             // Process event
@@ -458,8 +471,6 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
         }
     }
 }
-
-
 /**
  * Transmit data buffer to the radioport.
  * \param[in] data Data buffer to send

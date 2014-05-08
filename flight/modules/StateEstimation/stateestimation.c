@@ -139,12 +139,13 @@ static DelayedCallbackInfo *stateEstimationCallback;
 
 static volatile RevoSettingsData revoSettings;
 static volatile sensorUpdates updatedSensors;
-static volatile int32_t fusionAlgorithm = -1;
-static filterPipeline *filterChain = NULL;
+static volatile int32_t fusionAlgorithm  = -1;
+static const filterPipeline *filterChain = NULL;
 
 // different filters available to state estimation
 static stateFilter magFilter;
 static stateFilter baroFilter;
+static stateFilter baroiFilter;
 static stateFilter altitudeFilter;
 static stateFilter airFilter;
 static stateFilter stationaryFilter;
@@ -154,21 +155,38 @@ static stateFilter cfmFilter;
 static stateFilter ekf13iFilter;
 static stateFilter ekf13Filter;
 
+// this is a hack to provide a computational shortcut for faster gyro state progression
+static float gyroRaw[3];
+static float gyroDelta[3];
+
 // preconfigured filter chains selectable via revoSettings.FusionAlgorithm
-static filterPipeline *cfQueue = &(filterPipeline) {
+static const filterPipeline *cfQueue = &(filterPipeline) {
     .filter = &magFilter,
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &llaFilter,
+            .filter = &baroiFilter,
             .next   = &(filterPipeline) {
-                .filter = &baroFilter,
+                .filter = &altitudeFilter,
                 .next   = &(filterPipeline) {
-                    .filter = &altitudeFilter,
-                    .next   = &(filterPipeline) {
-                        .filter = &cfFilter,
-                        .next   = NULL,
-                    }
+                    .filter = &cfFilter,
+                    .next   = NULL,
+                }
+            }
+        }
+    }
+};
+static const filterPipeline *cfmiQueue = &(filterPipeline) {
+    .filter = &magFilter,
+    .next   = &(filterPipeline) {
+        .filter = &airFilter,
+        .next   = &(filterPipeline) {
+            .filter = &baroiFilter,
+            .next   = &(filterPipeline) {
+                .filter = &altitudeFilter,
+                .next   = &(filterPipeline) {
+                    .filter = &cfmFilter,
+                    .next   = NULL,
                 }
             }
         }
@@ -198,15 +216,12 @@ static const filterPipeline *ekf13iQueue = &(filterPipeline) {
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &llaFilter,
+            .filter = &baroiFilter,
             .next   = &(filterPipeline) {
-                .filter = &baroFilter,
+                .filter = &stationaryFilter,
                 .next   = &(filterPipeline) {
-                    .filter = &stationaryFilter,
-                    .next   = &(filterPipeline) {
-                        .filter = &ekf13iFilter,
-                        .next   = NULL,
-                    }
+                    .filter = &ekf13iFilter,
+                    .next   = NULL,
                 }
             }
         }
@@ -283,6 +298,7 @@ int32_t StateEstimationInitialize(void)
     uint32_t stack_required = STACK_SIZE_BYTES;
     // Initialize Filters
     stack_required = maxint32_t(stack_required, filterMagInitialize(&magFilter));
+    stack_required = maxint32_t(stack_required, filterBaroiInitialize(&baroiFilter));
     stack_required = maxint32_t(stack_required, filterBaroInitialize(&baroFilter));
     stack_required = maxint32_t(stack_required, filterAltitudeInitialize(&altitudeFilter));
     stack_required = maxint32_t(stack_required, filterAirInitialize(&airFilter));
@@ -324,7 +340,7 @@ static void StateEstimationCb(void)
     static int8_t alarm     = 0;
     static int8_t lastAlarm = -1;
     static uint16_t alarmcounter = 0;
-    static filterPipeline *current;
+    static const filterPipeline *current;
     static stateEstimation states;
     static uint32_t last_time;
     static uint16_t bootDelay = 64;
@@ -361,19 +377,22 @@ static void StateEstimationCb(void)
                     newFilterChain = cfQueue;
                     break;
                 case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAG:
+                    newFilterChain = cfmiQueue;
+                    break;
+                case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAGGPSOUTDOOR:
                     newFilterChain = cfmQueue;
                     break;
                 case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
                     newFilterChain = ekf13iQueue;
                     break;
-                case REVOSETTINGS_FUSIONALGORITHM_INS13OUTDOOR:
+                case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
                     newFilterChain = ekf13Queue;
                     break;
                 default:
                     newFilterChain = NULL;
                 }
                 // initialize filters in chain
-                current = (filterPipeline *)newFilterChain;
+                current = newFilterChain;
                 bool error = 0;
                 while (current != NULL) {
                     int32_t result = current->filter->init((stateFilter *)current->filter);
@@ -388,7 +407,7 @@ static void StateEstimationCb(void)
                     return;
                 } else {
                     // set new fusion algortithm
-                    filterChain     = (filterPipeline *)newFilterChain;
+                    filterChain     = newFilterChain;
                     fusionAlgorithm = revoSettings.FusionAlgorithm;
                 }
             }
@@ -400,6 +419,11 @@ static void StateEstimationCb(void)
 
         // fetch sensors, check values, and load into state struct
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GyroSensor, gyro, x, y, z);
+        if (IS_SET(states.updated, SENSORUPDATES_gyro)) {
+            gyroRaw[0] = states.gyro[0];
+            gyroRaw[1] = states.gyro[1];
+            gyroRaw[2] = states.gyro[2];
+        }
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AccelSensor, accel, x, y, z);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(MagSensor, mag, x, y, z);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GPSVelocitySensor, vel, North, East, Down);
@@ -411,7 +435,7 @@ static void StateEstimationCb(void)
         // at this point sensor state is stored in "states" with some rudimentary filtering applied
 
         // apply all filters in the current filter chain
-        current  = (filterPipeline *)filterChain;
+        current  = filterChain;
 
         // we are not done, re-dispatch self execution
         runState = RUNSTATE_FILTER;
@@ -438,7 +462,12 @@ static void StateEstimationCb(void)
     case RUNSTATE_SAVE:
 
         // the final output of filters is saved in state variables
-        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(GyroState, gyro, x, y, z);
+        // EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(GyroState, gyro, x, y, z) // replaced by performance shortcut
+        if (IS_SET(states.updated, SENSORUPDATES_gyro)) {
+            gyroDelta[0] = states.gyro[0] - gyroRaw[0];
+            gyroDelta[1] = states.gyro[1] - gyroRaw[1];
+            gyroDelta[2] = states.gyro[2] - gyroRaw[2];
+        }
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(AccelState, accel, x, y, z);
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(MagState, mag, x, y, z);
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(PositionState, pos, North, East, Down);
@@ -525,6 +554,14 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
 
     if (ev->obj == GyroSensorHandle()) {
         updatedSensors |= SENSORUPDATES_gyro;
+        // shortcut - update GyroState right away
+        GyroSensorData s;
+        GyroStateData t;
+        GyroSensorGet(&s);
+        t.x = s.x + gyroDelta[0];
+        t.y = s.y + gyroDelta[1];
+        t.z = s.z + gyroDelta[2];
+        GyroStateSet(&t);
     }
 
     if (ev->obj == AccelSensorHandle()) {

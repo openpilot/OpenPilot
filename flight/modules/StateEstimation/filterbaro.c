@@ -36,7 +36,7 @@
 
 // Private constants
 
-#define STACK_REQUIRED 64
+#define STACK_REQUIRED 128
 #define INIT_CYCLES    100
 
 // Private types
@@ -44,30 +44,59 @@ struct data {
     float   baroOffset;
     float   baroGPSOffsetCorrectionAlpha;
     float   baroAlt;
+    float   gpsAlt;
     int16_t first_run;
+    bool    useGPS;
 };
 
 // Private variables
 
 // Private functions
 
-static int32_t init(stateFilter *self);
+static int32_t initwithgps(stateFilter *self);
+static int32_t initwithoutgps(stateFilter *self);
+static int32_t maininit(stateFilter *self);
 static int32_t filter(stateFilter *self, stateEstimation *state);
 
 
 int32_t filterBaroInitialize(stateFilter *handle)
 {
-    handle->init      = &init;
+    handle->init      = &initwithgps;
     handle->filter    = &filter;
     handle->localdata = pvPortMalloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 
-static int32_t init(stateFilter *self)
+int32_t filterBaroiInitialize(stateFilter *handle)
+{
+    handle->init      = &initwithoutgps;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
+    return STACK_REQUIRED;
+}
+
+static int32_t initwithgps(stateFilter *self)
+{
+    struct data *this = (struct data *)self->localdata;
+
+    this->useGPS = 1;
+    return maininit(self);
+}
+
+static int32_t initwithoutgps(stateFilter *self)
+{
+    struct data *this = (struct data *)self->localdata;
+
+    this->useGPS = 0;
+    return maininit(self);
+}
+
+static int32_t maininit(stateFilter *self)
 {
     struct data *this = (struct data *)self->localdata;
 
     this->baroOffset = 0.0f;
+    this->gpsAlt     = 0.0f;
     this->first_run  = INIT_CYCLES;
 
     RevoSettingsInitialize();
@@ -81,17 +110,29 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     struct data *this = (struct data *)self->localdata;
 
     if (this->first_run) {
+        // Make sure initial location is initialized properly before continuing
+        if (this->useGPS && IS_SET(state->updated, SENSORUPDATES_pos)) {
+            if (this->first_run == INIT_CYCLES) {
+                this->gpsAlt = state->pos[2];
+                this->first_run--;
+            }
+        }
         // Initialize to current altitude reading at initial location
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
-            this->baroOffset = ((float)(INIT_CYCLES)-this->first_run) / (float)(INIT_CYCLES)*this->baroOffset + (this->first_run / (float)(INIT_CYCLES)) * state->baro[0];
-            this->baroAlt    = 0;
-            this->first_run--;
+            if (this->first_run < INIT_CYCLES || !this->useGPS) {
+                this->baroOffset = (((float)(INIT_CYCLES)-this->first_run) / (float)(INIT_CYCLES)) * this->baroOffset + (this->first_run / (float)(INIT_CYCLES)) * (state->baro[0] + this->gpsAlt);
+                this->baroAlt    = state->baro[0];
+                this->first_run--;
+            }
             UNSET_MASK(state->updated, SENSORUPDATES_baro);
         }
+        // make sure we raise an error until properly initialized - would not be good if people arm and
+        // use altitudehold without initialized barometer filter
+        return 2;
     } else {
         // Track barometric altitude offset with a low pass filter
         // based on GPS altitude if available
-        if (IS_SET(state->updated, SENSORUPDATES_pos)) {
+        if (this->useGPS && IS_SET(state->updated, SENSORUPDATES_pos)) {
             this->baroOffset = this->baroOffset * this->baroGPSOffsetCorrectionAlpha +
                                (1.0f - this->baroGPSOffsetCorrectionAlpha) * (this->baroAlt + state->pos[2]);
         }
@@ -100,9 +141,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             this->baroAlt   = state->baro[0];
             state->baro[0] -= this->baroOffset;
         }
+        return 0;
     }
-
-    return 0;
 }
 
 

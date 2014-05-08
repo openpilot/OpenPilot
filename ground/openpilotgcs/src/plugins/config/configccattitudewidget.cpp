@@ -44,7 +44,6 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     ui(new Ui_ccattitude)
 {
     ui->setupUi(this);
-    forceConnectedState(); // dynamic widgets don't recieve the connected signal
     connect(ui->zeroBias, SIGNAL(clicked()), this, SLOT(startAccelCalibration()));
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -67,7 +66,9 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     addWidgetBinding("AttitudeSettings", "BoardRotation", ui->pitchBias, AttitudeSettings::BOARDROTATION_PITCH);
     addWidgetBinding("AttitudeSettings", "BoardRotation", ui->yawBias, AttitudeSettings::BOARDROTATION_YAW);
     addWidget(ui->zeroBias);
+    populateWidgets();
     refreshWidgetsValues();
+    forceConnectedState();
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()

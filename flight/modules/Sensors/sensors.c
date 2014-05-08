@@ -84,7 +84,9 @@ AccelGyroSettingsData agcal;
 // These values are initialized by settings but can be updated by the attitude algorithm
 
 static float mag_bias[3] = { 0, 0, 0 };
-static float mag_transform[3][3]={{ 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1}};
+static float mag_transform[3][3] = {
+    { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }
+};
 // temp coefficient to calculate gyro bias
 static volatile bool gyro_temp_calibrated  = false;
 static volatile bool accel_temp_calibrated = false;
@@ -442,9 +444,9 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 {
     RevoCalibrationGet(&cal);
     AccelGyroSettingsGet(&agcal);
-    mag_bias[0]  = cal.mag_bias.X;
-    mag_bias[1]  = cal.mag_bias.Y;
-    mag_bias[2]  = cal.mag_bias.Z;
+    mag_bias[0] = cal.mag_bias.X;
+    mag_bias[1] = cal.mag_bias.Y;
+    mag_bias[2] = cal.mag_bias.Z;
 
     accel_temp_calibrated = (agcal.temp_calibrated_extent.max - agcal.temp_calibrated_extent.min > .1f) &&
                             (fabsf(agcal.accel_temp_coeff.X) > 1e-9f || fabsf(agcal.accel_temp_coeff.Y) > 1e-9f || fabsf(agcal.accel_temp_coeff.Z) > 1e-9f);
@@ -459,16 +461,16 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 
     // Indicates not to expend cycles on rotation
     if (fabsf(attitudeSettings.BoardRotation.Roll) < 0.00001f
-            && fabsf(attitudeSettings.BoardRotation.Pitch) < 0.00001f &&
-            fabsf(attitudeSettings.BoardRotation.Yaw) <0.00001f ) {
+        && fabsf(attitudeSettings.BoardRotation.Pitch) < 0.00001f &&
+        fabsf(attitudeSettings.BoardRotation.Yaw) < 0.00001f) {
         rotate = 0;
     } else {
         rotate = 1;
     }
     float rotationQuat[4];
-        const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
-                               attitudeSettings.BoardRotation.Pitch,
-                               attitudeSettings.BoardRotation.Yaw };
+    const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
+                           attitudeSettings.BoardRotation.Pitch,
+                           attitudeSettings.BoardRotation.Yaw };
     RPY2Quaternion(rpy, rotationQuat);
     Quaternion2R(rotationQuat, R);
 

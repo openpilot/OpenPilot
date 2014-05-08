@@ -46,7 +46,7 @@
 ****************************/
 
 // ! Check a stabilization mode switch position for safety
-static int32_t check_stabilization_settings(int index, bool multirotor);
+static int32_t check_stabilization_settings(int index, bool multirotor, bool coptercontrol);
 
 /**
  * Run a preflight check over the hardware configuration
@@ -98,31 +98,25 @@ int32_t configuration_check()
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
-            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(1, multirotor) : severity;
+            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(1, multirotor, coptercontrol) : severity;
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
-            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(2, multirotor) : severity;
+            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(2, multirotor, coptercontrol) : severity;
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
-            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : severity;
+            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor, coptercontrol) : severity;
+            break;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED4:
+            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(4, multirotor, coptercontrol) : severity;
+            break;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED5:
+            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(5, multirotor, coptercontrol) : severity;
+            break;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED6:
+            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(6, multirotor, coptercontrol) : severity;
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
             if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE)) {
-                severity = SYSTEMALARMS_ALARM_CRITICAL;
-            }
-            break;
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_ALTITUDEVARIO:
-            if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_CRITICAL;
-            }
-            // TODO: put check equivalent to TASK_MONITOR_IsRunning
-            // here as soon as available for delayed callbacks
-            break;
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
-            if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_CRITICAL;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
                 severity = SYSTEMALARMS_ALARM_CRITICAL;
             }
             break;
@@ -199,14 +193,8 @@ int32_t configuration_check()
  * @param[in] index Which stabilization mode to check
  * @returns SYSTEMALARMS_ALARM_OK or SYSTEMALARMS_ALARM_CRITICAL
  */
-static int32_t check_stabilization_settings(int index, bool multirotor)
+static int32_t check_stabilization_settings(int index, bool multirotor, bool coptercontrol)
 {
-    // Make sure the modes have identical sizes
-    if (FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM != FLIGHTMODESETTINGS_STABILIZATION2SETTINGS_NUMELEM ||
-        FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM != FLIGHTMODESETTINGS_STABILIZATION3SETTINGS_NUMELEM) {
-        return SYSTEMALARMS_ALARM_CRITICAL;
-    }
-
     uint8_t modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM];
 
     // Get the different axis modes for this switch position
@@ -220,22 +208,58 @@ static int32_t check_stabilization_settings(int index, bool multirotor)
     case 3:
         FlightModeSettingsStabilization3SettingsArrayGet(modes);
         break;
+    case 4:
+        FlightModeSettingsStabilization4SettingsArrayGet(modes);
+        break;
+    case 5:
+        FlightModeSettingsStabilization5SettingsArrayGet(modes);
+        break;
+    case 6:
+        FlightModeSettingsStabilization6SettingsArrayGet(modes);
+        break;
     default:
         return SYSTEMALARMS_ALARM_CRITICAL;
     }
 
-    // For multirotors verify that nothing is set to "none"
+    // For multirotors verify that roll/pitch/yaw are not set to "none"
+    // (why not? might be fun to test ones reactions ;) if you dare, set your frame to "custom"!
     if (multirotor) {
-        for (uint32_t i = 0; i < NELEMENTS(modes); i++) {
-            if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NONE) {
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST; i++) {
+            if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL) {
                 return SYSTEMALARMS_ALARM_CRITICAL;
             }
         }
     }
 
+    // coptercontrol cannot do altitude holding
+    if (coptercontrol) {
+        if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
+            || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_VERTICALVELOCITY
+            ) {
+            return SYSTEMALARMS_ALARM_CRITICAL;
+        }
+    }
+
+    // check that thrust modes are only set to thrust axis
+    for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST; i++) {
+        if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
+            || modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_VERTICALVELOCITY
+            ) {
+            return SYSTEMALARMS_ALARM_CRITICAL;
+        }
+    }
+    if (!(modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL
+          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
+          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_VERTICALVELOCITY
+          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL
+          )) {
+        return SYSTEMALARMS_ALARM_CRITICAL;
+    }
+
     // Warning: This assumes that certain conditions in the XML file are met.  That
-    // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NONE has the same numeric value for each channel
-    // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_NONE
+    // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL has the same numeric value for each channel
+    // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL
+    // (this is checked at compile time by static constraint manualcontrol.h)
 
     return SYSTEMALARMS_ALARM_OK;
 }

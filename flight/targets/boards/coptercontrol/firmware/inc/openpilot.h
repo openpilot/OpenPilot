@@ -39,6 +39,7 @@
 #include <uavtalk.h>
 
 #include "alarms.h"
+#include <mathmisc.h>
 
 /* Global Functions */
 void OpenPilotInit(void);

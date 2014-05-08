@@ -42,7 +42,7 @@ MODULES += FirmwareIAP
 MODULES += StateEstimation
 #MODULES += Sensors/simulated/Sensors
 MODULES += Airspeed
-MODULES += AltitudeHold
+#MODULES += AltitudeHold # now integrated in Stabilization
 #MODULES += OveroSync
 
 # Paths
@@ -96,6 +96,7 @@ SRC += $(FLIGHTLIB)/sanitycheck.c
 
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
+SRC += $(MATHLIB)/mathmisc.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
 SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c

@@ -5,6 +5,7 @@ QT += svg
 
 include(../../openpilotgcsplugin.pri) 
 include(../../plugins/coreplugin/coreplugin.pri) 
+include(../../libs/version_info/version_info.pri)
 include(telemetry_dependencies.pri)
 
 HEADERS += telemetry_global.h \

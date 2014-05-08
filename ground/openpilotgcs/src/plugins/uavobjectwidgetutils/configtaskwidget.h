@@ -69,6 +69,7 @@ public:
     ~WidgetBinding();
 
     QString units() const;
+    QString type() const;
     UAVObject *object() const;
     UAVObjectField *field() const;
     int index() const;
@@ -223,8 +224,8 @@ private:
 
     bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, double scale, bool hasLimits);
 
-    QVariant getVariantFromWidget(QWidget *widget, double scale, const QString units);
-    bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale, QString units);
+    QVariant getVariantFromWidget(QWidget *widget, double scale, const QString units, QString type);
+    bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale, QString units, QString type);
     bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale);
 
     void connectWidgetUpdatesToSlot(QWidget *widget, const char *function);

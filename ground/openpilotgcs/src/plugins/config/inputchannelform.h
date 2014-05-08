@@ -1,8 +1,10 @@
 #ifndef INPUTCHANNELFORM_H
 #define INPUTCHANNELFORM_H
 
-#include <QWidget>
 #include "configinputwidget.h"
+
+#include <QWidget>
+
 namespace Ui {
 class InputChannelForm;
 }
@@ -11,7 +13,7 @@ class InputChannelForm : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
-    explicit InputChannelForm(QWidget *parent = 0, bool showlegend = false);
+    explicit InputChannelForm(QWidget *parent = 0, const bool showLegend = false);
     ~InputChannelForm();
     friend class ConfigInputWidget;
     void setName(QString &name);
@@ -20,8 +22,6 @@ private slots:
     void neutralUpdated();
     void reversedUpdated();
     void groupUpdated();
-    void channelDropdownUpdated(int);
-    void channelNumberUpdated(int);
 
 private:
     Ui::InputChannelForm *ui;

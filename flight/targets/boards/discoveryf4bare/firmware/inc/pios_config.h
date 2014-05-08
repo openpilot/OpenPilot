@@ -78,15 +78,15 @@
 /* #define PIOS_INCLUDE_ADXL345 */
 /* #define PIOS_INCLUDE_BMA180 */
 /* #define PIOS_INCLUDE_L3GD20 */
-//#define PIOS_INCLUDE_MPU6000
-//#define PIOS_MPU6000_ACCEL
+// #define PIOS_INCLUDE_MPU6000
+// #define PIOS_MPU6000_ACCEL
 /* #define PIOS_INCLUDE_HMC5843 */
-//#define PIOS_INCLUDE_HMC5883
-//#define PIOS_HMC5883_HAS_GPIOS
+// #define PIOS_INCLUDE_HMC5883
+// #define PIOS_HMC5883_HAS_GPIOS
 /* #define PIOS_INCLUDE_BMP085 */
-//#define PIOS_INCLUDE_MS5611
-//#define PIOS_INCLUDE_MPXV
-//#define PIOS_INCLUDE_ETASV3
+// #define PIOS_INCLUDE_MS5611
+// #define PIOS_INCLUDE_MPXV
+// #define PIOS_INCLUDE_ETASV3
 /* #define PIOS_INCLUDE_HCSR04 */
 
 /* PIOS receiver drivers */
@@ -96,7 +96,7 @@
 #define PIOS_INCLUDE_DSM
 #define PIOS_INCLUDE_SBUS
 #define PIOS_INCLUDE_GCSRCVR
-//#define PIOS_INCLUDE_OPLINKRCVR
+// #define PIOS_INCLUDE_OPLINKRCVR
 
 /* PIOS abstract receiver interface */
 #define PIOS_INCLUDE_RCVR
@@ -117,9 +117,9 @@
 /* #define PIOS_INCLUDE_FLASH_EEPROM */
 
 /* PIOS radio modules */
-//#define PIOS_INCLUDE_RFM22B
-//#define PIOS_INCLUDE_RFM22B_COM
-//#define PIOS_INCLUDE_RFM22B_RCVR
+// #define PIOS_INCLUDE_RFM22B
+// #define PIOS_INCLUDE_RFM22B_COM
+// #define PIOS_INCLUDE_RFM22B_RCVR
 /* #define PIOS_INCLUDE_PPM_OUT */
 /* #define PIOS_RFM22B_DEBUG_ON_TELEM */
 

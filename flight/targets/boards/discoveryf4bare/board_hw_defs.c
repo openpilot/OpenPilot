@@ -55,7 +55,7 @@ static const struct pios_gpio pios_leds[] = {
         },
         .active_low         = false
     },
-    [PIOS_LED_D1] =     {
+    [PIOS_LED_D1] =        {
         .pin                =             {
             .gpio = GPIOD,
             .init =             {
@@ -68,7 +68,7 @@ static const struct pios_gpio pios_leds[] = {
         },
         .active_low         = false
     },
-    [PIOS_LED_D2] =     {
+    [PIOS_LED_D2] =        {
         .pin                =             {
             .gpio = GPIOD,
             .init =             {
@@ -91,7 +91,7 @@ static const struct pios_gpio_cfg pios_led_cfg = {
 
 const struct pios_gpio_cfg *PIOS_BOARD_HW_DEFS_GetLedCfg(__attribute__((unused)) uint32_t board_revision)
 {
-        return &pios_led_cfg;
+    return &pios_led_cfg;
 }
 
 #endif /* PIOS_INCLUDE_LED */

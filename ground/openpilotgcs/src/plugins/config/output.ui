@@ -122,8 +122,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>676</width>
-            <height>674</height>
+            <width>674</width>
+            <height>677</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -655,6 +655,9 @@ Leave at 50Hz for fixed wing.</string>
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
                <layout class="QVBoxLayout" name="channelLayout">
+                <property name="spacing">
+                 <number>6</number>
+                </property>
                 <property name="sizeConstraint">
                  <enum>QLayout::SetDefaultConstraint</enum>
                 </property>

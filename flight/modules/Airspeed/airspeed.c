@@ -60,7 +60,7 @@
 static xTaskHandle taskHandle;
 static bool airspeedEnabled  = false;
 static AirspeedSettingsData airspeedSettings;
-static AirspeedSettingsAirspeedSensorTypeOptions lastAirspeedSensorType = 0;
+static AirspeedSettingsAirspeedSensorTypeOptions lastAirspeedSensorType = -1;
 static int8_t airspeedADCPin = -1;
 
 
@@ -118,8 +118,6 @@ int32_t AirspeedInitialize()
             airspeedADCPin = i;
         }
     }
-
-    lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
 
     AirspeedSensorInitialize();
     AirspeedSettingsInitialize();

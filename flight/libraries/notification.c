@@ -62,9 +62,9 @@
     (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0b0000000000000001 : \
      x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0b0000000000100001 : \
      x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0b0000010000100001 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 0b0000000000100001 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 0b0000000000100001 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 0b0000000000100001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED4 ? 0b0000000000000001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED5 ? 0b0000000000100001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED6 ? 0b0000010000100001 : \
      x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0b0000010000100001 : \
      x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0b0001000100010001 : \
      x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0b0001000100010001 : \
@@ -75,9 +75,9 @@
     (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0b0000000000000000 : \
      x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0b0000000000000000 : \
      x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0b0000000000000000 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 0b0000000000100000 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 0b0000000000100000 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 0b0000000000100000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED4 ? 0b0000000000000001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED5 ? 0b0000000000000001 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED6 ? 0b0000000000000001 : \
      x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0b0000010000000000 : \
      x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0b0001000100000000 : \
      x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0b0001000100000000 : \
@@ -85,31 +85,33 @@
      x == FLIGHTSTATUS_FLIGHTMODE_POI ? 0b0000010000000000 : 0b0000010000000000)
 
 #define BLINK_B_FM_DISARMED_PATTERN(x) \
-    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 0b0001111111111111 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 0b0001111111111111 : 0b0001111111111111)
+    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0b0000000000000011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0b0000000001100011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0b0000110001100011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED4 ? 0b0000000000000011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED5 ? 0b0000000001100011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED6 ? 0b0000110001100011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0b0000110001100011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0b0011001100110011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0b0011001100110011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 0b0000110001100011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 0b0000110001100011 : 0b0000000000000011)
 
 #define BLINK_R_FM_DISARMED_PATTERN(x) \
-    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 0 : \
-     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 0 : 0)
+    (x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED1 ? 0b0000000000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED2 ? 0b0000000000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED3 ? 0b0000000000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED4 ? 0b0000000000000011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED5 ? 0b0000000000000011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_STABILIZED6 ? 0b0000000000000011 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ? 0b0000110000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE ? 0b0011001100000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_LAND ? 0b0011001100000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER ? 0b0000110000000000 : \
+     x == FLIGHTSTATUS_FLIGHTMODE_POI ? 0b0000110000000000 : 0b0000110000000000)
 
+#define BLINK_B_HEARTBEAT_PATTERN 0b0001111111111111
+#define BLINK_R_HEARTBEAT_PATTERN 0
 
 #define BLINK_B_NOTIFY_PATTERN(x) \
     (x == NOTIFY_NONE ? 0 : \
@@ -133,8 +135,8 @@ static volatile pios_notify_notification nextNotification = NOTIFY_NONE;
 static bool handleAlarms(uint16_t *r_pattern, uint16_t *b_pattern);
 #endif // PIOS_LED_ALARM
 static bool handleNotifications(pios_notify_notification runningNotification, uint16_t *r_pattern, uint16_t *b_pattern);
-static void handleStatus(uint16_t *r_pattern, uint16_t *b_pattern);
-
+static void handleFlightMode(uint16_t *r_pattern, uint16_t *b_pattern);
+static void handleHeartbeat(uint16_t *r_pattern, uint16_t *b_pattern);
 void NotificationUpdateStatus()
 {
     started = true;
@@ -152,12 +154,13 @@ void NotificationOnboardLedsRun()
     static uint16_t r_pattern;
     static uint16_t b_pattern;
     static uint8_t cycleCount; // count the number of cycles
+    static uint8_t lastFlightMode   = -1;
+    static bool forceShowFlightMode = false;
     static pios_notify_notification runningNotification = NOTIFY_NONE;
-
     static enum {
         STATUS_NOTIFY,
         STATUS_ALARM,
-        STATUS_FLIGHTMODE,
+        STATUS_FLIGHTMODE, // flightMode/HeartBeat
         STATUS_LENGHT
     } status;
 
@@ -182,6 +185,13 @@ void NotificationOnboardLedsRun()
         // Force a notification status
         status     = STATUS_NOTIFY;
         cycleCount = 0; // instantly start a notify cycle
+    } else {
+        if (lastFlightMode != currentFlightStatus.FlightMode) {
+            status         = STATUS_FLIGHTMODE;
+            lastFlightMode = currentFlightStatus.FlightMode;
+            cycleCount     = 0; // instantly start a flightMode cycle
+            forceShowFlightMode = true;
+        }
     }
 
     // check if a phase has just finished
@@ -189,6 +199,7 @@ void NotificationOnboardLedsRun()
         HEARTBEAT_LED_OFF();
         ALARM_LED_OFF();
         cycleCount = 0x0;
+        forceShowFlightMode = false;
         // Notification has been just shown, cleanup
         if (status == STATUS_NOTIFY) {
             runningNotification = NOTIFY_NONE;
@@ -218,7 +229,11 @@ void NotificationOnboardLedsRun()
 
     // **** Handles flightmode display
     if (status == STATUS_FLIGHTMODE && !cycleCount) {
-        handleStatus(&r_pattern, &b_pattern);
+        if (forceShowFlightMode || currentFlightStatus.Armed != FLIGHTSTATUS_ARMED_DISARMED) {
+            handleFlightMode(&r_pattern, &b_pattern);
+        } else {
+            handleHeartbeat(&r_pattern, &b_pattern);
+        }
     }
 
     // led output
@@ -259,7 +274,7 @@ static bool handleNotifications(pios_notify_notification runningNotification, ui
     return true;
 }
 
-static void handleStatus(uint16_t *r_pattern, uint16_t *b_pattern)
+static void handleFlightMode(uint16_t *r_pattern, uint16_t *b_pattern)
 {
     // Flash the heartbeat LED
     uint8_t flightmode = currentFlightStatus.FlightMode;
@@ -271,4 +286,11 @@ static void handleStatus(uint16_t *r_pattern, uint16_t *b_pattern)
         *b_pattern = BLINK_B_FM_ARMED_PATTERN(flightmode);
         *r_pattern = BLINK_R_FM_ARMED_PATTERN(flightmode);
     }
+}
+
+static void handleHeartbeat(uint16_t *r_pattern, uint16_t *b_pattern)
+{
+    // Flash the heartbeat LED
+    *b_pattern = BLINK_B_HEARTBEAT_PATTERN;
+    *r_pattern = BLINK_R_HEARTBEAT_PATTERN;
 }

@@ -75,7 +75,7 @@ void ImportExportGadgetWidget::on_exportButton_clicked()
     QString file   = filename;
     QString filter = tr("GCS Settings file (*.xml)");
 
-    file = QFileDialog::getSaveFileName(this, tr("Save GCS Settings too file .."), QFileInfo(file).absoluteFilePath(), filter).trimmed();
+    file = QFileDialog::getSaveFileName(this, tr("Save GCS Settings to file..."), QFileInfo(file).absoluteFilePath(), filter).trimmed();
     if (file.isEmpty()) {
         return;
     }

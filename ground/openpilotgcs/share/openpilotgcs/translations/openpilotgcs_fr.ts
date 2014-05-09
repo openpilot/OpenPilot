@@ -4387,10 +4387,14 @@ p, li { white-space: pre-wrap; }
         <translation>Fichier Paramètres GCS (*.xml)</translation>
     </message>
     <message>
-        <location line="-76"/>
         <source>Save GCS Settings too file ..</source>
         <translatorcomment>Typo too and ... on end without space ? Context ?</translatorcomment>
-        <translation type="unfinished">Enregistre Paramètres GCS vers fichier ..</translation>
+        <translation type="obsolete">Enregistre Paramètres GCS vers fichier ..</translation>
+    </message>
+    <message>
+        <location line="-76"/>
+        <source>Save GCS Settings to file...</source>
+        <translation>Enregistre Paramètres GCS vers fichier...</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -5683,7 +5687,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>GPS protocol :</source>
-        <translation type="unfinished"></translation>
+        <translation>Protocole GPS :</translation>
     </message>
 </context>
 <context>
@@ -6382,7 +6386,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Stabilization Modes Configuration</source>
-        <translation type="unfinished">Configuration des Modes de Stabilisation</translation>
+        <translation>Configuration des Modes de Stabilisation</translation>
     </message>
     <message>
         <location/>
@@ -6541,7 +6545,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Stabilized 6</source>
-        <translation type="unfinished">Stabilisé 6</translation>
+        <translation>Stabilisé 6</translation>
     </message>
     <message>
         <location/>
@@ -6856,7 +6860,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Live Testing</source>
-        <translation type="unfinished">Test en Temps Réel</translation>
+        <translation>Test en Temps Réel</translation>
     </message>
 </context>
 <context>
@@ -7301,12 +7305,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Calibration status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Statut de l&apos;étalonnage</translation>
     </message>
     <message>
         <location/>
         <source>Calibration instructions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Instructions d&apos;étalonnage</translation>
     </message>
     <message>
         <location/>
@@ -7341,7 +7345,37 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This  allow a certain amount of correction of those bias variations against temperature changes. It does improve both altitude hold and yaw performances.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;To perform this calibration leave the board to cool down at room temperature in the coldest places available. after 15-20 minutes attach the usb connector to the board and Click the Calibrate button leaving the board steady. Wait until completed&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; font-style:italic;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Les étapes #1, #2 et #3 sont nécessaires. L&apos;étape #4 vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#1 : Étalonnage multipoints&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les échelles pour les capteurs Accéléromètres ou Magnétomètre. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cliquer sur &amp;quot;Étalonner Accéléro.&amp;quot; ou &amp;quot;Étalonner Magnéto.&amp;quot; pour démarrer l&apos;étalonnage puis suivez les instructions qui seront affichées ici.  &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour un calibrage optimal effectuez l&apos;étalonnage des Accéléromètres sans monter la carte sur l&apos;appareil, de cette façon vous pourrez précisément la mettre de niveau sur votre bureau/table pendant le processus. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Le calibrage du magnétomètre devra être effectué avec la carte montée dans votre appareil pour tenir compte des champs magnétiques/ masses métalliques à bord.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 1:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; Votre &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;PositionHome doit être définie en premier&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 2:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; Vous n&apos;avez pas besoin de pointer exactement dans les directions Sud/Nord/Ouest/Est. Ceci est simplement utilisé pour indiquer clairement à l&apos;utilisateur comment orienter son appareil.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Vous pouvez simplement admettre que le Nord est face à vous, l&apos;Est à votre droite, etc. et effectuer l&apos;étalonnage de cette façon.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#2 : Étalonnage du niveau de la carte&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cette étape fera en sorte que la mise de niveau de la carte soit parfaite. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur Démarrer ci-dessus et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#3 : Étalonnage de l&apos;ajustement des Gyroscopes&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cette étape permet d&apos;étalonner la valeur mesurée sur les gyros lorsque la carte ne bouge pas. Pour effectuer l&apos;étalonnage laissez la carte/l&apos;appareil sans bouger et cliquez sur Démarrer. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#4 : Étalonnage de la compensation de température&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les variations des capteurs à plusieurs températures lors du réchauffement de la carte.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Ceci permet un certain niveau de correction sur la variation des ajustements en fonction des changements de température. Il améliore à la fois le maintien d&apos;altitude et les performances sur l&apos;axe de lacet.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour effectuer cette calibration laissez refroidir la carte à température ambiante dans un endroit le plus froid possible. Après 15-20 minutes branchez le connecteur USB à la carte et cliquez sur le bouton Démarrer et ne plus bouger la carte. Attendez jusqu&apos;à la fin du processus.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7351,7 +7385,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Launch accelerometer range and bias calibration.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Démarrer l&apos;étalonnage des plages et ajustements des accéléromètres.</translation>
     </message>
     <message>
         <location/>
@@ -7361,7 +7395,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Launch magnetometer range and bias calibration.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Démarrer l&apos;étalonnage des plages et ajustements du magnétomètre.</translation>
     </message>
     <message>
         <location/>
@@ -8435,7 +8469,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Percentage of full stick where the transition from Attitude to Rate occurs. This transition always occurs when the aircraft is exactly inverted (bank angle 180 degrees).  Small values are dangerous because they cause flips at small stick angles.  Values significantly over 100 act like attitude mode and can never flip.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pourcentage d&apos;une position de manche à fond où la transition du mode Attitude vers le mode Rate intervient. Cette transition intervient à chaque fois lorsque l&apos;appareil est exactement à l&apos;envers (inclinaison d&apos;un angle de 180 degrés).  Des valeurs faibles sont dangereuses car elles provoquent des pirouettes avec de petits mouvements aux manches.  Des valeurs significativement au dessus de 100 font que l&apos;appareil ne peut jamais se retourner et reviennent à fonctionner en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8451,7 +8485,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;CP helis can set this to Reversed to automatically reverse the direction of thrust when inverted. Fixed pitch copters, including multicopters, should leave this set at Unreversed. Unreversed direction with Boosted power may be dangerous because it adds power and the thrust direction moves the aircraft towards the ground.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les hélicos CP peuvent régler ceci à Reversed pour inverser automatiquement la direction de la poussée en vol dos. Les hélicos à pas fixe, multicoptères inclus, doivent laisser ce paramètre à Unreversed. L&apos;association du paramètre Unreversed avec Boosted ci-dessous peut-être dangereuse car elle ajoute de la puissance et la direction de la poussée déplace l&apos;appareil vers le sol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8462,17 +8496,17 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>InvrtdThrustRev</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">InversPousséeRenversé</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The bank angle where CruiseControl goes into inverted power mode.  InvertedThrustReverse and InvertedPower control the direction and amount of power when in inverted mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci correspond à l&apos;angle d&apos;inclinaison où CruiseControl passe en mode puissance renversé. InversPousséeRenversé et PuissanceRenversée contrôlent la direction et la quantité de puissance lorque vous êtes en mode inversé&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 3.0 means it will not use more than 3 times the power the throttle/collective stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Juste une limitation de sécurité. 3.0 signifie qu&apos;il n&apos;utilisera pas plus de 3 fois la puissance demandée par le manche de gaz/collectif.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8482,12 +8516,12 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>MinThrust</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PousséeMini</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle/Collective stick below this amount disables Cruise Control. Also, by default Cruise Control forces the use of this value for thrust when InvertedPower setting is Zero and the copter is inverted. CP helis probably want this set to -100%. For safety with fixed pitch copters (including multicopters), never set this so low that the trimmed throttle stick cannot get below it or your motor(s) will still run with the throttle stick all the way down. Fixed pitch throttle sticks go from -100 to 0 in the first tiny bit of throttle stick (and then up to 100 using the rest of the throttle range), so for example, a lot of &amp;quot;high throttle trim&amp;quot; will keep the stick from ever commanding less than 5% so it won&apos;t be possible to stop the motors with the throttle stick. Banking the copter in your hand in this state will make the motors speed up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsque le manche de gaz/collectif est en dessous de cette valeur, cela désactive Cruise Control. En outre, Cruize Control impose l&apos;utilisation de cette valeur de manche de gaz lorsque le paramètre PuissanceInversé est à zéro et l&apos;hélicoptère est à l&apos;envers.&lt;/p&gt;&lt;p&gt;Les hélicos CP auront besoin probablement d&apos;une valeur fixée à -100. Par mesure de sécurité avec les pas fixes (multicoptères inclus), ne jamais définir une valeur trop basse pour qu&apos;un manche de gaz baissé puisse descendre en dessous de cette valeur ou le(s) moteur(s) continuent de tourner avec le manche de gaz au mini. Le manche de gaz pour pas fixe va de -100 à 0 dans la première petite plage de la course du manche (puis jusqu&apos;à 100 dans la plage de gaz restante) donc par exemple un &amp;quot;trim élevé sur le manche de gaz&amp;quot; va maintenir les gaz au dessus de 5% si bien qu&apos;il ne sera pas possible d&apos;arrêter les moteurs avec la manche des gaz. Le fait d&apos;incliner l&apos;appareil à la main dans cet état fera accélérer les moteurs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8498,7 +8532,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 80% to 90% to leave some headroom for stabilization. CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les multicoptères devraient probablement utiliser une valeur de 80% à 90% afin de laisser une certaine marge pour la stabilisation. Les hélicos CP peuvent définir cette valeur à 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8509,7 +8543,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>MaxThrust</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PousséeMaxi</translation>
     </message>
     <message>
         <location/>
@@ -8525,12 +8559,12 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that quickly moving the stick around a lot makes the copter climb a bit, adjust this number down a little.  It will be a compromise between climbing a little with lots of stick motion and descending a little with minimal stick motion.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si vous trouvez qu&apos;un petit mouvement rapide de manche fait légèrement monter l&apos;hélicoptère, baissez un petit peu cette valeur. Ce sera un compromis entre une montée légère avec beaucoup de mouvements de manche et descente légère avec un mouvement de manche minime.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The amount of power used when in inverted mode. Zero (min throttle stick for fixed pitch copters includding multicopters, neutral collective for CP), Normal (uses stick value), or Boosted (boosted according to bank angle). Beginning multicopter pilots should leave this set to Zero to automatically reduce throttle during flips.   Boosted power with Unreversed direction may be dangerous because it adds power and the thrust direction moves the aircraft towards the ground.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La quantité de puissance utilisée en vol dos. Zero (PousséeMini pour les hélicos à pas fixe, multicoptères inclus, collectif au neutre pour hélicos CP), Normal (utilise la valeur du manche), ou Boosted (boosté en fonction de l&apos;angle d&apos;inclinaison). Les pilotes débutants en multicoptère devraient laisser ce paramètre à Zero pour automatiquement reduire les gaz durant les flips.  L&apos;association du paramètre Boosted  avec Unreversed ci-dessus peut-être dangereuse car elle ajoute de la puissance et la direction de la poussée déplace l&apos;appareil vers le sol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -9336,47 +9370,47 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.cpp" line="+45"/>
         <source>Waiting for all OP boards to be disconnected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Attente de la déconnexion de toutes les cartes OP.</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Please connect the board to the USB port (don&apos;t use external supply).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Veuillez connecter la carte sur le port USB (sans source d&apos;alimentation extérieure).</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Board going into bootloader mode.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Passage de la carte en mode bootloader.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Loading firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Chargement du firmware.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Uploading firmware.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Téléversement du firmware.</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Uploading description.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Téléversement de la description.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Booting the board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Démarrage de la carte.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Board updated, please press &apos;Next&apos; to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Carte mise à jour, cliquer sur &apos;Suivant&apos; pour continuer.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Something went wrong, you will have to manually upgrade the board using the uploader plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Quelque chose s&apos;est mal passé, vous devrez mettre à jour manuellement la carte en utilisant le plugin uploader.</translation>
     </message>
 </context>
 <context>
@@ -10604,7 +10638,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/config_cc_hw_widget.cpp" line="+91"/>
         <source>Enable GPS module and reboot the board to be able to select GPS protocol</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Activez le module GPS et redémarrez la carte pour pouvoir choisir le protocole GPS</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -11609,24 +11643,24 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+278"/>
         <source>Connected Device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Périphérique Connecté</translation>
     </message>
     <message>
         <location line="+107"/>
         <source>Bootloader</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bootloader</translation>
     </message>
     <message>
         <location line="+26"/>
         <location line="+11"/>
         <source>Bootloader?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bootloader ?</translation>
     </message>
     <message>
         <location line="+27"/>
         <location line="+380"/>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Périphérique</translation>
     </message>
     <message>
         <location line="-305"/>
@@ -11643,18 +11677,20 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <location line="+43"/>
         <location line="+161"/>
         <source>Timed out while waiting for all boards to be disconnected!</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Bof</translatorcomment>
+        <translation type="unfinished">Expiration du temps d&apos;attente de la déconnexion de toutes les cartes !</translation>
     </message>
     <message>
         <location line="-152"/>
         <location line="+167"/>
         <source>Timed out while waiting for a board to be connected!</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Bof</translatorcomment>
+        <translation type="unfinished">Expiration du temps dans l&apos;attente d&apos;une connexion de carte !</translation>
     </message>
     <message>
         <location line="-23"/>
         <source>Please disconnect your OpenPilot board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Veuillez déconnecter votre carte OpenPilot.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -11662,120 +11698,121 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <location line="+8"/>
         <location line="+7"/>
         <source>System Rescue</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sauvetage Système</translation>
     </message>
     <message>
         <location line="-8"/>
         <source>Please connect your OpenPilot board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Veuillez connecter votre carte OpenPilot.</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Board must be connected to the USB port!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La carte doit être connectée à un port USB !</translation>
     </message>
     <message>
         <location line="+131"/>
         <source>Waiting for all OpenPilot boards to be disconnected from USB.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Attente de la déconnexion de toutes les cartes connectées en USB.</translation>
     </message>
     <message>
         <location line="+4"/>
         <location line="+7"/>
         <source>Timing out in %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Expiration de l&apos;attente dans %1 secondes</translation>
     </message>
     <message>
         <location line="-4"/>
         <source>Please connect the OpenPilot board to the USB port.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Veuillez connecter la carte OpenPilot sur le port USB.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Bringing the board into boot loader mode.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Passage de la carte en mode bootloader.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Preparing to upload firmware to the board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Préparation du téléversement firmware sur la carte.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Uploading firmware to the board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Téléversement du firmware sur la carte.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Uploading description of the new firmware to the board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Téléversement de la description du nouveau firmware sur la carte.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Rebooting the board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Redémarrage de la carte.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Board was updated successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La carte a été mise à jour avec succès.</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+9"/>
         <source>Press OK to finish.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Appuyer sur OK pour terminer.</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Something went wrong, you will have to manually upgrade the board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Quelque chose s&apos;est mal passé, vous devrez mettre à jour la carte manuellement.</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Confirm Settings Erase?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Confirmer l&apos;Effacement des Paramètres ?</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Do you want to erase all settings from the board?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Voulez-vous effacer tous les paramètres sur la carte ?</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Settings cannot be recovered after this operation.
 The board will be restarted and all settings erased.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Les paramètres ne pourront être récupérés après cette opération.
+La carte sera redémarrée et tous les paramètres éffacés.</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Cannot Halt Board!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossible d&apos;Arrêter la Carte !</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>The controller board is armed and can not be halted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La carte contrôleur est armée et ne peut être arrêtée.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please make sure the board is not armed and then press Halt again to proceed or use Rescue to force a firmware upgrade.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau Arrêter pourcontinuer ou utilisez Sauvetage pour forcer une mise à jour du firmware.</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Cannot Reset Board!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossible de Réinitialiser la Carte !</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>The controller board is armed and can not be reset.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La carte contrôleur est armée et la réinitialisation n&apos;est pas possible.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please make sure the board is not armed and then press reset again to proceed or power cycle to force a board reset.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau Réinitialiser pourcontinuer ou allumer/éteindre la carte pour forcer le reset.</translation>
     </message>
     <message>
         <source>OpenPilot Uploader</source>
@@ -13414,7 +13451,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+5"/>
         <source>No file loaded</source>
-        <translation type="unfinished">Pas de fichier chargé</translation>
+        <translation>Pas de fichier chargé</translation>
     </message>
     <message>
         <location line="+50"/>
@@ -13978,7 +14015,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+0"/>
         <source>Logs...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Logs...</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -14046,17 +14083,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+6"/>
         <source>Could not parse enabled attribute.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossible d&apos;analyser l&apos;attribut activé.</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Could not parse period attribute, or object with name &apos;%1&apos; could not be found.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossible d&apos;analyser l&apos;attribut période, ou l&apos;objet avec le nom &apos;%1&apos; ne peut être trouvé.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Could not parse level attribute on setting &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossible d&apos;analyser l&apos;attribut level dans le paramètre &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -14173,12 +14210,13 @@ Veuillez vérifier le fichier.
     <message>
         <location line="+107"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>To apply the changes when binding/unbinding the board must be rebooted or power cycled.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>détachement ~ unbinding ? tr Bof</translatorcomment>
+        <translation type="unfinished">Pour appliquer les changements d&apos;association/détachement la carte doit être redémarrée ou débranchée/rebranchée.</translation>
     </message>
 </context>
 <context>
@@ -14573,22 +14611,22 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/telemetry/telemetryplugin.cpp" line="+157"/>
         <source>Firmware Version Mismatch!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Incompatibilité des Versions de Firmware !</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>GCS and firmware versions of the UAV objects set do not match which can cause configuration problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les versions des objets UAV de GCS et du firmware ne correspondent pas ce qui peut causer des problèmes de configuration.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>GCS version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Version GCS : %1</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Firmware version: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Version Firmware : %1</translation>
     </message>
 </context>
 <context>
@@ -14602,12 +14640,12 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location line="+8"/>
         <location line="+9"/>
         <source>Timing out in %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temps d&apos;attente dépassé dans %1 secondes</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Timed out after %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temps d&apos;attente dépassé après %1 secondes</translation>
     </message>
 </context>
 </TS>

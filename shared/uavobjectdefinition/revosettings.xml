@@ -7,6 +7,10 @@
         Defaults: updates at 5 Hz, tau = 300s settle time, exp(-(1/f)/tau) ~= 0.9993335555062
         Set BaroGPSOffsetCorrectionAlpha = 1.0 to completely disable baro offset updates. -->
         <field name="BaroGPSOffsetCorrectionAlpha" units="" type="float" elements="1" defaultvalue="0.9993335555062"/>
+
+	<!-- Configuration for magnetometer vector validity check -->
+	<field name="MagnetometerMaxDeviation" units="%" type="float" elementnames="Warning,Error" defaultvalue="0.05,0.15" />
+
         <!--  Cooefficients for the polynomial that models the barometer pressure bias as a function of temperature 
               bias = a + b * temp + c * temp^2 + d * temp^3 --> 
         <field name="BaroTempCorrectionPolynomial" units="" type="float" elements="4" elementnames="a,b,c,d" defaultvalue="0,0,0,0"/>

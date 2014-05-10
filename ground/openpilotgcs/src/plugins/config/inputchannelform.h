@@ -13,10 +13,14 @@ class InputChannelForm : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
-    explicit InputChannelForm(QWidget *parent = 0, const bool showLegend = false);
+    explicit InputChannelForm(QWidget *parent = 0);
     ~InputChannelForm();
+
     friend class ConfigInputWidget;
+
     void setName(QString &name);
+    void addToGrid(QGridLayout *gridLayout);
+
 private slots:
     void minMaxUpdated();
     void neutralUpdated();

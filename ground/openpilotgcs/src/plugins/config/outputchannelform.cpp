@@ -28,30 +28,10 @@
 #include "outputchannelform.h"
 #include "configoutputwidget.h"
 
-OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const bool showLegend) :
+OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
     ConfigTaskWidget(parent), ui(), m_index(index), m_inChannelTest(false)
 {
     ui.setupUi(this);
-    if (!showLegend) {
-        QLayout *legendLayout = layout()->itemAt(0)->layout();
-        Q_ASSERT(legendLayout);
-        // remove every item
-        while (legendLayout->count()) {
-            QLayoutItem *item = legendLayout->takeAt(0);
-            if (!item) {
-                continue;
-            }
-            // get widget from layout item
-            QWidget *widget = item->widget();
-            if (widget) {
-                delete widget;
-                continue;
-            }
-        }
-        // and finally remove and delete the legend layout
-        layout()->removeItem(legendLayout);
-        delete legendLayout;
-    }
 
     // The convention for OP is Channel 1 to Channel 10.
     ui.actuatorNumber->setText(QString("%1:").arg(m_index + 1));
@@ -72,6 +52,68 @@ OutputChannelForm::OutputChannelForm(const int index, QWidget *parent, const boo
 OutputChannelForm::~OutputChannelForm()
 {
     // Do nothing
+}
+
+void OutputChannelForm::addToGrid(QGridLayout *gridLayout)
+{
+    // if we are the first row to be inserted the show the legend
+    bool showLegend = (gridLayout->rowCount() == 1);
+
+    if (false && !showLegend) {
+        QLayout *legendLayout = layout()->itemAt(0)->layout();
+        Q_ASSERT(legendLayout);
+        // remove every item
+        while (legendLayout->count()) {
+            QLayoutItem *item = legendLayout->takeAt(0);
+            if (!item) {
+                continue;
+            }
+            // get widget from layout item
+            QWidget *widget = item->widget();
+            if (widget) {
+                delete widget;
+                continue;
+            }
+        }
+        // and finally remove and delete the legend layout
+        layout()->removeItem(legendLayout);
+        delete legendLayout;
+    }
+
+    QGridLayout *srcLayout = dynamic_cast<QGridLayout*>(layout());
+    Q_ASSERT(srcLayout);
+
+    if (showLegend) {
+        Q_ASSERT(srcLayout);
+        int row = gridLayout->rowCount();
+        for(int col = 0; col < srcLayout->columnCount(); col++) {
+            QLayoutItem *item = srcLayout->itemAtPosition(0, col);
+            if (!item) {
+                continue;
+            }
+            QWidget *widget = item->widget();
+            if (widget) {
+                gridLayout->addWidget(widget, row, col);
+                continue;
+            }
+        }
+    }
+
+    int row = gridLayout->rowCount();
+    for(int col = 0; col < srcLayout->columnCount(); col++) {
+        QLayoutItem *item = srcLayout->itemAtPosition(1, col);
+        if (!item) {
+            continue;
+        }
+        QWidget *widget = item->widget();
+        if (widget) {
+            gridLayout->addWidget(widget, row, col);
+            continue;
+        }
+    }
+
+    //
+    setVisible(false);
 }
 
 /**

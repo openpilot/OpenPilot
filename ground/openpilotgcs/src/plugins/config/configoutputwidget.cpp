@@ -76,10 +76,12 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     // NOTE: we have channel indices from 0 to 9, but the convention for OP is Channel 1 to Channel 10.
     // Register for ActuatorSettings changes:
     for (unsigned int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
-        OutputChannelForm *form = new OutputChannelForm(i, this, i == 0);
+        OutputChannelForm *form = new OutputChannelForm(i, this);
+        form->addToGrid(ui->channelLayout);
+
         connect(ui->channelOutTest, SIGNAL(toggled(bool)), form, SLOT(enableChannelTest(bool)));
         connect(form, SIGNAL(channelChanged(int, int)), this, SLOT(sendChannelTest(int, int)));
-        ui->channelLayout->addWidget(form);
+
         addWidget(form->ui.actuatorMin);
         addWidget(form->ui.actuatorNeutral);
         addWidget(form->ui.actuatorMax);

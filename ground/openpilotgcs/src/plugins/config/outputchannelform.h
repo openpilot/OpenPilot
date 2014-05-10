@@ -35,12 +35,14 @@ class OutputChannelForm : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
-    explicit OutputChannelForm(const int index, QWidget *parent = NULL, const bool showLegend = false);
+    explicit OutputChannelForm(const int index, QWidget *parent = NULL);
     ~OutputChannelForm();
+
     friend class ConfigOutputWidget;
 
     void setAssignment(const QString &assignment);
     int index() const;
+    void addToGrid(QGridLayout *gridLayout);
 
 public slots:
     void max(int maximum);
@@ -57,7 +59,7 @@ signals:
 
 private:
     Ui::outputChannelForm ui;
-    /// Channel index
+    // Channel index
     int m_index;
     bool m_inChannelTest;
 

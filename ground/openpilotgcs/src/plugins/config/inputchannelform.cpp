@@ -4,13 +4,31 @@
 #include "manualcontrolsettings.h"
 #include "gcsreceiver.h"
 
-InputChannelForm::InputChannelForm(QWidget *parent, bool showLegend) :
-    ConfigTaskWidget(parent), ui(new Ui::InputChannelForm)
+InputChannelForm::InputChannelForm(QWidget *parent) : ConfigTaskWidget(parent), ui(new Ui::InputChannelForm)
 {
     ui->setupUi(this);
 
+    connect(ui->channelMin, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
+    connect(ui->channelMax, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
+    connect(ui->neutralValue, SIGNAL(valueChanged(int)), this, SLOT(neutralUpdated()));
+    connect(ui->channelGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(groupUpdated()));
+    connect(ui->channelRev, SIGNAL(toggled(bool)), this, SLOT(reversedUpdated()));
+
+    disableMouseWheelEvents();
+}
+
+InputChannelForm::~InputChannelForm()
+{
+    delete ui;
+}
+
+void InputChannelForm::addToGrid(QGridLayout *gridLayout)
+{
+    // if we are the first row to be inserted the show the legend
+    bool showLegend = (gridLayout->rowCount() == 1);
+
     // The first time through the loop, keep the legend. All other times, delete it.
-    if (!showLegend) {
+    if (false && !showLegend) {
         QLayout *legendLayout = layout()->itemAt(0)->layout();
         Q_ASSERT(legendLayout);
         // remove every item
@@ -31,19 +49,40 @@ InputChannelForm::InputChannelForm(QWidget *parent, bool showLegend) :
         delete legendLayout;
     }
 
-    connect(ui->channelMin, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
-    connect(ui->channelMax, SIGNAL(valueChanged(int)), this, SLOT(minMaxUpdated()));
-    connect(ui->neutralValue, SIGNAL(valueChanged(int)), this, SLOT(neutralUpdated()));
-    connect(ui->channelGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(groupUpdated()));
-    connect(ui->channelRev, SIGNAL(toggled(bool)), this, SLOT(reversedUpdated()));
+    QGridLayout *srcLayout = dynamic_cast<QGridLayout*>(layout());
+    Q_ASSERT(srcLayout);
 
-    disableMouseWheelEvents();
-}
+    if (showLegend) {
+        Q_ASSERT(srcLayout);
+        int row = gridLayout->rowCount();
+        for(int col = 0; col < srcLayout->columnCount(); col++) {
+            QLayoutItem *item = srcLayout->itemAtPosition(0, col);
+            if (!item) {
+                continue;
+            }
+            QWidget *widget = item->widget();
+            if (widget) {
+                gridLayout->addWidget(widget, row, col);
+                continue;
+            }
+        }
+    }
 
+    int row = gridLayout->rowCount();
+    for(int col = 0; col < srcLayout->columnCount(); col++) {
+        QLayoutItem *item = srcLayout->itemAtPosition(1, col);
+        if (!item) {
+            continue;
+        }
+        QWidget *widget = item->widget();
+        if (widget) {
+            gridLayout->addWidget(widget, row, col);
+            continue;
+        }
+    }
 
-InputChannelForm::~InputChannelForm()
-{
-    delete ui;
+    //
+    setVisible(false);
 }
 
 void InputChannelForm::setName(QString &name)
@@ -118,8 +157,8 @@ void InputChannelForm::reversedUpdated()
  */
 void InputChannelForm::groupUpdated()
 {
-    ui->channelNumberDropdown->clear();
-    ui->channelNumberDropdown->addItem("Disabled");
+    ui->channelNumber->clear();
+    ui->channelNumber->addItem("Disabled");
 
     quint8 count = 0;
 
@@ -150,6 +189,6 @@ void InputChannelForm::groupUpdated()
     }
 
     for (int i = 0; i < count; i++) {
-        ui->channelNumberDropdown->addItem(QString(tr("Chan %1").arg(i + 1)));
+        ui->channelNumber->addItem(QString(tr("Chan %1").arg(i + 1)));
     }
 }

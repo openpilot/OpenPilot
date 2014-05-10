@@ -50,6 +50,18 @@ void RPY2Quaternion(const float rpy[3], float q[4]);
 // ** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
 void Quaternion2R(float q[4], float Rbe[3][3]);
 
+// ** Find x of body frame from quaternion **
+void QuaternionC2xB(const float q0, const float q1, const float q2, const float q3, float x[3]);
+void Quaternion2xB(const float q[4], float x[3]);
+
+// ** Find y of body frame from quaternion **
+void QuaternionC2yB(const float q0, const float q1, const float q2, const float q3, float y[3]);
+void Quaternion2yB(const float q[4], float y[3]);
+
+// ** Find x of body frame from quaternion **
+void QuaternionC2zB(const float q0, const float q1, const float q2, const float q3, float z[3]);
+void Quaternion2zB(const float q[4], float z[3]);
+
 // ****** Express LLA in a local NED Base Frame ********
 void LLA2Base(int32_t LLAi[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
 

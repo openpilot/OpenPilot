@@ -44,7 +44,7 @@
 #include "baro_airspeed_ms4525do.h"
 #include "baro_airspeed_etasv3.h"
 #include "baro_airspeed_mpxv.h"
-#include "gps_airspeed.h"
+#include "imu_airspeed.h"
 #include "taskinfo.h"
 
 // Private constants
@@ -143,7 +143,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
 
     AirspeedSettingsUpdatedCb(NULL);
 
-    gps_airspeedInitialize();
+    imu_airspeedInitialize();
 
     airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
 
@@ -183,7 +183,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
             break;
 #endif
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
-            gps_airspeedGet(&airspeedData, &airspeedSettings);
+            imu_airspeedGet(&airspeedData, &airspeedSettings);
             break;
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:
         default:

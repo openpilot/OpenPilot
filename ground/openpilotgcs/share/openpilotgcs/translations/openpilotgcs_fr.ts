@@ -14619,8 +14619,12 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     </message>
     <message>
         <location line="+2"/>
+        <source>Calibration failed! Please read the instructions and retry.</source>
+        <translation type="unfinished">Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau.</translation>
+    </message>
+    <message>
         <source>Calibration failed! Please read the instructions and retry</source>
-        <translation type="unfinished">Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau</translation>
+        <translation type="obsolete">Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau</translation>
     </message>
 </context>
 <context>

@@ -54,7 +54,7 @@ public:
         if (m_helper->calibrationSuccessful()) {
             nextStateName = tr("Calibration completed succesfully");
         } else {
-            nextStateName = tr("Calibration failed! Please read the instructions and retry");
+            nextStateName = tr("Calibration failed! Please read the instructions and retry.");
         }
         static_cast<WizardState *>(targetState())->setStepName(nextStateName);
     }

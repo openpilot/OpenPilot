@@ -6989,7 +6989,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Save Position</source>
-        <translation>Enregistre Position</translation>
+        <translation>Enregistrer Position</translation>
     </message>
     <message>
         <source>#2: Sensor noise calibration</source>
@@ -10366,7 +10366,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>filename</source>
-        <translation type="unfinished">Nom de fichier</translation>
+        <translation>Nom de fichier</translation>
     </message>
 </context>
 <context>
@@ -13348,7 +13348,7 @@ p, li { white-space: pre-wrap; }
         <location line="+249"/>
         <source>http://wiki.openpilot.org/x/WIGf</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation type="unfinished">http://wiki.openpilot.org/x/aoBqAQ</translation>
+        <translation>http://wiki.openpilot.org/x/aoBqAQ</translation>
     </message>
 </context>
 <context>
@@ -13586,7 +13586,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+33"/>
         <source>BL version: </source>
-        <translation type="unfinished">Version BL : </translation>
+        <translation>Version BL : </translation>
     </message>
     <message>
         <location line="+6"/>
@@ -14241,7 +14241,7 @@ Veuillez vérifier le fichier.
         <location line="+9"/>
         <location line="+9"/>
         <source>Unbind</source>
-        <translation type="unfinished"></translation>
+        <translation>Détacher</translation>
     </message>
     <message>
         <location line="-27"/>
@@ -14249,7 +14249,7 @@ Veuillez vérifier le fichier.
         <location line="+9"/>
         <location line="+9"/>
         <source>Bind</source>
-        <translation type="unfinished">Associer</translation>
+        <translation>Associer</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -14643,7 +14643,8 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location line="+2"/>
         <source>*** Please Wait *** Samples acquisition, this can take several minutes</source>
-        <translation type="unfinished">*** Veuillez Patienter *** Acquisition des échantillons, ceci peut prendre plusieurs minutes</translation>
+        <translatorcomment>Only one line allowed for text</translatorcomment>
+        <translation type="unfinished">*** Veuillez Patienter *** Acquisition des échantillons, cela demande du temps</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -14666,7 +14667,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/telemetry/telemetryplugin.cpp" line="+157"/>
         <source>Firmware Version Mismatch!</source>
-        <translation type="unfinished">Incompatibilité des Versions de Firmware !</translation>
+        <translation>Incompatibilité des Versions de Firmware !</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -14695,12 +14696,12 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location line="+8"/>
         <location line="+9"/>
         <source>Timing out in %1 seconds</source>
-        <translation type="unfinished">Temps d&apos;attente dépassé dans %1 secondes</translation>
+        <translation type="unfinished">Expiration du temps d&apos;attente dans %1 secondes</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Timed out after %1 seconds</source>
-        <translation type="unfinished">Temps d&apos;attente dépassé après %1 secondes</translation>
+        <translation type="unfinished">Expiration du temps d&apos;attente après %1 secondes</translation>
     </message>
 </context>
 </TS>

@@ -4427,7 +4427,13 @@ p, li { white-space: pre-wrap; }
         <translation>. Redémarrer le programme.</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+30"/>
+        <source>http://wiki.openpilot.org/x/OQBj</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/hoBqAQ</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>All your settings will be deleted!</source>
         <translation>Tous vos réglages seront effacés !</translation>
     </message>
@@ -7461,7 +7467,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Revolution+Manual+Sensor+Calibration</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation type="unfinished">url:http://wiki.openpilot.org/x/FQWJAQ</translation>
     </message>
 </context>
 <context>
@@ -10163,6 +10170,12 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
         <source>Import Summary</source>
         <translation>Sommaire d&apos;Importation</translation>
     </message>
+    <message>
+        <location line="+28"/>
+        <source>http://wiki.openpilot.org/display/Doc/UAV+Settings+import-export</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/IQCJAQ</translation>
+    </message>
 </context>
 <context>
     <name>deviceWidget</name>
@@ -10638,7 +10651,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/config_cc_hw_widget.cpp" line="+91"/>
         <source>Enable GPS module and reboot the board to be able to select GPS protocol</source>
-        <translation type="unfinished">Activez le module GPS et redémarrez la carte pour pouvoir choisir le protocole GPS</translation>
+        <translation>Activez le module GPS et redémarrez la carte pour pouvoir choisir le protocole GPS</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -10661,6 +10674,12 @@ p, li { white-space: pre-wrap; }
         <source>Warning: you have disabled USB Telemetry on both USB HID Port and USB VCP Port, this currently is not supported</source>
         <translation>Attention : vous avez désactivé la télémétrie USB sur les deux ports USB HID et USB VCP, ce n&apos;est actuellement pas possible</translation>
     </message>
+    <message>
+        <location line="+15"/>
+        <source>http://wiki.openpilot.org/x/D4AUAQ</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/HoBqAQ</translation>
+    </message>
 </context>
 <context>
     <name>ConfigCCAttitudeWidget</name>
@@ -10668,6 +10687,12 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/config/configccattitudewidget.cpp" line="+159"/>
         <source>Calibration timed out before receiving required updates.</source>
         <translation>Temps d&apos;attente dépassé avant d&apos;avoir reçu les mises à jour demandées.</translation>
+    </message>
+    <message>
+        <location line="+58"/>
+        <source>http://wiki.openpilot.org/x/44Cf</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation type="unfinished">http://wiki.openpilot.org/x/IIBqAQ</translation>
     </message>
 </context>
 <context>
@@ -10692,7 +10717,13 @@ Voulez-vous toujours continuer ?</translation>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+368"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+361"/>
+        <source>http://wiki.openpilot.org/x/04Cf</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/aIBqAQ</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <location line="+1056"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
@@ -11768,7 +11799,13 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <translation type="unfinished">Quelque chose s&apos;est mal passé, vous devrez mettre à jour la carte manuellement.</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+38"/>
+        <source>http://wiki.openpilot.org/x/AoBZ</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/SYBqAQ</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Confirm Settings Erase?</source>
         <translation type="unfinished">Confirmer l&apos;Effacement des Paramètres ?</translation>
     </message>
@@ -13307,6 +13344,12 @@ p, li { white-space: pre-wrap; }
         <source>This option will start your motors by the amount selected on the sliders regardless of transmitter. It is recommended to remove any blades from motors. Are you sure you want to do this?</source>
         <translation>Cette option démarre vos moteurs avec la valeur sélectionnée sur les curseurs, indépendamment de l&apos;émetteur. Il est recommandé d&apos;enlever les hélices des moteurs. Êtes-vous sûr de vouloir faire ça ?</translation>
     </message>
+    <message>
+        <location line="+249"/>
+        <source>http://wiki.openpilot.org/x/WIGf</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation type="unfinished">http://wiki.openpilot.org/x/aoBqAQ</translation>
+    </message>
 </context>
 <context>
     <name>ConfigRevoHWWidget</name>
@@ -13314,6 +13357,12 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/config/configrevohwwidget.cpp" line="+92"/>
         <source>Disabled</source>
         <translation>Désactivé</translation>
+    </message>
+    <message>
+        <location line="+201"/>
+        <source>http://wiki.openpilot.org/x/GgDBAQ</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/TYRNAQ</translation>
     </message>
 </context>
 <context>
@@ -14433,6 +14482,12 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location line="+1"/>
         <source>Custom</source>
         <translation type="unfinished">Personnalisé</translation>
+    </message>
+    <message>
+        <location line="+270"/>
+        <source>http://wiki.openpilot.org/x/44Cf</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/IIBqAQ</translation>
     </message>
 </context>
 <context>

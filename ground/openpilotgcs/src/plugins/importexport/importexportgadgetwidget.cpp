@@ -202,7 +202,7 @@ void ImportExportGadgetWidget::importConfiguration(const QString & fileName)
 
 void ImportExportGadgetWidget::on_helpButton_clicked()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/OQBj"));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/OQBj")));
 }
 
 

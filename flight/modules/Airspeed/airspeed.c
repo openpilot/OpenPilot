@@ -155,9 +155,19 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         if (airspeedSettings.AirspeedSensorType != lastAirspeedSensorType) {
             AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_DEFAULT);
             lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
-            if (airspeedSettings.AirspeedSensorType == AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE) {
+            switch (airspeedSettings.AirspeedSensorType) {
+            case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:
+                // AirspeedSensor will not be updated until a different sensor is selected
+                // set the disconencted satus now
                 airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
                 AirspeedSensorSet(&airspeedData);
+                break;
+            case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
+                if (!gpsAirspeedInitialized) {
+                    gpsAirspeedInitialized = true;
+                    gps_airspeedInitialize();
+                }
+                break;
             }
         }
         switch (airspeedSettings.AirspeedSensorType) {
@@ -181,10 +191,6 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
             break;
 #endif
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
-            if (!gpsAirspeedInitialized) {
-                gpsAirspeedInitialized = true;
-                gps_airspeedInitialize();
-            }
             gps_airspeedGet(&airspeedData, &airspeedSettings);
             break;
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:

@@ -747,7 +747,7 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
 
     # Packaged GCS should depend on opfw_resource
     ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
-        $(eval openpilotgcs: $(OPFW_RESOURCE))
+        $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
     endif
 
     # Clean the build directory if clean_package is requested

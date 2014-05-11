@@ -202,7 +202,9 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 {
     portTickType xDelay = 100 / portTICK_RATE_MS;
     uint32_t timeNowMs  = xTaskGetTickCount() * portTICK_RATE_MS;
+#ifdef PIOS_GPS_SETS_HOMELOCATION
     portTickType homelocationSetDelay = 0;
+#endif
     GPSPositionSensorData gpspositionsensor;
     GPSSettingsData gpsSettings;
 

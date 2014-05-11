@@ -554,7 +554,7 @@ margin:1px;</string>
       <item>
        <widget class="QSlider" name="actuatorNeutral">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -586,7 +586,7 @@ margin:1px;</string>
         </property>
         <property name="minimumSize">
          <size>
-          <width>20</width>
+          <width>25</width>
           <height>0</height>
          </size>
         </property>

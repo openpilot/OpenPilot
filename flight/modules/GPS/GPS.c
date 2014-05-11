@@ -63,24 +63,24 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // ****************
 // Private constants
 
-#define GPS_TIMEOUT_MS           500
+#define GPS_TIMEOUT_MS             500
 // delay from detecting HomeLocation.Set == False before setting new homelocation
 // this prevent that a save with homelocation.Set = false triggered by gps ends saving
 // the new location with Set = true.
-#define HOMELOCATIONSETDELAY  5000
+#define GPS_HOMELOCATION_SET_DELAY 5000
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-        #define STACK_SIZE_BYTES 1024
+        #define STACK_SIZE_BYTES   1024
 #else
 #if defined(PIOS_GPS_MINIMAL)
-        #define STACK_SIZE_BYTES 500
+        #define STACK_SIZE_BYTES   500
 #else
-        #define STACK_SIZE_BYTES 650
+        #define STACK_SIZE_BYTES   650
 #endif // PIOS_GPS_MINIMAL
 #endif // PIOS_GPS_SETS_HOMELOCATION
 
-#define TASK_PRIORITY            (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY              (tskIDLE_PRIORITY + 1)
 
 // ****************
 // Private variables
@@ -263,13 +263,13 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                 HomeLocationGet(&home);
 
                 if (home.Set == HOMELOCATION_SET_FALSE) {
-                	if(homelocationSetDelay == 0){
-                		homelocationSetDelay = xTaskGetTickCount();
-                	}
-                	if(xTaskGetTickCount() - homelocationSetDelay > HOMELOCATIONSETDELAY){
-                		setHomeLocation(&gpspositionsensor);
-                		homelocationSetDelay = 0;
-                	}
+                    if (homelocationSetDelay == 0) {
+                        homelocationSetDelay = xTaskGetTickCount();
+                    }
+                    if (xTaskGetTickCount() - homelocationSetDelay > GPS_HOMELOCATION_SET_DELAY) {
+                        setHomeLocation(&gpspositionsensor);
+                        homelocationSetDelay = 0;
+                    }
                 }
 #endif
             } else if ((gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&

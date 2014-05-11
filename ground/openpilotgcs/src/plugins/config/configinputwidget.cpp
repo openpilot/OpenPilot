@@ -98,6 +98,13 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
 
         addWidget(form->ui->channelRev);
 
+        // Reversing supported for some channels only
+        bool reversable = ((index == ManualControlSettings::CHANNELGROUPS_THROTTLE) ||
+                (index == ManualControlSettings::CHANNELGROUPS_ROLL)  ||
+                (index == ManualControlSettings::CHANNELGROUPS_PITCH)  ||
+                (index == ManualControlSettings::CHANNELGROUPS_YAW));
+        form->ui->channelRev->setVisible(reversable);
+
         // Input filter response time fields supported for some channels only
         switch (index) {
         case ManualControlSettings::CHANNELGROUPS_ROLL:

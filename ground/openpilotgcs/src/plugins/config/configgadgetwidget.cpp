@@ -147,7 +147,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 ConfigGadgetWidget::~ConfigGadgetWidget()
 {
     // TODO: properly delete all the tabs in stackWidget before exiting
-    delete stackWidget
+    delete stackWidget;
 }
 
 void ConfigGadgetWidget::startInputWizard()

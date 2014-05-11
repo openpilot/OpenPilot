@@ -2085,7 +2085,7 @@ const struct pios_ws2811_cfg pios_ws2811_cfg = {
         .flags = (DMA_IT_TCIF1),
         .init  = {
             .NVIC_IRQChannel    = DMA2_Stream1_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
             .NVIC_IRQChannelSubPriority        = 0,
             .NVIC_IRQChannelCmd = ENABLE,
         },

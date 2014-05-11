@@ -70,6 +70,7 @@ public:
 
     QString units() const;
     QString type() const;
+    bool isInteger() const;
     UAVObject *object() const;
     UAVObjectField *field() const;
     int index() const;
@@ -222,11 +223,10 @@ private:
     QString m_outOfLimitsStyle;
     QTimer *m_realtimeUpdateTimer;
 
-    bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, double scale, bool hasLimits);
+    bool setWidgetFromField(QWidget *widget, UAVObjectField *field, WidgetBinding *binding);
 
-    QVariant getVariantFromWidget(QWidget *widget, double scale, const QString units, QString type);
-    bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale, QString units, QString type);
-    bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale);
+    QVariant getVariantFromWidget(QWidget *widget, WidgetBinding *binding);
+    bool setWidgetFromVariant(QWidget *widget, QVariant value, WidgetBinding *binding);
 
     void connectWidgetUpdatesToSlot(QWidget *widget, const char *function);
     void disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function);

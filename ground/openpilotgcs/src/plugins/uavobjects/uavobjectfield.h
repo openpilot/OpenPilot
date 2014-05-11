@@ -71,6 +71,7 @@ public:
     quint32 getDataOffset();
     quint32 getNumBytes();
     bool isNumeric();
+    bool isInteger();
     bool isText();
     QString toString();
     void toXML(QXmlStreamWriter *xmlWriter);

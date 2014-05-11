@@ -215,10 +215,10 @@ void setupTimer()
     };
 
     // (duty in ticks) / (period in ticks) * 1.25uS (period in S) = 0.40 uS
-    oc.TIM_Pulse = 40 * PIOS_WS2811_TIM_PERIOD / 125;
+    oc.TIM_Pulse = PIOS_WS2811_T0_HIGH_PERIOD * PIOS_WS2811_TIM_PERIOD / 125;
     genericTIM_OCxInit(pios_ws2811_cfg->timer, &oc, pios_ws2811_cfg->timerCh1);
     // (duty in ticks) / (period in ticks) * 1.25uS (period in S) = 0.80 uS
-    oc.TIM_Pulse = 80 * PIOS_WS2811_TIM_PERIOD / 125;
+    oc.TIM_Pulse = PIOS_WS2811_T1_HIGH_PERIOD * PIOS_WS2811_TIM_PERIOD / 125;
     genericTIM_OCxInit(pios_ws2811_cfg->timer, &oc, pios_ws2811_cfg->timerCh2);
 }
 
@@ -337,7 +337,7 @@ void PIOS_WS2811_Update()
 
 void PIOS_WS2811_DMA_irq_handler()
 {
-    TIM_Cmd(pios_ws2811_cfg->timer, DISABLE);
+    pios_ws2811_cfg->timer->CR1 &= (uint16_t) ~TIM_CR1_CEN;
     DMA_ClearFlag(pios_ws2811_cfg->streamCh1, pios_ws2811_cfg->irq.flags);
 }
 

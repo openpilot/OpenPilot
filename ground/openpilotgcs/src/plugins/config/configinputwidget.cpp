@@ -96,7 +96,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         addWidgetBinding("ManualControlSettings", "ChannelMin", form->ui->channelMin, index);
         addWidgetBinding("ManualControlSettings", "ChannelMax", form->ui->channelMax, index);
 
-        addWidget(form->ui->channelResponseTime);
         addWidget(form->ui->channelRev);
 
         // Input filter response time fields supported for some channels only
@@ -113,7 +112,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         case ManualControlSettings::CHANNELGROUPS_THROTTLE:
         case ManualControlSettings::CHANNELGROUPS_FLIGHTMODE:
         case ManualControlSettings::CHANNELGROUPS_COLLECTIVE:
-            form->ui->channelResponseTime->setEnabled(false);
+            form->ui->channelResponseTime->setVisible(false);
             break;
         default:
             Q_ASSERT(0);

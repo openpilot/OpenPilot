@@ -817,6 +817,7 @@ bool UAVObjectField::isNumeric()
     case UINT16:
     case UINT32:
     case FLOAT32:
+    case BITFIELD:
         return true;
 
         break;

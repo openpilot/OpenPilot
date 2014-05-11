@@ -82,7 +82,7 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
     // Read alarm and update its severity only if it was changed
     SystemAlarmsAlarmGet(&alarms);
     uint16_t flightTime = (uint16_t)xTaskGetTickCount() * (uint16_t)portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
-    if ((flightTime - lastAlarmChange[alarm] > PIOS_ALARM_GRACETIME &&
+    if (((uint16_t)(flightTime - lastAlarmChange[alarm]) > PIOS_ALARM_GRACETIME &&
          cast_struct_to_array(alarms, alarms.Actuator)[alarm] != severity)
         || cast_struct_to_array(alarms, alarms.Actuator)[alarm] < severity) {
         cast_struct_to_array(alarms, alarms.Actuator)[alarm] = severity;
@@ -121,7 +121,7 @@ int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm,
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
     uint16_t flightTime = (uint16_t)xTaskGetTickCount() * (uint16_t)portTICK_RATE_MS; // this deliberately overflows every 2^16 milliseconds to save memory
-    if ((flightTime - lastAlarmChange[alarm] > PIOS_ALARM_GRACETIME &&
+    if (((uint16_t)(flightTime - lastAlarmChange[alarm]) > PIOS_ALARM_GRACETIME &&
          cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] != severity)
         || cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] < severity) {
         cast_struct_to_array(alarms.ExtendedAlarmStatus, alarms.ExtendedAlarmStatus.BootFault)[alarm]    = status;
@@ -253,6 +253,33 @@ static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
     // If this point is reached then no alarms found
     xSemaphoreGiveRecursive(lock);
     return 0;
+}
+/**
+ * Get the highest alarm severity
+ * @return
+ */
+SystemAlarmsAlarmOptions AlarmsGetHighestSeverity()
+{
+    SystemAlarmsAlarmData alarmsData;
+    SystemAlarmsAlarmOptions highest = SYSTEMALARMS_ALARM_UNINITIALISED;
+
+    // Lock
+    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+
+    // Read alarms
+    SystemAlarmsAlarmGet(&alarmsData);
+
+    // Go through alarms and find the highest severity
+    uint32_t n = 0;
+    while (n < SYSTEMALARMS_ALARM_NUMELEM && highest != SYSTEMALARMS_ALARM_CRITICAL) {
+        if (cast_struct_to_array(alarmsData, alarmsData.Actuator)[n] > highest) {
+            highest = cast_struct_to_array(alarmsData, alarmsData.Actuator)[n];
+        }
+        n++;
+    }
+
+    xSemaphoreGiveRecursive(lock);
+    return highest;
 }
 
 /**

@@ -197,7 +197,7 @@ export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
 # Define supported board lists
-ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix
+ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix discoveryf4bare
 
 # Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
@@ -206,6 +206,7 @@ revolution_short       := 'revo'
 osd_short              := 'osd '
 revoproto_short        := 'revp'
 simposix_short         := 'posx'
+discoveryf4bare_short  := 'df4b'
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.
@@ -697,7 +698,7 @@ endif
 ##############################
 
 # Firmware files to package
-PACKAGE_FW_TARGETS  := $(filter-out fw_simposix, $(FW_TARGETS))
+PACKAGE_FW_TARGETS  := $(filter-out fw_simposix fw_discoveryf4bare, $(FW_TARGETS))
 PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.

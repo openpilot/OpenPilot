@@ -33,6 +33,8 @@
 #include "inc/stateestimation.h"
 #include <attitudestate.h>
 #include <revocalibration.h>
+#include <revosettings.h>
+#include <systemalarms.h>
 #include <homelocation.h>
 
 #include <CoordinateConversions.h>
@@ -43,9 +45,13 @@
 
 // Private types
 struct data {
-    HomeLocationData    homeLocation;
     RevoCalibrationData revoCalibration;
-    float magBias[3];
+    RevoSettingsData    revoSettings;
+    uint8_t warningcount;
+    uint8_t errorcount;
+    float   homeLocationBe[3];
+    float   magBe2;
+    float   magBias[3];
 };
 
 // Private variables
@@ -54,6 +60,7 @@ struct data {
 
 static int32_t init(stateFilter *self);
 static int32_t filter(stateFilter *self, stateEstimation *state);
+static void checkMagValidity(struct data *this, float mag[3]);
 static void magOffsetEstimation(struct data *this, float mag[3]);
 
 
@@ -70,9 +77,13 @@ static int32_t init(stateFilter *self)
 {
     struct data *this = (struct data *)self->localdata;
 
-    this->magBias[0] = this->magBias[1] = this->magBias[2] = 0.0f;
-    HomeLocationGet(&this->homeLocation);
+    this->magBias[0]   = this->magBias[1] = this->magBias[2] = 0.0f;
+    this->warningcount = this->errorcount = 0;
+    HomeLocationBeGet(this->homeLocationBe);
+    // magBe2 holds the squared magnetic vector length (extpected)
+    this->magBe2 = this->homeLocationBe[0] * this->homeLocationBe[0] + this->homeLocationBe[1] * this->homeLocationBe[1] + this->homeLocationBe[2] * this->homeLocationBe[2];
     RevoCalibrationGet(&this->revoCalibration);
+    RevoSettingsGet(&this->revoSettings);
     return 0;
 }
 
@@ -81,6 +92,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     struct data *this = (struct data *)self->localdata;
 
     if (IS_SET(state->updated, SENSORUPDATES_mag)) {
+        checkMagValidity(this, state->mag);
         if (this->revoCalibration.MagBiasNullingRate > 0) {
             magOffsetEstimation(this, state->mag);
         }
@@ -88,6 +100,53 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
     return 0;
 }
+
+/**
+ * check validity of magnetometers
+ */
+static void checkMagValidity(struct data *this, float mag[3])
+{
+        #define ALARM_THRESHOLD 5
+
+    // mag2 holds the actual magnetic vector length (squared)
+    float mag2 = mag[0] * mag[0] + mag[1] * mag[1] + mag[2] * mag[2];
+
+    // warning and error thresholds
+    // avoud sqrt() : minlimit<actual<maxlimit === minlimit²<actual²<maxlimit²
+    //
+    // actual = |mag|
+    // minlimit = |Be| - maxDeviation*|Be| = |Be| * (1 - maxDeviation)
+    // maxlimit = |Be| + maxDeviation*|Be| = |Be| * (1 + maxDeviation)
+    // minlimit² = |Be|² * ( 1 - 2*maxDeviation + maxDeviation²)
+    // maxlimit² = |Be|² * ( 1 + 2*maxDeviation + maxDeviation²)
+    //
+
+    float minWarning2 = this->magBe2 * (1.0f - 2.0f * this->revoSettings.MagnetometerMaxDeviation.Warning + this->revoSettings.MagnetometerMaxDeviation.Warning * this->revoSettings.MagnetometerMaxDeviation.Warning);
+    float maxWarning2 = this->magBe2 * (1.0f + 2.0f * this->revoSettings.MagnetometerMaxDeviation.Warning + this->revoSettings.MagnetometerMaxDeviation.Warning * this->revoSettings.MagnetometerMaxDeviation.Warning);
+    float minError2   = this->magBe2 * (1.0f - 2.0f * this->revoSettings.MagnetometerMaxDeviation.Error + this->revoSettings.MagnetometerMaxDeviation.Error * this->revoSettings.MagnetometerMaxDeviation.Error);
+    float maxError2   = this->magBe2 * (1.0f + 2.0f * this->revoSettings.MagnetometerMaxDeviation.Error + this->revoSettings.MagnetometerMaxDeviation.Error * this->revoSettings.MagnetometerMaxDeviation.Error);
+
+    // set errors
+    if (minWarning2 < mag2 && mag2 < maxWarning2) {
+        this->warningcount = 0;
+        this->errorcount   = 0;
+        AlarmsClear(SYSTEMALARMS_ALARM_MAGNETOMETER);
+    } else if (minError2 < mag2 && mag2 < maxError2) {
+        this->errorcount = 0;
+        if (this->warningcount > ALARM_THRESHOLD) {
+            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_WARNING);
+        } else {
+            this->warningcount++;
+        }
+    } else {
+        if (this->errorcount > ALARM_THRESHOLD) {
+            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_CRITICAL);
+        } else {
+            this->errorcount++;
+        }
+    }
+}
+
 
 /**
  * Perform an update of the @ref MagBias based on
@@ -137,8 +196,8 @@ static void magOffsetEstimation(struct data *this, float mag[3])
     }
 #else // if 0
 
-    const float Rxy  = sqrtf(this->homeLocation.Be[0] * this->homeLocation.Be[0] + this->homeLocation.Be[1] * this->homeLocation.Be[1]);
-    const float Rz   = this->homeLocation.Be[2];
+    const float Rxy  = sqrtf(this->homeLocationBe[0] * this->homeLocationBe[0] + this->homeLocationBe[1] * this->homeLocationBe[1]);
+    const float Rz   = this->homeLocationBe[2];
 
     const float rate = this->revoCalibration.MagBiasNullingRate;
     float Rot[3][3];

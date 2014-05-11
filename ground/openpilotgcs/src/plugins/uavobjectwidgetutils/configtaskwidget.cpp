@@ -228,34 +228,6 @@ UAVObjectManager *ConfigTaskWidget::getObjectManager()
     return objMngr;
 }
 
-double ConfigTaskWidget::listMean(QList<double> list)
-{
-    double accum = 0;
-
-    for (int i = 0; i < list.size(); i++) {
-        accum += list[i];
-    }
-    return accum / list.size();
-}
-
-double ConfigTaskWidget::listVar(QList<double> list)
-{
-    double mean_accum = 0;
-    double var_accum  = 0;
-    double mean;
-
-    for (int i = 0; i < list.size(); i++) {
-        mean_accum += list[i];
-    }
-    mean = mean_accum / list.size();
-
-    for (int i = 0; i < list.size(); i++) {
-        var_accum += (list[i] - mean) * (list[i] - mean);
-    }
-
-    // Use unbiased estimator
-    return var_accum / (list.size() - 1);
-}
 
 void ConfigTaskWidget::onAutopilotDisconnect()
 {

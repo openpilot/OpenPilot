@@ -63,7 +63,7 @@
 #include "taskinfo.h"
 
 #include "CoordinateConversions.h"
-
+#include <pios_notify.h>
 
 // Private constants
 #define STACK_SIZE_BYTES 540
@@ -252,6 +252,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             rollPitchBiasRate    = 0.01f;
             accel_filter_enabled = false;
             init = 0;
+            PIOS_NOTIFY_StartNotification(NOTIFY_DRAW_ATTENTION, NOTIFY_PRIORITY_REGULAR);
         } else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
             accelKp     = 1.0f;
             accelKi     = 0.0f;
@@ -259,6 +260,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             rollPitchBiasRate    = 0.01f;
             accel_filter_enabled = false;
             init = 0;
+            PIOS_NOTIFY_StartNotification(NOTIFY_DRAW_ATTENTION, NOTIFY_PRIORITY_REGULAR);
         } else if (init == 0) {
             // Reload settings (all the rates)
             AttitudeSettingsAccelKiGet(&accelKi);
@@ -693,8 +695,9 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     }
 
     // Indicates not to expend cycles on rotation
-    if (attitudeSettings.BoardRotation.Pitch == 0 && attitudeSettings.BoardRotation.Roll == 0 &&
-        attitudeSettings.BoardRotation.Yaw == 0) {
+    if (fabsf(attitudeSettings.BoardRotation.Pitch) < 0.00001f &&
+        fabsf(attitudeSettings.BoardRotation.Roll) < 0.00001f &&
+        fabsf(attitudeSettings.BoardRotation.Yaw) < 0.00001f) {
         rotate = 0;
 
         // Shouldn't be used but to be safe

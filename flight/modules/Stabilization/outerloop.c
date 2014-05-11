@@ -114,9 +114,19 @@ static void stabilizationOuterloopTask()
         float q_desired[4];
         float q_error[4];
 
-        rpy_desired[0] = stabilizationDesiredAxis[0];
-        rpy_desired[1] = stabilizationDesiredAxis[1];
-        rpy_desired[2] = stabilizationDesiredAxis[2];
+        for (t = 0; t < 3; t++) {
+            switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
+            case STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE:
+            case STABILIZATIONSTATUS_OUTERLOOP_RATTITUDE:
+            case STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING:
+                rpy_desired[t] = stabilizationDesiredAxis[t];
+                break;
+            case STABILIZATIONSTATUS_OUTERLOOP_DIRECT:
+            default:
+                rpy_desired[t] = ((float *)&attitudeState.Roll)[t];
+                break;
+            }
+        }
 
         RPY2Quaternion(rpy_desired, q_desired);
         quat_inverse(q_desired);

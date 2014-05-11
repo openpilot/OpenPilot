@@ -36,6 +36,7 @@
 #include <ekfconfiguration.h>
 #include <ekfstatevariance.h>
 #include <attitudestate.h>
+#include <systemalarms.h>
 #include <homelocation.h>
 
 #include <insgps.h>
@@ -348,7 +349,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     INSCovariancePrediction(dT);
 
     if (IS_SET(this->work.updated, SENSORUPDATES_mag)) {
-        sensors |= MAG_SENSORS;
+        SystemAlarmsAlarmData alarms;
+        SystemAlarmsAlarmGet(&alarms);
+        if (alarms.Magnetometer == SYSTEMALARMS_ALARM_OK) {
+            sensors |= MAG_SENSORS;
+        }
     }
 
     if (IS_SET(this->work.updated, SENSORUPDATES_baro)) {

@@ -27,10 +27,10 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.4629556"
-     inkscape:cx="32.393349"
-     inkscape:cy="37.450437"
-     inkscape:current-layer="foreground"
+     inkscape:zoom="29.851822"
+     inkscape:cx="82.604436"
+     inkscape:cy="54.252252"
+     inkscape:current-layer="background"
      id="namedview3608"
      showgrid="true"
      inkscape:window-width="1366"
@@ -1002,12 +1002,13 @@
        inkscape:label="#rect4550-8-1-4-21-5-13" />
     <rect
        style="fill:#241c1c;fill-opacity:1;stroke:none;display:inline"
-       id="rect4550-8-1-4-21-5-8"
+       id="Magnetometer"
        width="18.966711"
        height="10.202584"
        x="570.72327"
        y="361.65591"
-       ry="1" />
+       ry="1"
+       inkscape:label="#rect4550-8-1-4-21-5-8" />
     <rect
        style="fill:#241c1c;fill-opacity:1;stroke:none;display:inline"
        id="Battery"
@@ -1120,6 +1121,21 @@
        height="10.202584"
        x="51.238789"
        y="17.375544"
+       ry="1"
+       inkscape:label="#rect4550-8-1-4-21-5-33" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer42"
+     inkscape:label="Magnetometer-OK"
+     style="display:none">
+    <rect
+       style="fill:#008000;fill-opacity:1;stroke:none;display:inline"
+       id="Magnetometer-OK"
+       width="18.966711"
+       height="10.202584"
+       x="73.057671"
+       y="17.391815"
        ry="1"
        inkscape:label="#rect4550-8-1-4-21-5-33" />
   </g>
@@ -1399,7 +1415,7 @@
      inkscape:groupmode="layer"
      id="g5044"
      inkscape:label="Airspeed-Warning"
-     style="display:inline">
+     style="display:none">
     <rect
        style="fill:#ff6600;fill-opacity:1;stroke:none;display:inline"
        id="Airspeed-Warning"
@@ -1407,6 +1423,21 @@
        height="10.202584"
        x="51.238789"
        y="17.375544"
+       ry="1"
+       inkscape:label="#rect4550-8-1-4-21-5-33" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer41"
+     inkscape:label="Magnetometer-Warning"
+     style="display:none">
+    <rect
+       style="fill:#ff6600;fill-opacity:1;stroke:none;display:inline"
+       id="Magnetometer-Warning"
+       width="18.966711"
+       height="10.202584"
+       x="73.091171"
+       y="17.425316"
        ry="1"
        inkscape:label="#rect4550-8-1-4-21-5-33" />
   </g>
@@ -1686,7 +1717,7 @@
      inkscape:groupmode="layer"
      id="g5420"
      inkscape:label="Airspeed-Critical"
-     style="display:inline">
+     style="display:none">
     <rect
        style="fill:#d40000;fill-opacity:1;stroke:none;display:inline"
        id="Airspeed-Critical"
@@ -1694,6 +1725,21 @@
        height="10.202584"
        x="51.238789"
        y="17.375544"
+       ry="1"
+       inkscape:label="#rect4550-8-1-4-21-5-33" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer40"
+     inkscape:label="Magnetometer-Critical"
+     style="display:none">
+    <rect
+       style="fill:#d40000;fill-opacity:1;stroke:none;display:inline"
+       id="Magnetometer-Critical"
+       width="18.966711"
+       height="10.202584"
+       x="73.02417"
+       y="17.391815"
        ry="1"
        inkscape:label="#rect4550-8-1-4-21-5-33" />
   </g>
@@ -2051,6 +2097,28 @@
       <path
          inkscape:connector-curvature="0"
          id="path6233-9-9-4-3"
+         d="M 51.580734,26.818576 69.902677,18.119165"
+         style="fill:#ff0000;stroke:#ff0000;stroke-width:1.19167542;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Magnetometer-Error"
+     style="display:none">
+    <g
+       style="display:inline"
+       id="Magnetometer-Error"
+       inkscape:label="#g3398"
+       transform="matrix(1.0309004,0,0,1,20.190366,0.03602308)">
+      <path
+         inkscape:connector-curvature="0"
+         id="path6233-9-9-79-9"
+         d="m 51.59088,18.071902 18.268111,8.770366"
+         style="fill:#ff0000;stroke:#ff0000;stroke-width:1.19476616;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6233-9-9-4-3-4"
          d="M 51.580734,26.818576 69.902677,18.119165"
          style="fill:#ff0000;stroke:#ff0000;stroke-width:1.19167542;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
     </g>
@@ -2450,15 +2518,15 @@
     <text
        xml:space="preserve"
        style="font-size:4px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="93.336571"
+       x="94.605125"
        y="20.116049"
        id="text5330-7-7-8"
        sodipodi:linespacing="125%"
        transform="scale(0.83127393,1.2029729)"><tspan
          sodipodi:role="line"
-         id="tspan4295"
-         x="93.336571"
-         y="20.116049">BARO</tspan></text>
+         id="tspan3835"
+         x="94.605125"
+         y="20.116049">MAG</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Arial;-inkscape-font-specification:Arial Bold"

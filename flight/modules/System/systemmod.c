@@ -42,7 +42,7 @@
 #include <pios_struct_helper.h>
 // private includes
 #include "inc/systemmod.h"
-
+#include "notification.h"
 
 // UAVOs
 #include <objectpersistence.h>
@@ -72,22 +72,15 @@
 #endif
 
 // Private constants
-#define SYSTEM_UPDATE_PERIOD_MS        1000
-#define LED_BLINK_RATE_HZ              5
-
-#ifndef IDLE_COUNTS_PER_SEC_AT_NO_LOAD
-#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 // calibrated by running tests/test_cpuload.c
-// must be updated if the FreeRTOS or compiler
-// optimisation options are changed.
-#endif
+#define SYSTEM_UPDATE_PERIOD_MS 250
 
 #if defined(PIOS_SYSTEM_STACK_SIZE)
-#define STACK_SIZE_BYTES PIOS_SYSTEM_STACK_SIZE
+#define STACK_SIZE_BYTES        PIOS_SYSTEM_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES 1024
+#define STACK_SIZE_BYTES        1024
 #endif
 
-#define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY           (tskIDLE_PRIORITY + 1)
 
 // Private types
 
@@ -98,6 +91,7 @@ static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_C
 static bool mallocFailed;
 static HwSettingsData bootHwSettings;
 static struct PIOS_FLASHFS_Stats fsStats;
+
 // Private functions
 static void objectUpdatedCb(UAVObjEvent *ev);
 static void hwSettingsUpdatedCb(UAVObjEvent *ev);
@@ -170,8 +164,6 @@ MODULE_INITCALL(SystemModInitialize, 0);
  */
 static void systemTask(__attribute__((unused)) void *parameters)
 {
-    uint8_t cycleCount = 0;
-
     /* create all modules thread */
     MODULE_TASKCREATE_ALL;
 
@@ -189,9 +181,6 @@ static void systemTask(__attribute__((unused)) void *parameters)
     /* Record a successful boot */
     PIOS_IAP_WriteBootCount(0);
 #endif
-
-    // Initialize vars
-
     // Listen for SettingPersistance object updates, connect a callback function
     ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
@@ -204,13 +193,10 @@ static void systemTask(__attribute__((unused)) void *parameters)
     TaskInfoData taskInfoData;
     CallbackInfoData callbackInfoData;
 #endif
-
     // Main system loop
     while (1) {
+        NotificationUpdateStatus();
         // Update the system statistics
-
-        cycleCount = cycleCount > 0 ? cycleCount - 1 : 7;
-// if(cycleCount == 1){
         updateStats();
         // Update the system alarms
         updateSystemAlarms();
@@ -230,35 +216,10 @@ static void systemTask(__attribute__((unused)) void *parameters)
 // }
 #endif
 // }
-        // Flash the heartbeat LED
-#if defined(PIOS_LED_HEARTBEAT)
-        uint8_t armingStatus;
-        FlightStatusArmedGet(&armingStatus);
-        if ((armingStatus == FLIGHTSTATUS_ARMED_ARMED && (cycleCount & 0x1)) ||
-            (armingStatus != FLIGHTSTATUS_ARMED_ARMED && (cycleCount & 0x4))) {
-            PIOS_LED_On(PIOS_LED_HEARTBEAT);
-        } else {
-            PIOS_LED_Off(PIOS_LED_HEARTBEAT);
-        }
-
-        DEBUG_MSG("+ 0x%08x\r\n", 0xDEADBEEF);
-#endif /* PIOS_LED_HEARTBEAT */
-
-        // Turn on the error LED if an alarm is set
-#if defined(PIOS_LED_ALARM)
-        if (AlarmsHasCritical()) {
-            PIOS_LED_On(PIOS_LED_ALARM);
-        } else if ((AlarmsHasErrors() && (cycleCount & 0x1)) ||
-                   (!AlarmsHasErrors() && AlarmsHasWarnings() && (cycleCount & 0x4))) {
-            PIOS_LED_On(PIOS_LED_ALARM);
-        } else {
-            PIOS_LED_Off(PIOS_LED_ALARM);
-        }
-#endif /* PIOS_LED_ALARM */
 
 
         UAVObjEvent ev;
-        int delayTime = SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2);
+        int delayTime = SYSTEM_UPDATE_PERIOD_MS;
 
 #if defined(PIOS_INCLUDE_RFM22B)
 
@@ -649,11 +610,12 @@ static void updateSystemAlarms()
 }
 
 /**
- * Called by the RTOS when the CPU is idle, used to measure the CPU idle time.
+ * Called by the RTOS when the CPU is idle,
  */
 void vApplicationIdleHook(void)
-{}
-
+{
+    NotificationOnboardLedsRun();
+}
 /**
  * Called by the RTOS when a stack overflow is detected.
  */

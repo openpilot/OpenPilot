@@ -106,8 +106,6 @@ public:
 
     void saveObjectToSD(UAVObject *obj);
     UAVObjectManager *getObjectManager();
-    static double listMean(QList<double> list);
-    static double listVar(QList<double> list);
 
     void addUAVObject(QString objectName, QList<int> *reloadGroups = NULL);
     void addUAVObject(UAVObject *objectName, QList<int> *reloadGroups = NULL);

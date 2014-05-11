@@ -199,14 +199,14 @@ void UAVObjectField::limitsInitialize(const QString &limits)
         elementLimits.insert(index, limitList);
         ++index;
     }
-    foreach(QList<LimitStruct> limitList, elementLimits) {
-        foreach(LimitStruct limit, limitList) {
-            qDebug() << "Limit type" << limit.type << "for board" << limit.board << "for field" << getName();
-            foreach(QVariant var, limit.values) {
-                qDebug() << "value" << var;
-            }
-        }
-    }
+    //    foreach(QList<LimitStruct> limitList, elementLimits) {
+    //        foreach(LimitStruct limit, limitList) {
+    //            qDebug() << "Limit type" << limit.type << "for board" << limit.board << "for field" << getName();
+    //            foreach(QVariant var, limit.values) {
+    //                qDebug() << "value" << var;
+    //            }
+    //        }
+    //    }
 }
 bool UAVObjectField::isWithinLimits(QVariant var, quint32 index, int board)
 {

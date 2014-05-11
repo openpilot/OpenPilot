@@ -42,7 +42,7 @@
 #include <revocalibration.h>
 
 #include <CoordinateConversions.h>
-
+#include <pios_notify.h>
 // Private constants
 
 #define STACK_REQUIRED          512
@@ -295,6 +295,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         this->accel_filter_enabled   = false;
         this->rollPitchBiasRate      = 0.01f;
         this->attitudeSettings.MagKp = this->magCalibrated ? 1.0f : 0.0f;
+        PIOS_NOTIFY_StartNotification(NOTIFY_DRAW_ATTENTION, NOTIFY_PRIORITY_REGULAR);
     } else if ((this->attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         this->attitudeSettings.AccelKp     = 1.0f;
         this->attitudeSettings.AccelKi     = 0.0f;
@@ -303,6 +304,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         this->rollPitchBiasRate      = 0.01f;
         this->attitudeSettings.MagKp = this->magCalibrated ? 1.0f : 0.0f;
         this->init = 0;
+        PIOS_NOTIFY_StartNotification(NOTIFY_DRAW_ATTENTION, NOTIFY_PRIORITY_REGULAR);
     } else if (this->init == 0) {
         // Reload settings (all the rates)
         AttitudeSettingsGet(&this->attitudeSettings);

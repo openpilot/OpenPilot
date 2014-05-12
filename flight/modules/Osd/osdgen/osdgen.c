@@ -114,6 +114,10 @@ static xTaskHandle osdgenTaskHandle;
 xSemaphoreHandle osdSemaphore = NULL;
 Unit Convert[2];
 
+#ifdef ONLY_WHITE_PIXEL
+static uint8_t only_white_pixel = 0;
+#endif
+
 #ifdef DEBUG_TIMING
 static portTickType in_ticks  = 0;
 static portTickType out_ticks = 0;
@@ -303,10 +307,10 @@ void write_pixel(uint8_t *buff, int x, int y, int mode)
  *
  * @param       x               x coordinate
  * @param       y               y coordinate
- * @param       mmode   0 = clear, 1 = set, 2 = toggle
  * @param       lmode   0 = black, 1 = white, 2 = toggle
+ * @param       mmode   0 = clear, 1 = set, 2 = toggle
  */
-void write_pixel_lm(int x, int y, int mmode, int lmode)
+void write_pixel_lm(int x, int y, int lmode, int mmode)
 {
     CHECK_COORDS(x, y);
     // Determine the bit in the word to be set and the word
@@ -315,8 +319,9 @@ void write_pixel_lm(int x, int y, int mmode, int lmode)
     int bytenum   = CALC_BUFF_ADDR(x, y);
     // Apply the masks.
     uint16_t mask = 1 << (7 - bitnum);
-    WRITE_BYTE_MODE(draw_buffer_mask, bytenum, mask, mmode);
+    CHECK_ONLY_WHITE_PIXEL
     WRITE_BYTE_MODE(draw_buffer_level, bytenum, mask, lmode);
+    WRITE_BYTE_MODE(draw_buffer_mask, bytenum, mask, mmode);
 }
 
 /**
@@ -370,13 +375,14 @@ void write_hline(uint8_t *buff, int x0, int x1, int y, int mode)
  * @param       x0              x0 coordinate
  * @param       x1              x1 coordinate
  * @param       y               y coordinate
- * @param       lmode   0 = clear, 1 = set, 2 = toggle
- * @param       mmode   0 = clear, 1 = set, 2 = toggle
+ * @param       lmode   0 = black, 1 = white, 2 = toggle
+ * @param       mmode   0 = clear, 1 = set,   2 = toggle
  */
 void write_hline_lm(int x0, int x1, int y, int lmode, int mmode)
 {
     // TODO: an optimisation would compute the masks and apply to
     // both buffers simultaneously.
+    CHECK_ONLY_WHITE_PIXEL
     write_hline(draw_buffer_level, x0, x1, y, lmode);
     write_hline(draw_buffer_mask, x0, x1, y, mmode);
 }
@@ -450,13 +456,14 @@ void write_vline(uint8_t *buff, int x, int y0, int y1, int mode)
  * @param       x               x coordinate
  * @param       y0              y0 coordinate
  * @param       y1              y1 coordinate
- * @param       lmode   0 = clear, 1 = set, 2 = toggle
- * @param       mmode   0 = clear, 1 = set, 2 = toggle
+ * @param       lmode   0 = black, 1 = white, 2 = toggle
+ * @param       mmode   0 = clear, 1 = set,   2 = toggle
  */
 void write_vline_lm(int x, int y0, int y1, int lmode, int mmode)
 {
     // TODO: an optimisation would compute the masks and apply to
     // both buffers simultaneously.
+    CHECK_ONLY_WHITE_PIXEL
     write_vline(draw_buffer_level, x, y0, y1, lmode);
     write_vline(draw_buffer_mask, x, y0, y1, mmode);
 }
@@ -565,13 +572,14 @@ void write_filled_rectangle(uint8_t *buff, int x, int y, int width, int height, 
  * @param       y               y coordinate (top)
  * @param       width   rectangle width
  * @param       height  rectangle height
- * @param       lmode   0 = clear, 1 = set, 2 = toggle
- * @param       mmode   0 = clear, 1 = set, 2 = toggle
+ * @param       lmode   0 = black, 1 = white, 2 = toggle
+ * @param       mmode   0 = clear, 1 = set,   2 = toggle
  */
 void write_filled_rectangle_lm(int x, int y, int width, int height, int lmode, int mmode)
 {
-    write_filled_rectangle(draw_buffer_mask, x, y, width, height, mmode);
+    CHECK_ONLY_WHITE_PIXEL
     write_filled_rectangle(draw_buffer_level, x, y, width, height, lmode);
+    write_filled_rectangle(draw_buffer_mask, x, y, width, height, mmode);
 }
 
 /**
@@ -781,13 +789,14 @@ void write_line(uint8_t *buff, int x0, int y0, int x1, int y1, int mode)
  * @param       y0              first y coordinate
  * @param       x1              second x coordinate
  * @param       y1              second y coordinate
- * @param       mmode   0 = clear, 1 = set, 2 = toggle
- * @param       lmode   0 = clear, 1 = set, 2 = toggle
+ * @param       lmode   0 = black, 1 = white, 2 = toggle
+ * @param       mmode   0 = clear, 1 = set,   2 = toggle
  */
-void write_line_lm(int x0, int y0, int x1, int y1, int mmode, int lmode)
+void write_line_lm(int x0, int y0, int x1, int y1, int lmode, int mmode)
 {
-    write_line(draw_buffer_mask, x0, y0, x1, y1, mmode);
+    CHECK_ONLY_WHITE_PIXEL
     write_line(draw_buffer_level, x0, y0, x1, y1, lmode);
+    write_line(draw_buffer_mask, x0, y0, x1, y1, mmode);
 }
 
 /**
@@ -840,15 +849,15 @@ void write_line_outlined(int x0, int y0, int x1, int y1,
     // Draw the outline.
     for (x = x0; x < x1; x++) {
         if (steep) {
-            write_pixel_lm(y - 1, x, mmode, omode);
-            write_pixel_lm(y + 1, x, mmode, omode);
-            write_pixel_lm(y, x - 1, mmode, omode);
-            write_pixel_lm(y, x + 1, mmode, omode);
+            write_pixel_lm(y - 1, x, omode, mmode);
+            write_pixel_lm(y + 1, x, omode, mmode);
+            write_pixel_lm(y, x - 1, omode, mmode);
+            write_pixel_lm(y, x + 1, omode, mmode);
         } else {
-            write_pixel_lm(x - 1, y, mmode, omode);
-            write_pixel_lm(x + 1, y, mmode, omode);
-            write_pixel_lm(x, y - 1, mmode, omode);
-            write_pixel_lm(x, y + 1, mmode, omode);
+            write_pixel_lm(x - 1, y, omode, mmode);
+            write_pixel_lm(x + 1, y, omode, mmode);
+            write_pixel_lm(x, y - 1, omode, mmode);
+            write_pixel_lm(x, y + 1, omode, mmode);
         }
         error -= deltay;
         if (error < 0) {
@@ -861,9 +870,9 @@ void write_line_outlined(int x0, int y0, int x1, int y1,
     y     = y0;
     for (x = x0; x < x1; x++) {
         if (steep) {
-            write_pixel_lm(y, x, mmode, imode);
+            write_pixel_lm(y, x, imode, mmode);
         } else {
-            write_pixel_lm(x, y, mmode, imode);
+            write_pixel_lm(x, y, imode, mmode);
         }
         error -= deltay;
         if (error < 0) {
@@ -924,15 +933,15 @@ void write_line_outlined_dashed(int x0, int y0, int x1, int y1,
     // Draw the outline.
     for (x = x0; x < x1; x++) {
         if (steep) {
-            write_pixel_lm(y - 1, x, mmode, omode);
-            write_pixel_lm(y + 1, x, mmode, omode);
-            write_pixel_lm(y, x - 1, mmode, omode);
-            write_pixel_lm(y, x + 1, mmode, omode);
+            write_pixel_lm(y - 1, x, omode, mmode);
+            write_pixel_lm(y + 1, x, omode, mmode);
+            write_pixel_lm(y, x - 1, omode, mmode);
+            write_pixel_lm(y, x + 1, omode, mmode);
         } else {
-            write_pixel_lm(x - 1, y, mmode, omode);
-            write_pixel_lm(x + 1, y, mmode, omode);
-            write_pixel_lm(x, y - 1, mmode, omode);
-            write_pixel_lm(x, y + 1, mmode, omode);
+            write_pixel_lm(x - 1, y, omode, mmode);
+            write_pixel_lm(x + 1, y, omode, mmode);
+            write_pixel_lm(x, y - 1, omode, mmode);
+            write_pixel_lm(x, y + 1, omode, mmode);
         }
         error -= deltay;
         if (error < 0) {
@@ -951,9 +960,9 @@ void write_line_outlined_dashed(int x0, int y0, int x1, int y1,
         }
         if (draw % 2) {
             if (steep) {
-                write_pixel_lm(y, x, mmode, imode);
+                write_pixel_lm(y, x, imode, mmode);
             } else {
-                write_pixel_lm(x, y, mmode, imode);
+                write_pixel_lm(x, y, imode, mmode);
             }
         }
         error -= deltay;
@@ -1079,7 +1088,7 @@ int fetch_font_info(uint8_t ch, int font, struct FontEntry *font_info, char *loo
 void write_char16(char ch, int x, int y, int font)
 {
     int yy, row, xshift;
-    uint16_t and_mask, or_mask, levels;
+    uint16_t level, mask, and_mask, or_mask;
     struct FontEntry font_info;
 
     fetch_font_info(0, font, &font_info, NULL);
@@ -1110,27 +1119,20 @@ void write_char16(char ch, int x, int y, int font)
         for (yy = y; yy < y + font_info.height; yy++) {
             if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
                 if (font == 3) {
-                    // mask
-                    write_word_misaligned_OR(draw_buffer_mask, font_mask12x18[row] << xshift, addr, bbit);
-                    // level
-                    levels   = font_frame12x18[row];
-                    // if (!(flags & FONT_INVERT)) // data is normally inverted
-                    levels   = ~levels;
-                    or_mask  = font_mask12x18[row] << xshift;
-                    and_mask = (font_mask12x18[row] & levels) << xshift;
+                    level = font_frame12x18[row];
+                    mask  = font_mask12x18[row];
                 } else {
-                    // mask
-                    write_word_misaligned_OR(draw_buffer_mask, font_mask8x10[row] << xshift, addr, bbit);
-                    // level
-                    levels   = font_frame8x10[row];
-                    // if (!(flags & FONT_INVERT)) // data is normally inverted
-                    levels   = ~levels;
-                    or_mask  = font_mask8x10[row] << xshift;
-                    and_mask = (font_mask8x10[row] & levels) << xshift;
+                    level = font_frame8x10[row];
+                    mask  = font_mask8x10[row];
                 }
+                CHECK_ONLY_WHITE_PIXEL_CHAR
+                // mask
+                write_word_misaligned_OR(draw_buffer_mask, mask << xshift, addr, bbit);
+                // level
+                level    = ~level;
+                or_mask  = mask << xshift;
+                and_mask = (mask & level) << xshift;
                 write_word_misaligned_OR(draw_buffer_level, or_mask, addr, bbit);
-                // If we're not bold write the AND mask.
-                // if (!(flags & FONT_BOLD))
                 write_word_misaligned_NAND(draw_buffer_level, and_mask, addr, bbit);
             }
             addr += BUFFER_WIDTH;
@@ -1152,7 +1154,7 @@ void write_char16(char ch, int x, int y, int font)
 void write_char(char ch, int x, int y, int flags, int font)
 {
     int yy, row, xshift;
-    uint8_t and_mask, or_mask, levels;
+    uint16_t level, mask, and_mask, or_mask;
     struct FontEntry font_info;
     char lookup = 0;
 
@@ -1183,18 +1185,18 @@ void write_char(char ch, int x, int y, int flags, int font)
         // To do this, for each word, we construct an AND mask and an OR mask, and apply each individually.
         for (yy = y; yy < y + font_info.height; yy++) {
             if (!partly_out || ((x >= GRAPHICS_LEFT) && (x + font_info.width <= GRAPHICS_RIGHT) && (yy >= GRAPHICS_TOP) && (yy <= GRAPHICS_BOTTOM))) {
+                level = font_info.data[row + font_info.height];
+                mask  = font_info.data[row];
+                CHECK_ONLY_WHITE_PIXEL_CHAR
                 // mask
-                write_byte_misaligned_OR(draw_buffer_mask, font_info.data[row] << xshift, addr, bbit);
+                write_byte_misaligned_OR(draw_buffer_mask, mask << xshift, addr, bbit);
                 // level
-                levels = font_info.data[row + font_info.height];
                 if (!(flags & FONT_INVERT)) { // data is normally inverted
-                    levels = ~levels;
+                    level = ~level;
                 }
-                or_mask  = font_info.data[row] << xshift;
-                and_mask = (font_info.data[row] & levels) << xshift;
+                or_mask  = mask << xshift;
+                and_mask = (mask & level) << xshift;
                 write_byte_misaligned_OR(draw_buffer_level, or_mask, addr, bbit);
-                // If we're not bold write the AND mask.
-                // if (!(flags & FONT_BOLD))
                 write_byte_misaligned_NAND(draw_buffer_level, and_mask, addr, bbit);
             }
             addr += BUFFER_WIDTH;
@@ -1842,7 +1844,11 @@ void introGraphics(int16_t x, int16_t y)
 
 void introText(int16_t x, int16_t y)
 {
+#ifdef PIOS_INCLUDE_MSP
+    write_string("v 0.0.1 MSP", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+#else
     write_string("v 0.0.1", x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_CENTER, 0, 3);
+#endif
 }
 
 void showVideoType(int16_t x, int16_t y)
@@ -2406,6 +2412,10 @@ void updateGraphics()
     AccelStateGet(&accelState);
 #endif
 
+#ifdef ONLY_WHITE_PIXEL
+    only_white_pixel = OsdSettings.Black == GCS_LEVEL_ONLY_WHITE_PIXEL;
+#endif
+
     switch (OsdSettings.Screen) {
     // show main flight screen
     case 0:
@@ -2540,12 +2550,32 @@ void updateGraphics()
             }
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.HomeDistanceSetup.CharSize);
         }
+#if 1
         // Vertical speed
         if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData *)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
             sprintf(temp, "VS%5.1f%c", (double)-gpsVelocityData.Down, 0x88); // TODO currently m/s for both
             // sprintf(temp, "VS%5.1f%c", (double)(-gpsVelocityData.Down * convert->ms_to_ms_fts), convert->char_ms_fts);	// TODO is ft/s or ft/m the common unit for imperial?
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.VerticalSpeedSetup.CharSize);
         }
+#else
+        // Travel distance
+        if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData *)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
+            static float td = 0.0f;
+            static portTickType callTimer = 0;
+            portTickType current_ms = xTaskGetTickCount();
+            if (homePos.GotHome) {
+                if (gpsData.Groundspeed > 0.2777778f) {
+                    td += (gpsData.Groundspeed * (current_ms - callTimer) / 1000.0f);
+                }
+                int d = (int)((uint32_t) td * convert->m_to_m_feet);
+                sprintf(temp, "TD%5d%c", d <= 99999 ? d : 99999, convert->char_m_feet);
+            } else {
+                sprintf(temp, "TD  ---%c", convert->char_m_feet);
+            }
+            callTimer = current_ms;
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.HomeDistanceSetup.CharSize);
+        }
+#endif
         // Flight mode
         if (check_enable_and_srceen(OsdSettings.FlightMode, (OsdSettingsWarningsSetupData *)&OsdSettings.FlightModeSetup, screen, &x, &y)) {
             draw_flight_mode(status.FlightMode, x, y, OsdSettings.FlightModeSetup.CharSize);

@@ -36,6 +36,17 @@
 
 int32_t osdgenInitialize(void);
 
+// Needed till someone fixes the black/white hardware problem
+//#define ONLY_WHITE_PIXEL
+#ifdef ONLY_WHITE_PIXEL
+#define GCS_LEVEL_ONLY_WHITE_PIXEL      4095
+#define CHECK_ONLY_WHITE_PIXEL          if (only_white_pixel) mmode = (lmode & 1);
+#define CHECK_ONLY_WHITE_PIXEL_CHAR     if (only_white_pixel) mask = level;
+#else
+#define CHECK_ONLY_WHITE_PIXEL
+#define CHECK_ONLY_WHITE_PIXEL_CHAR
+#endif
+
 // Size of an array (num items.)
 #define SIZEOF_ARRAY(x) (sizeof(x) / sizeof((x)[0]))
 

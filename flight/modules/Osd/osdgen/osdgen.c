@@ -165,19 +165,20 @@ void clearGraphics()
 void copyimage(uint16_t offsetx, uint16_t offsety, int image)
 {
     CHECK_COORDS(offsetx, offsety);
+    uint16_t level, mask;
     struct splashEntry splash_info;
     splash_info = splash[image];
     offsetx     = offsetx / 8;
     for (uint16_t y = offsety; y < ((splash_info.height) + offsety); y++) {
         uint16_t x1 = offsetx;
         for (uint16_t x = offsetx; x < (((splash_info.width) / 16) + offsetx); x++) {
-            draw_buffer_level[y * BUFFER_WIDTH + x1 + 1] = (uint8_t)(
-                mirror(splash_info.level[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)]) >> 8);
-            draw_buffer_level[y * BUFFER_WIDTH + x1]     = (uint8_t)(
-                mirror(splash_info.level[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)]) & 0xFF);
-            draw_buffer_mask[y * BUFFER_WIDTH + x1 + 1]  = (uint8_t)(
-                mirror(splash_info.mask[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)]) >> 8);
-            draw_buffer_mask[y * BUFFER_WIDTH + x1] = (uint8_t)(mirror(splash_info.mask[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)]) & 0xFF);
+            level = splash_info.level[(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)];
+            mask  = splash_info.mask [(y - offsety) * ((splash_info.width) / 16) + (x - offsetx)];
+            CHECK_ONLY_WHITE_PIXEL_CHAR
+            draw_buffer_level[y * BUFFER_WIDTH + x1 + 1] = (uint8_t)(mirror(level) >> 8);
+            draw_buffer_level[y * BUFFER_WIDTH + x1]     = (uint8_t)(mirror(level) & 0xFF);
+            draw_buffer_mask [y * BUFFER_WIDTH + x1 + 1] = (uint8_t)(mirror(mask)  >> 8);
+            draw_buffer_mask [y * BUFFER_WIDTH + x1]     = (uint8_t)(mirror(mask)  & 0xFF);
             x1 += 2;
         }
     }
@@ -2990,6 +2991,10 @@ static void osdgenTask(__attribute__((unused)) void *parameters)
     OsdSettingsData OsdSettings;
 
     OsdSettingsGet(&OsdSettings);
+
+#ifdef ONLY_WHITE_PIXEL
+    only_white_pixel = OsdSettings.Black == GCS_LEVEL_ONLY_WHITE_PIXEL;
+#endif
 
     switch (PIOS_Board_Revision()) {
     case 1:

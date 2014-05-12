@@ -82,6 +82,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_ui->calibrationVisualHelp->setRenderHint(QPainter::HighQualityAntialiasing, true);
     m_ui->calibrationVisualHelp->setRenderHint(QPainter::SmoothPixmapTransform, true);
     displayVisualHelp("empty");
+
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
     addUAVObject("RevoCalibration");

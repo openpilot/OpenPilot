@@ -122,6 +122,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
 
     // check if Homelocation is set
     if (!homeLocationData.Set) {
+        // TODO
         QMessageBox msgBox;
         msgBox.setInformativeText(tr("<p>HomeLocation not SET.</p><p>Please set your HomeLocation and try again. Aborting calibration!</p>"));
         msgBox.setStandardButtons(QMessageBox::Ok);

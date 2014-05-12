@@ -110,6 +110,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         case ManualControlSettings::CHANNELGROUPS_ROLL:
         case ManualControlSettings::CHANNELGROUPS_PITCH:
         case ManualControlSettings::CHANNELGROUPS_YAW:
+        case ManualControlSettings::CHANNELGROUPS_COLLECTIVE:
         case ManualControlSettings::CHANNELGROUPS_ACCESSORY0:
         case ManualControlSettings::CHANNELGROUPS_ACCESSORY1:
         case ManualControlSettings::CHANNELGROUPS_ACCESSORY2:
@@ -118,7 +119,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
             break;
         case ManualControlSettings::CHANNELGROUPS_THROTTLE:
         case ManualControlSettings::CHANNELGROUPS_FLIGHTMODE:
-        case ManualControlSettings::CHANNELGROUPS_COLLECTIVE:
             form->ui->channelResponseTime->setVisible(false);
             break;
         default:

@@ -173,16 +173,20 @@ ConfigRevoWidget::~ConfigRevoWidget()
 void ConfigRevoWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    updateVisualHelp();
     m_thermalCalibrationModel->init();
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    updateVisualHelp();
 }
 
+void ConfigRevoWidget::updateVisualHelp()
+{
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatioByExpanding);
+}
 
 void ConfigRevoWidget::storeAndClearBoardRotation()
 {
@@ -229,7 +233,7 @@ void ConfigRevoWidget::displayVisualHelp(QString elementID)
     QPixmap pixmap = QPixmap(":/configgadget/images/calibration/" + elementID + ".png");
     m_ui->calibrationVisualHelp->scene()->addPixmap(pixmap);
     m_ui->calibrationVisualHelp->setSceneRect(pixmap.rect());
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::IgnoreAspectRatio);
+    updateVisualHelp();
 }
 
 void ConfigRevoWidget::displayInstructions(QString instructions, bool replace)

@@ -80,9 +80,9 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     unsigned int indexRT = 0;
     foreach(QString name, manualSettingsObj->getField("ChannelNumber")->getElementNames()) {
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
-        InputChannelForm *form = new InputChannelForm(this);
-        form->addToGrid(ui->channelLayout);
+        InputChannelForm *form = new InputChannelForm(index, this);
         form->setName(name);
+        form->moveTo(*(ui->channelLayout));
 
         // The order of the following binding calls is important. Since the values will be populated
         // in reverse order of the binding order otherwise the 'Reversed' logic will floor the neutral value
@@ -100,9 +100,9 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
 
         // Reversing supported for some channels only
         bool reversable = ((index == ManualControlSettings::CHANNELGROUPS_THROTTLE) ||
-                (index == ManualControlSettings::CHANNELGROUPS_ROLL)  ||
-                (index == ManualControlSettings::CHANNELGROUPS_PITCH)  ||
-                (index == ManualControlSettings::CHANNELGROUPS_YAW));
+                           (index == ManualControlSettings::CHANNELGROUPS_ROLL) ||
+                           (index == ManualControlSettings::CHANNELGROUPS_PITCH) ||
+                           (index == ManualControlSettings::CHANNELGROUPS_YAW));
         form->ui->channelRev->setVisible(reversable);
 
         // Input filter response time fields supported for some channels only

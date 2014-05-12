@@ -27,11 +27,13 @@
 #ifndef OUTPUTCHANNELFORM_H
 #define OUTPUTCHANNELFORM_H
 
-#include <QWidget>
+#include "channelform.h"
+#include "configoutputwidget.h"
 #include "ui_outputchannelform.h"
-#include "configtaskwidget.h"
 
-class OutputChannelForm : public ConfigTaskWidget {
+#include <QWidget>
+
+class OutputChannelForm : public ChannelForm {
     Q_OBJECT
 
 public:
@@ -40,18 +42,17 @@ public:
 
     friend class ConfigOutputWidget;
 
-    void setAssignment(const QString &assignment);
-    int index() const;
-    void addToGrid(QGridLayout *gridLayout);
+    virtual QString name();
+    virtual void setName(const QString &name);
 
 public slots:
-    void max(int maximum);
-    int max() const;
-    void min(int minimum);
     int min() const;
-    void minmax(int minimum, int maximum);
-    void neutral(int value);
+    void setMin(int minimum);
+    int max() const;
+    void setMax(int maximum);
     int neutral() const;
+    void setNeutral(int value);
+    void setRange(int minimum, int maximum);
     void enableChannelTest(bool state);
 
 signals:
@@ -59,8 +60,6 @@ signals:
 
 private:
     Ui::outputChannelForm ui;
-    // Channel index
-    int m_index;
     bool m_inChannelTest;
 
 private slots:
@@ -70,23 +69,4 @@ private slots:
     void setChannelRange();
 };
 
-inline int OutputChannelForm::index() const
-{
-    return m_index;
-}
-
-inline int OutputChannelForm::max() const
-{
-    return ui.actuatorMax->value();
-}
-
-inline int OutputChannelForm::min() const
-{
-    return ui.actuatorMin->value();
-}
-
-inline int OutputChannelForm::neutral() const
-{
-    return ui.actuatorNeutral->value();
-}
 #endif // OUTPUTCHANNELFORM_H

@@ -26,15 +26,14 @@
  */
 
 #include "outputchannelform.h"
-#include "configoutputwidget.h"
 
 OutputChannelForm::OutputChannelForm(const int index, QWidget *parent) :
-    ConfigTaskWidget(parent), ui(), m_index(index), m_inChannelTest(false)
+    ChannelForm(index, parent), ui(), m_inChannelTest(false)
 {
     ui.setupUi(this);
 
     // The convention for OP is Channel 1 to Channel 10.
-    ui.actuatorNumber->setText(QString("%1:").arg(m_index + 1));
+    ui.actuatorNumber->setText(QString("%1:").arg(index + 1));
 
     // Register for ActuatorSettings changes:
     connect(ui.actuatorMin, SIGNAL(editingFinished()), this, SLOT(setChannelRange()));
@@ -54,66 +53,17 @@ OutputChannelForm::~OutputChannelForm()
     // Do nothing
 }
 
-void OutputChannelForm::addToGrid(QGridLayout *gridLayout)
+QString OutputChannelForm::name()
 {
-    // if we are the first row to be inserted the show the legend
-    bool showLegend = (gridLayout->rowCount() == 1);
+    return ui.actuatorName->text();
+}
 
-    if (false && !showLegend) {
-        QLayout *legendLayout = layout()->itemAt(0)->layout();
-        Q_ASSERT(legendLayout);
-        // remove every item
-        while (legendLayout->count()) {
-            QLayoutItem *item = legendLayout->takeAt(0);
-            if (!item) {
-                continue;
-            }
-            // get widget from layout item
-            QWidget *widget = item->widget();
-            if (widget) {
-                delete widget;
-                continue;
-            }
-        }
-        // and finally remove and delete the legend layout
-        layout()->removeItem(legendLayout);
-        delete legendLayout;
-    }
-
-    QGridLayout *srcLayout = dynamic_cast<QGridLayout*>(layout());
-    Q_ASSERT(srcLayout);
-
-    if (showLegend) {
-        Q_ASSERT(srcLayout);
-        int row = gridLayout->rowCount();
-        for(int col = 0; col < srcLayout->columnCount(); col++) {
-            QLayoutItem *item = srcLayout->itemAtPosition(0, col);
-            if (!item) {
-                continue;
-            }
-            QWidget *widget = item->widget();
-            if (widget) {
-                gridLayout->addWidget(widget, row, col);
-                continue;
-            }
-        }
-    }
-
-    int row = gridLayout->rowCount();
-    for(int col = 0; col < srcLayout->columnCount(); col++) {
-        QLayoutItem *item = srcLayout->itemAtPosition(1, col);
-        if (!item) {
-            continue;
-        }
-        QWidget *widget = item->widget();
-        if (widget) {
-            gridLayout->addWidget(widget, row, col);
-            continue;
-        }
-    }
-
-    //
-    setVisible(false);
+/**
+ * Set the channel assignment label.
+ */
+void OutputChannelForm::setName(const QString &name)
+{
+    ui.actuatorName->setText(name);
 }
 
 /**
@@ -184,26 +134,49 @@ void OutputChannelForm::linkToggled(bool state)
     }
 }
 
+int OutputChannelForm::max() const
+{
+    return ui.actuatorMax->value();
+}
+
 /**
  * Set maximal channel value.
  */
-void OutputChannelForm::max(int maximum)
+void OutputChannelForm::setMax(int maximum)
 {
-    minmax(ui.actuatorMin->value(), maximum);
+    setRange(ui.actuatorMin->value(), maximum);
+}
+
+int OutputChannelForm::min() const
+{
+    return ui.actuatorMin->value();
 }
 
 /**
  * Set minimal channel value.
  */
-void OutputChannelForm::min(int minimum)
+void OutputChannelForm::setMin(int minimum)
 {
-    minmax(minimum, ui.actuatorMax->value());
+    setRange(minimum, ui.actuatorMax->value());
+}
+
+int OutputChannelForm::neutral() const
+{
+    return ui.actuatorNeutral->value();
+}
+
+/**
+ * Set neutral of channel.
+ */
+void OutputChannelForm::setNeutral(int value)
+{
+    ui.actuatorNeutral->setValue(value);
 }
 
 /**
  * Set minimal and maximal channel value.
  */
-void OutputChannelForm::minmax(int minimum, int maximum)
+void OutputChannelForm::setRange(int minimum, int maximum)
 {
     ui.actuatorMin->setValue(minimum);
     ui.actuatorMax->setValue(maximum);
@@ -213,22 +186,6 @@ void OutputChannelForm::minmax(int minimum, int maximum)
     } else {
         ui.actuatorRev->setChecked(false);
     }
-}
-
-/**
- * Set neutral of channel.
- */
-void OutputChannelForm::neutral(int value)
-{
-    ui.actuatorNeutral->setValue(value);
-}
-
-/**
- * Set the channel assignment label.
- */
-void OutputChannelForm::setAssignment(const QString &assignment)
-{
-    ui.actuatorName->setText(assignment);
 }
 
 /**

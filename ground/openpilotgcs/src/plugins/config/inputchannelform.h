@@ -1,6 +1,7 @@
 #ifndef INPUTCHANNELFORM_H
 #define INPUTCHANNELFORM_H
 
+#include "channelform.h"
 #include "configinputwidget.h"
 
 #include <QWidget>
@@ -9,17 +10,17 @@ namespace Ui {
 class InputChannelForm;
 }
 
-class InputChannelForm : public ConfigTaskWidget {
+class InputChannelForm : public ChannelForm {
     Q_OBJECT
 
 public:
-    explicit InputChannelForm(QWidget *parent = 0);
+    explicit InputChannelForm(const int index, QWidget *parent = NULL);
     ~InputChannelForm();
 
     friend class ConfigInputWidget;
 
-    void setName(QString &name);
-    void addToGrid(QGridLayout *gridLayout);
+    virtual QString name();
+    virtual void setName(const QString &name);
 
 private slots:
     void minMaxUpdated();

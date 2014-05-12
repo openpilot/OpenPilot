@@ -80,6 +80,8 @@ private slots:
     void disableAllCalibrations();
     void enableAllCalibrations();
 
+    void updateVisualHelp();
+
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);

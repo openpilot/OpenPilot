@@ -12326,10 +12326,9 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>url:http://wiki.openpilot.org/x/dACrAQ</source>
-        <translatorcomment>Lien wiki FR </translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/AwCEAQ</translation>
+        <translatorcomment>Lien wiki FR http://wiki.openpilot.org/x/B4BYAQ</translatorcomment>
+        <translation type="vanished">url:http://wiki.openpilot.org/x/AwCEAQ</translation>
     </message>
     <message>
         <location/>
@@ -12665,6 +12664,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the coordinator id we currently are bound to.&lt;/p&gt;&lt;p&gt;To manually bind to a specific coordinator, just type&lt;/p&gt;&lt;p&gt;or paste its device id in this box and save.&lt;/p&gt;&lt;p&gt;The device must be rebooted for the binding to take place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci est l&apos;identifiant coordinateur avec lequel vous êtes associé.&lt;/p&gt;&lt;p&gt;Pour s&apos;associer manuellement avec un coordinateur particulier, tapez simplement ou copier/coller l&apos;identifiant de l&apos;appareil dans ce champ puis enregistrer.&lt;/p&gt;&lt;p&gt;L&apos;appareil doit être redémarré pour que l&apos;association soit effective.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>url:http://wiki.openpilot.org/x/hgAGAQ</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation type="unfinished">url:http://wiki.openpilot.org/x/B4BYAQ</translation>
     </message>
 </context>
 <context>

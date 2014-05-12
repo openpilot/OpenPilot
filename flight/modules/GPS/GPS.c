@@ -202,6 +202,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 {
     portTickType xDelay = 100 / portTICK_RATE_MS;
     uint32_t timeNowMs  = xTaskGetTickCount() * portTICK_RATE_MS;
+
 #ifdef PIOS_GPS_SETS_HOMELOCATION
     portTickType homelocationSetDelay = 0;
 #endif
@@ -272,6 +273,8 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                         setHomeLocation(&gpspositionsensor);
                         homelocationSetDelay = 0;
                     }
+                } else {
+                    homelocationSetDelay = 0;
                 }
 #endif
             } else if ((gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&

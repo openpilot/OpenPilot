@@ -82,8 +82,6 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
 
 void MyTabbedStackWidget::insertTab(const int index, QWidget *tab, const QIcon &icon, const QString &label)
 {
-    tab->setContentsMargins(0, 0, 0, 0);
-
     // create and insert item
     QListWidgetItem *item = new QListWidgetItem(icon, label);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -91,7 +89,8 @@ void MyTabbedStackWidget::insertTab(const int index, QWidget *tab, const QIcon &
     item->setToolTip(label);
     m_listWidget->insertItem(index, item);
 
-    // insert widget
+    // setup and insert widget
+    tab->setContentsMargins(0, 0, 0, 0);
     m_stackWidget->insertWidget(index, tab);
 }
 
@@ -99,8 +98,10 @@ void MyTabbedStackWidget::replaceTab(int index, QWidget *tab)
 {
     QWidget *wid = m_stackWidget->widget(index);
 
-    // insert new widget
+    // setup and insert new widget
+    tab->setContentsMargins(0, 0, 0, 0);
     m_stackWidget->insertWidget(index, tab);
+    // check special case when replacing currenlty selected tab
     if (index == currentIndex()) {
         // currently selected tab is being replaced so select the new tab before removing the old one
         m_stackWidget->setCurrentWidget(tab);

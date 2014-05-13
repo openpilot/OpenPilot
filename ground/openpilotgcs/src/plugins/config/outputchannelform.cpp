@@ -269,7 +269,7 @@ void OutputChannelForm::sendChannelTest(int value)
         value = ui.actuatorMin->value() - value + ui.actuatorMax->value();
     }
     // update the label
-    ui.actuatorValue->setText(QString::number(value));
+    ui.actuatorValue->setValue(value);
 
     if (ui.actuatorLink->checkState() && parent()) {
         // the channel is linked to other channels
@@ -296,7 +296,7 @@ void OutputChannelForm::sendChannelTest(int value)
             }
 
             outputChannelForm->ui.actuatorNeutral->setValue(val);
-            outputChannelForm->ui.actuatorValue->setText(QString::number(val));
+            outputChannelForm->ui.actuatorValue->setValue(val);
         }
     }
 

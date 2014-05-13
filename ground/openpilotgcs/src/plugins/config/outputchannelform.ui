@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>772</width>
+    <width>768</width>
     <height>51</height>
    </rect>
   </property>
@@ -32,14 +32,14 @@
    <item row="0" column="1">
     <widget class="QLabel" name="legend0">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>110</width>
+       <width>0</width>
        <height>20</height>
       </size>
      </property>
@@ -75,14 +75,14 @@ margin:1px;</string>
    <item row="0" column="2">
     <widget class="QLabel" name="legend1">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>50</width>
+       <width>0</width>
        <height>20</height>
       </size>
      </property>
@@ -171,14 +171,14 @@ margin:1px;</string>
    <item row="0" column="0">
     <widget class="QLabel" name="legend6">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>20</width>
+       <width>0</width>
        <height>20</height>
       </size>
      </property>
@@ -268,14 +268,14 @@ margin:1px;</string>
    <item row="1" column="2">
     <widget class="QSpinBox" name="actuatorMin">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>50</width>
+       <width>0</width>
        <height>0</height>
       </size>
      </property>
@@ -336,14 +336,14 @@ margin:1px;</string>
    <item row="0" column="6">
     <widget class="QLabel" name="legend3">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>50</width>
+       <width>0</width>
        <height>20</height>
       </size>
      </property>
@@ -379,14 +379,14 @@ margin:1px;</string>
    <item row="0" column="7">
     <widget class="QLabel" name="legend4">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>75</width>
+       <width>0</width>
        <height>20</height>
       </size>
      </property>
@@ -422,14 +422,14 @@ margin:1px;</string>
    <item row="0" column="8">
     <widget class="QLabel" name="legend5">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>45</width>
+       <width>0</width>
        <height>20</height>
       </size>
      </property>
@@ -493,14 +493,14 @@ margin:1px;</string>
    <item row="1" column="6">
     <widget class="QSpinBox" name="actuatorMax">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>50</width>
+       <width>0</width>
        <height>0</height>
       </size>
      </property>
@@ -577,33 +577,30 @@ margin:1px;</string>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="actuatorValue">
+       <widget class="QSpinBox" name="actuatorValue">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>25</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Current value of slider.</string>
-        </property>
-        <property name="text">
-         <string>0000</string>
+        <property name="frame">
+         <bool>true</bool>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::UpDownArrows</enum>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
         </property>
        </widget>
       </item>

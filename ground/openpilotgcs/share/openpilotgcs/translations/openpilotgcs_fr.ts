@@ -7055,7 +7055,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#1 : Étalonnage multipoints&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les échelles pour les capteurs Accéléromètres ou Magnétomètre. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cliquer sur &amp;quot;Étalonner Accéléro.&amp;quot; ou &amp;quot;Étalonner Magnéto.&amp;quot; pour démarrer l&apos;étalonnage puis suivez les instructions qui seront affichées ici.  &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cliquer sur &amp;quot;Étalonner Accéléromètre&amp;quot; ou &amp;quot;Étalonner Magnétomètre&amp;quot; pour démarrer l&apos;étalonnage puis suivez les instructions qui seront affichées ici.  &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour un calibrage optimal effectuez l&apos;étalonnage des Accéléromètres sans monter la carte sur l&apos;appareil, de cette façon vous pourrez précisément la mettre de niveau sur votre bureau/table pendant le processus. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Le calibrage du magnétomètre devra être effectué avec la carte montée dans votre appareil pour tenir compte des champs magnétiques/ masses métalliques à bord.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 1:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; Votre &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;PositionHome doit être définie en premier&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
@@ -7071,7 +7071,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#4 : Étalonnage de la compensation de température&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les variations des capteurs à plusieurs températures lors du réchauffement de la carte.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Ceci permet un certain niveau de correction sur la variation des ajustements en fonction des changements de température. Il améliore à la fois le maintien d&apos;altitude et les performances sur l&apos;axe de lacet.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour effectuer cette calibration laissez refroidir la carte à température ambiante dans un endroit le plus froid possible. Après 15-20 minutes branchez le connecteur USB à la carte et cliquez sur le bouton Démarrer et ne plus bouger la carte. Attendez jusqu&apos;à la fin du processus.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour effectuer cette calibration laissez refroidir la carte à température ambiante dans un endroit le plus froid possible. Après 15-20 minutes branchez le connecteur USB à la carte, cliquez sur le bouton Démarrer et ne bougez plus la carte. Attendez jusqu&apos;à la fin du processus.&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -7087,7 +7087,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Calibrate Accel</source>
-        <translation type="unfinished">Étalonner Accéléro.</translation>
+        <translation type="unfinished">Étalonner Accéléromètre</translation>
     </message>
     <message>
         <location/>
@@ -7097,7 +7097,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Calibrate Mag</source>
-        <translation type="unfinished">Étalonner Magnéto.</translation>
+        <translation type="unfinished">Étalonner Magnétomètre</translation>
     </message>
     <message>
         <location/>
@@ -8210,7 +8210,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thrust exponential value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Valeur exponentielle de la poussée.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Valeur exponentielle de la poussée.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8221,7 +8221,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Throttle/Collective Stick Response</source>
-        <translation type="unfinished">Réponse du manche Gaz/Collectif</translation>
+        <translation>Réponse du manche Gaz/Collectif</translation>
     </message>
 </context>
 <context>
@@ -8675,7 +8675,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Channels</source>
-        <translation type="unfinished">Canaux</translation>
+        <translation>Canaux</translation>
     </message>
 </context>
 <context>
@@ -13435,12 +13435,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+4"/>
         <source>Entries logged (free): </source>
-        <translation type="unfinished">Vols enregistrés (libres) : </translation>
+        <translation>Vols enregistrés (libres) : </translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Flight to download:</source>
-        <translation type="unfinished">Vols à télécharger :</translation>
+        <translation>Vols à télécharger :</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -13460,18 +13460,18 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+7"/>
         <source>Export logs...</source>
-        <translation type="unfinished">Exporter logs...</translation>
+        <translation>Exporter logs...</translation>
     </message>
     <message>
         <location line="+15"/>
         <location line="+128"/>
         <source>Settings</source>
-        <translation type="unfinished">Paramètres</translation>
+        <translation>Paramètres</translation>
     </message>
     <message>
         <location line="-121"/>
         <source>When to log: </source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer un log : </translation>
     </message>
     <message>
         <location line="+107"/>
@@ -13481,68 +13481,68 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+21"/>
         <source>Period</source>
-        <translation type="unfinished">Période</translation>
+        <translation>Période</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Load...</source>
-        <translation type="unfinished">Charger...</translation>
+        <translation>Charger...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Loads settings for all objects from a file.</source>
-        <translation type="unfinished">Charger paramètres pour tous les objets du fichier.</translation>
+        <translation>Charger paramètres pour tous les objets du fichier.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Save...</source>
-        <translation type="unfinished">Enregistrer...</translation>
+        <translation>Enregistrer...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Saves settings for all objects in a file.</source>
-        <translation type="unfinished">Enregistre les paramètres pour tous les objets dans le fichier.</translation>
+        <translation>Enregistre les paramètres pour tous les objets dans le fichier.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Reset</source>
-        <translation type="unfinished">Réinitialiser</translation>
+        <translation>Réinitialiser</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Resets all settings to the values currently set on the board.</source>
-        <translation type="unfinished">Réinitialiser tous les paramètres aux valeurs actuellement dans la carte.</translation>
+        <translation>Réinitialiser tous les paramètres aux valeurs actuellement dans la carte.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Clear</source>
-        <translation type="unfinished">Effacer</translation>
+        <translation>Effacer</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clears all settings to default values.</source>
-        <translation type="unfinished">Effacer tous les paramètres aux valeurs par défaut.</translation>
+        <translation>Effacer tous les paramètres aux valeurs par défaut.</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Save to board</source>
-        <translation type="unfinished">Enregistrer sur la carte</translation>
+        <translation>Enregistrer sur la carte</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Saves the logging configurations to the boards flash memory.</source>
-        <translation type="unfinished">Enregistre les configuration de logging dans la mémoire flash de la carte.</translation>
+        <translation>Enregistre les configuration de logging dans la mémoire flash de la carte.</translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+7"/>
         <source>Settings...</source>
-        <translation type="unfinished">Paramètres...</translation>
+        <translation>Paramètres...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Logs...</source>
-        <translation type="unfinished">Logs...</translation>
+        <translation>Logs...</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -13651,12 +13651,12 @@ Veuillez vérifier le fichier.
     <message>
         <location line="+0"/>
         <source>When updated</source>
-        <translation type="unfinished">Lorsque mis à jour</translation>
+        <translation type="unfinished">Lorsque modifié</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Throttled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifié + Ralenti</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -13666,7 +13666,7 @@ Veuillez vérifier le fichier.
     <message>
         <location line="+0"/>
         <source>Only when Armed</source>
-        <translation type="unfinished">Uniquement lorsque Armé</translation>
+        <translation type="unfinished">Uniquement Armé</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -13970,7 +13970,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location line="+126"/>
         <source>Gyroscope calibration computed succesfully.</source>
-        <translation>Étalonnage gyroscope calculé avec succès.</translation>
+        <translation>Étalonnage des gyroscopes calculés avec succès.</translation>
     </message>
 </context>
 <context>
@@ -14129,7 +14129,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location line="+2"/>
         <source>Canceled</source>
-        <translation type="unfinished">Annulé</translation>
+        <translation>Annulé</translation>
     </message>
 </context>
 <context>

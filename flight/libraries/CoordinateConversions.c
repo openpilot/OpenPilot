@@ -194,7 +194,8 @@ void Quaternion2R(float q[4], float Rbe[3][3])
 }
 
 
-// ** Find x of body frame from quaternion **
+// ** Find first row of Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** This vector corresponds to the fuselage/roll vector xB **
 void QuaternionC2xB(const float q0, const float q1, const float q2, const float q3, float x[3])
 {
     const float q0s = q0 * q0, q1s = q1 * q1, q2s = q2 * q2, q3s = q3 * q3;
@@ -211,7 +212,8 @@ void Quaternion2xB(const float q[4], float x[3])
 }
 
 
-// ** Find y of body frame from quaternion **
+// ** Find second row of Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** This vector corresponds to the spanwise/pitch vector yB **
 void QuaternionC2yB(const float q0, const float q1, const float q2, const float q3, float y[3])
 {
     const float q0s = q0 * q0, q1s = q1 * q1, q2s = q2 * q2, q3s = q3 * q3;
@@ -228,7 +230,8 @@ void Quaternion2yB(const float q[4], float y[3])
 }
 
 
-// ** Find z of body frame from quaternion **
+// ** Find third row of Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** This vector corresponds to the vertical/yaw vector zB **
 void QuaternionC2zB(const float q0, const float q1, const float q2, const float q3, float z[3])
 {
     const float q0s = q0 * q0, q1s = q1 * q1, q2s = q2 * q2, q3s = q3 * q3;

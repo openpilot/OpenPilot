@@ -406,24 +406,23 @@ void ConfigTaskWidget::widgetsContentsChanged()
 {
     QWidget *emitter = ((QWidget *)sender());
     emit widgetContentsChanged(emitter);
-    double scale     = 1.0;
     QVariant value;
 
     foreach(WidgetBinding * binding, m_widgetBindingsPerWidget.values(emitter)) {
         if (binding && binding->isEnabled()) {
             if (binding->widget() == emitter) {
-                checkWidgetsLimits(emitter, binding->field(), binding->index(), binding->isLimited(),
-                                   getVariantFromWidget(emitter, binding), binding->scale());
+                value = getVariantFromWidget(emitter, binding);
+                checkWidgetsLimits(emitter, binding->field(), binding->index(), binding->isLimited(), value, binding->scale());
             } else {
                 foreach(ShadowWidgetBinding * shadow, binding->shadows()) {
                     if (shadow->widget() == emitter) {
-                        WidgetBinding tmpBinding(shadow->widget(), binding->object(), binding->field(), binding->index(), shadow->scale(), shadow->isLimited());
-                        QVariant value = getVariantFromWidget(emitter, &tmpBinding);
-                        checkWidgetsLimits(emitter, binding->field(), binding->index(), shadow->isLimited(), value, scale);
+                        WidgetBinding tmpBinding(shadow->widget(), binding->object(), binding->field(),
+                                binding->index(), shadow->scale(), shadow->isLimited());
+                        value = getVariantFromWidget(emitter, &tmpBinding);
+                        checkWidgetsLimits(emitter, binding->field(), binding->index(), shadow->isLimited(), value, shadow->scale());
                     }
                 }
             }
-            value = getVariantFromWidget(emitter, binding);
             binding->setValue(value);
 
             if (binding->widget() != emitter) {

@@ -25,6 +25,7 @@
 		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS,ComUsbBridge,Fault,Altitude,Airspeed,TxPID,Autotune,VtolPathFollower,FixedWingPathFollower,Battery,Overo,MagBaro,OsdHk" options="Disabled,Enabled" defaultvalue="Disabled"/>
 		<field name="ADCRouting" units="" type="enum" elementnames="adc0,adc1,adc2,adc3" options="Disabled,BatteryVoltage,BatteryCurrent,AnalogAirspeed,Generic" defaultvalue="Disabled"/>
 		<field name="DSMxBind" units=""  type="uint8"  elements="1" defaultvalue="0"/>
+        <field name="WS2811LED_Out" units="" type="enum" elements="1" options="ServoOut1,ServoOut2,ServoOut3,ServoOut4,ServoOut5,ServoOut6,FlexiPin3,FlexiPin4,Disabled" defaultvalue="Disabled" />
 
 		<access gcs="readwrite" flight="readwrite"/>
 		<telemetrygcs acked="true" updatemode="onchange" period="0"/>

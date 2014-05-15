@@ -89,6 +89,8 @@
 #define PIOS_INCLUDE_ETASV3
 #define PIOS_INCLUDE_MS4525DO
 
+#define PIOS_INCLUDE_WS2811
+
 /* #define PIOS_INCLUDE_HCSR04 */
 
 /* PIOS receiver drivers */

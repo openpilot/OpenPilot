@@ -35,9 +35,11 @@
 
 class WizardModel : public QStateMachine {
     Q_OBJECT Q_PROPERTY(QQmlListProperty<QObject> steps READ steps CONSTANT)
-    Q_PROPERTY(QString instructions READ instructions NOTIFY instructionsChanged)
+    //Q_PROPERTY(QString instructions READ instructions NOTIFY instructionsChanged)
     Q_PROPERTY(WizardState * currentState READ currentState NOTIFY currentStateChanged)
 public:
+    enum MessageType { Info, Notice, Warning, Error };
+
     explicit WizardModel(QObject *parent = 0);
 
     QQmlListProperty<QObject> steps()
@@ -45,25 +47,28 @@ public:
         return QQmlListProperty<QObject>(this, m_steps);
     }
 
-    QString instructions()
+    QString &instructions()
     {
         return m_instructions;
     }
 
-    void setInstructions(QString instructions)
+    void setInstructions(QString text, MessageType type = WizardModel::Info)
     {
-        m_instructions = instructions;
-        emit instructionsChanged(instructions);
+        m_instructions = text;
+        emit displayInstructions(text, type);
     }
     WizardState *currentState();
+
 protected:
     QList<QObject *> m_steps;
+
 private:
     QString m_instructions;
+
 signals:
-    void instructionsChanged(QString status);
+    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info, bool clear = false);
     void currentStateChanged(WizardState *status);
-public slots:
+
 };
 
 #endif // WIZARDMODEL_H

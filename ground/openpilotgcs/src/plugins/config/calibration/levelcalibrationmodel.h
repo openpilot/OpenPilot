@@ -28,36 +28,43 @@
 #ifndef LEVELCALIBRATIONMODEL_H
 #define LEVELCALIBRATIONMODEL_H
 
-#include <QObject>
-#include <QMutex>
-#include <QList>
+#include "wizardmodel.h"
 #include "calibration/calibrationutils.h"
-
 #include <revocalibration.h>
 #include <accelgyrosettings.h>
 #include <homelocation.h>
 #include <accelstate.h>
 #include <magstate.h>
+
+#include <QObject>
+#include <QMutex>
+#include <QList>
+
 namespace OpenPilot {
+
 class LevelCalibrationModel : public QObject {
     Q_OBJECT
+
 public:
     explicit LevelCalibrationModel(QObject *parent = 0);
 
 signals:
     void displayVisualHelp(QString elementID);
-    void displayInstructions(QString instructions, bool replace);
+    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info, bool clear = false);
     void disableAllCalibrations();
     void enableAllCalibrations();
     void savePositionEnabledChanged(bool state);
     void progressChanged(int value);
+
 public slots:
     // Slots for calibrating the mags
     void start();
     void savePosition();
+
 private slots:
     void getSample(UAVObject *obj);
     void compute();
+
 private:
     QMutex sensorsUpdateLock;
     int position;
@@ -71,4 +78,5 @@ private:
     UAVObjectManager *getObjectManager();
 };
 }
+
 #endif // LEVELCALIBRATIONMODEL_H

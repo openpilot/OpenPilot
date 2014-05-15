@@ -94,6 +94,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // connect the thermalCalibration model to UI
     m_thermalCalibrationModel = new OpenPilot::ThermalCalibrationModel(this);
+    m_thermalCalibrationModel->init();
 
     connect(m_ui->ThermalBiasStart, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnStart()));
     connect(m_ui->ThermalBiasEnd, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnEnd()));
@@ -103,9 +104,10 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_thermalCalibrationModel, SIGNAL(endEnabledChanged(bool)), m_ui->ThermalBiasEnd, SLOT(setEnabled(bool)));
     connect(m_thermalCalibrationModel, SIGNAL(cancelEnabledChanged(bool)), m_ui->ThermalBiasCancel, SLOT(setEnabled(bool)));
 
-    connect(m_thermalCalibrationModel, SIGNAL(instructionsChanged(QString)), m_ui->label_thermalDescription, SLOT(setText(QString)));
-    connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(QString)), m_ui->textTemperature, SLOT(setText(QString)));
-    connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(QString)), m_ui->textThermalGradient, SLOT(setText(QString)));
+    connect(m_thermalCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
+            this, SLOT(displayInstructions(QString, WizardModel::MessageType)));
+//    connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(QString)), m_ui->textTemperature, SLOT(setText(QString)));
+//    connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(QString)), m_ui->textThermalGradient, SLOT(setText(QString)));
     connect(m_thermalCalibrationModel, SIGNAL(progressChanged(int)), m_ui->thermalBiasProgress, SLOT(setValue(int)));
     // note: init for m_thermalCalibrationModel is done in showEvent to prevent cases wiht "Start" button not enabled due to some itming issue.
 
@@ -119,7 +121,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_sixPointCalibrationModel, SIGNAL(enableAllCalibrations()), this, SLOT(enableAllCalibrations()));
     connect(m_sixPointCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
     connect(m_sixPointCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
-    connect(m_sixPointCalibrationModel, SIGNAL(displayInstructions(QString, bool)), this, SLOT(displayInstructions(QString, bool)));
+    connect(m_sixPointCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType, bool)),
+            this, SLOT(displayInstructions(QString, WizardModel::MessageType, bool)));
     connect(m_sixPointCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_sixPointCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->sixPointsSave, SLOT(setEnabled(bool)));
 
@@ -130,7 +133,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     connect(m_levelCalibrationModel, SIGNAL(disableAllCalibrations()), this, SLOT(disableAllCalibrations()));
     connect(m_levelCalibrationModel, SIGNAL(enableAllCalibrations()), this, SLOT(enableAllCalibrations()));
-    connect(m_levelCalibrationModel, SIGNAL(displayInstructions(QString, bool)), this, SLOT(displayInstructions(QString, bool)));
+    connect(m_levelCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType, bool)),
+            this, SLOT(displayInstructions(QString, WizardModel::MessageType, bool)));
     connect(m_levelCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_levelCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->boardLevelSavePos, SLOT(setEnabled(bool)));
     connect(m_levelCalibrationModel, SIGNAL(progressChanged(int)), this->m_ui->boardLevelProgress, SLOT(setValue(int)));
@@ -146,7 +150,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_gyroBiasCalibrationModel, SIGNAL(enableAllCalibrations()), this, SLOT(enableAllCalibrations()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(displayInstructions(QString, bool)), this, SLOT(displayInstructions(QString, bool)));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType, bool)),
+            this, SLOT(displayInstructions(QString, WizardModel::MessageType, bool)));
     connect(m_gyroBiasCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
 
 
@@ -170,12 +175,10 @@ ConfigRevoWidget::~ConfigRevoWidget()
     // Do nothing
 }
 
-
 void ConfigRevoWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
     updateVisualHelp();
-    m_thermalCalibrationModel->init();
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
@@ -237,13 +240,24 @@ void ConfigRevoWidget::displayVisualHelp(QString elementID)
     updateVisualHelp();
 }
 
-void ConfigRevoWidget::displayInstructions(QString instructions, bool replace)
+void ConfigRevoWidget::displayInstructions(QString text, WizardModel::MessageType type, bool clear)
 {
-    if (replace || instructions.isNull()) {
+    if (clear || text.isEmpty()) {
         m_ui->calibrationInstructions->clear();
     }
-    if (!instructions.isNull()) {
-        m_ui->calibrationInstructions->append(instructions);
+    if (!text.isNull()) {
+        switch(type) {
+        case WizardModel::Error:
+            text = QString("<font color='red'>%1</font>").arg(text);
+            break;
+        case WizardModel::Notice:
+            text = QString("<font color='blue'>%1</font>").arg(text);
+            break;
+        case WizardModel::Info:
+        default:
+            break;
+        }
+        m_ui->calibrationInstructions->append(text);
     }
 }
 

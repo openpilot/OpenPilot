@@ -27,17 +27,22 @@
  */
 #ifndef SIXPOINTCALIBRATIONMODEL_H
 #define SIXPOINTCALIBRATIONMODEL_H
-#include <QMutex>
-#include <QObject>
-#include <QList>
+
+#include "wizardmodel.h"
 #include "calibration/calibrationutils.h"
-#include <QString>
 #include <revocalibration.h>
 #include <accelgyrosettings.h>
 #include <homelocation.h>
 #include <accelstate.h>
 #include <magstate.h>
+
+#include <QMutex>
+#include <QObject>
+#include <QList>
+#include <QString>
+
 namespace OpenPilot {
+
 class SixPointCalibrationModel : public QObject {
     Q_OBJECT
 
@@ -61,7 +66,7 @@ public:
 
 signals:
     void displayVisualHelp(QString elementID);
-    void displayInstructions(QString instructions, bool replace);
+    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info, bool clear = false);
     void disableAllCalibrations();
     void enableAllCalibrations();
     void storeAndClearBoardRotation();

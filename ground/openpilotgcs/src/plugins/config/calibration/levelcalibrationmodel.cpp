@@ -32,7 +32,9 @@
 #include "calibration/calibrationuiutils.h"
 
 static const int LEVEL_SAMPLES = 100;
+
 namespace OpenPilot {
+
 LevelCalibrationModel::LevelCalibrationModel(QObject *parent) :
     QObject(parent)
 {}
@@ -62,7 +64,7 @@ void LevelCalibrationModel::start()
     attitudeState->setMetadata(mdata);
 
     /* Show instructions and enable controls */
-    displayInstructions(tr("Place horizontally and click Save Position button..."), true);
+    displayInstructions(tr("Place horizontally and click Save Position button..."), WizardModel::Info, true);
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
     disableAllCalibrations();
     savePositionEnabledChanged(true);
@@ -86,7 +88,7 @@ void LevelCalibrationModel::savePosition()
     Q_ASSERT(attitudeState);
     connect(attitudeState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
 
-    displayInstructions(tr("Hold..."), false);
+    displayInstructions(tr("Hold..."));
 }
 
 /**
@@ -130,7 +132,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             rot_data_pitch = OpenPilot::CalibrationUtils::listMean(rot_accum_pitch);
             rot_data_roll  = OpenPilot::CalibrationUtils::listMean(rot_accum_roll);
 
-            displayInstructions(tr("Leave horizontally, rotate 180° along yaw axis and click Save Position button..."), false);
+            displayInstructions(tr("Leave horizontally, rotate 180° along yaw axis and click Save Position button..."));
             displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_SWD);
 
             disableAllCalibrations();
@@ -146,7 +148,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             compute();
             enableAllCalibrations();
             displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
-            displayInstructions(tr("Board leveling computed successfully."), false);
+            displayInstructions(tr("Board leveling completed successfully."));
             break;
         }
     }

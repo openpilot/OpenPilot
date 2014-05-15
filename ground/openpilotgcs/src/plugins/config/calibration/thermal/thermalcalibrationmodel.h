@@ -37,7 +37,9 @@
 #include <QStateMachine>
 #include "../wizardstate.h"
 #include "../wizardmodel.h"
+
 namespace OpenPilot {
+
 class ThermalCalibrationModel : public WizardModel {
     Q_PROPERTY(bool startEnable READ startEnabled NOTIFY startEnabledChanged)
     Q_PROPERTY(bool endEnable READ endEnabled NOTIFY endEnabledChanged)
@@ -47,6 +49,7 @@ class ThermalCalibrationModel : public WizardModel {
     Q_PROPERTY(QString temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
     Q_PROPERTY(int progress READ progress WRITE setProgress NOTIFY progressChanged)
     Q_OBJECT
+
 public:
     explicit ThermalCalibrationModel(QObject *parent = 0);
 
@@ -181,19 +184,19 @@ signals:
     void next();
     void previous();
     void abort();
-public slots:
+
+ public slots:
     void stepChanged(WizardState *state);
     void init();
     void btnStart()
     {
+        setInstructions("");
         emit next();
     }
-
     void btnEnd()
     {
         m_helper->stopAcquisition();
     }
-
     void btnAbort()
     {
         emit abort();

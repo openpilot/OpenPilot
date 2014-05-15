@@ -37,8 +37,9 @@
 #include "calibration/calibrationuiutils.h"
 
 static const int LEVEL_SAMPLES = 100;
-#include "gyrobiascalibrationmodel.h"
+
 namespace OpenPilot {
+
 GyroBiasCalibrationModel::GyroBiasCalibrationModel(QObject *parent) :
     QObject(parent),
     collectingData(false)
@@ -70,7 +71,7 @@ void GyroBiasCalibrationModel::start()
     attitudeSettings->updated();
 
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
-    displayInstructions(tr("Calibrating the gyroscopes. Keep the copter/plane steady..."), true);
+    displayInstructions(tr("Calibrating the gyroscopes. Keep the copter/plane steady..."), WizardModel::Notice, true);
 
     gyro_accum_x.clear();
     gyro_accum_y.clear();
@@ -196,7 +197,7 @@ void GyroBiasCalibrationModel::getSample(UAVObject *obj)
         gyroState->setMetadata(initialGyroStateMdata);
         gyroSensor->setMetadata(initialGyroSensorMdata);
 
-        displayInstructions(tr("Gyroscope calibration computed succesfully."), false);
+        displayInstructions(tr("Gyroscope calibration completed succesfully."));
         displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
 
         // Recall saved board rotation

@@ -26,18 +26,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "sixpointcalibrationmodel.h"
-#include <QThread>
 #include "extensionsystem/pluginmanager.h"
-#include <QMessageBox>
-#include "math.h"
 #include "calibration/calibrationuiutils.h"
+
+#include "math.h"
+#include <QMessageBox>
+#include <QThread>
 #include "QDebug"
+
 #define POINT_SAMPLE_SIZE 50
 #define GRAVITY           9.81f
 #define sign(x) ((x < 0) ? -1 : 1)
 
 #define FITTING_USING_CONTINOUS_ACQUISITION
+
 namespace OpenPilot {
+
 SixPointCalibrationModel::SixPointCalibrationModel(QObject *parent) :
     QObject(parent),
     calibrationStepsMag(),
@@ -195,7 +199,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     }
 
     /* Show instructions and enable controls */
-    displayInstructions((*currentSteps)[0].instructions, true);
+    displayInstructions((*currentSteps)[0].instructions, WizardModel::Info, true);
     showHelp((*currentSteps)[0].visualHelp);
 
     disableAllCalibrations();
@@ -244,7 +248,7 @@ void SixPointCalibrationModel::savePositionData()
         connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
     }
 
-    displayInstructions(tr("Hold..."), false);
+    displayInstructions(tr("Hold..."));
 }
 
 /**
@@ -310,7 +314,7 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
 
         position = (position + 1) % 6;
         if (position != 0) {
-            displayInstructions((*currentSteps)[position].instructions, false);
+            displayInstructions((*currentSteps)[position].instructions);
             showHelp((*currentSteps)[position].visualHelp);
         } else {
 #ifdef FITTING_USING_CONTINOUS_ACQUISITION
@@ -484,9 +488,9 @@ void SixPointCalibrationModel::compute(bool mag, bool accel)
         } else {
             accelGyroSettings->setData(savedSettings.accelGyroSettings);
         }
-        displayInstructions(tr("Sensor scale and bias computed succesfully."), true);
+        displayInstructions(tr("Sensor scale and bias computed succesfully."));
     } else {
-        displayInstructions(tr("Bad calibration. Please review the instructions and repeat."), true);
+        displayInstructions(tr("Bad calibration. Please review the instructions and repeat."), WizardModel::Error);
     }
     position = -1; // set to run again
 }

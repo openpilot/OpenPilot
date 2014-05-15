@@ -29,7 +29,6 @@
 
 #include "ui_revosensors.h"
 #include "configtaskwidget.h"
-#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
@@ -69,7 +68,7 @@ private slots:
     void displayVisualHelp(QString elementID);
     void storeAndClearBoardRotation();
     void recallBoardRotation();
-    void displayInstructions(QString instructions = QString(), bool replace = false);
+    void displayInstructions(QString instructions, WizardModel::MessageType type = WizardModel::Info, bool clear = false);
 
     // ! Overriden method from the configTaskWidget to update UI
     virtual void refreshWidgetsValues(UAVObject *object = NULL);

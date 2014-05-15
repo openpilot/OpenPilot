@@ -33,6 +33,7 @@
 #include "compensationcalculationtransition.h"
 
 namespace OpenPilot {
+
 ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     WizardModel(parent),
     m_startEnabled(false),
@@ -41,7 +42,7 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     m_initDone(false)
 {
     m_helper.reset(new ThermalCalibrationHelper());
-    m_readyState       = new WizardState(tr("Start"), this),
+    m_readyState       = new WizardState("", this),
     m_workingState     = new WizardState(NULL, this);
 
     m_saveSettingState = new WizardState(tr("Saving initial settings"), m_workingState);
@@ -66,10 +67,12 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     connect(m_readyState, SIGNAL(exited()), this, SLOT(wizardStarted()));
     connect(m_completedState, SIGNAL(entered()), this, SLOT(wizardReady()));
     connect(m_completedState, SIGNAL(exited()), this, SLOT(wizardStarted()));
-    this->setInitialState(m_readyState);
+
+    setInitialState(m_readyState);
 
     m_steps << m_readyState << m_saveSettingState << m_setupState << m_acquisitionState << m_restoreState << m_calculateState;
 }
+
 void ThermalCalibrationModel::init()
 {
     if (!m_initDone) {
@@ -80,7 +83,6 @@ void ThermalCalibrationModel::init()
         start();
         setTemperature(0);
         setTemperatureGradient(0);
-        emit instructionsChanged(instructions());
     }
 }
 
@@ -115,4 +117,5 @@ void ThermalCalibrationModel::setTransitions()
     m_workingState->addTransition(this, SIGNAL(abort()), m_abortState);
     // Ready
 }
+
 }

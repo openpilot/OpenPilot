@@ -29,27 +29,35 @@
 #ifndef GYROBIASCALIBRATIONMODEL_H
 #define GYROBIASCALIBRATIONMODEL_H
 
-#include <QObject>
+#include "wizardmodel.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+
+#include <QObject>
+
 namespace OpenPilot {
+
 class GyroBiasCalibrationModel : public QObject {
     Q_OBJECT
+
 public:
     explicit GyroBiasCalibrationModel(QObject *parent = 0);
 
+
 signals:
     void displayVisualHelp(QString elementID);
-    void displayInstructions(QString instructions, bool replace);
+    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info, bool clear = false);
     void disableAllCalibrations();
     void enableAllCalibrations();
     void storeAndClearBoardRotation();
     void recallBoardRotation();
     void progressChanged(int value);
+
 public slots:
     // Slots for gyro bias zero
     void start();
+
 private slots:
     void getSample(UAVObject *obj);
 
@@ -69,4 +77,5 @@ private:
     UAVObjectManager *getObjectManager();
 };
 }
+
 #endif // GYROBIASCALIBRATIONMODEL_H

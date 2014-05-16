@@ -302,23 +302,11 @@ static void updatePathVelocity()
     // in this case the plane effectively needs to be turned around
     // indicators:
     // difference between correction_direction and velocitystate >90 degrees and
-    // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from eerything )
+    // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from everything )
     // fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
-    float angle1 = RAD2DEG(atan2f(progress.path_direction[1], progress.path_direction[0]) - atan2f(velocityState.East, velocityState.North));
-    float angle2 = RAD2DEG(atan2f(progress.correction_direction[1], progress.correction_direction[0]) - atan2f(velocityState.East, velocityState.North));
-    if (angle1 < -180.0f) {
-        angle1 += 360.0f;
-    }
-    if (angle1 > 180.0f) {
-        angle1 -= 360.0f;
-    }
-    if (angle2 < -180.0f) {
-        angle2 += 360.0f;
-    }
-    if (angle2 > 180.0f) {
-        angle2 -= 360.0f;
-    }
-    if (fabsf(angle1) >= 90.0f && fabsf(angle2) >= 90.0f) {
+    if ( // calculating angles < 90 degrees through dot products
+        ((progress.path_direction[0] * velocityState.North + progress.path_direction[1] * velocityState.East) < 0.0f) &&
+        ((progress.correction_direction[0] * velocityState.North + progress.correction_direction[1] * velocityState.East) < 0.0f)) {
         error_speed = 0;
     }
 
@@ -396,10 +384,13 @@ static uint8_t updateFixedDesiredAttitude()
     float descentspeedError;
     float powerCommand;
 
-    float bearing;
+    float fluidMovement[2];
     float heading;
     float headingError;
+    float correctedHeading;
     float course;
+    float courseComponent[2];
+    float correctedCourse;
     float courseError;
     float courseCommand;
 
@@ -413,6 +404,27 @@ static uint8_t updateFixedDesiredAttitude()
     AirspeedStateGet(&airspeedState);
     SystemSettingsGet(&systemSettings);
 
+    /**
+     * Calculate where we are heading and why (wind issues)
+     */
+    heading = RAD2DEG(atan2f(velocityState.East, velocityState.North));
+    headingError = heading - attitudeState.Yaw;
+    if (headingError < -180.0f) {
+        headingError += 360.0f;
+    }
+    if (headingError > 180.0f) {
+        headingError -= 360.0f;
+    }
+    // Error condition: wind speed is higher than airspeed. We are forced backwards!
+    fixedwingpathfollowerStatus.Errors.Wind = 0;
+    if ((headingError > fixedwingpathfollowerSettings.Safetymargins.Wind ||
+         headingError < -fixedwingpathfollowerSettings.Safetymargins.Wind) &&
+        fixedwingpathfollowerSettings.Safetymargins.Wind > 0.5f) { // alarm switched on
+        // we are flying backwards
+        fixedwingpathfollowerStatus.Errors.Wind = 1;
+        result = 0;
+    }
+
 
     /**
      * Compute speed error (required for thrust and pitch)
@@ -420,13 +432,29 @@ static uint8_t updateFixedDesiredAttitude()
 
     // Current ground speed
     groundspeedState = sqrtf(velocityState.East * velocityState.East + velocityState.North * velocityState.North);
+    // assume groundspeed is negative if we are flying backwards (otherwise increasing airspeed would reduce groundspeed)
+    if (fabsf(headingError) > 90.0f) {
+        groundspeedState = -groundspeedState;
+    }
+
     // note that airspeedStateBias is ( calibratedAirspeed - groundSpeed ) at the time of measurement,
     // but thanks to accelerometers,  groundspeed reacts faster to changes in direction
     // than airspeed and gps sensors alone
-    indicatedAirspeedState   = groundspeedState + indicatedAirspeedStateBias;
+    indicatedAirspeedState = groundspeedState + indicatedAirspeedStateBias;
+
+    // fluidMovement is a vector describing the aproximate movement vector in surrounding fluid (2d)
+    fluidMovement[0]   = indicatedAirspeedState * cosf(DEG2RAD(attitudeState.Yaw));
+    fluidMovement[1]   = indicatedAirspeedState * sinf(DEG2RAD(attitudeState.Yaw));
 
     // Desired ground speed
-    groundspeedDesired       = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
+    groundspeedDesired = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
+    // take negative speeds into account (if we are supposed to go the opposite way)
+    // this has two advantages:
+    // 1. it reduces speed to minimum for tight turns -- reducing speed = turn quicker - especially since we pull up to reduce speed ;)
+    // 2. in the unlikely case that we can fly backwards in strong headwind, we will - leads to awesome position hold ;)
+    if ((velocityDesired.North * fluidMovement[0] + velocityDesired.East * fluidMovement[1]) < 0.0f) { // difference >90 degrees
+        groundspeedDesired = -groundspeedDesired;
+    }
     indicatedAirspeedDesired = boundf(groundspeedDesired + indicatedAirspeedStateBias,
                                       fixedwingpathfollowerSettings.HorizontalVelMin,
                                       fixedwingpathfollowerSettings.HorizontalVelMax);
@@ -565,39 +593,23 @@ static uint8_t updateFixedDesiredAttitude()
     }
 
     /**
-     * Calculate where we are heading and why (wind issues)
-     */
-    bearing = attitudeState.Yaw;
-    heading = RAD2DEG(atan2f(velocityState.East, velocityState.North));
-    headingError = heading - bearing;
-    if (headingError < -180.0f) {
-        headingError += 360.0f;
-    }
-    if (headingError > 180.0f) {
-        headingError -= 360.0f;
-    }
-    // Error condition: wind speed is higher than airspeed. We are forced backwards!
-    fixedwingpathfollowerStatus.Errors.Wind = 0;
-    if ((headingError > fixedwingpathfollowerSettings.Safetymargins.Wind ||
-         headingError < -fixedwingpathfollowerSettings.Safetymargins.Wind) &&
-        fixedwingpathfollowerSettings.Safetymargins.Highpower > 0.5f) { // alarm switched on
-        // we are flying backwards
-        fixedwingpathfollowerStatus.Errors.Wind = 1;
-        result = 0;
-    }
-
-    /**
      * Compute desired roll command
      */
-    if (groundspeedDesired > 1e-6f) {
-        course = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North));
 
-        courseError = course - heading;
-    } else {
-        // if we are not supposed to move, run in a circle
-        courseError = -90.0f;
-        result = 0;
+    // Calculate wind corrected heading angle - this approach avoids oscillation at high airspeed but low groundspeed situations (headwind)
+    correctedHeading = RAD2DEG(atan2f(velocityState.East + fluidMovement[1], velocityState.North + fluidMovement[0]));
+
+    course = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North));
+    if (groundspeedDesired >= 0.0f || groundspeedDesired <= fixedwingpathfollowerSettings.HorizontalVelMin - indicatedAirspeedStateBias) {
+        courseComponent[0] = 2.0f *indicatedAirspeedState *cosf(DEG2RAD(course));
+        courseComponent[1] = 2.0f *indicatedAirspeedState *sinf(DEG2RAD(course));
+    } else { // small negative groundspeeds can be achieved if flying slowly into head wind - this allows hovering on the spot ;)
+        courseComponent[0] = -groundspeedDesired *cosf(DEG2RAD(course));
+        courseComponent[1] = -groundspeedDesired *sinf(DEG2RAD(course));
     }
+    correctedCourse = RAD2DEG(atan2f(courseComponent[1] + fluidMovement[1], courseComponent[0] + fluidMovement[0]));
+
+    courseError     = correctedCourse - correctedHeading;
 
     if (courseError < -180.0f) {
         courseError += 360.0f;

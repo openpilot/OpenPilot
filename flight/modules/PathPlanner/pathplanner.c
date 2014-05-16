@@ -176,10 +176,10 @@ static void pathPlannerTask()
 
             pathDesired.Start.North      = 0;
             pathDesired.Start.East       = 0;
-            pathDesired.Start.Down       = positionState.Down - settings.ReturnToHomeAltitudeOffset;
+            pathDesired.Start.Down       = positionState.Down - settings.ReturnToBaseAltitudeOffset;
             pathDesired.End.North        = 0;
             pathDesired.End.East         = 0;
-            pathDesired.End.Down         = positionState.Down - settings.ReturnToHomeAltitudeOffset;
+            pathDesired.End.Down         = positionState.Down - settings.ReturnToBaseAltitudeOffset;
             pathDesired.StartingVelocity = 1;
             pathDesired.EndingVelocity   = 0;
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;

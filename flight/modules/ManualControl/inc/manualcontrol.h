@@ -75,6 +75,13 @@ void pathFollowerHandler(bool newinit);
  */
 void pathPlannerHandler(bool newinit);
 
+/**
+ * @brief Handler to setup takeofflocation on arming. it is set up during Arming
+ * @input: NONE:
+ * @output: NONE
+ */
+void takeOffLocationHandler(bool newinit);
+
 /*
  * These are assumptions we make in the flight code about the order of settings and their consistency between
  * objects.  Please keep this synchronized to the UAVObjects

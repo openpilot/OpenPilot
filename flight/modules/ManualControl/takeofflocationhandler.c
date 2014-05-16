@@ -43,27 +43,30 @@ static HandlerStatus_t handlerStatus;
 // Private functions
 static void SetTakeOffLocation();
 
+void takeOffLocationHandlerInit()
+{
+    TakeOffLocationInitialize();
+    // check whether there is a preset/valid takeoff location
+    uint8_t mode;
+    uint8_t status;
+    TakeOffLocationModeGet(&mode);
+    TakeOffLocationStatusGet(&status);
+    if (mode == TAKEOFFLOCATION_MODE_PRESET && status == TAKEOFFLOCATION_STATUS_VALID) {
+        handlerStatus = HANDLER_STATUS_SET;
+    } else {
+        handlerStatus = HANDLER_STATUS_UNSET;
+        status = TAKEOFFLOCATION_STATUS_INVALID;
+        TakeOffLocationStatusSet(&status);
+    }
+}
 /**
  * Handles TakeOffPosition location setup
  * @param newinit
  */
-void takeOffLocationHandler(bool newinit)
+void takeOffLocationHandler()
 {
-    if (newinit) {
-        // check whether there is a preset/valid takeoff location
-        uint8_t mode;
-        uint8_t status;
-        TakeOffLocationModeGet(&mode);
-        TakeOffLocationStatusGet(&status);
-        if (mode == TAKEOFFLOCATION_MODE_PRESET && status == TAKEOFFLOCATION_STATUS_VALID) {
-            handlerStatus = HANDLER_STATUS_SET;
-        } else {
-            handlerStatus = HANDLER_STATUS_UNSET;
-        }
-        return;
-    }
-
     uint8_t armed;
+
     FlightStatusArmedGet(&armed);
 
     // Location already acquired/preset
@@ -121,5 +124,6 @@ void SetTakeOffLocation()
     takeOffLocation.North = positionState.North;
     takeOffLocation.East  = positionState.East;
     takeOffLocation.Down  = positionState.Down;
+    TakeOffLocationSet(&takeOffLocation);
     handlerStatus = HANDLER_STATUS_PENDING;
 }

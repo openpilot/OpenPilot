@@ -80,7 +80,12 @@ void pathPlannerHandler(bool newinit);
  * @input: NONE:
  * @output: NONE
  */
-void takeOffLocationHandler(bool newinit);
+void takeOffLocationHandler();
+
+/**
+ * @brief Initialize TakeoffLocationHanlder
+ */
+void takeOffLocationHandlerInit();
 
 /*
  * These are assumptions we make in the flight code about the order of settings and their consistency between

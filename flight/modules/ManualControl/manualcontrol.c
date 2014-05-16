@@ -135,7 +135,7 @@ int32_t ManualControlStart()
     armHandler(true);
 
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-    takeOffLocationHandler(true);
+    takeOffLocationHandlerInit();
 #endif
     // Start main task
     PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
@@ -171,7 +171,7 @@ static void manualControlTask(void)
     // Process Arming
     armHandler(false);
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
-    takeOffLocationHandler(false);
+    takeOffLocationHandler();
 #endif
     // Process flight mode
     FlightStatusData flightStatus;

@@ -40,8 +40,6 @@ typedef enum {
 
 // Private variables
 static HandlerStatus_t handlerStatus;
-static const uint8_t TakeOffStatusInvalid = TAKEOFFLOCATION_STATUS_INVALID;
-static const uint8_t TakeOffStatusValid   = TAKEOFFLOCATION_STATUS_VALID;
 // Private functions
 static void SetTakeOffLocation();
 

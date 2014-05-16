@@ -37,6 +37,7 @@
 
 
 #if defined(REVOLUTION)
+#include <takeofflocation.h>
 // Private constants
 
 // Private types
@@ -66,16 +67,26 @@ void pathFollowerHandler(bool newinit)
         FlightModeSettingsGet(&settings);
         PathDesiredData pathDesired;
         PathDesiredGet(&pathDesired);
+        TakeOffLocationData takeoffLocation;
+        TakeOffLocationGet(&takeoffLocation);
         switch (flightStatus.FlightMode) {
         case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-            // Simple Return To Base mode - keep altitude the same, fly to home position
 
+            // Simple Return To Base mode - keep altitude the same applying configured delta, fly to takeoff position
+            if (takeoffLocation.Status == TAKEOFFLOCATION_STATUS_VALID) {
+                pathDesired.Start.North = takeoffLocation.North;
+                pathDesired.Start.East  = takeoffLocation.East;
+                pathDesired.End.North   = takeoffLocation.North;
+                pathDesired.End.East    = takeoffLocation.East;
+            } else {
+                // in case for some bad reason takeofflocation isn't valid, fails back to home location.
+                pathDesired.Start.North = 0;
+                pathDesired.Start.East  = 0;
+                pathDesired.End.North   = 0;
+                pathDesired.End.East    = 0;
+            }
 
-            pathDesired.Start.North      = 0;
-            pathDesired.Start.East       = 0;
             pathDesired.Start.Down       = positionState.Down - settings.ReturnToHomeAltitudeOffset;
-            pathDesired.End.North        = 0;
-            pathDesired.End.East         = 0;
             pathDesired.End.Down         = positionState.Down - settings.ReturnToHomeAltitudeOffset;
             pathDesired.StartingVelocity = 1;
             pathDesired.EndingVelocity   = 0;

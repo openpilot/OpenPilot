@@ -55,69 +55,67 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-    ftw = new MyTabbedStackWidget(this, true, true);
-    ftw->setIconSize(64);
+    stackWidget = new MyTabbedStackWidget(this, true, true);
+    stackWidget->setIconSize(64);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(ftw);
+    layout->addWidget(stackWidget);
     setLayout(layout);
 
-    // *********************
     QWidget *qwd;
 
     QIcon *icon = new QIcon();
     icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd  = new DefaultHwSettingsWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
+    stackWidget->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/vehicle_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/vehicle_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd  = new ConfigVehicleTypeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::aircraft, qwd, *icon, QString("Vehicle"));
+    stackWidget->insertTab(ConfigGadgetWidget::aircraft, qwd, *icon, QString("Vehicle"));
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/input_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/input_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd  = new ConfigInputWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::input, qwd, *icon, QString("Input"));
+    stackWidget->insertTab(ConfigGadgetWidget::input, qwd, *icon, QString("Input"));
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/output_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/output_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd  = new ConfigOutputWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::output, qwd, *icon, QString("Output"));
+    stackWidget->insertTab(ConfigGadgetWidget::output, qwd, *icon, QString("Output"));
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd  = new DefaultAttitudeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Attitude"));
+    stackWidget->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Attitude"));
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/stabilization_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/stabilization_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd  = new ConfigStabilizationWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, *icon, QString("Stabilization"));
+    stackWidget->insertTab(ConfigGadgetWidget::stabilization, qwd, *icon, QString("Stabilization"));
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/camstab_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/camstab_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd  = new ConfigCameraStabilizationWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::camerastabilization, qwd, *icon, QString("Gimbal"));
+    stackWidget->insertTab(ConfigGadgetWidget::camerastabilization, qwd, *icon, QString("Gimbal"));
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/txpid_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/txpid_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd  = new ConfigTxPIDWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::txpid, qwd, *icon, QString("TxPID"));
+    stackWidget->insertTab(ConfigGadgetWidget::txpid, qwd, *icon, QString("TxPID"));
 
-    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-    // *********************
+    stackWidget->setCurrentIndex(ConfigGadgetWidget::hardware);
+
     // Listen to autopilot connection events
-
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
@@ -129,9 +127,9 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     }
 
     help = 0;
-    connect(ftw, SIGNAL(currentAboutToShow(int, bool *)), this, SLOT(tabAboutToChange(int, bool *)));
+    connect(stackWidget, SIGNAL(currentAboutToShow(int, bool *)), this, SLOT(tabAboutToChange(int, bool *)));
 
-    // Connect to the PipXStatus object updates
+    // Connect to the OPLinkStatus object updates
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     oplinkStatusObj = dynamic_cast<UAVDataObject *>(objManager->getObject("OPLinkStatus"));
     if (oplinkStatusObj != NULL) {
@@ -148,13 +146,13 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 
 ConfigGadgetWidget::~ConfigGadgetWidget()
 {
-    // TODO: properly delete all the tabs in ftw before exiting
+    delete stackWidget;
 }
 
 void ConfigGadgetWidget::startInputWizard()
 {
-    ftw->setCurrentIndex(ConfigGadgetWidget::input);
-    ConfigInputWidget *inputWidget = dynamic_cast<ConfigInputWidget *>(ftw->getWidget(ConfigGadgetWidget::input));
+    stackWidget->setCurrentIndex(ConfigGadgetWidget::input);
+    ConfigInputWidget *inputWidget = dynamic_cast<ConfigInputWidget *>(stackWidget->getWidget(ConfigGadgetWidget::input));
     Q_ASSERT(inputWidget);
     inputWidget->startInputWizard();
 }
@@ -167,10 +165,10 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 void ConfigGadgetWidget::onAutopilotDisconnect()
 {
     QWidget *qwd = new DefaultAttitudeWidget(this);
-    ftw->replaceTab(ConfigGadgetWidget::sensors, qwd);
+    stackWidget->replaceTab(ConfigGadgetWidget::sensors, qwd);
 
     qwd  = new DefaultHwSettingsWidget(this);
-    ftw->replaceTab(ConfigGadgetWidget::hardware, qwd);
+    stackWidget->replaceTab(ConfigGadgetWidget::hardware, qwd);
 
     emit autopilotDisconnected();
 }
@@ -186,19 +184,18 @@ void ConfigGadgetWidget::onAutopilotConnect()
         int board = utilMngr->getBoardModel();
         if ((board & 0xff00) == 1024) {
             // CopterControl family
-
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
-            ftw->replaceTab(ConfigGadgetWidget::sensors, qwd);
+            stackWidget->replaceTab(ConfigGadgetWidget::sensors, qwd);
 
             qwd  = new ConfigCCHWWidget(this);
-            ftw->replaceTab(ConfigGadgetWidget::hardware, qwd);
+            stackWidget->replaceTab(ConfigGadgetWidget::hardware, qwd);
         } else if ((board & 0xff00) == 0x0900) {
             // Revolution family
             QWidget *qwd = new ConfigRevoWidget(this);
-            ftw->replaceTab(ConfigGadgetWidget::sensors, qwd);
+            stackWidget->replaceTab(ConfigGadgetWidget::sensors, qwd);
 
             qwd  = new ConfigRevoHWWidget(this);
-            ftw->replaceTab(ConfigGadgetWidget::hardware, qwd);
+            stackWidget->replaceTab(ConfigGadgetWidget::hardware, qwd);
         } else {
             // Unknown board
             qDebug() << "Unknown board " << board;
@@ -212,7 +209,7 @@ void ConfigGadgetWidget::tabAboutToChange(int i, bool *proceed)
 {
     Q_UNUSED(i);
     *proceed = true;
-    ConfigTaskWidget *wid = qobject_cast<ConfigTaskWidget *>(ftw->currentWidget());
+    ConfigTaskWidget *wid = qobject_cast<ConfigTaskWidget *>(stackWidget->currentWidget());
     if (!wid) {
         return;
     }
@@ -243,7 +240,7 @@ void ConfigGadgetWidget::updateOPLinkStatus(UAVObject *)
         icon->addFile(":/configgadget/images/pipx-selected.png", QSize(), QIcon::Selected, QIcon::Off);
 
         QWidget *qwd = new ConfigPipXtremeWidget(this);
-        ftw->insertTab(ConfigGadgetWidget::oplink, qwd, *icon, QString("OPLink"));
+        stackWidget->insertTab(ConfigGadgetWidget::oplink, qwd, *icon, QString("OPLink"));
         oplinkConnected = true;
     }
 }
@@ -254,8 +251,8 @@ void ConfigGadgetWidget::onOPLinkDisconnect()
     oplinkTimeout->stop();
     oplinkConnected = false;
 
-    if (ftw->currentIndex() == ConfigGadgetWidget::oplink) {
-        ftw->setCurrentIndex(0);
+    if (stackWidget->currentIndex() == ConfigGadgetWidget::oplink) {
+        stackWidget->setCurrentIndex(0);
     }
-    ftw->removeTab(ConfigGadgetWidget::oplink);
+    stackWidget->removeTab(ConfigGadgetWidget::oplink);
 }

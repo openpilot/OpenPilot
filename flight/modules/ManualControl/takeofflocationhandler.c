@@ -62,6 +62,7 @@ void takeOffLocationHandlerInit()
 void takeOffLocationHandler()
 {
     uint8_t armed;
+    uint8_t status;
 
     FlightStatusArmedGet(&armed);
 
@@ -70,14 +71,15 @@ void takeOffLocationHandler()
         return;
     }
 
+    TakeOffLocationStatusGet(&status);
+
     switch (armed) {
     case FLIGHTSTATUS_ARMED_ARMING:
     case FLIGHTSTATUS_ARMED_ARMED:
-        if (!locationSet) {
+        if (!locationSet || status != TAKEOFFLOCATION_STATUS_VALID) {
             uint8_t mode;
-            uint8_t status;
-            TakeOffLocationStatusSet(&status);
             TakeOffLocationModeGet(&mode);
+
             if ((mode != TAKEOFFLOCATION_MODE_PRESET) || (status == TAKEOFFLOCATION_STATUS_INVALID)) {
                 SetTakeOffLocation();
             } else {
@@ -93,8 +95,8 @@ void takeOffLocationHandler()
             TakeOffLocationModeGet(&mode);
             if (mode == TAKEOFFLOCATION_MODE_ARMINGLOCATION) {
                 locationSet = false;
-                uint8_t newStatus = TAKEOFFLOCATION_STATUS_INVALID;
-                TakeOffLocationStatusSet(&newStatus);
+                status = TAKEOFFLOCATION_STATUS_INVALID;
+                TakeOffLocationStatusSet(&status);
             }
         }
         break;
@@ -113,9 +115,10 @@ void SetTakeOffLocation()
     PositionStateData positionState;
     PositionStateGet(&positionState);
 
-    takeOffLocation.North = positionState.North;
-    takeOffLocation.East  = positionState.East;
-    takeOffLocation.Down  = positionState.Down;
+    takeOffLocation.North  = positionState.North;
+    takeOffLocation.East   = positionState.East;
+    takeOffLocation.Down   = positionState.Down;
+    takeOffLocation.Status = TAKEOFFLOCATION_STATUS_VALID;
 
     TakeOffLocationSet(&takeOffLocation);
     locationSet = true;

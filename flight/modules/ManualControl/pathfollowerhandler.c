@@ -73,21 +73,14 @@ void pathFollowerHandler(bool newinit)
         case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
 
             // Simple Return To Base mode - keep altitude the same applying configured delta, fly to takeoff position
-            if (takeoffLocation.Status == TAKEOFFLOCATION_STATUS_VALID) {
-                pathDesired.Start.North = takeoffLocation.North;
-                pathDesired.Start.East  = takeoffLocation.East;
-                pathDesired.End.North   = takeoffLocation.North;
-                pathDesired.End.East    = takeoffLocation.East;
-            } else {
-                // in case for some bad reason takeofflocation isn't valid, fails back to home location.
-                pathDesired.Start.North = 0;
-                pathDesired.Start.East  = 0;
-                pathDesired.End.North   = 0;
-                pathDesired.End.East    = 0;
-            }
-
+            pathDesired.Start.North      = takeoffLocation.North;
+            pathDesired.Start.East       = takeoffLocation.East;
             pathDesired.Start.Down       = positionState.Down - settings.ReturnToBaseAltitudeOffset;
+
+            pathDesired.End.North        = takeoffLocation.North;
+            pathDesired.End.East         = takeoffLocation.East;
             pathDesired.End.Down         = positionState.Down - settings.ReturnToBaseAltitudeOffset;
+
             pathDesired.StartingVelocity = 1;
             pathDesired.EndingVelocity   = 0;
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;

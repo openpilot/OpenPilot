@@ -167,9 +167,10 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 void ConfigGadgetWidget::onAutopilotDisconnect()
 {
     QWidget *qwd = new DefaultAttitudeWidget(this);
+
     ftw->replaceTab(ConfigGadgetWidget::sensors, qwd);
 
-    qwd  = new DefaultHwSettingsWidget(this);
+    qwd = new DefaultHwSettingsWidget(this);
     ftw->replaceTab(ConfigGadgetWidget::hardware, qwd);
 
     emit autopilotDisconnected();
@@ -190,14 +191,14 @@ void ConfigGadgetWidget::onAutopilotConnect()
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
             ftw->replaceTab(ConfigGadgetWidget::sensors, qwd);
 
-            qwd  = new ConfigCCHWWidget(this);
+            qwd = new ConfigCCHWWidget(this);
             ftw->replaceTab(ConfigGadgetWidget::hardware, qwd);
         } else if ((board & 0xff00) == 0x0900) {
             // Revolution family
             QWidget *qwd = new ConfigRevoWidget(this);
             ftw->replaceTab(ConfigGadgetWidget::sensors, qwd);
 
-            qwd  = new ConfigRevoHWWidget(this);
+            qwd = new ConfigRevoHWWidget(this);
             ftw->replaceTab(ConfigGadgetWidget::hardware, qwd);
         } else {
             // Unknown board

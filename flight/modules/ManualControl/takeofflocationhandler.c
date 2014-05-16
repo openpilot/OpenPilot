@@ -32,14 +32,9 @@
 // Private constants
 
 // Private types
-typedef enum {
-    HANDLER_STATUS_UNSET,
-    HANDLER_STATUS_PENDING,
-    HANDLER_STATUS_SET,
-} HandlerStatus_t;
 
 // Private variables
-static HandlerStatus_t handlerStatus;
+static bool locationSet;
 // Private functions
 static void SetTakeOffLocation();
 
@@ -51,10 +46,11 @@ void takeOffLocationHandlerInit()
     uint8_t status;
     TakeOffLocationModeGet(&mode);
     TakeOffLocationStatusGet(&status);
+    // preset with invalid location will actually behave like FirstTakeoff
     if (mode == TAKEOFFLOCATION_MODE_PRESET && status == TAKEOFFLOCATION_STATUS_VALID) {
-        handlerStatus = HANDLER_STATUS_SET;
+        locationSet = true;
     } else {
-        handlerStatus = HANDLER_STATUS_UNSET;
+        locationSet = false;
         status = TAKEOFFLOCATION_STATUS_INVALID;
         TakeOffLocationStatusSet(&status);
     }
@@ -70,42 +66,36 @@ void takeOffLocationHandler()
     FlightStatusArmedGet(&armed);
 
     // Location already acquired/preset
-    if (armed == FLIGHTSTATUS_ARMED_ARMED && handlerStatus == HANDLER_STATUS_SET) {
+    if (armed == FLIGHTSTATUS_ARMED_ARMED && locationSet) {
         return;
     }
 
     switch (armed) {
+    case FLIGHTSTATUS_ARMED_ARMING:
     case FLIGHTSTATUS_ARMED_ARMED:
-        if (handlerStatus == HANDLER_STATUS_UNSET) {
-            // this is just a safety "net", should for any reason the ARMING status is skipped
-            SetTakeOffLocation();
-        } else if (handlerStatus == HANDLER_STATUS_PENDING) {
-            // confirms a "pending" TakeOffPosition
-            uint8_t newStatus = TAKEOFFLOCATION_STATUS_VALID;
-            TakeOffLocationStatusSet(&newStatus);
-            handlerStatus = HANDLER_STATUS_SET;
+        if (!locationSet) {
+            uint8_t mode;
+            uint8_t status;
+            TakeOffLocationStatusSet(&status);
+            TakeOffLocationModeGet(&mode);
+            if ((mode != TAKEOFFLOCATION_MODE_PRESET) || (status == TAKEOFFLOCATION_STATUS_INVALID)) {
+                SetTakeOffLocation();
+            } else {
+                locationSet = true;
+            }
         }
         break;
 
     case FLIGHTSTATUS_ARMED_DISARMED:
         // unset if location is to be acquired at each arming
-        if (handlerStatus == HANDLER_STATUS_SET) {
+        if (locationSet) {
             uint8_t mode;
             TakeOffLocationModeGet(&mode);
             if (mode == TAKEOFFLOCATION_MODE_ARMINGLOCATION) {
-                handlerStatus = HANDLER_STATUS_UNSET;
+                locationSet = false;
                 uint8_t newStatus = TAKEOFFLOCATION_STATUS_INVALID;
                 TakeOffLocationStatusSet(&newStatus);
             }
-            // Clear a previous "pending" flag
-        } else if (handlerStatus == HANDLER_STATUS_PENDING) {
-            handlerStatus = HANDLER_STATUS_UNSET;
-        }
-        break;
-
-    case FLIGHTSTATUS_ARMED_ARMING:
-        if (handlerStatus == HANDLER_STATUS_UNSET) {
-            SetTakeOffLocation();
         }
         break;
     }
@@ -119,11 +109,14 @@ void SetTakeOffLocation()
     TakeOffLocationData takeOffLocation;
 
     TakeOffLocationGet(&takeOffLocation);
+
     PositionStateData positionState;
     PositionStateGet(&positionState);
+
     takeOffLocation.North = positionState.North;
     takeOffLocation.East  = positionState.East;
     takeOffLocation.Down  = positionState.Down;
+
     TakeOffLocationSet(&takeOffLocation);
-    handlerStatus = HANDLER_STATUS_PENDING;
+    locationSet = true;
 }

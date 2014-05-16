@@ -389,7 +389,7 @@ void ConfigTaskWidget::widgetsContentsChanged()
                 foreach(ShadowWidgetBinding * shadow, binding->shadows()) {
                     if (shadow->widget() == emitter) {
                         WidgetBinding tmpBinding(shadow->widget(), binding->object(), binding->field(),
-                                binding->index(), shadow->scale(), shadow->isLimited());
+                                                 binding->index(), shadow->scale(), shadow->isLimited());
                         value = getVariantFromWidget(emitter, &tmpBinding);
                         checkWidgetsLimits(emitter, binding->field(), binding->index(), shadow->isLimited(), value, shadow->scale());
                     }

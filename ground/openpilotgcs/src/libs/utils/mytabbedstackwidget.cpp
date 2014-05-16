@@ -84,6 +84,7 @@ void MyTabbedStackWidget::insertTab(const int index, QWidget *tab, const QIcon &
 {
     // create and insert item
     QListWidgetItem *item = new QListWidgetItem(icon, label);
+
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     item->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     item->setToolTip(label);

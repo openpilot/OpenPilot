@@ -6693,24 +6693,13 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Formulaire</translation>
     </message>
     <message>
-        <location/>
         <source>Current value of slider.</source>
-        <translation>Valeur actuelle du curseur.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>0000</source>
-        <translation></translation>
+        <translation type="vanished">Valeur actuelle du curseur.</translation>
     </message>
     <message>
         <location/>
         <source>Link</source>
         <translation>Lien</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation></translation>
     </message>
     <message>
         <location/>
@@ -6766,6 +6755,16 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Reversed</source>
         <translation>Inversé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>0:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>-</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7002,12 +7001,12 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>Calibration status</source>
-        <translation type="unfinished">Statut de l&apos;étalonnage</translation>
+        <translation>Statut de l&apos;étalonnage</translation>
     </message>
     <message>
         <location/>
         <source>Calibration instructions</source>
-        <translation type="unfinished">Instructions d&apos;étalonnage</translation>
+        <translation>Instructions d&apos;étalonnage</translation>
     </message>
     <message>
         <location/>
@@ -7077,37 +7076,37 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>#1: Accelerometer/Magnetometer calibration</source>
-        <translation type="unfinished">#1 : Étalonnage Accéléromètres/Magnétomètre</translation>
+        <translation>#1 : Étalonnage Accéléromètres/Magnétomètre</translation>
     </message>
     <message>
         <location/>
         <source>Launch accelerometer range and bias calibration.</source>
-        <translation type="unfinished">Démarrer l&apos;étalonnage des plages et ajustements des accéléromètres.</translation>
+        <translation>Démarrer l&apos;étalonnage des plages et ajustements des accéléromètres.</translation>
     </message>
     <message>
         <location/>
         <source>Calibrate Accel</source>
-        <translation type="unfinished">Étalonner Accéléromètre</translation>
+        <translation>Étalonner Accéléromètre</translation>
     </message>
     <message>
         <location/>
         <source>Launch magnetometer range and bias calibration.</source>
-        <translation type="unfinished">Démarrer l&apos;étalonnage des plages et ajustements du magnétomètre.</translation>
+        <translation>Démarrer l&apos;étalonnage des plages et ajustements du magnétomètre.</translation>
     </message>
     <message>
         <location/>
         <source>Calibrate Mag</source>
-        <translation type="unfinished">Étalonner Magnétomètre</translation>
+        <translation>Étalonner Magnétomètre</translation>
     </message>
     <message>
         <location/>
         <source>#2: Board level calibration</source>
-        <translation type="unfinished">#2 : Étalonnage du niveau de la carte</translation>
+        <translation>#2 : Étalonnage du niveau de la carte</translation>
     </message>
     <message>
         <location/>
         <source>#3: Gyro bias calibration</source>
-        <translation type="unfinished">#3 : Étalonnage de l&apos;ajustement des Gyros</translation>
+        <translation>#3 : Étalonnage de l&apos;ajustement des Gyros</translation>
     </message>
     <message>
         <location/>
@@ -7118,7 +7117,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Temperature</source>
-        <translation type="unfinished">Température</translation>
+        <translation>Température</translation>
     </message>
     <message>
         <location/>
@@ -7128,7 +7127,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>°C - Temperature rise</source>
-        <translation type="unfinished">°C - Augmentation température</translation>
+        <translation>°C - Augmentation température</translation>
     </message>
     <message>
         <location/>
@@ -7143,23 +7142,23 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>this contains the current status of the thermal calibration wizard</source>
-        <translation type="unfinished">ceci contient le statut actuel de l&apos;assistant d&apos;étalonnage température</translation>
+        <translation>ceci contient le statut actuel de l&apos;assistant d&apos;étalonnage température</translation>
     </message>
     <message>
         <location/>
         <source>End</source>
-        <translation type="unfinished">Fin</translation>
+        <translation>Fin</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Revolution+Manual+Sensor+Calibration</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation type="unfinished">url:http://wiki.openpilot.org/x/FQWJAQ</translation>
+        <translation>url:http://wiki.openpilot.org/x/FQWJAQ</translation>
     </message>
 </context>
 <context>
@@ -7963,17 +7962,17 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Velocity Proportional</source>
-        <translation type="unfinished">Proportionnel Vitesse Verticale</translation>
+        <translation>Proportionnel Vitesse Verticale</translation>
     </message>
     <message>
         <location/>
         <source>Altitude Proportional</source>
-        <translation type="unfinished">Proportionnel Altitude</translation>
+        <translation>Proportionnel Altitude</translation>
     </message>
     <message>
         <location/>
         <source>Velocity Integral</source>
-        <translation type="unfinished">Intégrale Vitesse Verticale</translation>
+        <translation>Intégrale Vitesse Verticale</translation>
     </message>
     <message>
         <location/>
@@ -10303,7 +10302,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+252"/>
+        <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+218"/>
         <source>Unsaved changes</source>
         <translation>Modifications non sauvegardées</translation>
     </message>
@@ -10318,7 +10317,7 @@ Voulez-vous toujours continuer ?</translation>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+361"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+366"/>
         <source>http://wiki.openpilot.org/x/04Cf</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
         <translation>http://wiki.openpilot.org/x/aIBqAQ</translation>
@@ -12669,7 +12668,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <location/>
         <source>url:http://wiki.openpilot.org/x/hgAGAQ</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
-        <translation type="unfinished">url:http://wiki.openpilot.org/x/B4BYAQ</translation>
+        <translation>url:http://wiki.openpilot.org/x/B4BYAQ</translation>
     </message>
 </context>
 <context>
@@ -12851,7 +12850,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigOutputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+138"/>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+140"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
         <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuillez corriger cela avant de tester les sorties.</translation>
     </message>
@@ -13570,19 +13569,19 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+84"/>
         <source>OpenPilot Log file %1</source>
-        <translation type="unfinished">Fichier Log OpenPilot %1</translation>
+        <translation>Fichier Log OpenPilot %1</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Text file %1</source>
-        <translation type="unfinished">Fichier Texte %1</translation>
+        <translation>Fichier Texte %1</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+36"/>
         <location line="+58"/>
         <source>XML file %1</source>
-        <translation type="unfinished">fichier XML %1</translation>
+        <translation>fichier XML %1</translation>
     </message>
     <message>
         <location line="-90"/>
@@ -13597,41 +13596,41 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+15"/>
         <source>The file has the wrong version or could not parse version information.</source>
-        <translation type="unfinished">Le fichier possède une mauvaise version ou les informations de version n&apos;ont pu être analysées.</translation>
+        <translation>Le fichier possède une mauvaise version ou les informations de version n&apos;ont pu être analysées.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Could not parse enabled attribute.</source>
-        <translation type="unfinished">Impossible d&apos;analyser l&apos;attribut activé.</translation>
+        <translation>Impossible d&apos;analyser l&apos;attribut activé.</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Could not parse period attribute, or object with name &apos;%1&apos; could not be found.</source>
-        <translation type="unfinished">Impossible d&apos;analyser l&apos;attribut période, ou l&apos;objet avec le nom &apos;%1&apos; ne peut être trouvé.</translation>
+        <translation>Impossible d&apos;analyser l&apos;attribut période, ou l&apos;objet avec le nom &apos;%1&apos; ne peut être trouvé.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Could not parse level attribute on setting &apos;%1&apos;</source>
-        <translation type="unfinished">Impossible d&apos;analyser l&apos;attribut level dans le paramètre &apos;%1&apos;</translation>
+        <translation>Impossible d&apos;analyser l&apos;attribut level dans le paramètre &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Settings file corrupt.</source>
-        <translation type="unfinished">Fichier paramètres corrompu.</translation>
+        <translation>Fichier paramètres corrompu.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The file loaded is not in the correct format.
 Please check the file.
 %1</source>
-        <translation type="unfinished">Le fichier chargé n&apos;est pas au bon format.
+        <translation>Le fichier chargé n&apos;est pas au bon format.
 Veuillez vérifier le fichier.
 %1</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Save Log Settings</source>
-        <translation type="unfinished">Enregistrer Paramètres Log</translation>
+        <translation>Enregistrer Paramètres Log</translation>
     </message>
     <message>
         <location line="+79"/>
@@ -13641,17 +13640,17 @@ Veuillez vérifier le fichier.
     <message>
         <location line="+33"/>
         <source>Disabled</source>
-        <translation type="unfinished">Désactivé</translation>
+        <translation>Désactivé</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Periodically</source>
-        <translation type="unfinished">Périodiquement</translation>
+        <translation>Périodiquement</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>When updated</source>
-        <translation type="unfinished">Lorsque modifié</translation>
+        <translation>Lorsque modifié</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -13661,17 +13660,17 @@ Veuillez vérifier le fichier.
     <message>
         <location line="+5"/>
         <source>Never</source>
-        <translation type="unfinished">Jamais</translation>
+        <translation>Jamais</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Only when Armed</source>
-        <translation type="unfinished">Uniquement Armé</translation>
+        <translation>Uniquement Armé</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Always</source>
-        <translation type="unfinished">Tout le temps</translation>
+        <translation>Tout le temps</translation>
     </message>
 </context>
 <context>
@@ -13887,12 +13886,6 @@ Veuillez vérifier le fichier.
     </message>
     <message>
         <location/>
-        <source>TextLabel</source>
-        <translatorcomment>Pas toucher ! ?</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Channel max</source>
         <translation>Valeur maxi canal</translation>
     </message>
@@ -13921,9 +13914,14 @@ Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des
 et même conduire au crash. A utiliser avec prudence.</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+171"/>
+        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+138"/>
         <source>Chan %1</source>
         <translation>Canal %1</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/config/inputchannelform.ui"/>
+        <source>Text</source>
+        <translation type="unfinished">Texte</translation>
     </message>
 </context>
 <context>

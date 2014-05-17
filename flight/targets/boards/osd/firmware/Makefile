@@ -37,6 +37,8 @@ MODULES += Telemetry
 
 OPTMODULES =
 
+SRC += $(FLIGHTLIB)/notification.c
+
 # Some diagnostics
 CDEFS += -DDIAG_TASKS
 

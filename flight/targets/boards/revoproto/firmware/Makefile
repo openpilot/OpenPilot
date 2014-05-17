@@ -50,6 +50,8 @@ MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
 
+SRC += $(FLIGHTLIB)/notification.c
+
 OPTMODULES += ComUsbBridge
 
 # Include all camera options

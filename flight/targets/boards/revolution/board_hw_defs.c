@@ -1962,3 +1962,138 @@ const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
     .data_tx_ep = 1,
 };
 #endif /* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_USB_CDC */
+
+#ifdef PIOS_INCLUDE_WS2811
+#include <pios_ws2811.h>
+#include <hwsettings.h>
+#define PIOS_WS2811_TIM_DIVIDER (PIOS_PERIPHERAL_APB2_CLOCK / (800000 * PIOS_WS2811_TIM_PERIOD))
+
+void DMA2_Stream1_IRQHandler(void) __attribute__((alias("PIOS_WS2811_irq_handler")));
+// list of pin configurable as ws281x outputs.
+// this will not clash with PWM in or servo output as
+// pins will be reconfigured as _OUT so the alternate function is disabled.
+const struct pios_ws2811_pin_cfg pios_ws2811_pin_cfg[] = {
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT1] = {
+        .gpio     = GPIOB,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_0,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT2] = {
+        .gpio     = GPIOB,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_1,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT3] = {
+        .gpio     = GPIOA,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_3,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT4] = {
+        .gpio     = GPIOA,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_2,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT5] = {
+        .gpio     = GPIOA,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_1,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_SERVOOUT6] = {
+        .gpio     = GPIOA,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_0,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_FLEXIPIN3] = {
+        .gpio     = GPIOB,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_12,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+    [HWSETTINGS_WS2811LED_OUT_FLEXIPIN4] = {
+        .gpio     = GPIOB,
+        .gpioInit =                        {
+            .GPIO_Pin   = GPIO_Pin_13,
+            .GPIO_Speed = GPIO_Speed_25MHz,
+            .GPIO_Mode  = GPIO_Mode_OUT,
+            .GPIO_OType = GPIO_OType_PP,
+        },
+    },
+};
+
+const struct pios_ws2811_cfg pios_ws2811_cfg = {
+    .timer     = TIM1,
+    .timerInit = {
+        .TIM_Prescaler         = PIOS_WS2811_TIM_DIVIDER - 1,
+        .TIM_ClockDivision     = TIM_CKD_DIV1,
+        .TIM_CounterMode       = TIM_CounterMode_Up,
+        // period (1.25 uS per period
+        .TIM_Period                            = PIOS_WS2811_TIM_PERIOD,
+        .TIM_RepetitionCounter = 0x0000,
+    },
+
+    .timerCh1     = 1,
+    .streamCh1    = DMA2_Stream1,
+    .timerCh2     = 3,
+    .streamCh2    = DMA2_Stream6,
+    .streamUpdate = DMA2_Stream5,
+
+    // DMA streamCh1, triggered by timerCh1 pwm signal.
+    // if FrameBuffer indicates, reset output value early to indicate "0" bit to ws2812
+    .dmaInitCh1 = PIOS_WS2811_DMA_CH1_CONFIG(DMA_Channel_6),
+    .dmaItCh1   = DMA_IT_TEIF1 | DMA_IT_TCIF1,
+
+    // DMA streamCh2, triggered by timerCh2 pwm signal.
+    // Reset output value late to indicate "1" bit to ws2812.
+    .dmaInitCh2 = PIOS_WS2811_DMA_CH2_CONFIG(DMA_Channel_6),
+    .dmaItCh2   = DMA_IT_TEIF6 | DMA_IT_TCIF6,
+
+    // DMA streamUpdate Triggered by timer update event
+    // Outputs a high logic level at beginning of a cycle
+    .dmaInitUpdate = PIOS_WS2811_DMA_UPDATE_CONFIG(DMA_Channel_6),
+    .dmaItUpdate   = DMA_IT_TEIF5 | DMA_IT_TCIF5,
+    .dmaSource     = TIM_DMA_CC1 | TIM_DMA_CC3 | TIM_DMA_Update,
+
+    // DMAInitCh1 interrupt vector, used to block timer at end of framebuffer transfer
+    .irq                                       = {
+        .flags = (DMA_IT_TCIF1),
+        .init  = {
+            .NVIC_IRQChannel    = DMA2_Stream1_IRQn,
+            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannelCmd = ENABLE,
+        },
+    },
+};
+
+void PIOS_WS2811_irq_handler(void)
+{
+    PIOS_WS2811_DMA_irq_handler();
+}
+#endif // PIOS_INCLUDE_WS2811

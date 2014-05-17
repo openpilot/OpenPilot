@@ -254,6 +254,33 @@ static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
     xSemaphoreGiveRecursive(lock);
     return 0;
 }
+/**
+ * Get the highest alarm severity
+ * @return
+ */
+SystemAlarmsAlarmOptions AlarmsGetHighestSeverity()
+{
+    SystemAlarmsAlarmData alarmsData;
+    SystemAlarmsAlarmOptions highest = SYSTEMALARMS_ALARM_UNINITIALISED;
+
+    // Lock
+    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+
+    // Read alarms
+    SystemAlarmsAlarmGet(&alarmsData);
+
+    // Go through alarms and find the highest severity
+    uint32_t n = 0;
+    while (n < SYSTEMALARMS_ALARM_NUMELEM && highest != SYSTEMALARMS_ALARM_CRITICAL) {
+        if (cast_struct_to_array(alarmsData, alarmsData.Actuator)[n] > highest) {
+            highest = cast_struct_to_array(alarmsData, alarmsData.Actuator)[n];
+        }
+        n++;
+    }
+
+    xSemaphoreGiveRecursive(lock);
+    return highest;
+}
 
 /**
  * @}

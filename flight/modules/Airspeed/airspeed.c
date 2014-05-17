@@ -60,7 +60,7 @@
 static xTaskHandle taskHandle;
 static bool airspeedEnabled  = false;
 static AirspeedSettingsData airspeedSettings;
-static AirspeedSettingsAirspeedSensorTypeOptions lastAirspeedSensorType = 0;
+static AirspeedSettingsAirspeedSensorTypeOptions lastAirspeedSensorType = -1;
 static int8_t airspeedADCPin = -1;
 
 
@@ -119,8 +119,6 @@ int32_t AirspeedInitialize()
         }
     }
 
-    lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
-
     AirspeedSensorInitialize();
     AirspeedSettingsInitialize();
 
@@ -137,16 +135,13 @@ MODULE_INITCALL(AirspeedInitialize, AirspeedStart);
 static void airspeedTask(__attribute__((unused)) void *parameters)
 {
     AirspeedSettingsUpdatedCb(AirspeedSettingsHandle());
-
+    bool gpsAirspeedInitialized = false;
     AirspeedSensorData airspeedData;
     AirspeedSensorGet(&airspeedData);
 
     AirspeedSettingsUpdatedCb(NULL);
 
-    gps_airspeedInitialize();
-
     airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
-
 
     // Main task loop
     portTickType lastSysTime = xTaskGetTickCount();
@@ -160,8 +155,21 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
         if (airspeedSettings.AirspeedSensorType != lastAirspeedSensorType) {
             AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_DEFAULT);
             lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
+            switch (airspeedSettings.AirspeedSensorType) {
+            case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:
+                // AirspeedSensor will not be updated until a different sensor is selected
+                // set the disconencted satus now
+                airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+                AirspeedSensorSet(&airspeedData);
+                break;
+            case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
+                if (!gpsAirspeedInitialized) {
+                    gpsAirspeedInitialized = true;
+                    gps_airspeedInitialize();
+                }
+                break;
+            }
         }
-
         switch (airspeedSettings.AirspeedSensorType) {
 #if defined(PIOS_INCLUDE_MPXV)
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV7002:
@@ -186,6 +194,10 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
             gps_airspeedGet(&airspeedData, &airspeedSettings);
             break;
         case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:
+            // no need to check so often until a sensor is enabled
+            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_DEFAULT);
+            vTaskDelay(2000 / portTICK_RATE_MS);
+            continue;
         default:
             airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
             break;

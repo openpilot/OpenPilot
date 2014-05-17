@@ -52,8 +52,9 @@ plugin_uavtalk.depends += plugin_coreplugin
 # Telemetry plugin
 SUBDIRS += plugin_telemetry
 plugin_telemetry.subdir = telemetry
+plugin_telemetry.depends = plugin_coreplugin
+plugin_telemetry.depends += plugin_uavobjectutil
 plugin_telemetry.depends += plugin_uavtalk
-plugin_telemetry.depends += plugin_coreplugin
 
 # OPMap UAVGadget
 plugin_opmap.subdir = opmap
@@ -98,9 +99,9 @@ macx:contains(QT_VERSION, ^4\\.8\\.0): CONFIG += disable_notify_plugin
 plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
 plugin_uploader.depends += plugin_uavobjects
+plugin_uploader.depends += plugin_uavobjectutil
 plugin_uploader.depends += plugin_uavtalk
 plugin_uploader.depends += plugin_opHID
-plugin_uploader.depends += plugin_uavobjectutil
 SUBDIRS += plugin_uploader
 
 # Dial gadget

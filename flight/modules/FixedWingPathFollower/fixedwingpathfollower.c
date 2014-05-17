@@ -406,14 +406,14 @@ static uint8_t updateFixedDesiredAttitude()
     /**
      * Compute speed error and course
      */
-
-    // missing sensors for airspeed-direction we have to assume within reasonable error
-    // that measured airspeed is always the component in forward pointing direction
-    // this vector is normalized
+    // missing sensors for airspeed-direction we have to assume within
+    // reasonable error that measured airspeed is actually the airspeed
+    // component in forward pointing direction
+    // airspeedVector is normalized
     airspeedVector[0]     = cos_lookup_deg(attitudeState.Yaw);
     airspeedVector[1]     = sin_lookup_deg(attitudeState.Yaw);
 
-    // Current ground speed projected in forward direction
+    // current ground speed projected in forward direction
     groundspeedProjection = velocityState.North * airspeedVector[0] + velocityState.East * airspeedVector[1];
 
     // note that airspeedStateBias is ( calibratedAirspeed - groundspeedProjection ) at the time of measurement,
@@ -421,10 +421,13 @@ static uint8_t updateFixedDesiredAttitude()
     // than airspeed and gps sensors alone
     indicatedAirspeedState = groundspeedProjection + indicatedAirspeedStateBias;
 
-    // fluidMovement is a vector describing the aproximate movement vector in surrounding fluid (2d)
-    fluidMovement[0]   = velocityState.North - (indicatedAirspeedState * airspeedVector[0]);
-    fluidMovement[1]   = velocityState.East - (indicatedAirspeedState * airspeedVector[1]);
+    // fluidMovement is a vector describing the aproximate movement vector of
+    // the surrounding fluid in 2d space (aka wind vector)
+    fluidMovement[0] = velocityState.North - (indicatedAirspeedState * airspeedVector[0]);
+    fluidMovement[1] = velocityState.East - (indicatedAirspeedState * airspeedVector[1]);
 
+    // calculate the movement vector we need to fly to reach velocityDesired -
+    // taking fluidMovement into account
     courseComponent[0] = velocityDesired.North - fluidMovement[0];
     courseComponent[1] = velocityDesired.East - fluidMovement[1];
 
@@ -432,11 +435,14 @@ static uint8_t updateFixedDesiredAttitude()
                                       fixedwingpathfollowerSettings.HorizontalVelMin,
                                       fixedwingpathfollowerSettings.HorizontalVelMax);
 
-    // if we could fly at arbitrary speeds, we'd just have to move into courseComponent and we'd be fine
-    // unfortunately we bound by min and max speed, so we need to calculate the correct course to meet
-    // at least the velocityDesired vector direction at our current speed
-
+    // if we could fly at arbitrary speeds, we'd just have to move towards the
+    // courseComponent vector as previously calculated and we'd be fine
+    // unfortunately however we are bound by min and max air speed limits, so
+    // we need to recalculate the correct course to meet at least the
+    // velocityDesired vector direction at our current speed
+    // this overwrites courseComponent
     bool valid = correctCourse(courseComponent, (float *)&velocityDesired.North, fluidMovement, indicatedAirspeedDesired);
+
     // Error condition: wind speed too high, we can't go where we want anymore
     fixedwingpathfollowerStatus.Errors.Wind = 0;
     if ((!valid) &&
@@ -478,14 +484,15 @@ static uint8_t updateFixedDesiredAttitude()
     /**
      * Compute desired thrust command
      */
-
     // compute saturated integral error thrust response. Make integral leaky for better performance. Approximately 30s time constant.
     if (fixedwingpathfollowerSettings.PowerPI.Ki > 0) {
         powerIntegral = boundf(powerIntegral + -descentspeedError * dT,
                                -fixedwingpathfollowerSettings.PowerPI.ILimit / fixedwingpathfollowerSettings.PowerPI.Ki,
                                fixedwingpathfollowerSettings.PowerPI.ILimit / fixedwingpathfollowerSettings.PowerPI.Ki
                                ) * (1.0f - 1.0f / (1.0f + 30.0f / dT));
-    } else { powerIntegral = 0; }
+    } else {
+        powerIntegral = 0;
+    }
 
     // Compute the cross feed from vertical speed to pitch, with saturation
     float speedErrorToPowerCommandComponent = boundf(
@@ -534,7 +541,6 @@ static uint8_t updateFixedDesiredAttitude()
     /**
      * Compute desired pitch command
      */
-
     if (fixedwingpathfollowerSettings.SpeedPI.Ki > 0) {
         // Integrate with saturation
         airspeedErrorInt = boundf(airspeedErrorInt + airspeedError * dT,
@@ -655,8 +661,6 @@ static void airspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     // vector projection of groundspeed on airspeed vector to handle both forward and backwards movement
     float groundspeedProjection = velocityState.North * airspeedVector[0] + velocityState.East * airspeedVector[1];
 
-    // warning - deliberately messed up airspeed sensor value to see if course calculation is coping with crappy sensor
-    // do not let this pass the review ;)
     indicatedAirspeedStateBias = airspeedState.CalibratedAirspeed - groundspeedProjection;
     // note - we do fly by Indicated Airspeed (== calibrated airspeed) however
     // since airspeed is updated less often than groundspeed, we use sudden
@@ -667,71 +671,83 @@ static void airspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
 
 /**
- * Function to correct course C based on airspeed s, fluid movement F and desired movement vector V
+ * Function to calculate course vector C based on airspeed s, fluid movement F
+ * and desired movement vector V
+ * parameters in: V,F,s
+ * parameters out: C
+ * returns true if a valid solution could be found for V,F,s, false if not
+ * C will be set to a best effort attempt either way
  */
 static bool correctCourse(float *C, float *V, float *F, float s)
 {
-    // approach:
-    // let Sc be a circle around origin marking possible movement vectors
-    // of the craft with airspeed s
-    // let Vl be a line through the origin along movement vector V
-    // let Wl be a line parallel to Vl where for any point v on line Vl
-    // there is a point w on WL with w = v - F
-    // then any intersecting point between Sc and Wl is a course which
-    // results in a movement vector k*V
-    // if there is no intersection point, S is insufficient to compensate
-    // for F and we better fly in direction of V (thus having wind drift
+    // Approach:
+    // Let Sc be a circle around origin marking possible movement vectors
+    // of the craft with airspeed s (all possible options for C)
+    // Let Vl be a line through the origin along movement vector V where fr any
+    // point v on line Vl v = k * (V / |V|) = k' * V
+    // Let Wl be a line parallel to Vl where for any point v on line Vl exists
+    // a point w on WL with w = v - F
+    // Then any intersection between circle Sc and line Wl represents course
+    // vector which would result in a movement vector
+    // V' = k * ( V / |V|) = k' * V
+    // If there is no intersection point, S is insufficient to compensate
+    // for F and we can only try to fly in direction of V (thus having wind drift
     // but at least making progress orthogonal to wind)
 
     s = fabsf(s);
     float f = sqrtf(F[0] * F[0] + F[1] * F[1]);
 
-    // normalize V
+    // normalize Cn=V/|V|, |V| must be >0
     float v = sqrtf(V[0] * V[0] + V[1] * V[1]);
     if (v < 1e-6f) {
-        // if we aren't supposed to move, turn into the wind (this allows hovering)
+        // if |V|=0, we aren't supposed to move, turn into the wind
+        // (this allows hovering)
         C[0] = -F[0];
         C[1] = -F[1];
-        return fabsf(f - s) < 1e-3f; // returns true if a hover is actually intended
+        // if desired airspeed matches fluidmovement a hover is actually
+        // intended so return true
+        return fabsf(f - s) < 1e-3f;
     }
     float Vn[2] = { V[0] / v, V[1] / v };
 
     // project F on V
     float fp    = F[0] * Vn[0] + F[1] * Vn[1];
 
-    // find component of F orthogonal to V (distance between V and W)
+    // find component Fo of F that is orthogonal to V
+    // (which is exactly the distance between Vl and Wl)
     float Fo[2] = { F[0] - (fp * Vn[0]), F[1] - (fp * Vn[1]) };
     float fo2   = Fo[0] * Fo[0] + Fo[1] * Fo[1];
 
     // find k where k * Vn = C - Fo
-    // S is the hypothenuse in any rectangular triangle formed by k * Vn and Fo
-    // so k^2 + fo^2 = s^2   (since |Vn|=1)
+    // |C|=s is the hypothenuse in any rectangular triangle formed by k * Vn and Fo
+    // so k^2 + fo^2 = s^2 (since |Vn|=1)
     float k2 = s * s - fo2;
     if (k2 <= -1e-3f) {
         // there is no solution, we will be drifted off either way
-        // fallback: fly stupidly towards V and hope for the best
+        // fallback: fly stupidly in direction of V and hope for the best
         C[0] = V[0];
         C[1] = V[1];
         return false;
     } else if (k2 <= 1e-3f) {
-        // there is one solution: -Fo
+        // there is exactly one solution: -Fo
         C[0] = -Fo[0];
         C[1] = -Fo[1];
         return true;
     }
-
-    // now we have two possible solutions k positive and k negative
-    // which one is better?
-    // two criteria:
-    // 1. we MUST move in the right direction, if k leads to -v its invalid
+    // we have two possible solutions k positive and k negative as there are
+    // two intersection points between Wl and Sc
+    // which one is better? two criteria:
+    // 1. we MUST move in the right direction, if any k leads to -v its invalid
     // 2. we should minimize the speed error
     float k     = sqrt(k2);
     float C1[2] = { -k * Vn[0] - Fo[0], -k * Vn[1] - Fo[1] };
     float C2[2] = { k *Vn[0] - Fo[0], k * Vn[1] - Fo[1] };
-    // project each solution on Vn to find length
+    // project C+F on Vn to find signed resulting movement vector length
     float vp1   = (C1[0] + F[0]) * Vn[0] + (C1[1] + F[1]) * Vn[1];
     float vp2   = (C2[0] + F[0]) * Vn[0] + (C2[1] + F[1]) * Vn[1];
     if (vp1 >= 0.0f && fabsf(v - vp1) < fabsf(v - vp2)) {
+        // in this case the angle between course and resulting movement vector
+        // is greater than 90 degrees - so we actually fly backwards
         C[0] = C1[0];
         C[1] = C1[1];
         return true;
@@ -739,8 +755,14 @@ static bool correctCourse(float *C, float *V, float *F, float s)
     C[0] = C2[0];
     C[1] = C2[1];
     if (vp2 >= 0.0f) {
+        // in this case the angle between course and movement vector is less than
+        // 90 degrees, but we do move in the right direction
         return true;
     } else {
+        // in this case we actually get driven in the opposite direction of V
+        // with both solutions for C
+        // this might be reached in headwind stronger than maximum allowed
+        // airspeed.
         return false;
     }
 }

@@ -796,7 +796,7 @@ void UAVObjInstanceWriteToLog(UAVObjHandle obj_handle, uint16_t instId)
 unlock_exit:
     xSemaphoreGiveRecursive(mutex);
 }
-
+#ifdef PIOS_INCLUDE_FLASH
 /**
  * Save the data of the specified object to the file system (SD card).
  * If the object contains multiple instances, all of them will be saved.
@@ -891,7 +891,21 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
     PIOS_FLASHFS_ObjDelete(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId);
     return 0;
 }
+#else // PIOS_INCLUDE_FLASH
 
+int32_t UAVObjSave(__attribute__((unused)) UAVObjHandle obj_handle, __attribute__((unused))  uint16_t instId){
+    return 0;
+}
+
+int32_t UAVObjLoad(__attribute__((unused)) UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId){
+    return 0;
+}
+
+int32_t UAVObjDelete(__attribute__((unused)) UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId)
+{
+    return 0;
+}
+#endif // PIOS_INCLUDE_FLASH
 /**
  * Save all settings objects to the SD card.
  * @return 0 if success or -1 if failure

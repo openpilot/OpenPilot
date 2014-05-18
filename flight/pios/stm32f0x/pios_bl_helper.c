@@ -33,7 +33,7 @@
 #ifdef PIOS_INCLUDE_BL_HELPER
 
 #include <pios_board_info.h>
-#include <stm32f10x_flash.h>
+#include <stm32f0xx_flash.h>
 #include <stdbool.h>
 
 uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress)

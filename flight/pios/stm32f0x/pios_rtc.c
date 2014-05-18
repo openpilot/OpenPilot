@@ -3,11 +3,11 @@
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
  * @addtogroup   PIOS_PWM PWM Input Functions
- * @brief		Code to measure with PWM input
+ * @brief       Code to measure with PWM input
  * @{
  *
  * @file       pios_pwm.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      PWM Input functions (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -49,30 +49,38 @@ static uint8_t rtc_callback_next = 0;
 
 void PIOS_RTC_Init(const struct pios_rtc_cfg *cfg)
 {
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR,
-                           ENABLE);
+    RCC_BackupResetCmd(ENABLE);
+    RCC_BackupResetCmd(DISABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
     PWR_BackupAccessCmd(ENABLE);
-
+    // Divide external 8 MHz clock to 1 MHz
     RCC_RTCCLKConfig(cfg->clksrc);
     RCC_RTCCLKCmd(ENABLE);
-    RTC_WaitForLastTask();
-    RTC_WaitForSynchro();
-    RTC_WaitForLastTask();
+
+    RTC_WakeUpCmd(DISABLE);
+    // Divide 1 Mhz clock by 16 -> 62.5 khz
+    RTC_WakeUpClockConfig(RTC_WakeUpClock_RTCCLK_Div16);
+    // Divide 62.5 khz by 200 to get 625 Hz
+    RTC_SetWakeUpCounter(cfg->prescaler); // cfg->prescaler);
+    RTC_WakeUpCmd(ENABLE);
 
     /* Configure and enable the RTC Second interrupt */
-    NVIC_Init(&cfg->irq.init);
-    RTC_ITConfig(RTC_IT_SEC, ENABLE);
-    RTC_WaitForLastTask();
+    EXTI_InitTypeDef ExtiInit = {
+        .EXTI_Line    = EXTI_Line22, // matches above GPIO pin
+        .EXTI_Mode    = EXTI_Mode_Interrupt,
+        .EXTI_Trigger = EXTI_Trigger_Rising,
+        .EXTI_LineCmd = ENABLE,
+    };
+    EXTI_Init(&ExtiInit);
+    NVIC_Init((NVIC_InitTypeDef*)&cfg->irq.init);
+    RTC_ITConfig(RTC_IT_WUT, ENABLE);
 
-    RTC_SetPrescaler(cfg->prescaler);
-    RTC_WaitForLastTask();
-    RTC_SetCounter(0);
-    RTC_WaitForLastTask();
+    RTC_ClearFlag(RTC_FLAG_WUTF);
 }
 
 uint32_t PIOS_RTC_Counter()
 {
-    return RTC_GetCounter();
+    return RTC_GetWakeUpCounter();
 }
 
 /* FIXME: This shouldn't use hard-coded clock rates, dividers or prescalers.
@@ -106,7 +114,7 @@ bool PIOS_RTC_RegisterTickCallback(void (*fn)(uint32_t id), uint32_t data)
 
 void PIOS_RTC_irq_handler(void)
 {
-    if (RTC_GetITStatus(RTC_IT_SEC)) {
+    if (RTC_GetITStatus(RTC_IT_WUT)) {
         /* Call all registered callbacks */
         for (uint8_t i = 0; i < rtc_callback_next; i++) {
             struct rtc_callback_entry *cb = &rtc_callback_list[i];
@@ -115,10 +123,12 @@ void PIOS_RTC_irq_handler(void)
             }
         }
 
-        /* Wait until last write operation on RTC registers has finished */
-        RTC_WaitForLastTask();
         /* Clear the RTC Second interrupt */
-        RTC_ClearITPendingBit(RTC_IT_SEC);
+        RTC_ClearITPendingBit(RTC_IT_WUT);
+    }
+
+    if (EXTI_GetITStatus(EXTI_Line22) != RESET) {
+        EXTI_ClearITPendingBit(EXTI_Line22);
     }
 }
 

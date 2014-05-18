@@ -31,17 +31,12 @@
  */
 
 #include <pios.h>
-
+#include <stm32f0xx_rcc.h>
+#include <stm32f0xx_tim.h>
 #ifdef PIOS_INCLUDE_DELAY
 
 /* these should be defined by CMSIS, but they aren't */
-#define DWT_CTRL   (*(volatile uint32_t *)0xe0001000)
-#define CYCCNTENA  (1 << 0)
-#define DWT_CYCCNT (*(volatile uint32_t *)0xe0001004)
-
-
-/* cycles per microsecond */
-static uint32_t us_ticks;
+#define DELAY_COUNTER   (TIM2->CNT)
 
 /**
  * Initialises the Timer used by PIOS_DELAY functions.
@@ -51,18 +46,25 @@ static uint32_t us_ticks;
 
 int32_t PIOS_DELAY_Init(void)
 {
-    RCC_ClocksTypeDef clocks;
+    // unfortunately F0 does not allow access to DWT and CoreDebug functionality from CPU side
+    // thus we are going to use timer3 for timing measurement
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
-    /* compute the number of system clocks per microsecond */
-    RCC_GetClocksFreq(&clocks);
-    us_ticks = clocks.SYSCLK_Frequency / 1000000;
-    PIOS_DEBUG_Assert(us_ticks > 1);
-
-    /* turn on access to the DWT registers */
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-
-    /* enable the CPU cycle counter */
-    DWT_CTRL |= CYCCNTENA;
+    const TIM_TimeBaseInitTypeDef timerInit = {
+        .TIM_Prescaler         = 8,
+        .TIM_ClockDivision     = TIM_CKD_DIV1,
+        .TIM_CounterMode       = TIM_CounterMode_Up,
+        // period (1.25 uS per period
+        .TIM_Period                            = 0,
+        .TIM_RepetitionCounter = 0x0000,
+    };
+    // Stop timer
+    TIM_Cmd(TIM2, DISABLE);
+    // Configure timebase and internal clock
+    TIM_TimeBaseInit(TIM2, (TIM_TimeBaseInitTypeDef*)&timerInit);
+    TIM_InternalClockConfig(TIM2);
+    TIM_SetCounter(TIM2, 0);
+    TIM_Cmd(TIM2, ENABLE);
 
     return 0;
 }
@@ -81,10 +83,10 @@ int32_t PIOS_DELAY_Init(void)
 int32_t PIOS_DELAY_WaituS(uint32_t uS)
 {
     uint32_t elapsed    = 0;
-    uint32_t last_count = DWT_CYCCNT;
+    uint32_t last_count = DELAY_COUNTER;
 
     for (;;) {
-        uint32_t current_count = DWT_CYCCNT;
+        uint32_t current_count = DELAY_COUNTER;
         uint32_t elapsed_uS;
 
         /* measure the time elapsed since the last time we checked */
@@ -92,7 +94,7 @@ int32_t PIOS_DELAY_WaituS(uint32_t uS)
         last_count = current_count;
 
         /* convert to microseconds */
-        elapsed_uS = elapsed / us_ticks;
+        elapsed_uS = elapsed;
         if (elapsed_uS >= uS) {
             break;
         }
@@ -101,7 +103,7 @@ int32_t PIOS_DELAY_WaituS(uint32_t uS)
         uS -= elapsed_uS;
 
         /* keep fractional microseconds for the next iteration */
-        elapsed %= us_ticks;
+        elapsed = 0;
     }
 
     /* No error */
@@ -135,7 +137,7 @@ int32_t PIOS_DELAY_WaitmS(uint32_t mS)
  */
 uint32_t PIOS_DELAY_GetuS(void)
 {
-    return DWT_CYCCNT / us_ticks;
+    return DELAY_COUNTER;
 }
 
 /**
@@ -154,7 +156,7 @@ uint32_t PIOS_DELAY_GetuSSince(uint32_t t)
  */
 uint32_t PIOS_DELAY_GetRaw()
 {
-    return DWT_CYCCNT;
+    return DELAY_COUNTER;
 }
 
 /**
@@ -163,9 +165,9 @@ uint32_t PIOS_DELAY_GetRaw()
  */
 uint32_t PIOS_DELAY_DiffuS(uint32_t raw)
 {
-    uint32_t diff = DWT_CYCCNT - raw;
+    uint32_t diff =  - raw;
 
-    return diff / us_ticks;
+    return diff;
 }
 
 #endif /* PIOS_INCLUDE_DELAY */

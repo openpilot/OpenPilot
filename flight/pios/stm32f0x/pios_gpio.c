@@ -48,13 +48,22 @@ int32_t PIOS_GPIO_Init(uint32_t *gpios_dev_id, const struct pios_gpio_cfg *cfg)
         /* Enable the peripheral clock for the GPIO */
         switch ((uint32_t)gpio->pin.gpio) {
         case (uint32_t)GPIOA:
-            RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+            RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
             break;
         case (uint32_t)GPIOB:
-            RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+            RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
             break;
         case (uint32_t)GPIOC:
-            RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+            RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
+            break;
+        case (uint32_t)GPIOD:
+            RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD, ENABLE);
+            break;
+        case (uint32_t)GPIOE:
+            RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE, ENABLE);
+            break;
+        case (uint32_t)GPIOF:
+            RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF, ENABLE);
             break;
         default:
             PIOS_Assert(0);
@@ -62,10 +71,10 @@ int32_t PIOS_GPIO_Init(uint32_t *gpios_dev_id, const struct pios_gpio_cfg *cfg)
         }
 
         if (gpio->remap) {
-            GPIO_PinRemapConfig(gpio->remap, ENABLE);
+            GPIO_PinAFConfig(gpio->pin.gpio, gpio->pin.init.GPIO_Pin, gpio->remap);
         }
 
-        GPIO_Init(gpio->pin.gpio, &gpio->pin.init);
+        GPIO_Init(gpio->pin.gpio, (GPIO_InitTypeDef*)&gpio->pin.init);
 
         PIOS_GPIO_Off(*gpios_dev_id, i);
     }

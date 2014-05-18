@@ -25,9 +25,9 @@ EXTRAINCDIRS		+= $(PIOS_DEVLIB)inc
 # CMSIS for the F0
 include $(PIOSCOMMON)/libraries/CMSIS/library.mk
 
-CMSIS_DEVICEDIR		= $(PIOS_DEVLIB)libraries/CMSIS/Device/ST/STM32F0xx/
+CMSIS_DEVICEDIR		= $(PIOS_DEVLIB)libraries/CMSIS/Device/ST/STM32F0xx/Source
 CMSIS_DIR		= $(PIOS_DEVLIB)/libraries/CMSIS/Include
-EXTRAINCDIRS		+= $(CMSIS_DEVICEDIR)/Include
+EXTRAINCDIRS		+= $(CMSIS_DEVICEDIR)/../Include
 EXTRAINCDIRS		+= $(CMSIS_DIR)
 # ST Peripheral library
 PERIPHLIB		=  $(PIOS_DEVLIB)libraries/STM32F0xx_StdPeriph_Driver

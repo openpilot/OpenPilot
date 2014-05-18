@@ -49,6 +49,8 @@ ifeq ($(MCU),cortex-m3)
     include $(PIOS)/stm32f10x/library.mk
 else ifeq ($(MCU),cortex-m4)
     include $(PIOS)/stm32f4xx/library.mk
+else ifeq ($(MCU),cortex-m0)
+    include $(PIOS)/stm32f0x/library.mk
 else
     $(error Unsupported MCU: $(MCU))
 endif
@@ -90,12 +92,12 @@ SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
 SRC += $(PIOSCOMMON)/pios_sbus.c
 SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_led.c
-
+ifneq ($(PIOS_OMITS_USB),YES)
 ## PIOS USB related files
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
-
+endif
 ## PIOS system code
 SRC += $(PIOSCOMMON)/pios_task_monitor.c
 SRC += $(PIOSCOMMON)/pios_callbackscheduler.c

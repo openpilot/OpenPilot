@@ -44,6 +44,7 @@ SECTIONS
 
     . = ALIGN(4);
     _etext = .;
+    .ram_vector_table(NOLOAD): {*(.ram_vector_table)} >VTRAM
     _sidata = .;
 
     /*

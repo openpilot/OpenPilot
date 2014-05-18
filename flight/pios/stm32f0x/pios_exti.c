@@ -87,19 +87,18 @@ static uint8_t PIOS_EXTI_line_to_index(uint32_t line)
 uint8_t PIOS_EXTI_gpio_port_to_exti_source_port(GPIO_TypeDef *gpio_port)
 {
     switch ((uint32_t)gpio_port) {
-    case (uint32_t)GPIOA: return GPIO_PortSourceGPIOA;
+    case (uint32_t)GPIOA: return EXTI_PortSourceGPIOA;
 
-    case (uint32_t)GPIOB: return GPIO_PortSourceGPIOB;
+    case (uint32_t)GPIOB: return EXTI_PortSourceGPIOB;
 
-    case (uint32_t)GPIOC: return GPIO_PortSourceGPIOC;
+    case (uint32_t)GPIOC: return EXTI_PortSourceGPIOC;
 
-    case (uint32_t)GPIOD: return GPIO_PortSourceGPIOD;
+    case (uint32_t)GPIOD: return EXTI_PortSourceGPIOD;
 
-    case (uint32_t)GPIOE: return GPIO_PortSourceGPIOE;
+    case (uint32_t)GPIOE: return EXTI_PortSourceGPIOE;
 
-    case (uint32_t)GPIOF: return GPIO_PortSourceGPIOF;
+    case (uint32_t)GPIOF: return EXTI_PortSourceGPIOF;
 
-    case (uint32_t)GPIOG: return GPIO_PortSourceGPIOG;
     }
 
     PIOS_Assert(0);
@@ -167,16 +166,16 @@ int32_t PIOS_EXTI_Init(const struct pios_exti_cfg *cfg)
     pios_exti_line_to_cfg_map[line_index] = cfg_index;
 
     /* Initialize the GPIO pin */
-    GPIO_Init(cfg->pin.gpio, &cfg->pin.init);
+    GPIO_Init(cfg->pin.gpio,(GPIO_InitTypeDef*) &cfg->pin.init);
 
     /* Set up the EXTI interrupt source */
     uint8_t exti_source_port = PIOS_EXTI_gpio_port_to_exti_source_port(cfg->pin.gpio);
     uint8_t exti_source_pin  = PIOS_EXTI_gpio_pin_to_exti_source_pin(cfg->pin.init.GPIO_Pin);
-    GPIO_EXTILineConfig(exti_source_port, exti_source_pin);
-    EXTI_Init(&cfg->exti.init);
+    SYSCFG_EXTILineConfig(exti_source_port, exti_source_pin);
+    EXTI_Init((EXTI_InitTypeDef*)&cfg->exti.init);
 
     /* Enable the interrupt channel */
-    NVIC_Init(&cfg->irq.init);
+    NVIC_Init((NVIC_InitTypeDef*)&cfg->irq.init);
 
     return 0;
 
@@ -200,6 +199,8 @@ static bool PIOS_EXTI_generic_irq_handler(uint8_t line_index)
     return cfg->vector();
 }
 
+/* Bind Interrupt Handlers */
+
 #ifdef PIOS_INCLUDE_FREERTOS
 #define PIOS_EXTI_HANDLE_LINE(line, woken)                      \
     if (EXTI_GetITStatus(EXTI_Line##line) != RESET) {       \
@@ -214,14 +215,12 @@ static bool PIOS_EXTI_generic_irq_handler(uint8_t line_index)
     }
 #endif
 
-/* Bind Interrupt Handlers */
-
 static void PIOS_EXTI_0_irq_handler(void)
 {
 #ifdef PIOS_INCLUDE_FREERTOS
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 #else
-    bool xHigherPriorityTaskWoken; // dummy variable
+    bool xHigherPriorityTaskWoken;
 #endif
     PIOS_EXTI_HANDLE_LINE(0, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
@@ -235,7 +234,7 @@ static void PIOS_EXTI_1_irq_handler(void)
 #ifdef PIOS_INCLUDE_FREERTOS
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 #else
-    bool xHigherPriorityTaskWoken; // dummy variable
+    bool xHigherPriorityTaskWoken;
 #endif
     PIOS_EXTI_HANDLE_LINE(1, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
@@ -249,7 +248,7 @@ static void PIOS_EXTI_2_irq_handler(void)
 #ifdef PIOS_INCLUDE_FREERTOS
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 #else
-    bool xHigherPriorityTaskWoken; // dummy variable
+    bool xHigherPriorityTaskWoken;
 #endif
     PIOS_EXTI_HANDLE_LINE(2, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
@@ -263,7 +262,7 @@ static void PIOS_EXTI_3_irq_handler(void)
 #ifdef PIOS_INCLUDE_FREERTOS
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 #else
-    bool xHigherPriorityTaskWoken; // dummy variable
+    bool xHigherPriorityTaskWoken;
 #endif
     PIOS_EXTI_HANDLE_LINE(3, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
@@ -277,7 +276,7 @@ static void PIOS_EXTI_4_irq_handler(void)
 #ifdef PIOS_INCLUDE_FREERTOS
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 #else
-    bool xHigherPriorityTaskWoken; // dummy variable
+    bool xHigherPriorityTaskWoken;
 #endif
     PIOS_EXTI_HANDLE_LINE(4, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
@@ -291,7 +290,7 @@ static void PIOS_EXTI_9_5_irq_handler(void)
 #ifdef PIOS_INCLUDE_FREERTOS
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 #else
-    bool xHigherPriorityTaskWoken; // dummy variable
+    bool xHigherPriorityTaskWoken;
 #endif
     PIOS_EXTI_HANDLE_LINE(5, xHigherPriorityTaskWoken);
     PIOS_EXTI_HANDLE_LINE(6, xHigherPriorityTaskWoken);
@@ -309,7 +308,7 @@ static void PIOS_EXTI_15_10_irq_handler(void)
 #ifdef PIOS_INCLUDE_FREERTOS
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 #else
-    bool xHigherPriorityTaskWoken; // dummy variable
+    bool xHigherPriorityTaskWoken;
 #endif
     PIOS_EXTI_HANDLE_LINE(10, xHigherPriorityTaskWoken);
     PIOS_EXTI_HANDLE_LINE(11, xHigherPriorityTaskWoken);

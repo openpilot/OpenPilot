@@ -3,6 +3,8 @@ PROVIDE (   vPortSVCHandler = 0 ) ;
 PROVIDE (   xPortPendSVHandler = 0 ) ;
 PROVIDE (   xPortSysTickHandler = 0 ) ;
 
+PROVIDE(pios_board_info_blob = ORIGIN(BD_INFO));
+
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
 _irq_stack_size = 0x200;
 

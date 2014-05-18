@@ -34,7 +34,7 @@
 #include <flightstatus.h>
 #include <positionstate.h>
 #include <flightmodesettings.h>
-
+#include <pios_math.h>
 
 #if defined(REVOLUTION)
 #include <takeofflocation.h>
@@ -71,20 +71,26 @@ void pathFollowerHandler(bool newinit)
         TakeOffLocationGet(&takeoffLocation);
         switch (flightStatus.FlightMode) {
         case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-
+        {
             // Simple Return To Base mode - keep altitude the same applying configured delta, fly to takeoff position
+
+            // TODO: right now VTOLPF does fly straight to destination altitude.
+            // For a safer RTB destination altitude will be the higher between takeofflocation and current position (corrected with safety margin)
+            float destDown = MIN(positionState.Down, takeoffLocation.Down) - settings.ReturnToBaseAltitudeOffset;
+
             pathDesired.Start.North      = takeoffLocation.North;
             pathDesired.Start.East       = takeoffLocation.East;
-            pathDesired.Start.Down       = positionState.Down - settings.ReturnToBaseAltitudeOffset;
+            pathDesired.Start.Down       = destDown;
 
             pathDesired.End.North        = takeoffLocation.North;
             pathDesired.End.East         = takeoffLocation.East;
-            pathDesired.End.Down         = positionState.Down - settings.ReturnToBaseAltitudeOffset;
+            pathDesired.End.Down         = destDown;
 
             pathDesired.StartingVelocity = 1;
             pathDesired.EndingVelocity   = 0;
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-            break;
+        }
+        break;
         default:
 
             pathDesired.Start.North      = positionState.North;

@@ -29,7 +29,7 @@
  */
 
 #include <plans.h>
-#include <pios.h>
+#include <openpilot.h>
 #include <attitudesettings.h>
 #include <takeofflocation.h>
 #include <pathdesired.h>

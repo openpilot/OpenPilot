@@ -92,7 +92,7 @@ void plan_setup_returnToBase()
 
     float destDown;
     FlightModeSettingsReturnToBaseAltitudeOffsetGet(&destDown);
-    destDown -= MIN(positionStateDown, takeoffLocation.Down);
+    destDown = MIN(positionStateDown, takeoffLocation.Down) - destDown;
 
     pathDesired.Start.North      = takeoffLocation.North;
     pathDesired.Start.East       = takeoffLocation.East;

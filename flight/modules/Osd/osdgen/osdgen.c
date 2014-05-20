@@ -2432,6 +2432,7 @@ void updateGraphics()
 
         static portTickType airborne = 0;
         static double current_total  = 0;                // accumulated sensor current [mAh]
+        static uint8_t HomePosOnTime = 1;
         static HomePosition homePos;
         static ADCfiltered filteredADC;
         char temp[50]     = { 0 };
@@ -2486,7 +2487,9 @@ void updateGraphics()
         if (homePos.GotHome) {
             calc_home_data(&homePos, &gpsData);
         } else {
-            if (OsdSettings.HomeSource == OSDSETTINGS_HOMESOURCE_CONFIG && home.Set == HOMELOCATION_SET_TRUE) {
+            if (airborne) {
+                HomePosOnTime = 0;
+            } else if (OsdSettings.HomeSource == OSDSETTINGS_HOMESOURCE_CONFIG && home.Set == HOMELOCATION_SET_TRUE) {
                 homePos.Latitude  = home.Latitude;
                 homePos.Longitude = home.Longitude;
                 homePos.Altitude  = home.Altitude;
@@ -2510,11 +2513,11 @@ void updateGraphics()
         }
         // GPS coordinates
         if (check_enable_and_srceen(OsdSettings.GPSLatitude, (OsdSettingsWarningsSetupData *)&OsdSettings.GPSLatitudeSetup, screen, &x, &y)) {
-            sprintf(temp, "Lat%11.6f", homePos.GotHome ? (double)(gpsData.Latitude / 10000000.0f + OsdSettings2.PositionStealth) : (double)0.0f);
+            sprintf(temp, "Lat%11.6f", gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX2D ? (double)0.0f : (double)(gpsData.Latitude / 10000000.0f + OsdSettings2.PositionStealth));
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLatitudeSetup.CharSize);
         }
         if (check_enable_and_srceen(OsdSettings.GPSLongitude, (OsdSettingsWarningsSetupData *)&OsdSettings.GPSLongitudeSetup, screen, &x, &y)) {
-            sprintf(temp, "Lon%11.6f", homePos.GotHome ? (double)(gpsData.Longitude / 10000000.0f + OsdSettings2.PositionStealth) : (double)0.0f);
+            sprintf(temp, "Lon%11.6f", gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX2D ? (double)0.0f : (double)(gpsData.Longitude / 10000000.0f + OsdSettings2.PositionStealth));
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSLongitudeSetup.CharSize);
         }
         // GPS satellite info
@@ -2528,21 +2531,21 @@ void updateGraphics()
             hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, OsdSettings.SpeedSetup.Orientation, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 5, 8, 11, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
         // Home altitude in HUD design as vertical scale right side (centered relative to y)
-        if (check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData *)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
+        if (HomePosOnTime && check_enable_and_srceen(OsdSettings.Altitude, (OsdSettingsWarningsSetupData *)&OsdSettings.AltitudeSetup, screen, &x, &y)) {
             hud_draw_vertical_scale(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_GPS ? (int)((gpsData.Altitude - homePos.Altitude) * convert->m_to_m_feet) : (int)(baro.Altitude * convert->m_to_m_feet), 100, OsdSettings.AltitudeSetup.Orientation, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 5, 8, 11, 100, 0);
         }
         // Heading in HUD design (centered relative to x)
         // JR_HINT TODO use and test mag heading in-flight
-        if (check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData *)&OsdSettings.HeadingSetup, screen, &x, &y)) {
+        if ((HomePosOnTime || gpsData.Status >= GPSPOSITIONSENSOR_STATUS_FIX2D) && check_enable_and_srceen(OsdSettings.Heading, (OsdSettingsWarningsSetupData *)&OsdSettings.HeadingSetup, screen, &x, &y)) {
             int16_t heading = OsdSettings.HeadingSource == OSDSETTINGS_HEADINGSOURCE_GPS ? (int16_t)gpsData.Heading : (int16_t)attitude.Yaw;
             hud_draw_linear_compass(heading < 0 ? heading + 360 : heading, 150, 120, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 15, 30, 5, 8, 0);
         }
         // Home direction visualization
-        if (check_enable_and_srceen(OsdSettings.HomeArrow, (OsdSettingsWarningsSetupData *)&OsdSettings.HomeArrowSetup, screen, &x, &y)) {
+        if (HomePosOnTime && check_enable_and_srceen(OsdSettings.HomeArrow, (OsdSettingsWarningsSetupData *)&OsdSettings.HomeArrowSetup, screen, &x, &y)) {
             drawArrow(GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, homePos.Direction, OsdSettings.HomeArrowSetup.Size);
         }
         // Home distance
-        if (check_enable_and_srceen(OsdSettings.HomeDistance, (OsdSettingsWarningsSetupData *)&OsdSettings.HomeDistanceSetup, screen, &x, &y)) {
+        if (HomePosOnTime && check_enable_and_srceen(OsdSettings.HomeDistance, (OsdSettingsWarningsSetupData *)&OsdSettings.HomeDistanceSetup, screen, &x, &y)) {
             int d = (int)(homePos.Distance * convert->m_to_m_feet);
             if (homePos.GotHome) {
                 sprintf(temp, "HD%5d%c", d <= 99999 ? d : 99999, convert->char_m_feet);
@@ -2551,16 +2554,16 @@ void updateGraphics()
             }
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.HomeDistanceSetup.CharSize);
         }
-#if 1
+#if 0
         // Vertical speed
-        if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData *)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
+        if ((HomePosOnTime || gpsData.Status >= GPSPOSITIONSENSOR_STATUS_FIX2D) && check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData *)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
             sprintf(temp, "VS%5.1f%c", (double)-gpsVelocityData.Down, 0x88); // TODO currently m/s for both
             // sprintf(temp, "VS%5.1f%c", (double)(-gpsVelocityData.Down * convert->ms_to_ms_fts), convert->char_ms_fts);	// TODO is ft/s or ft/m the common unit for imperial?
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.VerticalSpeedSetup.CharSize);
         }
 #else
         // Travel distance
-        if (check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData *)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
+        if (HomePosOnTime && check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData *)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
             static float td = 0.0f;
             static portTickType callTimer = 0;
             portTickType current_ms = xTaskGetTickCount();
@@ -2711,8 +2714,8 @@ void updateGraphics()
         // Warnings (centered relative to x)
         if (check_enable_and_srceen(OsdSettings.Warnings, (OsdSettingsWarningsSetupData *)&OsdSettings.WarningsSetup, screen, &x, &y)) {
             WarnMask |= xTaskGetTickCount() < DO_NOT_MOVE_MILLIS ? WARN_DO_NOT_MOVE : 0x00;
-            WarnMask |= gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D ? WARN_NO_SAT_FIX : 0x00;
-            WarnMask |= !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE ? WARN_HOME_NOT_SET : 0x00;
+            WarnMask |= (HomePosOnTime && gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D) ? WARN_NO_SAT_FIX : 0x00;
+            WarnMask |= (HomePosOnTime && !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE) ? WARN_HOME_NOT_SET : 0x00;
             WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED ? WARN_DISARMED : 0x00;
             draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, OsdSettings.WarningsSetup.VerticalSpacing, OsdSettings.WarningsSetup.CharSize);
         }

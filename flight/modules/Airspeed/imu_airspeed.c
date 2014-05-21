@@ -169,14 +169,6 @@ void imu_airspeedInitialize()
  *
  * See OP-1317 imu_wind_estimation.pdf for details on the adaptation
  * Need a low pass filter to filter out spikes in non coordinated maneuvers
- * Note: filtering of xB and gpsV is more effective than of the airspeed itself. Reason: derivative of oscillating part is scaled
- * by 1/period, i.e. fast oscillation => small period => large oscillation in derivative => large oscillation in airspeed
- * Idea: treat gpsV and xB as noisy time series with trend and
- * apply Holt-Winters double exponential smoothing to avoid smoothing out of trend (=derivative)
- * s1 = x1
- * b1 = x1 - x0
- * s_{k+1} = alpha*x_{k+1} + (1-alpha)*(s_k + b_k)
- * b_{k+1} = beta*(s_{k+1} - s_k) + (1-beta)b_k
  */
 void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *airspeedSettings)
 {

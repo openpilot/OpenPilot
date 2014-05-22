@@ -65,10 +65,12 @@ private:
     bool isBoardRotationStored;
 
 private slots:
-    void displayVisualHelp(QString elementID);
     void storeAndClearBoardRotation();
     void recallBoardRotation();
+    void displayVisualHelp(QString elementID);
     void displayInstructions(QString instructions, WizardModel::MessageType type = WizardModel::Info, bool clear = false);
+    void displayTemperature(float temp);
+    void displayTemperatureGradient(float tempGradient);
 
     // ! Overriden method from the configTaskWidget to update UI
     virtual void refreshWidgetsValues(UAVObject *object = NULL);

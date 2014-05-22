@@ -45,8 +45,8 @@ class ThermalCalibrationModel : public WizardModel {
     Q_PROPERTY(bool endEnable READ endEnabled NOTIFY endEnabledChanged)
     Q_PROPERTY(bool cancelEnable READ cancelEnabled NOTIFY cancelEnabledChanged)
 
-    Q_PROPERTY(QString temperature READ temperature NOTIFY temperatureChanged)
-    Q_PROPERTY(QString temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
+    Q_PROPERTY(float temperature READ temperature NOTIFY temperatureChanged)
+    Q_PROPERTY(float temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
     Q_PROPERTY(int progress READ progress WRITE setProgress NOTIFY progressChanged)
     Q_OBJECT
 
@@ -99,33 +99,29 @@ public slots:
         return m_progress;
     }
 
-    QString temperature()
+    float temperature()
     {
         return m_temperature;
     }
 
-    QString temperatureGradient()
+    float temperatureGradient()
     {
         return m_temperatureGradient;
     }
 
-    void setTemperature(float status)
+    void setTemperature(float temp)
     {
-        QString tmp = QString("%1").arg(status, 5, 'f', 2);
-
-        if (m_temperature != tmp) {
-            m_temperature = tmp;
-            emit temperatureChanged(tmp);
+        if (m_temperature != temp) {
+            m_temperature = temp;
+            emit temperatureChanged(m_temperature);
         }
     }
 
-    void setTemperatureGradient(float status)
+    void setTemperatureGradient(float tempGradient)
     {
-        QString tmp = QString("%1").arg(status, 5, 'f', 2);
-
-        if (m_temperatureGradient != tmp) {
-            m_temperatureGradient = tmp;
-            emit temperatureGradientChanged(tmp);
+        if (m_temperatureGradient != tempGradient) {
+            m_temperatureGradient = tempGradient;
+            emit temperatureGradientChanged(m_temperatureGradient);
         }
     }
 
@@ -144,8 +140,8 @@ private:
     bool m_endEnabled;
     bool m_initDone;
     int m_progress;
-    QString m_temperature;
-    QString m_temperatureGradient;
+    float m_temperature;
+    float m_temperatureGradient;
 
     QScopedPointer<ThermalCalibrationHelper> m_helper;
 
@@ -177,8 +173,8 @@ signals:
     void endEnabledChanged(bool state);
     void cancelEnabledChanged(bool state);
 
-    void temperatureChanged(QString status);
-    void temperatureGradientChanged(QString status);
+    void temperatureChanged(float temp);
+    void temperatureGradientChanged(float tempGradient);
     void progressChanged(int value);
 
     void next();
@@ -190,7 +186,11 @@ signals:
     void init();
     void btnStart()
     {
-        setInstructions("");
+        // HACKS
+        // clear instructions
+        setInstructions(QString());
+        emit temperatureGradientChanged(0);
+        // END OF HACKS
         emit next();
     }
     void btnEnd()

@@ -95,6 +95,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // connect the thermalCalibration model to UI
     m_thermalCalibrationModel = new OpenPilot::ThermalCalibrationModel(this);
     m_thermalCalibrationModel->init();
+    m_ui->temperatureLabel->setText("");
+    m_ui->temperatureGradientLabel->setText("");
 
     connect(m_ui->ThermalBiasStart, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnStart()));
     connect(m_ui->ThermalBiasEnd, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnEnd()));
@@ -106,8 +108,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     connect(m_thermalCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
             this, SLOT(displayInstructions(QString, WizardModel::MessageType)));
-//    connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(QString)), m_ui->textTemperature, SLOT(setText(QString)));
-//    connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(QString)), m_ui->textThermalGradient, SLOT(setText(QString)));
+    connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(float)), this, SLOT(displayTemperature(float)));
+    connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(float)), this, SLOT(displayTemperatureGradient(float)));
     connect(m_thermalCalibrationModel, SIGNAL(progressChanged(int)), m_ui->thermalBiasProgress, SLOT(setValue(int)));
     // note: init for m_thermalCalibrationModel is done in showEvent to prevent cases wiht "Start" button not enabled due to some itming issue.
 
@@ -242,7 +244,7 @@ void ConfigRevoWidget::displayVisualHelp(QString elementID)
 
 void ConfigRevoWidget::displayInstructions(QString text, WizardModel::MessageType type, bool clear)
 {
-    if (clear || text.isEmpty()) {
+    if (clear || text.isNull()) {
         m_ui->calibrationInstructions->clear();
     }
     if (!text.isNull()) {
@@ -259,6 +261,15 @@ void ConfigRevoWidget::displayInstructions(QString text, WizardModel::MessageTyp
         }
         m_ui->calibrationInstructions->append(text);
     }
+}
+
+void ConfigRevoWidget::displayTemperature(float temp) {
+    m_ui->temperatureLabel->setText(tr("Temperature %1 °C").arg(temp, 5, 'f', 2));
+}
+
+void ConfigRevoWidget::displayTemperatureGradient(float tempGradient)
+{
+    m_ui->temperatureGradientLabel->setText(tr("Temperature rise %1 °C/min").arg(tempGradient, 5, 'f', 2));
 }
 
 /********** UI Functions *************/

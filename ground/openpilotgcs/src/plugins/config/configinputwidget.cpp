@@ -80,41 +80,46 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     unsigned int indexRT = 0;
     foreach(QString name, manualSettingsObj->getField("ChannelNumber")->getElementNames()) {
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
-        InputChannelForm *inpForm = new InputChannelForm(this, index == 0);
-        ui->channelSettings->layout()->addWidget(inpForm); // Add the row to the UI
-        inpForm->setName(name);
+        InputChannelForm *form = new InputChannelForm(index, this);
+        form->setName(name);
+        form->moveTo(*(ui->channelLayout));
 
         // The order of the following binding calls is important. Since the values will be populated
         // in reverse order of the binding order otherwise the 'Reversed' logic will floor the neutral value
         // to the max value ( which is smaller than the neutral value when reversed ) and the channel number
         // will not be set correctly.
-        addWidgetBinding("ManualControlSettings", "ChannelNumber", inpForm->ui->channelNumber, index);
-        addWidgetBinding("ManualControlSettings", "ChannelGroups", inpForm->ui->channelGroup, index);
-        addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->channelNeutral, index);
-        addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->neutralValue, index);
-        addWidgetBinding("ManualControlSettings", "ChannelMax", inpForm->ui->channelMax, index);
-        addWidgetBinding("ManualControlSettings", "ChannelMin", inpForm->ui->channelMin, index);
-        addWidgetBinding("ManualControlSettings", "ChannelMax", inpForm->ui->channelMax, index);
+        addWidgetBinding("ManualControlSettings", "ChannelNumber", form->ui->channelNumber, index);
+        addWidgetBinding("ManualControlSettings", "ChannelGroups", form->ui->channelGroup, index);
+        addWidgetBinding("ManualControlSettings", "ChannelNeutral", form->ui->channelNeutral, index);
+        addWidgetBinding("ManualControlSettings", "ChannelNeutral", form->ui->neutralValue, index);
+        addWidgetBinding("ManualControlSettings", "ChannelMax", form->ui->channelMax, index);
+        addWidgetBinding("ManualControlSettings", "ChannelMin", form->ui->channelMin, index);
+        addWidgetBinding("ManualControlSettings", "ChannelMax", form->ui->channelMax, index);
 
-        addWidget(inpForm->ui->channelNumberDropdown);
-        addWidget(inpForm->ui->channelResponseTime);
-        addWidget(inpForm->ui->channelRev);
+        addWidget(form->ui->channelRev);
+
+        // Reversing supported for some channels only
+        bool reversable = ((index == ManualControlSettings::CHANNELGROUPS_THROTTLE) ||
+                           (index == ManualControlSettings::CHANNELGROUPS_ROLL) ||
+                           (index == ManualControlSettings::CHANNELGROUPS_PITCH) ||
+                           (index == ManualControlSettings::CHANNELGROUPS_YAW));
+        form->ui->channelRev->setVisible(reversable);
 
         // Input filter response time fields supported for some channels only
         switch (index) {
         case ManualControlSettings::CHANNELGROUPS_ROLL:
         case ManualControlSettings::CHANNELGROUPS_PITCH:
         case ManualControlSettings::CHANNELGROUPS_YAW:
+        case ManualControlSettings::CHANNELGROUPS_COLLECTIVE:
         case ManualControlSettings::CHANNELGROUPS_ACCESSORY0:
         case ManualControlSettings::CHANNELGROUPS_ACCESSORY1:
         case ManualControlSettings::CHANNELGROUPS_ACCESSORY2:
-            addWidgetBinding("ManualControlSettings", "ResponseTime", inpForm->ui->channelResponseTime, indexRT);
+            addWidgetBinding("ManualControlSettings", "ResponseTime", form->ui->channelResponseTime, indexRT);
             ++indexRT;
             break;
         case ManualControlSettings::CHANNELGROUPS_THROTTLE:
         case ManualControlSettings::CHANNELGROUPS_FLIGHTMODE:
-        case ManualControlSettings::CHANNELGROUPS_COLLECTIVE:
-            inpForm->ui->channelResponseTime->setEnabled(false);
+            form->ui->channelResponseTime->setVisible(false);
             break;
         default:
             Q_ASSERT(0);

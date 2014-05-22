@@ -52,6 +52,8 @@ MODULES += Telemetry
 
 OPTMODULES += ComUsbBridge
 
+SRC += $(FLIGHTLIB)/notification.c
+
 # Include all camera options
 CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF
 

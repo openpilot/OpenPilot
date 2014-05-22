@@ -661,11 +661,10 @@ static void updateTelemetryStats()
         flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
     }
 
-    // Update the telemetry alarm
+    // TODO: check whether is there any error condition worth raising an alarm
+    // Disconnection is actually a normal (non)working status so it is not raising alarms anymore.
     if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
         AlarmsClear(SYSTEMALARMS_ALARM_TELEMETRY);
-    } else {
-        AlarmsSet(SYSTEMALARMS_ALARM_TELEMETRY, SYSTEMALARMS_ALARM_ERROR);
     }
 
     // Update object

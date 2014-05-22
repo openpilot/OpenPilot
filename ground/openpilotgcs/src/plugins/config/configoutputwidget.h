@@ -47,6 +47,8 @@ public:
     ConfigOutputWidget(QWidget *parent = 0);
     ~ConfigOutputWidget();
 
+protected:
+    void enableControls(bool enable);
 
 private:
     Ui_OutputWidget *ui;
@@ -55,14 +57,14 @@ private:
 
     void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
 
-    void assignChannel(UAVDataObject *obj, QString str);
-    void assignOutputChannel(UAVDataObject *obj, QString str);
+    void assignOutputChannel(UAVDataObject *obj, QString &str);
     OutputChannelForm *getOutputChannelForm(const int index) const;
     int mccDataRate;
 
     UAVObject::Metadata accInitialData;
 
     bool wasItMe;
+
 private slots:
     void stopTests();
     void disableIfNotMe(UAVObject *obj);
@@ -71,8 +73,6 @@ private slots:
     void runChannelTests(bool state);
     void sendChannelTest(int index, int value);
     void openHelp();
-protected:
-    void enableControls(bool enable);
 };
 
-#endif // ifndef CONFIGOUTPUTWIDGET_H
+#endif // CONFIGOUTPUTWIDGET_H

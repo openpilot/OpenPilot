@@ -1,18 +1,19 @@
 TEMPLATE = lib
 TARGET = Config
 DEFINES += CONFIG_LIBRARY
-QT += svg
-QT += opengl
-QT += qml quick
+
+QT += svg opengl qml quick
 
 include(config_dependencies.pri)
 
 INCLUDEPATH += ../../libs/eigen
 
-OTHER_FILES += Config.pluginspec \
+OTHER_FILES += \
+    Config.pluginspec \
     calibration/WizardStepIndicator.qml
 
-HEADERS += configplugin.h \
+HEADERS += \
+    configplugin.h \
     configgadgetwidget.h \
     configgadgetfactory.h \
     configgadget.h \
@@ -27,6 +28,7 @@ HEADERS += configplugin.h \
     assertions.h \
     defaultattitudewidget.h \
     defaulthwsettingswidget.h \
+    channelform.h \
     inputchannelform.h \
     configcamerastabilizationwidget.h \
     configtxpidwidget.h \
@@ -57,7 +59,8 @@ HEADERS += configplugin.h \
     calibration/gyrobiascalibrationmodel.h \
     calibration/calibrationuiutils.h
 
-SOURCES += configplugin.cpp \
+SOURCES += \
+    configplugin.cpp \
     configgadgetwidget.cpp \
     configgadgetfactory.cpp \
     configgadget.cpp \
@@ -71,6 +74,7 @@ SOURCES += configplugin.cpp \
     configpipxtremewidget.cpp \
     defaultattitudewidget.cpp \
     defaulthwsettingswidget.cpp \
+    channelform.cpp \
     inputchannelform.cpp \
     configcamerastabilizationwidget.cpp \
     configrevowidget.cpp \
@@ -95,7 +99,8 @@ SOURCES += configplugin.cpp \
     calibration/levelcalibrationmodel.cpp \
     calibration/gyrobiascalibrationmodel.cpp
 
-FORMS += airframe.ui \
+FORMS += \
+    airframe.ui \
     airframe_ccpm.ui \
     airframe_fixedwing.ui \
     airframe_ground.ui \

@@ -65,7 +65,6 @@ signals:
 
 protected:
     void resizeEvent(QResizeEvent *event);
-    MyTabbedStackWidget *ftw;
 
 private:
     UAVDataObject *oplinkStatusObj;
@@ -73,6 +72,8 @@ private:
     // A timer that timesout the connction to the OPLink.
     QTimer *oplinkTimeout;
     bool oplinkConnected;
+
+    MyTabbedStackWidget *stackWidget;
 };
 
 #endif // CONFIGGADGETWIDGET_H

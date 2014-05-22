@@ -24,6 +24,9 @@ core
 
 # ground
 openpilotgcs-build-desktop
+ground/openpilotgcs/.cproject
+ground/openpilotgcs/.project
+ground/openpilotgcs/.settings
 
 # Ignore some of the .pro.user files
 *.pro.user

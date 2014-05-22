@@ -53,6 +53,8 @@ MODULES += Telemetry
 
 OPTMODULES += ComUsbBridge
 
+SRC += $(FLIGHTLIB)/notification.c
+
 # Include all camera options
 CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF
 
@@ -96,7 +98,9 @@ endif
 
 # Optional component libraries
 include $(FLIGHTLIB)/rscode/library.mk
+
 #include $(FLIGHTLIB)/PyMite/pymite.mk
+
 
 include $(ROOT_DIR)/make/apps-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk

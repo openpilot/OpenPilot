@@ -7,14 +7,6 @@
         <field name="DifferentialPressure" units="Pa" type="float" elements="1"/>
         <field name="Temperature" units="K" type="float" elements="1"/>
         <field name="CalibratedAirspeed" units="m/s" type="float" elements="1"/>
-        <!-- For debugin/testng purposes. Should be deleted before merge -->
-        <field name="f" units="" type="float" elements="3"/>
-        <field name="v" units="" type="float" elements="3"/>
-        <field name="df" units="" type="float" elements="3"/>
-        <field name="dv" units="" type="float" elements="3"/>
-        <field name="absdf" units="" type="float" elements="1"/>
-        <field name="dvdotdf" units="" type="float" elements="1"/>
-        <!-- End of debuging variables-->
         <field name="TrueAirspeed" units="m/s" type="float" elements="1" defaultvalue="-1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>

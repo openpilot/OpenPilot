@@ -182,9 +182,9 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
 {
     // pre-filter frequency rate
     // corresponds to a cut-off frequency of 0.04 Hz or a period of 25 sec
-    const float ff  = 0.04f * 1000.0f / airspeedSettings->SamplePeriod;
+    const float ff  = 0.04f * airspeedSettings->SamplePeriod / 1000.0f;
     // good values for turbulent situation: cut-off 0.01 Hz or a period of 100 sec
-    const float ffV = 0.01f * 1000.0f / airspeedSettings->SamplePeriod;
+    const float ffV = 0.01f * airspeedSettings->SamplePeriod / 1000.0f;
     // good values for steady situation: cut-off 0.05 Hz or a period of 20 sec
 // const float ffV=0.05 * 1000.0f/airspeedSettings->SamplePeriod;
 

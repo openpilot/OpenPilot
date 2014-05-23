@@ -57,7 +57,7 @@ endif
 
 # List C source files here (C dependencies are automatically generated).
 # Use file-extension c for "c-only"-files
-
+ifneq ($(PIOS_APPS_MINIMAL),YES)
 ## PIOS Hardware (Common Peripherals)
 SRC += $(PIOSCOMMON)/pios_adxl345.c
 SRC += $(PIOSCOMMON)/pios_bma180.c
@@ -76,22 +76,25 @@ SRC += $(PIOSCOMMON)/pios_ms5611.c
 SRC += $(PIOSCOMMON)/pios_oplinkrcvr.c
 SRC += $(PIOSCOMMON)/pios_video.c
 SRC += $(PIOSCOMMON)/pios_wavplay.c
+SRC += $(PIOSCOMMON)/pios_rfm22b.c
+SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
+SRC += $(PIOSCOMMON)/pios_rcvr.c
+SRC += $(PIOSCOMMON)/pios_sbus.c
+SRC += $(PIOSCOMMON)/pios_sdcard.c
 
 ## PIOS Hardware (Common)
+SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
+SRC += $(PIOSCOMMON)/pios_flash_jedec.c
+SRC += $(PIOSCOMMON)/pios_debuglog.c
+endif
+
 SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/pios_crc.c
-SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
-SRC += $(PIOSCOMMON)/pios_flash_jedec.c
-SRC += $(PIOSCOMMON)/pios_debuglog.c
 SRC += $(PIOSCOMMON)/pios_deltatime.c
-SRC += $(PIOSCOMMON)/pios_rcvr.c
-SRC += $(PIOSCOMMON)/pios_rfm22b.c
-SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
-SRC += $(PIOSCOMMON)/pios_sbus.c
-SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_led.c
+
 ifneq ($(PIOS_OMITS_USB),YES)
 ## PIOS USB related files
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
@@ -187,6 +190,9 @@ ifeq ($(MCU),cortex-m3)
     LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_sections.ld
 else ifeq ($(MCU),cortex-m4)
     LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
+else ifeq ($(MCU),cortex-m0)
+    LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_memory.ld
+    LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_sections.ld
 endif
 
 # Add jtag targets (program and wipe)

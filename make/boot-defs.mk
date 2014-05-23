@@ -47,7 +47,7 @@ endif
 # Use file-extension c for "c-only"-files
 
 ## Bootloader Core
-SRC += ../pios_usb_board_data.c
+
 SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
 
@@ -55,8 +55,11 @@ SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(PIOSCOMMON)/pios_board_info.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/pios_iap.c
+ifneq ($(PIOS_OMITS_USB),YES)
+SRC += ../pios_usb_board_data.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
+endif
 SRC += $(PIOSCOMMON)/pios_led.c
 
 ## Misc library functions
@@ -119,6 +122,9 @@ ifeq ($(MCU),cortex-m3)
     LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_BL_sections.ld
 else ifeq ($(MCU),cortex-m4)
     LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_BL))
+else ifeq ($(MCU),cortex-m0)
+    LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_memory.ld
+    LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_BL_sections.ld
 endif
 
 # Add jtag targets (program and wipe)

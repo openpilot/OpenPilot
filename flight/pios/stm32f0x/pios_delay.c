@@ -51,11 +51,10 @@ int32_t PIOS_DELAY_Init(void)
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
     const TIM_TimeBaseInitTypeDef timerInit = {
-        .TIM_Prescaler         = 8,
+        .TIM_Prescaler         = (48000000 / 1000000),
         .TIM_ClockDivision     = TIM_CKD_DIV1,
         .TIM_CounterMode       = TIM_CounterMode_Up,
-        // period (1.25 uS per period
-        .TIM_Period                            = 0,
+        .TIM_Period            = 0xFFFFFFFF,
         .TIM_RepetitionCounter = 0x0000,
     };
     // Stop timer

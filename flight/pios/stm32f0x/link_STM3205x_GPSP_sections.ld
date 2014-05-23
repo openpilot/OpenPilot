@@ -13,10 +13,15 @@ PROVIDE(pios_board_info_blob = ORIGIN(BD_INFO));
 /* Section Definitions */
 SECTIONS
 {
+    .isr_vector :
+    {
+        . = ALIGN(4);
+        pios_isr_vector_table_base = .;
+        KEEP(*(.isr_vector))        /* Interrupt vectors */
+    } > FLASH
     .text :
     {
-        PROVIDE (pios_isr_vector_table_base = .);
-        KEEP(*(.isr_vector .isr_vector.*))
+        . = ALIGN(4);
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
@@ -44,8 +49,8 @@ SECTIONS
 
     . = ALIGN(4);
     _etext = .;
-    .ram_vector_table(NOLOAD): {*(.ram_vector_table)} >VTRAM
     _sidata = .;
+    .ram_vector_table(NOLOAD): {*(.ram_vector_table)} >VTRAM
 
     /*
      * This stack is used both as the initial sp during early init as well as ultimately
@@ -101,7 +106,7 @@ SECTIONS
 
     _eram = ORIGIN(SRAM) + LENGTH(SRAM) ;
     _ebss = _eram ;
-    
+    _estack = _init_stack_top;
     /* keep the heap section at the end of the SRAM
      * this will allow to claim the remaining bytes not used
      * at run time! (done by the reset vector).

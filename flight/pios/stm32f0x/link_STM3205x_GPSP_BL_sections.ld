@@ -11,15 +11,20 @@ _irq_stack_size = 0x200;
 /* Section Definitions */
 SECTIONS
 {
+    .isr_vector :
+    {
+        . = ALIGN(4);
+        pios_isr_vector_table_base = .;
+        KEEP(*(.isr_vector))        /* Interrupt vectors */
+    } >BL_FLASH
     .text :
     {
-        PROVIDE (pios_isr_vector_table_base = .);
-        KEEP(*(.isr_vector .isr_vector.*))
+        . = ALIGN(4);    
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
     } > BL_FLASH
-
+    
     .ARM.extab :
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -33,7 +38,8 @@ SECTIONS
     . = ALIGN(4);
     _etext = .;
     _sidata = .;
-
+    .ram_vector_table(NOLOAD): {*(.ram_vector_table)} >VTRAM
+    
     .data : AT (_etext)
     {
         _sdata = .;
@@ -69,7 +75,7 @@ SECTIONS
          _init_stack_top = _irq_stack_top;
          . = ALIGN(4);
     } > SRAM
-    
+    _estack = _init_stack_top;
     . = ALIGN(4);
     _end = . ;
 
@@ -80,6 +86,17 @@ SECTIONS
 	. = ALIGN(ORIGIN(BD_INFO)+LENGTH(BD_INFO));
     } > BD_INFO
 
+    
+    /* This can remove the debugging information from the standard libraries */    
+    /* 
+    DISCARD :
+    {
+     libc.a ( * )
+     libm.a ( * )
+     libgcc.a ( * )
+     }
+     */
+  
     /* Stabs debugging sections.  */
     .stab          0 : { *(.stab) }
     .stabstr       0 : { *(.stabstr) }
@@ -88,9 +105,11 @@ SECTIONS
     .stab.index    0 : { *(.stab.index) }
     .stab.indexstr 0 : { *(.stab.indexstr) }
     .comment       0 : { *(.comment) }
-    /* DWARF debug sections.
-       Symbols in the DWARF debugging sections are relative to the beginning
-       of the section so we begin them at 0.  */
+    /*
+     * DWARF debug sections.
+     * Symbols in the DWARF debugging sections are relative to the beginning
+     * of the section so we begin them at 0.  
+     */
     /* DWARF 1 */
     .debug          0 : { *(.debug) }
     .line           0 : { *(.line) }
@@ -112,5 +131,5 @@ SECTIONS
     .debug_weaknames 0 : { *(.debug_weaknames) }
     .debug_funcnames 0 : { *(.debug_funcnames) }
     .debug_typenames 0 : { *(.debug_typenames) }
-    .debug_varnames  0 : { *(.debug_varnames) }
+    .debug_varnames  0 : { *(.debug_varnames) }    
 }

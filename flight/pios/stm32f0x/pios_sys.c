@@ -145,9 +145,7 @@ void PIOS_SYS_Init(void)
 
     GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_All;
     GPIO_Init(GPIOC, &GPIO_InitStructure);
-    GPIO_Init(GPIOD, &GPIO_InitStructure);
-    GPIO_Init(GPIOE, &GPIO_InitStructure);
-    GPIO_Init(GPIOF, &GPIO_InitStructure);
+
 }
 
 /**

@@ -43,7 +43,7 @@
 // Private constants
 #define TWO_PI            6.283185308f
 #define SQRT2             1.414213562f
-#define EPS_REORIENTATION 1e-8f
+#define EPS_REORIENTATION 1e-10f
 #define EPS_VELOCITY      1.f
 
 // Private types
@@ -96,19 +96,32 @@ static void Quaternion2PY(const float q0, const float q1, const float q2, const 
         *yPtr = y_;
     } else {
         // calculate needed mutliples of 2pi to avoid jumps
-        // take slightly less than 2pi, because the jump will never be exactly 2pi
-        const int mod = (int)((y_ - *yPtr) / (TWO_PI * 0.9f));
-        *yPtr = y_ - TWO_PI * mod;
+        // number of cycles accumulated in old yaw
+        const int cycles = (int)(*yPtr / TWO_PI);
+        // look for a jump by substracting the modulus, i.e. there is maximally one jump.
+        // take slightly less than 2pi, because the jump will always be lower than 2pi
+        const int mod    = (int)((y_ - (*yPtr - cycles * TWO_PI)) / (TWO_PI * 0.9f));
+        *yPtr = y_ + TWO_PI * (cycles - mod);
     }
 }
 
-static void PY2xB(float p, float y, float x[3])
+static void PY2xB(const float p, const float y, float x[3])
 {
     const float cosp = cosf(p);
 
     x[0] = cosp * cosf(y);
     x[1] = cosp * sinf(y);
     x[2] = -sinf(p);
+}
+
+
+static void PY2DeltaxB(const float p, const float y, float x[3])
+{
+    const float cosp = cosf(p);
+
+    x[0] -= cosp * cosf(y);
+    x[1] -= cosp * sinf(y);
+    x[2] -= -sinf(p);
 }
 
 
@@ -196,7 +209,7 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
         VelocityStateData velData;
         VelocityStateGet(&velData);
         float p = imu->pOld, y = imu->yOld;
-        float dxB[3], xBOld[3];
+        float dxB[3];
 
         // get pitch and roll Euler angles from quaternion
         // do not calculate the principlal argument of yaw, i.e. use old yaw to add multiples of 2pi to have a continuous yaw
@@ -206,13 +219,10 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
         p = FilterButterWorthDF2(ff, p, &(imu->pn1), &(imu->pn2));
         y = FilterButterWorthDF2(ff, y, &(imu->yn1), &(imu->yn2));
         // transform pitch and yaw into fuselage vector xB and xBold
-        PY2xB(imu->pOld, imu->yOld, xBOld);
         PY2xB(p, y, dxB);
-        // calculate change in fuselage vector
-        dxB[0] -= xBOld[0];
-        dxB[1] -= xBOld[1];
-        dxB[2] -= xBOld[2];
-
+        // calculate change in fuselage vector by substraction of old value
+        PY2DeltaxB(imu->pOld, imu->yOld, dxB);
+                
         // filter ground speed from VelocityState
         const float fv1n = FilterButterWorthDF2(ff, velData.North, &(imu->v1n1), &(imu->v1n2));
         const float fv2n = FilterButterWorthDF2(ff, velData.East, &(imu->v2n1), &(imu->v2n2));

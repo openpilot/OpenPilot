@@ -14,8 +14,8 @@ Image {
     property int border: 0
     property variant scaledBounds: svgRenderer.scaledElementBounds(svgFileName, elementName)
 
-    sourceSize.width: Math.round(sceneSize.width*scaledBounds.width)
-    sourceSize.height: Math.round(sceneSize.height*scaledBounds.height)
+    sourceSize.width: sceneSize.width*scaledBounds.width
+    sourceSize.height: sceneSize.height*scaledBounds.height
 
     x: Math.floor(scaledBounds.x * sceneSize.width)
     y: Math.floor(scaledBounds.y * sceneSize.height)

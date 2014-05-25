@@ -62,6 +62,7 @@
 #include <CoordinateConversions.h>
 
 #include <pios_board_info.h>
+#include <pios_struct_helper.h>
 
 // Private constants
 #define STACK_SIZE_BYTES 1000
@@ -474,35 +475,7 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     RPY2Quaternion(rpy, rotationQuat);
     Quaternion2R(rotationQuat, R);
 
-    mag_transform[0][0] = R[0][0] * cal.mag_transform.r0c0 +
-                          R[1][0] * cal.mag_transform.r0c1 +
-                          R[2][0] * cal.mag_transform.r0c2;
-    mag_transform[0][1] = R[0][1] * cal.mag_transform.r0c0 +
-                          R[1][1] * cal.mag_transform.r0c1 +
-                          R[2][1] * cal.mag_transform.r0c2;
-    mag_transform[0][2] = R[0][2] * cal.mag_transform.r0c0 +
-                          R[1][2] * cal.mag_transform.r0c1 +
-                          R[2][2] * cal.mag_transform.r0c2;
-
-    mag_transform[1][0] = R[0][0] * cal.mag_transform.r1c0 +
-                          R[1][0] * cal.mag_transform.r1c1 +
-                          R[2][0] * cal.mag_transform.r1c2;
-    mag_transform[1][1] = R[0][1] * cal.mag_transform.r1c0 +
-                          R[1][1] * cal.mag_transform.r1c1 +
-                          R[2][1] * cal.mag_transform.r1c2;
-    mag_transform[1][2] = R[0][2] * cal.mag_transform.r1c0 +
-                          R[1][2] * cal.mag_transform.r1c1 +
-                          R[2][2] * cal.mag_transform.r1c2;
-
-    mag_transform[1][0] = R[0][0] * cal.mag_transform.r2c0 +
-                          R[1][0] * cal.mag_transform.r2c1 +
-                          R[2][0] * cal.mag_transform.r2c2;
-    mag_transform[2][1] = R[0][1] * cal.mag_transform.r2c0 +
-                          R[1][1] * cal.mag_transform.r2c1 +
-                          R[2][1] * cal.mag_transform.r2c2;
-    mag_transform[2][2] = R[0][2] * cal.mag_transform.r2c0 +
-                          R[1][2] * cal.mag_transform.r2c1 +
-                          R[2][2] * cal.mag_transform.r2c2;
+    matrix_mult_3x3f((float(*)[3])cast_struct_to_array(cal.mag_transform, cal.mag_transform.r0c0), R, mag_transform);
 }
 /**
  * @}

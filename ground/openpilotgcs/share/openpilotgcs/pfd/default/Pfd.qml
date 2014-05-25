@@ -97,11 +97,6 @@ Rectangle {
                 sceneSize: sceneItem.viewportSize
             }
 
-//            PfdIndicators {
-//                anchors.fill: parent
-//                sceneSize: sceneItem.viewportSize
-//            }
-
             Info {
                 anchors.fill: parent
                 sceneSize: sceneItem.viewportSize

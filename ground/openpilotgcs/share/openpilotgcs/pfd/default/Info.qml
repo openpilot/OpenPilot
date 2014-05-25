@@ -86,7 +86,7 @@ Item {
         y: scaledBounds.y * sceneItem.height
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
-        //visible: FlightBatteryState.Voltage > 0
+        visible: FlightBatteryState.Voltage > 0
 
         Text {
             id: battery_volt
@@ -109,7 +109,7 @@ Item {
         y: scaledBounds.y * sceneItem.height
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
-        //visible: FlightBatteryState.Current > 0
+        visible: FlightBatteryState.Current > 0
 
         Text {
             id: battery_cur
@@ -132,7 +132,7 @@ Item {
         y: scaledBounds.y * sceneItem.height
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
-        //visible: FlightBatteryState.ConsumedEnergy > 0
+        visible: FlightBatteryState.ConsumedEnergy > 0
 
         Text {
             id: battery_conso
@@ -163,6 +163,24 @@ Item {
     SvgElementImage {
         id: mask_ThrottleBar
         elementName: "throttle-mask"
+        sceneSize: info.sceneSize
+    }
+
+    SvgElementImage {
+        id: mask_SatBar
+        elementName: "satbar-mask"
+        sceneSize: info.sceneSize
+    }
+
+    SvgElementImage {
+        id: mask_telemetryTx
+        elementName: "tx-mask"
+        sceneSize: info.sceneSize
+    }
+
+    SvgElementImage {
+        id: mask_telemetryRx
+        elementName: "rx-mask"
         sceneSize: info.sceneSize
     }
 }

@@ -81,6 +81,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_ui->calibrationVisualHelp->setScene(new QGraphicsScene(this));
     m_ui->calibrationVisualHelp->setRenderHint(QPainter::HighQualityAntialiasing, true);
     m_ui->calibrationVisualHelp->setRenderHint(QPainter::SmoothPixmapTransform, true);
+    m_ui->calibrationVisualHelp->setBackgroundBrush(QBrush(QColor(51, 51, 51)));
     displayVisualHelp("empty");
 
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
@@ -191,7 +192,7 @@ void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 
 void ConfigRevoWidget::updateVisualHelp()
 {
-    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatioByExpanding);
+    m_ui->calibrationVisualHelp->fitInView(m_ui->calibrationVisualHelp->scene()->sceneRect(), Qt::KeepAspectRatio);
 }
 
 void ConfigRevoWidget::storeAndClearBoardRotation()

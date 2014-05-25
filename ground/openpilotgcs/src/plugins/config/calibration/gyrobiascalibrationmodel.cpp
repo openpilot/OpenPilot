@@ -71,7 +71,7 @@ void GyroBiasCalibrationModel::start()
     attitudeSettings->updated();
 
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
-    displayInstructions(tr("Calibrating the gyroscopes. Keep the copter/plane steady..."), WizardModel::Notice, true);
+    displayInstructions(tr("Calibrating the gyroscopes. Keep the copter/plane steady..."), WizardModel::Notice);
 
     gyro_accum_x.clear();
     gyro_accum_y.clear();

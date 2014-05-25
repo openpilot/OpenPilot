@@ -125,8 +125,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_sixPointCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
     connect(m_sixPointCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
     connect(m_sixPointCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
-    connect(m_sixPointCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType, bool)),
-            this, SLOT(displayInstructions(QString, WizardModel::MessageType, bool)));
+    connect(m_sixPointCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
+            this, SLOT(displayInstructions(QString, WizardModel::MessageType)));
     connect(m_sixPointCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_sixPointCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->sixPointsSave, SLOT(setEnabled(bool)));
 
@@ -137,8 +137,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     connect(m_levelCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
     connect(m_levelCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
-    connect(m_levelCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType, bool)),
-            this, SLOT(displayInstructions(QString, WizardModel::MessageType, bool)));
+    connect(m_levelCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
+            this, SLOT(displayInstructions(QString, WizardModel::MessageType)));
     connect(m_levelCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_levelCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->boardLevelSavePos, SLOT(setEnabled(bool)));
     connect(m_levelCalibrationModel, SIGNAL(progressChanged(int)), this->m_ui->boardLevelProgress, SLOT(setValue(int)));
@@ -153,8 +153,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_gyroBiasCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType, bool)),
-            this, SLOT(displayInstructions(QString, WizardModel::MessageType, bool)));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
+            this, SLOT(displayInstructions(QString, WizardModel::MessageType)));
     connect(m_gyroBiasCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
 
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
@@ -242,11 +242,13 @@ void ConfigRevoWidget::displayVisualHelp(QString elementID)
     updateVisualHelp();
 }
 
-void ConfigRevoWidget::displayInstructions(QString text, WizardModel::MessageType type, bool clear)
+void ConfigRevoWidget::clearInstructions()
 {
-    if (clear || text.isNull()) {
-        m_ui->calibrationInstructions->clear();
-    }
+    m_ui->calibrationInstructions->clear();
+}
+
+void ConfigRevoWidget::displayInstructions(QString text, WizardModel::MessageType type)
+{
     if (!text.isNull()) {
         switch(type) {
         case WizardModel::Error:
@@ -314,6 +316,7 @@ void ConfigRevoWidget::clearHomeLocation()
 
 void ConfigRevoWidget::disableAllCalibrations()
 {
+    clearInstructions();
     m_ui->sixPointsStartAccel->setEnabled(false);
     m_ui->sixPointsStartMag->setEnabled(false);
     m_ui->boardLevelStart->setEnabled(false);

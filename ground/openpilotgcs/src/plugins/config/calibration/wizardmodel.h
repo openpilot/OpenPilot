@@ -66,7 +66,7 @@ private:
     QString m_instructions;
 
 signals:
-    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info, bool clear = false);
+    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info);
     void currentStateChanged(WizardState *status);
 
 };

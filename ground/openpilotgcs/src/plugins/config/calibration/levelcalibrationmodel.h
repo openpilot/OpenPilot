@@ -50,7 +50,7 @@ public:
 
 signals:
     void displayVisualHelp(QString elementID);
-    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info, bool clear = false);
+    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info);
     void started();
     void stopped();
     void savePositionEnabledChanged(bool state);

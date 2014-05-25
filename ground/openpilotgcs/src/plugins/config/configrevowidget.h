@@ -68,7 +68,8 @@ private slots:
     void storeAndClearBoardRotation();
     void recallBoardRotation();
     void displayVisualHelp(QString elementID);
-    void displayInstructions(QString instructions, WizardModel::MessageType type = WizardModel::Info, bool clear = false);
+    void clearInstructions();
+    void displayInstructions(QString instructions, WizardModel::MessageType type = WizardModel::Info);
     void displayTemperature(float temp);
     void displayTemperatureGradient(float tempGradient);
 

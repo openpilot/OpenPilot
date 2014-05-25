@@ -198,11 +198,11 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
         mag->setMetadata(mdata);
     }
 
-    /* Show instructions and enable controls */
-    displayInstructions((*currentSteps)[0].instructions, WizardModel::Info, true);
-    showHelp((*currentSteps)[0].visualHelp);
-
     started();
+
+    // Show instructions and enable controls
+    displayInstructions((*currentSteps)[0].instructions, WizardModel::Info);
+    showHelp((*currentSteps)[0].visualHelp);
     savePositionEnabledChanged(true);
     position = 0;
     mag_fit_x.clear();
@@ -492,7 +492,8 @@ void SixPointCalibrationModel::compute(bool mag, bool accel)
     } else {
         displayInstructions(tr("Bad calibration. Please review the instructions and repeat."), WizardModel::Error);
     }
-    position = -1; // set to run again
+    // set to run again
+    position = -1;
 }
 UAVObjectManager *SixPointCalibrationModel::getObjectManager()
 {

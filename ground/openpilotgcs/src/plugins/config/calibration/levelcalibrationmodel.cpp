@@ -40,7 +40,6 @@ LevelCalibrationModel::LevelCalibrationModel(QObject *parent) :
 {}
 
 
-/******* Level calibration *******/
 /**
  * Starts an accelerometer bias calibration.
  */
@@ -64,7 +63,7 @@ void LevelCalibrationModel::start()
     attitudeState->setMetadata(mdata);
 
     /* Show instructions and enable controls */
-    displayInstructions(tr("Place horizontally and click Save Position button..."), WizardModel::Info, true);
+    displayInstructions(tr("Place horizontally and click Save Position button..."), WizardModel::Info);
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
     savePositionEnabledChanged(true);
     position = 0;
@@ -134,8 +133,6 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             displayInstructions(tr("Leave horizontally, rotate 180° along yaw axis and click Save Position button..."));
             displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_SWD);
 
-            started();
-
             savePositionEnabledChanged(true);
             break;
         case 2:
@@ -145,13 +142,13 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             rot_data_roll  /= 2;
             attitudeState->setMetadata(initialAttitudeStateMdata);
             compute();
-            stopped();
             displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
             displayInstructions(tr("Board leveling completed successfully."));
             break;
         }
     }
 }
+
 void LevelCalibrationModel::compute()
 {
     stopped();
@@ -168,6 +165,7 @@ void LevelCalibrationModel::compute()
     attitudeSettings->setData(attitudeSettingsData);
     attitudeSettings->updated();
 }
+
 UAVObjectManager *LevelCalibrationModel::getObjectManager()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -176,4 +174,5 @@ UAVObjectManager *LevelCalibrationModel::getObjectManager()
     Q_ASSERT(objMngr);
     return objMngr;
 }
+
 }

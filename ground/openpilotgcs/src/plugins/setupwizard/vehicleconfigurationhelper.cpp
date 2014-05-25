@@ -311,13 +311,16 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
     {
         ActuatorSettings::DataFields data = actSettings->getData();
 
-	qDebug() << "Override center pulse for fixed wing servos\n";
+	qDebug() << "Override center, min and max pulses for fixed wing servos\n";
 	// move all but first chan to 1500 center pluse
         QList<actuatorChannelSettings> actuatorSettings = m_configSource->getActuatorSettings();
         for (quint16 i = 1; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
             data.ChannelType[i]    = ActuatorSettings::CHANNELTYPE_PWM;
             data.ChannelAddr[i]    = i;
+            data.ChannelMin[i] = 554; // Arduino library defaults to 554 http://arduino.cc/en/Reference/ServoAttach, 
+				      // 600 is for HS85mg - http://www.servocity.com/html/hs-85mg__mighty_micro.html#.U4JEWhapKBU
             data.ChannelNeutral[i] = 1500;
+            data.ChannelMax[i] = 2400; // Same rules as above from the Arduino *generic* library and the servo city info for the 85mg
         }
 	qDebug() << "Save Fixed Wing Actuator Data\n";
         actSettings->setData(data);
@@ -1345,6 +1348,20 @@ void VehicleConfigurationHelper::setupVtail()
     channels[2].roll      = 100;
     channels[2].pitch     = -50;
     channels[2].yaw = 0;
+
+    channels[3].type      = MIXER_TYPE_SERVO;
+    channels[3].throttle1 = 0;
+    channels[3].throttle2 = 0;
+    channels[3].roll      = 0;
+    channels[3].pitch     = 0;
+    channels[3].yaw = 0;
+
+    channels[3].type      = MIXER_TYPE_SERVO;
+    channels[3].throttle1 = 0;
+    channels[3].throttle2 = 0;
+    channels[3].roll      = 0;
+    channels[3].pitch     = 0;
+    channels[3].yaw = 0;
 
     guiSettings.fixedwing.FixedWingThrottle = 1;
     guiSettings.fixedwing.FixedWingRoll1 = 2;

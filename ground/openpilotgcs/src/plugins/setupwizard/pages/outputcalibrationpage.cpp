@@ -161,6 +161,24 @@ void OutputCalibrationPage::setupVehicle()
         m_actuatorSettings[6].channelNeutral = 1500;
         m_actuatorSettings[7].channelNeutral = 1500;
 
+	// Arduino library defaults to 554 http://arduino.cc/en/Reference/ServoAttach,
+	// 600 is for HS85mg - http://www.servocity.com/html/hs-85mg__mighty_micro.html#.U4JEWhapKBU
+	// Same rules as above from the Arduino *generic* library and the servo city info for the 85mg
+        m_actuatorSettings[1].channelMin     = 554;
+        m_actuatorSettings[1].channelMax     = 2400;
+        m_actuatorSettings[2].channelMin     = 554;
+        m_actuatorSettings[2].channelMax     = 2400;
+        m_actuatorSettings[3].channelMin     = 554;
+        m_actuatorSettings[3].channelMax     = 2400;
+        m_actuatorSettings[4].channelMin     = 554;
+        m_actuatorSettings[4].channelMax     = 2400;
+        m_actuatorSettings[5].channelMin     = 554;
+        m_actuatorSettings[5].channelMax     = 2400;
+        m_actuatorSettings[6].channelMin     = 554;
+        m_actuatorSettings[6].channelMax     = 2400;
+        m_actuatorSettings[7].channelMin     = 554;
+        m_actuatorSettings[7].channelMax     = 2400;
+
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
     case SetupWizard::FIXED_WING_VTAIL:
@@ -179,6 +197,24 @@ void OutputCalibrationPage::setupVehicle()
         m_actuatorSettings[5].channelNeutral = 1500;
         m_actuatorSettings[6].channelNeutral = 1500;
         m_actuatorSettings[7].channelNeutral = 1500;
+
+	// Arduino library defaults to 554 http://arduino.cc/en/Reference/ServoAttach,
+	// 600 is for HS85mg - http://www.servocity.com/html/hs-85mg__mighty_micro.html#.U4JEWhapKBU
+	// Same rules as above from the Arduino *generic* library and the servo city info for the 85mg
+        m_actuatorSettings[1].channelMin     = 554;
+        m_actuatorSettings[1].channelMax     = 2400;
+        m_actuatorSettings[2].channelMin     = 554;
+        m_actuatorSettings[2].channelMax     = 2400;
+        m_actuatorSettings[3].channelMin     = 554;
+        m_actuatorSettings[3].channelMax     = 2400;
+        m_actuatorSettings[4].channelMin     = 554;
+        m_actuatorSettings[4].channelMax     = 2400;
+        m_actuatorSettings[5].channelMin     = 554;
+        m_actuatorSettings[5].channelMax     = 2400;
+        m_actuatorSettings[6].channelMin     = 554;
+        m_actuatorSettings[6].channelMax     = 2400;
+        m_actuatorSettings[7].channelMin     = 554;
+        m_actuatorSettings[7].channelMax     = 2400;
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
@@ -255,7 +291,7 @@ void OutputCalibrationPage::setWizardPage()
     ui->calibrationStack->setCurrentIndex(currentPageIndex);
 
     int currentChannel = getCurrentChannel();
-    qDebug() << "Current channel: " << currentChannel;
+    qDebug() << "Current channel: " << currentChannel+1;
     if (currentChannel >= 0) {
         if (currentPageIndex == 1) {
             ui->motorNeutralSlider->setValue(m_actuatorSettings[currentChannel].channelNeutral);

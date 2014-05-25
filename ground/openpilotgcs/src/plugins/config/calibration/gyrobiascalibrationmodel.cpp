@@ -52,7 +52,7 @@ void GyroBiasCalibrationModel::start()
     // Store and reset board rotation before calibration starts
     storeAndClearBoardRotation();
 
-    disableAllCalibrations();
+    started();
     progressChanged(0);
 
     RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
@@ -159,7 +159,7 @@ void GyroBiasCalibrationModel::getSample(UAVObject *obj)
         Q_ASSERT(gyroSensor);
         disconnect(gyroSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
 
-        enableAllCalibrations();
+        stopped();
 
         RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
         Q_ASSERT(revoCalibration);

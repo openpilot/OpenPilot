@@ -173,6 +173,9 @@ signals:
     void endEnabledChanged(bool state);
     void cancelEnabledChanged(bool state);
 
+    void started();
+    void stopped();
+
     void temperatureChanged(float temp);
     void temperatureGradientChanged(float tempGradient);
     void progressChanged(int value);
@@ -206,12 +209,14 @@ signals:
         setStartEnabled(true);
         setEndEnabled(false);
         setCancelEnabled(false);
+        stopped();
     }
     void wizardStarted()
     {
         setStartEnabled(false);
         setEndEnabled(true);
         setCancelEnabled(true);
+        started();
     }
 };
 }

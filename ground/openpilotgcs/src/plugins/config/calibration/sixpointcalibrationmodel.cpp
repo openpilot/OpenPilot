@@ -202,7 +202,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     displayInstructions((*currentSteps)[0].instructions, WizardModel::Info, true);
     showHelp((*currentSteps)[0].visualHelp);
 
-    disableAllCalibrations();
+    started();
     savePositionEnabledChanged(true);
     position = 0;
     mag_fit_x.clear();
@@ -325,7 +325,7 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
             compute(calibratingMag, calibratingAccel);
             savePositionEnabledChanged(false);
 
-            enableAllCalibrations();
+            stopped();
             showHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
             /* Cleanup original settings */
             accelState->setMetadata(initialAccelStateMdata);

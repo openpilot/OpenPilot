@@ -48,7 +48,7 @@ void LevelCalibrationModel::start()
 {
     // Store and reset board rotation before calibration starts
 
-    disableAllCalibrations();
+    started();
     progressChanged(0);
 
     rot_data_pitch = 0;
@@ -66,7 +66,6 @@ void LevelCalibrationModel::start()
     /* Show instructions and enable controls */
     displayInstructions(tr("Place horizontally and click Save Position button..."), WizardModel::Info, true);
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
-    disableAllCalibrations();
     savePositionEnabledChanged(true);
     position = 0;
 }
@@ -135,7 +134,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             displayInstructions(tr("Leave horizontally, rotate 180° along yaw axis and click Save Position button..."));
             displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_SWD);
 
-            disableAllCalibrations();
+            started();
 
             savePositionEnabledChanged(true);
             break;
@@ -146,7 +145,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             rot_data_roll  /= 2;
             attitudeState->setMetadata(initialAttitudeStateMdata);
             compute();
-            enableAllCalibrations();
+            stopped();
             displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
             displayInstructions(tr("Board leveling completed successfully."));
             break;
@@ -155,7 +154,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
 }
 void LevelCalibrationModel::compute()
 {
-    enableAllCalibrations();
+    stopped();
 
     AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
     Q_ASSERT(attitudeSettings);

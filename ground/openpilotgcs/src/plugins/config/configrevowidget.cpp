@@ -77,7 +77,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 {
     m_ui->setupUi(this);
 
-    // Initialization of the Paper plane widget
+    // Initialization of the visual help
     m_ui->calibrationVisualHelp->setScene(new QGraphicsScene(this));
     m_ui->calibrationVisualHelp->setRenderHint(QPainter::HighQualityAntialiasing, true);
     m_ui->calibrationVisualHelp->setRenderHint(QPainter::SmoothPixmapTransform, true);
@@ -92,7 +92,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     addUAVObject("AccelGyroSettings");
     autoLoadWidgets();
 
-    // connect the thermalCalibration model to UI
+    // thermal calibration
     m_thermalCalibrationModel = new OpenPilot::ThermalCalibrationModel(this);
     m_thermalCalibrationModel->init();
     m_ui->temperatureLabel->setText("");
@@ -105,22 +105,24 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_thermalCalibrationModel, SIGNAL(startEnabledChanged(bool)), m_ui->ThermalBiasStart, SLOT(setEnabled(bool)));
     connect(m_thermalCalibrationModel, SIGNAL(endEnabledChanged(bool)), m_ui->ThermalBiasEnd, SLOT(setEnabled(bool)));
     connect(m_thermalCalibrationModel, SIGNAL(cancelEnabledChanged(bool)), m_ui->ThermalBiasCancel, SLOT(setEnabled(bool)));
+    connect(m_thermalCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
+    connect(m_thermalCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
 
     connect(m_thermalCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
             this, SLOT(displayInstructions(QString, WizardModel::MessageType)));
     connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(float)), this, SLOT(displayTemperature(float)));
     connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(float)), this, SLOT(displayTemperatureGradient(float)));
     connect(m_thermalCalibrationModel, SIGNAL(progressChanged(int)), m_ui->thermalBiasProgress, SLOT(setValue(int)));
-    // note: init for m_thermalCalibrationModel is done in showEvent to prevent cases wiht "Start" button not enabled due to some itming issue.
+    // note: init for m_thermalCalibrationModel is done in showEvent to prevent cases with "Start" button not enabled due to some timing issue.
 
+    // six point calibration
     m_sixPointCalibrationModel = new OpenPilot::SixPointCalibrationModel(this);
-    // six point calibrations
     connect(m_ui->sixPointsStartAccel, SIGNAL(clicked()), m_sixPointCalibrationModel, SLOT(accelStart()));
     connect(m_ui->sixPointsStartMag, SIGNAL(clicked()), m_sixPointCalibrationModel, SLOT(magStart()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), m_sixPointCalibrationModel, SLOT(savePositionData()));
 
-    connect(m_sixPointCalibrationModel, SIGNAL(disableAllCalibrations()), this, SLOT(disableAllCalibrations()));
-    connect(m_sixPointCalibrationModel, SIGNAL(enableAllCalibrations()), this, SLOT(enableAllCalibrations()));
+    connect(m_sixPointCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
+    connect(m_sixPointCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
     connect(m_sixPointCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
     connect(m_sixPointCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
     connect(m_sixPointCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType, bool)),
@@ -128,34 +130,32 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_sixPointCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_sixPointCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->sixPointsSave, SLOT(setEnabled(bool)));
 
-    m_levelCalibrationModel = new OpenPilot::LevelCalibrationModel(this);
     // level calibration
+    m_levelCalibrationModel = new OpenPilot::LevelCalibrationModel(this);
     connect(m_ui->boardLevelStart, SIGNAL(clicked()), m_levelCalibrationModel, SLOT(start()));
     connect(m_ui->boardLevelSavePos, SIGNAL(clicked()), m_levelCalibrationModel, SLOT(savePosition()));
 
-    connect(m_levelCalibrationModel, SIGNAL(disableAllCalibrations()), this, SLOT(disableAllCalibrations()));
-    connect(m_levelCalibrationModel, SIGNAL(enableAllCalibrations()), this, SLOT(enableAllCalibrations()));
+    connect(m_levelCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
+    connect(m_levelCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
     connect(m_levelCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType, bool)),
             this, SLOT(displayInstructions(QString, WizardModel::MessageType, bool)));
     connect(m_levelCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_levelCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->boardLevelSavePos, SLOT(setEnabled(bool)));
     connect(m_levelCalibrationModel, SIGNAL(progressChanged(int)), this->m_ui->boardLevelProgress, SLOT(setValue(int)));
 
-    // Connect the signals
     // gyro zero calibration
     m_gyroBiasCalibrationModel = new OpenPilot::GyroBiasCalibrationModel(this);
     connect(m_ui->gyroBiasStart, SIGNAL(clicked()), m_gyroBiasCalibrationModel, SLOT(start()));
 
     connect(m_gyroBiasCalibrationModel, SIGNAL(progressChanged(int)), this->m_ui->gyroBiasProgress, SLOT(setValue(int)));
 
-    connect(m_gyroBiasCalibrationModel, SIGNAL(disableAllCalibrations()), this, SLOT(disableAllCalibrations()));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(enableAllCalibrations()), this, SLOT(enableAllCalibrations()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType, bool)),
             this, SLOT(displayInstructions(QString, WizardModel::MessageType, bool)));
     connect(m_gyroBiasCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
-
 
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
 

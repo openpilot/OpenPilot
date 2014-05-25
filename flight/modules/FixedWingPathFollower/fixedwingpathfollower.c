@@ -127,17 +127,17 @@ int32_t FixedWingPathFollowerInitialize()
 }
 MODULE_INITCALL(FixedWingPathFollowerInitialize, FixedWingPathFollowerStart);
 
-static float northVelIntegral = 0;
-static float eastVelIntegral  = 0;
-static float downVelIntegral  = 0;
+static float northVelIntegral = 0.0f;
+static float eastVelIntegral  = 0.0f;
+static float downVelIntegral  = 0.0f;
 
-static float courseIntegral   = 0;
-static float speedIntegral    = 0;
-static float powerIntegral    = 0;
-static float airspeedErrorInt = 0;
+static float courseIntegral   = 0.0f;
+static float speedIntegral    = 0.0f;
+static float powerIntegral    = 0.0f;
+static float airspeedErrorInt = 0.0f;
 
 // correct speed by measured airspeed
-static float indicatedAirspeedStateBias = 0;
+static float indicatedAirspeedStateBias = 0.0f;
 
 /**
  * Module thread, should not return.
@@ -227,12 +227,12 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
             }
         } else {
             // Be cleaner and get rid of global variables
-            northVelIntegral = 0;
-            eastVelIntegral  = 0;
-            downVelIntegral  = 0;
-            courseIntegral   = 0;
-            speedIntegral    = 0;
-            powerIntegral    = 0;
+            northVelIntegral = 0.0f;
+            eastVelIntegral  = 0.0f;
+            downVelIntegral  = 0.0f;
+            courseIntegral   = 0.0f;
+            speedIntegral    = 0.0f;
+            powerIntegral    = 0.0f;
         }
         PathStatusSet(&pathStatus);
     }
@@ -278,14 +278,14 @@ static void updatePathVelocity()
     case PATHDESIRED_MODE_DRIVEVECTOR:
     default:
         groundspeed = pathDesired.StartingVelocity + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) *
-                      boundf(progress.fractional_progress, 0, 1);
+                      boundf(progress.fractional_progress, 0.0f, 1.0f);
         altitudeSetpoint = pathDesired.Start.Down + (pathDesired.End.Down - pathDesired.Start.Down) *
-                           boundf(progress.fractional_progress, 0, 1);
+                           boundf(progress.fractional_progress, 0.0f, 1.0f);
         break;
     }
     // make sure groundspeed is not zero
-    if (groundspeed < 1e-2f) {
-        groundspeed = 1e-2f;
+    if (groundspeed < 1e-6f) {
+        groundspeed = 1e-6f;
     }
 
     // calculate velocity - can be zero if waypoints are too close
@@ -309,7 +309,7 @@ static void updatePathVelocity()
     if ( // calculating angles < 90 degrees through dot products
         ((progress.path_direction[0] * velocityState.North + progress.path_direction[1] * velocityState.East) < 0.0f) &&
         ((progress.correction_direction[0] * velocityState.North + progress.correction_direction[1] * velocityState.East) < 0.0f)) {
-        error_speed = 0;
+        error_speed = 0.0f;
     }
 
     // calculate correction - can also be zero if correction vector is 0 or no error present
@@ -318,7 +318,7 @@ static void updatePathVelocity()
 
     // scale to correct length
     float l = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
-    if (l > 0.0f) {
+    if (l > 1e-9f) {
         velocityDesired.North *= groundspeed / l;
         velocityDesired.East  *= groundspeed / l;
     }
@@ -485,13 +485,13 @@ static uint8_t updateFixedDesiredAttitude()
      * Compute desired thrust command
      */
     // compute saturated integral error thrust response. Make integral leaky for better performance. Approximately 30s time constant.
-    if (fixedwingpathfollowerSettings.PowerPI.Ki > 0) {
+    if (fixedwingpathfollowerSettings.PowerPI.Ki > 0.0f) {
         powerIntegral = boundf(powerIntegral + -descentspeedError * dT,
                                -fixedwingpathfollowerSettings.PowerPI.ILimit / fixedwingpathfollowerSettings.PowerPI.Ki,
                                fixedwingpathfollowerSettings.PowerPI.ILimit / fixedwingpathfollowerSettings.PowerPI.Ki
                                ) * (1.0f - 1.0f / (1.0f + 30.0f / dT));
     } else {
-        powerIntegral = 0;
+        powerIntegral = 0.0f;
     }
 
     // Compute the cross feed from vertical speed to pitch, with saturation
@@ -519,9 +519,9 @@ static uint8_t updateFixedDesiredAttitude()
     // Error condition: plane cannot hold altitude at current speed.
     fixedwingpathfollowerStatus.Errors.Lowpower = 0;
     if (fixedwingpathfollowerSettings.ThrustLimit.Neutral + powerCommand >= fixedwingpathfollowerSettings.ThrustLimit.Max && // thrust at maximum
-        velocityState.Down > 0 && // we ARE going down
-        descentspeedDesired < 0 && // we WANT to go up
-        airspeedError > 0 && // we are too slow already
+        velocityState.Down > 0.0f && // we ARE going down
+        descentspeedDesired < 0.0f && // we WANT to go up
+        airspeedError > 0.0f && // we are too slow already
         fixedwingpathfollowerSettings.Safetymargins.Lowpower > 0.5f) { // alarm switched on
         fixedwingpathfollowerStatus.Errors.Lowpower = 1;
         result = 0;
@@ -529,9 +529,9 @@ static uint8_t updateFixedDesiredAttitude()
     // Error condition: plane keeps climbing despite minimum thrust (opposite of above)
     fixedwingpathfollowerStatus.Errors.Highpower = 0;
     if (fixedwingpathfollowerSettings.ThrustLimit.Neutral + powerCommand <= fixedwingpathfollowerSettings.ThrustLimit.Min && // thrust at minimum
-        velocityState.Down < 0 && // we ARE going up
-        descentspeedDesired > 0 && // we WANT to go down
-        airspeedError < 0 && // we are too fast already
+        velocityState.Down < 0.0f && // we ARE going up
+        descentspeedDesired > 0.0f && // we WANT to go down
+        airspeedError < 0.0f && // we are too fast already
         fixedwingpathfollowerSettings.Safetymargins.Highpower > 0.5f) { // alarm switched on
         fixedwingpathfollowerStatus.Errors.Highpower = 1;
         result = 0;
@@ -570,9 +570,9 @@ static uint8_t updateFixedDesiredAttitude()
     // Error condition: high speed dive
     fixedwingpathfollowerStatus.Errors.Pitchcontrol = 0;
     if (fixedwingpathfollowerSettings.PitchLimit.Neutral + pitchCommand >= fixedwingpathfollowerSettings.PitchLimit.Max && // pitch demand is full up
-        velocityState.Down > 0 && // we ARE going down
-        descentspeedDesired < 0 && // we WANT to go up
-        airspeedError < 0 && // we are too fast already
+        velocityState.Down > 0.0f && // we ARE going down
+        descentspeedDesired < 0.0f && // we WANT to go up
+        airspeedError < 0.0f && // we are too fast already
         fixedwingpathfollowerSettings.Safetymargins.Pitchcontrol > 0.5f) { // alarm switched on
         fixedwingpathfollowerStatus.Errors.Pitchcontrol = 1;
         result = 0;
@@ -584,10 +584,10 @@ static uint8_t updateFixedDesiredAttitude()
     courseError = RAD2DEG(atan2f(courseComponent[1], courseComponent[0])) - attitudeState.Yaw;
 
     if (courseError < -180.0f) {
-        courseError += 360;
+        courseError += 360.0f;
     }
     if (courseError > 180.0f) {
-        courseError -= 360;
+        courseError -= 360.0f;
     }
 
     // overlap calculation. Theres a dead zone behind the craft where the
@@ -625,7 +625,7 @@ static uint8_t updateFixedDesiredAttitude()
      * Compute desired yaw command
      */
     // TODO implement raw control mode for yaw and base on Accels.Y
-    stabDesired.Yaw = 0;
+    stabDesired.Yaw = 0.0f;
 
 
     stabDesired.StabilizationMode.Roll   = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

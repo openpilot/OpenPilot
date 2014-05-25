@@ -25,4 +25,5 @@ Item {
             origin.x : rollscale.width/2
         }
     }
+
 }

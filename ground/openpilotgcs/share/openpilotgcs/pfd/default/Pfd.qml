@@ -48,8 +48,16 @@ Rectangle {
             }
 
             SvgElementImage {
+                id: side_slip_fixed
+                elementName: "sideslip-fixed"
+                sceneSize: sceneItem.viewportSize
+
+                x: scaledBounds.x * sceneItem.width
+            }
+
+            SvgElementImage {
                 id: side_slip
-                elementName: "sideslip"
+                elementName: "sideslip-moving"
                 sceneSize: sceneItem.viewportSize
                 smooth: true
 
@@ -65,7 +73,7 @@ Rectangle {
 
                 anchors.horizontalCenter: foreground.horizontalCenter
                 //0.5 coefficient is empirical to limit indicator movement
-                anchors.horizontalCenterOffset: -sideSlip*width*0.5
+                anchors.horizontalCenterOffset: sideSlip*width*0.1 //was 0.5
                 y: scaledBounds.y * sceneItem.height
             }
 

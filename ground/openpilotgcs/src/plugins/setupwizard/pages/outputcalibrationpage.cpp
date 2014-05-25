@@ -139,47 +139,46 @@ void OutputCalibrationPage::setupVehicle()
         break;
     case SetupWizard::FIXED_WING_AILERON:
         loadSVGFile(FIXEDWING_SVG_FILE);
-        m_wizardIndexes << 0 << 1 << 2 << 3 << 4 << 2 << 3 << 4 << 2 << 3 << 4 << 2 << 3 << 4;
+	m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2; //2 for servoCenterSlider! 
         m_vehicleElementIds << "aileron" << "aileron-frame" << "aileron-motor" << "aileron-ail-left" << "aileron-ail-right" << "aileron-rudder" << "aileron-elevator";
-        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 2 << 2 << 3 << 3 << 3 << 4 << 4 << 4 << 5 << 5 << 5;
-        m_channelIndex << 0 << 0 << 1 << 1 << 1 << 2 << 2 << 2 << 3 << 3 << 3 << 4 << 4 << 4;
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
+        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4;
 
         // see Servo city for an example. 1500 usec is center on MS85mg for example.
         // - http://www.servocity.com/html/hs-85mg__mighty_micro.html
         // make sure Aileron servo one does not go to an extreme value
-        m_actuatorSettings[1].channelMin     = 1500;
+	// would also be nice to make these all default to 50hz so we don't shred servos. 
+
         m_actuatorSettings[1].channelNeutral = 1500;
-        m_actuatorSettings[1].channelMax     = 1500;
         // make sure Aileron servo two does not go to an extreme value
-        m_actuatorSettings[2].channelMin     = 1500;
         m_actuatorSettings[2].channelNeutral = 1500;
-        m_actuatorSettings[2].channelMax     = 1500;
         // make sure Elevator servo one does not go to an extreme value
-        m_actuatorSettings[3].channelMin     = 1500;
-        m_actuatorSettings[4].channelNeutral = 1500;
-        m_actuatorSettings[3].channelMax     = 1500;
+        m_actuatorSettings[3].channelNeutral = 1500;
         // make sure Rudder servo one does not go to an extreme value
-        m_actuatorSettings[4].channelMin     = 1500;
         m_actuatorSettings[4].channelNeutral = 1500;
-        m_actuatorSettings[4].channelMax     = 1500;
+        m_actuatorSettings[4].channelNeutral = 1500;
+        m_actuatorSettings[5].channelNeutral = 1500;
+        m_actuatorSettings[6].channelNeutral = 1500;
+        m_actuatorSettings[7].channelNeutral = 1500;
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
     case SetupWizard::FIXED_WING_VTAIL:
         loadSVGFile(FIXEDWING_SVG_FILE);
-        m_wizardIndexes << 0 << 1 << 2 << 3 << 4 << 2 << 3 << 4;
+	m_wizardIndexes << 0 << 1 << 2 << 2; //2 for servoCenterSlider! 
         m_vehicleElementIds << "v-tail" << "v-tail-frame" << "v-tail-motor" << "v-tail-elevon-left" << "v-tail-elevon-right";
-        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 2 << 2 << 3 << 3 << 3;
-        m_channelIndex << 0 << 0 << 1 << 1 << 1 << 2 << 2 << 2;
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3;
+        m_channelIndex << 0 << 0 << 1 << 2;
 
         // make sure elevon servo one does not go to an extreme value
-        m_actuatorSettings[1].channelMin     = 1500;
         m_actuatorSettings[1].channelNeutral = 1500;
-        m_actuatorSettings[1].channelMax     = 1500;
         // make sure elevon servo two does not go to an extreme value
-        m_actuatorSettings[2].channelMin     = 1500;
         m_actuatorSettings[2].channelNeutral = 1500;
-        m_actuatorSettings[2].channelMax     = 1500;
+        m_actuatorSettings[3].channelNeutral = 1500;
+        m_actuatorSettings[4].channelNeutral = 1500;
+        m_actuatorSettings[5].channelNeutral = 1500;
+        m_actuatorSettings[6].channelNeutral = 1500;
+        m_actuatorSettings[7].channelNeutral = 1500;
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;

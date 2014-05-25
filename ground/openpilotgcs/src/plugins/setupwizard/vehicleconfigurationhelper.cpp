@@ -306,7 +306,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         addModifiedObject(actSettings, tr("Writing actuator settings"));
         break;
     }
-/*
+
     case VehicleConfigurationSource::VEHICLE_FIXEDWING:
     {
         ActuatorSettings::DataFields data = actSettings->getData();
@@ -317,12 +317,14 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         for (quint16 i = 1; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
             data.ChannelType[i]    = ActuatorSettings::CHANNELTYPE_PWM;
             data.ChannelAddr[i]    = i;
-            data.ChannelMin[i]     = 1500;
             data.ChannelNeutral[i] = 1500;
-            data.ChannelMax[i]     = 1500;
         }
+	qDebug() << "Save Fixed Wing Actuator Data\n";
+        actSettings->setData(data);
+        addModifiedObject(actSettings, tr("Writing actuator settings"));
+	break;
     }
-*/
+
     case VehicleConfigurationSource::VEHICLE_HELI:
     case VehicleConfigurationSource::VEHICLE_SURFACE:
         // TODO: Implement settings for other vehicle types?

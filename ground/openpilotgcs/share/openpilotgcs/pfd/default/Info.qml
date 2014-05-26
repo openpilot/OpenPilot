@@ -10,6 +10,25 @@ Item {
         sceneSize: info.sceneSize
     }
 
+    SvgElementImage {
+        id: batinfo_energy
+        elementName: "warning-low-energy"
+        sceneSize: info.sceneSize
+        Rectangle {
+            anchors.fill: batinfo_energy
+            border.width: 0
+            // Alarm based on FlightBatteryState.EstimatedFlightTime < 120s orange, < 60s red
+            color: (FlightBatteryState.EstimatedFlightTime <= 120 && FlightBatteryState.EstimatedFlightTime > 60 ? "orange" :
+                   (FlightBatteryState.EstimatedFlightTime <= 60 ? "red": "black"))
+        }
+    }
+
+    SvgElementImage {
+        id: energy_label
+        elementName: "battery-milliamp-label"
+        sceneSize: info.sceneSize
+    }
+
     Repeater {
         id: satNumberBar
 
@@ -139,8 +158,6 @@ Item {
             visible: throttleNumberBar.throttleNumber >= minThrottleNumber
         }
     }
-
-
 
     SvgElementImage {
         id: mask_ThrottleBar

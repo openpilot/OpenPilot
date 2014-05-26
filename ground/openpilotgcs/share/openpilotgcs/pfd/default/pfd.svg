@@ -7,7 +7,6 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="640"
@@ -15,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="pfd.svg.2014_05_25_21_18_35.0.svg"
+   sodipodi:docname="pfd.svg"
    inkscape:export-filename="/Users/muralha/Desktop/new PFD ideas/pfd/test2.png"
    inkscape:export-xdpi="72"
    inkscape:export-ydpi="72">
@@ -28,7 +27,7 @@
          offset="0"
          id="stop4621" />
       <stop
-         style="stop-color:#000000;stop-opacity:0.11764706;"
+         style="stop-color:#000000;stop-opacity:0.35294119;"
          offset="1"
          id="stop4623" />
     </linearGradient>
@@ -51,17 +50,6 @@
          stdDeviation="125.9375"
          id="feGaussianBlur4993" />
     </filter>
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient4619"
-       id="radialGradient4625"
-       cx="320.25"
-       cy="240.25"
-       fx="320.25"
-       fy="240.25"
-       r="320.75"
-       gradientTransform="matrix(1,0,0,0.75058457,0,59.922058)"
-       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -70,11 +58,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.29375"
-     inkscape:cx="646.12508"
-     inkscape:cy="427.22933"
+     inkscape:zoom="0.46790582"
+     inkscape:cx="320"
+     inkscape:cy="240"
      inkscape:document-units="px"
-     inkscape:current-layer="layer48"
+     inkscape:current-layer="warning-master-caution"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -133,7 +121,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1149,13 +1137,15 @@
      id="layer3"
      inkscape:label="info"
      style="display:inline"
-     transform="translate(0,-4)">
+     transform="translate(0,-4)"
+     sodipodi:insensitive="true">
     <g
        inkscape:groupmode="layer"
        id="layer48"
        inkscape:label="info-bg"
        style="display:inline"
-       transform="translate(0,4)">
+       transform="translate(0,4)"
+       sodipodi:insensitive="true">
       <g
          id="info-bg"
          inkscape:label="#g4460">
@@ -1506,13 +1496,15 @@
        inkscape:groupmode="layer"
        id="g4727"
        inkscape:label="battery"
-       style="display:inline">
+       style="display:inline"
+       sodipodi:insensitive="true">
       <g
          inkscape:groupmode="layer"
          id="layer66"
          inkscape:label="battery-milliamp-text"
          transform="translate(0,1.768481)"
-         style="display:inline">
+         style="display:inline"
+         sodipodi:insensitive="true">
         <g
            style="font-size:10px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
            id="battery-milliamp-text"
@@ -1549,7 +1541,8 @@
          id="layer64"
          inkscape:groupmode="layer"
          transform="translate(0,0.768478)"
-         style="display:inline">
+         style="display:inline"
+         sodipodi:insensitive="true">
         <g
            id="battery-amp-text"
            style="font-size:10px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
@@ -2015,7 +2008,8 @@
        inkscape:groupmode="layer"
        id="layer59"
        inkscape:label="telemetry"
-       style="display:inline">
+       style="display:inline"
+       sodipodi:insensitive="true">
       <g
          inkscape:groupmode="layer"
          id="layer45"
@@ -2065,7 +2059,8 @@
          inkscape:groupmode="layer"
          id="layer54"
          inkscape:label="telemetry-rx"
-         style="display:inline">
+         style="display:inline"
+         sodipodi:insensitive="true">
         <path
            inkscape:label="#path10180"
            inkscape:connector-curvature="0"
@@ -2227,7 +2222,8 @@
          inkscape:groupmode="layer"
          id="layer55"
          inkscape:label="telemetry-tx"
-         style="display:inline">
+         style="display:inline"
+         sodipodi:insensitive="true">
         <path
            style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
            d="M 110,18.095328 110,7.012414"
@@ -2504,7 +2500,8 @@
        inkscape:groupmode="layer"
        id="layer23"
        inkscape:label="info-fg"
-       style="display:inline">
+       style="display:inline"
+       sodipodi:insensitive="true">
       <path
          style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
          d="m 25,51.418075 60,0.08193 0,-22.998652 -6,-0.0014 0,22.992116 -6,-0.0088 0,-20.97668 6,0.04472 -6,-0.04472 0,2.12303 -6,3.48e-4 0,18.845475 -6,-0.0069 0.02494,-16.83188 5.97506,-0.007 -6.024941,0.007 0.02494,1.934623 -6,-0.07128 0,14.959092 -6,-0.0081 0,-12.950991 6,-3.28e-4 -6,3.28e-4 0,2 -6,0 0,10.942406 0,-8.942406 -6,0 0,8.93472 0,-6.93472 -6,0 0,6.926248 0,-4.926248 -6,5e-6 z"
@@ -4682,14 +4679,12 @@
      inkscape:groupmode="layer"
      id="layer67"
      inkscape:label="warnings"
-     style="display:none"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <g
        inkscape:groupmode="layer"
        id="layer68"
        inkscape:label="warnings-bg"
-       style="display:inline"
-       sodipodi:insensitive="true">
+       style="display:inline">
       <rect
          style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.0059247;display:inline"
          id="warnings-bg"
@@ -4703,8 +4698,7 @@
        inkscape:groupmode="layer"
        id="layer51"
        inkscape:label="warning-autopilot"
-       style="display:inline"
-       sodipodi:insensitive="true">
+       style="display:inline">
       <g
          id="warning-autopilot"
          inkscape:label="#g4860">
@@ -4718,7 +4712,8 @@
            inkscape:label="#rect4824" />
         <g
            style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
-           id="warning-autopilot-label">
+           id="warning-autopilot-label"
+           transform="translate(0,0.73039)">
           <path
              d="m 393.41498,468.10666 -1.60547,4.35351 3.2168,0 -1.61133,-4.35351 m -0.66797,-1.16602 1.3418,0 3.33398,8.74805 -1.23047,0 -0.79687,-2.24414 -3.94336,0 -0.79688,2.24414 -1.24804,0 3.33984,-8.74805"
              style="font-size:12px;fill:#ffffff"
@@ -4771,8 +4766,7 @@
        inkscape:groupmode="layer"
        id="layer29"
        inkscape:label="warning-master-caution"
-       style="display:inline"
-       sodipodi:insensitive="true">
+       style="display:inline">
       <g
          id="warning-master-caution"
          inkscape:label="#g4850">
@@ -4786,7 +4780,8 @@
         <g
            style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
            id="warning-master-caution-label"
-           inkscape:label="#warning-master-caution-label">
+           inkscape:label="#warning-master-caution-label"
+           transform="translate(-0.37041,0.11598)">
           <path
              d="m 267.67041,467.55505 1.76367,0 2.23242,5.95313 2.24414,-5.95313 1.76368,0 0,8.74805 -1.1543,0 0,-7.68164 -2.25586,6 -1.18945,0 -2.25586,-6 0,7.68164 -1.14844,0 0,-8.74805"
              style="font-size:12px;fill:#ffffff;-inkscape-font-specification:Sans"
@@ -4859,8 +4854,7 @@
        inkscape:groupmode="layer"
        id="layer33"
        inkscape:label="warning-rc-input"
-       style="display:inline"
-       sodipodi:insensitive="true">
+       style="display:inline">
       <g
          id="warning-rc-input"
          inkscape:label="#g4855">
@@ -5060,7 +5054,7 @@
      inkscape:label="foreground_layer"
      sodipodi:insensitive="true">
     <rect
-       style="fill:url(#radialGradient4625);fill-opacity:1;stroke:none"
+       style="fill:none;stroke:none"
        id="foreground"
        width="641.5"
        height="481.5"

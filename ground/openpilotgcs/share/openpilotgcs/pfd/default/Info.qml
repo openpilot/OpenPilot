@@ -77,72 +77,52 @@ Item {
             visible: rxNumberBar.rxRateNumber >= minRxRateNumber
         }
     }
-    Item {
-        id: battery_voltage
 
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "battery-volt-text")
-
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
-        width: scaledBounds.width * sceneItem.width
-        height: scaledBounds.height * sceneItem.height
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "battery-volt-text"
         visible: FlightBatteryState.Voltage > 0
 
         Text {
-            id: battery_volt
-            text:  FlightBatteryState.Voltage.toFixed(2)
+            text: FlightBatteryState.Voltage.toFixed(2)
+            anchors.centerIn: parent
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 1.2
+                pixelSize: parent.height * 1.3
             }
-            anchors.centerIn: parent
         }
     }
 
-   Item {
-        id: battery_current
-
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "battery-amp-text")
-
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
-        width: scaledBounds.width * sceneItem.width
-        height: scaledBounds.height * sceneItem.height
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "battery-amp-text"
         visible: FlightBatteryState.Current > 0
 
         Text {
-            id: battery_cur
-            text:  FlightBatteryState.Current.toFixed(2)
+            text: FlightBatteryState.Current.toFixed(2)
+            anchors.centerIn: parent
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 1.2
+                pixelSize: parent.height * 1.3
             }
-            anchors.centerIn: parent
         }
     }
 
-   Item {
-        id: battery_consumed_energy
-
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "battery-milliamp-text")
-
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
-        width: scaledBounds.width * sceneItem.width
-        height: scaledBounds.height * sceneItem.height
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "battery-milliamp-text"
         visible: FlightBatteryState.ConsumedEnergy > 0
 
         Text {
-            id: battery_conso
-            text:  FlightBatteryState.ConsumedEnergy.toFixed()
+            text: FlightBatteryState.ConsumedEnergy.toFixed()
+            anchors.centerIn: parent
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 1.2
+                pixelSize: parent.height * 1.3
             }
-            anchors.centerIn: parent
         }
     }
 
@@ -159,6 +139,8 @@ Item {
             visible: throttleNumberBar.throttleNumber >= minThrottleNumber
         }
     }
+
+
 
     SvgElementImage {
         id: mask_ThrottleBar

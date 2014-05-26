@@ -40,6 +40,7 @@ public:
     MyTabbedStackWidget(QWidget *parent = 0, bool isVertical = false, bool iconAbove = true);
 
     void insertTab(int index, QWidget *tab, const QIcon &icon, const QString &label);
+    void replaceTab(int index, QWidget *tab);
     void removeTab(int index);
     void setIconSize(int size)
     {

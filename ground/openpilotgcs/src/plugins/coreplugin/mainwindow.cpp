@@ -270,7 +270,7 @@ void MainWindow::extensionsInitialized()
 
     // We'll use qApp macro to get the QApplication pointer
     // and set the style sheet application wide.
-    qDebug() << "Setting application style sheet to:" << style;
+    // qDebug() << "Setting application style sheet to:" << style;
     qApp->setStyleSheet(style);
 
     qs->endGroup();

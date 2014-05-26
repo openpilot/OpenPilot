@@ -20,6 +20,8 @@ Item {
             // Alarm based on FlightBatteryState.EstimatedFlightTime < 120s orange, < 60s red
             color: (FlightBatteryState.EstimatedFlightTime <= 120 && FlightBatteryState.EstimatedFlightTime > 60 ? "orange" :
                    (FlightBatteryState.EstimatedFlightTime <= 60 ? "red": "black"))
+
+            visible: FlightBatteryState.ConsumedEnergy > 0
         }
     }
 

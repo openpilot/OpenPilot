@@ -94,6 +94,7 @@ SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/paths.c
+SRC += $(FLIGHTLIB)/plans.c
 SRC += $(FLIGHTLIB)/sanitycheck.c
 
 SRC += $(MATHLIB)/sin_lookup.c

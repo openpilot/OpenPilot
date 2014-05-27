@@ -21,7 +21,7 @@ Item {
         //rotate it around the center of horizon
         transform: Rotation {
             angle: -AttitudeState.Roll
-            origin.y : rollscale.height*2.35
+            origin.y : rollscale.height*2.4
             origin.x : rollscale.width/2
         }
     }

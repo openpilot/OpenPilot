@@ -37,8 +37,7 @@ __IO uint32_t VectorTable[48] __attribute__((section(".ram_vector_table")));
 
 /* Private Function Prototypes */
 void NVIC_Configuration(void);
-void SysTick_Handler(void);
-
+void stopHandler();
 /* Local Macros */
 #define MEM8(addr)  (*((volatile uint8_t *)(addr)))
 #define MEM16(addr) (*((volatile uint16_t *)(addr)))
@@ -73,57 +72,13 @@ void PIOS_SYS_Init(void)
     RCC_AHBPeriphClockCmd(
         RCC_AHBPeriph_GPIOA |
         RCC_AHBPeriph_GPIOB |
-//        RCC_AHBPeriph_GPIOC |
-//        RCC_AHBPeriph_GPIOD |
-//        RCC_AHBPeriph_GPIOE |
-//        RCC_AHBPeriph_GPIOF |
-//        RCC_AHBPeriph_CRC |
         RCC_AHBPeriph_FLITF |
         RCC_AHBPeriph_SRAM |
         RCC_AHBPeriph_DMA1
         , ENABLE);
 
-    /*RCC_APB1PeriphClockCmd(
-        RCC_APB1Periph_TIM2 |
-        RCC_APB1Periph_TIM3 |
-        RCC_APB1Periph_TIM4 |
-        RCC_APB1Periph_TIM5 |
-        RCC_APB1Periph_TIM6 |
-        RCC_APB1Periph_TIM7 |
-        RCC_APB1Periph_TIM12 |
-        RCC_APB1Periph_TIM13 |
-        RCC_APB1Periph_TIM14 |
-        RCC_APB1Periph_WWDG |
-        RCC_APB1Periph_SPI2 |
-        RCC_APB1Periph_SPI3 |
-        RCC_APB1Periph_USART2 |
-        RCC_APB1Periph_USART3 |
-        RCC_APB1Periph_UART4 |
-        RCC_APB1Periph_UART5 |
-        RCC_APB1Periph_I2C1 |
-        RCC_APB1Periph_I2C2 |
-        RCC_APB1Periph_I2C3 |
-        RCC_APB1Periph_CAN1 |
-        RCC_APB1Periph_CAN2 |
-        RCC_APB1Periph_PWR |
-        RCC_APB1Periph_DAC |
-        0, ENABLE);
-*/
     RCC_APB2PeriphClockCmd(
-//        RCC_APB2Periph_TIM1 |
-//        RCC_APB2Periph_TIM8 |
-//        RCC_APB2Periph_USART1 |
-//        RCC_APB2Periph_USART6 |
-//        RCC_APB2Periph_ADC |
-//        RCC_APB2Periph_ADC1 |
-//        RCC_APB2Periph_ADC2 |
-//        RCC_APB2Periph_ADC3 |
-//        RCC_APB2Periph_SDIO |
-//        RCC_APB2Periph_SPI1 |
         RCC_APB2Periph_SYSCFG |
-//        RCC_APB2Periph_TIM9 |
-//        RCC_APB2Periph_TIM10 |
-//        RCC_APB2Periph_TIM11 |
         0, ENABLE);
 
     /*
@@ -177,8 +132,6 @@ int32_t PIOS_SYS_Reset(void)
     PIOS_LED_Off(PIOS_LED_ALARM);
 #endif /* PIOS_LED_ALARM */
 
-    /* XXX F10x port resets most (but not all) peripherals ... do we care? */
-
     /* Reset STM32 */
     NVIC_SystemReset();
 
@@ -210,7 +163,7 @@ int32_t PIOS_SYS_SerialNumberGetBinary(uint8_t *array)
 
     /* Stored in the so called "electronic signature" */
     for (i = 0; i < PIOS_SYS_SERIAL_NUM_BINARY_LEN; ++i) {
-        uint8_t b = MEM8(0x1fff7a10 + i);
+        uint8_t b = MEM8(0x1FFFF7AC + i);
 
         array[i] = b;
     }
@@ -231,7 +184,7 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 
     /* Stored in the so called "electronic signature" */
     for (i = 0; i < PIOS_SYS_SERIAL_NUM_ASCII_LEN; ++i) {
-        uint8_t b = MEM8(0x1fff7a10 + (i / 2));
+        uint8_t b = MEM8(0x1FFFF7AC + (i / 2));
         if (!(i & 1)) {
             b >>= 4;
         }
@@ -251,13 +204,15 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 void NVIC_Configuration(void)
 {
     /* Relocate by software the vector table to the internal SRAM at 0x20000000 ***/
-    extern void *pios_isr_vector_table_base;
+    extern uint32_t pios_isr_vector_table_base;
+    uint32_t *romTable = &pios_isr_vector_table_base;
 
     /* Copy the vector table from the Flash (mapped at the base of the application
-    load address 0x08003000) to the base address of the SRAM at 0x20000000. */
+    load address 0x0800X000) to the base address of the SRAM at 0x20000000. */
+
     for(uint32_t i = 0; i < 48; i++)
     {
-        VectorTable[i] = *(__IO uint32_t*)(pios_isr_vector_table_base + (i<<2));
+        VectorTable[i] = romTable[i];
     }
 
     /* Enable the SYSCFG peripheral clock*/
@@ -305,6 +260,36 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* ifdef USE_FULL_ASSERT */
 
+void NMI_Handler(void)
+{
+    stopHandler();
+}
+
+void HardFault_Handler(void)
+{
+    stopHandler();
+}
+
+void MemManage_Handler(void)
+{
+    stopHandler();
+}
+
+void BusFault_Handler(void)
+{
+    stopHandler();
+}
+
+void UsageFault_Handler(void)
+{
+    stopHandler();
+}
+
+void stopHandler(){
+    while (1)
+    {
+    }
+}
 #endif /* PIOS_INCLUDE_SYS */
 
 /**

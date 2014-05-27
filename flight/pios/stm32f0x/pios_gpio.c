@@ -56,15 +56,6 @@ int32_t PIOS_GPIO_Init(uint32_t *gpios_dev_id, const struct pios_gpio_cfg *cfg)
         case (uint32_t)GPIOC:
             RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
             break;
-        case (uint32_t)GPIOD:
-            RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD, ENABLE);
-            break;
-        case (uint32_t)GPIOE:
-            RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOE, ENABLE);
-            break;
-        case (uint32_t)GPIOF:
-            RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF, ENABLE);
-            break;
         default:
             PIOS_Assert(0);
             break;
@@ -100,9 +91,9 @@ void PIOS_GPIO_On(uint32_t gpios_dev_id, uint8_t gpio_id)
     const struct pios_gpio *gpio = &(gpio_cfg->gpios[gpio_id]);
 
     if (gpio->active_low) {
-        GPIO_ResetBits(gpio->pin.gpio, gpio->pin.init.GPIO_Pin);
+        gpio->pin.gpio->BRR = gpio->pin.init.GPIO_Pin;
     } else {
-        GPIO_SetBits(gpio->pin.gpio, gpio->pin.init.GPIO_Pin);
+        gpio->pin.gpio->BSRR = gpio->pin.init.GPIO_Pin;
     }
 }
 
@@ -124,9 +115,9 @@ void PIOS_GPIO_Off(uint32_t gpios_dev_id, uint8_t gpio_id)
     const struct pios_gpio *gpio = &(gpio_cfg->gpios[gpio_id]);
 
     if (gpio->active_low) {
-        GPIO_SetBits(gpio->pin.gpio, gpio->pin.init.GPIO_Pin);
+        gpio->pin.gpio->BSRR = gpio->pin.init.GPIO_Pin;
     } else {
-        GPIO_ResetBits(gpio->pin.gpio, gpio->pin.init.GPIO_Pin);
+        gpio->pin.gpio->BRR = gpio->pin.init.GPIO_Pin;
     }
 }
 
@@ -147,19 +138,12 @@ void PIOS_GPIO_Toggle(uint32_t gpios_dev_id, uint8_t gpio_id)
 
     const struct pios_gpio *gpio = &(gpio_cfg->gpios[gpio_id]);
 
-    if (GPIO_ReadOutputDataBit(gpio->pin.gpio, gpio->pin.init.GPIO_Pin) == Bit_SET) {
-        if (gpio->active_low) {
-            PIOS_GPIO_On(gpios_dev_id, gpio_id);
-        } else {
-            PIOS_GPIO_Off(gpios_dev_id, gpio_id);
-        }
+    if (((gpio->pin.gpio->ODR & gpio->pin.init.GPIO_Pin) != 0) ^ gpio->active_low ) {
+        PIOS_GPIO_Off(gpios_dev_id, gpio_id);
     } else {
-        if (gpio->active_low) {
-            PIOS_GPIO_Off(gpios_dev_id, gpio_id);
-        } else {
-            PIOS_GPIO_On(gpios_dev_id, gpio_id);
-        }
+        PIOS_GPIO_On(gpios_dev_id, gpio_id);
     }
+
 }
 
 #endif /* PIOS_INCLUDE_GPIO */

@@ -153,12 +153,17 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
 
     /* Enable the USART Pins Software Remapping */
     if (usart_dev->cfg->remap) {
-        GPIO_PinRemapConfig(usart_dev->cfg->remap, ENABLE);
+        GPIO_PinAFConfig(usart_dev->cfg->rx.gpio,
+                         __builtin_ctz(usart_dev->cfg->rx.init.GPIO_Pin),
+                         usart_dev->cfg->remap);
+        GPIO_PinAFConfig(usart_dev->cfg->tx.gpio,
+                         __builtin_ctz(usart_dev->cfg->tx.init.GPIO_Pin),
+                         usart_dev->cfg->remap);
     }
 
     /* Initialize the USART Rx and Tx pins */
-    GPIO_Init(usart_dev->cfg->rx.gpio, &usart_dev->cfg->rx.init);
-    GPIO_Init(usart_dev->cfg->tx.gpio, &usart_dev->cfg->tx.init);
+    GPIO_Init(usart_dev->cfg->rx.gpio, (GPIO_InitTypeDef*)&usart_dev->cfg->rx.init);
+    GPIO_Init(usart_dev->cfg->tx.gpio, (GPIO_InitTypeDef*)&usart_dev->cfg->tx.init);
 
     /* Enable USART clock */
     switch ((uint32_t)usart_dev->cfg->regs) {
@@ -174,7 +179,7 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
     }
 
     /* Configure the USART */
-    USART_Init(usart_dev->cfg->regs, &usart_dev->cfg->init);
+    USART_Init(usart_dev->cfg->regs, (USART_InitTypeDef*)&usart_dev->cfg->init);
 
     *usart_id = (uint32_t)usart_dev;
 
@@ -190,7 +195,7 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
         PIOS_USART_3_id = (uint32_t)usart_dev;
         break;
     }
-    NVIC_Init(&usart_dev->cfg->irq.init);
+    NVIC_Init((NVIC_InitTypeDef*)&usart_dev->cfg->irq.init);
     USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
     USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
 
@@ -290,12 +295,12 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
     PIOS_Assert(valid);
 
     /* Force read of dr after sr to make sure to clear error flags */
-    volatile uint16_t sr = usart_dev->cfg->regs->SR;
-    volatile uint8_t dr  = usart_dev->cfg->regs->DR;
+    volatile uint16_t sr = usart_dev->cfg->regs->ISR;
+    volatile uint8_t dr  = usart_dev->cfg->regs->RDR;
 
     /* Check if RXNE flag is set */
     bool rx_need_yield   = false;
-    if (sr & USART_SR_RXNE) {
+    if (sr & USART_ISR_RXNE) {
         uint8_t byte = dr;
         if (usart_dev->rx_in_cb) {
             uint16_t rc;
@@ -309,7 +314,7 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 
     /* Check if TXE flag is set */
     bool tx_need_yield = false;
-    if (sr & USART_SR_TXE) {
+    if (sr & USART_ISR_TXE) {
         if (usart_dev->tx_out_cb) {
             uint8_t b;
             uint16_t bytes_to_send;
@@ -318,7 +323,7 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 
             if (bytes_to_send > 0) {
                 /* Send the byte we've been given */
-                usart_dev->cfg->regs->DR = b;
+                usart_dev->cfg->regs->TDR = b;
             } else {
                 /* No bytes to send, disable TXE interrupt */
                 USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, DISABLE);

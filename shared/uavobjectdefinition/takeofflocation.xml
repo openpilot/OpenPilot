@@ -1,0 +1,14 @@
+<xml>
+    <object name="TakeOffLocation" singleinstance="true" settings="true" category="Navigation">
+        <description>TakeOffLocation setting which contains the destination of a ReturnToBase operation</description>
+        <field name="North" units="m" type="float" elements="1" defaultvalue="0" />
+        <field name="East" units="m" type="float" elements="1" defaultvalue="0" />
+        <field name="Down" units="m" type="float" elements="1" defaultvalue="0" />
+        <field name="Mode" units="" type="enum" elements="1" options="ArmingLocation,FirstArmingLocation,Preset" defaultvalue="ArmingLocation"/>
+        <field name="Status" units="" type="enum" elements="1" options="Valid,Invalid" defaultvalue="Invalid"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

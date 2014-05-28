@@ -47,11 +47,13 @@
 #include <magsensor.h>
 #include "accelgyrosettings.h"
 
-
 // Calibration data
 #include <accelgyrosettings.h>
 #include <revocalibration.h>
 #include <revosettings.h>
+
+#include "../wizardmodel.h"
+
 namespace OpenPilot {
 typedef struct {
     // this is not needed for revo, but should for CC/CC3D
@@ -85,10 +87,13 @@ typedef struct {
     float accelGyroTempMin;
     float accelGyroTempMax;
 } thermalCalibrationResults;
+
 class ThermalCalibrationHelper : public QObject {
     Q_OBJECT
+
 public:
     explicit ThermalCalibrationHelper(QObject *parent = 0);
+
     float temperature()
     {
         return m_temperature;
@@ -103,6 +108,7 @@ public:
     {
         return m_processPercentage;
     }
+
     void endAcquisition();
 
     bool calibrationSuccessful()
@@ -112,12 +118,13 @@ public:
     }
 
 signals:
+    void instructionsAdded(QString text, WizardModel::MessageType type = WizardModel::Info);
     void statusRestoreCompleted(bool succesful);
     void statusSaveCompleted(bool succesful);
     void setupBoardCompleted(bool succesful);
     void temperatureChanged(float value);
-    void gradientChanged(float value);
-    void processPercentageChanged(int percentage);
+    void temperatureGradientChanged(float value);
+    void progressChanged(int value);
     void collectionCompleted();
     void calculationCompleted();
     void abort();
@@ -152,12 +159,17 @@ public slots:
     void calculate();
 
     void collectSample(UAVObject *sample);
-    void setProcessPercentage(int value)
+    void setProgress(int value)
     {
         if (m_processPercentage != value) {
             m_processPercentage = value;
-            emit processPercentageChanged(value);
+            emit progressChanged(value);
         }
+    }
+
+    void addInstructions(QString text, WizardModel::MessageType type = WizardModel::Info)
+    {
+        emit instructionsAdded(text, type);
     }
 
     void cleanup();

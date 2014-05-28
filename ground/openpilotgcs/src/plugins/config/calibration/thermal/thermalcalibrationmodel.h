@@ -30,25 +30,21 @@
 #define THERMALCALIBRATIONMODEL_H
 
 #include "thermalcalibrationhelper.h"
-
+#include "../wizardstate.h"
+#include "../wizardmodel.h"
 
 #include <QObject>
 #include <QState>
 #include <QStateMachine>
-#include "../wizardstate.h"
-#include "../wizardmodel.h"
 
 namespace OpenPilot {
-
 class ThermalCalibrationModel : public WizardModel {
-    Q_PROPERTY(bool startEnable READ startEnabled NOTIFY startEnabledChanged)
+    Q_OBJECT Q_PROPERTY(bool startEnable READ startEnabled NOTIFY startEnabledChanged)
     Q_PROPERTY(bool endEnable READ endEnabled NOTIFY endEnabledChanged)
     Q_PROPERTY(bool cancelEnable READ cancelEnabled NOTIFY cancelEnabledChanged)
-
     Q_PROPERTY(float temperature READ temperature NOTIFY temperatureChanged)
     Q_PROPERTY(float temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
     Q_PROPERTY(int progress READ progress WRITE setProgress NOTIFY progressChanged)
-    Q_OBJECT
 
 public:
     explicit ThermalCalibrationModel(QObject *parent = 0);
@@ -92,7 +88,6 @@ public:
         }
     }
 
-
 public slots:
     int progress()
     {
@@ -125,13 +120,10 @@ public slots:
         }
     }
 
-    void setProgress(int status)
+    void setProgress(int progress)
     {
-        m_progress = status;
-        emit progressChanged(status);
-        if (this->currentState()) {
-            setInstructions(this->currentState()->stepName());
-        }
+        m_progress = progress;
+        emit progressChanged(progress);
     }
 
 private:
@@ -164,7 +156,7 @@ private:
     WizardState *m_finalizeState;
     // revert board settings if something goes wrong
     WizardState *m_abortState;
-    // just the same as readystate, but it is reached after havign completed the calibration
+    // just the same as ready state, but it is reached after having completed the calibration
     WizardState *m_completedState;
     void setTransitions();
 
@@ -184,14 +176,13 @@ signals:
     void previous();
     void abort();
 
- public slots:
+public slots:
     void stepChanged(WizardState *state);
     void init();
     void btnStart()
     {
         // HACKS
         // clear instructions
-        setInstructions(QString());
         emit temperatureGradientChanged(0);
         // END OF HACKS
         emit next();
@@ -213,10 +204,10 @@ signals:
     }
     void wizardStarted()
     {
+        started();
         setStartEnabled(false);
         setEndEnabled(true);
         setCancelEnabled(true);
-        started();
     }
 };
 }

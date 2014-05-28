@@ -199,7 +199,7 @@ bool ThermalCalibrationHelper::restoreInitialSettings()
 
 void ThermalCalibrationHelper::setupBoard()
 {
-    setProcessPercentage(ProcessPercentageSetupBoard);
+    setProgress(ProcessPercentageSetupBoard);
     if (setupBoardForCalibration()) {
         emit setupBoardCompleted(true);
     } else {
@@ -219,7 +219,7 @@ void ThermalCalibrationHelper::statusRestore()
 
 void ThermalCalibrationHelper::statusSave()
 {
-    setProcessPercentage(ProcessPercentageSaveSettings);
+    setProgress(ProcessPercentageSaveSettings);
     // prevent saving multiple times
     if (!isBoardInitialSettingsSaved() && saveBoardInitialSettings()) {
         emit statusSaveCompleted(true);
@@ -230,7 +230,7 @@ void ThermalCalibrationHelper::statusSave()
 
 void ThermalCalibrationHelper::initAcquisition()
 {
-    setProcessPercentage(ProcessPercentageBaseAcquisition);
+    setProgress(ProcessPercentageBaseAcquisition);
     QMutexLocker lock(&sensorsUpdateLock);
     m_targetduration  = 0;
     m_gradient = 0.0f;
@@ -325,7 +325,7 @@ void ThermalCalibrationHelper::cleanup()
 
 void ThermalCalibrationHelper::calculate()
 {
-    setProcessPercentage(ProcessPercentageBaseCalculation);
+    setProgress(ProcessPercentageBaseCalculation);
     int count = m_baroSamples.count();
     Eigen::VectorXf datax(count);
     Eigen::VectorXf datay(1);
@@ -341,7 +341,7 @@ void ThermalCalibrationHelper::calculate()
 
     m_results.baroTempMin    = datat.array().minCoeff();
     m_results.baroTempMax    = datat.array().maxCoeff();
-    setProcessPercentage(processPercentage() + 2);
+    setProgress(processPercentage() + 2);
     count = m_gyroSamples.count();
     datax.resize(count);
     datay.resize(count);
@@ -360,7 +360,7 @@ void ThermalCalibrationHelper::calculate()
     m_results.accelGyroTempMax = datat.array().maxCoeff();
     // TODO: sanity checks needs to be enforced before accel calibration can be enabled and usable.
     /*
-       setProcessPercentage(processPercentage() + 2);
+       setProgress(processPercentage() + 2);
        count = m_accelSamples.count();
        datax.resize(count);
        datay.resize(count);
@@ -413,7 +413,7 @@ void ThermalCalibrationHelper::updateTemp(float temp)
         // gradient is expressed in °C/min
         float gradient = 60.0 * (m_temperature - m_lastCheckpointTemp) / (float)secondsSinceLastCheck;
         m_gradient = gradient;
-        emit gradientChanged(gradient);
+        emit temperatureGradientChanged(gradient);
 
         qDebug() << "Temp Gradient " << gradient << " Elapsed" << elapsed;
         m_debugStream << "INFO::Trace Temp Gradient " << gradient << " Elapsed" << elapsed << endl;
@@ -431,10 +431,9 @@ void ThermalCalibrationHelper::updateTemp(float temp)
         }
 
         if (m_targetduration != 0) {
-            int tmp = ((ProcessPercentageBaseCalculation - ProcessPercentageBaseAcquisition)
-                       * elapsed) / m_targetduration;
+            int tmp = ((ProcessPercentageBaseCalculation - ProcessPercentageBaseAcquisition) * elapsed) / m_targetduration;
             tmp = tmp > ProcessPercentageBaseCalculation - 5 ? ProcessPercentageBaseCalculation - 5 : tmp;
-            setProcessPercentage(tmp);
+            setProgress(tmp);
         } else if (m_gradient > .1 && m_initialGradient / 2.0f > m_gradient) {
             qDebug() << "M_gradient " << m_gradient << " Elapsed" << elapsed << " m_initialGradient" << m_initialGradient;
             // make a rough estimation of the time needed

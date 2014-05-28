@@ -28,13 +28,16 @@
 
 #ifndef SETTINGSHANDLINGTRANSITIONS_H
 #define SETTINGSHANDLINGTRANSITIONS_H
+
+#include "thermalcalibrationhelper.h"
+
 #include <QSignalTransition>
 #include <QEventTransition>
 
-#include "thermalcalibrationhelper.h"
 namespace OpenPilot {
 class BoardStatusSaveTransition : public QSignalTransition {
     Q_OBJECT
+
 public:
     BoardStatusSaveTransition(ThermalCalibrationHelper *helper, QState *currentState, QState *targetState)
         : QSignalTransition(helper, SIGNAL(statusSaveCompleted(bool))),
@@ -65,18 +68,21 @@ public:
     {
         Q_UNUSED(e);
     }
+
 public slots:
     void enterState()
     {
+        m_helper->addInstructions(tr("Saving initial settings."));
         m_helper->statusSave();
     }
+
 private:
     ThermalCalibrationHelper *m_helper;
 };
 
-
 class BoardStatusRestoreTransition : public QSignalTransition {
     Q_OBJECT
+
 public:
     BoardStatusRestoreTransition(ThermalCalibrationHelper *helper, QState *currentState, QState *targetState)
         : QSignalTransition(helper, SIGNAL(statusRestoreCompleted(bool))),
@@ -102,12 +108,15 @@ public:
         }
         return false;
     }
+
 public slots:
     void enterState()
     {
+        m_helper->addInstructions(tr("Restoring board configuration."));
         m_helper->endAcquisition();
         m_helper->statusRestore();
     }
+
 private:
     ThermalCalibrationHelper *m_helper;
 };

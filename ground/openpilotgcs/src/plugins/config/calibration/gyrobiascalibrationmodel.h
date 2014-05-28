@@ -37,7 +37,6 @@
 #include <QObject>
 
 namespace OpenPilot {
-
 class GyroBiasCalibrationModel : public QObject {
     Q_OBJECT
 

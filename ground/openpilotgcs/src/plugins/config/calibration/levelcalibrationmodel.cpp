@@ -34,7 +34,6 @@
 static const int LEVEL_SAMPLES = 100;
 
 namespace OpenPilot {
-
 LevelCalibrationModel::LevelCalibrationModel(QObject *parent) :
     QObject(parent)
 {}
@@ -62,8 +61,8 @@ void LevelCalibrationModel::start()
     mdata.flightTelemetryUpdatePeriod = 100;
     attitudeState->setMetadata(mdata);
 
-    /* Show instructions and enable controls */
-    displayInstructions(tr("Place horizontally and click Save Position button..."), WizardModel::Info);
+    // Show instructions and enable controls
+    displayInstructions(tr("Place horizontally and press Save Position..."), WizardModel::Prompt);
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
     savePositionEnabledChanged(true);
     position = 0;
@@ -130,7 +129,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             rot_data_pitch = OpenPilot::CalibrationUtils::listMean(rot_accum_pitch);
             rot_data_roll  = OpenPilot::CalibrationUtils::listMean(rot_accum_roll);
 
-            displayInstructions(tr("Leave horizontally, rotate 180° along yaw axis and click Save Position button..."));
+            displayInstructions(tr("Leave horizontally, rotate 180° along yaw axis and press Save Position..."), WizardModel::Prompt);
             displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_SWD);
 
             savePositionEnabledChanged(true);
@@ -143,7 +142,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             attitudeState->setMetadata(initialAttitudeStateMdata);
             compute();
             displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
-            displayInstructions(tr("Board leveling completed successfully."));
+            displayInstructions(tr("Board leveling completed successfully."), WizardModel::Success);
             break;
         }
     }
@@ -174,5 +173,4 @@ UAVObjectManager *LevelCalibrationModel::getObjectManager()
     Q_ASSERT(objMngr);
     return objMngr;
 }
-
 }

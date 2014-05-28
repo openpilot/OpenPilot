@@ -42,7 +42,6 @@
 #include <QString>
 
 namespace OpenPilot {
-
 class SixPointCalibrationModel : public QObject {
     Q_OBJECT
 

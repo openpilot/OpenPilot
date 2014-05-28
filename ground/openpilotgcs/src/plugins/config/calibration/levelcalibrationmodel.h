@@ -41,7 +41,6 @@
 #include <QList>
 
 namespace OpenPilot {
-
 class LevelCalibrationModel : public QObject {
     Q_OBJECT
 

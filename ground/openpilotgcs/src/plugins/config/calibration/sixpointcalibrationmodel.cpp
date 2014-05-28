@@ -41,7 +41,6 @@
 #define FITTING_USING_CONTINOUS_ACQUISITION
 
 namespace OpenPilot {
-
 SixPointCalibrationModel::SixPointCalibrationModel(QObject *parent) :
     QObject(parent),
     calibrationStepsMag(),
@@ -55,31 +54,31 @@ SixPointCalibrationModel::SixPointCalibrationModel(QObject *parent) :
     calibrationStepsMag.clear();
     calibrationStepsMag
         << CalibrationStep(CALIBRATION_HELPER_IMAGE_NED,
-                           tr("Place horizontally, nose pointing north and click Save Position button..."))
+                           tr("Place horizontally, nose pointing north and press Save Position..."))
         << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
-                       tr("Place with nose down, right side west and click Save Position button..."))
+                       tr("Place with nose down, right side west and press Save Position..."))
         << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
-                       tr("Place right side down, nose west and click Save Position button..."))
+                       tr("Place right side down, nose west and press Save Position..."))
         << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
-                       tr("Place upside down, nose east and click Save Position button..."))
+                       tr("Place upside down, nose east and press Save Position..."))
         << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
-                       tr("Place with nose up, left side north and click Save Position button..."))
+                       tr("Place with nose up, left side north and press Save Position..."))
         << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
-                       tr("Place with left side down, nose south and click Save Position button..."));
+                       tr("Place with left side down, nose south and press Save Position..."));
 
     calibrationStepsAccelOnly.clear();
     calibrationStepsAccelOnly << CalibrationStep(CALIBRATION_HELPER_IMAGE_NED,
-                                                 tr("Place horizontally and click Save Position button..."))
+                                                 tr("Place horizontally and press Save Position..."))
                               << CalibrationStep(CALIBRATION_HELPER_IMAGE_DWN,
-                       tr("Place with nose down and click Save Position button..."))
+                       tr("Place with nose down and press Save Position..."))
                               << CalibrationStep(CALIBRATION_HELPER_IMAGE_WDS,
-                       tr("Place right side down and click Save Position button..."))
+                       tr("Place right side down and press Save Position..."))
                               << CalibrationStep(CALIBRATION_HELPER_IMAGE_ENU,
-                       tr("Place upside down and click Save Position button..."))
+                       tr("Place upside down and press Save Position..."))
                               << CalibrationStep(CALIBRATION_HELPER_IMAGE_USE,
-                       tr("Place with nose up and click Save Position button..."))
+                       tr("Place with nose up and press Save Position..."))
                               << CalibrationStep(CALIBRATION_HELPER_IMAGE_SUW,
-                       tr("Place with left side down and click Save Position button..."));
+                       tr("Place with left side down and press Save Position..."));
 }
 
 /********** Six point calibration **************/
@@ -201,7 +200,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     started();
 
     // Show instructions and enable controls
-    displayInstructions((*currentSteps)[0].instructions, WizardModel::Info);
+    displayInstructions((*currentSteps)[0].instructions, WizardModel::Prompt);
     showHelp((*currentSteps)[0].visualHelp);
     savePositionEnabledChanged(true);
     position = 0;
@@ -212,7 +211,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
 
 /**
  * Saves the data from the aircraft in one of six positions.
- * This is called when they click "save position" and starts
+ * This is called when they press "save position" and starts
  * averaging data for this position.
  */
 void SixPointCalibrationModel::savePositionData()
@@ -314,7 +313,7 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
 
         position = (position + 1) % 6;
         if (position != 0) {
-            displayInstructions((*currentSteps)[position].instructions);
+            displayInstructions((*currentSteps)[position].instructions, WizardModel::Prompt);
             showHelp((*currentSteps)[position].visualHelp);
         } else {
 #ifdef FITTING_USING_CONTINOUS_ACQUISITION
@@ -488,9 +487,9 @@ void SixPointCalibrationModel::compute(bool mag, bool accel)
         } else {
             accelGyroSettings->setData(savedSettings.accelGyroSettings);
         }
-        displayInstructions(tr("Sensor scale and bias computed succesfully."));
+        displayInstructions(tr("Sensor scale and bias computed succesfully."), WizardModel::Success);
     } else {
-        displayInstructions(tr("Bad calibration. Please review the instructions and repeat."), WizardModel::Error);
+        displayInstructions(tr("Bad calibration. Please review the instructions and repeat."), WizardModel::Failure);
     }
     // set to run again
     position = -1;

@@ -109,25 +109,6 @@
 
 #define VERSION_DEFAULT "0.0.0"
 
-#define TEXT_MINOR_LOSS_OF_CONFIGURATION \
-    tr( \
-        " Some of the configured features might not be supported \
-by your version of the plugin. You might want to upgrade the plugin.")
-
-#define TEXT_MISSING_CONFIGURATION \
-    tr( \
-        " Some configuration is missing in the imported config and will be replaced \
-by default settings.")
-
-#define TEXT_MAJOR_LOSS_OF_CONFIGURATION \
-    tr( \
-        " Major features can't be imported \
-by your version of the plugin. You should upgrade the plugin to import these settings.")
-
-#define TEXT_NOT_COMPATIBLE \
-    tr( \
-        " The imported settings are not compatible with this plugin and won't be imported!")
-
 using namespace Core;
 
 UAVConfigInfo::UAVConfigInfo(QObject *parent) :
@@ -188,32 +169,32 @@ bool UAVConfigInfo::askToAbort(int compat, QString message)
         return false;
 
     case MinorLossOfConfiguration:
-        msgBox.setText(tr("INFO: ") + message + TEXT_MINOR_LOSS_OF_CONFIGURATION);
+        msgBox.setText(tr("INFO: ") + message + tr(" Some of the configured features might not be supported by your version of the plugin. You might want to upgrade the plugin."));
         msgBox.setDefaultButton(QMessageBox::Ok);
         result = msgBox.exec();
         break;
 
     case MissingConfiguration:
-        msgBox.setText(tr("WARNING: ") + message + TEXT_MISSING_CONFIGURATION);
+        msgBox.setText(tr("WARNING: ") + message + tr(" Some configuration is missing in the imported config and will be replaced by default settings."));
         msgBox.setDefaultButton(QMessageBox::Ok);
         result = msgBox.exec();
         break;
 
     case MajorLossOfConfiguration:
-        msgBox.setText(tr("ERROR: ") + message + TEXT_MAJOR_LOSS_OF_CONFIGURATION);
+        msgBox.setText(tr("ERROR: ") + message + tr(" Major features can't be imported by your version of the plugin. You should upgrade the plugin to import these settings."));
         msgBox.setDefaultButton(QMessageBox::Cancel);
         result = msgBox.exec();
         break;
 
     case NotCompatible:
-        msgBox.setText("ERROR: " + message + TEXT_NOT_COMPATIBLE);
+        msgBox.setText("ERROR: " + message + tr(" The imported settings are not compatible with this plugin and won't be imported!"));
         msgBox.setInformativeText(tr(""));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
         return true;
 
     default:
-        msgBox.setText("INTERNAL ERROR: " + message + tr("Unknown compatibility level: " + compat));
+        msgBox.setText("INTERNAL ERROR: " + message + tr(" Unknown compatibility level: " + compat));
     }
     if (result == QMessageBox::Ok) {
         return false;

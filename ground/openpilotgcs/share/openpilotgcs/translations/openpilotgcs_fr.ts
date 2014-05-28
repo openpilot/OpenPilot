@@ -4443,7 +4443,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Core::UAVConfigInfo</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+181"/>
+        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+162"/>
         <source>Do you want to continue the import?</source>
         <translation>Voulez-vous continuer l&apos;importation ?</translation>
     </message>
@@ -4453,7 +4453,27 @@ p, li { white-space: pre-wrap; }
         <translation>INFO : </translation>
     </message>
     <message>
+        <location line="+0"/>
+        <source> Some of the configured features might not be supported by your version of the plugin. You might want to upgrade the plugin.</source>
+        <translation type="unfinished"> Certaines des fonctionnalités configurées pourraient ne pas être prises en charge par votre version du plugin. Vous pourriez peut-être mettre à jour le plugin.</translation>
+    </message>
+    <message>
         <location line="+6"/>
+        <source> Some configuration is missing in the imported config and will be replaced by default settings.</source>
+        <translation type="unfinished"> Certains paramètres sont manquants dans la configuration importée et seront remplacés par les paramètres par défaut.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source> Major features can&apos;t be imported by your version of the plugin. You should upgrade the plugin to import these settings.</source>
+        <translation type="unfinished"> Des paramètres primordiaux ne peuvent être importés par votre version du plugin. Vous devriez mettre à jour le plugin pour importer ces paramètres.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source> The imported settings are not compatible with this plugin and won&apos;t be imported!</source>
+        <translation type="unfinished"> Les paramètres importés ne sont pas compatibles avec ce plugin et ne seront pas importés !</translation>
+    </message>
+    <message>
+        <location line="-12"/>
         <source>WARNING: </source>
         <translation>ATTENTION : </translation>
     </message>
@@ -4464,8 +4484,12 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+13"/>
+        <source> Unknown compatibility level: </source>
+        <translation type="unfinished"> Niveau de compatibilité inconnu : </translation>
+    </message>
+    <message>
         <source>Unknown compatibility level: </source>
-        <translation>Niveau de compatibilité inconnu : </translation>
+        <translation type="vanished">Niveau de compatibilité inconnu : </translation>
     </message>
 </context>
 <context>

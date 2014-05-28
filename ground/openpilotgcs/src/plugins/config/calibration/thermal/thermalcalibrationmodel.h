@@ -165,8 +165,8 @@ signals:
     void endEnabledChanged(bool state);
     void cancelEnabledChanged(bool state);
 
-    void started();
-    void stopped();
+    void wizardStarted();
+    void wizardStopped();
 
     void temperatureChanged(float temp);
     void temperatureGradientChanged(float tempGradient);
@@ -195,21 +195,22 @@ public slots:
     {
         emit abort();
     }
-    void wizardReady()
+    void startWizard()
+    {
+        setStartEnabled(false);
+        setEndEnabled(true);
+        setCancelEnabled(true);
+        wizardStarted();
+    }
+    void stopWizard()
     {
         setStartEnabled(true);
         setEndEnabled(false);
         setCancelEnabled(false);
-        stopped();
-    }
-    void wizardStarted()
-    {
-        started();
-        setStartEnabled(false);
-        setEndEnabled(true);
-        setCancelEnabled(true);
+        wizardStopped();
     }
 };
+
 }
 
 #endif // THERMALCALIBRATIONMODEL_H

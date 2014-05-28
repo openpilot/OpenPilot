@@ -106,8 +106,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_thermalCalibrationModel, SIGNAL(startEnabledChanged(bool)), m_ui->ThermalBiasStart, SLOT(setEnabled(bool)));
     connect(m_thermalCalibrationModel, SIGNAL(endEnabledChanged(bool)), m_ui->ThermalBiasEnd, SLOT(setEnabled(bool)));
     connect(m_thermalCalibrationModel, SIGNAL(cancelEnabledChanged(bool)), m_ui->ThermalBiasCancel, SLOT(setEnabled(bool)));
-    connect(m_thermalCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
-    connect(m_thermalCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
+    connect(m_thermalCalibrationModel, SIGNAL(wizardStarted()), this, SLOT(disableAllCalibrations()));
+    connect(m_thermalCalibrationModel, SIGNAL(wizardStopped()), this, SLOT(enableAllCalibrations()));
 
     connect(m_thermalCalibrationModel, SIGNAL(instructionsAdded(QString, WizardModel::MessageType)),
             this, SLOT(addInstructions(QString, WizardModel::MessageType)));

@@ -77,6 +77,7 @@
 #define UPDATE_MAX       1.0f
 #define UPDATE_ALPHA     1.0e-2f
 
+#define ZERO_ROT_ANGLE   0.00001f
 // Private types
 
 // Private variables
@@ -695,22 +696,33 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     }
 
     // Indicates not to expend cycles on rotation
-    if (fabsf(attitudeSettings.BoardRotation.Pitch) < 0.00001f &&
-        fabsf(attitudeSettings.BoardRotation.Roll) < 0.00001f &&
-        fabsf(attitudeSettings.BoardRotation.Yaw) < 0.00001f) {
+    if (fabsf(attitudeSettings.BoardRotation.Roll) < ZERO_ROT_ANGLE
+        && fabsf(attitudeSettings.BoardRotation.Pitch) < ZERO_ROT_ANGLE &&
+        fabsf(attitudeSettings.BoardRotation.Yaw) < ZERO_ROT_ANGLE) {
         rotate = 0;
-
-        // Shouldn't be used but to be safe
-        float rotationQuat[4] = { 1, 0, 0, 0 };
-        Quaternion2R(rotationQuat, R);
     } else {
-        float rotationQuat[4];
-        const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
-                               attitudeSettings.BoardRotation.Pitch,
-                               attitudeSettings.BoardRotation.Yaw };
-        RPY2Quaternion(rpy, rotationQuat);
-        Quaternion2R(rotationQuat, R);
         rotate = 1;
+    }
+    const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
+                           attitudeSettings.BoardRotation.Pitch,
+                           attitudeSettings.BoardRotation.Yaw };
+
+    float rotationQuat[4];
+    RPY2Quaternion(rpy, rotationQuat);
+
+    if (fabsf(attitudeSettings.BoardLevelTrim.Roll) > ZERO_ROT_ANGLE ||
+        fabsf(attitudeSettings.BoardLevelTrim.Pitch) > ZERO_ROT_ANGLE) {
+        float trimQuat[4];
+        float sumQuat[4];
+        rotate = 1;
+
+        const float trimRpy[3] = { attitudeSettings.BoardLevelTrim.Roll, attitudeSettings.BoardLevelTrim.Pitch, 0.0f };
+        RPY2Quaternion(trimRpy, trimQuat);
+
+        quat_mult(rotationQuat, trimQuat, sumQuat);
+        Quaternion2R(sumQuat, R);
+    } else {
+        Quaternion2R(rotationQuat, R);
     }
 
     if (attitudeSettings.TrimFlight == ATTITUDESETTINGS_TRIMFLIGHT_START) {

@@ -26,17 +26,24 @@
  */
 
 #include "levelcalibrationmodel.h"
-#include <attitudestate.h>
-#include <attitudesettings.h>
 #include "extensionsystem/pluginmanager.h"
 #include "calibration/calibrationuiutils.h"
+
+#include <attitudestate.h>
+#include <attitudesettings.h>
 
 static const int LEVEL_SAMPLES = 100;
 
 namespace OpenPilot {
 LevelCalibrationModel::LevelCalibrationModel(QObject *parent) :
-    QObject(parent)
-{}
+    QObject(parent), m_dirty(false)
+{
+    attitudeState    = AttitudeState::GetInstance(getObjectManager());
+    Q_ASSERT(attitudeState);
+
+    attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
+    Q_ASSERT(attitudeSettings);
+}
 
 
 /**
@@ -44,35 +51,32 @@ LevelCalibrationModel::LevelCalibrationModel(QObject *parent) :
  */
 void LevelCalibrationModel::start()
 {
-    // Store and reset board rotation before calibration starts
-
-    started();
-    progressChanged(0);
-
-    rot_data_pitch = 0;
-    rot_data_roll  = 0;
-    UAVObject::Metadata mdata;
-
-    AttitudeState *attitudeState = AttitudeState::GetInstance(getObjectManager());
-    Q_ASSERT(attitudeState);
-    initialAttitudeStateMdata = attitudeState->getMetadata();
-    mdata = initialAttitudeStateMdata;
+    memento.attitudeStateMdata = attitudeState->getMetadata();
+    UAVObject::Metadata mdata = attitudeState->getMetadata();
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     attitudeState->setMetadata(mdata);
 
+    rot_data_pitch = 0;
+    rot_data_roll  = 0;
+
+    // reset dirty state to forget previous unsaved runs
+    m_dirty  = false;
+
+    position = 0;
+
+    started();
+
     // Show instructions and enable controls
+    progressChanged(0);
     displayInstructions(tr("Place horizontally and press Save Position..."), WizardModel::Prompt);
     displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
     savePositionEnabledChanged(true);
-    position = 0;
 }
 
 void LevelCalibrationModel::savePosition()
 {
     QMutexLocker lock(&sensorsUpdateLock);
-
-    Q_UNUSED(lock);
 
     savePositionEnabledChanged(false);
 
@@ -81,8 +85,6 @@ void LevelCalibrationModel::savePosition()
 
     collectingData = true;
 
-    AttitudeState *attitudeState = AttitudeState::GetInstance(getObjectManager());
-    Q_ASSERT(attitudeState);
     connect(attitudeState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
 
     displayInstructions(tr("Hold..."));
@@ -95,13 +97,9 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
 {
     QMutexLocker lock(&sensorsUpdateLock);
 
-    Q_UNUSED(lock);
-
     switch (obj->getObjID()) {
     case AttitudeState::OBJID:
     {
-        AttitudeState *attitudeState = AttitudeState::GetInstance(getObjectManager());
-        Q_ASSERT(attitudeState);
         AttitudeState::DataFields attitudeStateData = attitudeState->getData();
         rot_accum_roll.append(attitudeStateData.Roll);
         rot_accum_pitch.append(attitudeStateData.Pitch);
@@ -139,8 +137,12 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
             rot_data_pitch /= 2;
             rot_data_roll  += OpenPilot::CalibrationUtils::listMean(rot_accum_roll);
             rot_data_roll  /= 2;
-            attitudeState->setMetadata(initialAttitudeStateMdata);
-            compute();
+
+            attitudeState->setMetadata(memento.attitudeStateMdata);
+
+            m_dirty = true;
+
+            stopped();
             displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
             displayInstructions(tr("Board leveling completed successfully."), WizardModel::Success);
             break;
@@ -148,12 +150,11 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
     }
 }
 
-void LevelCalibrationModel::compute()
+void LevelCalibrationModel::save()
 {
-    stopped();
-
-    AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
-    Q_ASSERT(attitudeSettings);
+    if (!m_dirty) {
+        return;
+    }
     AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
 
     // Update the biases based on collected data
@@ -162,7 +163,8 @@ void LevelCalibrationModel::compute()
     attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL]  -= rot_data_roll;
 
     attitudeSettings->setData(attitudeSettingsData);
-    attitudeSettings->updated();
+
+    m_dirty = false;
 }
 
 UAVObjectManager *LevelCalibrationModel::getObjectManager()

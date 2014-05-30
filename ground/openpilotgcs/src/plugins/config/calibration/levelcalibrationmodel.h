@@ -30,11 +30,8 @@
 
 #include "wizardmodel.h"
 #include "calibration/calibrationutils.h"
-#include <revocalibration.h>
-#include <accelgyrosettings.h>
-#include <homelocation.h>
-#include <accelstate.h>
-#include <magstate.h>
+#include <attitudestate.h>
+#include <attitudesettings.h>
 
 #include <QObject>
 #include <QMutex>
@@ -47,33 +44,49 @@ class LevelCalibrationModel : public QObject {
 public:
     explicit LevelCalibrationModel(QObject *parent = 0);
 
+    bool dirty()
+    {
+        return m_dirty;
+    }
+
 signals:
-    void displayVisualHelp(QString elementID);
-    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info);
     void started();
     void stopped();
     void savePositionEnabledChanged(bool state);
     void progressChanged(int value);
+    void displayVisualHelp(QString elementID);
+    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info);
 
 public slots:
-    // Slots for calibrating the mags
     void start();
     void savePosition();
+    void save();
 
 private slots:
     void getSample(UAVObject *obj);
-    void compute();
 
 private:
+    typedef struct {
+        UAVObject::Metadata attitudeStateMdata;
+    } Memento;
+
     QMutex sensorsUpdateLock;
     int position;
+
     bool collectingData;
+    bool m_dirty;
+
+    Memento memento;
 
     QList<double> rot_accum_roll;
     QList<double> rot_accum_pitch;
     double rot_data_roll;
     double rot_data_pitch;
-    UAVObject::Metadata initialAttitudeStateMdata;
+
+    // convenience pointers
+    AttitudeState *attitudeState;
+    AttitudeSettings *attitudeSettings;
+
     UAVObjectManager *getObjectManager();
 };
 }

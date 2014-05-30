@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>834</width>
-    <height>772</height>
+    <height>652</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,8 +49,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>812</width>
-            <height>692</height>
+            <width>810</width>
+            <height>575</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
@@ -1761,6 +1761,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="submitButtons">
+     <property name="spacing">
+      <number>4</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -1776,7 +1779,19 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
         <size>
          <width>25</width>
          <height>25</height>

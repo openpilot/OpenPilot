@@ -469,8 +469,28 @@ void SixPointCalibrationModel::save()
     if (!m_dirty) {
         return;
     }
-    revoCalibration->setData(result.revoCalibrationData);
-    accelGyroSettings->setData(result.accelGyroSettingsData);
+    if (calibratingMag) {
+        RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+
+        for (int i = 0; i < RevoCalibration::MAG_TRANSFORM_R2C2; i++) {
+            revoCalibrationData.mag_transform[i] = result.revoCalibrationData.mag_transform[i];
+        }
+        for (int i = 0; i < 3; i++) {
+            revoCalibrationData.mag_bias[i] = result.revoCalibrationData.mag_bias[i];
+        }
+
+        revoCalibration->setData(revoCalibrationData);
+    }
+    if (calibratingAccel) {
+        AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
+
+        for (int i = 0; i < 3; i++) {
+            accelGyroSettingsData.accel_scale[i] = result.accelGyroSettingsData.accel_scale[i];
+            accelGyroSettingsData.accel_bias[i]  = result.accelGyroSettingsData.accel_bias[i];
+        }
+
+        accelGyroSettings->setData(accelGyroSettingsData);
+    }
 
     m_dirty = false;
 }

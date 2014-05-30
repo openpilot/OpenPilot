@@ -301,6 +301,9 @@ void ConfigRevoWidget::updateObjectsFromWidgets()
 {
     ConfigTaskWidget::updateObjectsFromWidgets();
 
+    if (m_sixPointCalibrationModel->dirty()) {
+        m_sixPointCalibrationModel->save();
+    }
     if (m_gyroBiasCalibrationModel->dirty()) {
         m_gyroBiasCalibrationModel->save();
     }
@@ -336,7 +339,10 @@ void ConfigRevoWidget::disableAllCalibrations()
 
 void ConfigRevoWidget::enableAllCalibrations()
 {
-    // TODO should use a signal from m_gyroBiasCalibrationModel instead
+    // TODO should use a signal instead
+    if (m_sixPointCalibrationModel->dirty()) {
+        widgetsContentsChanged();
+    }
     if (m_gyroBiasCalibrationModel->dirty()) {
         widgetsContentsChanged();
     }

@@ -108,34 +108,21 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QGroupBox" name="step1GroupBox">
+            <widget class="QGroupBox" name="accelCalGroupBox">
              <property name="title">
-              <string>Step 1: Accelerometer / magnetometer calibration</string>
+              <string>Accelerometer calibration</string>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <widget class="QPushButton" name="sixPointsStartAccel">
+               <widget class="QPushButton" name="accelStart">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="toolTip">
                  <string>Launch accelerometer range and bias calibration.</string>
                 </property>
                 <property name="text">
-                 <string>Calibrate Accel</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="sixPointsStartMag">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>Launch magnetometer range and bias calibration.</string>
-                </property>
-                <property name="text">
-                 <string>Calibrate Mag</string>
+                 <string>Start</string>
                 </property>
                </widget>
               </item>
@@ -153,9 +140,9 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="sixPointsSave">
+               <widget class="QPushButton" name="accelSavePos">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="toolTip">
                  <string>Save settings (only enabled when calibration is running)</string>
@@ -169,15 +156,60 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="step2GroupBox">
+            <widget class="QGroupBox" name="magCalGroupBox">
              <property name="title">
-              <string>Step 2: Board level calibration</string>
+              <string>Magnetometer calibration</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QPushButton" name="magStart">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Launch magnetometer range and bias calibration.</string>
+                </property>
+                <property name="text">
+                 <string>Start</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="magSavePos">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="text">
+                 <string>Save Position</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="boardLevelCalGroupBox">
+             <property name="title">
+              <string>Board level calibration</string>
              </property>
              <layout class="QHBoxLayout">
               <item>
                <widget class="QPushButton" name="boardLevelStart">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="text">
                  <string>Start</string>
@@ -197,7 +229,7 @@
               <item>
                <widget class="QPushButton" name="boardLevelSavePos">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="text">
                  <string>Save Position</string>
@@ -208,15 +240,15 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="step3GroupBox">
+            <widget class="QGroupBox" name="gyroBiasGroupBox">
              <property name="title">
-              <string>Step 3: Gyro bias calibration</string>
+              <string>Gyro bias calibration</string>
              </property>
              <layout class="QHBoxLayout">
               <item>
                <widget class="QPushButton" name="gyroBiasStart">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -255,9 +287,9 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="step4GroupBox">
+            <widget class="QGroupBox" name="thermalCalGroupBox">
              <property name="title">
-              <string>Step 4: Thermal calibration</string>
+              <string>Thermal calibration</string>
              </property>
              <layout class="QVBoxLayout">
               <item>
@@ -265,7 +297,7 @@
                 <item>
                  <widget class="QPushButton" name="ThermalBiasStart">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="text">
                    <string>Start</string>
@@ -297,7 +329,7 @@
                 <item>
                  <widget class="QPushButton" name="ThermalBiasEnd">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="text">
                    <string>End</string>
@@ -307,7 +339,7 @@
                 <item>
                  <widget class="QPushButton" name="ThermalBiasCancel">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="text">
                    <string>Cancel</string>
@@ -388,8 +420,8 @@
              <property name="font">
               <font>
                <pointsize>10</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
+               <weight>50</weight>
+               <bold>false</bold>
               </font>
              </property>
              <property name="toolTip">
@@ -411,8 +443,8 @@
               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:10pt; font-weight:600; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="textInteractionFlags">
               <set>Qt::NoTextInteraction</set>
@@ -443,7 +475,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;Steps 1, 2 and 3 are necessary. Step 4 is optional but may help achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 1: Accelerometer / magnetometer calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 1: Accelerometer and magnetometer calibration&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;This calibration will compute the scale for Magnetometer or Accelerometer sensors. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;Press &amp;quot;Calibrate Mag&amp;quot; or &amp;quot;Calibrate Accel&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  &lt;/span&gt;&lt;/p&gt;
@@ -967,13 +999,6 @@ A setting of 0.00 disables the filter.</string>
    <item>
     <layout class="QHBoxLayout" name="submitButtons">
      <item>
-      <widget class="QLabel" name="calibInstructions">
-       <property name="text">
-        <string>Telemetry link not established.</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -981,7 +1006,7 @@ A setting of 0.00 disables the filter.</string>
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
-         <height>20</height>
+         <height>5</height>
         </size>
        </property>
       </spacer>
@@ -996,8 +1021,8 @@ A setting of 0.00 disables the filter.</string>
        </property>
        <property name="maximumSize">
         <size>
-         <width>32</width>
-         <height>32</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="font">
@@ -1014,8 +1039,8 @@ A setting of 0.00 disables the filter.</string>
        </property>
        <property name="iconSize">
         <size>
-         <width>32</width>
-         <height>32</height>
+         <width>25</width>
+         <height>25</height>
         </size>
        </property>
        <property name="shortcut">

@@ -53,10 +53,11 @@ public:
     ~ConfigRevoWidget();
 
 private:
-    OpenPilot::SixPointCalibrationModel *m_sixPointCalibrationModel;
-    OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
+    OpenPilot::SixPointCalibrationModel *m_accelCalibrationModel;
+    OpenPilot::SixPointCalibrationModel *m_magCalibrationModel;
     OpenPilot::LevelCalibrationModel *m_levelCalibrationModel;
     OpenPilot::GyroBiasCalibrationModel *m_gyroBiasCalibrationModel;
+    OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
 
     Ui_RevoSensorsWidget *m_ui;
 

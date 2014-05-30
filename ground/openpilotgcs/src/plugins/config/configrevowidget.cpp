@@ -93,6 +93,63 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 // addUAVObject("AccelGyroSettings");
     autoLoadWidgets();
 
+    // accel calibration
+    m_accelCalibrationModel = new OpenPilot::SixPointCalibrationModel(this);
+    connect(m_ui->accelStart, SIGNAL(clicked()), m_accelCalibrationModel, SLOT(accelStart()));
+    connect(m_ui->accelSavePos, SIGNAL(clicked()), m_accelCalibrationModel, SLOT(savePositionData()));
+
+    connect(m_accelCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
+    connect(m_accelCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
+    connect(m_accelCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
+    connect(m_accelCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
+    connect(m_accelCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
+            this, SLOT(addInstructions(QString, WizardModel::MessageType)));
+    connect(m_accelCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
+    connect(m_accelCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), m_ui->accelSavePos, SLOT(setEnabled(bool)));
+    m_ui->accelSavePos->setEnabled(false);
+
+    // mag calibration
+    m_magCalibrationModel = new OpenPilot::SixPointCalibrationModel(this);
+    connect(m_ui->magStart, SIGNAL(clicked()), m_magCalibrationModel, SLOT(magStart()));
+    connect(m_ui->magSavePos, SIGNAL(clicked()), m_magCalibrationModel, SLOT(savePositionData()));
+
+    connect(m_magCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
+    connect(m_magCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
+    connect(m_magCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
+    connect(m_magCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
+    connect(m_magCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
+            this, SLOT(addInstructions(QString, WizardModel::MessageType)));
+    connect(m_magCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
+    connect(m_magCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), m_ui->magSavePos, SLOT(setEnabled(bool)));
+    m_ui->magSavePos->setEnabled(false);
+
+    // board level calibration
+    m_levelCalibrationModel = new OpenPilot::LevelCalibrationModel(this);
+    connect(m_ui->boardLevelStart, SIGNAL(clicked()), m_levelCalibrationModel, SLOT(start()));
+    connect(m_ui->boardLevelSavePos, SIGNAL(clicked()), m_levelCalibrationModel, SLOT(savePosition()));
+
+    connect(m_levelCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
+    connect(m_levelCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
+    connect(m_levelCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
+            this, SLOT(addInstructions(QString, WizardModel::MessageType)));
+    connect(m_levelCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
+    connect(m_levelCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), m_ui->boardLevelSavePos, SLOT(setEnabled(bool)));
+    connect(m_levelCalibrationModel, SIGNAL(progressChanged(int)), m_ui->boardLevelProgress, SLOT(setValue(int)));
+
+    // gyro zero calibration
+    m_gyroBiasCalibrationModel = new OpenPilot::GyroBiasCalibrationModel(this);
+    connect(m_ui->gyroBiasStart, SIGNAL(clicked()), m_gyroBiasCalibrationModel, SLOT(start()));
+
+    connect(m_gyroBiasCalibrationModel, SIGNAL(progressChanged(int)), m_ui->gyroBiasProgress, SLOT(setValue(int)));
+
+    connect(m_gyroBiasCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
+            this, SLOT(addInstructions(QString, WizardModel::MessageType)));
+    connect(m_gyroBiasCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
+
     // thermal calibration
     m_thermalCalibrationModel = new OpenPilot::ThermalCalibrationModel(this);
     m_thermalCalibrationModel->init();
@@ -115,48 +172,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(float)), this, SLOT(displayTemperatureGradient(float)));
     connect(m_thermalCalibrationModel, SIGNAL(progressChanged(int)), m_ui->thermalBiasProgress, SLOT(setValue(int)));
 
-    // six point calibration
-    m_sixPointCalibrationModel = new OpenPilot::SixPointCalibrationModel(this);
-    connect(m_ui->sixPointsStartAccel, SIGNAL(clicked()), m_sixPointCalibrationModel, SLOT(accelStart()));
-    connect(m_ui->sixPointsStartMag, SIGNAL(clicked()), m_sixPointCalibrationModel, SLOT(magStart()));
-    connect(m_ui->sixPointsSave, SIGNAL(clicked()), m_sixPointCalibrationModel, SLOT(savePositionData()));
-
-    connect(m_sixPointCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
-    connect(m_sixPointCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
-    connect(m_sixPointCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
-    connect(m_sixPointCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
-    connect(m_sixPointCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
-            this, SLOT(addInstructions(QString, WizardModel::MessageType)));
-    connect(m_sixPointCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
-    connect(m_sixPointCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->sixPointsSave, SLOT(setEnabled(bool)));
-
-    // board level calibration
-    m_levelCalibrationModel = new OpenPilot::LevelCalibrationModel(this);
-    connect(m_ui->boardLevelStart, SIGNAL(clicked()), m_levelCalibrationModel, SLOT(start()));
-    connect(m_ui->boardLevelSavePos, SIGNAL(clicked()), m_levelCalibrationModel, SLOT(savePosition()));
-
-    connect(m_levelCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
-    connect(m_levelCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
-    connect(m_levelCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
-            this, SLOT(addInstructions(QString, WizardModel::MessageType)));
-    connect(m_levelCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
-    connect(m_levelCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), this->m_ui->boardLevelSavePos, SLOT(setEnabled(bool)));
-    connect(m_levelCalibrationModel, SIGNAL(progressChanged(int)), this->m_ui->boardLevelProgress, SLOT(setValue(int)));
-
-    // gyro zero calibration
-    m_gyroBiasCalibrationModel = new OpenPilot::GyroBiasCalibrationModel(this);
-    connect(m_ui->gyroBiasStart, SIGNAL(clicked()), m_gyroBiasCalibrationModel, SLOT(start()));
-
-    connect(m_gyroBiasCalibrationModel, SIGNAL(progressChanged(int)), this->m_ui->gyroBiasProgress, SLOT(setValue(int)));
-
-    connect(m_gyroBiasCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
-            this, SLOT(addInstructions(QString, WizardModel::MessageType)));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
-
+    // home location
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
 
     addWidgetBinding("RevoSettings", "FusionAlgorithm", m_ui->FusionAlgorithm);
@@ -301,8 +317,11 @@ void ConfigRevoWidget::updateObjectsFromWidgets()
 {
     ConfigTaskWidget::updateObjectsFromWidgets();
 
-    if (m_sixPointCalibrationModel->dirty()) {
-        m_sixPointCalibrationModel->save();
+    if (m_accelCalibrationModel->dirty()) {
+        m_accelCalibrationModel->save();
+    }
+    if (m_magCalibrationModel->dirty()) {
+        m_magCalibrationModel->save();
     }
     if (m_levelCalibrationModel->dirty()) {
         m_levelCalibrationModel->save();
@@ -333,8 +352,8 @@ void ConfigRevoWidget::disableAllCalibrations()
 {
     clearInstructions();
 
-    m_ui->sixPointsStartAccel->setEnabled(false);
-    m_ui->sixPointsStartMag->setEnabled(false);
+    m_ui->accelStart->setEnabled(false);
+    m_ui->magStart->setEnabled(false);
     m_ui->boardLevelStart->setEnabled(false);
     m_ui->gyroBiasStart->setEnabled(false);
     m_ui->ThermalBiasStart->setEnabled(false);
@@ -343,13 +362,13 @@ void ConfigRevoWidget::disableAllCalibrations()
 void ConfigRevoWidget::enableAllCalibrations()
 {
     // TODO should use a signal instead
-    if (m_sixPointCalibrationModel->dirty() || m_levelCalibrationModel->dirty()
+    if (m_accelCalibrationModel->dirty() || m_magCalibrationModel->dirty() || m_levelCalibrationModel->dirty()
         || m_gyroBiasCalibrationModel->dirty()) {
         widgetsContentsChanged();
     }
 
-    m_ui->sixPointsStartAccel->setEnabled(true);
-    m_ui->sixPointsStartMag->setEnabled(true);
+    m_ui->accelStart->setEnabled(true);
+    m_ui->magStart->setEnabled(true);
     m_ui->boardLevelStart->setEnabled(true);
     m_ui->gyroBiasStart->setEnabled(true);
     m_ui->ThermalBiasStart->setEnabled(true);

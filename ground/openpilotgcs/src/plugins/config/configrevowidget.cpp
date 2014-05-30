@@ -26,6 +26,19 @@
  */
 #include "configrevowidget.h"
 
+#include <attitudestate.h>
+#include <attitudesettings.h>
+#include <revocalibration.h>
+#include <accelgyrosettings.h>
+#include <homelocation.h>
+#include <accelstate.h>
+
+#include <magstate.h>
+
+#include "assertions.h"
+#include "calibration.h"
+#include "calibration/calibrationutils.h"
+
 #include "math.h"
 #include <QDebug>
 #include <QTimer>
@@ -40,25 +53,11 @@
 #include <iostream>
 #include <QDesktopServices>
 #include <QUrl>
-#include <attitudestate.h>
-#include <attitudesettings.h>
-#include <revocalibration.h>
-#include <accelgyrosettings.h>
-#include <homelocation.h>
-#include <accelstate.h>
 
-#include <magstate.h>
-
-#include "assertions.h"
-#include "calibration.h"
-#include "calibration/calibrationutils.h"
 #define sign(x) ((x < 0) ? -1 : 1)
 
 // Uncomment this to enable 6 point calibration on the accels
 #define NOISE_SAMPLES 50
-
-
-// *****************
 
 class Thread : public QThread {
 public:
@@ -68,14 +67,15 @@ public:
     }
 };
 
-// *****************
-
 ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     ConfigTaskWidget(parent),
     m_ui(new Ui_RevoSensorsWidget()),
     isBoardRotationStored(false)
 {
     m_ui->setupUi(this);
+    m_ui->tabWidget->setCurrentIndex(0);
+
+    addApplySaveButtons(m_ui->revoCalSettingsSaveRAM, m_ui->revoCalSettingsSaveSD);
 
     // Initialization of the visual help
     m_ui->calibrationVisualHelp->setScene(new QGraphicsScene(this));
@@ -86,11 +86,11 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
-    addUAVObject("RevoCalibration");
+// addUAVObject("RevoCalibration");
     addUAVObject("HomeLocation");
-    addUAVObject("AttitudeSettings");
-    addUAVObject("RevoSettings");
-    addUAVObject("AccelGyroSettings");
+// addUAVObject("AttitudeSettings");
+// addUAVObject("RevoSettings");
+// addUAVObject("AccelGyroSettings");
     autoLoadWidgets();
 
     // thermal calibration
@@ -114,7 +114,6 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(float)), this, SLOT(displayTemperature(float)));
     connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(float)), this, SLOT(displayTemperatureGradient(float)));
     connect(m_thermalCalibrationModel, SIGNAL(progressChanged(int)), m_ui->thermalBiasProgress, SLOT(setValue(int)));
-    // note: init for m_thermalCalibrationModel is done in showEvent to prevent cases with "Start" button not enabled due to some timing issue.
 
     // six point calibration
     m_sixPointCalibrationModel = new OpenPilot::SixPointCalibrationModel(this);
@@ -169,8 +168,9 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     populateWidgets();
     refreshWidgetsValues();
-    m_ui->tabWidget->setCurrentIndex(0);
     enableAllCalibrations();
+
+    forceConnectedState();
 }
 
 ConfigRevoWidget::~ConfigRevoWidget()
@@ -246,17 +246,21 @@ void ConfigRevoWidget::displayVisualHelp(QString elementID)
 void ConfigRevoWidget::clearInstructions()
 {
     m_ui->calibrationInstructions->clear();
+    // addInstructions(tr("Press any Start button to start a calibration step."), WizardModel::Prompt);
 }
 
 void ConfigRevoWidget::addInstructions(QString text, WizardModel::MessageType type)
 {
     if (!text.isNull()) {
         switch (type) {
-        case WizardModel::Failure:
-            text = QString("<font color='red'>%1</font>").arg(text);
-            break;
         case WizardModel::Prompt:
-            text = QString("<font color='blue'>%1</font>").arg(text);
+            text = QString("<b><font color='blue'>%1</font>").arg(text);
+            break;
+        case WizardModel::Success:
+            text = QString("<b><font color='green'>%1</font>").arg(text);
+            break;
+        case WizardModel::Failure:
+            text = QString("<b><font color='red'>%1</font>").arg(text);
             break;
         default:
             break;
@@ -275,8 +279,6 @@ void ConfigRevoWidget::displayTemperatureGradient(float tempGradient)
     m_ui->temperatureGradientLabel->setText(tr("Temperature rise %1 °C/min").arg(tempGradient, 5, 'f', 2));
 }
 
-/********** UI Functions *************/
-
 /**
  * Called by the ConfigTaskWidget parent when RevoCalibration is updated
  * to update the UI
@@ -284,9 +286,6 @@ void ConfigRevoWidget::displayTemperatureGradient(float tempGradient)
 void ConfigRevoWidget::refreshWidgetsValues(UAVObject *object)
 {
     ConfigTaskWidget::refreshWidgetsValues(object);
-
-
-    m_ui->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 
     m_ui->isSetCheckBox->setEnabled(false);
 
@@ -296,6 +295,15 @@ void ConfigRevoWidget::refreshWidgetsValues(UAVObject *object)
 
     QString beStr = QString("%1:%2:%3").arg(QString::number(homeLocationData.Be[0]), QString::number(homeLocationData.Be[1]), QString::number(homeLocationData.Be[2]));
     m_ui->beBox->setText(beStr);
+}
+
+void ConfigRevoWidget::updateObjectsFromWidgets()
+{
+    ConfigTaskWidget::updateObjectsFromWidgets();
+
+    if (m_gyroBiasCalibrationModel->dirty()) {
+        m_gyroBiasCalibrationModel->save();
+    }
 }
 
 void ConfigRevoWidget::clearHomeLocation()
@@ -318,6 +326,7 @@ void ConfigRevoWidget::clearHomeLocation()
 void ConfigRevoWidget::disableAllCalibrations()
 {
     clearInstructions();
+
     m_ui->sixPointsStartAccel->setEnabled(false);
     m_ui->sixPointsStartMag->setEnabled(false);
     m_ui->boardLevelStart->setEnabled(false);
@@ -327,6 +336,11 @@ void ConfigRevoWidget::disableAllCalibrations()
 
 void ConfigRevoWidget::enableAllCalibrations()
 {
+    // TODO should use a signal from m_gyroBiasCalibrationModel instead
+    if (m_gyroBiasCalibrationModel->dirty()) {
+        widgetsContentsChanged();
+    }
+
     m_ui->sixPointsStartAccel->setEnabled(true);
     m_ui->sixPointsStartMag->setEnabled(true);
     m_ui->boardLevelStart->setEnabled(true);

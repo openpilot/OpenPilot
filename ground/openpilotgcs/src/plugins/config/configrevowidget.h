@@ -75,6 +75,7 @@ private slots:
 
     // ! Overriden method from the configTaskWidget to update UI
     virtual void refreshWidgetsValues(UAVObject *object = NULL);
+    virtual void updateObjectsFromWidgets();
 
     // Slot for clearing home location
     void clearHomeLocation();

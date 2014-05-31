@@ -196,6 +196,7 @@ private:
     // temperature checkpoints, used to calculate temp gradient
     const static int TimeBetweenCheckpoints = 10;
     QTime m_lastCheckpointTime;
+    bool m_acquiring;
     bool m_forceStopAcquisition;
     float m_lastCheckpointTemp;
     float m_gradient;
@@ -206,7 +207,7 @@ private:
     const static int ProcessPercentageBaseAcquisition = 15;
     const static int ProcessPercentageBaseCalculation = 85;
     const static int ProcessPercentageSaveResults     = 95;
-    const static float TargetGradient = 0.20f;
+    const static float TargetGradient  = 0.20f;
     const static float TargetTempDelta = 10.0f;
     int m_targetduration;
     int m_processPercentage;

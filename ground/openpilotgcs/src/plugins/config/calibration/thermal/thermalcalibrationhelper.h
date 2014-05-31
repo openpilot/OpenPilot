@@ -64,7 +64,7 @@ typedef struct {
     UAVObject::Metadata accelSensorMeta;
     UAVObject::Metadata baroensorMeta;
     bool statusSaved;
-} thermalCalibrationBoardSettings;
+} Memento;
 
 typedef struct {
     bool  baroCalibrated;
@@ -113,8 +113,7 @@ public:
 
     bool calibrationSuccessful()
     {
-        return m_results.baroCalibrated &&
-               ((m_results.baroTempMax - m_results.baroTempMin) > 10.0f);
+        return m_results.baroCalibrated && ((m_results.baroTempMax - m_results.baroTempMin) > TargetTempDelta);
     }
 
 signals:
@@ -208,8 +207,17 @@ private:
     const static int ProcessPercentageBaseCalculation = 85;
     const static int ProcessPercentageSaveResults     = 95;
     const static float TargetGradient = 0.20f;
+    const static float TargetTempDelta = 10.0f;
     int m_targetduration;
     int m_processPercentage;
+
+    // convenience pointers
+    AccelSensor *accelSensor;
+    GyroSensor *gyroSensor;
+    BaroSensor *baroSensor;
+    MagSensor *magSensor;
+    AccelGyroSettings *accelGyroSettings;
+    RevoSettings *revoSettings;
 
     /* board settings save/restore */
     bool setupBoardForCalibration();
@@ -217,15 +225,16 @@ private:
     bool restoreInitialSettings();
     bool isBoardInitialSettingsSaved()
     {
-        return m_boardInitialSettings.statusSaved;
+        return m_memento.statusSaved;
     }
     void clearBoardInitialSettingsSaved()
     {
-        m_boardInitialSettings.statusSaved = false;
+        m_memento.statusSaved = false;
     }
-    thermalCalibrationBoardSettings m_boardInitialSettings;
+    Memento m_memento;
     thermalCalibrationResults m_results;
 
+    float getTemperature();
     void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();
 };

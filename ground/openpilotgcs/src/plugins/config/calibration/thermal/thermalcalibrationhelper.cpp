@@ -31,17 +31,26 @@
 #include <uavtalk/telemetrymanager.h>
 #include "version_info/version_info.h"
 
+//#define SIMULATE
+
 namespace OpenPilot {
 ThermalCalibrationHelper::ThermalCalibrationHelper(QObject *parent) :
     QObject(parent)
 {
     m_tempdir.reset(new QTemporaryDir());
-    m_boardInitialSettings    = thermalCalibrationBoardSettings();
-    m_boardInitialSettings.statusSaved = false;
+    m_memento    = Memento();
+    m_memento.statusSaved = false;
     m_results = thermalCalibrationResults();
     m_results.accelCalibrated = false;
     m_results.baroCalibrated  = false;
     m_results.gyroCalibrated  = false;
+
+    accelSensor     = AccelSensor::GetInstance(getObjectManager());
+    gyroSensor = GyroSensor::GetInstance(getObjectManager());
+    baroSensor = BaroSensor::GetInstance(getObjectManager());
+    magSensor = MagSensor::GetInstance(getObjectManager());
+    accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
+    revoSettings = RevoSettings::GetInstance(getObjectManager());
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
@@ -56,28 +65,17 @@ bool ThermalCalibrationHelper::setupBoardForCalibration()
 {
     qDebug() << "setupBoardForCalibration";
 
-    UAVObjectManager *objManager = getObjectManager();
-    Q_ASSERT(objManager);
-
     // accelSensor Meta
-    AccelSensor *accelSensor = AccelSensor::GetInstance(objManager);
-    Q_ASSERT(accelSensor);
     setMetadataForCalibration(accelSensor);
 
     // gyroSensor Meta
-    GyroSensor *gyroSensor = GyroSensor::GetInstance(objManager);
-    Q_ASSERT(gyroSensor);
     setMetadataForCalibration(gyroSensor);
 
     // baroSensor Meta
-    BaroSensor *baroSensor = BaroSensor::GetInstance(objManager);
-    Q_ASSERT(baroSensor);
     setMetadataForCalibration(baroSensor);
 
     // Clean up any gyro/accel correction before calibrating
-    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
-    Q_ASSERT(accelGyroSettings);
-    AccelGyroSettings::DataFields data   = accelGyroSettings->getData();
+    AccelGyroSettings::DataFields data = accelGyroSettings->getData();
     for (uint i = 0; i < AccelGyroSettings::ACCEL_TEMP_COEFF_NUMELEM; i++) {
         data.accel_temp_coeff[i] = 0.0f;
     }
@@ -92,8 +90,6 @@ bool ThermalCalibrationHelper::setupBoardForCalibration()
     accelGyroSettings->setData(data);
 
     // clean any correction before calibrating
-    RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);
-    Q_ASSERT(revoSettings);
     RevoSettings::DataFields revoSettingsData = revoSettings->getData();
     for (uint i = 0; i < RevoSettings::BAROTEMPCORRECTIONPOLYNOMIAL_NUMELEM; i++) {
         revoSettingsData.BaroTempCorrectionPolynomial[i] = 0.0f;
@@ -115,41 +111,28 @@ bool ThermalCalibrationHelper::saveBoardInitialSettings()
     // Store current board status:
     qDebug() << "Save initial settings";
 
-    UAVObjectManager *objManager = getObjectManager();
-    Q_ASSERT(objManager);
     // accelSensor Meta
-    AccelSensor *accelSensor     = AccelSensor::GetInstance(objManager);
-    Q_ASSERT(accelSensor);
-    m_boardInitialSettings.accelSensorMeta = accelSensor->getMetadata();
+    m_memento.accelSensorMeta = accelSensor->getMetadata();
+
     // gyroSensor Meta
-    GyroSensor *gyroSensor = GyroSensor::GetInstance(objManager);
-    Q_ASSERT(gyroSensor);
-    m_boardInitialSettings.gyroSensorMeta = gyroSensor->getMetadata();
+    m_memento.gyroSensorMeta = gyroSensor->getMetadata();
 
     // baroSensor Meta
-    BaroSensor *baroSensor = BaroSensor::GetInstance(objManager);
-    Q_ASSERT(baroSensor);
-    m_boardInitialSettings.baroensorMeta = baroSensor->getMetadata();
+    m_memento.baroensorMeta = baroSensor->getMetadata();
 
     // accelGyroSettings data
-    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
-    Q_ASSERT(accelGyroSettings);
-    m_boardInitialSettings.accelGyroSettings = accelGyroSettings->getData();
+    m_memento.accelGyroSettings = accelGyroSettings->getData();
 
     // revoSettings data
-    RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);
-    Q_ASSERT(revoSettings);
-    m_boardInitialSettings.revoSettings = revoSettings->getData();
+    m_memento.revoSettings = revoSettings->getData();
 
     // accelGyroSettings data
     /*
-     * TODO: for revolution it is not neede but in case of CC we would prevent having
+     * TODO: for revolution it is not needed but in case of CC we would prevent having
      * a new set of xxxSensor UAVOs beside actual xxxState so it may be needed to reset the following
-       AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
-       Q_ASSERT(accelGyroSettings);
-       m_boardInitialSettings.accelGyroSettings = accelGyroSettings->getData();
+       m_memento.accelGyroSettings = accelGyroSettings->getData();
      */
-    m_boardInitialSettings.statusSaved = true;
+    m_memento.statusSaved = true;
     return true;
 }
 
@@ -159,37 +142,15 @@ bool ThermalCalibrationHelper::saveBoardInitialSettings()
  */
 bool ThermalCalibrationHelper::restoreInitialSettings()
 {
-    if (!m_boardInitialSettings.statusSaved) {
+    if (!m_memento.statusSaved) {
         return false;
     }
-    // restore initial board status
-    UAVObjectManager *objManager = getObjectManager();
-    Q_ASSERT(objManager);
 
-    // accelSensor Meta
-    AccelSensor *accelSensor = AccelSensor::GetInstance(objManager);
-    Q_ASSERT(accelSensor);
-    accelSensor->setMetadata(m_boardInitialSettings.accelSensorMeta);
-
-    // gyroSensor Meta
-    GyroSensor *gyroSensor = GyroSensor::GetInstance(objManager);
-    Q_ASSERT(gyroSensor);
-    gyroSensor->setMetadata(m_boardInitialSettings.gyroSensorMeta);
-
-    // baroSensor Meta
-    BaroSensor *baroSensor = BaroSensor::GetInstance(objManager);
-    Q_ASSERT(baroSensor);
-    baroSensor->setMetadata(m_boardInitialSettings.baroensorMeta);
-
-    // AccelGyroSettings data
-    AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
-    Q_ASSERT(accelGyroSettings);
-    accelGyroSettings->setData(m_boardInitialSettings.accelGyroSettings);
-
-    // revoSettings data
-    RevoSettings *revoSettings = RevoSettings::GetInstance(objManager);
-    Q_ASSERT(revoSettings);
-    revoSettings->setData(m_boardInitialSettings.revoSettings);
+    accelSensor->setMetadata(m_memento.accelSensorMeta);
+    gyroSensor->setMetadata(m_memento.gyroSensorMeta);
+    baroSensor->setMetadata(m_memento.baroensorMeta);
+    accelGyroSettings->setData(m_memento.accelGyroSettings);
+    revoSettings->setData(m_memento.revoSettings);
 
     return true;
 }
@@ -245,9 +206,7 @@ void ThermalCalibrationHelper::initAcquisition()
     // retrieve current temperature/time as initial checkpoint.
     m_lastCheckpointTime = QTime::currentTime();
     m_startTime = m_lastCheckpointTime;
-    BaroSensor *baroSensor = BaroSensor::GetInstance(getObjectManager());
-    Q_ASSERT(baroSensor);
-    m_lastCheckpointTemp = baroSensor->getTemperature();
+    m_lastCheckpointTemp = m_temperature = getTemperature();
     m_gradient = 0;
     connectUAVOs();
 }
@@ -259,9 +218,7 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
     switch (sample->getObjID()) {
     case AccelSensor::OBJID:
     {
-        AccelSensor *reading = AccelSensor::GetInstance(getObjectManager());
-        Q_ASSERT(reading);
-        m_accelSamples.append(reading->getData());
+        m_accelSamples.append(accelSensor->getData());
         m_debugStream << "ACCEL:: " << m_accelSamples.last().temperature <<
             "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
             "\t" << m_accelSamples.last().x <<
@@ -272,9 +229,7 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
     }
     case GyroSensor::OBJID:
     {
-        GyroSensor *reading = GyroSensor::GetInstance(getObjectManager());
-        Q_ASSERT(reading);
-        m_gyroSamples.append(reading->getData());
+        m_gyroSamples.append(gyroSensor->getData());
         m_debugStream << "GYRO:: " << m_gyroSamples.last().temperature <<
             "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
             "\t" << m_gyroSamples.last().x <<
@@ -284,23 +239,23 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
     }
     case BaroSensor::OBJID:
     {
-        BaroSensor *reading = BaroSensor::GetInstance(getObjectManager());
-        Q_ASSERT(reading);
-        m_baroSamples.append(reading->getData());
+        // this is needed as temperature is low pass filtered
+        float temp = getTemperature();
+        updateTemp(temp);
+        BaroSensor::DataFields data = baroSensor->getData();
+#ifdef SIMULATE
+        data.Temperature = temp;
+#endif
+        m_baroSamples.append(data);
         m_debugStream << "BARO:: " << m_baroSamples.last().Temperature <<
             "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
             "\t" << m_baroSamples.last().Pressure <<
             "\t" << m_baroSamples.last().Altitude << endl;
-        // this is needed as temperature is low pass filtered
-        m_temperature = reading->getTemperature();
-        updateTemp(m_temperature);
         break;
     }
     case MagSensor::OBJID:
     {
-        MagSensor *reading = MagSensor::GetInstance(getObjectManager());
-        Q_ASSERT(reading);
-        m_magSamples.append(reading->getData());
+        m_magSamples.append(magSensor->getData());
         m_debugStream << "MAG:: " <<
             "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
             "\t" << m_magSamples.last().x <<
@@ -313,6 +268,16 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
         qDebug() << " unexpected object " << sample->getObjID();
     }
     }
+}
+
+float ThermalCalibrationHelper::getTemperature() {
+#ifdef SIMULATE
+    float t = m_startTime.msecsTo(QTime::currentTime()) / 1000.0f;
+    // simulate a temperature rise from 20°C to 40°C
+    return 40 - 20 / (t + 1);
+#else
+    return baroSensor->getTemperature();
+#endif
 }
 
 void ThermalCalibrationHelper::cleanup()
@@ -338,6 +303,9 @@ void ThermalCalibrationHelper::calculate()
     }
 
     m_results.baroCalibrated = ThermalCalibration::BarometerCalibration(datax, datat, m_results.baro, &m_results.baroInSigma, &m_results.baroOutSigma);
+    if (!m_results.baroCalibrated) {
+        qDebug() << "Failed to calibrate baro!";
+    }
 
     m_results.baroTempMin    = datat.array().minCoeff();
     m_results.baroTempMax    = datat.array().maxCoeff();
@@ -356,6 +324,9 @@ void ThermalCalibrationHelper::calculate()
     }
 
     m_results.gyroCalibrated   = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro, m_results.gyroInSigma, m_results.gyroOutSigma);
+    if (!m_results.gyroCalibrated) {
+        qDebug() << "Failed to calibrate gyro!";
+    }
     m_results.accelGyroTempMin = datat.array().minCoeff();
     m_results.accelGyroTempMax = datat.array().maxCoeff();
     // TODO: sanity checks needs to be enforced before accel calibration can be enabled and usable.
@@ -454,34 +425,19 @@ void ThermalCalibrationHelper::endAcquisition()
 void ThermalCalibrationHelper::connectUAVOs()
 {
     createDebugLog();
-    AccelSensor *accel = AccelSensor::GetInstance(getObjectManager());
 
-    connect(accel, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
-
-    GyroSensor *gyro = GyroSensor::GetInstance(getObjectManager());
-    connect(gyro, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
-
-    BaroSensor *baro = BaroSensor::GetInstance(getObjectManager());
-    connect(baro, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
-
-    MagSensor *mag   = MagSensor::GetInstance(getObjectManager());
-    connect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
+    connect(accelSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
+    connect(gyroSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
+    connect(baroSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
+    connect(magSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
 }
 
 void ThermalCalibrationHelper::disconnectUAVOs()
 {
-    AccelSensor *accel = AccelSensor::GetInstance(getObjectManager());
-
-    disconnect(accel, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
-
-    GyroSensor *gyro = GyroSensor::GetInstance(getObjectManager());
-    disconnect(gyro, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
-
-    BaroSensor *baro = BaroSensor::GetInstance(getObjectManager());
-    disconnect(baro, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
-
-    MagSensor *mag   = MagSensor::GetInstance(getObjectManager());
-    disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
+    disconnect(accelSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
+    disconnect(gyroSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
+    disconnect(baroSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
+    disconnect(magSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
 }
 
 void ThermalCalibrationHelper::createDebugLog()
@@ -531,27 +487,17 @@ void ThermalCalibrationHelper::closeDebugLog()
 
 void ThermalCalibrationHelper::copyResultToSettings()
 {
-    UAVObjectManager *objManager = getObjectManager();
-
-    Q_ASSERT(objManager);
-
     if (calibrationSuccessful()) {
-        RevoSettings *revosettings = RevoSettings::GetInstance(objManager);
-        Q_ASSERT(revosettings);
-        RevoSettings::DataFields revosettingsdata = revosettings->getData();
-        revosettingsdata.BaroTempCorrectionPolynomial[0] = m_results.baro[0];
-        revosettingsdata.BaroTempCorrectionPolynomial[1] = m_results.baro[1];
-        revosettingsdata.BaroTempCorrectionPolynomial[2] = m_results.baro[2];
-        revosettingsdata.BaroTempCorrectionPolynomial[3] = m_results.baro[3];
-        revosettingsdata.BaroTempCorrectionExtent[0]     = m_results.baroTempMin;
-        revosettingsdata.BaroTempCorrectionExtent[1]     = m_results.baroTempMax;
-        revosettings->setData(revosettingsdata);
-        revosettings->updated();
+        RevoSettings::DataFields revoSettingsData = revoSettings->getData();
+        revoSettingsData.BaroTempCorrectionPolynomial[0] = m_results.baro[0];
+        revoSettingsData.BaroTempCorrectionPolynomial[1] = m_results.baro[1];
+        revoSettingsData.BaroTempCorrectionPolynomial[2] = m_results.baro[2];
+        revoSettingsData.BaroTempCorrectionPolynomial[3] = m_results.baro[3];
+        revoSettingsData.BaroTempCorrectionExtent[0]     = m_results.baroTempMin;
+        revoSettingsData.BaroTempCorrectionExtent[1]     = m_results.baroTempMax;
+        revoSettings->setData(revoSettingsData);
 
-        AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(objManager);
-        Q_ASSERT(accelGyroSettings);
         AccelGyroSettings::DataFields data   = accelGyroSettings->getData();
-
         if (m_results.gyroCalibrated) {
             data.gyro_temp_coeff[0] = m_results.gyro[0];
             data.gyro_temp_coeff[1] = m_results.gyro[1];
@@ -570,7 +516,6 @@ void ThermalCalibrationHelper::copyResultToSettings()
         data.temp_calibrated_extent[1] = m_results.accelGyroTempMax;
 
         accelGyroSettings->setData(data);
-        accelGyroSettings->updated();
     }
 }
 

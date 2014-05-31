@@ -210,7 +210,6 @@ public slots:
         wizardStopped();
     }
 };
-
 }
 
 #endif // THERMALCALIBRATIONMODEL_H

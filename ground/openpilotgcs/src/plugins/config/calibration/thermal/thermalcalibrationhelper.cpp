@@ -402,7 +402,7 @@ void ThermalCalibrationHelper::updateTemp(float temp)
         }
 
         if (m_targetduration != 0) {
-            int tmp = ((ProcessPercentageBaseCalculation - ProcessPercentageBaseAcquisition) * elapsed) / m_targetduration;
+            int tmp = ProcessPercentageBaseAcquisition + ((ProcessPercentageBaseCalculation - ProcessPercentageBaseAcquisition) * elapsed) / m_targetduration;
             tmp = tmp > ProcessPercentageBaseCalculation - 5 ? ProcessPercentageBaseCalculation - 5 : tmp;
             setProgress(tmp);
         } else if (m_gradient > .1 && m_initialGradient / 2.0f > m_gradient) {

@@ -364,7 +364,6 @@ void ThermalCalibrationHelper::calculate()
            .arg(m_results.accelOutSigma[0]).arg(m_results.accelOutSigma[1]).arg(m_results.accelOutSigma[2]) + QChar::CarriageReturn;
     qDebug() << str;
     m_debugStream << str;
-    copyResultToSettings();
     emit calculationCompleted();
     closeDebugLog();
 }

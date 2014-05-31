@@ -88,6 +88,12 @@ public:
         }
     }
 
+    bool dirty()
+    {
+        return m_dirty;
+    }
+
+
 public slots:
     int progress()
     {
@@ -131,6 +137,7 @@ private:
     bool m_cancelEnabled;
     bool m_endEnabled;
     bool m_initDone;
+    bool m_dirty;
     int m_progress;
     float m_temperature;
     float m_temperatureGradient;
@@ -197,6 +204,7 @@ public slots:
     }
     void startWizard()
     {
+        m_dirty = false;
         setStartEnabled(false);
         setEndEnabled(true);
         setCancelEnabled(true);
@@ -204,10 +212,18 @@ public slots:
     }
     void stopWizard()
     {
+        m_dirty = m_helper->calibrationSuccessful();
         setStartEnabled(true);
         setEndEnabled(false);
         setCancelEnabled(false);
         wizardStopped();
+    }
+    void save()
+    {
+        if (m_dirty) {
+            m_dirty = false;
+            m_helper->copyResultToSettings();
+        }
     }
 };
 }

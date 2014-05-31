@@ -116,6 +116,8 @@ public:
         return m_results.baroCalibrated && ((m_results.baroTempMax - m_results.baroTempMin) > TargetTempDelta);
     }
 
+    void copyResultToSettings();
+
 signals:
     void instructionsAdded(QString text, WizardModel::MessageType type = WizardModel::Info);
     void statusRestoreCompleted(bool succesful);

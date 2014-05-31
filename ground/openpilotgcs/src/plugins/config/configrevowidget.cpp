@@ -329,6 +329,9 @@ void ConfigRevoWidget::updateObjectsFromWidgets()
     if (m_gyroBiasCalibrationModel->dirty()) {
         m_gyroBiasCalibrationModel->save();
     }
+    if (m_thermalCalibrationModel->dirty()) {
+        m_thermalCalibrationModel->save();
+    }
 }
 
 void ConfigRevoWidget::clearHomeLocation()
@@ -363,7 +366,7 @@ void ConfigRevoWidget::enableAllCalibrations()
 {
     // TODO should use a signal instead
     if (m_accelCalibrationModel->dirty() || m_magCalibrationModel->dirty() || m_levelCalibrationModel->dirty()
-        || m_gyroBiasCalibrationModel->dirty()) {
+        || m_gyroBiasCalibrationModel->dirty() || m_thermalCalibrationModel->dirty()) {
         widgetsContentsChanged();
     }
 

@@ -63,15 +63,8 @@ ThermalCalibrationHelper::ThermalCalibrationHelper(QObject *parent) :
  */
 bool ThermalCalibrationHelper::setupBoardForCalibration()
 {
-    qDebug() << "setupBoardForCalibration";
-
-    // accelSensor Meta
     setMetadataForCalibration(accelSensor);
-
-    // gyroSensor Meta
     setMetadataForCalibration(gyroSensor);
-
-    // baroSensor Meta
     setMetadataForCalibration(baroSensor);
 
     // Clean up any gyro/accel correction before calibrating
@@ -109,24 +102,13 @@ bool ThermalCalibrationHelper::setupBoardForCalibration()
 bool ThermalCalibrationHelper::saveBoardInitialSettings()
 {
     // Store current board status:
-    qDebug() << "Save initial settings";
-
-    // accelSensor Meta
     m_memento.accelSensorMeta = accelSensor->getMetadata();
-
-    // gyroSensor Meta
     m_memento.gyroSensorMeta = gyroSensor->getMetadata();
-
-    // baroSensor Meta
     m_memento.baroensorMeta = baroSensor->getMetadata();
 
-    // accelGyroSettings data
     m_memento.accelGyroSettings = accelGyroSettings->getData();
-
-    // revoSettings data
     m_memento.revoSettings = revoSettings->getData();
 
-    // accelGyroSettings data
     /*
      * TODO: for revolution it is not needed but in case of CC we would prevent having
      * a new set of xxxSensor UAVOs beside actual xxxState so it may be needed to reset the following
@@ -208,6 +190,8 @@ void ThermalCalibrationHelper::initAcquisition()
     m_startTime = m_lastCheckpointTime;
     m_lastCheckpointTemp = m_temperature = getTemperature();
     m_gradient = 0;
+
+    createDebugLog();
     connectUAVOs();
 }
 
@@ -241,7 +225,6 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
     {
         // this is needed as temperature is low pass filtered
         float temp = getTemperature();
-        updateTemp(temp);
         BaroSensor::DataFields data = baroSensor->getData();
 #ifdef SIMULATE
         data.Temperature = temp;
@@ -251,6 +234,8 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
             "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz") <<
             "\t" << m_baroSamples.last().Pressure <<
             "\t" << m_baroSamples.last().Altitude << endl;
+        // must be done last as this call might end acquisition and close the debug log file
+        updateTemp(temp);
         break;
     }
     case MagSensor::OBJID:
@@ -265,7 +250,7 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
     }
     default:
     {
-        qDebug() << " unexpected object " << sample->getObjID();
+        qDebug() << "Unexpected object" << sample->getObjID();
     }
     }
 }
@@ -280,17 +265,21 @@ float ThermalCalibrationHelper::getTemperature() {
 #endif
 }
 
+void ThermalCalibrationHelper::endAcquisition()
+{
+    disconnectUAVOs();
+}
+
 void ThermalCalibrationHelper::cleanup()
 {
     disconnectUAVOs();
-    m_debugStream.flush();
-    m_debugFile.close();
+    closeDebugLog();
 }
-
 
 void ThermalCalibrationHelper::calculate()
 {
     setProgress(ProcessPercentageBaseCalculation);
+
     int count = m_baroSamples.count();
     Eigen::VectorXf datax(count);
     Eigen::VectorXf datay(1);
@@ -397,9 +386,6 @@ void ThermalCalibrationHelper::updateTemp(float temp)
         if (m_initialGradient < .1 && m_gradient > .1) {
             m_initialGradient = m_gradient;
         }
-        if (m_gradient < TargetGradient || m_forceStopAcquisition) {
-            emit collectionCompleted();
-        }
 
         if (m_targetduration != 0) {
             int tmp = ProcessPercentageBaseAcquisition + ((ProcessPercentageBaseCalculation - ProcessPercentageBaseAcquisition) * elapsed) / m_targetduration;
@@ -409,23 +395,18 @@ void ThermalCalibrationHelper::updateTemp(float temp)
             qDebug() << "M_gradient " << m_gradient << " Elapsed" << elapsed << " m_initialGradient" << m_initialGradient;
             // make a rough estimation of the time needed
             m_targetduration = elapsed * 8;
-            if (m_debugFile.isOpen()) {
-                m_debugStream << "INFO::Trace gradient " << m_gradient << " Elapsed" << elapsed << " m_initialGradient" << m_initialGradient
+            m_debugStream << "INFO::Trace gradient " << m_gradient << " Elapsed" << elapsed << " m_initialGradient" << m_initialGradient
                               << " target:" << m_targetduration << endl;
-            }
+        }
+
+        if (m_gradient < TargetGradient || m_forceStopAcquisition) {
+            emit collectionCompleted();
         }
     }
 }
 
-void ThermalCalibrationHelper::endAcquisition()
-{
-    disconnectUAVOs();
-}
-
 void ThermalCalibrationHelper::connectUAVOs()
 {
-    createDebugLog();
-
     connect(accelSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
     connect(gyroSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));
     connect(baroSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(collectSample(UAVObject *)));

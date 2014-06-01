@@ -283,7 +283,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_thermalbias2">
                 <item>
-                 <widget class="QPushButton" name="ThermalBiasStart">
+                 <widget class="QPushButton" name="thermalBiasStart">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>
@@ -315,7 +315,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="ThermalBiasEnd">
+                 <widget class="QPushButton" name="thermalBiasEnd">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>
@@ -325,7 +325,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="ThermalBiasCancel">
+                 <widget class="QPushButton" name="thermalBiasCancel">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>

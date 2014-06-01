@@ -137,6 +137,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_levelCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_levelCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), m_ui->boardLevelSavePos, SLOT(setEnabled(bool)));
     connect(m_levelCalibrationModel, SIGNAL(progressChanged(int)), m_ui->boardLevelProgress, SLOT(setValue(int)));
+    m_ui->boardLevelSavePos->setEnabled(false);
 
     // gyro zero calibration
     m_gyroBiasCalibrationModel = new OpenPilot::GyroBiasCalibrationModel(this);
@@ -158,13 +159,13 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_ui->temperatureLabel->setText("");
     m_ui->temperatureGradientLabel->setText("");
 
-    connect(m_ui->ThermalBiasStart, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnStart()));
-    connect(m_ui->ThermalBiasEnd, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnEnd()));
-    connect(m_ui->ThermalBiasCancel, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnAbort()));
+    connect(m_ui->thermalBiasStart, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnStart()));
+    connect(m_ui->thermalBiasEnd, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnEnd()));
+    connect(m_ui->thermalBiasCancel, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnAbort()));
 
-    connect(m_thermalCalibrationModel, SIGNAL(startEnabledChanged(bool)), m_ui->ThermalBiasStart, SLOT(setEnabled(bool)));
-    connect(m_thermalCalibrationModel, SIGNAL(endEnabledChanged(bool)), m_ui->ThermalBiasEnd, SLOT(setEnabled(bool)));
-    connect(m_thermalCalibrationModel, SIGNAL(cancelEnabledChanged(bool)), m_ui->ThermalBiasCancel, SLOT(setEnabled(bool)));
+    connect(m_thermalCalibrationModel, SIGNAL(startEnabledChanged(bool)), m_ui->thermalBiasStart, SLOT(setEnabled(bool)));
+    connect(m_thermalCalibrationModel, SIGNAL(endEnabledChanged(bool)), m_ui->thermalBiasEnd, SLOT(setEnabled(bool)));
+    connect(m_thermalCalibrationModel, SIGNAL(cancelEnabledChanged(bool)), m_ui->thermalBiasCancel, SLOT(setEnabled(bool)));
     connect(m_thermalCalibrationModel, SIGNAL(wizardStarted()), this, SLOT(disableAllCalibrations()));
     connect(m_thermalCalibrationModel, SIGNAL(wizardStopped()), this, SLOT(enableAllCalibrations()));
 
@@ -173,6 +174,8 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(float)), this, SLOT(displayTemperature(float)));
     connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(float)), this, SLOT(displayTemperatureGradient(float)));
     connect(m_thermalCalibrationModel, SIGNAL(progressChanged(int)), m_ui->thermalBiasProgress, SLOT(setValue(int)));
+    m_ui->thermalBiasEnd->setEnabled(false);
+    m_ui->thermalBiasCancel->setEnabled(false);
 
     // home location
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
@@ -361,12 +364,13 @@ void ConfigRevoWidget::disableAllCalibrations()
     m_ui->magStart->setEnabled(false);
     m_ui->boardLevelStart->setEnabled(false);
     m_ui->gyroBiasStart->setEnabled(false);
-    m_ui->ThermalBiasStart->setEnabled(false);
+    m_ui->thermalBiasStart->setEnabled(false);
 }
 
 void ConfigRevoWidget::enableAllCalibrations()
 {
-    // TODO should use a signal instead
+    // TODO this logic should not be here and should use a signal instead
+    // need to check if ConfigTaskWidget has support for this kind of use cases
     if (m_accelCalibrationModel->dirty() || m_magCalibrationModel->dirty() || m_levelCalibrationModel->dirty()
         || m_gyroBiasCalibrationModel->dirty() || m_thermalCalibrationModel->dirty()) {
         widgetsContentsChanged();
@@ -376,5 +380,5 @@ void ConfigRevoWidget::enableAllCalibrations()
     m_ui->magStart->setEnabled(true);
     m_ui->boardLevelStart->setEnabled(true);
     m_ui->gyroBiasStart->setEnabled(true);
-    m_ui->ThermalBiasStart->setEnabled(true);
+    m_ui->thermalBiasStart->setEnabled(true);
 }

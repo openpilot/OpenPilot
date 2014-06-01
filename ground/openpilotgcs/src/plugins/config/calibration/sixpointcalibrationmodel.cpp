@@ -470,6 +470,7 @@ void SixPointCalibrationModel::compute()
         }
         displayInstructions(tr("Sensor scale and bias computed successfully."), WizardModel::Success);
     } else {
+        progressChanged(0);
         displayInstructions(tr("Failed to calibrate! Please review the instructions and repeat."), WizardModel::Failure);
     }
     // set to run again

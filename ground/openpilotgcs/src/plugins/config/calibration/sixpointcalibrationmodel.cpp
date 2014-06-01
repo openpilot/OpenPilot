@@ -463,11 +463,11 @@ void SixPointCalibrationModel::compute()
         m_dirty = true;
         if (calibratingMag) {
             result.revoCalibrationData = revoCalibrationData;
-            displayInstructions(tr("Accelerometer calibration completed successfully."), WizardModel::Success);
+            displayInstructions(tr("Magnetometer calibration completed successfully."), WizardModel::Success);
         }
         if (calibratingAccel) {
             result.accelGyroSettingsData = accelGyroSettingsData;
-            displayInstructions(tr("Magnetometer calibration completed successfully."), WizardModel::Success);
+            displayInstructions(tr("Accelerometer calibration completed successfully."), WizardModel::Success);
         }
     } else {
         progressChanged(0);

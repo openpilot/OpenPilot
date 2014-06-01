@@ -56,11 +56,11 @@ public:
         if (m_helper->calibrationSuccessful()) {
             m_helper->setProgressMax(100);
             m_helper->setProgress(100);
-            m_helper->addInstructions(tr("Calibration completed successfully."), WizardModel::Success);
+            m_helper->addInstructions(tr("Thermal calibration completed successfully."), WizardModel::Success);
         } else {
             m_helper->setProgressMax(100);
             m_helper->setProgress(0);
-            m_helper->addInstructions(tr("Calibration failed! Please read the instructions and retry."), WizardModel::Failure);
+            m_helper->addInstructions(tr("Calibration failed! Please review the help and retry."), WizardModel::Failure);
         }
     }
 

@@ -144,7 +144,7 @@ void LevelCalibrationModel::getSample(UAVObject *obj)
 
             stopped();
             displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
-            displayInstructions(tr("Board leveling completed successfully."), WizardModel::Success);
+            displayInstructions(tr("Board level calibration completed successfully."), WizardModel::Success);
             break;
         }
     }

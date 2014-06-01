@@ -153,7 +153,7 @@ void GyroBiasCalibrationModel::getSample(UAVObject *obj)
         recallBoardRotation();
 
         stopped();
-        displayInstructions(tr("Gyroscope calibration completed succesfully."), WizardModel::Success);
+        displayInstructions(tr("Gyroscope calibration completed successfully."), WizardModel::Success);
         displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
     }
 }

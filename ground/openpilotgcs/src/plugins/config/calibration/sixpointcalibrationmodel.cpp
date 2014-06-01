@@ -126,9 +126,8 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     // check if Homelocation is set
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
     if (!homeLocationData.Set) {
-        // TODO
         QMessageBox msgBox;
-        msgBox.setInformativeText(tr("<p>HomeLocation not SET.</p><p>Please set your HomeLocation and try again. Aborting calibration!</p>"));
+        msgBox.setInformativeText(tr("<p>Home location not set.</p><p>Please set your home location and retry. Aborting calibration!</p>"));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setIcon(QMessageBox::Information);
@@ -464,14 +463,15 @@ void SixPointCalibrationModel::compute()
         m_dirty = true;
         if (calibratingMag) {
             result.revoCalibrationData = revoCalibrationData;
+            displayInstructions(tr("Accelerometer calibration completed successfully."), WizardModel::Success);
         }
         if (calibratingAccel) {
             result.accelGyroSettingsData = accelGyroSettingsData;
+            displayInstructions(tr("Magnetometer calibration completed successfully."), WizardModel::Success);
         }
-        displayInstructions(tr("Sensor scale and bias computed successfully."), WizardModel::Success);
     } else {
         progressChanged(0);
-        displayInstructions(tr("Failed to calibrate! Please review the instructions and repeat."), WizardModel::Failure);
+        displayInstructions(tr("Calibration failed! Please review the help and retry."), WizardModel::Failure);
     }
     // set to run again
     position = -1;

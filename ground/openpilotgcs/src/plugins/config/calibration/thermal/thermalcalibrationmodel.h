@@ -45,6 +45,7 @@ class ThermalCalibrationModel : public WizardModel {
     Q_PROPERTY(float temperature READ temperature NOTIFY temperatureChanged)
     Q_PROPERTY(float temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
     Q_PROPERTY(int progress READ progress WRITE setProgress NOTIFY progressChanged)
+    Q_PROPERTY(int progressMax READ progressMax WRITE setProgressMax NOTIFY progressMaxChanged)
 
 public:
     explicit ThermalCalibrationModel(QObject *parent = 0);
@@ -100,6 +101,11 @@ public slots:
         return m_progress;
     }
 
+    int progressMax()
+    {
+        return m_progressMax;
+    }
+
     float temperature()
     {
         return m_temperature;
@@ -126,10 +132,16 @@ public slots:
         }
     }
 
-    void setProgress(int progress)
+    void setProgress(int value)
     {
-        m_progress = progress;
-        emit progressChanged(progress);
+        m_progress = value;
+        emit progressChanged(value);
+    }
+
+    void setProgressMax(int value)
+    {
+        m_progressMax = value;
+        emit progressMaxChanged(value);
     }
 
 private:
@@ -139,6 +151,7 @@ private:
     bool m_initDone;
     bool m_dirty;
     int m_progress;
+    int m_progressMax;
     float m_temperature;
     float m_temperatureGradient;
 
@@ -178,6 +191,7 @@ signals:
     void temperatureChanged(float temp);
     void temperatureGradientChanged(float tempGradient);
     void progressChanged(int value);
+    void progressMaxChanged(int value);
 
     void next();
     void previous();

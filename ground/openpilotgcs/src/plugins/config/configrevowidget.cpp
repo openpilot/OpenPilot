@@ -174,6 +174,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(float)), this, SLOT(displayTemperature(float)));
     connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(float)), this, SLOT(displayTemperatureGradient(float)));
     connect(m_thermalCalibrationModel, SIGNAL(progressChanged(int)), m_ui->thermalBiasProgress, SLOT(setValue(int)));
+    connect(m_thermalCalibrationModel, SIGNAL(progressMaxChanged(int)), m_ui->thermalBiasProgress, SLOT(setMaximum(int)));
     m_ui->thermalBiasEnd->setEnabled(false);
     m_ui->thermalBiasCancel->setEnabled(false);
 

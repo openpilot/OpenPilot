@@ -57,6 +57,8 @@ public:
 public slots:
     void enterState()
     {
+        m_helper->setProgressMax(0);
+        m_helper->setProgress(0);
         m_helper->addInstructions(tr("Please wait during samples acquisition. This can take several minutes..."), WizardModel::Prompt);
         m_helper->initAcquisition();
     }

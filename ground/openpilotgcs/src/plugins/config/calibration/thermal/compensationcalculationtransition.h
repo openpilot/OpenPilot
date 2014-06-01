@@ -54,8 +54,12 @@ public:
         Q_UNUSED(e);
         QString nextStateName;
         if (m_helper->calibrationSuccessful()) {
+            m_helper->setProgressMax(100);
+            m_helper->setProgress(100);
             m_helper->addInstructions(tr("Calibration completed successfully."), WizardModel::Success);
         } else {
+            m_helper->setProgressMax(100);
+            m_helper->setProgress(0);
             m_helper->addInstructions(tr("Calibration failed! Please read the instructions and retry."), WizardModel::Failure);
         }
     }

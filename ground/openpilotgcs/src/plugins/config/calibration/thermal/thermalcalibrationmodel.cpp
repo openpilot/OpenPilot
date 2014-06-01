@@ -38,7 +38,8 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     m_startEnabled(false),
     m_cancelEnabled(false),
     m_endEnabled(false),
-    m_initDone(false)
+    m_initDone(false),
+    m_dirty(false)
 {
     m_helper.reset(new ThermalCalibrationHelper());
 
@@ -63,6 +64,7 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     connect(m_helper.data(), SIGNAL(temperatureChanged(float)), this, SLOT(setTemperature(float)));
     connect(m_helper.data(), SIGNAL(temperatureGradientChanged(float)), this, SLOT(setTemperatureGradient(float)));
     connect(m_helper.data(), SIGNAL(progressChanged(int)), this, SLOT(setProgress(int)));
+    connect(m_helper.data(), SIGNAL(progressMaxChanged(int)), this, SLOT(setProgressMax(int)));
     connect(m_helper.data(), SIGNAL(instructionsAdded(QString, WizardModel::MessageType)), this, SLOT(addInstructions(QString, WizardModel::MessageType)));
     connect(m_readyState, SIGNAL(entered()), this, SLOT(stopWizard()));
     connect(m_readyState, SIGNAL(exited()), this, SLOT(startWizard()));
@@ -95,10 +97,10 @@ void ThermalCalibrationModel::stepChanged(WizardState *state)
 void ThermalCalibrationModel::setTransitions()
 {
     m_readyState->addTransition(this, SIGNAL(next()), m_workingState);
+    m_readyState->assignProperty(this, "progressMax", 100);
     m_readyState->assignProperty(this, "progress", 0);
 
     m_completedState->addTransition(this, SIGNAL(next()), m_workingState);
-    m_completedState->assignProperty(this, "progress", 100);
 
     // handles board initial status save
     // Ready->WorkingState->saveSettings->setup
@@ -115,6 +117,7 @@ void ThermalCalibrationModel::setTransitions()
 
     // abort causes initial settings to be restored and acquisition stopped.
     m_abortState->addTransition(new BoardStatusRestoreTransition(m_helper.data(), m_abortState, m_readyState));
+
     m_workingState->addTransition(this, SIGNAL(abort()), m_abortState);
     // Ready
 }

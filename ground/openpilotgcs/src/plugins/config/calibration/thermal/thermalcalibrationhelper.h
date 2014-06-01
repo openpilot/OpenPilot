@@ -106,7 +106,7 @@ public:
 
     int processPercentage()
     {
-        return m_processPercentage;
+        return m_progress;
     }
 
     void endAcquisition();
@@ -126,9 +126,9 @@ signals:
     void temperatureChanged(float value);
     void temperatureGradientChanged(float value);
     void progressChanged(int value);
+    void progressMaxChanged(int value);
     void collectionCompleted();
     void calculationCompleted();
-    void abort();
 
 public slots:
     /**
@@ -162,10 +162,15 @@ public slots:
     void collectSample(UAVObject *sample);
     void setProgress(int value)
     {
-        if (m_processPercentage != value) {
-            m_processPercentage = value;
+        if (m_progress != value) {
+            m_progress = value;
             emit progressChanged(value);
         }
+    }
+    void setProgressMax(int value)
+    {
+        m_progressMax = value;
+        emit progressMaxChanged(value);
     }
 
     void addInstructions(QString text, WizardModel::MessageType type = WizardModel::Info)
@@ -203,15 +208,12 @@ private:
     float m_gradient;
     float m_temperature;
     float m_initialGradient;
-    const static int ProcessPercentageSaveSettings    = 5;
-    const static int ProcessPercentageSetupBoard      = 10;
-    const static int ProcessPercentageBaseAcquisition = 15;
-    const static int ProcessPercentageBaseCalculation = 85;
-    const static int ProcessPercentageSaveResults     = 95;
+    int m_targetduration;
+    int m_progress;
+    int m_progressMax;
+
     const static float TargetGradient  = 0.20f;
     const static float TargetTempDelta = 10.0f;
-    int m_targetduration;
-    int m_processPercentage;
 
     // convenience pointers
     AccelSensor *accelSensor;

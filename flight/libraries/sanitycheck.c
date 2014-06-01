@@ -37,6 +37,7 @@
 #include <flightmodesettings.h>
 #include <systemsettings.h>
 #include <systemalarms.h>
+#include <revosettings.h>
 #include <taskinfo.h>
 
 /****************************
@@ -61,8 +62,27 @@ int32_t configuration_check()
     const struct pios_board_info *bdinfo = &pios_board_info_blob;
     bool coptercontrol     = bdinfo->board_type == 0x04;
 
+    // Classify navigation capability
+#ifdef REVOLUTION
+    RevoSettingsInitialize();
+    uint8_t revoFusion;
+    RevoSettingsFusionAlgorithmGet(&revoFusion);
+    bool navCapableFusion;
+    switch (revoFusion) {
+    case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAGGPSOUTDOOR:
+    case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
+        navCapableFusion = true;
+        break;
+    default:
+        navCapableFusion = false;
+    }
+#else
+    const bool navCapableFusion = false;
+#endif
+
+
     // Classify airframe type
-    bool multirotor = true;
+    bool multirotor;
     uint8_t airframe_type;
 
     SystemSettingsAirframeTypeGet(&airframe_type);
@@ -126,6 +146,9 @@ int32_t configuration_check()
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                 // Revo supports Position Hold
                 severity = SYSTEMALARMS_ALARM_ERROR;
+            } else if (!navCapableFusion) {
+                // we need nav capable fusion algorithm
+                severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
@@ -133,6 +156,9 @@ int32_t configuration_check()
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                 // Revo supports AutoLand Mode
+                severity = SYSTEMALARMS_ALARM_ERROR;
+            } else if (!navCapableFusion) {
+                // we need nav capable fusion algorithm
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
@@ -142,10 +168,19 @@ int32_t configuration_check()
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                 // Revo supports POI Mode
                 severity = SYSTEMALARMS_ALARM_ERROR;
+            } else if (!navCapableFusion) {
+                // we need nav capable fusion algorithm
+                severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
             if (coptercontrol) {
+                severity = SYSTEMALARMS_ALARM_ERROR;
+            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                // Revo supports PathPlanner
+                severity = SYSTEMALARMS_ALARM_ERROR;
+            } else if (!navCapableFusion) {
+                // we need nav capable fusion algorithm
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else {
                 // Revo supports PathPlanner and that must be OK or we are not sane
@@ -163,6 +198,9 @@ int32_t configuration_check()
                 severity = SYSTEMALARMS_ALARM_ERROR;
             } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                 // Revo supports ReturnToBase
+                severity = SYSTEMALARMS_ALARM_ERROR;
+            } else if (!navCapableFusion) {
+                // we need nav capable fusion algorithm
                 severity = SYSTEMALARMS_ALARM_ERROR;
             }
             break;

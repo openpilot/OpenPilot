@@ -399,7 +399,12 @@ void ThermalCalibrationHelper::updateTemp(float temp)
         } else if ((m_gradient > .1) && ((m_initialGradient / 2.0f) > m_gradient)) {
             // make a rough estimation of the time needed
             m_targetduration = elapsed * 8;
+
             setProgressMax(100);
+
+            QTime t     = QTime(0, 0).addSecs(m_targetduration);
+            addInstructions(tr("Estimated duration: %1").arg(t.toString("m' minute(s) and 's' second(s).'")));
+
             QString str = QStringLiteral("INFO::Trace gradient : %1, elapsed : %2 initial gradient : %3, target : %4")
                           .arg(m_gradient).arg(elapsed).arg(m_initialGradient).arg(m_targetduration);
             qDebug() << str;

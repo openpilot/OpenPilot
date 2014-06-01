@@ -211,6 +211,7 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     started();
 
     // Show instructions and enable controls
+    progressChanged(0);
     displayInstructions((*currentSteps)[0].instructions, WizardModel::Prompt);
     showHelp((*currentSteps)[0].visualHelp);
     savePositionEnabledChanged(true);
@@ -283,9 +284,20 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
         }
     }
 
-    if ((!calibratingAccel || (accel_accum_x.size() >= POINT_SAMPLE_SIZE)) &&
-        (!calibratingMag || (mag_accum_x.size() >= POINT_SAMPLE_SIZE / 10)) &&
-        (collectingData == true)) {
+    bool done = true;
+    float progress = 0;
+    if (calibratingAccel) {
+        done     = (accel_accum_x.size() >= POINT_SAMPLE_SIZE);
+        progress = (float)accel_accum_x.size() / (float)POINT_SAMPLE_SIZE;
+    }
+    if (calibratingMag) {
+        done     = (mag_accum_x.size() >= POINT_SAMPLE_SIZE / 10);
+        progress = (float)mag_accum_x.size() / (float)(POINT_SAMPLE_SIZE / 10);
+    }
+
+    progressChanged(progress * 100);
+
+    if (collectingData && done) {
         collectingData = false;
 
         savePositionEnabledChanged(true);

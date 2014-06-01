@@ -106,6 +106,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
             this, SLOT(addInstructions(QString, WizardModel::MessageType)));
     connect(m_accelCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_accelCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), m_ui->accelSavePos, SLOT(setEnabled(bool)));
+    connect(m_accelCalibrationModel, SIGNAL(progressChanged(int)), m_ui->accelProgress, SLOT(setValue(int)));
     m_ui->accelSavePos->setEnabled(false);
 
     // mag calibration
@@ -121,6 +122,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
             this, SLOT(addInstructions(QString, WizardModel::MessageType)));
     connect(m_magCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
     connect(m_magCalibrationModel, SIGNAL(savePositionEnabledChanged(bool)), m_ui->magSavePos, SLOT(setEnabled(bool)));
+    connect(m_magCalibrationModel, SIGNAL(progressChanged(int)), m_ui->magProgress, SLOT(setValue(int)));
     m_ui->magSavePos->setEnabled(false);
 
     // board level calibration

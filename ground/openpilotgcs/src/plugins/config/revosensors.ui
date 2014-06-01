@@ -127,17 +127,11 @@
                </widget>
               </item>
               <item>
-               <spacer name="horizontalSpacer_thermalbias_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+               <widget class="QProgressBar" name="accelProgress">
+                <property name="value">
+                 <number>0</number>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
+               </widget>
               </item>
               <item>
                <widget class="QPushButton" name="accelSavePos">
@@ -175,17 +169,11 @@
                </widget>
               </item>
               <item>
-               <spacer name="horizontalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+               <widget class="QProgressBar" name="magProgress">
+                <property name="value">
+                 <number>0</number>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
+               </widget>
               </item>
               <item>
                <widget class="QPushButton" name="magSavePos">

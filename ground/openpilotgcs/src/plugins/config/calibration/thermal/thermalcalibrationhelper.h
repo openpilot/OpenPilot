@@ -185,7 +185,6 @@ private:
     QScopedPointer<QTemporaryDir> m_tempdir;
     void createDebugLog();
     void closeDebugLog();
-    void copyResultToSettings();
 
     QMutex sensorsUpdateLock;
 

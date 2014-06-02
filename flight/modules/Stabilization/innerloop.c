@@ -110,7 +110,7 @@ static void stabilizationInnerloopTask()
         bool warn  = false;
         bool error = false;
         bool crit  = false;
-        // check if outer loop keeps executing
+        /*// check if outer loop keeps executing
         if (stabSettings.monitor.rateupdates > -64) {
             stabSettings.monitor.rateupdates--;
         }
@@ -134,7 +134,7 @@ static void stabilizationInnerloopTask()
         if (stabSettings.monitor.gyroupdates > 3) {
             // error if we missed 3 gyro updates
             error = true;
-        }
+        }*/
         stabSettings.monitor.gyroupdates = 0;
 
         if (crit) {

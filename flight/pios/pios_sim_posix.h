@@ -93,6 +93,10 @@ extern void PIOS_LED_Init(void);
 #include <pios_flash.h>
 #include <pios_flashfs.h>
 
+#ifdef PIOS_INCLUDE_I2C
+#include <pios_i2c.h>
+#endif
+
 #if defined(PIOS_INCLUDE_IAP)
 #include <pios_iap.h>
 #endif

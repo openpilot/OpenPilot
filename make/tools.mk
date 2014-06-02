@@ -90,7 +90,7 @@ endif
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
 
 # Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
-ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
+ARM_SDK_DIR     := /opt/toolchain/raspberrypi/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.2.1
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
 PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin
@@ -457,11 +457,11 @@ endef
 $(eval $(call TOOL_INSTALL_TEMPLATE,arm_sdk,$(ARM_SDK_DIR),$(ARM_SDK_URL),$(notdir $(ARM_SDK_URL))))
 
 ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
+    export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-linux-gnueabihf-
 else
     # not installed, hope it's in the path...
     # $(info $(EMPTY) WARNING     $(call toprel, $(ARM_SDK_DIR)) not found (make arm_sdk_install), using system PATH)
-    export ARM_SDK_PREFIX ?= arm-none-eabi-
+    export ARM_SDK_PREFIX ?= arm-linux-gnueabihf-
 endif
 
 .PHONY: arm_sdk_version
@@ -470,9 +470,9 @@ arm_sdk_version:
 
 # Template to check ARM toolchain version before building targets
 define ARM_GCC_VERSION_CHECK_TEMPLATE
-	if ! $(ARM_SDK_PREFIX)gcc --version --specs=nano.specs >/dev/null 2>&1; then \
+	if ! $(ARM_SDK_PREFIX)gcc --version >/dev/null 2>&1; then \
 		$(ECHO) $(MSG_NOTICE) Please install ARM toolchain 4.7+ using \'make arm_sdk_install\' && \
-		$(ECHO) $(MSG_NOTICE) Older ARM SDKs do not support new \'--specs=nano.specs\' option && \
+		$(ECHO) $(MSG_NOTICE) Older ARM SDKs do not support new option && \
 		exit 1; \
 	fi
 endef

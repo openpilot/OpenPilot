@@ -2119,6 +2119,7 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 	/* Stop warnings. */
 	( void ) pvParameters;
 
+printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
 	for( ;; )
 	{
 		/* See if any tasks have been deleted. */

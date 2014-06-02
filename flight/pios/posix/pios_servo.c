@@ -42,23 +42,42 @@ static volatile uint16_t ServoPosition[PIOS_SERVO_NUM_TIMERS];
  * Initialise Servos
  */
 void PIOS_Servo_Init(void)
-{}
+{
+	printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
+}
 
 /**
  * Set the servo update rate (Max 500Hz)
- * \param[in] onetofour Rate for outputs 1 to 4 (Hz)
- * \param[in] fivetoeight Rate for outputs 5 to 8 (Hz)
+ * \param[in] array of rates in Hz
+ * \param[in] maximum number of banks
  */
 void PIOS_Servo_SetHz(const uint16_t *banks, uint8_t num_banks)
-{}
+{
+	int i;
+
+	for (i = 0; i < num_banks; ++i)
+	{
+		printf("%s:%d %s() --> bank = %d, Hz = %d.\n", __FILE__, __LINE__, __func__, i, banks[i]);
+	}
+}
 
 /**
  * Set servo position
  * \param[in] Servo Servo number (0-7)
  * \param[in] Position Servo position in milliseconds
  */
+
+//or
+
+/**
+ * Set servo position
+ * \param[in] Servo Servo number (0-7)
+ * \param[in] Position Servo position in microseconds
+ */
+// miliseconds or microseconds thats the question
 void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 {
+//printf("%s:%d %s() -->Servo = %d, Position = %d.\n", __FILE__, __LINE__, __func__, Servo, Position);
 #ifndef PIOS_ENABLE_DEBUG_PINS
     /* Make sure servo exists */
     if (Servo < PIOS_SERVO_NUM_OUTPUTS) {

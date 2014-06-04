@@ -259,36 +259,48 @@ static void getVector(float controlVector[5], vario_type type)
 static void plan_run_PositionVario(vario_type type)
 {
     float controlVector[5];
+    PathDesiredData pathDesired;
+
+    PathDesiredGet(&pathDesired);
 
     ManualControlCommandRollGet(&controlVector[0]);
     ManualControlCommandPitchGet(&controlVector[1]);
     ManualControlCommandYawGet(&controlVector[2]);
     ManualControlCommandThrustGet(&controlVector[3]);
-    controlVector[4] = 0;
+    controlVector[4] = 0.0f;
+
     // check if movement is desired
     if (normalizeDeadband(controlVector) == false) {
-        // no movement desired, re-enter positionHold at current position
+        // no movement desired, re-enter positionHold at current start-position
         if (!vario_hold) {
             vario_hold = true;
-            plan_setup_positionHold();
+
+            FlightModeSettingsPositionHoldMaxGradientData maxGradient;
+            FlightModeSettingsPositionHoldMaxGradientGet(&maxGradient);
+            // new hold position is the position that was previously the start position
+            pathDesired.End.North   = pathDesired.Start.North;
+            pathDesired.End.East    = pathDesired.Start.East;
+            pathDesired.End.Down    = pathDesired.Start.Down;
+            // while the new start position has the same offset as in position hold
+            pathDesired.Start.North = pathDesired.Start.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
+            pathDesired.StartingVelocity = maxGradient.Speed;
+            PathDesiredSet(&pathDesired);
         }
     } else {
         PositionStateData positionState;
         PositionStateGet(&positionState);
-        PathDesiredData pathDesired;
-        PathDesiredGet(&pathDesired);
 
         getVector(controlVector, type);
 
         // layout of control Vector : unitVector in movement direction {0,1,2} vector length {3} velocity {4}
         if (vario_hold) {
-            // start position is the position where positionvario is initially enabled
+            // start position is the position that was previously the hold position
             vario_hold = false;
-            pathDesired.Start.North = positionState.North;
-            pathDesired.Start.East  = positionState.East;
-            pathDesired.Start.Down  = positionState.Down;
+            pathDesired.Start.North = pathDesired.End.North;
+            pathDesired.Start.East  = pathDesired.End.East;
+            pathDesired.Start.Down  = pathDesired.End.Down;
         } else {
-            // start position is advanced according to movement - in the direction of controlVector only
+            // start position is advanced according to movement - in the direction of ControlVector only
             // projection using scalar product
             float kp = (positionState.North - pathDesired.Start.North) * controlVector[0]
                        + (positionState.East - pathDesired.Start.East) * controlVector[1]
@@ -299,11 +311,10 @@ static void plan_run_PositionVario(vario_type type)
                 pathDesired.Start.Down  += kp * controlVector[2];
             }
         }
-        pathDesired.StartingVelocity = controlVector[4];
-        pathDesired.EndingVelocity   = 0;
         pathDesired.End.North = pathDesired.Start.North + controlVector[0] * controlVector[3];
         pathDesired.End.East  = pathDesired.Start.East + controlVector[1] * controlVector[3];
         pathDesired.End.Down  = pathDesired.Start.Down - controlVector[2] * controlVector[3];
+        pathDesired.StartingVelocity = controlVector[4];
         PathDesiredSet(&pathDesired);
     }
 }

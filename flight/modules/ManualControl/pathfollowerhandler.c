@@ -68,31 +68,44 @@ void pathFollowerHandler(bool newinit)
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
             plan_setup_positionHold();
             break;
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
+            plan_setup_PositionVarioFPV();
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
+            plan_setup_PositionVarioLOS();
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
+            plan_setup_PositionVarioNSEW();
+            break;
 
         case FLIGHTSTATUS_FLIGHTMODE_LAND:
             plan_setup_land();
             break;
+        case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
+            plan_setup_AutoCruise();
+            break;
 
         default:
             plan_setup_positionHold();
-
-            /* Disable this section, until such time as proper discussion can be had about how to implement it for all types of crafts.
-               } else {
-               PathDesiredData pathDesired;
-               PathDesiredGet(&pathDesired);
-               pathDesired.End[PATHDESIRED_END_NORTH] += dT * -cmd->Pitch;
-               pathDesired.End[PATHDESIRED_END_EAST] += dT * cmd->Roll;
-               pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-               PathDesiredSet(&pathDesired);
-             */
             break;
         }
     }
 
     switch (flightMode) {
-    // special handling of autoland - behaves like positon hold but with slow altitude decrease
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
+        plan_run_PositionVarioFPV();
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
+        plan_run_PositionVarioLOS();
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
+        plan_run_PositionVarioNSEW();
+        break;
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
         plan_run_land();
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
+        plan_run_AutoCruise();
         break;
     default:
         break;

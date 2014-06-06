@@ -100,6 +100,7 @@ SRC += $(PIOSCOMMON)/pios_usb_util.c
 SRC += $(PIOSCOMMON)/pios_task_monitor.c
 SRC += $(PIOSCOMMON)/pios_callbackscheduler.c
 SRC += $(PIOSCOMMON)/pios_notify.c
+SRC += $(PIOSCOMMON)/pios_instrumentation.c
 ## Misc library functions
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/sanitycheck.c

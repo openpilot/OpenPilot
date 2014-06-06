@@ -49,6 +49,8 @@ int8_t PIOS_Instrumentation_CreateCounter(uint32_t id)
     PIOS_Assert(pios_instrumentation_perf_counters && (pios_instrumentation_max_counters > pios_instrumentation_last_used_counter));
     int8_t idx = ++pios_instrumentation_last_used_counter;
     pios_instrumentation_perf_counters[idx].id = id;
+    pios_instrumentation_perf_counters[idx].max = INT32_MIN;
+    pios_instrumentation_perf_counters[idx].min = INT32_MAX;
     return idx;
 }
 

@@ -36,6 +36,11 @@
 #include <pios_oplinkrcvr_priv.h>
 #include <taskinfo.h>
 #include <pios_callbackscheduler.h>
+
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+#include <pios_instrumentation.h>
+#endif
+
 /*
  * Pull in the board-specific static HW definitions.
  * Including .c files is a bit ugly but this allows all of
@@ -339,6 +344,11 @@ void PIOS_Board_Init(void)
     PIOS_Assert(led_cfg);
     PIOS_LED_Init(led_cfg);
 #endif /* PIOS_INCLUDE_LED */
+
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+    PIOS_Instrumentation_Init(PIOS_INSTRUMENTATION_MAX_COUNTERS);
+#endif
+
 
 #if false
     /* Set up the SPI interface to the gyro/acelerometer */

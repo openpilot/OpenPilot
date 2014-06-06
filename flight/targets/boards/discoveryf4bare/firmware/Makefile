@@ -75,12 +75,14 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
+    
     #ifeq ($(DEBUG), YES)
     SRC += $(OPSYSTEM)/dcc_stdio.c
     SRC += $(OPSYSTEM)/cm3_fault_handlers.c
     #endif
 
     ## Misc library functions
+    SRC += $(FLIGHTLIB)/instrumentation.c
     SRC += $(FLIGHTLIB)/paths.c
 	SRC += $(FLIGHTLIB)/plans.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c

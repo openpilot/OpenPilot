@@ -290,6 +290,8 @@ static void plan_run_PositionVario(vario_type type)
         PositionStateData positionState;
         PositionStateGet(&positionState);
 
+        // flip pitch to have pitch down (away) point north
+        controlVector[1] = -controlVector[1];
         getVector(controlVector, type);
 
         // layout of control Vector : unitVector in movement direction {0,1,2} vector length {3} velocity {4}
@@ -304,11 +306,11 @@ static void plan_run_PositionVario(vario_type type)
             // projection using scalar product
             float kp = (positionState.North - pathDesired.Start.North) * controlVector[0]
                        + (positionState.East - pathDesired.Start.East) * controlVector[1]
-                       + (positionState.Down - pathDesired.Start.Down) * controlVector[2];
+                       + (positionState.Down - pathDesired.Start.Down) * -controlVector[2];
             if (kp > 0.0f) {
                 pathDesired.Start.North += kp * controlVector[0];
                 pathDesired.Start.East  += kp * controlVector[1];
-                pathDesired.Start.Down  += kp * controlVector[2];
+                pathDesired.Start.Down  += kp * -controlVector[2];
             }
         }
         pathDesired.End.North = pathDesired.Start.North + controlVector[0] * controlVector[3];
@@ -428,9 +430,7 @@ void plan_run_AutoCruise()
     // resulting movement vector is scaled by velocity demand in controlvector[3] [0.0-1.0]
     vector[0] = cosf(DEG2RAD(angle)) * maxGradient.Distance * controlVector[3];
     vector[1] = sinf(DEG2RAD(angle)) * maxGradient.Distance * controlVector[3];
-    vector[2] = controlVector[1] * maxGradient.Distance * controlVector[3];
-    // note: no negation in down vector, negative pitch demand actually "pulls
-    // up", which reduces "down" coordinate as expected by fixed wing pilots
+    vector[2] = -controlVector[1] * maxGradient.Distance * controlVector[3];
 
     pathDesired.End.North = pathDesired.Start.North + vector[0];
     pathDesired.End.East  = pathDesired.Start.East + vector[1];

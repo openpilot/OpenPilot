@@ -49,7 +49,7 @@ void InstrumentationPublishAllCounters()
 
 void counterCallback(const pios_perf_counter_t *counter, const int8_t index, __attribute__((unused)) void *context)
 {
-    if (publishedCountersInstances < index) {
+    if (publishedCountersInstances < index + 1) {
         PerfCounterCreateInstance();
         publishedCountersInstances++;
     }

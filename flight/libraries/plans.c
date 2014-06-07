@@ -285,7 +285,6 @@ static void plan_run_PositionVario(vario_type type)
             pathDesired.Start.North = pathDesired.End.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
             pathDesired.Start.East  = pathDesired.End.East;
             pathDesired.Start.Down  = pathDesired.End.Down;
-            pathDesired.StartingVelocity = maxGradient.Speed;
             PathDesiredSet(&pathDesired);
         }
     } else {
@@ -323,7 +322,6 @@ static void plan_run_PositionVario(vario_type type)
         pathDesired.Start.North = pathDesired.End.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
         pathDesired.Start.East  = pathDesired.End.East;
         pathDesired.Start.Down  = pathDesired.End.Down;
-        pathDesired.StartingVelocity = maxGradient.Speed;
         PathDesiredSet(&pathDesired);
     }
 }
@@ -450,6 +448,5 @@ void plan_run_AutoCruise()
     pathDesired.Start.North = pathDesired.End.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
     pathDesired.Start.East  = pathDesired.End.East;
     pathDesired.Start.Down  = pathDesired.End.Down;
-    pathDesired.StartingVelocity = maxGradient.Speed * controlVector[3];
     PathDesiredSet(&pathDesired);
 }

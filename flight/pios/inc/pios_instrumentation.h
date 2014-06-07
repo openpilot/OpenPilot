@@ -94,6 +94,27 @@ inline void PIOS_Instrumentation_TimeEnd(int8_t counterIdx)
 }
 
 /**
+ * Used to determine the mean period between each call to the function
+ * @param counterIdx counterIdx index of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
+ */
+inline void PIOS_Instrumentation_TrackPeriod(int8_t counterIdx)
+{
+    vPortEnterCritical();
+    PIOS_Assert(pios_instrumentation_perf_counters && (counterIdx <= pios_instrumentation_last_used_counter));
+    pios_perf_counter_t *counter = &pios_instrumentation_perf_counters[counterIdx];
+    uint32_t period = PIOS_DELAY_DiffuS(counter->lastUpdateTS);
+    counter->lastUpdateTS = PIOS_DELAY_GetRaw();
+    counter->value = (counter->value * 14 + period * 2) / 16;
+    if (counter->value > counter->max) {
+        counter->max = counter->value;
+    }
+    if (counter->value < counter->min) {
+        counter->min = counter->value;
+    }
+    vPortExitCritical();
+}
+
+/**
  * Initialize the Instrumentation infrastructure
  * @param maxCounters maximum number of allowed counters
  */

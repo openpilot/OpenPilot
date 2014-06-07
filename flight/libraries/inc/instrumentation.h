@@ -3,8 +3,8 @@
  *
  * @file       instrumentation.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      brief goes here.
- *             --
+ * @brief      Instrumentation infrastructure
+ *             UAVObject wrapper layer for PiOS instrumentation
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -26,9 +26,14 @@
 #ifndef INSTRUMENTATION_H
 #define INSTRUMENTATION_H
 #include <perfcounter.h>
-
+/**
+ * Initialize the instrumentationUAVObject wrapper
+ */
 void InstrumentationInit();
 
+/**
+ * publish all counters to UAVObjects
+ */
 void InstrumentationPublishAllCounters();
 
 #endif /* INSTRUMENTATION_H */

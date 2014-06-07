@@ -3,8 +3,8 @@
  *
  * @file       instrumentation.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      brief goes here.
- *             --
+ * @brief      Instrumentation infrastructure
+ *             UAVObject wrapper layer for PiOS instrumentation
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

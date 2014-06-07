@@ -71,14 +71,14 @@ void plan_setup_positionHold()
     FlightModeSettingsPositionHoldMaxGradientData maxGradient;
     FlightModeSettingsPositionHoldMaxGradientGet(&maxGradient);
 
-    pathDesired.Start.North      = positionState.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
-    pathDesired.Start.East       = positionState.East;
-    pathDesired.Start.Down       = positionState.Down;
     pathDesired.End.North        = positionState.North;
     pathDesired.End.East         = positionState.East;
     pathDesired.End.Down         = positionState.Down;
+    pathDesired.Start.North      = positionState.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
+    pathDesired.Start.East       = positionState.East;
+    pathDesired.Start.Down       = positionState.Down;
     pathDesired.StartingVelocity = maxGradient.Speed;
-    pathDesired.EndingVelocity   = 0;
+    pathDesired.EndingVelocity   = 0.0f;
     pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 
     PathDesiredSet(&pathDesired);
@@ -109,16 +109,16 @@ void plan_setup_returnToBase()
     FlightModeSettingsPositionHoldMaxGradientData maxGradient;
     FlightModeSettingsPositionHoldMaxGradientGet(&maxGradient);
 
-    pathDesired.Start.North      = takeoffLocation.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
-    pathDesired.Start.East       = takeoffLocation.East;
-    pathDesired.Start.Down       = destDown;
-
     pathDesired.End.North        = takeoffLocation.North;
     pathDesired.End.East         = takeoffLocation.East;
     pathDesired.End.Down         = destDown;
 
+    pathDesired.Start.North      = takeoffLocation.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
+    pathDesired.Start.East       = takeoffLocation.East;
+    pathDesired.Start.Down       = destDown;
+
     pathDesired.StartingVelocity = maxGradient.Speed;
-    pathDesired.EndingVelocity   = 0;
+    pathDesired.EndingVelocity   = 0.0f;
     pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 
     PathDesiredSet(&pathDesired);
@@ -149,6 +149,7 @@ void plan_run_land()
  * @brief positionvario functionality
  */
 static bool vario_hold = true;
+static float hold_position[3];
 
 static void plan_setup_PositionVario()
 {
@@ -200,7 +201,7 @@ static bool normalizeDeadband(float controlVector[4])
 
 typedef enum { FPV, LOS, NSEW } vario_type;
 
-static void getVector(float controlVector[5], vario_type type)
+static void getVector(float controlVector[4], vario_type type)
 {
     float length = sqrtf(controlVector[0] * controlVector[0] + controlVector[1] * controlVector[1] + controlVector[3] * controlVector[3]);
 
@@ -220,7 +221,6 @@ static void getVector(float controlVector[5], vario_type type)
     FlightModeSettingsPositionHoldMaxGradientData maxGradient;
     FlightModeSettingsPositionHoldMaxGradientGet(&maxGradient);
     controlVector[3] = length * maxGradient.Distance;
-    controlVector[4] = length * maxGradient.Speed;
 
     // rotate north and east - rotation angle based on type
     float angle;
@@ -258,16 +258,18 @@ static void getVector(float controlVector[5], vario_type type)
 
 static void plan_run_PositionVario(vario_type type)
 {
-    float controlVector[5];
+    float controlVector[4];
     PathDesiredData pathDesired;
 
     PathDesiredGet(&pathDesired);
+    FlightModeSettingsPositionHoldMaxGradientData maxGradient;
+    FlightModeSettingsPositionHoldMaxGradientGet(&maxGradient);
+
 
     ManualControlCommandRollGet(&controlVector[0]);
     ManualControlCommandPitchGet(&controlVector[1]);
     ManualControlCommandYawGet(&controlVector[2]);
     ManualControlCommandThrustGet(&controlVector[3]);
-    controlVector[4] = 0.0f;
 
     // check if movement is desired
     if (normalizeDeadband(controlVector) == false) {
@@ -275,14 +277,14 @@ static void plan_run_PositionVario(vario_type type)
         if (!vario_hold) {
             vario_hold = true;
 
-            FlightModeSettingsPositionHoldMaxGradientData maxGradient;
-            FlightModeSettingsPositionHoldMaxGradientGet(&maxGradient);
             // new hold position is the position that was previously the start position
-            pathDesired.End.North   = pathDesired.Start.North;
-            pathDesired.End.East    = pathDesired.Start.East;
-            pathDesired.End.Down    = pathDesired.Start.Down;
+            pathDesired.End.North   = hold_position[0];
+            pathDesired.End.East    = hold_position[1];
+            pathDesired.End.Down    = hold_position[2];
             // while the new start position has the same offset as in position hold
-            pathDesired.Start.North = pathDesired.Start.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
+            pathDesired.Start.North = pathDesired.End.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
+            pathDesired.Start.East  = pathDesired.End.East;
+            pathDesired.Start.Down  = pathDesired.End.Down;
             pathDesired.StartingVelocity = maxGradient.Speed;
             PathDesiredSet(&pathDesired);
         }
@@ -298,25 +300,30 @@ static void plan_run_PositionVario(vario_type type)
         if (vario_hold) {
             // start position is the position that was previously the hold position
             vario_hold = false;
-            pathDesired.Start.North = pathDesired.End.North;
-            pathDesired.Start.East  = pathDesired.End.East;
-            pathDesired.Start.Down  = pathDesired.End.Down;
+            hold_position[0] = pathDesired.End.North;
+            hold_position[1] = pathDesired.End.East;
+            hold_position[2] = pathDesired.End.Down;
         } else {
             // start position is advanced according to movement - in the direction of ControlVector only
             // projection using scalar product
-            float kp = (positionState.North - pathDesired.Start.North) * controlVector[0]
-                       + (positionState.East - pathDesired.Start.East) * controlVector[1]
-                       + (positionState.Down - pathDesired.Start.Down) * -controlVector[2];
+            float kp = (positionState.North - hold_position[0]) * controlVector[0]
+                       + (positionState.East - hold_position[1]) * controlVector[1]
+                       + (positionState.Down - hold_position[2]) * -controlVector[2];
             if (kp > 0.0f) {
-                pathDesired.Start.North += kp * controlVector[0];
-                pathDesired.Start.East  += kp * controlVector[1];
-                pathDesired.Start.Down  += kp * -controlVector[2];
+                hold_position[0] += kp * controlVector[0];
+                hold_position[1] += kp * controlVector[1];
+                hold_position[2] += kp * -controlVector[2];
             }
         }
-        pathDesired.End.North = pathDesired.Start.North + controlVector[0] * controlVector[3];
-        pathDesired.End.East  = pathDesired.Start.East + controlVector[1] * controlVector[3];
-        pathDesired.End.Down  = pathDesired.Start.Down - controlVector[2] * controlVector[3];
-        pathDesired.StartingVelocity = controlVector[4];
+        // new destination position is advanced based on controlVector
+        pathDesired.End.North   = hold_position[0] + controlVector[0] * controlVector[3];
+        pathDesired.End.East    = hold_position[1] + controlVector[1] * controlVector[3];
+        pathDesired.End.Down    = hold_position[2] - controlVector[2] * controlVector[3];
+        // the new start position has the same offset as in position hold
+        pathDesired.Start.North = pathDesired.End.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
+        pathDesired.Start.East  = pathDesired.End.East;
+        pathDesired.Start.Down  = pathDesired.End.Down;
+        pathDesired.StartingVelocity = maxGradient.Speed;
         PathDesiredSet(&pathDesired);
     }
 }
@@ -359,15 +366,19 @@ void plan_setup_AutoCruise()
         cos_lookup_deg(angle),
         sin_lookup_deg(angle)
     };
-    pathDesired.Start.North      = positionState.North;
-    pathDesired.Start.East       = positionState.East;
-    pathDesired.Start.Down       = positionState.Down;
-    pathDesired.End.North        = positionState.North + vector[0];
-    pathDesired.End.East         = positionState.East + vector[1];
-    pathDesired.End.Down         = positionState.Down;
-    pathDesired.StartingVelocity = 1.0f;
-    pathDesired.EndingVelocity   = 1.0f;
-    pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+    hold_position[0]             = positionState.North;
+    hold_position[1]             = positionState.East;
+    hold_position[2]             = positionState.Down;
+    pathDesired.End.North        = hold_position[0] + vector[0];
+    pathDesired.End.East         = hold_position[1] + vector[1];
+    pathDesired.End.Down         = hold_position[2];
+    // start position has the same offset as in position hold
+    pathDesired.Start.North      = pathDesired.End.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
+    pathDesired.Start.East       = pathDesired.End.East;
+    pathDesired.Start.Down       = pathDesired.End.Down;
+    pathDesired.StartingVelocity = maxGradient.Speed;
+    pathDesired.EndingVelocity   = 0.0f;
+    pathDesired.Mode             = PATHDESIRED_MODE_FLYENDPOINT;
 
     PathDesiredSet(&pathDesired);
 
@@ -399,9 +410,9 @@ void plan_run_AutoCruise()
     controlVector[3] = boundf(controlVector[3], 0.0f, 1.0f);
 
     // normalize old desired movement vector
-    float vector[3] = { pathDesired.End.North - pathDesired.Start.North,
-                        pathDesired.End.East - pathDesired.Start.East,
-                        pathDesired.End.Down - pathDesired.Start.Down };
+    float vector[3] = { pathDesired.End.North - hold_position[0],
+                        pathDesired.End.East - hold_position[1],
+                        pathDesired.End.Down - hold_position[2] };
     float length    = sqrtf(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
     if (length < 1e-9f) {
         length = 1.0f; // should not happen since initialized properly in setup()
@@ -412,13 +423,13 @@ void plan_run_AutoCruise()
 
     // start position is advanced according to actual movement - in the direction of desired vector only
     // projection using scalar product
-    float kp = (positionState.North - pathDesired.Start.North) * vector[0]
-               + (positionState.East - pathDesired.Start.East) * vector[1]
-               + (positionState.Down - pathDesired.Start.Down) * vector[2];
+    float kp = (positionState.North - hold_position[0]) * vector[0]
+               + (positionState.East - hold_position[1]) * vector[1]
+               + (positionState.Down - hold_position[2]) * vector[2];
     if (kp > 0.0f) {
-        pathDesired.Start.North += kp * vector[0];
-        pathDesired.Start.East  += kp * vector[1];
-        pathDesired.Start.Down  += kp * vector[2];
+        hold_position[0] += kp * vector[0];
+        hold_position[1] += kp * vector[1];
+        hold_position[2] += kp * vector[2];
     }
 
     // new angle is equal to old angle plus offset depending on yaw input and time
@@ -432,10 +443,13 @@ void plan_run_AutoCruise()
     vector[1] = sinf(DEG2RAD(angle)) * maxGradient.Distance * controlVector[3];
     vector[2] = -controlVector[1] * maxGradient.Distance * controlVector[3];
 
-    pathDesired.End.North = pathDesired.Start.North + vector[0];
-    pathDesired.End.East  = pathDesired.Start.East + vector[1];
-    pathDesired.End.Down  = pathDesired.Start.Down + vector[2];
+    pathDesired.End.North   = hold_position[0] + vector[0];
+    pathDesired.End.East    = hold_position[1] + vector[1];
+    pathDesired.End.Down    = hold_position[2] + vector[2];
+    // start position has the same offset as in position hold
+    pathDesired.Start.North = pathDesired.End.North + maxGradient.Distance; // in FlyEndPoint the direction of this vector does not matter
+    pathDesired.Start.East  = pathDesired.End.East;
+    pathDesired.Start.Down  = pathDesired.End.Down;
     pathDesired.StartingVelocity = maxGradient.Speed * controlVector[3];
-    pathDesired.EndingVelocity   = maxGradient.Speed * controlVector[3];
     PathDesiredSet(&pathDesired);
 }

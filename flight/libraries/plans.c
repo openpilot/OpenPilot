@@ -407,7 +407,7 @@ void plan_run_AutoCruise()
     controlVector[3] = 0.5f; // dummy, thrust is normalized separately
     normalizeDeadband(controlVector); // return value ignored
     ManualControlCommandThrustGet(&controlVector[3]); // no deadband as we are using thrust for velocity
-    controlVector[3] = boundf(controlVector[3], 0.0f, 1.0f);
+    controlVector[3] = boundf(controlVector[3], 1e-6f, 1.0f); // bound to above zero, to prevent loss of vector direction
 
     // normalize old desired movement vector
     float vector[3] = { pathDesired.End.North - hold_position[0],

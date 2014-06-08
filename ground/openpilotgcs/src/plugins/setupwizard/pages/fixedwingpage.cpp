@@ -105,8 +105,13 @@ void FixedWingPage::updateImageAndDescription()
     case SetupWizard::FIXED_WING_AILERON:
         elementId = "aileron";
         break;
+<<<<<<< HEAD
     case SetupWizard::FIXED_WING_ELEVON:
         elementId = "elevon";
+=======
+    case SetupWizard::FIXED_WING_VTAIL:
+        elementId = "v-tail";
+>>>>>>> parent of 11fa414... Fix minor cosmetic issue where vtail model was not rendering in the Configuration screen. Edit the Inkscape Object Properties.
         break;
     default:
         elementId = "";

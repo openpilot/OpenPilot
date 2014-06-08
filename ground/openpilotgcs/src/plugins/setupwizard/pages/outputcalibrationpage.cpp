@@ -181,10 +181,10 @@ void OutputCalibrationPage::setupVehicle()
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
-    case SetupWizard::FIXED_WING_VTAIL:
+    case SetupWizard::FIXED_WING_ELEVON:
         loadSVGFile(FIXEDWING_SVG_FILE);
 	m_wizardIndexes << 0 << 1 << 2 << 2; //2 for servoCenterSlider! 
-        m_vehicleElementIds << "v-tail" << "v-tail-frame" << "v-tail-motor" << "v-tail-elevon-left" << "v-tail-elevon-right";
+        m_vehicleElementIds << "elevon" << "elevon-frame" << "elevon-motor" << "elevon-left" << "elevon-right";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3;
         m_channelIndex << 0 << 0 << 1 << 2;
 

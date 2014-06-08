@@ -85,7 +85,7 @@ void FixedWingPage::setupFixedWingTypesCombo()
     ui->typeCombo->addItem(tr("Aileron, Elevator, Rudder"), SetupWizard::FIXED_WING_AILERON);
     m_descriptions << tr("This setup currently expects a traditional 4 channel setup including two ailerons (not connected by Y adapter), an elevator and a rudder. ");
 
-    ui->typeCombo->addItem(tr("V-Tail"), SetupWizard::FIXED_WING_VTAIL);
+    ui->typeCombo->addItem(tr("Elevon"), SetupWizard::FIXED_WING_ELEVON);
     m_descriptions << tr("This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet supported. Setup should include only two elevons, and should explicitly not include a rudder.");
 }
 
@@ -105,8 +105,8 @@ void FixedWingPage::updateImageAndDescription()
     case SetupWizard::FIXED_WING_AILERON:
         elementId = "aileron";
         break;
-    case SetupWizard::FIXED_WING_VTAIL:
-        elementId = "vtail";
+    case SetupWizard::FIXED_WING_ELEVON:
+        elementId = "elevon";
         break;
     default:
         elementId = "";

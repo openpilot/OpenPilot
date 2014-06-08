@@ -561,7 +561,7 @@ static inline void apply_accel_filter(const float *raw, float *filtered)
     }
 }
 
-static void updateAttitude(AccelStateData *accelStateData, GyroStateData *gyrosData)
+__attribute__((optimize("O3"))) static void updateAttitude(AccelStateData *accelStateData, GyroStateData *gyrosData)
 {
     float dT      = PIOS_DELTATIME_GetAverageSeconds(&dtconfig);
 
@@ -602,10 +602,10 @@ static void updateAttitude(AccelStateData *accelStateData, GyroStateData *gyrosD
     if (grot_mag < 1.0e-3f) {
         return;
     }
-
-    accel_err[0] /= (accel_mag * grot_mag);
-    accel_err[1] /= (accel_mag * grot_mag);
-    accel_err[2] /= (accel_mag * grot_mag);
+    const float invMag = 1.0f / (accel_mag * grot_mag);
+    accel_err[0] *= invMag;
+    accel_err[1] *= invMag;
+    accel_err[2] *= invMag;
 
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
     gyro_correct_int[0] += accel_err[0] * accelKi;
@@ -614,9 +614,10 @@ static void updateAttitude(AccelStateData *accelStateData, GyroStateData *gyrosD
     // gyro_correct_int[2] += accel_err[2] * accelKi;
 
     // Correct rates based on error, integral component dealt with in updateSensors
-    gyros[0] += accel_err[0] * accelKp / dT;
-    gyros[1] += accel_err[1] * accelKp / dT;
-    gyros[2] += accel_err[2] * accelKp / dT;
+    const float kpInvdT = accelKp / dT;
+    gyros[0] += accel_err[0] * kpInvdT;
+    gyros[1] += accel_err[1] * kpInvdT;
+    gyros[2] += accel_err[2] * kpInvdT;
 
     { // scoping variables to save memory
       // Work out time derivative from INSAlgo writeup
@@ -652,10 +653,11 @@ static void updateAttitude(AccelStateData *accelStateData, GyroStateData *gyrosD
         q[2] = 0;
         q[3] = 0;
     } else {
-        q[0] = q[0] / qmag;
-        q[1] = q[1] / qmag;
-        q[2] = q[2] / qmag;
-        q[3] = q[3] / qmag;
+        const float invQmag = 1.0f / qmag;
+        q[0] = q[0] * invQmag;
+        q[1] = q[1] * invQmag;
+        q[2] = q[2] * invQmag;
+        q[3] = q[3] * invQmag;
     }
 
     AttitudeStateData attitudeState;

@@ -94,13 +94,8 @@ void UAVObjectBrowserWidget::showMetaData(bool show)
 
 void UAVObjectBrowserWidget::categorize(bool categorize)
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-
-    Q_ASSERT(pm);
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(objManager);
-
     UAVObjectTreeModel *tmpModel = m_model;
+
     m_model = new UAVObjectTreeModel(0, categorize, m_viewoptions->cbScientific->isChecked());
     m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
     m_model->setManuallyChangedColor(m_manuallyChangedColor);
@@ -115,13 +110,8 @@ void UAVObjectBrowserWidget::categorize(bool categorize)
 
 void UAVObjectBrowserWidget::useScientificNotation(bool scientific)
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-
-    Q_ASSERT(pm);
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(objManager);
-
     UAVObjectTreeModel *tmpModel = m_model;
+
     m_model = new UAVObjectTreeModel(0, m_viewoptions->cbCategorized->isChecked(), scientific);
     m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
     m_model->setManuallyChangedColor(m_manuallyChangedColor);

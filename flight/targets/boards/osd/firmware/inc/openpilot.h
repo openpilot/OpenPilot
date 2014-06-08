@@ -36,10 +36,10 @@
 #include <utlist.h>
 #include <uavobjectmanager.h>
 #include <eventdispatcher.h>
-#include <callbackscheduler.h>
 #include <uavtalk.h>
 
 #include "alarms.h"
+#include <mathmisc.h>
 
 /* Global Functions */
 void OpenPilotInit(void);

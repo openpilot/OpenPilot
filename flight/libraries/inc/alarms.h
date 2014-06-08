@@ -42,9 +42,11 @@ int32_t AlarmsDefault(SystemAlarmsAlarmElem alarm);
 void AlarmsDefaultAll();
 int32_t AlarmsClear(SystemAlarmsAlarmElem alarm);
 void AlarmsClearAll();
+
 int32_t AlarmsHasWarnings();
 int32_t AlarmsHasErrors();
 int32_t AlarmsHasCritical();
+SystemAlarmsAlarmOptions AlarmsGetHighestSeverity();
 
 #endif // ALARMS_H
 

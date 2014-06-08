@@ -199,14 +199,14 @@ void UAVObjectField::limitsInitialize(const QString &limits)
         elementLimits.insert(index, limitList);
         ++index;
     }
-    foreach(QList<LimitStruct> limitList, elementLimits) {
-        foreach(LimitStruct limit, limitList) {
-            qDebug() << "Limit type" << limit.type << "for board" << limit.board << "for field" << getName();
-            foreach(QVariant var, limit.values) {
-                qDebug() << "value" << var;
-            }
-        }
-    }
+    // foreach(QList<LimitStruct> limitList, elementLimits) {
+    // foreach(LimitStruct limit, limitList) {
+    // qDebug() << "Limit type" << limit.type << "for board" << limit.board << "for field" << getName();
+    // foreach(QVariant var, limit.values) {
+    // qDebug() << "value" << var;
+    // }
+    // }
+    // }
 }
 bool UAVObjectField::isWithinLimits(QVariant var, quint32 index, int board)
 {
@@ -654,6 +654,24 @@ QString UAVObjectField::toString()
     return sout;
 }
 
+void UAVObjectField::toXML(QXmlStreamWriter *xmlWriter)
+{
+    xmlWriter->writeStartElement("field");
+    xmlWriter->writeAttribute("name", getName());
+    xmlWriter->writeAttribute("type", getTypeAsString());
+    if (!getUnits().isEmpty()) {
+        xmlWriter->writeAttribute("unit", getUnits());
+    }
+    for (unsigned int n = 0; n < numElements; ++n) {
+        xmlWriter->writeStartElement("value");
+        if (getElementNames().size() > 1) {
+            xmlWriter->writeAttribute("name", getElementNames().at(n));
+        }
+        xmlWriter->writeCharacters(getValue(n).toString());
+        xmlWriter->writeEndElement(); // value
+    }
+    xmlWriter->writeEndElement(); // field
+}
 
 qint32 UAVObjectField::pack(quint8 *dataOut)
 {
@@ -793,43 +811,31 @@ bool UAVObjectField::isNumeric()
 {
     switch (type) {
     case INT8:
-        return true;
-
-        break;
     case INT16:
-        return true;
-
-        break;
     case INT32:
-        return true;
-
-        break;
     case UINT8:
-        return true;
-
-        break;
     case UINT16:
-        return true;
-
-        break;
     case UINT32:
-        return true;
-
-        break;
     case FLOAT32:
-        return true;
-
-        break;
-    case ENUM:
-        return false;
-
-        break;
     case BITFIELD:
         return true;
 
         break;
-    case STRING:
+    default:
         return false;
+    }
+}
+
+bool UAVObjectField::isInteger()
+{
+    switch (type) {
+    case INT8:
+    case INT16:
+    case INT32:
+    case UINT8:
+    case UINT16:
+    case UINT32:
+        return true;
 
         break;
     default:
@@ -840,42 +846,7 @@ bool UAVObjectField::isNumeric()
 bool UAVObjectField::isText()
 {
     switch (type) {
-    case INT8:
-        return false;
-
-        break;
-    case INT16:
-        return false;
-
-        break;
-    case INT32:
-        return false;
-
-        break;
-    case UINT8:
-        return false;
-
-        break;
-    case UINT16:
-        return false;
-
-        break;
-    case UINT32:
-        return false;
-
-        break;
-    case FLOAT32:
-        return false;
-
-        break;
     case ENUM:
-        return true;
-
-        break;
-    case BITFIELD:
-        return false;
-
-        break;
     case STRING:
         return true;
 

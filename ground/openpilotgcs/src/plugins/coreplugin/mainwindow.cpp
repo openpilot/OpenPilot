@@ -270,7 +270,7 @@ void MainWindow::extensionsInitialized()
 
     // We'll use qApp macro to get the QApplication pointer
     // and set the style sheet application wide.
-    qDebug() << "Setting application style sheet to:" << style;
+    // qDebug() << "Setting application style sheet to:" << style;
     qApp->setStyleSheet(style);
 
     qs->endGroup();
@@ -743,25 +743,14 @@ void MainWindow::registerDefaultActions()
     tmpaction->setEnabled(true);
     connect(tmpaction, SIGNAL(triggered()), this, SLOT(showHelp()));
 
-    // About sep
-#ifndef Q_WS_MAC // doesn't have the "About" actions in the Help menu
+    // About GCS Action
+    // Mac doesn't have the "About" actions in the Help menu
+#ifndef Q_WS_MAC
     tmpaction = new QAction(this);
     tmpaction->setSeparator(true);
     cmd = am->registerAction(tmpaction, QLatin1String("QtCreator.Help.Sep.About"), m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
 #endif
-
-    // About GCS Action
-#ifdef Q_WS_MAC
-
-#else
-
-#endif
-
-#ifdef Q_WS_MAC
-
-#endif
-    connect(tmpaction, SIGNAL(triggered()), this, SLOT(aboutOpenPilotGCS()));
 
     // About Plugins Action
     tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Plugins..."), this);

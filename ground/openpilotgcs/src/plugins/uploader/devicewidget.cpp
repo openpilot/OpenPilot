@@ -132,8 +132,13 @@ void DeviceWidget::populate()
         myDevice->lblGitTag->setText(tr("Unknown"));
         myDevice->lblBrdName->setText(tr("Unknown"));
     }
-
+    myDevice->filenameLabel->setText(tr("No file loaded"));
     status("Ready...", STATUSICON_INFO);
+    QString fwFileName = getDevFirmwarePath();
+    QFile fwFile(fwFileName);
+    if (fwFile.exists()) {
+        loadFirmware(fwFileName);
+    }
 }
 
 /**
@@ -225,6 +230,7 @@ void DeviceWidget::dfuStatus(QString str)
 
 void DeviceWidget::confirmCB(int value)
 {
+    Q_UNUSED(value);
     updateButtons(true);
 }
 
@@ -254,10 +260,17 @@ void DeviceWidget::status(QString str, StatusIcon ic)
 
 void DeviceWidget::loadFirmware()
 {
+    QString file = setOpenFileName();
+
+    loadFirmware(file);
+}
+
+void DeviceWidget::loadFirmware(QString fwfilename)
+{
     myDevice->verticalGroupBox_loaded->setVisible(false);
     myDevice->groupCustom->setVisible(false);
 
-    filename = setOpenFileName();
+    filename = fwfilename;
 
     myDevice->confirmCheckBox->setVisible(false);
     myDevice->confirmCheckBox->setChecked(false);
@@ -277,7 +290,7 @@ void DeviceWidget::loadFirmware()
 
     QByteArray desc = loadedFW.right(100);
     QPixmap px;
-    if (loadedFW.length() > m_dfu->devices[deviceID].SizeOfCode) {
+    if (loadedFW.length() > (int)m_dfu->devices[deviceID].SizeOfCode) {
         myDevice->lblCRCL->setText(tr("Can't calculate, file too big for device"));
     } else {
         myDevice->lblCRCL->setText(QString::number(DFUObject::CRCFromQBArray(loadedFW, m_dfu->devices[deviceID].SizeOfCode)));
@@ -312,6 +325,7 @@ void DeviceWidget::loadFirmware()
         myDevice->verticalGroupBox_loaded->setVisible(false);
         myDevice->groupCustom->setVisible(true);
     }
+    myDevice->filenameLabel->setText(tr("Firmware loaded: ") + filename);
     myDevice->statusIcon->setPixmap(px);
 }
 
@@ -508,42 +522,40 @@ void DeviceWidget::setProgress(int percent)
     myDevice->progressBar->setValue(percent);
 }
 
+QString DeviceWidget::getDevFirmwarePath()
+{
+    QDir fwDirectory;
+    QString fwDirectoryStr;
+
+    fwDirectoryStr = QCoreApplication::applicationDirPath();
+    fwDirectory    = QDir(fwDirectoryStr);
+#ifdef Q_OS_WIN
+    fwDirectory.cd("../..");
+    fwDirectoryStr = fwDirectory.absolutePath();
+#elif defined Q_OS_LINUX
+    fwDirectory.cd("../..");
+    fwDirectoryStr = fwDirectory.absolutePath();
+#elif defined Q_OS_MAC
+    fwDirectory.cd("../../../../../..");
+    fwDirectoryStr = fwDirectory.absolutePath();
+#endif
+    fwDirectoryStr = fwDirectoryStr + "/fw_" + myDevice->lblBrdName->text().toLower() + "/fw_" + myDevice->lblBrdName->text().toLower() + ".opfw";
+    return fwDirectoryStr;
+}
+
 /**
  * Opens an open file dialog.
  */
 QString DeviceWidget::setOpenFileName()
 {
-    QFileDialog::Options options;
-    QString selectedFilter;
-    QString fwDirectoryStr;
-    QDir fwDirectory;
+    QString fwDirectoryStr = getDevFirmwarePath();
 
     // Format filename for file chooser
-#ifdef Q_OS_WIN
-    fwDirectoryStr = QCoreApplication::applicationDirPath();
-    fwDirectory    = QDir(fwDirectoryStr);
-    fwDirectory.cdUp();
-    fwDirectory.cd("firmware");
-    fwDirectoryStr = fwDirectory.absolutePath();
-#elif defined Q_OS_LINUX
-    fwDirectoryStr = QCoreApplication::applicationDirPath();
-    fwDirectory    = QDir(fwDirectoryStr);
-    fwDirectory.cd("../../..");
-    fwDirectoryStr = fwDirectory.absolutePath();
-    fwDirectoryStr = fwDirectoryStr + "/fw_" + myDevice->lblBrdName->text().toLower() + "/fw_" + myDevice->lblBrdName->text().toLower() + ".opfw";
-#elif defined Q_OS_MAC
-    fwDirectoryStr = QCoreApplication::applicationDirPath();
-    fwDirectory    = QDir(fwDirectoryStr);
-    fwDirectory.cd("../../../../../..");
-    fwDirectoryStr = fwDirectory.absolutePath();
-    fwDirectoryStr = fwDirectoryStr + "/fw_" + myDevice->lblBrdName->text().toLower() + "/fw_" + myDevice->lblBrdName->text().toLower() + ".opfw";
-#endif
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Select firmware file"),
                                                     fwDirectoryStr,
-                                                    tr("Firmware Files (*.opfw *.bin)"),
-                                                    &selectedFilter,
-                                                    options);
+                                                    tr("Firmware Files (*.opfw *.bin)"));
+
     return fileName;
 }
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>808</width>
-    <height>510</height>
+    <width>836</width>
+    <height>605</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,329 +29,400 @@
       <attribute name="title">
        <string>Calibration</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_11">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <layout class="QHBoxLayout" name="sixPointLayout" stretch="1,2">
-         <item>
-          <widget class="QFrame" name="frame">
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Sunken</enum>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_9">
-            <property name="leftMargin">
-             <number>3</number>
-            </property>
-            <property name="topMargin">
-             <number>3</number>
-            </property>
-            <property name="rightMargin">
-             <number>3</number>
-            </property>
-            <property name="bottomMargin">
-             <number>3</number>
-            </property>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_2">
-                <item>
-                 <widget class="QLabel" name="label_3">
-                  <property name="font">
-                   <font>
-                    <weight>50</weight>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>#1: Magnetometer calibration</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <widget class="QGraphicsView" name="sixPointsHelp">
-                <property name="toolTip">
-                 <string>Nice paper plane, eh?</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_4">
-                <item>
-                 <widget class="QPushButton" name="sixPointsStart">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="toolTip">
-                   <string>Launch a sensor range and bias calibration.</string>
-                  </property>
-                  <property name="text">
-                   <string>Start</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="sixPointsSave">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="toolTip">
-                   <string>Save settings (only enabled when calibration is running)</string>
-                  </property>
-                  <property name="text">
-                   <string>Save Position</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QFrame" name="frame_2">
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Sunken</enum>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_10">
-            <property name="leftMargin">
-             <number>3</number>
-            </property>
-            <property name="topMargin">
-             <number>3</number>
-            </property>
-            <property name="rightMargin">
-             <number>3</number>
-            </property>
-            <property name="bottomMargin">
-             <number>3</number>
-            </property>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_4">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <item>
-                 <widget class="QLabel" name="label">
-                  <property name="font">
-                   <font>
-                    <weight>50</weight>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>#2: Sensor noise calibration</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <widget class="QGraphicsView" name="sensorsBargraph">
-                <property name="toolTip">
-                 <string>These are the sensor variance values computed by the AHRS.
-
-Tip: lower is better!</string>
-                </property>
-                <property name="verticalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAlwaysOff</enum>
-                </property>
-                <property name="horizontalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAlwaysOff</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout">
-                <item>
-                 <widget class="QPushButton" name="noiseMeasurementStart">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="toolTip">
-                   <string>Press to start a calibration procedure, about 15 seconds.
-
-Hint: run this with engines at cruising speed.</string>
-                  </property>
-                  <property name="text">
-                   <string>Start</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QProgressBar" name="noiseMeasurementProgress">
-                  <property name="enabled">
-                   <bool>true</bool>
-                  </property>
-                  <property name="maximum">
-                   <number>100</number>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="textVisible">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="sensorNoiseLayout">
-         <item>
-          <widget class="QFrame" name="frame_3">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <property name="leftMargin">
-             <number>3</number>
-            </property>
-            <property name="topMargin">
-             <number>3</number>
-            </property>
-            <property name="rightMargin">
-             <number>3</number>
-            </property>
-            <property name="bottomMargin">
-             <number>3</number>
-            </property>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_5">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_9">
-                <item>
-                 <widget class="QLabel" name="label_5">
-                  <property name="font">
-                   <font>
-                    <weight>50</weight>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>#3: Accelerometer Bias calibration</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_3">
-                <item>
-                 <widget class="QPushButton" name="accelBiasStart">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>Start</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QProgressBar" name="accelBiasProgress">
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="textVisible">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QTextEdit" name="sixPointCalibInstructions">
-         <property name="toolTip">
-          <string>Six Point Calibration instructions</string>
+        <layout class="QGridLayout" name="gridLayout">
+         <property name="leftMargin">
+          <number>12</number>
          </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
+         <property name="topMargin">
+          <number>12</number>
          </property>
-         <property name="html">
-          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+         <property name="rightMargin">
+          <number>12</number>
+         </property>
+         <property name="bottomMargin">
+          <number>12</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>6</number>
+         </property>
+         <item row="0" column="0" rowspan="4">
+          <layout class="QVBoxLayout">
+           <item>
+            <widget class="QGraphicsView" name="calibrationVisualHelp">
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0" colspan="2">
+          <layout class="QVBoxLayout" name="instruction_layout">
+           <item>
+            <widget class="QTextEdit" name="calibrationInstructions">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>Calibration status</string>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::AdjustToContents</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTextEdit" name="textEdit">
+             <property name="toolTip">
+              <string>Calibration instructions</string>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="html">
+              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;Step #1 and #2 are really necessary. Step #3 will help you achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;#1: Multi-Point calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;This calibration will compute the scale for all sensors on the INS. Press &amp;quot;Start&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  Note that your HomeLocation must be set first, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;#2: Sensor noise calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;This calibration will compute sensor variance under standard conditions. You can leave your engines running at low to mid throttle to take their vibration into account before pressing &amp;quot;Start&amp;quot;.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;#3: Accelerometer bias calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;This step will ensure that accelerometer bias is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; font-style:italic;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Following steps #1, #2 and #3 are necessary. Step #4 is optional, it may helps you achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#1: Multi-Point calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This calibration will compute the scale for Magnetometer or Accelerometer sensors. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Press &amp;quot;Calibrate Mag&amp;quot; or &amp;quot;Calibrate Accel&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;For optimal calibration perform the Accel calibration with the board not mounted to the craft. in this way you can accurately level the board on your desk/table during the process. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Magnetometer calibration need to be performed inside your plane/copter to account for metal/magnetic stuffs on board.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 1:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; Your &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;HomeLocation must be set first&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 2:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; There is no need to point exactly at South/North/West/East. They are just used to easily tells the user how to point the plane/craft. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;You can simply assume that North is in front of you, right is East etc. and perform the calibration this way.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#2: Board level calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step will ensure that board leveling is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#3: Gyro Bias calculation&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step allows to calibrate the gyro measured value when the board is steady. To perform the calibration leave the board/aircraft completely steady and click start. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#4: Thermal Calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;The calibration will compute sensors bias variations at different temperatures while the board warms up.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This  allow a certain amount of correction of those bias variations against temperature changes. It does improve both altitude hold and yaw performances.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;To perform this calibration leave the board to cool down at room temperature in the coldest places available. after 15-20 minutes attach the usb connector to the board and Click the Calibrate button leaving the board steady. Wait until completed&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="1">
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>#1: Accelerometer/Magnetometer calibration</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QPushButton" name="sixPointsStartAccel">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Launch accelerometer range and bias calibration.</string>
+              </property>
+              <property name="text">
+               <string>Calibrate Accel</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="sixPointsStartMag">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Launch magnetometer range and bias calibration.</string>
+              </property>
+              <property name="text">
+               <string>Calibrate Mag</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_thermalbias_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="sixPointsSave">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Save settings (only enabled when calibration is running)</string>
+              </property>
+              <property name="text">
+               <string>Save Position</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>#2: Board level calibration</string>
+           </property>
+           <layout class="QHBoxLayout">
+            <item>
+             <widget class="QPushButton" name="boardLevelStart">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Start</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QProgressBar" name="boardLevelProgress">
+              <property name="value">
+               <number>0</number>
+              </property>
+              <property name="textVisible">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="boardLevelSavePos">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Save Position</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string>#3: Gyro bias calibration</string>
+           </property>
+           <layout class="QHBoxLayout">
+            <item>
+             <widget class="QPushButton" name="gyroBiasStart">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Start</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QProgressBar" name="gyroBiasProgress">
+              <property name="value">
+               <number>0</number>
+              </property>
+              <property name="textVisible">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="title">
+            <string>#4*: Thermal calibration</string>
+           </property>
+           <layout class="QVBoxLayout">
+            <item>
+             <layout class="QHBoxLayout">
+              <item>
+               <widget class="QLabel" name="label_temperature">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Temperature</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="textTemperature">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <italic>true</italic>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>0.00</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_thermalcal1">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>°C - Temperature rise</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="textThermalGradient">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <italic>true</italic>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>0.5</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_thermalcal2">
+                <property name="font">
+                 <font>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>°C/min</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_thermalbias">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_thermalDescription">
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>this contains the current status of the thermal calibration wizard</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_thermalbias2">
+              <item>
+               <widget class="QPushButton" name="ThermalBiasStart">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Start</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QProgressBar" name="thermalBiasProgress">
+                <property name="value">
+                 <number>0</number>
+                </property>
+                <property name="textVisible">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="ThermalBiasEnd">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>End</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="ThermalBiasCancel">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Cancel</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -397,12 +468,12 @@ p, li { white-space: pre-wrap; }
              </spacer>
             </item>
             <item row="1" column="3">
-             <widget class="QSpinBox" name="pitchRotation">
+             <widget class="QDoubleSpinBox" name="pitchRotation">
               <property name="minimum">
-               <number>-90</number>
+               <double>-90.000000000000000</double>
               </property>
               <property name="maximum">
-               <number>90</number>
+               <double>90.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -431,8 +502,8 @@ p, li { white-space: pre-wrap; }
                <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
               </property>
               <property name="text">
                <string>Roll</string>
@@ -454,8 +525,8 @@ margin:1px;</string>
                <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
               </property>
               <property name="text">
                <string>Yaw</string>
@@ -479,12 +550,12 @@ margin:1px;</string>
              </spacer>
             </item>
             <item row="1" column="1">
-             <widget class="QSpinBox" name="rollRotation">
+             <widget class="QDoubleSpinBox" name="rollRotation">
               <property name="minimum">
-               <number>-180</number>
+               <double>-180.000000000000000</double>
               </property>
               <property name="maximum">
-               <number>180</number>
+               <double>180.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -500,8 +571,8 @@ margin:1px;</string>
                <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
               </property>
               <property name="text">
                <string>Pitch</string>
@@ -512,12 +583,12 @@ margin:1px;</string>
              </widget>
             </item>
             <item row="1" column="5">
-             <widget class="QSpinBox" name="yawRotation">
+             <widget class="QDoubleSpinBox" name="yawRotation">
               <property name="minimum">
-               <number>-180</number>
+               <double>-180.000000000000000</double>
               </property>
               <property name="maximum">
-               <number>180</number>
+               <double>180.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -539,8 +610,8 @@ margin:1px;</string>
                <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
               </property>
               <property name="text">
                <string>Accelerometers</string>
@@ -874,8 +945,8 @@ A setting of 0.00 disables the filter.</string>
        </property>
        <property name="maximumSize">
         <size>
-         <width>25</width>
-         <height>25</height>
+         <width>32</width>
+         <height>32</height>
         </size>
        </property>
        <property name="font">
@@ -908,7 +979,7 @@ A setting of 0.00 disables the filter.</string>
        <property name="objrelation" stdset="0">
         <stringlist>
          <string>button:help</string>
-         <string>url:http://wiki.openpilot.org/display/Doc/Revo+Configuration</string>
+         <string>url:http://wiki.openpilot.org/display/Doc/Revolution+Manual+Sensor+Calibration</string>
         </stringlist>
        </property>
       </widget>

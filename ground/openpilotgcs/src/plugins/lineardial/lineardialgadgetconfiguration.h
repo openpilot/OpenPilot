@@ -176,11 +176,9 @@ private:
     double yellowMax;
     double greenMin;
     double greenMax;
-
     double factor;
-    bool useOpenGLFlag;
-
     int decimalPlaces;
+    bool useOpenGLFlag;
 };
 
 #endif // LINEARDIALGADGETCONFIGURATION_H

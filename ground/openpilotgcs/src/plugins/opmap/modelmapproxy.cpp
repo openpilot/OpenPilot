@@ -92,19 +92,14 @@ modelMapProxy::overlayType modelMapProxy::overlayTranslate(int type)
     case MapDataDelegate::MODE_DRIVEVECTOR:
         return OVERLAY_LINE;
 
-        break;
     case MapDataDelegate::MODE_FLYCIRCLERIGHT:
     case MapDataDelegate::MODE_DRIVECIRCLERIGHT:
         return OVERLAY_CIRCLE_RIGHT;
 
-        break;
     case MapDataDelegate::MODE_FLYCIRCLELEFT:
     case MapDataDelegate::MODE_DRIVECIRCLELEFT:
-        return OVERLAY_CIRCLE_LEFT;
-
-        break;
     default:
-        break;
+        return OVERLAY_CIRCLE_LEFT;
     }
 }
 
@@ -297,6 +292,8 @@ void modelMapProxy::dataChanged(const QModelIndex &topLeft, const QModelIndex &b
 void modelMapProxy::rowsInserted(const QModelIndex &parent, int first, int last)
 {
     Q_UNUSED(parent);
+
+
     for (int x = first; x < last + 1; x++) {
         QModelIndex index;
         WayPointItem *item;
@@ -326,6 +323,7 @@ void modelMapProxy::rowsInserted(const QModelIndex &parent, int first, int last)
             item = myMap->WPInsert(latlng, altitude, desc, x);
         }
     }
+
     refreshOverlays();
 }
 void modelMapProxy::deleteWayPoint(int number)

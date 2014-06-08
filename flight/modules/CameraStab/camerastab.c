@@ -79,7 +79,6 @@ static struct CameraStab_data {
 
 // Private functions
 static void attitudeUpdated(UAVObjEvent *ev);
-static float bound(float val, float limit);
 
 #ifdef USE_GIMBAL_FF
 static void applyFeedForward(uint8_t index, float dT, float *attitude, CameraStabSettingsData *cameraStab);
@@ -128,6 +127,7 @@ int32_t CameraStabInitialize(void)
             .obj    = AttitudeStateHandle(),
             .instId = 0,
             .event  = 0,
+            .lowPriority = false,
         };
         EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
@@ -185,8 +185,9 @@ static void attitudeUpdated(UAVObjEvent *ev)
                     input_rate = accessory.AccessoryVal *
                                  cast_struct_to_array(cameraStab.InputRate, cameraStab.InputRate.Roll)[i];
                     if (fabsf(input_rate) > cameraStab.MaxAxisLockRate) {
-                        csd->inputs[i] = bound(csd->inputs[i] + input_rate * 0.001f * dT_millis,
-                                               cast_struct_to_array(cameraStab.InputRange, cameraStab.InputRange.Roll)[i]);
+                        csd->inputs[i] = boundf(csd->inputs[i] + input_rate * 0.001f * dT_millis,
+                                                -cast_struct_to_array(cameraStab.InputRange, cameraStab.InputRange.Roll)[i],
+                                                cast_struct_to_array(cameraStab.InputRange, cameraStab.InputRange.Roll)[i]);
                     }
                     break;
                 default:
@@ -228,7 +229,7 @@ static void attitudeUpdated(UAVObjEvent *ev)
         // bounding for elevon mixing occurs on the unmixed output
         // to limit the range of the mixed output you must limit the range
         // of both the unmixed pitch and unmixed roll
-        float output = bound((attitude + csd->inputs[i]) / cast_struct_to_array(cameraStab.OutputRange, cameraStab.OutputRange.Roll)[i], 1.0f);
+        float output = boundf((attitude + csd->inputs[i]) / cast_struct_to_array(cameraStab.OutputRange, cameraStab.OutputRange.Roll)[i], -1.0f, 1.0f);
 
         // set output channels
         switch (i) {
@@ -279,13 +280,6 @@ static void attitudeUpdated(UAVObjEvent *ev)
             PIOS_Assert(0);
         }
     }
-}
-
-float bound(float val, float limit)
-{
-    return (val > limit) ? limit :
-           (val < -limit) ? -limit :
-           val;
 }
 
 #ifdef USE_GIMBAL_FF

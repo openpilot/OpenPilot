@@ -268,6 +268,7 @@ static void registerObject(UAVObjHandle obj)
         .obj    = obj,
         .instId = UAVOBJ_ALL_INSTANCES,
         .event  = EV_UPDATED_PERIODIC,
+        .lowPriority = true,
     };
 
     // Get metadata
@@ -289,34 +290,33 @@ static void updateRadioComBridgeStats()
     RadioComBridgeStatsData radioComBridgeStats;
 
     // Get telemetry stats
-    UAVTalkGetStats(data->telemUAVTalkCon, &telemetryUAVTalkStats);
-    UAVTalkResetStats(data->telemUAVTalkCon);
+    UAVTalkGetStats(data->telemUAVTalkCon, &telemetryUAVTalkStats, true);
 
     // Get radio stats
-    UAVTalkGetStats(data->radioUAVTalkCon, &radioUAVTalkStats);
-    UAVTalkResetStats(data->radioUAVTalkCon);
+    UAVTalkGetStats(data->radioUAVTalkCon, &radioUAVTalkStats, true);
 
     // Get stats object data
     RadioComBridgeStatsGet(&radioComBridgeStats);
 
+    radioComBridgeStats.TelemetryTxRetries     = data->telemetryTxRetries;
+    radioComBridgeStats.RadioTxRetries         = data->radioTxRetries;
+
     // Update stats object
     radioComBridgeStats.TelemetryTxBytes      += telemetryUAVTalkStats.txBytes;
     radioComBridgeStats.TelemetryTxFailures   += telemetryUAVTalkStats.txErrors;
-    radioComBridgeStats.TelemetryTxRetries    += data->telemetryTxRetries;
 
     radioComBridgeStats.TelemetryRxBytes      += telemetryUAVTalkStats.rxBytes;
     radioComBridgeStats.TelemetryRxFailures   += telemetryUAVTalkStats.rxErrors;
     radioComBridgeStats.TelemetryRxSyncErrors += telemetryUAVTalkStats.rxSyncErrors;
     radioComBridgeStats.TelemetryRxCrcErrors  += telemetryUAVTalkStats.rxCrcErrors;
 
-    radioComBridgeStats.RadioTxBytes      += radioUAVTalkStats.txBytes;
-    radioComBridgeStats.RadioTxFailures   += radioUAVTalkStats.txErrors;
-    radioComBridgeStats.RadioTxRetries    += data->radioTxRetries;
+    radioComBridgeStats.RadioTxBytes += radioUAVTalkStats.txBytes;
+    radioComBridgeStats.RadioTxFailures       += radioUAVTalkStats.txErrors;
 
-    radioComBridgeStats.RadioRxBytes      += radioUAVTalkStats.rxBytes;
-    radioComBridgeStats.RadioRxFailures   += radioUAVTalkStats.rxErrors;
-    radioComBridgeStats.RadioRxSyncErrors += radioUAVTalkStats.rxSyncErrors;
-    radioComBridgeStats.RadioRxCrcErrors  += radioUAVTalkStats.rxCrcErrors;
+    radioComBridgeStats.RadioRxBytes += radioUAVTalkStats.rxBytes;
+    radioComBridgeStats.RadioRxFailures       += radioUAVTalkStats.rxErrors;
+    radioComBridgeStats.RadioRxSyncErrors     += radioUAVTalkStats.rxSyncErrors;
+    radioComBridgeStats.RadioRxCrcErrors      += radioUAVTalkStats.rxCrcErrors;
 
     // Update stats object data
     RadioComBridgeStatsSet(&radioComBridgeStats);
@@ -342,11 +342,11 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
                 updateRadioComBridgeStats();
             }
             // Send update (with retries)
+            int32_t ret = -1;
             uint32_t retries = 0;
-            int32_t success  = -1;
-            while (retries < MAX_RETRIES && success == -1) {
-                success = UAVTalkSendObject(data->telemUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS) == 0;
-                if (success == -1) {
+            while (retries <= MAX_RETRIES && ret == -1) {
+                ret = UAVTalkSendObject(data->telemUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS);
+                if (ret == -1) {
                     ++retries;
                 }
             }
@@ -376,11 +376,11 @@ static void radioTxTask(__attribute__((unused)) void *parameters)
         if (xQueueReceive(data->radioEventQueue, &ev, MAX_PORT_DELAY) == pdTRUE) {
             if ((ev.event == EV_UPDATED) || (ev.event == EV_UPDATE_REQ)) {
                 // Send update (with retries)
+                int32_t ret = -1;
                 uint32_t retries = 0;
-                int32_t success  = -1;
-                while (retries < MAX_RETRIES && success == -1) {
-                    success = UAVTalkSendObject(data->radioUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS) == 0;
-                    if (success == -1) {
+                while (retries <= MAX_RETRIES && ret == -1) {
+                    ret = UAVTalkSendObject(data->radioUAVTalkCon, ev.obj, ev.instId, 0, RETRY_TIMEOUT_MS);
+                    if (ret == -1) {
                         ++retries;
                     }
                 }
@@ -413,8 +413,8 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
                     }
                 } else if (PIOS_COM_TELEMETRY) {
                     // Send the data straight to the telemetry port.
-                    // FIXME following call can fail (with -2 error code) if buffer is full
-                    // it is the caller responsibility to retry in such cases...
+                    // Following call can fail with -2 error code (buffer full) or -3 error code (could not acquire send mutex)
+                    // It is the caller responsibility to retry in such cases...
                     int32_t ret   = -2;
                     uint8_t count = 5;
                     while (count-- > 0 && ret < -1) {
@@ -513,12 +513,12 @@ static void serialRxTask(__attribute__((unused)) void *parameters)
 
             if (bytes_to_process > 0) {
                 // Send the data over the radio link.
-                // FIXME following call can fail (with -2 error code) if buffer is full
-                // it is the caller responsibility to retry in such cases...
+                // Following call can fail with -2 error code (buffer full) or -3 error code (could not acquire send mutex)
+                // It is the caller responsibility to retry in such cases...
                 int32_t ret   = -2;
                 uint8_t count = 5;
                 while (count-- > 0 && ret < -1) {
-                    PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, data->serialRxBuf, bytes_to_process);
+                    ret = PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, data->serialRxBuf, bytes_to_process);
                 }
             }
         } else {
@@ -547,8 +547,8 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
     }
 #endif /* PIOS_INCLUDE_USB */
     if (outputPort) {
-        // FIXME following call can fail (with -2 error code) if buffer is full
-        // it is the caller responsibility to retry in such cases...
+        // Following call can fail with -2 error code (buffer full) or -3 error code (could not acquire send mutex)
+        // It is the caller responsibility to retry in such cases...
         ret = -2;
         uint8_t count = 5;
         while (count-- > 0 && ret < -1) {
@@ -577,8 +577,8 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
 
     // Don't send any data unless the radio port is available.
     if (outputPort && PIOS_COM_Available(outputPort)) {
-        // FIXME following call can fail (with -2 error code) if buffer is full
-        // it is the caller responsibility to retry in such cases...
+        // Following call can fail with -2 error code (buffer full) or -3 error code (could not acquire send mutex)
+        // It is the caller responsibility to retry in such cases...
         int32_t ret   = -2;
         uint8_t count = 5;
         while (count-- > 0 && ret < -1) {

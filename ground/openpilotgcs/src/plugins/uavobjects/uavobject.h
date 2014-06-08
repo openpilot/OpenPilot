@@ -37,6 +37,7 @@
 #include <QList>
 #include <QFile>
 #include <stdint.h>
+#include <QXmlStreamWriter>
 #include "uavobjectfield.h"
 
 #define UAVOBJ_ACCESS_SHIFT                    0
@@ -54,6 +55,7 @@ class UAVOBJECTS_EXPORT UAVObject : public QObject {
     Q_OBJECT
 
 public:
+    Q_PROPERTY(QString Name READ getName)
 
     /**
      * Object update mode
@@ -127,8 +129,13 @@ public:
     QString toString();
     QString toStringBrief();
     QString toStringData();
+    void toXML(QXmlStreamWriter *xmlWriter);
     void emitTransactionCompleted(bool success);
     void emitNewInstance(UAVObject *);
+
+    virtual bool isSettingsObject();
+    virtual bool isDataObject();
+    virtual bool isMetaDataObject();
 
     // Metadata accessors
     static void MetadataInitialize(Metadata & meta);
@@ -144,6 +151,8 @@ public:
     static void SetFlightTelemetryUpdateMode(Metadata & meta, UpdateMode val);
     static UpdateMode GetGcsTelemetryUpdateMode(const Metadata & meta);
     static void SetGcsTelemetryUpdateMode(Metadata & meta, UpdateMode val);
+    static UpdateMode GetLoggingUpdateMode(const Metadata & meta);
+    static void SetLoggingUpdateMode(Metadata & meta, UpdateMode val);
 
 public slots:
     void requestUpdate();

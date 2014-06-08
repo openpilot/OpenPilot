@@ -57,10 +57,11 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     loop(NULL),
     skipflag(false)
 {
-    manualCommandObj    = ManualControlCommand::GetInstance(getObjectManager());
-    manualSettingsObj   = ManualControlSettings::GetInstance(getObjectManager());
-    flightStatusObj     = FlightStatus::GetInstance(getObjectManager());
-    receiverActivityObj = ReceiverActivity::GetInstance(getObjectManager());
+    manualCommandObj      = ManualControlCommand::GetInstance(getObjectManager());
+    manualSettingsObj     = ManualControlSettings::GetInstance(getObjectManager());
+    flightModeSettingsObj = FlightModeSettings::GetInstance(getObjectManager());
+    flightStatusObj = FlightStatus::GetInstance(getObjectManager());
+    receiverActivityObj   = ReceiverActivity::GetInstance(getObjectManager());
     ui = new Ui_InputWidget();
     ui->setupUi(this);
 
@@ -79,40 +80,46 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     unsigned int indexRT = 0;
     foreach(QString name, manualSettingsObj->getField("ChannelNumber")->getElementNames()) {
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
-        InputChannelForm *inpForm = new InputChannelForm(this, index == 0);
-        ui->channelSettings->layout()->addWidget(inpForm); // Add the row to the UI
-        inpForm->setName(name);
+        InputChannelForm *form = new InputChannelForm(index, this);
+        form->setName(name);
+        form->moveTo(*(ui->channelLayout));
 
         // The order of the following binding calls is important. Since the values will be populated
         // in reverse order of the binding order otherwise the 'Reversed' logic will floor the neutral value
         // to the max value ( which is smaller than the neutral value when reversed ) and the channel number
         // will not be set correctly.
-        addWidgetBinding("ManualControlSettings", "ChannelNumber", inpForm->ui->channelNumber, index);
-        addWidgetBinding("ManualControlSettings", "ChannelGroups", inpForm->ui->channelGroup, index);
-        addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->channelNeutral, index);
-        addWidgetBinding("ManualControlSettings", "ChannelNeutral", inpForm->ui->neutralValue, index);
-        addWidgetBinding("ManualControlSettings", "ChannelMin", inpForm->ui->channelMin, index);
-        addWidgetBinding("ManualControlSettings", "ChannelMax", inpForm->ui->channelMax, index);
+        addWidgetBinding("ManualControlSettings", "ChannelNumber", form->ui->channelNumber, index);
+        addWidgetBinding("ManualControlSettings", "ChannelGroups", form->ui->channelGroup, index);
+        addWidgetBinding("ManualControlSettings", "ChannelNeutral", form->ui->channelNeutral, index);
+        addWidgetBinding("ManualControlSettings", "ChannelNeutral", form->ui->neutralValue, index);
+        addWidgetBinding("ManualControlSettings", "ChannelMax", form->ui->channelMax, index);
+        addWidgetBinding("ManualControlSettings", "ChannelMin", form->ui->channelMin, index);
+        addWidgetBinding("ManualControlSettings", "ChannelMax", form->ui->channelMax, index);
 
-        addWidget(inpForm->ui->channelNumberDropdown);
-        addWidget(inpForm->ui->channelResponseTime);
-        addWidget(inpForm->ui->channelRev);
+        addWidget(form->ui->channelRev);
+
+        // Reversing supported for some channels only
+        bool reversable = ((index == ManualControlSettings::CHANNELGROUPS_THROTTLE) ||
+                           (index == ManualControlSettings::CHANNELGROUPS_ROLL) ||
+                           (index == ManualControlSettings::CHANNELGROUPS_PITCH) ||
+                           (index == ManualControlSettings::CHANNELGROUPS_YAW));
+        form->ui->channelRev->setVisible(reversable);
 
         // Input filter response time fields supported for some channels only
         switch (index) {
         case ManualControlSettings::CHANNELGROUPS_ROLL:
         case ManualControlSettings::CHANNELGROUPS_PITCH:
         case ManualControlSettings::CHANNELGROUPS_YAW:
+        case ManualControlSettings::CHANNELGROUPS_COLLECTIVE:
         case ManualControlSettings::CHANNELGROUPS_ACCESSORY0:
         case ManualControlSettings::CHANNELGROUPS_ACCESSORY1:
         case ManualControlSettings::CHANNELGROUPS_ACCESSORY2:
-            addWidgetBinding("ManualControlSettings", "ResponseTime", inpForm->ui->channelResponseTime, indexRT);
+            addWidgetBinding("ManualControlSettings", "ResponseTime", form->ui->channelResponseTime, indexRT);
             ++indexRT;
             break;
         case ManualControlSettings::CHANNELGROUPS_THROTTLE:
         case ManualControlSettings::CHANNELGROUPS_FLIGHTMODE:
-        case ManualControlSettings::CHANNELGROUPS_COLLECTIVE:
-            inpForm->ui->channelResponseTime->setEnabled(false);
+            form->ui->channelResponseTime->setVisible(false);
             break;
         default:
             Q_ASSERT(0);
@@ -133,26 +140,41 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     connect(ui->wzBack, SIGNAL(clicked()), this, SLOT(wzBack()));
 
     ui->stackedWidget->setCurrentIndex(0);
-    addWidgetBinding("ManualControlSettings", "FlightModePosition", ui->fmsModePos1, 0, 1, true);
-    addWidgetBinding("ManualControlSettings", "FlightModePosition", ui->fmsModePos2, 1, 1, true);
-    addWidgetBinding("ManualControlSettings", "FlightModePosition", ui->fmsModePos3, 2, 1, true);
-    addWidgetBinding("ManualControlSettings", "FlightModePosition", ui->fmsModePos4, 3, 1, true);
-    addWidgetBinding("ManualControlSettings", "FlightModePosition", ui->fmsModePos5, 4, 1, true);
-    addWidgetBinding("ManualControlSettings", "FlightModePosition", ui->fmsModePos6, 5, 1, true);
+    addWidgetBinding("FlightModeSettings", "FlightModePosition", ui->fmsModePos1, 0, 1, true);
+    addWidgetBinding("FlightModeSettings", "FlightModePosition", ui->fmsModePos2, 1, 1, true);
+    addWidgetBinding("FlightModeSettings", "FlightModePosition", ui->fmsModePos3, 2, 1, true);
+    addWidgetBinding("FlightModeSettings", "FlightModePosition", ui->fmsModePos4, 3, 1, true);
+    addWidgetBinding("FlightModeSettings", "FlightModePosition", ui->fmsModePos5, 4, 1, true);
+    addWidgetBinding("FlightModeSettings", "FlightModePosition", ui->fmsModePos6, 5, 1, true);
     addWidgetBinding("ManualControlSettings", "FlightModeNumber", ui->fmsPosNum);
 
-    addWidgetBinding("ManualControlSettings", "Stabilization1Settings", ui->fmsSsPos1Roll, "Roll", 1, true);
-    addWidgetBinding("ManualControlSettings", "Stabilization2Settings", ui->fmsSsPos2Roll, "Roll", 1, true);
-    addWidgetBinding("ManualControlSettings", "Stabilization3Settings", ui->fmsSsPos3Roll, "Roll", 1, true);
-    addWidgetBinding("ManualControlSettings", "Stabilization1Settings", ui->fmsSsPos1Pitch, "Pitch", 1, true);
-    addWidgetBinding("ManualControlSettings", "Stabilization2Settings", ui->fmsSsPos2Pitch, "Pitch", 1, true);
-    addWidgetBinding("ManualControlSettings", "Stabilization3Settings", ui->fmsSsPos3Pitch, "Pitch", 1, true);
-    addWidgetBinding("ManualControlSettings", "Stabilization1Settings", ui->fmsSsPos1Yaw, "Yaw", 1, true);
-    addWidgetBinding("ManualControlSettings", "Stabilization2Settings", ui->fmsSsPos2Yaw, "Yaw", 1, true);
-    addWidgetBinding("ManualControlSettings", "Stabilization3Settings", ui->fmsSsPos3Yaw, "Yaw", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization1Settings", ui->fmsSsPos1Roll, "Roll", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization2Settings", ui->fmsSsPos2Roll, "Roll", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization3Settings", ui->fmsSsPos3Roll, "Roll", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization4Settings", ui->fmsSsPos4Roll, "Roll", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization5Settings", ui->fmsSsPos5Roll, "Roll", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization6Settings", ui->fmsSsPos6Roll, "Roll", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization1Settings", ui->fmsSsPos1Pitch, "Pitch", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization2Settings", ui->fmsSsPos2Pitch, "Pitch", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization3Settings", ui->fmsSsPos3Pitch, "Pitch", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization4Settings", ui->fmsSsPos4Pitch, "Pitch", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization5Settings", ui->fmsSsPos5Pitch, "Pitch", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization6Settings", ui->fmsSsPos6Pitch, "Pitch", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization1Settings", ui->fmsSsPos1Yaw, "Yaw", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization2Settings", ui->fmsSsPos2Yaw, "Yaw", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization3Settings", ui->fmsSsPos3Yaw, "Yaw", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization4Settings", ui->fmsSsPos4Yaw, "Yaw", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization5Settings", ui->fmsSsPos5Yaw, "Yaw", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization6Settings", ui->fmsSsPos6Yaw, "Yaw", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization1Settings", ui->fmsSsPos1Thrust, "Thrust", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization2Settings", ui->fmsSsPos2Thrust, "Thrust", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization3Settings", ui->fmsSsPos3Thrust, "Thrust", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization4Settings", ui->fmsSsPos4Thrust, "Thrust", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization5Settings", ui->fmsSsPos5Thrust, "Thrust", 1, true);
+    addWidgetBinding("FlightModeSettings", "Stabilization6Settings", ui->fmsSsPos6Thrust, "Thrust", 1, true);
 
-    addWidgetBinding("ManualControlSettings", "Arming", ui->armControl);
-    addWidgetBinding("ManualControlSettings", "ArmedTimeout", ui->armTimeout, 0, 1000);
+    addWidgetBinding("FlightModeSettings", "Arming", ui->armControl);
+    addWidgetBinding("FlightModeSettings", "ArmedTimeout", ui->armTimeout, 0, 1000);
     connect(ManualControlCommand::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveFMSlider()));
     connect(ManualControlSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updatePositionSlider()));
 
@@ -366,10 +388,12 @@ void ConfigInputWidget::goToWizard()
     // that the UAVO is changed, but then backs out to the start and
     // chooses a different TX type (which could otherwise result in
     // unexpected TX channels being enabled)
-    manualSettingsData = manualSettingsObj->getData();
-    previousManualSettingsData = manualSettingsData;
-    manualSettingsData.Arming  = ManualControlSettings::ARMING_ALWAYSDISARMED;
-    manualSettingsObj->setData(manualSettingsData);
+    manualSettingsData             = manualSettingsObj->getData();
+    previousManualSettingsData     = manualSettingsData;
+    flightModeSettingsData         = flightModeSettingsObj->getData();
+    previousFlightModeSettingsData = flightModeSettingsData;
+    flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
+    flightModeSettingsObj->setData(flightModeSettingsData);
 
     // start the wizard
     wizardSetUpStep(wizardWelcome);
@@ -399,6 +423,7 @@ void ConfigInputWidget::wzCancel()
 
     // Load settings back from beginning of wizard
     manualSettingsObj->setData(previousManualSettingsData);
+    flightModeSettingsObj->setData(previousFlightModeSettingsData);
 }
 
 void ConfigInputWidget::wzNext()
@@ -909,7 +934,7 @@ void ConfigInputWidget::setMoveFromCommand(int command)
     // CHANNELNUMBER_ACCESSORY1=6,
     // CHANNELNUMBER_ACCESSORY2=7
 
-    txMovements movement;
+    txMovements movement = moveLeftVerticalStick;
 
     switch (command) {
     case ManualControlSettings::CHANNELNUMBER_ROLL:
@@ -1027,10 +1052,10 @@ void ConfigInputWidget::setTxMovement(txMovements movement)
 void ConfigInputWidget::moveTxControls()
 {
     QTransform trans;
-    QGraphicsItem *item;
-    txMovementType move;
-    int limitMax;
-    int limitMin;
+    QGraphicsItem *item = NULL;
+    txMovementType move = vertical;
+    int limitMax = 0;
+    int limitMin = 0;
     static bool auxFlag = false;
 
     switch (currentMovement) {
@@ -1219,13 +1244,13 @@ void ConfigInputWidget::moveSticks()
         Q_ASSERT(0);
         break;
     }
-    if (flightStatusData.FlightMode == manualSettingsData.FlightModePosition[0]) {
+    if (flightStatusData.FlightMode == flightModeSettingsData.FlightModePosition[0]) {
         m_txFlightMode->setElementId("flightModeLeft");
         m_txFlightMode->setTransform(m_txFlightModeLOrig, false);
-    } else if (flightStatusData.FlightMode == manualSettingsData.FlightModePosition[1]) {
+    } else if (flightStatusData.FlightMode == flightModeSettingsData.FlightModePosition[1]) {
         m_txFlightMode->setElementId("flightModeCenter");
         m_txFlightMode->setTransform(m_txFlightModeCOrig, false);
-    } else if (flightStatusData.FlightMode == manualSettingsData.FlightModePosition[2]) {
+    } else if (flightStatusData.FlightMode == flightModeSettingsData.FlightModePosition[2]) {
         m_txFlightMode->setElementId("flightModeRight");
         m_txFlightMode->setTransform(m_txFlightModeROrig, false);
     }
@@ -1319,32 +1344,26 @@ void ConfigInputWidget::updatePositionSlider()
     default:
     case 6:
         ui->fmsModePos6->setEnabled(true);
-        ui->cc_box_5->setEnabled(true);
         ui->pidBankSs1_5->setEnabled(true);
     // pass through
     case 5:
         ui->fmsModePos5->setEnabled(true);
-        ui->cc_box_4->setEnabled(true);
         ui->pidBankSs1_4->setEnabled(true);
     // pass through
     case 4:
         ui->fmsModePos4->setEnabled(true);
-        ui->cc_box_3->setEnabled(true);
         ui->pidBankSs1_3->setEnabled(true);
     // pass through
     case 3:
         ui->fmsModePos3->setEnabled(true);
-        ui->cc_box_2->setEnabled(true);
         ui->pidBankSs1_2->setEnabled(true);
     // pass through
     case 2:
         ui->fmsModePos2->setEnabled(true);
-        ui->cc_box_1->setEnabled(true);
         ui->pidBankSs1_1->setEnabled(true);
     // pass through
     case 1:
         ui->fmsModePos1->setEnabled(true);
-        ui->cc_box_0->setEnabled(true);
         ui->pidBankSs1_0->setEnabled(true);
     // pass through
     case 0:
@@ -1354,32 +1373,26 @@ void ConfigInputWidget::updatePositionSlider()
     switch (manualSettingsDataPriv.FlightModeNumber) {
     case 0:
         ui->fmsModePos1->setEnabled(false);
-        ui->cc_box_0->setEnabled(false);
         ui->pidBankSs1_0->setEnabled(false);
     // pass through
     case 1:
         ui->fmsModePos2->setEnabled(false);
-        ui->cc_box_1->setEnabled(false);
         ui->pidBankSs1_1->setEnabled(false);
     // pass through
     case 2:
         ui->fmsModePos3->setEnabled(false);
-        ui->cc_box_2->setEnabled(false);
         ui->pidBankSs1_2->setEnabled(false);
     // pass through
     case 3:
         ui->fmsModePos4->setEnabled(false);
-        ui->cc_box_3->setEnabled(false);
         ui->pidBankSs1_3->setEnabled(false);
     // pass through
     case 4:
         ui->fmsModePos5->setEnabled(false);
-        ui->cc_box_4->setEnabled(false);
         ui->pidBankSs1_4->setEnabled(false);
     // pass through
     case 5:
         ui->fmsModePos6->setEnabled(false);
-        ui->cc_box_5->setEnabled(false);
         ui->pidBankSs1_5->setEnabled(false);
     // pass through
     case 6:
@@ -1419,11 +1432,12 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.exec();
 
-        manualCommandData  = manualCommandObj->getData();
+        manualCommandData      = manualCommandObj->getData();
 
-        manualSettingsData = manualSettingsObj->getData();
-        manualSettingsData.Arming = ManualControlSettings::ARMING_ALWAYSDISARMED;
-        manualSettingsObj->setData(manualSettingsData);
+        manualSettingsData     = manualSettingsObj->getData();
+        flightModeSettingsData = flightModeSettingsObj->getData();
+        flightModeSettingsData.Arming = FlightModeSettings::ARMING_ALWAYSDISARMED;
+        flightModeSettingsObj->setData(flightModeSettingsData);
 
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
             reverse[i] = manualSettingsData.ChannelMax[i] < manualSettingsData.ChannelMin[i];

@@ -33,6 +33,7 @@
 static xSemaphoreHandle mLock;
 static xTaskHandle *mTaskHandles;
 static uint32_t mLastMonitorTime;
+static uint32_t mLastIdleMonitorTime;
 static uint16_t mMaxTasks;
 
 /**
@@ -53,9 +54,11 @@ int32_t PIOS_TASK_MONITOR_Initialize(uint16_t max_tasks)
 
     mMaxTasks = max_tasks;
 #if (configGENERATE_RUN_TIME_STATS == 1)
-    mLastMonitorTime = portGET_RUN_TIME_COUNTER_VALUE();
+    mLastMonitorTime     = portGET_RUN_TIME_COUNTER_VALUE();
+    mLastIdleMonitorTime = portGET_RUN_TIME_COUNTER_VALUE();
 #else
-    mLastMonitorTime = 0;
+    mLastMonitorTime     = 0;
+    mLastIdleMonitorTime = 0;
 #endif
     return 0;
 }
@@ -145,5 +148,32 @@ void PIOS_TASK_MONITOR_ForEachTask(TaskMonitorTaskInfoCallback callback, void *c
 
     xSemaphoreGiveRecursive(mLock);
 }
+
+uint8_t PIOS_TASK_MONITOR_GetIdlePercentage()
+{
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+    return 50;
+
+#elif (configGENERATE_RUN_TIME_STATS == 1)
+    xSemaphoreTakeRecursive(mLock, portMAX_DELAY);
+
+    uint32_t currentTime = portGET_RUN_TIME_COUNTER_VALUE();
+
+    /* avoid divide-by-zero if the interval is too small */
+    uint32_t deltaTime   = ((currentTime - mLastIdleMonitorTime) / 100) ? : 1;
+    mLastIdleMonitorTime = currentTime;
+    uint8_t running_time_percentage = 0;
+
+    /* Generate idle time percentage stats */
+    running_time_percentage = uxTaskGetRunTime(xTaskGetIdleTaskHandle()) / deltaTime;
+    xSemaphoreGiveRecursive(mLock);
+    return running_time_percentage;
+
+#else
+    return 0;
+
+#endif
+}
+
 
 #endif // PIOS_INCLUDE_TASK_MONITOR

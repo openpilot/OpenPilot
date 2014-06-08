@@ -214,8 +214,8 @@ Up to 3 separate PID options (or option pairs) can be selected and updated.</str
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>PID option</string>
@@ -243,8 +243,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Control Source</string>
@@ -272,8 +272,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Min</string>
@@ -301,8 +301,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Max</string>
@@ -620,8 +620,8 @@ only when system is armed without disabling the module.</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Min</string>
@@ -649,8 +649,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Max</string>

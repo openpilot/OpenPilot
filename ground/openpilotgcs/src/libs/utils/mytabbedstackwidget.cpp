@@ -82,13 +82,34 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
 
 void MyTabbedStackWidget::insertTab(const int index, QWidget *tab, const QIcon &icon, const QString &label)
 {
-    tab->setContentsMargins(0, 0, 0, 0);
-    m_stackWidget->insertWidget(index, tab);
+    // create and insert item
     QListWidgetItem *item = new QListWidgetItem(icon, label);
+
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     item->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     item->setToolTip(label);
     m_listWidget->insertItem(index, item);
+
+    // setup and insert widget
+    tab->setContentsMargins(0, 0, 0, 0);
+    m_stackWidget->insertWidget(index, tab);
+}
+
+void MyTabbedStackWidget::replaceTab(int index, QWidget *tab)
+{
+    QWidget *wid = m_stackWidget->widget(index);
+
+    // setup and insert new widget
+    tab->setContentsMargins(0, 0, 0, 0);
+    m_stackWidget->insertWidget(index, tab);
+    // check special case when replacing currenlty selected tab
+    if (index == currentIndex()) {
+        // currently selected tab is being replaced so select the new tab before removing the old one
+        m_stackWidget->setCurrentWidget(tab);
+    }
+    // remove and delete old widget
+    m_stackWidget->removeWidget(wid);
+    delete wid;
 }
 
 void MyTabbedStackWidget::removeTab(int index)
@@ -97,6 +118,7 @@ void MyTabbedStackWidget::removeTab(int index)
 
     m_stackWidget->removeWidget(wid);
     delete wid;
+
     QListWidgetItem *item = m_listWidget->item(index);
     m_listWidget->removeItemWidget(item);
     delete item;

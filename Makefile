@@ -197,7 +197,7 @@ export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
 # Define supported board lists
-ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix
+ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix discoveryf4bare
 
 # Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
@@ -206,6 +206,7 @@ revolution_short       := 'revo'
 osd_short              := 'osd '
 revoproto_short        := 'revp'
 simposix_short         := 'posx'
+discoveryf4bare_short  := 'df4b'
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.
@@ -450,11 +451,25 @@ else
     GCS_SILENT := silent
 endif
 
+.NOTPARALLEL:
 .PHONY: openpilotgcs
-openpilotgcs: uavobjects_gcs
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/$@_$(GCS_BUILD_CONF)
-	$(V1) ( cd $(BUILD_DIR)/$@_$(GCS_BUILD_CONF) && \
-	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
+openpilotgcs: uavobjects_gcs openpilotgcs_qmake openpilotgcs_make
+
+.PHONY: openpilotgcs_qmake
+openpilotgcs_qmake:
+ifeq ($(QMAKE_SKIP),)
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
+	)
+else
+	@$(ECHO) "skipping qmake"
+endif
+
+.PHONY: openpilotgcs_make
+openpilotgcs_make:
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)/$(MAKE_DIR) && \
 	    $(MAKE) -w ; \
 	)
 
@@ -683,7 +698,7 @@ endif
 ##############################
 
 # Firmware files to package
-PACKAGE_FW_TARGETS  := $(filter-out fw_simposix, $(FW_TARGETS))
+PACKAGE_FW_TARGETS  := $(filter-out fw_simposix fw_discoveryf4bare, $(FW_TARGETS))
 PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.
@@ -709,7 +724,7 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 
 # If opfw_resource or all firmware are requested, GCS should depend on the resource
 ifneq ($(strip $(filter opfw_resource all all_fw all_flight,$(MAKECMDGOALS))),)
-    $(eval openpilotgcs: $(OPFW_RESOURCE))
+    $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
 endif
 
 # Packaging targets: package, clean_package
@@ -732,7 +747,7 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
 
     # Packaged GCS should depend on opfw_resource
     ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
-        $(eval openpilotgcs: $(OPFW_RESOURCE))
+        $(eval openpilotgcs_qmake: $(OPFW_RESOURCE))
     endif
 
     # Clean the build directory if clean_package is requested
@@ -864,9 +879,8 @@ help:
 	@$(ECHO) "   [Tool Installers]"
 	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
-	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
-	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
 	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
+	@$(ECHO) "     sdl_install          - Install the SDL library (Windows only)"
 	@$(ECHO) "     openssl_install      - Install the OpenSSL libraries (Windows only)"
 	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     doxygen_install      - Install the Doxygen documentation generator"
@@ -947,6 +961,9 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   [GCS]"
 	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application (debug|release)"
+	@$(ECHO) "                            Skip qmake: QMAKE_SKIP=1"
+	@$(ECHO) "                            Compile specific directory: MAKE_DIR=<dir>"
+	@$(ECHO) "                            Example: make gcs QMAKE_SKIP=1 MAKE_DIR=src/plugins/coreplugin"
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO)

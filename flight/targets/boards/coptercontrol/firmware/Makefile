@@ -34,6 +34,7 @@ ERASE_FLASH ?= NO
 MODULES += Attitude
 MODULES += Stabilization
 MODULES += Actuator
+MODULES += Receiver
 MODULES += ManualControl
 MODULES += FirmwareIAP
 MODULES += Telemetry
@@ -47,8 +48,12 @@ OPTMODULES += Osd/osdoutput
 #OPTMODULES += Altitude
 #OPTMODULES += Fault
 
+SRC += $(FLIGHTLIB)/notification.c
+
 # Include all camera options
 CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF
+
+
 
 # Erase flash firmware should be buildable from command line
 ifeq ($(ERASE_FLASH), YES)
@@ -70,7 +75,6 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/accessorydesired.c
@@ -87,17 +91,20 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank1.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank2.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationsettingsbank3.c
+    SRC += $(OPUAVSYNTHDIR)/stabilizationstatus.c
     SRC += $(OPUAVSYNTHDIR)/stabilizationbank.c
     SRC += $(OPUAVSYNTHDIR)/actuatorcommand.c
     SRC += $(OPUAVSYNTHDIR)/actuatordesired.c
     SRC += $(OPUAVSYNTHDIR)/actuatorsettings.c
     SRC += $(OPUAVSYNTHDIR)/accelstate.c
+    SRC += $(OPUAVSYNTHDIR)/accelgyrosettings.c
     SRC += $(OPUAVSYNTHDIR)/gyrostate.c
     SRC += $(OPUAVSYNTHDIR)/attitudestate.c
     SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
     SRC += $(OPUAVSYNTHDIR)/i2cstats.c
     SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
     SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
+    SRC += $(OPUAVSYNTHDIR)/flightmodesettings.c
     SRC += $(OPUAVSYNTHDIR)/mixersettings.c
     SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
     SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
@@ -112,6 +119,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/relaytuningsettings.c
     SRC += $(OPUAVSYNTHDIR)/relaytuning.c
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+    SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/ratedesired.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c

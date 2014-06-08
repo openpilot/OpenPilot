@@ -51,10 +51,10 @@ public:
     void editWaypoint(mapcontrol::WayPointItem *waypoint_item);
 
 private:
-    Ui::opmap_edit_waypoint_dialog *ui;
     QDataWidgetMapper *mapper;
     QAbstractItemModel *model;
     QItemSelectionModel *itemSelection;
+    Ui::opmap_edit_waypoint_dialog *ui;
 private slots:
 
 private slots:

@@ -103,7 +103,7 @@ private:
     void setupQuadCopter();
     void setupHexaCopter();
     void setupOctoCopter();
-    void setupVtail();
+    void setupElevon();
     void setupAileron();
 
 private slots:

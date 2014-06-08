@@ -221,8 +221,8 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
         case VehicleConfigurationSource::FIXED_WING_AILERON:
             setupAileron();
             break;
-        case VehicleConfigurationSource::FIXED_WING_VTAIL:
-            setupVtail();
+        case VehicleConfigurationSource::FIXED_WING_ELEVON:
+            setupElevon();
             break;
         default:
             break;
@@ -1332,7 +1332,7 @@ void VehicleConfigurationHelper::setupOctoCopter()
     applyMultiGUISettings(frame, guiSettings);
 }
 
-void VehicleConfigurationHelper::setupVtail()
+void VehicleConfigurationHelper::setupElevon()
 {
 
     mixerChannelSettings channels[10];
@@ -1348,15 +1348,15 @@ void VehicleConfigurationHelper::setupVtail()
     channels[1].type      = MIXER_TYPE_SERVO;
     channels[1].throttle1 = 0;
     channels[1].throttle2 = 0;
-    channels[1].roll      = -100;
-    channels[1].pitch     = 50;
+    channels[1].roll      = -127;
+    channels[1].pitch     = 127;
     channels[1].yaw = 0;
 
     channels[2].type      = MIXER_TYPE_SERVO;
     channels[2].throttle1 = 0;
     channels[2].throttle2 = 0;
-    channels[2].roll      = 100;
-    channels[2].pitch     = -50;
+    channels[2].roll      = 127;
+    channels[2].pitch     = -127;
     channels[2].yaw = 0;
 
     channels[3].type      = MIXER_TYPE_SERVO;

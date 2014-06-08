@@ -242,7 +242,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
         gyro_queue = xQueueCreate(1, sizeof(float) * 4);
         PIOS_Assert(gyro_queue != NULL);
         PIOS_ADC_SetQueue(gyro_queue);
-        PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * UPDATE_RATE);
+        PIOS_ADC_Config(46);
 #endif
     }
     // Force settings update to make sure rotation loaded
@@ -401,7 +401,6 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
         accelState->y = accel[1];
         accelState->z = accel[2];
     }
-
     if (trim_requested) {
         if (trim_samples >= MAX_TRIM_FLIGHT_SAMPLES) {
             trim_requested = false;

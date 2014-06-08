@@ -45,6 +45,12 @@
 #include "cameradesired.h"
 #include "manualcontrolcommand.h"
 #include "taskinfo.h"
+#undef PIOS_INCLUDE_INSTRUMENTATION
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+#include <pios_instrumentation.h>
+static int8_t counter;
+// Counter 0xAC700001 total Actuator body execution time(excluding queue waits etc).
+#endif
 
 // Private constants
 #define MAX_QUEUE_SIZE       2
@@ -106,7 +112,6 @@ int32_t ActuatorStart()
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_ACTUATOR);
 #endif
-
     return 0;
 }
 
@@ -173,6 +178,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
     float throttleDesired;
     float collectiveDesired;
 
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+    counter = PIOS_Instrumentation_CreateCounter(0xAC700001);
+#endif
     /* Read initial values of ActuatorSettings */
     ActuatorSettingsData actuatorSettings;
 
@@ -199,7 +207,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         // Wait until the ActuatorDesired object is updated
         uint8_t rc = xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS);
-
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+        PIOS_Instrumentation_TimeStart(counter);
+#endif
         /* Process settings updated events even in timeout case so we always act on the latest settings */
         if (actuator_settings_updated) {
             actuator_settings_updated = false;
@@ -449,6 +459,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             ActuatorCommandSet(&command);
             AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
         }
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+        PIOS_Instrumentation_TimeEnd(counter);
+#endif
     }
 }
 
@@ -482,17 +495,17 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
         result += accumulator;
         if (period > 0.0f) {
             if (accumulator > 0.0f) {
-                float filter = mixerSettings->AccelTime / period;
-                if (filter < 1) {
-                    filter = 1;
+                float invFilter = period / mixerSettings->AccelTime;
+                if (invFilter > 1) {
+                    invFilter = 1;
                 }
-                accumulator -= accumulator / filter;
+                accumulator -= accumulator * invFilter;
             } else {
-                float filter = mixerSettings->DecelTime / period;
-                if (filter < 1) {
-                    filter = 1;
+                float invFilter = period / mixerSettings->DecelTime;
+                if (invFilter > 1) {
+                    invFilter = 1;
                 }
-                accumulator -= accumulator / filter;
+                accumulator -= accumulator * invFilter;
             }
         }
         filterAccumulator[index] = accumulator;

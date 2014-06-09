@@ -46,6 +46,7 @@ struct pios_adc_dev {
 #endif
     volatile int16_t *valid_data_buffer;
     volatile uint8_t adc_oversample;
+    volatile uint8_t adc_oversample_block_size;
     uint8_t  dma_block_size;
     uint16_t dma_half_buffer_size;
 #if defined(PIOS_INCLUDE_ADC)
@@ -144,8 +145,10 @@ int32_t PIOS_ADC_Init(const struct pios_adc_cfg *cfg)
  */
 void PIOS_ADC_Config(uint32_t oversampling)
 {
+    // Ensure oversample is an even number
+    PIOS_Assert(!(oversampling & 0x1));
     pios_adc_dev->adc_oversample = (oversampling > PIOS_ADC_MAX_OVERSAMPLING) ? PIOS_ADC_MAX_OVERSAMPLING : oversampling;
-
+    pios_adc_dev->adc_oversample_block_size = pios_adc_dev->adc_oversample / 2;
     ADC_DeInit(ADC1);
     ADC_DeInit(ADC2);
 
@@ -218,7 +221,7 @@ void PIOS_ADC_Config(uint32_t oversampling)
 
     /* This makes sure we have an even number of transfers if using ADC2 */
     pios_adc_dev->dma_block_size = ((PIOS_ADC_NUM_CHANNELS + PIOS_ADC_USE_ADC2) >> PIOS_ADC_USE_ADC2) << PIOS_ADC_USE_ADC2;
-    pios_adc_dev->dma_half_buffer_size = pios_adc_dev->dma_block_size * pios_adc_dev->adc_oversample / 2;
+    pios_adc_dev->dma_half_buffer_size = pios_adc_dev->dma_block_size * pios_adc_dev->adc_oversample_block_size;
 
     /* Configure DMA channel */
     DMA_InitTypeDef dma_init = pios_adc_dev->cfg->dma.rx.init;
@@ -342,7 +345,7 @@ void PIOS_ADC_downsample_data()
         }
     }
 
-    for (sample = 0; sample < pios_adc_dev->adc_oversample / 2; sample++) {
+    for (sample = 0; sample < pios_adc_dev->adc_oversample_block_size; sample++) {
         const uint16_t *buffer  = (const uint16_t *)&pios_adc_dev->valid_data_buffer[sample * pios_adc_dev->dma_block_size];
         const uint16_t firCoeff = pios_adc_dev->fir_coeffs[sample + PIOS_ADC_NUM_CHANNELS * pios_adc_dev->downsampleStep];
 #if (PIOS_ADC_USE_TEMP_SENSOR)

@@ -36,6 +36,9 @@ typedef struct {
     int32_t  value;
     uint32_t lastUpdateTS;
 } pios_perf_counter_t;
+
+typedef void *pios_counter_t;
+
 extern pios_perf_counter_t *pios_instrumentation_perf_counters;
 extern int8_t pios_instrumentation_last_used_counter;
 
@@ -44,11 +47,11 @@ extern int8_t pios_instrumentation_last_used_counter;
  * @param counterIdx index of the counter to update @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  * @param newValue the updated value.
  */
-inline void PIOS_Instrumentation_updateCounter(int8_t counterIdx, int32_t newValue)
+inline void PIOS_Instrumentation_updateCounter(pios_counter_t counter_handle, int32_t newValue)
 {
-    PIOS_Assert(pios_instrumentation_perf_counters && (counterIdx <= pios_instrumentation_last_used_counter));
+    PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     vPortEnterCritical();
-    pios_perf_counter_t *counter = &pios_instrumentation_perf_counters[counterIdx];
+    pios_perf_counter_t *counter = (pios_perf_counter_t *) counter_handle;
     counter->value = newValue;
     if (counter->value > counter->max) {
         counter->max = counter->value;
@@ -64,11 +67,12 @@ inline void PIOS_Instrumentation_updateCounter(int8_t counterIdx, int32_t newVal
  * Used to determine the time duration of a code block, mark the begin of the block. @see PIOS_Instrumentation_TimeEnd
  * @param counterIdx counterIdx index of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  */
-inline void PIOS_Instrumentation_TimeStart(int8_t counterIdx)
+inline void PIOS_Instrumentation_TimeStart(pios_counter_t counter_handle)
 {
+    PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     vPortEnterCritical();
-    PIOS_Assert(pios_instrumentation_perf_counters && (counterIdx <= pios_instrumentation_last_used_counter));
-    pios_perf_counter_t *counter = &pios_instrumentation_perf_counters[counterIdx];
+    pios_perf_counter_t *counter = (pios_perf_counter_t *) counter_handle;
+
     counter->lastUpdateTS = PIOS_DELAY_GetRaw();
     vPortExitCritical();
 }
@@ -77,11 +81,12 @@ inline void PIOS_Instrumentation_TimeStart(int8_t counterIdx)
  * Used to determine the time duration of a code block, mark the end of the block. @see PIOS_Instrumentation_TimeStart
  * @param counterIdx counterIdx index of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  */
-inline void PIOS_Instrumentation_TimeEnd(int8_t counterIdx)
+inline void PIOS_Instrumentation_TimeEnd(pios_counter_t counter_handle)
 {
-    PIOS_Assert(pios_instrumentation_perf_counters && (counterIdx <= pios_instrumentation_last_used_counter));
+    PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     vPortEnterCritical();
-    pios_perf_counter_t *counter = &pios_instrumentation_perf_counters[counterIdx];
+    pios_perf_counter_t *counter = (pios_perf_counter_t *) counter_handle;
+
     counter->value = PIOS_DELAY_DiffuS(counter->lastUpdateTS);
     if (counter->value > counter->max) {
         counter->max = counter->value;
@@ -97,21 +102,23 @@ inline void PIOS_Instrumentation_TimeEnd(int8_t counterIdx)
  * Used to determine the mean period between each call to the function
  * @param counterIdx counterIdx index of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  */
-inline void PIOS_Instrumentation_TrackPeriod(int8_t counterIdx)
+inline void PIOS_Instrumentation_TrackPeriod(pios_counter_t counter_handle)
 {
-    vPortEnterCritical();
-    PIOS_Assert(pios_instrumentation_perf_counters && (counterIdx <= pios_instrumentation_last_used_counter));
-    pios_perf_counter_t *counter = &pios_instrumentation_perf_counters[counterIdx];
-    uint32_t period = PIOS_DELAY_DiffuS(counter->lastUpdateTS);
+    PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
+    pios_perf_counter_t *counter = (pios_perf_counter_t *) counter_handle;
+    if(counter->lastUpdateTS != 0){
+        vPortEnterCritical();
+        uint32_t period = PIOS_DELAY_DiffuS(counter->lastUpdateTS);
+        counter->value = (counter->value * 15 + period) / 16;
+        if ((int32_t)period > counter->max) {
+            counter->max = period;
+        }
+        if ((int32_t)period < counter->min) {
+            counter->min = period;
+        }
+        vPortExitCritical();
+    }
     counter->lastUpdateTS = PIOS_DELAY_GetRaw();
-    counter->value = (counter->value * 14 + period * 2) / 16;
-    if (counter->value > counter->max) {
-        counter->max = counter->value;
-    }
-    if (counter->value < counter->min) {
-        counter->min = counter->value;
-    }
-    vPortExitCritical();
 }
 
 /**
@@ -125,14 +132,14 @@ void PIOS_Instrumentation_Init(int8_t maxCounters);
  * @param id the unique id to assig to the counter
  * @return the counter index to be used to manage its content
  */
-int8_t PIOS_Instrumentation_CreateCounter(uint32_t id);
+pios_counter_t PIOS_Instrumentation_CreateCounter(uint32_t id);
 
 /**
  * search a counter index by its unique Id
  * @param id the unique id to assig to the counter
  * @return the counter index to be used to manage its content
  */
-int8_t PIOS_Instrumentation_SearchCounter(uint32_t id);
+pios_counter_t PIOS_Instrumentation_SearchCounter(uint32_t id);
 
 typedef void (*InstrumentationCounterCallback)(const pios_perf_counter_t *counter, const int8_t index, void *context);
 /**

@@ -129,8 +129,8 @@ size_t mask = alignment - 1;
 		}
 
 		traceMALLOC( pvReturn, xWantedSize );
-	}	
-	xTaskResumeAll();
+	}
+	( void ) xTaskResumeAll();
 
 	#if( configUSE_MALLOC_FAILED_HOOK == 1 )
 	{

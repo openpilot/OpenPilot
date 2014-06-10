@@ -56,6 +56,8 @@
 
 #define sign(x) ((x < 0) ? -1 : 1)
 
+//#define DEBUG
+
 // Uncomment this to enable 6 point calibration on the accels
 #define NOISE_SAMPLES 50
 
@@ -268,26 +270,37 @@ void ConfigRevoWidget::displayVisualHelp(QString elementID)
 void ConfigRevoWidget::clearInstructions()
 {
     m_ui->calibrationInstructions->clear();
-    // addInstructions(tr("Press any Start button to start a calibration step."), WizardModel::Prompt);
 }
 
 void ConfigRevoWidget::addInstructions(QString text, WizardModel::MessageType type)
 {
-    if (!text.isNull()) {
-        switch (type) {
-        case WizardModel::Prompt:
-            text = QString("<b><font color='blue'>%1</font>").arg(text);
-            break;
-        case WizardModel::Success:
-            text = QString("<b><font color='green'>%1</font>").arg(text);
-            break;
-        case WizardModel::Failure:
-            text = QString("<b><font color='red'>%1</font>").arg(text);
-            break;
-        default:
-            break;
-        }
-        m_ui->calibrationInstructions->append(text);
+    QString msg;
+    switch (type) {
+    case WizardModel::Debug:
+#ifdef DEBUG
+        msg = QString("<i>%1</i>").arg(text);
+#endif
+        break;
+    case WizardModel::Info:
+        msg = QString("%1").arg(text);
+        break;
+    case WizardModel::Prompt:
+        msg = QString("<b><font color='blue'>%1</font>").arg(text);
+        break;
+    case WizardModel::Warn:
+        msg = QString("<b>%1</b>").arg(text);
+        break;
+    case WizardModel::Success:
+        msg = QString("<b><font color='green'>%1</font>").arg(text);
+        break;
+    case WizardModel::Failure:
+        msg = QString("<b><font color='red'>%1</font>").arg(text);
+        break;
+    default:
+        break;
+    }
+    if (!msg.isEmpty()) {
+        m_ui->calibrationInstructions->append(msg);
     }
 }
 

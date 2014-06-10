@@ -40,7 +40,7 @@ class WizardModel : public QStateMachine {
     Q_PROPERTY(WizardState * currentState READ currentState NOTIFY currentStateChanged)
 
 public:
-    enum MessageType { Info, Prompt, Warn, Success, Failure };
+    enum MessageType { Debug, Info, Prompt, Warn, Success, Failure };
 
     explicit WizardModel(QObject *parent = 0);
 

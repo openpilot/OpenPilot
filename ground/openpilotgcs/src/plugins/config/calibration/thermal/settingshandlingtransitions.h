@@ -72,7 +72,7 @@ public:
 public slots:
     void enterState()
     {
-        m_helper->addInstructions(tr("Saving initial settings."));
+        m_helper->addInstructions(tr("Saving initial settings."), WizardModel::Debug);
         m_helper->statusSave();
     }
 
@@ -112,7 +112,7 @@ public:
 public slots:
     void enterState()
     {
-        m_helper->addInstructions(tr("Restoring board configuration."));
+        m_helper->addInstructions(tr("Restoring board configuration."), WizardModel::Debug);
         m_helper->endAcquisition();
         m_helper->statusRestore();
     }

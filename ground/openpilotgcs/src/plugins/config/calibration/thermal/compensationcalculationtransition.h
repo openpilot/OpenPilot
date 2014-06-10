@@ -67,7 +67,7 @@ public:
 public slots:
     void enterState()
     {
-        m_helper->addInstructions("Calculating calibration data.");
+        m_helper->addInstructions("Calculating calibration data.", WizardModel::Debug);
         m_helper->calculate();
     }
 

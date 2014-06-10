@@ -72,7 +72,7 @@ public:
 public slots:
     void enterState()
     {
-        m_helper->addInstructions(tr("Configuring board for calibration."));
+        m_helper->addInstructions(tr("Configuring board for calibration."), WizardModel::Debug);
         m_helper->setupBoard();
     }
 

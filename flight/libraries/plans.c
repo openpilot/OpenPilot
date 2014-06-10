@@ -177,29 +177,31 @@ void plan_setup_PositionVarioNSEW()
 }
 
 
+#define DEADBAND 0.1f
 static bool normalizeDeadband(float controlVector[4])
 {
     bool moving = false;
+
     // roll, pitch, yaw between -1 and +1
+    // thrust between 0 and 1 mapped to -1 to +1
+    controlVector[3] = (2.0f * controlVector[3]) - 1.0f;
     int t;
 
-    for (t = 0; t < 3; t++) {
-        controlVector[t] = boundf(controlVector[t], -1.0f, 1.0f);
-        if (fabsf(controlVector[t]) > 0.1f) {
+    for (t = 0; t < 4; t++) {
+        if (controlVector[t] < -DEADBAND) {
             moving = true;
+            controlVector[t] += DEADBAND;
+        } else if (controlVector[t] > DEADBAND) {
+            moving = true;
+            controlVector[t] -= DEADBAND;
         } else {
             controlVector[t] = 0.0f;
         }
+        // deadband has been cut out, scale value back to [-1,+1]
+        controlVector[t] *= (1.0f / (1.0f - DEADBAND));
+        controlVector[t]  = boundf(controlVector[t], -1.0f, 1.0f);
     }
 
-    // thrust between 0 and +1
-    controlVector[3] = boundf(controlVector[3], 0.0f, 1.0f);
-    controlVector[3] = (2.0f * controlVector[3]) - 1.0f;
-    if (fabsf(controlVector[3]) > 0.2f) { // bigger deadband on thrust due to 2.0f factor above
-        moving = true;
-    } else {
-        controlVector[3] = 0.0f;
-    }
     return moving;
 }
 

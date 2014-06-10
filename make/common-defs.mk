@@ -35,6 +35,7 @@ DIAG_MIXERSTATUS	?= NO
 DIAG_RATEDESIRED	?= NO
 DIAG_I2C_WDG_STATS	?= NO
 DIAG_TASKS		?= NO
+DIAG_INSTRUMENTATION  ?=NO
 
 # Or just turn on all the above diagnostics. WARNING: this consumes massive amounts of memory.
 DIAG_ALL		?= NO
@@ -91,6 +92,9 @@ ifneq (,$(filter YES,$(DIAG_TASKS) $(DIAG_ALL)))
     CFLAGS += -DDIAG_TASKS
 endif
 
+ifneq (,$(filter YES,$(DIAG_INSTRUMENTATION) $(DIAG_ALL)))
+    CFLAGS += -DPIOS_INCLUDE_INSTRUMENTATION
+endif
 # Place project-specific -D and/or -U options for Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
 ADEFS = -D__ASSEMBLY__

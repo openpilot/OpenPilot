@@ -107,6 +107,12 @@ typedef unsigned long UBaseType_t;
 #define portSTACK_GROWTH			( -1 )
 #define portTICK_PERIOD_MS			( ( TickType_t ) 1000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT			8
+#define portBYTE_HEAP_ALIGNMENT    4 // this value is used to allocate heap
+
+// Following define allow to keep a 8 bytes alignment for stack and other RTOS structures
+// while using 4 bytes alignment for the remaining heap allocations to save ram
+extern void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment);
+#define pvPortMallocAligned( x, puxStackBuffer ) ( ( ( puxStackBuffer ) == NULL ) ? ( pvPortMallocGeneric( ( x ) , portBYTE_ALIGNMENT) ) : ( puxStackBuffer ) )
 /*-----------------------------------------------------------*/
 
 

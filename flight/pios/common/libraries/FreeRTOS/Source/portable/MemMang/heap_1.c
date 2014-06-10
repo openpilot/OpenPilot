@@ -90,22 +90,23 @@ static size_t currentTOTAL_HEAP_SIZE = configTOTAL_HEAP_SIZE;
 /* Allocate the memory for the heap. */
 static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ] __attribute__ ((section (".heap")));
 static size_t xNextFreeByte = ( size_t ) 0;
+void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment);
 
 
 
 /*-----------------------------------------------------------*/
 
-void *pvPortMalloc( size_t xWantedSize )
+void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment)
 {
 void *pvReturn = NULL;
 static uint8_t *pucAlignedHeap = NULL;
-
+size_t mask = alignment - 1;
 	/* Ensure that blocks are always aligned to the required number of bytes. */
 	#if portBYTE_ALIGNMENT != 1
 		if( xWantedSize & portBYTE_ALIGNMENT_MASK )
 		{
 			/* Byte alignment required. */
-			xWantedSize += ( portBYTE_ALIGNMENT - ( xWantedSize & portBYTE_ALIGNMENT_MASK ) );
+		    xWantedSize += ( alignment - ( xWantedSize & mask ) );
 		}
 	#endif
 
@@ -114,7 +115,7 @@ static uint8_t *pucAlignedHeap = NULL;
 		if( pucAlignedHeap == NULL )
 		{
 			/* Ensure the heap starts on a correctly aligned boundary. */
-			pucAlignedHeap = ( uint8_t * ) ( ( ( portPOINTER_SIZE_TYPE ) &ucHeap[ portBYTE_ALIGNMENT ] ) & ( ( portPOINTER_SIZE_TYPE ) ~portBYTE_ALIGNMENT_MASK ) );
+            pucAlignedHeap = ( uint8_t * ) ( ( ( portPOINTER_SIZE_TYPE ) &ucHeap[ alignment ] ) & ( ( portPOINTER_SIZE_TYPE ) ~mask ) );
 		}
 
 		/* Check there is enough room left for the allocation. */
@@ -143,8 +144,12 @@ static uint8_t *pucAlignedHeap = NULL;
 
 	return pvReturn;
 }
+/*-----------------------------------------------------------*/
 
 
+void *pvPortMalloc(size_t xWantedSize) {
+    return pvPortMallocGeneric(xWantedSize, portBYTE_HEAP_ALIGNMENT);
+}
 /*-----------------------------------------------------------*/
 
 void vPortFree( void *pv )

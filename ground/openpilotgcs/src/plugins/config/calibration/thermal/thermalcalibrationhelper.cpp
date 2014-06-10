@@ -31,6 +31,8 @@
 #include <uavtalk/telemetrymanager.h>
 #include "version_info/version_info.h"
 
+#include <math.h>
+
 // #define SIMULATE
 
 namespace OpenPilot {
@@ -263,8 +265,14 @@ float ThermalCalibrationHelper::getTemperature()
 {
 #ifdef SIMULATE
     float t = m_startTime.msecsTo(QTime::currentTime()) / 1000.0f;
-    // simulate a temperature rise from 20°C to 40°C
-    return 40 - 20 / (t + 1);
+    // Simulate a temperature rise using Newton's law of cooling
+    // See http://en.wikipedia.org/wiki/Newton%27s_law_of_cooling#Newton.27s_law_of_cooling
+    // Initial temp : 20
+    // Final temp : 40
+    // Made up time constant (t0) : 10.0
+    // For a plot of the function, see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiI0MC0yMCplXigteC8xMCkiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyItOTIuMjAzMjYzMTkzMzY4ODMiLCI5Ni45NzE2MzQ3NzU0MDAwOCIsIi00NC4zNzkzODMzMjU1NzY3NTQiLCI3Mi4wMzU5Mzg1MDEzNTc5OSJdfV0-
+    double t0 = 10.0;
+    return 40.0 - 20.0 * exp(-t / t0);
 
 #else
     return baroSensor->getTemperature();

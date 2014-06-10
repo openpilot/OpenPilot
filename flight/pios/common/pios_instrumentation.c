@@ -49,12 +49,12 @@ pios_counter_t PIOS_Instrumentation_CreateCounter(uint32_t id)
     PIOS_Assert(pios_instrumentation_perf_counters && (pios_instrumentation_max_counters > pios_instrumentation_last_used_counter));
 
     pios_counter_t counter_handle = PIOS_Instrumentation_SearchCounter(id);
-    if(!counter_handle) {
+    if (!counter_handle) {
         pios_perf_counter_t *newcounter = &pios_instrumentation_perf_counters[++pios_instrumentation_last_used_counter];
-        newcounter ->id  = id;
-        newcounter ->max = INT32_MIN;
-        newcounter ->min = INT32_MAX;
-        counter_handle = (pios_counter_t)newcounter;
+        newcounter->id  = id;
+        newcounter->max = INT32_MIN;
+        newcounter->min = INT32_MAX;
+        counter_handle  = (pios_counter_t)newcounter;
     }
     return counter_handle;
 }

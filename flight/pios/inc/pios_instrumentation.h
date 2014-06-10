@@ -51,7 +51,7 @@ inline void PIOS_Instrumentation_updateCounter(pios_counter_t counter_handle, in
 {
     PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     vPortEnterCritical();
-    pios_perf_counter_t *counter = (pios_perf_counter_t *) counter_handle;
+    pios_perf_counter_t *counter = (pios_perf_counter_t *)counter_handle;
     counter->value = newValue;
     if (counter->value > counter->max) {
         counter->max = counter->value;
@@ -71,7 +71,7 @@ inline void PIOS_Instrumentation_TimeStart(pios_counter_t counter_handle)
 {
     PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     vPortEnterCritical();
-    pios_perf_counter_t *counter = (pios_perf_counter_t *) counter_handle;
+    pios_perf_counter_t *counter = (pios_perf_counter_t *)counter_handle;
 
     counter->lastUpdateTS = PIOS_DELAY_GetRaw();
     vPortExitCritical();
@@ -85,7 +85,7 @@ inline void PIOS_Instrumentation_TimeEnd(pios_counter_t counter_handle)
 {
     PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
     vPortEnterCritical();
-    pios_perf_counter_t *counter = (pios_perf_counter_t *) counter_handle;
+    pios_perf_counter_t *counter = (pios_perf_counter_t *)counter_handle;
 
     counter->value = PIOS_DELAY_DiffuS(counter->lastUpdateTS);
     if (counter->value > counter->max) {
@@ -105,8 +105,8 @@ inline void PIOS_Instrumentation_TimeEnd(pios_counter_t counter_handle)
 inline void PIOS_Instrumentation_TrackPeriod(pios_counter_t counter_handle)
 {
     PIOS_Assert(pios_instrumentation_perf_counters && counter_handle);
-    pios_perf_counter_t *counter = (pios_perf_counter_t *) counter_handle;
-    if(counter->lastUpdateTS != 0){
+    pios_perf_counter_t *counter = (pios_perf_counter_t *)counter_handle;
+    if (counter->lastUpdateTS != 0) {
         vPortEnterCritical();
         uint32_t period = PIOS_DELAY_DiffuS(counter->lastUpdateTS);
         counter->value = (counter->value * 15 + period) / 16;

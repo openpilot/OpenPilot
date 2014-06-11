@@ -94,7 +94,7 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
     // Set default model to "Elevator aileron rudder"
     m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
 
-    setupUI(m_aircraft->fixedWingType->currentText());    
+    //setupUI(m_aircraft->fixedWingType->currentText());    
 
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
     updateEnableControls();
@@ -602,6 +602,7 @@ bool ConfigFixedWingWidget::throwConfigError(QString airframeType)
             m_aircraft->fwRudder1ChannelBox->setItemData(0, 0, Qt::DecorationRole); // Reset color palettes
         }
     } else if (airframeType == "FixedWingElevon") {
+/*
         if (m_aircraft->fwEngineChannelBox->currentText() == "None") {
             m_aircraft->fwEngineChannelBox->setItemData(0, pixmap, Qt::DecorationRole); // Set color palettes
             error = true;
@@ -622,6 +623,7 @@ bool ConfigFixedWingWidget::throwConfigError(QString airframeType)
         } else {
 	   m_aircraft->fwElevator2ChannelBox->setItemData(0, 0, Qt::DecorationRole); // Reset color palettes
         }
+*/
     }
 
     if (error) {

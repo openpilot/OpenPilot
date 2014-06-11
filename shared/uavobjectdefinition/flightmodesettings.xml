@@ -109,8 +109,11 @@
         <field name="ArmingSequenceTime" units="ms" type="uint16" elements="1" defaultvalue="1000"/>
         <field name="DisarmingSequenceTime" units="ms" type="uint16" elements="1" defaultvalue="1000"/>
         <field name="ReturnToBaseAltitudeOffset" units="m" type="float" elements="1" defaultvalue="10"/>
-        <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="40,5"/>
+        <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="10,2"/>
+	<!-- optimized for current vtolpathfollower,
+	     for fixed wing pathfollower set to Horizontal=500,Vertical=5 -->
         <field name="PositionHoldStartingVelocity" units="m/s" type="float" elements="1" defaultvalue="20"/>
+	<!-- currently ignored by vtolpathfollower -->
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

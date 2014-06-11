@@ -24,45 +24,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 #ifndef PIOS_MEM_H
 #define PIOS_MEM_H
-#ifdef PIOS_TARGET_PROVIDES_FAST_HEAP
-// relies on pios_general_malloc to perform the allocation (i.e. pios_msheap.c)
-extern void *pios_general_malloc(size_t size, bool fastheap);
 
-inline void *pios_fastheapmalloc(size_t size)
-{
-	return pios_general_malloc(size, true);
-}
+void *pios_fastheapmalloc(size_t size);
 
+void *pios_malloc(size_t size);
 
-inline void *pios_malloc(size_t size)
-{
-	return pios_general_malloc(size, false);
-}
+void pios_free(void *p);
 
-inline void *pios_free(void *p)
-{
-	vPortFree(p);
-}
-
-#else
-// demand to pvPortMalloc implementation
-inline void *pios_fastheapmalloc(size_t size)
-{
-	return pvPortMalloc(size);
-}
-
-
-inline void *pios_malloc(size_t size)
-{
-	return pvPortMalloc(size);
-}
-
-inline void *pios_free(void *p)
-{
-	vPortFree(p);
-}
-#endif
 #endif /* PIOS_MEM_H */

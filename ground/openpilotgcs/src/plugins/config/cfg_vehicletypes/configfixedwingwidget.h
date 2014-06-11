@@ -71,6 +71,7 @@ private:
     bool setupFixedWingMixer(double mixerFactors[8][3]);
     bool setupFixedWingElevonMixer(double mixerFactors[8][3]);
     void setupMotors(QList<QString> motorList);
+    void setupElevonServo(int channel, double roll, double pitch);
 
     void updateAirframe(QString multiRotorType);
     void setupEnabledControls(QString airframeType);

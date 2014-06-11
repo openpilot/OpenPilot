@@ -1100,11 +1100,7 @@
            id="path8516_1_"
            inkscape:connector-curvature="0"
            style="fill:none;stroke:#010101;stroke-width:0.69520003;stroke-linecap:round;stroke-linejoin:round" /></g></g></g><g
-<<<<<<< HEAD
      id="elevon"
-=======
-     id="v-tail"
->>>>>>> parent of 11fa414... Fix minor cosmetic issue where vtail model was not rendering in the Configuration screen. Edit the Inkscape Object Properties.
      transform="matrix(0.8,0,0,0.8,78.355285,170.6871)"><path
        style="stroke:#000000;stroke-width:0.75538152;stroke-miterlimit:10"
        inkscape:connector-curvature="0"

@@ -66,4 +66,29 @@ void plan_setup_land();
  * @brief execute land
  */
 void plan_run_land();
+
+/**
+ * @brief setup pathfollower for positionvario
+ */
+void plan_setup_PositionVarioFPV();
+void plan_setup_PositionVarioLOS();
+void plan_setup_PositionVarioNSEW();
+
+/**
+ * @brief run for positionvario
+ */
+void plan_run_PositionVarioFPV();
+void plan_run_PositionVarioLOS();
+void plan_run_PositionVarioNSEW();
+
+/**
+ * @brief setup pathplanner/pathfollower for AutoCruise
+ */
+void plan_setup_AutoCruise();
+
+/**
+ * @brief execute AutoCruise
+ */
+void plan_run_AutoCruise();
+
 #endif /* PLANS_H_ */

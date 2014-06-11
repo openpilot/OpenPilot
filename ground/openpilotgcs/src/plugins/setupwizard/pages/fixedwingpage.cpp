@@ -108,6 +108,9 @@ void FixedWingPage::updateImageAndDescription()
     case SetupWizard::FIXED_WING_ELEVON:
         elementId = "elevon";
         break;
+//    case SetupWizard::FIXED_WING_VTAIL:
+//        elementId = "vtail";
+//        break;
     default:
         elementId = "";
         break;

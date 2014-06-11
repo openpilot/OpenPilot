@@ -239,6 +239,9 @@ QString SetupWizard::getSummaryText()
         case SetupWizard::FIXED_WING_ELEVON:
             summary.append(tr("Elevon"));
             break;
+//        case SetupWizard::FIXED_WING_VTAIL:
+//            summary.append(tr("Vtail"));
+//            break;
         default:
             summary.append(tr("Unknown"));
             break;

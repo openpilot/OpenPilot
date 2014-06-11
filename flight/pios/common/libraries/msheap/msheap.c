@@ -138,71 +138,10 @@
     })
 
 
-/*
- * The heap consists of ranges (free or allocated) separated and
- * bounded by markers.
- *
- * For maximum space efficiency, the default is to use 4-byte
- * 'compact' markers, which limits the heap to a maxium of 128KiB.
- * For larger heaps define HEAP_SUPPORT_LARGE, which doubles markers
- * to 8 bytes each, but allows heaps up to 2^^33 bytes in size.
- *
- * Each marker contains two structures, one describing the previous
- * region and one describing the next.  Thus, markers form a
- * doubly-linked list chaining each region together. 
- *
- * Each region is described by two identical structures, providing
- * a measure of referential integrity that can be used to detect
- * overflows out of the region without the use of separate magic
- * numbers.
- *
- * The region descriptor size includes the size of the marker at its
- * head.  This means that zero is not a legal marker value.
- *
- * Free regions are always coalesced, and a pointer is kept to the
- * most recently-created free region to accelerate allocation in the
- * common case where a large number of free objects are allocated
- * early.
- *
- * The heap is bounded by markers pointing to zero-sized allocated
- * ranges, so they can never be merged.
- */
-#ifdef HEAP_SUPPORT_LARGE
 
-struct region_descriptor {
-    uint32_t    size:31;    /* size of the region (including marker) in multiples of the marker size */
-    uint32_t    free:1;     /* if nonzero, region is free */
-};
-static const uint32_t       max_free = 0x7fffffff;
-
-#else /* !HEAP_SUPPORT_LARGE */
-
-struct region_descriptor {
-    uint16_t    size:15;    /* size of the region (including marker) in multiples of the marker size */
-    uint16_t    free:1;     /* if nonzero, region is free */
-};
-static const uint32_t       max_free = 0x7fff;
-
-#endif /* HEAP_SUPPORT_LARGE */
-
-/**
- * The marker placed between regions.
- *
- * Allocations are aligned and rounded to the size of this structure.
- */
-struct marker {
-    struct region_descriptor    prev;
-    struct region_descriptor    next;
-};
-
-typedef struct marker       *marker_t;
 static const uintptr_t      marker_size = sizeof(struct marker);
 
-/* heap boundaries */
-static marker_t     heap_base;
-static marker_t     heap_limit;
-static uint32_t     heap_free;
-static marker_t     free_hint;      /* likely free region, or heap_base if no free region hint */
+
 
 /* rounding macros for powers of 2 */
 #define round_down(_val, _boundary) ((_val) & ~(_boundary - 1))
@@ -211,56 +150,56 @@ static marker_t     free_hint;      /* likely free region, or heap_base if no fr
 /* default panic handler */
 void msheap_panic(const char *reason) __attribute__((weak, noreturn));
 
-static int  region_check(marker_t marker);
-static void split_region(marker_t marker, uint32_t size);
+static int  region_check(heap_handle_t *heap, marker_t marker);
+static void split_region(heap_handle_t *heap, marker_t marker, uint32_t size);
 static void merge_region(marker_t marker);
 
 /**
- * Initialise the heap.
+ * Initialise the heap->
  *
- * @param   base        The lower boundary of the heap.
- * @param   limit       The upper boundary of the heap.
+ * @param   base        The lower boundary of the heap->
+ * @param   limit       The upper boundary of the heap->
  */
 void
-msheap_init(void *base, void *limit)
+msheap_init(heap_handle_t *heap, void *base, void *limit)
 {
-    heap_base = (marker_t)round_up((uintptr_t)base, marker_size);
-    heap_limit = (marker_t)round_down((uintptr_t)limit, marker_size) - 1;
+    heap->heap_base = (marker_t)round_up((uintptr_t)base, marker_size);
+    heap->heap_limit = (marker_t)round_down((uintptr_t)limit, marker_size) - 1;
 
-    ASSERT(3, heap_base);               /* must not be NULL */
-    ASSERT(3, heap_limit);              /* must not be NULL */
-    ASSERT(3, heap_limit > heap_base);  /* limit must be above base */
+    ASSERT(3, heap->heap_base);               /* must not be NULL */
+    ASSERT(3, heap->heap_limit);              /* must not be NULL */
+    ASSERT(3, heap->heap_limit > heap->heap_base);  /* limit must be above base */
 
     /* Initial size of the free region (includes the heap_base marker) */
-    heap_free = heap_limit - heap_base;
-    ASSERT(0, heap_free <= max_free);   /* heap must not be too large */
-    ASSERT(3, heap_free > 1);           /* heap must be at least 1 marker in size */
+    heap->heap_free = heap->heap_limit - heap->heap_base;
+    ASSERT(0, heap->heap_free <= max_free);   /* heap must not be too large */
+    ASSERT(3, heap->heap_free > 1);           /* heap must be at least 1 marker in size */
 
     /*
      * Initialise the base and limit markers.
      */
-    heap_base->prev.size = 0;
-    heap_base->prev.free = 0;
-    heap_base->next.size = heap_free;
-    heap_base->next.free = 1;
-    heap_limit->prev.size = heap_free;
-    heap_limit->prev.free = 1;
-    heap_limit->next.size = 0;
-    heap_limit->next.free = 0;
+    heap->heap_base->prev.size = 0;
+    heap->heap_base->prev.free = 0;
+    heap->heap_base->next.size = heap->heap_free;
+    heap->heap_base->next.free = 1;
+    heap->heap_limit->prev.size = heap->heap_free;
+    heap->heap_limit->prev.free = 1;
+    heap->heap_limit->next.size = 0;
+    heap->heap_limit->next.free = 0;
 
-    free_hint = heap_base;              /* a good place to start ... */
+    heap->free_hint = heap->heap_base;              /* a good place to start ... */
 
-    region_check(heap_base);
-    region_check(heap_limit);
+    region_check(heap, heap->heap_base);
+    region_check(heap, heap->heap_limit);
 }
 
 void *
-msheap_alloc(uint32_t size)
+msheap_alloc(heap_handle_t *heap, uint32_t size)
 {
     marker_t    cursor;
     marker_t    best;
 
-    ASSERT(3, msheap_check());
+    ASSERT(3, msheap_check(heap));
 
     /* convert the passed-in size to the number of marker-size units we need to allocate */
     size += marker_size;
@@ -268,16 +207,16 @@ msheap_alloc(uint32_t size)
     size /= marker_size;
 
     /* cannot possibly satisfy this allocation */
-    if (size > heap_free)
+    if (size > heap->heap_free)
         return 0;
 
     /* simple single-pass best-fit search */
 restart:
-    cursor = free_hint;
+    cursor = heap->free_hint;
     best = 0;
-    while (cursor != heap_limit) {
+    while (cursor != heap->heap_limit) {
 
-        ASSERT(1, region_check(cursor));
+        ASSERT(1, region_check(heap, cursor));
 
         /* if the region is free and large enough */
         if ((cursor->next.free) && (cursor->next.size >= size)) {
@@ -295,8 +234,8 @@ restart:
          * If we were working from the hint and found nothing, reset
          * the hint and try again
          */
-        if (free_hint != heap_base) { 
-            free_hint = heap_base;
+        if (heap->free_hint != heap->heap_base) {
+        	heap->free_hint = heap->heap_base;
             goto restart; 
         }
 
@@ -305,24 +244,24 @@ restart:
     }
 
     /* split the free region to make space */
-    split_region(best, size);
+    split_region(heap, best, size);
 
     /* update free space counter */
-    heap_free -= size;
+    heap->heap_free -= size;
     traceMALLOC( (void *)(best + 1), size );
     /* and return a pointer to the allocated region */
     return (void *)(best + 1);
 }
 
 void
-msheap_free(void *ptr)
+msheap_free(heap_handle_t *heap, void *ptr)
 {
     marker_t    marker;
 
     marker = (marker_t)ptr - 1;
 
-    ASSERT(0, region_check(marker));
-    ASSERT(3, msheap_check());
+    ASSERT(0, region_check(heap, marker));
+    ASSERT(3, msheap_check(heap));
 
     /* this region is free, mark it accordingly */
     marker->next.free = 1;
@@ -331,7 +270,7 @@ msheap_free(void *ptr)
     traceFREE( ptr, marker->next.size );
 
     /* account for space we are freeing */
-    heap_free += marker->next.size;
+    heap->heap_free += marker->next.size;
 
     /* possibly merge this region and the following */
     merge_region(marker);
@@ -344,60 +283,60 @@ msheap_free(void *ptr)
 
     /*
      * Marker now points to the new free region, so update
-     * the free hint if this has opened space earlier in the heap.
+     * the free hint if this has opened space earlier in the heap->
      */
-    if (marker < free_hint)
-        free_hint = marker;
+    if (marker < heap->free_hint)
+    	heap->free_hint = marker;
 }
 
 int
-msheap_check(void)
+msheap_check(heap_handle_t *heap)
 {
     marker_t    cursor;
     uint32_t    free_space = 0;
 
-    cursor = heap_base;                             /* start at the base of the heap */
+    cursor = heap->heap_base;                             /* start at the base of the heap */
 
     for (;;) {
-        if (ASSERT_TEST(2, region_check(cursor)))   /* check the current region */
+        if (ASSERT_TEST(2, region_check(heap, cursor)))   /* check the current region */
             return 0;
         if (cursor->next.free)                      /* if the region is free */
             free_space += cursor->next.size;        /* count it as free space */
-        if (cursor == heap_limit)                   /* if this was the last region, stop */
+        if (cursor == heap->heap_limit)                   /* if this was the last region, stop */
             break;
         cursor += cursor->next.size;                /* next region */
     }
 
-    if (ASSERT_TEST(2, region_check(free_hint)))
+    if (ASSERT_TEST(2, region_check(heap, heap->free_hint)))
         return 0;
-    if (ASSERT_TEST(2, free_space == heap_free))
+    if (ASSERT_TEST(2, free_space == heap->heap_free))
         return 0;
 
     return 1;
 }
 
 void
-msheap_walk(void (* callback)(void *ptr, uint32_t size, int free))
+msheap_walk(heap_handle_t *heap, void (* callback)(void *ptr, uint32_t size, int free))
 {
     marker_t    cursor;
 
-    cursor = heap_base;
+    cursor = heap->heap_base;
     for (;;) {
         callback(cursor + 1, cursor->next.size * marker_size, cursor->next.free);
-        if (cursor == heap_limit)
+        if (cursor == heap->heap_limit)
             break;
         cursor += cursor->next.size;
     }
 }
 
 uint32_t
-msheap_free_space(void)
+msheap_free_space(heap_handle_t *heap)
 {
-    return heap_free * marker_size;
+    return heap->heap_free * marker_size;
 }
 
 void
-msheap_extend(uint32_t size)
+msheap_extend(heap_handle_t *heap, uint32_t size)
 {
     marker_t    new_free;
 
@@ -411,10 +350,10 @@ msheap_extend(uint32_t size)
      * the heap limit, or we can turn the heap limit marker
      * into the marker for a free region.
      */
-    if (heap_limit->prev.free) {
-        new_free = heap_limit - heap_limit->prev.size;
+    if (heap->heap_limit->prev.free) {
+    	new_free = heap->heap_limit - heap->heap_limit->prev.size;
     } else {
-        new_free = heap_limit;
+        new_free = heap->heap_limit;
     }
 
     /* update new free region */
@@ -422,13 +361,13 @@ msheap_extend(uint32_t size)
     new_free->next.free = 1;
 
     /* new end marker */
-    heap_limit = new_free + new_free->next.size;
-    heap_limit->prev.size = new_free->next.size;
-    heap_limit->prev.free = 1;
-    heap_limit->next.size = 0;
-    heap_limit->next.free = 0;
+    heap->heap_limit = new_free + new_free->next.size;
+    heap->heap_limit->prev.size = new_free->next.size;
+    heap->heap_limit->prev.free = 1;
+    heap->heap_limit->next.size = 0;
+    heap->heap_limit->next.free = 0;
 
-    ASSERT(3, msheap_check());
+    ASSERT(3, msheap_check(heap));
 }
 
 /**
@@ -456,14 +395,14 @@ msheap_panic(__attribute__((unused)) const char *reason)
  * @return              0 if the region fails checking, 1 otherwise.
  */
 static int
-region_check(marker_t marker)
+region_check(heap_handle_t *heap,  marker_t marker)
 {
     marker_t    other;
 
     if (ASSERT_TEST(2, marker) |                            /* not NULL */
         ASSERT_TEST(2, !((uintptr_t)marker % marker_size)) | /* properly aligned */
-        ASSERT_TEST(2, marker >= heap_base) |               /* within the heap */
-        ASSERT_TEST(2, marker <= heap_limit))
+        ASSERT_TEST(2, marker >= heap->heap_base) |               /* within the heap */
+        ASSERT_TEST(2, marker <= heap->heap_limit))
         return 0;
 
     /* validate link to next marker & return link from that marker */
@@ -471,12 +410,12 @@ region_check(marker_t marker)
         other = marker + marker->next.size;
 
         if (ASSERT_TEST(2, other > marker) |                        /* must be after */
-            ASSERT_TEST(2, other <= heap_limit) |                   /* must be inside the heap */
+            ASSERT_TEST(2, other <= heap->heap_limit) |                   /* must be inside the heap */
             ASSERT_TEST(2, marker->next.size == other->prev.size) | /* sizes must match */
             ASSERT_TEST(2, marker->next.free == other->prev.free))  /* free state must match */
             return 0;
     } else {
-        if (ASSERT_TEST(2, marker == heap_limit))                   /* or it's the end of the heap */
+        if (ASSERT_TEST(2, marker == heap->heap_limit))                   /* or it's the end of the heap */
             return 0;
     }
 
@@ -485,12 +424,12 @@ region_check(marker_t marker)
         other = marker - marker->prev.size;
 
         if (ASSERT_TEST(2, other < marker) |                        /* must be before */
-            ASSERT_TEST(2, other >= heap_base) |                    /* must be inside the heap */
+            ASSERT_TEST(2, other >= heap->heap_base) |                    /* must be inside the heap */
             ASSERT_TEST(2, marker->prev.size == other->next.size) | /* sizes must match */
             ASSERT_TEST(2, marker->prev.free == other->next.free))  /* free state must match */
             return 0;
     } else {
-        if (ASSERT_TEST(2, marker == heap_base))                    /* or it's the end of the heap */
+        if (ASSERT_TEST(2, marker == heap->heap_base))                    /* or it's the end of the heap */
             return 0;
     }
 
@@ -508,7 +447,7 @@ region_check(marker_t marker)
  * @param   size        Size of the portion to be allocated.
  */
 static void
-split_region(marker_t marker, uint32_t size)
+split_region(heap_handle_t *heap, marker_t marker, uint32_t size)
 {
     marker_t    split, tail;
 
@@ -519,7 +458,7 @@ split_region(marker_t marker, uint32_t size)
     ASSERT(3, size);                        /* split result must be at least one marker in size */
 
     tail = marker + marker->next.size;
-    ASSERT(1, region_check(tail));          /* validate the following region */
+    ASSERT(1, region_check(heap, tail));          /* validate the following region */
 
     /* 
      * The split marker is at the end of the allocated region; it may actually
@@ -542,25 +481,25 @@ split_region(marker_t marker, uint32_t size)
          * Update the allocation speedup hint to
          * point to the new free region if we just used it.
          */
-        if (free_hint == marker)
-            free_hint = split;
+        if (heap->free_hint == marker)
+        	heap->free_hint = split;
     } else {
 
         /*
          * If we just allocated all of what the free hint
-         * pointed to, reset it to the base of the heap.
+         * pointed to, reset it to the base of the heap->
          */
-        if (free_hint == marker)
-            free_hint = heap_base;
+        if (heap->free_hint == marker)
+        	heap->free_hint = heap->heap_base;
     }
 
     /* and update the allocated region */
     marker->next.size = size;
     marker->next.free = 0;
 
-    ASSERT(3, region_check(marker));
-    ASSERT(3, region_check(split));
-    ASSERT(3, region_check(tail));
+    ASSERT(3, region_check(heap, marker));
+    ASSERT(3, region_check(heap, split));
+    ASSERT(3, region_check(heap, tail));
 }
 
 /**

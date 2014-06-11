@@ -108,6 +108,10 @@ typedef unsigned long UBaseType_t;
 #define portTICK_PERIOD_MS			( ( TickType_t ) 1000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT			8
 /*-----------------------------------------------------------*/
+// Following define allow to use a different malloc to allocate thread stack
+extern void *pvPortMallocStack(size_t s);
+#define pvPortMallocAligned( x, puxStackBuffer ) ( ( ( puxStackBuffer ) == NULL ) ? ( pvPortMallocStack( x ) ) : ( puxStackBuffer ) )
+/*-----------------------------------------------------------*/
 
 
 /* Scheduler utilities. */

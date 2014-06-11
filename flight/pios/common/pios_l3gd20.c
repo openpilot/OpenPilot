@@ -77,7 +77,7 @@ static struct l3gd20_dev *PIOS_L3GD20_alloc(void)
 {
     struct l3gd20_dev *l3gd20_dev;
 
-    l3gd20_dev = (struct l3gd20_dev *)pvPortMalloc(sizeof(*l3gd20_dev));
+    l3gd20_dev = (struct l3gd20_dev *)pios_malloc(sizeof(*l3gd20_dev));
     if (!l3gd20_dev) {
         return NULL;
     }

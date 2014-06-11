@@ -92,7 +92,7 @@ static struct pios_ppm_dev *PIOS_PPM_alloc(void)
 {
     struct pios_ppm_dev *ppm_dev;
 
-    ppm_dev = (struct pios_ppm_dev *)pvPortMalloc(sizeof(*ppm_dev));
+    ppm_dev = (struct pios_ppm_dev *)pios_malloc(sizeof(*ppm_dev));
     if (!ppm_dev) {
         return NULL;
     }

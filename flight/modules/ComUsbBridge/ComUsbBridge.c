@@ -115,9 +115,9 @@ static int32_t comUsbBridgeInitialize(void)
 #endif
 
     if (bridge_enabled) {
-        com2usb_buf = pvPortMalloc(BRIDGE_BUF_LEN);
+        com2usb_buf = pios_malloc(BRIDGE_BUF_LEN);
         PIOS_Assert(com2usb_buf);
-        usb2com_buf = pvPortMalloc(BRIDGE_BUF_LEN);
+        usb2com_buf = pios_malloc(BRIDGE_BUF_LEN);
         PIOS_Assert(usb2com_buf);
 
         updateSettings();

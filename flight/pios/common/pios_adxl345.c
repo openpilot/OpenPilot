@@ -59,7 +59,7 @@ static struct adxl345_dev *PIOS_ADXL345_alloc(void)
 {
     struct adxl345_dev *adxl345_dev;
 
-    adxl345_dev = (struct adxl345_dev *)pvPortMalloc(sizeof(*adxl345_dev));
+    adxl345_dev = (struct adxl345_dev *)pios_malloc(sizeof(*adxl345_dev));
     if (!adxl345_dev) {
         return NULL;
     }

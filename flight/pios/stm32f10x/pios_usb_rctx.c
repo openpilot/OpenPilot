@@ -65,7 +65,7 @@ static struct pios_usb_rctx_dev *PIOS_USB_RCTX_alloc(void)
 {
     struct pios_usb_rctx_dev *usb_rctx_dev;
 
-    usb_rctx_dev = (struct pios_usb_rctx_dev *)pvPortMalloc(sizeof(*usb_rctx_dev));
+    usb_rctx_dev = (struct pios_usb_rctx_dev *)pios_malloc(sizeof(*usb_rctx_dev));
     if (!usb_rctx_dev) {
         return NULL;
     }

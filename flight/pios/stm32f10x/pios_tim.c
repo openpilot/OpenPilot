@@ -30,7 +30,7 @@ static struct pios_tim_dev *PIOS_TIM_alloc(void)
 {
     struct pios_tim_dev *tim_dev;
 
-    tim_dev = (struct pios_tim_dev *)malloc(sizeof(*tim_dev));
+    tim_dev = (struct pios_tim_dev *)pios_malloc(sizeof(*tim_dev));
     if (!tim_dev) {
         return NULL;
     }

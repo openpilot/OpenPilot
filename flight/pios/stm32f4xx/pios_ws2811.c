@@ -175,7 +175,7 @@ void PIOS_WS2811_Init(const struct pios_ws2811_cfg *ws2811_cfg, const struct pio
         dmaSource[i] = (ledbuf_t)pios_ws2811_pin_cfg->gpioInit.GPIO_Pin;
     }
 
-    fb = (ledbuf_t *)pvPortMalloc(PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
+    fb = (ledbuf_t *)pios_malloc(PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
     memset(fb, 0, PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
     Color ledoff = { 0, 0, 0 };
     for (uint8_t i = 0; i < PIOS_WS2811_NUMLEDS; i++) {

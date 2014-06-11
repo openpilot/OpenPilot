@@ -82,7 +82,7 @@ static struct pios_dsm_dev *PIOS_DSM_Alloc(void)
 {
     struct pios_dsm_dev *dsm_dev;
 
-    dsm_dev = (struct pios_dsm_dev *)pvPortMalloc(sizeof(*dsm_dev));
+    dsm_dev = (struct pios_dsm_dev *)pios_malloc(sizeof(*dsm_dev));
     if (!dsm_dev) {
         return NULL;
     }

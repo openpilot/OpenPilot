@@ -29,7 +29,7 @@
 #define PIOS_MEM_H
 #ifdef PIOS_TARGET_PROVIDES_FAST_HEAP
 // relies on pios_general_malloc to perform the allocation (i.e. pios_msheap.c)
-extern void *pios_general_malloc(size_t size);
+extern void *pios_general_malloc(size_t size, bool fastheap);
 
 inline void *pios_fastheapmalloc(size_t size)
 {
@@ -44,7 +44,7 @@ inline void *pios_malloc(size_t size)
 
 inline void *pios_free(void *p)
 {
-	return vPortFree(p);
+	vPortFree(p);
 }
 
 #else

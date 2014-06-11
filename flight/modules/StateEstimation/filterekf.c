@@ -104,7 +104,7 @@ int32_t filterEKF13iInitialize(stateFilter *handle)
     globalInit();
     handle->init      = &init13i;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 int32_t filterEKF13Initialize(stateFilter *handle)
@@ -112,7 +112,7 @@ int32_t filterEKF13Initialize(stateFilter *handle)
     globalInit();
     handle->init      = &init13;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 // XXX
@@ -123,7 +123,7 @@ int32_t filterEKF16iInitialize(stateFilter *handle)
     globalInit();
     handle->init      = &init13i;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 int32_t filterEKF16Initialize(stateFilter *handle)
@@ -131,7 +131,7 @@ int32_t filterEKF16Initialize(stateFilter *handle)
     globalInit();
     handle->init      = &init13;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 

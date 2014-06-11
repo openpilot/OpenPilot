@@ -8199,11 +8199,6 @@ Useful if you have accidentally changed some settings.</source>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moves the inverted mode power switching this fraction of a second into the future to compensate for slow responding power systems.  Used to more accurately time the changing of power when entering/exiting inverted mode.  Set this to equal the fraction of a second it takes for your vehicle to go from full negative thrust (10% positive thrust for multis, full negative thrust (-90%) for CP helis) to full positive thrust (+90%).  Increase this if for example continuous left flips &amp;quot;walk off&amp;quot; to the left because power is changed too late.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>fieldname:CruiseControlPowerDelayComp</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
@@ -8245,6 +8240,11 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>Throttle/Collective Stick Response</source>
         <translation>Réponse du manche Gaz/Collectif</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Motor response time to go from min thrust to max thrust. It allows thrust anticipation on entering/exiting inverted mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Temps de réponse du moteur pour passer de la poussée minimum à la poussée maximum. Cela permet une anticipation lors de l&apos;entrée/sortie du mode inversé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>

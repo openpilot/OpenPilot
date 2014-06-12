@@ -35,6 +35,7 @@
 #include "manualcontrolsettings.h"
 #include "flightmodesettings.h"
 #include "stabilizationsettings.h"
+#include "stabilizationbank.h"
 #include "stabilizationsettingsbank1.h"
 #include "revocalibration.h"
 #include "accelgyrosettings.h"
@@ -336,28 +337,43 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 	// unfortunately not sure this is the right way to do it! 
 	
 	qDebug() << "Saving Fixed Wing Default PID Data\n";
-//	qDebug() << "Save Fixed Wing StabilizationSettings object\n";
-//        StabilizationSettings *stabilizationSettings = StabilizationSettings::GetInstance(m_uavoManager);
-//	StabilizationSettings::DataFields stabSettings = stabilizationSettings->getData();
-//	Values pulled from ./build/uavobject-synthetics/gcs/stabilizationsettings.h 
-//        stabSettings.CruiseControlInvertedThrustReversing[StabilizationSettings::CRUISECONTROLINVERTEDTHRUSTREVERSING_UNREVERSED] = 0;
-//	Currently broken, need to set max servo throw via iLimit here per my notes in http://forums.openpilot.org/topic/32356-gonna-give-revo-a-run-on-my-bixler-v1-any-suggestions/#entry252556
-//        stabilizationSettings->setData(stabSettings);
-//	addModifiedObject(stabilizationSettings, tr("Writing stabilization settings"));
+
+/*
+	qDebug() << "Save Fixed Wing StabilizationBank object\n";
+        StabilizationBank *stabilizationBank = StabilizationBank::GetInstance(m_uavoManager);
+	StabilizationBank::DataFields stabBank = stabilizationBank->getData();
+	Values pulled from ./build/uavobject-synthetics/gcs/stabilizationbank.h 
+        stabBank.PitchPI[StabilizationBank::PITCHPI_ILIMIT] = 1.123;
+        stabilizationBank->setData(stabBank);
+	addModifiedObject(stabilizationBank, tr("Writing stabilization bank"));
+*/
 
 	qDebug() << "Save Fixed Wing StabilizationSettingsBank1 object\n";
 
-//      Values pulled from ./build/uavobject-synthetics/gcs/stabilizationsettingsbank1.h
+	// Values pulled from ./build/uavobject-synthetics/gcs/stabilizationsettingsbank1.h
         StabilizationSettingsBank1 *stabilizationSettingsBank = StabilizationSettingsBank1::GetInstance(m_uavoManager);
 	StabilizationSettingsBank1::DataFields stabSettingsBank = stabilizationSettingsBank->getData();
         stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KP] = 2.420;
         stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KI] = 2.420;
         stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KP] = 2.420;
         stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KI] = 2.420;
+
         stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KP] = 2.420;
         stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KI] = 2.420;
         stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KP] = 2.420;
         stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KI] = 2.420;
+
+        stabSettingsBank.YawRatePID[StabilizationSettingsBank1::YAWRATEPID_KP] = 2.420;
+        stabSettingsBank.YawRatePID[StabilizationSettingsBank1::YAWRATEPID_KI] = 2.420;
+        stabSettingsBank.YawPI[StabilizationSettingsBank1::YAWPI_KP] = 2.420;
+        stabSettingsBank.YawPI[StabilizationSettingsBank1::YAWPI_KI] = 2.420;
+
+	
+	// need to set max servo throw via iLimit here per my notes in http://forums.openpilot.org/topic/32356-gonna-give-revo-a-run-on-my-bixler-v1-any-suggestions/#entry252556
+        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_ILIMIT] = 1.420;
+        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_ILIMIT] = 1.420;
+        stabSettingsBank.YawPI[StabilizationSettingsBank1::YAWPI_ILIMIT] = 1.420;
+
 	stabilizationSettingsBank->setData(stabSettingsBank);
 	addModifiedObject(stabilizationSettingsBank, tr("Writing stabilization bank 1 settings"));
 

@@ -104,6 +104,11 @@ public:
         return m_gradient;
     }
 
+    float range()
+    {
+        return fabs(m_maxTemperature - m_minTemperature);
+    }
+
     int processPercentage()
     {
         return m_progress;
@@ -113,22 +118,42 @@ public:
 
     bool calibrationSuccessful()
     {
-        return m_results.baroCalibrated && ((m_results.baroTempMax - m_results.baroTempMin) > TargetTempDelta);
+        return (range() > TargetTempDelta) && baroCalibrationSuccessful();
+    }
+
+    bool baroCalibrationSuccessful()
+    {
+        return m_results.baroCalibrated;
+    }
+
+    bool gyroCalibrationSuccessful()
+    {
+        return m_results.gyroCalibrated;
+    }
+
+    bool accelCalibrationSuccessful()
+    {
+        return m_results.accelCalibrated;
     }
 
     void copyResultToSettings();
 
 signals:
-    void instructionsAdded(QString text, WizardModel::MessageType type = WizardModel::Info);
     void statusRestoreCompleted(bool succesful);
     void statusSaveCompleted(bool succesful);
     void setupBoardCompleted(bool succesful);
-    void temperatureChanged(float value);
-    void temperatureGradientChanged(float value);
-    void progressChanged(int value);
-    void progressMaxChanged(int value);
     void collectionCompleted();
     void calculationCompleted();
+
+    void temperatureChanged(float temperature);
+    void temperatureGradientChanged(float temperatureGradient);
+    void temperatureRangeChanged(float temperatureRange);
+
+    void progressChanged(int value);
+    void progressMaxChanged(int value);
+
+    void instructionsAdded(QString text, WizardModel::MessageType type = WizardModel::Info);
+
 
 public slots:
     /**
@@ -181,7 +206,9 @@ public slots:
     void cleanup();
 
 private:
-    void updateTemp(float temp);
+    float getTemperature();
+    void updateTemperature(float temp);
+
     void connectUAVOs();
     void disconnectUAVOs();
 
@@ -198,17 +225,24 @@ private:
     QList<BaroSensor::DataFields> m_baroSamples;
     QList<MagSensor::DataFields> m_magSamples;
 
-    QTime m_startTime;
     // temperature checkpoints, used to calculate temp gradient
     const static int TimeBetweenCheckpoints = 10;
-    QTime m_lastCheckpointTime;
+
     bool m_acquiring;
     bool m_forceStopAcquisition;
+
+    QTime m_startTime;
+    QTime m_lastCheckpointTime;
     float m_lastCheckpointTemp;
-    float m_gradient;
+
     float m_temperature;
+    float m_minTemperature;
+    float m_maxTemperature;
+    float m_gradient;
     float m_initialGradient;
+
     int m_targetduration;
+
     int m_progress;
     int m_progressMax;
 
@@ -238,7 +272,6 @@ private:
     Memento m_memento;
     thermalCalibrationResults m_results;
 
-    float getTemperature();
     void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();
 };

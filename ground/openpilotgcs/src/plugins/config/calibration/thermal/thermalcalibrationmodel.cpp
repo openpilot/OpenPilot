@@ -38,7 +38,6 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     m_startEnabled(false),
     m_cancelEnabled(false),
     m_endEnabled(false),
-    m_initDone(false),
     m_dirty(false)
 {
     m_helper.reset(new ThermalCalibrationHelper());
@@ -63,6 +62,7 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
 
     connect(m_helper.data(), SIGNAL(temperatureChanged(float)), this, SLOT(setTemperature(float)));
     connect(m_helper.data(), SIGNAL(temperatureGradientChanged(float)), this, SLOT(setTemperatureGradient(float)));
+    connect(m_helper.data(), SIGNAL(temperatureRangeChanged(float)), this, SLOT(setTemperatureRange(float)));
     connect(m_helper.data(), SIGNAL(progressChanged(int)), this, SLOT(setProgress(int)));
     connect(m_helper.data(), SIGNAL(progressMaxChanged(int)), this, SLOT(setProgressMax(int)));
     connect(m_helper.data(), SIGNAL(instructionsAdded(QString, WizardModel::MessageType)), this, SLOT(addInstructions(QString, WizardModel::MessageType)));
@@ -78,15 +78,13 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
 
 void ThermalCalibrationModel::init()
 {
-    if (!m_initDone) {
-        m_initDone = true;
-        setStartEnabled(true);
-        setEndEnabled(false);
-        setCancelEnabled(false);
-        setTemperature(0);
-        setTemperatureGradient(0);
-        start();
-    }
+    setStartEnabled(true);
+    setEndEnabled(false);
+    setCancelEnabled(false);
+    setTemperature(NAN);
+    setTemperatureGradient(NAN);
+    setTemperatureRange(NAN);
+    start();
 }
 
 void ThermalCalibrationModel::stepChanged(WizardState *state)

@@ -54,7 +54,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 
-#define sign(x) ((x < 0) ? -1 : 1)
+#include <math.h>
 
 //#define DEBUG
 
@@ -157,10 +157,6 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // thermal calibration
     m_thermalCalibrationModel = new OpenPilot::ThermalCalibrationModel(this);
-    m_thermalCalibrationModel->init();
-    m_ui->temperatureLabel->setText("");
-    m_ui->temperatureGradientLabel->setText("");
-
     connect(m_ui->thermalBiasStart, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnStart()));
     connect(m_ui->thermalBiasEnd, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnEnd()));
     connect(m_ui->thermalBiasCancel, SIGNAL(clicked()), m_thermalCalibrationModel, SLOT(btnAbort()));
@@ -175,10 +171,10 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
             this, SLOT(addInstructions(QString, WizardModel::MessageType)));
     connect(m_thermalCalibrationModel, SIGNAL(temperatureChanged(float)), this, SLOT(displayTemperature(float)));
     connect(m_thermalCalibrationModel, SIGNAL(temperatureGradientChanged(float)), this, SLOT(displayTemperatureGradient(float)));
+    connect(m_thermalCalibrationModel, SIGNAL(temperatureRangeChanged(float)), this, SLOT(displayTemperatureRange(float)));
     connect(m_thermalCalibrationModel, SIGNAL(progressChanged(int)), m_ui->thermalBiasProgress, SLOT(setValue(int)));
     connect(m_thermalCalibrationModel, SIGNAL(progressMaxChanged(int)), m_ui->thermalBiasProgress, SLOT(setMaximum(int)));
-    m_ui->thermalBiasEnd->setEnabled(false);
-    m_ui->thermalBiasCancel->setEnabled(false);
+    m_thermalCalibrationModel->init();
 
     // home location
     connect(m_ui->hlClearButton, SIGNAL(clicked()), this, SLOT(clearHomeLocation()));
@@ -304,14 +300,35 @@ void ConfigRevoWidget::addInstructions(QString text, WizardModel::MessageType ty
     }
 }
 
-void ConfigRevoWidget::displayTemperature(float temp)
+static QString format(float v)
 {
-    m_ui->temperatureLabel->setText(tr("Temperature %1 °C").arg(temp, 5, 'f', 2));
+    QString str;
+
+    if (!std::isnan(v)) {
+        // format as ##.##
+        str = QString("%1").arg(v, 5, 'f', 2, ' ');
+        str = str.replace(" ", "&nbsp;");
+    } else {
+        str = "--.--";
+    }
+    // use a fixed width font
+    QString style("font-family:courier new,monospace;");
+    return QString("<span style=\"%1\">%2</span>").arg(style).arg(str);
 }
 
-void ConfigRevoWidget::displayTemperatureGradient(float tempGradient)
+void ConfigRevoWidget::displayTemperature(float temperature)
 {
-    m_ui->temperatureGradientLabel->setText(tr("Temperature rise %1 °C/min").arg(tempGradient, 5, 'f', 2));
+    m_ui->temperatureLabel->setText(tr("Temperature: %1 °C").arg(format(temperature)));
+}
+
+void ConfigRevoWidget::displayTemperatureGradient(float temperatureGradient)
+{
+    m_ui->temperatureGradientLabel->setText(tr("Variance: %1 °C/min").arg(format(temperatureGradient)));
+}
+
+void ConfigRevoWidget::displayTemperatureRange(float temperatureRange)
+{
+    m_ui->temperatureRangeLabel->setText(tr("Acquisition range: %1 °C").arg(format(temperatureRange)));
 }
 
 /**

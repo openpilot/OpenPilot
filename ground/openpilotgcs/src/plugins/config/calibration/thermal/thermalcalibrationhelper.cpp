@@ -33,19 +33,21 @@
 
 #include <math.h>
 
-// #define SIMULATE
+#define SIMULATE
 
 namespace OpenPilot {
 ThermalCalibrationHelper::ThermalCalibrationHelper(QObject *parent) :
     QObject(parent)
 {
     m_tempdir.reset(new QTemporaryDir());
+
     m_memento = Memento();
     m_memento.statusSaved = false;
+
     m_results = thermalCalibrationResults();
     m_results.accelCalibrated = false;
-    m_results.baroCalibrated  = false;
     m_results.gyroCalibrated  = false;
+    m_results.baroCalibrated  = false;
 
     m_progress        = -1;
     m_progressMax     = -1;
@@ -176,23 +178,29 @@ void ThermalCalibrationHelper::initAcquisition()
 {
     QMutexLocker lock(&sensorsUpdateLock);
 
-    m_targetduration  = 0;
-    m_gradient = 0.0f;
-    m_initialGradient = m_gradient;
-    m_forceStopAcquisition = false;
-    m_acquiring = true;
-
     // Clear all samples
     m_accelSamples.clear();
     m_gyroSamples.clear();
     m_baroSamples.clear();
     m_magSamples.clear();
 
+    m_results.accelCalibrated = false;
+    m_results.gyroCalibrated  = false;
+    m_results.baroCalibrated  = false;
+
     // retrieve current temperature/time as initial checkpoint.
-    m_lastCheckpointTime = QTime::currentTime();
-    m_startTime = m_lastCheckpointTime;
-    m_lastCheckpointTemp = m_temperature = getTemperature();
+    m_startTime            = m_lastCheckpointTime = QTime::currentTime();
+    m_temperature          = getTemperature();
+    m_lastCheckpointTemp   = m_temperature;
+    m_minTemperature       = m_temperature;
+    m_maxTemperature       = m_temperature;
     m_gradient = 0;
+    m_initialGradient      = 0;
+
+    m_targetduration       = 0;
+
+    m_forceStopAcquisition = false;
+    m_acquiring            = true;
 
     createDebugLog();
     connectUAVOs();
@@ -208,18 +216,15 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
 
     switch (sample->getObjID()) {
     case AccelSensor::OBJID:
-    {
         m_accelSamples.append(accelSensor->getData());
         m_debugStream << "ACCEL:: " << m_accelSamples.last().temperature
                       << "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz")
                       << "\t" << m_accelSamples.last().x
                       << "\t" << m_accelSamples.last().y
                       << "\t" << m_accelSamples.last().z << endl;
-
         break;
-    }
+
     case GyroSensor::OBJID:
-    {
         m_gyroSamples.append(gyroSensor->getData());
         m_debugStream << "GYRO:: " << m_gyroSamples.last().temperature
                       << "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz")
@@ -227,7 +232,7 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
                       << "\t" << m_gyroSamples.last().y
                       << "\t" << m_gyroSamples.last().z << endl;
         break;
-    }
+
     case BaroSensor::OBJID:
     {
         float temp = getTemperature();
@@ -242,22 +247,20 @@ void ThermalCalibrationHelper::collectSample(UAVObject *sample)
                       << "\t" << m_baroSamples.last().Pressure
                       << "\t" << m_baroSamples.last().Altitude << endl;
         // must be done last as this call might end acquisition and close the debug log file
-        updateTemp(temp);
+        updateTemperature(temp);
         break;
     }
+
     case MagSensor::OBJID:
-    {
         m_magSamples.append(magSensor->getData());
         m_debugStream << "MAG:: " << "\t" << QDateTime::currentDateTime().toString("hh.mm.ss.zzz")
                       << "\t" << m_magSamples.last().x
                       << "\t" << m_magSamples.last().y
                       << "\t" << m_magSamples.last().z << endl;
         break;
-    }
+
     default:
-    {
         qDebug() << "Unexpected object" << sample->getObjID();
-    }
     }
 }
 
@@ -269,7 +272,7 @@ float ThermalCalibrationHelper::getTemperature()
     // See http://en.wikipedia.org/wiki/Newton%27s_law_of_cooling#Newton.27s_law_of_cooling
     // Initial temp : 20
     // Final temp : 40
-    // Made up time constant (t0) : 10.0
+    // Time constant (t0) : 10.0
     // For a plot of the function, see http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiI0MC0yMCplXigteC8xMCkiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyItOTIuMjAzMjYzMTkzMzY4ODMiLCI5Ni45NzE2MzQ3NzU0MDAwOCIsIi00NC4zNzkzODMzMjU1NzY3NTQiLCI3Mi4wMzU5Mzg1MDEzNTc5OSJdfV0-
     double t0 = 10.0;
     return 40.0 - 20.0 * exp(-t / t0);
@@ -294,6 +297,7 @@ void ThermalCalibrationHelper::cleanup()
 
 void ThermalCalibrationHelper::calculate()
 {
+    // baro
     int count = m_baroSamples.count();
     Eigen::VectorXf datax(count);
     Eigen::VectorXf datay(1);
@@ -314,6 +318,7 @@ void ThermalCalibrationHelper::calculate()
     m_results.baroTempMin = datat.array().minCoeff();
     m_results.baroTempMax = datat.array().maxCoeff();
 
+    // gyro
     count = m_gyroSamples.count();
     datax.resize(count);
     datay.resize(count);
@@ -332,6 +337,8 @@ void ThermalCalibrationHelper::calculate()
     if (!m_results.gyroCalibrated) {
         qDebug() << "Failed to calibrate gyro!";
     }
+
+    // accel
     m_results.accelGyroTempMin = datat.array().minCoeff();
     m_results.accelGyroTempMax = datat.array().maxCoeff();
     // TODO: sanity checks needs to be enforced before accel calibration can be enabled and usable.
@@ -373,7 +380,7 @@ void ThermalCalibrationHelper::calculate()
 }
 
 /* helper methods */
-void ThermalCalibrationHelper::updateTemp(float temp)
+void ThermalCalibrationHelper::updateTemperature(float temp)
 {
     int elapsed = m_startTime.secsTo(QTime::currentTime());
     int secondsSinceLastCheck = m_lastCheckpointTime.secsTo(QTime::currentTime());
@@ -382,14 +389,22 @@ void ThermalCalibrationHelper::updateTemp(float temp)
     m_temperature = m_temperature * 0.95f + temp * 0.05f;
     emit temperatureChanged(m_temperature);
 
+    // temperature range
+    if (m_temperature < m_minTemperature) {
+        m_minTemperature = m_temperature;
+    }
+    if (m_temperature > m_maxTemperature) {
+        m_maxTemperature = m_temperature;
+    }
+    emit temperatureRangeChanged(range());
+
     if (secondsSinceLastCheck > TimeBetweenCheckpoints) {
         // gradient is expressed in °C/min
-        float gradient = 60.0 * (m_temperature - m_lastCheckpointTemp) / (float)secondsSinceLastCheck;
-        m_gradient = gradient;
-        emit temperatureGradientChanged(gradient);
+        m_gradient = 60.0 * (m_temperature - m_lastCheckpointTemp) / (float)secondsSinceLastCheck;
+        emit temperatureGradientChanged(gradient());
 
-        qDebug() << "Temp Gradient " << gradient << " Elapsed" << elapsed;
-        m_debugStream << "INFO::Trace Temp Gradient " << gradient << " Elapsed" << elapsed << endl;
+        qDebug() << "Temp Gradient " << gradient() << " Elapsed" << elapsed;
+        m_debugStream << "INFO::Trace Temp Gradient " << gradient() << " Elapsed" << elapsed << endl;
 
         m_lastCheckpointTime = QTime::currentTime();
         m_lastCheckpointTemp = m_temperature;
@@ -411,7 +426,7 @@ void ThermalCalibrationHelper::updateTemp(float temp)
             setProgressMax(100);
 
             QTime time = QTime(0, 0).addSecs(m_targetduration);
-            QString timeString = time.toString(tr("m' minute(s) and 's' second(s).'"));
+            QString timeString = time.toString(tr("m'''s''''"));
             addInstructions(tr("Estimated duration: %1").arg(timeString));
 
             QString str = QStringLiteral("INFO::Trace gradient : %1, elapsed : %2 initial gradient : %3, target : %4")

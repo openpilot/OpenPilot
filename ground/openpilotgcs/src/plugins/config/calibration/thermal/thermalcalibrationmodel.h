@@ -44,6 +44,7 @@ class ThermalCalibrationModel : public WizardModel {
     Q_PROPERTY(bool cancelEnable READ cancelEnabled NOTIFY cancelEnabledChanged)
     Q_PROPERTY(float temperature READ temperature NOTIFY temperatureChanged)
     Q_PROPERTY(float temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
+    Q_PROPERTY(float temperatureRange READ temperatureRange NOTIFY temperatureRangeChanged)
     Q_PROPERTY(int progress READ progress WRITE setProgress NOTIFY progressChanged)
     Q_PROPERTY(int progressMax READ progressMax WRITE setProgressMax NOTIFY progressMaxChanged)
 
@@ -89,6 +90,21 @@ public:
         }
     }
 
+    float temperature()
+    {
+        return m_helper->temperature();
+    }
+
+    float temperatureGradient()
+    {
+        return m_helper->gradient();
+    }
+
+    float temperatureRange()
+    {
+        return m_helper->range();
+    }
+
     bool dirty()
     {
         return m_dirty;
@@ -96,46 +112,35 @@ public:
 
 
 public slots:
+    void setTemperature(float temperature)
+    {
+        emit temperatureChanged(temperature);
+    }
+
+    void setTemperatureGradient(float temperatureGradient)
+    {
+        emit temperatureGradientChanged(temperatureGradient);
+    }
+
+    void setTemperatureRange(float temperatureRange)
+    {
+        emit temperatureRangeChanged(temperatureRange);
+    }
+
     int progress()
     {
         return m_progress;
-    }
-
-    int progressMax()
-    {
-        return m_progressMax;
-    }
-
-    float temperature()
-    {
-        return m_temperature;
-    }
-
-    float temperatureGradient()
-    {
-        return m_temperatureGradient;
-    }
-
-    void setTemperature(float temp)
-    {
-        if (m_temperature != temp) {
-            m_temperature = temp;
-            emit temperatureChanged(m_temperature);
-        }
-    }
-
-    void setTemperatureGradient(float tempGradient)
-    {
-        if (m_temperatureGradient != tempGradient) {
-            m_temperatureGradient = tempGradient;
-            emit temperatureGradientChanged(m_temperatureGradient);
-        }
     }
 
     void setProgress(int value)
     {
         m_progress = value;
         emit progressChanged(value);
+    }
+
+    int progressMax()
+    {
+        return m_progressMax;
     }
 
     void setProgressMax(int value)
@@ -145,17 +150,15 @@ public slots:
     }
 
 private:
+    QScopedPointer<ThermalCalibrationHelper> m_helper;
+
     bool m_startEnabled;
     bool m_cancelEnabled;
     bool m_endEnabled;
-    bool m_initDone;
     bool m_dirty;
+
     int m_progress;
     int m_progressMax;
-    float m_temperature;
-    float m_temperatureGradient;
-
-    QScopedPointer<ThermalCalibrationHelper> m_helper;
 
     // Start from here
     WizardState *m_readyState;
@@ -188,8 +191,10 @@ signals:
     void wizardStarted();
     void wizardStopped();
 
-    void temperatureChanged(float temp);
-    void temperatureGradientChanged(float tempGradient);
+    void temperatureChanged(float temperature);
+    void temperatureGradientChanged(float temperatureGradient);
+    void temperatureRangeChanged(float temperatureRange);
+
     void progressChanged(int value);
     void progressMaxChanged(int value);
 
@@ -202,10 +207,7 @@ public slots:
     void init();
     void btnStart()
     {
-        // HACKS
-        // clear instructions
-        emit temperatureGradientChanged(0);
-        // END OF HACKS
+        init();
         emit next();
     }
     void btnEnd()

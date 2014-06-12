@@ -71,8 +71,9 @@ private slots:
     void displayVisualHelp(QString elementID);
     void clearInstructions();
     void addInstructions(QString text, WizardModel::MessageType type = WizardModel::Info);
-    void displayTemperature(float temp);
-    void displayTemperatureGradient(float tempGradient);
+    void displayTemperature(float tempareture);
+    void displayTemperatureGradient(float temparetureGradient);
+    void displayTemperatureRange(float temparetureRange);
 
     // ! Overriden method from the configTaskWidget to update UI
     virtual void refreshWidgetsValues(UAVObject *object = NULL);

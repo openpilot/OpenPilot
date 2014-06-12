@@ -375,7 +375,14 @@
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>&lt;temperature gradient&gt;</string>
+                   <string>&lt;gradient&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="temperatureRangeLabel">
+                  <property name="text">
+                   <string>&lt;range&gt;</string>
                   </property>
                  </widget>
                 </item>

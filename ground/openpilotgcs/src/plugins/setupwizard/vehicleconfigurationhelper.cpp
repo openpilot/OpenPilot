@@ -35,6 +35,7 @@
 #include "manualcontrolsettings.h"
 #include "flightmodesettings.h"
 #include "stabilizationsettings.h"
+#include "stabilizationsettingsbank1.h"
 #include "revocalibration.h"
 #include "accelgyrosettings.h"
 
@@ -330,6 +331,29 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 	qDebug() << "Save Fixed Wing Actuator Data\n";
         actSettings->setData(data);
         addModifiedObject(actSettings, tr("Writing actuator settings"));
+
+	// I think I need to add a saved stabilizationsettings object also. 
+	// unfortunately not sure this is the right way to do it! 
+	
+	qDebug() << "Save Fixed Wing Default PID Data\n";
+
+        StabilizationSettingsBank1 *stabilizationSettingsBank = StabilizationSettingsBank1::GetInstance(m_uavoManager);
+	StabilizationSettingsBank1::DataFields stabSettingsBank = stabilizationSettingsBank->getData();
+        stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KP] = 666;
+        stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KI] = 666;
+        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KP] = 666;
+        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KI] = 666;
+        stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KP] = 666;
+        stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KI] = 666;
+        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KP] = 666;
+        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KI] = 666;
+
+	addModifiedObject(stabilizationSettingsBank, tr("Writing stabilization bank 1 settings"));
+
+	// Set up model view image here? 
+	// loop through all the window instances and check which are of the type ModelViewGadget.
+	// per m_thread on each instance setAcFileName(QString model_file_name) and then call reloadScene() on the same object. 	
+
 	break;
     }
 

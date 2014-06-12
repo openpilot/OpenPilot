@@ -335,19 +335,30 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 	// I think I need to add a saved stabilizationsettings object also. 
 	// unfortunately not sure this is the right way to do it! 
 	
-	qDebug() << "Save Fixed Wing Default PID Data\n";
+	qDebug() << "Saving Fixed Wing Default PID Data\n";
+//	qDebug() << "Save Fixed Wing StabilizationSettings object\n";
+//        StabilizationSettings *stabilizationSettings = StabilizationSettings::GetInstance(m_uavoManager);
+//	StabilizationSettings::DataFields stabSettings = stabilizationSettings->getData();
+//	Values pulled from ./build/uavobject-synthetics/gcs/stabilizationsettings.h 
+//        stabSettings.CruiseControlInvertedThrustReversing[StabilizationSettings::CRUISECONTROLINVERTEDTHRUSTREVERSING_UNREVERSED] = 0;
+//	Currently broken, need to set max servo throw via iLimit here per my notes in http://forums.openpilot.org/topic/32356-gonna-give-revo-a-run-on-my-bixler-v1-any-suggestions/#entry252556
+//        stabilizationSettings->setData(stabSettings);
+//	addModifiedObject(stabilizationSettings, tr("Writing stabilization settings"));
 
+	qDebug() << "Save Fixed Wing StabilizationSettingsBank1 object\n";
+
+//      Values pulled from ./build/uavobject-synthetics/gcs/stabilizationsettingsbank1.h
         StabilizationSettingsBank1 *stabilizationSettingsBank = StabilizationSettingsBank1::GetInstance(m_uavoManager);
 	StabilizationSettingsBank1::DataFields stabSettingsBank = stabilizationSettingsBank->getData();
-        stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KP] = 666;
-        stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KI] = 666;
-        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KP] = 666;
-        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KI] = 666;
-        stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KP] = 666;
-        stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KI] = 666;
-        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KP] = 666;
-        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KI] = 666;
-
+        stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KP] = 2.420;
+        stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KI] = 2.420;
+        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KP] = 2.420;
+        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KI] = 2.420;
+        stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KP] = 2.420;
+        stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KI] = 2.420;
+        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KP] = 2.420;
+        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KI] = 2.420;
+	stabilizationSettingsBank->setData(stabSettingsBank);
 	addModifiedObject(stabilizationSettingsBank, tr("Writing stabilization bank 1 settings"));
 
 	// Set up model view image here? 

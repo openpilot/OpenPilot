@@ -313,8 +313,8 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
         // pitch   roll    yaw
         double mixerMatrix[8][3] = {
             { 0,   0,  0 },
-            { 127,   -127,  0 },
-            { -127,   127,  0 },
+            { 1,   -1,  0 },
+            { -1,   1,  0 },
             { 0,   0,  0 },
             { 0,   0,  0 },
             { 0,   0,  0 },

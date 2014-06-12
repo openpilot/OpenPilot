@@ -2444,12 +2444,26 @@ void updateGraphics()
         bool GCSconnected = PIOS_COM_Available(PIOS_COM_TELEM_USB);
 
 #ifdef PIOS_INCLUDE_MSP
+        MSPPage page = MSPGetPage();
+
+        if (page.Mode == 1) {
+            uint8_t y_delta = 0;
+            for (int i = 0; i < page.Rows; i++) {
+                write_string(page.Text + i * page.Cols, 20, 20 + y_delta, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
+                if (i == 0 || i == 8)
+                    y_delta += 40;
+                else
+                    y_delta += 20;
+            }
+            break;
+        }
+
         MSPProfile = MSPGetProfile();
         status.Armed = MSPGetArmed() ? FLIGHTSTATUS_ARMED_ARMED : FLIGHTSTATUS_ARMED_DISARMED;
         status.FlightMode = MSPGetMode() + FLIGHTSTATUS_FLIGHTMODE_STABILIZED1;
-        mcc.Throttle = (float)(MSPGetRC(3) - 968) / 1103.0f;                                       // TODO assumes channel 3 and 968 - 2071 µs
+        mcc.Throttle = (float)(MSPGetRC(MSP_THROTTLE) - 968) / 1103.0f;                                 // TODO assumes channel 3 and 968 - 2071 µs
         mcc.Connected = 1;
-        mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] = MSPGetRC(5);                      // TODO assumes channel 5
+        mcc.Channel[OsdSettings.ScreenSwitching.SwitchChannel] = MSPGetRC(MSP_AUX2);                    // TODO assumes channel 5
         attitude.Roll  =  0.1f * ((int16_t)MSPGetAngle(0));
         attitude.Pitch = -0.1f * ((int16_t)MSPGetAngle(1));
 #endif
@@ -2554,7 +2568,7 @@ void updateGraphics()
             }
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.HomeDistanceSetup.CharSize);
         }
-#if 0
+#if 1
         // Vertical speed
         if ((HomePosOnTime || gpsData.Status >= GPSPOSITIONSENSOR_STATUS_FIX2D) && check_enable_and_srceen(OsdSettings.VerticalSpeed, (OsdSettingsWarningsSetupData *)&OsdSettings.VerticalSpeedSetup, screen, &x, &y)) {
             sprintf(temp, "VS%5.1f%c", (double)-gpsVelocityData.Down, 0x88); // TODO currently m/s for both
@@ -2577,7 +2591,7 @@ void updateGraphics()
                 sprintf(temp, "TD  ---%c", convert->char_m_feet);
             }
             callTimer = current_ms;
-            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.HomeDistanceSetup.CharSize);
+            write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.VerticalSpeedSetup.CharSize);
         }
 #endif
         // Flight mode

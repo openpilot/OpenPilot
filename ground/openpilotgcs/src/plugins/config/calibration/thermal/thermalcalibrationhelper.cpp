@@ -410,8 +410,9 @@ void ThermalCalibrationHelper::updateTemp(float temp)
 
             setProgressMax(100);
 
-            QTime t     = QTime(0, 0).addSecs(m_targetduration);
-            addInstructions(tr("Estimated duration: %1").arg(t.toString("m' minute(s) and 's' second(s).'")));
+            QTime time = QTime(0, 0).addSecs(m_targetduration);
+            QString timeString = time.toString(tr("m' minute(s) and 's' second(s).'"));
+            addInstructions(tr("Estimated duration: %1").arg(timeString));
 
             QString str = QStringLiteral("INFO::Trace gradient : %1, elapsed : %2 initial gradient : %3, target : %4")
                           .arg(m_gradient).arg(elapsed).arg(m_initialGradient).arg(m_targetduration);

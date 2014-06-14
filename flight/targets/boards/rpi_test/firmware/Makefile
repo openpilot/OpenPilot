@@ -40,7 +40,7 @@ MODULES += Telemetry
 MODULES += Logging
 MODULES += FirmwareIAP
 MODULES += StateEstimation
-#MODULES += Sensors/simulated/Sensors
+MODULES += Sensors
 MODULES += Airspeed
 MODULES += Actuator
 #MODULES += AltitudeHold # now integrated in Stabilization
@@ -395,6 +395,8 @@ endif
 
 #create compile-time module auto-initialisation
 MODNAMES = ${notdir $(subst /revolution,,$(MODULES))}
+#adding mpu because we need thread for this one
+MODNAMES += Mpu
 
 # Generate intermediate code
 gencode: ${OUTDIR}/InitMods.c ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 

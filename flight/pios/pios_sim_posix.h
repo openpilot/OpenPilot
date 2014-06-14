@@ -97,6 +97,12 @@ extern void PIOS_LED_Init(void);
 #include <pios_i2c.h>
 #endif
 
+#ifdef PIOS_INCLUDE_MPU6000
+/* MPU6000 3-Axis Gyro/Accelerometer */
+/* #define PIOS_MPU6000_ACCEL */
+#include <pios_mpu6000.h>
+#endif
+
 #if defined(PIOS_INCLUDE_IAP)
 #include <pios_iap.h>
 #endif

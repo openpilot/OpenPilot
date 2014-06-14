@@ -24,6 +24,7 @@
 # (all architectures)
 
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += accelgyrosettings
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired
@@ -111,6 +112,7 @@ UAVOBJSRCFILENAMES += revosettings
 UAVOBJSRCFILENAMES += altitudeholdstatus
 UAVOBJSRCFILENAMES += ekfconfiguration
 UAVOBJSRCFILENAMES += ekfstatevariance
+UAVOBJSRCFILENAMES += mpu6000settings
 UAVOBJSRCFILENAMES += takeofflocation
 
 UAVOBJSRC = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),$(UAVOBJSYNTHDIR)/$(UAVOBJSRCFILE).c )

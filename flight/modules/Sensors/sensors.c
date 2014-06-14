@@ -216,6 +216,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         }
     }
 
+printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
     // Main task loop
     lastSysTime = xTaskGetTickCount();
     bool error = false;
@@ -224,6 +225,10 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         // TODO: add timeouts to the sensor reads and set an error if the fail
         sensor_dt_us = PIOS_DELAY_DiffuS(timeval);
         timeval = PIOS_DELAY_GetRaw();
+// RPi hack --------------------------------------------------
+/* slowing down this task for tests purposes */
+vTaskDelay(30);
+//------------------------------------------------------------
 
         if (error) {
 #ifdef PIOS_INCLUDE_WDG

@@ -31,6 +31,12 @@ SRC					+=	$(sort $(wildcard $(PIOS_DEVLIB)*.c))
 EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 
 #
+# PIOS MPU-9150 driver
+#
+SRC					+=	$(sort $(wildcard $(PIOS_DEVLIB)mpu_9150/*.c))
+EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/mpu_9150
+
+#
 # CMSIS for the F4
 #
 #include $(PIOSCOMMONLIB)/CMSIS2/library.mk

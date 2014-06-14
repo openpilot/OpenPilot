@@ -68,26 +68,20 @@ public:
 
     void setStartEnabled(bool status)
     {
-        if (m_startEnabled != status) {
-            m_startEnabled = status;
-            emit startEnabledChanged(status);
-        }
+        m_startEnabled = status;
+        emit startEnabledChanged(status);
     }
 
     void setEndEnabled(bool status)
     {
-        if (m_endEnabled != status) {
-            m_endEnabled = status;
-            emit endEnabledChanged(status);
-        }
+        m_endEnabled = status;
+        emit endEnabledChanged(status);
     }
 
     void setCancelEnabled(bool status)
     {
-        if (m_cancelEnabled != status) {
-            m_cancelEnabled = status;
-            emit cancelEnabledChanged(status);
-        }
+        m_cancelEnabled = status;
+        emit cancelEnabledChanged(status);
     }
 
     float temperature()
@@ -125,6 +119,10 @@ public slots:
     void setTemperatureRange(float temperatureRange)
     {
         emit temperatureRangeChanged(temperatureRange);
+
+        if (m_helper->range() >= ThermalCalibrationHelper::TargetTempDelta) {
+            setEndEnabled(true);
+        }
     }
 
     int progress()
@@ -222,7 +220,7 @@ public slots:
     {
         m_dirty = false;
         setStartEnabled(false);
-        setEndEnabled(true);
+        setEndEnabled(false);
         setCancelEnabled(true);
         wizardStarted();
     }

@@ -50,13 +50,13 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QErrorMessage>
-#include <iostream>
 #include <QDesktopServices>
 #include <QUrl>
+#include <iostream>
 
 #include <math.h>
 
-//#define DEBUG
+// #define DEBUG
 
 // Uncomment this to enable 6 point calibration on the accels
 #define NOISE_SAMPLES 50
@@ -88,11 +88,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
-// addUAVObject("RevoCalibration");
     addUAVObject("HomeLocation");
-// addUAVObject("AttitudeSettings");
-// addUAVObject("RevoSettings");
-// addUAVObject("AccelGyroSettings");
     autoLoadWidgets();
 
     // accel calibration

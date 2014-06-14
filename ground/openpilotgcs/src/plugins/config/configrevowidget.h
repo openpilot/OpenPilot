@@ -32,18 +32,19 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "calibration/thermal/thermalcalibrationmodel.h"
+#include "calibration/sixpointcalibrationmodel.h"
+#include "calibration/levelcalibrationmodel.h"
+#include "calibration/gyrobiascalibrationmodel.h"
+
 #include <QWidget>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QList>
 #include <QTimer>
 #include <QMutex>
-#include "calibration/thermal/thermalcalibrationmodel.h"
-#include "calibration/sixpointcalibrationmodel.h"
-#include "calibration/levelcalibrationmodel.h"
-#include "calibration/gyrobiascalibrationmodel.h"
-class Ui_Widget;
 
+class Ui_Widget;
 
 class ConfigRevoWidget : public ConfigTaskWidget {
     Q_OBJECT

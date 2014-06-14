@@ -271,6 +271,7 @@ void ConfigRevoWidget::clearInstructions()
 void ConfigRevoWidget::addInstructions(QString text, WizardModel::MessageType type)
 {
     QString msg;
+
     switch (type) {
     case WizardModel::Debug:
 #ifdef DEBUG
@@ -318,17 +319,17 @@ static QString format(float v)
 
 void ConfigRevoWidget::displayTemperature(float temperature)
 {
-    m_ui->temperatureLabel->setText(tr("Temperature: %1 °C").arg(format(temperature)));
+    m_ui->temperatureLabel->setText(tr("Temperature: %1°C").arg(format(temperature)));
 }
 
 void ConfigRevoWidget::displayTemperatureGradient(float temperatureGradient)
 {
-    m_ui->temperatureGradientLabel->setText(tr("Variance: %1 °C/min").arg(format(temperatureGradient)));
+    m_ui->temperatureGradientLabel->setText(tr("Variance: %1°C/min").arg(format(temperatureGradient)));
 }
 
 void ConfigRevoWidget::displayTemperatureRange(float temperatureRange)
 {
-    m_ui->temperatureRangeLabel->setText(tr("Acquisition range: %1 °C").arg(format(temperatureRange)));
+    m_ui->temperatureRangeLabel->setText(tr("Sampled range: %1°C").arg(format(temperatureRange)));
 }
 
 /**

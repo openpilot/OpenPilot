@@ -59,7 +59,12 @@ public slots:
     {
         m_helper->setProgressMax(0);
         m_helper->setProgress(0);
+
         m_helper->addInstructions(tr("Please wait during samples acquisition. This can take several minutes..."), WizardModel::Prompt);
+        m_helper->addInstructions(tr("Acquisition will run until the rate of temperature change is less than %1°C/min.").arg(ThermalCalibrationHelper::TargetGradient, 4, 'f', 2));
+        m_helper->addInstructions(tr("For the calibration to be valid, the temperature span during acquisition must be greater than %1°C.").arg(ThermalCalibrationHelper::TargetTempDelta, 4, 'f', 2));
+        m_helper->addInstructions(tr("Estimating calibration duration..."));
+
         m_helper->initAcquisition();
     }
 

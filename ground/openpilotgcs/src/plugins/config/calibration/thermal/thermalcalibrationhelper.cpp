@@ -44,7 +44,7 @@ ThermalCalibrationHelper::ThermalCalibrationHelper(QObject *parent) :
     m_memento = Memento();
     m_memento.statusSaved = false;
 
-    m_results = thermalCalibrationResults();
+    m_results = Results();
     m_results.accelCalibrated = false;
     m_results.gyroCalibrated  = false;
     m_results.baroCalibrated  = false;
@@ -199,6 +199,8 @@ void ThermalCalibrationHelper::initAcquisition()
 
     m_targetduration       = 0;
 
+    m_rangeReached         = false;
+
     m_forceStopAcquisition = false;
     m_acquiring            = true;
 
@@ -311,8 +313,11 @@ void ThermalCalibrationHelper::calculate()
 
     m_results.baroCalibrated = ThermalCalibration::BarometerCalibration(datax, datat, m_results.baro,
                                                                         &m_results.baroInSigma, &m_results.baroOutSigma);
-    if (!m_results.baroCalibrated) {
+    if (m_results.baroCalibrated) {
+        addInstructions(tr("Barometer calibrated."), WizardModel::Warn);
+    } else {
         qDebug() << "Failed to calibrate baro!";
+        addInstructions(tr("Failed to calibrate barometer!"), WizardModel::Warn);
     }
 
     m_results.baroTempMin = datat.array().minCoeff();
@@ -334,8 +339,11 @@ void ThermalCalibrationHelper::calculate()
 
     m_results.gyroCalibrated = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro,
                                                                         m_results.gyroInSigma, m_results.gyroOutSigma);
-    if (!m_results.gyroCalibrated) {
+    if (m_results.gyroCalibrated) {
+        addInstructions(tr("Gyro calibrated."), WizardModel::Warn);
+    } else {
         qDebug() << "Failed to calibrate gyro!";
+        addInstructions(tr("Failed to calibrate gyro!"), WizardModel::Warn);
     }
 
     // accel
@@ -396,6 +404,10 @@ void ThermalCalibrationHelper::updateTemperature(float temp)
     if (m_temperature > m_maxTemperature) {
         m_maxTemperature = m_temperature;
     }
+    if (!m_rangeReached && (range() >= TargetTempDelta)) {
+        m_rangeReached = true;
+        addInstructions(tr("Target temperature span has been acquired. You may now end acquisition or continue."));
+    }
     emit temperatureRangeChanged(range());
 
     if (secondsSinceLastCheck > TimeBetweenCheckpoints) {
@@ -426,8 +438,8 @@ void ThermalCalibrationHelper::updateTemperature(float temp)
             setProgressMax(100);
 
             QTime time = QTime(0, 0).addSecs(m_targetduration);
-            QString timeString = time.toString(tr("m'''s''''"));
-            addInstructions(tr("Estimated duration: %1").arg(timeString));
+            QString timeString = time.toString(tr("m''''s'''''"));
+            addInstructions(tr("Estimated acquisition duration is %1.").arg(timeString));
 
             QString str = QStringLiteral("INFO::Trace gradient : %1, elapsed : %2 initial gradient : %3, target : %4")
                           .arg(m_gradient).arg(elapsed).arg(m_initialGradient).arg(m_targetduration);

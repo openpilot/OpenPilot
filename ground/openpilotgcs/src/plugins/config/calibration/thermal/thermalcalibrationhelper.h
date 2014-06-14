@@ -86,12 +86,15 @@ typedef struct {
     float baroTempMax;
     float accelGyroTempMin;
     float accelGyroTempMax;
-} thermalCalibrationResults;
+} Results;
 
 class ThermalCalibrationHelper : public QObject {
     Q_OBJECT
 
 public:
+    const static float TargetGradient = 0.20f;
+    const static float TargetTempDelta = 10.0f;
+
     explicit ThermalCalibrationHelper(QObject *parent = 0);
 
     float temperature()
@@ -243,11 +246,10 @@ private:
 
     int m_targetduration;
 
+    bool m_rangeReached;
+
     int m_progress;
     int m_progressMax;
-
-    const static float TargetGradient  = 0.20f;
-    const static float TargetTempDelta = 10.0f;
 
     // convenience pointers
     AccelSensor *accelSensor;
@@ -270,7 +272,7 @@ private:
         m_memento.statusSaved = false;
     }
     Memento m_memento;
-    thermalCalibrationResults m_results;
+    Results m_results;
 
     void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();

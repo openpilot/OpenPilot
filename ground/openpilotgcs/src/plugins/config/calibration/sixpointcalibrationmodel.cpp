@@ -30,7 +30,6 @@
 #include "calibration/calibrationuiutils.h"
 
 #include "math.h"
-#include <QMessageBox>
 #include <QThread>
 #include "QDebug"
 
@@ -126,12 +125,8 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     // check if Homelocation is set
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
     if (!homeLocationData.Set) {
-        QMessageBox msgBox;
-        msgBox.setInformativeText(tr("<p>Home location not set.</p><p>Please set your home location and retry. Aborting calibration!</p>"));
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
+        displayInstructions(tr("Home location not set, please set your home location and retry."), WizardModel::Warn);
+        displayInstructions(tr("Aborting calibration!"), WizardModel::Failure);
         return;
     }
 

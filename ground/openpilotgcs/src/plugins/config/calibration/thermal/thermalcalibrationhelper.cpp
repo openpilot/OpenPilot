@@ -33,7 +33,8 @@
 
 #include <math.h>
 
-#define SIMULATE
+// uncomment to simulate board warming up (no need to put it in the fridge...)
+// #define SIMULATE
 
 namespace OpenPilot {
 ThermalCalibrationHelper::ThermalCalibrationHelper(QObject *parent) :

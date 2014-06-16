@@ -119,16 +119,19 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     calibratingAccel = calibrateAccel;
     calibratingMag   = calibrateMag;
 
-    // Store and reset board rotation before calibration starts
-    storeAndClearBoardRotation();
+    started();
 
     // check if Homelocation is set
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
     if (!homeLocationData.Set) {
         displayInstructions(tr("Home location not set, please set your home location and retry."), WizardModel::Warn);
         displayInstructions(tr("Aborting calibration!"), WizardModel::Failure);
+        stopped();
         return;
     }
+
+    // Store and reset board rotation before calibration starts
+    storeAndClearBoardRotation();
 
     // Calibration accel
     AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
@@ -201,8 +204,6 @@ void SixPointCalibrationModel::start(bool calibrateAccel, bool calibrateMag)
     }
 
     position = 0;
-
-    started();
 
     // Show instructions and enable controls
     progressChanged(0);

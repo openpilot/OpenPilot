@@ -315,7 +315,7 @@ void ThermalCalibrationHelper::calculate()
     m_results.baroCalibrated = ThermalCalibration::BarometerCalibration(datax, datat, m_results.baro,
                                                                         &m_results.baroInSigma, &m_results.baroOutSigma);
     if (m_results.baroCalibrated) {
-        addInstructions(tr("Barometer calibrated."), WizardModel::Warn);
+        addInstructions(tr("Barometer is calibrated."));
     } else {
         qDebug() << "Failed to calibrate baro!";
         addInstructions(tr("Failed to calibrate barometer!"), WizardModel::Warn);
@@ -341,7 +341,7 @@ void ThermalCalibrationHelper::calculate()
     m_results.gyroCalibrated = ThermalCalibration::GyroscopeCalibration(datax, datay, dataz, datat, m_results.gyro,
                                                                         m_results.gyroInSigma, m_results.gyroOutSigma);
     if (m_results.gyroCalibrated) {
-        addInstructions(tr("Gyro calibrated."), WizardModel::Warn);
+        addInstructions(tr("Gyro is calibrated."));
     } else {
         qDebug() << "Failed to calibrate gyro!";
         addInstructions(tr("Failed to calibrate gyro!"), WizardModel::Warn);

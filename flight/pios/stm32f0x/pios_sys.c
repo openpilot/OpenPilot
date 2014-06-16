@@ -212,6 +212,8 @@ void NVIC_Configuration(void)
     for (uint32_t i = 0; i < 48; i++) {
         VectorTable[i] = romTable[i];
     }
+    // Ensure all memory operation completes prior the remap
+    __DSB();
 
     /* Enable the SYSCFG peripheral clock*/
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_SYSCFG, ENABLE);

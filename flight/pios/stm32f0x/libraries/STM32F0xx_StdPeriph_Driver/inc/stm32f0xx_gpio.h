@@ -325,7 +325,7 @@ typedef struct
 void GPIO_DeInit(GPIO_TypeDef* GPIOx);
 
 /* Initialization and Configuration functions *********************************/
-void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct);
+void GPIO_Init(GPIO_TypeDef* GPIOx, const GPIO_InitTypeDef* GPIO_InitStruct);
 void GPIO_StructInit(GPIO_InitTypeDef* GPIO_InitStruct);
 void GPIO_PinLockConfig(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 

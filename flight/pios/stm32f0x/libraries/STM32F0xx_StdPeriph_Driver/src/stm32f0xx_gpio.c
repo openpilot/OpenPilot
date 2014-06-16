@@ -166,7 +166,7 @@ void GPIO_DeInit(GPIO_TypeDef* GPIOx)
   *         the configuration information for the specified GPIO peripheral.
   * @retval None
   */
-void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct)
+void GPIO_Init(GPIO_TypeDef* GPIOx, const GPIO_InitTypeDef* GPIO_InitStruct)
 {
   uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
 

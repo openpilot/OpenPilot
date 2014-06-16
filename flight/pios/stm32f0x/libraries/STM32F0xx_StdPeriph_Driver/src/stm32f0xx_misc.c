@@ -74,7 +74,7 @@
   *         the configuration information for the specified NVIC peripheral.
   * @retval None
   */
-void NVIC_Init(NVIC_InitTypeDef* NVIC_InitStruct)
+void NVIC_Init(const NVIC_InitTypeDef* NVIC_InitStruct)
 {
   uint32_t tmppriority = 0x00;
   

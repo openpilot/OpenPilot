@@ -122,7 +122,7 @@ typedef struct
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */ 
 
-void NVIC_Init(NVIC_InitTypeDef* NVIC_InitStruct);
+void NVIC_Init(const NVIC_InitTypeDef* NVIC_InitStruct);
 void NVIC_SystemLPConfig(uint8_t LowPowerMode, FunctionalState NewState);
 void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource);
 

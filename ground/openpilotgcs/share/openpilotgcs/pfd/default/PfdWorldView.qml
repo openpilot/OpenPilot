@@ -41,9 +41,8 @@ Item {
 
         SvgElementImage {
             id: horizont_line
-            //elementName: "world-centerline"
-            // TODO: rename the centerline element in svg file
-            elementName: "path4731"
+            elementName: "center-line"
+
             //worldView is loaded with Loader, so background element is visible
             sceneSize: background.sceneSize
             anchors.centerIn: parent

@@ -82,6 +82,12 @@ SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_sbus.c
 SRC += $(PIOSCOMMON)/pios_sdcard.c
 
+## Misc library functions
+SRC += $(FLIGHTLIB)/sanitycheck.c
+SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(MATHLIB)/sin_lookup.c
+SRC += $(MATHLIB)/pid.c
+
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
@@ -109,10 +115,7 @@ SRC += $(PIOSCOMMON)/pios_instrumentation.c
 SRC += $(PIOSCOMMON)/pios_mem.c
 ## Misc library functions
 SRC += $(FLIGHTLIB)/fifo_buffer.c
-SRC += $(FLIGHTLIB)/sanitycheck.c
-SRC += $(FLIGHTLIB)/CoordinateConversions.c
-SRC += $(MATHLIB)/sin_lookup.c
-SRC += $(MATHLIB)/pid.c
+
 SRC += $(MATHLIB)/mathmisc.c
 SRC += $(MATHLIB)/butterworth.c
 SRC += $(FLIGHTLIB)/printf-stdarg.c

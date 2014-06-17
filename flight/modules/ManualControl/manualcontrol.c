@@ -134,6 +134,9 @@ int32_t ManualControlStart()
     // Make sure unarmed on power up
     armHandler(true);
 
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+    takeOffLocationHandlerInit();
+#endif
     // Start main task
     PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
 
@@ -167,7 +170,9 @@ static void manualControlTask(void)
 {
     // Process Arming
     armHandler(false);
-
+#ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
+    takeOffLocationHandler();
+#endif
     // Process flight mode
     FlightStatusData flightStatus;
 
@@ -200,9 +205,13 @@ static void manualControlTask(void)
         break;
 #ifndef PIOS_EXCLUDE_ADVANCED_FEATURES
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
     case FLIGHTSTATUS_FLIGHTMODE_POI:
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
         handler = &handler_PATHFOLLOWER;
         break;
     case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:

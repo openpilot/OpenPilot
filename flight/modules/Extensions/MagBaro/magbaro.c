@@ -81,7 +81,7 @@ int32_t MagBaroStart()
 {
     if (magbaroEnabled) {
         // Start main task
-        xTaskCreate(magbaroTask, (const char *)"MagBaro", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+        xTaskCreate(magbaroTask, "MagBaro", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_MAGBARO, taskHandle);
         return 0;
     }

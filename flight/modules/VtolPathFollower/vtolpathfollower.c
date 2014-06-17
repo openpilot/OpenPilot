@@ -112,7 +112,7 @@ int32_t VtolPathFollowerStart()
 {
     if (vtolpathfollower_enabled) {
         // Start main task
-        xTaskCreate(vtolPathFollowerTask, (const char *)"VtolPathFollower", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
+        xTaskCreate(vtolPathFollowerTask, "VtolPathFollower", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
     }
 

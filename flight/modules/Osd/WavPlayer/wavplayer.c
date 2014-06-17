@@ -55,7 +55,7 @@ static uint32_t timeOfLastUpdateMs;
 int32_t WavPlayerStart(void)
 {
     // Start WavPlayer task
-    xTaskCreate(WavPlayerTask, (const char *)"WavPlayer", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &WavPlayerTaskHandle);
+    xTaskCreate(WavPlayerTask, "WavPlayer", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &WavPlayerTaskHandle);
 
     return 0;
 }

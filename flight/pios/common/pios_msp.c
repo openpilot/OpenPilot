@@ -79,7 +79,7 @@ typedef struct {
 } CursorTransitions;
 
 
-CursorTransitions PageTransitions[MAXPAGE] =
+CursorTransitions PageTransitions[MAXPAGE + 1] =
 {
         {
                 2, 8,
@@ -89,13 +89,17 @@ CursorTransitions PageTransitions[MAXPAGE] =
                 2, 8,
                 0, 0,
         },
+        {
+                0, 0,
+                PAGE_COL, SAVE_COL,
+        },
 };
 
 
 void setPage(void) {
     switch (config.Page) {
     case 1:
-        sprintf(MSPText[0], "1/2      PID CONFIG");
+        sprintf(MSPText[0], "1/2 PID CONFIG     Profile %u", MwProfile);
         sprintf(MSPText[1], "           P      I      D");
         sprintf(MSPText[2], "ROLL      %3u    %3u    %3u ", MwP[MSP_PID_ROLL],  MwI[MSP_PID_ROLL],  MwD[MSP_PID_ROLL]);
         sprintf(MSPText[3], "PITCH     %3u    %3u    %3u ", MwP[MSP_PID_PITCH], MwI[MSP_PID_PITCH], MwD[MSP_PID_PITCH]);
@@ -110,7 +114,7 @@ void setPage(void) {
         }
         break;
     case 2:
-        sprintf(MSPText[0], "2/2      RC TUNING");
+        sprintf(MSPText[0], "2/2 RC TUNING      Profile %u", MwProfile);
         sprintf(MSPText[1], "                   VALUE");
         sprintf(MSPText[2], "ROLL PITCH RATE     %3u ", MwRollPitchRate);
         sprintf(MSPText[3], "YAW RATE            %3u ", MwYawRate);
@@ -125,16 +129,21 @@ void setPage(void) {
         }
         break;
     case PAGE_SAVED:
-        sprintf(MSPText[0], "            SAVE");
+        sprintf(MSPText[0], "    SAVE           Profile %u", MwProfile);
         sprintf(MSPText[1], " ");
         sprintf(MSPText[2], " ");
         sprintf(MSPText[3], " ");
-        sprintf(MSPText[4], "        PAGE %u SAVED", config.PageSaved);
         sprintf(MSPText[5], " ");
         sprintf(MSPText[6], " ");
         sprintf(MSPText[7], " ");
         sprintf(MSPText[8], " ");
-        sprintf(MSPText[ACTION_INDEX], "           > OK <");
+        if (writeEEPROM) {
+            sprintf(MSPText[4], "           SAVING");
+            sprintf(MSPText[ACTION_INDEX], " ");
+        } else {
+            sprintf(MSPText[4], "        PAGE %u SAVED", config.PageSaved);
+            sprintf(MSPText[ACTION_INDEX], "           > OK <");
+        }
         break;
     }
     if (config.Page != PAGE_SAVED) {
@@ -152,17 +161,13 @@ void setPage(void) {
 void checkTransition(void) {
     int8_t pagenum = config.Page - 1;
 
-    if (config.Row < PageTransitions[pagenum].row_min)      config.Row = PageTransitions[pagenum].row_min;
-    if (config.Row == ACTION_ROW - 1)                       config.Row = PageTransitions[pagenum].row_max;
-    if (config.Row > PageTransitions[pagenum].row_max)      config.Row = ACTION_ROW;
+    if (config.Row < PageTransitions[pagenum].row_min)  config.Row = PageTransitions[pagenum].row_min;
+    if (config.Row == ACTION_ROW - 1)                   config.Row = PageTransitions[pagenum].row_max;
+    if (config.Row > PageTransitions[pagenum].row_max)  config.Row = ACTION_ROW;
 
-    if (config.Row < ACTION_ROW) {
-        if (config.Col < PageTransitions[pagenum].col_min)  config.Col = PageTransitions[pagenum].col_min;
-        if (config.Col > PageTransitions[pagenum].col_max)  config.Col = PageTransitions[pagenum].col_max;
-    } else {
-        if (config.Col < PAGE_COL)                          config.Col = PAGE_COL;
-        if (config.Col > SAVE_COL)                          config.Col = SAVE_COL;
-    }
+    if (config.Row == ACTION_ROW) pagenum = MAXPAGE;
+    if (config.Col < PageTransitions[pagenum].col_min)  config.Col = PageTransitions[pagenum].col_min;
+    if (config.Col > PageTransitions[pagenum].col_max)  config.Col = PageTransitions[pagenum].col_max;
 }
 
 
@@ -323,8 +328,9 @@ void handleRawRC(void) {
             timeout = 1000;
     }
     else if (waitStick == 1) {
-        if (config.Page == PAGE_SAVED)
-            timeout = 1000;
+        if (config.Page == PAGE_SAVED) {
+            waitStick = 2;                                                              // sticks must return to center before continue
+        }
         else
             timeout = 100;
         if ((xTaskGetTickCount() - stickTime) > timeout) waitStick = 0;
@@ -380,15 +386,18 @@ void handleRawRC(void) {
                 if (config.Row == ACTION_ROW) {
                     if (config.Col == PAGE_COL) {
                         if (config.Page == PAGE_SAVED) {
-                            switch (config.PageSaved) {
-                            case 1:
-                                modeMSPRequests |= REQ_MSP_PID;
-                                break;
-                            case 2:
-                                modeMSPRequests |= REQ_MSP_RC_TUNING;
-                                break;
+                            if (writeEEPROM == 0) {
+                                switch (config.PageSaved) {
+                                case 1:
+                                    modeMSPRequests |= REQ_MSP_PID;
+                                    break;
+                                case 2:
+                                    modeMSPRequests |= REQ_MSP_RC_TUNING;
+                                    break;
+                                }
+                                config.Page = config.PageSaved;
+                                waitStick = 2;                                          // sticks must return to center before continue
                             }
-                            config.Page = config.PageSaved;
                         } else {
                             if (MwRcData[MSP_YAW] > MAXSTICK) {
                                 config.Page++;
@@ -553,8 +562,10 @@ void MSPRequests(uint32_t port)
         }
 
         if (writeEEPROM)
-            if (writeEEPROM-- == 1)
+            if (writeEEPROM-- == 1) {
                 MSPblankserialRequest(MSP_EEPROM_WRITE);
+                setPage();
+            }
     }
 }
 

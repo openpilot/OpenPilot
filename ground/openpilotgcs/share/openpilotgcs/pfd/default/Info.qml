@@ -6,8 +6,10 @@ Item {
 
     SvgElementImage {
         id: info_bg
-        elementName: "info-bg"
         sceneSize: info.sceneSize
+        elementName: "info-bg"
+        width: parent.width
+        anchors.fill: parent.top
     }
 
     SvgElementImage {
@@ -25,11 +27,6 @@ Item {
         }
     }
 
-    SvgElementImage {
-        id: energy_label
-        elementName: "battery-milliamp-label"
-        sceneSize: info.sceneSize
-    }
 
     Repeater {
         id: satNumberBar
@@ -53,7 +50,7 @@ Item {
         Text {
             text: ["No GPS", "No Fix", "Fix2D", "Fix3D"][GPSPositionSensor.Status]
             anchors.centerIn: parent
-            font.pixelSize: parent.height*1.2
+            font.pixelSize: Math.floor(parent.height*1.2)
             color: "white"
         }
     }
@@ -66,7 +63,7 @@ Item {
             text: ["Disconnected","HandshakeReq","HandshakeAck","Connected"][GCSTelemetryStats.Status]
 
             anchors.centerIn: parent
-            font.pixelSize: parent.height*1.2
+            font.pixelSize: Math.floor(parent.height*1.2)
             color: "white"
         }
     }
@@ -110,7 +107,7 @@ Item {
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 1.3
+                pixelSize: Math.floor(parent.height * 1.2)
             }
         }
     }
@@ -126,7 +123,7 @@ Item {
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 1.3
+                pixelSize: Math.floor(parent.height * 1.2)
             }
         }
     }
@@ -142,7 +139,7 @@ Item {
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 1.3
+                pixelSize: Math.floor(parent.height * 1.2)
             }
         }
     }
@@ -183,5 +180,13 @@ Item {
         id: mask_telemetryRx
         elementName: "rx-mask"
         sceneSize: info.sceneSize
+    }
+
+    SvgElementImage {
+        id: info_border
+        elementName: "info-border"
+        sceneSize: info.sceneSize
+        width: Math.floor(parent.width * 1.01)
+        anchors.fill: parent.top
     }
 }

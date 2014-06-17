@@ -10,6 +10,8 @@ Item {
         id: warning_bg
         elementName: "warnings-bg"
         sceneSize: warnings.sceneSize
+        width: parent.width + 4
+        anchors.fill: parent.bottom
     }
 
     SvgElementPositionItem {
@@ -26,7 +28,7 @@ Item {
                 text: "RC INPUT"
                 font {
                     family: "Arial"
-                    pixelSize: parent.height * 0.8
+                    pixelSize: Math.floor(parent.height * 0.8)
                     weight: Font.DemiBold
                 }
             }
@@ -53,7 +55,7 @@ Item {
                 text: "MASTER CAUTION"
                 font {
                     family: "Arial"
-                    pixelSize: parent.height * 0.8
+                    pixelSize: Math.floor(parent.height * 0.8)
                     weight: Font.DemiBold
                 }
             }
@@ -74,7 +76,7 @@ Item {
                 text: "AUTOPILOT"
                 font {
                     family: "Arial"
-                    pixelSize: parent.height * 0.8
+                    pixelSize: Math.floor(parent.height * 0.8)
                     weight: Font.DemiBold
                 }
             }

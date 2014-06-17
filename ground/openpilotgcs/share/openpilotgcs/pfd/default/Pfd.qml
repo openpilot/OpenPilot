@@ -8,18 +8,32 @@ Rectangle {
         elementName: "pfd-window"
         fillMode: Image.PreserveAspectFit
         anchors.fill: parent
-
         sceneSize: Qt.size(width, height)
+        
+        Rectangle {
+            width: Math.floor(parent.paintedHeight * 1.32)
+            height: Math.floor(parent.paintedHeight - parent.paintedHeight * 0.008)
+            
+            color: "transparent"
+            border.color: "white"
+            border.width: Math.floor(parent.paintedHeight * 0.008)
+            radius: Math.floor(parent.paintedHeight * 0.01)
+            anchors.centerIn: parent             
+        }
 
         Item {
             id: sceneItem
+ 
+
+            width: Math.floor((parent.paintedHeight * 1.32) - (parent.paintedHeight * 0.015))
+            height: Math.floor(parent.paintedHeight - parent.paintedHeight * 0.02)
             property variant viewportSize : Qt.size(width, height)
 
-            width: parent.paintedWidth
-            height: parent.paintedHeight
             anchors.centerIn: parent
             clip: true
 
+            //onWidthChanged:console.log("Width/Height : "+width+" "+ height+" scale : "+width/height+" border : "+parent.paintedHeight * 0.006 )
+            
             Loader {
                 id: worldLoader
                 anchors.fill: parent

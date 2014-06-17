@@ -9,7 +9,7 @@ Item {
         sceneSize: info.sceneSize
         elementName: "info-bg"
         width: parent.width
-        anchors.fill: parent.top
+        //anchors.top: parent.top
     }
 
     SvgElementImage {
@@ -154,6 +154,7 @@ Item {
             property int minThrottleNumber : index+1
             elementName: "eng" + minThrottleNumber
             sceneSize: info.sceneSize
+
             visible: throttleNumberBar.throttleNumber >= minThrottleNumber
         }
     }
@@ -186,7 +187,6 @@ Item {
         id: info_border
         elementName: "info-border"
         sceneSize: info.sceneSize
-        width: Math.floor(parent.width * 1.01)
-        anchors.fill: parent.top
+        width: Math.floor(parent.width * 1.009)
     }
 }

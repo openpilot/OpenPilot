@@ -10,8 +10,8 @@ Item {
         id: warning_bg
         elementName: "warnings-bg"
         sceneSize: warnings.sceneSize
-        width: parent.width + 4
-        anchors.fill: parent.bottom
+        width: background.width
+        anchors.bottom: parent.bottom
     }
 
     SvgElementPositionItem {
@@ -103,7 +103,7 @@ Item {
         id: warning_battery
         elementName: "warning-battery"
         sceneSize: warnings.sceneSize
-
+        anchors.right: parent.right
         visible: SystemAlarms.Alarm_Battery > 1
     }
 
@@ -111,7 +111,6 @@ Item {
         id: warning_attitude
         elementName: "warning-attitude"
         sceneSize: warnings.sceneSize
-
         visible: SystemAlarms.Alarm_Attitude > 1
     }
 }

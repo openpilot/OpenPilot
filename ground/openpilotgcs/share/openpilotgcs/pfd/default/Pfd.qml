@@ -11,7 +11,7 @@ Rectangle {
         sceneSize: Qt.size(width, height)
         
         Rectangle {
-            width: Math.floor(parent.paintedHeight * 1.32)
+            width: Math.floor(parent.paintedHeight * 1.319)
             height: Math.floor(parent.paintedHeight - parent.paintedHeight * 0.008)
             
             color: "transparent"
@@ -25,7 +25,7 @@ Rectangle {
             id: sceneItem
  
 
-            width: Math.floor((parent.paintedHeight * 1.32) - (parent.paintedHeight * 0.015))
+            width: Math.floor((parent.paintedHeight * 1.32) - (parent.paintedHeight * 0.013))
             height: Math.floor(parent.paintedHeight - parent.paintedHeight * 0.02)
             property variant viewportSize : Qt.size(width, height)
 

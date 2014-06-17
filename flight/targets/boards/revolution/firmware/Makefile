@@ -84,6 +84,7 @@ ifndef TESTAPP
 
     ## Misc library functions
     SRC += $(FLIGHTLIB)/paths.c
+    SRC += $(FLIGHTLIB)/plans.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
 

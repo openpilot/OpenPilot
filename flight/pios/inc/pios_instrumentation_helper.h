@@ -30,50 +30,50 @@
  */
 
 /**
-* \par
-* This is a collections of helper macros that ease adding instrumentation support.
-* \par
-* Step by step guide:
-*
-* Define PIOS_INSTRUMENT_MODULE before including this file to enable instrumentation for a module
-*
-* <pre>#define PIOS_INSTRUMENT_MODULE
-* #include <pios_instrumentation_helper.h></pre>
-*
-* Declare the variables used to hold counter handlers.
-* Place the following code along all module variables declaration.
-* <pre>PERF_DEFINE_COUNTER(counterUpd);
-* PERF_DEFINE_COUNTER(counterAccelSamples);
-* PERF_DEFINE_COUNTER(counterPeriod);
-* PERF_DEFINE_COUNTER(counterAtt);</pre>
-*
-* Counters needs to be initialized before they are used.
-* The following code needs to be added to a function called at module initialization.
-* the second parameter is a unique counter Id.
-* A good pracice is to use the upper half word as module id and lower as counter id
-* <pre>PERF_INIT_COUNTER(counterUpd, 0xA7710001);
-* PERF_INIT_COUNTER(counterAtt, 0xA7710002);
-* PERF_INIT_COUNTER(counterPeriod, 0xA7710003);
-* PERF_INIT_COUNTER(counterAccelSamples, 0xA7710004);</pre>
-*
-* At this point you can start using the counters as in the following samples
-*
-* Track the time spent on a certain function:
-* <pre>PERF_TIMED_SECTION_START(counterAtt);
-* updateAttitude(&accelState, &gyros);
-* PERF_TIMED_SECTION_END(counterAtt);</pre>
-* PERF_TIMED_SECTION_[START!STOP] marks the beginning and the end of the code to monitor
-*
-* Measure the mean of the period a certain point is reached:
-* <pre>PERF_MEASURE_PERIOD(counterPeriod);</pre>
-* Note that the value stored in the counter is a long running mean while max and min are single point values
-*
-* Track an user defined int32_t value:
-* <pre>PERF_TRACK_VALUE(counterAccelSamples, i);</pre>
-* the counter is then updated with the value of i.
-*
-* \par
-*/
+ * \par
+ * This is a collections of helper macros that ease adding instrumentation support.
+ * \par
+ * Step by step guide:
+ *
+ * Define PIOS_INSTRUMENT_MODULE before including this file to enable instrumentation for a module
+ *
+ * <pre>#define PIOS_INSTRUMENT_MODULE
+ * #include <pios_instrumentation_helper.h></pre>
+ *
+ * Declare the variables used to hold counter handlers.
+ * Place the following code along all module variables declaration.
+ * <pre>PERF_DEFINE_COUNTER(counterUpd);
+ * PERF_DEFINE_COUNTER(counterAccelSamples);
+ * PERF_DEFINE_COUNTER(counterPeriod);
+ * PERF_DEFINE_COUNTER(counterAtt);</pre>
+ *
+ * Counters needs to be initialized before they are used.
+ * The following code needs to be added to a function called at module initialization.
+ * the second parameter is a unique counter Id.
+ * A good pracice is to use the upper half word as module id and lower as counter id
+ * <pre>PERF_INIT_COUNTER(counterUpd, 0xA7710001);
+ * PERF_INIT_COUNTER(counterAtt, 0xA7710002);
+ * PERF_INIT_COUNTER(counterPeriod, 0xA7710003);
+ * PERF_INIT_COUNTER(counterAccelSamples, 0xA7710004);</pre>
+ *
+ * At this point you can start using the counters as in the following samples
+ *
+ * Track the time spent on a certain function:
+ * <pre>PERF_TIMED_SECTION_START(counterAtt);
+ * updateAttitude(&accelState, &gyros);
+ * PERF_TIMED_SECTION_END(counterAtt);</pre>
+ * PERF_TIMED_SECTION_[START!STOP] marks the beginning and the end of the code to monitor
+ *
+ * Measure the mean of the period a certain point is reached:
+ * <pre>PERF_MEASURE_PERIOD(counterPeriod);</pre>
+ * Note that the value stored in the counter is a long running mean while max and min are single point values
+ *
+ * Track an user defined int32_t value:
+ * <pre>PERF_TRACK_VALUE(counterAccelSamples, i);</pre>
+ * the counter is then updated with the value of i.
+ *
+ * \par
+ */
 
 #ifndef PIOS_INSTRUMENTATION_HELPER_H
 #define PIOS_INSTRUMENTATION_HELPER_H

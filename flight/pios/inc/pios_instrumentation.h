@@ -44,7 +44,7 @@ extern int8_t pios_instrumentation_last_used_counter;
 
 /**
  * Update a counter with a new value
- * @param counterIdx index of the counter to update @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
+ * @param counter_handle handle of the counter to update @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  * @param newValue the updated value.
  */
 inline void PIOS_Instrumentation_updateCounter(pios_counter_t counter_handle, int32_t newValue)
@@ -65,7 +65,7 @@ inline void PIOS_Instrumentation_updateCounter(pios_counter_t counter_handle, in
 
 /**
  * Used to determine the time duration of a code block, mark the begin of the block. @see PIOS_Instrumentation_TimeEnd
- * @param counterIdx counterIdx index of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
+ * @param counter_handle handle of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  */
 inline void PIOS_Instrumentation_TimeStart(pios_counter_t counter_handle)
 {
@@ -79,7 +79,7 @@ inline void PIOS_Instrumentation_TimeStart(pios_counter_t counter_handle)
 
 /**
  * Used to determine the time duration of a code block, mark the end of the block. @see PIOS_Instrumentation_TimeStart
- * @param counterIdx counterIdx index of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
+ * @param counter_handle handle of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  */
 inline void PIOS_Instrumentation_TimeEnd(pios_counter_t counter_handle)
 {
@@ -100,7 +100,7 @@ inline void PIOS_Instrumentation_TimeEnd(pios_counter_t counter_handle)
 
 /**
  * Used to determine the mean period between each call to the function
- * @param counterIdx counterIdx index of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
+ * @param counter_handle handle of the counter @see PIOS_Instrumentation_SearchCounter @see PIOS_Instrumentation_CreateCounter
  */
 inline void PIOS_Instrumentation_TrackPeriod(pios_counter_t counter_handle)
 {
@@ -129,15 +129,16 @@ void PIOS_Instrumentation_Init(int8_t maxCounters);
 
 /**
  * Create a new counter.
- * @param id the unique id to assig to the counter
- * @return the counter index to be used to manage its content
+ * @param id the unique id to assign to the counter
+ * @return the counter handle to be used to manage its content
  */
 pios_counter_t PIOS_Instrumentation_CreateCounter(uint32_t id);
 
 /**
  * search a counter index by its unique Id
- * @param id the unique id to assig to the counter
- * @return the counter index to be used to manage its content
+ * @param id the unique id to assign to the counter.
+ * If a counter with the same id exists, the previous instance is returned
+ * @return the counter handle to be used to manage its content
  */
 pios_counter_t PIOS_Instrumentation_SearchCounter(uint32_t id);
 

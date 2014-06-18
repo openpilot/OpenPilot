@@ -181,7 +181,12 @@ int32_t configuration_check()
         }
     }
 
-    // TODO: Check on a multirotor no axis supports "None"
+    uint8_t checks_disabled;
+    FlightModeSettingsDisableSanityChecksGet(&checks_disabled);
+    if (checks_disabled == FLIGHTMODESETTINGS_DISABLESANITYCHECKS_TRUE) {
+        severity = SYSTEMALARMS_ALARM_WARNING;
+    }
+
     if (severity != SYSTEMALARMS_ALARM_OK) {
         ExtendedAlarmsSet(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION, severity, alarmstatus, alarmsubstatus);
     } else {

@@ -54,14 +54,6 @@ Rectangle {
             }
 
             SvgElementImage {
-                id: foreground
-                elementName: "foreground"
-                sceneSize: sceneItem.viewportSize
-
-                anchors.centerIn: parent
-            }
-
-            SvgElementImage {
                 id: side_slip_fixed
                 elementName: "sideslip-fixed"
                 sceneSize: sceneItem.viewportSize

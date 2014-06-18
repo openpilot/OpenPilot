@@ -38,6 +38,7 @@
 #include <systemsettings.h>
 #include <systemalarms.h>
 #include <revosettings.h>
+#include <positionstate.h>
 #include <taskinfo.h>
 
 // a number of useful macros
@@ -79,10 +80,17 @@ int32_t configuration_check()
         break;
     default:
         navCapableFusion = false;
+        // check for hitl.  hitl allows to feed position and velocity state via
+        // telemetry, this makes nav possible even with an unsuited algorithm
+        if (PositionStateHandle()) {
+            if (PositionStateReadOnly()) {
+                navCapableFusion = true;
+            }
+        }
     }
 #else
     const bool navCapableFusion = false;
-#endif
+#endif /* ifdef REVOLUTION */
 
 
     // Classify airframe type
@@ -173,7 +181,12 @@ int32_t configuration_check()
         }
     }
 
-    // TODO: Check on a multirotor no axis supports "None"
+    uint8_t checks_disabled;
+    FlightModeSettingsDisableSanityChecksGet(&checks_disabled);
+    if (checks_disabled == FLIGHTMODESETTINGS_DISABLESANITYCHECKS_TRUE) {
+        severity = SYSTEMALARMS_ALARM_WARNING;
+    }
+
     if (severity != SYSTEMALARMS_ALARM_OK) {
         ExtendedAlarmsSet(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION, severity, alarmstatus, alarmsubstatus);
     } else {

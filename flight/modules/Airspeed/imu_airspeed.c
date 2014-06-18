@@ -267,11 +267,18 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
         imu->Vw3 = FilterButterWorthDF2(ffV, wind[2], &(imu->Vw3n1), &(imu->Vw3n2));
     } // else leave wind estimation unchanged
 
-    // airspeed = groundspeed - wind
-    airspeedData->CalibratedAirspeed = sqrtf(
-        (imu->v1Old - imu->Vw1) * (imu->v1Old - imu->Vw1)
-        + (imu->v2Old - imu->Vw2) * (imu->v2Old - imu->Vw2)
-        + (imu->v3Old - imu->Vw3) * (imu->v3Old - imu->Vw3));
+    { // Scoping to save memory
+      // airspeed = groundspeed - wind
+        const float Vair[3] = {
+            imu->v1Old - imu->Vw1,
+            imu->v2Old - imu->Vw2,
+            imu->v3Old - imu->Vw3
+        };
+
+        // project airspeed into fuselage vector
+        airspeedData->CalibratedAirspeed = Vair[0] * xB[0] + Vair[1] * xB[1] + Vair[2] * xB[2];
+    }
+
     airspeedData->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
     AlarmsClear(SYSTEMALARMS_ALARM_AIRSPEED);
 }

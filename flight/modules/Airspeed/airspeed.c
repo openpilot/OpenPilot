@@ -98,7 +98,7 @@ int32_t AirspeedInitialize()
 
     HwSettingsInitialize();
     uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
-    HwSettingsOptionalModulesGet(optionalModules);
+    HwSettingsOptionalModulesArrayGet(optionalModules);
 
 
     if (optionalModules[HWSETTINGS_OPTIONALMODULES_AIRSPEED] == HWSETTINGS_OPTIONALMODULES_ENABLED) {

@@ -200,6 +200,8 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                 UAVObjSetAccess(&metadata, ACCESS_READWRITE);
                 ManualControlCommandSetMetadata(&metadata);
             }
+            AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_WARNING);
+            continue;
         }
 
         bool valid_input_detected = true;

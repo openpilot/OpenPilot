@@ -61,6 +61,8 @@ Rectangle {
                 x: scaledBounds.x * sceneItem.width
             }
 
+// Disable Side_slip moving because flickering issue on whole Pfd.
+/*
             SvgElementImage {
                 id: side_slip
                 elementName: "sideslip-moving"
@@ -77,11 +79,12 @@ Rectangle {
                     }
                 }
 
-                anchors.horizontalCenter: foreground.horizontalCenter
+                anchors.horizontalCenter: horizontCenterItem.horizontalCenter
                 //0.5 coefficient is empirical to limit indicator movement
                 anchors.horizontalCenterOffset: sideSlip*width*0.1 //was 0.5
                 y: scaledBounds.y * sceneItem.height
             }
+*/
 
             Compass {
                 anchors.fill: parent

@@ -37,6 +37,42 @@ Item {
         smooth: true
     }
 
+    SvgElementImage {
+        id: compass_home
+        elementName: "compass-home" // Cyan point
+        sceneSize: sceneItem.sceneSize
+        smooth: true
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+        property real home_degrees: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East, TakeOffLocation.North - PositionState.North)
+
+        rotation: -AttitudeState.Yaw + home_degrees
+        transformOrigin: Item.Bottom
+        visible: TakeOffLocation.Status == 0
+
+    }
+
+    SvgElementImage {
+        id: compass_waypoint // Double Purple arrow
+        elementName: "compass-waypoint"
+        sceneSize: sceneItem.sceneSize
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+        property real course_degrees: 180/3.1415 * Math.atan2(PathDesired.End_East - PositionState.East, PathDesired.End_North - PositionState.North)
+
+        rotation: -AttitudeState.Yaw + course_degrees
+        transformOrigin: Item.Center
+
+        smooth: true
+        visible: false
+    }
+
+
+
     Item {
         id: compass_text_box
 

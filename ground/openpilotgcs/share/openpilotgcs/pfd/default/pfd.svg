@@ -50,11 +50,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.7432465"
-     inkscape:cx="152.24569"
-     inkscape:cy="438.16076"
+     inkscape:zoom="1.3234375"
+     inkscape:cx="320"
+     inkscape:cy="240"
      inkscape:document-units="px"
-     inkscape:current-layer="layer71"
+     inkscape:current-layer="layer8"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -76,7 +76,9 @@
      inkscape:snap-to-guides="true"
      inkscape:snap-nodes="true"
      inkscape:bbox-paths="false"
-     inkscape:snap-global="true">
+     inkscape:snap-global="true"
+     inkscape:snap-intersection-paths="false"
+     inkscape:snap-object-midpoints="true">
     <sodipodi:guide
        orientation="1,0"
        position="320.03652,382.998"
@@ -113,7 +115,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -2821,14 +2823,12 @@
      id="layer7"
      inkscape:label="compass"
      style="display:inline"
-     transform="translate(0,-4)"
-     sodipodi:insensitive="true">
+     transform="translate(0,-4)">
     <g
        inkscape:groupmode="layer"
        id="layer70"
        inkscape:label="compass-vector"
-       style="display:inline"
-       sodipodi:insensitive="true">
+       style="display:inline">
       <rect
          style="fill:#008000;fill-opacity:1;fill-rule:evenodd;stroke:none"
          id="compass-vector"
@@ -2850,7 +2850,7 @@
          transform="translate(0,78)">
         <path
            transform="matrix(0.84971585,0,0,0.84971585,73.153736,57.627199)"
-           d="m 381.49999,370 c 0,50.26377 -40.74684,91.01061 -91.01061,91.01061 -50.26377,0 -91.01061,-40.74684 -91.01061,-91.01061 0,-50.26377 40.74684,-91.01061 91.01061,-91.01061 50.26377,0 91.01061,40.74684 91.01061,91.01061 z"
+           d="m 381.49999,370 a 91.010612,91.010612 0 1 1 -182.02122,0 91.010612,91.010612 0 1 1 182.02122,0 z"
            sodipodi:ry="91.010612"
            sodipodi:rx="91.010612"
            sodipodi:cy="370"
@@ -3916,14 +3916,12 @@
            id="path5472"
            d="m 319.99619,305.5318 -8.52371,8.73614 6.87739,-0.0531 -4.3e-4,27.16436 3.29307,0 0,-27.16436 6.85084,0.0531 z"
            style="fill:#bf00bf;fill-opacity:1;stroke:none" />
-        <rect
-           inkscape:transform-center-y="58.290951"
-           y="401.12097"
-           x="318.21518"
-           height="37.464817"
-           width="3.5531087"
-           id="rect5478"
-           style="fill:#bf00bf;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+        <path
+           style="fill:#bf00bf;fill-opacity:1;stroke:none"
+           d="m 319.99619,402.73825 -8.52371,8.73614 6.87739,-0.0531 -4.3e-4,27.16436 3.29307,0 0,-27.16436 6.85084,0.0531 z"
+           id="path4628"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cccccccc" />
       </g>
     </g>
     <g
@@ -3959,13 +3957,22 @@
        inkscape:label="compass-home"
        style="display:inline"
        sodipodi:insensitive="true">
-      <path
-         style="fill:#00ffff;stroke:none"
-         d="m 320,372.78125 -3.78125,4.5 3.78125,4.5 3.78125,-4.5 -3.78125,-4.5 z"
-         id="compass-home"
-         inkscape:connector-curvature="0"
-         inkscape:transform-center-y="-72.71875"
-         inkscape:label="#path4831" />
+      <g
+         id="compass-home">
+        <path
+           inkscape:label="#path4831"
+           inkscape:transform-center-y="-72.71875"
+           inkscape:connector-curvature="0"
+           id="path4626"
+           d="m 320,372.78125 -3.78125,4.5 3.78125,4.5 3.78125,-4.5 -3.78125,-4.5 z"
+           style="fill:#00ffff;stroke:none" />
+        <path
+           transform="translate(0,4)"
+           inkscape:connector-curvature="0"
+           id="path3849"
+           d="m 320,377.78125 -0.0171,68.20098"
+           style="fill:none;stroke:none" />
+      </g>
     </g>
     <g
        inkscape:groupmode="layer"

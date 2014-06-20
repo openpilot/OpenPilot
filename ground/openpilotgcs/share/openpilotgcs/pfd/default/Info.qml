@@ -4,6 +4,12 @@ Item {
     id: info
     property variant sceneSize
 
+    property real home_heading: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East, 
+                                                        TakeOffLocation.North - PositionState.North)
+
+    property real home_distance: Math.sqrt((TakeOffLocation.East - PositionState.East)*(TakeOffLocation.East - PositionState.East) 
+                                         + (TakeOffLocation.North - PositionState.North)*(TakeOffLocation.North - PositionState.North))
+
     SvgElementImage {
         id: info_bg
         sceneSize: info.sceneSize
@@ -182,6 +188,49 @@ Item {
         elementName: "rx-mask"
         sceneSize: info.sceneSize
     }
+
+    SvgElementImage {
+        id: home_bg
+        elementName: "home-bg"
+        sceneSize: info.sceneSize
+
+        visible: TakeOffLocation.Status == 0
+    }
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "home-heading-text"
+
+        visible: TakeOffLocation.Status == 0
+
+        Text {
+            text: home_heading.toFixed(1)+"°"
+            anchors.fill: parent
+            color: "cyan"
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1.2)
+            }
+        }
+    }
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "home-distance-text"
+
+        visible: TakeOffLocation.Status == 0
+
+        Text {
+            text: home_distance.toFixed(0)+" m"
+            anchors.fill: parent
+            color: "cyan"
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1.2)
+            }
+        }
+    }
+
 
     SvgElementImage {
         id: info_border

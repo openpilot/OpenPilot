@@ -111,6 +111,7 @@ Item {
         id: warning_attitude
         elementName: "warning-attitude"
         sceneSize: warnings.sceneSize
+        anchors.centerIn: background.centerIn
         visible: SystemAlarms.Alarm_Attitude > 1
     }
 }

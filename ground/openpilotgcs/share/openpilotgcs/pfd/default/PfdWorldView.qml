@@ -49,6 +49,16 @@ Item {
             border: 1
             smooth: true
         }
+
+        SvgElementImage {
+            id: pitch_0
+            elementName: "pitch0"
+
+            sceneSize: background.sceneSize
+            anchors.centerIn: parent
+            border: 1            
+            smooth: true
+        }
     }
 
     Item {

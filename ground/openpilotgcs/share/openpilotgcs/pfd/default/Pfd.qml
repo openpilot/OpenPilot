@@ -32,7 +32,7 @@ Rectangle {
             anchors.centerIn: parent
             clip: true
 
-            onWidthChanged:console.log("Width/Height : "+width+" "+ height+" scale : "+width/height+" border : "+parent.paintedHeight * 0.006+" TakeOffLocation.Status" + TakeOffLocation.Status)
+            //onWidthChanged:console.log("TakeOffLocation.Status " + TakeOffLocation.Status)
             
             Loader {
                 id: worldLoader

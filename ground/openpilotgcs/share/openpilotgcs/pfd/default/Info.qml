@@ -7,15 +7,15 @@ Item {
     property real home_heading: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East, 
                                                         TakeOffLocation.North - PositionState.North)
 
-    property real home_distance: Math.sqrt(Math.pow(TakeOffLocation.East - PositionState.East,2) +
-                                           Math.pow(TakeOffLocation.North - PositionState.North,2))
+    property real home_distance: Math.sqrt(Math.pow((TakeOffLocation.East - PositionState.East),2) +
+                                           Math.pow((TakeOffLocation.North - PositionState.North),2))
 
     property real current_velocity: Math.sqrt(Math.pow(VelocityState.North,2)+Math.pow(VelocityState.East,2))
 
-    property real home_eta: Math.round(home_distance/current_velocity)
-    property real home_eta_h: Math.floor(home_eta / 3600)
-    property real home_eta_m: Math.floor((home_eta - home_eta_h*3600)/60) 
-    property real home_eta_s: Math.floor(home_eta - home_eta_h*3600 - home_eta_m*60)
+    property real home_eta: (home_distance > 0 && current_velocity > 0 ? Math.round(home_distance/current_velocity) : 0)
+    property real home_eta_h: (home_eta > 0 ? Math.floor(home_eta / 3600) : 0 )
+    property real home_eta_m: (home_eta > 0 ? Math.floor((home_eta - home_eta_h*3600)/60) : 0) 
+    property real home_eta_s: (home_eta > 0 ? Math.floor(home_eta - home_eta_h*3600 - home_eta_m*60) : 0)
 
    function formatTime(time) {
         if (time === 0)
@@ -209,57 +209,109 @@ Item {
         id: home_bg
         elementName: "home-bg"
         sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        visible: TakeOffLocation.Status == 0
+        states: State  {
+             name: "fading"
+             when: TakeOffLocation.Status !== 0
+             PropertyChanges  { target: home_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width;  }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
     }
 
     SvgElementPositionItem {
         sceneSize: info.sceneSize
+        id: home_heading_text
         elementName: "home-heading-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        visible: TakeOffLocation.Status == 0
-
+        states: State  {
+             name: "fading_heading"
+             when: TakeOffLocation.Status !== 0
+             PropertyChanges  { target: home_heading_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width  }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
         Text {
-            text: home_heading.toFixed(1)+"°"
-            anchors.fill: parent
+            text: "  "+home_heading.toFixed(1)+"°"
+            anchors.centerIn: parent
             color: "cyan"
             font {
                 family: "Arial"
-                pixelSize: Math.floor(parent.height * 1.2)
+                pixelSize: parent.height * 1.2
             }
         }
     }
 
     SvgElementPositionItem {
         sceneSize: info.sceneSize
+        id: home_distance_text
         elementName: "home-distance-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        visible: TakeOffLocation.Status == 0
+        states: State  {
+             name: "fading_distance"
+             when: TakeOffLocation.Status !== 0
+             PropertyChanges  { target: home_distance_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width;  }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
 
         Text {
             text: home_distance.toFixed(0)+" m"
-            anchors.fill: parent
+            anchors.centerIn: parent
             color: "cyan"
             font {
                 family: "Arial"
-                pixelSize: Math.floor(parent.height * 1.2)
+                pixelSize: parent.height * 1.2
             }
         }
     }
 
     SvgElementPositionItem {
         sceneSize: info.sceneSize
+        id: home_eta_text
         elementName: "home-eta-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        visible: TakeOffLocation.Status == 0
+        states: State  {
+             name: "fading_distance"
+             when: TakeOffLocation.Status !== 0
+             PropertyChanges  { target: home_eta_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width;  }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
 
         Text {
             text: formatTime(home_eta_h) + ":" + formatTime(home_eta_m) + ":" + formatTime(home_eta_s)
-            anchors.fill: parent
+            anchors.centerIn: parent
             color: "cyan"
             font {
                 family: "Arial"
-                pixelSize: Math.floor(parent.height * 1.2)
+                pixelSize: parent.height * 1.2
             }
         }
     }

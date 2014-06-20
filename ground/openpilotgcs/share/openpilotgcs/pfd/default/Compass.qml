@@ -68,7 +68,7 @@ Item {
         transformOrigin: Item.Center
 
         smooth: true
-        visible: false
+        visible: PathDesired.End_East !== 0.0 && PathDesired.End_East !== 0.0
     }
 
 

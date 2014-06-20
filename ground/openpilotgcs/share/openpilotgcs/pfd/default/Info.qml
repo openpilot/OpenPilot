@@ -7,9 +7,25 @@ Item {
     property real home_heading: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East, 
                                                         TakeOffLocation.North - PositionState.North)
 
-    property real home_distance: Math.sqrt((TakeOffLocation.East - PositionState.East)*(TakeOffLocation.East - PositionState.East) 
-                                         + (TakeOffLocation.North - PositionState.North)*(TakeOffLocation.North - PositionState.North))
+    property real home_distance: Math.sqrt(Math.pow(TakeOffLocation.East - PositionState.East,2) +
+                                           Math.pow(TakeOffLocation.North - PositionState.North,2))
 
+    property real current_velocity: Math.sqrt(Math.pow(VelocityState.North,2)+Math.pow(VelocityState.East,2))
+
+    property real home_eta: Math.round(home_distance/current_velocity)
+    property real home_eta_h: Math.floor(home_eta / 3600)
+    property real home_eta_m: Math.floor((home_eta - home_eta_h*3600)/60) 
+    property real home_eta_s: Math.floor(home_eta - home_eta_h*3600 - home_eta_m*60)
+
+   function formatTime(time) {
+        if (time === 0)
+            return "00"
+        if (time < 10)
+            return "0" + time;
+        else
+            return time.toString();
+    }
+    
     SvgElementImage {
         id: info_bg
         sceneSize: info.sceneSize
@@ -222,6 +238,23 @@ Item {
 
         Text {
             text: home_distance.toFixed(0)+" m"
+            anchors.fill: parent
+            color: "cyan"
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1.2)
+            }
+        }
+    }
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "home-eta-text"
+
+        visible: TakeOffLocation.Status == 0
+
+        Text {
+            text: formatTime(home_eta_h) + ":" + formatTime(home_eta_m) + ":" + formatTime(home_eta_s)
             anchors.fill: parent
             color: "cyan"
             font {

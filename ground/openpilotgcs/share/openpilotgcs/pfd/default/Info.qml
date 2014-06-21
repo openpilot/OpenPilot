@@ -10,6 +10,12 @@ Item {
     property real home_distance: Math.sqrt(Math.pow((TakeOffLocation.East - PositionState.East),2) +
                                            Math.pow((TakeOffLocation.North - PositionState.North),2))
 
+    property real wp_heading: 180/3.1415 * Math.atan2(PathDesired.End_East - PositionState.East, 
+                                                      PathDesired.End_North - PositionState.North)
+
+    property real wp_distance: Math.sqrt(Math.pow((PathDesired.End_East - PositionState.East),2) +
+                                           Math.pow(( PathDesired.End_North - PositionState.North),2))
+
     property real current_velocity: Math.sqrt(Math.pow(VelocityState.North,2)+Math.pow(VelocityState.East,2))
 
     property real home_eta: (home_distance > 0 && current_velocity > 0 ? Math.round(home_distance/current_velocity) : 0)
@@ -17,7 +23,28 @@ Item {
     property real home_eta_m: (home_eta > 0 ? Math.floor((home_eta - home_eta_h*3600)/60) : 0) 
     property real home_eta_s: (home_eta > 0 ? Math.floor(home_eta - home_eta_h*3600 - home_eta_m*60) : 0)
 
-   function formatTime(time) {
+    property real wp_eta: (wp_distance > 0 && current_velocity > 0 ? Math.round(wp_distance/current_velocity) : 0)
+    property real wp_eta_h: (wp_eta > 0 ? Math.floor(wp_eta / 3600) : 0 )
+    property real wp_eta_m: (wp_eta > 0 ? Math.floor((wp_eta - wp_eta_h*3600)/60) : 0) 
+    property real wp_eta_s: (wp_eta > 0 ? Math.floor(wp_eta - wp_eta_h*3600 - wp_eta_m*60) : 0)
+
+    property real posEast_old
+    property real posNorth_old
+    property real total_distance
+    property bool init_dist: false
+
+    function compute_distance(posEast,posNorth) {
+        if (total_distance == 0 && !init_dist){init_dist = "true"; posEast_old = posEast; posNorth_old = posNorth;}
+        if (posEast > posEast_old+3 || posEast < posEast_old-3 || posNorth > posNorth_old+3 || posNorth < posNorth_old-3) {
+        total_distance += Math.sqrt(Math.pow((posEast - posEast_old ),2) + Math.pow((posNorth - posNorth_old),2));    
+
+        posEast_old = posEast;
+        posNorth_old = posNorth;
+        return total_distance;
+        } 
+    }
+
+    function formatTime(time) {
         if (time === 0)
             return "00"
         if (time < 10)
@@ -120,14 +147,90 @@ Item {
 
     SvgElementPositionItem {
         sceneSize: info.sceneSize
-        elementName: "waypoint-description-text"
+        elementName: "waypoint-heading-text"
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
         visible: SystemAlarms.Alarm_PathPlan == 1
 
         Text {
-            text: WaypointActive.Index+" / "+PathPlan.WaypointCount+"   "
+            text: "   "+wp_heading.toFixed(1)+"°"
+
+            anchors.centerIn: parent
+            font.pixelSize: parent.height*1.1
+            color: "magenta"
+        }
+    }
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "waypoint-distance-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan == 1
+
+        Text {
+            text: "  "+wp_distance.toFixed(0)+" m"
+
+            anchors.centerIn: parent
+            font.pixelSize: parent.height*1.1
+            color: "magenta"
+        }
+    }
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "waypoint-total-distance-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: true //total_distance > 5
+
+        property real total_distance: 0
+
+        Text {
+            text: "  "+total_distance.toFixed(0)+" m"
+
+            anchors.centerIn: parent
+            font.pixelSize: parent.height*1.1
+            color: "magenta"
+        }
+
+    Timer {
+        interval: 1000; running: true; repeat: true;
+        onTriggered: {if (GPSPositionSensor.Status == 3) compute_distance(PositionState.East,PositionState.North)}
+    }
+
+    }
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "waypoint-eta-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan == 1
+
+        Text {
+            text: formatTime(wp_eta_h) + ":" + formatTime(wp_eta_m) + ":" + formatTime(wp_eta_s)
+
+            anchors.centerIn: parent
+            font.pixelSize: parent.height*1.1
+            color: "magenta"
+        }
+    }
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "waypoint-number-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan == 1
+
+        Text {
+            text: (WaypointActive.Index+1)+" / "+PathPlan.WaypointCount
 
             anchors.centerIn: parent
             font.pixelSize: parent.height*1.1
@@ -152,8 +255,6 @@ Item {
             color: "magenta"
         }
     }
-
-
 
     SvgElementPositionItem {
         sceneSize: info.sceneSize

@@ -120,6 +120,43 @@ Item {
 
     SvgElementPositionItem {
         sceneSize: info.sceneSize
+        elementName: "waypoint-description-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan == 1
+
+        Text {
+            text: WaypointActive.Index+" / "+PathPlan.WaypointCount+"   "
+
+            anchors.centerIn: parent
+            font.pixelSize: parent.height*1.1
+            color: "magenta"
+        }
+    }
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "waypoint-mode-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan == 1
+
+        Text {
+            text: ["Fly End Point","Fly Vector","Fly Circle Right","Fly Circle Left","Drive End Point","Drive Vector","Drive Circle Right",
+                   "Drive Circle Left","Fixed Attitude","Set Accessory","Land","Disarm Alarm"][PathDesired.Mode]
+
+            anchors.centerIn: parent
+            font.pixelSize: parent.height*1.1
+            color: "magenta"
+        }
+    }
+
+
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
         elementName: "battery-volt-text"
         visible: FlightBatteryState.Voltage > 0
 

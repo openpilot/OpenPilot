@@ -465,7 +465,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
     pios_rfm22_inject_event(rfm22b_dev, RADIO_EVENT_INITIALIZE, false);
 
     // Start the driver task.  This task controls the radio state machine and removed all of the IO from the IRQ handler.
-    xTaskCreate(pios_rfm22_task, (signed char *)"PIOS_RFM22B_Task", STACK_SIZE_BYTES, (void *)rfm22b_dev, TASK_PRIORITY, &(rfm22b_dev->taskHandle));
+    xTaskCreate(pios_rfm22_task, "PIOS_RFM22B_Task", STACK_SIZE_BYTES, (void *)rfm22b_dev, TASK_PRIORITY, &(rfm22b_dev->taskHandle));
 
     return 0;
 }

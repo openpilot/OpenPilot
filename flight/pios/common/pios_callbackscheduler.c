@@ -45,7 +45,7 @@ struct DelayedCallbackTaskStruct {
     DelayedCallbackInfo *callbackQueue[CALLBACK_PRIORITY_LOW + 1];
     DelayedCallbackInfo *queueCursor[CALLBACK_PRIORITY_LOW + 1];
     xTaskHandle callbackSchedulerTaskHandle;
-    signed char name[3];
+    char name[3];
     uint32_t    stackSize;
     DelayedCallbackPriorityTask priorityTask;
     xSemaphoreHandle signal;

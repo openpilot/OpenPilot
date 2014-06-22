@@ -111,7 +111,7 @@ int32_t GPSStart(void)
     if (gpsEnabled) {
         if (gpsPort) {
             // Start gps task
-            xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &gpsTaskHandle);
+            xTaskCreate(gpsTask, "GPS", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &gpsTaskHandle);
             PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, gpsTaskHandle);
             return 0;
         }

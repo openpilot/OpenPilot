@@ -36,6 +36,20 @@
 
 #include "msheap.h"
 
+#if defined(PIOS_INCLUDE_FREERTOS)
+
+#define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+
+#include "FreeRTOS.h"
+#include "task.h"
+
+#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+
+#else
+#define traceMALLOC(...)
+#define traceFREE(...)
+#endif
+
 /*
  * Integrity checking.
  *
@@ -295,7 +309,7 @@ restart:
 
     /* update free space counter */
     heap_free -= size;
-
+    traceMALLOC( (void *)(best + 1), size );
     /* and return a pointer to the allocated region */
     return (void *)(best + 1);
 }
@@ -313,6 +327,8 @@ msheap_free(void *ptr)
     /* this region is free, mark it accordingly */
     marker->next.free = 1;
     (marker + marker->next.size)->prev.free = 1;
+
+    traceFREE( ptr, marker->next.size );
 
     /* account for space we are freeing */
     heap_free += marker->next.size;

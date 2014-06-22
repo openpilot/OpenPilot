@@ -110,7 +110,7 @@ static bool updateRcvrActivity(struct rcvr_activity_fsm *fsm);
 int32_t ReceiverStart()
 {
     // Start main task
-    xTaskCreate(receiverTask, (signed char *)"Receiver", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+    xTaskCreate(receiverTask, "Receiver", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RECEIVER, taskHandle);
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_MANUAL);

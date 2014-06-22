@@ -33,6 +33,10 @@ Item {
     property real total_distance
     property bool init_dist: false
 
+    function reset_distance(){
+        total_distance = 0;
+    }
+
     function compute_distance(posEast,posNorth) {
         if (total_distance == 0 && !init_dist){init_dist = "true"; posEast_old = posEast; posNorth_old = posNorth;}
         if (posEast > posEast_old+3 || posEast < posEast_old-3 || posNorth > posNorth_old+3 || posNorth < posNorth_old-3) {
@@ -187,7 +191,7 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         visible: true //total_distance > 5
 
-        property real total_distance: 0
+        MouseArea { id: total_dist_mouseArea; anchors.fill: parent; onClicked: reset_distance()}
 
         Text {
             text: "  "+total_distance.toFixed(0)+" m"
@@ -197,11 +201,10 @@ Item {
             color: "magenta"
         }
 
-    Timer {
-        interval: 1000; running: true; repeat: true;
-        onTriggered: {if (GPSPositionSensor.Status == 3) compute_distance(PositionState.East,PositionState.North)}
-    }
-
+        Timer {
+            interval: 1000; running: true; repeat: true;
+            onTriggered: {if (GPSPositionSensor.Status == 3) compute_distance(PositionState.East,PositionState.North)}
+        }
     }
 
     SvgElementPositionItem {

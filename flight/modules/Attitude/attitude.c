@@ -65,17 +65,19 @@
 #include "CoordinateConversions.h"
 #include <pios_notify.h>
 
-#undef PIOS_INCLUDE_INSTRUMENTATION
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-#include <pios_instrumentation.h>
-int8_t counterUpd;
-int8_t counterAccelSamples = -1;
+
+#include <pios_instrumentation_helper.h>
+
+PERF_DEFINE_COUNTER(counterUpd);
+PERF_DEFINE_COUNTER(counterAccelSamples);
+PERF_DEFINE_COUNTER(counterPeriod);
+PERF_DEFINE_COUNTER(counterAtt);
 // Counters:
 // - 0xA7710001 sensor fetch duration
 // - 0xA7710002 updateAttitude execution time
 // - 0xA7710003 Attitude loop rate(period)
 // - 0xA7710004 number of accel samples read for each loop (cc only).
-#endif
+
 // Private constants
 #define STACK_SIZE_BYTES 540
 #define TASK_PRIORITY    (tskIDLE_PRIORITY + 3)
@@ -245,16 +247,15 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
         PIOS_ADC_Config(46);
 #endif
     }
+
+    PERF_INIT_COUNTER(counterUpd, 0xA7710001);
+    PERF_INIT_COUNTER(counterAtt, 0xA7710002);
+    PERF_INIT_COUNTER(counterPeriod, 0xA7710003);
+    PERF_INIT_COUNTER(counterAccelSamples, 0xA7710004);
+
     // Force settings update to make sure rotation loaded
     settingsUpdatedCb(AttitudeSettingsHandle());
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-    counterUpd = PIOS_Instrumentation_CreateCounter(0xA7710001);
-    int8_t counterAtt    = PIOS_Instrumentation_CreateCounter(0xA7710002);
-    int8_t counterPeriod = PIOS_Instrumentation_CreateCounter(0xA7710003);
-    if (!cc3d) {
-        counterAccelSamples = PIOS_Instrumentation_CreateCounter(0xA7710004);
-    }
-#endif
+
     PIOS_DELTATIME_Init(&dtconfig, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
 
     // Main task loop
@@ -309,19 +310,13 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
         } else {
             // Do not update attitude data in simulation mode
             if (!AttitudeStateReadOnly()) {
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-                PIOS_Instrumentation_TimeStart(counterAtt);
-#endif
+                PERF_TIMED_SECTION_START(counterAtt);
                 updateAttitude(&accelState, &gyros);
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-                PIOS_Instrumentation_TimeEnd(counterAtt);
-#endif
+                PERF_TIMED_SECTION_END(counterAtt);
             }
+            PERF_MEASURE_PERIOD(counterPeriod);
             AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
         }
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-        PIOS_Instrumentation_TrackPeriod(counterPeriod);
-#endif
     }
 }
 
@@ -351,9 +346,7 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
     if (fifoSamples == 0) {
         return -1;
     }
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-    PIOS_Instrumentation_TimeStart(counterUpd);
-#endif
+    PERF_TIMED_SECTION_START(counterUpd);
     // First sample is temperature
     gyros->x = -(gyro[1] - STD_CC_ANALOG_GYRO_NEUTRAL) * gyro_scale.X;
     gyros->y = (gyro[2] - STD_CC_ANALOG_GYRO_NEUTRAL) * gyro_scale.Y;
@@ -378,9 +371,7 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
             z += -accel_data.z;
         } while ((i < 32) && (samples_remaining > 0));
     }
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-    PIOS_Instrumentation_updateCounter(counterAccelSamples, i);
-#endif
+    PERF_TRACK_VALUE(counterAccelSamples, i);
     float accel[3] = { accel_scale.X * (float)x / i,
                        accel_scale.Y * (float)y / i,
                        accel_scale.Z * (float)z / i };
@@ -401,6 +392,7 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
         accelState->y = accel[1];
         accelState->z = accel[2];
     }
+
     if (trim_requested) {
         if (trim_samples >= MAX_TRIM_FLIGHT_SAMPLES) {
             trim_requested = false;
@@ -438,10 +430,7 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
     // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
     // and make it average zero (weakly)
     gyro_correct_int[2] += -gyros->z * yawBiasRate;
-
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-    PIOS_Instrumentation_TimeEnd(counterUpd);
-#endif
+    PERF_TIMED_SECTION_END(counterUpd);
 
     GyroStateSet(gyros);
     AccelStateSet(accelState);
@@ -470,10 +459,7 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     if (GyroStateReadOnly() || AccelStateReadOnly()) {
         return 0;
     }
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-    PIOS_Instrumentation_TimeStart(counterUpd);
-    vPortEnterCritical();
-#endif
+    PERF_TIMED_SECTION_START(counterUpd);
     gyros[0]  = mpu6000_data.gyro_x * gyro_scale.X;
     gyros[1]  = mpu6000_data.gyro_y * gyro_scale.Y;
     gyros[2]  = mpu6000_data.gyro_z * gyro_scale.Z;
@@ -537,10 +523,7 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
     // and make it average zero (weakly)
     gyro_correct_int[2] += -gyrosData->z * yawBiasRate;
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-    vPortExitCritical();
-    PIOS_Instrumentation_TimeEnd(counterUpd);
-#endif
+    PERF_TIMED_SECTION_END(counterUpd);
     GyroStateSet(gyrosData);
     AccelStateSet(accelStateData);
 

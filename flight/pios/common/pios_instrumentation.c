@@ -44,25 +44,32 @@ void PIOS_Instrumentation_Init(int8_t maxCounters)
     }
 }
 
-int8_t PIOS_Instrumentation_CreateCounter(uint32_t id)
+pios_counter_t PIOS_Instrumentation_CreateCounter(uint32_t id)
 {
     PIOS_Assert(pios_instrumentation_perf_counters && (pios_instrumentation_max_counters > pios_instrumentation_last_used_counter));
-    int8_t idx = ++pios_instrumentation_last_used_counter;
-    pios_instrumentation_perf_counters[idx].id  = id;
-    pios_instrumentation_perf_counters[idx].max = INT32_MIN;
-    pios_instrumentation_perf_counters[idx].min = INT32_MAX;
-    return idx;
+
+    pios_counter_t counter_handle = PIOS_Instrumentation_SearchCounter(id);
+    if (!counter_handle) {
+        pios_perf_counter_t *newcounter = &pios_instrumentation_perf_counters[++pios_instrumentation_last_used_counter];
+        newcounter->id  = id;
+        newcounter->max = INT32_MIN;
+        newcounter->min = INT32_MAX;
+        counter_handle  = (pios_counter_t)newcounter;
+    }
+    return counter_handle;
 }
 
-int8_t PIOS_Instrumentation_SearchCounter(uint32_t id)
+pios_counter_t PIOS_Instrumentation_SearchCounter(uint32_t id)
 {
     PIOS_Assert(pios_instrumentation_perf_counters);
     uint8_t i = 0;
-    while (i < pios_instrumentation_last_used_counter && pios_instrumentation_perf_counters[i].id != id) {}
-    if (pios_instrumentation_perf_counters[i].id != id) {
-        return -1;
+    while (i < pios_instrumentation_last_used_counter && pios_instrumentation_perf_counters[i].id != id) {
+        i++;
     }
-    return i;
+    if (pios_instrumentation_perf_counters[i].id != id) {
+        return NULL;
+    }
+    return (pios_counter_t)&pios_instrumentation_perf_counters[i];
 }
 
 void PIOS_Instrumentation_ForEachCounter(InstrumentationCounterCallback callback, void *context)

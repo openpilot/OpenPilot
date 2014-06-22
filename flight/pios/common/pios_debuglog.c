@@ -66,7 +66,7 @@ void PIOS_DEBUGLOG_Initialize()
 #if defined(PIOS_INCLUDE_FREERTOS)
     if (!mutex) {
         mutex  = xSemaphoreCreateRecursiveMutex();
-        buffer = pvPortMalloc(sizeof(DebugLogEntryData));
+        buffer = pios_malloc(sizeof(DebugLogEntryData));
     }
 #else
     buffer = &staticbuffer;

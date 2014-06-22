@@ -101,6 +101,7 @@ SRC += $(PIOSCOMMON)/pios_task_monitor.c
 SRC += $(PIOSCOMMON)/pios_callbackscheduler.c
 SRC += $(PIOSCOMMON)/pios_notify.c
 SRC += $(PIOSCOMMON)/pios_instrumentation.c
+SRC += $(PIOSCOMMON)/pios_mem.c
 ## Misc library functions
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/sanitycheck.c

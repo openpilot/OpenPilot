@@ -41,12 +41,6 @@ struct adxl345_dev {
     uint32_t slave_num;
     enum pios_adxl345_dev_magic magic;
 };
-#undef PIOS_INCLUDE_INSTRUMENTATION
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-#include <pios_instrumentation.h>
-static int8_t counterUpd;
-// Counter 0xA3450001 time it takes to transfer the requested amount of samples using PIOS_ADXL345_ReadAndAccumulateSamples
-#endif
 
 // ! Global structure for this device device
 static struct adxl345_dev *dev;
@@ -65,10 +59,7 @@ static struct adxl345_dev *PIOS_ADXL345_alloc(void)
 {
     struct adxl345_dev *adxl345_dev;
 
-#ifdef PIOS_INCLUDE_INSTRUMENTATION
-    counterUpd  = PIOS_Instrumentation_CreateCounter(0xA3450001);
-#endif
-    adxl345_dev = (struct adxl345_dev *)pvPortMalloc(sizeof(*adxl345_dev));
+    adxl345_dev = (struct adxl345_dev *)pios_malloc(sizeof(*adxl345_dev));
     if (!adxl345_dev) {
         return NULL;
     }
@@ -108,7 +99,7 @@ static int32_t PIOS_ADXL345_ClaimBus()
     if (PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
         return -2;
     }
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_8);
+
     PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
 
     return 0;

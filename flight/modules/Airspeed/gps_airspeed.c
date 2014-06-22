@@ -73,7 +73,7 @@ static inline float Sq(float x)
 void gps_airspeedInitialize()
 {
     // This method saves memory in case we don't use the GPS module.
-    gps = (struct GPSGlobals *)pvPortMalloc(sizeof(struct GPSGlobals));
+    gps = (struct GPSGlobals *)pios_malloc(sizeof(struct GPSGlobals));
 
     // GPS airspeed calculation variables
     VelocityStateInitialize();

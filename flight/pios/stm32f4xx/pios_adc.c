@@ -238,7 +238,7 @@ static struct pios_adc_dev *PIOS_ADC_Allocate()
 {
     struct pios_adc_dev *adc_dev;
 
-    adc_dev = (struct pios_adc_dev *)pvPortMalloc(sizeof(*adc_dev));
+    adc_dev = (struct pios_adc_dev *)pios_malloc(sizeof(*adc_dev));
     if (!adc_dev) {
         return NULL;
     }

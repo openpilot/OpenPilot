@@ -228,7 +228,7 @@ static int32_t eventPeriodicCreate(UAVObjEvent *ev, UAVObjEventCallback cb, xQue
         }
     }
     // Create handle
-    objEntry = (PeriodicObjectList *)pvPortMalloc(sizeof(PeriodicObjectList));
+    objEntry = (PeriodicObjectList *)pios_malloc(sizeof(PeriodicObjectList));
     if (objEntry == NULL) {
         return -1;
     }

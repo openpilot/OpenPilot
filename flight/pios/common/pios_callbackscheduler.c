@@ -273,7 +273,7 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     // if given priorityTask does not exist, create it
     if (!task) {
         // allocate memory if possible
-        task = (struct DelayedCallbackTaskStruct *)pvPortMalloc(sizeof(struct DelayedCallbackTaskStruct));
+        task = (struct DelayedCallbackTaskStruct *)pios_malloc(sizeof(struct DelayedCallbackTaskStruct));
         if (!task) {
             xSemaphoreGiveRecursive(mutex);
             return NULL;
@@ -329,7 +329,7 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     }
 
     // initialize callback scheduling info
-    DelayedCallbackInfo *info = (DelayedCallbackInfo *)pvPortMalloc(sizeof(DelayedCallbackInfo));
+    DelayedCallbackInfo *info = (DelayedCallbackInfo *)pios_malloc(sizeof(DelayedCallbackInfo));
     if (!info) {
         xSemaphoreGiveRecursive(mutex);
         return NULL; // error - not enough memory

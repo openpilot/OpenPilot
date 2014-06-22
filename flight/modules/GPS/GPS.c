@@ -175,10 +175,10 @@ int32_t GPSInitialize(void)
         GPSSettingsDataProtocolGet(&gpsProtocol);
         switch (gpsProtocol) {
         case GPSSETTINGS_DATAPROTOCOL_NMEA:
-            gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
+            gps_rx_buffer = pios_malloc(NMEA_MAX_PACKET_LENGTH);
             break;
         case GPSSETTINGS_DATAPROTOCOL_UBX:
-            gps_rx_buffer = pvPortMalloc(sizeof(struct UBXPacket));
+            gps_rx_buffer = pios_malloc(sizeof(struct UBXPacket));
             break;
         default:
             gps_rx_buffer = NULL;

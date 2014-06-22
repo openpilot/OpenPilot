@@ -81,8 +81,9 @@
 #include "queue.h"
 #include "semphr.h"
 #endif
-
 #include <stdbool.h>
+
+#include <pios_mem.h>
 
 #include <pios_architecture.h>
 

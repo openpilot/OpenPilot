@@ -102,7 +102,7 @@ int32_t osdinputInitialize(void)
 
     oposdPort = PIOS_COM_OSD;
 
-    oposd_rx_buffer = pvPortMalloc(MAX_PACKET_LENGTH);
+    oposd_rx_buffer = pios_malloc(MAX_PACKET_LENGTH);
     PIOS_Assert(oposd_rx_buffer);
 
     return 0;

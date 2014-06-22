@@ -6834,9 +6834,8 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Effacer tout</translation>
     </message>
     <message>
-        <location/>
         <source>Telemetry link not established.</source>
-        <translation>Lien de télémétrie coupé.</translation>
+        <translation type="vanished">Lien de télémétrie coupé.</translation>
     </message>
     <message>
         <location/>
@@ -7033,7 +7032,6 @@ Une valeur de 0.00 désactive le filtre.</translation>
         <translation>Instructions d&apos;étalonnage</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -7065,7 +7063,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This  allow a certain amount of correction of those bias variations against temperature changes. It does improve both altitude hold and yaw performances.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;To perform this calibration leave the board to cool down at room temperature in the coldest places available. after 15-20 minutes attach the usb connector to the board and Click the Calibrate button leaving the board steady. Wait until completed&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -7098,9 +7096,8 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>#1: Accelerometer/Magnetometer calibration</source>
-        <translation>#1 : Étalonnage Accéléromètres/Magnétomètre</translation>
+        <translation type="vanished">#1 : Étalonnage Accéléromètres/Magnétomètre</translation>
     </message>
     <message>
         <location/>
@@ -7108,9 +7105,8 @@ p, li { white-space: pre-wrap; }
         <translation>Démarrer l&apos;étalonnage des plages et ajustements des accéléromètres.</translation>
     </message>
     <message>
-        <location/>
         <source>Calibrate Accel</source>
-        <translation>Étalonner Accéléromètre</translation>
+        <translation type="vanished">Étalonner Accéléromètre</translation>
     </message>
     <message>
         <location/>
@@ -7118,55 +7114,33 @@ p, li { white-space: pre-wrap; }
         <translation>Démarrer l&apos;étalonnage des plages et ajustements du magnétomètre.</translation>
     </message>
     <message>
-        <location/>
         <source>Calibrate Mag</source>
-        <translation>Étalonner Magnétomètre</translation>
+        <translation type="vanished">Étalonner Magnétomètre</translation>
     </message>
     <message>
-        <location/>
         <source>#2: Board level calibration</source>
-        <translation>#2 : Étalonnage du niveau de la carte</translation>
+        <translation type="vanished">#2 : Étalonnage du niveau de la carte</translation>
     </message>
     <message>
-        <location/>
         <source>#3: Gyro bias calibration</source>
-        <translation>#3 : Étalonnage de l&apos;ajustement des Gyros</translation>
+        <translation type="vanished">#3 : Étalonnage de l&apos;ajustement des Gyros</translation>
     </message>
     <message>
-        <location/>
         <source>#4*: Thermal calibration</source>
         <translatorcomment>Typo : Why &quot;*&quot; ? Optional ?</translatorcomment>
-        <translation type="unfinished">#4* : Étalonnage de la compensation de température</translation>
+        <translation type="obsolete">#4* : Étalonnage de la compensation de température</translation>
     </message>
     <message>
-        <location/>
         <source>Temperature</source>
-        <translation>Température</translation>
+        <translation type="vanished">Température</translation>
     </message>
     <message>
-        <location/>
-        <source>0.00</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>°C - Temperature rise</source>
-        <translation>°C - Augmentation température</translation>
+        <translation type="vanished">°C - Augmentation température</translation>
     </message>
     <message>
-        <location/>
-        <source>0.5</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>°C/min</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>this contains the current status of the thermal calibration wizard</source>
-        <translation>ceci contient le statut actuel de l&apos;assistant d&apos;étalonnage température</translation>
+        <translation type="vanished">ceci contient le statut actuel de l&apos;assistant d&apos;étalonnage température</translation>
     </message>
     <message>
         <location/>
@@ -7183,6 +7157,143 @@ p, li { white-space: pre-wrap; }
         <source>url:http://wiki.openpilot.org/display/Doc/Revolution+Manual+Sensor+Calibration</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
         <translation>url:http://wiki.openpilot.org/x/FQWJAQ</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accelerometer calibration</source>
+        <translation type="unfinished">Étalonnage accéléromètres</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Magnetometer calibration</source>
+        <translation type="unfinished">Étalonnage magnétomètre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Board level calibration</source>
+        <translation type="unfinished">Étalonnage du niveau de la carte</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Gyro bias calibration</source>
+        <translation type="unfinished">Étalonnage de l&apos;ajustement des Gyros</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Thermal calibration</source>
+        <translation type="unfinished">Étalonnage de la compensation de température</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;temperature&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;gradient&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;range&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Help</source>
+        <translation type="unfinished">Aide</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Steps 1, 2 and 3 are necessary.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Step 4 is optional but may help achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 1: Accelerometer and Magnetometer calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;These calibrations will compute the scale for Magnetometer and Accelerometer sensors. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Press &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; to begin calibration and follow the instructions which will be displayed.  &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;For optimal calibration, perform the acceleration calibration with the board not mounted in the craft.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;In this way you can accurately level the board on your desk/table during the process. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Magnetometer calibration needs to be performed inside your plane/copter to account for metal/magnetic elements on board.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Note 1&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; text-decoration: underline;&quot;&gt;Your HomeLocation must be set first&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Note 2&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; There is no need to point exactly at South/North/West/East. These are just used to easily tell the user how to point the plane/craft. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;You can simply assume that North is in front of you, right is East, etc., and perform the calibration this way.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 2: Board level calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step will ensure that board leveling is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 3: Gyro bias calculation&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step allows to calibrate the gyro measured value when the board is steady. To perform the calibration leave the board/aircraft completely steady and pres &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 4: Thermal calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;The calibration will compute sensors bias variations at different temperatures while the board warms up.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This  allows a certain amount of correction of those bias variations against temperature changes. It does improve both altitude hold and yaw performances.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;To perform this calibration leave the board to cool down at room temperature in the coldest places available.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;After 15-20 minutes, attach the usb connector to the board and press &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Start,&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; leaving the board steady. Wait until completed.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Les étapes 1, 2 et 3 sont nécessaires.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;L&apos;étape 4 est optionnelle et vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 1: Étalonnage des Accéléromètres et Magnétomètre&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les échelles pour les capteurs Accéléromètres ou Magnétomètre. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cliquer sur &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; pour démarrer l&apos;étalonnage puis suivez les instructions qui seront affichées.  &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Pour un calibrage optimal effectuez l&apos;étalonnage des Accéléromètres sans monter la carte sur l&apos;appareil.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;De cette façon vous pourrez précisément la mettre de niveau sur votre bureau/table pendant le processus. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Le calibrage du magnétomètre devra être effectué avec la carte montée dans votre appareil pour tenir compte des champs magnétiques/ masses métalliques à bord.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Note 1&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; text-decoration: underline;&quot;&gt;Votre PositionHome doit être définie en premier&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Note 2&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; Vous n&apos;avez pas besoin de pointer exactement dans les directions Sud/Nord/Ouest/Est. Ceci est simplement utilisé pour indiquer clairement à l&apos;utilisateur comment orienter son appareil.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Vous pouvez simplement admettre que le Nord est face à vous, l&apos;Est à votre droite, etc. et effectuer l&apos;étalonnage de cette façon.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 2: Étalonnage du niveau de la carte&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette étape fera en sorte que la mise de niveau de la carte soit parfaite. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 3: Étalonnage de l&apos;ajustement des Gyroscopes&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette étape permet d&apos;étalonner la valeur mesurée sur les gyros lorsque la carte ne bouge pas. Pour effectuer l&apos;étalonnage laissez la carte/l&apos;appareil sans bouger et cliquez sur &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 4: Étalonnage de la compensation de température&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les variations des capteurs à plusieurs températures lors du réchauffement de la carte.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Ceci permet un certain niveau de correction sur la variation des ajustements en fonction des changements de température. Il améliore à la fois le maintien d&apos;altitude et les performances sur l&apos;axe de lacet.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Pour effectuer cette calibration laissez refroidir la carte à température ambiante dans un endroit le plus froid possible.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Après 15-20 minutes branchez le connecteur USB à la carte, cliquez sur le bouton &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Démarrer,&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; et ne bougez plus la carte. Attendez jusqu&apos;à la fin du processus.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -13985,105 +14096,182 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>OpenPilot::GyroBiasCalibrationModel</name>
     <message>
-        <location filename="../../../src/plugins/config/calibration/gyrobiascalibrationmodel.cpp" line="+73"/>
         <source>Calibrating the gyroscopes. Keep the copter/plane steady...</source>
-        <translation>Étalonnage en cours des gyroscopes. Maintenez l&apos;appareil sans le bouger...</translation>
+        <translation type="vanished">Étalonnage en cours des gyroscopes. Maintenez l&apos;appareil sans le bouger...</translation>
     </message>
     <message>
-        <location line="+126"/>
         <source>Gyroscope calibration computed succesfully.</source>
-        <translation>Étalonnage des gyroscopes calculés avec succès.</translation>
+        <translation type="vanished">Étalonnage des gyroscopes calculés avec succès.</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/gyrobiascalibrationmodel.cpp" line="+98"/>
+        <source>Calibrating the gyroscopes. Keep the vehicle steady...</source>
+        <translation type="unfinished">Étalonnage en cours des gyroscopes. Maintenez l&apos;appareil sans le bouger...</translation>
+    </message>
+    <message>
+        <location line="+58"/>
+        <source>Gyroscope calibration completed successfully.</source>
+        <translation type="unfinished">Étalonnage des gyroscopes calculé avec succès.</translation>
     </message>
 </context>
 <context>
     <name>OpenPilot::LevelCalibrationModel</name>
     <message>
-        <location filename="../../../src/plugins/config/calibration/levelcalibrationmodel.cpp" line="+65"/>
         <source>Place horizontally and click Save Position button...</source>
-        <translation>Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation type="vanished">Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location filename="../../../src/plugins/config/calibration/levelcalibrationmodel.cpp" line="+72"/>
+        <source>Place horizontally and press Save Position...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+18"/>
         <source>Hold...</source>
         <translation>Maintenir en position...</translation>
     </message>
     <message>
-        <location line="+44"/>
-        <source>Leave horizontally, rotate 180° along yaw axis and click Save Position button...</source>
-        <translation>Garder horizontal, tourner de 180° sur l&apos;axe de Yaw et cliquer sur le bouton Enregistrer Position...</translation>
+        <location line="+40"/>
+        <source>Leave horizontally, rotate 180° along yaw axis and press Save Position...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+17"/>
+        <source>Board level calibration completed successfully.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave horizontally, rotate 180° along yaw axis and click Save Position button...</source>
+        <translation type="vanished">Garder horizontal, tourner de 180° sur l&apos;axe de Yaw et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
         <source>Board leveling computed successfully.</source>
-        <translation>Mise à niveau de la carte calculé avec succès.</translation>
+        <translation type="vanished">Mise à niveau de la carte calculé avec succès.</translation>
     </message>
 </context>
 <context>
     <name>OpenPilot::SixPointCalibrationModel</name>
     <message>
-        <location filename="../../../src/plugins/config/calibration/sixpointcalibrationmodel.cpp" line="+54"/>
         <source>Place horizontally, nose pointing north and click Save Position button...</source>
+        <translation type="obsolete">Positionner horizontalement, le nez en direction du nord et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place with nose down, right side west and click Save Position button...</source>
+        <translation type="obsolete">Positionner avec le nez vers le bas, le coté droit vers l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place right side down, nose west and click Save Position button...</source>
+        <translation type="obsolete">Positionner le flanc droit vers le bas, le nez en direction de l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place upside down, nose east and click Save Position button...</source>
+        <translation type="obsolete">Positionner à l&apos;envers, le nez vers l&apos;est et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place with nose up, left side north and click Save Position button...</source>
+        <translation type="obsolete">Positionner le nez vers le haut, le flanc droit vers le nord et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place with left side down, nose south and click Save Position button...</source>
+        <translation type="obsolete">Positionner avec le flanc gauche vers le bas, le nez vers le sud et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place horizontally and click Save Position button...</source>
+        <translation type="obsolete">Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place with nose down and click Save Position button...</source>
+        <translation type="obsolete">Positionner avec le nez vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place right side down and click Save Position button...</source>
+        <translation type="obsolete">Positionner le flanc droit vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place upside down and click Save Position button...</source>
+        <translation type="obsolete">Positionner à l&apos;envers et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place with nose up and click Save Position button...</source>
+        <translation type="obsolete">Positionner avec le nez vers le haut et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>Place with left side down and click Save Position button...</source>
+        <translation type="obsolete">Positionner le flanc gauche vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;HomeLocation not SET.&lt;/p&gt;&lt;p&gt;Please set your HomeLocation and try again. Aborting calibration!&lt;/p&gt;</source>
+        <translation type="obsolete">&lt;p&gt;Position Home non définie.&lt;/p&gt;&lt;p&gt;Veuillez définir votre position Home et essayez à nouveau. Étalonnage abandonné !&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/sixpointcalibrationmodel.cpp" line="+59"/>
+        <source>Place horizontally, nose pointing north and press Save Position...</source>
         <translation type="unfinished">Positionner horizontalement, le nez en direction du nord et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place with nose down, right side west and click Save Position button...</source>
+        <source>Place with nose down, right side west and press Save Position...</source>
         <translation type="unfinished">Positionner avec le nez vers le bas, le coté droit vers l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place right side down, nose west and click Save Position button...</source>
+        <source>Place right side down, nose west and press Save Position...</source>
         <translation type="unfinished">Positionner le flanc droit vers le bas, le nez en direction de l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place upside down, nose east and click Save Position button...</source>
+        <source>Place upside down, nose east and press Save Position...</source>
         <translation type="unfinished">Positionner à l&apos;envers, le nez vers l&apos;est et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place with nose up, left side north and click Save Position button...</source>
+        <source>Place with nose up, left side north and press Save Position...</source>
         <translation type="unfinished">Positionner le nez vers le haut, le flanc droit vers le nord et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place with left side down, nose south and click Save Position button...</source>
+        <source>Place with left side down, nose south and press Save Position...</source>
         <translation type="unfinished">Positionner avec le flanc gauche vers le bas, le nez vers le sud et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>Place horizontally and click Save Position button...</source>
+        <source>Place horizontally and press Save Position...</source>
         <translation type="unfinished">Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place with nose down and click Save Position button...</source>
+        <source>Place with nose down and press Save Position...</source>
         <translation type="unfinished">Positionner avec le nez vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place right side down and click Save Position button...</source>
+        <source>Place right side down and press Save Position...</source>
         <translation type="unfinished">Positionner le flanc droit vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place upside down and click Save Position button...</source>
+        <source>Place upside down and press Save Position...</source>
         <translation type="unfinished">Positionner à l&apos;envers et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place with nose up and click Save Position button...</source>
+        <source>Place with nose up and press Save Position...</source>
         <translation type="unfinished">Positionner avec le nez vers le haut et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Place with left side down and click Save Position button...</source>
+        <source>Place with left side down and press Save Position...</source>
         <translation type="unfinished">Positionner le flanc gauche vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
-        <location line="+48"/>
-        <source>&lt;p&gt;HomeLocation not SET.&lt;/p&gt;&lt;p&gt;Please set your HomeLocation and try again. Aborting calibration!&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;Position Home non définie.&lt;/p&gt;&lt;p&gt;Veuillez définir votre position Home et essayez à nouveau. Étalonnage abandonné !&lt;/p&gt;</translation>
+        <location line="+44"/>
+        <source>Home location not set, please set your home location and retry.</source>
+        <translation type="unfinished">Position Home non définie, veuillez régler votre position Home et essayez à nouveau.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Aborting calibration!</source>
+        <translation type="unfinished">Étalonnage abandonné !</translation>
     </message>
     <message>
         <location line="+120"/>
@@ -14091,67 +14279,81 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <translation type="unfinished">Maintenir en position...</translation>
     </message>
     <message>
-        <location line="+240"/>
-        <source>Sensor scale and bias computed succesfully.</source>
-        <translatorcomment>Typo : succeSSfully.</translatorcomment>
-        <translation type="unfinished">Échelle et ajustement du capteur calculés avec succès.</translation>
+        <location line="+214"/>
+        <source>Magnetometer calibration completed successfully.</source>
+        <translation type="unfinished">Étalonnage du magnétomètre terminée avec succès.</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+4"/>
+        <source>Accelerometer calibration completed successfully.</source>
+        <translation type="unfinished">Étalonnage des accéléromètres terminée avec succès.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Calibration failed! Please review the help and retry.</source>
+        <translation type="unfinished">Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau.</translation>
+    </message>
+    <message>
+        <source>Sensor scale and bias computed succesfully.</source>
+        <translatorcomment>Typo : succeSSfully.</translatorcomment>
+        <translation type="obsolete">Échelle et ajustement du capteur calculés avec succès.</translation>
+    </message>
+    <message>
         <source>Bad calibration. Please review the instructions and repeat.</source>
-        <translation type="unfinished">Mauvais étalonnage. Relisez les instructions et essayez à nouveau.</translation>
+        <translation type="obsolete">Mauvais étalonnage. Relisez les instructions et essayez à nouveau.</translation>
     </message>
 </context>
 <context>
     <name>OpenPilot::CompensationCalculationTransition</name>
     <message>
-        <location filename="../../../src/plugins/config/calibration/thermal/compensationcalculationtransition.h" line="+55"/>
         <source>Calibration completed succesfully</source>
-        <translation>Étalonnage terminé avec succès</translation>
+        <translation type="vanished">Étalonnage terminé avec succès</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Calibration failed! Please read the instructions and retry.</source>
-        <translation>Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau.</translation>
+        <translation type="vanished">Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau.</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/compensationcalculationtransition.h" line="+59"/>
+        <source>Thermal calibration completed successfully.</source>
+        <translation type="unfinished">Étalonnage terminé avec succès.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Calibration failed! Please review the help and retry.</source>
+        <translation type="unfinished">Échec étalonnage ! Veuillez relire les instructions et essayer à nouveau.</translation>
     </message>
 </context>
 <context>
     <name>OpenPilot::ThermalCalibrationModel</name>
     <message>
-        <location filename="../../../src/plugins/config/calibration/thermal/thermalcalibrationmodel.cpp" line="+44"/>
         <source>Start</source>
-        <translation>Démarrer</translation>
+        <translation type="vanished">Démarrer</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Saving initial settings</source>
-        <translation>Enregistrement des paramètres initiaux</translation>
+        <translation type="vanished">Enregistrement des paramètres initiaux</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Setup board for calibration</source>
-        <translation>Préparation de la carte pour l&apos;étalonnage</translation>
+        <translation type="vanished">Préparation de la carte pour l&apos;étalonnage</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>*** Please Wait *** Samples acquisition, this can take several minutes</source>
         <translatorcomment>Only one line allowed for text</translatorcomment>
-        <translation>*** Veuillez Patienter *** Acquisition des échantillons, cela demande du temps</translation>
+        <translation type="vanished">*** Veuillez Patienter *** Acquisition des échantillons, cela demande du temps</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Restore board settings</source>
-        <translation>Restaurer les paramètres de la carte</translation>
+        <translation type="vanished">Restaurer les paramètres de la carte</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Calculate calibration data</source>
-        <translation>Calcul des données d&apos;étalonnage</translation>
+        <translation type="vanished">Calcul des données d&apos;étalonnage</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Canceled</source>
-        <translation>Annulé</translation>
+        <translation type="vanished">Annulé</translation>
     </message>
 </context>
 <context>
@@ -14196,6 +14398,109 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <source>Timed out after %1 seconds</source>
         <translatorcomment>Expiration du temps d&apos;attente après %1 secondes Shorted : size allowed</translatorcomment>
         <translation type="unfinished">Expiration après %1 secondes</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::BoardSetupTransition</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/boardsetuptransition.h" line="+75"/>
+        <source>Configuring board for calibration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::DataAcquisitionTransition</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/dataacquisitiontransition.h" line="+63"/>
+        <source>Please wait during samples acquisition. This can take several minutes...</source>
+        <translation type="unfinished">Veuillez attendre pendant l&apos;acquisition des échantillons. Cela peut plusieurs minutes...</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Acquisition will run until the rate of temperature change is less than %1°C/min.</source>
+        <translation type="unfinished">L&apos;acquisition s&apos;effectue jusqu&apos;à ce que le changement de température soit inférieur à %1°C/min.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>For the calibration to be valid, the temperature span during acquisition must be greater than %1°C.</source>
+        <translation type="unfinished">Pour que la calibration soit valide, la différence de température durant l&apos;acquisition doit être supérieure à %1°C.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Estimating acquisition duration...</source>
+        <translation type="unfinished">Estimation de la durée d&apos;acquisition...</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::BoardStatusSaveTransition</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/settingshandlingtransitions.h" line="+75"/>
+        <source>Saving initial settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::BoardStatusRestoreTransition</name>
+    <message>
+        <location line="+40"/>
+        <source>Restoring board configuration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::ThermalCalibrationHelper</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/thermalcalibrationhelper.cpp" line="+318"/>
+        <source>Barometer is calibrated.</source>
+        <translation type="unfinished">Baromètre calibré.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Failed to calibrate barometer!</source>
+        <translation type="unfinished">Échec de la calibration du baromètre !</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Gyro is calibrated.</source>
+        <translation type="unfinished">Gyroscope calibré.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Failed to calibrate gyro!</source>
+        <translation type="unfinished">Échec de la calibration des gyroscopes !</translation>
+    </message>
+    <message>
+        <location line="+63"/>
+        <source>Target temperature span has been acquired. You may now end acquisition or continue.</source>
+        <translation type="unfinished">La différence de température a été atteinte. Vous pouvez arrêter maintenant ou continuer.</translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>m&apos;&apos;s&apos;&apos;&apos;&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Estimated acquisition duration is %1.</source>
+        <translation type="unfinished">La durée estimée d&apos;acquisition est de %1.</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigRevoWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+318"/>
+        <source>Temperature: %1°C</source>
+        <translation type="unfinished">Température : %1°C</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Variance: %1°C/min</source>
+        <translation type="unfinished">Variation : %1°C/min</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Sampled range: %1°C</source>
+        <translation type="unfinished">Plage d&apos;échantillonnage : %1°C</translation>
     </message>
 </context>
 </TS>

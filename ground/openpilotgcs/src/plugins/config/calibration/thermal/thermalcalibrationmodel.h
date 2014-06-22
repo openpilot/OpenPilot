@@ -30,23 +30,24 @@
 #define THERMALCALIBRATIONMODEL_H
 
 #include "thermalcalibrationhelper.h"
-
+#include "../wizardstate.h"
+#include "../wizardmodel.h"
 
 #include <QObject>
 #include <QState>
 #include <QStateMachine>
-#include "../wizardstate.h"
-#include "../wizardmodel.h"
+
 namespace OpenPilot {
 class ThermalCalibrationModel : public WizardModel {
-    Q_PROPERTY(bool startEnable READ startEnabled NOTIFY startEnabledChanged)
+    Q_OBJECT Q_PROPERTY(bool startEnable READ startEnabled NOTIFY startEnabledChanged)
     Q_PROPERTY(bool endEnable READ endEnabled NOTIFY endEnabledChanged)
     Q_PROPERTY(bool cancelEnable READ cancelEnabled NOTIFY cancelEnabledChanged)
-
-    Q_PROPERTY(QString temperature READ temperature NOTIFY temperatureChanged)
-    Q_PROPERTY(QString temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
+    Q_PROPERTY(float temperature READ temperature NOTIFY temperatureChanged)
+    Q_PROPERTY(float temperatureGradient READ temperatureGradient NOTIFY temperatureGradientChanged)
+    Q_PROPERTY(float temperatureRange READ temperatureRange NOTIFY temperatureRangeChanged)
     Q_PROPERTY(int progress READ progress WRITE setProgress NOTIFY progressChanged)
-    Q_OBJECT
+    Q_PROPERTY(int progressMax READ progressMax WRITE setProgressMax NOTIFY progressMaxChanged)
+
 public:
     explicit ThermalCalibrationModel(QObject *parent = 0);
 
@@ -67,84 +68,95 @@ public:
 
     void setStartEnabled(bool status)
     {
-        if (m_startEnabled != status) {
-            m_startEnabled = status;
-            emit startEnabledChanged(status);
-        }
+        m_startEnabled = status;
+        emit startEnabledChanged(status);
     }
 
     void setEndEnabled(bool status)
     {
-        if (m_endEnabled != status) {
-            m_endEnabled = status;
-            emit endEnabledChanged(status);
-        }
+        m_endEnabled = status;
+        emit endEnabledChanged(status);
     }
 
     void setCancelEnabled(bool status)
     {
-        if (m_cancelEnabled != status) {
-            m_cancelEnabled = status;
-            emit cancelEnabledChanged(status);
-        }
+        m_cancelEnabled = status;
+        emit cancelEnabledChanged(status);
+    }
+
+    float temperature()
+    {
+        return m_helper->temperature();
+    }
+
+    float temperatureGradient()
+    {
+        return m_helper->gradient();
+    }
+
+    float temperatureRange()
+    {
+        return m_helper->range();
+    }
+
+    bool dirty()
+    {
+        return m_dirty;
     }
 
 
 public slots:
+    void setTemperature(float temperature)
+    {
+        emit temperatureChanged(temperature);
+    }
+
+    void setTemperatureGradient(float temperatureGradient)
+    {
+        emit temperatureGradientChanged(temperatureGradient);
+    }
+
+    void setTemperatureRange(float temperatureRange)
+    {
+        emit temperatureRangeChanged(temperatureRange);
+
+        if (m_helper->range() >= ThermalCalibrationHelper::TargetTempDelta) {
+            setEndEnabled(true);
+        }
+    }
+
     int progress()
     {
         return m_progress;
     }
 
-    QString temperature()
+    void setProgress(int value)
     {
-        return m_temperature;
+        m_progress = value;
+        emit progressChanged(value);
     }
 
-    QString temperatureGradient()
+    int progressMax()
     {
-        return m_temperatureGradient;
+        return m_progressMax;
     }
 
-    void setTemperature(float status)
+    void setProgressMax(int value)
     {
-        QString tmp = QString("%1").arg(status, 5, 'f', 2);
-
-        if (m_temperature != tmp) {
-            m_temperature = tmp;
-            emit temperatureChanged(tmp);
-        }
-    }
-
-    void setTemperatureGradient(float status)
-    {
-        QString tmp = QString("%1").arg(status, 5, 'f', 2);
-
-        if (m_temperatureGradient != tmp) {
-            m_temperatureGradient = tmp;
-            emit temperatureGradientChanged(tmp);
-        }
-    }
-
-    void setProgress(int status)
-    {
-        m_progress = status;
-        emit progressChanged(status);
-        if (this->currentState()) {
-            setInstructions(this->currentState()->stepName());
-        }
+        m_progressMax = value;
+        emit progressMaxChanged(value);
     }
 
 private:
+    QScopedPointer<ThermalCalibrationHelper> m_helper;
+
     bool m_startEnabled;
     bool m_cancelEnabled;
     bool m_endEnabled;
-    bool m_initDone;
-    int m_progress;
-    QString m_temperature;
-    QString m_temperatureGradient;
+    bool m_dirty;
 
-    QScopedPointer<ThermalCalibrationHelper> m_helper;
+    int m_progress;
+    int m_progressMax;
 
     // Start from here
     WizardState *m_readyState;
@@ -165,7 +177,7 @@ private:
     WizardState *m_finalizeState;
     // revert board settings if something goes wrong
     WizardState *m_abortState;
-    // just the same as readystate, but it is reached after havign completed the calibration
+    // just the same as ready state, but it is reached after having completed the calibration
     WizardState *m_completedState;
     void setTransitions();
 
@@ -174,41 +186,58 @@ signals:
     void endEnabledChanged(bool state);
     void cancelEnabledChanged(bool state);
 
-    void temperatureChanged(QString status);
-    void temperatureGradientChanged(QString status);
+    void wizardStarted();
+    void wizardStopped();
+
+    void temperatureChanged(float temperature);
+    void temperatureGradientChanged(float temperatureGradient);
+    void temperatureRangeChanged(float temperatureRange);
+
     void progressChanged(int value);
+    void progressMaxChanged(int value);
 
     void next();
     void previous();
     void abort();
+
 public slots:
     void stepChanged(WizardState *state);
     void init();
     void btnStart()
     {
+        init();
         emit next();
     }
-
     void btnEnd()
     {
         m_helper->stopAcquisition();
     }
-
     void btnAbort()
     {
         emit abort();
     }
-    void wizardReady()
+    void startWizard()
     {
+        m_dirty = false;
+        setStartEnabled(false);
+        setEndEnabled(false);
+        setCancelEnabled(true);
+        wizardStarted();
+    }
+    void stopWizard()
+    {
+        m_dirty = m_helper->calibrationSuccessful();
         setStartEnabled(true);
         setEndEnabled(false);
         setCancelEnabled(false);
+        wizardStopped();
     }
-    void wizardStarted()
+    void save()
     {
-        setStartEnabled(false);
-        setEndEnabled(true);
-        setCancelEnabled(true);
+        if (m_dirty) {
+            m_dirty = false;
+            m_helper->copyResultToSettings();
+        }
     }
 };
 }

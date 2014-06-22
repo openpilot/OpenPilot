@@ -25,52 +25,61 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <attitudestate.h>
-#include <attitudesettings.h>
-#include "extensionsystem/pluginmanager.h"
-#include <gyrostate.h>
-#include <gyrosensor.h>
-#include <revocalibration.h>
-#include <accelgyrosettings.h>
 #include "calibration/gyrobiascalibrationmodel.h"
 #include "calibration/calibrationutils.h"
 #include "calibration/calibrationuiutils.h"
+#include "extensionsystem/pluginmanager.h"
 
 static const int LEVEL_SAMPLES = 100;
-#include "gyrobiascalibrationmodel.h"
+
 namespace OpenPilot {
 GyroBiasCalibrationModel::GyroBiasCalibrationModel(QObject *parent) :
-    QObject(parent),
-    collectingData(false)
-{}
+    QObject(parent), collectingData(false), m_dirty(false)
+{
+    gyroState  = GyroState::GetInstance(getObjectManager());
+    Q_ASSERT(gyroState);
+
+    gyroSensor = GyroSensor::GetInstance(getObjectManager());
+    Q_ASSERT(gyroSensor);
+
+    revoCalibration   = RevoCalibration::GetInstance(getObjectManager());
+    Q_ASSERT(revoCalibration);
+
+    attitudeSettings  = AttitudeSettings::GetInstance(getObjectManager());
+    Q_ASSERT(attitudeSettings);
+
+    accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
+    Q_ASSERT(accelGyroSettings);
+}
 
 
-/******* gyro bias zero ******/
 void GyroBiasCalibrationModel::start()
 {
     // Store and reset board rotation before calibration starts
     storeAndClearBoardRotation();
 
-    disableAllCalibrations();
-    progressChanged(0);
-
-    RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
     RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+    memento.revoCalibrationData = revoCalibrationData;
     revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_FALSE;
     revoCalibration->setData(revoCalibrationData);
-    revoCalibration->updated();
 
     // Disable gyro bias correction while calibrating
-    AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
-    Q_ASSERT(attitudeSettings);
     AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
+    memento.attitudeSettingsData = attitudeSettingsData;
     attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
     attitudeSettings->setData(attitudeSettingsData);
-    attitudeSettings->updated();
 
-    displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
-    displayInstructions(tr("Calibrating the gyroscopes. Keep the copter/plane steady..."), true);
+    UAVObject::Metadata gyroStateMetadata = gyroState->getMetadata();
+    memento.gyroStateMetadata = gyroStateMetadata;
+    UAVObject::SetFlightTelemetryUpdateMode(gyroStateMetadata, UAVObject::UPDATEMODE_PERIODIC);
+    gyroStateMetadata.flightTelemetryUpdatePeriod = 100;
+    gyroState->setMetadata(gyroStateMetadata);
+
+    UAVObject::Metadata gyroSensorMetadata = gyroSensor->getMetadata();
+    memento.gyroSensorMetadata = gyroSensorMetadata;
+    UAVObject::SetFlightTelemetryUpdateMode(gyroSensorMetadata, UAVObject::UPDATEMODE_PERIODIC);
+    gyroSensorMetadata.flightTelemetryUpdatePeriod = 100;
+    gyroSensor->setMetadata(gyroSensorMetadata);
 
     gyro_accum_x.clear();
     gyro_accum_y.clear();
@@ -80,24 +89,13 @@ void GyroBiasCalibrationModel::start()
     gyro_state_accum_y.clear();
     gyro_state_accum_z.clear();
 
-    UAVObject::Metadata metadata;
+    // reset dirty state to forget previous unsaved runs
+    m_dirty = false;
 
-    GyroState *gyroState = GyroState::GetInstance(getObjectManager());
-    Q_ASSERT(gyroState);
-    initialGyroStateMdata = gyroState->getMetadata();
-    metadata = initialGyroStateMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(metadata, UAVObject::UPDATEMODE_PERIODIC);
-    metadata.flightTelemetryUpdatePeriod = 100;
-    gyroState->setMetadata(metadata);
-
-    UAVObject::Metadata gyroSensorMetadata;
-    GyroSensor *gyroSensor = GyroSensor::GetInstance(getObjectManager());
-    Q_ASSERT(gyroSensor);
-    initialGyroSensorMdata = gyroSensor->getMetadata();
-    gyroSensorMetadata     = initialGyroSensorMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(gyroSensorMetadata, UAVObject::UPDATEMODE_PERIODIC);
-    gyroSensorMetadata.flightTelemetryUpdatePeriod = 100;
-    gyroSensor->setMetadata(gyroSensorMetadata);
+    started();
+    progressChanged(0);
+    displayVisualHelp(CALIBRATION_HELPER_PLANE_PREFIX + CALIBRATION_HELPER_IMAGE_NED);
+    displayInstructions(tr("Calibrating the gyroscopes. Keep the vehicle steady..."));
 
     // Now connect to the accels and mag updates, gather for 100 samples
     collectingData = true;
@@ -112,15 +110,10 @@ void GyroBiasCalibrationModel::getSample(UAVObject *obj)
 {
     QMutexLocker lock(&sensorsUpdateLock);
 
-    Q_UNUSED(lock);
-
     switch (obj->getObjID()) {
     case GyroState::OBJID:
     {
-        GyroState *gyroState = GyroState::GetInstance(getObjectManager());
-        Q_ASSERT(gyroState);
         GyroState::DataFields gyroStateData = gyroState->getData();
-
         gyro_state_accum_x.append(gyroStateData.x);
         gyro_state_accum_y.append(gyroStateData.y);
         gyro_state_accum_z.append(gyroStateData.z);
@@ -128,10 +121,7 @@ void GyroBiasCalibrationModel::getSample(UAVObject *obj)
     }
     case GyroSensor::OBJID:
     {
-        GyroSensor *gyroSensor = GyroSensor::GetInstance(getObjectManager());
-        Q_ASSERT(gyroSensor);
         GyroSensor::DataFields gyroSensorData = gyroSensor->getData();
-
         gyro_accum_x.append(gyroSensorData.x);
         gyro_accum_y.append(gyroSensorData.y);
         gyro_accum_z.append(gyroSensorData.z);
@@ -149,61 +139,48 @@ void GyroBiasCalibrationModel::getSample(UAVObject *obj)
     if ((gyro_accum_y.size() >= LEVEL_SAMPLES || (gyro_accum_y.size() == 0 && gyro_state_accum_y.size() >= LEVEL_SAMPLES)) &&
         collectingData == true) {
         collectingData = false;
+        m_dirty = true;
 
-        GyroState *gyroState = GyroState::GetInstance(getObjectManager());
-        disconnect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
-        Q_ASSERT(gyroState);
-
-        GyroSensor *gyroSensor = GyroSensor::GetInstance(getObjectManager());
-        Q_ASSERT(gyroSensor);
         disconnect(gyroSensor, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
+        disconnect(gyroState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(getSample(UAVObject *)));
 
-        enableAllCalibrations();
-
-        RevoCalibration *revoCalibration     = RevoCalibration::GetInstance(getObjectManager());
-        Q_ASSERT(revoCalibration);
-        AccelGyroSettings *accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
-        Q_ASSERT(accelGyroSettings);
-
-        RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
-        AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
-
-        revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
-        // Update biases based on collected data
-        // check whether the board does supports gyroSensor(updates were received)
-        if (gyro_accum_x.count() < LEVEL_SAMPLES / 10) {
-            accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X] += OpenPilot::CalibrationUtils::listMean(gyro_state_accum_x);
-            accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y] += OpenPilot::CalibrationUtils::listMean(gyro_state_accum_y);
-            accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z] += OpenPilot::CalibrationUtils::listMean(gyro_state_accum_z);
-        } else {
-            accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X] += OpenPilot::CalibrationUtils::listMean(gyro_accum_x);
-            accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y] += OpenPilot::CalibrationUtils::listMean(gyro_accum_y);
-            accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z] += OpenPilot::CalibrationUtils::listMean(gyro_accum_z);
-        }
-
-        revoCalibration->setData(revoCalibrationData);
-        revoCalibration->updated();
-        accelGyroSettings->setData(accelGyroSettingsData);
-        accelGyroSettings->updated();
-
-        AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
-        Q_ASSERT(attitudeSettings);
-        AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
-        attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
-        attitudeSettings->setData(attitudeSettingsData);
-        attitudeSettings->updated();
-
-        gyroState->setMetadata(initialGyroStateMdata);
-        gyroSensor->setMetadata(initialGyroSensorMdata);
-
-        displayInstructions(tr("Gyroscope calibration computed succesfully."), false);
-        displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
+        gyroState->setMetadata(memento.gyroStateMetadata);
+        gyroSensor->setMetadata(memento.gyroSensorMetadata);
+        revoCalibration->setData(memento.revoCalibrationData);
+        attitudeSettings->setData(memento.attitudeSettingsData);
 
         // Recall saved board rotation
         recallBoardRotation();
+
+        stopped();
+        displayInstructions(tr("Gyroscope calibration completed successfully."), WizardModel::Success);
+        displayVisualHelp(CALIBRATION_HELPER_IMAGE_EMPTY);
     }
 }
 
+void GyroBiasCalibrationModel::save()
+{
+    if (!m_dirty) {
+        return;
+    }
+    // Update biases based on collected data
+    AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
+
+    // check whether the board does supports gyroSensor (updates were received)
+    if (gyro_accum_x.count() < LEVEL_SAMPLES / 10) {
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X] += OpenPilot::CalibrationUtils::listMean(gyro_state_accum_x);
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y] += OpenPilot::CalibrationUtils::listMean(gyro_state_accum_y);
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z] += OpenPilot::CalibrationUtils::listMean(gyro_state_accum_z);
+    } else {
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_X] += OpenPilot::CalibrationUtils::listMean(gyro_accum_x);
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Y] += OpenPilot::CalibrationUtils::listMean(gyro_accum_y);
+        accelGyroSettingsData.gyro_bias[AccelGyroSettings::GYRO_BIAS_Z] += OpenPilot::CalibrationUtils::listMean(gyro_accum_z);
+    }
+
+    accelGyroSettings->setData(accelGyroSettingsData);
+
+    m_dirty = false;
+}
 
 UAVObjectManager *GyroBiasCalibrationModel::getObjectManager()
 {

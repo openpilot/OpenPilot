@@ -28,7 +28,7 @@
 #define PIOS_MEM_H
 
 #define pios_fastheapmalloc(size) (malloc(size))
-#define pios_malloc(size) (malloc(size))
-#define pios_free(p)  (free(p))
+#define pios_malloc(size)         (malloc(size))
+#define pios_free(p)              (free(p))
 
 #endif /* PIOS_MEM_H */

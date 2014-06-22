@@ -72,6 +72,7 @@ ifndef TESTAPP
     SRC += $(OPSYSTEM)/coptercontrol.c
     SRC += $(OPSYSTEM)/pios_board.c
     SRC += $(FLIGHTLIB)/alarms.c
+    SRC += $(FLIGHTLIB)/instrumentation.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
@@ -126,6 +127,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
     SRC += $(OPUAVSYNTHDIR)/airspeedstate.c
     SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
+    SRC += $(OPUAVSYNTHDIR)/perfcounter.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

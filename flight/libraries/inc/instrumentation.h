@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
  *
- * @file       pios_architecture.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
- * @brief      Architecture specific macros and definitions
- *             --
+ * @file       instrumentation.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      Instrumentation infrastructure
+ *             UAVObject wrapper layer for PiOS instrumentation
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,17 +23,17 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef INSTRUMENTATION_H
+#define INSTRUMENTATION_H
+#include <perfcounter.h>
+/**
+ * Initialize the instrumentationUAVObject wrapper
+ */
+void InstrumentationInit();
 
-#ifndef PIOS_ARCHITECTURE_H
-#define PIOS_ARCHITECTURE_H
+/**
+ * publish all counters to UAVObjects
+ */
+void InstrumentationPublishAllCounters();
 
-// defines for adc
-#define PIOS_ADC_VOLTAGE_SCALE        3.30f / 4096.0f
-
-// defines for Temp measurements
-#define PIOS_ADC_STM32_TEMP_V25       1.43f /* V */
-#define PIOS_ADC_STM32_TEMP_AVG_SLOPE 4.3f /* mV/C */
-#define PIOS_CONVERT_VOLT_TO_CPU_TEMP(x) ((PIOS_ADC_STM32_TEMP_V25 - x) * (1000.0f / PIOS_ADC_STM32_TEMP_AVG_SLOPE) + 25.0f)
-
-
-#endif /* PIOS_ARCHITECTURE_H */
+#endif /* INSTRUMENTATION_H */

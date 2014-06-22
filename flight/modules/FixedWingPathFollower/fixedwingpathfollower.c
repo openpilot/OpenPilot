@@ -96,7 +96,7 @@ int32_t FixedWingPathFollowerStart()
 {
     if (followerEnabled) {
         // Start main task
-        xTaskCreate(pathfollowerTask, (signed char *)"PathFollower", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
+        xTaskCreate(pathfollowerTask, "PathFollower", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
     }
 

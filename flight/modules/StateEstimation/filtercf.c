@@ -106,7 +106,7 @@ int32_t filterCFInitialize(stateFilter *handle)
     globalInit();
     handle->init      = &initwithoutmag;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 
@@ -115,7 +115,7 @@ int32_t filterCFMInitialize(stateFilter *handle)
     globalInit();
     handle->init      = &initwithmag;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 

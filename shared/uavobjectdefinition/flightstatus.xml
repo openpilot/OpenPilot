@@ -4,7 +4,7 @@
         <field name="Armed" units="" type="enum" elements="1" options="Disarmed,Arming,Armed" defaultvalue="Disarmed"/>
 
 	<!-- Note these enumerated values should be the same as ManualControlSettings -->
-        <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,Autotune,PositionHold,ReturnToBase,Land,PathPlanner,POI"/>
+        <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,Autotune,PositionHold,PositionVarioFPV,PositionVarioLOS,PositionVarioNSEW,ReturnToBase,Land,PathPlanner,POI,AutoCruise"/>
 
 	<field name="ControlChain" units="bool" type="enum" options="false,true">
 		<elementnames>

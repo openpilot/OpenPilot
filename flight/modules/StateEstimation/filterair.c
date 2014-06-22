@@ -57,7 +57,7 @@ int32_t filterAirInitialize(stateFilter *handle)
 {
     handle->init      = &init;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 

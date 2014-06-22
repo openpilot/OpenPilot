@@ -34,9 +34,11 @@
 
 #include "../wizardstate.h"
 #include "thermalcalibrationhelper.h"
+
 namespace OpenPilot {
 class CompensationCalculationTransition : public QSignalTransition {
     Q_OBJECT
+
 public:
     CompensationCalculationTransition(ThermalCalibrationHelper *helper, QState *currentState, QState *targetState)
         : QSignalTransition(helper, SIGNAL(calculationCompleted())),
@@ -52,19 +54,23 @@ public:
         Q_UNUSED(e);
         QString nextStateName;
         if (m_helper->calibrationSuccessful()) {
-            nextStateName = tr("Calibration completed succesfully");
+            m_helper->setProgressMax(100);
+            m_helper->setProgress(100);
+            m_helper->addInstructions(tr("Thermal calibration completed successfully."), WizardModel::Success);
         } else {
-            nextStateName = tr("Calibration failed! Please read the instructions and retry.");
+            m_helper->setProgressMax(100);
+            m_helper->setProgress(0);
+            m_helper->addInstructions(tr("Calibration failed! Please review the help and retry."), WizardModel::Failure);
         }
-        static_cast<WizardState *>(targetState())->setStepName(nextStateName);
     }
-
 
 public slots:
     void enterState()
     {
+        m_helper->addInstructions("Calculating calibration data.", WizardModel::Debug);
         m_helper->calculate();
     }
+
 private:
     ThermalCalibrationHelper *m_helper;
 };

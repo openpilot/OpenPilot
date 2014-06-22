@@ -70,7 +70,7 @@ static struct pios_usb_dev *PIOS_USB_alloc(void)
 {
     struct pios_usb_dev *usb_dev;
 
-    usb_dev = (struct pios_usb_dev *)pvPortMalloc(sizeof(*usb_dev));
+    usb_dev = (struct pios_usb_dev *)pios_malloc(sizeof(*usb_dev));
     if (!usb_dev) {
         return NULL;
     }

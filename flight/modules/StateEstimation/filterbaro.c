@@ -63,7 +63,7 @@ int32_t filterBaroInitialize(stateFilter *handle)
 {
     handle->init      = &initwithgps;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 
@@ -71,7 +71,7 @@ int32_t filterBaroiInitialize(stateFilter *handle)
 {
     handle->init      = &initwithoutgps;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 

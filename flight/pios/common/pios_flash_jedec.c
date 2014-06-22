@@ -93,7 +93,7 @@ static struct jedec_flash_dev *PIOS_Flash_Jedec_alloc(void)
 {
     struct jedec_flash_dev *flash_dev;
 
-    flash_dev = (struct jedec_flash_dev *)pvPortMalloc(sizeof(*flash_dev));
+    flash_dev = (struct jedec_flash_dev *)pios_malloc(sizeof(*flash_dev));
     if (!flash_dev) {
         return NULL;
     }

@@ -74,7 +74,7 @@ static struct pios_sbus_dev *PIOS_SBus_Alloc(void)
 {
     struct pios_sbus_dev *sbus_dev;
 
-    sbus_dev = (struct pios_sbus_dev *)pvPortMalloc(sizeof(*sbus_dev));
+    sbus_dev = (struct pios_sbus_dev *)pios_malloc(sizeof(*sbus_dev));
     if (!sbus_dev) {
         return NULL;
     }

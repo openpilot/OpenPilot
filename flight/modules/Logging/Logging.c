@@ -58,7 +58,7 @@ int32_t LoggingInitialize(void)
     DebugLogEntryInitialize();
     FlightStatusInitialize();
     PIOS_DEBUGLOG_Initialize();
-    entry = pvPortMalloc(sizeof(DebugLogEntryData));
+    entry = pios_malloc(sizeof(DebugLogEntryData));
     if (!entry) {
         return -1;
     }

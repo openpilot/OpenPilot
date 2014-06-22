@@ -55,6 +55,12 @@
 #include <callbackinfo.h>
 #include <hwsettings.h>
 #include <pios_flashfs.h>
+
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+#include <instrumentation.h>
+#include <pios_instrumentation.h>
+#endif
+
 #if defined(PIOS_INCLUDE_RFM22B)
 #include <oplinkstatus.h>
 #endif
@@ -120,10 +126,9 @@ int32_t SystemModStart(void)
     stackOverflow = STACKOVERFLOW_NONE;
     mallocFailed  = false;
     // Create system task
-    xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
+    xTaskCreate(systemTask, "System", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
     // Register task
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
-
 
     return 0;
 }
@@ -146,6 +151,10 @@ int32_t SystemModInitialize(void)
 #ifdef DIAG_I2C_WDG_STATS
     I2CStatsInitialize();
     WatchdogStatusInitialize();
+#endif
+
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+    InstrumentationInit();
 #endif
 
     objectPersistenceQueue = xQueueCreate(1, sizeof(UAVObjEvent));
@@ -203,6 +212,10 @@ static void systemTask(__attribute__((unused)) void *parameters)
 #ifdef DIAG_I2C_WDG_STATS
         updateI2Cstats();
         updateWDGstats();
+#endif
+
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+        InstrumentationPublishAllCounters();
 #endif
 
 #ifdef DIAG_TASKS

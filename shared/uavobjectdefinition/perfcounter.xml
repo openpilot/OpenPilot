@@ -1,0 +1,11 @@
+<xml>
+    <object name="PerfCounter" singleinstance="false" settings="false" category="System">
+        <description>A single performance counter, used to instrument flight code</description>
+        <field name="Id" units="hex" type="uint32" elements="1" />
+        <field name="Counter" units="" type="int32" elementnames="Value, Min, Max"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="manual" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

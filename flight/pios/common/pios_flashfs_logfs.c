@@ -485,7 +485,7 @@ static struct logfs_state *PIOS_FLASHFS_Logfs_alloc(void)
 {
     struct logfs_state *logfs;
 
-    logfs = (struct logfs_state *)pvPortMalloc(sizeof(*logfs));
+    logfs = (struct logfs_state *)pios_malloc(sizeof(*logfs));
     if (!logfs) {
         return NULL;
     }

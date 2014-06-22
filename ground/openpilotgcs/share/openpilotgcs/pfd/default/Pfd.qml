@@ -23,7 +23,6 @@ Rectangle {
 
         Item {
             id: sceneItem
- 
 
             width: Math.floor((parent.paintedHeight * 1.32) - (parent.paintedHeight * 0.013))
             height: Math.floor(parent.paintedHeight - parent.paintedHeight * 0.02)
@@ -31,9 +30,7 @@ Rectangle {
 
             anchors.centerIn: parent
             clip: true
-
-            //onWidthChanged:console.log("TakeOffLocation.Status " + TakeOffLocation.Status)
-            
+           
             Loader {
                 id: worldLoader
                 anchors.fill: parent
@@ -60,31 +57,6 @@ Rectangle {
 
                 x: scaledBounds.x * sceneItem.width
             }
-
-// Disable Side_slip moving because flickering issue on whole Pfd.
-/*
-            SvgElementImage {
-                id: side_slip
-                elementName: "sideslip-moving"
-                sceneSize: sceneItem.viewportSize
-                smooth: true
-
-                property real sideSlip: AccelState.y
-                //smooth side slip changes, a low pass filter replacement
-                //accels are updated once per second
-                Behavior on sideSlip {
-                    SmoothedAnimation {
-                        duration: 1000
-                        velocity: -1
-                    }
-                }
-
-                anchors.horizontalCenter: horizontCenterItem.horizontalCenter
-                //0.5 coefficient is empirical to limit indicator movement
-                anchors.horizontalCenterOffset: sideSlip*width*0.1 //was 0.5
-                y: scaledBounds.y * sceneItem.height
-            }
-*/
 
             Compass {
                 anchors.fill: parent

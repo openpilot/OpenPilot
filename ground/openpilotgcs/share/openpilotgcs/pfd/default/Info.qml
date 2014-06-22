@@ -62,7 +62,6 @@ Item {
         sceneSize: info.sceneSize
         elementName: "info-bg"
         width: parent.width
-        //anchors.top: parent.top
     }
 
     SvgElementImage {
@@ -189,7 +188,7 @@ Item {
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
-        visible: true //total_distance > 5
+        visible: true
 
         MouseArea { id: total_dist_mouseArea; anchors.fill: parent; onClicked: reset_distance()}
 

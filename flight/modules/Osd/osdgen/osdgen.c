@@ -2107,6 +2107,15 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
             sprintf(temp, "DISARMED");
             write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
             d_y += v_spacing;
+#ifndef PIOS_GPS_MINIMAL
+            if (!(WarnMask & WARN_NO_SAT_FIX)) {
+                GPSTimeData gpsTime;
+                GPSTimeGet(&gpsTime);
+                sprintf(temp, "%02u:%02u:%02u UTC", gpsTime.Hour, gpsTime.Minute, gpsTime.Second);
+                write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+                d_y += v_spacing;
+            }
+#endif
         }
 #define CRC_CRITICAL_PERCENT         75
 #ifdef PIOS_INCLUDE_TSLRSDEBUG
@@ -2541,7 +2550,7 @@ void updateGraphics()
             write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings.GPSSatInfoSetup.CharSize);
         }
         // Ground speed in HUD design as vertical scale left side (centered relative to y)
-        if (check_enable_and_srceen(OsdSettings.Speed, (OsdSettingsWarningsSetupData *)&OsdSettings.SpeedSetup, screen, &x, &y)) {
+        if (HomePosOnTime && check_enable_and_srceen(OsdSettings.Speed, (OsdSettingsWarningsSetupData *)&OsdSettings.SpeedSetup, screen, &x, &y)) {
             hud_draw_vertical_scale((int)(gpsData.Groundspeed * convert->ms_to_kmh_mph), 100, OsdSettings.SpeedSetup.Orientation, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, 100, 10, 20, 5, 8, 11, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
         // Home altitude in HUD design as vertical scale right side (centered relative to y)
@@ -2728,9 +2737,15 @@ void updateGraphics()
         // Warnings (centered relative to x)
         if (check_enable_and_srceen(OsdSettings.Warnings, (OsdSettingsWarningsSetupData *)&OsdSettings.WarningsSetup, screen, &x, &y)) {
             WarnMask |= xTaskGetTickCount() < DO_NOT_MOVE_MILLIS ? WARN_DO_NOT_MOVE : 0x00;
-            WarnMask |= (HomePosOnTime && gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D) ? WARN_NO_SAT_FIX : 0x00;
-            WarnMask |= (HomePosOnTime && !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE) ? WARN_HOME_NOT_SET : 0x00;
-            WarnMask |= status.Armed < FLIGHTSTATUS_ARMED_ARMED ? WARN_DISARMED : 0x00;
+            if (status.Armed < FLIGHTSTATUS_ARMED_ARMED) {
+                WarnMask |= WARN_DISARMED;
+                WarnMask |= (gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D) ? WARN_NO_SAT_FIX : 0x00;
+                WarnMask |= (!homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE) ? WARN_HOME_NOT_SET : 0x00;
+            } else {
+                WarnMask |= 0x00;
+                WarnMask |= (HomePosOnTime && gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D) ? WARN_NO_SAT_FIX : 0x00;
+                WarnMask |= (HomePosOnTime && !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE) ? WARN_HOME_NOT_SET : 0x00;
+            }
             draw_warnings(OsdSettings.WarningsSetup.Mask & WarnMask, GRAPHICS_X_MIDDLE + x, GRAPHICS_Y_MIDDLE + y, OsdSettings.WarningsSetup.VerticalSpacing, OsdSettings.WarningsSetup.CharSize);
         }
 

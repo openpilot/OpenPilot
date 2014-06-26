@@ -164,7 +164,7 @@ uint32_t PIOS_DELAY_GetRaw()
  */
 uint32_t PIOS_DELAY_DiffuS(uint32_t raw)
 {
-    uint32_t diff = -raw;
+    uint32_t diff = PIOS_DELAY_GetRaw() - raw;
 
     return diff;
 }

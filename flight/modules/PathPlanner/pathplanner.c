@@ -173,7 +173,7 @@ static void pathPlannerTask()
             // copy pasta: same calculation as in manualcontrol, set return to home coordinates
             plan_setup_positionHold();
         }
-        AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_ERROR);
+        AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_CRITICAL);
 
         return;
     }

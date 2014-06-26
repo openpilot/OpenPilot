@@ -81,8 +81,8 @@ static FlightStatusData flightStatus;
 static int32_t initwithmag(stateFilter *self);
 static int32_t initwithoutmag(stateFilter *self);
 static int32_t maininit(stateFilter *self);
-static int32_t filter(stateFilter *self, stateEstimation *state);
-static int32_t complementaryFilter(struct data *this, float gyro[3], float accel[3], float mag[3], float attitude[4]);
+static filterResult filter(stateFilter *self, stateEstimation *state);
+static filterResult complementaryFilter(struct data *this, float gyro[3], float accel[3], float mag[3], float attitude[4]);
 
 static void flightStatusUpdatedCb(UAVObjEvent *ev);
 
@@ -165,11 +165,11 @@ static int32_t maininit(stateFilter *self)
 /**
  * Collect all required state variables, then run complementary filter
  */
-static int32_t filter(stateFilter *self, stateEstimation *state)
+static filterResult filter(stateFilter *self, stateEstimation *state)
 {
-    struct data *this = (struct data *)self->localdata;
+    struct data *this   = (struct data *)self->localdata;
 
-    int32_t result    = 0;
+    filterResult result = FILTERRESULT_OK;
 
     if (IS_SET(state->updated, SENSORUPDATES_mag)) {
         this->magUpdated    = 1;
@@ -187,7 +187,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         if (this->accelUpdated) {
             float attitude[4];
             result = complementaryFilter(this, state->gyro, this->currentAccel, this->currentMag, attitude);
-            if (!result) {
+            if (result == FILTERRESULT_OK) {
                 state->attitude[0] = attitude[0];
                 state->attitude[1] = attitude[1];
                 state->attitude[2] = attitude[2];
@@ -215,7 +215,7 @@ static inline void apply_accel_filter(const struct data *this, const float *raw,
     }
 }
 
-static int32_t complementaryFilter(struct data *this, float gyro[3], float accel[3], float mag[3], float attitude[4])
+static filterResult complementaryFilter(struct data *this, float gyro[3], float accel[3], float mag[3], float attitude[4])
 {
     float dT;
 
@@ -224,7 +224,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
 #if defined(PIOS_INCLUDE_HMC5883)
         // wait until mags have been updated
         if (!this->magUpdated) {
-            return 1;
+            return FILTERRESULT_ERROR;
         }
 #else
         mag[0] = 100.0f;
@@ -280,13 +280,13 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         this->timeval   = PIOS_DELAY_GetRaw(); // Cycle counter used for precise timing
         this->starttime = xTaskGetTickCount(); // Tick counter used for long time intervals
 
-        return 0; // must return zero on initial initialization, so attitude will init with a valid quaternion
+        return FILTERRESULT_OK; // must return OK on initial initialization, so attitude will init with a valid quaternion
     }
 
     if (this->init == 0 && xTaskGetTickCount() - this->starttime < CALIBRATION_DELAY_MS / portTICK_RATE_MS) {
         // wait 4 seconds for the user to get his hands off in case the board was just powered
         this->timeval = PIOS_DELAY_GetRaw();
-        return 1;
+        return FILTERRESULT_ERROR;
     } else if (this->init == 0 && xTaskGetTickCount() - this->starttime < (CALIBRATION_DELAY_MS + CALIBRATION_DURATION_MS) / portTICK_RATE_MS) {
         // For first 6 seconds use accels to get gyro bias
         this->attitudeSettings.AccelKp     = 1.0f;
@@ -345,7 +345,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
     // Account for accel magnitude
     float accel_mag = sqrtf(this->accels_filtered[0] * this->accels_filtered[0] + this->accels_filtered[1] * this->accels_filtered[1] + this->accels_filtered[2] * this->accels_filtered[2]);
     if (accel_mag < 1.0e-3f) {
-        return 2; // safety feature copied from CC
+        return FILTERRESULT_CRITICAL; // safety feature copied from CC
     }
 
     // Account for filtered gravity vector magnitude
@@ -356,7 +356,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         grot_mag = 1.0f;
     }
     if (grot_mag < 1.0e-3f) {
-        return 2;
+        return FILTERRESULT_CRITICAL;
     }
 
     accel_err[0] /= (accel_mag * grot_mag);
@@ -449,13 +449,13 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
     // THIS SHOULD NEVER ACTUALLY HAPPEN
     if ((fabsf(qmag) < 1.0e-3f) || isnan(qmag)) {
         this->first_run = 1;
-        return 2;
+        return FILTERRESULT_WARNING;
     }
 
     if (this->init) {
-        return 0;
+        return FILTERRESULT_OK;
     } else {
-        return 2; // return "critical" for now, so users can see the zeroing period, switch to more graceful notification later
+        return FILTERRESULT_CRITICAL; // return "critical" for now, so users can see the zeroing period, switch to more graceful notification later
     }
 }
 

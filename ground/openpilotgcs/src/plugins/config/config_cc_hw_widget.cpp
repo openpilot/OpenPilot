@@ -147,7 +147,7 @@ void ConfigCCHWWidget::enableSaveButtons(bool enable)
 
 void ConfigCCHWWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/D4AUAQ", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/D4AUAQ"), QUrl::StrictMode));
 }
 
 /**

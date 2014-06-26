@@ -75,7 +75,7 @@ void ImportExportGadgetWidget::on_exportButton_clicked()
     QString file   = filename;
     QString filter = tr("GCS Settings file (*.xml)");
 
-    file = QFileDialog::getSaveFileName(this, tr("Save GCS Settings too file .."), QFileInfo(file).absoluteFilePath(), filter).trimmed();
+    file = QFileDialog::getSaveFileName(this, tr("Save GCS Settings to file..."), QFileInfo(file).absoluteFilePath(), filter).trimmed();
     if (file.isEmpty()) {
         return;
     }
@@ -202,7 +202,7 @@ void ImportExportGadgetWidget::importConfiguration(const QString & fileName)
 
 void ImportExportGadgetWidget::on_helpButton_clicked()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/OQBj"));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/OQBj")));
 }
 
 

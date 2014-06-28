@@ -11501,7 +11501,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <source>Settings cannot be recovered after this operation.
 The board will be restarted and all settings erased.</source>
         <translation>Les paramètres ne pourront être récupérés après cette opération.
-La carte sera redémarrée et tous les paramètres éffacés.</translation>
+La carte sera redémarrée et tous les paramètres effacés.</translation>
     </message>
     <message>
         <location line="+9"/>

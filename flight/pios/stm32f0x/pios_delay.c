@@ -36,7 +36,7 @@
 #ifdef PIOS_INCLUDE_DELAY
 
 /* these should be defined by CMSIS, but they aren't */
-#define DELAY_COUNTER   (TIM2->CNT)
+#define DELAY_COUNTER (TIM2->CNT)
 
 /**
  * Initialises the Timer used by PIOS_DELAY functions.
@@ -60,7 +60,7 @@ int32_t PIOS_DELAY_Init(void)
     // Stop timer
     TIM_Cmd(TIM2, DISABLE);
     // Configure timebase and internal clock
-    TIM_TimeBaseInit(TIM2, (TIM_TimeBaseInitTypeDef*)&timerInit);
+    TIM_TimeBaseInit(TIM2, (TIM_TimeBaseInitTypeDef *)&timerInit);
     TIM_InternalClockConfig(TIM2);
     TIM_SetCounter(TIM2, 0);
     TIM_Cmd(TIM2, ENABLE);
@@ -164,7 +164,7 @@ uint32_t PIOS_DELAY_GetRaw()
  */
 uint32_t PIOS_DELAY_DiffuS(uint32_t raw)
 {
-    uint32_t diff =  - raw;
+    uint32_t diff = -raw;
 
     return diff;
 }

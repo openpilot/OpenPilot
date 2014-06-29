@@ -95,14 +95,14 @@ int32_t PIOS_SPI_Init(uint32_t *spi_id, const struct pios_spi_cfg *cfg)
 #endif
     /* Enable the associated peripheral clock */
     switch ((uint32_t)spi_dev->cfg->regs) {
-        case (uint32_t)SPI1:
-            /* Enable SPI peripheral clock (APB2 == high speed) */
-            RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
-            break;
-        case (uint32_t)SPI2:
-            /* Enable SPI peripheral clock (APB1 == slow speed) */
-            RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-            break;
+    case (uint32_t)SPI1:
+        /* Enable SPI peripheral clock (APB2 == high speed) */
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+        break;
+    case (uint32_t)SPI2:
+        /* Enable SPI peripheral clock (APB1 == slow speed) */
+        RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+        break;
     }
     /* Enable DMA clock */
     RCC_AHBPeriphClockCmd(spi_dev->cfg->dma.ahb_clk, ENABLE);
@@ -571,7 +571,7 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
         SPI_CalculateCRC(spi_dev->cfg->regs, ENABLE);
     }
 
-    //TODO: Verify the LDMA_TX and LDMA_RX handling then len is not a multiple of two!!
+    // TODO: Verify the LDMA_TX and LDMA_RX handling then len is not a multiple of two!!
 
     /* Start DMA transfers */
     DMA_Cmd(spi_dev->cfg->dma.rx.channel, ENABLE);

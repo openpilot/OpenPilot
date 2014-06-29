@@ -92,7 +92,7 @@ void PIOS_SYS_Init(void)
 
     GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_All;
 
-    GPIO_InitStructure.GPIO_Pin &= ~(GPIO_Pin_13 | GPIO_Pin_14 ); // leave SWD pins alone
+    GPIO_InitStructure.GPIO_Pin &= ~(GPIO_Pin_13 | GPIO_Pin_14); // leave SWD pins alone
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
     GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_All;
@@ -100,7 +100,6 @@ void PIOS_SYS_Init(void)
 
     GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_All;
     GPIO_Init(GPIOC, &GPIO_InitStructure);
-
 }
 
 /**
@@ -208,10 +207,9 @@ void NVIC_Configuration(void)
     uint32_t *romTable = &pios_isr_vector_table_base;
 
     /* Copy the vector table from the Flash (mapped at the base of the application
-    load address 0x0800X000) to the base address of the SRAM at 0x20000000. */
+       load address 0x0800X000) to the base address of the SRAM at 0x20000000. */
 
-    for(uint32_t i = 0; i < 48; i++)
-    {
+    for (uint32_t i = 0; i < 48; i++) {
         VectorTable[i] = romTable[i];
     }
 
@@ -285,10 +283,9 @@ void UsageFault_Handler(void)
     stopHandler();
 }
 
-void stopHandler(){
-    while (1)
-    {
-    }
+void stopHandler()
+{
+    while (1) {}
 }
 #endif /* PIOS_INCLUDE_SYS */
 

@@ -65,7 +65,7 @@ int32_t PIOS_GPIO_Init(uint32_t *gpios_dev_id, const struct pios_gpio_cfg *cfg)
             GPIO_PinAFConfig(gpio->pin.gpio, gpio->pin.init.GPIO_Pin, gpio->remap);
         }
 
-        GPIO_Init(gpio->pin.gpio, (GPIO_InitTypeDef*)&gpio->pin.init);
+        GPIO_Init(gpio->pin.gpio, (GPIO_InitTypeDef *)&gpio->pin.init);
 
         PIOS_GPIO_Off(*gpios_dev_id, i);
     }
@@ -138,12 +138,11 @@ void PIOS_GPIO_Toggle(uint32_t gpios_dev_id, uint8_t gpio_id)
 
     const struct pios_gpio *gpio = &(gpio_cfg->gpios[gpio_id]);
 
-    if (((gpio->pin.gpio->ODR & gpio->pin.init.GPIO_Pin) != 0) ^ gpio->active_low ) {
+    if (((gpio->pin.gpio->ODR & gpio->pin.init.GPIO_Pin) != 0) ^ gpio->active_low) {
         PIOS_GPIO_Off(gpios_dev_id, gpio_id);
     } else {
         PIOS_GPIO_On(gpios_dev_id, gpio_id);
     }
-
 }
 
 #endif /* PIOS_INCLUDE_GPIO */

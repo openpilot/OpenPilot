@@ -162,8 +162,8 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
     }
 
     /* Initialize the USART Rx and Tx pins */
-    GPIO_Init(usart_dev->cfg->rx.gpio, (GPIO_InitTypeDef*)&usart_dev->cfg->rx.init);
-    GPIO_Init(usart_dev->cfg->tx.gpio, (GPIO_InitTypeDef*)&usart_dev->cfg->tx.init);
+    GPIO_Init(usart_dev->cfg->rx.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->rx.init);
+    GPIO_Init(usart_dev->cfg->tx.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->tx.init);
 
     /* Enable USART clock */
     switch ((uint32_t)usart_dev->cfg->regs) {
@@ -179,7 +179,7 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
     }
 
     /* Configure the USART */
-    USART_Init(usart_dev->cfg->regs, (USART_InitTypeDef*)&usart_dev->cfg->init);
+    USART_Init(usart_dev->cfg->regs, (USART_InitTypeDef *)&usart_dev->cfg->init);
 
     *usart_id = (uint32_t)usart_dev;
 
@@ -195,7 +195,7 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
         PIOS_USART_3_id = (uint32_t)usart_dev;
         break;
     }
-    NVIC_Init((NVIC_InitTypeDef*)&usart_dev->cfg->irq.init);
+    NVIC_Init((NVIC_InitTypeDef *)&usart_dev->cfg->irq.init);
     USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
     USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
 

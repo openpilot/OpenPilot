@@ -893,11 +893,13 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 }
 #else // PIOS_INCLUDE_FLASH
 
-int32_t UAVObjSave(__attribute__((unused)) UAVObjHandle obj_handle, __attribute__((unused))  uint16_t instId){
+int32_t UAVObjSave(__attribute__((unused)) UAVObjHandle obj_handle, __attribute__((unused))  uint16_t instId)
+{
     return 0;
 }
 
-int32_t UAVObjLoad(__attribute__((unused)) UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId){
+int32_t UAVObjLoad(__attribute__((unused)) UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId)
+{
     return 0;
 }
 

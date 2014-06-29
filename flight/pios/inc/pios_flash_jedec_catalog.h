@@ -63,7 +63,28 @@ const struct pios_flash_jedec_cfg pios_flash_jedec_catalog[] =
         .expect_capacity     = 0x15,
         .sector_erase        = 0x20,
         .chip_erase          = 0x60
-    }
+    },
+    { // 25q512
+        .expect_manufacturer = JEDEC_MANUFACTURER_MICRON,
+        .expect_memorytype   = 0xBA,
+        .expect_capacity     = 0x20,
+        .sector_erase        = 0xD8,
+        .chip_erase          = 0xC7
+    },
+    { // 25q256
+        .expect_manufacturer = JEDEC_MANUFACTURER_NUMORIX,
+        .expect_memorytype   = 0xBA,
+        .expect_capacity     = 0x19,
+        .sector_erase        = 0xD8,
+        .chip_erase          = 0xC7
+    },
+    { // 25q128
+        .expect_manufacturer = JEDEC_MANUFACTURER_MICRON,
+        .expect_memorytype   = 0xBA,
+        .expect_capacity     = 0x18,
+        .sector_erase        = 0xD8,
+        .chip_erase          = 0xC7
+    },
 };
 const uint32_t pios_flash_jedec_catalog_size = NELEMENTS(pios_flash_jedec_catalog);
 

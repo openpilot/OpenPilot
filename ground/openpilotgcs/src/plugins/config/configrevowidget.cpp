@@ -89,6 +89,10 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
     addUAVObject("HomeLocation");
+    addUAVObject("RevoCalibration");
+    addUAVObject("AttitudeSettings");
+    addUAVObject("RevoSettings");
+    addUAVObject("AccelGyroSettings");
     autoLoadWidgets();
 
     // accel calibration

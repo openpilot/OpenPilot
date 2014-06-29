@@ -32,8 +32,10 @@
 #include <accelgyrosettings.h>
 #include <homelocation.h>
 #include <accelstate.h>
-
 #include <magstate.h>
+
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 #include "assertions.h"
 #include "calibration.h"
@@ -78,6 +80,12 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_ui->tabWidget->setCurrentIndex(0);
 
     addApplySaveButtons(m_ui->revoCalSettingsSaveRAM, m_ui->revoCalSettingsSaveSD);
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+    if (!settings->useExpertMode()) {
+        m_ui->revoCalSettingsSaveRAM->setVisible(false);
+    }
 
     // Initialization of the visual help
     m_ui->calibrationVisualHelp->setScene(new QGraphicsScene(this));

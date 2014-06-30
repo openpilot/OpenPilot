@@ -86,7 +86,7 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
 
-    if (hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_GPS] != HwSettings::OPTIONALMODULES_ENABLED) {
+    if(hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_GPS] != HwSettings::OPTIONALMODULES_ENABLED) {
         m_telemetry->gpsProtocol->setEnabled(false);
         m_telemetry->gpsProtocol->setToolTip(tr("Enable GPS module and reboot the board to be able to select GPS protocol"));
     } else {
@@ -147,7 +147,7 @@ void ConfigCCHWWidget::enableSaveButtons(bool enable)
 
 void ConfigCCHWWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/D4AUAQ", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/D4AUAQ"), QUrl::StrictMode));
 }
 
 /**

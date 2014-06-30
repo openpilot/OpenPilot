@@ -10,6 +10,8 @@ Item {
         id: warning_bg
         elementName: "warnings-bg"
         sceneSize: warnings.sceneSize
+        width: background.width
+        anchors.bottom: parent.bottom
     }
 
     SvgElementPositionItem {
@@ -26,7 +28,7 @@ Item {
                 text: "RC INPUT"
                 font {
                     family: "Arial"
-                    pixelSize: parent.height * 0.8
+                    pixelSize: Math.floor(parent.height * 0.8)
                     weight: Font.DemiBold
                 }
             }
@@ -53,7 +55,7 @@ Item {
                 text: "MASTER CAUTION"
                 font {
                     family: "Arial"
-                    pixelSize: parent.height * 0.8
+                    pixelSize: Math.floor(parent.height * 0.8)
                     weight: Font.DemiBold
                 }
             }
@@ -74,7 +76,7 @@ Item {
                 text: "AUTOPILOT"
                 font {
                     family: "Arial"
-                    pixelSize: parent.height * 0.8
+                    pixelSize: Math.floor(parent.height * 0.8)
                     weight: Font.DemiBold
                 }
             }
@@ -101,7 +103,7 @@ Item {
         id: warning_battery
         elementName: "warning-battery"
         sceneSize: warnings.sceneSize
-
+        anchors.right: parent.right
         visible: SystemAlarms.Alarm_Battery > 1
     }
 
@@ -109,7 +111,7 @@ Item {
         id: warning_attitude
         elementName: "warning-attitude"
         sceneSize: warnings.sceneSize
-
+        anchors.centerIn: background.centerIn
         visible: SystemAlarms.Alarm_Attitude > 1
     }
 }

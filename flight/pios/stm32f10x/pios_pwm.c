@@ -72,7 +72,7 @@ static struct pios_pwm_dev *PIOS_PWM_alloc(void)
 {
     struct pios_pwm_dev *pwm_dev;
 
-    pwm_dev = (struct pios_pwm_dev *)pvPortMalloc(sizeof(*pwm_dev));
+    pwm_dev = (struct pios_pwm_dev *)pios_malloc(sizeof(*pwm_dev));
     if (!pwm_dev) {
         return NULL;
     }

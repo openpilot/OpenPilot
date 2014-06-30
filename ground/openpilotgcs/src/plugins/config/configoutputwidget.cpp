@@ -400,7 +400,7 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
 
 void ConfigOutputWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/WIGf", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/WIGf"), QUrl::StrictMode));
 }
 
 void ConfigOutputWidget::stopTests()

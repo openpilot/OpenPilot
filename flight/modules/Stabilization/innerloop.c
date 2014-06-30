@@ -119,20 +119,20 @@ static void stabilizationInnerloopTask()
             warn = true;
         }
         if (stabSettings.monitor.rateupdates < -(4 * OUTERLOOP_SKIPCOUNT)) {
-            // error if rate loop skipped more than 4 executions
+            // critical if rate loop skipped more than 4 executions
 // RPi hack --------------------------------------------------
 /* slowing down this task for tests purposes */
 // horrible hack but we are still slow
-            //error = true;
+            //crit = true;
 //------------------------------------------------------------
         }
         // check if gyro keeps updating
         if (stabSettings.monitor.gyroupdates < 1) {
-            // critical if gyro didn't update at all!
+            // error if gyro didn't update at all!
 // RPi hack --------------------------------------------------
 /* slowing down this task for tests purposes */
 // horrible hack but gyro is updated slowly now
-            //crit = true;
+            //error = true;
 //------------------------------------------------------------
         }
         if (stabSettings.monitor.gyroupdates > 1) {
@@ -140,8 +140,8 @@ static void stabilizationInnerloopTask()
             warn = true;
         }
         if (stabSettings.monitor.gyroupdates > 3) {
-            // error if we missed 3 gyro updates
-            error = true;
+            // critical if we missed 3 gyro updates
+            crit = true;
         }
         stabSettings.monitor.gyroupdates = 0;
 

@@ -78,7 +78,7 @@ int sin_lookup_initalize()
         return 0;
     }
 
-    sin_table = (float *)pvPortMalloc(sizeof(float) * SIN_RESOLUTION);
+    sin_table = (float *)pios_malloc(sizeof(float) * SIN_RESOLUTION);
     if (sin_table == NULL) {
         return -1;
     }

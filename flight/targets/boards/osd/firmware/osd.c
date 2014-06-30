@@ -189,7 +189,7 @@ int main()
 
     /* For Revolution we use a FreeRTOS task to bring up the system so we can */
     /* always rely on FreeRTOS primitive */
-    result = xTaskCreate(initTask, (const signed char *)"init",
+    result = xTaskCreate(initTask, "init",
                          INIT_TASK_STACK, NULL, INIT_TASK_PRIORITY,
                          &initTaskHandle);
     PIOS_Assert(result == pdPASS);

@@ -47,11 +47,13 @@
 #include <magsensor.h>
 #include "accelgyrosettings.h"
 
-
 // Calibration data
 #include <accelgyrosettings.h>
 #include <revocalibration.h>
 #include <revosettings.h>
+
+#include "../wizardmodel.h"
+
 namespace OpenPilot {
 typedef struct {
     // this is not needed for revo, but should for CC/CC3D
@@ -62,7 +64,7 @@ typedef struct {
     UAVObject::Metadata accelSensorMeta;
     UAVObject::Metadata baroensorMeta;
     bool statusSaved;
-} thermalCalibrationBoardSettings;
+} Memento;
 
 typedef struct {
     bool  baroCalibrated;
@@ -84,11 +86,17 @@ typedef struct {
     float baroTempMax;
     float accelGyroTempMin;
     float accelGyroTempMax;
-} thermalCalibrationResults;
+} Results;
+
 class ThermalCalibrationHelper : public QObject {
     Q_OBJECT
+
 public:
+    const static float TargetGradient = 0.20f;
+    const static float TargetTempDelta = 10.0f;
+
     explicit ThermalCalibrationHelper(QObject *parent = 0);
+
     float temperature()
     {
         return m_temperature;
@@ -99,28 +107,56 @@ public:
         return m_gradient;
     }
 
+    float range()
+    {
+        return fabs(m_maxTemperature - m_minTemperature);
+    }
+
     int processPercentage()
     {
-        return m_processPercentage;
+        return m_progress;
     }
+
     void endAcquisition();
 
     bool calibrationSuccessful()
     {
-        return m_results.baroCalibrated &&
-               ((m_results.baroTempMax - m_results.baroTempMin) > 10.0f);
+        return (range() > TargetTempDelta) && baroCalibrationSuccessful();
     }
+
+    bool baroCalibrationSuccessful()
+    {
+        return m_results.baroCalibrated;
+    }
+
+    bool gyroCalibrationSuccessful()
+    {
+        return m_results.gyroCalibrated;
+    }
+
+    bool accelCalibrationSuccessful()
+    {
+        return m_results.accelCalibrated;
+    }
+
+    void copyResultToSettings();
 
 signals:
     void statusRestoreCompleted(bool succesful);
     void statusSaveCompleted(bool succesful);
     void setupBoardCompleted(bool succesful);
-    void temperatureChanged(float value);
-    void gradientChanged(float value);
-    void processPercentageChanged(int percentage);
     void collectionCompleted();
     void calculationCompleted();
-    void abort();
+
+    void temperatureChanged(float temperature);
+    void temperatureGradientChanged(float temperatureGradient);
+    void temperatureRangeChanged(float temperatureRange);
+
+    void progressChanged(int value);
+    void progressMaxChanged(int value);
+
+    void instructionsAdded(QString text, WizardModel::MessageType type = WizardModel::Info);
+
 
 public slots:
     /**
@@ -152,18 +188,30 @@ public slots:
     void calculate();
 
     void collectSample(UAVObject *sample);
-    void setProcessPercentage(int value)
+    void setProgress(int value)
     {
-        if (m_processPercentage != value) {
-            m_processPercentage = value;
-            emit processPercentageChanged(value);
+        if (m_progress != value) {
+            m_progress = value;
+            emit progressChanged(value);
         }
+    }
+    void setProgressMax(int value)
+    {
+        m_progressMax = value;
+        emit progressMaxChanged(value);
+    }
+
+    void addInstructions(QString text, WizardModel::MessageType type = WizardModel::Info)
+    {
+        emit instructionsAdded(text, type);
     }
 
     void cleanup();
 
 private:
-    void updateTemp(float temp);
+    float getTemperature();
+    void updateTemperature(float temp);
+
     void connectUAVOs();
     void disconnectUAVOs();
 
@@ -172,7 +220,6 @@ private:
     QScopedPointer<QTemporaryDir> m_tempdir;
     void createDebugLog();
     void closeDebugLog();
-    void copyResultToSettings();
 
     QMutex sensorsUpdateLock;
 
@@ -181,23 +228,36 @@ private:
     QList<BaroSensor::DataFields> m_baroSamples;
     QList<MagSensor::DataFields> m_magSamples;
 
-    QTime m_startTime;
     // temperature checkpoints, used to calculate temp gradient
     const static int TimeBetweenCheckpoints = 10;
-    QTime m_lastCheckpointTime;
+
+    bool m_acquiring;
     bool m_forceStopAcquisition;
+
+    QTime m_startTime;
+    QTime m_lastCheckpointTime;
     float m_lastCheckpointTemp;
-    float m_gradient;
+
     float m_temperature;
+    float m_minTemperature;
+    float m_maxTemperature;
+    float m_gradient;
     float m_initialGradient;
-    const static int ProcessPercentageSaveSettings    = 5;
-    const static int ProcessPercentageSetupBoard      = 10;
-    const static int ProcessPercentageBaseAcquisition = 15;
-    const static int ProcessPercentageBaseCalculation = 85;
-    const static int ProcessPercentageSaveResults     = 95;
-    const static float TargetGradient = 0.20f;
+
     int m_targetduration;
-    int m_processPercentage;
+
+    bool m_rangeReached;
+
+    int m_progress;
+    int m_progressMax;
+
+    // convenience pointers
+    AccelSensor *accelSensor;
+    GyroSensor *gyroSensor;
+    BaroSensor *baroSensor;
+    MagSensor *magSensor;
+    AccelGyroSettings *accelGyroSettings;
+    RevoSettings *revoSettings;
 
     /* board settings save/restore */
     bool setupBoardForCalibration();
@@ -205,14 +265,14 @@ private:
     bool restoreInitialSettings();
     bool isBoardInitialSettingsSaved()
     {
-        return m_boardInitialSettings.statusSaved;
+        return m_memento.statusSaved;
     }
     void clearBoardInitialSettingsSaved()
     {
-        m_boardInitialSettings.statusSaved = false;
+        m_memento.statusSaved = false;
     }
-    thermalCalibrationBoardSettings m_boardInitialSettings;
-    thermalCalibrationResults m_results;
+    Memento m_memento;
+    Results m_results;
 
     void setMetadataForCalibration(UAVDataObject *uavo);
     UAVObjectManager *getObjectManager();

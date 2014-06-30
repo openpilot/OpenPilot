@@ -24615,7 +24615,7 @@ border-radius: 5;</string>
                  <item row="3" column="1">
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moves the inverted mode power switching this fraction of a second into the future to compensate for slow responding power systems.  Used to more accurately time the changing of power when entering/exiting inverted mode.  Set this to equal the fraction of a second it takes for your vehicle to go from full negative thrust (10% positive thrust for multis, full negative thrust (-90%) for CP helis) to full positive thrust (+90%).  Increase this if for example continuous left flips &amp;quot;walk off&amp;quot; to the left because power is changed too late.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Motor response time to go from min thrust to max thrust. It allows thrust anticipation on entering/exiting inverted mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

@@ -64,7 +64,7 @@ static void updateAck(UAVTalkConnectionData *connection, uint8_t type, uint32_t 
 UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream)
 {
     // allocate object
-    UAVTalkConnectionData *connection = pvPortMalloc(sizeof(UAVTalkConnectionData));
+    UAVTalkConnectionData *connection = pios_malloc(sizeof(UAVTalkConnectionData));
 
     if (!connection) {
         return 0;
@@ -76,11 +76,11 @@ UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream)
     connection->lock = xSemaphoreCreateRecursiveMutex();
     connection->transLock   = xSemaphoreCreateRecursiveMutex();
     // allocate buffers
-    connection->rxBuffer    = pvPortMalloc(UAVTALK_MAX_PACKET_LENGTH);
+    connection->rxBuffer    = pios_malloc(UAVTALK_MAX_PACKET_LENGTH);
     if (!connection->rxBuffer) {
         return 0;
     }
-    connection->txBuffer = pvPortMalloc(UAVTALK_MAX_PACKET_LENGTH);
+    connection->txBuffer = pios_malloc(UAVTALK_MAX_PACKET_LENGTH);
     if (!connection->txBuffer) {
         return 0;
     }

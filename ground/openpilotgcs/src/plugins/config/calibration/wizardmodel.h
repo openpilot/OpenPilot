@@ -28,16 +28,20 @@
 #ifndef WIZARDMODEL_H
 #define WIZARDMODEL_H
 
-#include <QStateMachine>
-#include <QQmlListProperty>
 #include "wizardstate.h"
 #include <accelsensor.h>
 
+#include <QStateMachine>
+#include <QQmlListProperty>
+
 class WizardModel : public QStateMachine {
     Q_OBJECT Q_PROPERTY(QQmlListProperty<QObject> steps READ steps CONSTANT)
-    Q_PROPERTY(QString instructions READ instructions NOTIFY instructionsChanged)
+    // Q_PROPERTY(QString instructions READ instructions NOTIFY instructionsChanged)
     Q_PROPERTY(WizardState * currentState READ currentState NOTIFY currentStateChanged)
+
 public:
+    enum MessageType { Debug, Info, Prompt, Warn, Success, Failure };
+
     explicit WizardModel(QObject *parent = 0);
 
     QQmlListProperty<QObject> steps()
@@ -45,25 +49,29 @@ public:
         return QQmlListProperty<QObject>(this, m_steps);
     }
 
-    QString instructions()
+    QString &instructions()
     {
         return m_instructions;
     }
 
-    void setInstructions(QString instructions)
-    {
-        m_instructions = instructions;
-        emit instructionsChanged(instructions);
-    }
     WizardState *currentState();
+
+public slots:
+    void addInstructions(QString text, WizardModel::MessageType type = WizardModel::Info)
+    {
+        m_instructions = text;
+        emit instructionsAdded(text, type);
+    }
+
 protected:
     QList<QObject *> m_steps;
+
 private:
     QString m_instructions;
+
 signals:
-    void instructionsChanged(QString status);
+    void instructionsAdded(QString text, WizardModel::MessageType type = WizardModel::Info);
     void currentStateChanged(WizardState *status);
-public slots:
 };
 
 #endif // WIZARDMODEL_H

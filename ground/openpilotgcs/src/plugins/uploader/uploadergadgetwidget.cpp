@@ -989,7 +989,7 @@ UploaderGadgetWidget::~UploaderGadgetWidget()
 
 void UploaderGadgetWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/AoBZ", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/AoBZ"), QUrl::StrictMode));
 }
 
 int UploaderGadgetWidget::confirmEraseSettingsMessageBox()

@@ -38,50 +38,53 @@ ThermalCalibrationModel::ThermalCalibrationModel(QObject *parent) :
     m_startEnabled(false),
     m_cancelEnabled(false),
     m_endEnabled(false),
-    m_initDone(false)
+    m_dirty(false)
 {
     m_helper.reset(new ThermalCalibrationHelper());
-    m_readyState       = new WizardState(tr("Start"), this),
-    m_workingState     = new WizardState(NULL, this);
 
-    m_saveSettingState = new WizardState(tr("Saving initial settings"), m_workingState);
+    m_readyState       = new WizardState("Ready", this),
+    m_workingState     = new WizardState("Working", this);
+
+    m_saveSettingState = new WizardState("Storing Settings", m_workingState);
     m_workingState->setInitialState(m_saveSettingState);
 
-    m_setupState       = new WizardState(tr("Setup board for calibration"), m_workingState);
+    m_setupState       = new WizardState("SetupBoard", m_workingState);
 
-    m_acquisitionState = new WizardState(tr("*** Please Wait *** Samples acquisition, this can take several minutes"), m_workingState);
-    m_restoreState     = new WizardState(tr("Restore board settings"), m_workingState);
-    m_calculateState   = new WizardState(tr("Calculate calibration data"), m_workingState);
+    m_acquisitionState = new WizardState("Acquiring", m_workingState);
+    m_restoreState     = new WizardState("Restoring Settings", m_workingState);
+    m_calculateState   = new WizardState("Calculating", m_workingState);
 
-    m_abortState       = new WizardState(tr("Canceled"), this);
+    m_abortState       = new WizardState("Canceled", this);
 
-    // note: step name for this state is changed by CompensationCalculationTransition based on result
-    m_completedState   = new WizardState(NULL, this);
+    m_completedState   = new WizardState("Completed", this);
+
     setTransitions();
 
-    connect(m_helper.data(), SIGNAL(gradientChanged(float)), this, SLOT(setTemperatureGradient(float)));
     connect(m_helper.data(), SIGNAL(temperatureChanged(float)), this, SLOT(setTemperature(float)));
-    connect(m_helper.data(), SIGNAL(processPercentageChanged(int)), this, SLOT(setProgress(int)));
-    connect(m_readyState, SIGNAL(entered()), this, SLOT(wizardReady()));
-    connect(m_readyState, SIGNAL(exited()), this, SLOT(wizardStarted()));
-    connect(m_completedState, SIGNAL(entered()), this, SLOT(wizardReady()));
-    connect(m_completedState, SIGNAL(exited()), this, SLOT(wizardStarted()));
-    this->setInitialState(m_readyState);
+    connect(m_helper.data(), SIGNAL(temperatureGradientChanged(float)), this, SLOT(setTemperatureGradient(float)));
+    connect(m_helper.data(), SIGNAL(temperatureRangeChanged(float)), this, SLOT(setTemperatureRange(float)));
+    connect(m_helper.data(), SIGNAL(progressChanged(int)), this, SLOT(setProgress(int)));
+    connect(m_helper.data(), SIGNAL(progressMaxChanged(int)), this, SLOT(setProgressMax(int)));
+    connect(m_helper.data(), SIGNAL(instructionsAdded(QString, WizardModel::MessageType)), this, SLOT(addInstructions(QString, WizardModel::MessageType)));
+    connect(m_readyState, SIGNAL(entered()), this, SLOT(stopWizard()));
+    connect(m_readyState, SIGNAL(exited()), this, SLOT(startWizard()));
+    connect(m_completedState, SIGNAL(entered()), this, SLOT(stopWizard()));
+    connect(m_completedState, SIGNAL(exited()), this, SLOT(startWizard()));
+
+    setInitialState(m_readyState);
 
     m_steps << m_readyState << m_saveSettingState << m_setupState << m_acquisitionState << m_restoreState << m_calculateState;
 }
+
 void ThermalCalibrationModel::init()
 {
-    if (!m_initDone) {
-        m_initDone = true;
-        setStartEnabled(true);
-        setEndEnabled(false);
-        setCancelEnabled(false);
-        start();
-        setTemperature(0);
-        setTemperatureGradient(0);
-        emit instructionsChanged(instructions());
-    }
+    setStartEnabled(true);
+    setEndEnabled(false);
+    setCancelEnabled(false);
+    setTemperature(NAN);
+    setTemperatureGradient(NAN);
+    setTemperatureRange(NAN);
+    start();
 }
 
 void ThermalCalibrationModel::stepChanged(WizardState *state)
@@ -92,10 +95,10 @@ void ThermalCalibrationModel::stepChanged(WizardState *state)
 void ThermalCalibrationModel::setTransitions()
 {
     m_readyState->addTransition(this, SIGNAL(next()), m_workingState);
+    m_readyState->assignProperty(this, "progressMax", 100);
     m_readyState->assignProperty(this, "progress", 0);
 
     m_completedState->addTransition(this, SIGNAL(next()), m_workingState);
-    m_completedState->assignProperty(this, "progress", 100);
 
     // handles board initial status save
     // Ready->WorkingState->saveSettings->setup
@@ -112,6 +115,7 @@ void ThermalCalibrationModel::setTransitions()
 
     // abort causes initial settings to be restored and acquisition stopped.
     m_abortState->addTransition(new BoardStatusRestoreTransition(m_helper.data(), m_abortState, m_readyState));
+
     m_workingState->addTransition(this, SIGNAL(abort()), m_abortState);
     // Ready
 }

@@ -290,5 +290,5 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
 
 void ConfigRevoHWWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/GgDBAQ", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/GgDBAQ"), QUrl::StrictMode));
 }

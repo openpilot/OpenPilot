@@ -58,12 +58,14 @@ endif
 
 ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
-        ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-amd64.tar.bz2
+        ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2
+        ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2/+md5
         QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.2/5.2.1/qt-opensource-linux-x64-5.2.1.run
         QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-linux-x64-5.2.1.run.md5
         QT_SDK_ARCH := gcc_64
     else
-        ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-i686.tar.bz2
+        ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2
+        ARM_SDK_MD5_URL := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2/+md5
         QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.2/5.2.1/qt-opensource-linux-x86-5.2.1.run
         QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-linux-x86-5.2.1.run.md5
         QT_SDK_ARCH := gcc
@@ -71,12 +73,14 @@ ifeq ($(UNAME), Linux)
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Darwin)
-    ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
+    ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2
+    ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2/+md5
     QT_SDK_URL     := "Please install native Qt 5.1.x SDK using package manager"
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Windows)
-    ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
+    ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip
+    ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip/+md5
     QT_SDK_URL     := http://download.qt-project.org/official_releases/qt/5.2/5.2.1/qt-opensource-windows-x86-mingw48_opengl-5.2.1.exe
     QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-windows-x86-mingw48_opengl-5.2.1.exe.md5
     QT_SDK_ARCH    := mingw48_32
@@ -111,7 +115,7 @@ QT_SDK_PREFIX := $(QT_SDK_DIR)
 
 BUILD_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
-    BUILD_SDK_TARGETS += mingw sdl python nsis openssl
+    BUILD_SDK_TARGETS += sdl nsis openssl
 endif
 ALL_SDK_TARGETS := $(BUILD_SDK_TARGETS) gtest uncrustify doxygen
 
@@ -275,11 +279,14 @@ endef
 #  $(1) = tool name
 #  $(2) = tool extract/build directory
 #  $(3) = tool distribution URL
-#  $(4) = tool distribution file
-#  $(5) = optional extra build recipes template
-#  $(6) = optional extra clean recipes template
+#  $(4) = tool distribution MD5 URL
+#  $(5) = tool distribution file
+#  $(6) = optional extra build recipes template
+#  $(7) = optional extra clean recipes template
 #
 ##############################
+
+
 
 define TOOL_INSTALL_TEMPLATE
 
@@ -287,27 +294,28 @@ define TOOL_INSTALL_TEMPLATE
 
 $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	
-	$(call DOWNLOAD_TEMPLATE,$(3),$(4),"$(3).md5")
-
+	$(if $(4), $(call DOWNLOAD_TEMPLATE,$(3),$(5),$(4)),$(call DOWNLOAD_TEMPLATE,$(3),$(5),"$(3).md5"))
+	
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
-	$(if $(filter $(suffix $(4)), .zip),
-		$(V1) $(UNZIP) $(UNZIP_SILENT) -d $$(call toprel, $(dir $(2))) $$(call toprel, $(DL_DIR)/$(4)),
-		$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(dir $(2))) -xf $$(call toprel, $(DL_DIR)/$(4))
+
+	$(if $(filter $(suffix $(5)), .zip),
+		$(V1) $(UNZIP) $(UNZIP_SILENT) -d $$(call toprel, $(dir $(2))) $$(call toprel, $(DL_DIR)/$(5)),
+		$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(dir $(2))) -xf $$(call toprel, $(DL_DIR)/$(5))
 	)
 
-	$(5)
+	$(6)
 
 $(1)_clean:
 	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(2))
 	$(V1) [ ! -d "$(2)" ] || $(RM) -rf "$(2)"
 
-	$(6)
+	$(7)
 
 $(1)_distclean:
-	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $(DL_DIR)/$(4))
-	$(V1) [ ! -f "$(DL_DIR)/$(4)" ]     || $(RM) "$(DL_DIR)/$(4)"
-	$(V1) [ ! -f "$(DL_DIR)/$(4).md5" ] || $(RM) "$(DL_DIR)/$(4).md5"
+	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $(DL_DIR)/$(5))
+	$(V1) [ ! -f "$(DL_DIR)/$(5)" ]     || $(RM) "$(DL_DIR)/$(5)"
+	$(V1) [ ! -f "$(DL_DIR)/$(5).md5" ] || $(RM) "$(DL_DIR)/$(5).md5"
 
 endef
 
@@ -453,9 +461,13 @@ endef
 # ARM SDK
 #
 ##############################
-
-$(eval $(call TOOL_INSTALL_TEMPLATE,arm_sdk,$(ARM_SDK_DIR),$(ARM_SDK_URL),$(notdir $(ARM_SDK_URL))))
-
+ifeq ($(UNAME), Windows)
+#unfortunately zip package for this release is missing root directory, so adding / at the end of the path 
+# so that template interpret last part as directory and use the full path
+$(eval $(call TOOL_INSTALL_TEMPLATE,arm_sdk,$(ARM_SDK_DIR)/,$(ARM_SDK_URL),$(ARM_SDK_MD5_URL),$(notdir $(ARM_SDK_URL))))
+else
+$(eval $(call TOOL_INSTALL_TEMPLATE,arm_sdk,$(ARM_SDK_DIR),$(ARM_SDK_URL),$(ARM_SDK_MD5_URL),$(notdir $(ARM_SDK_URL))))
+endif
 ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
     export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-linux-gnueabihf-
 else
@@ -471,7 +483,7 @@ arm_sdk_version:
 # Template to check ARM toolchain version before building targets
 define ARM_GCC_VERSION_CHECK_TEMPLATE
 	if ! $(ARM_SDK_PREFIX)gcc --version >/dev/null 2>&1; then \
-		$(ECHO) $(MSG_NOTICE) Please install ARM toolchain 4.7+ using \'make arm_sdk_install\' && \
+		$(ECHO) $(MSG_NOTICE) Please install ARM toolchain 4.8 2014q1 using \'make arm_sdk_install\' && \
 		$(ECHO) $(MSG_NOTICE) Older ARM SDKs do not support new option && \
 		exit 1; \
 	fi
@@ -600,7 +612,7 @@ python_version:
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,nsis,$(NSIS_DIR),$(NSIS_URL),$(notdir $(NSIS_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,nsis,$(NSIS_DIR),$(NSIS_URL),,$(notdir $(NSIS_URL))))
 
 ifeq ($(shell [ -d "$(NSIS_DIR)" ] && $(ECHO) "exists"), exists)
     export NSIS := $(NSIS_DIR)/makensis
@@ -624,7 +636,7 @@ endif
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,sdl,$(SDL_DIR),$(SDL_URL),$(notdir $(SDL_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,sdl,$(SDL_DIR),$(SDL_URL),,$(notdir $(SDL_URL))))
 
 ifeq ($(shell [ -d "$(SDL_DIR)" ] && $(ECHO) "exists"), exists)
     export SDL_DIR := $(SDL_DIR)
@@ -647,7 +659,7 @@ endif
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,openssl,$(OPENSSL_DIR),$(OPENSSL_URL),$(notdir $(OPENSSL_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,openssl,$(OPENSSL_DIR),$(OPENSSL_URL),,$(notdir $(OPENSSL_URL))))
 
 ifeq ($(shell [ -d "$(OPENSSL_DIR)" ] && $(ECHO) "exists"), exists)
     export OPENSSL := "$(OPENSSL_DIR)/bin/openssl"    
@@ -671,7 +683,7 @@ endif
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_DIR),$(UNCRUSTIFY_URL),$(notdir $(UNCRUSTIFY_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_DIR),$(UNCRUSTIFY_URL),,$(notdir $(UNCRUSTIFY_URL))))
 
 else # Linux or Mac
 
@@ -695,7 +707,7 @@ define UNCRUSTIFY_CLEAN_TEMPLATE
 	-$(V1) [ ! -d "$(UNCRUSTIFY_DIR)" ] || $(RM) -rf "$(UNCRUSTIFY_DIR)"
 endef
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_BUILD_DIR),$(UNCRUSTIFY_URL),$(notdir $(UNCRUSTIFY_URL)),$(UNCRUSTIFY_BUILD_TEMPLATE),$(UNCRUSTIFY_CLEAN_TEMPLATE)))
+$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_BUILD_DIR),$(UNCRUSTIFY_URL),,$(notdir $(UNCRUSTIFY_URL)),$(UNCRUSTIFY_BUILD_TEMPLATE),$(UNCRUSTIFY_CLEAN_TEMPLATE)))
 
 endif
 
@@ -719,7 +731,7 @@ uncrustify_version:
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_DIR),$(DOXYGEN_URL),$(notdir $(DOXYGEN_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_DIR),$(DOXYGEN_URL),,$(notdir $(DOXYGEN_URL))))
 
 else # Linux or Mac
 
@@ -743,7 +755,7 @@ define DOXYGEN_CLEAN_TEMPLATE
 	-$(V1) [ ! -d "$(DOXYGEN_DIR)" ] || $(RM) -rf "$(DOXYGEN_DIR)"
 endef
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_BUILD_DIR),$(DOXYGEN_URL),$(notdir $(DOXYGEN_URL)),$(DOXYGEN_BUILD_TEMPLATE),$(DOXYGEN_CLEAN_TEMPLATE)))
+$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_BUILD_DIR),$(DOXYGEN_URL),,$(notdir $(DOXYGEN_URL)),$(DOXYGEN_BUILD_TEMPLATE),$(DOXYGEN_CLEAN_TEMPLATE)))
 
 endif
 
@@ -765,7 +777,7 @@ doxygen_version:
 #
 ##############################
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,gtest,$(GTEST_DIR),$(GTEST_URL),$(notdir $(GTEST_URL))))
+$(eval $(call TOOL_INSTALL_TEMPLATE,gtest,$(GTEST_DIR),$(GTEST_URL),,$(notdir $(GTEST_URL))))
 
 export GTEST_DIR
 

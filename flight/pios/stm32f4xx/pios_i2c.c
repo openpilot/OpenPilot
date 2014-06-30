@@ -903,7 +903,7 @@ static struct pios_i2c_dev *PIOS_I2C_alloc(void)
 {
     struct pios_i2c_dev *i2c_adapter;
 
-    i2c_adapter = (struct pios_i2c_adapter *)malloc(sizeof(*i2c_adapter));
+    i2c_adapter = (struct pios_i2c_adapter *)pios_malloc(sizeof(*i2c_adapter));
     if (!i2c_adapter) {
         return NULL;
     }

@@ -39,6 +39,7 @@
 #include "queue.h"
 #include "semphr.h"
 #endif
+#include <pios_mem.h>
 
 #ifdef PIOS_INCLUDE_TASK_MONITOR
 #ifndef PIOS_INCLUDE_FREERTOS

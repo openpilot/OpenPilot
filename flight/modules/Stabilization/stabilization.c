@@ -31,6 +31,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 #include <openpilot.h>
 #include <pios_struct_helper.h>
 #include <pid.h>
@@ -174,8 +175,8 @@ static void StabilizationDesiredUpdatedCb(__attribute__((unused)) UAVObjEvent *e
             cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE;
             cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
             break;
-        case STABILIZATIONDESIRED_STABILIZATIONMODE_VERTICALVELOCITY:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_VERTICALVELOCITY;
+        case STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO:
+            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO;
             cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_CRUISECONTROL:

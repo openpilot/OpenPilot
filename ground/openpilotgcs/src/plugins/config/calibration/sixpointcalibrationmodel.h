@@ -27,20 +27,53 @@
  */
 #ifndef SIXPOINTCALIBRATIONMODEL_H
 #define SIXPOINTCALIBRATIONMODEL_H
-#include <QMutex>
-#include <QObject>
-#include <QList>
+
+#include "wizardmodel.h"
 #include "calibration/calibrationutils.h"
-#include <QString>
 #include <revocalibration.h>
 #include <accelgyrosettings.h>
 #include <homelocation.h>
 #include <accelstate.h>
 #include <magstate.h>
+
+#include <QMutex>
+#include <QObject>
+#include <QList>
+#include <QString>
+
 namespace OpenPilot {
 class SixPointCalibrationModel : public QObject {
     Q_OBJECT
 
+public:
+    explicit SixPointCalibrationModel(QObject *parent = 0);
+
+    bool dirty()
+    {
+        return m_dirty;
+    }
+
+signals:
+    void started();
+    void stopped();
+    void storeAndClearBoardRotation();
+    void recallBoardRotation();
+    void savePositionEnabledChanged(bool state);
+    void progressChanged(int value);
+    void displayVisualHelp(QString elementID);
+    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info);
+
+public slots:
+    void magStart();
+    void accelStart();
+    void savePositionData();
+    void save();
+
+private slots:
+    void getSample(UAVObject *obj);
+    void continouslyGetMagSamples(UAVObject *obj);
+
+private:
     class CalibrationStep {
 public:
         CalibrationStep(QString newVisualHelp, QString newInstructions)
@@ -53,54 +86,36 @@ public:
     };
 
     typedef struct {
-        RevoCalibration::DataFields   revoCalibration;
-        AccelGyroSettings::DataFields accelGyroSettings;
-    } SavedSettings;
-public:
-    explicit SixPointCalibrationModel(QObject *parent = 0);
+        UAVObject::Metadata accelStateMetadata;
+        UAVObject::Metadata magStateMetadata;
+        RevoCalibration::DataFields revoCalibrationData;
+        AccelGyroSettings::DataFields accelGyroSettingsData;
+    } Memento;
 
-signals:
-    void displayVisualHelp(QString elementID);
-    void displayInstructions(QString instructions, bool replace);
-    void disableAllCalibrations();
-    void enableAllCalibrations();
-    void storeAndClearBoardRotation();
-    void recallBoardRotation();
-    void savePositionEnabledChanged(bool state);
-
-public slots:
-    // Slots for calibrating the mags
-    void magStart();
-    void accelStart();
-    void savePositionData();
-private slots:
-    void getSample(UAVObject *obj);
-    void continouslyGetMagSamples(UAVObject *obj);
-private:
-    void start(bool calibrateAccel, bool calibrateMag);
-    UAVObjectManager *getObjectManager();
-    QList<CalibrationStep> calibrationStepsMag;
-    QList<CalibrationStep> calibrationStepsAccelOnly;
-    QList<CalibrationStep> *currentSteps;
-    UAVObject::Metadata initialAccelStateMdata;
-    UAVObject::Metadata initialMagStateMdata;
-    float initialMagCorrectionRate;
-    SavedSettings savedSettings;
-
-    int position;
+    typedef struct {
+        RevoCalibration::DataFields   revoCalibrationData;
+        AccelGyroSettings::DataFields accelGyroSettingsData;
+    } Result;
 
     bool calibratingMag;
     bool calibratingAccel;
 
-    double accel_data_x[6], accel_data_y[6], accel_data_z[6];
-    double mag_data_x[6], mag_data_y[6], mag_data_z[6];
+    QList<CalibrationStep> calibrationStepsMag;
+    QList<CalibrationStep> calibrationStepsAccelOnly;
+    QList<CalibrationStep> *currentSteps;
+    int position;
+
+    Memento memento;
+    Result result;
+
+    bool collectingData;
+    bool m_dirty;
 
     QMutex sensorsUpdateLock;
 
-    // ! Computes the scale and bias of the mag based on collected data
-    void compute(bool mag, bool accel);
+    double accel_data_x[6], accel_data_y[6], accel_data_z[6];
+    double mag_data_x[6], mag_data_y[6], mag_data_z[6];
 
-    bool collectingData;
     QList<double> accel_accum_x;
     QList<double> accel_accum_y;
     QList<double> accel_accum_z;
@@ -110,7 +125,20 @@ private:
     QList<float> mag_fit_x;
     QList<float> mag_fit_y;
     QList<float> mag_fit_z;
+
+    // convenience pointers
+    RevoCalibration *revoCalibration;
+    AccelGyroSettings *accelGyroSettings;
+    AccelState *accelState;
+    MagState *magState;
+    HomeLocation *homeLocation;
+
+    void start(bool calibrateAccel, bool calibrateMag);
+    // Computes the scale and bias of the mag based on collected data
+    void compute();
     void showHelp(QString image);
+    UAVObjectManager *getObjectManager();
 };
 }
+
 #endif // SIXPOINTCALIBRATIONMODEL_H

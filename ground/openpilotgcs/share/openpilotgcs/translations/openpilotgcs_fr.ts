@@ -7161,27 +7161,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Accelerometer calibration</source>
-        <translation type="unfinished">Étalonnage accéléromètres</translation>
+        <translation>Étalonnage des accéléromètres</translation>
     </message>
     <message>
         <location/>
         <source>Magnetometer calibration</source>
-        <translation type="unfinished">Étalonnage magnétomètre</translation>
+        <translation>Étalonnage du magnétomètre</translation>
     </message>
     <message>
         <location/>
         <source>Board level calibration</source>
-        <translation type="unfinished">Étalonnage du niveau de la carte</translation>
+        <translation>Étalonnage du niveau de la carte</translation>
     </message>
     <message>
         <location/>
         <source>Gyro bias calibration</source>
-        <translation type="unfinished">Étalonnage de l&apos;ajustement des Gyros</translation>
+        <translation>Étalonnage de l&apos;ajustement des gyroscopes</translation>
     </message>
     <message>
         <location/>
         <source>Thermal calibration</source>
-        <translation type="unfinished">Étalonnage de la compensation de température</translation>
+        <translation>Étalonnage de la compensation en température</translation>
     </message>
     <message>
         <location/>
@@ -7210,7 +7210,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Help</source>
-        <translation type="unfinished">Aide</translation>
+        <translation>Aide</translation>
     </message>
     <message>
         <location/>
@@ -11501,7 +11501,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <source>Settings cannot be recovered after this operation.
 The board will be restarted and all settings erased.</source>
         <translation>Les paramètres ne pourront être récupérés après cette opération.
-La carte sera redémarrée et tous les paramètres éffacés.</translation>
+La carte sera redémarrée et tous les paramètres effacés.</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -14106,12 +14106,12 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/calibration/gyrobiascalibrationmodel.cpp" line="+98"/>
         <source>Calibrating the gyroscopes. Keep the vehicle steady...</source>
-        <translation type="unfinished">Étalonnage en cours des gyroscopes. Maintenez l&apos;appareil sans le bouger...</translation>
+        <translation>Étalonnage en cours des gyroscopes. Maintenez l&apos;appareil sans le bouger...</translation>
     </message>
     <message>
         <location line="+58"/>
         <source>Gyroscope calibration completed successfully.</source>
-        <translation type="unfinished">Étalonnage des gyroscopes calculé avec succès.</translation>
+        <translation>Étalonnage des gyroscopes calculé avec succès.</translation>
     </message>
 </context>
 <context>
@@ -14123,7 +14123,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/calibration/levelcalibrationmodel.cpp" line="+72"/>
         <source>Place horizontally and press Save Position...</source>
-        <translation type="unfinished"></translation>
+        <translation>Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+18"/>
@@ -14133,12 +14133,12 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location line="+40"/>
         <source>Leave horizontally, rotate 180° along yaw axis and press Save Position...</source>
-        <translation type="unfinished"></translation>
+        <translation>Garder horizontalement, tourner de 180° sur l&apos;axe de Yaw et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Board level calibration completed successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à niveau de la carte calculé avec succès.</translation>
     </message>
     <message>
         <source>Leave horizontally, rotate 180° along yaw axis and click Save Position button...</source>
@@ -14206,92 +14206,92 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/calibration/sixpointcalibrationmodel.cpp" line="+59"/>
         <source>Place horizontally, nose pointing north and press Save Position...</source>
-        <translation type="unfinished">Positionner horizontalement, le nez en direction du nord et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner horizontalement, le nez en direction du nord et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place with nose down, right side west and press Save Position...</source>
-        <translation type="unfinished">Positionner avec le nez vers le bas, le coté droit vers l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner avec le nez vers le bas, le coté droit vers l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place right side down, nose west and press Save Position...</source>
-        <translation type="unfinished">Positionner le flanc droit vers le bas, le nez en direction de l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner le flanc droit vers le bas, le nez en direction de l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place upside down, nose east and press Save Position...</source>
-        <translation type="unfinished">Positionner à l&apos;envers, le nez vers l&apos;est et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner à l&apos;envers, le nez vers l&apos;est et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place with nose up, left side north and press Save Position...</source>
-        <translation type="unfinished">Positionner le nez vers le haut, le flanc droit vers le nord et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner le nez vers le haut, le flanc gauche vers le nord et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place with left side down, nose south and press Save Position...</source>
-        <translation type="unfinished">Positionner avec le flanc gauche vers le bas, le nez vers le sud et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner avec le flanc gauche vers le bas, le nez vers le sud et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Place horizontally and press Save Position...</source>
-        <translation type="unfinished">Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place with nose down and press Save Position...</source>
-        <translation type="unfinished">Positionner avec le nez vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner avec le nez vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place right side down and press Save Position...</source>
-        <translation type="unfinished">Positionner le flanc droit vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner le flanc droit vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place upside down and press Save Position...</source>
-        <translation type="unfinished">Positionner à l&apos;envers et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner à l&apos;envers et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place with nose up and press Save Position...</source>
-        <translation type="unfinished">Positionner avec le nez vers le haut et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner avec le nez vers le haut et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Place with left side down and press Save Position...</source>
-        <translation type="unfinished">Positionner le flanc gauche vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
+        <translation>Positionner le flanc gauche vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Home location not set, please set your home location and retry.</source>
-        <translation type="unfinished">Position Home non définie, veuillez régler votre position Home et essayez à nouveau.</translation>
+        <translation>Position Home non définie, veuillez régler votre position Home et essayez à nouveau.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Aborting calibration!</source>
-        <translation type="unfinished">Étalonnage abandonné !</translation>
+        <translation>Étalonnage abandonné !</translation>
     </message>
     <message>
         <location line="+120"/>
         <source>Hold...</source>
-        <translation type="unfinished">Maintenir en position...</translation>
+        <translation>Maintenir en position...</translation>
     </message>
     <message>
         <location line="+214"/>
         <source>Magnetometer calibration completed successfully.</source>
-        <translation type="unfinished">Étalonnage du magnétomètre terminée avec succès.</translation>
+        <translation>Étalonnage du magnétomètre terminé avec succès.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Accelerometer calibration completed successfully.</source>
-        <translation type="unfinished">Étalonnage des accéléromètres terminée avec succès.</translation>
+        <translation>Étalonnage des accéléromètres terminé avec succès.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Calibration failed! Please review the help and retry.</source>
-        <translation type="unfinished">Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau.</translation>
+        <translation>Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau.</translation>
     </message>
     <message>
         <source>Sensor scale and bias computed succesfully.</source>
@@ -14316,12 +14316,12 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/calibration/thermal/compensationcalculationtransition.h" line="+59"/>
         <source>Thermal calibration completed successfully.</source>
-        <translation type="unfinished">Étalonnage terminé avec succès.</translation>
+        <translation>Étalonnage température terminé avec succès.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Calibration failed! Please review the help and retry.</source>
-        <translation type="unfinished">Échec étalonnage ! Veuillez relire les instructions et essayer à nouveau.</translation>
+        <translation>Échec étalonnage ! Veuillez relire les instructions et essayer à nouveau.</translation>
     </message>
 </context>
 <context>
@@ -14391,13 +14391,13 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location line="+9"/>
         <source>Timing out in %1 seconds</source>
         <translatorcomment>Expiration du temps d&apos;attente dans %1 secondes - Shorted / size allowed</translatorcomment>
-        <translation type="unfinished">Expiration dans %1 secondes</translation>
+        <translation>Expiration dans %1 secondes</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Timed out after %1 seconds</source>
         <translatorcomment>Expiration du temps d&apos;attente après %1 secondes Shorted : size allowed</translatorcomment>
-        <translation type="unfinished">Expiration après %1 secondes</translation>
+        <translation>Expiration après %1 secondes</translation>
     </message>
 </context>
 <context>
@@ -14405,7 +14405,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/calibration/thermal/boardsetuptransition.h" line="+75"/>
         <source>Configuring board for calibration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration de la carte pour la calibration.</translation>
     </message>
 </context>
 <context>
@@ -14413,22 +14413,22 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/calibration/thermal/dataacquisitiontransition.h" line="+63"/>
         <source>Please wait during samples acquisition. This can take several minutes...</source>
-        <translation type="unfinished">Veuillez attendre pendant l&apos;acquisition des échantillons. Cela peut plusieurs minutes...</translation>
+        <translation>Veuillez attendre pendant l&apos;acquisition des échantillons. Cela peut prendre plusieurs minutes...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Acquisition will run until the rate of temperature change is less than %1°C/min.</source>
-        <translation type="unfinished">L&apos;acquisition s&apos;effectue jusqu&apos;à ce que le changement de température soit inférieur à %1°C/min.</translation>
+        <translation>L&apos;acquisition s&apos;effectue jusqu&apos;à ce que le changement de température soit inférieur à %1°C/min.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>For the calibration to be valid, the temperature span during acquisition must be greater than %1°C.</source>
-        <translation type="unfinished">Pour que la calibration soit valide, la différence de température durant l&apos;acquisition doit être supérieure à %1°C.</translation>
+        <translation>Pour que la calibration soit valide, la différence de température durant l&apos;acquisition doit être supérieure à %1°C.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Estimating acquisition duration...</source>
-        <translation type="unfinished">Estimation de la durée d&apos;acquisition...</translation>
+        <translation>Estimation de la durée d&apos;acquisition...</translation>
     </message>
 </context>
 <context>
@@ -14436,7 +14436,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/calibration/thermal/settingshandlingtransitions.h" line="+75"/>
         <source>Saving initial settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement des paramètres initiaux.</translation>
     </message>
 </context>
 <context>
@@ -14444,7 +14444,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location line="+40"/>
         <source>Restoring board configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Restauration des paramètres de la carte.</translation>
     </message>
 </context>
 <context>
@@ -14452,37 +14452,37 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/calibration/thermal/thermalcalibrationhelper.cpp" line="+318"/>
         <source>Barometer is calibrated.</source>
-        <translation type="unfinished">Baromètre calibré.</translation>
+        <translation>Le baromètre est calibré.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Failed to calibrate barometer!</source>
-        <translation type="unfinished">Échec de la calibration du baromètre !</translation>
+        <translation>Échec de la calibration du baromètre !</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Gyro is calibrated.</source>
-        <translation type="unfinished">Gyroscope calibré.</translation>
+        <translation>Les gyroscopes sont calibrés.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Failed to calibrate gyro!</source>
-        <translation type="unfinished">Échec de la calibration des gyroscopes !</translation>
+        <translation>Échec de la calibration des gyroscopes !</translation>
     </message>
     <message>
         <location line="+63"/>
         <source>Target temperature span has been acquired. You may now end acquisition or continue.</source>
-        <translation type="unfinished">La différence de température a été atteinte. Vous pouvez arrêter maintenant ou continuer.</translation>
+        <translation>La différence de température a été atteinte. Vous pouvez arrêter maintenant ou continuer.</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>m&apos;&apos;s&apos;&apos;&apos;&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Estimated acquisition duration is %1.</source>
-        <translation type="unfinished">La durée estimée d&apos;acquisition est de %1.</translation>
+        <translation>La durée estimée de l&apos;acquisition est de %1.</translation>
     </message>
 </context>
 <context>
@@ -14490,17 +14490,17 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+318"/>
         <source>Temperature: %1°C</source>
-        <translation type="unfinished">Température : %1°C</translation>
+        <translation>Température : %1°C</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Variance: %1°C/min</source>
-        <translation type="unfinished">Variation : %1°C/min</translation>
+        <translation>Variation : %1°C/min</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Sampled range: %1°C</source>
-        <translation type="unfinished">Plage d&apos;échantillonnage : %1°C</translation>
+        <translation>Plage d&apos;échantillonnage : %1°C</translation>
     </message>
 </context>
 </TS>

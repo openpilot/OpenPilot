@@ -137,8 +137,14 @@ typedef enum {
 			case SYSTEMALARMS_ALARM_GPS:
 				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_GPS.\n", __FILE__, __LINE__, __func__);
 				break;
-			case SYSTEMALARMS_ALARM_POWER:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_POWER.\n", __FILE__, __LINE__, __func__);
+			case SYSTEMALARMS_ALARM_RECEIVER:
+				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_RECEIVER.\n", __FILE__, __LINE__, __func__);
+				break;
+			case SYSTEMALARMS_ALARM_MAGNETOMETER:
+				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_MAGNETOMETER.\n", __FILE__, __LINE__, __func__);
+				break;
+			case SYSTEMALARMS_ALARM_AIRSPEED:
+				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_AIRSPEED.\n", __FILE__, __LINE__, __func__);
 				break;
 		}
 	}

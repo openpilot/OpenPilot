@@ -1,4 +1,16 @@
---- RELEASE-14.06 --- Peanuts Schnapps ---
+--- RELEASE-14.06-RC2 --- Peanuts Schnapps ---
+This Release Candidate fixes the following issues:
+    *[OP-1378] - Check Limits for flight modes
+    *[OP-1377] - Calibration config panel has Apply button even when not in Expert mode
+    *[OP-1376] - Calibration results not saved to SD
+    *[OP-1375] - Update Mag Ki and Kp default settings
+    *[OP-1374] - Automatically enable the right PathFollower
+    *[OP-1337] - Fixes for French translation
+    
+The full list of features, improvements and bugfixes in this release candidate is accessible here:
+http://progress.openpilot.org/issues/?filter=11462
+
+--- RELEASE-14.06-RC1 --- Peanuts Schnapps ---
 This is the Mid 2014 release. 
 This version still supports the CopterControl and CC3D.
 It includes several additions and changes aimed at gps/navigation functionalities 

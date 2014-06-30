@@ -150,6 +150,11 @@ void PIOS_Board_Init(void)
 	PIOS_I2C_init();
 #endif
 
+	/* Setup servo driver */
+#if defined(PIOS_INCLUDE_SERVO)
+	PIOS_Servo_Init();
+#endif
+
     /* Configure Telemetry port */
     uint8_t hwsettings_rv_telemetryport;
     HwSettingsRV_TelemetryPortGet(&hwsettings_rv_telemetryport);

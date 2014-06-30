@@ -42,6 +42,7 @@
 /* Linux includes */
 #include <sys/time.h>
 
+#define GRAV                 9.81f
 #define STACK_SIZE_BYTES     2048
 #define TASK_PRIORITY        (tskIDLE_PRIORITY + 4) // device driver
 /* in Hz */
@@ -95,7 +96,7 @@ int32_t MpuInitialize()
 	mpu_set_compass_sample_rate(MPU_9150_SAMPLE_RATE);
 	dmp_load_motion_driver_firmware();
 	dmp_set_orientation(inv_orientation_matrix_to_scaler(gyro_orientation));
-  	dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_GYRO_CAL);
+	dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_RAW_GYRO);
 	dmp_set_fifo_rate(MPU_9150_SAMPLE_RATE);
 	mpu_set_dmp_state(1);
 	printf(" done.\n");
@@ -108,10 +109,8 @@ MODULE_INITCALL(MpuInitialize, MpuStart);
  * \brief Reads the queue handle
  * \return Handle to the queue or null if invalid device
  */
-/* reading from different thred should be no problem ??? (synchronization ???) */
 xQueueHandle PIOS_MPU6000_GetQueue()
 {
-	// should we get call to this function ???
     return queue;
 }
 
@@ -215,8 +214,6 @@ static void mpuTask(__attribute__((unused)) void *parameters)
 	mpu_9150_data_t mpu_data;
 	struct pios_mpu6000_data mpu6000_data;
 
-	printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
-
 	/* no queue, no task, many problems */
 	if (NULL == queue) {
 		/* this should not happen BTW */
@@ -225,13 +222,14 @@ static void mpuTask(__attribute__((unused)) void *parameters)
 
 	while (1) {
 		if (mpu_read_data(&mpu_data) == 0) {
+			// 180DEG rotation for Z
 			mpu6000_data.gyro_x = mpu_data.raw_gyro[0];
 			mpu6000_data.gyro_y = mpu_data.raw_gyro[1];
-			mpu6000_data.gyro_z = mpu_data.raw_gyro[2];
+			mpu6000_data.gyro_z = - mpu_data.raw_gyro[2];
 #if defined(PIOS_MPU6000_ACCEL)
 			mpu6000_data.accel_x = mpu_data.raw_accel[0];
 			mpu6000_data.accel_y = mpu_data.raw_accel[1];
-			mpu6000_data.accel_z = mpu_data.raw_accel[2];
+			mpu6000_data.accel_z = - mpu_data.raw_accel[2];
 #endif /* PIOS_MPU6000_ACCEL */
 			mpu6000_data.temperature = (int16_t) ((mpu_data.temperature & 0x00FFFF00) >> 8);
 
@@ -265,10 +263,12 @@ int32_t PIOS_MPU6000_Test() {
 	return 0;
 }
 float PIOS_MPU6000_GetScale() {
-	return 1.0;
+	//PIOS_MPU6000_SCALE_2000_DEG:
+	return 1.0f / 16.4f;
 }
 float PIOS_MPU6000_GetAccelScale() {
-	return 1.0;
+	//PIOS_MPU6000_ACCEL_8G:
+	return GRAV / 4096.0f;
 }
 
 #endif /* PIOS_INCLUDE_MPU6000 */

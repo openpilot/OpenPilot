@@ -42,7 +42,7 @@
 #include <taskinfo.h>
 
 // a number of useful macros
-#define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_ERROR))
+#define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
 
 
 /****************************

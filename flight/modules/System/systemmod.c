@@ -403,7 +403,7 @@ static void hwSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     HwSettingsGet(&currentHwSettings);
     // check whether the Hw Configuration has changed from the one used at boot time
     if (memcmp(&bootHwSettings, &currentHwSettings, sizeof(HwSettingsData)) != 0) {
-        ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_ERROR, SYSTEMALARMS_EXTENDEDALARMSTATUS_REBOOTREQUIRED, 0);
+        ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL, SYSTEMALARMS_EXTENDEDALARMSTATUS_REBOOTREQUIRED, 0);
     }
 }
 
@@ -607,7 +607,7 @@ static void updateSystemAlarms()
     UAVObjClearStats();
     EventClearStats();
     if (objStats.eventCallbackErrors > 0 || objStats.eventQueueErrors > 0 || evStats.eventErrors > 0) {
-        AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_ERROR);
+        AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_WARNING);
     } else {
         AlarmsClear(SYSTEMALARMS_ALARM_EVENTSYSTEM);
     }

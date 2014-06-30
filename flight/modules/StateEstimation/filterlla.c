@@ -53,7 +53,7 @@ struct data {
 // Private functions
 
 static int32_t init(stateFilter *self);
-static int32_t filter(stateFilter *self, stateEstimation *state);
+static filterResult filter(stateFilter *self, stateEstimation *state);
 
 
 int32_t filterLLAInitialize(stateFilter *handle)
@@ -86,13 +86,13 @@ static int32_t init(__attribute__((unused)) stateFilter *self)
     return 0;
 }
 
-static int32_t filter(__attribute__((unused)) stateFilter *self, stateEstimation *state)
+static filterResult filter(__attribute__((unused)) stateFilter *self, stateEstimation *state)
 {
     struct data *this = (struct data *)self->localdata;
 
     // cannot update local NED if home location is unset
     if (this->home.Set != HOMELOCATION_SET_TRUE) {
-        return 0;
+        return FILTERRESULT_WARNING;
     }
 
     // only do stuff if we have a valid GPS update
@@ -116,7 +116,7 @@ static int32_t filter(__attribute__((unused)) stateFilter *self, stateEstimation
         }
     }
 
-    return 0;
+    return FILTERRESULT_OK;
 }
 
 /**

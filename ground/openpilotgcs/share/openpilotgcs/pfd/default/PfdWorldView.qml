@@ -12,7 +12,7 @@ Item {
 
         property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "horizon")
         width: Math.round(sceneItem.width*scaledBounds.width/2)*2
-        height: Math.round(sceneItem.height*scaledBounds.height/2)*2
+        height: Math.round(sceneItem.height*scaledBounds.height/2)*3
 
         property double pitch1DegScaledHeight: (svgRenderer.scaledElementBounds("pfd.svg", "pitch-90").y -
                                                 svgRenderer.scaledElementBounds("pfd.svg", "pitch90").y)/180.0
@@ -47,6 +47,16 @@ Item {
             sceneSize: background.sceneSize
             anchors.centerIn: parent
             border: 1
+            smooth: true
+        }
+
+        SvgElementImage {
+            id: pitch_0
+            elementName: "pitch0"
+
+            sceneSize: background.sceneSize
+            anchors.centerIn: parent
+            border: 1            
             smooth: true
         }
     }

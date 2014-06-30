@@ -32,8 +32,10 @@
 #include <accelgyrosettings.h>
 #include <homelocation.h>
 #include <accelstate.h>
-
 #include <magstate.h>
+
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
 
 #include "assertions.h"
 #include "calibration.h"
@@ -79,6 +81,12 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     addApplySaveButtons(m_ui->revoCalSettingsSaveRAM, m_ui->revoCalSettingsSaveSD);
 
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+    if (!settings->useExpertMode()) {
+        m_ui->revoCalSettingsSaveRAM->setVisible(false);
+    }
+
     // Initialization of the visual help
     m_ui->calibrationVisualHelp->setScene(new QGraphicsScene(this));
     m_ui->calibrationVisualHelp->setRenderHint(QPainter::HighQualityAntialiasing, true);
@@ -89,6 +97,10 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
     addUAVObject("HomeLocation");
+    addUAVObject("RevoCalibration");
+    addUAVObject("AttitudeSettings");
+    addUAVObject("RevoSettings");
+    addUAVObject("AccelGyroSettings");
     autoLoadWidgets();
 
     // accel calibration

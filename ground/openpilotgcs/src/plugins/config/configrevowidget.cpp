@@ -330,7 +330,7 @@ void ConfigRevoWidget::displayTemperature(float temperature)
 
 void ConfigRevoWidget::displayTemperatureGradient(float temperatureGradient)
 {
-    m_ui->temperatureGradientLabel->setText(tr("Variance: %1°C/min").arg(format(temperatureGradient)));
+    m_ui->temperatureGradientLabel->setText(tr("Gradient: %1°C/min").arg(format(temperatureGradient)));
 }
 
 void ConfigRevoWidget::displayTemperatureRange(float temperatureRange)

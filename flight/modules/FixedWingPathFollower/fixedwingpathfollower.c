@@ -62,6 +62,7 @@
 #include "velocitystate.h"
 #include "taskinfo.h"
 #include <pios_struct_helper.h>
+#include <sanitycheck.h>
 
 #include "sin_lookup.h"
 #include "paths.h"
@@ -112,7 +113,10 @@ int32_t FixedWingPathFollowerInitialize()
     HwSettingsInitialize();
     HwSettingsOptionalModulesData optionalModules;
     HwSettingsOptionalModulesGet(&optionalModules);
-    if (optionalModules.FixedWingPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    FrameType_t frameType = GetCurrentFrameType();
+
+    if ((optionalModules.FixedWingPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) ||
+        (frameType == FRAME_TYPE_FIXED_WING)) {
         followerEnabled = true;
         FixedWingPathFollowerSettingsInitialize();
         FixedWingPathFollowerStatusInitialize();

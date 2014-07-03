@@ -37,7 +37,7 @@
 int32_t osdgenInitialize(void);
 
 // Needed till someone fixes the black/white hardware problem
-//#define ONLY_WHITE_PIXEL
+#define ONLY_WHITE_PIXEL
 #ifdef ONLY_WHITE_PIXEL
 #define GCS_LEVEL_ONLY_WHITE_PIXEL      4095
 #define CHECK_ONLY_WHITE_PIXEL          if (only_white_pixel) mmode = (lmode & 1);

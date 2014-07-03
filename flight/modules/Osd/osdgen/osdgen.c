@@ -2111,9 +2111,31 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
             if (!(WarnMask & WARN_NO_SAT_FIX)) {
                 GPSTimeData gpsTime;
                 GPSTimeGet(&gpsTime);
-                sprintf(temp, "%02u:%02u:%02u UTC", gpsTime.Hour, gpsTime.Minute, gpsTime.Second);
-                write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
-                d_y += v_spacing;
+                if (gpsTime.Hour | gpsTime.Minute | gpsTime.Second) {
+#if 1
+                    sprintf(temp, "%02u:%02u:%02u UTC", gpsTime.Hour, gpsTime.Minute, gpsTime.Second);
+                    write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+                    d_y += v_spacing;
+#else                                   // TODO make configurable
+#define TIME_ZONE_WET       0           // TODO make configurable
+#define TIME_ZONE_MET       1           // TODO make configurable
+#define DAYLIGHT_SAVING     1           // TODO make configurable and calculate
+                    sprintf(temp, "%02u:%02u:%02u UTC ", gpsTime.Hour, gpsTime.Minute, gpsTime.Second);
+                    write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+                    d_y += v_spacing;
+                    int8_t Hour;
+                    Hour = TIME_ZONE_WET + DAYLIGHT_SAVING + gpsTime.Hour;
+                    Hour = Hour <  0 ? Hour + 24 : Hour < 24 ? Hour : Hour - 24;
+                    sprintf(temp, "%02u:%02u:%02u WEST", Hour, gpsTime.Minute, gpsTime.Second);
+                    write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+                    d_y += v_spacing;
+                    Hour = TIME_ZONE_MET + DAYLIGHT_SAVING + gpsTime.Hour;
+                    Hour = Hour <  0 ? Hour + 24 : Hour < 24 ? Hour : Hour - 24;
+                    sprintf(temp, "%02u:%02u:%02u MEST", Hour, gpsTime.Minute, gpsTime.Second);
+                    write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+                    d_y += v_spacing;
+#endif
+                }
             }
 #endif
         }
@@ -2742,7 +2764,6 @@ void updateGraphics()
                 WarnMask |= (gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D) ? WARN_NO_SAT_FIX : 0x00;
                 WarnMask |= (!homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE) ? WARN_HOME_NOT_SET : 0x00;
             } else {
-                WarnMask |= 0x00;
                 WarnMask |= (HomePosOnTime && gpsData.Status < GPSPOSITIONSENSOR_STATUS_FIX3D) ? WARN_NO_SAT_FIX : 0x00;
                 WarnMask |= (HomePosOnTime && !homePos.GotHome && home.Set == HOMELOCATION_SET_FALSE) ? WARN_HOME_NOT_SET : 0x00;
             }

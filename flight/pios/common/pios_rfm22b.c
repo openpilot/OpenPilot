@@ -62,6 +62,15 @@
 #include <pios_ppm_out.h>
 #include <ecc.h>
 
+/* Local Defines for better PPM resolution over the RFM link */
+//#define PIOS_RFM_PPM_BETTER_RESOLUTION
+#ifdef PIOS_RFM_PPM_BETTER_RESOLUTION
+#define RFM_PPM_ADDITIONAL_BYTES    2
+//#define RFM_PPM_800_2200
+#else
+#define RFM_PPM_ADDITIONAL_BYTES    0
+#endif
+
 /* Local Defines */
 #define STACK_SIZE_BYTES                 200
 #define TASK_PRIORITY                    (tskIDLE_PRIORITY + 4) // flight control relevant device driver (ppm link)
@@ -1732,6 +1741,9 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
     uint8_t *p  = radio_dev->tx_packet;
     uint8_t len = 0;
     uint8_t max_data_len = radio_dev->max_packet_len - (radio_dev->ppm_only_mode ? 0 : RS_ECC_NPARITY);
+#ifdef PIOS_RFM_PPM_BETTER_RESOLUTION
+    uint16_t hi_bits = 0;
+#endif // PIOS_RFM_PPM_BETTER_RESOLUTION
 
     // Don't send if it's not our turn, or if we're receiving a packet.
     if (!rfm22_timeToSend(radio_dev) || !PIOS_RFM22B_InRxWait((uint32_t)radio_dev)) {
@@ -1745,7 +1757,7 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
 
     // Should we append PPM data to the packet?
     if (radio_dev->ppm_send_mode) {
-        len = RFM22B_PPM_NUM_CHANNELS + (radio_dev->ppm_only_mode ? 2 : 1);
+        len = RFM22B_PPM_NUM_CHANNELS + RFM_PPM_ADDITIONAL_BYTES + (radio_dev->ppm_only_mode ? 2 : 1);
 
         // Ensure we can fit the PPM data in the packet.
         if (max_data_len < len) {
@@ -1762,17 +1774,39 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
                 p[i + 1] = 0;
             } else {
                 p[0]    |= 1 << i;
+#ifdef PIOS_RFM_PPM_BETTER_RESOLUTION
+                // TODO pack
+                // first step
+                //      988 - 2011
+                // second step
+                //      conversion between microseconds 808-2192 and value 0-1023
+                //       808-1000 ==    0 -   11 (16us per step)
+                //      1000-1999 ==   12 - 1011 ( 1us per step)
+                //      2000-2192 == 1012 - 1023 (16us per step)
+#ifdef RFM_PPM_800_2200
+                uint16_t v = (val < 800) ? 0 : (val < 1000) ? (val - 799) / 16 : (val < 2000) ? val - 988 : (val < 2200) ? (val - 1992) / 16 + 1011 : 1023;
+#else
+                uint16_t v = (val < 988) ? 0 : ((val > 2011) ? 1023 : (uint8_t)(val - 988));
+#endif // RFM_PPM_800_2200
+                p[i + 1] = (uint8_t) v;
+                hi_bits |= ((v >> 8) & 0x03) << (2 * i);
+#else
                 p[i + 1] = (val < 1000) ? 0 : ((val >= 1900) ? 255 : (uint8_t)(256 * (val - 1000) / 900));
+#endif // PIOS_RFM_PPM_BETTER_RESOLUTION
             }
         }
+#ifdef PIOS_RFM_PPM_BETTER_RESOLUTION
+        p[RFM22B_PPM_NUM_CHANNELS + 1] = (uint8_t) hi_bits;
+        p[RFM22B_PPM_NUM_CHANNELS + 2] = (uint8_t) (hi_bits >> 8);
+#endif // PIOS_RFM_PPM_BETTER_RESOLUTION
 
         // The last byte is a CRC.
         if (radio_dev->ppm_only_mode) {
             uint8_t crc = 0;
-            for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS + 1; ++i) {
+            for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS + RFM_PPM_ADDITIONAL_BYTES + 1; ++i) {
                 crc = PIOS_CRC_updateByte(crc, p[i]);
             }
-            p[RFM22B_PPM_NUM_CHANNELS + 1] = crc;
+            p[RFM22B_PPM_NUM_CHANNELS + RFM_PPM_ADDITIONAL_BYTES + 1] = crc;
         }
     }
 
@@ -1865,6 +1899,9 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
     bool good_packet = true;
     bool corrected_packet = false;
     uint8_t data_len = rx_len;
+#ifdef PIOS_RFM_PPM_BETTER_RESOLUTION
+    uint16_t hi_bits = 0;
+#endif // PIOS_RFM_PPM_BETTER_RESOLUTION
 
     // We don't rsencode ppm only packets.
     if (!radio_dev->ppm_only_mode) {
@@ -1885,7 +1922,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
 
     // Should we pull PPM data off of the head of the packet?
     if ((good_packet || corrected_packet) && radio_dev->ppm_recv_mode) {
-        uint8_t ppm_len = RFM22B_PPM_NUM_CHANNELS + (radio_dev->ppm_only_mode ? 2 : 1);
+        uint8_t ppm_len = RFM22B_PPM_NUM_CHANNELS + RFM_PPM_ADDITIONAL_BYTES + (radio_dev->ppm_only_mode ? 2 : 1);
 
         // Ensure the packet it long enough
         if (data_len < ppm_len) {
@@ -1895,28 +1932,45 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
         // Verify the CRC if this is a PPM only packet.
         if ((good_packet || corrected_packet) && radio_dev->ppm_only_mode) {
             uint8_t crc = 0;
-            for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS + 1; ++i) {
+            for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS + RFM_PPM_ADDITIONAL_BYTES + 1; ++i) {
                 crc = PIOS_CRC_updateByte(crc, p[i]);
             }
-            if (p[RFM22B_PPM_NUM_CHANNELS + 1] != crc) {
+            if (p[RFM22B_PPM_NUM_CHANNELS + RFM_PPM_ADDITIONAL_BYTES + 1] != crc) {
                 good_packet = false;
                 corrected_packet = false;
             }
         }
 
         if (good_packet || corrected_packet) {
+#ifdef PIOS_RFM_PPM_BETTER_RESOLUTION
+            hi_bits  = p[RFM22B_PPM_NUM_CHANNELS + 1];
+            hi_bits |= p[RFM22B_PPM_NUM_CHANNELS + 2] << 8;
+#endif // PIOS_RFM_PPM_BETTER_RESOLUTION
             for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
                 // Is this a valid channel?
                 if (p[0] & (1 << i)) {
                     uint32_t val = p[i + 1];
+#ifdef PIOS_RFM_PPM_BETTER_RESOLUTION
+                    // TODO unpack
+                    // ...
+                    // ...
+                    // ...
+#ifdef RFM_PPM_800_2200
+                    uint16_t v = (val < 12) ? 808 + val * 16 : (val < 1012) ? val + 988 : (val < 1024) ? 2000 + (val - 1011) * 16 : 2192;
+#else
+                    uint16_t v = val + 988;
+#endif // RFM_PPM_800_2200
+                    radio_dev->ppm[i] = v;
+#else
                     radio_dev->ppm[i] = (uint16_t)(1000 + val * 900 / 256);
+#endif // PIOS_RFM_PPM_BETTER_RESOLUTION
                 } else {
                     radio_dev->ppm[i] = PIOS_RCVR_INVALID;
                 }
             }
 
-            p += RFM22B_PPM_NUM_CHANNELS + 1;
-            data_len -= RFM22B_PPM_NUM_CHANNELS + 1;
+            p += RFM22B_PPM_NUM_CHANNELS + RFM_PPM_ADDITIONAL_BYTES + 1;
+            data_len -= RFM22B_PPM_NUM_CHANNELS + RFM_PPM_ADDITIONAL_BYTES + 1;
 
             // Call the PPM received callback if it's available.
             if (radio_dev->ppm_callback) {
@@ -1934,6 +1988,16 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
     } else {
         // We couldn't correct the error, so drop the packet.
         rfm22b_add_rx_status(radio_dev, RADIO_ERROR_RX_PACKET);
+#if 0   // JR_TEST  Just an untested idea: Send channel or channel index info in case of dropped packet.
+        char temp[10] = { 0 };
+        int len;
+#if 1
+        len = sprintf(temp, "c:%d%c%c", radio_dev->channel, 0x0D, 0x0A);
+#else
+        len = sprintf(temp, "c:%d%c%c", radio_dev->channel_index, 0x0D, 0x0A);
+#endif
+        PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, (uint8_t*) temp, len);
+#endif
     }
 
     enum pios_radio_event ret_event = RADIO_EVENT_RX_COMPLETE;

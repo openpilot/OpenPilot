@@ -234,7 +234,7 @@ static filterResult complementaryFilter(struct data *this, float gyro[3], float 
         float magBias[3];
         RevoCalibrationmag_biasArrayGet(magBias);
         // don't trust Mag for initial orientation if it has not been calibrated
-        if (magBias[0] < 1e-6f && magBias[1] < 1e-6f && magBias[2] < 1e-6f) {
+        if (fabsf(magBias[0]) < 1e-6f && fabsf(magBias[1]) < 1e-6f && fabsf(magBias[2]) < 1e-6f) {
             this->magCalibrated = false;
             mag[0] = 100.0f;
             mag[1] = 0.0f;

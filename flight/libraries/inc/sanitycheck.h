@@ -32,6 +32,14 @@
 
 #include <systemalarms.h>
 
+typedef enum {
+    FRAME_TYPE_MULTIROTOR,
+    FRAME_TYPE_HELI,
+    FRAME_TYPE_FIXED_WING,
+    FRAME_TYPE_GROUND,
+    FRAME_TYPE_CUSTOM,
+} FrameType_t;
+
 #define SANITYCHECK_STATUS_ERROR_NONE         SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE
 #define SANITYCHECK_STATUS_ERROR_FLIGHTMODE   SYSTEMALARMS_EXTENDEDALARMSTATUS_FLIGHTMODE
 
@@ -44,5 +52,7 @@
 #endif
 
 extern int32_t configuration_check();
+
+FrameType_t GetCurrentFrameType();
 
 #endif /* SANITYCHECK_H */

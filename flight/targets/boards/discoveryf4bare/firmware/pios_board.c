@@ -302,7 +302,7 @@ static void PIOS_Board_configure_pwm(const struct pios_pwm_cfg *pwm_cfg)
     /* Set up the receiver port.  Later this should be optional */
     uint32_t pios_pwm_id;
 
-    PIOS_PWM_Init(&pios_pwm_id, pwm_cfg);
+    PIOS_PWM_Init(&pios_pwm_id, pwm_cfg, PIOS_SERVO_ENABLE_ALL);
 
     uint32_t pios_pwm_rcvr_id;
     if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
@@ -904,7 +904,7 @@ void PIOS_Board_Init(void)
 
 #ifndef PIOS_ENABLE_DEBUG_PINS
     // pios_servo_cfg points to the correct configuration based on input port settings
-    PIOS_Servo_Init(pios_servo_cfg);
+    PIOS_Servo_Init(pios_servo_cfg, PIOS_SERVO_ENABLE_ALL);
 #else
     PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
 #endif

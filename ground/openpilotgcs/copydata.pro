@@ -45,7 +45,7 @@ GCS_LIBRARY_PATH
                          imageformats \
                          platforms \
                          mediaservice \
-                         sqldrivers 
+                         sqldrivers
         for(dir, QT_PLUGIN_DIRS) {
             data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_PLUGINS_PATH/$$dir\") $$addNewline()
         }

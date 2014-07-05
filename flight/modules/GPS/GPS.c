@@ -386,6 +386,9 @@ static void updateSettings()
         case HWSETTINGS_GPSSPEED_115200:
             PIOS_COM_ChangeBaud(gpsPort, 115200);
             break;
+        case HWSETTINGS_GPSSPEED_230400:
+            PIOS_COM_ChangeBaud(gpsPort, 230400);
+            break;
         }
     }
 }

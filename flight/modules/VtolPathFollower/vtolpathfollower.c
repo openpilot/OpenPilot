@@ -73,6 +73,7 @@
 
 #include "paths.h"
 #include "CoordinateConversions.h"
+#include <sanitycheck.h>
 
 #include "cameradesired.h"
 #include "poilearnsettings.h"
@@ -128,8 +129,10 @@ int32_t VtolPathFollowerInitialize()
     HwSettingsOptionalModulesData optionalModules;
 
     HwSettingsOptionalModulesGet(&optionalModules);
+    FrameType_t frameType = GetCurrentFrameType();
 
-    if (optionalModules.VtolPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    if ((optionalModules.VtolPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) ||
+        (frameType == FRAME_TYPE_MULTIROTOR)) {
         VtolPathFollowerSettingsInitialize();
         NedAccelInitialize();
         PathDesiredInitialize();

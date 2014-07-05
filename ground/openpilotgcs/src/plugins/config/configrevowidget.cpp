@@ -157,8 +157,6 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
 
     connect(m_gyroBiasCalibrationModel, SIGNAL(started()), this, SLOT(disableAllCalibrations()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(stopped()), this, SLOT(enableAllCalibrations()));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(storeAndClearBoardRotation()), this, SLOT(storeAndClearBoardRotation()));
-    connect(m_gyroBiasCalibrationModel, SIGNAL(recallBoardRotation()), this, SLOT(recallBoardRotation()));
     connect(m_gyroBiasCalibrationModel, SIGNAL(displayInstructions(QString, WizardModel::MessageType)),
             this, SLOT(addInstructions(QString, WizardModel::MessageType)));
     connect(m_gyroBiasCalibrationModel, SIGNAL(displayVisualHelp(QString)), this, SLOT(displayVisualHelp(QString)));
@@ -332,7 +330,7 @@ void ConfigRevoWidget::displayTemperature(float temperature)
 
 void ConfigRevoWidget::displayTemperatureGradient(float temperatureGradient)
 {
-    m_ui->temperatureGradientLabel->setText(tr("Variance: %1°C/min").arg(format(temperatureGradient)));
+    m_ui->temperatureGradientLabel->setText(tr("Gradient: %1°C/min").arg(format(temperatureGradient)));
 }
 
 void ConfigRevoWidget::displayTemperatureRange(float temperatureRange)

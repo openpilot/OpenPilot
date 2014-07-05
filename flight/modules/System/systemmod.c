@@ -96,11 +96,12 @@ static xQueueHandle objectPersistenceQueue;
 static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_CRITICAL = 3 } stackOverflow;
 static bool mallocFailed;
 static HwSettingsData bootHwSettings;
+static FrameType_t bootFrameType;
 static struct PIOS_FLASHFS_Stats fsStats;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent *ev);
-static void hwSettingsUpdatedCb(UAVObjEvent *ev);
+static void checkSettingsUpdatedCb(UAVObjEvent *ev);
 #ifdef DIAG_TASKS
 static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_info *task_info, void *context);
 static void callbackSchedulerForEachCallback(int16_t callback_id, const struct pios_callback_info *callback_info, void *context);
@@ -195,8 +196,10 @@ static void systemTask(__attribute__((unused)) void *parameters)
 
     // Load a copy of HwSetting active at boot time
     HwSettingsGet(&bootHwSettings);
+    bootFrameType = GetCurrentFrameType();
     // Whenever the configuration changes, make sure it is safe to fly
-    HwSettingsConnectCallback(hwSettingsUpdatedCb);
+    HwSettingsConnectCallback(checkSettingsUpdatedCb);
+    SystemSettingsConnectCallback(checkSettingsUpdatedCb);
 
 #ifdef DIAG_TASKS
     TaskInfoData taskInfoData;
@@ -396,13 +399,15 @@ static void objectUpdatedCb(UAVObjEvent *ev)
 /**
  * Called whenever hardware settings changed
  */
-static void hwSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+static void checkSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     HwSettingsData currentHwSettings;
 
     HwSettingsGet(&currentHwSettings);
+    FrameType_t currentFrameType = GetCurrentFrameType();
     // check whether the Hw Configuration has changed from the one used at boot time
-    if (memcmp(&bootHwSettings, &currentHwSettings, sizeof(HwSettingsData)) != 0) {
+    if ((memcmp(&bootHwSettings, &currentHwSettings, sizeof(HwSettingsData)) != 0) ||
+        (currentFrameType != bootFrameType)) {
         ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL, SYSTEMALARMS_EXTENDEDALARMSTATUS_REBOOTREQUIRED, 0);
     }
 }

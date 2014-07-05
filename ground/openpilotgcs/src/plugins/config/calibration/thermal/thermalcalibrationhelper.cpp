@@ -407,7 +407,7 @@ void ThermalCalibrationHelper::updateTemperature(float temp)
     }
     if (!m_rangeReached && (range() >= TargetTempDelta)) {
         m_rangeReached = true;
-        addInstructions(tr("Target temperature span has been acquired. You may now end acquisition or continue."));
+        addInstructions(tr("Target temperature span has been acquired. Acquisition may be ended or, preferably, continued."));
     }
     emit temperatureRangeChanged(range());
 

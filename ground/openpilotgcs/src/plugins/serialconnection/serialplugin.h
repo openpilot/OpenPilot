@@ -51,9 +51,10 @@ class SerialEnumerationThread : public QThread {
     Q_OBJECT
 public:
     SerialEnumerationThread(SerialConnection *serial);
-    virtual ~SerialEnumerationThread();
 
     virtual void run();
+
+    void stop();
 
 signals:
     void enumerationChanged();

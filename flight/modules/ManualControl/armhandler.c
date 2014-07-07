@@ -35,6 +35,7 @@
 #include <accessorydesired.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>
+#include <stabilizationdesired.h>
 
 // Private constants
 #define ARMED_THRESHOLD 0.50f
@@ -267,6 +268,7 @@ static bool okToArm(void)
         }
     }
 
+    StabilizationDesiredStabilizationModeData stabDesired;
     uint8_t flightMode;
     FlightStatusFlightModeGet(&flightMode);
     switch (flightMode) {
@@ -277,8 +279,14 @@ static bool okToArm(void)
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-        return true;
-
+        // Prevent arming if unsafe due to current Thrust Mode
+        StabilizationDesiredStabilizationModeGet(&stabDesired);
+        if (stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEHOLD ||
+            stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO) {
+            return false;
+        } else {
+            return true;
+        }
         break;
 
     default:

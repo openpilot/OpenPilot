@@ -26,14 +26,15 @@
 #include <QtPlugin>
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
+#include <QtQuick>
 
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
 #include <QKeySequence>
 #include <coreplugin/modemanager.h>
-
-#include "flightlogdialog.h"
+#include "flightlogmanager.h"
+#include "uavobject.h"
 
 FlightLogPlugin::FlightLogPlugin() : m_logDialog(0)
 {}
@@ -72,11 +73,22 @@ bool FlightLogPlugin::initialize(const QStringList & args, QString *errMsg)
 void FlightLogPlugin::ShowLogManagementDialog()
 {
     if (!m_logDialog) {
-        m_logDialog = new FlightLogDialog(0, new FlightLogManager());
-        connect(m_logDialog, SIGNAL(finished(int)), this, SLOT(LogManagementDialogClosed()));
+        qmlRegisterType<ExtendedDebugLogEntry>("org.openpilot", 1, 0, "DebugLogEntry");
+        qmlRegisterType<UAVOLogSettingsWrapper>("org.openpilot", 1, 0, "UAVOLogSettingsWrapper");
+        FlightLogManager *flightLogManager = new FlightLogManager();
+        m_logDialog = new QQuickView();
+        m_logDialog->rootContext()->setContextProperty("logStatus", flightLogManager->flightLogStatus());
+        m_logDialog->rootContext()->setContextProperty("logControl", flightLogManager->flightLogControl());
+        m_logDialog->rootContext()->setContextProperty("logSettings", flightLogManager->flightLogSettings());
+        m_logDialog->rootContext()->setContextProperty("logManager", flightLogManager);
+        m_logDialog->rootContext()->setContextProperty("logDialog", m_logDialog);
+        m_logDialog->setResizeMode(QQuickView::SizeRootObjectToView);
+        m_logDialog->setSource(QUrl("qrc:/flightlog/FlightLogDialog.qml"));
+        m_logDialog->setModality(Qt::WindowModal);
         m_logDialog->show();
+        connect(m_logDialog, SIGNAL(destroyed()), this, SLOT(LogManagementDialogClosed()));
     } else {
-        m_logDialog->raise();
+        m_logDialog->show();
     }
 }
 

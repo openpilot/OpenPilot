@@ -77,6 +77,8 @@ void FlightLogPlugin::ShowLogManagementDialog()
         qmlRegisterType<UAVOLogSettingsWrapper>("org.openpilot", 1, 0, "UAVOLogSettingsWrapper");
         FlightLogManager *flightLogManager = new FlightLogManager();
         m_logDialog = new QQuickView();
+        m_logDialog->setIcon(QIcon(":/core/images/openpilot_logo_32.png"));
+        m_logDialog->setTitle(tr("Manage flight side logs"));
         m_logDialog->rootContext()->setContextProperty("logStatus", flightLogManager->flightLogStatus());
         m_logDialog->rootContext()->setContextProperty("logControl", flightLogManager->flightLogControl());
         m_logDialog->rootContext()->setContextProperty("logSettings", flightLogManager->flightLogSettings());
@@ -84,12 +86,11 @@ void FlightLogPlugin::ShowLogManagementDialog()
         m_logDialog->rootContext()->setContextProperty("logDialog", m_logDialog);
         m_logDialog->setResizeMode(QQuickView::SizeRootObjectToView);
         m_logDialog->setSource(QUrl("qrc:/flightlog/FlightLogDialog.qml"));
-        m_logDialog->setModality(Qt::WindowModal);
-        m_logDialog->show();
+        m_logDialog->setFlags(Qt::Dialog);
+        m_logDialog->setModality(Qt::ApplicationModal);
         connect(m_logDialog, SIGNAL(destroyed()), this, SLOT(LogManagementDialogClosed()));
-    } else {
-        m_logDialog->show();
     }
+    m_logDialog->show();
 }
 
 void FlightLogPlugin::LogManagementDialogClosed()

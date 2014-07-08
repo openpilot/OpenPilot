@@ -94,6 +94,10 @@ public slots:
             setDirty(true);
             if (m_setting != 1 && m_setting != 3) {
                 setPeriod(0);
+            } else {
+                if (!period()) {
+                    setPeriod(500);
+                }
             }
             emit settingChanged(setting);
         }
@@ -240,7 +244,6 @@ public:
     {
         return m_loggingEnabled;
     }
-
 signals:
     void logEntriesChanged();
     void flightEntriesChanged();

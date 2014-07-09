@@ -86,7 +86,6 @@ void FlightLogPlugin::ShowLogManagementDialog()
         m_logDialog->rootContext()->setContextProperty("logDialog", m_logDialog);
         m_logDialog->setResizeMode(QQuickView::SizeRootObjectToView);
         m_logDialog->setSource(QUrl("qrc:/flightlog/FlightLogDialog.qml"));
-        m_logDialog->setFlags(Qt::Dialog);
         m_logDialog->setModality(Qt::ApplicationModal);
         connect(m_logDialog, SIGNAL(destroyed()), this, SLOT(LogManagementDialogClosed()));
     }

@@ -98,7 +98,7 @@ Rectangle {
                         }
                         Text {
                             id: totalSlots
-                            text: "<b>" + qsTr("Slot used (free): ") + "</b>" +
+                            text: "<b>" + qsTr("Slots used (free): ") + "</b>" +
                                   logStatus.UsedSlots + " (" + logStatus.FreeSlots + ")"
                         }
                         Text {

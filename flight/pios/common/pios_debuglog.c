@@ -105,8 +105,9 @@ void PIOS_DEBUGLOG_Initialize()
 void PIOS_DEBUGLOG_Enable(uint8_t enabled)
 {
     // increase the flight num as soon as logging is disabled
-    if (!logging_enabled && enabled) {
+    if (logging_enabled && !enabled) {
         flightnum++;
+        lognum = 0;
     }
     logging_enabled = enabled;
 }

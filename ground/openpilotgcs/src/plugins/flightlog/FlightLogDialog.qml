@@ -103,7 +103,7 @@ Rectangle {
                         }
                         Text {
                             id: totalEntries
-                            text: "<b>" + qsTr("Entries logged: ") + "</b>" + logManager.uavoEntries.count
+                            text: "<b>" + qsTr("Entries downloaded: ") + "</b>" + logManager.logEntriesCount
                         }
                         Rectangle {
                             Layout.fillHeight: true

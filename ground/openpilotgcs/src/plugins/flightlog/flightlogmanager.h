@@ -182,7 +182,7 @@ class FlightLogManager : public QObject {
     Q_PROPERTY(QStringList logSettings READ logSettings NOTIFY logSettingsChanged)
     Q_PROPERTY(QStringList logStatuses READ logStatuses NOTIFY logStatusesChanged)
     Q_PROPERTY(int loggingEnabled READ loggingEnabled WRITE setLoggingEnabled NOTIFY loggingEnabledChanged)
-
+    Q_PROPERTY(int logEntriesCount READ logEntriesCount NOTIFY logEntriesChanged)
 
 public:
     explicit FlightLogManager(QObject *parent = 0);
@@ -243,6 +243,9 @@ public:
     int loggingEnabled() const
     {
         return m_loggingEnabled;
+    }
+    int logEntriesCount(){
+        return m_logEntries.count();
     }
 signals:
     void logEntriesChanged();

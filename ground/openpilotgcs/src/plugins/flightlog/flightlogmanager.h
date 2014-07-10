@@ -244,7 +244,8 @@ public:
     {
         return m_loggingEnabled;
     }
-    int logEntriesCount(){
+    int logEntriesCount()
+    {
         return m_logEntries.count();
     }
 signals:

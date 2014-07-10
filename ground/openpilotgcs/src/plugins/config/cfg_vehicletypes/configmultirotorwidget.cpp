@@ -158,22 +158,22 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     } else if (frameType == "Hexa" || frameType == "Hexacopter") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Hexacopter"));
 
-        m_aircraft->mrRollMixLevel->setValue(50);
-        m_aircraft->mrPitchMixLevel->setValue(33);
+        m_aircraft->mrRollMixLevel->setValue(60); // Old Roll 50 - Pitch 33
+        m_aircraft->mrPitchMixLevel->setValue(40);
         setYawMixLevel(33);
     } else if (frameType == "HexaX" || frameType == "Hexacopter X") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType,
                              m_aircraft->multirotorFrameType->findText("Hexacopter X"));
 
-        m_aircraft->mrRollMixLevel->setValue(33);
-        m_aircraft->mrPitchMixLevel->setValue(50);
+        m_aircraft->mrRollMixLevel->setValue(40); // Old: Roll 33 - Pitch 50
+        m_aircraft->mrPitchMixLevel->setValue(60);
         setYawMixLevel(33);
     } else if (frameType == "HexaH" || frameType == "Hexacopter H") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType,
                              m_aircraft->multirotorFrameType->findText("Hexacopter H"));
 
-        m_aircraft->mrRollMixLevel->setValue(33);
-        m_aircraft->mrPitchMixLevel->setValue(50);
+        m_aircraft->mrRollMixLevel->setValue(40);
+        m_aircraft->mrPitchMixLevel->setValue(60);
         setYawMixLevel(33);
     } else if (frameType == "HexaCoax" || frameType == "Hexacopter Y6") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType,
@@ -375,9 +375,12 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
 
         int channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
         if (channel > -1) {
+            //get motor 1 value for Pitch
             double value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
             m_aircraft->mrPitchMixLevel->setValue(qRound(value / 1.27));
 
+            //get motor 2 value for Yaw and Roll
+            channel += 1;
             value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
             setYawMixLevel(-qRound(value / 1.27));
 
@@ -401,9 +404,12 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
 
         int channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
         if (channel > -1) {
+            //get motor 1 value for Pitch
             double value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
             m_aircraft->mrPitchMixLevel->setValue(qRound(value / 1.27));
 
+            //get motor 2 value for Yaw and Roll
+            channel += 1;
             value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
             setYawMixLevel(-qRound(value / 1.27));
 
@@ -426,9 +432,12 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
 
         int channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
         if (channel > -1) {
+            //get motor 1 value for Pitch
             double value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
             m_aircraft->mrPitchMixLevel->setValue(qRound(value / 1.27));
 
+            //get motor 2 value for Yaw and Roll
+            channel += 1;
             value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
             setYawMixLevel(-qRound(value / 1.27));
 
@@ -602,12 +611,12 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
         // 6 [  0.5,  0.3,  0.3 ] NW
         //     pitch  roll  yaw
         double hMixer[8][3] = {
-            {  1 , -1, -1 },
-            {  0 , -1,  1 },
-            { -1 , -1, -1 },
-            { -1 ,  1,  1 },
-            {  0 ,  1, -1 },
-            {  1 ,  1,  1 },
+            {  1 , -0.5, -0.5 },
+            {  0 , -1  ,  1   },
+            { -1 , -0.5, -0.5 },
+            { -1 ,  0.5,  0.5 },
+            {  0 ,  1  , -1   },
+            {  1 ,  0.5,  0.5 },
             {  0,  0,  0  },
             {  0,  0,  0  }
         };
@@ -989,12 +998,12 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
     // 5 {-0.3  , 0.5    ,-0.3 // SW  CW
     // 6 { 0.3  , 0.5    , 0.3 // NW CCW
     double pMixer[8][3] = {
-        {  1  ,  0   , -1 },
-        {  0.5, -0.87,  1 },
-        { -0.5, -0.87, -1 },
-        { -1  ,  0   ,  1 },
-        { -0.5,  0.87, -1 },
-        {  0.5,  0.87,  1 },
+        {  1  , 0 , -1 },
+        {  0.5, -1,  1 },
+        { -0.5, -1, -1 },
+        { -1  , 0 ,  1 },
+        { -0.5, 1 , -1 },
+        {  0.5, 1 ,  1 },
         {  0,  0,  0  },
         {  0,  0,  0  }
     };
@@ -1007,12 +1016,12 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
     // 5 [  0  ,  0.3, -0.3 ] W
     // 6 [  0.5,  0.3,  0.3 ] NW
     double xMixer[8][3] = {
-        {  0.87, -0.5, -1 },
-        {  0   , -1  ,  1 },
-        { -0.87, -0.5, -1 },
-        { -0.87,  0.5,  1 },
-        {  0   ,  1  , -1 },
-        {  0.87,  0.5,  1 },
+        {  1, -0.5, -1 },
+        {  0, -1  ,  1 },
+        { -1, -0.5, -1 },
+        { -1,  0.5,  1 },
+        {  0,  1  , -1 },
+        {  1,  0.5,  1 },
         {  0,  0,  0  },
         {  0,  0,  0  }
     };

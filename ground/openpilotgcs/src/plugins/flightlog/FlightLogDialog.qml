@@ -94,16 +94,16 @@ Rectangle {
                         spacing: 10
                         Text {
                             id: totalFlights
-                            text: "<b>" + qsTr("Flights recorded: ") + "</b>" + (logStatus.Flight + 1)
+                            text: "<b>" + qsTr("Flights recorded:") + "</b> " + (logStatus.Flight + 1)
                         }
                         Text {
                             id: totalSlots
-                            text: "<b>" + qsTr("Slots used (free): ") + "</b>" +
-                                  logStatus.UsedSlots + " (" + logStatus.FreeSlots + ")"
+                            text: "<b>" + qsTr("Slots used/free:") + "</b> " +
+                                  logStatus.UsedSlots + "/" + logStatus.FreeSlots
                         }
                         Text {
                             id: totalEntries
-                            text: "<b>" + qsTr("Entries downloaded: ") + "</b>" + logManager.logEntriesCount
+                            text: "<b>" + qsTr("Entries downloaded:") + "</b> " + logManager.logEntriesCount
                         }
                         Rectangle {
                             Layout.fillHeight: true

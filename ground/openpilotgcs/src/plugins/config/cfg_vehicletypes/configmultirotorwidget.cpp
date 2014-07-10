@@ -110,7 +110,7 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
     m_aircraft->quadShape->setScene(scene);
 
     QStringList multiRotorTypes;
-    multiRotorTypes << "Tricopter Y" << "Quad +" << "Quad X" << "Hexacopter" << "Hexacopter X" << "Hexacopter Y6"
+    multiRotorTypes << "Tricopter Y" << "Quad +" << "Quad X" << "Hexacopter" << "Hexacopter X" << "Hexacopter H" << "Hexacopter Y6"
                     << "Octocopter" << "Octocopter V" << "Octo Coax +" << "Octo Coax X";
     m_aircraft->multirotorFrameType->addItems(multiRotorTypes);
 
@@ -164,6 +164,13 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     } else if (frameType == "HexaX" || frameType == "Hexacopter X") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType,
                              m_aircraft->multirotorFrameType->findText("Hexacopter X"));
+
+        m_aircraft->mrRollMixLevel->setValue(33);
+        m_aircraft->mrPitchMixLevel->setValue(50);
+        setYawMixLevel(33);
+    } else if (frameType == "HexaH" || frameType == "Hexacopter H") {
+        setComboCurrentIndex(m_aircraft->multirotorFrameType,
+                             m_aircraft->multirotorFrameType->findText("Hexacopter H"));
 
         m_aircraft->mrRollMixLevel->setValue(33);
         m_aircraft->mrPitchMixLevel->setValue(50);
@@ -234,6 +241,8 @@ void ConfigMultiRotorWidget::setupEnabledControls(QString frameType)
     } else if (frameType == "Hexa" || frameType == "Hexacopter") {
         enableComboBoxes(this, CHANNELBOXNAME, 6, true);
     } else if (frameType == "HexaX" || frameType == "Hexacopter X") {
+        enableComboBoxes(this, CHANNELBOXNAME, 6, true);
+    } else if (frameType == "HexaH" || frameType == "Hexacopter H") {
         enableComboBoxes(this, CHANNELBOXNAME, 6, true);
     } else if (frameType == "HexaCoax" || frameType == "Hexacopter Y6") {
         enableComboBoxes(this, CHANNELBOXNAME, 6, true);
@@ -378,6 +387,31 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
             m_aircraft->mrRollMixLevel->setValue(-qRound(value / 1.27));
         }
     } else if (frameType == "HexaX") {
+        // Motors 1/2/3 4/5/6 are: NE / E / SE / SW / W / NW
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2, multi.VTOLMotorE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3, multi.VTOLMotorSE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorSW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox5, multi.VTOLMotorW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox6, multi.VTOLMotorNW);
+
+        // Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
+        // This assumes that all vectors are identical - if not, the user should use the
+        // "custom" setting.
+
+        int channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
+        if (channel > -1) {
+            double value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
+            m_aircraft->mrPitchMixLevel->setValue(qRound(value / 1.27));
+
+            value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+            setYawMixLevel(-qRound(value / 1.27));
+
+            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+            value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            m_aircraft->mrRollMixLevel->setValue(-qRound(value / 1.27));
+        }
+    } else if (frameType == "HexaH") {
         // Motors 1/2/3 4/5/6 are: NE / E / SE / SW / W / NW
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNE);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox2, multi.VTOLMotorE);
@@ -549,6 +583,36 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
     } else if (m_aircraft->multirotorFrameType->currentText() == "Hexacopter X") {
         airframeType = "HexaX";
         setupHexa(false);
+    } else if (m_aircraft->multirotorFrameType->currentText() == "Hexacopter H") {
+        airframeType = "HexaH";
+
+        // Show any config errors in GUI
+        if (throwConfigError(6)) {
+            return airframeType;
+        }
+        motorList << "VTOLMotorNE" << "VTOLMotorE" << "VTOLMotorSE" << "VTOLMotorSW" << "VTOLMotorW" << "VTOLMotorNW";
+        setupMotors(motorList);
+
+        // Motor 1 to 6, H layout (old hexaX)
+        // 1 [  0.5, -0.3, -0.3 ] NE
+        // 2 [  0  , -0.3,  0.3 ] E
+        // 3 [ -0.5, -0.3, -0.3 ] SE
+        // 4 [ -0.5,  0.3,  0.3 ] SW
+        // 5 [  0  ,  0.3, -0.3 ] W
+        // 6 [  0.5,  0.3,  0.3 ] NW
+        //     pitch  roll  yaw
+        double hMixer[8][3] = {
+            {  1 , -1, -1 },
+            {  0 , -1,  1 },
+            { -1 , -1, -1 },
+            { -1 ,  1,  1 },
+            {  0 ,  1, -1 },
+            {  1 ,  1,  1 },
+            {  0,  0,  0  },
+            {  0,  0,  0  }
+        };
+        setupMultiRotorMixer(hMixer);
+        m_aircraft->mrStatusLabel->setText("Configuration OK");
     } else if (m_aircraft->multirotorFrameType->currentText() == "Hexacopter Y6") {
         airframeType = "HexaCoax";
 
@@ -748,6 +812,8 @@ void ConfigMultiRotorWidget::updateAirframe(QString frameType)
     } else if (frameType == "Hexa" || frameType == "Hexacopter") {
         elementId = "quad-hexa";
     } else if (frameType == "HexaX" || frameType == "Hexacopter X") {
+        elementId = "quad-hexa-X";
+    } else if (frameType == "HexaH" || frameType == "Hexacopter H") {
         elementId = "quad-hexa-H";
     } else if (frameType == "HexaCoax" || frameType == "Hexacopter Y6") {
         elementId = "hexa-coax";
@@ -923,17 +989,17 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
     // 5 {-0.3  , 0.5    ,-0.3 // SW  CW
     // 6 { 0.3  , 0.5    , 0.3 // NW CCW
     double pMixer[8][3] = {
-        { 1,  0,  -1 },
-        { 1,  -1, 1  },
-        { -1, -1, -1 },
-        { -1, 0,  1  },
-        { -1, 1,  -1 },
-        { 1,  1,  1  },
-        { 0,  0,  0  },
-        { 0,  0,  0  }
+        {  1  ,  0   , -1 },
+        {  0.5, -0.87,  1 },
+        { -0.5, -0.87, -1 },
+        { -1  ,  0   ,  1 },
+        { -0.5,  0.87, -1 },
+        {  0.5,  0.87,  1 },
+        {  0,  0,  0  },
+        {  0,  0,  0  }
     };
 
-    // Motor 1 to 6, X Layout:
+    // Motor 1 to 6, X Layout  (Real X layout)
     // 1 [  0.5, -0.3, -0.3 ] NE
     // 2 [  0  , -0.3,  0.3 ] E
     // 3 [ -0.5, -0.3, -0.3 ] SE
@@ -941,14 +1007,14 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
     // 5 [  0  ,  0.3, -0.3 ] W
     // 6 [  0.5,  0.3,  0.3 ] NW
     double xMixer[8][3] = {
-        { 1,  -1, -1 },
-        { 0,  -1, 1  },
-        { -1, -1, -1 },
-        { -1, 1,  1  },
-        { 0,  1,  -1 },
-        { 1,  1,  1  },
-        { 0,  0,  0  },
-        { 0,  0,  0  }
+        {  0.87, -0.5, -1 },
+        {  0   , -1  ,  1 },
+        { -0.87, -0.5, -1 },
+        { -0.87,  0.5,  1 },
+        {  0   ,  1  , -1 },
+        {  0.87,  0.5,  1 },
+        {  0,  0,  0  },
+        {  0,  0,  0  }
     };
 
     if (pLayout) {

@@ -104,6 +104,12 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         break;
+    case SetupWizard::MULTI_ROTOR_HEXA_X:
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+        m_vehicleElementIds << "hexa-x" << "hexa-x-frame" << "hexa-x-m1" << "hexa-x-m2" << "hexa-x-m3" << "hexa-x-m4" << "hexa-x-m5" << "hexa-x-m6";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
+        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        break;
     default:
         break;
     }
@@ -131,7 +137,7 @@ void OutputCalibrationPage::setupVehicleItems()
     m_vehicleScene->addItem(m_vehicleBoundsItem);
 
     QRectF parentBounds = m_vehicleRenderer->boundsOnElement(m_vehicleElementIds[0]);
-
+    qDebug() << "parentBounds " << parentBounds;
     for (int i = 1; i < m_vehicleElementIds.size(); i++) {
         QGraphicsSvgItem *item = new QGraphicsSvgItem();
         item->setSharedRenderer(m_vehicleRenderer);

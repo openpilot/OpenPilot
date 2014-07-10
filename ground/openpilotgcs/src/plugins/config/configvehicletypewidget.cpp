@@ -263,6 +263,7 @@ int ConfigVehicleTypeWidget::frameCategory(QString frameType)
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
                || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
                || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
+               || frameType == "HexaH" || frameType == "Hexacopter H" 
                || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
                || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
                || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {

@@ -202,6 +202,7 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y:
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA_H:
+        case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
             setupHexaCopter();
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO:
@@ -279,6 +280,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y:
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA_H:
+        case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS:
@@ -940,7 +942,62 @@ void VehicleConfigurationHelper::setupHexaCopter()
     }
     case VehicleConfigurationSource::MULTI_ROTOR_HEXA_H:
     {
-        frame = SystemSettings::AIRFRAMETYPE_HEXAX;
+        frame = SystemSettings::AIRFRAMETYPE_HEXAH;
+
+        channels[0].type      = MIXER_TYPE_MOTOR;
+        channels[0].throttle1 = 100;
+        channels[0].throttle2 = 0;
+        channels[0].roll      = -33;
+        channels[0].pitch     = 50;
+        channels[0].yaw = -33;
+
+        channels[1].type      = MIXER_TYPE_MOTOR;
+        channels[1].throttle1 = 100;
+        channels[1].throttle2 = 0;
+        channels[1].roll      = -33;
+        channels[1].pitch     = 0;
+        channels[1].yaw = 33;
+
+        channels[2].type      = MIXER_TYPE_MOTOR;
+        channels[2].throttle1 = 100;
+        channels[2].throttle2 = 0;
+        channels[2].roll      = -33;
+        channels[2].pitch     = -50;
+        channels[2].yaw = -33;
+
+        channels[3].type      = MIXER_TYPE_MOTOR;
+        channels[3].throttle1 = 100;
+        channels[3].throttle2 = 0;
+        channels[3].roll      = -33;
+        channels[3].pitch     = -50;
+        channels[3].yaw = 33;
+
+        channels[4].type      = MIXER_TYPE_MOTOR;
+        channels[4].throttle1 = 100;
+        channels[4].throttle2 = 0;
+        channels[4].roll      = 33;
+        channels[4].pitch     = 0;
+        channels[4].yaw = -33;
+
+        channels[5].type      = MIXER_TYPE_MOTOR;
+        channels[5].throttle1 = 100;
+        channels[5].throttle2 = 0;
+        channels[5].roll      = 33;
+        channels[5].pitch     = 50;
+        channels[5].yaw = -33;
+
+        guiSettings.multi.VTOLMotorNE = 1;
+        guiSettings.multi.VTOLMotorE  = 2;
+        guiSettings.multi.VTOLMotorSE = 3;
+        guiSettings.multi.VTOLMotorSW = 4;
+        guiSettings.multi.VTOLMotorW  = 5;
+        guiSettings.multi.VTOLMotorNW = 6;
+
+        break;
+    }
+    case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
+    {
+        frame = SystemSettings::AIRFRAMETYPE_HEXAH;
 
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;

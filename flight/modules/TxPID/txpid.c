@@ -227,6 +227,9 @@ static void updatePIDs(UAVObjEvent *ev)
             case TXPIDSETTINGS_PIDS_ROLLRATEILIMIT:
                 needsUpdateBank |= update(&bank.RollRatePID.ILimit, value);
                 break;
+            case TXPIDSETTINGS_PIDS_ROLLRATERESP:
+                needsUpdateBank |= update(&bank.ManualRate.Roll, value);
+                break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEKP:
                 needsUpdateBank |= update(&bank.RollPI.Kp, value);
                 break;
@@ -250,6 +253,9 @@ static void updatePIDs(UAVObjEvent *ev)
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEILIMIT:
                 needsUpdateBank |= update(&bank.PitchRatePID.ILimit, value);
+                break;
+            case TXPIDSETTINGS_PIDS_PITCHRATERESP:
+                needsUpdateBank |= update(&bank.ManualRate.Pitch, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEKP:
                 needsUpdateBank |= update(&bank.PitchPI.Kp, value);
@@ -279,6 +285,10 @@ static void updatePIDs(UAVObjEvent *ev)
                 needsUpdateBank |= update(&bank.RollRatePID.ILimit, value);
                 needsUpdateBank |= update(&bank.PitchRatePID.ILimit, value);
                 break;
+            case TXPIDSETTINGS_PIDS_ROLLPITCHRATERESP:
+                needsUpdateBank |= update(&bank.ManualRate.Roll, value);
+                needsUpdateBank |= update(&bank.ManualRate.Pitch, value);
+                break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKP:
                 needsUpdateBank |= update(&bank.RollPI.Kp, value);
                 needsUpdateBank |= update(&bank.PitchPI.Kp, value);
@@ -306,6 +316,9 @@ static void updatePIDs(UAVObjEvent *ev)
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEILIMIT:
                 needsUpdateBank |= update(&bank.YawRatePID.ILimit, value);
+                break;
+            case TXPIDSETTINGS_PIDS_YAWRATERESP:
+                needsUpdateBank |= update(&bank.ManualRate.Yaw, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEKP:
                 needsUpdateBank |= update(&bank.YawPI.Kp, value);

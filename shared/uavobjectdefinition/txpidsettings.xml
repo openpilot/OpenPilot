@@ -18,6 +18,7 @@
 			Roll Attitude.Kp, Pitch Attitude.Kp, Roll+Pitch Attitude.Kp, Yaw Attitude.Kp,
 			Roll Attitude.Ki, Pitch Attitude.Ki, Roll+Pitch Attitude.Ki, Yaw Attitude.Ki,
 			Roll Attitude.ILimit, Pitch Attitude.ILimit, Roll+Pitch Attitude.ILimit, Yaw Attitude.ILimit,
+			Roll Attitude.Resp, Pitch Attitude.Resp, Roll+Pitch Attitude.Resp, Yaw Attitude.Resp,
 			GyroTau"
 		defaultvalue="Disabled"/>
         <field name="MinPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>

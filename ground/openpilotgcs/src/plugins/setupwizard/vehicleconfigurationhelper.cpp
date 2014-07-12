@@ -635,8 +635,9 @@ void VehicleConfigurationHelper::resetVehicleConfig()
     for (int i = 1; i <= 2; i++) {
         UAVObjectField *field = mSettings->getField(throttlePattern.arg(i));
         Q_ASSERT(field);
+        // Wizard support only Multirotors - Set default curve with 90% max
         for (quint32 i = 0; i < field->getNumElements(); i++) {
-            field->setValue(i * (1.0f / (field->getNumElements() - 1)), i);
+            field->setValue(i * (0.9f / (field->getNumElements() - 1)), i);
         }
     }
 
@@ -832,49 +833,56 @@ void VehicleConfigurationHelper::setupHexaCopter()
     switch (m_configSource->getVehicleSubType()) {
     case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
     {
-        frame = SystemSettings::AIRFRAMETYPE_HEXA;
-
+        frame = SystemSettings::AIRFRAMETYPE_HEXA; 
+        // HexaPlus according to new mixer table and pitch-roll-yaw mixing at 100%
+        //    Pitch Roll Yaw
+        //M1 {  1  , 0 , -1 },
+        //M2 {  0.5, -1,  1 },
+        //M3 { -0.5, -1, -1 },
+        //M4 { -1  , 0 ,  1 },
+        //M5 { -0.5, 1 , -1 },
+        //M6 {  0.5, 1 ,  1 },
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;
         channels[0].throttle2 = 0;
         channels[0].roll      = 0;
-        channels[0].pitch     = 33;
-        channels[0].yaw = -33;
+        channels[0].pitch     = 100;
+        channels[0].yaw = -100;
 
         channels[1].type      = MIXER_TYPE_MOTOR;
         channels[1].throttle1 = 100;
         channels[1].throttle2 = 0;
-        channels[1].roll      = -50;
-        channels[1].pitch     = 33;
-        channels[1].yaw = 33;
+        channels[1].roll      = -100;
+        channels[1].pitch     = 50;
+        channels[1].yaw = 100;
 
         channels[2].type      = MIXER_TYPE_MOTOR;
         channels[2].throttle1 = 100;
         channels[2].throttle2 = 0;
-        channels[2].roll      = -50;
-        channels[2].pitch     = -33;
-        channels[2].yaw = -33;
+        channels[2].roll      = -100;
+        channels[2].pitch     = -50;
+        channels[2].yaw = -100;
 
         channels[3].type      = MIXER_TYPE_MOTOR;
         channels[3].throttle1 = 100;
         channels[3].throttle2 = 0;
         channels[3].roll      = 0;
-        channels[3].pitch     = -33;
-        channels[3].yaw = 33;
+        channels[3].pitch     = -100;
+        channels[3].yaw = 100;
 
         channels[4].type      = MIXER_TYPE_MOTOR;
         channels[4].throttle1 = 100;
         channels[4].throttle2 = 0;
-        channels[4].roll      = 50;
-        channels[4].pitch     = -33;
-        channels[4].yaw = -33;
+        channels[4].roll      = 100;
+        channels[4].pitch     = -50;
+        channels[4].yaw = -100;
 
         channels[5].type      = MIXER_TYPE_MOTOR;
         channels[5].throttle1 = 100;
         channels[5].throttle2 = 0;
-        channels[5].roll      = 50;
-        channels[5].pitch     = 33;
-        channels[5].yaw = 33;
+        channels[5].roll      = 100;
+        channels[5].pitch     = 50;
+        channels[5].yaw = 100;
 
         guiSettings.multi.VTOLMotorN  = 1;
         guiSettings.multi.VTOLMotorNE = 2;
@@ -943,48 +951,55 @@ void VehicleConfigurationHelper::setupHexaCopter()
     case VehicleConfigurationSource::MULTI_ROTOR_HEXA_H:
     {
         frame = SystemSettings::AIRFRAMETYPE_HEXAH;
-
+        // HexaH according to new mixer table and pitch-roll-yaw mixing at 100%
+        //    Pitch Roll Yaw
+        //M1 {  1 , -0.5, -0.5 },
+        //M2 {  0 , -1  ,  1   },
+        //M3 { -1 , -0.5, -0.5 },
+        //M4 { -1 ,  0.5,  0.5 },
+        //M5 {  0 ,  1  , -1   },
+        //M6 {  1 ,  0.5,  0.5 },
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;
         channels[0].throttle2 = 0;
-        channels[0].roll      = -33;
-        channels[0].pitch     = 50;
-        channels[0].yaw = -33;
+        channels[0].roll      = -50;
+        channels[0].pitch     = 100;
+        channels[0].yaw = -50;
 
         channels[1].type      = MIXER_TYPE_MOTOR;
         channels[1].throttle1 = 100;
         channels[1].throttle2 = 0;
-        channels[1].roll      = -33;
+        channels[1].roll      = -100;
         channels[1].pitch     = 0;
-        channels[1].yaw = 33;
+        channels[1].yaw = 100;
 
         channels[2].type      = MIXER_TYPE_MOTOR;
         channels[2].throttle1 = 100;
         channels[2].throttle2 = 0;
-        channels[2].roll      = -33;
-        channels[2].pitch     = -50;
-        channels[2].yaw = -33;
+        channels[2].roll      = -50;
+        channels[2].pitch     = -100;
+        channels[2].yaw = -50;
 
         channels[3].type      = MIXER_TYPE_MOTOR;
         channels[3].throttle1 = 100;
         channels[3].throttle2 = 0;
-        channels[3].roll      = -33;
-        channels[3].pitch     = -50;
-        channels[3].yaw = 33;
+        channels[3].roll      = 50;
+        channels[3].pitch     = -100;
+        channels[3].yaw = 50;
 
         channels[4].type      = MIXER_TYPE_MOTOR;
         channels[4].throttle1 = 100;
         channels[4].throttle2 = 0;
-        channels[4].roll      = 33;
+        channels[4].roll      = 100;
         channels[4].pitch     = 0;
-        channels[4].yaw = -33;
+        channels[4].yaw = -100;
 
         channels[5].type      = MIXER_TYPE_MOTOR;
         channels[5].throttle1 = 100;
         channels[5].throttle2 = 0;
-        channels[5].roll      = 33;
-        channels[5].pitch     = 50;
-        channels[5].yaw = -33;
+        channels[5].roll      = 50;
+        channels[5].pitch     = 100;
+        channels[5].yaw = 50;
 
         guiSettings.multi.VTOLMotorNE = 1;
         guiSettings.multi.VTOLMotorE  = 2;
@@ -998,48 +1013,55 @@ void VehicleConfigurationHelper::setupHexaCopter()
     case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
     {
         frame = SystemSettings::AIRFRAMETYPE_HEXAH;
-
+        // HexaX according to new mixer table and pitch-roll-yaw mixing at 100%
+        //    Pitch Roll Yaw
+        //M1 {  1, -0.5, -1 },
+        //M2 {  0, -1  ,  1 },
+        //M3 { -1, -0.5, -1 },
+        //M4 { -1,  0.5,  1 },
+        //M5 {  0,  1  , -1 },
+        //M6 {  1,  0.5,  1 },
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;
         channels[0].throttle2 = 0;
-        channels[0].roll      = -33;
-        channels[0].pitch     = 50;
-        channels[0].yaw = -33;
+        channels[0].roll      = -50;
+        channels[0].pitch     = 100;
+        channels[0].yaw = -100;
 
         channels[1].type      = MIXER_TYPE_MOTOR;
         channels[1].throttle1 = 100;
         channels[1].throttle2 = 0;
-        channels[1].roll      = -33;
+        channels[1].roll      = -100;
         channels[1].pitch     = 0;
-        channels[1].yaw = 33;
+        channels[1].yaw = 100;
 
         channels[2].type      = MIXER_TYPE_MOTOR;
         channels[2].throttle1 = 100;
         channels[2].throttle2 = 0;
-        channels[2].roll      = -33;
-        channels[2].pitch     = -50;
-        channels[2].yaw = -33;
+        channels[2].roll      = -50;
+        channels[2].pitch     = -100;
+        channels[2].yaw = -100;
 
         channels[3].type      = MIXER_TYPE_MOTOR;
         channels[3].throttle1 = 100;
         channels[3].throttle2 = 0;
-        channels[3].roll      = -33;
-        channels[3].pitch     = -50;
-        channels[3].yaw = 33;
+        channels[3].roll      = 50;
+        channels[3].pitch     = -100;
+        channels[3].yaw = 100;
 
         channels[4].type      = MIXER_TYPE_MOTOR;
         channels[4].throttle1 = 100;
         channels[4].throttle2 = 0;
-        channels[4].roll      = 33;
+        channels[4].roll      = 100;
         channels[4].pitch     = 0;
-        channels[4].yaw = -33;
+        channels[4].yaw = -100;
 
         channels[5].type      = MIXER_TYPE_MOTOR;
         channels[5].throttle1 = 100;
         channels[5].throttle2 = 0;
-        channels[5].roll      = 33;
-        channels[5].pitch     = 50;
-        channels[5].yaw = -33;
+        channels[5].roll      = 50;
+        channels[5].pitch     = 100;
+        channels[5].yaw = 100;
 
         guiSettings.multi.VTOLMotorNE = 1;
         guiSettings.multi.VTOLMotorE  = 2;

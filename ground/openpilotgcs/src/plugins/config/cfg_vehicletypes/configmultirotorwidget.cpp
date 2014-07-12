@@ -158,23 +158,23 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     } else if (frameType == "Hexa" || frameType == "Hexacopter") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Hexacopter"));
 
-        m_aircraft->mrRollMixLevel->setValue(60); // Old Roll 50 - Pitch 33
-        m_aircraft->mrPitchMixLevel->setValue(40);
-        setYawMixLevel(33);
+        m_aircraft->mrRollMixLevel->setValue(100); // Old Roll 50 - Pitch 33 - Yaw 33
+        m_aircraft->mrPitchMixLevel->setValue(100);// Do not alter mixer matrix
+        setYawMixLevel(100);
     } else if (frameType == "HexaX" || frameType == "Hexacopter X") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType,
                              m_aircraft->multirotorFrameType->findText("Hexacopter X"));
 
-        m_aircraft->mrRollMixLevel->setValue(40); // Old: Roll 33 - Pitch 50
-        m_aircraft->mrPitchMixLevel->setValue(60);
-        setYawMixLevel(33);
+        m_aircraft->mrRollMixLevel->setValue(100); // Old: Roll 33 - Pitch 50 - Yaw 33
+        m_aircraft->mrPitchMixLevel->setValue(100);// Do not alter mixer matrix
+        setYawMixLevel(100);
     } else if (frameType == "HexaH" || frameType == "Hexacopter H") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType,
                              m_aircraft->multirotorFrameType->findText("Hexacopter H"));
 
-        m_aircraft->mrRollMixLevel->setValue(40);
-        m_aircraft->mrPitchMixLevel->setValue(60);
-        setYawMixLevel(33);
+        m_aircraft->mrRollMixLevel->setValue(100); // Do not alter mixer matrix
+        m_aircraft->mrPitchMixLevel->setValue(100);// All mixers RPY levels = 100%
+        setYawMixLevel(100);
     } else if (frameType == "HexaCoax" || frameType == "Hexacopter Y6") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType,
                              m_aircraft->multirotorFrameType->findText("Hexacopter Y6"));

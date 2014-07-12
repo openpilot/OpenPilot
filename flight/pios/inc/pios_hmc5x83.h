@@ -76,6 +76,8 @@
 #define PIOS_HMC5x83_GAIN_5_6           0xC0
 #define PIOS_HMC5x83_GAIN_8_1           0xE0
 
+#define PIOS_HMC5x83_CTRLA_TEMP         0x40
+
 /* Modes */
 #define PIOS_HMC5x83_MODE_CONTINUOUS    0x00
 #define PIOS_HMC5x83_MODE_SINGLE        0x01
@@ -109,10 +111,11 @@ struct pios_hmc5x83_cfg {
 #ifdef PIOS_HMC5x83_HAS_GPIOS
     const struct pios_exti_cfg *exti_cfg; /* Pointer to the EXTI configuration */
 #endif
-    uint8_t M_ODR; /* OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */
-    uint8_t Meas_Conf; /* Measurement Configuration,: Normal, positive bias, or negative bias --> here below the relative define */
-    uint8_t Gain; /* Gain Configuration, select the full scale --> here below the relative define (See datasheet page 11 for more details) */
+    uint8_t M_ODR; // OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */
+    uint8_t Meas_Conf; // Measurement Configuration,: Normal, positive bias, or negative bias --> here below the relative define */
+    uint8_t Gain; // Gain Configuration, select the full scale --> here below the relative define (See datasheet page 11 for more details) */
     uint8_t Mode;
+    bool    TempCompensation; // enable temperature sensor on HMC5983 for temperature gain compensation
     const struct pios_hmc5x83_io_driver *Driver;
 };
 

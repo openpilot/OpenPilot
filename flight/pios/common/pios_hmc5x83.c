@@ -135,6 +135,7 @@ static int32_t PIOS_HMC5x83_Config(const struct pios_hmc5x83_cfg *cfg)
     CTRLB  = 0;
 
     CTRLA |= (uint8_t)(cfg->M_ODR | cfg->Meas_Conf);
+    CTRLA |= cfg->TempCompensation ? PIOS_HMC5x83_CTRLA_TEMP : 0;
     CTRLB |= (uint8_t)(cfg->Gain);
     MODE  |= (uint8_t)(cfg->Mode);
 

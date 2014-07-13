@@ -85,6 +85,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXX:
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXP:
     case SystemSettings::AIRFRAMETYPE_OCTO:
+    case SystemSettings::AIRFRAMETYPE_OCTOX:
     case SystemSettings::AIRFRAMETYPE_HEXAX:
     case SystemSettings::AIRFRAMETYPE_HEXACOAX:
     case SystemSettings::AIRFRAMETYPE_HEXA:
@@ -263,9 +264,11 @@ int ConfigVehicleTypeWidget::frameCategory(QString frameType)
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
                || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
                || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
-               || frameType == "HexaH" || frameType == "Hexacopter H" 
-               || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
-               || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
+               || frameType == "HexaH" || frameType == "Hexacopter H" || frameType == "Hexacopter Y6"
+               || frameType == "Octo"  || frameType == "Octocopter"
+               || frameType == "OctoX"  || frameType == "Octocopter X" 
+               || frameType == "OctoV" || frameType == "Octocopter V" 
+               || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
                || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
         return ConfigVehicleTypeWidget::MULTIROTOR;
     } else if (frameType == "HeliCP") {

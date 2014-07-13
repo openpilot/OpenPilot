@@ -206,6 +206,7 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
             setupHexaCopter();
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO:
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO_X:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_V:
@@ -282,6 +283,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA_H:
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO:
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO_X:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_V:
@@ -1089,62 +1091,71 @@ void VehicleConfigurationHelper::setupOctoCopter()
     case VehicleConfigurationSource::MULTI_ROTOR_OCTO:
     {
         frame = SystemSettings::AIRFRAMETYPE_OCTO;
-
+        // OctoP according to new mixer table and pitch-roll-yaw mixing at 100%
+        //    Pitch Roll Yaw
+        //M1{  1   , 0   , -1 },
+        //M2{  0.71,-0.71,  1 },
+        //M3{  0   ,-1   , -1 },
+        //M4{ -0.71,-0.71,  1 },
+        //M5{ -1   , 0   , -1 },
+        //M6{ -0.71, 0.71,  1 },
+        //M7{  0   ,  1  , -1 },
+        //M8{  0.71, 0.71,  1 }
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;
         channels[0].throttle2 = 0;
         channels[0].roll      = 0;
-        channels[0].pitch     = 33;
-        channels[0].yaw = -25;
+        channels[0].pitch     = 100;
+        channels[0].yaw = -100;
 
         channels[1].type      = MIXER_TYPE_MOTOR;
         channels[1].throttle1 = 100;
         channels[1].throttle2 = 0;
-        channels[1].roll      = -33;
-        channels[1].pitch     = 33;
-        channels[1].yaw = 25;
+        channels[1].roll      = -71;
+        channels[1].pitch     = 71;
+        channels[1].yaw = 100;
 
         channels[2].type      = MIXER_TYPE_MOTOR;
         channels[2].throttle1 = 100;
         channels[2].throttle2 = 0;
-        channels[2].roll      = -33;
+        channels[2].roll      = -71;
         channels[2].pitch     = 0;
-        channels[2].yaw = -25;
+        channels[2].yaw = -100;
 
         channels[3].type      = MIXER_TYPE_MOTOR;
         channels[3].throttle1 = 100;
         channels[3].throttle2 = 0;
-        channels[3].roll      = -33;
-        channels[3].pitch     = -33;
-        channels[3].yaw = 25;
+        channels[3].roll      = -71;
+        channels[3].pitch     = -71;
+        channels[3].yaw = 100;
 
         channels[4].type      = MIXER_TYPE_MOTOR;
         channels[4].throttle1 = 100;
         channels[4].throttle2 = 0;
         channels[4].roll      = 0;
-        channels[4].pitch     = -33;
-        channels[4].yaw = -25;
+        channels[4].pitch     = -100;
+        channels[4].yaw = -100;
 
         channels[5].type      = MIXER_TYPE_MOTOR;
         channels[5].throttle1 = 100;
         channels[5].throttle2 = 0;
-        channels[5].roll      = 33;
-        channels[5].pitch     = -33;
-        channels[5].yaw = 25;
+        channels[5].roll      = 71;
+        channels[5].pitch     = -71;
+        channels[5].yaw = 100;
 
         channels[6].type      = MIXER_TYPE_MOTOR;
         channels[6].throttle1 = 100;
         channels[6].throttle2 = 0;
-        channels[6].roll      = 33;
+        channels[6].roll      = 100;
         channels[6].pitch     = 0;
-        channels[6].yaw = -25;
+        channels[6].yaw = -100;
 
         channels[7].type      = MIXER_TYPE_MOTOR;
         channels[7].throttle1 = 100;
         channels[7].throttle2 = 0;
-        channels[7].roll      = 33;
-        channels[7].pitch     = 33;
-        channels[7].yaw = 25;
+        channels[7].roll      = 71;
+        channels[7].pitch     = 71;
+        channels[7].yaw = 100;
 
         guiSettings.multi.VTOLMotorN  = 1;
         guiSettings.multi.VTOLMotorNE = 2;
@@ -1154,6 +1165,86 @@ void VehicleConfigurationHelper::setupOctoCopter()
         guiSettings.multi.VTOLMotorSW = 6;
         guiSettings.multi.VTOLMotorW  = 7;
         guiSettings.multi.VTOLMotorNW = 8;
+
+        break;
+    }
+    case VehicleConfigurationSource::MULTI_ROTOR_OCTO_X:
+    {
+        frame = SystemSettings::AIRFRAMETYPE_OCTOX;
+        // OctoX according to new mixer table and pitch-roll-yaw mixing at 100%
+        //    Pitch  Roll   Yaw
+        //M1{  1   ,-0.41,  -1 },
+        //M2{  0.41,  -1 ,   1 },
+        //M3{ -0.41,  -1 ,  -1 },
+        //M4{ -1   ,-0.41,   1 },
+        //M5{ -1   , 0.41,  -1 },
+        //M6{ -0.41,   1 ,   1 },
+        //M7{  0.41,   1 ,  -1 },
+        //M8{  1   , 0.41,   1 }
+        channels[0].type      = MIXER_TYPE_MOTOR;
+        channels[0].throttle1 = 100;
+        channels[0].throttle2 = 0;
+        channels[0].roll      = -41;
+        channels[0].pitch     = 100;
+        channels[0].yaw = -100;
+
+        channels[1].type      = MIXER_TYPE_MOTOR;
+        channels[1].throttle1 = 100;
+        channels[1].throttle2 = 0;
+        channels[1].roll      = -100;
+        channels[1].pitch     = 41;
+        channels[1].yaw = 100;
+
+        channels[2].type      = MIXER_TYPE_MOTOR;
+        channels[2].throttle1 = 100;
+        channels[2].throttle2 = 0;
+        channels[2].roll      = -100;
+        channels[2].pitch     = -41;
+        channels[2].yaw = -100;
+
+        channels[3].type      = MIXER_TYPE_MOTOR;
+        channels[3].throttle1 = 100;
+        channels[3].throttle2 = 0;
+        channels[3].roll      = -41;
+        channels[3].pitch     = -100;
+        channels[3].yaw = 100;
+
+        channels[4].type      = MIXER_TYPE_MOTOR;
+        channels[4].throttle1 = 100;
+        channels[4].throttle2 = 0;
+        channels[4].roll      = 41;
+        channels[4].pitch     = -100;
+        channels[4].yaw = -100;
+
+        channels[5].type      = MIXER_TYPE_MOTOR;
+        channels[5].throttle1 = 100;
+        channels[5].throttle2 = 0;
+        channels[5].roll      = 100;
+        channels[5].pitch     = -41;
+        channels[5].yaw = 100;
+
+        channels[6].type      = MIXER_TYPE_MOTOR;
+        channels[6].throttle1 = 100;
+        channels[6].throttle2 = 0;
+        channels[6].roll      = 100;
+        channels[6].pitch     = 41;
+        channels[6].yaw = -100;
+
+        channels[7].type      = MIXER_TYPE_MOTOR;
+        channels[7].throttle1 = 100;
+        channels[7].throttle2 = 0;
+        channels[7].roll      = 41;
+        channels[7].pitch     = 100;
+        channels[7].yaw = 100;
+
+        guiSettings.multi.VTOLMotorNNE = 1;
+        guiSettings.multi.VTOLMotorENE = 2;
+        guiSettings.multi.VTOLMotorESE = 3;
+        guiSettings.multi.VTOLMotorSSE = 4;
+        guiSettings.multi.VTOLMotorSSW = 5;
+        guiSettings.multi.VTOLMotorWSW = 6;
+        guiSettings.multi.VTOLMotorWNW = 7;
+        guiSettings.multi.VTOLMotorNNW = 8;
 
         break;
     }

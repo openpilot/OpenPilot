@@ -42,6 +42,15 @@ typedef struct {
     uint    VTOLMotorNE : 4;
     uint    VTOLMotorSW : 4;
     uint    VTOLMotorSE : 4; // 32 bits
+    /* OctoX */
+    uint    VTOLMotorNNE : 4;
+    uint    VTOLMotorENE : 4;
+    uint    VTOLMotorESE : 4;
+    uint    VTOLMotorSSE : 4;
+    uint    VTOLMotorSSW : 4;
+    uint    VTOLMotorWSW : 4;
+    uint    VTOLMotorWNW : 4;
+    uint    VTOLMotorNNW : 4; // 32 bits    
     uint    TRIYaw : 4;
     quint32 padding : 28; // 64 bits
     quint32 padding1;

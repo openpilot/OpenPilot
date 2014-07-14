@@ -4487,10 +4487,6 @@ p, li { white-space: pre-wrap; }
         <source> Unknown compatibility level: </source>
         <translation type="unfinished"> Niveau de compatibilité inconnu : </translation>
     </message>
-    <message>
-        <source>Unknown compatibility level: </source>
-        <translation type="vanished">Niveau de compatibilité inconnu : </translation>
-    </message>
 </context>
 <context>
     <name>LoggingGadgetFactory</name>
@@ -6456,8 +6452,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;ALtitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translatorcomment>Typo : &quot;AL&quot;titude  + allow translation on dropdown menu Altitude - Velocity control - CruiseControl</translatorcomment>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Éviter &amp;quot;Manuel&amp;quot; pour les multirotors ! Ne jamais sélectionner &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; ou &amp;quot;CruiseControl&amp;quot; sur une aile volante !&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
@@ -6717,10 +6712,6 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Formulaire</translation>
     </message>
     <message>
-        <source>Current value of slider.</source>
-        <translation type="vanished">Valeur actuelle du curseur.</translation>
-    </message>
-    <message>
         <location/>
         <source>Link</source>
         <translation>Lien</translation>
@@ -6801,7 +6792,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Calibration</source>
-        <translation type="unfinished">Étalonnage</translation>
+        <translation>Étalonnage</translation>
     </message>
     <message>
         <location/>
@@ -6832,10 +6823,6 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Clear</source>
         <translation>Effacer tout</translation>
-    </message>
-    <message>
-        <source>Telemetry link not established.</source>
-        <translation type="vanished">Lien de télémétrie coupé.</translation>
     </message>
     <message>
         <location/>
@@ -7032,115 +7019,14 @@ Une valeur de 0.00 désactive le filtre.</translation>
         <translation>Instructions d&apos;étalonnage</translation>
     </message>
     <message>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; font-style:italic;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Following steps #1, #2 and #3 are necessary. Step #4 is optional, it may helps you achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#1: Multi-Point calibration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This calibration will compute the scale for Magnetometer or Accelerometer sensors. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Press &amp;quot;Calibrate Mag&amp;quot; or &amp;quot;Calibrate Accel&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;For optimal calibration perform the Accel calibration with the board not mounted to the craft. in this way you can accurately level the board on your desk/table during the process. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Magnetometer calibration need to be performed inside your plane/copter to account for metal/magnetic stuffs on board.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 1:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; Your &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;HomeLocation must be set first&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 2:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; There is no need to point exactly at South/North/West/East. They are just used to easily tells the user how to point the plane/craft. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;You can simply assume that North is in front of you, right is East etc. and perform the calibration this way.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#2: Board level calibration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step will ensure that board leveling is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#3: Gyro Bias calculation&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step allows to calibrate the gyro measured value when the board is steady. To perform the calibration leave the board/aircraft completely steady and click start. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#4: Thermal Calibration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;The calibration will compute sensors bias variations at different temperatures while the board warms up.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This  allow a certain amount of correction of those bias variations against temperature changes. It does improve both altitude hold and yaw performances.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;To perform this calibration leave the board to cool down at room temperature in the coldest places available. after 15-20 minutes attach the usb connector to the board and Click the Calibrate button leaving the board steady. Wait until completed&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; font-style:italic;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Les étapes #1, #2 et #3 sont nécessaires. L&apos;étape #4 vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#1 : Étalonnage multipoints&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les échelles pour les capteurs Accéléromètres ou Magnétomètre. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cliquer sur &amp;quot;Étalonner Accéléromètre&amp;quot; ou &amp;quot;Étalonner Magnétomètre&amp;quot; pour démarrer l&apos;étalonnage puis suivez les instructions qui seront affichées ici.  &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour un calibrage optimal effectuez l&apos;étalonnage des Accéléromètres sans monter la carte sur l&apos;appareil, de cette façon vous pourrez précisément la mettre de niveau sur votre bureau/table pendant le processus. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Le calibrage du magnétomètre devra être effectué avec la carte montée dans votre appareil pour tenir compte des champs magnétiques/ masses métalliques à bord.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 1:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; Votre &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;PositionHome doit être définie en premier&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 2:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; Vous n&apos;avez pas besoin de pointer exactement dans les directions Sud/Nord/Ouest/Est. Ceci est simplement utilisé pour indiquer clairement à l&apos;utilisateur comment orienter son appareil.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Vous pouvez simplement admettre que le Nord est face à vous, l&apos;Est à votre droite, etc. et effectuer l&apos;étalonnage de cette façon.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#2 : Étalonnage du niveau de la carte&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cette étape fera en sorte que la mise de niveau de la carte soit parfaite. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur Démarrer ci-dessus et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#3 : Étalonnage de l&apos;ajustement des Gyroscopes&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cette étape permet d&apos;étalonner la valeur mesurée sur les gyros lorsque la carte ne bouge pas. Pour effectuer l&apos;étalonnage laissez la carte/l&apos;appareil sans bouger et cliquez sur Démarrer. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#4 : Étalonnage de la compensation de température&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les variations des capteurs à plusieurs températures lors du réchauffement de la carte.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Ceci permet un certain niveau de correction sur la variation des ajustements en fonction des changements de température. Il améliore à la fois le maintien d&apos;altitude et les performances sur l&apos;axe de lacet.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour effectuer cette calibration laissez refroidir la carte à température ambiante dans un endroit le plus froid possible. Après 15-20 minutes branchez le connecteur USB à la carte, cliquez sur le bouton Démarrer et ne bougez plus la carte. Attendez jusqu&apos;à la fin du processus.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>#1: Accelerometer/Magnetometer calibration</source>
-        <translation type="vanished">#1 : Étalonnage Accéléromètres/Magnétomètre</translation>
-    </message>
-    <message>
         <location/>
         <source>Launch accelerometer range and bias calibration.</source>
         <translation>Démarrer l&apos;étalonnage des plages et ajustements des accéléromètres.</translation>
     </message>
     <message>
-        <source>Calibrate Accel</source>
-        <translation type="vanished">Étalonner Accéléromètre</translation>
-    </message>
-    <message>
         <location/>
         <source>Launch magnetometer range and bias calibration.</source>
         <translation>Démarrer l&apos;étalonnage des plages et ajustements du magnétomètre.</translation>
-    </message>
-    <message>
-        <source>Calibrate Mag</source>
-        <translation type="vanished">Étalonner Magnétomètre</translation>
-    </message>
-    <message>
-        <source>#2: Board level calibration</source>
-        <translation type="vanished">#2 : Étalonnage du niveau de la carte</translation>
-    </message>
-    <message>
-        <source>#3: Gyro bias calibration</source>
-        <translation type="vanished">#3 : Étalonnage de l&apos;ajustement des Gyros</translation>
-    </message>
-    <message>
-        <source>#4*: Thermal calibration</source>
-        <translatorcomment>Typo : Why &quot;*&quot; ? Optional ?</translatorcomment>
-        <translation type="obsolete">#4* : Étalonnage de la compensation de température</translation>
-    </message>
-    <message>
-        <source>Temperature</source>
-        <translation type="vanished">Température</translation>
-    </message>
-    <message>
-        <source>°C - Temperature rise</source>
-        <translation type="vanished">°C - Augmentation température</translation>
-    </message>
-    <message>
-        <source>this contains the current status of the thermal calibration wizard</source>
-        <translation type="vanished">ceci contient le statut actuel de l&apos;assistant d&apos;étalonnage température</translation>
     </message>
     <message>
         <location/>
@@ -7218,82 +7104,68 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Steps 1, 2 and 3 are necessary.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Step 4 is optional but may help achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 1: Accelerometer and Magnetometer calibration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;These calibrations will compute the scale for Magnetometer and Accelerometer sensors. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Press &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; to begin calibration and follow the instructions which will be displayed.  &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;For optimal calibration, perform the acceleration calibration with the board not mounted in the craft.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;In this way you can accurately level the board on your desk/table during the process. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Magnetometer calibration needs to be performed inside your plane/copter to account for metal/magnetic elements on board.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Note 1&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; text-decoration: underline;&quot;&gt;Your HomeLocation must be set first&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Note 2&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; There is no need to point exactly at South/North/West/East. These are just used to easily tell the user how to point the plane/craft. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;You can simply assume that North is in front of you, right is East, etc., and perform the calibration this way.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 2: Board level calibration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step will ensure that board leveling is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 3: Gyro bias calculation&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step allows to calibrate the gyro measured value when the board is steady. To perform the calibration leave the board/aircraft completely steady and pres &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 4: Thermal calibration&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;The calibration will compute sensors bias variations at different temperatures while the board warms up.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This  allows a certain amount of correction of those bias variations against temperature changes. It does improve both altitude hold and yaw performances.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;To perform this calibration leave the board to cool down at room temperature in the coldest places available.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;After 15-20 minutes, attach the usb connector to the board and press &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Start,&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; leaving the board steady. Wait until completed.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Steps 1, 2 and 3 are necessary.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Step 4 is optional but may help achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 1: Accelerometer and Magnetometer calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step will calibrate the scale for the Magnetometer and the Accelerometer sensors. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Press &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; to begin, and follow the instructions for each step. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;For best results with the accelerometer calibration, it is advised that it be performed with a free unmounted flight controller as this allows one to accurately position the board for each orientation in the sequence.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;The magnetometer calibration must be performed with the board mounted in the airframe in order for the measurements to incorporate any bias produced by local onboard metal/magnetic elements.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Note 1: Before the magnetometer or the accelerometer calibration is performed your Home Location must be set. This step is needed in order to determine the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Note 2: There is no need to align the airframe exactly south, north, east or west during the individual steps. The directions indicated serve only to tell you in which direction the airframe should be positioned relative to some point.  One can simply assume that North is in front of you, East is to the right, West is to the left and South is pointing at you.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 2: Board level calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step will ensure that board leveling is accurate. Place the airframe as horizontally as possible (use a spirit level if necessary), then press &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;.  Do not move the airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 3: Gyro bias calculation&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step will allow you to calibrate the gyro measured value when the board is steady. To perform the calibration leave the board/airframe completely stationary and press &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 4: Thermal calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;The calibration will compute sensors bias variations at different temperatures while the board warms up.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This allows a certain amount of correction of those bias variations against temperature changes.  It improves altitude hold accuracy and reduces yaw drift.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;To perform this calibration disconnect any power from the board and leave it to cool down at room temperature for 15-20 minutes. Then attach the usb connector to the board and press &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;, leaving the board completely stationary. Wait until complete.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Les étapes 1, 2 et 3 sont nécessaires.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;L&apos;étape 4 est optionnelle et vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 1: Étalonnage des Accéléromètres et Magnétomètre&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les échelles pour les capteurs Accéléromètres ou Magnétomètre. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cliquer sur &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; pour démarrer l&apos;étalonnage puis suivez les instructions qui seront affichées.  &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Pour un calibrage optimal effectuez l&apos;étalonnage des Accéléromètres sans monter la carte sur l&apos;appareil.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;De cette façon vous pourrez précisément la mettre de niveau sur votre bureau/table pendant le processus. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Le calibrage du magnétomètre devra être effectué avec la carte montée dans votre appareil pour tenir compte des champs magnétiques/ masses métalliques à bord.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Note 1&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; text-decoration: underline;&quot;&gt;Votre PositionHome doit être définie en premier&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Note 2&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; Vous n&apos;avez pas besoin de pointer exactement dans les directions Sud/Nord/Ouest/Est. Ceci est simplement utilisé pour indiquer clairement à l&apos;utilisateur comment orienter son appareil.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Vous pouvez simplement admettre que le Nord est face à vous, l&apos;Est à votre droite, etc. et effectuer l&apos;étalonnage de cette façon.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 2: Étalonnage du niveau de la carte&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette étape fera en sorte que la mise de niveau de la carte soit parfaite. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 3: Étalonnage de l&apos;ajustement des Gyroscopes&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette étape permet d&apos;étalonner la valeur mesurée sur les gyros lorsque la carte ne bouge pas. Pour effectuer l&apos;étalonnage laissez la carte/l&apos;appareil sans bouger et cliquez sur &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 4: Étalonnage de la compensation de température&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les variations des capteurs à plusieurs températures lors du réchauffement de la carte.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Ceci permet un certain niveau de correction sur la variation des ajustements en fonction des changements de température. Il améliore à la fois le maintien d&apos;altitude et les performances sur l&apos;axe de lacet.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Pour effectuer cette calibration laissez refroidir la carte à température ambiante dans un endroit le plus froid possible.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Après 15-20 minutes branchez le connecteur USB à la carte, cliquez sur le bouton &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-style:italic;&quot;&gt;Démarrer,&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt; et ne bougez plus la carte. Attendez jusqu&apos;à la fin du processus.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; font-style:italic;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Les étapes #1, #2 et #3 sont nécessaires. L&apos;étape #4 vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#1 : Étalonnage multipoints&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les échelles pour les capteurs Accéléromètres ou Magnétomètre. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cliquer sur &amp;quot;Étalonner Accéléromètre&amp;quot; ou &amp;quot;Étalonner Magnétomètre&amp;quot; pour démarrer l&apos;étalonnage puis suivez les instructions qui seront affichées ici.  &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour un calibrage optimal effectuez l&apos;étalonnage des Accéléromètres sans monter la carte sur l&apos;appareil, de cette façon vous pourrez précisément la mettre de niveau sur votre bureau/table pendant le processus. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Le calibrage du magnétomètre devra être effectué avec la carte montée dans votre appareil pour tenir compte des champs magnétiques/ masses métalliques à bord.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 1:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; Votre &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;PositionHome doit être définie en premier&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; font-style:italic;&quot;&gt;Note 2:&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; Vous n&apos;avez pas besoin de pointer exactement dans les directions Sud/Nord/Ouest/Est. Ceci est simplement utilisé pour indiquer clairement à l&apos;utilisateur comment orienter son appareil.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Vous pouvez simplement admettre que le Nord est face à vous, l&apos;Est à votre droite, etc. et effectuer l&apos;étalonnage de cette façon.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#2 : Étalonnage du niveau de la carte&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cette étape fera en sorte que la mise de niveau de la carte soit parfaite. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur Démarrer ci-dessus et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#3 : Étalonnage de l&apos;ajustement des Gyroscopes&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cette étape permet d&apos;étalonner la valeur mesurée sur les gyros lorsque la carte ne bouge pas. Pour effectuer l&apos;étalonnage laissez la carte/l&apos;appareil sans bouger et cliquez sur Démarrer. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;#4 : Étalonnage de la compensation de température&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les variations des capteurs à plusieurs températures lors du réchauffement de la carte.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Ceci permet un certain niveau de correction sur la variation des ajustements en fonction des changements de température. Il améliore à la fois le maintien d&apos;altitude et les performances sur l&apos;axe de lacet.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour effectuer cette calibration laissez refroidir la carte à température ambiante dans un endroit le plus froid possible. Après 15-20 minutes branchez le connecteur USB à la carte, cliquez sur le bouton Démarrer et ne bougez plus la carte. Attendez jusqu&apos;à la fin du processus.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -8164,7 +8036,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>PowerTrim</source>
-        <translation type="unfinished">AjustPuissance</translation>
+        <translation>AjustPuissance</translation>
     </message>
     <message>
         <location/>
@@ -8175,17 +8047,17 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>MaxPowerFactor</source>
-        <translation type="unfinished">FacteurMaxiPuissance</translation>
+        <translation>FacteurMaxiPuissance</translation>
     </message>
     <message>
         <location/>
         <source>MaxAngle</source>
-        <translation type="unfinished">AngleMaxi</translation>
+        <translation>AngleMaxi</translation>
     </message>
     <message>
         <location/>
         <source>InvertedPower</source>
-        <translation type="unfinished">PuissanceRenversé</translation>
+        <translation>PuissanceRenversé</translation>
     </message>
     <message>
         <location/>
@@ -8212,27 +8084,27 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference. higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle doit monter ou descendre le véhicule pour compenser une certaine différence d&apos;altitude. Des valeurs plus élevées pourraient entraîner un maintien d&apos;altitude plus précis mais aussi des réactions plus violentes, des valeurs inférieures sont plus sûres et donnent un vol plus doux. La valeur par défaut devrait être bonne pour la plupart des appareils.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle doit monter ou descendre le véhicule pour compenser une certaine différence d&apos;altitude. Des valeurs plus élevées pourraient entraîner un maintien d&apos;altitude plus précis mais aussi des réactions plus violentes, des valeurs inférieures sont plus sûres et donnent un vol plus doux. La valeur par défaut devrait être bonne pour la plupart des appareils.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How much the vehicle should throttle up or down to compensate or achieve a certain vertical speed. Higher values lead to more aggressive throttle changes and could lead to oscillations. This is the most likely candidate to change depending on the crafts engine thrust. Heavy craft with weak engines might require higher values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine de combien le véhicule augmente ou diminue les gaz pour compenser ou atteindre une certaine vitesse verticale. Des valeurs plus élevées entraînent des variations de gaz plus agressives qui peuvent produire des oscillations. C&apos;est le paramètre à changer en fonction de la poussée moteur de l&apos;appareil. Des appareils chargés avec des moteurs faibles peuvent demander des valeurs plus élevées.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine de combien le véhicule augmente ou diminue les gaz pour compenser ou atteindre une certaine vitesse verticale. Des valeurs plus élevées entraînent des variations de gaz plus agressives qui peuvent produire des oscillations. C&apos;est le paramètre à changer en fonction de la poussée moteur de l&apos;appareil. Des appareils chargés avec des moteurs faibles peuvent demander des valeurs plus élevées.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle le véhicule doit ajuster son estimation de gaz au neutre. Le Maintien d&apos;Altitude suppose que lorsque il est activé, il est la plage nécessaire pour se maintenir en l&apos;air. Si les gaz est beaucoup plus élevé ou plus bas, il faut ajuster ce &quot;trim&quot;. Des valeurs plus élevées peuvent lui permettre de faire cet ajustement plus rapidement mais cela pourrait conduire à des oscillations. A laisser par défaut, à moins de savoir ce que vous faites.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle le véhicule doit ajuster son estimation de gaz au neutre. Le Maintien d&apos;Altitude suppose que lorsque il est activé, il est la plage nécessaire pour se maintenir en l&apos;air. Si les gaz est beaucoup plus élevé ou plus bas, il faut ajuster ce &quot;trim&quot;. Des valeurs plus élevées peuvent lui permettre de faire cet ajustement plus rapidement mais cela pourrait conduire à des oscillations. A laisser par défaut, à moins de savoir ce que vous faites.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Max rate limit (all modes) (deg/s)</source>
-        <translation type="unfinished">Limitation Rate max (tous modes) (deg/s)</translation>
+        <translation>Limitation Rate max (tous modes) (deg/s)</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Percentage of full stick where the transition from Attitude to Rate occurs. This transition always occurs when the aircraft is exactly inverted (bank angle 180 degrees).  Small values are dangerous because they cause flips at small stick angles.  Values significantly over 100 act like attitude mode and can never flip.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pourcentage d&apos;une position de manche à fond où la transition du mode Attitude vers le mode Rate intervient. Cette transition intervient à chaque fois lorsque l&apos;appareil est exactement à l&apos;envers (inclinaison d&apos;un angle de 180 degrés).  Des valeurs faibles sont dangereuses car elles provoquent des pirouettes avec de petits mouvements aux manches.  Des valeurs significativement au dessus de 100 font que l&apos;appareil ne peut jamais se retourner et reviennent à fonctionner en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pourcentage d&apos;une position de manche à fond où la transition du mode Attitude vers le mode Rate intervient. Cette transition intervient à chaque fois lorsque l&apos;appareil est exactement à l&apos;envers (inclinaison d&apos;un angle de 180 degrés).  Des valeurs faibles sont dangereuses car elles provoquent des pirouettes avec de petits mouvements aux manches.  Des valeurs significativement au dessus de 100 font que l&apos;appareil ne peut jamais se retourner et reviennent à fonctionner en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8248,7 +8120,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;CP helis can set this to Reversed to automatically reverse the direction of thrust when inverted. Fixed pitch copters, including multicopters, should leave this set at Unreversed. Unreversed direction with Boosted power may be dangerous because it adds power and the thrust direction moves the aircraft towards the ground.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les hélicos CP peuvent régler ceci à Reversed pour inverser automatiquement la direction de la poussée en vol dos. Les hélicos à pas fixe, multicoptères inclus, doivent laisser ce paramètre à Unreversed. L&apos;association du paramètre Unreversed avec Boosted ci-dessous peut-être dangereuse car elle ajoute de la puissance et la direction de la poussée déplace l&apos;appareil vers le sol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les hélicos CP peuvent régler ceci à Reversed pour inverser automatiquement la direction de la poussée en vol dos. Les hélicos à pas fixe, multicoptères inclus, doivent laisser ce paramètre à Unreversed. L&apos;association du paramètre Unreversed avec Boosted ci-dessous peut-être dangereuse car elle ajoute de la puissance et la direction de la poussée déplace l&apos;appareil vers le sol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8259,17 +8131,17 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>InvrtdThrustRev</source>
-        <translation type="unfinished">InversPousséeRenversé</translation>
+        <translation>InversPousséeRenversé</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The bank angle where CruiseControl goes into inverted power mode.  InvertedThrustReverse and InvertedPower control the direction and amount of power when in inverted mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci correspond à l&apos;angle d&apos;inclinaison où CruiseControl passe en mode puissance renversé. InversPousséeRenversé et PuissanceRenversée contrôlent la direction et la quantité de puissance lorque vous êtes en mode inversé&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci correspond à l&apos;angle d&apos;inclinaison où CruiseControl passe en mode puissance renversé. InversPousséeRenversé et PuissanceRenversée contrôlent la direction et la quantité de puissance lorsque vous êtes en mode inversé&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 3.0 means it will not use more than 3 times the power the throttle/collective stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Juste une limitation de sécurité. 3.0 signifie qu&apos;il n&apos;utilisera pas plus de 3 fois la puissance demandée par le manche de gaz/collectif.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Juste une limitation de sécurité. 3.0 signifie qu&apos;il n&apos;utilisera pas plus de 3 fois la puissance demandée par le manche de gaz/collectif.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8279,12 +8151,12 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>MinThrust</source>
-        <translation type="unfinished">PousséeMini</translation>
+        <translation>PousséeMini</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle/Collective stick below this amount disables Cruise Control. Also, by default Cruise Control forces the use of this value for thrust when InvertedPower setting is Zero and the copter is inverted. CP helis probably want this set to -100%. For safety with fixed pitch copters (including multicopters), never set this so low that the trimmed throttle stick cannot get below it or your motor(s) will still run with the throttle stick all the way down. Fixed pitch throttle sticks go from -100 to 0 in the first tiny bit of throttle stick (and then up to 100 using the rest of the throttle range), so for example, a lot of &amp;quot;high throttle trim&amp;quot; will keep the stick from ever commanding less than 5% so it won&apos;t be possible to stop the motors with the throttle stick. Banking the copter in your hand in this state will make the motors speed up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsque le manche de gaz/collectif est en dessous de cette valeur, cela désactive Cruise Control. En outre, Cruize Control impose l&apos;utilisation de cette valeur de manche de gaz lorsque le paramètre PuissanceInversé est à zéro et l&apos;hélicoptère est à l&apos;envers.&lt;/p&gt;&lt;p&gt;Les hélicos CP auront besoin probablement d&apos;une valeur fixée à -100. Par mesure de sécurité avec les pas fixes (multicoptères inclus), ne jamais définir une valeur trop basse pour qu&apos;un manche de gaz baissé puisse descendre en dessous de cette valeur ou le(s) moteur(s) continuent de tourner avec le manche de gaz au mini. Le manche de gaz pour pas fixe va de -100 à 0 dans la première petite plage de la course du manche (puis jusqu&apos;à 100 dans la plage de gaz restante) donc par exemple un &amp;quot;trim élevé sur le manche de gaz&amp;quot; va maintenir les gaz au dessus de 5% si bien qu&apos;il ne sera pas possible d&apos;arrêter les moteurs avec la manche des gaz. Le fait d&apos;incliner l&apos;appareil à la main dans cet état fera accélérer les moteurs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsque le manche de gaz/collectif est en dessous de cette valeur, cela désactive Cruise Control. En outre, Cruize Control impose l&apos;utilisation de cette valeur de manche de gaz lorsque le paramètre PuissanceInversé est à zéro et l&apos;hélicoptère est à l&apos;envers.&lt;/p&gt;&lt;p&gt;Les hélicos CP auront besoin probablement d&apos;une valeur fixée à -100. Par mesure de sécurité avec les pas fixes (multicoptères inclus), ne jamais définir une valeur trop basse pour qu&apos;un manche de gaz baissé puisse descendre en dessous de cette valeur ou le(s) moteur(s) continuent de tourner avec le manche de gaz au mini. Le manche de gaz pour pas fixe va de -100 à 0 dans la première petite plage de la course du manche (puis jusqu&apos;à 100 dans la plage de gaz restante) donc par exemple un &amp;quot;trim élevé sur le manche de gaz&amp;quot; va maintenir les gaz au dessus de 5% si bien qu&apos;il ne sera pas possible d&apos;arrêter les moteurs avec la manche des gaz. Le fait d&apos;incliner l&apos;appareil à la main dans cet état fera accélérer les moteurs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8295,7 +8167,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 80% to 90% to leave some headroom for stabilization. CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les multicoptères devraient probablement utiliser une valeur de 80% à 90% afin de laisser une certaine marge pour la stabilisation. Les hélicos CP peuvent définir cette valeur à 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les multicoptères devraient probablement utiliser une valeur de 80% à 90% afin de laisser une certaine marge pour la stabilisation. Les hélicos CP peuvent définir cette valeur à 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8306,7 +8178,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>MaxThrust</source>
-        <translation type="unfinished">PousséeMaxi</translation>
+        <translation>PousséeMaxi</translation>
     </message>
     <message>
         <location/>
@@ -8317,12 +8189,12 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that quickly moving the stick around a lot makes the copter climb a bit, adjust this number down a little.  It will be a compromise between climbing a little with lots of stick motion and descending a little with minimal stick motion.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si vous trouvez qu&apos;un petit mouvement rapide de manche fait légèrement monter l&apos;hélicoptère, baissez un petit peu cette valeur. Ce sera un compromis entre une montée légère avec beaucoup de mouvements de manche et descente légère avec un mouvement de manche minime.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si vous trouvez qu&apos;un petit mouvement rapide de manche fait légèrement monter l&apos;hélicoptère, baissez un petit peu cette valeur. Ce sera un compromis entre une montée légère avec beaucoup de mouvements de manche et descente légère avec un mouvement de manche minime.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The amount of power used when in inverted mode. Zero (min throttle stick for fixed pitch copters includding multicopters, neutral collective for CP), Normal (uses stick value), or Boosted (boosted according to bank angle). Beginning multicopter pilots should leave this set to Zero to automatically reduce throttle during flips.   Boosted power with Unreversed direction may be dangerous because it adds power and the thrust direction moves the aircraft towards the ground.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La quantité de puissance utilisée en vol dos. Zero (PousséeMini pour les hélicos à pas fixe, multicoptères inclus, collectif au neutre pour hélicos CP), Normal (utilise la valeur du manche), ou Boosted (boosté en fonction de l&apos;angle d&apos;inclinaison). Les pilotes débutants en multicoptère devraient laisser ce paramètre à Zero pour automatiquement reduire les gaz durant les flips.  L&apos;association du paramètre Boosted  avec Unreversed ci-dessus peut-être dangereuse car elle ajoute de la puissance et la direction de la poussée déplace l&apos;appareil vers le sol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La quantité de puissance utilisée en vol dos. Zero (PousséeMini pour les hélicos à pas fixe, multicoptères inclus, collectif au neutre pour hélicos CP), Normal (utilise la valeur du manche), ou Boosted (boosté en fonction de l&apos;angle d&apos;inclinaison). Les pilotes débutants en multicoptère devraient laisser ce paramètre à Zero pour automatiquement reduire les gaz durant les flips.  L&apos;association du paramètre Boosted  avec Unreversed ci-dessus peut-être dangereuse car elle ajoute de la puissance et la direction de la poussée déplace l&apos;appareil vers le sol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8355,7 +8227,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Motor response time to go from min thrust to max thrust. It allows thrust anticipation on entering/exiting inverted mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Temps de réponse du moteur pour passer de la poussée minimum à la poussée maximum. Cela permet une anticipation lors de l&apos;entrée/sortie du mode inversé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Temps de réponse du moteur pour passer de la poussée minimum à la poussée maximum. Cela permet une anticipation lors de l&apos;entrée/sortie du mode inversé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -10346,7 +10218,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and later&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;&lt;p&gt;        Utile si la carte n&apos;arrive pas à démarrer correctement.&lt;/p&gt;&lt;p&gt;        La Led Bleue commence à clignoter rapidement pendant 20-30 secondes puis la carte démarre normalement&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez le lien utilisé avec la liste déroulante&lt;/p&gt;&lt;p&gt;située à droite.&lt;/p&gt;&lt;p&gt;VEUILLEZ NOTER : Supporté avec les versions de bootloaders 4.0 et supérieures&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;&lt;p&gt;        Utile si la carte n&apos;arrive pas à démarrer correctement.&lt;/p&gt;&lt;p&gt;        La Led Bleue commence à clignoter rapidement pendant 20-30 secondes puis la carte démarre normalement&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez le lien utilisé avec la liste déroulante située à droite.&lt;/p&gt;&lt;p&gt;VEUILLEZ NOTER : Supporté avec les versions de bootloaders 4.0 et supérieures&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12460,11 +12332,6 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <translation></translation>
     </message>
     <message>
-        <source>url:http://wiki.openpilot.org/x/dACrAQ</source>
-        <translatorcomment>Lien wiki FR http://wiki.openpilot.org/x/B4BYAQ</translatorcomment>
-        <translation type="vanished">url:http://wiki.openpilot.org/x/AwCEAQ</translation>
-    </message>
-    <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
         <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non volatile</translation>
@@ -14096,30 +13963,18 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>OpenPilot::GyroBiasCalibrationModel</name>
     <message>
-        <source>Calibrating the gyroscopes. Keep the copter/plane steady...</source>
-        <translation type="vanished">Étalonnage en cours des gyroscopes. Maintenez l&apos;appareil sans le bouger...</translation>
-    </message>
-    <message>
-        <source>Gyroscope calibration computed succesfully.</source>
-        <translation type="vanished">Étalonnage des gyroscopes calculés avec succès.</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/config/calibration/gyrobiascalibrationmodel.cpp" line="+98"/>
+        <location filename="../../../src/plugins/config/calibration/gyrobiascalibrationmodel.cpp" line="+100"/>
         <source>Calibrating the gyroscopes. Keep the vehicle steady...</source>
         <translation>Étalonnage en cours des gyroscopes. Maintenez l&apos;appareil sans le bouger...</translation>
     </message>
     <message>
-        <location line="+58"/>
+        <location line="+55"/>
         <source>Gyroscope calibration completed successfully.</source>
         <translation>Étalonnage des gyroscopes calculé avec succès.</translation>
     </message>
 </context>
 <context>
     <name>OpenPilot::LevelCalibrationModel</name>
-    <message>
-        <source>Place horizontally and click Save Position button...</source>
-        <translation type="vanished">Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
     <message>
         <location filename="../../../src/plugins/config/calibration/levelcalibrationmodel.cpp" line="+72"/>
         <source>Place horizontally and press Save Position...</source>
@@ -14140,69 +13995,9 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <source>Board level calibration completed successfully.</source>
         <translation>Mise à niveau de la carte calculé avec succès.</translation>
     </message>
-    <message>
-        <source>Leave horizontally, rotate 180° along yaw axis and click Save Position button...</source>
-        <translation type="vanished">Garder horizontal, tourner de 180° sur l&apos;axe de Yaw et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Board leveling computed successfully.</source>
-        <translation type="vanished">Mise à niveau de la carte calculé avec succès.</translation>
-    </message>
 </context>
 <context>
     <name>OpenPilot::SixPointCalibrationModel</name>
-    <message>
-        <source>Place horizontally, nose pointing north and click Save Position button...</source>
-        <translation type="obsolete">Positionner horizontalement, le nez en direction du nord et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place with nose down, right side west and click Save Position button...</source>
-        <translation type="obsolete">Positionner avec le nez vers le bas, le coté droit vers l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place right side down, nose west and click Save Position button...</source>
-        <translation type="obsolete">Positionner le flanc droit vers le bas, le nez en direction de l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place upside down, nose east and click Save Position button...</source>
-        <translation type="obsolete">Positionner à l&apos;envers, le nez vers l&apos;est et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place with nose up, left side north and click Save Position button...</source>
-        <translation type="obsolete">Positionner le nez vers le haut, le flanc droit vers le nord et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place with left side down, nose south and click Save Position button...</source>
-        <translation type="obsolete">Positionner avec le flanc gauche vers le bas, le nez vers le sud et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place horizontally and click Save Position button...</source>
-        <translation type="obsolete">Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place with nose down and click Save Position button...</source>
-        <translation type="obsolete">Positionner avec le nez vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place right side down and click Save Position button...</source>
-        <translation type="obsolete">Positionner le flanc droit vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place upside down and click Save Position button...</source>
-        <translation type="obsolete">Positionner à l&apos;envers et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place with nose up and click Save Position button...</source>
-        <translation type="obsolete">Positionner avec le nez vers le haut et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>Place with left side down and click Save Position button...</source>
-        <translation type="obsolete">Positionner le flanc gauche vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;HomeLocation not SET.&lt;/p&gt;&lt;p&gt;Please set your HomeLocation and try again. Aborting calibration!&lt;/p&gt;</source>
-        <translation type="obsolete">&lt;p&gt;Position Home non définie.&lt;/p&gt;&lt;p&gt;Veuillez définir votre position Home et essayez à nouveau. Étalonnage abandonné !&lt;/p&gt;</translation>
-    </message>
     <message>
         <location filename="../../../src/plugins/config/calibration/sixpointcalibrationmodel.cpp" line="+59"/>
         <source>Place horizontally, nose pointing north and press Save Position...</source>
@@ -14293,26 +14088,9 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <source>Calibration failed! Please review the help and retry.</source>
         <translation>Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau.</translation>
     </message>
-    <message>
-        <source>Sensor scale and bias computed succesfully.</source>
-        <translatorcomment>Typo : succeSSfully.</translatorcomment>
-        <translation type="obsolete">Échelle et ajustement du capteur calculés avec succès.</translation>
-    </message>
-    <message>
-        <source>Bad calibration. Please review the instructions and repeat.</source>
-        <translation type="obsolete">Mauvais étalonnage. Relisez les instructions et essayez à nouveau.</translation>
-    </message>
 </context>
 <context>
     <name>OpenPilot::CompensationCalculationTransition</name>
-    <message>
-        <source>Calibration completed succesfully</source>
-        <translation type="vanished">Étalonnage terminé avec succès</translation>
-    </message>
-    <message>
-        <source>Calibration failed! Please read the instructions and retry.</source>
-        <translation type="vanished">Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau.</translation>
-    </message>
     <message>
         <location filename="../../../src/plugins/config/calibration/thermal/compensationcalculationtransition.h" line="+59"/>
         <source>Thermal calibration completed successfully.</source>
@@ -14322,38 +14100,6 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location line="+4"/>
         <source>Calibration failed! Please review the help and retry.</source>
         <translation>Échec étalonnage ! Veuillez relire les instructions et essayer à nouveau.</translation>
-    </message>
-</context>
-<context>
-    <name>OpenPilot::ThermalCalibrationModel</name>
-    <message>
-        <source>Start</source>
-        <translation type="vanished">Démarrer</translation>
-    </message>
-    <message>
-        <source>Saving initial settings</source>
-        <translation type="vanished">Enregistrement des paramètres initiaux</translation>
-    </message>
-    <message>
-        <source>Setup board for calibration</source>
-        <translation type="vanished">Préparation de la carte pour l&apos;étalonnage</translation>
-    </message>
-    <message>
-        <source>*** Please Wait *** Samples acquisition, this can take several minutes</source>
-        <translatorcomment>Only one line allowed for text</translatorcomment>
-        <translation type="vanished">*** Veuillez Patienter *** Acquisition des échantillons, cela demande du temps</translation>
-    </message>
-    <message>
-        <source>Restore board settings</source>
-        <translation type="vanished">Restaurer les paramètres de la carte</translation>
-    </message>
-    <message>
-        <source>Calculate calibration data</source>
-        <translation type="vanished">Calcul des données d&apos;étalonnage</translation>
-    </message>
-    <message>
-        <source>Canceled</source>
-        <translation type="vanished">Annulé</translation>
     </message>
 </context>
 <context>
@@ -14471,8 +14217,8 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     </message>
     <message>
         <location line="+63"/>
-        <source>Target temperature span has been acquired. You may now end acquisition or continue.</source>
-        <translation>La différence de température a été atteinte. Vous pouvez arrêter maintenant ou continuer.</translation>
+        <source>Target temperature span has been acquired. Acquisition may be ended or, preferably, continued.</source>
+        <translation>La différence de température a été atteinte. Vous pouvez arrêter maintenant, mais il est préférable de continuer.</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -14488,13 +14234,13 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>ConfigRevoWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+318"/>
+        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+328"/>
         <source>Temperature: %1°C</source>
         <translation>Température : %1°C</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Variance: %1°C/min</source>
+        <source>Gradient: %1°C/min</source>
         <translation>Variation : %1°C/min</translation>
     </message>
     <message>

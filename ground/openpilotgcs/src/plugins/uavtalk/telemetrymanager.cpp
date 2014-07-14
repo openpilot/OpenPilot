@@ -53,6 +53,8 @@ bool TelemetryManager::isConnected()
 void TelemetryManager::start(QIODevice *dev)
 {
     device = dev;
+    // take ownership of the device (the why is not clear?)
+    device->moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
     emit myStart();
 }
 

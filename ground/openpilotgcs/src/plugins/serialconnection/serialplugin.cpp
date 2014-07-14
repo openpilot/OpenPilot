@@ -114,12 +114,29 @@ bool sortPorts(const QSerialPortInfo &s1, const QSerialPortInfo &s2)
     return s1.portName() < s2.portName();
 }
 
+QList<QSerialPortInfo> SerialConnection::availablePorts()
+{
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+#if QT_VERSION == 0x050301 && defined(Q_OS_WIN)
+    // workaround to QTBUG-39748 (https://bugreports.qt-project.org/browse/QTBUG-39748)
+    // Qt 5.3.1 reports spurious ports with an empty description...
+    QMutableListIterator<QSerialPortInfo> i(ports);
+    while (i.hasNext()) {
+        if (i.next().description().isEmpty()) {
+            i.remove();
+        }
+    }
+#endif
+    return ports;
+}
+
+
 QList <Core::IConnection::device> SerialConnection::availableDevices()
 {
     QList <Core::IConnection::device> list;
 
     if (enablePolling) {
-        QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+        QList<QSerialPortInfo> ports = availablePorts();
 
         // sort the list by port number (nice idea from PT_Dreamer :))
         qSort(ports.begin(), ports.end(), sortPorts);
@@ -140,7 +157,7 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
     if (serialHandle) {
         closeDevice(deviceName);
     }
-    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    QList<QSerialPortInfo> ports = availablePorts();
     foreach(QSerialPortInfo port, ports) {
         if (port.portName() == deviceName) {
             // we need to handle port settings here...

@@ -51,6 +51,10 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_txpid->Apply, SIGNAL(clicked()), this, SLOT(applySettings()));
     connect(m_txpid->Save, SIGNAL(clicked()), this, SLOT(saveSettings()));
 
+    connect(m_txpid->PID1, SIGNAL(activated(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
+    connect(m_txpid->PID2, SIGNAL(activated(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
+    connect(m_txpid->PID3, SIGNAL(activated(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
+
     addWidgetBinding("TxPIDSettings", "BankNumber", m_txpid->pidBank, 0, 1, true);
 
     addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID1, TxPIDSettings::PIDS_INSTANCE1);
@@ -86,6 +90,45 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
 ConfigTxPIDWidget::~ConfigTxPIDWidget()
 {
     // Do nothing
+}
+
+void ConfigTxPIDWidget::updateSpinBoxProperties(const QString & selected_pid_type)
+{
+    QDoubleSpinBox *minPID;
+    QDoubleSpinBox *maxPID;
+
+    qDebug() << "ConfigTxPIDWidget::updateSpinBoxProperties(" << selected_pid_type << ")";
+
+    QObject *obj = sender();
+    if (obj == m_txpid->PID1) {
+        minPID = m_txpid->MinPID1;
+        maxPID = m_txpid->MaxPID1;
+    } else if (obj == m_txpid->PID2) {
+        minPID = m_txpid->MinPID2;
+        maxPID = m_txpid->MaxPID2;
+    } else if (obj == m_txpid->PID3) {
+        minPID = m_txpid->MinPID3;
+        maxPID = m_txpid->MaxPID3;
+    } else {
+        qDebug() << "updateSpinBoxProperties: Incorrect sender object";
+        return;
+    }
+
+    if (selected_pid_type.endsWith(".Resp")) {
+        minPID->setRange(0, 999);
+        maxPID->setRange(0, 999);
+        minPID->setSingleStep(1);
+        maxPID->setSingleStep(1);
+        minPID->setDecimals(0);
+        maxPID->setDecimals(0);
+    } else {
+        minPID->setRange(0, 99.99);
+        maxPID->setRange(0, 99.99);
+        minPID->setSingleStep(0.000100);
+        maxPID->setSingleStep(0.000100);
+        minPID->setDecimals(6);
+        maxPID->setDecimals(6);
+    }
 }
 
 void ConfigTxPIDWidget::refreshValues()

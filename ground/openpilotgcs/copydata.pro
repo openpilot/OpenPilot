@@ -142,9 +142,9 @@ GCS_LIBRARY_PATH
                   Qt5MultimediaWidgets$${DS}.dll \
                   Qt5Quick$${DS}.dll \
                   Qt5Qml$${DS}.dll \
-                  icuin51.dll \
-                  icudt51.dll \
-                  icuuc51.dll
+                  icuin52.dll \
+                  icudt52.dll \
+                  icuuc52.dll
         # it is more robust to take the following DLLs from Qt rather than from MinGW
         QT_DLLS += libgcc_s_dw2-1.dll \
                    libstdc++-6.dll \

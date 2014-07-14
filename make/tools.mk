@@ -14,6 +14,7 @@
 #    nsis_install (Windows only)
 #    sdl_install (Windows only)
 #    openssl_install (Windows only)
+#    mesawin_install (Windows only)
 #    uncrustify_install
 #    doxygen_install
 #    gtest_install
@@ -89,6 +90,7 @@ else ifeq ($(UNAME), Windows)
     OPENSSL_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
+    MESAWIN_URL    := http://wiki.openpilot.org/download/attachments/18612236/mesawin.tar.gz
 endif
 
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
@@ -104,6 +106,7 @@ OPENSSL_DIR     := $(TOOLS_DIR)/openssl-1.0.1e-win32
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
+MESAWIN_DIR     := $(TOOLS_DIR)/mesawin
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
 
@@ -115,7 +118,7 @@ QT_SDK_PREFIX := $(QT_SDK_DIR)
 
 BUILD_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
-    BUILD_SDK_TARGETS += sdl nsis openssl
+    BUILD_SDK_TARGETS += sdl nsis mesawin openssl 
 endif
 ALL_SDK_TARGETS := $(BUILD_SDK_TARGETS) gtest uncrustify doxygen
 
@@ -648,6 +651,29 @@ endif
 .PHONY: sdl_version
 sdl_version:
 	-$(V1) $(ECHO) "SDL 1.2.15"
+
+endif
+
+##################################
+#
+# Mesa OpenGL DLL (Windows only)
+#
+##################################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,mesawin,$(MESAWIN_DIR),$(MESAWIN_URL),,$(notdir $(MESAWIN_URL))))
+
+ifeq ($(shell [ -d "$(MESAWIN_DIR)" ] && $(ECHO) "exists"), exists)
+    export MESAWIN_DIR := $(MESAWIN_DIR)
+else
+    # not installed, hope it's in the path...
+    #$(info $(EMPTY) WARNING     $(call toprel, $(MESA_WIN_DIR)) not found (make mesawin_install), using system PATH)
+endif
+
+.PHONY: mesawin_version
+mesawin_version:
+	-$(V1) $(ECHO) "MesaOpenGL vXX"
 
 endif
 

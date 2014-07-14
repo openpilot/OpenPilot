@@ -42,7 +42,7 @@ typedef struct {
     uint    VTOLMotorNE : 4;
     uint    VTOLMotorSW : 4;
     uint    VTOLMotorSE : 4; // 32 bits
-    /* OctoX */
+    // OctoX
     uint    VTOLMotorNNE : 4;
     uint    VTOLMotorENE : 4;
     uint    VTOLMotorESE : 4;

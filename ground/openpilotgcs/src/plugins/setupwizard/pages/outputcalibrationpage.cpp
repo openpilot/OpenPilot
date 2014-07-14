@@ -137,7 +137,7 @@ void OutputCalibrationPage::setupVehicleItems()
     m_vehicleScene->addItem(m_vehicleBoundsItem);
 
     QRectF parentBounds = m_vehicleRenderer->boundsOnElement(m_vehicleElementIds[0]);
-    qDebug() << "parentBounds " << parentBounds;
+
     for (int i = 1; i < m_vehicleElementIds.size(); i++) {
         QGraphicsSvgItem *item = new QGraphicsSvgItem();
         item->setSharedRenderer(m_vehicleRenderer);

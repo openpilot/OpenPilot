@@ -55,7 +55,8 @@ QStringList ConfigMultiRotorWidget::getChannelDescriptions()
     // get the gui config data
     GUIConfigDataUnion configData = getConfigData();
     multiGUISettingsStruct multi  = configData.multi;
-    /* Octocopter X motor definition */
+
+    // Octocopter X motor definition
     if (multi.VTOLMotorNNE > 0 && multi.VTOLMotorNNE <= ConfigMultiRotorWidget::CHANNEL_NUMELEM) {
         channelDesc[multi.VTOLMotorNNE - 1] = QString("VTOLMotorNNE");
     }
@@ -672,13 +673,14 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
         motorList << "VTOLMotorNE" << "VTOLMotorE" << "VTOLMotorSE" << "VTOLMotorSW" << "VTOLMotorW" << "VTOLMotorNW";
         setupMotors(motorList);
 
-        // Motor 1 to 6, H layout (old hexaX)
-        // 1 [  0.5, -0.3, -0.3 ] NE
-        // 2 [  0  , -0.3,  0.3 ] E
-        // 3 [ -0.5, -0.3, -0.3 ] SE
-        // 4 [ -0.5,  0.3,  0.3 ] SW
-        // 5 [  0  ,  0.3, -0.3 ] W
-        // 6 [  0.5,  0.3,  0.3 ] NW
+        // Motor 1 to 6, H layout
+        // ---------------------------------------------
+        // Motor:   1      2      3     4     5     6
+        // ROLL  {-0.50, -1.00, -0.50, 0.50, 1.00, 0.50}
+        // PITCH {1.00, 0.00, -1.00, -1.00, -0.00, 1.00}
+        // YAW   {-0.50, 1.00, -0.50, 0.50, -1.00, 0.50}
+        // ---------------------------------------------
+        // http://wiki.paparazziuav.org/wiki/RotorcraftMixing
         //     pitch  roll  yaw
         double hMixer[8][3] = {
             {  1 , -0.5, -0.5 },
@@ -726,8 +728,15 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
         motorList << "VTOLMotorN" << "VTOLMotorNE" << "VTOLMotorE" << "VTOLMotorSE" << "VTOLMotorS" << "VTOLMotorSW"
                   << "VTOLMotorW" << "VTOLMotorNW";
         setupMotors(motorList);
-        // Motor 1 to 8:
-        // pitch   roll    yaw (OctoP)
+        // Motor 1 to 8, OctoP
+        // -------------------------------------------------------
+        // Motor:   1      2      3     4     5     6     7     8
+        // ROLL  {0.00, -0.71, -1.00, -0.71, 0.00, 0.71, 1.00, 0.71}
+        // PITCH {1.00,  0.71, -0.00, -0.71,-1.00,-0.71,-0.00, 0.71}
+        // YAW   {-1.00, 1.00, -1.00, 1.00, -1.00, 1.00,-1.00, 1.00}
+        // -------------------------------------------------------
+        // http://wiki.paparazziuav.org/wiki/RotorcraftMixing
+        // pitch   roll    yaw 
         double mixerMatrix[8][3] = {
             {  1   , 0   , -1 },
             {  0.71,-0.71,  1 },
@@ -750,8 +759,15 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
         motorList << "VTOLMotorNNE" << "VTOLMotorENE" << "VTOLMotorESE" << "VTOLMotorSSE" << "VTOLMotorSSW" << "VTOLMotorWSW"
                   << "VTOLMotorWNW" << "VTOLMotorNNW";
         setupMotors(motorList);
-        // Motor 1 to 8:
-        // pitch   roll    yaw  (OctoX)
+        // Motor 1 to 8, OctoX
+        // --------------------------------------------------------
+        // Motor:   1      2      3      4     5     6     7     8
+        // ROLL  {-0.41, -1.00, -1.00, -0.41, 0.41, 1.00, 1.00, 0.41}
+        // PITCH {1.00, 0.41, -0.41, -1.00, -1.00, -0.41, 0.41, 1.00}
+        // YAW   {-1.00, 1.00, -1.00, 1.00, -1.00, 1.00, -1.00, 1.00}
+        // --------------------------------------------------------
+        // http://wiki.paparazziuav.org/wiki/RotorcraftMixing
+        // pitch   roll    yaw
         double mixerMatrix[8][3] = {
             {  1   ,-0.41,  -1 },
             {  0.41,  -1 ,   1 },
@@ -1102,14 +1118,15 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
 
     // and set only the relevant channels:
 
-    // Motor 1 to 6, P Layout:
+    // Motor 1 to 6, HexaP Layout
+    // ---------------------------------------------
+    // Motor:   1      2      3     4     5     6
+    // ROLL  {0.00, -1.00, -1.00, 0.00, 1.00, 1.00}
+    // PITCH {1.00, 0.50, -0.50, -1.00, -0.50, 0.50}
+    // YAW   {-1.00, 1.00, -1.00, 1.00, -1.00, 1.00}
+    // ---------------------------------------------
+    // http://wiki.paparazziuav.org/wiki/RotorcraftMixing
     // pitch   roll    yaw
-    // 1 { 0.3  , 0      ,-0.3 // N   CW
-    // 2 { 0.3  ,-0.5    , 0.3 // NE CCW
-    // 3 {-0.3  ,-0.5    ,-0.3 // SE  CW
-    // 4 {-0.3  , 0      , 0.3 // S  CCW
-    // 5 {-0.3  , 0.5    ,-0.3 // SW  CW
-    // 6 { 0.3  , 0.5    , 0.3 // NW CCW
     double pMixer[8][3] = {
         {  1  , 0 , -1 },
         {  0.5, -1,  1 },
@@ -1121,13 +1138,15 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
         {  0,  0,  0  }
     };
 
-    // Motor 1 to 6, X Layout  (Real X layout)
-    // 1 [  0.5, -0.3, -0.3 ] NE
-    // 2 [  0  , -0.3,  0.3 ] E
-    // 3 [ -0.5, -0.3, -0.3 ] SE
-    // 4 [ -0.5,  0.3,  0.3 ] SW
-    // 5 [  0  ,  0.3, -0.3 ] W
-    // 6 [  0.5,  0.3,  0.3 ] NW
+    // Motor 1 to 6, HexaX Layout
+    // ---------------------------------------------
+    // Motor:   1      2      3     4     5     6
+    // ROLL  {-0.50, -1.00, -0.50, 0.50, 1.00, 0.50}
+    // PITCH {1.00, 0.00, -1.00, -1.00, -0.00, 1.00}
+    // YAW   {-1.00, 1.00, -1.00, 1.00, -1.00, 1.00}
+    // ---------------------------------------------
+    // http://wiki.paparazziuav.org/wiki/RotorcraftMixing
+    // pitch   roll    yaw
     double xMixer[8][3] = {
         {  1, -0.5, -1 },
         {  0, -1  ,  1 },

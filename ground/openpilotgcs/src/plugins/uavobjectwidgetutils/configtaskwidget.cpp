@@ -32,7 +32,7 @@
 #include <QWidget>
 #include <QLineEdit>
 
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent), m_isConnected(false), m_isWidgetUpdatesAllowed(true),
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent), m_currentBoardId(-1), m_isConnected(false), m_isWidgetUpdatesAllowed(true),
     m_saveButton(NULL), m_isDirty(false), m_outOfLimitsStyle("background-color: rgb(255, 0, 0);"), m_realtimeUpdateTimer(NULL)
 {
     m_pluginManager     = ExtensionSystem::PluginManager::instance();
@@ -230,7 +230,21 @@ UAVObjectManager *ConfigTaskWidget::getObjectManager()
 
 void ConfigTaskWidget::onAutopilotDisconnect()
 {
-    m_isConnected = false;
+    m_isConnected    = false;
+
+    // Reset board ID and clear bound combo box lists to force repopulation
+    // when we get another connected signal. This means that we get the
+    // correct values in combo boxes bound to fields with limits applied.
+    m_currentBoardId = -1;
+
+    foreach(WidgetBinding * binding, m_widgetBindingsPerObject) {
+        QComboBox *cb;
+
+        if (binding->widget() && (cb = qobject_cast<QComboBox *>(binding->widget()))) {
+            cb->clear();
+        }
+    }
+
     enableControls(false);
     invalidateObjects();
 }
@@ -275,7 +289,8 @@ void ConfigTaskWidget::refreshWidgetsValues(UAVObject *obj)
 
     bool dirtyBack = isDirty();
     emit refreshWidgetsValuesRequested();
-    foreach(WidgetBinding * binding, m_widgetBindingsPerObject.values(obj)) {
+    QList<WidgetBinding *> bindings = obj == NULL ? m_widgetBindingsPerObject.values() : m_widgetBindingsPerObject.values(obj);
+    foreach(WidgetBinding * binding, bindings) {
         if (binding->isEnabled() && binding->field() != NULL && binding->widget() != NULL) {
             setWidgetFromField(binding->widget(), binding->field(), binding);
         }
@@ -978,9 +993,16 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget *widget, UAVObjectField *field, 
         cb->clear();
         QStringList option = field->getOptions();
         if (hasLimits) {
-            foreach(QString str, option) {
-                if (field->isWithinLimits(str, index, m_currentBoardId)) {
-                    cb->addItem(str);
+            // Only add options to combo box if we have a board id to check limits for.
+            // We could enter this method while there is no board connected and without
+            // this check, we would add all the board dependent options whether they were
+            // valid or not. Ultimately this method will be called again when the connected
+            // signal is handled.
+            if (m_currentBoardId > -1) {
+                foreach(QString str, option) {
+                    if (field->isWithinLimits(str, index, m_currentBoardId)) {
+                        cb->addItem(str);
+                    }
                 }
             }
         } else {

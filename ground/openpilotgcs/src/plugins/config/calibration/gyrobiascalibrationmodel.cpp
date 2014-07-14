@@ -55,18 +55,23 @@ GyroBiasCalibrationModel::GyroBiasCalibrationModel(QObject *parent) :
 
 void GyroBiasCalibrationModel::start()
 {
-    // Store and reset board rotation before calibration starts
-    storeAndClearBoardRotation();
+    // reset dirty state to forget previous unsaved runs
+    m_dirty = false;
 
+    // configure board for calibration
     RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
     memento.revoCalibrationData = revoCalibrationData;
     revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_FALSE;
     revoCalibration->setData(revoCalibrationData);
 
-    // Disable gyro bias correction while calibrating
     AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
     memento.attitudeSettingsData = attitudeSettingsData;
+    // Disable gyro bias correction while calibrating
     attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
+    // Zero board rotation
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_YAW]   = 0;
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL]  = 0;
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] = 0;
     attitudeSettings->setData(attitudeSettingsData);
 
     UAVObject::Metadata gyroStateMetadata = gyroState->getMetadata();
@@ -88,9 +93,6 @@ void GyroBiasCalibrationModel::start()
     gyro_state_accum_x.clear();
     gyro_state_accum_y.clear();
     gyro_state_accum_z.clear();
-
-    // reset dirty state to forget previous unsaved runs
-    m_dirty = false;
 
     started();
     progressChanged(0);
@@ -148,9 +150,6 @@ void GyroBiasCalibrationModel::getSample(UAVObject *obj)
         gyroSensor->setMetadata(memento.gyroSensorMetadata);
         revoCalibration->setData(memento.revoCalibrationData);
         attitudeSettings->setData(memento.attitudeSettingsData);
-
-        // Recall saved board rotation
-        recallBoardRotation();
 
         stopped();
         displayInstructions(tr("Gyroscope calibration completed successfully."), WizardModel::Success);

@@ -82,9 +82,9 @@ else ifeq ($(UNAME), Darwin)
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip/+md5
-    QT_SDK_URL     := http://download.qt-project.org/official_releases/qt/5.2/5.2.1/qt-opensource-windows-x86-mingw48_opengl-5.2.1.exe
-    QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-windows-x86-mingw48_opengl-5.2.1.exe.md5
-    QT_SDK_ARCH    := mingw48_32
+    QT_SDK_URL     := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-windows-x86-mingw482_opengl-5.3.1.exe
+    QT_SDK_MD5_URL := http://wiki.openpilot.org/download/attachments/18612236/qt-opensource-windows-x86-mingw482_opengl-5.3.1.exe.md5
+    QT_SDK_ARCH    := mingw482_32
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
     SDL_URL        := http://wiki.openpilot.org/download/attachments/18612236/SDL-devel-1.2.15-mingw32.tar.gz
     OPENSSL_URL    := http://wiki.openpilot.org/download/attachments/18612236/openssl-1.0.1e-win32.tar.bz2
@@ -97,16 +97,19 @@ GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0
 
 # Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_8-2014q1
-QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.2.1
-MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
-PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin
-NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
-SDL_DIR         := $(TOOLS_DIR)/SDL-1.2.15
-OPENSSL_DIR     := $(TOOLS_DIR)/openssl-1.0.1e-win32
+QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.3.1
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
-MESAWIN_DIR     := $(TOOLS_DIR)/mesawin
+
+ifeq ($(UNAME), Windows)
+    MINGW_DIR   := $(QT_SDK_DIR)/Tools/$(QT_SDK_ARCH)
+    PYTHON_DIR  := $(QT_SDK_DIR)/Tools/$(QT_SDK_ARCH)/opt/bin
+    NSIS_DIR    := $(TOOLS_DIR)/nsis-2.46-unicode
+    SDL_DIR     := $(TOOLS_DIR)/SDL-1.2.15
+    OPENSSL_DIR := $(TOOLS_DIR)/openssl-1.0.1e-win32
+    MESAWIN_DIR := $(TOOLS_DIR)/mesawin
+endif
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
 
@@ -353,14 +356,14 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) $(DL_DIR)/$(5) --dump-binary-data -o  $(1)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0qt-project-url.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/1.0.0ThirdPartySoftware_Listing.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0readme.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.521.win32_mingw48.essentials/5.2.1mingw48_essentials.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.521.win32_mingw48.essentials/5.2.1x32-4.8.0-release-posix-dwarf-rev2-runtime.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.521.win32_mingw48.essentials/5.2.1icu_51_1_mingw_builds_4_8_0_posix_dwarf_32.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.521.win32_mingw48.addons/5.2.1mingw48_addons.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.tools.win32_mingw48/4.8.0-1-1x32-4.8.0-release-posix-dwarf-rev2.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.1ThirdPartySoftware_Listing.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.1-0qt5_essentials.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.1-0i686-4.8.2-release-posix-dwarf-rt_v3-rev3-runtime.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.1-0icu_52_1_mingw_builds_32_4_8_2_posix_dwarf.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.1-0qt5_addons.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.tools.win32_mingw482/4.8.2i686-4.8.2-release-posix-dwarf-rt_v3-rev3.7z" | grep -v Extracting
 # Run patcher
 	@$(ECHO)
 	@$(ECHO) "Executing QtPatch in" $$(call toprel, $(QT_SDK_PREFIX))
@@ -502,7 +505,7 @@ endef
 
 ifeq ($(UNAME), Windows)
 
-QT_SDK_PREFIX := $(QT_SDK_DIR)/5.2.1/$(QT_SDK_ARCH)
+QT_SDK_PREFIX := $(QT_SDK_DIR)/5.3/$(QT_SDK_ARCH)
 
 # This additional configuration step should not be necessary
 # but it is needed as a workaround to https://bugreports.qt-project.org/browse/QTBUG-33254

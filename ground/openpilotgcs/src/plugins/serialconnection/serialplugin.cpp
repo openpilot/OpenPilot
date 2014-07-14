@@ -169,11 +169,10 @@ void SerialConnection::closeDevice(const QString &deviceName)
     // we have to delete the serial connection we created
     if (serialHandle) {
         serialHandle->deleteLater();
-        serialHandle   = NULL;
-        m_deviceOpened = false;
+        serialHandle = NULL;
     }
+    m_deviceOpened = false;
 }
-
 
 QString SerialConnection::connectionName()
 {

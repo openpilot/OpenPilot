@@ -230,7 +230,7 @@ UAVObjectManager *ConfigTaskWidget::getObjectManager()
 
 void ConfigTaskWidget::onAutopilotDisconnect()
 {
-    m_isConnected    = false;
+    m_isConnected = false;
 
     // Reset board ID and clear bound combo box lists to force repopulation
     // when we get another connected signal. This means that we get the

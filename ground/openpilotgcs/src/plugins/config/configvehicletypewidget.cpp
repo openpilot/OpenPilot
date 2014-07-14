@@ -265,9 +265,9 @@ int ConfigVehicleTypeWidget::frameCategory(QString frameType)
                || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
                || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
                || frameType == "HexaH" || frameType == "Hexacopter H" || frameType == "Hexacopter Y6"
-               || frameType == "Octo"  || frameType == "Octocopter"
-               || frameType == "OctoX"  || frameType == "Octocopter X" 
-               || frameType == "OctoV" || frameType == "Octocopter V" 
+               || frameType == "Octo" || frameType == "Octocopter"
+               || frameType == "OctoX" || frameType == "Octocopter X"
+               || frameType == "OctoV" || frameType == "Octocopter V"
                || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
                || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
         return ConfigVehicleTypeWidget::MULTIROTOR;

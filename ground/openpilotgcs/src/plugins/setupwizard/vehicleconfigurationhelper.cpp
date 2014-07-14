@@ -835,15 +835,15 @@ void VehicleConfigurationHelper::setupHexaCopter()
     switch (m_configSource->getVehicleSubType()) {
     case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
     {
-        frame = SystemSettings::AIRFRAMETYPE_HEXA; 
+        frame = SystemSettings::AIRFRAMETYPE_HEXA;
         // HexaPlus according to new mixer table and pitch-roll-yaw mixing at 100%
-        //    Pitch Roll Yaw
-        //M1 {  1  , 0 , -1 },
-        //M2 {  0.5, -1,  1 },
-        //M3 { -0.5, -1, -1 },
-        //M4 { -1  , 0 ,  1 },
-        //M5 { -0.5, 1 , -1 },
-        //M6 {  0.5, 1 ,  1 },
+        // Pitch Roll Yaw
+        // M1 {  1  , 0 , -1 },
+        // M2 {  0.5, -1,  1 },
+        // M3 { -0.5, -1, -1 },
+        // M4 { -1  , 0 ,  1 },
+        // M5 { -0.5, 1 , -1 },
+        // M6 {  0.5, 1 ,  1 },
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;
         channels[0].throttle2 = 0;
@@ -954,13 +954,13 @@ void VehicleConfigurationHelper::setupHexaCopter()
     {
         frame = SystemSettings::AIRFRAMETYPE_HEXAH;
         // HexaH according to new mixer table and pitch-roll-yaw mixing at 100%
-        //    Pitch Roll Yaw
-        //M1 {  1 , -0.5, -0.5 },
-        //M2 {  0 , -1  ,  1   },
-        //M3 { -1 , -0.5, -0.5 },
-        //M4 { -1 ,  0.5,  0.5 },
-        //M5 {  0 ,  1  , -1   },
-        //M6 {  1 ,  0.5,  0.5 },
+        // Pitch Roll Yaw
+        // M1 {  1 , -0.5, -0.5 },
+        // M2 {  0 , -1  ,  1   },
+        // M3 { -1 , -0.5, -0.5 },
+        // M4 { -1 ,  0.5,  0.5 },
+        // M5 {  0 ,  1  , -1   },
+        // M6 {  1 ,  0.5,  0.5 },
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;
         channels[0].throttle2 = 0;
@@ -1016,13 +1016,13 @@ void VehicleConfigurationHelper::setupHexaCopter()
     {
         frame = SystemSettings::AIRFRAMETYPE_HEXAH;
         // HexaX according to new mixer table and pitch-roll-yaw mixing at 100%
-        //    Pitch Roll Yaw
-        //M1 {  1, -0.5, -1 },
-        //M2 {  0, -1  ,  1 },
-        //M3 { -1, -0.5, -1 },
-        //M4 { -1,  0.5,  1 },
-        //M5 {  0,  1  , -1 },
-        //M6 {  1,  0.5,  1 },
+        // Pitch Roll Yaw
+        // M1 {  1, -0.5, -1 },
+        // M2 {  0, -1  ,  1 },
+        // M3 { -1, -0.5, -1 },
+        // M4 { -1,  0.5,  1 },
+        // M5 {  0,  1  , -1 },
+        // M6 {  1,  0.5,  1 },
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;
         channels[0].throttle2 = 0;
@@ -1092,15 +1092,15 @@ void VehicleConfigurationHelper::setupOctoCopter()
     {
         frame = SystemSettings::AIRFRAMETYPE_OCTO;
         // OctoP according to new mixer table and pitch-roll-yaw mixing at 100%
-        //    Pitch Roll Yaw
-        //M1{  1   , 0   , -1 },
-        //M2{  0.71,-0.71,  1 },
-        //M3{  0   ,-1   , -1 },
-        //M4{ -0.71,-0.71,  1 },
-        //M5{ -1   , 0   , -1 },
-        //M6{ -0.71, 0.71,  1 },
-        //M7{  0   ,  1  , -1 },
-        //M8{  0.71, 0.71,  1 }
+        // Pitch Roll Yaw
+        // M1{  1   , 0   , -1 },
+        // M2{  0.71,-0.71,  1 },
+        // M3{  0   ,-1   , -1 },
+        // M4{ -0.71,-0.71,  1 },
+        // M5{ -1   , 0   , -1 },
+        // M6{ -0.71, 0.71,  1 },
+        // M7{  0   ,  1  , -1 },
+        // M8{  0.71, 0.71,  1 }
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;
         channels[0].throttle2 = 0;
@@ -1172,15 +1172,15 @@ void VehicleConfigurationHelper::setupOctoCopter()
     {
         frame = SystemSettings::AIRFRAMETYPE_OCTOX;
         // OctoX according to new mixer table and pitch-roll-yaw mixing at 100%
-        //    Pitch  Roll   Yaw
-        //M1{  1   ,-0.41,  -1 },
-        //M2{  0.41,  -1 ,   1 },
-        //M3{ -0.41,  -1 ,  -1 },
-        //M4{ -1   ,-0.41,   1 },
-        //M5{ -1   , 0.41,  -1 },
-        //M6{ -0.41,   1 ,   1 },
-        //M7{  0.41,   1 ,  -1 },
-        //M8{  1   , 0.41,   1 }
+        // Pitch  Roll   Yaw
+        // M1{  1   ,-0.41,  -1 },
+        // M2{  0.41,  -1 ,   1 },
+        // M3{ -0.41,  -1 ,  -1 },
+        // M4{ -1   ,-0.41,   1 },
+        // M5{ -1   , 0.41,  -1 },
+        // M6{ -0.41,   1 ,   1 },
+        // M7{  0.41,   1 ,  -1 },
+        // M8{  1   , 0.41,   1 }
         channels[0].type      = MIXER_TYPE_MOTOR;
         channels[0].throttle1 = 100;
         channels[0].throttle2 = 0;

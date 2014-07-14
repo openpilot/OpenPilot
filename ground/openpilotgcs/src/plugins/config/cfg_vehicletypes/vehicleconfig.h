@@ -50,7 +50,7 @@ typedef struct {
     uint    VTOLMotorSSW : 4;
     uint    VTOLMotorWSW : 4;
     uint    VTOLMotorWNW : 4;
-    uint    VTOLMotorNNW : 4; // 32 bits    
+    uint    VTOLMotorNNW : 4; // 32 bits
     uint    TRIYaw : 4;
     quint32 padding : 28; // 64 bits
     quint32 padding1;

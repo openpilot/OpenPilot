@@ -387,35 +387,36 @@ static void updatePathVelocity()
         cast_struct_to_array(pathDesired.End, pathDesired.End.North),
         cur, &progress, pathDesired.Mode);
 
-    float groundspeed;
+    float speed;
     switch (pathDesired.Mode) {
     case PATHDESIRED_MODE_FLYCIRCLERIGHT:
     case PATHDESIRED_MODE_DRIVECIRCLERIGHT:
     case PATHDESIRED_MODE_FLYCIRCLELEFT:
     case PATHDESIRED_MODE_DRIVECIRCLELEFT:
-        groundspeed = pathDesired.EndingVelocity;
+        speed = pathDesired.EndingVelocity;
         break;
     case PATHDESIRED_MODE_FLYENDPOINT:
     case PATHDESIRED_MODE_DRIVEENDPOINT:
-        groundspeed = pathDesired.EndingVelocity - pathDesired.EndingVelocity * boundf(progress.fractional_progress, 0, 1);
+        speed = pathDesired.EndingVelocity - pathDesired.EndingVelocity * boundf(progress.fractional_progress, 0, 1);
         if (progress.fractional_progress > 1) {
-            groundspeed = 0;
+            speed = 0;
         }
         break;
     case PATHDESIRED_MODE_FLYVECTOR:
     case PATHDESIRED_MODE_DRIVEVECTOR:
     default:
-        groundspeed = pathDesired.StartingVelocity
+        speed = pathDesired.StartingVelocity
                       + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) * boundf(progress.fractional_progress, 0, 1);
         if (progress.fractional_progress > 1) {
-            groundspeed = 0;
+            speed = 0;
         }
         break;
     }
 
     VelocityDesiredData velocityDesired;
-    velocityDesired.North = progress.path_direction[0] * groundspeed;
-    velocityDesired.East  = progress.path_direction[1] * groundspeed;
+    velocityDesired.North = progress.path_direction[0] * speed;
+    velocityDesired.East  = progress.path_direction[1] * speed;
+    velocityDesired.Down  = progress.path_direction[2] * speed;
 
     float error_speed = progress.error * vtolpathfollowerSettings.HorizontalPosPI.Kp;
     float correction_velocity[2] =
@@ -436,7 +437,7 @@ static void updatePathVelocity()
     downPosIntegral = boundf(downPosIntegral + downError * dT * vtolpathfollowerSettings.VerticalPosPI.Ki,
                              -vtolpathfollowerSettings.VerticalPosPI.ILimit,
                              vtolpathfollowerSettings.VerticalPosPI.ILimit);
-    downCommand     = (downError * vtolpathfollowerSettings.VerticalPosPI.Kp + downPosIntegral);
+    downCommand     = velocityDesired.Down + (downError * vtolpathfollowerSettings.VerticalPosPI.Kp + downPosIntegral);
     velocityDesired.Down = boundf(downCommand, -vtolpathfollowerSettings.VerticalVelMax, vtolpathfollowerSettings.VerticalVelMax);
 
     // update pathstatus

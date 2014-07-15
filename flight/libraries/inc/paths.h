@@ -30,8 +30,8 @@
 struct path_status {
     float fractional_progress;
     float error;
-    float correction_direction[2];
-    float path_direction[2];
+    float correction_direction[3];
+    float path_direction[3];
 };
 
 void path_progress(float *start_point, float *end_point, float *cur_point, struct path_status *status, uint8_t mode);

@@ -110,6 +110,7 @@
         <field name="DisarmingSequenceTime" units="ms" type="uint16" elements="1" defaultvalue="1000"/>
 	<field name="DisableSanityChecks" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <field name="ReturnToBaseAltitudeOffset" units="m" type="float" elements="1" defaultvalue="10"/>
+        <field name="LandingVelocity" units="m" type="float" elements="1" defaultvalue="0.4"/>
         <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="10,2"/>
 	<!-- optimized for current vtolpathfollower,
 	     for fixed wing pathfollower set to Horizontal=500,Vertical=5 -->

@@ -128,9 +128,19 @@ void plan_setup_returnToBase()
     PathDesiredSet(&pathDesired);
 }
 
+static PiOSDeltatimeConfig landdT;
 void plan_setup_land()
 {
+    float descendspeed;
     plan_setup_positionHold();
+
+    FlightModeSettingsLandingVelocityGet(&descendspeed);
+    PathDesiredData pathDesired;
+    PathDesiredGet(&pathDesired);
+    pathDesired.StartingVelocity = descendspeed;
+    pathDesired.EndingVelocity   = descendspeed;
+    PathDesiredSet(&pathDesired);
+    PIOS_DELTATIME_Init(&landdT, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
 }
 
 /**
@@ -138,12 +148,18 @@ void plan_setup_land()
  */
 void plan_run_land()
 {
+    float downPos, descendspeed;
     PathDesiredEndData pathDesiredEnd;
 
-    PathDesiredEndGet(&pathDesiredEnd);
+    PositionStateDownGet(&downPos); // current down position
+    PathDesiredEndGet(&pathDesiredEnd); // desired position
+    PathDesiredEndingVelocityGet(&descendspeed);
 
-    PositionStateDownGet(&pathDesiredEnd.Down);
-    pathDesiredEnd.Down += 5;
+    // desired position is updated to match the desired descend speed but don't run ahead
+    // too far if the current position can't keep up. This normaly means we have landed.
+    if (pathDesiredEnd.Down - downPos < 10) {
+        pathDesiredEnd.Down += descendspeed * PIOS_DELTATIME_GetAverageSeconds(&landdT);
+    }
 
     PathDesiredEndSet(&pathDesiredEnd);
 }

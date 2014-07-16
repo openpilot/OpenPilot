@@ -146,15 +146,17 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     foreach(QSerialPortInfo port, ports) {
         if (port.portName() == deviceName) {
+            // don't specify a parent when constructing the QSerialPort as this object will be moved
+            // to a different thread later on (see telemetrymanager.cpp)
+            serialHandle = new QSerialPort(port);
             // we need to handle port settings here...
-            qDebug() << "Serial telemetry running at " << m_config->speed();
-            serialHandle = new QSerialPort(port, this);
             if (serialHandle->open(QIODevice::ReadWrite)) {
                 if (serialHandle->setBaudRate(m_config->speed().toInt())
                     && serialHandle->setDataBits(QSerialPort::Data8)
                     && serialHandle->setParity(QSerialPort::NoParity)
                     && serialHandle->setStopBits(QSerialPort::OneStop)
                     && serialHandle->setFlowControl(QSerialPort::NoFlowControl)) {
+                    qDebug() << "Serial telemetry running at " << m_config->speed();
                     m_deviceOpened = true;
                 }
             }
@@ -170,11 +172,10 @@ void SerialConnection::closeDevice(const QString &deviceName)
     // we have to delete the serial connection we created
     if (serialHandle) {
         serialHandle->deleteLater();
-        serialHandle   = NULL;
-        m_deviceOpened = false;
+        serialHandle = NULL;
     }
+    m_deviceOpened = false;
 }
-
 
 QString SerialConnection::connectionName()
 {

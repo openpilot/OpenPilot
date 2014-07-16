@@ -1,3 +1,21 @@
+--- RELEASE-14.06-RC3 --- Peanuts Schnapps ---
+This Release Candidate fixes the following issues:
+    * [OP-1394] - Flight display widget - telemetry data does not zero on disconnection
+    * [OP-1393] - SerialPlugin destructor generates valgrind error
+    * [OP-1391] - System allows arming if current flight mode uses Thrust Control = AH or AV
+    * [OP-1390] - OpenGL support for older Graphics Cards
+    * [OP-1389] - GCS Crashes exiting Flight side log window
+    * [OP-1384] - Revo Board Rotation data is cleared to zero by other calibration steps
+    * [OP-1383] - GCS crashes when connected via serial port
+    * [OP-1347] - Flight logs settings - UI / segfault
+    * [OP-1337] - French translations updates (14.04/05)
+    * [OP-1226] - screen problems
+    * [OP-1063] - Multirotor Configuration
+    * [OP-792] - 'Autotune' still showing up in flight mode settings in GCS
+
+The full list of features, improvements and bugfixes in this release candidate is accessible here:
+http://progress.openpilot.org/issues/?filter=11561
+
 --- RELEASE-14.06-RC2 --- Peanuts Schnapps ---
 This Release Candidate fixes the following issues:
     *[OP-1378] - Check Limits for flight modes

@@ -190,7 +190,8 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
             && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXAX)
             && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXACOAX) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTO)
             && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTOV) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXP)
-            && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_TRI)) {
+            && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_TRI) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXAH) 
+            && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTOX)) {
             AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
             vTaskDelay(1000);
             continue;

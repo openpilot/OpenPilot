@@ -37,23 +37,13 @@
 
 
 SerialEnumerationThread::SerialEnumerationThread(SerialConnection *serial)
-    : m_serial(serial),
-    m_running(true)
+    : m_serial(serial), m_running(false)
 {}
-
-SerialEnumerationThread::~SerialEnumerationThread()
-{
-    m_running = false;
-    // wait for the thread to terminate
-    if (wait(2100) == false) {
-        qDebug() << "Cannot terminate SerialEnumerationThread";
-    }
-}
 
 void SerialEnumerationThread::run()
 {
+    m_running = true;
     QList <Core::IConnection::device> devices = m_serial->availableDevices();
-
     while (m_running) {
         if (!m_serial->deviceOpened()) {
             QList <Core::IConnection::device> newDev = m_serial->availableDevices();
@@ -62,11 +52,22 @@ void SerialEnumerationThread::run()
                 emit enumerationChanged();
             }
         }
-
-        msleep(2000); // update available devices every two seconds (doesn't need more)
+        // update available devices every two seconds (doesn't need more)
+        msleep(2000);
     }
 }
 
+void SerialEnumerationThread::stop()
+{
+    if (!m_running) {
+        return;
+    }
+    m_running = false;
+    // wait for the thread to terminate
+    if (wait(2100) == false) {
+        qDebug() << "Cannot terminate SerialEnumerationThread";
+    }
+}
 
 SerialConnection::SerialConnection() :
     serialHandle(NULL),
@@ -100,7 +101,9 @@ SerialConnection::SerialConnection() :
 }
 
 SerialConnection::~SerialConnection()
-{}
+{
+    m_enumerateThread.stop();
+}
 
 void SerialConnection::onEnumerationChanged()
 {
@@ -199,7 +202,7 @@ void SerialConnection::resumePolling()
     enablePolling = true;
 }
 
-SerialPlugin::SerialPlugin()
+SerialPlugin::SerialPlugin() : m_connection(0)
 {}
 
 SerialPlugin::~SerialPlugin()

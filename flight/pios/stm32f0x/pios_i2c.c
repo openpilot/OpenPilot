@@ -38,6 +38,15 @@
 
 #include <pios_i2c_priv.h>
 
+// Error mask = Bus error | Arbitration lost | Overrun/Underrun
+#define I2C_ISR_ERROR_MASK     (I2C_ISR_BERR|I2C_ISR_ARLO|I2C_ISR_OVR)
+#define I2C_ISR_ERR (I2C_IT_ERRI)
+//Transfer Complete interrupt mask
+#define I2C_ISR_BUF (I2C_IT_TCI)
+// Stop Detection interrupt mask|Not Acknowledge received interrupt mask|
+// Address Match interrupt mask|RX interrupt mask
+#define I2C_ISR_EVT (I2C_IT_STOPI|I2C_IT_NACKI|I2C_IT_ADDRI|I2C_IT_RXI|I2C_IT_TXI)
+
 // #define I2C_HALT_ON_ERRORS
 
 enum i2c_adapter_event {
@@ -117,6 +126,9 @@ struct i2c_adapter_transition {
     void (*entry_fn)(struct pios_i2c_adapter *i2c_adapter);
     enum i2c_adapter_state next_state[I2C_EVENT_NUM_EVENTS];
 };
+
+static void i2c_irq_error_handler(struct pios_i2c_adapter *i2c_adapter);
+static void i2c_irq_event_handler(struct pios_i2c_adapter *i2c_adapter);
 
 static void i2c_adapter_process_auto(struct pios_i2c_adapter *i2c_adapter);
 static void i2c_adapter_inject_event(struct pios_i2c_adapter *i2c_adapter, enum i2c_adapter_event event);
@@ -394,7 +406,7 @@ static void go_stopping(struct pios_i2c_adapter *i2c_adapter)
 
 static void go_stopped(struct pios_i2c_adapter *i2c_adapter)
 {
-    I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
+    I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERRI, DISABLE);
     I2C_AcknowledgeConfig(i2c_adapter->cfg->regs, ENABLE);
 }
 
@@ -1005,6 +1017,19 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
            0;
 }
 
+void PIOS_I2C_IRQ_Handler(uint32_t i2c_id){
+    struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
+
+    bool valid = PIOS_I2C_validate(i2c_adapter);
+
+    PIOS_Assert(valid)
+
+    if(!(i2c_adapter->cfg->regs->ISR & I2C_ISR_ERROR_MASK)){
+        i2c_irq_event_handler(i2c_adapter);
+    } else {
+        i2c_irq_error_handler(i2c_adapter);
+    }
+}
 
 void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 {
@@ -1013,7 +1038,24 @@ void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
     bool valid = PIOS_I2C_validate(i2c_adapter);
 
     PIOS_Assert(valid)
+    i2c_irq_event_handler(i2c_adapter );
+}
 
+void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
+{
+    struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
+
+    bool valid = PIOS_I2C_validate(i2c_adapter);
+
+    PIOS_Assert(valid)
+    i2c_irq_error_handler(i2c_adapter);
+}
+
+
+
+void i2c_irq_event_handler(struct pios_i2c_adapter *i2c_adapter){
+
+    i2c_adapter->cfg->regs->ISR
     uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
 #if defined(PIOS_I2C_DIAGNOSTICS)
@@ -1132,14 +1174,8 @@ skip_event:
 }
 
 
-void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
+void i2c_irq_error_handler(struct pios_i2c_adapter *i2c_adapter)
 {
-    struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
-
-    bool valid = PIOS_I2C_validate(i2c_adapter);
-
-    PIOS_Assert(valid)
-
 #if defined(PIOS_I2C_DIAGNOSTICS)
     uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 

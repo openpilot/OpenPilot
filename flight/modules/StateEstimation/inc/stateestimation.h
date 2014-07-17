@@ -47,8 +47,8 @@ typedef enum {
     SENSORUPDATES_gyro         = 1 << 0,
         SENSORUPDATES_accel    = 1 << 1,
         SENSORUPDATES_mag      = 1 << 2,
-        SENSORUPDATES_auxMag   = 1 << 2,
-        SENSORUPDATES_boardMag = 1 << 2,
+        SENSORUPDATES_boardMag = 1 << 10,
+        SENSORUPDATES_auxMag   = 1 << 9,
         SENSORUPDATES_attitude = 1 << 3,
         SENSORUPDATES_pos      = 1 << 4,
         SENSORUPDATES_vel      = 1 << 5,
@@ -57,7 +57,7 @@ typedef enum {
         SENSORUPDATES_lla      = 1 << 8,
 } sensorUpdates;
 
-#define MAGSTATUS_ONBOARD 1
+#define MAGSTATUS_OK      1
 #define MAGSTATUS_AUX     2
 #define MAGSTATUS_INVALID 0
 typedef struct {

@@ -261,9 +261,9 @@ struct UBX_OP_SYSINFO {
 
 // OP custom messages
 struct UBX_OP_MAG {
-    uint16_t x;
-    uint16_t y;
-    uint16_t z;
+    int16_t x;
+    int16_t y;
+    int16_t z;
     uint16_t Status;
 };
 
@@ -299,5 +299,6 @@ struct UBXPacket {
 bool checksum_ubx_message(struct UBXPacket *);
 uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionSensorData *);
 int parse_ubx_stream(uint8_t, char *, GPSPositionSensorData *, struct GPS_RX_STATS *);
+void load_mag_settings();
 
 #endif /* UBX_H */

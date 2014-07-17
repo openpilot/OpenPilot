@@ -34,6 +34,13 @@
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 #include "inc/UBX.h"
 #include "inc/GPS.h"
+#include "CoordinateConversions.h"
+#include "auxmagcalibration.h"
+
+static float mag_bias[3] = { 0, 0, 0 };
+static float mag_transform[3][3] = {
+    { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }
+};
 
 // If a PVT sentence is received in the last UBX_PVT_TIMEOUT (ms) timeframe it disables VELNED/POSLLH/SOL/TIMEUTC
 #define UBX_PVT_TIMEOUT (1000)
@@ -293,7 +300,7 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
     }
 #endif
 }
-
+#if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_op_sys(struct UBX_OP_SYSINFO *sysinfo)
 {
     GPSExtendedStatusData data;
@@ -306,13 +313,21 @@ void parse_ubx_op_sys(struct UBX_OP_SYSINFO *sysinfo)
     data.Status  = GPSEXTENDEDSTATUS_STATUS_GPSV9;
     GPSExtendedStatusSet(&data);
 }
+#endif
 void parse_ubx_op_mag(struct UBX_OP_MAG *mag)
 {
-    AuxMagSensorData data;
+    float mags[3] = { mag->x - mag_bias[0],
+                      mag->y - mag_bias[1],
+                      mag->z - mag_bias[2] };
 
-    data.x = mag->x;
-    data.y = mag->y;
-    data.z = mag->z;
+    float mag_out[3];
+
+    rot_mult(mag_transform, mags, mag_out);
+
+    AuxMagSensorData data;
+    data.x = mag_out[0];
+    data.y = mag_out[1];
+    data.z = mag_out[2];
     data.Status = mag->Status;
     AuxMagSensorSet(&data);
 }
@@ -427,9 +442,11 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
         break;
     case UBX_CLASS_OP_CUST:
         switch (ubx->header.id) {
+#if !defined(PIOS_GPS_MINIMAL)
         case UBX_ID_SYS:
             parse_ubx_op_sys(&ubx->payload.op_sysinfo);
             break;
+#endif
         case UBX_ID_MAG:
             parse_ubx_op_mag(&ubx->payload.op_mag);
             break;
@@ -445,4 +462,10 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
     return id;
 }
 
+
+void load_mag_settings()
+{
+    AuxMagCalibrationmag_transformArrayGet((float *)mag_transform);
+    AuxMagCalibrationmag_biasArrayGet(mag_bias);
+}
 #endif // PIOS_INCLUDE_GPS_UBX_PARSER

@@ -98,7 +98,9 @@ static uint32_t timeOfLastUpdateMs;
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER) || defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 static struct GPS_RX_STATS gpsRxStats;
 #endif
-
+#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+void AuxMagCalibrationUpdatedCb(UAVObjEvent *ev);
+#endif
 // ****************
 /**
  * Initialise the gps module
@@ -153,10 +155,16 @@ int32_t GPSInitialize(void)
     GPSTimeInitialize();
     GPSSatellitesInitialize();
     HomeLocationInitialize();
+#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
     AuxMagSensorInitialize();
+    AuxMagCalibrationInitialize();
     GPSExtendedStatusInitialize();
-    updateSettings();
 
+    // Initialize mag parameters
+    AuxMagCalibrationUpdatedCb(NULL);
+    AuxMagCalibrationConnectCallback(AuxMagCalibrationUpdatedCb);
+#endif
+    updateSettings();
 #else
     if (gpsPort && gpsEnabled) {
         GPSPositionSensorInitialize();
@@ -381,7 +389,12 @@ static void updateSettings()
         }
     }
 }
-
+#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+void AuxMagCalibrationUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    load_mag_settings();
+}
+#endif
 /**
  * @}
  * @}

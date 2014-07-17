@@ -32,6 +32,7 @@ UAVOBJSRCFILENAMES += accelstate
 UAVOBJSRCFILENAMES += accelsensor
 UAVOBJSRCFILENAMES += magsensor
 UAVOBJSRCFILENAMES += auxmagsensor
+UAVOBJSRCFILENAMES += auxmagcalibration
 UAVOBJSRCFILENAMES += magstate
 UAVOBJSRCFILENAMES += barosensor
 UAVOBJSRCFILENAMES += airspeedsensor

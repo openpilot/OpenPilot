@@ -128,6 +128,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.h \
     $$UAVOBJECT_SYNTHETICS/auxmagsensor.h \
+    $$UAVOBJECT_SYNTHETICS/auxmagcalibration.h \
     $$UAVOBJECT_SYNTHETICS/perfcounter.h
 
 SOURCES += \
@@ -233,5 +234,6 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.cpp \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.cpp \
     $$UAVOBJECT_SYNTHETICS/auxmagsensor.cpp \
+    $$UAVOBJECT_SYNTHETICS/auxmagcalibration.cpp \
     $$UAVOBJECT_SYNTHETICS/perfcounter.cpp
-    
+

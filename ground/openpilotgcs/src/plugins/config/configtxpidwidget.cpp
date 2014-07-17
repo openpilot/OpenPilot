@@ -92,12 +92,22 @@ ConfigTxPIDWidget::~ConfigTxPIDWidget()
     // Do nothing
 }
 
-void ConfigTxPIDWidget::updateSpinBoxProperties(const QString & selected_pid_type)
+static bool isResponsivenessType(const QString & pidType)
+{
+    return pidType.endsWith(".Resp");
+}
+
+static bool isAttitudeType(const QString & pidType)
+{
+    return pidType.contains("Attitude");
+}
+
+void ConfigTxPIDWidget::updateSpinBoxProperties(const QString & selectedPidType)
 {
     QDoubleSpinBox *minPID;
     QDoubleSpinBox *maxPID;
 
-    qDebug() << "ConfigTxPIDWidget::updateSpinBoxProperties(" << selected_pid_type << ")";
+    qDebug() << "ConfigTxPIDWidget::updateSpinBoxProperties(" << selectedPidType << ")";
 
     QObject *obj = sender();
     if (obj == m_txpid->PID1) {
@@ -114,9 +124,15 @@ void ConfigTxPIDWidget::updateSpinBoxProperties(const QString & selected_pid_typ
         return;
     }
 
-    if (selected_pid_type.endsWith(".Resp")) {
-        minPID->setRange(0, 999);
-        maxPID->setRange(0, 999);
+    if (isResponsivenessType(selectedPidType)) {
+        if (isAttitudeType(selectedPidType)) {
+            // Limit to 180 degrees.
+            minPID->setRange(0, 180);
+            maxPID->setRange(0, 180);
+        } else {
+            minPID->setRange(0, 999);
+            maxPID->setRange(0, 999);
+        }
         minPID->setSingleStep(1);
         maxPID->setSingleStep(1);
         minPID->setDecimals(0);

@@ -40,7 +40,7 @@ private:
     Ui_TxPIDWidget *m_txpid;
 
 private slots:
-    void updateSpinBoxProperties(const QString & selected_pid_type);
+    void updateSpinBoxProperties(const QString & selectedPidType);
     void refreshValues();
     void applySettings();
     void saveSettings();

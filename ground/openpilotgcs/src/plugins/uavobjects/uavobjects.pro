@@ -129,6 +129,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.h \
     $$UAVOBJECT_SYNTHETICS/auxmagsensor.h \
     $$UAVOBJECT_SYNTHETICS/auxmagsettings.h \
+    $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.h \
     $$UAVOBJECT_SYNTHETICS/perfcounter.h
 
 SOURCES += \
@@ -235,5 +236,6 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.cpp \
     $$UAVOBJECT_SYNTHETICS/auxmagsensor.cpp \
     $$UAVOBJECT_SYNTHETICS/auxmagsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/gpsextendedstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/perfcounter.cpp
 

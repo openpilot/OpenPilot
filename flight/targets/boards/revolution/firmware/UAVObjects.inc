@@ -56,6 +56,7 @@ UAVOBJSRCFILENAMES += gpssatellites
 UAVOBJSRCFILENAMES += gpstime
 UAVOBJSRCFILENAMES += gpsvelocitysensor
 UAVOBJSRCFILENAMES += gpssettings
+UAVOBJSRCFILENAMES += gpsextendedstatus
 UAVOBJSRCFILENAMES += fixedwingpathfollowersettings
 UAVOBJSRCFILENAMES += fixedwingpathfollowerstatus
 UAVOBJSRCFILENAMES += vtolpathfollowersettings

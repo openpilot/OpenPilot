@@ -60,7 +60,7 @@ struct data {
 
 static int32_t init(stateFilter *self);
 static filterResult filter(stateFilter *self, stateEstimation *state);
-static void checkMagValidity(struct data *this, float mag[3]);
+static bool checkMagValidity(struct data *this, float mag[3], bool setAlarms);
 static void magOffsetEstimation(struct data *this, float mag[3]);
 
 
@@ -91,8 +91,25 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
 {
     struct data *this = (struct data *)self->localdata;
 
+    // Uses the external mag when available
+    if (IS_SET(state->updated, SENSORUPDATES_auxMag) && checkMagValidity(this, state->auxMag, false)) {
+        state->mag[0]    = state->auxMag[0];
+        state->mag[1]    = state->auxMag[1];
+        state->mag[2]    = state->auxMag[2];
+        state->magStatus = MAGSTATUS_AUX;
+        return FILTERRESULT_OK;
+    }
+
+    // Defaults to board magnetometer
+    state->mag[0]    = state->boardMag[0];
+    state->mag[1]    = state->boardMag[1];
+    state->mag[2]    = state->boardMag[2];
+    state->magStatus = MAGSTATUS_ONBOARD;
     if (IS_SET(state->updated, SENSORUPDATES_mag)) {
-        checkMagValidity(this, state->mag);
+        // set alarm as aux sensor is invalid too
+        if (!checkMagValidity(this, state->mag, true)) {
+            state->magStatus = MAGSTATUS_INVALID;
+        }
         if (this->revoCalibration.MagBiasNullingRate > 0) {
             magOffsetEstimation(this, state->mag);
         }
@@ -104,10 +121,10 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
 /**
  * check validity of magnetometers
  */
-static void checkMagValidity(struct data *this, float mag[3])
+static bool checkMagValidity(struct data *this, float mag[3], bool setAlarms)
 {
-        #define ALARM_THRESHOLD 5
-
+    #define ALARM_THRESHOLD 5
+    bool valid = true;
     // mag2 holds the actual magnetic vector length (squared)
     float mag2 = mag[0] * mag[0] + mag[1] * mag[1] + mag[2] * mag[2];
 
@@ -130,21 +147,29 @@ static void checkMagValidity(struct data *this, float mag[3])
     if (minWarning2 < mag2 && mag2 < maxWarning2) {
         this->warningcount = 0;
         this->errorcount   = 0;
+        valid = true;
         AlarmsClear(SYSTEMALARMS_ALARM_MAGNETOMETER);
     } else if (minError2 < mag2 && mag2 < maxError2) {
         this->errorcount = 0;
         if (this->warningcount > ALARM_THRESHOLD) {
-            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_WARNING);
+            valid = false;
+            if (setAlarms) {
+                AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_WARNING);
+            }
         } else {
             this->warningcount++;
         }
     } else {
         if (this->errorcount > ALARM_THRESHOLD) {
-            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_CRITICAL);
+            valid = false;
+            if (setAlarms) {
+                AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_CRITICAL);
+            }
         } else {
             this->errorcount++;
         }
     }
+    return valid;
 }
 
 

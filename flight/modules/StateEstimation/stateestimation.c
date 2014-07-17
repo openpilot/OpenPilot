@@ -41,6 +41,7 @@
 #include <gpspositionsensor.h>
 #include <gpsvelocitysensor.h>
 #include <homelocation.h>
+#include <auxmagsensor.h>
 
 #include <gyrostate.h>
 #include <accelstate.h>
@@ -267,6 +268,7 @@ int32_t StateEstimationInitialize(void)
 
     GyroSensorInitialize();
     MagSensorInitialize();
+    AuxMagSensorInitialize();
     BaroSensorInitialize();
     AirspeedSensorInitialize();
     GPSVelocitySensorInitialize();
@@ -423,7 +425,8 @@ static void StateEstimationCb(void)
             gyroRaw[2] = states.gyro[2];
         }
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AccelSensor, accel, x, y, z);
-        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(MagSensor, mag, x, y, z);
+        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(MagSensor, boardMag, x, y, z);
+        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AuxMagSensor, auxMag, x, y, z);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GPSVelocitySensor, vel, North, East, Down);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(BaroSensor, baro, Altitude, true);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_2_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(AirspeedSensor, airspeed, CalibratedAirspeed, TrueAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
@@ -467,7 +470,27 @@ static void StateEstimationCb(void)
             gyroDelta[2] = states.gyro[2] - gyroRaw[2];
         }
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(AccelState, accel, x, y, z);
-        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(MagState, mag, x, y, z);
+
+        {
+            MagStateData s;
+
+            MagStateGet(&s);
+            s.x = states.mag[0];
+            s.y = states.mag[1];
+            s.z = states.mag[2];
+            switch (states.magStatus) {
+            case MAGSTATUS_ONBOARD:
+                s.Source = MAGSTATE_SOURCE_ONBOARD;
+                break;
+            case MAGSTATUS_AUX:
+                s.Source = MAGSTATE_SOURCE_AUX;
+                break;
+            default:
+                s.Source = MAGSTATE_SOURCE_INVALID;
+            }
+            MagStateSet(&s);
+        }
+
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(PositionState, pos, North, East, Down);
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(VelocityState, vel, North, East, Down);
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_2_DIMENSIONS(AirspeedState, airspeed, CalibratedAirspeed, TrueAirspeed);

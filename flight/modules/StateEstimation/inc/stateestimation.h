@@ -47,6 +47,8 @@ typedef enum {
     SENSORUPDATES_gyro         = 1 << 0,
         SENSORUPDATES_accel    = 1 << 1,
         SENSORUPDATES_mag      = 1 << 2,
+        SENSORUPDATES_auxMag   = 1 << 2,
+        SENSORUPDATES_boardMag = 1 << 2,
         SENSORUPDATES_attitude = 1 << 3,
         SENSORUPDATES_pos      = 1 << 4,
         SENSORUPDATES_vel      = 1 << 5,
@@ -55,15 +57,21 @@ typedef enum {
         SENSORUPDATES_lla      = 1 << 8,
 } sensorUpdates;
 
+#define MAGSTATUS_ONBOARD 1
+#define MAGSTATUS_AUX     2
+#define MAGSTATUS_INVALID 0
 typedef struct {
-    float gyro[3];
-    float accel[3];
-    float mag[3];
-    float attitude[4];
-    float pos[3];
-    float vel[3];
-    float airspeed[2];
-    float baro[1];
+    float   gyro[3];
+    float   accel[3];
+    float   mag[3];
+    float   attitude[4];
+    float   pos[3];
+    float   vel[3];
+    float   airspeed[2];
+    float   baro[1];
+    float   auxMag[3];
+    uint8_t magStatus;
+    float   boardMag[3];
     sensorUpdates updated;
 } stateEstimation;
 

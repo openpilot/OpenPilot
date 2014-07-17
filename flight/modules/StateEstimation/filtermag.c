@@ -36,7 +36,7 @@
 #include <revosettings.h>
 #include <systemalarms.h>
 #include <homelocation.h>
-
+#include <auxmagsettings.h>
 #include <CoordinateConversions.h>
 
 // Private constants
@@ -47,10 +47,12 @@
 struct data {
     RevoCalibrationData revoCalibration;
     RevoSettingsData    revoSettings;
+    AuxMagSettingsUsageOptions auxMagUsage;
     uint8_t warningcount;
     uint8_t errorcount;
     float   homeLocationBe[3];
-    float   magBe2;
+    float   magBe;
+    float   invMagBe;
     float   magBias[3];
 };
 
@@ -60,9 +62,9 @@ struct data {
 
 static int32_t init(stateFilter *self);
 static filterResult filter(stateFilter *self, stateEstimation *state);
-static bool checkMagValidity(struct data *this, float mag[3], bool setAlarms);
-static void magOffsetEstimation(struct data *this, float mag[3]);
-
+static bool checkMagValidity(struct data *this, float error, bool setAlarms);
+// static void magOffsetEstimation(struct data *this, float mag[3]);
+static float getMagError(struct data *this, float mag[3]);
 
 int32_t filterMagInitialize(stateFilter *handle)
 {
@@ -80,105 +82,131 @@ static int32_t init(stateFilter *self)
     this->magBias[0]   = this->magBias[1] = this->magBias[2] = 0.0f;
     this->warningcount = this->errorcount = 0;
     HomeLocationBeGet(this->homeLocationBe);
-    // magBe2 holds the squared magnetic vector length (extpected)
-    this->magBe2 = this->homeLocationBe[0] * this->homeLocationBe[0] + this->homeLocationBe[1] * this->homeLocationBe[1] + this->homeLocationBe[2] * this->homeLocationBe[2];
+    // magBe holds the squared magnetic vector length (extpected)
+    this->magBe    = sqrtf(this->homeLocationBe[0] * this->homeLocationBe[0] + this->homeLocationBe[1] * this->homeLocationBe[1] + this->homeLocationBe[2] * this->homeLocationBe[2]);
+    this->invMagBe = 1.0f / this->magBe;
     RevoCalibrationGet(&this->revoCalibration);
     RevoSettingsGet(&this->revoSettings);
+    AuxMagSettingsUsageGet(&this->auxMagUsage);
     return 0;
 }
 
 static filterResult filter(stateFilter *self, stateEstimation *state)
 {
-    struct data *this = (struct data *)self->localdata;
+    struct data *this   = (struct data *)self->localdata;
+    float auxMagError;
+    float boardMagError;
+    float temp_mag[3]   = { 0 };
+    uint8_t temp_status = MAGSTATUS_INVALID;
+    uint8_t magSamples  = 0;
 
     // Uses the external mag when available
-    if (IS_SET(state->updated, SENSORUPDATES_auxMag) && checkMagValidity(this, state->auxMag, false)) {
-        state->mag[0]    = state->auxMag[0];
-        state->mag[1]    = state->auxMag[1];
-        state->mag[2]    = state->auxMag[2];
-        state->magStatus = MAGSTATUS_AUX;
-        return FILTERRESULT_OK;
-    }
-
-    // Defaults to board magnetometer
-    state->mag[0]    = state->boardMag[0];
-    state->mag[1]    = state->boardMag[1];
-    state->mag[2]    = state->boardMag[2];
-    state->magStatus = MAGSTATUS_ONBOARD;
-    if (IS_SET(state->updated, SENSORUPDATES_mag)) {
-        // set alarm as aux sensor is invalid too
-        if (!checkMagValidity(this, state->mag, true)) {
-            state->magStatus = MAGSTATUS_INVALID;
-        }
-        if (this->revoCalibration.MagBiasNullingRate > 0) {
-            magOffsetEstimation(this, state->mag);
+    if ((this->auxMagUsage != AUXMAGSETTINGS_USAGE_ONBOARDONLY) &&
+        IS_SET(state->updated, SENSORUPDATES_auxMag)) {
+        auxMagError = getMagError(this, state->auxMag);
+        // Handles alarms only if it will rely on aux mag only
+        if (checkMagValidity(this, auxMagError,
+                             (this->auxMagUsage == AUXMAGSETTINGS_USAGE_AUXONLY))) {
+            temp_mag[0] = state->auxMag[0];
+            temp_mag[1] = state->auxMag[1];
+            temp_mag[2] = state->auxMag[2];
+            temp_status = MAGSTATUS_AUX;
+            magSamples++;
         }
     }
 
+    if ((this->auxMagUsage != AUXMAGSETTINGS_USAGE_AUXONLY) &&
+        IS_SET(state->updated, SENSORUPDATES_boardMag)) {
+        // TODO!
+        /*if (this->revoCalibration.MagBiasNullingRate > 0) {
+            magOffsetEstimation(this, state->boardMag);
+           }*/
+        boardMagError = getMagError(this, state->boardMag);
+        // sets warning only if no mag data are available (aux is invalid or missing)
+        if (checkMagValidity(this, boardMagError, temp_status == MAGSTATUS_INVALID)) {
+            temp_mag[0] += state->boardMag[0];
+            temp_mag[1] += state->boardMag[1];
+            temp_mag[2] += state->boardMag[2];
+            temp_status  = MAGSTATUS_OK;
+            magSamples++;
+        }
+    }
+
+    if (magSamples > 1) {
+        temp_mag[0] *= 0.5f;
+        temp_mag[1] *= 0.5f;
+        temp_mag[2] *= 0.5f;
+    }
+
+    if (temp_status != MAGSTATUS_INVALID) {
+        temp_mag[0]    *= this->invMagBe;
+        temp_mag[1]    *= this->invMagBe;
+        temp_mag[2]    *= this->invMagBe;
+        state->mag[0]   = temp_mag[0];
+        state->mag[1]   = temp_mag[1];
+        state->mag[2]   = temp_mag[2];
+        state->updated |= SENSORUPDATES_mag;
+    }
+    state->magStatus = temp_status;
     return FILTERRESULT_OK;
 }
 
 /**
  * check validity of magnetometers
  */
-static bool checkMagValidity(struct data *this, float mag[3], bool setAlarms)
+static bool checkMagValidity(struct data *this, float error, bool setAlarms)
 {
     #define ALARM_THRESHOLD 5
-    bool valid = true;
-    // mag2 holds the actual magnetic vector length (squared)
-    float mag2 = mag[0] * mag[0] + mag[1] * mag[1] + mag[2] * mag[2];
-
-    // warning and error thresholds
-    // avoud sqrt() : minlimit<actual<maxlimit === minlimit²<actual²<maxlimit²
-    //
-    // actual = |mag|
-    // minlimit = |Be| - maxDeviation*|Be| = |Be| * (1 - maxDeviation)
-    // maxlimit = |Be| + maxDeviation*|Be| = |Be| * (1 + maxDeviation)
-    // minlimit² = |Be|² * ( 1 - 2*maxDeviation + maxDeviation²)
-    // maxlimit² = |Be|² * ( 1 + 2*maxDeviation + maxDeviation²)
-    //
-
-    float minWarning2 = this->magBe2 * (1.0f - 2.0f * this->revoSettings.MagnetometerMaxDeviation.Warning + this->revoSettings.MagnetometerMaxDeviation.Warning * this->revoSettings.MagnetometerMaxDeviation.Warning);
-    float maxWarning2 = this->magBe2 * (1.0f + 2.0f * this->revoSettings.MagnetometerMaxDeviation.Warning + this->revoSettings.MagnetometerMaxDeviation.Warning * this->revoSettings.MagnetometerMaxDeviation.Warning);
-    float minError2   = this->magBe2 * (1.0f - 2.0f * this->revoSettings.MagnetometerMaxDeviation.Error + this->revoSettings.MagnetometerMaxDeviation.Error * this->revoSettings.MagnetometerMaxDeviation.Error);
-    float maxError2   = this->magBe2 * (1.0f + 2.0f * this->revoSettings.MagnetometerMaxDeviation.Error + this->revoSettings.MagnetometerMaxDeviation.Error * this->revoSettings.MagnetometerMaxDeviation.Error);
 
     // set errors
-    if (minWarning2 < mag2 && mag2 < maxWarning2) {
+    if (error < this->revoSettings.MagnetometerMaxDeviation.Warning) {
         this->warningcount = 0;
         this->errorcount   = 0;
-        valid = true;
         AlarmsClear(SYSTEMALARMS_ALARM_MAGNETOMETER);
-    } else if (minError2 < mag2 && mag2 < maxError2) {
+        return true;
+    }
+
+    if (error < this->revoSettings.MagnetometerMaxDeviation.Error) {
         this->errorcount = 0;
         if (this->warningcount > ALARM_THRESHOLD) {
-            valid = false;
             if (setAlarms) {
                 AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_WARNING);
             }
+            return false;
         } else {
             this->warningcount++;
-        }
-    } else {
-        if (this->errorcount > ALARM_THRESHOLD) {
-            valid = false;
-            if (setAlarms) {
-                AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_CRITICAL);
-            }
-        } else {
-            this->errorcount++;
+            return true;
         }
     }
-    return valid;
+
+    if (this->errorcount > ALARM_THRESHOLD) {
+        if (setAlarms) {
+            AlarmsSet(SYSTEMALARMS_ALARM_MAGNETOMETER, SYSTEMALARMS_ALARM_CRITICAL);
+        }
+        return false;
+    } else {
+        this->errorcount++;
+    }
+    // still in "grace period"
+    return true;
 }
 
+static float getMagError(struct data *this, float mag[3])
+{
+    // vector norm
+    float magnitude = sqrtf(mag[0] * mag[0] + mag[1] * mag[1] + mag[2] * mag[2]);
+    // absolute value of relative error against Be
+    float error     = fabsf(magnitude - this->magBe) * this->invMagBe;
 
+    return error;
+}
+#if 0
 /**
  * Perform an update of the @ref MagBias based on
  * Magmeter Offset Cancellation: Theory and Implementation,
  * revisited William Premerlani, October 14, 2011
  */
-static void magOffsetEstimation(struct data *this, float mag[3])
+void magOffsetEstimation(struct data *this, float mag[3])
 {
 #if 0
     // Constants, to possibly go into a UAVO
@@ -269,7 +297,7 @@ static void magOffsetEstimation(struct data *this, float mag[3])
 #endif // if 0
 }
 
-
+#endif /* if 0 */
 /**
  * @}
  * @}

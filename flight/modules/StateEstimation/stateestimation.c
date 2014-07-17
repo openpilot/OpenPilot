@@ -292,6 +292,7 @@ int32_t StateEstimationInitialize(void)
     MagSensorConnectCallback(&sensorUpdatedCb);
     BaroSensorConnectCallback(&sensorUpdatedCb);
     AirspeedSensorConnectCallback(&sensorUpdatedCb);
+    AuxMagSensorConnectCallback(&sensorUpdatedCb);
     GPSVelocitySensorConnectCallback(&sensorUpdatedCb);
     GPSPositionSensorConnectCallback(&sensorUpdatedCb);
 
@@ -470,8 +471,7 @@ static void StateEstimationCb(void)
             gyroDelta[2] = states.gyro[2] - gyroRaw[2];
         }
         EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(AccelState, accel, x, y, z);
-
-        {
+        if (IS_SET(states.updated, SENSORUPDATES_mag)) {
             MagStateData s;
 
             MagStateGet(&s);
@@ -479,8 +479,8 @@ static void StateEstimationCb(void)
             s.y = states.mag[1];
             s.z = states.mag[2];
             switch (states.magStatus) {
-            case MAGSTATUS_ONBOARD:
-                s.Source = MAGSTATE_SOURCE_ONBOARD;
+            case MAGSTATUS_OK:
+                s.Source = MAGSTATE_SOURCE_OK;
                 break;
             case MAGSTATUS_AUX:
                 s.Source = MAGSTATE_SOURCE_AUX;
@@ -590,7 +590,11 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
     }
 
     if (ev->obj == MagSensorHandle()) {
-        updatedSensors |= SENSORUPDATES_mag;
+        updatedSensors |= SENSORUPDATES_boardMag;
+    }
+
+    if (ev->obj == AuxMagSensorHandle()) {
+        updatedSensors |= SENSORUPDATES_auxMag;
     }
 
     if (ev->obj == GPSPositionSensorHandle()) {

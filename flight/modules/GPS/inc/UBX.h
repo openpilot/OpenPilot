@@ -35,22 +35,23 @@
 #include "GPS.h"
 
 
-#define UBX_SYNC1      0xb5 // UBX protocol synchronization characters
-#define UBX_SYNC2      0x62
+#define UBX_SYNC1         0xb5 // UBX protocol synchronization characters
+#define UBX_SYNC2         0x62
 
 // From u-blox6 receiver protocol specification
 
 // Messages classes
-#define UBX_CLASS_NAV  0x01
+#define UBX_CLASS_NAV     0x01
 
 // Message IDs
-#define UBX_ID_POSLLH  0x02
-#define UBX_ID_STATUS  0x03
-#define UBX_ID_DOP     0x04
-#define UBX_ID_SOL     0x06
-#define UBX_ID_VELNED  0x12
-#define UBX_ID_TIMEUTC 0x21
-#define UBX_ID_SVINFO  0x30
+#define UBX_ID_POSLLH     0x02
+#define UBX_ID_STATUS     0x03
+#define UBX_ID_DOP        0x04
+#define UBX_ID_SOL        0x06
+#define UBX_ID_VELNED     0x12
+#define UBX_ID_TIMEUTC    0x21
+#define UBX_ID_SVINFO     0x30
+#define UBX_ID_PVT        0x07
 
 // private structures
 
@@ -156,6 +157,59 @@ struct UBX_NAV_TIMEUTC {
     uint8_t  valid;  // Validity Flags
 };
 
+#define PVT_VALID_VALIDDATE            0x01
+#define PVT_VALID_VALIDTIME            0x02
+#define PVT_VALID_FULLYRESOLVED        0x04
+
+#define PVT_FIX_TYPE_NO_FIX            0
+#define PVT_FIX_TYPE_DEAD_RECKON       0x01 // Dead Reckoning only
+#define PVT_FIX_TYPE_2D                0x02 // 2D-Fix
+#define PVT_FIX_TYPE_3D                0x03 // 3D-Fix
+#define PVT_FIX_TYPE_GNSS_DEAD_RECKON  0x04 // GNSS + dead reckoning combined
+#define PVT_FIX_TYPE_TIME_ONLY         0x05 // Time only fix
+
+#define PVT_FLAGS_GNNSFIX_OK           (1 << 0)
+#define PVT_FLAGS_DIFFSOLN             (1 << 1)
+#define PVT_FLAGS_PSMSTATE_ENABLED     (1 << 2)
+#define PVT_FLAGS_PSMSTATE_ACQUISITION (2 << 2)
+#define PVT_FLAGS_PSMSTATE_TRACKING    (3 << 2)
+#define PVT_FLAGS_PSMSTATE_PO_TRACKING (4 << 2)
+#define PVT_FLAGS_PSMSTATE_INACTIVE    (5 << 2)
+
+// PVT Navigation Position Velocity Time Solution
+struct UBX_NAV_PVT {
+    uint32_t iTOW;
+    uint16_t year;
+    uint8_t  month;
+    uint8_t  day;
+    uint8_t  hour;
+    uint8_t  min;
+    uint8_t  sec;
+    uint8_t  valid;
+    uint32_t tAcc;
+    int32_t  nano;
+    uint8_t  fixType;
+    uint8_t  flags;
+    uint8_t  reserved1;
+    uint8_t  numSV;
+    int32_t  lon;
+    int32_t  lat;
+    int32_t  height;
+    int32_t  hMSL;
+    uint32_t hAcc;
+    uint32_t vAcc;
+    int32_t  velN;
+    int32_t  velE;
+    int32_t  velD;
+    int32_t  gSpeed;
+    int32_t  heading;
+    uint32_t sAcc;
+    uint32_t headingAcc;
+    uint32_t pDOP;
+    uint16_t reserved2;
+    uint32_t reserved3;
+};
+
 // Space Vehicle (SV) Information
 
 // Single SV information block
@@ -198,6 +252,7 @@ typedef union {
     struct UBX_NAV_DOP     nav_dop;
     struct UBX_NAV_SOL     nav_sol;
     struct UBX_NAV_VELNED  nav_velned;
+    struct UBX_NAV_PVT     nav_pvt;
 #if !defined(PIOS_GPS_MINIMAL)
     struct UBX_NAV_TIMEUTC nav_timeutc;
     struct UBX_NAV_SVINFO  nav_svinfo;

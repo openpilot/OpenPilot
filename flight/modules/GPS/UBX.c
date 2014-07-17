@@ -251,6 +251,47 @@ void parse_ubx_nav_velned(struct UBX_NAV_VELNED *velned, GPSPositionSensorData *
     }
 }
 
+void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPosition)
+{
+    GPSVelocitySensorData GpsVelocity;
+
+    if (check_msgtracker(pvt->iTOW, ALL_RECEIVED)) {
+        if ((pvt->fixType == PVT_FIX_TYPE_3D) ||
+            (pvt->fixType == PVT_FIX_TYPE_2D)) {
+            GpsVelocity.North = (float)pvt->velN / 100.0f;
+            GpsVelocity.East  = (float)pvt->velE / 100.0f;
+            GpsVelocity.Down  = (float)pvt->velD / 100.0f;
+            GPSVelocitySensorSet(&GpsVelocity);
+
+            GpsPosition->Groundspeed     = (float)pvt->gSpeed * 0.01f;
+            GpsPosition->Heading         = (float)pvt->heading * 1.0e-5f;
+            GpsPosition->Altitude        = (float)pvt->hMSL * 0.001f;
+            GpsPosition->GeoidSeparation = (float)(pvt->height - pvt->hMSL) * 0.001f;
+            GpsPosition->Latitude        = pvt->lat;
+            GpsPosition->Longitude       = pvt->lon;
+            GpsPosition->Status = pvt->fixType == PVT_FIX_TYPE_3D ?
+                                  GPSPOSITIONSENSOR_STATUS_FIX3D : GPSPOSITIONSENSOR_STATUS_FIX2D;
+
+            GpsPosition->PDOP   = (float)pvt->pDOP * 0.01f;
+        } else {
+            GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_NOFIX;
+        }
+
+        if (pvt->valid & PVT_VALID_VALIDTIME) {
+            // Time is valid, set GpsTime
+            GPSTimeData GpsTime;
+
+            GpsTime.Year   = pvt->year;
+            GpsTime.Month  = pvt->month;
+            GpsTime.Day    = pvt->day;
+            GpsTime.Hour   = pvt->hour;
+            GpsTime.Minute = pvt->min;
+            GpsTime.Second = pvt->sec;
+
+            GPSTimeSet(&GpsTime);
+        }
+    }
+}
 #if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_nav_timeutc(struct UBX_NAV_TIMEUTC *timeutc)
 {
@@ -323,6 +364,9 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
             break;
         case UBX_ID_VELNED:
             parse_ubx_nav_velned(&ubx->payload.nav_velned, GpsPosition);
+            break;
+        case UBX_ID_PVT:
+            parse_ubx_nav_pvt(&ubx->payload.nav_pvt, GpsPosition);
             break;
 #if !defined(PIOS_GPS_MINIMAL)
         case UBX_ID_TIMEUTC:

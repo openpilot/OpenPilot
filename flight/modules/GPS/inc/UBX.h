@@ -32,6 +32,8 @@
 #define UBX_H
 #include "openpilot.h"
 #include "gpspositionsensor.h"
+#include "gpsextendedstatus.h"
+#include "auxmagsensor.h"
 #include "GPS.h"
 
 
@@ -41,7 +43,8 @@
 // From u-blox6 receiver protocol specification
 
 // Messages classes
-#define UBX_CLASS_NAV  0x01
+#define UBX_CLASS_NAV     0x01
+#define UBX_CLASS_OP_CUST 0x99
 
 // Message IDs
 #define UBX_ID_POSLLH  0x02
@@ -53,6 +56,8 @@
 #define UBX_ID_SVINFO  0x30
 #define UBX_ID_PVT     0x07
 
+#define UBX_ID_SYS        0x01
+#define UBX_ID_MAG        0x02
 // private structures
 
 // Geodetic Position Solution
@@ -245,6 +250,23 @@ struct UBX_NAV_SVINFO {
     struct UBX_NAV_SVINFO_SV sv[MAX_SVS]; // Repeated 'numCh' times
 };
 
+// OP custom messages
+struct UBX_OP_SYSINFO {
+    uint32_t flightTime;
+    uint32_t HeapRemaining;
+    uint16_t IRQStackRemaining;
+    uint16_t SystemModStackRemaining;
+    uint16_t options;
+};
+
+// OP custom messages
+struct UBX_OP_MAG {
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+    uint16_t Status;
+};
+
 typedef union {
     uint8_t payload[0];
     struct UBX_NAV_POSLLH  nav_posllh;
@@ -257,6 +279,8 @@ typedef union {
     struct UBX_NAV_TIMEUTC nav_timeutc;
     struct UBX_NAV_SVINFO  nav_svinfo;
 #endif
+    struct UBX_OP_SYSINFO  op_sysinfo;
+    struct UBX_OP_MAG op_mag;
 } UBXPayload;
 
 struct UBXHeader {

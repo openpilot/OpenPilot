@@ -40,7 +40,7 @@
 #include "gpssettings.h"
 #include "taskinfo.h"
 #include "hwsettings.h"
-
+#include "auxmagsensor.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
 
@@ -153,6 +153,8 @@ int32_t GPSInitialize(void)
     GPSTimeInitialize();
     GPSSatellitesInitialize();
     HomeLocationInitialize();
+    AuxMagSensorInitialize();
+    GPSExtendedStatusInitialize();
     updateSettings();
 
 #else

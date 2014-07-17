@@ -293,6 +293,30 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
     }
 #endif
 }
+
+void parse_ubx_op_sys(struct UBX_OP_SYSINFO *sysinfo)
+{
+    GPSExtendedStatusData data;
+
+    data.FlightTime           = sysinfo->flightTime;
+    data.HeapRemaining        = sysinfo->HeapRemaining;
+    data.IRQStackRemaining    = sysinfo->IRQStackRemaining;
+    data.SysModStackRemaining = sysinfo->SystemModStackRemaining;
+    data.Options = sysinfo->options;
+    data.Status  = GPSEXTENDEDSTATUS_STATUS_GPSV9;
+    GPSExtendedStatusSet(&data);
+}
+void parse_ubx_op_mag(struct UBX_OP_MAG *mag)
+{
+    AuxMagSensorData data;
+
+    data.x = mag->x;
+    data.y = mag->y;
+    data.z = mag->z;
+    data.Status = mag->Status;
+    AuxMagSensorSet(&data);
+}
+
 #if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_nav_timeutc(struct UBX_NAV_TIMEUTC *timeutc)
 {
@@ -399,6 +423,16 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
             parse_ubx_nav_svinfo(&ubx->payload.nav_svinfo);
             break;
 #endif
+        }
+        break;
+    case UBX_CLASS_OP_CUST:
+        switch (ubx->header.id) {
+        case UBX_ID_SYS:
+            parse_ubx_op_sys(&ubx->payload.op_sysinfo);
+            break;
+        case UBX_ID_MAG:
+            parse_ubx_op_mag(&ubx->payload.op_mag);
+            break;
         }
         break;
     }

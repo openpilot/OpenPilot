@@ -352,7 +352,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
     // During initialization and
     if (first_run) {
-#if defined(PIOS_INCLUDE_HMC5883)
+#if defined(PIOS_INCLUDE_HMC5X83)
         // To initialize we need a valid mag reading
         if (xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) != pdTRUE) {
             return -1;

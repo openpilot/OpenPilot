@@ -64,7 +64,7 @@ static int32_t alt_ds_pres = 0;
 static int alt_ds_count    = 0;
 #endif
 
-#if defined(PIOS_INCLUDE_HMC5883)
+#if defined(PIOS_INCLUDE_HMC5X83)
 int32_t mag_test;
 static float mag_bias[3] = { 0, 0, 0 };
 static float mag_scale[3] = { 1, 1, 1 };
@@ -108,7 +108,7 @@ int32_t MagBaroInitialize()
 #endif
 
     if (magbaroEnabled) {
-#if defined(PIOS_INCLUDE_HMC5883)
+#if defined(PIOS_INCLUDE_HMC5X83)
         MagSensorInitialize();
 #endif
 
@@ -127,15 +127,16 @@ MODULE_INITCALL(MagBaroInitialize, MagBaroStart);
 /**
  * Module thread, should not return.
  */
-#if defined(PIOS_INCLUDE_HMC5883)
-static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
-#ifdef PIOS_HMC5883_HAS_GPIOS
+#if defined(PIOS_INCLUDE_HMC5X83)
+static const struct pios_hmc5x83_cfg pios_hmc5x83_cfg = {
+#ifdef PIOS_HMC5X83_HAS_GPIOS
     .exti_cfg  = 0,
 #endif
-    .M_ODR     = PIOS_HMC5883_ODR_15,
-    .Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
-    .Gain = PIOS_HMC5883_GAIN_1_9,
-    .Mode = PIOS_HMC5883_MODE_CONTINUOUS,
+    .M_ODR     = PIOS_HMC5x83_ODR_15,
+    .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
+    .Gain      = PIOS_HMC5x83_GAIN_1_9,
+    .Mode      = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Driver    = &PIOS_HMC5x83_I2C_DRIVER,
 };
 #endif
 
@@ -148,9 +149,9 @@ static void magbaroTask(__attribute__((unused)) void *parameters)
     PIOS_BMP085_Init();
 #endif
 
-#if defined(PIOS_INCLUDE_HMC5883)
+#if defined(PIOS_INCLUDE_HMC5X83)
     MagSensorData mag;
-    PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+    PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, PIOS_I2C_MAIN_ADAPTER, 0);
     uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 #endif
 
@@ -197,10 +198,10 @@ static void magbaroTask(__attribute__((unused)) void *parameters)
         }
 #endif /* if defined(PIOS_INCLUDE_BMP085) */
 
-#if defined(PIOS_INCLUDE_HMC5883)
-        if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 100000) {
+#if defined(PIOS_INCLUDE_HMC5X83)
+        if (PIOS_HMC5x83_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 100000) {
             int16_t values[3];
-            PIOS_HMC5883_ReadMag(values);
+            PIOS_HMC5x83_ReadMag(values);
             float mags[3] = { (float)values[1] * mag_scale[0] - mag_bias[0],
                               (float)values[0] * mag_scale[1] - mag_bias[1],
                               -(float)values[2] * mag_scale[2] - mag_bias[2] };

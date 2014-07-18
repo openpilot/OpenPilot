@@ -200,8 +200,8 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         PIOS_DEBUG_Assert(0);
     }
 
-#if defined(PIOS_INCLUDE_HMC5883)
-    mag_test = PIOS_HMC5883_Test();
+#if defined(PIOS_INCLUDE_HMC5X83)
+    mag_test = PIOS_HMC5x83_Test();
 #else
     mag_test = 0;
 #endif
@@ -409,11 +409,11 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
         // and make it average zero (weakly)
 
-#if defined(PIOS_INCLUDE_HMC5883)
+#if defined(PIOS_INCLUDE_HMC5X83)
         MagSensorData mag;
-        if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
+        if (PIOS_HMC5x83_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
             int16_t values[3];
-            PIOS_HMC5883_ReadMag(values);
+            PIOS_HMC5x83_ReadMag(values);
             float mags[3] = { (float)values[1] - mag_bias[0],
                               (float)values[0] - mag_bias[1],
                               -(float)values[2] - mag_bias[2] };
@@ -428,7 +428,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             MagSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();
         }
-#endif /* if defined(PIOS_INCLUDE_HMC5883) */
+#endif /* if defined(PIOS_INCLUDE_HMC5X83) */
 
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);

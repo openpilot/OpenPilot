@@ -108,7 +108,7 @@ extern const struct pios_hmc5x83_io_driver PIOS_HMC5x83_I2C_DRIVER;
 #endif
 
 struct pios_hmc5x83_cfg {
-#ifdef PIOS_HMC5x83_HAS_GPIOS
+#ifdef PIOS_HMC5X83_HAS_GPIOS
     const struct pios_exti_cfg *exti_cfg; /* Pointer to the EXTI configuration */
 #endif
     uint8_t M_ODR; // OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */

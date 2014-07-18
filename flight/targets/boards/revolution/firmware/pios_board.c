@@ -91,10 +91,10 @@ void PIOS_ADC_DMC_irq_handler(void)
 
 #endif /* if defined(PIOS_INCLUDE_ADC) */
 
-#if defined(PIOS_INCLUDE_HMC5883)
-#include "pios_hmc5883.h"
-static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
-    .vector = PIOS_HMC5883_IRQHandler,
+#if defined(PIOS_INCLUDE_HMC5X83)
+#include "pios_hmc5x83.h"
+static const struct pios_exti_cfg pios_exti_hmc5x83_cfg __exti_config = {
+    .vector = PIOS_HMC5x83_IRQHandler,
     .line   = EXTI_Line7,
     .pin    = {
         .gpio = GPIOB,
@@ -124,14 +124,15 @@ static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
     },
 };
 
-static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
-    .exti_cfg  = &pios_exti_hmc5883_cfg,
-    .M_ODR     = PIOS_HMC5883_ODR_75,
-    .Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
-    .Gain = PIOS_HMC5883_GAIN_1_9,
-    .Mode = PIOS_HMC5883_MODE_CONTINUOUS,
+static const struct pios_hmc5x83_cfg pios_hmc5x83_cfg = {
+    .exti_cfg  = &pios_exti_hmc5x83_cfg,
+    .M_ODR     = PIOS_HMC5x83_ODR_75,
+    .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
+    .Gain      = PIOS_HMC5x83_GAIN_1_9,
+    .Mode      = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Driver    = &PIOS_HMC5x83_I2C_DRIVER,
 };
-#endif /* PIOS_INCLUDE_HMC5883 */
+#endif /* PIOS_INCLUDE_HMC5X83 */
 
 /**
  * Configuration for the MS5611 chip
@@ -944,8 +945,8 @@ void PIOS_Board_Init(void)
     PIOS_ADC_Init(&pios_adc_cfg);
 #endif
 
-#if defined(PIOS_INCLUDE_HMC5883)
-    PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+#if defined(PIOS_INCLUDE_HMC5X83)
+    PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_mag_pressure_adapter_id, 0);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)

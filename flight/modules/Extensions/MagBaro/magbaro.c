@@ -65,6 +65,7 @@ static int alt_ds_count    = 0;
 #endif
 
 #if defined(PIOS_INCLUDE_HMC5X83)
+pios_hmc5x83_dev_t mag_handle = 0;
 int32_t mag_test;
 static float mag_bias[3] = { 0, 0, 0 };
 static float mag_scale[3] = { 1, 1, 1 };
@@ -151,7 +152,7 @@ static void magbaroTask(__attribute__((unused)) void *parameters)
 
 #if defined(PIOS_INCLUDE_HMC5X83)
     MagSensorData mag;
-    PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, PIOS_I2C_MAIN_ADAPTER, 0);
+    mag_handle = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, PIOS_I2C_MAIN_ADAPTER, 0);
     uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 #endif
 
@@ -199,9 +200,9 @@ static void magbaroTask(__attribute__((unused)) void *parameters)
 #endif /* if defined(PIOS_INCLUDE_BMP085) */
 
 #if defined(PIOS_INCLUDE_HMC5X83)
-        if (PIOS_HMC5x83_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 100000) {
+        if (PIOS_HMC5x83_NewDataAvailable(mag_handle) || PIOS_DELAY_DiffuS(mag_update_time) > 100000) {
             int16_t values[3];
-            PIOS_HMC5x83_ReadMag(values);
+            PIOS_HMC5x83_ReadMag(mag_handle, values);
             float mags[3] = { (float)values[1] * mag_scale[0] - mag_bias[0],
                               (float)values[0] * mag_scale[1] - mag_bias[1],
                               -(float)values[2] * mag_scale[2] - mag_bias[2] };

@@ -276,7 +276,7 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
         } else {
             GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_NOFIX;
         }
-
+#if !defined(PIOS_GPS_MINIMAL)
         if (pvt->valid & PVT_VALID_VALIDTIME) {
             // Time is valid, set GpsTime
             GPSTimeData GpsTime;
@@ -290,6 +290,7 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
 
             GPSTimeSet(&GpsTime);
         }
+#endif
     }
 }
 #if !defined(PIOS_GPS_MINIMAL)

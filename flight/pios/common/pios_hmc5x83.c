@@ -30,46 +30,79 @@
 
 #include "pios.h"
 #include <pios_hmc5x83.h>
+#include <pios_mem.h>
 
 #ifdef PIOS_INCLUDE_HMC5X83
 
+#define PIOS_HMC5X83_MAGIC 0x4d783833
 /* Global Variables */
 
 /* Local Types */
 
-/* Local Variables */
-volatile bool pios_hmc5x83_data_ready;
+typedef struct {
+    uint32_t magic;
+    const struct pios_hmc5x83_cfg *cfg;
+    uint32_t port_id;
+    uint8_t  slave_num;
+    uint8_t  CTRLB;
+    volatile bool data_ready;
+} pios_hmc5x83_dev_data_t;
 
-static int32_t PIOS_HMC5x83_Config(const struct pios_hmc5x83_cfg *cfg);
-// static int32_t PIOS_HMC5x83_Read(uint8_t address, uint8_t *buffer, uint8_t len);
-// static int32_t PIOS_HMC5x83_Write(uint8_t address, uint8_t buffer);
+static int32_t PIOS_HMC5x83_Config(pios_hmc5x83_dev_data_t *dev);
 
-static const struct pios_hmc5x83_cfg *dev_cfg;
-static uint32_t dev_port_id;
-static uint8_t dev_slave_num;
+/**
+ * Allocate the device setting structure
+ * @return pios_hmc5x83_dev_data_t pointer to newly created structure
+ */
+pios_hmc5x83_dev_data_t *dev_alloc()
+{
+    pios_hmc5x83_dev_data_t *dev = (pios_hmc5x83_dev_data_t *)pios_malloc(sizeof(pios_hmc5x83_dev_data_t));
+
+    PIOS_DEBUG_Assert(dev);
+    memset(dev, 0x00, sizeof(pios_hmc5x83_dev_data_t));
+    dev->magic = PIOS_HMC5X83_MAGIC;
+    return dev;
+}
+
+/**
+ * Validate a pios_hmc5x83_dev_t handler and return the related pios_hmc5x83_dev_data_t pointer
+ * @param dev device handler
+ * @return the device data structure
+ */
+pios_hmc5x83_dev_data_t *dev_validate(pios_hmc5x83_dev_t dev)
+{
+    pios_hmc5x83_dev_data_t *dev_data = (pios_hmc5x83_dev_data_t *)dev;
+
+    PIOS_DEBUG_Assert(dev_data->magic == PIOS_HMC5X83_MAGIC);
+    return dev_data;
+}
+
 /**
  * @brief Initialize the HMC5x83 magnetometer sensor.
  * @return none
  */
-void PIOS_HMC5x83_Init(const struct pios_hmc5x83_cfg *cfg, uint32_t port_id, uint8_t slave_num)
+pios_hmc5x83_dev_t PIOS_HMC5x83_Init(const struct pios_hmc5x83_cfg *cfg, uint32_t port_id, uint8_t slave_num)
 {
-    dev_cfg       = cfg; // store config before enabling interrupt
-    dev_port_id   = port_id;
-    dev_slave_num = slave_num;
+    pios_hmc5x83_dev_data_t *dev = dev_alloc();
+
+    dev->cfg       = cfg; // store config before enabling interrupt
+    dev->port_id   = port_id;
+    dev->slave_num = slave_num;
 #ifdef PIOS_HMC5X83_HAS_GPIOS
     PIOS_EXTI_Init(cfg->exti_cfg);
 #endif
 
-    int32_t val = PIOS_HMC5x83_Config(cfg);
-
+    int32_t val = PIOS_HMC5x83_Config(dev);
     PIOS_Assert(val == 0);
 
-    pios_hmc5x83_data_ready = false;
+    dev->data_ready = false;
+    return (pios_hmc5x83_dev_t)dev;
 }
 
 /**
  * @brief Initialize the HMC5x83 magnetometer sensor
  * \return none
+ * \param[in] pios_hmc5x83_dev_data_t device config to be used.
  * \param[in] PIOS_HMC5x83_ConfigTypeDef struct to be used to configure sensor.
  *
  * CTRL_REGA: Control Register A
@@ -126,31 +159,32 @@ void PIOS_HMC5x83_Init(const struct pios_hmc5x83_cfg *cfg, uint32_t port_id, uin
  *              1  |  0   |  Negative Bias
  *              1  |  1   |  Sleep Mode
  */
-static uint8_t CTRLB = 0x00;
-static int32_t PIOS_HMC5x83_Config(const struct pios_hmc5x83_cfg *cfg)
+static int32_t PIOS_HMC5x83_Config(pios_hmc5x83_dev_data_t *dev)
 {
     uint8_t CTRLA = 0x00;
     uint8_t MODE  = 0x00;
 
-    CTRLB  = 0;
+    const struct pios_hmc5x83_cfg *cfg = dev->cfg;
+
+    dev->CTRLB = 0;
 
     CTRLA |= (uint8_t)(cfg->M_ODR | cfg->Meas_Conf);
     CTRLA |= cfg->TempCompensation ? PIOS_HMC5x83_CTRLA_TEMP : 0;
-    CTRLB |= (uint8_t)(cfg->Gain);
+    dev->CTRLB |= (uint8_t)(cfg->Gain);
     MODE  |= (uint8_t)(cfg->Mode);
 
     // CRTL_REGA
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_CONFIG_REG_A, CTRLA) != 0) {
+    if (cfg->Driver->Write((pios_hmc5x83_dev_t)dev, PIOS_HMC5x83_CONFIG_REG_A, CTRLA) != 0) {
         return -1;
     }
 
     // CRTL_REGB
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_CONFIG_REG_B, CTRLB) != 0) {
+    if (cfg->Driver->Write((pios_hmc5x83_dev_t)dev, PIOS_HMC5x83_CONFIG_REG_B, dev->CTRLB) != 0) {
         return -1;
     }
 
     // Mode register
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_MODE_REG, MODE) != 0) {
+    if (cfg->Driver->Write((pios_hmc5x83_dev_t)dev, PIOS_HMC5x83_MODE_REG, MODE) != 0) {
         return -1;
     }
 
@@ -159,21 +193,24 @@ static int32_t PIOS_HMC5x83_Config(const struct pios_hmc5x83_cfg *cfg)
 
 /**
  * @brief Read current X, Z, Y values (in that order)
+ * \param[in] dev device handler
  * \param[out] int16_t array of size 3 to store X, Z, and Y magnetometer readings
  * \return 0 for success or -1 for failure
  */
-int32_t PIOS_HMC5x83_ReadMag(int16_t out[3])
+int32_t PIOS_HMC5x83_ReadMag(pios_hmc5x83_dev_t handler, int16_t out[3])
 {
-    pios_hmc5x83_data_ready = false;
+    pios_hmc5x83_dev_data_t *dev = dev_validate(handler);
+
+    dev->data_ready = false;
     uint8_t buffer[6];
     int32_t temp;
     int32_t sensitivity;
 
-    if (dev_cfg->Driver->Read(PIOS_HMC5x83_DATAOUT_XMSB_REG, buffer, 6) != 0) {
+    if (dev->cfg->Driver->Read(handler, PIOS_HMC5x83_DATAOUT_XMSB_REG, buffer, 6) != 0) {
         return -1;
     }
 
-    switch (CTRLB & 0xE0) {
+    switch (dev->CTRLB & 0xE0) {
     case 0x00:
         sensitivity = PIOS_HMC5x83_Sensitivity_0_88Ga;
         break;
@@ -213,7 +250,7 @@ int32_t PIOS_HMC5x83_ReadMag(int16_t out[3])
     out[1] = temp;
 
     // This should not be necessary but for some reason it is coming out of continuous conversion mode
-    dev_cfg->Driver->Write(PIOS_HMC5x83_MODE_REG, PIOS_HMC5x83_MODE_CONTINUOUS);
+    dev->cfg->Driver->Write(handler, PIOS_HMC5x83_MODE_REG, PIOS_HMC5x83_MODE_CONTINUOUS);
 
     return 0;
 }
@@ -224,9 +261,10 @@ int32_t PIOS_HMC5x83_ReadMag(int16_t out[3])
  * \param[out] uint8_t array of size 4 to store HMC5x83 ID.
  * \return 0 if successful, -1 if not
  */
-uint8_t PIOS_HMC5x83_ReadID(uint8_t out[4])
+uint8_t PIOS_HMC5x83_ReadID(pios_hmc5x83_dev_t handler, uint8_t out[4])
 {
-    uint8_t retval = dev_cfg->Driver->Read(PIOS_HMC5x83_DATAOUT_IDA_REG, out, 3);
+    pios_hmc5x83_dev_data_t *dev = dev_validate(handler);
+    uint8_t retval = dev->cfg->Driver->Read(handler, PIOS_HMC5x83_DATAOUT_IDA_REG, out, 3);
 
     out[3] = '\0';
     return retval;
@@ -237,16 +275,18 @@ uint8_t PIOS_HMC5x83_ReadID(uint8_t out[4])
  * \return true if new data is available
  * \return false if new data is not available
  */
-bool PIOS_HMC5x83_NewDataAvailable(void)
+bool PIOS_HMC5x83_NewDataAvailable(pios_hmc5x83_dev_t handler)
 {
-    return pios_hmc5x83_data_ready;
+    pios_hmc5x83_dev_data_t *dev = dev_validate(handler);
+
+    return dev->data_ready;
 }
 
 /**
  * @brief Run self-test operation.  Do not call this during operational use!!
  * \return 0 if success, -1 if test failed
  */
-int32_t PIOS_HMC5x83_Test(void)
+int32_t PIOS_HMC5x83_Test(pios_hmc5x83_dev_t handler)
 {
     int32_t failed = 0;
     uint8_t registers[3] = { 0, 0, 0 };
@@ -255,30 +295,30 @@ int32_t PIOS_HMC5x83_Test(void)
     uint8_t ctrl_b_read;
     uint8_t mode_read;
     int16_t values[3];
-
+    pios_hmc5x83_dev_data_t *dev = dev_validate(handler);
 
     /* Verify that ID matches (HMC5x83 ID is null-terminated ASCII string "H43") */
     char id[4];
 
-    PIOS_HMC5x83_ReadID((uint8_t *)id);
+    PIOS_HMC5x83_ReadID(handler, (uint8_t *)id);
     if ((id[0] != 'H') || (id[1] != '4') || (id[2] != '3')) { // Expect H43
         return -1;
     }
 
     /* Backup existing configuration */
-    if (dev_cfg->Driver->Read(PIOS_HMC5x83_CONFIG_REG_A, registers, 3) != 0) {
+    if (dev->cfg->Driver->Read(handler, PIOS_HMC5x83_CONFIG_REG_A, registers, 3) != 0) {
         return -1;
     }
 
     /* Stop the device and read out last value */
     PIOS_DELAY_WaitmS(10);
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_MODE_REG, PIOS_HMC5x83_MODE_IDLE) != 0) {
+    if (dev->cfg->Driver->Write(handler, PIOS_HMC5x83_MODE_REG, PIOS_HMC5x83_MODE_IDLE) != 0) {
         return -1;
     }
-    if (dev_cfg->Driver->Read(PIOS_HMC5x83_DATAOUT_STATUS_REG, &status, 1) != 0) {
+    if (dev->cfg->Driver->Read(handler, PIOS_HMC5x83_DATAOUT_STATUS_REG, &status, 1) != 0) {
         return -1;
     }
-    if (PIOS_HMC5x83_ReadMag(values) != 0) {
+    if (PIOS_HMC5x83_ReadMag(handler, values) != 0) {
         return -1;
     }
 
@@ -294,51 +334,42 @@ int32_t PIOS_HMC5x83_Test(void)
      * Changing measurement config back to PIOS_HMC5x83_MEASCONF_NORMAL will leave self-test mode.
      */
     PIOS_DELAY_WaitmS(10);
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_CONFIG_REG_A, PIOS_HMC5x83_MEASCONF_BIAS_POS | PIOS_HMC5x83_ODR_15) != 0) {
+    if (dev->cfg->Driver->Write(handler, PIOS_HMC5x83_CONFIG_REG_A, PIOS_HMC5x83_MEASCONF_BIAS_POS | PIOS_HMC5x83_ODR_15) != 0) {
         return -1;
     }
     PIOS_DELAY_WaitmS(10);
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_CONFIG_REG_B, PIOS_HMC5x83_GAIN_8_1) != 0) {
+    if (dev->cfg->Driver->Write(handler, PIOS_HMC5x83_CONFIG_REG_B, PIOS_HMC5x83_GAIN_8_1) != 0) {
         return -1;
     }
     PIOS_DELAY_WaitmS(10);
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_MODE_REG, PIOS_HMC5x83_MODE_SINGLE) != 0) {
+    if (dev->cfg->Driver->Write(handler, PIOS_HMC5x83_MODE_REG, PIOS_HMC5x83_MODE_SINGLE) != 0) {
         return -1;
     }
 
     /* Must wait for value to be updated */
     PIOS_DELAY_WaitmS(200);
 
-    if (PIOS_HMC5x83_ReadMag(values) != 0) {
+    if (PIOS_HMC5x83_ReadMag(handler, values) != 0) {
         return -1;
     }
 
-    /*
-       if(abs(values[0] - 766) > 20)
-       failed |= 1;
-       if(abs(values[1] - 766) > 20)
-       failed |= 1;
-       if(abs(values[2] - 713) > 20)
-       failed |= 1;
-     */
-
-    dev_cfg->Driver->Read(PIOS_HMC5x83_CONFIG_REG_A, &ctrl_a_read, 1);
-    dev_cfg->Driver->Read(PIOS_HMC5x83_CONFIG_REG_B, &ctrl_b_read, 1);
-    dev_cfg->Driver->Read(PIOS_HMC5x83_MODE_REG, &mode_read, 1);
-    dev_cfg->Driver->Read(PIOS_HMC5x83_DATAOUT_STATUS_REG, &status, 1);
+    dev->cfg->Driver->Read(handler, PIOS_HMC5x83_CONFIG_REG_A, &ctrl_a_read, 1);
+    dev->cfg->Driver->Read(handler, PIOS_HMC5x83_CONFIG_REG_B, &ctrl_b_read, 1);
+    dev->cfg->Driver->Read(handler, PIOS_HMC5x83_MODE_REG, &mode_read, 1);
+    dev->cfg->Driver->Read(handler, PIOS_HMC5x83_DATAOUT_STATUS_REG, &status, 1);
 
 
     /* Restore backup configuration */
     PIOS_DELAY_WaitmS(10);
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_CONFIG_REG_A, registers[0]) != 0) {
+    if (dev->cfg->Driver->Write(handler, PIOS_HMC5x83_CONFIG_REG_A, registers[0]) != 0) {
         return -1;
     }
     PIOS_DELAY_WaitmS(10);
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_CONFIG_REG_B, registers[1]) != 0) {
+    if (dev->cfg->Driver->Write(handler, PIOS_HMC5x83_CONFIG_REG_B, registers[1]) != 0) {
         return -1;
     }
     PIOS_DELAY_WaitmS(10);
-    if (dev_cfg->Driver->Write(PIOS_HMC5x83_MODE_REG, registers[2]) != 0) {
+    if (dev->cfg->Driver->Write(handler, PIOS_HMC5x83_MODE_REG, registers[2]) != 0) {
         return -1;
     }
 
@@ -348,35 +379,36 @@ int32_t PIOS_HMC5x83_Test(void)
 /**
  * @brief IRQ Handler
  */
-bool PIOS_HMC5x83_IRQHandler(void)
+bool PIOS_HMC5x83_IRQHandler(pios_hmc5x83_dev_t handler)
 {
-    pios_hmc5x83_data_ready = true;
+    pios_hmc5x83_dev_data_t *dev = dev_validate(handler);
 
+    dev->data_ready = true;
     return false;
 }
 
 #ifdef PIOS_INCLUDE_SPI
-int32_t PIOS_HMC5x83_SPI_Read(uint8_t address, uint8_t *buffer, uint8_t len);
-int32_t PIOS_HMC5x83_SPI_Write(uint8_t address, uint8_t buffer);
+int32_t PIOS_HMC5x83_SPI_Read(pios_hmc5x83_dev_t handler, uint8_t address, uint8_t *buffer, uint8_t len);
+int32_t PIOS_HMC5x83_SPI_Write(pios_hmc5x83_dev_t handler, uint8_t address, uint8_t buffer);
 
 const struct pios_hmc5x83_io_driver PIOS_HMC5x83_SPI_DRIVER = {
     .Read  = PIOS_HMC5x83_SPI_Read,
     .Write = PIOS_HMC5x83_SPI_Write,
 };
 
-static int32_t pios_hmc5x83_spi_claim_bus()
+static int32_t pios_hmc5x83_spi_claim_bus(pios_hmc5x83_dev_data_t *dev)
 {
-    if (PIOS_SPI_ClaimBus(dev_port_id) < 0) {
+    if (PIOS_SPI_ClaimBus(dev->port_id) < 0) {
         return -1;
     }
-    PIOS_SPI_RC_PinSet(dev_port_id, dev_slave_num, 0);
+    PIOS_SPI_RC_PinSet(dev->port_id, dev->slave_num, 0);
     return 0;
 }
 
-static void pios_hmc5x83_spi_release_bus()
+static void pios_hmc5x83_spi_release_bus(pios_hmc5x83_dev_data_t *dev)
 {
-    PIOS_SPI_RC_PinSet(dev_port_id, dev_slave_num, 1);
-    PIOS_SPI_ReleaseBus(dev_port_id);
+    PIOS_SPI_RC_PinSet(dev->port_id, dev->slave_num, 1);
+    PIOS_SPI_ReleaseBus(dev->port_id);
 }
 /**
  * @brief Reads one or more bytes into a buffer
@@ -387,22 +419,24 @@ static void pios_hmc5x83_spi_release_bus()
  * \return -1 if error during I2C transfer
  * \return -2 if unable to claim i2c device
  */
-int32_t PIOS_HMC5x83_SPI_Read(uint8_t address, uint8_t *buffer, uint8_t len)
+int32_t PIOS_HMC5x83_SPI_Read(pios_hmc5x83_dev_t handler, uint8_t address, uint8_t *buffer, uint8_t len)
 {
-    if (pios_hmc5x83_spi_claim_bus() < 0) {
+    pios_hmc5x83_dev_data_t *dev = dev_validate(handler);
+
+    if (pios_hmc5x83_spi_claim_bus(dev) < 0) {
         return -1;
     }
 
     memset(buffer, 0xA5, len);
-    PIOS_SPI_TransferByte(dev_port_id, address | PIOS_HMC5x83_SPI_AUTOINCR_FLAG | PIOS_HMC5x83_SPI_READ_FLAG);
+    PIOS_SPI_TransferByte(dev->port_id, address | PIOS_HMC5x83_SPI_AUTOINCR_FLAG | PIOS_HMC5x83_SPI_READ_FLAG);
 
     // buffer[0] = address | PIOS_HMC5x83_SPI_AUTOINCR_FLAG | PIOS_HMC5x83_SPI_READ_FLAG;
     /* Copy the transfer data to the buffer */
-    if (PIOS_SPI_TransferBlock(dev_port_id, NULL, buffer, len, NULL) < 0) {
-        pios_hmc5x83_spi_release_bus();
+    if (PIOS_SPI_TransferBlock(dev->port_id, NULL, buffer, len, NULL) < 0) {
+        pios_hmc5x83_spi_release_bus(dev);
         return -3;
     }
-    pios_hmc5x83_spi_release_bus();
+    pios_hmc5x83_spi_release_bus(dev);
     return 0;
 }
 
@@ -414,9 +448,11 @@ int32_t PIOS_HMC5x83_SPI_Read(uint8_t address, uint8_t *buffer, uint8_t len)
  * \return -1 if error during I2C transfer
  * \return -2 if unable to claim spi device
  */
-int32_t PIOS_HMC5x83_SPI_Write(uint8_t address, uint8_t buffer)
+int32_t PIOS_HMC5x83_SPI_Write(pios_hmc5x83_dev_t handler, uint8_t address, uint8_t buffer)
 {
-    if (pios_hmc5x83_spi_claim_bus() < 0) {
+    pios_hmc5x83_dev_data_t *dev = dev_validate(handler);
+
+    if (pios_hmc5x83_spi_claim_bus(dev) < 0) {
         return -1;
     }
     uint8_t data[] = {
@@ -424,19 +460,19 @@ int32_t PIOS_HMC5x83_SPI_Write(uint8_t address, uint8_t buffer)
         buffer,
     };
 
-    if (PIOS_SPI_TransferBlock(dev_port_id, data, NULL, sizeof(data), NULL) < 0) {
-        pios_hmc5x83_spi_release_bus();
+    if (PIOS_SPI_TransferBlock(dev->port_id, data, NULL, sizeof(data), NULL) < 0) {
+        pios_hmc5x83_spi_release_bus(dev);
         return -2;
     }
 
-    pios_hmc5x83_spi_release_bus();
+    pios_hmc5x83_spi_release_bus(dev);
     return 0;
 }
-#endif /* ifdef PIOS_INCLUDE_SPI */
+#endif /* PIOS_INCLUDE_SPI */
 #ifdef PIOS_INCLUDE_I2C
 
-int32_t PIOS_HMC5x83_I2C_Read(uint8_t address, uint8_t *buffer, uint8_t len);
-int32_t PIOS_HMC5x83_I2C_Write(uint8_t address, uint8_t buffer);
+int32_t PIOS_HMC5x83_I2C_Read(pios_hmc5x83_dev_t handler, uint8_t address, uint8_t *buffer, uint8_t len);
+int32_t PIOS_HMC5x83_I2C_Write(pios_hmc5x83_dev_t handler, uint8_t address, uint8_t buffer);
 
 const struct pios_hmc5x83_io_driver PIOS_HMC5x83_I2C_DRIVER = {
     .Read  = PIOS_HMC5x83_I2C_Read,
@@ -452,8 +488,9 @@ const struct pios_hmc5x83_io_driver PIOS_HMC5x83_I2C_DRIVER = {
  * \return -1 if error during I2C transfer
  * \return -2 if unable to claim i2c device
  */
-int32_t PIOS_HMC5x83_I2C_Read(uint8_t address, uint8_t *buffer, uint8_t len)
+int32_t PIOS_HMC5x83_I2C_Read(pios_hmc5x83_dev_t handler, uint8_t address, uint8_t *buffer, uint8_t len)
 {
+    pios_hmc5x83_dev_data_t *dev = dev_validate(handler);
     uint8_t addr_buffer[] = {
         address,
     };
@@ -476,7 +513,7 @@ int32_t PIOS_HMC5x83_I2C_Read(uint8_t address, uint8_t *buffer, uint8_t len)
         }
     };
 
-    return PIOS_I2C_Transfer(dev_port_id, txn_list, NELEMENTS(txn_list));
+    return PIOS_I2C_Transfer(dev->port_id, txn_list, NELEMENTS(txn_list));
 }
 
 /**
@@ -487,8 +524,9 @@ int32_t PIOS_HMC5x83_I2C_Read(uint8_t address, uint8_t *buffer, uint8_t len)
  * \return -1 if error during I2C transfer
  * \return -2 if unable to claim i2c device
  */
-int32_t PIOS_HMC5x83_I2C_Write(uint8_t address, uint8_t buffer)
+int32_t PIOS_HMC5x83_I2C_Write(pios_hmc5x83_dev_t handler, uint8_t address, uint8_t buffer)
 {
+    pios_hmc5x83_dev_data_t *dev = dev_validate(handler);
     uint8_t data[] = {
         address,
         buffer,
@@ -506,9 +544,9 @@ int32_t PIOS_HMC5x83_I2C_Write(uint8_t address, uint8_t buffer)
     };
 
     ;
-    return PIOS_I2C_Transfer(dev_port_id, txn_list, NELEMENTS(txn_list));
+    return PIOS_I2C_Transfer(dev->port_id, txn_list, NELEMENTS(txn_list));
 }
-#endif /* ifdef PIOS_INCLUDE_I2C */
+#endif /* PIOS_INCLUDE_I2C */
 
 
 #endif /* PIOS_INCLUDE_HMC5x83 */

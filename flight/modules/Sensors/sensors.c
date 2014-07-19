@@ -82,6 +82,11 @@ static xTaskHandle sensorsTaskHandle;
 RevoCalibrationData cal;
 AccelGyroSettingsData agcal;
 
+#ifdef PIOS_INCLUDE_HMC5X83
+#include <pios_hmc5x83.h>
+extern pios_hmc5x83_dev_t onboard_mag;
+#endif
+
 // These values are initialized by settings but can be updated by the attitude algorithm
 
 static float mag_bias[3] = { 0, 0, 0 };
@@ -201,7 +206,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
     }
 
 #if defined(PIOS_INCLUDE_HMC5X83)
-    mag_test = PIOS_HMC5x83_Test();
+    mag_test = PIOS_HMC5x83_Test(onboard_mag);
 #else
     mag_test = 0;
 #endif
@@ -411,9 +416,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 
 #if defined(PIOS_INCLUDE_HMC5X83)
         MagSensorData mag;
-        if (PIOS_HMC5x83_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
+        if (PIOS_HMC5x83_NewDataAvailable(onboard_mag) || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
             int16_t values[3];
-            PIOS_HMC5x83_ReadMag(values);
+            PIOS_HMC5x83_ReadMag(onboard_mag, values);
             float mags[3] = { (float)values[1] - mag_bias[0],
                               (float)values[0] - mag_bias[1],
                               -(float)values[2] - mag_bias[2] };

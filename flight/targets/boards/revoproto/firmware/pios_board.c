@@ -82,9 +82,15 @@ void PIOS_ADC_DMC_irq_handler(void)
 #endif /* if defined(PIOS_INCLUDE_ADC) */
 
 #if defined(PIOS_INCLUDE_HMC5X83)
+pios_hmc5x83_dev_t onboard_mag = 0;
+
+bool pios_board_internal_mag_handler()
+{
+    return PIOS_HMC5x83_IRQHandler(onboard_mag);
+}
 #include "pios_hmc5x83.h"
 static const struct pios_exti_cfg pios_exti_hmc5x83_cfg __exti_config = {
-    .vector = PIOS_HMC5x83_IRQHandler,
+    .vector = pios_board_internal_mag_handler,
     .line   = EXTI_Line5,
     .pin    = {
         .gpio = GPIOB,
@@ -940,7 +946,7 @@ void PIOS_Board_Init(void)
 #endif
 
 #if defined(PIOS_INCLUDE_HMC5X83)
-    PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_pressure_adapter_id, 0);
+    onboard_mag = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_pressure_adapter_id, 0);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)

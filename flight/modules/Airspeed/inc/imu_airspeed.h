@@ -31,8 +31,8 @@
 #ifndef IMU_AIRSPEED_H
 #define IMU_AIRSPEED_H
 
-void imu_airspeedInitialize();
-void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *airspeedSettings);
+void imu_airspeedInitialize(const AirspeedSettingsData *airspeedSettings);
+void imu_airspeedGet(AirspeedSensorData *airspeedData, const AirspeedSettingsData *airspeedSettings);
 
 #endif // IMU_AIRSPEED_H
 

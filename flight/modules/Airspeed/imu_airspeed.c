@@ -145,12 +145,40 @@ float FilterButterWorthDF2(const float ff, const float xn, float *wn1Ptr, float 
     return val;
 }
 
+// Initialization function for direct form 2 Butterworth filter
+void InitButterWorthDF2(const float ff, const float x0, float *wn1Ptr, float *wn2Ptr)
+{
+    const float ita  = 1.0f / tanf(M_PI_F * ff);
+    const float b0   = 1.0f / (1.0f + SQRT2 * ita + Sq(ita));
+    const float b1   = 2.0f * b0;
+    const float b2   = b0;
+    const float a1   = 2.0f * b0 * (Sq(ita) - 1.0f);
+    const float a2   = -b0 * (1.0f - SQRT2 * ita + Sq(ita));
+
+    const float a11  = b1 + b0 * a1;
+    const float a12  = b2 + b0 * a2;
+    const float a21  = b1 + b0 * (Sq(a1) + a2);
+    const float a22  = b2 + b0 * a1 * a2;
+    const float det  = a11 * a22 - a12 * a21;
+
+    const float rhs1 = x0 - b0 * x0;
+    const float rhs2 = x0 - b0 * (x0 + a1 * x0);
+
+    *wn1Ptr = (a22 * rhs1 - a12 * rhs2) / det;
+    *wn2Ptr = (-a21 * rhs1 + a11 * rhs2) / det;
+}
+
 
 /*
  * Initialize function loads first data sets, and allocates memory for structure.
  */
-void imu_airspeedInitialize()
+void imu_airspeedInitialize(const AirspeedSettingsData *airspeedSettings)
 {
+    // pre-filter frequency rate
+    const float ff  = (float)(airspeedSettings->SamplePeriod) / 1000.0f / airspeedSettings->IMUBasedEstimationLowPassPeriod1;
+    // filter frequency rate
+    const float ffV = (float)(airspeedSettings->SamplePeriod) / 1000.0f / airspeedSettings->IMUBasedEstimationLowPassPeriod2;
+
     // This method saves memory in case we don't use the module.
     imu = (struct IMUGlobals *)pvPortMalloc(sizeof(struct IMUGlobals));
 
@@ -164,19 +192,22 @@ void imu_airspeedInitialize()
 
     // get pitch and yaw from quarternion; principal argument for yaw
     Quaternion2PY(attData.q1, attData.q2, attData.q3, attData.q4, &(imu->pOld), &(imu->yOld), true);
+    InitButterWorthDF2(ff, imu->pOld, &(imu->pn1), &(imu->pn2));
+    InitButterWorthDF2(ff, imu->yOld, &(imu->yn1), &(imu->yn2));
 
-    imu->pn1   = imu->pn2 = imu->pOld;
-    imu->yn1   = imu->yn2 = imu->yOld;
-
-    imu->v1n1  = imu->v1n2 = imu->v1Old = velData.North;
-    imu->v2n1  = imu->v2n2 = imu->v2Old = velData.East;
-    imu->v3n1  = imu->v3n2 = imu->v3Old = velData.Down;
+    // use current NED speed as vOld vector and as initial value for filter
+    imu->v1Old = velData.North;
+    imu->v2Old = velData.East;
+    imu->v3Old = velData.Down;
+    InitButterWorthDF2(ff, imu->v1Old, &(imu->v1n1), &(imu->v1n2));
+    InitButterWorthDF2(ff, imu->v2Old, &(imu->v2n1), &(imu->v2n2));
+    InitButterWorthDF2(ff, imu->v3Old, &(imu->v3n1), &(imu->v3n2));
 
     // initial guess for windspeed is zero
-    imu->Vw1n1 = imu->Vw1n2 = 0.0f;
-    imu->Vw2n1 = imu->Vw2n2 = 0.0f;
-    imu->Vw3n1 = imu->Vw3n2 = 0.0f;
-    imu->Vw1   = imu->Vw2 = 0.0f;
+    imu->Vw3   = imu->Vw2 = imu->Vw1 = 0.0f;
+    InitButterWorthDF2(ffV, 0.0f, &(imu->Vw1n1), &(imu->Vw1n2));
+    imu->Vw3n1 = imu->Vw2n1 = imu->Vw1n1;
+    imu->Vw3n2 = imu->Vw2n2 = imu->Vw1n2;
 }
 
 /*
@@ -196,7 +227,7 @@ void imu_airspeedInitialize()
  * and yaw to keep a unit length. After building the differenced dxB and dVel are produced and
  * the airspeed calculated. The calculated airspeed is filtered again with a Butterworth filter
  */
-void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *airspeedSettings)
+void imu_airspeedGet(AirspeedSensorData *airspeedData, const AirspeedSettingsData *airspeedSettings)
 {
     // pre-filter frequency rate
     const float ff  = (float)(airspeedSettings->SamplePeriod) / 1000.0f / airspeedSettings->IMUBasedEstimationLowPassPeriod1;

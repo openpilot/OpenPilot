@@ -12,6 +12,8 @@
 
         <field name="CourseFeedForward" units="s" type="float" elements="1" defaultvalue="3.0"/>
                 <!-- how many seconds to plan the flight vector ahead when initiating necessary heading changes - increase for planes with sluggish response -->
+        <field name="ReverseCourseOverlap" units="deg" type="float" elements="1" defaultvalue="20.0"/>
+		<!-- how big the overlapping area behind the plane is, where, if the desired course lies behind, the current bank angle will determine if the plane goes left or right -->
 
         <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->

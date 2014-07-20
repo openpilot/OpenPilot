@@ -55,8 +55,10 @@ struct IMUGlobals {
     float v1n1, v1n2;
     float v2n1, v2n2;
     float v3n1, v3n2;
-    float Vn1, Vn2;
-
+    float Vw1n1, Vw1n2;
+    float Vw2n1, Vw2n2;
+    float Vw3n1, Vw3n2;
+    float Vw1, Vw2, Vw3;
 
     // storage variables for derivative calculation
     float pOld, yOld;
@@ -115,13 +117,13 @@ static void PY2xB(const float p, const float y, float x[3])
 }
 
 
-static void PY2DeltaxB(const float p, const float y, float x[3])
+static void PY2DeltaxB(const float p, const float y, const float xB[3], float x[3])
 {
     const float cosp = cosf(p);
 
-    x[0] -= cosp * cosf(y);
-    x[1] -= cosp * sinf(y);
-    x[2] -= -sinf(p);
+    x[0] = xB[0] - cosp * cosf(y);
+    x[1] = xB[1] - cosp * sinf(y);
+    x[2] = xB[2] - -sinf(p);
 }
 
 
@@ -163,15 +165,18 @@ void imu_airspeedInitialize()
     // get pitch and yaw from quarternion; principal argument for yaw
     Quaternion2PY(attData.q1, attData.q2, attData.q3, attData.q4, &(imu->pOld), &(imu->yOld), true);
 
-    imu->pn1  = imu->pn2 = imu->pOld;
-    imu->yn1  = imu->yn2 = imu->yOld;
+    imu->pn1   = imu->pn2 = imu->pOld;
+    imu->yn1   = imu->yn2 = imu->yOld;
 
-    imu->v1n1 = imu->v1n2 = imu->v1Old = velData.North;
-    imu->v2n1 = imu->v2n2 = imu->v2Old = velData.East;
-    imu->v3n1 = imu->v3n2 = imu->v3Old = velData.Down;
+    imu->v1n1  = imu->v1n2 = imu->v1Old = velData.North;
+    imu->v2n1  = imu->v2n2 = imu->v2Old = velData.East;
+    imu->v3n1  = imu->v3n2 = imu->v3Old = velData.Down;
 
-    // initial guess for airspeed is modulus of groundspeed
-    imu->Vn1  = imu->Vn2 = sqrt(Sq(velData.North) + Sq(velData.East) + Sq(velData.Down));
+    // initial guess for windspeed is zero
+    imu->Vw1n1 = imu->Vw1n2 = 0.0f;
+    imu->Vw2n1 = imu->Vw2n2 = 0.0f;
+    imu->Vw3n1 = imu->Vw3n2 = 0.0f;
+    imu->Vw1   = imu->Vw2 = 0.0f;
 }
 
 /*
@@ -202,6 +207,7 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
     float normDiffAttitude2;
     float dvdtDotdfdt;
 
+    float xB[3];
     // get values and conduct smoothing of ground speed and orientation independently of the calculation of airspeed
     { // Scoping to save memory
         AttitudeStateData attData;
@@ -219,9 +225,9 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
         p = FilterButterWorthDF2(ff, p, &(imu->pn1), &(imu->pn2));
         y = FilterButterWorthDF2(ff, y, &(imu->yn1), &(imu->yn2));
         // transform pitch and yaw into fuselage vector xB and xBold
-        PY2xB(p, y, dxB);
+        PY2xB(p, y, xB);
         // calculate change in fuselage vector by substraction of old value
-        PY2DeltaxB(imu->pOld, imu->yOld, dxB);
+        PY2DeltaxB(imu->pOld, imu->yOld, xB, dxB);
 
         // filter ground speed from VelocityState
         const float fv1n = FilterButterWorthDF2(ff, velData.North, &(imu->v1n1), &(imu->v1n2));
@@ -250,17 +256,31 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
         // Airspeed modulus: |v| = dv/dt * dxB/dt / |dxB/dt|^2
         // airspeed is always REAL because  normDiffAttitude2 > EPS_REORIENTATION > 0 and REAL dvdtDotdfdt
         const float airspeed = dvdtDotdfdt / normDiffAttitude2;
-        // filter raw airspeed
-        const float fVn = FilterButterWorthDF2(ffV, airspeed, &(imu->Vn1), &(imu->Vn2));
 
-        airspeedData->CalibratedAirspeed = fVn;
-        airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
-        AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_OK);
-    } else {
-        airspeedData->CalibratedAirspeed = 0;
-        airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
-        AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_WARNING);
+        // groundspeed = airspeed + wind ---> wind = groundspeed - airspeed
+        const float wind[3]  = { imu->v1Old - xB[0] * airspeed,
+                                 imu->v2Old - xB[1] * airspeed,
+                                 imu->v3Old - xB[2] * airspeed };
+        // filter raw wind
+        imu->Vw1 = FilterButterWorthDF2(ffV, wind[0], &(imu->Vw1n1), &(imu->Vw1n2));
+        imu->Vw2 = FilterButterWorthDF2(ffV, wind[1], &(imu->Vw2n1), &(imu->Vw2n2));
+        imu->Vw3 = FilterButterWorthDF2(ffV, wind[2], &(imu->Vw3n1), &(imu->Vw3n2));
+    } // else leave wind estimation unchanged
+
+    { // Scoping to save memory
+      // airspeed = groundspeed - wind
+        const float Vair[3] = {
+            imu->v1Old - imu->Vw1,
+            imu->v2Old - imu->Vw2,
+            imu->v3Old - imu->Vw3
+        };
+
+        // project airspeed into fuselage vector
+        airspeedData->CalibratedAirspeed = Vair[0] * xB[0] + Vair[1] * xB[1] + Vair[2] * xB[2];
     }
+
+    airspeedData->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
+    AlarmsClear(SYSTEMALARMS_ALARM_AIRSPEED);
 }
 
 

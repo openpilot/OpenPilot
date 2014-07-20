@@ -45,6 +45,7 @@
 #include "flightmodesettings.h"
 #include <pios_struct_helper.h>
 #include "paths.h"
+#include "plans.h"
 
 // Private constants
 #define STACK_SIZE_BYTES            1024
@@ -89,6 +90,7 @@ static bool pathplanner_active = false;
  */
 int32_t PathPlannerStart()
 {
+    plan_initialize();
     // when the active waypoint changes, update pathDesired
     WaypointConnectCallback(commandUpdated);
     WaypointActiveConnectCallback(commandUpdated);
@@ -169,21 +171,7 @@ static void pathPlannerTask()
         if (!failsafeRTHset) {
             failsafeRTHset = 1;
             // copy pasta: same calculation as in manualcontrol, set return to home coordinates
-            PositionStateData positionState;
-            PositionStateGet(&positionState);
-            FlightModeSettingsData settings;
-            FlightModeSettingsGet(&settings);
-
-            pathDesired.Start.North      = 0;
-            pathDesired.Start.East       = 0;
-            pathDesired.Start.Down       = positionState.Down - settings.ReturnToHomeAltitudeOffset;
-            pathDesired.End.North        = 0;
-            pathDesired.End.East         = 0;
-            pathDesired.End.Down         = positionState.Down - settings.ReturnToHomeAltitudeOffset;
-            pathDesired.StartingVelocity = 1;
-            pathDesired.EndingVelocity   = 0;
-            pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-            PathDesiredSet(&pathDesired);
+            plan_setup_positionHold();
         }
         AlarmsSet(SYSTEMALARMS_ALARM_PATHPLAN, SYSTEMALARMS_ALARM_ERROR);
 

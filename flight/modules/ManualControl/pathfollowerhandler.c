@@ -35,8 +35,9 @@
 #include <positionstate.h>
 #include <flightmodesettings.h>
 
-
 #if defined(REVOLUTION)
+#include <plans.h>
+
 // Private constants
 
 // Private types
@@ -51,69 +52,63 @@
 void pathFollowerHandler(bool newinit)
 {
     if (newinit) {
-        PathDesiredInitialize();
-        PositionStateInitialize();
+        plan_initialize();
     }
 
-    FlightStatusData flightStatus;
-    FlightStatusGet(&flightStatus);
+    uint8_t flightMode;
+    FlightStatusFlightModeGet(&flightMode);
 
     if (newinit) {
         // After not being in this mode for a while init at current height
-        PositionStateData positionState;
-        PositionStateGet(&positionState);
-        FlightModeSettingsData settings;
-        FlightModeSettingsGet(&settings);
-        PathDesiredData pathDesired;
-        PathDesiredGet(&pathDesired);
-        switch (flightStatus.FlightMode) {
+        switch (flightMode) {
         case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
-            // Simple Return To Base mode - keep altitude the same, fly to home position
-
-
-            pathDesired.Start.North      = 0;
-            pathDesired.Start.East       = 0;
-            pathDesired.Start.Down       = positionState.Down - settings.ReturnToHomeAltitudeOffset;
-            pathDesired.End.North        = 0;
-            pathDesired.End.East         = 0;
-            pathDesired.End.Down         = positionState.Down - settings.ReturnToHomeAltitudeOffset;
-            pathDesired.StartingVelocity = 1;
-            pathDesired.EndingVelocity   = 0;
-            pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
+            plan_setup_returnToBase();
             break;
-        default:
 
-            pathDesired.Start.North      = positionState.North;
-            pathDesired.Start.East       = positionState.East;
-            pathDesired.Start.Down       = positionState.Down;
-            pathDesired.End.North        = positionState.North;
-            pathDesired.End.East         = positionState.East;
-            pathDesired.End.Down         = positionState.Down;
-            pathDesired.StartingVelocity = 1;
-            pathDesired.EndingVelocity   = 0;
-            pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-            /* Disable this section, until such time as proper discussion can be had about how to implement it for all types of crafts.
-               } else {
-               PathDesiredData pathDesired;
-               PathDesiredGet(&pathDesired);
-               pathDesired.End[PATHDESIRED_END_NORTH] += dT * -cmd->Pitch;
-               pathDesired.End[PATHDESIRED_END_EAST] += dT * cmd->Roll;
-               pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
-               PathDesiredSet(&pathDesired);
-             */
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+            plan_setup_positionHold();
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
+            plan_setup_PositionVarioFPV();
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
+            plan_setup_PositionVarioLOS();
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
+            plan_setup_PositionVarioNSEW();
+            break;
+
+        case FLIGHTSTATUS_FLIGHTMODE_LAND:
+            plan_setup_land();
+            break;
+        case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
+            plan_setup_AutoCruise();
+            break;
+
+        default:
+            plan_setup_positionHold();
             break;
         }
-        PathDesiredSet(&pathDesired);
     }
 
-    // special handling of autoland - behaves like positon hold but with slow altitude decrease
-    if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_LAND) {
-        PositionStateData positionState;
-        PositionStateGet(&positionState);
-        PathDesiredData pathDesired;
-        PathDesiredGet(&pathDesired);
-        pathDesired.End.Down = positionState.Down + 5;
-        PathDesiredSet(&pathDesired);
+    switch (flightMode) {
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
+        plan_run_PositionVarioFPV();
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
+        plan_run_PositionVarioLOS();
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
+        plan_run_PositionVarioNSEW();
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_LAND:
+        plan_run_land();
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE:
+        plan_run_AutoCruise();
+        break;
+    default:
+        break;
     }
 }
 

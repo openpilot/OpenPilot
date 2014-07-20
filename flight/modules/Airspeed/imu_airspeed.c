@@ -97,10 +97,10 @@ static void Quaternion2PY(const float q0, const float q1, const float q2, const 
     } else {
         // calculate needed mutliples of 2pi to avoid jumps
         // number of cycles accumulated in old yaw
-        const int cycles = (int)(*yPtr / TWO_PI);
+        const int32_t cycles = (int32_t)(*yPtr / TWO_PI);
         // look for a jump by substracting the modulus, i.e. there is maximally one jump.
         // take slightly less than 2pi, because the jump will always be lower than 2pi
-        const int mod    = (int)((y_ - (*yPtr - cycles * TWO_PI)) / (TWO_PI * 0.9f));
+        const int32_t mod    = (int32_t)((y_ - (*yPtr - cycles * TWO_PI)) / (TWO_PI * 0.8f));
         *yPtr = y_ + TWO_PI * (cycles - mod);
     }
 }
@@ -222,7 +222,7 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
         PY2xB(p, y, dxB);
         // calculate change in fuselage vector by substraction of old value
         PY2DeltaxB(imu->pOld, imu->yOld, dxB);
-                
+
         // filter ground speed from VelocityState
         const float fv1n = FilterButterWorthDF2(ff, velData.North, &(imu->v1n1), &(imu->v1n2));
         const float fv2n = FilterButterWorthDF2(ff, velData.East, &(imu->v2n1), &(imu->v2n2));

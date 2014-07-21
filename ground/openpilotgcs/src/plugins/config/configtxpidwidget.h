@@ -41,6 +41,7 @@ private:
 
 private slots:
     void updateSpinBoxProperties(const QString & selectedPidOption);
+    float getDefaultValueForPidOption(const QString & pidOption);
     void refreshValues();
     void applySettings();
     void saveSettings();

@@ -51,19 +51,20 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_txpid->Apply, SIGNAL(clicked()), this, SLOT(applySettings()));
     connect(m_txpid->Save, SIGNAL(clicked()), this, SLOT(saveSettings()));
 
-    connect(m_txpid->PID1, SIGNAL(activated(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
-    connect(m_txpid->PID2, SIGNAL(activated(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
-    connect(m_txpid->PID3, SIGNAL(activated(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
+    connect(m_txpid->PID1, SIGNAL(currentTextChanged(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
+    connect(m_txpid->PID2, SIGNAL(currentTextChanged(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
+    connect(m_txpid->PID3, SIGNAL(currentTextChanged(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
 
     addWidgetBinding("TxPIDSettings", "BankNumber", m_txpid->pidBank, 0, 1, true);
-
-    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID1, TxPIDSettings::PIDS_INSTANCE1);
-    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID2, TxPIDSettings::PIDS_INSTANCE2);
-    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID3, TxPIDSettings::PIDS_INSTANCE3);
 
     addWidgetBinding("TxPIDSettings", "Inputs", m_txpid->Input1, TxPIDSettings::INPUTS_INSTANCE1);
     addWidgetBinding("TxPIDSettings", "Inputs", m_txpid->Input2, TxPIDSettings::INPUTS_INSTANCE2);
     addWidgetBinding("TxPIDSettings", "Inputs", m_txpid->Input3, TxPIDSettings::INPUTS_INSTANCE3);
+
+    // It's important that the PIDx values are populated before the MinPIDx and MaxPIDx,
+    // otherwise the MinPIDx and MaxPIDx will be capped by the old spin box limits. The correct limits
+    // are set when updateSpinBoxProperties is called when the PIDx->currentTextChanged signal is sent.
+    // The binding order is reversed because the values are populated in reverse.
 
     addWidgetBinding("TxPIDSettings", "MinPID", m_txpid->MinPID1, TxPIDSettings::MINPID_INSTANCE1);
     addWidgetBinding("TxPIDSettings", "MinPID", m_txpid->MinPID2, TxPIDSettings::MINPID_INSTANCE2);
@@ -72,6 +73,10 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addWidgetBinding("TxPIDSettings", "MaxPID", m_txpid->MaxPID1, TxPIDSettings::MAXPID_INSTANCE1);
     addWidgetBinding("TxPIDSettings", "MaxPID", m_txpid->MaxPID2, TxPIDSettings::MAXPID_INSTANCE2);
     addWidgetBinding("TxPIDSettings", "MaxPID", m_txpid->MaxPID3, TxPIDSettings::MAXPID_INSTANCE3);
+
+    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID1, TxPIDSettings::PIDS_INSTANCE1);
+    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID2, TxPIDSettings::PIDS_INSTANCE2);
+    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID3, TxPIDSettings::PIDS_INSTANCE3);
 
     addWidgetBinding("TxPIDSettings", "ThrottleRange", m_txpid->ThrottleMin, TxPIDSettings::THROTTLERANGE_MIN);
     addWidgetBinding("TxPIDSettings", "ThrottleRange", m_txpid->ThrottleMax, TxPIDSettings::THROTTLERANGE_MAX);
@@ -92,24 +97,23 @@ ConfigTxPIDWidget::~ConfigTxPIDWidget()
     // Do nothing
 }
 
-static bool isResponsivenessType(const QString & pidType)
+static bool isResponsivenessOption(const QString & pidOption)
 {
-    return pidType.endsWith(".Resp");
+    return pidOption.endsWith(".Resp");
 }
 
-static bool isAttitudeType(const QString & pidType)
+static bool isAttitudeOption(const QString & pidOption)
 {
-    return pidType.contains("Attitude");
+    return pidOption.contains("Attitude");
 }
 
-void ConfigTxPIDWidget::updateSpinBoxProperties(const QString & selectedPidType)
+void ConfigTxPIDWidget::updateSpinBoxProperties(const QString & selectedPidOption)
 {
     QDoubleSpinBox *minPID;
     QDoubleSpinBox *maxPID;
 
-    qDebug() << "ConfigTxPIDWidget::updateSpinBoxProperties(" << selectedPidType << ")";
-
     QObject *obj = sender();
+
     if (obj == m_txpid->PID1) {
         minPID = m_txpid->MinPID1;
         maxPID = m_txpid->MaxPID1;
@@ -124,8 +128,8 @@ void ConfigTxPIDWidget::updateSpinBoxProperties(const QString & selectedPidType)
         return;
     }
 
-    if (isResponsivenessType(selectedPidType)) {
-        if (isAttitudeType(selectedPidType)) {
+    if (isResponsivenessOption(selectedPidOption)) {
+        if (isAttitudeOption(selectedPidOption)) {
             // Limit to 180 degrees.
             minPID->setRange(0, 180);
             maxPID->setRange(0, 180);

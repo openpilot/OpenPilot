@@ -37,18 +37,25 @@
 #include "airspeedsettings.h"
 #include "imu_airspeed.h"
 #include "CoordinateConversions.h"
+#include "butterworth.h"
 #include <pios_math.h>
 
 
 // Private constants
 #define TWO_PI            6.283185308f
-#define SQRT2             1.414213562f
+#define EPS               1e-6f
 #define EPS_REORIENTATION 1e-10f
 #define EPS_VELOCITY      1.f
 
 // Private types
-// structure with smoothed fuselage orientation, ground speed and their changes in time
+// structure with smoothed fuselage orientation, ground speed, wind vector and their changes in time
 struct IMUGlobals {
+    // Butterworth filters
+    struct ButterWorthDF2Filter filter;
+    struct ButterWorthDF2Filter prefilter;
+    float ff, ffV;
+
+
     // storage variables for Butterworth filter
     float pn1, pn2;
     float yn1, yn2;
@@ -130,8 +137,8 @@ static void PY2DeltaxB(const float p, const float y, const float xB[3], float x[
 // second order Butterworth filter with cut-off frequency ratio ff
 // Biquadratic filter in direct from 2, such that only two values wn1=w[n-1] and wn2=w[n-2] need to be stored
 // function takes care of updating the values wn1 and wn2
-float FilterButterWorthDF2(const float ff, const float xn, float *wn1Ptr, float *wn2Ptr)
-{
+/*float FilterButterWorthDF2(const float ff, const float xn, float *wn1Ptr, float *wn2Ptr)
+   {
     const float ita = 1.0f / tanf(M_PI_F * ff);
     const float b0  = 1.0f / (1.0f + SQRT2 * ita + Sq(ita));
     const float a1  = 2.0f * b0 * (Sq(ita) - 1.0f);
@@ -140,14 +147,30 @@ float FilterButterWorthDF2(const float ff, const float xn, float *wn1Ptr, float 
     const float wn  = xn + a1 * (*wn1Ptr) + a2 * (*wn2Ptr);
     const float val = b0 * (wn + 2.0f * (*wn1Ptr) + (*wn2Ptr));
 
-    *wn2Ptr = *wn1Ptr;
-    *wn1Ptr = wn;
+ * wn2Ptr = *wn1Ptr;
+ * wn1Ptr = wn;
     return val;
-}
+   }*/
+
+
+// second order Butterworth filter with cut-off frequency ratio ff
+// Biquadratic filter in direct from 2, such that only two values wn1=w[n-1] and wn2=w[n-2] need to be stored
+// function takes care of updating the values wn1 and wn2
+// float FilterButterWorthDF2(const float xn, const ButterWorthDF2Filter *filter, float *wn1Ptr, float *wn2Ptr)
+// {
+//
+// const float wn  = xn + filter->a1 * (*wn1Ptr) + filter->a2 * (*wn2Ptr);
+// const float val = filter->b0 * (wn + 2.0f * (*wn1Ptr) + (*wn2Ptr));
+//
+// *wn2Ptr = *wn1Ptr;
+// *wn1Ptr = wn;
+// return val;
+// }
+
 
 // Initialization function for direct form 2 Butterworth filter
-void InitButterWorthDF2(const float ff, const float x0, float *wn1Ptr, float *wn2Ptr)
-{
+/*void InitButterWorthDF2(const float ff, const float x0, float *wn1Ptr, float *wn2Ptr)
+   {
     const float ita  = 1.0f / tanf(M_PI_F * ff);
     const float b0   = 1.0f / (1.0f + SQRT2 * ita + Sq(ita));
     const float b1   = 2.0f * b0;
@@ -164,9 +187,48 @@ void InitButterWorthDF2(const float ff, const float x0, float *wn1Ptr, float *wn
     const float rhs1 = x0 - b0 * x0;
     const float rhs2 = x0 - b0 * (x0 + a1 * x0);
 
-    *wn1Ptr = (a22 * rhs1 - a12 * rhs2) / det;
-    *wn2Ptr = (-a21 * rhs1 + a11 * rhs2) / det;
-}
+ * wn1Ptr = (a22 * rhs1 - a12 * rhs2) / det;
+ * wn2Ptr = (-a21 * rhs1 + a11 * rhs2) / det;
+   }*/
+
+
+// Initialization function for direct form 2 Butterworth filter
+// initialize filter constants. Note that the following is used:
+// b1  = 2 * b0
+// b2  = b0
+// void InitButterWorthDF2Filter(const float ff, ButterWorthDF2Filter *filter)
+// {
+// const float ita = 1.0f / tanf(M_PI_F * ff);
+// const float b0  = 1.0f / (1.0f + SQRT2 * ita + Sq(ita));
+// const float a1  = 2.0f * b0 * (Sq(ita) - 1.0f);
+// const float a2  = -b0 * (1.0f - SQRT2 * ita + Sq(ita));
+//
+// filter->ff = ff;
+// filter->b0 = b0;
+// filter->a1 = a1;
+// filter->a2 = a2;
+// }
+
+
+//// Initialization function for direct form 2 Butterworth filter
+//// initialize intermediate values for starting value x0
+// void InitButterWorthDF2Values(const float x0, const ButterWorthDF2Filter *filter, float *wn1Ptr, float *wn2Ptr)
+// {
+// const float b0  = filter->b0;
+// const float a1  = filter->a1;
+// const float a2  = filter->a2;
+//
+// const float a11  = 2.0f + a1;
+// const float a12  = 1.0f + a2;
+// const float a21  = 2.0f + Sq(a1) + a2;
+// const float a22  = 1.0f + a1 * a2;
+// const float det  = a11 * a22 - a12 * a21;
+// const float rhs1 = x0 / b0 - x0;
+// const float rhs2 = x0 / b0 - x0 + a1 * x0;
+//
+// *wn1Ptr = ( a22 * rhs1 - a12 * rhs2) / det;
+// *wn2Ptr = (-a21 * rhs1 + a11 * rhs2) / det;
+// }
 
 
 /*
@@ -190,22 +252,28 @@ void imu_airspeedInitialize(const AirspeedSettingsData *airspeedSettings)
     AttitudeStateData attData;
     AttitudeStateGet(&attData);
 
+    // initialize filters for given ff and ffV
+    InitButterWorthDF2Filter(ffV, &(imu->filter));
+    InitButterWorthDF2Filter(ff, &(imu->prefilter));
+    imu->ffV = ffV;
+    imu->ff  = ff;
+
     // get pitch and yaw from quarternion; principal argument for yaw
     Quaternion2PY(attData.q1, attData.q2, attData.q3, attData.q4, &(imu->pOld), &(imu->yOld), true);
-    InitButterWorthDF2(ff, imu->pOld, &(imu->pn1), &(imu->pn2));
-    InitButterWorthDF2(ff, imu->yOld, &(imu->yn1), &(imu->yn2));
+    InitButterWorthDF2Values(imu->pOld, &(imu->prefilter), &(imu->pn1), &(imu->pn2));
+    InitButterWorthDF2Values(imu->yOld, &(imu->prefilter), &(imu->yn1), &(imu->yn2));
 
     // use current NED speed as vOld vector and as initial value for filter
     imu->v1Old = velData.North;
     imu->v2Old = velData.East;
     imu->v3Old = velData.Down;
-    InitButterWorthDF2(ff, imu->v1Old, &(imu->v1n1), &(imu->v1n2));
-    InitButterWorthDF2(ff, imu->v2Old, &(imu->v2n1), &(imu->v2n2));
-    InitButterWorthDF2(ff, imu->v3Old, &(imu->v3n1), &(imu->v3n2));
+    InitButterWorthDF2Values(imu->v1Old, &(imu->prefilter), &(imu->v1n1), &(imu->v1n2));
+    InitButterWorthDF2Values(imu->v2Old, &(imu->prefilter), &(imu->v2n1), &(imu->v2n2));
+    InitButterWorthDF2Values(imu->v3Old, &(imu->prefilter), &(imu->v3n1), &(imu->v3n2));
 
     // initial guess for windspeed is zero
     imu->Vw3   = imu->Vw2 = imu->Vw1 = 0.0f;
-    InitButterWorthDF2(ffV, 0.0f, &(imu->Vw1n1), &(imu->Vw1n2));
+    InitButterWorthDF2Values(0.0f, &(imu->filter), &(imu->Vw1n1), &(imu->Vw1n2));
     imu->Vw3n1 = imu->Vw2n1 = imu->Vw1n1;
     imu->Vw3n2 = imu->Vw2n2 = imu->Vw1n2;
 }
@@ -234,6 +302,22 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, const AirspeedSettingsDat
     // filter frequency rate
     const float ffV = (float)(airspeedSettings->SamplePeriod) / 1000.0f / airspeedSettings->IMUBasedEstimationLowPassPeriod2;
 
+    // check for a change in filter frequency rate. if yes, then actualize filter constants and intermediate values
+    if (fabsf(ffV - imu->ffV) > EPS) {
+        InitButterWorthDF2Filter(ffV, &(imu->filter));
+        InitButterWorthDF2Values(imu->Vw1, &(imu->filter), &(imu->Vw1n1), &(imu->Vw1n2));
+        InitButterWorthDF2Values(imu->Vw2, &(imu->filter), &(imu->Vw2n1), &(imu->Vw2n2));
+        InitButterWorthDF2Values(imu->Vw3, &(imu->filter), &(imu->Vw3n1), &(imu->Vw3n2));
+    }
+    if (fabsf(ff - imu->ff) > EPS) {
+        InitButterWorthDF2Filter(ff, &(imu->prefilter));
+        InitButterWorthDF2Values(imu->pOld, &(imu->prefilter), &(imu->pn1), &(imu->pn2));
+        InitButterWorthDF2Values(imu->yOld, &(imu->prefilter), &(imu->yn1), &(imu->yn2));
+        InitButterWorthDF2Values(imu->v1Old, &(imu->prefilter), &(imu->v1n1), &(imu->v1n2));
+        InitButterWorthDF2Values(imu->v2Old, &(imu->prefilter), &(imu->v2n1), &(imu->v2n2));
+        InitButterWorthDF2Values(imu->v3Old, &(imu->prefilter), &(imu->v3n1), &(imu->v3n2));
+    }
+
     float normVel2;
     float normDiffAttitude2;
     float dvdtDotdfdt;
@@ -253,17 +337,17 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, const AirspeedSettingsDat
         Quaternion2PY(attData.q1, attData.q2, attData.q3, attData.q4, &p, &y, false);
 
         // filter pitch and roll Euler angles instead of fuselage vector to guarantee a unit length at all times
-        p = FilterButterWorthDF2(ff, p, &(imu->pn1), &(imu->pn2));
-        y = FilterButterWorthDF2(ff, y, &(imu->yn1), &(imu->yn2));
+        p = FilterButterWorthDF2(p, &(imu->prefilter), &(imu->pn1), &(imu->pn2));
+        y = FilterButterWorthDF2(y, &(imu->prefilter), &(imu->yn1), &(imu->yn2));
         // transform pitch and yaw into fuselage vector xB and xBold
         PY2xB(p, y, xB);
         // calculate change in fuselage vector by substraction of old value
         PY2DeltaxB(imu->pOld, imu->yOld, xB, dxB);
 
         // filter ground speed from VelocityState
-        const float fv1n = FilterButterWorthDF2(ff, velData.North, &(imu->v1n1), &(imu->v1n2));
-        const float fv2n = FilterButterWorthDF2(ff, velData.East, &(imu->v2n1), &(imu->v2n2));
-        const float fv3n = FilterButterWorthDF2(ff, velData.Down, &(imu->v3n1), &(imu->v3n2));
+        const float fv1n = FilterButterWorthDF2(velData.North, &(imu->prefilter), &(imu->v1n1), &(imu->v1n2));
+        const float fv2n = FilterButterWorthDF2(velData.East, &(imu->prefilter), &(imu->v2n1), &(imu->v2n2));
+        const float fv3n = FilterButterWorthDF2(velData.Down, &(imu->prefilter), &(imu->v3n1), &(imu->v3n2));
 
         // calculate norm of ground speed
         normVel2 = Sq(fv1n) + Sq(fv2n) + Sq(fv3n);
@@ -293,9 +377,9 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, const AirspeedSettingsDat
                                  imu->v2Old - xB[1] * airspeed,
                                  imu->v3Old - xB[2] * airspeed };
         // filter raw wind
-        imu->Vw1 = FilterButterWorthDF2(ffV, wind[0], &(imu->Vw1n1), &(imu->Vw1n2));
-        imu->Vw2 = FilterButterWorthDF2(ffV, wind[1], &(imu->Vw2n1), &(imu->Vw2n2));
-        imu->Vw3 = FilterButterWorthDF2(ffV, wind[2], &(imu->Vw3n1), &(imu->Vw3n2));
+        imu->Vw1 = FilterButterWorthDF2(wind[0], &(imu->filter), &(imu->Vw1n1), &(imu->Vw1n2));
+        imu->Vw2 = FilterButterWorthDF2(wind[1], &(imu->filter), &(imu->Vw2n1), &(imu->Vw2n2));
+        imu->Vw3 = FilterButterWorthDF2(wind[2], &(imu->filter), &(imu->Vw3n1), &(imu->Vw3n2));
     } // else leave wind estimation unchanged
 
     { // Scoping to save memory

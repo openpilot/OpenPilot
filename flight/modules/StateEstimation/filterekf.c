@@ -206,10 +206,10 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
     this->work.updated |= state->updated;
 
     // check magnetometer alarm, discard any magnetometer readings if not OK
-    // this will also delay initialization
+    // during initialization phase (but let them through afterwards)
     SystemAlarmsAlarmData alarms;
     SystemAlarmsAlarmGet(&alarms);
-    if (alarms.Magnetometer != SYSTEMALARMS_ALARM_OK) {
+    if (alarms.Magnetometer != SYSTEMALARMS_ALARM_OK && !this->inited) {
         UNSET_MASK(state->updated, SENSORUPDATES_mag);
         UNSET_MASK(this->work.updated, SENSORUPDATES_mag);
     }

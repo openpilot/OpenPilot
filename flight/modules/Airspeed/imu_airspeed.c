@@ -42,7 +42,6 @@
 
 
 // Private constants
-#define TWO_PI            6.283185308f
 #define EPS               1e-6f
 #define EPS_REORIENTATION 1e-10f
 #define EPS_VELOCITY      1.f
@@ -54,7 +53,6 @@ struct IMUGlobals {
     struct ButterWorthDF2Filter filter;
     struct ButterWorthDF2Filter prefilter;
     float ff, ffV;
-
 
     // storage variables for Butterworth filter
     float pn1, pn2;
@@ -106,11 +104,11 @@ static void Quaternion2PY(const float q0, const float q1, const float q2, const 
     } else {
         // calculate needed mutliples of 2pi to avoid jumps
         // number of cycles accumulated in old yaw
-        const int32_t cycles = (int32_t)(*yPtr / TWO_PI);
+        const int32_t cycles = (int32_t)(*yPtr / M_2PI_F);
         // look for a jump by substracting the modulus, i.e. there is maximally one jump.
         // take slightly less than 2pi, because the jump will always be lower than 2pi
-        const int32_t mod    = (int32_t)((y_ - (*yPtr - cycles * TWO_PI)) / (TWO_PI * 0.8f));
-        *yPtr = y_ + TWO_PI * (cycles - mod);
+        const int32_t mod    = (int32_t)((y_ - (*yPtr - cycles * M_2PI_F)) / (M_2PI_F * 0.8f));
+        *yPtr = y_ + M_2PI_F * (cycles - mod);
     }
 }
 
@@ -133,102 +131,6 @@ static void PY2DeltaxB(const float p, const float y, const float xB[3], float x[
     x[2] = xB[2] - -sinf(p);
 }
 
-
-// second order Butterworth filter with cut-off frequency ratio ff
-// Biquadratic filter in direct from 2, such that only two values wn1=w[n-1] and wn2=w[n-2] need to be stored
-// function takes care of updating the values wn1 and wn2
-/*float FilterButterWorthDF2(const float ff, const float xn, float *wn1Ptr, float *wn2Ptr)
-   {
-    const float ita = 1.0f / tanf(M_PI_F * ff);
-    const float b0  = 1.0f / (1.0f + SQRT2 * ita + Sq(ita));
-    const float a1  = 2.0f * b0 * (Sq(ita) - 1.0f);
-    const float a2  = -b0 * (1.0f - SQRT2 * ita + Sq(ita));
-
-    const float wn  = xn + a1 * (*wn1Ptr) + a2 * (*wn2Ptr);
-    const float val = b0 * (wn + 2.0f * (*wn1Ptr) + (*wn2Ptr));
-
- * wn2Ptr = *wn1Ptr;
- * wn1Ptr = wn;
-    return val;
-   }*/
-
-
-// second order Butterworth filter with cut-off frequency ratio ff
-// Biquadratic filter in direct from 2, such that only two values wn1=w[n-1] and wn2=w[n-2] need to be stored
-// function takes care of updating the values wn1 and wn2
-// float FilterButterWorthDF2(const float xn, const ButterWorthDF2Filter *filter, float *wn1Ptr, float *wn2Ptr)
-// {
-//
-// const float wn  = xn + filter->a1 * (*wn1Ptr) + filter->a2 * (*wn2Ptr);
-// const float val = filter->b0 * (wn + 2.0f * (*wn1Ptr) + (*wn2Ptr));
-//
-// *wn2Ptr = *wn1Ptr;
-// *wn1Ptr = wn;
-// return val;
-// }
-
-
-// Initialization function for direct form 2 Butterworth filter
-/*void InitButterWorthDF2(const float ff, const float x0, float *wn1Ptr, float *wn2Ptr)
-   {
-    const float ita  = 1.0f / tanf(M_PI_F * ff);
-    const float b0   = 1.0f / (1.0f + SQRT2 * ita + Sq(ita));
-    const float b1   = 2.0f * b0;
-    const float b2   = b0;
-    const float a1   = 2.0f * b0 * (Sq(ita) - 1.0f);
-    const float a2   = -b0 * (1.0f - SQRT2 * ita + Sq(ita));
-
-    const float a11  = b1 + b0 * a1;
-    const float a12  = b2 + b0 * a2;
-    const float a21  = b1 + b0 * (Sq(a1) + a2);
-    const float a22  = b2 + b0 * a1 * a2;
-    const float det  = a11 * a22 - a12 * a21;
-
-    const float rhs1 = x0 - b0 * x0;
-    const float rhs2 = x0 - b0 * (x0 + a1 * x0);
-
- * wn1Ptr = (a22 * rhs1 - a12 * rhs2) / det;
- * wn2Ptr = (-a21 * rhs1 + a11 * rhs2) / det;
-   }*/
-
-
-// Initialization function for direct form 2 Butterworth filter
-// initialize filter constants. Note that the following is used:
-// b1  = 2 * b0
-// b2  = b0
-// void InitButterWorthDF2Filter(const float ff, ButterWorthDF2Filter *filter)
-// {
-// const float ita = 1.0f / tanf(M_PI_F * ff);
-// const float b0  = 1.0f / (1.0f + SQRT2 * ita + Sq(ita));
-// const float a1  = 2.0f * b0 * (Sq(ita) - 1.0f);
-// const float a2  = -b0 * (1.0f - SQRT2 * ita + Sq(ita));
-//
-// filter->ff = ff;
-// filter->b0 = b0;
-// filter->a1 = a1;
-// filter->a2 = a2;
-// }
-
-
-//// Initialization function for direct form 2 Butterworth filter
-//// initialize intermediate values for starting value x0
-// void InitButterWorthDF2Values(const float x0, const ButterWorthDF2Filter *filter, float *wn1Ptr, float *wn2Ptr)
-// {
-// const float b0  = filter->b0;
-// const float a1  = filter->a1;
-// const float a2  = filter->a2;
-//
-// const float a11  = 2.0f + a1;
-// const float a12  = 1.0f + a2;
-// const float a21  = 2.0f + Sq(a1) + a2;
-// const float a22  = 1.0f + a1 * a2;
-// const float det  = a11 * a22 - a12 * a21;
-// const float rhs1 = x0 / b0 - x0;
-// const float rhs2 = x0 / b0 - x0 + a1 * x0;
-//
-// *wn1Ptr = ( a22 * rhs1 - a12 * rhs2) / det;
-// *wn2Ptr = (-a21 * rhs1 + a11 * rhs2) / det;
-// }
 
 
 /*

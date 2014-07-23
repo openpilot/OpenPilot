@@ -132,7 +132,6 @@ static void PY2DeltaxB(const float p, const float y, const float xB[3], float x[
 }
 
 
-
 /*
  * Initialize function loads first data sets, and allocates memory for structure.
  */

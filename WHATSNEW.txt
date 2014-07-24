@@ -1,3 +1,13 @@
+--- RELEASE-14.06-RC4 --- Peanuts Schnapps ---
+This Release Candidate fixes the following issues:
+    * [OP-1413] - Disable Land flight mode
+    * [OP-1412] - INS13Outdoor Yaw Gyro drift
+    * [OP-1408] - Board rotation is not always saved during Revo calibration
+    * [OP-1358] - Split board rotation into user set configuration and calibrated offseta
+
+The full list of features, improvements and bugfixes in this release candidate is accessible here:
+http://progress.openpilot.org/issues/?filter=11562
+
 --- RELEASE-14.06-RC3 --- Peanuts Schnapps ---
 This Release Candidate fixes the following issues:
     * [OP-1394] - Flight display widget - telemetry data does not zero on disconnection

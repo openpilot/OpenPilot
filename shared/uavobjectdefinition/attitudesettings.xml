@@ -2,6 +2,7 @@
     <object name="AttitudeSettings" singleinstance="true" settings="true" category="State">
         <description>Settings for the @ref Attitude module used on CopterControl</description>
         <field name="BoardRotation" units="deg" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="0,0,0"/>
+        <field name="BoardLevelTrim" units="deg" type="float" elementnames="Roll,Pitch" defaultvalue="0,0"/>
         <field name="AccelKp" units="channel" type="float" elements="1" defaultvalue="0.05"/>
         <field name="AccelKi" units="channel" type="float" elements="1" defaultvalue="0.0001"/>
         <field name="MagKi" units="" type="float" elements="1" defaultvalue="0.000001"/>

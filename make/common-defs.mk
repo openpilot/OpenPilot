@@ -21,23 +21,24 @@ ifndef OPENPILOT_IS_COOL
 endif
 
 # Set to YES to compile for debugging
-DEBUG ?= NO
+DEBUG                ?= NO
 
 # Set to YES to use the Servo output pins for debugging via scope or logic analyser
-ENABLE_DEBUG_PINS	?= NO
+ENABLE_DEBUG_PINS    ?= NO
 
 # Set to YES to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
-ENABLE_AUX_UART		?= NO
+ENABLE_AUX_UART      ?= NO
 
 # Include objects that are just nice information to show
-DIAG_STACK		?= NO
-DIAG_MIXERSTATUS	?= NO
-DIAG_RATEDESIRED	?= NO
-DIAG_I2C_WDG_STATS	?= NO
-DIAG_TASKS		?= NO
+DIAG_STACK           ?= NO
+DIAG_MIXERSTATUS     ?= NO
+DIAG_RATEDESIRED     ?= NO
+DIAG_I2C_WDG_STATS   ?= NO
+DIAG_TASKS           ?= NO
+DIAG_INSTRUMENTATION ?= NO
 
 # Or just turn on all the above diagnostics. WARNING: this consumes massive amounts of memory.
-DIAG_ALL		?= NO
+DIAG_ALL             ?= NO
 
 # Optimization level, can be [0, 1, 2, 3, s].
 # 0 = turn off optimization. s = optimize for size.
@@ -91,6 +92,9 @@ ifneq (,$(filter YES,$(DIAG_TASKS) $(DIAG_ALL)))
     CFLAGS += -DDIAG_TASKS
 endif
 
+ifneq (,$(filter YES,$(DIAG_INSTRUMENTATION) $(DIAG_ALL)))
+    CFLAGS += -DPIOS_INCLUDE_INSTRUMENTATION
+endif
 # Place project-specific -D and/or -U options for Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
 ADEFS = -D__ASSEMBLY__

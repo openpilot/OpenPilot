@@ -35,6 +35,7 @@
 #include <accessorydesired.h>
 #include <flightstatus.h>
 #include <flightmodesettings.h>
+#include <stabilizationdesired.h>
 
 // Private constants
 #define ARMED_THRESHOLD 0.50f
@@ -258,7 +259,7 @@ static bool okToArm(void)
 
     // Check each alarm
     for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++) {
-        if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[i] >= SYSTEMALARMS_ALARM_ERROR) { // found an alarm thats set
+        if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[i] >= SYSTEMALARMS_ALARM_CRITICAL) { // found an alarm thats set
             if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY) {
                 continue;
             }
@@ -266,6 +267,8 @@ static bool okToArm(void)
             return false;
         }
     }
+
+    StabilizationDesiredStabilizationModeData stabDesired;
 
     uint8_t flightMode;
     FlightStatusFlightModeGet(&flightMode);
@@ -277,8 +280,14 @@ static bool okToArm(void)
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-        return true;
-
+        // Prevent arming if unsafe due to the current Thrust Mode
+        StabilizationDesiredStabilizationModeGet(&stabDesired);
+        if (stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEHOLD ||
+            stabDesired.Thrust == STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO) {
+            return false;
+        } else {
+            return true;
+        }
         break;
 
     default:

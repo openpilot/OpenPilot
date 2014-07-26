@@ -69,13 +69,13 @@
 #define TASK_PRIORITY    (tskIDLE_PRIORITY + 3)
 #define SENSOR_PERIOD    2
 
+#define ZERO_ROT_ANGLE   0.00001f
 // Private types
 
 
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
-// static void magOffsetEstimation(MagSensorData *mag);
 
 // Private variables
 static xTaskHandle sensorsTaskHandle;
@@ -135,7 +135,7 @@ int32_t SensorsInitialize(void)
 int32_t SensorsStart(void)
 {
     // Start main task
-    xTaskCreate(SensorsTask, (signed char *)"Sensors", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &sensorsTaskHandle);
+    xTaskCreate(SensorsTask, "Sensors", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &sensorsTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SENSORS, sensorsTaskHandle);
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_SENSORS);
@@ -461,20 +461,35 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     AttitudeSettingsGet(&attitudeSettings);
 
     // Indicates not to expend cycles on rotation
-    if (fabsf(attitudeSettings.BoardRotation.Roll) < 0.00001f
-        && fabsf(attitudeSettings.BoardRotation.Pitch) < 0.00001f &&
-        fabsf(attitudeSettings.BoardRotation.Yaw) < 0.00001f) {
+    if (fabsf(attitudeSettings.BoardRotation.Roll) < ZERO_ROT_ANGLE
+        && fabsf(attitudeSettings.BoardRotation.Pitch) < ZERO_ROT_ANGLE &&
+        fabsf(attitudeSettings.BoardRotation.Yaw) < ZERO_ROT_ANGLE) {
         rotate = 0;
     } else {
         rotate = 1;
     }
-    float rotationQuat[4];
+
     const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
                            attitudeSettings.BoardRotation.Pitch,
                            attitudeSettings.BoardRotation.Yaw };
-    RPY2Quaternion(rpy, rotationQuat);
-    Quaternion2R(rotationQuat, R);
 
+    float rotationQuat[4];
+    RPY2Quaternion(rpy, rotationQuat);
+
+    if (fabsf(attitudeSettings.BoardLevelTrim.Roll) > ZERO_ROT_ANGLE ||
+        fabsf(attitudeSettings.BoardLevelTrim.Pitch) > ZERO_ROT_ANGLE) {
+        float trimQuat[4];
+        float sumQuat[4];
+        rotate = 1;
+
+        const float trimRpy[3] = { attitudeSettings.BoardLevelTrim.Roll, attitudeSettings.BoardLevelTrim.Pitch, 0.0f };
+        RPY2Quaternion(trimRpy, trimQuat);
+
+        quat_mult(rotationQuat, trimQuat, sumQuat);
+        Quaternion2R(sumQuat, R);
+    } else {
+        Quaternion2R(rotationQuat, R);
+    }
     matrix_mult_3x3f((float(*)[3])cast_struct_to_array(cal.mag_transform, cal.mag_transform.r0c0), R, mag_transform);
 }
 /**

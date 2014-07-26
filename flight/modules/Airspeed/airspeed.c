@@ -45,6 +45,7 @@
 #include "baro_airspeed_etasv3.h"
 #include "baro_airspeed_mpxv.h"
 #include "imu_airspeed.h"
+#include "airspeedalarm.h"
 #include "taskinfo.h"
 
 // Private constants
@@ -81,7 +82,7 @@ int32_t AirspeedStart()
     }
 
     // Start main task
-    xTaskCreate(airspeedTask, (signed char *)"Airspeed", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+    xTaskCreate(airspeedTask, "Airspeed", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_AIRSPEED, taskHandle);
     return 0;
 }
@@ -153,7 +154,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
 
         // if sensor type changed reset Airspeed alarm
         if (airspeedSettings.AirspeedSensorType != lastAirspeedSensorType) {
-            AlarmsSet(SYSTEMALARMS_ALARM_AIRSPEED, SYSTEMALARMS_ALARM_DEFAULT);
+            AirspeedAlarm(SYSTEMALARMS_ALARM_DEFAULT);
             lastAirspeedSensorType = airspeedSettings.AirspeedSensorType;
             switch (airspeedSettings.AirspeedSensorType) {
             case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_NONE:

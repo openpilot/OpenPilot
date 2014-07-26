@@ -9,7 +9,7 @@ import "functions.js" as Functions
 Rectangle {
     width: 600
     height: 400
-
+    id: root
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 10
@@ -393,7 +393,7 @@ Rectangle {
                 text: qsTr("OK")
                 isDefault: true
                 activeFocusOnPress: true
-                onClicked: dialog.close()
+                onClicked: logDialog.close()
             }
         }
     }

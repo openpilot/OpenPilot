@@ -23,7 +23,7 @@
 /* Notes: We use 5 task priorities */
 
 #define configUSE_PREEMPTION                         1
-#define configUSE_IDLE_HOOK                          0
+#define configUSE_IDLE_HOOK                          1
 #define configUSE_TICK_HOOK                          0
 #define configUSE_MALLOC_FAILED_HOOK                 1
 #define configCPU_CLOCK_HZ                           ((unsigned long)72000000)
@@ -52,7 +52,7 @@
 #define INCLUDE_uxTaskPriorityGet                    1
 #define INCLUDE_vTaskDelete                          1
 #define INCLUDE_vTaskCleanUpResources                0
-#define INCLUDE_vTaskSuspend                         0
+#define INCLUDE_vTaskSuspend                         1
 #define INCLUDE_vTaskDelayUntil                      1
 #define INCLUDE_vTaskDelay                           1
 #define INCLUDE_xTaskGetSchedulerState               0

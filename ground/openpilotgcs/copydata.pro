@@ -158,7 +158,8 @@ GCS_LIBRARY_PATH
                          imageformats \
                          platforms \
                          mediaservice \
-                         sqldrivers
+                         sqldrivers \
+			 opengl32_32
         for(dir, QT_PLUGIN_DIRS) {
             data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
         }
@@ -233,6 +234,13 @@ GCS_LIBRARY_PATH
             libeay32.dll
         for(dll, OPENSSL_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(OPENSSL_DIR)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+        }
+
+        # copy OpenGL DLL
+        OPENGL_DLLS = \
+            opengl32_32/opengl32.dll
+        for(dll, OPENGL_DLLS) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(MESAWIN_DIR)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
         data_copy.target = FORCE

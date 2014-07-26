@@ -214,7 +214,7 @@ void ConfigCCAttitudeWidget::startAccelCalibration()
 
 void ConfigCCAttitudeWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/44Cf"), QUrl::StrictMode));
 }
 
 void ConfigCCAttitudeWidget::setAccelFiltering(bool active)

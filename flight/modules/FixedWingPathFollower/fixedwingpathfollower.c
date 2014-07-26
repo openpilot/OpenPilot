@@ -62,6 +62,7 @@
 #include "velocitystate.h"
 #include "taskinfo.h"
 #include <pios_struct_helper.h>
+#include <sanitycheck.h>
 
 #include "sin_lookup.h"
 #include "paths.h"
@@ -96,7 +97,7 @@ int32_t FixedWingPathFollowerStart()
 {
     if (followerEnabled) {
         // Start main task
-        xTaskCreate(pathfollowerTask, (signed char *)"PathFollower", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
+        xTaskCreate(pathfollowerTask, "PathFollower", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
     }
 
@@ -112,7 +113,10 @@ int32_t FixedWingPathFollowerInitialize()
     HwSettingsInitialize();
     HwSettingsOptionalModulesData optionalModules;
     HwSettingsOptionalModulesGet(&optionalModules);
-    if (optionalModules.FixedWingPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    FrameType_t frameType = GetCurrentFrameType();
+
+    if ((optionalModules.FixedWingPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) ||
+        (frameType == FRAME_TYPE_FIXED_WING)) {
         followerEnabled = true;
         FixedWingPathFollowerSettingsInitialize();
         FixedWingPathFollowerStatusInitialize();
@@ -193,7 +197,7 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
                         AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
                     }
                 } else {
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                 }
             } else {
                 pathStatus.UID    = pathDesired.UID;
@@ -221,7 +225,7 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
                     break;
                 default:
                     pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                     break;
                 }
             }

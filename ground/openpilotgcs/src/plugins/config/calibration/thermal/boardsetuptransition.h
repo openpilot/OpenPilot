@@ -29,13 +29,15 @@
 #ifndef BOARDSETUPTRANSITION_H
 #define BOARDSETUPTRANSITION_H
 
+#include "thermalcalibrationhelper.h"
+
 #include <QSignalTransition>
 #include <QEventTransition>
 
-#include "thermalcalibrationhelper.h"
 namespace OpenPilot {
 class BoardSetupTransition : public QSignalTransition {
     Q_OBJECT
+
 public:
     BoardSetupTransition(ThermalCalibrationHelper *helper, QState *currentState, QState *targetState)
         : QSignalTransition(helper, SIGNAL(setupBoardCompleted(bool))),
@@ -66,11 +68,14 @@ public:
     {
         Q_UNUSED(e);
     }
+
 public slots:
     void enterState()
     {
+        m_helper->addInstructions(tr("Configuring board for calibration."), WizardModel::Debug);
         m_helper->setupBoard();
     }
+
 private:
     ThermalCalibrationHelper *m_helper;
 };

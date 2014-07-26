@@ -152,7 +152,7 @@ float FilterButterWorthDF2(const float ff, const float xn, float *wn1Ptr, float 
 void imu_airspeedInitialize()
 {
     // This method saves memory in case we don't use the module.
-    imu = (struct IMUGlobals *)pvPortMalloc(sizeof(struct IMUGlobals));
+    imu = (struct IMUGlobals *)pios_malloc(sizeof(struct IMUGlobals));
 
     // airspeed calculation variables
     VelocityStateInitialize();

@@ -83,7 +83,7 @@ static bool initialized = 0;
 static int32_t init13i(stateFilter *self);
 static int32_t init13(stateFilter *self);
 static int32_t maininit(stateFilter *self);
-static int32_t filter(stateFilter *self, stateEstimation *state);
+static filterResult filter(stateFilter *self, stateEstimation *state);
 static inline bool invalid_var(float data);
 
 static void globalInit(void);
@@ -104,7 +104,7 @@ int32_t filterEKF13iInitialize(stateFilter *handle)
     globalInit();
     handle->init      = &init13i;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 int32_t filterEKF13Initialize(stateFilter *handle)
@@ -112,7 +112,7 @@ int32_t filterEKF13Initialize(stateFilter *handle)
     globalInit();
     handle->init      = &init13;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 // XXX
@@ -123,7 +123,7 @@ int32_t filterEKF16iInitialize(stateFilter *handle)
     globalInit();
     handle->init      = &init13i;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 int32_t filterEKF16Initialize(stateFilter *handle)
@@ -131,7 +131,7 @@ int32_t filterEKF16Initialize(stateFilter *handle)
     globalInit();
     handle->init      = &init13;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 
@@ -193,7 +193,7 @@ static int32_t maininit(stateFilter *self)
 /**
  * Collect all required state variables, then run complementary filter
  */
-static int32_t filter(stateFilter *self, stateEstimation *state)
+static filterResult filter(stateFilter *self, stateEstimation *state)
 {
     struct data *this    = (struct data *)self->localdata;
 
@@ -204,6 +204,15 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     uint16_t sensors = 0;
 
     this->work.updated |= state->updated;
+
+    // check magnetometer alarm, discard any magnetometer readings if not OK
+    // during initialization phase (but let them through afterwards)
+    SystemAlarmsAlarmData alarms;
+    SystemAlarmsAlarmGet(&alarms);
+    if (alarms.Magnetometer != SYSTEMALARMS_ALARM_OK && !this->inited) {
+        UNSET_MASK(state->updated, SENSORUPDATES_mag);
+        UNSET_MASK(this->work.updated, SENSORUPDATES_mag);
+    }
 
     // Get most recent data
     IMPORT_SENSOR_IF_UPDATED(gyro, 3);
@@ -222,7 +231,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         UNSET_MASK(state->updated, SENSORUPDATES_vel);
         UNSET_MASK(state->updated, SENSORUPDATES_attitude);
         UNSET_MASK(state->updated, SENSORUPDATES_gyro);
-        return 0;
+        return FILTERRESULT_OK;
     }
 
     dT = PIOS_DELTATIME_GetAverageSeconds(&this->dtconfig);
@@ -316,11 +325,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             this->inited = true;
         }
 
-        return 0;
+        return FILTERRESULT_OK;
     }
 
     if (!this->inited) {
-        return 3;
+        return FILTERRESULT_CRITICAL;
     }
 
     float gyros[3] = { DEG2RAD(this->work.gyro[0]), DEG2RAD(this->work.gyro[1]), DEG2RAD(this->work.gyro[2]) };
@@ -349,11 +358,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     INSCovariancePrediction(dT);
 
     if (IS_SET(this->work.updated, SENSORUPDATES_mag)) {
-        SystemAlarmsAlarmData alarms;
-        SystemAlarmsAlarmGet(&alarms);
-        if (alarms.Magnetometer == SYSTEMALARMS_ALARM_OK) {
-            sensors |= MAG_SENSORS;
-        }
+        sensors |= MAG_SENSORS;
     }
 
     if (IS_SET(this->work.updated, SENSORUPDATES_baro)) {
@@ -361,7 +366,6 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     }
 
     INSSetMagNorth(this->homeLocation.Be);
-    INSSetG(this->homeLocation.g_e);
 
     if (!this->usePos) {
         // position and velocity variance used in indoor mode
@@ -433,9 +437,9 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     this->work.updated = 0;
 
     if (this->init_stage < 0) {
-        return 1;
+        return FILTERRESULT_WARNING;
     } else {
-        return 0;
+        return FILTERRESULT_OK;
     }
 }
 

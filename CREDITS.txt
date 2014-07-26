@@ -89,7 +89,6 @@ Mat Wellington
 Kendal Wells
 David Willis
 Dmitriy Zaitsev
-Bertrand Songis
 Andre Bernet
 Anthony Gomes
 Cliff Geerdes
@@ -99,3 +98,7 @@ Laurent Lalanne
 Patrick Huebner
 Rich von Lehe
 Stefan Cenkov
+Andrés Chavarría Krauser
+Bertrand Oresve
+Cosimo Corrado
+Rodney Grainger

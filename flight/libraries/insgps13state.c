@@ -91,8 +91,6 @@ static struct EKFData {
     float H[NUMV][NUMX];
     // local magnetic unit vector in NED frame
     float Be[3];
-    // local gravity vector
-    float g_e;
     // covariance matrix and state vector
     float P[NUMX][NUMX];
     float X[NUMX];
@@ -286,11 +284,6 @@ void INSSetMagNorth(float B[3])
     ekf.Be[0] = B[0] / mag;
     ekf.Be[1] = B[1] / mag;
     ekf.Be[2] = B[2] / mag;
-}
-
-void INSSetG(float g_e)
-{
-    ekf.g_e = g_e;
 }
 
 void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
@@ -648,7 +641,7 @@ void StateEq(float X[NUMX], float U[NUMU], float Xdot[NUMX])
         az;
     Xdot[5] =
         2.0f * (q1 * q3 - q0 * q2) * ax + 2 * (q2 * q3 + q0 * q1) * ay +
-        (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * az + ekf.g_e;
+        (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * az + 9.81f;
 
     // qdot = Q*w
     Xdot[6]  = (-q1 * wx - q2 * wy - q3 * wz) / 2.0f;

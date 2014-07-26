@@ -59,7 +59,7 @@ struct data {
 // Private functions
 
 static int32_t init(stateFilter *self);
-static int32_t filter(stateFilter *self, stateEstimation *state);
+static filterResult filter(stateFilter *self, stateEstimation *state);
 static void checkMagValidity(struct data *this, float mag[3]);
 static void magOffsetEstimation(struct data *this, float mag[3]);
 
@@ -68,7 +68,7 @@ int32_t filterMagInitialize(stateFilter *handle)
 {
     handle->init      = &init;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     HomeLocationInitialize();
     return STACK_REQUIRED;
 }
@@ -87,7 +87,7 @@ static int32_t init(stateFilter *self)
     return 0;
 }
 
-static int32_t filter(stateFilter *self, stateEstimation *state)
+static filterResult filter(stateFilter *self, stateEstimation *state)
 {
     struct data *this = (struct data *)self->localdata;
 
@@ -98,7 +98,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         }
     }
 
-    return 0;
+    return FILTERRESULT_OK;
 }
 
 /**

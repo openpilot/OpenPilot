@@ -37,18 +37,23 @@
 #include "airspeedsettings.h"
 #include "imu_airspeed.h"
 #include "CoordinateConversions.h"
+#include "butterworth.h"
 #include <pios_math.h>
 
 
 // Private constants
-#define TWO_PI            6.283185308f
-#define SQRT2             1.414213562f
+#define EPS               1e-6f
 #define EPS_REORIENTATION 1e-10f
 #define EPS_VELOCITY      1.f
 
 // Private types
-// structure with smoothed fuselage orientation, ground speed and their changes in time
+// structure with smoothed fuselage orientation, ground speed, wind vector and their changes in time
 struct IMUGlobals {
+    // Butterworth filters
+    struct ButterWorthDF2Filter filter;
+    struct ButterWorthDF2Filter prefilter;
+    float ff, ffV;
+
     // storage variables for Butterworth filter
     float pn1, pn2;
     float yn1, yn2;
@@ -99,11 +104,11 @@ static void Quaternion2PY(const float q0, const float q1, const float q2, const 
     } else {
         // calculate needed mutliples of 2pi to avoid jumps
         // number of cycles accumulated in old yaw
-        const int cycles = (int)(*yPtr / TWO_PI);
+        const int32_t cycles = (int32_t)(*yPtr / M_2PI_F);
         // look for a jump by substracting the modulus, i.e. there is maximally one jump.
         // take slightly less than 2pi, because the jump will always be lower than 2pi
-        const int mod    = (int)((y_ - (*yPtr - cycles * TWO_PI)) / (TWO_PI * 0.9f));
-        *yPtr = y_ + TWO_PI * (cycles - mod);
+        const int32_t mod    = (int32_t)((y_ - (*yPtr - cycles * M_2PI_F)) / (M_2PI_F * 0.8f));
+        *yPtr = y_ + M_2PI_F * (cycles - mod);
     }
 }
 
@@ -127,30 +132,16 @@ static void PY2DeltaxB(const float p, const float y, const float xB[3], float x[
 }
 
 
-// second order Butterworth filter with cut-off frequency ratio ff
-// Biquadratic filter in direct from 2, such that only two values wn1=w[n-1] and wn2=w[n-2] need to be stored
-// function takes care of updating the values wn1 and wn2
-float FilterButterWorthDF2(const float ff, const float xn, float *wn1Ptr, float *wn2Ptr)
-{
-    const float ita = 1.0f / tanf(M_PI_F * ff);
-    const float b0  = 1.0f / (1.0f + SQRT2 * ita + Sq(ita));
-    const float a1  = 2.0f * b0 * (Sq(ita) - 1.0f);
-    const float a2  = -b0 * (1.0f - SQRT2 * ita + Sq(ita));
-
-    const float wn  = xn + a1 * (*wn1Ptr) + a2 * (*wn2Ptr);
-    const float val = b0 * (wn + 2.0f * (*wn1Ptr) + (*wn2Ptr));
-
-    *wn2Ptr = *wn1Ptr;
-    *wn1Ptr = wn;
-    return val;
-}
-
-
 /*
  * Initialize function loads first data sets, and allocates memory for structure.
  */
-void imu_airspeedInitialize()
+void imu_airspeedInitialize(const AirspeedSettingsData *airspeedSettings)
 {
+    // pre-filter frequency rate
+    const float ff  = (float)(airspeedSettings->SamplePeriod) / 1000.0f / airspeedSettings->IMUBasedEstimationLowPassPeriod1;
+    // filter frequency rate
+    const float ffV = (float)(airspeedSettings->SamplePeriod) / 1000.0f / airspeedSettings->IMUBasedEstimationLowPassPeriod2;
+
     // This method saves memory in case we don't use the module.
     imu = (struct IMUGlobals *)pios_malloc(sizeof(struct IMUGlobals));
 
@@ -162,21 +153,30 @@ void imu_airspeedInitialize()
     AttitudeStateData attData;
     AttitudeStateGet(&attData);
 
+    // initialize filters for given ff and ffV
+    InitButterWorthDF2Filter(ffV, &(imu->filter));
+    InitButterWorthDF2Filter(ff, &(imu->prefilter));
+    imu->ffV = ffV;
+    imu->ff  = ff;
+
     // get pitch and yaw from quarternion; principal argument for yaw
     Quaternion2PY(attData.q1, attData.q2, attData.q3, attData.q4, &(imu->pOld), &(imu->yOld), true);
+    InitButterWorthDF2Values(imu->pOld, &(imu->prefilter), &(imu->pn1), &(imu->pn2));
+    InitButterWorthDF2Values(imu->yOld, &(imu->prefilter), &(imu->yn1), &(imu->yn2));
 
-    imu->pn1   = imu->pn2 = imu->pOld;
-    imu->yn1   = imu->yn2 = imu->yOld;
-
-    imu->v1n1  = imu->v1n2 = imu->v1Old = velData.North;
-    imu->v2n1  = imu->v2n2 = imu->v2Old = velData.East;
-    imu->v3n1  = imu->v3n2 = imu->v3Old = velData.Down;
+    // use current NED speed as vOld vector and as initial value for filter
+    imu->v1Old = velData.North;
+    imu->v2Old = velData.East;
+    imu->v3Old = velData.Down;
+    InitButterWorthDF2Values(imu->v1Old, &(imu->prefilter), &(imu->v1n1), &(imu->v1n2));
+    InitButterWorthDF2Values(imu->v2Old, &(imu->prefilter), &(imu->v2n1), &(imu->v2n2));
+    InitButterWorthDF2Values(imu->v3Old, &(imu->prefilter), &(imu->v3n1), &(imu->v3n2));
 
     // initial guess for windspeed is zero
-    imu->Vw1n1 = imu->Vw1n2 = 0.0f;
-    imu->Vw2n1 = imu->Vw2n2 = 0.0f;
-    imu->Vw3n1 = imu->Vw3n2 = 0.0f;
-    imu->Vw1   = imu->Vw2 = 0.0f;
+    imu->Vw3   = imu->Vw2 = imu->Vw1 = 0.0f;
+    InitButterWorthDF2Values(0.0f, &(imu->filter), &(imu->Vw1n1), &(imu->Vw1n2));
+    imu->Vw3n1 = imu->Vw2n1 = imu->Vw1n1;
+    imu->Vw3n2 = imu->Vw2n2 = imu->Vw1n2;
 }
 
 /*
@@ -196,12 +196,28 @@ void imu_airspeedInitialize()
  * and yaw to keep a unit length. After building the differenced dxB and dVel are produced and
  * the airspeed calculated. The calculated airspeed is filtered again with a Butterworth filter
  */
-void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *airspeedSettings)
+void imu_airspeedGet(AirspeedSensorData *airspeedData, const AirspeedSettingsData *airspeedSettings)
 {
     // pre-filter frequency rate
     const float ff  = (float)(airspeedSettings->SamplePeriod) / 1000.0f / airspeedSettings->IMUBasedEstimationLowPassPeriod1;
     // filter frequency rate
     const float ffV = (float)(airspeedSettings->SamplePeriod) / 1000.0f / airspeedSettings->IMUBasedEstimationLowPassPeriod2;
+
+    // check for a change in filter frequency rate. if yes, then actualize filter constants and intermediate values
+    if (fabsf(ffV - imu->ffV) > EPS) {
+        InitButterWorthDF2Filter(ffV, &(imu->filter));
+        InitButterWorthDF2Values(imu->Vw1, &(imu->filter), &(imu->Vw1n1), &(imu->Vw1n2));
+        InitButterWorthDF2Values(imu->Vw2, &(imu->filter), &(imu->Vw2n1), &(imu->Vw2n2));
+        InitButterWorthDF2Values(imu->Vw3, &(imu->filter), &(imu->Vw3n1), &(imu->Vw3n2));
+    }
+    if (fabsf(ff - imu->ff) > EPS) {
+        InitButterWorthDF2Filter(ff, &(imu->prefilter));
+        InitButterWorthDF2Values(imu->pOld, &(imu->prefilter), &(imu->pn1), &(imu->pn2));
+        InitButterWorthDF2Values(imu->yOld, &(imu->prefilter), &(imu->yn1), &(imu->yn2));
+        InitButterWorthDF2Values(imu->v1Old, &(imu->prefilter), &(imu->v1n1), &(imu->v1n2));
+        InitButterWorthDF2Values(imu->v2Old, &(imu->prefilter), &(imu->v2n1), &(imu->v2n2));
+        InitButterWorthDF2Values(imu->v3Old, &(imu->prefilter), &(imu->v3n1), &(imu->v3n2));
+    }
 
     float normVel2;
     float normDiffAttitude2;
@@ -222,17 +238,17 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
         Quaternion2PY(attData.q1, attData.q2, attData.q3, attData.q4, &p, &y, false);
 
         // filter pitch and roll Euler angles instead of fuselage vector to guarantee a unit length at all times
-        p = FilterButterWorthDF2(ff, p, &(imu->pn1), &(imu->pn2));
-        y = FilterButterWorthDF2(ff, y, &(imu->yn1), &(imu->yn2));
+        p = FilterButterWorthDF2(p, &(imu->prefilter), &(imu->pn1), &(imu->pn2));
+        y = FilterButterWorthDF2(y, &(imu->prefilter), &(imu->yn1), &(imu->yn2));
         // transform pitch and yaw into fuselage vector xB and xBold
         PY2xB(p, y, xB);
         // calculate change in fuselage vector by substraction of old value
         PY2DeltaxB(imu->pOld, imu->yOld, xB, dxB);
 
         // filter ground speed from VelocityState
-        const float fv1n = FilterButterWorthDF2(ff, velData.North, &(imu->v1n1), &(imu->v1n2));
-        const float fv2n = FilterButterWorthDF2(ff, velData.East, &(imu->v2n1), &(imu->v2n2));
-        const float fv3n = FilterButterWorthDF2(ff, velData.Down, &(imu->v3n1), &(imu->v3n2));
+        const float fv1n = FilterButterWorthDF2(velData.North, &(imu->prefilter), &(imu->v1n1), &(imu->v1n2));
+        const float fv2n = FilterButterWorthDF2(velData.East, &(imu->prefilter), &(imu->v2n1), &(imu->v2n2));
+        const float fv3n = FilterButterWorthDF2(velData.Down, &(imu->prefilter), &(imu->v3n1), &(imu->v3n2));
 
         // calculate norm of ground speed
         normVel2 = Sq(fv1n) + Sq(fv2n) + Sq(fv3n);
@@ -262,9 +278,9 @@ void imu_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *air
                                  imu->v2Old - xB[1] * airspeed,
                                  imu->v3Old - xB[2] * airspeed };
         // filter raw wind
-        imu->Vw1 = FilterButterWorthDF2(ffV, wind[0], &(imu->Vw1n1), &(imu->Vw1n2));
-        imu->Vw2 = FilterButterWorthDF2(ffV, wind[1], &(imu->Vw2n1), &(imu->Vw2n2));
-        imu->Vw3 = FilterButterWorthDF2(ffV, wind[2], &(imu->Vw3n1), &(imu->Vw3n2));
+        imu->Vw1 = FilterButterWorthDF2(wind[0], &(imu->filter), &(imu->Vw1n1), &(imu->Vw1n2));
+        imu->Vw2 = FilterButterWorthDF2(wind[1], &(imu->filter), &(imu->Vw2n1), &(imu->Vw2n2));
+        imu->Vw3 = FilterButterWorthDF2(wind[2], &(imu->filter), &(imu->Vw3n1), &(imu->Vw3n2));
     } // else leave wind estimation unchanged
 
     { // Scoping to save memory

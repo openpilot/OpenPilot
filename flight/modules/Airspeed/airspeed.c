@@ -166,7 +166,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
             case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
                 if (!imuAirspeedInitialized) {
                     imuAirspeedInitialized = true;
-                    imu_airspeedInitialize();
+                    imu_airspeedInitialize(&airspeedSettings);
                 }
                 break;
             }

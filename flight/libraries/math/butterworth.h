@@ -1,14 +1,13 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
+ * @addtogroup OpenPilot Math Utilities
  * @{
- * @addtogroup AirspeedModule Airspeed Module
- * @brief Calculate airspeed as a function of the difference between sequential ground velocity and attitude measurements
+ * @addtogroup Butterworth low pass filter
  * @{
  *
- * @file       imu_airspeed.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Airspeed module, reads temperature and pressure from BMP085
+ * @file       butterworth.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      Direct form two of a second order Butterworth low pass filter
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -28,15 +27,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef IMU_AIRSPEED_H
-#define IMU_AIRSPEED_H
 
-void imu_airspeedInitialize(const AirspeedSettingsData *airspeedSettings);
-void imu_airspeedGet(AirspeedSensorData *airspeedData, const AirspeedSettingsData *airspeedSettings);
+#ifndef BUTTERWORTH_H
+#define BUTTERWORTH_H
 
-#endif // IMU_AIRSPEED_H
+// Coefficients of second order Butterworth biquadratic filter in direct from 2
+struct ButterWorthDF2Filter {
+    float b0;
+    float a1;
+    float a2;
+};
 
-/**
- * @}
- * @}
- */
+// Function declarations
+void InitButterWorthDF2Filter(const float ff, struct ButterWorthDF2Filter *filterPtr);
+void InitButterWorthDF2Values(const float x0, const struct ButterWorthDF2Filter *filterPtr, float *wn1Ptr, float *wn2Ptr);
+float FilterButterWorthDF2(const float xn, const struct ButterWorthDF2Filter *filterPtr, float *wn1Ptr, float *wn2Ptr);
+
+#endif

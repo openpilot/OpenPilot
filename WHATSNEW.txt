@@ -1,3 +1,11 @@
+--- RELEASE-14.06-RC5 --- Peanuts Schnapps ---
+This Release Candidate fixes the following issues:
+    * [OP-1419] - GCS does not set Z magnetometer scale correctly on mag calibration
+    * [OP-1337] - French translations updates (14.04/05)
+
+The full list of features, improvements and bugfixes in this release candidate is accessible here:
+http://progress.openpilot.org/issues/?filter=11563
+
 --- RELEASE-14.06-RC4 --- Peanuts Schnapps ---
 This Release Candidate fixes the following issues:
     * [OP-1413] - Disable Land flight mode

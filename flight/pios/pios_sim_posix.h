@@ -39,12 +39,21 @@
 #include "queue.h"
 #include "semphr.h"
 #endif
+#include <pios_mem.h>
 
 #ifdef PIOS_INCLUDE_TASK_MONITOR
 #ifndef PIOS_INCLUDE_FREERTOS
 #error PiOS Task Monitor requires PIOS_INCLUDE_FREERTOS to be defined
 #endif
 #include <pios_task_monitor.h>
+#endif
+
+/* PIOS CallbackScheduler */
+#ifdef PIOS_INCLUDE_CALLBACKSCHEDULER
+#ifndef PIOS_INCLUDE_FREERTOS
+#error PiOS CallbackScheduler requires PIOS_INCLUDE_FREERTOS to be defined
+#endif
+#include <pios_callbackscheduler.h>
 #endif
 
 /* C Lib Includes */

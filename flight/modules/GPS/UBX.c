@@ -254,22 +254,25 @@ void parse_ubx_nav_velned(struct UBX_NAV_VELNED *velned, GPSPositionSensorData *
 #if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_nav_timeutc(struct UBX_NAV_TIMEUTC *timeutc)
 {
-    if (!(timeutc->valid & TIMEUTC_VALIDUTC)) {
+    // Test if time is valid
+    if ((timeutc->valid & TIMEUTC_VALIDTOW) && (timeutc->valid & TIMEUTC_VALIDWKN)) {
+        // Time is valid, set GpsTime
+        GPSTimeData GpsTime;
+
+        GpsTime.Year   = timeutc->year;
+        GpsTime.Month  = timeutc->month;
+        GpsTime.Day    = timeutc->day;
+        GpsTime.Hour   = timeutc->hour;
+        GpsTime.Minute = timeutc->min;
+        GpsTime.Second = timeutc->sec;
+
+        GPSTimeSet(&GpsTime);
+    } else {
+        // Time is not valid, nothing to do
         return;
     }
-
-    GPSTimeData GpsTime;
-
-    GpsTime.Year   = timeutc->year;
-    GpsTime.Month  = timeutc->month;
-    GpsTime.Day    = timeutc->day;
-    GpsTime.Hour   = timeutc->hour;
-    GpsTime.Minute = timeutc->min;
-    GpsTime.Second = timeutc->sec;
-
-    GPSTimeSet(&GpsTime);
 }
-#endif
+#endif /* if !defined(PIOS_GPS_MINIMAL) */
 
 #if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)

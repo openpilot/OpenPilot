@@ -123,7 +123,6 @@ void FancyTabBar::mouseMoveEvent(QMouseEvent *e)
         m_hoverRect  = QRect();
 
         if (m_hoverIndex >= 0) {
-            QRect oldHoverRect = m_hoverRect;
             m_hoverRect = tabRect(m_hoverIndex);
             m_hoverControl.start();
         }

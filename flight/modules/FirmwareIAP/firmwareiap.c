@@ -100,6 +100,7 @@ int32_t FirmwareIAPInitialize()
     PIOS_BL_HELPER_FLASH_Read_Description(data.Description, FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
     PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
     data.BoardRevision = bdinfo->board_rev;
+    data.BootloaderRevision = bdinfo->bl_rev;
     data.ArmReset = 0;
     data.crc = 0;
     FirmwareIAPObjSet(&data);
@@ -147,6 +148,7 @@ static void FirmwareIAPCallback(UAVObjEvent *ev)
             PIOS_BL_HELPER_FLASH_Read_Description(data.Description, FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
             PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
             data.BoardRevision = bdinfo->board_rev;
+            data.BootloaderRevision = bdinfo->bl_rev;
             data.crc = PIOS_BL_HELPER_CRC_Memory_Calc();
             FirmwareIAPObjSet(&data);
         }
@@ -191,7 +193,7 @@ static void FirmwareIAPCallback(UAVObjEvent *ev)
                     /* Note: Cant just wait timeout value, because first time is randomized */
                     reset_count = 0;
                     lastResetSysTime = xTaskGetTickCount();
-                    UAVObjEvent *event = pvPortMalloc(sizeof(UAVObjEvent));
+                    UAVObjEvent *event = pios_malloc(sizeof(UAVObjEvent));
                     memset(event, 0, sizeof(UAVObjEvent));
                     EventPeriodicCallbackCreate(event, resetTask, 100);
                     iap_state = IAP_STATE_RESETTING;

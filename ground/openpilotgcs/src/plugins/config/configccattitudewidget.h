@@ -67,7 +67,6 @@ private:
 
     static const float DEFAULT_ENABLED_ACCEL_TAU = 0.1;
     static const int NUM_SENSOR_UPDATES = 300;
-    static const float ACCEL_SCALE = 0.004f * 9.81f;
 protected:
     virtual void enableControls(bool enable);
 };

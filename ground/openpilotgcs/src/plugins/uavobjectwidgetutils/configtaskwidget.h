@@ -69,6 +69,8 @@ public:
     ~WidgetBinding();
 
     QString units() const;
+    QString type() const;
+    bool isInteger() const;
     UAVObject *object() const;
     UAVObjectField *field() const;
     int index() const;
@@ -106,8 +108,6 @@ public:
 
     void saveObjectToSD(UAVObject *obj);
     UAVObjectManager *getObjectManager();
-    static double listMean(QList<double> list);
-    static double listVar(QList<double> list);
 
     void addUAVObject(QString objectName, QList<int> *reloadGroups = NULL);
     void addUAVObject(UAVObject *objectName, QList<int> *reloadGroups = NULL);
@@ -221,11 +221,10 @@ private:
     QString m_outOfLimitsStyle;
     QTimer *m_realtimeUpdateTimer;
 
-    bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, double scale, bool hasLimits);
+    bool setWidgetFromField(QWidget *widget, UAVObjectField *field, WidgetBinding *binding);
 
-    QVariant getVariantFromWidget(QWidget *widget, double scale, const QString units);
-    bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale, QString units);
-    bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale);
+    QVariant getVariantFromWidget(QWidget *widget, WidgetBinding *binding);
+    bool setWidgetFromVariant(QWidget *widget, QVariant value, WidgetBinding *binding);
 
     void connectWidgetUpdatesToSlot(QWidget *widget, const char *function);
     void disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function);

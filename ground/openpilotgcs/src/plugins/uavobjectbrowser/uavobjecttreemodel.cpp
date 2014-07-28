@@ -99,7 +99,7 @@ void UAVObjectTreeModel::newObject(UAVObject *obj)
 
 void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
 {
-    TopTreeItem *root = obj->isSettings() ? m_settingsTree : m_nonSettingsTree;
+    TopTreeItem *root = obj->isSettingsObject() ? m_settingsTree : m_nonSettingsTree;
 
     TreeItem *parent  = root;
 
@@ -207,7 +207,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
         data.append(QString("[%1]").arg((field->getElementNames())[index]));
     }
 
-    FieldTreeItem *item;
+    FieldTreeItem *item = NULL;
     UAVObjectField::FieldType type = field->getType();
     switch (type) {
     case UAVObjectField::BITFIELD:
@@ -461,7 +461,7 @@ ObjectTreeItem *UAVObjectTreeModel::findObjectTreeItem(UAVObject *object)
 
 DataObjectTreeItem *UAVObjectTreeModel::findDataObjectTreeItem(UAVDataObject *obj)
 {
-    TopTreeItem *root = obj->isSettings() ? m_settingsTree : m_nonSettingsTree;
+    TopTreeItem *root = obj->isSettingsObject() ? m_settingsTree : m_nonSettingsTree;
 
     return root->findDataObjectTreeItemByObjectId(obj->getObjID());
 }
@@ -471,7 +471,7 @@ MetaObjectTreeItem *UAVObjectTreeModel::findMetaObjectTreeItem(UAVMetaObject *ob
     UAVDataObject *dataObject = qobject_cast<UAVDataObject *>(obj->getParentObject());
 
     Q_ASSERT(dataObject);
-    TopTreeItem *root = dataObject->isSettings() ? m_settingsTree : m_nonSettingsTree;
+    TopTreeItem *root = dataObject->isSettingsObject() ? m_settingsTree : m_nonSettingsTree;
     return root->findMetaObjectTreeItemByObjectId(obj->getObjID());
 }
 

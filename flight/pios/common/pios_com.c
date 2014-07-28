@@ -71,7 +71,7 @@ static struct pios_com_dev *PIOS_COM_alloc(void)
 {
     struct pios_com_dev *com_dev;
 
-    com_dev = (struct pios_com_dev *)pvPortMalloc(sizeof(struct pios_com_dev));
+    com_dev = (struct pios_com_dev *)pios_malloc(sizeof(struct pios_com_dev));
     if (!com_dev) {
         return NULL;
     }

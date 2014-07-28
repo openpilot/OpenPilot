@@ -45,6 +45,12 @@
 #include "cameradesired.h"
 #include "manualcontrolcommand.h"
 #include "taskinfo.h"
+#undef PIOS_INCLUDE_INSTRUMENTATION
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+#include <pios_instrumentation.h>
+static int8_t counter;
+// Counter 0xAC700001 total Actuator body execution time(excluding queue waits etc).
+#endif
 
 // Private constants
 #define MAX_QUEUE_SIZE       2
@@ -101,12 +107,11 @@ typedef struct {
 int32_t ActuatorStart()
 {
     // Start main task
-    xTaskCreate(actuatorTask, (signed char *)"Actuator", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+    xTaskCreate(actuatorTask, "Actuator", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ACTUATOR, taskHandle);
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_ACTUATOR);
 #endif
-
     return 0;
 }
 
@@ -128,6 +133,9 @@ int32_t ActuatorInitialize()
     ActuatorDesiredInitialize();
     queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
     ActuatorDesiredConnectQueue(queue);
+
+    // Register AccessoryDesired (Secondary input to this module)
+    AccessoryDesiredInitialize();
 
     // Primary output of this module
     ActuatorCommandInitialize();
@@ -166,7 +174,13 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
     ActuatorDesiredData desired;
     MixerStatusData mixerStatus;
     FlightStatusData flightStatus;
+    SystemSettingsThrustControlOptions thrustType;
+    float throttleDesired;
+    float collectiveDesired;
 
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+    counter = PIOS_Instrumentation_CreateCounter(0xAC700001);
+#endif
     /* Read initial values of ActuatorSettings */
     ActuatorSettingsData actuatorSettings;
 
@@ -193,7 +207,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         // Wait until the ActuatorDesired object is updated
         uint8_t rc = xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS);
-
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+        PIOS_Instrumentation_TimeStart(counter);
+#endif
         /* Process settings updated events even in timeout case so we always act on the latest settings */
         if (actuator_settings_updated) {
             actuator_settings_updated = false;
@@ -220,6 +236,41 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         FlightStatusGet(&flightStatus);
         ActuatorDesiredGet(&desired);
         ActuatorCommandGet(&command);
+        SystemSettingsThrustControlGet(&thrustType);
+
+        // read in throttle and collective -demultiplex thrust
+        switch (thrustType) {
+        case SYSTEMSETTINGS_THRUSTCONTROL_THROTTLE:
+            throttleDesired = desired.Thrust;
+            ManualControlCommandCollectiveGet(&collectiveDesired);
+            break;
+        case SYSTEMSETTINGS_THRUSTCONTROL_COLLECTIVE:
+            ManualControlCommandThrottleGet(&throttleDesired);
+            collectiveDesired = desired.Thrust;
+            break;
+        default:
+            ManualControlCommandThrottleGet(&throttleDesired);
+            ManualControlCommandCollectiveGet(&collectiveDesired);
+        }
+
+        bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
+
+        // safety settings
+        if (!armed) {
+            throttleDesired = 0;
+        }
+        if (throttleDesired <= 0.00f || !armed) {
+            // force set all other controls to zero if throttle is cut (previously set in Stabilization)
+            if (actuatorSettings.LowThrottleZeroAxis.Roll == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+                desired.Roll = 0;
+            }
+            if (actuatorSettings.LowThrottleZeroAxis.Pitch == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+                desired.Pitch = 0;
+            }
+            if (actuatorSettings.LowThrottleZeroAxis.Yaw == ACTUATORSETTINGS_LOWTHROTTLEZEROAXIS_TRUE) {
+                desired.Yaw = 0;
+            }
+        }
 
 #ifdef DIAG_MIXERSTATUS
         MixerStatusGet(&mixerStatus);
@@ -238,18 +289,18 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
 
         AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
-        bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
-        bool positiveThrottle = desired.Throttle >= 0.00f;
+        bool activeThrottle   = (throttleDesired < 0.00f || throttleDesired > 0.00f);
+        bool positiveThrottle = (throttleDesired > 0.00f);
         bool spinWhileArmed   = actuatorSettings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 
-        float curve1 = MixerCurve(desired.Throttle, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
+        float curve1 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve1, MIXERSETTINGS_THROTTLECURVE1_NUMELEM);
 
         // The source for the secondary curve is selectable
         float curve2 = 0;
         AccessoryDesiredData accessory;
         switch (mixerSettings.Curve2Source) {
         case MIXERSETTINGS_CURVE2SOURCE_THROTTLE:
-            curve2 = MixerCurve(desired.Throttle, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
+            curve2 = MixerCurve(throttleDesired, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_ROLL:
             curve2 = MixerCurve(desired.Roll, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
@@ -262,8 +313,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             curve2 = MixerCurve(desired.Yaw, mixerSettings.ThrottleCurve2, MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_COLLECTIVE:
-            ManualControlCommandCollectiveGet(&curve2);
-            curve2 = MixerCurve(curve2, mixerSettings.ThrottleCurve2,
+            curve2 = MixerCurve(collectiveDesired, mixerSettings.ThrottleCurve2,
                                 MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
             break;
         case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0:
@@ -295,7 +345,7 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                 continue;
             }
 
-            if ((mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) || (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_SERVO)) {
+            if ((mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) || (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_REVERSABLEMOTOR) || (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_SERVO)) {
                 status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dTSeconds);
             } else {
                 status[ct] = -1;
@@ -314,6 +364,16 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
                 else if ((spinWhileArmed && !positiveThrottle) ||
                          (status[ct] < 0)) {
                     status[ct] = 0;
+                }
+            }
+
+            // Reversable Motors are like Motors but go to neutral instead of minimum
+            if (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_REVERSABLEMOTOR) {
+                // If not armed or motor is inactive - no "spinwhilearmed" for this engine type
+                if (!armed || !activeThrottle) {
+                    filterAccumulator[ct] = 0;
+                    lastResult[ct] = 0;
+                    status[ct] = 0; // force neutral throttle
                 }
             }
 
@@ -399,6 +459,9 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             ActuatorCommandSet(&command);
             AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
         }
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+        PIOS_Instrumentation_TimeEnd(counter);
+#endif
     }
 }
 
@@ -419,6 +482,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
                    (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_PITCH] / 128.0f) * desired->Pitch) +
                    (((float)mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_YAW] / 128.0f) * desired->Yaw);
 
+    // note: no feedforward for reversable motors yet for safety reasons
     if (mixer->type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
         if (result < 0.0f) { // idle throttle
             result = 0.0f;
@@ -431,17 +495,17 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
         result += accumulator;
         if (period > 0.0f) {
             if (accumulator > 0.0f) {
-                float filter = mixerSettings->AccelTime / period;
-                if (filter < 1) {
-                    filter = 1;
+                float invFilter = period / mixerSettings->AccelTime;
+                if (invFilter > 1) {
+                    invFilter = 1;
                 }
-                accumulator -= accumulator / filter;
+                accumulator -= accumulator * invFilter;
             } else {
-                float filter = mixerSettings->DecelTime / period;
-                if (filter < 1) {
-                    filter = 1;
+                float invFilter = period / mixerSettings->DecelTime;
+                if (invFilter > 1) {
+                    invFilter = 1;
                 }
-                accumulator -= accumulator / filter;
+                accumulator -= accumulator * invFilter;
             }
         }
         filterAccumulator[index] = accumulator;
@@ -537,7 +601,7 @@ static void setFailsafe(const ActuatorSettingsData *actuatorSettings, const Mixe
     for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n) {
         if (mixers[n].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
             Channel[n] = actuatorSettings->ChannelMin[n];
-        } else if (mixers[n].type == MIXERSETTINGS_MIXER1TYPE_SERVO) {
+        } else if (mixers[n].type == MIXERSETTINGS_MIXER1TYPE_SERVO || mixers[n].type == MIXERSETTINGS_MIXER1TYPE_REVERSABLEMOTOR) {
             Channel[n] = actuatorSettings->ChannelNeutral[n];
         } else {
             Channel[n] = 0;

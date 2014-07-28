@@ -72,6 +72,9 @@ void replaceCommonTags(QString & out, ObjectInfo *info)
     // Replace $(ISSETTINGS) tag
     out.replace(QString("$(ISSETTINGS)"), boolTo01String(info->isSettings));
     out.replace(QString("$(ISSETTINGSTF)"), boolToTRUEFALSEString(info->isSettings));
+    // Replace $(ISPRIORITY) tag
+    out.replace(QString("$(ISPRIORITY)"), boolTo01String(info->isPriority));
+    out.replace(QString("$(ISPRIORITYTF)"), boolToTRUEFALSEString(info->isPriority));
     // Replace $(GCSACCESS) tag
     value = accessModeStr[info->gcsAccess];
     out.replace(QString("$(GCSACCESS)"), value);

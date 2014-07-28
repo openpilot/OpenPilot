@@ -148,7 +148,11 @@ static const uint8_t FULL_PREAMBLE[FIFO_SIZE] = {
     PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE,
     PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE
 }; // 64 bytes
-static const uint8_t HEADER[(TX_PREAMBLE_NIBBLES + 1) / 2 + 2] = { PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, SYNC_BYTE_1, SYNC_BYTE_2 };
+
+static const uint8_t HEADER[(TX_PREAMBLE_NIBBLES + 1) / 2 + 2] = {
+    PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, PREAMBLE_BYTE, SYNC_BYTE_1, SYNC_BYTE_2
+};
+
 static const uint8_t OUT_FF[64] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -159,8 +163,21 @@ static const uint8_t OUT_FF[64] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
+
 // The randomized channel list.
-static const uint8_t channel_list[] = { 68, 34, 2, 184, 166, 94, 204, 18, 47, 118, 239, 176, 5, 213, 218, 186, 104, 160, 199, 209, 231, 197, 92, 191, 88, 129, 40, 19, 93, 200, 156, 14, 247, 182, 193, 194, 208, 210, 248, 76, 244, 48, 179, 105, 25, 74, 155, 203, 39, 97, 195, 81, 83, 180, 134, 172, 235, 132, 198, 119, 207, 154, 0, 61, 140, 171, 245, 26, 95, 3, 22, 62, 169, 55, 127, 144, 45, 33, 170, 91, 158, 167, 63, 201, 41, 21, 190, 51, 103, 49, 189, 205, 240, 89, 181, 149, 6, 157, 249, 230, 115, 72, 163, 17, 29, 99, 28, 117, 219, 73, 78, 53, 69, 216, 161, 124, 110, 242, 214, 145, 13, 11, 220, 113, 138, 58, 54, 162, 237, 37, 152, 187, 232, 77, 126, 85, 38, 238, 173, 23, 188, 100, 131, 226, 31, 9, 114, 106, 221, 42, 233, 139, 4, 241, 96, 211, 8, 98, 121, 147, 24, 217, 27, 87, 122, 125, 135, 148, 178, 71, 206, 57, 141, 35, 30, 246, 159, 16, 32, 15, 229, 20, 12, 223, 150, 101, 79, 56, 102, 111, 174, 236, 137, 143, 52, 225, 64, 224, 112, 168, 243, 130, 108, 202, 123, 146, 228, 75, 46, 153, 7, 192, 175, 151, 222, 59, 82, 90, 1, 65, 109, 44, 165, 84, 43, 36, 128, 196, 67, 80, 136, 86, 70, 234, 66, 185, 10, 164, 177, 116, 50, 107, 183, 215, 212, 60, 227, 133, 120, 142 };
+static const uint8_t channel_list[] = {
+    68,  34,  2,   184, 166, 94,  204, 18,  47,  118, 239, 176, 5,   213, 218, 186, 104, 160, 199, 209, 231, 197, 92,
+    191, 88,  129, 40,  19,  93,  200, 156, 14,  247, 182, 193, 194, 208, 210, 248, 76,  244, 48,  179, 105, 25,  74,
+    155, 203, 39,  97,  195, 81,  83,  180, 134, 172, 235, 132, 198, 119, 207, 154, 0,   61,  140, 171, 245, 26,  95,
+    3,   22,  62,  169, 55,  127, 144, 45,  33,  170, 91,  158, 167, 63,  201, 41,  21,  190, 51,  103, 49,  189, 205,
+    240, 89,  181, 149, 6,   157, 249, 230, 115, 72,  163, 17,  29,  99,  28,  117, 219, 73,  78,  53,  69,  216, 161,
+    124, 110, 242, 214, 145, 13,  11,  220, 113, 138, 58,  54,  162, 237, 37,  152, 187, 232, 77,  126, 85,  38,  238,
+    173, 23,  188, 100, 131, 226, 31,  9,   114, 106, 221, 42,  233, 139, 4,   241, 96,  211, 8,   98,  121, 147, 24,
+    217, 27,  87,  122, 125, 135, 148, 178, 71,  206, 57,  141, 35,  30,  246, 159, 16,  32,  15,  229, 20,  12,  223,
+    150, 101, 79,  56,  102, 111, 174, 236, 137, 143, 52,  225, 64,  224, 112, 168, 243, 130, 108, 202, 123, 146, 228,
+    75,  46,  153, 7,   192, 175, 151, 222, 59,  82,  90,  1,   65,  109, 44,  165, 84,  43,  36,  128, 196, 67,  80,
+    136, 86,  70,  234, 66,  185, 10,  164, 177, 116, 50,  107, 183, 215, 212, 60,  227, 133, 120, 14
+};
 
 /* Local function forwared declarations */
 static void pios_rfm22_task(void *parameters);
@@ -457,7 +474,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
     pios_rfm22_inject_event(rfm22b_dev, RADIO_EVENT_INITIALIZE, false);
 
     // Start the driver task.  This task controls the radio state machine and removed all of the IO from the IRQ handler.
-    xTaskCreate(pios_rfm22_task, (signed char *)"PIOS_RFM22B_Task", STACK_SIZE_BYTES, (void *)rfm22b_dev, TASK_PRIORITY, &(rfm22b_dev->taskHandle));
+    xTaskCreate(pios_rfm22_task, "PIOS_RFM22B_Task", STACK_SIZE_BYTES, (void *)rfm22b_dev, TASK_PRIORITY, &(rfm22b_dev->taskHandle));
 
     return 0;
 }
@@ -2455,7 +2472,7 @@ static struct pios_rfm22b_dev *pios_rfm22_alloc(void)
 {
     struct pios_rfm22b_dev *rfm22b_dev;
 
-    rfm22b_dev = (struct pios_rfm22b_dev *)pvPortMalloc(sizeof(*rfm22b_dev));
+    rfm22b_dev = (struct pios_rfm22b_dev *)pios_malloc(sizeof(*rfm22b_dev));
     rfm22b_dev->spi_id = 0;
     if (!rfm22b_dev) {
         return NULL;

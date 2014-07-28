@@ -76,10 +76,12 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     // NOTE: we have channel indices from 0 to 9, but the convention for OP is Channel 1 to Channel 10.
     // Register for ActuatorSettings changes:
     for (unsigned int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
-        OutputChannelForm *form = new OutputChannelForm(i, this, i == 0);
+        OutputChannelForm *form = new OutputChannelForm(i, this);
+        form->moveTo(*(ui->channelLayout));
+
         connect(ui->channelOutTest, SIGNAL(toggled(bool)), form, SLOT(enableChannelTest(bool)));
         connect(form, SIGNAL(channelChanged(int, int)), this, SLOT(sendChannelTest(int, int)));
-        ui->channelLayout->addWidget(form);
+
         addWidget(form->ui.actuatorMin);
         addWidget(form->ui.actuatorNeutral);
         addWidget(form->ui.actuatorMax);
@@ -194,7 +196,7 @@ OutputChannelForm *ConfigOutputWidget::getOutputChannelForm(const int index) con
 /**
  * Set the label for a channel output assignement
  */
-void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
+void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString &str)
 {
     // FIXME: use signal/ slot approach
     UAVObjectField *field = obj->getField(str);
@@ -204,7 +206,7 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
     OutputChannelForm *outputChannelForm = getOutputChannelForm(index);
 
     if (outputChannelForm) {
-        outputChannelForm->setAssignment(str);
+        outputChannelForm->setName(str);
     }
 }
 
@@ -254,15 +256,15 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
     // Initialize output forms
     QList<OutputChannelForm *> outputChannelForms = findChildren<OutputChannelForm *>();
     foreach(OutputChannelForm * outputChannelForm, outputChannelForms) {
-        outputChannelForm->setAssignment(ChannelDesc[outputChannelForm->index()]);
+        outputChannelForm->setName(ChannelDesc[outputChannelForm->index()]);
 
         // init min,max,neutral
         int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
         int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
-        outputChannelForm->minmax(minValue, maxValue);
+        outputChannelForm->setRange(minValue, maxValue);
 
         int neutral  = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
-        outputChannelForm->neutral(neutral);
+        outputChannelForm->setNeutral(neutral);
     }
 
     // Get the SpinWhileArmed setting
@@ -349,10 +351,10 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
         int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
         int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
 
-        outputChannelForm->minmax(minValue, maxValue);
+        outputChannelForm->setRange(minValue, maxValue);
 
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
-        outputChannelForm->neutral(neutral);
+        outputChannelForm->setNeutral(neutral);
     }
 
     setDirty(dirty);
@@ -398,7 +400,7 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
 
 void ConfigOutputWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/WIGf", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/WIGf"), QUrl::StrictMode));
 }
 
 void ConfigOutputWidget::stopTests()

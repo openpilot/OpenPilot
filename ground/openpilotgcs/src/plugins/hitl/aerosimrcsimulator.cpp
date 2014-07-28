@@ -97,7 +97,7 @@ void AeroSimRCSimulator::transmitUpdate()
         roll     = actData.Roll;
         pitch    = -actData.Pitch;
         yaw      = actData.Yaw;
-        throttle = (actData.Throttle * 2.0) - 1.0;
+        throttle = (actData.Thrust * 2.0) - 1.0;
     }
     channels[0] = roll;
     channels[1] = pitch;

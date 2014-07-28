@@ -111,6 +111,7 @@ int32_t TxPIDInitialize(void)
             .obj    = AccessoryDesiredHandle(),
             .instId = 0,
             .event  = 0,
+            .lowPriority = false,
         };
         EventPeriodicCallbackCreate(&ev, updatePIDs, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
@@ -326,7 +327,7 @@ static void updatePIDs(UAVObjEvent *ev)
             break;
 
         case 2:
-            StabilizationSettingsBank2Set((StabilizationSettingsBank2Data *)&bank);
+            StabilizationSettingsBank3Set((StabilizationSettingsBank3Data *)&bank);
             break;
 
         default:

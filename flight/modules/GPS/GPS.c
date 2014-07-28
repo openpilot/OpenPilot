@@ -63,21 +63,24 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // ****************
 // Private constants
 
-#define GPS_TIMEOUT_MS           500
-
+#define GPS_TIMEOUT_MS             500
+// delay from detecting HomeLocation.Set == False before setting new homelocation
+// this prevent that a save with homelocation.Set = false triggered by gps ends saving
+// the new location with Set = true.
+#define GPS_HOMELOCATION_SET_DELAY 5000
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-        #define STACK_SIZE_BYTES 1024
+        #define STACK_SIZE_BYTES   1024
 #else
 #if defined(PIOS_GPS_MINIMAL)
-        #define STACK_SIZE_BYTES 500
+        #define STACK_SIZE_BYTES   500
 #else
-        #define STACK_SIZE_BYTES 650
+        #define STACK_SIZE_BYTES   650
 #endif // PIOS_GPS_MINIMAL
 #endif // PIOS_GPS_SETS_HOMELOCATION
 
-#define TASK_PRIORITY            (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY              (tskIDLE_PRIORITY + 1)
 
 // ****************
 // Private variables
@@ -108,7 +111,7 @@ int32_t GPSStart(void)
     if (gpsEnabled) {
         if (gpsPort) {
             // Start gps task
-            xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &gpsTaskHandle);
+            xTaskCreate(gpsTask, "GPS", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &gpsTaskHandle);
             PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, gpsTaskHandle);
             return 0;
         }
@@ -172,10 +175,10 @@ int32_t GPSInitialize(void)
         GPSSettingsDataProtocolGet(&gpsProtocol);
         switch (gpsProtocol) {
         case GPSSETTINGS_DATAPROTOCOL_NMEA:
-            gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
+            gps_rx_buffer = pios_malloc(NMEA_MAX_PACKET_LENGTH);
             break;
         case GPSSETTINGS_DATAPROTOCOL_UBX:
-            gps_rx_buffer = pvPortMalloc(sizeof(struct UBXPacket));
+            gps_rx_buffer = pios_malloc(sizeof(struct UBXPacket));
             break;
         default:
             gps_rx_buffer = NULL;
@@ -200,6 +203,9 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     portTickType xDelay = 100 / portTICK_RATE_MS;
     uint32_t timeNowMs  = xTaskGetTickCount() * portTICK_RATE_MS;
 
+#ifdef PIOS_GPS_SETS_HOMELOCATION
+    portTickType homelocationSetDelay = 0;
+#endif
     GPSPositionSensorData gpspositionsensor;
     GPSSettingsData gpsSettings;
 
@@ -260,7 +266,15 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                 HomeLocationGet(&home);
 
                 if (home.Set == HOMELOCATION_SET_FALSE) {
-                    setHomeLocation(&gpspositionsensor);
+                    if (homelocationSetDelay == 0) {
+                        homelocationSetDelay = xTaskGetTickCount();
+                    }
+                    if (xTaskGetTickCount() - homelocationSetDelay > GPS_HOMELOCATION_SET_DELAY) {
+                        setHomeLocation(&gpspositionsensor);
+                        homelocationSetDelay = 0;
+                    }
+                } else {
+                    homelocationSetDelay = 0;
                 }
 #endif
             } else if ((gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&

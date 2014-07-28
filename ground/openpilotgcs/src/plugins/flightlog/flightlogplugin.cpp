@@ -26,14 +26,15 @@
 #include <QtPlugin>
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
+#include <QtQuick>
 
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
 #include <QKeySequence>
 #include <coreplugin/modemanager.h>
-
-#include "flightlogdialog.h"
+#include "flightlogmanager.h"
+#include "uavobject.h"
 
 FlightLogPlugin::FlightLogPlugin() : m_logDialog(0)
 {}
@@ -72,10 +73,23 @@ bool FlightLogPlugin::initialize(const QStringList & args, QString *errMsg)
 void FlightLogPlugin::ShowLogManagementDialog()
 {
     if (!m_logDialog) {
-        m_logDialog = new FlightLogDialog(0, new FlightLogManager());
-        connect(m_logDialog, SIGNAL(finished(int)), this, SLOT(LogManagementDialogClosed()));
-        m_logDialog->show();
+        qmlRegisterType<ExtendedDebugLogEntry>("org.openpilot", 1, 0, "DebugLogEntry");
+        qmlRegisterType<UAVOLogSettingsWrapper>("org.openpilot", 1, 0, "UAVOLogSettingsWrapper");
+        FlightLogManager *flightLogManager = new FlightLogManager();
+        m_logDialog = new QQuickView();
+        m_logDialog->setIcon(QIcon(":/core/images/openpilot_logo_32.png"));
+        m_logDialog->setTitle(tr("Manage flight side logs"));
+        m_logDialog->rootContext()->setContextProperty("logStatus", flightLogManager->flightLogStatus());
+        m_logDialog->rootContext()->setContextProperty("logControl", flightLogManager->flightLogControl());
+        m_logDialog->rootContext()->setContextProperty("logSettings", flightLogManager->flightLogSettings());
+        m_logDialog->rootContext()->setContextProperty("logManager", flightLogManager);
+        m_logDialog->rootContext()->setContextProperty("logDialog", m_logDialog);
+        m_logDialog->setResizeMode(QQuickView::SizeRootObjectToView);
+        m_logDialog->setSource(QUrl("qrc:/flightlog/FlightLogDialog.qml"));
+        m_logDialog->setModality(Qt::ApplicationModal);
+        connect(m_logDialog, SIGNAL(destroyed()), this, SLOT(LogManagementDialogClosed()));
     }
+    m_logDialog->show();
 }
 
 void FlightLogPlugin::LogManagementDialogClosed()

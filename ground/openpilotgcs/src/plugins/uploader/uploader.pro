@@ -11,6 +11,10 @@ macx {
     QMAKE_CXXFLAGS  += -fpermissive
 }
 
+!macx {
+    QMAKE_CXXFLAGS += -Wno-enum-compare
+}
+
 HEADERS += uploadergadget.h \
     uploadergadgetconfiguration.h \
     uploadergadgetfactory.h \
@@ -42,15 +46,14 @@ SOURCES += uploadergadget.cpp \
     SSP/qsspt.cpp \
     runningdevicewidget.cpp
 
-OTHER_FILES += Uploader.pluginspec \
+OTHER_FILES += Uploader.pluginspec
 
 FORMS += \
     uploader.ui \
     devicewidget.ui \
     runningdevicewidget.ui
 
-RESOURCES += \
-    uploader.qrc
+RESOURCES += uploader.qrc
 
 exists( ../../../../../build/openpilotgcs-synthetics/opfw_resource.qrc ) {
     RESOURCES += ../../../../../build/openpilotgcs-synthetics/opfw_resource.qrc

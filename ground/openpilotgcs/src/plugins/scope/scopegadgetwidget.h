@@ -41,6 +41,8 @@
 #include <QVector>
 #include <QMutex>
 
+class QSettings;
+
 /*!
    \brief This class is used to render the time values on the horizontal axis for the
    ChronoPlot.
@@ -95,9 +97,14 @@ public:
     void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int meanSamples = 1,
                       QString mathFunction = "None", QPen pen = QPen(Qt::black), bool antialiased = true);
     void clearCurvePlots();
+
+    void saveState(QSettings *qSettings);
+    void restoreState(QSettings *qSettings);
+
     int csvLoggingStart();
     int csvLoggingStop();
     void csvLoggingSetName(QString);
+
     void setLoggingEnabled(bool value)
     {
         m_csvLoggingEnabled = value;

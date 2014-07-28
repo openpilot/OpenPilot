@@ -42,8 +42,10 @@ MODULES += FirmwareIAP
 MODULES += StateEstimation
 #MODULES += Sensors/simulated/Sensors
 MODULES += Airspeed
-MODULES += AltitudeHold
+#MODULES += AltitudeHold # now integrated in Stabilization
 #MODULES += OveroSync
+
+SRC += $(FLIGHTLIB)/notification.c
 
 # Paths
 OPSYSTEM = .
@@ -85,7 +87,6 @@ SRC += $(FLIGHTLIB)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(OPUAVOBJ)/callbackscheduler.c
 SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
@@ -93,15 +94,20 @@ SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/paths.c
+SRC += $(FLIGHTLIB)/plans.c
 SRC += $(FLIGHTLIB)/sanitycheck.c
 
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
+SRC += $(MATHLIB)/mathmisc.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
 SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
 SRC += $(PIOSCORECOMMON)/pios_debuglog.c
+SRC += $(PIOSCORECOMMON)/pios_callbackscheduler.c
 SRC += $(PIOSCORECOMMON)/pios_deltatime.c
+SRC += $(PIOSCORECOMMON)/pios_notify.c
+SRC += $(PIOSCORECOMMON)/pios_mem.c
 
 ## PIOS Hardware
 include $(PIOS)/posix/library.mk

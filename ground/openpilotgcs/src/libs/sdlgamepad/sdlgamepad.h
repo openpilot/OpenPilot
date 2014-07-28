@@ -20,17 +20,12 @@
  * mail.nalla@gmail.com
  */
 
-/**********************************************************************/
 #ifndef SDLGAMEPAD_H
 #define SDLGAMEPAD_H
 
-/**********************************************************************/
-#include <SDL/SDL.h>
-#undef main
-
-/**********************************************************************/
-#include <QThread>
 #include "sdlgamepad_global.h"
+
+#include <QThread>
 
 /**
  * The Axis range that is treated as null.
@@ -113,6 +108,8 @@ enum ButtonNumber {
  * @see SDLGamepad::axisValues()
  */
 typedef QList<qint16> QListInt16;
+
+class SDLGamepadPrivate;
 
 /**
  * A class for communication with a sdl gamepad.
@@ -227,17 +224,6 @@ public slots:
 private:
 
     /**
-     * Variable to control thread.
-     *
-     * This class member variable is false at construction time. If
-     * the sdl init was successfull it will be set to true. The quit
-     * slot will false it again.
-     *
-     * @see quit()
-     */
-    bool loop;
-
-    /**
      * Get new axes information from the SDL system.
      *
      * This class member is called from the run method to ask the SDL
@@ -260,6 +246,17 @@ private:
      * @see buttonState()
      */
     void updateButtons();
+
+    /**
+     * Variable to control thread.
+     *
+     * This class member variable is false at construction time. If
+     * the SDL init was successful it will be set to true. The quit
+     * slot will false it again.
+     *
+     * @see quit()
+     */
+    bool loop;
 
     /**
      * Number of buttons.
@@ -296,18 +293,16 @@ private:
     qint16 index;
 
     /**
-     * SDL_Joystick object.
-     *
-     * This represents the currently opend SDL_Joystick object.
-     */
-    SDL_Joystick *gamepad;
-
-    /**
      * A QList to store the current button states.
      *
-     * This list stores the current states of all avaliable buttons.
+     * This list stores the current states of all available buttons.
      */
     QList<qint16> buttonStates;
+
+    /**
+     * Variable that holds private members.
+     */
+    SDLGamepadPrivate *priv;
 
 signals:
 
@@ -354,5 +349,4 @@ signals:
     void axesValues(QListInt16 values);
 };
 
-/**********************************************************************/
 #endif // SDLGAMEPAD_H

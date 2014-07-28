@@ -53,7 +53,7 @@ static bool PIOS_SPI_validate(__attribute__((unused)) struct pios_spi_dev *com_d
 #if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_spi_dev *PIOS_SPI_alloc(void)
 {
-    return pvPortMalloc(sizeof(struct pios_spi_dev));
+    return pios_malloc(sizeof(struct pios_spi_dev));
 }
 #else
 static struct pios_spi_dev pios_spi_devs[PIOS_SPI_MAX_DEVS];

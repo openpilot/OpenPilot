@@ -2237,20 +2237,29 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
         sprintf(temp, "Stab3");
         break;
 #endif
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
+        sprintf(temp, "Stab4");
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
+        sprintf(temp, "Stab5");
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
+        sprintf(temp, "Stab6");
+        break;
     case FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE:
         sprintf(temp, "Tune");
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
-        sprintf(temp, "AHold");
-        break;
-    case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO:
-        sprintf(temp, "AVario");
-        break;
-    case FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL:
-        sprintf(temp, "VCont");
-        break;
     case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
         sprintf(temp, "PH");
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV	:
+        sprintf(temp, "PVFPV");
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
+        sprintf(temp, "PVLOS");
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
+        sprintf(temp, "PVNSEW");
         break;
     case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
         sprintf(temp, "RTB");
@@ -2263,6 +2272,9 @@ void draw_flight_mode(uint8_t FlightMode, int16_t x, int16_t y, int8_t char_size
         break;
     case FLIGHTSTATUS_FLIGHTMODE_POI:
         sprintf(temp, "POI");
+        break;
+    case FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE	:
+        sprintf(temp, "AutoCruise");
         break;
     default:
         sprintf(temp, "Mode%2d", FlightMode);
@@ -2955,7 +2967,7 @@ void updateGraphics()
 int32_t osdgenStart(void)
 {
     vSemaphoreCreateBinary(osdSemaphore);
-    xTaskCreate(osdgenTask, (signed char *)"OSDGEN", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
+    xTaskCreate(osdgenTask, "OSDGEN", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_OSDGEN, osdgenTaskHandle);
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_OSDGEN);

@@ -211,6 +211,7 @@ inline QString msgSendArgumentFailed()
 
 void mainMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
+    Q_UNUSED(context);
     QFile file(QDir::tempPath() + "/gcs.log");
 
     if (file.open(QIODevice::Append | QIODevice::Text)) {

@@ -231,7 +231,7 @@ int32_t AttitudeStart(void)
     gpsVelQueue   = xQueueCreate(1, sizeof(UAVObjEvent));
 
     // Start main task
-    xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
+    xTaskCreate(AttitudeTask, "Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, attitudeTaskHandle);
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
@@ -278,7 +278,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
         case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
             ret_val = updateAttitudeComplementary(first_run);
             break;
-        case REVOSETTINGS_FUSIONALGORITHM_INS13OUTDOOR:
+        case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
             ret_val = updateAttitudeINSGPS(first_run, true);
             break;
         case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
@@ -650,7 +650,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         if (airspeedSensor.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE) {
             // we have airspeed available
             airspeed.CalibratedAirspeed = airspeedSensor.CalibratedAirspeed;
-            airspeed.TrueAirspeed = airspeed.CalibratedAirspeed * IAS2TAS(homeLocation.Altitude - positionState.Down);
+            airspeed.TrueAirspeed = (airspeedSensor.TrueAirspeed < 0.f) ? airspeed.CalibratedAirspeed *IAS2TAS(homeLocation.Altitude - positionState.Down) : airspeedSensor.TrueAirspeed;
             AirspeedStateSet(&airspeed);
         }
     }
@@ -1072,13 +1072,23 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
         vel[2]   = gpsVelData.Down;
     }
 
+    // Copy the position into the UAVO
+    PositionStateData positionState;
+    PositionStateGet(&positionState);
+    positionState.North = Nav.Pos[0];
+    positionState.East  = Nav.Pos[1];
+    positionState.Down  = Nav.Pos[2];
+    PositionStateSet(&positionState);
+
+    // airspeed correction needs current positionState
     if (airspeed_updated) {
         // we have airspeed available
         AirspeedStateData airspeed;
         AirspeedStateGet(&airspeed);
 
         airspeed.CalibratedAirspeed = airspeedData.CalibratedAirspeed;
-        airspeed.TrueAirspeed = airspeed.CalibratedAirspeed * IAS2TAS(homeLocation.Altitude - Nav.Pos[2]);
+        airspeed.TrueAirspeed = (airspeedData.TrueAirspeed < 0.f) ? airspeed.CalibratedAirspeed *IAS2TAS(homeLocation.Altitude - positionState.Down) : airspeedData.TrueAirspeed;
+
         AirspeedStateSet(&airspeed);
 
         if (!gps_vel_updated && !gps_updated) {
@@ -1107,14 +1117,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
         INSCorrection(&magData.x, NED, vel, (baroData.Altitude + baroOffset), sensors);
     }
 
-    // Copy the position and velocity into the UAVO
-    PositionStateData positionState;
-    PositionStateGet(&positionState);
-    positionState.North = Nav.Pos[0];
-    positionState.East  = Nav.Pos[1];
-    positionState.Down  = Nav.Pos[2];
-    PositionStateSet(&positionState);
-
+    // Copy the velocity into the UAVO
     VelocityStateData velocityState;
     VelocityStateGet(&velocityState);
     velocityState.North = Nav.Vel[0];

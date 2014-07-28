@@ -107,6 +107,9 @@ void ConnectionDiagram::setupGraphicsScene()
             case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
                 elementsToShow << "hexa";
                 break;
+            case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
+                elementsToShow << "hexa-x";
+                break;
             case VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y:
                 elementsToShow << "hexa-y";
                 break;
@@ -155,7 +158,8 @@ void ConnectionDiagram::setupGraphicsScene()
 void ConnectionDiagram::setupGraphicsSceneItems(QList<QString> elementsToShow)
 {
     qreal z = 0;
-    QRectF backgBounds = m_renderer->boundsOnElement("background");
+
+    // QRectF backgBounds = m_renderer->boundsOnElement("background");
 
     foreach(QString elementId, elementsToShow) {
         if (m_renderer->elementExists(elementId)) {

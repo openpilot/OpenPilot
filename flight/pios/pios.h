@@ -81,8 +81,9 @@
 #include "queue.h"
 #include "semphr.h"
 #endif
-
 #include <stdbool.h>
+
+#include <pios_mem.h>
 
 #include <pios_architecture.h>
 
@@ -91,6 +92,14 @@
 #error PiOS Task Monitor requires PIOS_INCLUDE_FREERTOS to be defined
 #endif
 #include <pios_task_monitor.h>
+#endif
+
+/* PIOS CallbackScheduler */
+#ifdef PIOS_INCLUDE_CALLBACKSCHEDULER
+#ifndef PIOS_INCLUDE_FREERTOS
+#error PiOS CallbackScheduler requires PIOS_INCLUDE_FREERTOS to be defined
+#endif
+#include <pios_callbackscheduler.h>
 #endif
 
 /* PIOS bootloader helper */
@@ -220,6 +229,12 @@
 /* Eagle Tree Systems Airspeed MicroSensor V3 */
 #include <pios_etasv3.h>
 #endif
+
+#ifdef PIOS_INCLUDE_MS4525DO
+/* PixHawk Airspeed Sensor based on MS4525DO */
+#include <pios_ms4525do.h>
+#endif
+
 
 #ifdef PIOS_INCLUDE_HCSR04
 /* HC-SR04 Ultrasonic Sensor */

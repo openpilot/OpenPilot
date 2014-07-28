@@ -26,7 +26,6 @@
  */
 #include "config_cc_hw_widget.h"
 #include "hwsettings.h"
-
 #include <QDebug>
 #include <QStringList>
 #include <QWidget>
@@ -82,6 +81,18 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addWidgetBinding("HwSettings", "USB_VCPPort", m_telemetry->cbUsbVcp);
     addWidgetBinding("HwSettings", "TelemetrySpeed", m_telemetry->telemetrySpeed);
     addWidgetBinding("HwSettings", "GPSSpeed", m_telemetry->gpsSpeed);
+    // Add Gps protocol configuration
+
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings::DataFields hwSettingsData = hwSettings->getData();
+
+    if (hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_GPS] != HwSettings::OPTIONALMODULES_ENABLED) {
+        m_telemetry->gpsProtocol->setEnabled(false);
+        m_telemetry->gpsProtocol->setToolTip(tr("Enable GPS module and reboot the board to be able to select GPS protocol"));
+    } else {
+        addWidgetBinding("GPSSettings", "DataProtocol", m_telemetry->gpsProtocol);
+    }
+
     addWidgetBinding("HwSettings", "ComUsbBridgeSpeed", m_telemetry->comUsbBridgeSpeed);
     connect(m_telemetry->cchwHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
     enableSaveButtons(false);
@@ -136,7 +147,7 @@ void ConfigCCHWWidget::enableSaveButtons(bool enable)
 
 void ConfigCCHWWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/D4AUAQ", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/D4AUAQ"), QUrl::StrictMode));
 }
 
 /**

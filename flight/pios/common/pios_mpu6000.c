@@ -79,7 +79,7 @@ static struct mpu6000_dev *PIOS_MPU6000_alloc(void)
 {
     struct mpu6000_dev *mpu6000_dev;
 
-    mpu6000_dev = (struct mpu6000_dev *)pvPortMalloc(sizeof(*mpu6000_dev));
+    mpu6000_dev = (struct mpu6000_dev *)pios_malloc(sizeof(*mpu6000_dev));
     if (!mpu6000_dev) {
         return NULL;
     }

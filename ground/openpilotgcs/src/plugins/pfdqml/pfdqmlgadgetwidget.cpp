@@ -62,7 +62,12 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
         "GCSTelemetryStats" <<
         "SystemAlarms" <<
         "NedAccel" <<
-        "FlightBatteryState";
+        "FlightBatteryState" <<
+        "ActuatorDesired" <<
+        "TakeOffLocation" <<
+        "PathPlan" <<
+        "WaypointActive" <<
+        "OPLinkStatus";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -162,6 +167,7 @@ void PfdQmlGadgetWidget::setAltitudeFactor(double factor)
 
 void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
 {
+    Q_UNUSED(arg);
     setTerrainEnabled(m_terrainEnabled);
 }
 

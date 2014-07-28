@@ -69,6 +69,7 @@ SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_mpu6000.c
 SRC += $(PIOSCOMMON)/pios_mpxv.c
+SRC += $(PIOSCOMMON)/pios_ms4525do.c
 SRC += $(PIOSCOMMON)/pios_ms5611.c
 SRC += $(PIOSCOMMON)/pios_oplinkrcvr.c
 SRC += $(PIOSCOMMON)/pios_video.c
@@ -97,13 +98,17 @@ SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 ## PIOS system code
 SRC += $(PIOSCOMMON)/pios_task_monitor.c
-
+SRC += $(PIOSCOMMON)/pios_callbackscheduler.c
+SRC += $(PIOSCOMMON)/pios_notify.c
+SRC += $(PIOSCOMMON)/pios_instrumentation.c
+SRC += $(PIOSCOMMON)/pios_mem.c
 ## Misc library functions
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/sanitycheck.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
+SRC += $(MATHLIB)/mathmisc.c
 # Choose between printf-stdarg.c and printf2.c in the appropriate board Makefile
 
 ## Modules

@@ -28,12 +28,12 @@ GCS_LIBRARY_PATH
                   libQt5MultimediaWidgets.so.5 \
                   libQt5Quick.so.5 \
                   libQt5Qml.so.5 \
-                  libQt5V8.so.5 \
                   libQt5DBus.so.5 \
                   libQt5QuickParticles.so.5 \
                   libicui18n.so.51 \
                   libicuuc.so.51 \
-                  libicudata.so.51
+                  libicudata.so.51 \
+                  libqgsttools_p.so.1
 
         data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_LIBRARY_PATH\") $$addNewline()
         for(lib, QT_LIBS) {
@@ -56,6 +56,8 @@ GCS_LIBRARY_PATH
                          imageformats/libqmng.so \
                          imageformats/libqsvg.so \
                          imageformats/libqtiff.so \
+                         mediaservice/libgstaudiodecoder.so \
+                         mediaservice/libgstmediaplayer.so \
                          platforms/libqxcb.so \
                          sqldrivers/libqsqlite.so
         for(lib, QT_PLUGIN_LIBS) {
@@ -114,10 +116,8 @@ GCS_LIBRARY_PATH
         data_copy.target = FORCE
         QMAKE_EXTRA_TARGETS += data_copy
     }
-    # Windows release only, no debug target DLLs ending with 'd'
-    # It is assumed that SDL.dll can be found in the same directory as mingw32-make.exe
-    win32 {
 
+    win32 {
         # set debug suffix if needed
         CONFIG(debug, debug|release):DS = "d"
 
@@ -142,7 +142,6 @@ GCS_LIBRARY_PATH
                   Qt5MultimediaWidgets$${DS}.dll \
                   Qt5Quick$${DS}.dll \
                   Qt5Qml$${DS}.dll \
-                  Qt5V8$${DS}.dll \
                   icuin51.dll \
                   icudt51.dll \
                   icuuc51.dll
@@ -159,7 +158,8 @@ GCS_LIBRARY_PATH
                          imageformats \
                          platforms \
                          mediaservice \
-                         sqldrivers
+                         sqldrivers \
+			 opengl32_32
         for(dir, QT_PLUGIN_DIRS) {
             data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
         }
@@ -228,18 +228,19 @@ GCS_LIBRARY_PATH
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_QML]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
-        # copy MinGW DLLs
-        MINGW_DLLS = SDL.dll
-        for(dll, MINGW_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
-        }
-
         # copy OpenSSL DLLs
         OPENSSL_DLLS = \
             ssleay32.dll \
             libeay32.dll
         for(dll, OPENSSL_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(OPENSSL_DIR)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+        }
+
+        # copy OpenGL DLL
+        OPENGL_DLLS = \
+            opengl32_32/opengl32.dll
+        for(dll, OPENGL_DLLS) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(MESAWIN_DIR)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
         data_copy.target = FORCE

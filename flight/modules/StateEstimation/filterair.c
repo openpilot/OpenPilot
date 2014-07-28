@@ -50,14 +50,14 @@ struct data {
 // Private functions
 
 static int32_t init(stateFilter *self);
-static int32_t filter(stateFilter *self, stateEstimation *state);
+static filterResult filter(stateFilter *self, stateEstimation *state);
 
 
 int32_t filterAirInitialize(stateFilter *handle)
 {
     handle->init      = &init;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 
@@ -69,7 +69,7 @@ static int32_t init(stateFilter *self)
     return 0;
 }
 
-static int32_t filter(stateFilter *self, stateEstimation *state)
+static filterResult filter(stateFilter *self, stateEstimation *state)
 {
     struct data *this = (struct data *)self->localdata;
 
@@ -78,11 +78,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         this->altitude = state->baro[0];
     }
     // calculate true airspeed estimation
-    if (IS_SET(state->updated, SENSORUPDATES_airspeed)) {
+    if (IS_SET(state->updated, SENSORUPDATES_airspeed) && (state->airspeed[1] < 0.f)) {
         state->airspeed[1] = state->airspeed[0] * IAS2TAS(this->altitude);
     }
 
-    return 0;
+    return FILTERRESULT_OK;
 }
 
 

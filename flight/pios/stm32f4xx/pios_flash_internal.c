@@ -141,7 +141,7 @@ static struct pios_internal_flash_dev *PIOS_Flash_Internal_alloc(void)
 {
     struct pios_internal_flash_dev *flash_dev;
 
-    flash_dev = (struct pios_internal_flash_dev *)pvPortMalloc(sizeof(*flash_dev));
+    flash_dev = (struct pios_internal_flash_dev *)pios_malloc(sizeof(*flash_dev));
     if (!flash_dev) {
         return NULL;
     }

@@ -25,17 +25,110 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uploadergadgetwidget.h"
-#include "version_info/version_info.h"
-#include "flightstatus.h"
 
+#include "flightstatus.h"
+#include "delay.h"
+#include "devicewidget.h"
+#include "runningdevicewidget.h"
+
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/icore.h>
 #include <coreplugin/coreconstants.h>
+#include <coreplugin/connectionmanager.h>
 #include <uavtalk/telemetrymanager.h>
 
+#include <QDesktopServices>
+#include <QMessageBox>
+#include <QProgressBar>
 #include <QDebug>
 
 #define DFU_DEBUG true
 
+const int UploaderGadgetWidget::BOARD_EVENT_TIMEOUT = 20000;
 const int UploaderGadgetWidget::AUTOUPDATE_CLOSE_TIMEOUT = 7000;
+
+TimedDialog::TimedDialog(const QString &title, const QString &labelText, int timeout, QWidget *parent, Qt::WindowFlags flags) :
+    QProgressDialog(labelText, tr("Cancel"), 0, timeout, parent, flags), bar(new QProgressBar(this))
+{
+    setWindowTitle(title);
+    setAutoReset(false);
+    // open immediately...
+    setMinimumDuration(0);
+    // setup progress bar
+    bar->setRange(0, timeout);
+    bar->setFormat(tr("Timing out in %1 seconds").arg(timeout));
+    setBar(bar);
+}
+
+void TimedDialog::perform()
+{
+    setValue(value() + 1);
+    int remaining = bar->maximum() - bar->value();
+    if (remaining > 0) {
+        bar->setFormat(tr("Timing out in %1 seconds").arg(remaining));
+    } else {
+        bar->setFormat(tr("Timed out after %1 seconds").arg(bar->maximum()));
+    }
+}
+
+ConnectionWaiter::ConnectionWaiter(int targetDeviceCount, int timeout, QWidget *parent) : QObject(parent), eventLoop(this), timer(this), timeout(timeout), elapsed(0), targetDeviceCount(targetDeviceCount), result(ConnectionWaiter::Ok)
+{}
+
+int ConnectionWaiter::exec()
+{
+    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(deviceEvent()));
+    connect(USBMonitor::instance(), SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(deviceEvent()));
+
+    connect(&timer, SIGNAL(timeout()), this, SLOT(perform()));
+    timer.start(1000);
+
+    emit timeChanged(0);
+    eventLoop.exec();
+
+    return result;
+}
+
+void ConnectionWaiter::cancel()
+{
+    quit();
+    result = ConnectionWaiter::Canceled;
+}
+
+void ConnectionWaiter::quit()
+{
+    disconnect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(deviceEvent()));
+    disconnect(USBMonitor::instance(), SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(deviceEvent()));
+    timer.stop();
+    eventLoop.exit();
+}
+
+void ConnectionWaiter::perform()
+{
+    ++elapsed;
+    emit timeChanged(elapsed);
+    int remaining = timeout - elapsed * 1000;
+    if (remaining <= 0) {
+        result = ConnectionWaiter::TimedOut;
+        quit();
+    }
+}
+
+void ConnectionWaiter::deviceEvent()
+{
+    if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() == targetDeviceCount) {
+        quit();
+    }
+}
+
+int ConnectionWaiter::openDialog(const QString &title, const QString &labelText, int targetDeviceCount, int timeout, QWidget *parent, Qt::WindowFlags flags)
+{
+    TimedDialog dlg(title, labelText, timeout / 1000, parent, flags);
+    ConnectionWaiter waiter(targetDeviceCount, timeout, parent);
+
+    connect(&dlg, SIGNAL(canceled()), &waiter, SLOT(cancel()));
+    connect(&waiter, SIGNAL(timeChanged(int)), &dlg, SLOT(perform()));
+    return waiter.exec();
+}
 
 UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 {
@@ -44,16 +137,15 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     currentStep = IAP_STATE_READY;
     resetOnly   = false;
     dfu = NULL;
-    m_timer     = 0;
-    m_progress  = 0;
-    msg = new QErrorMessage(this);
+
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
-    connect(telMngr, SIGNAL(connected()), this, SLOT(versionMatchCheck()));
-
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
+
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(onPhysicalHWConnect()));
 
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(systemHalt()));
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
@@ -61,18 +153,15 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->safeBootButton, SIGNAL(clicked()), this, SLOT(systemSafeBoot()));
     connect(m_config->eraseBootButton, SIGNAL(clicked()), this, SLOT(systemEraseBoot()));
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(onPhisicalHWConnect()));
+
     getSerialPorts();
 
-    m_config->autoUpdateButton->setEnabled(autoUpdateCapable());
     connect(m_config->autoUpdateButton, SIGNAL(clicked()), this, SLOT(startAutoUpdate()));
     connect(m_config->autoUpdateOkButton, SIGNAL(clicked()), this, SLOT(closeAutoUpdate()));
+    m_config->autoUpdateButton->setEnabled(autoUpdateCapable());
     m_config->autoUpdateGroupBox->setVisible(false);
 
-    QIcon rbi;
-    rbi.addFile(QString(":uploader/images/view-refresh.svg"));
-    m_config->refreshPorts->setIcon(rbi);
+    m_config->refreshPorts->setIcon(QIcon(":uploader/images/view-refresh.svg"));
 
     bootButtonsSetEnable(false);
 
@@ -82,10 +171,8 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     // And check whether by any chance we are not already connected
     if (telMngr->isConnected()) {
         onAutopilotConnect();
-        versionMatchCheck();
     }
 }
-
 
 bool sortPorts(const QSerialPortInfo &s1, const QSerialPortInfo &s2)
 {
@@ -141,7 +228,7 @@ FlightStatus *UploaderGadgetWidget::getFlightStatus()
     Q_ASSERT(pm);
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objManager);
-    FlightStatus *status = dynamic_cast<FlightStatus *>(objManager->getObject(QString("FlightStatus")));
+    FlightStatus *status = dynamic_cast<FlightStatus *>(objManager->getObject("FlightStatus"));
     Q_ASSERT(status);
     return status;
 }
@@ -151,14 +238,12 @@ void UploaderGadgetWidget::bootButtonsSetEnable(bool enabled)
     m_config->bootButton->setEnabled(enabled);
     m_config->safeBootButton->setEnabled(enabled);
 
-
-    m_config->eraseBootButton->setEnabled(
-        enabled &&
-        // this feature is supported only on BL revision >= 4
-        ((dfu != NULL) && (dfu->devices[0].BL_Version >= 4)));
+    // this feature is supported only on BL revision >= 4
+    bool isBL4 = ((dfu != NULL) && (dfu->devices[0].BL_Version >= 4));
+    m_config->eraseBootButton->setEnabled(isBL4 && enabled);
 }
 
-void UploaderGadgetWidget::onPhisicalHWConnect()
+void UploaderGadgetWidget::onPhysicalHWConnect()
 {
     bootButtonsSetEnable(false);
     m_config->rescueButton->setEnabled(false);
@@ -190,7 +275,7 @@ void UploaderGadgetWidget::populate()
     }
     RunningDeviceWidget *dw = new RunningDeviceWidget(this);
     dw->populate();
-    m_config->systemElements->addTab(dw, QString("Connected Device"));
+    m_config->systemElements->addTab(dw, tr("Connected Device"));
 }
 
 /**
@@ -210,6 +295,14 @@ void UploaderGadgetWidget::onAutopilotDisconnect()
     }
 }
 
+static void sleep(int ms)
+{
+    QEventLoop eventLoop;
+    QTimer::singleShot(ms, &eventLoop, SLOT(quit()));
+
+    eventLoop.exec();
+}
+
 /**
    Tell the mainboard to go to bootloader:
    - Send the relevant IAP commands
@@ -221,7 +314,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVObject *fwIAP = dynamic_cast<UAVDataObject *>(objManager->getObject(QString("FirmwareIAPObj")));
+    UAVObject *fwIAP = dynamic_cast<UAVDataObject *>(objManager->getObject("FirmwareIAPObj"));
 
     switch (currentStep) {
     case IAP_STATE_READY:
@@ -235,39 +328,37 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
         connect(fwIAP, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(goToBootloader(UAVObject *, bool)));
         currentStep = IAP_STATE_STEP_1;
         clearLog();
-        log(QString("IAP Step 1"));
+        log("IAP Step 1");
         fwIAP->updated();
         break;
     case IAP_STATE_STEP_1:
         if (!success) {
-            log(QString("Oops, failure step 1"));
+            log("Oops, failure step 1");
             log("Reset did NOT happen");
             currentStep = IAP_STATE_READY;
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(goToBootloader(UAVObject *, bool)));
             m_config->haltButton->setEnabled(true);
             break;
         }
-        QTimer::singleShot(600, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(600);
         fwIAP->getField("Command")->setValue("2233");
         currentStep = IAP_STATE_STEP_2;
-        log(QString("IAP Step 2"));
+        log("IAP Step 2");
         fwIAP->updated();
         break;
     case IAP_STATE_STEP_2:
         if (!success) {
-            log(QString("Oops, failure step 2"));
+            log("Oops, failure step 2");
             log("Reset did NOT happen");
             currentStep = IAP_STATE_READY;
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(goToBootloader(UAVObject *, bool)));
             m_config->haltButton->setEnabled(true);
             break;
         }
-        QTimer::singleShot(600, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(600);
         fwIAP->getField("Command")->setValue("3344");
         currentStep = IAP_STEP_RESET;
-        log(QString("IAP Step 3"));
+        log("IAP Step 3");
         fwIAP->updated();
         break;
     case IAP_STEP_RESET:
@@ -286,14 +377,12 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
         QString dli = cm->getCurrentDevice().getConName();
         QString dlj = cm->getCurrentDevice().getConName();
         cm->disconnectDevice();
-        QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(200);
         // Tell connections to stop their polling threads: otherwise it will mess up DFU
         cm->suspendPolling();
-        QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(200);
         log("Board Halt");
-        m_config->boardStatus->setText("Bootloader");
+        m_config->boardStatus->setText(tr("Bootloader"));
         if (dlj.startsWith("USB")) {
             m_config->telemetryLink->setCurrentIndex(m_config->telemetryLink->findText("USB"));
         } else {
@@ -319,7 +408,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             dfu = NULL;
             cm->resumePolling();
             currentStep = IAP_STATE_READY;
-            m_config->boardStatus->setText("Bootloader?");
+            m_config->boardStatus->setText(tr("Bootloader?"));
             m_config->haltButton->setEnabled(true);
             return;
         }
@@ -330,15 +419,14 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             dfu = NULL;
             cm->resumePolling();
             currentStep = IAP_STATE_READY;
-            m_config->boardStatus->setText("Bootloader?");
+            m_config->boardStatus->setText(tr("Bootloader?"));
             return;
         }
         // dfu.StatusRequest();
 
-        QTimer::singleShot(500, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
+        sleep(500);
         dfu->findDevices();
-        log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
+        log(QString("Found %1 device(s).").arg(QString::number(dfu->numberOfDevices)));
         if (dfu->numberOfDevices < 0 || dfu->numberOfDevices > 3) {
             log("Inconsistent number of devices! Aborting");
             delete dfu;
@@ -358,7 +446,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             dw->setDeviceID(i);
             dw->setDfu(dfu);
             dw->populate();
-            m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
+            m_config->systemElements->addTab(dw, tr("Device") + QString::number(i));
         }
 
         // Need to re-enable in case we were not connected
@@ -380,20 +468,14 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
 
 void UploaderGadgetWidget::systemHalt()
 {
-    FlightStatus *status = getFlightStatus();
-
     // The board can not be halted when in armed state.
     // If board is armed, or arming. Show message with notice.
+    FlightStatus *status = getFlightStatus();
+
     if (status->getArmed() == FlightStatus::ARMED_DISARMED) {
         goToBootloader();
     } else {
-        QMessageBox mbox(this);
-        mbox.setText(QString(tr("The controller board is armed and can not be halted.\n\n"
-                                "Please make sure the board is not armed and then press halt again to proceed\n"
-                                "or use the rescue option to force a firmware upgrade.")));
-        mbox.setStandardButtons(QMessageBox::Ok);
-        mbox.setIcon(QMessageBox::Warning);
-        mbox.exec();
+        cannotHaltMessageBox();
     }
 }
 
@@ -418,13 +500,7 @@ void UploaderGadgetWidget::systemReset()
         log("Board Reset initiated.");
         goToBootloader();
     } else {
-        QMessageBox mbox(this);
-        mbox.setText(QString(tr("The controller board is armed and can not be reset.\n\n"
-                                "Please make sure the board is not armed and then press reset again to proceed\n"
-                                "or power cycle to force a board reset.")));
-        mbox.setStandardButtons(QMessageBox::Ok);
-        mbox.setIcon(QMessageBox::Warning);
-        mbox.exec();
+        cannotResetMessageBox();
     }
 }
 
@@ -440,19 +516,16 @@ void UploaderGadgetWidget::systemSafeBoot()
 
 void UploaderGadgetWidget::systemEraseBoot()
 {
-    QMessageBox msgBox;
-    int result;
-
-    msgBox.setWindowTitle(tr("Erase Settings"));
-    msgBox.setInformativeText(tr("Do you want to erase all settings from the board?\nSettings cannot be recovered after this operation.\nThe board will be restarted and all the setting erased"));
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel | QMessageBox::Help);
-    result = msgBox.exec();
-    if (result == QMessageBox::Ok) {
+    switch (confirmEraseSettingsMessageBox()) {
+    case QMessageBox::Ok:
         commonSystemBoot(true, true);
-    } else if (result == QMessageBox::Help) {
+        break;
+    case QMessageBox::Help:
         QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/display/Doc/Erase+board+settings"), QUrl::StrictMode));
+        break;
     }
 }
+
 
 /**
  * Tells the system to boot (from Bootloader state)
@@ -494,7 +567,7 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot, bool erase)
     cm->resumePolling();
     m_config->rescueButton->setEnabled(true);
     m_config->telemetryLink->setEnabled(true);
-    m_config->boardStatus->setText("Running");
+    m_config->boardStatus->setText(tr("Running"));
     if (currentStep == IAP_STATE_BOOTLOADER) {
         // Freeze the tabs, they are not useful anymore and their buttons
         // will cause segfaults or weird stuff if we use them.
@@ -531,32 +604,25 @@ bool UploaderGadgetWidget::autoUpdate()
         delete dfu;
         dfu = NULL;
     }
-    QEventLoop loop;
-    QTimer timer;
-    timer.setSingleShot(true);
-    connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-    while (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
-        emit autoUpdateSignal(WAITING_DISCONNECT, QVariant());
-        if (QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("Please disconnect your OpenPilot board"), QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
-            emit autoUpdateSignal(FAILURE, QVariant());
+
+    if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
+        // wait for all boards to be disconnected
+        ConnectionWaiter waiter(0, BOARD_EVENT_TIMEOUT);
+        connect(&waiter, SIGNAL(timeChanged(int)), this, SLOT(autoUpdateDisconnectProgress(int)));
+        if (waiter.exec() == ConnectionWaiter::TimedOut) {
+            emit autoUpdateSignal(FAILURE, QVariant(tr("Timed out while waiting for all boards to be disconnected!")));
             return false;
         }
-        timer.start(500);
-        loop.exec();
     }
-    emit autoUpdateSignal(WAITING_CONNECT, 0);
-    autoUpdateConnectTimeout = 0;
-    m_timer = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(performAuto()));
-    m_timer->start(1000);
-    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), &m_eventloop, SLOT(quit()));
-    m_eventloop.exec();
-    if (!m_timer->isActive()) {
-        m_timer->stop();
-        emit autoUpdateSignal(FAILURE, QVariant());
+
+    // wait for a board to connect
+    ConnectionWaiter waiter(1, BOARD_EVENT_TIMEOUT);
+    connect(&waiter, SIGNAL(timeChanged(int)), this, SLOT(autoUpdateConnectProgress(int)));
+    if (waiter.exec() == ConnectionWaiter::TimedOut) {
+        emit autoUpdateSignal(FAILURE, QVariant(tr("Timed out while waiting for a board to be connected!")));
         return false;
     }
-    m_timer->stop();
+
     dfu = new DFUObject(DFU_DEBUG, false, QString());
     dfu->AbortOperation();
     emit autoUpdateSignal(JUMP_TO_BL, QVariant());
@@ -581,6 +647,7 @@ bool UploaderGadgetWidget::autoUpdate()
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;
     }
+
     QString filename;
     emit autoUpdateSignal(LOADING_FW, QVariant());
     switch (dfu->devices[0].ID) {
@@ -617,9 +684,10 @@ bool UploaderGadgetWidget::autoUpdate()
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;
     }
+    QEventLoop eventLoop;
     firmware = file.readAll();
-    connect(dfu, SIGNAL(progressUpdated(int)), this, SLOT(autoUpdateProgress(int)));
-    connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &m_eventloop, SLOT(quit()));
+    connect(dfu, SIGNAL(progressUpdated(int)), this, SLOT(autoUpdateFlashProgress(int)));
+    connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &eventLoop, SLOT(quit()));
     emit autoUpdateSignal(UPLOADING_FW, QVariant());
     if (!dfu->enterDFU(0)) {
         emit autoUpdateSignal(FAILURE, QVariant());
@@ -630,7 +698,7 @@ bool UploaderGadgetWidget::autoUpdate()
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;
     }
-    m_eventloop.exec();
+    eventLoop.exec();
     QByteArray desc = firmware.right(100);
     emit autoUpdateSignal(UPLOADING_DESC, QVariant());
     if (dfu->UploadDescription(desc) != OP_DFU::Last_operation_Success) {
@@ -642,7 +710,17 @@ bool UploaderGadgetWidget::autoUpdate()
     return true;
 }
 
-void UploaderGadgetWidget::autoUpdateProgress(int value)
+void UploaderGadgetWidget::autoUpdateDisconnectProgress(int value)
+{
+    emit autoUpdateSignal(WAITING_DISCONNECT, value);
+}
+
+void UploaderGadgetWidget::autoUpdateConnectProgress(int value)
+{
+    emit autoUpdateSignal(WAITING_CONNECT, value);
+}
+
+void UploaderGadgetWidget::autoUpdateFlashProgress(int value)
 {
     emit autoUpdateSignal(UPLOADING_FW, value);
 }
@@ -658,62 +736,62 @@ void UploaderGadgetWidget::systemRescue()
     cm->disconnectDevice();
     // stop the polling thread: otherwise it will mess up DFU
     cm->suspendPolling();
+
     // Delete all previous tabs:
     while (m_config->systemElements->count()) {
         QWidget *qw = m_config->systemElements->widget(0);
         m_config->systemElements->removeTab(0);
         delete qw;
     }
+
     // Existing DFU objects will have a handle over USB and will
     // disturb everything for the rescue process:
     if (dfu) {
         delete dfu;
         dfu = NULL;
     }
+
     // Avoid users pressing Rescue twice.
     m_config->rescueButton->setEnabled(false);
 
-    // Now we're good to go:
+    // Now we're good to go
     clearLog();
     log("**********************************************************");
     log("** Follow those instructions to attempt a system rescue **");
     log("**********************************************************");
     log("You will be prompted to first connect USB, then system power");
+
+    // Check if boards are connected and, if yes, prompt user to disconnect them all
     if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
-        if (QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("Please disconnect your OpenPilot board"), QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
+        QString labelText = QString("<p align=\"left\">%1</p>").arg(tr("Please disconnect your OpenPilot board."));
+        int result = ConnectionWaiter::openDialog(tr("System Rescue"), labelText, 0, BOARD_EVENT_TIMEOUT, this);
+        switch (result) {
+        case ConnectionWaiter::Canceled:
+            m_config->rescueButton->setEnabled(true);
+            return;
+
+        case ConnectionWaiter::TimedOut:
+            QMessageBox::warning(this, tr("System Rescue"), tr("Timed out while waiting for all boards to be disconnected!"));
             m_config->rescueButton->setEnabled(true);
             return;
         }
     }
-    // Now we're good to go:
-    clearLog();
-    log("**********************************************************");
-    log("** Follow those instructions to attempt a system rescue **");
-    log("**********************************************************");
-    log("You will be prompted to first connect USB, then system power");
-    m_progress = new QProgressDialog(tr("Please connect your OpenPilot board (USB only!)"), tr("Cancel"), 0, 20);
-    QProgressBar *bar = new QProgressBar(m_progress);
-    bar->setFormat("Timeout");
-    m_progress->setBar(bar);
-    m_progress->setMinimumDuration(0);
-    m_progress->setRange(0, 20);
-    connect(m_progress, SIGNAL(canceled()), this, SLOT(cancel()));
-    m_timer = new QTimer(this);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(perform()));
-    m_timer->start(1000);
-    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)), &m_eventloop, SLOT(quit()));
-    m_eventloop.exec();
-    if (!m_timer->isActive()) {
-        m_progress->close();
-        m_timer->stop();
-        QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("No board connection was detected!"));
+
+    // Now prompt user to connect board
+    QString labelText = QString("<p align=\"left\">%1<br>%2</p>").arg(tr("Please connect your OpenPilot board.")).arg(tr("Board must be connected to the USB port!"));
+    int result = ConnectionWaiter::openDialog(tr("System Rescue"), labelText, 1, BOARD_EVENT_TIMEOUT, this);
+    switch (result) {
+    case ConnectionWaiter::Canceled:
+        m_config->rescueButton->setEnabled(true);
+        return;
+
+    case ConnectionWaiter::TimedOut:
+        QMessageBox::warning(this, tr("System Rescue"), tr("Timed out while waiting for a board to be connected!"));
         m_config->rescueButton->setEnabled(true);
         return;
     }
-    m_progress->close();
-    m_timer->stop();
-    log("... Detecting First Board...");
-    repaint();
+
+    log("Detecting first board...");
     dfu = new DFUObject(DFU_DEBUG, false, QString());
     dfu->AbortOperation();
     if (!dfu->enterDFU(0)) {
@@ -732,7 +810,8 @@ void UploaderGadgetWidget::systemRescue()
         m_config->rescueButton->setEnabled(true);
         return;
     }
-    log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
+    log(QString("Found %1 device(s).").arg(dfu->numberOfDevices));
+
     if (dfu->numberOfDevices > 5) {
         log("Inconsistent number of devices, aborting!");
         delete dfu;
@@ -747,36 +826,15 @@ void UploaderGadgetWidget::systemRescue()
         dw->setDeviceID(i);
         dw->setDfu(dfu);
         dw->populate();
-        m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
+        m_config->systemElements->addTab(dw, tr("Device") + QString::number(i));
     }
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
     bootButtonsSetEnable(true);
     m_config->rescueButton->setEnabled(false);
-    currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
-}
 
-void UploaderGadgetWidget::perform()
-{
-    if (m_progress->value() == 19) {
-        m_timer->stop();
-        m_eventloop.exit();
-    }
-    m_progress->setValue(m_progress->value() + 1);
-}
-void UploaderGadgetWidget::performAuto()
-{
-    ++autoUpdateConnectTimeout;
-    emit autoUpdateSignal(WAITING_CONNECT, autoUpdateConnectTimeout * 5);
-    if (autoUpdateConnectTimeout == 20) {
-        m_timer->stop();
-        m_eventloop.exit();
-    }
-}
-void UploaderGadgetWidget::cancel()
-{
-    m_timer->stop();
-    m_eventloop.exit();
+    // So that we can boot from the GUI afterwards.
+    currentStep = IAP_STATE_BOOTLOADER;
 }
 
 void UploaderGadgetWidget::uploadStarted()
@@ -823,6 +881,7 @@ void UploaderGadgetWidget::startAutoUpdate()
     m_config->splitter->setEnabled(false);
     m_config->autoUpdateGroupBox->setVisible(true);
     m_config->autoUpdateOkButton->setEnabled(false);
+
     connect(this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::AutoUpdateStep, QVariant)));
     autoUpdate();
 }
@@ -831,14 +890,13 @@ void UploaderGadgetWidget::finishAutoUpdate()
 {
     disconnect(this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::AutoUpdateStep, QVariant)));
     m_config->autoUpdateOkButton->setEnabled(true);
-    connect(&autoUpdateCloseTimer, SIGNAL(timeout()), this, SLOT(closeAutoUpdate()));
-    autoUpdateCloseTimer.start(AUTOUPDATE_CLOSE_TIMEOUT);
+
+    // wait a bit and "close" auto update
+    QTimer::singleShot(AUTOUPDATE_CLOSE_TIMEOUT, this, SLOT(closeAutoUpdate()));
 }
 
 void UploaderGadgetWidget::closeAutoUpdate()
 {
-    autoUpdateCloseTimer.stop();
-    disconnect(&autoUpdateCloseTimer, SIGNAL(timeout()), this, SLOT(closeAutoUpdate()));
     m_config->autoUpdateGroupBox->setVisible(false);
     m_config->buttonFrame->setEnabled(true);
     m_config->splitter->setEnabled(true);
@@ -846,37 +904,57 @@ void UploaderGadgetWidget::closeAutoUpdate()
 
 void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value)
 {
+    QString msg;
+    int remaining;
+
     switch (status) {
     case uploader::WAITING_DISCONNECT:
-        m_config->autoUpdateLabel->setText("Waiting for all OpenPilot boards to be disconnected from USB.");
+        m_config->autoUpdateLabel->setText(tr("Waiting for all OpenPilot boards to be disconnected from USB."));
+        m_config->autoUpdateProgressBar->setMaximum(BOARD_EVENT_TIMEOUT / 1000);
+        m_config->autoUpdateProgressBar->setValue(value.toInt());
+        remaining = m_config->autoUpdateProgressBar->maximum() - m_config->autoUpdateProgressBar->value();
+        m_config->autoUpdateProgressBar->setFormat(tr("Timing out in %1 seconds").arg(remaining));
         break;
     case uploader::WAITING_CONNECT:
-        m_config->autoUpdateLabel->setText("Please connect the OpenPilot board to the USB port.");
+        m_config->autoUpdateLabel->setText(tr("Please connect the OpenPilot board to the USB port."));
+        m_config->autoUpdateProgressBar->setMaximum(BOARD_EVENT_TIMEOUT / 1000);
         m_config->autoUpdateProgressBar->setValue(value.toInt());
+        remaining = m_config->autoUpdateProgressBar->maximum() - m_config->autoUpdateProgressBar->value();
+        m_config->autoUpdateProgressBar->setFormat(tr("Timing out in %1 seconds").arg(remaining));
         break;
     case uploader::JUMP_TO_BL:
         m_config->autoUpdateProgressBar->setValue(0);
-        m_config->autoUpdateLabel->setText("Bringing the board into boot loader mode.");
+        m_config->autoUpdateLabel->setText(tr("Bringing the board into boot loader mode."));
         break;
     case uploader::LOADING_FW:
-        m_config->autoUpdateLabel->setText("Preparing to upload firmware to the board.");
+        m_config->autoUpdateLabel->setText(tr("Preparing to upload firmware to the board."));
         break;
     case uploader::UPLOADING_FW:
-        m_config->autoUpdateLabel->setText("Uploading firmware to the board.");
+        m_config->autoUpdateLabel->setText(tr("Uploading firmware to the board."));
+        m_config->autoUpdateProgressBar->setFormat("%p%");
+        m_config->autoUpdateProgressBar->setMaximum(100);
         m_config->autoUpdateProgressBar->setValue(value.toInt());
         break;
     case uploader::UPLOADING_DESC:
-        m_config->autoUpdateLabel->setText("Uploading description of the new firmware to the board.");
+        m_config->autoUpdateLabel->setText(tr("Uploading description of the new firmware to the board."));
         break;
     case uploader::BOOTING:
-        m_config->autoUpdateLabel->setText("Rebooting the board.");
+        m_config->autoUpdateLabel->setText(tr("Rebooting the board."));
         break;
     case uploader::SUCCESS:
-        m_config->autoUpdateLabel->setText("<font color='green'>Board was updated successfully, press OK to finish.</font>");
+        m_config->autoUpdateProgressBar->setValue(m_config->autoUpdateProgressBar->maximum());
+        msg  = tr("Board was updated successfully.");
+        msg += " " + tr("Press OK to finish.");
+        m_config->autoUpdateLabel->setText(QString("<font color='green'>%1</font>").arg(msg));
         finishAutoUpdate();
         break;
     case uploader::FAILURE:
-        m_config->autoUpdateLabel->setText("<font color='red'>Something went wrong, you will have to manually upgrade the board. Press OK to continue.</font>");
+        msg = value.toString();
+        if (msg.isEmpty()) {
+            msg = tr("Something went wrong, you will have to manually upgrade the board.");
+        }
+        msg += " " + tr("Press OK to finish.");
+        m_config->autoUpdateLabel->setText(QString("<font color='red'>%1</font>").arg(msg));
         finishAutoUpdate();
         break;
     }
@@ -887,9 +965,8 @@ void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVa
  */
 void UploaderGadgetWidget::log(QString str)
 {
-    qDebug() << str;
+    qDebug() << "UploaderGadgetWidget -" << str;
     m_config->textBrowser->append(str);
-    m_config->textBrowser->repaint();
 }
 
 void UploaderGadgetWidget::clearLog()
@@ -908,92 +985,45 @@ UploaderGadgetWidget::~UploaderGadgetWidget()
         delete qw;
         qw = 0;
     }
-    if (m_progress) {
-        delete m_progress;
-        m_progress = 0;
-    }
-    if (m_timer) {
-        delete m_timer;
-        m_timer = 0;
-    }
-}
-
-
-/**
-   Shows a message box with an error string.
-
-   @param errorString	The error string to display.
-
-   @param errorNumber      Not used
-
- */
-void UploaderGadgetWidget::error(QString errorString, int errorNumber)
-{
-    Q_UNUSED(errorNumber);
-    QMessageBox msgBox;
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.setText(errorString);
-    msgBox.exec();
-    m_config->boardStatus->setText(errorString);
-}
-
-/**
-   Shows a message box with an information string.
-
-   @param infoString	The information string to display.
-
-   @param infoNumber       Not used
-
- */
-void UploaderGadgetWidget::info(QString infoString, int infoNumber)
-{
-    Q_UNUSED(infoNumber);
-    m_config->boardStatus->setText(infoString);
-}
-
-void UploaderGadgetWidget::versionMatchCheck()
-{
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
-    deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
-    QByteArray uavoHashArray;
-    QString uavoHash = VersionInfo::uavoHashArray();
-
-
-    uavoHash.chop(2);
-    uavoHash.remove(0, 2);
-    uavoHash = uavoHash.trimmed();
-    bool ok;
-    foreach(QString str, uavoHash.split(",")) {
-        uavoHashArray.append(str.toInt(&ok, 16));
-    }
-
-    QByteArray fwVersion = boardDescription.uavoHash;
-    if (fwVersion != uavoHashArray) {
-        QString gcsDescription = VersionInfo::revision();
-        QString gcsGitHash     = gcsDescription.mid(gcsDescription.indexOf(":") + 1, 8);
-        gcsGitHash.remove(QRegExp("^[0]*"));
-        QString gcsGitDate     = gcsDescription.mid(gcsDescription.indexOf(" ") + 1, 14);
-
-        QString gcsUavoHashStr;
-        QString fwUavoHashStr;
-        foreach(char i, fwVersion) {
-            fwUavoHashStr.append(QString::number(i, 16).right(2));
-        }
-        foreach(char i, uavoHashArray) {
-            gcsUavoHashStr.append(QString::number(i, 16).right(2));
-        }
-        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-" + gcsUavoHashStr.left(8) + ")";
-        QString fwVersion  = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.left(8) + ")";
-
-        QString warning    = QString(tr(
-                                         "GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. "
-                                         "GCS version: %1 Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
-        msg->showMessage(warning);
-    }
 }
 
 void UploaderGadgetWidget::openHelp()
 {
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/AoBZ", QUrl::StrictMode));
+    QDesktopServices::openUrl(QUrl(tr("http://wiki.openpilot.org/x/AoBZ"), QUrl::StrictMode));
+}
+
+int UploaderGadgetWidget::confirmEraseSettingsMessageBox()
+{
+    QMessageBox msgBox(this);
+
+    msgBox.setWindowTitle(tr("Confirm Settings Erase?"));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(tr("Do you want to erase all settings from the board?"));
+    msgBox.setInformativeText(tr("Settings cannot be recovered after this operation.\nThe board will be restarted and all settings erased."));
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel | QMessageBox::Help);
+    return msgBox.exec();
+}
+
+int UploaderGadgetWidget::cannotHaltMessageBox()
+{
+    QMessageBox msgBox(this);
+
+    msgBox.setWindowTitle(tr("Cannot Halt Board!"));
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(tr("The controller board is armed and can not be halted."));
+    msgBox.setInformativeText(tr("Please make sure the board is not armed and then press Halt again to proceed or use Rescue to force a firmware upgrade."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    return msgBox.exec();
+}
+
+int UploaderGadgetWidget::cannotResetMessageBox()
+{
+    QMessageBox msgBox(this);
+
+    msgBox.setWindowTitle(tr("Cannot Reset Board!"));
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(tr("The controller board is armed and can not be reset."));
+    msgBox.setInformativeText(tr("Please make sure the board is not armed and then press reset again to proceed or power cycle to force a board reset."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    return msgBox.exec();
 }

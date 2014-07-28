@@ -108,6 +108,7 @@ struct UAVOBase {
         bool isMeta        : 1;
         bool isSingle      : 1;
         bool isSettings    : 1;
+        bool isPriority    : 1;
     } flags;
 } __attribute__((packed));
 
@@ -277,7 +278,7 @@ static struct UAVOData *UAVObjAllocSingle(uint32_t num_bytes)
     uint32_t object_size = sizeof(struct UAVOSingle) + num_bytes;
 
     /* Allocate the object from the heap */
-    struct UAVOSingle *uavo_single = (struct UAVOSingle *)pvPortMalloc(object_size);
+    struct UAVOSingle *uavo_single = (struct UAVOSingle *)pios_malloc(object_size);
 
     if (!uavo_single) {
         return NULL;
@@ -302,7 +303,7 @@ static struct UAVOData *UAVObjAllocMulti(uint32_t num_bytes)
     uint32_t object_size = sizeof(struct UAVOMulti) + num_bytes;
 
     /* Allocate the object from the heap */
-    struct UAVOMulti *uavo_multi = (struct UAVOMulti *)pvPortMalloc(object_size);
+    struct UAVOMulti *uavo_multi = (struct UAVOMulti *)pios_malloc(object_size);
 
     if (!uavo_multi) {
         return NULL;
@@ -339,7 +340,7 @@ static struct UAVOData *UAVObjAllocMulti(uint32_t num_bytes)
  * \return
  */
 UAVObjHandle UAVObjRegister(uint32_t id,
-                            int32_t isSingleInstance, int32_t isSettings,
+                            bool isSingleInstance, bool isSettings, bool isPriority,
                             uint32_t num_bytes,
                             UAVObjInitializeCallback initCb)
 {
@@ -368,8 +369,11 @@ UAVObjHandle UAVObjRegister(uint32_t id,
     uavo_data->instance_size = num_bytes;
     if (isSettings) {
         uavo_data->base.flags.isSettings = true;
+        // settings defaults to being sent with priority
+        uavo_data->base.flags.isPriority = true;
+    } else {
+        uavo_data->base.flags.isPriority = isPriority;
     }
-
     /* Initialize the embedded meta UAVO */
     UAVObjInitMetaData(&uavo_data->metaObj);
 
@@ -604,6 +608,22 @@ bool UAVObjIsSettings(UAVObjHandle obj_handle)
 
     return uavo_base->flags.isSettings;
 }
+
+/**
+ * Is this a prioritized object?
+ * \param[in] obj The object handle
+ * \return True (1) if this is a prioritized object
+ */
+bool UAVObjIsPriority(UAVObjHandle obj_handle)
+{
+    PIOS_Assert(obj_handle);
+
+    /* Recover the common object header */
+    struct UAVOBase *uavo_base = (struct UAVOBase *)obj_handle;
+
+    return uavo_base->flags.isPriority;
+}
+
 
 /**
  * Unpack an object from a byte array
@@ -1719,6 +1739,7 @@ static int32_t sendEvent(struct UAVOBase *obj, uint16_t instId, UAVObjEventType 
         .obj    = (UAVObjHandle)obj,
         .event  = triggered_event,
         .instId = instId,
+        .lowPriority = false,
     };
 
     // Go through each object and push the event message in the queue (if event is activated for the queue)
@@ -1781,7 +1802,7 @@ static InstanceHandle createInstance(struct UAVOData *obj, uint16_t instId)
 
     /* Create the actual instance */
     uint32_t size = sizeof(struct UAVOMultiInst) + obj->instance_size;
-    instEntry = (struct UAVOMultiInst *)pvPortMalloc(size);
+    instEntry = (struct UAVOMultiInst *)pios_malloc(size);
     if (!instEntry) {
         return NULL;
     }
@@ -1869,7 +1890,7 @@ static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue,
     }
 
     // Add queue to list
-    event = (struct ObjectEventEntry *)pvPortMalloc(sizeof(struct ObjectEventEntry));
+    event = (struct ObjectEventEntry *)pios_malloc(sizeof(struct ObjectEventEntry));
     if (event == NULL) {
         return -1;
     }

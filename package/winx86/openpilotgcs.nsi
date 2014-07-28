@@ -253,6 +253,12 @@ Section "CDC driver" InSecInstallDrivers
   ExecWait '"$PLUGINSDIR\dpinst.exe" /lm /path "$INSTDIR\drivers"'
 SectionEnd
 
+; Copy Opengl32.dll if needed (disabled by default)
+Section /o "Mesa OpenGL driver" InSecInstallOpenGL
+  SetOutPath "$INSTDIR\bin"
+  File /r "${GCS_BUILD_TREE}\bin\opengl32_32\opengl32.dll"
+SectionEnd
+
 ; AeroSimRC plugin files
 Section "AeroSimRC plugin" InSecAeroSimRC
   SetOutPath "$INSTDIR\misc\AeroSIM-RC"
@@ -319,6 +325,7 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecUtilities} $(DESC_InSecUtilities)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecDrivers} $(DESC_InSecDrivers)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecInstallDrivers} $(DESC_InSecInstallDrivers)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecInstallOpenGL} $(DESC_InSecInstallOpenGL)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecAeroSimRC} $(DESC_InSecAeroSimRC)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecShortcuts} $(DESC_InSecShortcuts)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END

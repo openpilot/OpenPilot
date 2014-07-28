@@ -34,9 +34,16 @@
 
 // UAVOs
 #include <manualcontrolsettings.h>
+#include <flightmodesettings.h>
 #include <systemsettings.h>
 #include <systemalarms.h>
+#include <revosettings.h>
+#include <positionstate.h>
 #include <taskinfo.h>
+
+// a number of useful macros
+#define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
+
 
 /****************************
 * Current checks:
@@ -45,7 +52,7 @@
 ****************************/
 
 // ! Check a stabilization mode switch position for safety
-static int32_t check_stabilization_settings(int index, bool multirotor);
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol);
 
 /**
  * Run a preflight check over the hardware configuration
@@ -60,120 +67,94 @@ int32_t configuration_check()
     const struct pios_board_info *bdinfo = &pios_board_info_blob;
     bool coptercontrol     = bdinfo->board_type == 0x04;
 
-    // Classify airframe type
-    bool multirotor = true;
-    uint8_t airframe_type;
-
-    SystemSettingsAirframeTypeGet(&airframe_type);
-    switch (airframe_type) {
-    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTO:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXAX:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOV:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXP:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXACOAX:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_TRI:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXX:
-        multirotor = true;
+    // Classify navigation capability
+#ifdef REVOLUTION
+    RevoSettingsInitialize();
+    uint8_t revoFusion;
+    RevoSettingsFusionAlgorithmGet(&revoFusion);
+    bool navCapableFusion;
+    switch (revoFusion) {
+    case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAGGPSOUTDOOR:
+    case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
+        navCapableFusion = true;
         break;
     default:
-        multirotor = false;
+        navCapableFusion = false;
+        // check for hitl.  hitl allows to feed position and velocity state via
+        // telemetry, this makes nav possible even with an unsuited algorithm
+        if (PositionStateHandle()) {
+            if (PositionStateReadOnly()) {
+                navCapableFusion = true;
+            }
+        }
     }
+#else
+    const bool navCapableFusion = false;
+#endif /* ifdef REVOLUTION */
+
+
+    // Classify airframe type
+    bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR);
+
 
     // For each available flight mode position sanity check the available
     // modes
     uint8_t num_modes;
-    uint8_t modes[MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_NUMELEM];
+    uint8_t modes[FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_NUMELEM];
     ManualControlSettingsFlightModeNumberGet(&num_modes);
-    ManualControlSettingsFlightModePositionGet(modes);
+    FlightModeSettingsFlightModePositionGet(modes);
 
     for (uint32_t i = 0; i < num_modes; i++) {
         switch (modes[i]) {
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_MANUAL:
-            if (multirotor) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            }
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_MANUAL:
+            ADDSEVERITY(!multirotor);
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
-            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(1, multirotor) : severity;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
+            ADDSEVERITY(check_stabilization_settings(1, multirotor, coptercontrol));
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
-            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(2, multirotor) : severity;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
+            ADDSEVERITY(check_stabilization_settings(2, multirotor, coptercontrol));
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
-            severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : severity;
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
+            ADDSEVERITY(check_stabilization_settings(3, multirotor, coptercontrol));
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
-            if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE)) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            }
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED4:
+            ADDSEVERITY(check_stabilization_settings(4, multirotor, coptercontrol));
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEVARIO:
-            if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            }
-            // TODO: put check equivalent to TASK_MONITOR_IsRunning
-            // here as soon as available for delayed callbacks
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED5:
+            ADDSEVERITY(check_stabilization_settings(5, multirotor, coptercontrol));
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
-            if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            }
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED6:
+            ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol));
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
-            if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
-                // Revo supports Position Hold
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            }
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
+            ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE));
             break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_LAND:
-            if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
-                // Revo supports AutoLand Mode
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            }
-            break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POI:
-            if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
-                // Revo supports POI Mode
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            }
-            break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
-            if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            } else {
-                // Revo supports PathPlanner and that must be OK or we are not sane
-                // PathPlan alarm is uninitialized if not running
-                // PathPlan alarm is warning or error if the flightplan is invalid
-                SystemAlarmsAlarmData alarms;
-                SystemAlarmsAlarmGet(&alarms);
-                if (alarms.PathPlan != SYSTEMALARMS_ALARM_OK) {
-                    severity = SYSTEMALARMS_ALARM_ERROR;
-                }
-            }
-            break;
-        case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
-            if (coptercontrol) {
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
-                // Revo supports ReturnToBase
-                severity = SYSTEMALARMS_ALARM_ERROR;
-            }
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
+        {
+            // Revo supports PathPlanner and that must be OK or we are not sane
+            // PathPlan alarm is uninitialized if not running
+            // PathPlan alarm is warning or error if the flightplan is invalid
+            SystemAlarmsAlarmData alarms;
+            SystemAlarmsAlarmGet(&alarms);
+            ADDSEVERITY(alarms.PathPlan == SYSTEMALARMS_ALARM_OK);
+        }
+        // intentionally no break as this also needs pathfollower
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOFPV:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOLOS:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIONSEW:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:
+            ADDSEVERITY(!coptercontrol);
+            ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER));
+            ADDSEVERITY(navCapableFusion);
             break;
         default:
             // Uncovered modes are automatically an error
-            severity = SYSTEMALARMS_ALARM_ERROR;
+            ADDSEVERITY(false);
         }
         // mark the first encountered erroneous setting in status and substatus
         if ((severity != SYSTEMALARMS_ALARM_OK) && (alarmstatus == SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE)) {
@@ -182,7 +163,12 @@ int32_t configuration_check()
         }
     }
 
-    // TODO: Check on a multirotor no axis supports "None"
+    uint8_t checks_disabled;
+    FlightModeSettingsDisableSanityChecksGet(&checks_disabled);
+    if (checks_disabled == FLIGHTMODESETTINGS_DISABLESANITYCHECKS_TRUE) {
+        severity = SYSTEMALARMS_ALARM_WARNING;
+    }
+
     if (severity != SYSTEMALARMS_ALARM_OK) {
         ExtendedAlarmsSet(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION, severity, alarmstatus, alarmsubstatus);
     } else {
@@ -196,45 +182,116 @@ int32_t configuration_check()
  * Checks the stabiliation settings for a paritcular mode and makes
  * sure it is appropriate for the airframe
  * @param[in] index Which stabilization mode to check
- * @returns SYSTEMALARMS_ALARM_OK or SYSTEMALARMS_ALARM_ERROR
+ * @returns true or false
  */
-static int32_t check_stabilization_settings(int index, bool multirotor)
+static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol)
 {
-    // Make sure the modes have identical sizes
-    if (MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_NUMELEM ||
-        MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_NUMELEM) {
-        return SYSTEMALARMS_ALARM_ERROR;
-    }
-
-    uint8_t modes[MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM];
+    uint8_t modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_NUMELEM];
 
     // Get the different axis modes for this switch position
     switch (index) {
     case 1:
-        ManualControlSettingsStabilization1SettingsArrayGet(modes);
+        FlightModeSettingsStabilization1SettingsArrayGet(modes);
         break;
     case 2:
-        ManualControlSettingsStabilization2SettingsArrayGet(modes);
+        FlightModeSettingsStabilization2SettingsArrayGet(modes);
         break;
     case 3:
-        ManualControlSettingsStabilization3SettingsArrayGet(modes);
+        FlightModeSettingsStabilization3SettingsArrayGet(modes);
+        break;
+    case 4:
+        FlightModeSettingsStabilization4SettingsArrayGet(modes);
+        break;
+    case 5:
+        FlightModeSettingsStabilization5SettingsArrayGet(modes);
+        break;
+    case 6:
+        FlightModeSettingsStabilization6SettingsArrayGet(modes);
         break;
     default:
-        return SYSTEMALARMS_ALARM_ERROR;
+        return false;
     }
 
-    // For multirotors verify that nothing is set to "none"
+    // For multirotors verify that roll/pitch/yaw are not set to "none"
+    // (why not? might be fun to test ones reactions ;) if you dare, set your frame to "custom"!
     if (multirotor) {
-        for (uint32_t i = 0; i < NELEMENTS(modes); i++) {
-            if (modes[i] == MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NONE) {
-                return SYSTEMALARMS_ALARM_ERROR;
+        for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST; i++) {
+            if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL) {
+                return false;
             }
         }
     }
 
-    // Warning: This assumes that certain conditions in the XML file are met.  That
-    // MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NONE has the same numeric value for each channel
-    // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_NONE
+    // coptercontrol cannot do altitude holding
+    if (coptercontrol) {
+        if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
+            || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO
+            ) {
+            return false;
+        }
+    }
 
-    return SYSTEMALARMS_ALARM_OK;
+    // check that thrust modes are only set to thrust axis
+    for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST; i++) {
+        if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
+            || modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO
+            ) {
+            return false;
+        }
+    }
+    if (!(modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL
+          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
+          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO
+          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL
+          )) {
+        return false;
+    }
+
+    // Warning: This assumes that certain conditions in the XML file are met.  That
+    // FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL has the same numeric value for each channel
+    // and is the same for STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL
+    // (this is checked at compile time by static constraint manualcontrol.h)
+
+    return true;
+}
+
+FrameType_t GetCurrentFrameType()
+{
+    uint8_t airframe_type;
+
+    SystemSettingsAirframeTypeGet(&airframe_type);
+    switch ((SystemSettingsAirframeTypeOptions)airframe_type) {
+    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTO:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOX:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXAX:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXAH:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOV:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXP:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXACOAX:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_TRI:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXX:
+        return FRAME_TYPE_MULTIROTOR;
+
+    case SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGVTAIL:
+        return FRAME_TYPE_FIXED_WING;
+
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HELICP:
+        return FRAME_TYPE_HELI;
+
+    case SYSTEMSETTINGS_AIRFRAMETYPE_GROUNDVEHICLECAR:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_GROUNDVEHICLEDIFFERENTIAL:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_GROUNDVEHICLEMOTORCYCLE:
+        return FRAME_TYPE_GROUND;
+
+    case SYSTEMSETTINGS_AIRFRAMETYPE_VTOL:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_CUSTOM:
+        return FRAME_TYPE_CUSTOM;
+    }
+    // anyway it should not reach here
+    return FRAME_TYPE_CUSTOM;
 }

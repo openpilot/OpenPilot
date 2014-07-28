@@ -1,19 +1,160 @@
---- RELEASE-14.01-RC4 --- Cruising Ratt ---
-this issue includes the following fixes to previous RC3:
-OP-1228 OP-1218
+--- RELEASE-14.06-RC4 --- Peanuts Schnapps ---
+This Release Candidate fixes the following issues:
+    * [OP-1413] - Disable Land flight mode
+    * [OP-1412] - INS13Outdoor Yaw Gyro drift
+    * [OP-1408] - Board rotation is not always saved during Revo calibration
+    * [OP-1358] - Split board rotation into user set configuration and calibrated offseta
 
-Full list of bug fixed in this release is accessible here
-http://progress.openpilot.org/issues/?filter=11364
+The full list of features, improvements and bugfixes in this release candidate is accessible here:
+http://progress.openpilot.org/issues/?filter=11562
 
---- RELEASE-14.01-RC3 --- Cruising Ratt ---
-this issue includes the following fixes to previous RC2:
-OP-1088 OP-1141 OP-1166 OP-1187 OP-1191 OP-1195 OP-1211 OP-1218 
+--- RELEASE-14.06-RC3 --- Peanuts Schnapps ---
+This Release Candidate fixes the following issues:
+    * [OP-1394] - Flight display widget - telemetry data does not zero on disconnection
+    * [OP-1393] - SerialPlugin destructor generates valgrind error
+    * [OP-1391] - System allows arming if current flight mode uses Thrust Control = AH or AV
+    * [OP-1390] - OpenGL support for older Graphics Cards
+    * [OP-1389] - GCS Crashes exiting Flight side log window
+    * [OP-1384] - Revo Board Rotation data is cleared to zero by other calibration steps
+    * [OP-1383] - GCS crashes when connected via serial port
+    * [OP-1347] - Flight logs settings - UI / segfault
+    * [OP-1337] - French translations updates (14.04/05)
+    * [OP-1226] - screen problems
+    * [OP-1063] - Multirotor Configuration
+    * [OP-792] - 'Autotune' still showing up in flight mode settings in GCS
 
-Full list of bug fixed in this release is accessible here
-http://progress.openpilot.org/issues/?filter=11361
+The full list of features, improvements and bugfixes in this release candidate is accessible here:
+http://progress.openpilot.org/issues/?filter=11561
 
---- RELEASE-14.01-RC2 --- Cruising Ratt ---
-This is the RC2 for the first 2014 software release. 
+--- RELEASE-14.06-RC2 --- Peanuts Schnapps ---
+This Release Candidate fixes the following issues:
+    *[OP-1378] - Check Limits for flight modes
+    *[OP-1377] - Calibration config panel has Apply button even when not in Expert mode
+    *[OP-1376] - Calibration results not saved to SD
+    *[OP-1375] - Update Mag Ki and Kp default settings
+    *[OP-1374] - Automatically enable the right PathFollower
+    *[OP-1337] - Fixes for French translation
+    
+The full list of features, improvements and bugfixes in this release candidate is accessible here:
+http://progress.openpilot.org/issues/?filter=11462
+
+--- RELEASE-14.06-RC1 --- Peanuts Schnapps ---
+This is the Mid 2014 release. 
+This version still supports the CopterControl and CC3D.
+It includes several additions and changes aimed at gps/navigation functionalities 
+(that are expected to be fully available on next release).
+
+Some additions in this release:
+- Addition of GPS assisted flight modes for revo: - Return To Base, Position hold, AutoCruise and Position Vario(LOS, FPV and NSEW);
+- Stabilization refactoring that enhance rate performances;
+- Sensor calibration has been redesigned for better usability;
+
+The full list of features, improvements and bugfixes in this release is accessible here:
+
+http://progress.openpilot.org/issues/?filter=11460
+
+** New Feature & Improvements
+    * [OP-943] - Start using F4's Core Coupled RAM for more than just the IRQ handler stack
+    * [OP-974] - Make Bootloader Version available while flight software is running
+    * [OP-975] - Reconsider the calibration process
+    * [OP-1068] - Add support for magnetometer calibration matrix in place of scaling parameters
+    * [OP-1149] - Handle thermal bias calculation/calibration to gyro and accel
+    * [OP-1150] - Create UI to allow users to perform board thermal calibration 
+    * [OP-1159] - Remove "Rev" checkboxes on input tab for channels on which it doesn't have an effect
+    * [OP-1161] - Add Alarm for Magnetometer if disturbed or uncalibrated
+    * [OP-1174] - Beautify Uploader gadget popups
+    * [OP-1194] - Scope gadget - plot and legend visibility state should be persisted between runs
+    * [OP-1198] - Allow GCS gadgets to save/restore individual state
+    * [OP-1216] - Refactor Flight Control Modules
+    * [OP-1230] - Automatically load the correct firmware file when GCS is running in a development environment
+    * [OP-1233] - Add make options to skip qmake and build a specific GCS directory
+    * [OP-1245] - Add GUI to control if, what, when and how to do flight side logging.
+    * [OP-1250] - Add GPS Protocol configuration in the Hardware configuration panel
+    * [OP-1258] - Update GCC ARM Embedded to 4.8-2014-q1
+    * [OP-1259] - Cruise Control tweaks
+    * [OP-1260] - Rattitude tweaks
+    * [OP-1273] - Implementation of the PixHawk airspeed sensor based on the MS4525DO
+    * [OP-1282] - Include I2C Alarm into Eagletree speed sensor module
+    * [OP-1287] - GPS assisted flight for Revo
+    * [OP-1299] - Autodetect number of cells in Battery module
+    * [OP-1302] - Improve on board led functionality
+    * [OP-1303] - Add PathPlan Alarm in System Health
+    * [OP-1307] - Create a bare DiscoveryF4 target for debugging and development purposes
+    * [OP-1308] - Set the same logic to CRITICAL Alarm and same logic to ERROR Alarm
+    * [OP-1312] - Implement a PIOS WS281x driver
+    * [OP-1319] - Fix minor spelling mistakes in fw code
+    * [OP-1335] - ConfigTaskWidget - Add support to bind GComboBox to integer property
+    * [OP-1339] - System Health panel improvement
+    * [OP-1350] - TakeOff location handling to be used with RTH 
+    * [OP-1365] - Add instrumentation functions for flight code
+
+** Bug
+    * [OP-1026] - Provide some standard method of calibrating CPU speed and load measurement for boards
+    * [OP-1033] - Data transfer errors on USB HID on F1 devices
+    * [OP-1043] - Ground OPLinkMini refuses to connect to one Revo unless first connected to another Revo
+    * [OP-1056] - GPS does not set home location when erased after lock has been established
+    * [OP-1080] - Unreliable detection of board through OPLink
+    * [OP-1100] - GCS plist for mac shows wrong associated filetypes, leftover from qtcreator
+    * [OP-1131] - Firmware mismatch check is not done if Uploader gadget is not active
+    * [OP-1172] - Some fonts are not defined in config files
+    * [OP-1196] - Board rotation in GCS not shown correctly upon connection but correctly saved in memory
+    * [OP-1212] - Fix Priority queue handling in telemetry 
+    * [OP-1227] - High CPU load in ratitude mode on CopterControl
+    * [OP-1232] - Setting high telemetry rates for periodic uavobject triggers eventsystem warning.
+    * [OP-1235] - Some fixes for altitude estimation
+    * [OP-1237] - Blank/Black Buttons on Vehicle Configuration Multirotor Throttle Curve
+    * [OP-1241] - TxPID Does not work for Bank 3 PID settings
+    * [OP-1243] - OPMap widget context menu duplicating some menu separators each time its opened
+    * [OP-1252] - Update GCS to qt 5.2.1
+    * [OP-1266] - Gyro and accel thermal compensation is not applied if one or more coefficients have negative value
+    * [OP-1267] - Incorrect UAV position on GCS OPMap after homeLocation modification
+    * [OP-1272] - Unable to debug in SWD mode a revo board
+    * [OP-1283] - SystemHealthGadgetWidget::updateAlarms misinterprets coordinates in SVG file
+    * [OP-1284] - RTB flies into ground if base is high
+    * [OP-1285] - Erase Settings ToolTip is wrong
+    * [OP-1286] - GCS Map "Go To Place" doesn't work
+    * [OP-1288] - GPS PositionHold immediately flies several meters away if Home is not close
+    * [OP-1291] - Fix matlab import after UAVTalk changes
+    * [OP-1294] - Fix stack sizes for CopterControl
+    * [OP-1295] - Autoupdate not working
+    * [OP-1296] - Altitude Hold causes copter to ascent at full throttle when far from home location
+    * [OP-1297] - OPMap fails to read in saved waypoints correctly
+    * [OP-1300] - SystemHealth gadget does not show "Configuration Alarm"
+    * [OP-1301] - Hardware settings can't be saved with CC/CC3D
+    * [OP-1304] - Revo stack alarm
+    * [OP-1314] - Fix Airspeed stack size
+    * [OP-1315] - Unable to arm UAV when AirspeedSensorType is set to GroundspeedBaseWindEstimation
+    * [OP-1323] - GCS font fixes
+    * [OP-1325] - Fix event system warnings to be errors
+    * [OP-1326] - Set AIrspeedSensor default back to "None"
+    * [OP-1327] - SystemAlarms must be non-acked
+    * [OP-1329] - Various fixes to airspeed module
+    * [OP-1330] - Cannot set homelocation.set=false when gps reception is optimal
+    * [OP-1331] - Input and Output Channel Configuration alignments issues
+    * [OP-1332] - PiOS alarms does not reset alarm state on timer overflow
+    * [OP-1333] - Output Channel Configuration  alignments issues
+    * [OP-1340] - Auto-update greyed out - not available
+    * [OP-1343] - GCS Configuration - Input Channel ResponseTime not saved
+    * [OP-1346] - Input Channel Response Time mismatch between GCS config screen and UAVObject
+    * [OP-1348] - Config Gadget flashes next panel when connecting/disconnecting board
+    * [OP-1351] - GCS Calibration UI polishing
+    * [OP-1352] - Headwind-improvements for FixedWingPathFollower
+    * [OP-1353] - HITL Flightgear fails to set Position and velocity correctly
+    * [OP-1354] - Current and voltage not shown in PFD
+    * [OP-1355] - Magnetometer calibration and board rotation don't play along
+    * [OP-1363] - Sanitychecks MUST check if magnetometers and GPS are enabled for any pathfollower modes (outdoor mode selected)
+    * [OP-1371] - Sanitychecks overzealous:  hitl/sitl broken
+
+** Tasks
+    * [OP-1274] - Update FreeRTOS to 8.0
+    * [OP-1337] - French translations updates (14.04/05)
+    * [OP-1254] - Update to QT5.2.1 for Linux x86/64
+    * [OP-1263] - Move SDL out of Qt install
+    * [OP-1309] - Stabilization refactoring
+
+
+--- RELEASE-14.01 --- Cruising Ratt ---
+This is the first 2014 software release. 
 This version still supports the  CopterControl and CC3D.
 It includes some major "under the hood" changes like migration
 to Qt5.1 and QtQuick2 widgets, an overhaul of UAVTalk to improve
@@ -27,12 +168,119 @@ Some additions in this release:
 the full list of features, improvements and bufixes shipping
 in this release is accessible here:
 
-http://progress.openpilot.org/browse/OP/fixforversion/10220
+http://progress.openpilot.org/issues/?filter=11260
 
-Issues fixes since RC1 release 
-http://progress.openpilot.org/issues/?jql=labels%20%3D%20%2214.01-rc1%22
-OP-1166 OP-1168 OP-1169 OP-1176 OP-1177 OP-1178 OP-1179 OP-1180 
-OP-1182 OP-1183 OP-1184 OP-1187 OP-1188 OP-1192
+** Improvement
+    * [OP-771] - Change Wizard wording for better usability
+    * [OP-791] - Integrate About Authors, OpenPilot GCS, Plugins dialogs into a single dialog window
+    * [OP-803] - Gadgets get their configuration set twice when restoring workspaces during GCS startup
+    * [OP-835] - Upgrade GCS to use Qt 5.1.0
+    * [OP-883] - Make system and flight targets cleanup, pass 01
+    * [OP-913] - Poor UAVObject data structure alignment on flight side causes performance degradation
+    * [OP-951] - Add -Wshadow to flight CFLAGS and fix compilation breakage that results
+    * [OP-966] - Scope Plugin Cleanup
+    * [OP-984] - Provide multi PID banks, these should be assignable per flight mode. 
+    * [OP-996] - Add GCS option to remember the last selected workspace
+    * [OP-1022] - Additional improvements for altitude hold
+    * [OP-1036] - Improvements to Fixed Wing PathFollower and Nav
+    * [OP-1059] - Typo (2x) in OpenPilot Setup Wizard - Output Calibration Window
+    * [OP-1063] - Multirotor Configuration
+    * [OP-1071] - Make map "emergency" lines less strong and dashed
+    * [OP-1079] - Update to FreeRTOS v7.5.2
+    * [OP-1082] - Add a ticker on the Welcome page showing Jira activity alongside the 'Project News'
+    * [OP-1083] - Fix minor English spelling errors in stabilization tooltips
+    * [OP-1085] - Upgrade GCS to use Qt 5.1.1
+    * [OP-1094] - Turn on Progress for large SDK downloads / remove for MD5 files
+    * [OP-1104] - Create BL version 6 to support larger firmware
+    * [OP-1105] - If firmware .info blob is missing, test string is too long
+    * [OP-1107] - Convert About dialog to QTQuick 2.0 and cleanup code.
+    * [OP-1110] - Move Welcome screen to QtQuick 2
+    * [OP-1111] - Move About to QtQuick2
+    * [OP-1112] - Update contributors in GCS
+    * [OP-1113] - Convert new PFD design to QtQuik2
+    * [OP-1117] - Implement Horizon mode
+    * [OP-1120] - Waypoint upload to board should be transacted
+    * [OP-1133] - UAVTalk - expose send/request all instances of multi instance uav objects + related uavtalk fixes
+    * [OP-1137] - Make Configuration Checkbox checked by default during uninstall
+    * [OP-1141] - Add a further bias correction to barometer to better handle thermal variations
+    * [OP-1143] - Missing Linux udev rules for Revolution boards 
+    * [OP-1153] - Provide a mean to instrument SystemMod stack utilization
+    * [OP-1154] - Config Option to Automatically Increase Copter Throttle per 1/cos(bank_angle)
+    * [OP-1158] - Add flight plan consistency checks
+    * [OP-1160] - Some dev Env improvements,  git hooks for messages, make prepare etc.
+
+** Task
+    * [OP-775] - Add ARM DSP library to OP codebase
+    * [OP-813] - Manage merge of translation work to French 
+    * [OP-839] - Disable pyMyte dependency until really used
+    * [OP-901] - Update STM32 StdPeriphLib to current
+    * [OP-1087] - Update Qt used from Makefile to 5.1.1 for Windows and Mac
+    * [OP-1109] - Created share Qt5 QtQuick2 port branch
+    * [OP-1115] - Remove old artwork from the Artwork folder in Git
+    * [OP-1119] - Write GCS plugin to access and display on board logs through uavtalk and export .opl files from logged uavobjects
+    * [OP-1058] - UAVO:Implement a structured named accessors for multielement fields (Flight side)
+
+** Bug
+    * [OP-844] - Fix header comments in altitudehold.c
+    * [OP-845] - Fix reading serial number from USB device on mac platform
+    * [OP-846] - make qt_sdk_install fails
+    * [OP-865] - PWM output 6 does not work on RM
+    * [OP-887] - Provide some standard method of calibrating CPU speed and load measurement for boards
+    * [OP-924] - PPM output does not have failsafe
+    * [OP-934] - Incorrect timeout handling in rfm22b receiver
+    * [OP-971] - Add UI to set AccellTau with revo board
+    * [OP-1004] - UAVObjectBrowser, buttons don't work when scientific display is turned on
+    * [OP-1014] - Com port connections are not working on OPLink
+    * [OP-1018] - Zero point initialization in ETASv3 Airspeed sensor buggy
+    * [OP-1027] - Segfault in UAVObjectBrowser when "Request"ing a UAVObjectCategory
+    * [OP-1042] - Revo firmware version isn't read correctly through OPLink
+    * [OP-1046] - Waypoint upload incomplete, no visual confirmation of failed uploads in uavobjectbrowser and waypoint editor
+    * [OP-1048] - Attitude is not working with AccelTau > 0
+    * [OP-1049] - CC3D attitude estimation failure after multiple settings changes and reboots
+    * [OP-1067] - Invalid value for "LinkState"
+    * [OP-1076] - CF Attitude filter in next randomly re-initializes on arming.
+    * [OP-1078] - GCS segfaults if you close it after playing a log file
+    * [OP-1080] - Unreliable detection of board through OPLink
+    * [OP-1095] - GCS crashing on macosx 10.9 upon connection of oplink mini
+    * [OP-1098] - CDC driver fails installation in Windows 8 or 8.1
+    * [OP-1099] - Hidden icons in Configuration tab
+    * [OP-1101] - Tools.mk has a few tabs and they need to be converted to spaces
+    * [OP-1102] - OP GCS registers some file types is should not
+    * [OP-1103] - GCS can not be compiled on OSX 10.8 after update to Qt5.1.1
+    * [OP-1108] - Minor bugs found while reading the code
+    * [OP-1114] - QGLWidget prohibits QListWidgetItem, set AA_DontCreateNativeWidgetSiblings as work around
+    * [OP-1118] - QComboBox in UAVObjectBrowser does not stay in focus on Mac OSX
+    * [OP-1121] - GCS will not exit if the Waypoint editor/PathPlanner dialog is open
+    * [OP-1123] - GCS assertion failure when loading a waypoint file
+    * [OP-1125] - UAVTalk - acking/nacking multi instance uavobjects is broken (when sending individual instances)
+    * [OP-1132] - LIBEAY32.dll missing from installer
+    * [OP-1139] - Add higher order correction to MS5611 driver for low and very low temperature compensation 
+    * [OP-1142] - No yaw in Horizon mode
+    * [OP-1145] - OPLM to GCS link not reliable
+    * [OP-1148] - Futaba R7008SB S.Bus protocol not supported
+    * [OP-1151] - PFD display - inverted flight
+    * [OP-1152] - Check Stack usage for CopterControl & CC3D
+    * [OP-1155] - Fix OSX Packaging for GCS
+    * [OP-1157] - sin_lookup_deg() returns garbage for negative angles
+    * [OP-1166] - GCS misses yaw neutral setting on sync from initial connection
+    * [OP-1167] - New flight mode switch position UAVO to work better with SITL, HITL
+    * [OP-1168] - GCS Reload Board Data button doesn't work
+    * [OP-1169] - GCS UAVO object titles off by one
+    * [OP-1176] - Cruise Control checkboxes use wrong Default button
+    * [OP-1177] - AltHold - Need a setting to allow disabling of bank angle throttle compensation in AH
+    * [OP-1178] - After re-factoring of ConfigTaskWidget code the OPLink config page does not work reliably.
+    * [OP-1179] - About box not working in Linux64 build (but probably the same is for Linux32)
+    * [OP-1180] - GCS AltHold Tab - Reload button and update in real time
+    * [OP-1181] - on radio configuration the pitch slider has maxed out on its own three times randomly
+    * [OP-1182] - Telemetry monitor widget is too small on Mac
+    * [OP-1183] - UAVBrowser displays hex string as decimal
+    * [OP-1184] - Scope gadget - Stack monitor configurations need a cleanup
+    * [OP-1188] - Optimize Stabilization Module stack size usage 
+    * [OP-1191] - Revo OPLink bug in GCS
+    * [OP-1192] - Even though Throttle is off there is motor movement in some situations.
+    * [OP-1211] - dT calculation in Stabilization and other modules unsafe
+    * [OP-1218] - PIOS_COM is not thread safe
+    * [OP-1228] - GCS Quits unexpectedly
 
 --- RELEASE-13.06.04 ---
 This maintenance release includes the following fixes missing in (previously not released to public) RELEASE-13.06.03.

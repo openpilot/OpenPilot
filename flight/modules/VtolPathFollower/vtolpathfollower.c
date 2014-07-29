@@ -370,22 +370,19 @@ static void updatePOIBearing()
 static void updatePathVelocity()
 {
     float dT = vtolpathfollowerSettings.UpdatePeriod / 1000.0f;
-    float downCommand;
 
     PathDesiredData pathDesired;
-
     PathDesiredGet(&pathDesired);
     PositionStateData positionState;
     PositionStateGet(&positionState);
 
-    float cur[3] =
-    { positionState.North, positionState.East, positionState.Down };
+    float current_position[3] = { positionState.North, positionState.East, positionState.Down };
     struct path_status progress;
 
     path_progress(
         cast_struct_to_array(pathDesired.Start, pathDesired.Start.North),
         cast_struct_to_array(pathDesired.End, pathDesired.End.North),
-        cur, &progress, pathDesired.Mode);
+        current_position, &progress, pathDesired.Mode);
 
     float speed;
     switch (pathDesired.Mode) {
@@ -414,36 +411,45 @@ static void updatePathVelocity()
     }
 
     VelocityDesiredData velocityDesired;
-    velocityDesired.North = progress.path_direction[0] * speed;
-    velocityDesired.East  = progress.path_direction[1] * speed;
-    velocityDesired.Down  = progress.path_direction[2] * speed;
 
-    float error_speed = progress.error * vtolpathfollowerSettings.HorizontalPosPI.Kp;
-    float correction_velocity[2] =
-    { progress.correction_direction[0] * error_speed, progress.correction_direction[1] * error_speed };
+    northPosIntegral += progress.correction_direction[0] * progress.error * vtolpathfollowerSettings.HorizontalPosPI.Ki * dT;
+    eastPosIntegral  += progress.correction_direction[1] * progress.error * vtolpathfollowerSettings.HorizontalPosPI.Ki * dT;
+    downPosIntegral  += progress.correction_direction[2] * progress.error * vtolpathfollowerSettings.VerticalPosPI.Ki * dT;
 
-    float total_vel = sqrtf(powf(correction_velocity[0], 2) + powf(correction_velocity[1], 2));
-    float scale     = 1;
-    if (total_vel > vtolpathfollowerSettings.HorizontalVelMax) {
-        scale = vtolpathfollowerSettings.HorizontalVelMax / total_vel;
+    northPosIntegral = boundf(northPosIntegral, -vtolpathfollowerSettings.HorizontalPosPI.ILimit,
+                                                 vtolpathfollowerSettings.HorizontalPosPI.ILimit);
+    eastPosIntegral  = boundf(eastPosIntegral, -vtolpathfollowerSettings.HorizontalPosPI.ILimit,
+                                                vtolpathfollowerSettings.HorizontalPosPI.ILimit);
+    downPosIntegral  = boundf(downPosIntegral, -vtolpathfollowerSettings.VerticalPosPI.ILimit,
+                                                vtolpathfollowerSettings.VerticalPosPI.ILimit);
+
+    velocityDesired.North = progress.path_direction[0] * speed + northPosIntegral +
+        progress.correction_direction[0] * progress.error * vtolpathfollowerSettings.HorizontalPosPI.Kp;
+    velocityDesired.East  = progress.path_direction[1] * speed + eastPosIntegral +
+        progress.correction_direction[1] * progress.error * vtolpathfollowerSettings.HorizontalPosPI.Kp;
+    velocityDesired.Down  = progress.path_direction[2] * speed + downPosIntegral +
+        progress.correction_direction[2] * progress.error * vtolpathfollowerSettings.VerticalPosPI.Kp;
+
+    // Make sure the desired velocities don't exceed PathFollower limits.
+    float groundspeedDesired = sqrtf(powf(velocityDesired.North, 2) + powf(velocityDesired.East, 2));
+
+    if (groundspeedDesired > vtolpathfollowerSettings.HorizontalVelMax) {
+        velocityDesired.North *= vtolpathfollowerSettings.HorizontalVelMax / groundspeedDesired;
+        velocityDesired.East  *= vtolpathfollowerSettings.HorizontalVelMax / groundspeedDesired;
     }
 
-    velocityDesired.North += progress.correction_direction[0] * error_speed * scale;
-    velocityDesired.East  += progress.correction_direction[1] * error_speed * scale;
-
-    float altitudeSetpoint = pathDesired.Start.Down + (pathDesired.End.Down - pathDesired.Start.Down) * boundf(progress.fractional_progress, 0, 1);
-
-    float downError = altitudeSetpoint - positionState.Down;
-    downPosIntegral = boundf(downPosIntegral + downError * dT * vtolpathfollowerSettings.VerticalPosPI.Ki,
-                             -vtolpathfollowerSettings.VerticalPosPI.ILimit,
-                             vtolpathfollowerSettings.VerticalPosPI.ILimit);
-    downCommand     = velocityDesired.Down + (downError * vtolpathfollowerSettings.VerticalPosPI.Kp + downPosIntegral);
-    velocityDesired.Down = boundf(downCommand, -vtolpathfollowerSettings.VerticalVelMax, vtolpathfollowerSettings.VerticalVelMax);
+    velocityDesired.Down = boundf(velocityDesired.Down, -vtolpathfollowerSettings.VerticalVelMax, vtolpathfollowerSettings.VerticalVelMax);
 
     // update pathstatus
-    pathStatus.error     = progress.error;
-    pathStatus.fractional_progress = progress.fractional_progress;
+    pathStatus.error = progress.error;
+    pathStatus.fractional_progress  = progress.fractional_progress;
+    pathStatus.path_direction_north = progress.path_direction[0];
+    pathStatus.path_direction_east  = progress.path_direction[1];
+    pathStatus.path_direction_down  = progress.path_direction[2];
 
+    pathStatus.correction_direction_north = progress.correction_direction[0];
+    pathStatus.correction_direction_east  = progress.correction_direction[1];
+    pathStatus.correction_direction_down  = progress.correction_direction[2];
     VelocityDesiredSet(&velocityDesired);
 }
 

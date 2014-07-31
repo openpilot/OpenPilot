@@ -166,12 +166,11 @@ static void path_vector(float *start_point, float *end_point, float *cur_point, 
         status->path_direction[2] = path[2] / dist_path;
         status->fractional_progress = dot / (dist_path * dist_path);
     } else {
-        // if the path is too short, we cannot determine vector direction.
-        // Assume progress=1 and zero-length path.
-        status->path_direction[0] = 0;
-        status->path_direction[1] = 0;
-        status->path_direction[2] = 0;
+        // Fly towards the endpoint to prevent flying away,
+        // but assume progress=1 either way.
+        path_endpoint(start_point, end_point, cur_point, status);
         status->fractional_progress = 1;
+        return;
     }
 
     // Compute point on track that is closest to our current position.

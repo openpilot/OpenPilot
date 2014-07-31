@@ -174,10 +174,6 @@ static void path_vector(float *start_point, float *end_point, float *cur_point, 
     }
 
     // Compute point on track that is closest to our current position.
-    // Limiting fractional_progress makes sure the resulting point is also
-    // limited to be between start and endpoint.
-    status->fractional_progress = boundf(status->fractional_progress, 0, 1);
-
     track_point[0] = status->fractional_progress * path[0] + start_point[0];
     track_point[1] = status->fractional_progress * path[1] + start_point[1];
     track_point[2] = status->fractional_progress * path[2] + start_point[2];

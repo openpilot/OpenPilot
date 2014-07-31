@@ -113,7 +113,8 @@ static void path_endpoint(float *start_point, float *end_point, float *cur_point
     if (dist_diff < 1e-6f) {
         status->fractional_progress = 1;
         status->error = 0;
-        status->path_direction[0] = status->path_direction[1] = status->path_direction[2] = 0;
+        status->path_direction[0] = status->path_direction[1] = 0;
+        status->path_direction[2] = 1;
         return;
     }
 

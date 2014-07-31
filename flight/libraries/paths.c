@@ -168,7 +168,7 @@ static void path_vector(float *start_point, float *end_point, float *cur_point, 
     } else {
         // Fly towards the endpoint to prevent flying away,
         // but assume progress=1 either way.
-        path_endpoint(start_point, end_point, cur_point, status);
+        path_endpoint(start_point, end_point, cur_point, status, mode3D);
         status->fractional_progress = 1;
         return;
     }

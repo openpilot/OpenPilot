@@ -28,6 +28,10 @@
 #include "configtxpidwidget.h"
 #include "txpidsettings.h"
 #include "hwsettings.h"
+#include "stabilizationsettings.h"
+#include "stabilizationsettingsbank1.h"
+#include "stabilizationsettingsbank2.h"
+#include "stabilizationsettingsbank3.h"
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
 
@@ -50,6 +54,10 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(HwSettings::GetInstance(getObjectManager()), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(refreshValues()));
     connect(m_txpid->Apply, SIGNAL(clicked()), this, SLOT(applySettings()));
     connect(m_txpid->Save, SIGNAL(clicked()), this, SLOT(saveSettings()));
+
+    connect(m_txpid->PID1, SIGNAL(currentTextChanged(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
+    connect(m_txpid->PID2, SIGNAL(currentTextChanged(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
+    connect(m_txpid->PID3, SIGNAL(currentTextChanged(QString)), this, SLOT(updateSpinBoxProperties(const QString &)));
 
     addWidgetBinding("TxPIDSettings", "BankNumber", m_txpid->pidBank, 0, 1, true);
 
@@ -86,6 +94,124 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
 ConfigTxPIDWidget::~ConfigTxPIDWidget()
 {
     // Do nothing
+}
+
+template <class StabilizationSettingsBankX>
+static float defaultValueForPidOption(const StabilizationSettingsBankX *bank, const QString & pidOption)
+{
+    if (pidOption == "Disabled") {
+        return 0.0f;
+    } else if (pidOption == "Roll Rate.Kp") {
+        return bank->getRollRatePID_Kp();
+    } else if (pidOption == "Pitch Rate.Kp") {
+        return bank->getPitchRatePID_Kp();
+    } else if (pidOption == "Roll+Pitch Rate.Kp") {
+        return bank->getRollRatePID_Kp();
+    } else if (pidOption == "Yaw Rate.Kp") {
+        return bank->getYawRatePID_Kp();
+    } else if (pidOption == "Roll Rate.Ki") {
+        return bank->getRollRatePID_Ki();
+    } else if (pidOption == "Pitch Rate.Ki") {
+        return bank->getPitchRatePID_Ki();
+    } else if (pidOption == "Roll+Pitch Rate.Ki") {
+        return bank->getRollRatePID_Ki();
+    } else if (pidOption == "Yaw Rate.Ki") {
+        return bank->getYawRatePID_Ki();
+    } else if (pidOption == "Roll Rate.Kd") {
+        return bank->getRollRatePID_Kd();
+    } else if (pidOption == "Pitch Rate.Kd") {
+        return bank->getPitchRatePID_Kd();
+    } else if (pidOption == "Roll+Pitch Rate.Kd") {
+        return bank->getRollRatePID_Kd();
+    } else if (pidOption == "Yaw Rate.Kd") {
+        return bank->getYawRatePID_Kd();
+    } else if (pidOption == "Roll Rate.ILimit") {
+        return bank->getRollRatePID_ILimit();
+    } else if (pidOption == "Pitch Rate.ILimit") {
+        return bank->getPitchRatePID_ILimit();
+    } else if (pidOption == "Roll+Pitch Rate.ILimit") {
+        return bank->getRollRatePID_ILimit();
+    } else if (pidOption == "Yaw Rate.ILimit") {
+        return bank->getYawRatePID_ILimit();
+    } else if (pidOption == "Roll Attitude.Kp") {
+        return bank->getRollPI_Kp();
+    } else if (pidOption == "Pitch Attitude.Kp") {
+        return bank->getPitchPI_Kp();
+    } else if (pidOption == "Roll+Pitch Attitude.Kp") {
+        return bank->getRollPI_Kp();
+    } else if (pidOption == "Yaw Attitude.Kp") {
+        return bank->getYawPI_Kp();
+    } else if (pidOption == "Roll Attitude.Ki") {
+        return bank->getRollPI_Ki();
+    } else if (pidOption == "Pitch Attitude.Ki") {
+        return bank->getPitchPI_Ki();
+    } else if (pidOption == "Roll+Pitch Attitude.Ki") {
+        return bank->getRollPI_Ki();
+    } else if (pidOption == "Yaw Attitude.Ki") {
+        return bank->getYawPI_Ki();
+    } else if (pidOption == "Roll Attitude.ILimit") {
+        return bank->getRollPI_ILimit();
+    } else if (pidOption == "Pitch Attitude.ILimit") {
+        return bank->getPitchPI_ILimit();
+    } else if (pidOption == "Roll+Pitch Attitude.ILimit") {
+        return bank->getRollPI_ILimit();
+    } else if (pidOption == "Yaw Attitude.ILimit") {
+        return bank->getYawPI_ILimit();
+    }
+
+    qDebug() << "getDefaultValueForOption: Incorrect PID option" << pidOption;
+    return 0.0f;
+}
+
+float ConfigTxPIDWidget::getDefaultValueForPidOption(const QString & pidOption)
+{
+    if (pidOption == "GyroTau") {
+        StabilizationSettings *stab = qobject_cast<StabilizationSettings *>(getObject(QString("StabilizationSettings")));
+        return stab->getGyroTau();
+    }
+
+    uint bankNumber = m_txpid->pidBank->currentIndex() + 1;
+
+    if (bankNumber == 1) {
+        StabilizationSettingsBank1 *bank = qobject_cast<StabilizationSettingsBank1 *>(getObject(QString("StabilizationSettingsBank1")));
+        return defaultValueForPidOption(bank, pidOption);
+    } else if (bankNumber == 2) {
+        StabilizationSettingsBank2 *bank = qobject_cast<StabilizationSettingsBank2 *>(getObject(QString("StabilizationSettingsBank2")));
+        return defaultValueForPidOption(bank, pidOption);
+    } else if (bankNumber == 3) {
+        StabilizationSettingsBank3 *bank = qobject_cast<StabilizationSettingsBank3 *>(getObject(QString("StabilizationSettingsBank3")));
+        return defaultValueForPidOption(bank, pidOption);
+    } else {
+        qDebug() << "getDefaultValueForPidOption: Incorrect bank number:" << bankNumber;
+        return 0.0f;
+    }
+}
+
+void ConfigTxPIDWidget::updateSpinBoxProperties(const QString & selectedPidOption)
+{
+    QObject *PIDx = sender();
+
+    QDoubleSpinBox *minPID;
+    QDoubleSpinBox *maxPID;
+
+    if (PIDx == m_txpid->PID1) {
+        minPID = m_txpid->MinPID1;
+        maxPID = m_txpid->MaxPID1;
+    } else if (PIDx == m_txpid->PID2) {
+        minPID = m_txpid->MinPID2;
+        maxPID = m_txpid->MaxPID2;
+    } else if (PIDx == m_txpid->PID3) {
+        minPID = m_txpid->MinPID3;
+        maxPID = m_txpid->MaxPID3;
+    } else {
+        qDebug() << "updateSpinBoxProperties: Incorrect sender object";
+        return;
+    }
+
+    float value = getDefaultValueForPidOption(selectedPidOption);
+
+    minPID->setValue(value);
+    maxPID->setValue(value);
 }
 
 void ConfigTxPIDWidget::refreshValues()

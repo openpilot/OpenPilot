@@ -112,7 +112,7 @@ static bool isAttitudeOption(const QString & pidOption)
 }
 
 template <class StabilizationSettingsBankX>
-static float defaultValueForPidOption(const StabilizationSettingsBankX & bank, const QString & pidOption)
+static float defaultValueForPidOption(const StabilizationSettingsBankX *bank, const QString & pidOption)
 {
     if (pidOption == "Disabled") {
         return 0.0f;

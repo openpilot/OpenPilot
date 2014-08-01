@@ -28,6 +28,7 @@
 #include "configtxpidwidget.h"
 #include "txpidsettings.h"
 #include "hwsettings.h"
+#include "stabilizationsettings.h"
 #include "stabilizationsettingsbank1.h"
 #include "stabilizationsettingsbank2.h"
 #include "stabilizationsettingsbank3.h"
@@ -196,8 +197,8 @@ static float defaultValueForPidOption(const StabilizationSettingsBankX & bank, c
 float ConfigTxPIDWidget::getDefaultValueForPidOption(const QString & pidOption)
 {
     if (pidOption == "GyroTau") {
-        // TODO: Implement
-        return 0.0f;
+        StabilizationSettings *stab = qobject_cast<StabilizationSettings *>(getObject(QString("StabilizationSettings")));
+        return stab->getGyroTau();
     }
 
     uint bankNumber = m_txpid->pidBank->currentIndex() + 1;

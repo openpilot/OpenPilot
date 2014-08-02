@@ -49,6 +49,9 @@ static xSemaphoreHandle mutex = 0;
 #endif
 
 static bool logging_enabled = false;
+#define MAX_CONSECUTIVE_FAILS_COUNT 10
+static bool log_is_full     = false;
+static uint8_t fails_count  = 0;
 static uint16_t flightnum   = 0;
 static uint16_t lognum = 0;
 static DebugLogEntryData *buffer = 0;
@@ -56,8 +59,16 @@ static DebugLogEntryData *buffer = 0;
 static DebugLogEntryData staticbuffer;
 #endif
 
-/* Private Function Prototypes */
+#define LOG_ENTRY_MAX_DATA_SIZE (sizeof(((DebugLogEntryData *)0)->Data))
+#define LOG_ENTRY_HEADER_SIZE   (sizeof(DebugLogEntryData) - LOG_ENTRY_MAX_DATA_SIZE)
+// build the obj_id as a DEBUGLOGENTRY ID with least significant byte zeroed and filled with flight number
+#define LOG_GET_FLIGHT_OBJID(x) ((DEBUGLOGENTRY_OBJID & ~0xFF) | (x & 0xFF))
 
+static uint32_t used_buffer_space = 0;
+
+/* Private Function Prototypes */
+static void enqueue_data(uint32_t objid, uint16_t instid, size_t size, uint8_t *data);
+static bool write_current_buffer();
 /**
  * @brief Initialize the log facility
  */
@@ -75,9 +86,12 @@ void PIOS_DEBUGLOG_Initialize()
         return;
     }
     mutexlock();
-    lognum    = 0;
-    flightnum = 0;
-    while (PIOS_FLASHFS_ObjLoad(pios_user_fs_id, flightnum * 256, lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
+    lognum      = 0;
+    flightnum   = 0;
+    fails_count = 0;
+    used_buffer_space = 0;
+    log_is_full = false;
+    while (PIOS_FLASHFS_ObjLoad(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
         flightnum++;
     }
     mutexunlock();
@@ -90,6 +104,11 @@ void PIOS_DEBUGLOG_Initialize()
  */
 void PIOS_DEBUGLOG_Enable(uint8_t enabled)
 {
+    // increase the flight num as soon as logging is disabled
+    if (logging_enabled && !enabled) {
+        flightnum++;
+        lognum = 0;
+    }
     logging_enabled = enabled;
 }
 
@@ -103,30 +122,13 @@ void PIOS_DEBUGLOG_Enable(uint8_t enabled)
  */
 void PIOS_DEBUGLOG_UAVObject(uint32_t objid, uint16_t instid, size_t size, uint8_t *data)
 {
-    if (!logging_enabled || !buffer) {
+    if (!logging_enabled || !buffer || log_is_full) {
         return;
     }
     mutexlock();
-    buffer->Flight     = flightnum;
-#if defined(PIOS_INCLUDE_FREERTOS)
-    buffer->FlightTime = xTaskGetTickCount() * portTICK_RATE_MS;
-#else
-    buffer->FlightTime = 0;
-#endif
-    buffer->Entry      = lognum;
-    buffer->Type       = DEBUGLOGENTRY_TYPE_UAVOBJECT;
-    buffer->ObjectID   = objid;
-    buffer->InstanceID = instid;
-    if (size > sizeof(buffer->Data)) {
-        size = sizeof(buffer->Data);
-    }
-    buffer->Size = size;
-    memset(buffer->Data, 0xff, sizeof(buffer->Data));
-    memcpy(buffer->Data, data, size);
 
-    if (PIOS_FLASHFS_ObjSave(pios_user_fs_id, flightnum * 256, lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
-        lognum++;
-    }
+    enqueue_data(objid, instid, size, data);
+
     mutexunlock();
 }
 /**
@@ -137,27 +139,30 @@ void PIOS_DEBUGLOG_UAVObject(uint32_t objid, uint16_t instid, size_t size, uint8
  */
 void PIOS_DEBUGLOG_Printf(char *format, ...)
 {
-    if (!logging_enabled || !buffer) {
+    if (!logging_enabled || !buffer || log_is_full) {
         return;
     }
+
     va_list args;
     va_start(args, format);
     mutexlock();
+    // flush any pending buffer before writing debug text
+    if (used_buffer_space) {
+        write_current_buffer();
+    }
     memset(buffer->Data, 0xff, sizeof(buffer->Data));
     vsnprintf((char *)buffer->Data, sizeof(buffer->Data), (char *)format, args);
     buffer->Flight     = flightnum;
-#if defined(PIOS_INCLUDE_FREERTOS)
-    buffer->FlightTime = xTaskGetTickCount() * portTICK_RATE_MS;
-#else
-    buffer->FlightTime = 0;
-#endif
+
+    buffer->FlightTime = PIOS_DELAY_GetuS();
+
     buffer->Entry      = lognum;
     buffer->Type       = DEBUGLOGENTRY_TYPE_TEXT;
     buffer->ObjectID   = 0;
     buffer->InstanceID = 0;
     buffer->Size       = strlen((const char *)buffer->Data);
 
-    if (PIOS_FLASHFS_ObjSave(pios_user_fs_id, flightnum * 256, lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
+    if (PIOS_FLASHFS_ObjSave(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
         lognum++;
     }
     mutexunlock();
@@ -179,7 +184,7 @@ void PIOS_DEBUGLOG_Printf(char *format, ...)
 int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, uint16_t inst)
 {
     PIOS_Assert(mybuffer);
-    return PIOS_FLASHFS_ObjLoad(pios_user_fs_id, flight * 256, inst, (uint8_t *)mybuffer, sizeof(DebugLogEntryData));
+    return PIOS_FLASHFS_ObjLoad(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flight), inst, (uint8_t *)mybuffer, sizeof(DebugLogEntryData));
 }
 
 /**
@@ -214,11 +219,68 @@ void PIOS_DEBUGLOG_Format(void)
 {
     mutexlock();
     PIOS_FLASHFS_Format(pios_user_fs_id);
-    lognum    = 0;
-    flightnum = 0;
+    lognum      = 0;
+    flightnum   = 0;
+    log_is_full = false;
+    fails_count = 0;
+    used_buffer_space = 0;
     mutexunlock();
 }
 
+void enqueue_data(uint32_t objid, uint16_t instid, size_t size, uint8_t *data)
+{
+    DebugLogEntryData *entry;
+
+    // start a new block
+    if (!used_buffer_space) {
+        entry = buffer;
+        memset(buffer->Data, 0xff, sizeof(buffer->Data));
+        used_buffer_space += size;
+    } else {
+        // if an instance is being filled and there is enough space, does enqueues new data.
+        if (used_buffer_space + size + LOG_ENTRY_HEADER_SIZE > LOG_ENTRY_MAX_DATA_SIZE) {
+            buffer->Type = DEBUGLOGENTRY_TYPE_MULTIPLEUAVOBJECTS;
+            if (!write_current_buffer()) {
+                return;
+            }
+            entry = buffer;
+            memset(buffer->Data, 0xff, sizeof(buffer->Data));
+            used_buffer_space += size;
+        } else {
+            entry = (DebugLogEntryData *)&buffer->Data[used_buffer_space];
+            used_buffer_space += size + LOG_ENTRY_HEADER_SIZE;
+        }
+    }
+
+    entry->Flight     = flightnum;
+    entry->FlightTime = PIOS_DELAY_GetuS();
+    entry->Entry = lognum;
+    entry->Type = DEBUGLOGENTRY_TYPE_UAVOBJECT;
+    entry->ObjectID   = objid;
+    entry->InstanceID = instid;
+    if (size > sizeof(buffer->Data)) {
+        size = sizeof(buffer->Data);
+    }
+    entry->Size = size;
+
+    memcpy(entry->Data, data, size);
+}
+
+bool write_current_buffer()
+{
+    // not enough space, write the block and start a new one
+    if (PIOS_FLASHFS_ObjSave(pios_user_fs_id, LOG_GET_FLIGHT_OBJID(flightnum), lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
+        lognum++;
+        fails_count = 0;
+        used_buffer_space = 0;
+    } else {
+        if (fails_count++ > MAX_CONSECUTIVE_FAILS_COUNT) {
+            log_is_full = true;
+        }
+        return false;
+    }
+    return true;
+}
 /**
  * @}
  * @}

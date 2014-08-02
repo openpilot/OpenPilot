@@ -15,7 +15,6 @@ The full list of features, improvements and bugfixes in this release is accessib
 
 http://progress.openpilot.org/issues/?filter=11460
 
-
 ** New Feature & Improvements
     * [OP-943] - Start using F4's Core Coupled RAM for more than just the IRQ handler stack
     * [OP-974] - Make Bootloader Version available while flight software is running
@@ -136,8 +135,6 @@ http://progress.openpilot.org/issues/?filter=11460
     * [OP-1254] - Update to QT5.2.1 for Linux x86/64
     * [OP-1263] - Move SDL out of Qt install
     * [OP-1309] - Stabilization refactoring
-
-
 
 --- RELEASE-14.01 --- Cruising Ratt ---
 This is the first 2014 software release. 

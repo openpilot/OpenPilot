@@ -255,41 +255,41 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
 {
     GPSVelocitySensorData GpsVelocity;
 
-    msgtracker.currentTOW = pvt->iTOW;
+    msgtracker.currentTOW   = pvt->iTOW;
     msgtracker.msg_received = (SOL_RECEIVED | VELNED_RECEIVED | POSLLH_RECEIVED);
 
-	GpsVelocity.North = (float)pvt->velN / 100.0f;
-	GpsVelocity.East  = (float)pvt->velE / 100.0f;
-	GpsVelocity.Down  = (float)pvt->velD / 100.0f;
-	GPSVelocitySensorSet(&GpsVelocity);
+    GpsVelocity.North = (float)pvt->velN / 100.0f;
+    GpsVelocity.East  = (float)pvt->velE / 100.0f;
+    GpsVelocity.Down  = (float)pvt->velD / 100.0f;
+    GPSVelocitySensorSet(&GpsVelocity);
 
-	GpsPosition->Groundspeed     = (float)pvt->gSpeed * 0.01f;
-	GpsPosition->Heading         = (float)pvt->heading * 1.0e-5f;
-	GpsPosition->Altitude        = (float)pvt->hMSL * 0.001f;
-	GpsPosition->GeoidSeparation = (float)(pvt->height - pvt->hMSL) * 0.001f;
-	GpsPosition->Latitude        = pvt->lat;
-	GpsPosition->Longitude       = pvt->lon;
-	GpsPosition->Satellites 	 = pvt->numSV;
-	if(pvt->flags & PVT_FLAGS_GNNSFIX_OK) {
-		GpsPosition->Status = pvt->fixType == PVT_FIX_TYPE_3D ?
-				GPSPOSITIONSENSOR_STATUS_FIX3D : GPSPOSITIONSENSOR_STATUS_FIX2D;
-	} else {
-		GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_NOFIX;
-	}
+    GpsPosition->Groundspeed     = (float)pvt->gSpeed * 0.01f;
+    GpsPosition->Heading         = (float)pvt->heading * 1.0e-5f;
+    GpsPosition->Altitude        = (float)pvt->hMSL * 0.001f;
+    GpsPosition->GeoidSeparation = (float)(pvt->height - pvt->hMSL) * 0.001f;
+    GpsPosition->Latitude        = pvt->lat;
+    GpsPosition->Longitude       = pvt->lon;
+    GpsPosition->Satellites      = pvt->numSV;
+    if (pvt->flags & PVT_FLAGS_GNNSFIX_OK) {
+        GpsPosition->Status = pvt->fixType == PVT_FIX_TYPE_3D ?
+                              GPSPOSITIONSENSOR_STATUS_FIX3D : GPSPOSITIONSENSOR_STATUS_FIX2D;
+    } else {
+        GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_NOFIX;
+    }
 #if !defined(PIOS_GPS_MINIMAL)
-	if (pvt->valid & PVT_VALID_VALIDTIME) {
-		// Time is valid, set GpsTime
-		GPSTimeData GpsTime;
+    if (pvt->valid & PVT_VALID_VALIDTIME) {
+        // Time is valid, set GpsTime
+        GPSTimeData GpsTime;
 
-		GpsTime.Year   = pvt->year;
-		GpsTime.Month  = pvt->month;
-		GpsTime.Day    = pvt->day;
-		GpsTime.Hour   = pvt->hour;
-		GpsTime.Minute = pvt->min;
-		GpsTime.Second = pvt->sec;
+        GpsTime.Year   = pvt->year;
+        GpsTime.Month  = pvt->month;
+        GpsTime.Day    = pvt->day;
+        GpsTime.Hour   = pvt->hour;
+        GpsTime.Minute = pvt->min;
+        GpsTime.Second = pvt->sec;
 
-		GPSTimeSet(&GpsTime);
-	}
+        GPSTimeSet(&GpsTime);
+    }
 #endif
 }
 #if !defined(PIOS_GPS_MINIMAL)

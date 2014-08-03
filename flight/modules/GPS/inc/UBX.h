@@ -35,23 +35,23 @@
 #include "GPS.h"
 
 
-#define UBX_SYNC1         0xb5 // UBX protocol synchronization characters
-#define UBX_SYNC2         0x62
+#define UBX_SYNC1      0xb5 // UBX protocol synchronization characters
+#define UBX_SYNC2      0x62
 
 // From u-blox6 receiver protocol specification
 
 // Messages classes
-#define UBX_CLASS_NAV     0x01
+#define UBX_CLASS_NAV  0x01
 
 // Message IDs
-#define UBX_ID_POSLLH     0x02
-#define UBX_ID_STATUS     0x03
-#define UBX_ID_DOP        0x04
-#define UBX_ID_SOL        0x06
-#define UBX_ID_VELNED     0x12
-#define UBX_ID_TIMEUTC    0x21
-#define UBX_ID_SVINFO     0x30
-#define UBX_ID_PVT        0x07
+#define UBX_ID_POSLLH  0x02
+#define UBX_ID_STATUS  0x03
+#define UBX_ID_DOP     0x04
+#define UBX_ID_SOL     0x06
+#define UBX_ID_VELNED  0x12
+#define UBX_ID_TIMEUTC 0x21
+#define UBX_ID_SVINFO  0x30
+#define UBX_ID_PVT     0x07
 
 // private structures
 

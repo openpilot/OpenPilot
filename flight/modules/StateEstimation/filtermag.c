@@ -105,8 +105,9 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
         IS_SET(state->updated, SENSORUPDATES_auxMag)) {
         auxMagError = getMagError(this, state->auxMag);
         // Handles alarms only if it will rely on aux mag only
-        if (checkMagValidity(this, auxMagError,
-                             (this->auxMagUsage == AUXMAGSETTINGS_USAGE_AUXONLY))) {
+        bool auxMagValid = checkMagValidity(this, auxMagError, (this->auxMagUsage == AUXMAGSETTINGS_USAGE_AUXONLY));
+        // if we are going to use Aux only, force the update even if mag is invalid
+        if (auxMagValid || (this->auxMagUsage == AUXMAGSETTINGS_USAGE_AUXONLY)) {
             temp_mag[0] = state->auxMag[0];
             temp_mag[1] = state->auxMag[1];
             temp_mag[2] = state->auxMag[2];
@@ -123,7 +124,10 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
            }*/
         boardMagError = getMagError(this, state->boardMag);
         // sets warning only if no mag data are available (aux is invalid or missing)
-        if (checkMagValidity(this, boardMagError, temp_status == MAGSTATUS_INVALID)) {
+        bool boardMagValid = checkMagValidity(this, boardMagError, (temp_status == MAGSTATUS_INVALID));
+        // force it to be set to board mag value if no data has been feed to temp_mag yet.
+        // this works also as a failsafe in case aux mag stops feeding data.
+        if (boardMagValid || (temp_status == MAGSTATUS_INVALID)) {
             temp_mag[0] += state->boardMag[0];
             temp_mag[1] += state->boardMag[1];
             temp_mag[2] += state->boardMag[2];

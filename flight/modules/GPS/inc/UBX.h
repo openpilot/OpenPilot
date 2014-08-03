@@ -253,7 +253,7 @@ struct UBX_NAV_SVINFO {
 // OP custom messages
 struct UBX_OP_SYSINFO {
     uint32_t flightTime;
-    uint32_t HeapRemaining;
+    uint16_t HeapRemaining;
     uint16_t IRQStackRemaining;
     uint16_t SystemModStackRemaining;
     uint16_t options;

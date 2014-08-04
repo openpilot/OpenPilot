@@ -208,7 +208,7 @@ struct UBX_NAV_PVT {
     uint32_t pDOP;
     uint16_t reserved2;
     uint32_t reserved3;
-};
+} __attribute__((packed));
 
 // Space Vehicle (SV) Information
 

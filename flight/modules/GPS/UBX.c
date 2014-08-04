@@ -35,6 +35,8 @@
 #include "inc\UBX.h"
 #include "inc\GPS.h"
 
+// If a PVT sentence is received in the last UBX_PVT_TIMEOUT (ms) timeframe it disables VELNED/POSLLH/SOL/TIMEUTC
+#define UBX_PVT_TIMEOUT (1000)
 // parse incoming character stream for messages in UBX binary format
 
 int parse_ubx_stream(uint8_t c, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
@@ -254,7 +256,7 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
 {
     GPSVelocitySensorData GpsVelocity;
 
-    check_msgtracker(pvt->iTOW, (SOL_RECEIVED | VELNED_RECEIVED | POSLLH_RECEIVED));
+    check_msgtracker(pvt->iTOW, (ALL_RECEIVED));
 
     GpsVelocity.North = (float)pvt->velN * 0.001f;
     GpsVelocity.East  = (float)pvt->velE * 0.001f;
@@ -268,6 +270,7 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
     GpsPosition->Latitude        = pvt->lat;
     GpsPosition->Longitude       = pvt->lon;
     GpsPosition->Satellites      = pvt->numSV;
+    GpsPosition->PDOP = pvt->pDOP * 0.01f;
     if (pvt->flags & PVT_FLAGS_GNSSFIX_OK) {
         GpsPosition->Status = pvt->fixType == PVT_FIX_TYPE_3D ?
                               GPSPOSITIONSENSOR_STATUS_FIX3D : GPSPOSITIONSENSOR_STATUS_FIX2D;
@@ -347,33 +350,63 @@ void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
 uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
     uint32_t id = 0;
+    static uint32_t lastPvtTime;
+    static bool ubxInitialized = false;
+
+    if (!ubxInitialized) {
+        // initialize dop values. If no DOP sentence is received it is safer to initialize them to a high value rather than 0.
+        GpsPosition->HDOP = 99.99f;
+        GpsPosition->PDOP = 99.99f;
+        GpsPosition->VDOP = 99.99f;
+        ubxInitialized    = true;
+    }
+    // is it using PVT?
+    bool usePvt = (PIOS_DELAY_GetuSSince(lastPvtTime) < UBX_PVT_TIMEOUT * 1000);
 
     switch (ubx->header.class) {
     case UBX_CLASS_NAV:
-        switch (ubx->header.id) {
-        case UBX_ID_POSLLH:
-            parse_ubx_nav_posllh(&ubx->payload.nav_posllh, GpsPosition);
-            break;
-        case UBX_ID_DOP:
-            parse_ubx_nav_dop(&ubx->payload.nav_dop, GpsPosition);
-            break;
-        case UBX_ID_SOL:
-            parse_ubx_nav_sol(&ubx->payload.nav_sol, GpsPosition);
-            break;
-        case UBX_ID_VELNED:
-            parse_ubx_nav_velned(&ubx->payload.nav_velned, GpsPosition);
-            break;
+        if (!usePvt) {
+            switch (ubx->header.id) {
+            case UBX_ID_POSLLH:
+                parse_ubx_nav_posllh(&ubx->payload.nav_posllh, GpsPosition);
+                break;
+            case UBX_ID_DOP:
+                parse_ubx_nav_dop(&ubx->payload.nav_dop, GpsPosition);
+                break;
+            case UBX_ID_SOL:
+                parse_ubx_nav_sol(&ubx->payload.nav_sol, GpsPosition);
+                break;
+            case UBX_ID_VELNED:
+                parse_ubx_nav_velned(&ubx->payload.nav_velned, GpsPosition);
+                break;
+            case UBX_ID_PVT:
+                parse_ubx_nav_pvt(&ubx->payload.nav_pvt, GpsPosition);
+                lastPvtTime = PIOS_DELAY_GetuS();
+                break;
+#if !defined(PIOS_GPS_MINIMAL)
+            case UBX_ID_TIMEUTC:
+                parse_ubx_nav_timeutc(&ubx->payload.nav_timeutc);
+                break;
+            case UBX_ID_SVINFO:
+                parse_ubx_nav_svinfo(&ubx->payload.nav_svinfo);
+                break;
+#endif
+            }
+        } else {
+            switch (ubx->header.id) {
+            case UBX_ID_DOP:
+                parse_ubx_nav_dop(&ubx->payload.nav_dop, GpsPosition);
+                break;
+            }
         case UBX_ID_PVT:
             parse_ubx_nav_pvt(&ubx->payload.nav_pvt, GpsPosition);
-            break;
-#if !defined(PIOS_GPS_MINIMAL)
-        case UBX_ID_TIMEUTC:
-            parse_ubx_nav_timeutc(&ubx->payload.nav_timeutc);
+            lastPvtTime = PIOS_DELAY_GetuS();
             break;
         case UBX_ID_SVINFO:
             parse_ubx_nav_svinfo(&ubx->payload.nav_svinfo);
             break;
-#endif
+        default:
+            break;
         }
         break;
     }

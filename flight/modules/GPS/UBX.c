@@ -397,16 +397,19 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
             case UBX_ID_DOP:
                 parse_ubx_nav_dop(&ubx->payload.nav_dop, GpsPosition);
                 break;
+
+            case UBX_ID_PVT:
+                parse_ubx_nav_pvt(&ubx->payload.nav_pvt, GpsPosition);
+                lastPvtTime = PIOS_DELAY_GetuS();
+                break;
+#if !defined(PIOS_GPS_MINIMAL)
+            case UBX_ID_SVINFO:
+                parse_ubx_nav_svinfo(&ubx->payload.nav_svinfo);
+                break;
+#endif
+            default:
+                break;
             }
-        case UBX_ID_PVT:
-            parse_ubx_nav_pvt(&ubx->payload.nav_pvt, GpsPosition);
-            lastPvtTime = PIOS_DELAY_GetuS();
-            break;
-        case UBX_ID_SVINFO:
-            parse_ubx_nav_svinfo(&ubx->payload.nav_svinfo);
-            break;
-        default:
-            break;
         }
         break;
     }

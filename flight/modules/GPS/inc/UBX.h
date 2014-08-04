@@ -168,7 +168,7 @@ struct UBX_NAV_TIMEUTC {
 #define PVT_FIX_TYPE_GNSS_DEAD_RECKON  0x04 // GNSS + dead reckoning combined
 #define PVT_FIX_TYPE_TIME_ONLY         0x05 // Time only fix
 
-#define PVT_FLAGS_GNNSFIX_OK           (1 << 0)
+#define PVT_FLAGS_GNSSFIX_OK           (1 << 0)
 #define PVT_FLAGS_DIFFSOLN             (1 << 1)
 #define PVT_FLAGS_PSMSTATE_ENABLED     (1 << 2)
 #define PVT_FLAGS_PSMSTATE_ACQUISITION (2 << 2)

@@ -32,9 +32,8 @@
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-
-#include "UBX.h"
-#include "GPS.h"
+#include "inc\UBX.h"
+#include "inc\GPS.h"
 
 // parse incoming character stream for messages in UBX binary format
 
@@ -255,22 +254,21 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
 {
     GPSVelocitySensorData GpsVelocity;
 
-    msgtracker.currentTOW   = pvt->iTOW;
-    msgtracker.msg_received = (SOL_RECEIVED | VELNED_RECEIVED | POSLLH_RECEIVED);
+    check_msgtracker(pvt->iTOW, (SOL_RECEIVED | VELNED_RECEIVED | POSLLH_RECEIVED));
 
-    GpsVelocity.North = (float)pvt->velN / 100.0f;
-    GpsVelocity.East  = (float)pvt->velE / 100.0f;
-    GpsVelocity.Down  = (float)pvt->velD / 100.0f;
+    GpsVelocity.North = (float)pvt->velN * 0.001f;
+    GpsVelocity.East  = (float)pvt->velE * 0.001f;
+    GpsVelocity.Down  = (float)pvt->velD * 0.001f;
     GPSVelocitySensorSet(&GpsVelocity);
 
-    GpsPosition->Groundspeed     = (float)pvt->gSpeed * 0.01f;
+    GpsPosition->Groundspeed     = (float)pvt->gSpeed * 0.001f;
     GpsPosition->Heading         = (float)pvt->heading * 1.0e-5f;
     GpsPosition->Altitude        = (float)pvt->hMSL * 0.001f;
     GpsPosition->GeoidSeparation = (float)(pvt->height - pvt->hMSL) * 0.001f;
     GpsPosition->Latitude        = pvt->lat;
     GpsPosition->Longitude       = pvt->lon;
     GpsPosition->Satellites      = pvt->numSV;
-    if (pvt->flags & PVT_FLAGS_GNNSFIX_OK) {
+    if (pvt->flags & PVT_FLAGS_GNSSFIX_OK) {
         GpsPosition->Status = pvt->fixType == PVT_FIX_TYPE_3D ?
                               GPSPOSITIONSENSOR_STATUS_FIX3D : GPSPOSITIONSENSOR_STATUS_FIX2D;
     } else {

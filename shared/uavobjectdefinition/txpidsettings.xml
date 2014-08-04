@@ -11,15 +11,14 @@
         <field name="PIDs" units="option" type="enum"
 		elementnames="Instance1,Instance2,Instance3"
 		options="Disabled,
-			Roll Rate.Kp, Pitch Rate.Kp, Roll+Pitch Rate.Kp, Yaw Rate.Kp,
-			Roll Rate.Ki, Pitch Rate.Ki, Roll+Pitch Rate.Ki, Yaw Rate.Ki,
-			Roll Rate.Kd, Pitch Rate.Kd, Roll+Pitch Rate.Kd, Yaw Rate.Kd,
-			Roll Rate.ILimit, Pitch Rate.ILimit, Roll+Pitch Rate.ILimit, Yaw Rate.ILimit,
-			Roll Rate.Resp, Pitch Rate.Resp, Roll+Pitch Rate.Resp, Yaw Rate.Resp,
-			Roll Attitude.Kp, Pitch Attitude.Kp, Roll+Pitch Attitude.Kp, Yaw Attitude.Kp,
-			Roll Attitude.Ki, Pitch Attitude.Ki, Roll+Pitch Attitude.Ki, Yaw Attitude.Ki,
-			Roll Attitude.ILimit, Pitch Attitude.ILimit, Roll+Pitch Attitude.ILimit, Yaw Attitude.ILimit,
-			Roll Attitude.Resp, Pitch Attitude.Resp, Roll+Pitch Attitude.Resp, Yaw Attitude.Resp,
+			Roll Rate.Kp, Roll Rate.Ki, Roll Rate.Kd, Roll Rate.ILimit, Roll Rate.Resp,
+			Pitch Rate.Kp, Pitch Rate.Ki, Pitch Rate.Kd, Pitch Rate.ILimit, Pitch Rate.Resp,
+			Roll+Pitch Rate.Kp, Roll+Pitch Rate.Ki, Roll+Pitch Rate.Kd, Roll+Pitch Rate.ILimit, Roll+Pitch Rate.Resp,
+			Yaw Rate.Kp, Yaw Rate.Ki, Yaw Rate.Kd, Yaw Rate.ILimit, Yaw Rate.Resp,
+			Roll Attitude.Kp, Roll Attitude.Ki, Roll Attitude.ILimit, Roll Attitude.Resp,
+			Pitch Attitude.Kp, Pitch Attitude.Ki, Pitch Attitude.ILimit, Pitch Attitude.Resp,
+			Roll+Pitch Attitude.Kp, Roll+Pitch Attitude.Ki, Roll+Pitch Attitude.ILimit, Roll+Pitch Attitude.Resp,
+			Yaw Attitude.Kp, Yaw Attitude.Ki, Yaw Attitude.ILimit, Yaw Attitude.Resp,
 			GyroTau"
 		defaultvalue="Disabled"/>
         <field name="MinPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>

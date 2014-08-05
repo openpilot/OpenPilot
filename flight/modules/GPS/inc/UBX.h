@@ -205,7 +205,7 @@ struct UBX_NAV_PVT {
     int32_t  heading;
     uint32_t sAcc;
     uint32_t headingAcc;
-    uint32_t pDOP;
+    uint16_t pDOP;
     uint16_t reserved2;
     uint32_t reserved3;
 } __attribute__((packed));

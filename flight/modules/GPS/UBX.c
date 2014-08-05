@@ -32,8 +32,8 @@
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-#include "inc\UBX.h"
-#include "inc\GPS.h"
+#include "inc/UBX.h"
+#include "inc/GPS.h"
 
 // If a PVT sentence is received in the last UBX_PVT_TIMEOUT (ms) timeframe it disables VELNED/POSLLH/SOL/TIMEUTC
 #define UBX_PVT_TIMEOUT (1000)

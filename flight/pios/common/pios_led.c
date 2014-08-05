@@ -34,7 +34,17 @@
 
 #include <pios_gpio_priv.h>
 #include <pios_gpio.h>
+#include <stdbool.h>
 
+#ifdef PIOS_INCLUDE_WS2811
+#include <pios_ws2811.h>
+
+union {
+    Color   color;
+    uint8_t carr[3];
+} color[3];
+
+#endif
 static uint32_t pios_led_gpios_id;
 
 /**
@@ -42,6 +52,13 @@ static uint32_t pios_led_gpios_id;
  */
 int32_t PIOS_LED_Init(const struct pios_gpio_cfg *cfg)
 {
+#ifdef PIOS_INCLUDE_WS2811
+    for (uint8_t i = 0; i < 3; i++) {
+        color[i].color.R = 0;
+        color[i].color.G = 0;
+        color[i].color.B = 0;
+    }
+#endif
     PIOS_Assert(cfg);
     return PIOS_GPIO_Init(&pios_led_gpios_id, cfg);
 }
@@ -53,6 +70,12 @@ int32_t PIOS_LED_Init(const struct pios_gpio_cfg *cfg)
 void PIOS_LED_On(uint32_t led_id)
 {
     PIOS_GPIO_On(pios_led_gpios_id, led_id);
+#ifdef PIOS_INCLUDE_WS2811
+    if (led_id < 3) {
+        color[led_id].carr[led_id] = 0xff;
+        PIOS_WS2811_setColorRGB(color[led_id].color, led_id, true);
+    }
+#endif
 }
 
 /**
@@ -62,6 +85,12 @@ void PIOS_LED_On(uint32_t led_id)
 void PIOS_LED_Off(uint32_t led_id)
 {
     PIOS_GPIO_Off(pios_led_gpios_id, led_id);
+#ifdef PIOS_INCLUDE_WS2811
+    if (led_id < 3) {
+        color[led_id].carr[led_id] = 0x0;
+        PIOS_WS2811_setColorRGB(color[led_id].color, led_id, true);
+    }
+#endif
 }
 
 /**
@@ -71,6 +100,12 @@ void PIOS_LED_Off(uint32_t led_id)
 void PIOS_LED_Toggle(uint32_t led_id)
 {
     PIOS_GPIO_Toggle(pios_led_gpios_id, led_id);
+#ifdef PIOS_INCLUDE_WS2811
+    if (led_id < 3) {
+        color[led_id].carr[led_id] = !color[led_id].carr[led_id];
+        PIOS_WS2811_setColorRGB(color[led_id].color, led_id, true);
+    }
+#endif
 }
 
 #endif /* PIOS_INCLUDE_LED */

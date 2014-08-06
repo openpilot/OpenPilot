@@ -325,8 +325,8 @@ void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
     svdata.SatsInView = 0;
     for (chan = 0; chan < svinfo->numCh; chan++) {
         if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM) {
-            svdata.Azimuth[svdata.SatsInView]   = (float)svinfo->sv[chan].azim;
-            svdata.Elevation[svdata.SatsInView] = (float)svinfo->sv[chan].elev;
+            svdata.Azimuth[svdata.SatsInView]   = svinfo->sv[chan].azim;
+            svdata.Elevation[svdata.SatsInView] = svinfo->sv[chan].elev;
             svdata.PRN[svdata.SatsInView] = svinfo->sv[chan].svid;
             svdata.SNR[svdata.SatsInView] = svinfo->sv[chan].cno;
             svdata.SatsInView++;
@@ -334,8 +334,8 @@ void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
     }
     // fill remaining slots (if any)
     for (chan = svdata.SatsInView; chan < GPSSATELLITES_PRN_NUMELEM; chan++) {
-        svdata.Azimuth[chan]   = (float)0.0f;
-        svdata.Elevation[chan] = (float)0.0f;
+        svdata.Azimuth[chan]   = 0;
+        svdata.Elevation[chan] = 0;
         svdata.PRN[chan] = 0;
         svdata.SNR[chan] = 0;
     }

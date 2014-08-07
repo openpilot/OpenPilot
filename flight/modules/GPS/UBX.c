@@ -30,11 +30,11 @@
 
 #include "openpilot.h"
 #include "pios.h"
-
+#include "CoordinateConversions.h"
+#include "pios_math.h"
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 #include "inc/UBX.h"
 #include "inc/GPS.h"
-#include "CoordinateConversions.h"
 #include "auxmagsettings.h"
 
 static float mag_bias[3] = { 0, 0, 0 };
@@ -483,6 +483,7 @@ void load_mag_settings()
         float rotz;
         AuxMagSettingsmag_transformArrayGet((float *)a);
         AuxMagSettingsOrientationGet(&rotz);
+        rotz = DEG2RAD(rotz);
         rot_about_axis_z(rotz, b);
         matrix_mult_3x3f(a, b, mag_transform);
         AuxMagSettingsmag_biasArrayGet(mag_bias);

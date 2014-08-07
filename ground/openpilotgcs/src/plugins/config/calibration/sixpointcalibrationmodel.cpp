@@ -592,7 +592,7 @@ void SixPointCalibrationModel::save()
         if (externalMagAvailable) {
             AuxMagSettings::DataFields auxCalibrationData = auxMagSettings->getData();
             // Note that Revo/AuxMag MAG_TRANSFORM_RxCx are interchangeable, an assertion at initialization enforces the structs are equal
-            for (int i = 0; i < RevoCalibration::MAG_TRANSFORM_R2C2; i++) {
+            for (int i = 0; i < RevoCalibration::MAG_TRANSFORM_NUMELEM; i++) {
                 auxCalibrationData.mag_transform[i] = result.auxMagSettingsData.mag_transform[i];
             }
             for (int i = 0; i < 3; i++) {

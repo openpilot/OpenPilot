@@ -115,7 +115,7 @@ int32_t FixedWingPathFollowerInitialize()
     HwSettingsOptionalModulesGet(&optionalModules);
     FrameType_t frameType = GetCurrentFrameType();
 
-    if ((optionalModules.FixedWingPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) ||
+    if ((optionalModules.FixedWingPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) || true ||
         (frameType == FRAME_TYPE_FIXED_WING)) {
         followerEnabled = true;
         FixedWingPathFollowerSettingsInitialize();
@@ -169,13 +169,13 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
         // FlightMode is PathPlanner and PathDesired.Mode is Endpoint or Path
 
         SystemSettingsGet(&systemSettings);
-        if ((systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING) &&
+        /*if ((systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING) &&
             (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON) &&
             (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGVTAIL)) {
             AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
             vTaskDelay(1000);
             continue;
-        }
+           }*/
 
         // Continue collecting data if not enough time
         vTaskDelayUntil(&lastUpdateTime, fixedwingpathfollowerSettings.UpdatePeriod / portTICK_RATE_MS);

@@ -129,10 +129,11 @@ int32_t VtolPathFollowerInitialize()
     HwSettingsOptionalModulesData optionalModules;
 
     HwSettingsOptionalModulesGet(&optionalModules);
-    FrameType_t frameType = GetCurrentFrameType();
+    // FrameType_t frameType = GetCurrentFrameType();
 
-    if ((optionalModules.VtolPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) ||
-        (frameType == FRAME_TYPE_MULTIROTOR)) {
+    // if ((optionalModules.VtolPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) ||
+    // (frameType == FRAME_TYPE_MULTIROTOR)) {
+    if (false) {
         VtolPathFollowerSettingsInitialize();
         NedAccelInitialize();
         PathDesiredInitialize();

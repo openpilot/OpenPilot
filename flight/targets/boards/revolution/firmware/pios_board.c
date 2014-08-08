@@ -624,14 +624,18 @@ void PIOS_Board_Init(void)
         }
 #endif
         break;
-    case HWSETTINGS_RM_MAINPORT_DSM2:
+    case HWSETTINGS_RM_MAINPORT_DSM210BIT:
+    case HWSETTINGS_RM_MAINPORT_DSM211BIT:
     case HWSETTINGS_RM_MAINPORT_DSMX10BIT:
     case HWSETTINGS_RM_MAINPORT_DSMX11BIT:
     {
         enum pios_dsm_proto proto;
         switch (hwsettings_mainport) {
-        case HWSETTINGS_RM_MAINPORT_DSM2:
-            proto = PIOS_DSM_PROTO_DSM2;
+        case HWSETTINGS_RM_MAINPORT_DSM210BIT:
+            proto = PIOS_DSM_PROTO_DSM210BIT;
+            break;
+        case HWSETTINGS_RM_MAINPORT_DSM211BIT:
+            proto = PIOS_DSM_PROTO_DSM211BIT;
             break;
         case HWSETTINGS_RM_MAINPORT_DSMX10BIT:
             proto = PIOS_DSM_PROTO_DSMX10BIT;
@@ -693,14 +697,18 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_FLEXIPORT_GPS:
         PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_GPS_RX_BUF_LEN, -1, &pios_usart_com_driver, &pios_com_gps_id);
         break;
-    case HWSETTINGS_RM_FLEXIPORT_DSM2:
+    case HWSETTINGS_RM_FLEXIPORT_DSM210BIT:
+    case HWSETTINGS_RM_FLEXIPORT_DSM211BIT:
     case HWSETTINGS_RM_FLEXIPORT_DSMX10BIT:
     case HWSETTINGS_RM_FLEXIPORT_DSMX11BIT:
     {
         enum pios_dsm_proto proto;
         switch (hwsettings_flexiport) {
-        case HWSETTINGS_RM_FLEXIPORT_DSM2:
-            proto = PIOS_DSM_PROTO_DSM2;
+        case HWSETTINGS_RM_FLEXIPORT_DSM210BIT:
+            proto = PIOS_DSM_PROTO_DSM210BIT;
+            break;
+        case HWSETTINGS_RM_FLEXIPORT_DSM211BIT:
+            proto = PIOS_DSM_PROTO_DSM211BIT;
             break;
         case HWSETTINGS_RM_FLEXIPORT_DSMX10BIT:
             proto = PIOS_DSM_PROTO_DSMX10BIT;

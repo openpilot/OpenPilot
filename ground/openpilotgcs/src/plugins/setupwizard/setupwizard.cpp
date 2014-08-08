@@ -252,14 +252,17 @@ QString SetupWizard::getSummaryText()
     case INPUT_SBUS:
         summary.append(tr("Futaba S.Bus"));
         break;
-    case INPUT_DSM2:
-        summary.append(tr("Spektrum satellite (DSM2)"));
+    case INPUT_DSM2_10:
+        summary.append(tr("Spektrum satellite (DSM2 10bits)"));
+        break;
+    case INPUT_DSM2_11:
+        summary.append(tr("Spektrum satellite (DSM2 11bits)"));
         break;
     case INPUT_DSMX10:
-        summary.append(tr("Spektrum satellite (DSMX10BIT)"));
+        summary.append(tr("Spektrum satellite (DSMX 10bits)"));
         break;
     case INPUT_DSMX11:
-        summary.append(tr("Spektrum satellite (DSMX11BIT)"));
+        summary.append(tr("Spektrum satellite (DSMX 11bits)"));
         break;
     default:
         summary.append(tr("Unknown"));

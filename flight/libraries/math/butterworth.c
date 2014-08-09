@@ -32,8 +32,6 @@
 #include "math.h"
 #include "butterworth.h"
 
-#define SQRT2 1.414213562f
-
 /**
  * Initialization function for coefficients of a second order Butterworth biquadratic filter in direct from 2.
  * Note that b1  = 2 * b0 and b2  = b0 is use here and in the sequel.
@@ -44,9 +42,9 @@
 void InitButterWorthDF2Filter(const float ff, struct ButterWorthDF2Filter *filterPtr)
 {
     const float ita = 1.0f / tanf(M_PI_F * ff);
-    const float b0  = 1.0f / (1.0f + SQRT2 * ita + ita * ita);
+    const float b0  = 1.0f / (1.0f + M_SQRT2_F * ita + ita * ita);
     const float a1  = 2.0f * b0 * (ita * ita - 1.0f);
-    const float a2  = -b0 * (1.0f - SQRT2 * ita + ita * ita);
+    const float a2  = -b0 * (1.0f - M_SQRT2_F * ita + ita * ita);
 
     filterPtr->b0 = b0;
     filterPtr->a1 = a1;

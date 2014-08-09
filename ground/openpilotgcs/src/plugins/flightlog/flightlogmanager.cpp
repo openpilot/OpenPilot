@@ -205,21 +205,47 @@ void FlightLogManager::retrieveLogs(int flightToRetrieve)
     for (int flight = startFlight; flight <= endFlight; flight++) {
         m_flightLogControl->setFlight(flight);
         bool gotLast = false;
-        int entry    = 0;
+        int slot     = 0;
         while (!gotLast) {
             // Send request for loading flight entry on flight side and wait for ack/nack
-            m_flightLogControl->setEntry(entry);
+            m_flightLogControl->setEntry(slot);
 
             if (updateHelper.doObjectAndWait(m_flightLogControl, UAVTALK_TIMEOUT) == UAVObjectUpdaterHelper::SUCCESS &&
                 requestHelper.doObjectAndWait(m_flightLogEntry, UAVTALK_TIMEOUT) == UAVObjectUpdaterHelper::SUCCESS) {
                 if (m_flightLogEntry->getType() != DebugLogEntry::TYPE_EMPTY) {
                     // Ok, we retrieved the entry, and it was the correct one. clone it and add it to the list
                     ExtendedDebugLogEntry *logEntry = new ExtendedDebugLogEntry();
+
                     logEntry->setData(m_flightLogEntry->getData(), m_objectManager);
                     m_logEntries << logEntry;
+                    if (logEntry->getData().Type == DebugLogEntry::TYPE_MULTIPLEUAVOBJECTS) {
+                        const quint32 total_len  = sizeof(DebugLogEntry::DataFields);
+                        const quint32 data_len   = sizeof(((DebugLogEntry::DataFields *)0)->Data);
+                        const quint32 header_len = total_len - data_len;
+
+                        DebugLogEntry::DataFields fields;
+                        quint32 start = logEntry->getData().Size;
+
+                        // cycle until there is space for another object
+                        while (start + header_len + 1 < data_len) {
+                            memset(&fields, 0xFF, total_len);
+                            memcpy(&fields, &logEntry->getData().Data[start], header_len);
+                            // check wether a packed object is found
+                            // note that empty data blocks are set as 0xFF in flight side to minimize flash wearing
+                            // thus as soon as this read outside of used area, the test will fail as lenght would be 0xFFFF
+                            quint32 toread = header_len + fields.Size;
+                            if (!(toread + start > data_len)) {
+                                memcpy(&fields, &logEntry->getData().Data[start], toread);
+                                ExtendedDebugLogEntry *subEntry = new ExtendedDebugLogEntry();
+                                subEntry->setData(fields, m_objectManager);
+                                m_logEntries << subEntry;
+                            }
+                            start += toread;
+                        }
+                    }
 
                     // Increment to get next entry from flight side
-                    entry++;
+                    slot++;
                 } else {
                     // We are done, not more entries on this flight
                     gotLast = true;
@@ -280,7 +306,7 @@ void FlightLogManager::exportToOPL(QString fileName)
             ExtendedDebugLogEntry *entry = m_logEntries[currentEntry];
 
             // Only log uavobjects
-            if (entry->getType() == ExtendedDebugLogEntry::TYPE_UAVOBJECT) {
+            if (entry->getType() == ExtendedDebugLogEntry::TYPE_UAVOBJECT || entry->getType() == ExtendedDebugLogEntry::TYPE_MULTIPLEUAVOBJECTS) {
                 // Set timestamp that should be logged for this entry
                 logFile.setNextTimeStamp(entry->getFlightTime() - adjustedBaseTime);
 
@@ -615,7 +641,7 @@ QString ExtendedDebugLogEntry::getLogString()
 {
     if (getType() == DebugLogEntry::TYPE_TEXT) {
         return QString((const char *)getData().Data);
-    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT || getType() == DebugLogEntry::TYPE_MULTIPLEUAVOBJECTS) {
         return m_object->toString().replace("\n", " ").replace("\t", " ");
     } else {
         return "";
@@ -631,7 +657,7 @@ void ExtendedDebugLogEntry::toXML(QXmlStreamWriter *xmlWriter, quint32 baseTime)
     if (getType() == DebugLogEntry::TYPE_TEXT) {
         xmlWriter->writeAttribute("type", "text");
         xmlWriter->writeTextElement("message", QString((const char *)getData().Data));
-    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT || getType() == DebugLogEntry::TYPE_MULTIPLEUAVOBJECTS) {
         xmlWriter->writeAttribute("type", "uavobject");
         m_object->toXML(xmlWriter);
     }
@@ -644,7 +670,7 @@ void ExtendedDebugLogEntry::toCSV(QTextStream *csvStream, quint32 baseTime)
 
     if (getType() == DebugLogEntry::TYPE_TEXT) {
         data = QString((const char *)getData().Data);
-    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+    } else if (getType() == DebugLogEntry::TYPE_UAVOBJECT || getType() == DebugLogEntry::TYPE_MULTIPLEUAVOBJECTS) {
         data = m_object->toString().replace("\n", "").replace("\t", "");
     }
     *csvStream << QString::number(getFlight() + 1) << '\t' << QString::number(getFlightTime() - baseTime) << '\t' << QString::number(getEntry()) << '\t' << data << '\n';
@@ -654,7 +680,7 @@ void ExtendedDebugLogEntry::setData(const DebugLogEntry::DataFields &data, UAVOb
 {
     DebugLogEntry::setData(data);
 
-    if (getType() == DebugLogEntry::TYPE_UAVOBJECT) {
+    if (getType() == DebugLogEntry::TYPE_UAVOBJECT || getType() == DebugLogEntry::TYPE_MULTIPLEUAVOBJECTS) {
         UAVDataObject *object = (UAVDataObject *)objectManager->getObject(getObjectID(), getInstanceID());
         Q_ASSERT(object);
         m_object = object->clone(getInstanceID());

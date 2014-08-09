@@ -425,7 +425,7 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
             // get motor 2 value for Yaw and Roll
             channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
             value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
-            setYawMixLevel(-qRound(value / 1.27));
+            setYawMixLevel(qRound(value / 1.27));
 
             // change channels
             channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
@@ -454,7 +454,7 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
             // get motor 2 value for Yaw and Roll
             channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
             value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
-            setYawMixLevel(-qRound(value / 1.27));
+            setYawMixLevel(qRound(value / 1.27));
 
             channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
             value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
@@ -480,9 +480,9 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
             m_aircraft->mrPitchMixLevel->setValue(qRound(value / 1.27));
 
             // get motor 2 value for Yaw and Roll
-            channel += 1;
+            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
             value    = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
-            setYawMixLevel(-qRound(value / 1.27));
+            setYawMixLevel(qRound(value / 1.27));
 
             channel  = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
             value    = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);

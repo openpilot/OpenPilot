@@ -42,6 +42,7 @@
 #include <flightstatus.h>
 #include <manualcontrolcommand.h>
 #include <stabilizationbank.h>
+#include <gpspositionsensor.h>
 
 
 #include <stabilization.h>
@@ -134,6 +135,35 @@ static void stabilizationOuterloopTask()
         quat_inverse(q_error);
         Quaternion2RPY(q_error, local_error);
 
+        #define MAXCOUNT 250
+        static uint8_t count = MAXCOUNT;
+        static uint8_t oldmode = 255;
+        uint8_t flightmode;
+        static float heading;
+
+        FlightStatusFlightModeGet(&flightmode);
+        if (flightmode != oldmode) {
+            oldmode = flightmode;
+            count = MAXCOUNT;
+        }
+        if (flightmode == FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
+            if (++count >= MAXCOUNT) {
+                count = 0;
+                GPSPositionSensorHeadingGet(&heading);
+                if (heading > 180.0f) {
+                   heading = heading - 360.0f;
+                }
+            }
+            local_error[2] = stabilizationDesiredAxis[2] - (attitudeState.Yaw - heading);
+            // find shortest way
+            float modulo = fmodf(local_error[2] + 180.0f, 360.0f);
+            if (modulo < 0.0f) {
+                local_error[2] = modulo + 180.0f;
+            } else {
+                local_error[2] = modulo - 180.0f;
+            }
+            cast_struct_to_array(enabled, enabled.Roll)[2] = STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE; 
+        }
 #else /* if defined(PIOS_QUATERNION_STABILIZATION) */
         // Simpler algorithm for CC, less memory
         local_error[0] = stabilizationDesiredAxis[0] - attitudeState.Roll;

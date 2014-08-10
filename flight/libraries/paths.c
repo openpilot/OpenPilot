@@ -26,6 +26,7 @@
 
 #include <pios.h>
 #include <pios_math.h>
+#include <mathmisc.h>
 
 #include "paths.h"
 
@@ -34,8 +35,8 @@
 // no direct UAVObject usage allowed in this file
 
 // private functions
-static void path_endpoint(float *start_point, float *end_point, float *cur_point, struct path_status *status);
-static void path_vector(float *start_point, float *end_point, float *cur_point, struct path_status *status);
+static void path_endpoint(float *start_point, float *end_point, float *cur_point, struct path_status *status, bool mode);
+static void path_vector(float *start_point, float *end_point, float *cur_point, struct path_status *status, bool mode);
 static void path_circle(float *start_point, float *end_point, float *cur_point, struct path_status *status, bool clockwise);
 
 /**
@@ -50,8 +51,11 @@ void path_progress(float *start_point, float *end_point, float *cur_point, struc
 {
     switch (mode) {
     case PATHDESIRED_MODE_FLYVECTOR:
+        return path_vector(start_point, end_point, cur_point, status, true);
+
+	break;
     case PATHDESIRED_MODE_DRIVEVECTOR:
-        return path_vector(start_point, end_point, cur_point, status);
+        return path_vector(start_point, end_point, cur_point, status, false);
 
         break;
     case PATHDESIRED_MODE_FLYCIRCLERIGHT:
@@ -65,10 +69,13 @@ void path_progress(float *start_point, float *end_point, float *cur_point, struc
 
         break;
     case PATHDESIRED_MODE_FLYENDPOINT:
+        return path_endpoint(start_point, end_point, cur_point, status, true);
+
+        break;
     case PATHDESIRED_MODE_DRIVEENDPOINT:
     default:
         // use the endpoint as default failsafe if called in unknown modes
-        return path_endpoint(start_point, end_point, cur_point, status);
+        return path_endpoint(start_point, end_point, cur_point, status, false);
 
         break;
     }
@@ -80,39 +87,48 @@ void path_progress(float *start_point, float *end_point, float *cur_point, struc
  * @param[in] end_point Ending point
  * @param[in] cur_point Current location
  * @param[out] status Structure containing progress along path and deviation
+ * @param[in] mode3D set true to include altitude in distance and progress calculation
  */
-static void path_endpoint(float *start_point, float *end_point, float *cur_point, struct path_status *status)
+static void path_endpoint(float *start_point, float *end_point, float *cur_point, struct path_status *status, bool mode3D)
 {
-    float path_north, path_east, diff_north, diff_east;
+    float path[3], diff[3];
     float dist_path, dist_diff;
 
     // we do not correct in this mode
-    status->correction_direction[0] = status->correction_direction[1] = 0;
+    status->correction_direction[0] = status->correction_direction[1] = status->correction_direction[2] = 0;
 
     // Distance to go
-    path_north = end_point[0] - start_point[0];
-    path_east  = end_point[1] - start_point[1];
+    path[0] = end_point[0] - start_point[0];
+    path[1] = end_point[1] - start_point[1];
+    path[2] = mode3D ? end_point[2] - start_point[2] : 0;
 
     // Current progress location relative to end
-    diff_north = end_point[0] - cur_point[0];
-    diff_east  = end_point[1] - cur_point[1];
+    diff[0] = end_point[0] - cur_point[0];
+    diff[1] = end_point[1] - cur_point[1];
+    diff[2] = mode3D ? end_point[2] - cur_point[2] : 0;
 
-    dist_diff  = sqrtf(diff_north * diff_north + diff_east * diff_east);
-    dist_path  = sqrtf(path_north * path_north + path_east * path_east);
+    dist_diff  = sqrtf(diff[0]*diff[0] + diff[1]*diff[1] + diff[2]*diff[2]);
+    dist_path  = sqrtf(path[0]*path[0] + path[1]*path[1] + path[2]*path[2]);
 
     if (dist_diff < 1e-6f) {
         status->fractional_progress = 1;
         status->error = 0;
-        status->path_direction[0]   = status->path_direction[1] = 0;
+        status->path_direction[0] = status->path_direction[1] = 0;
+        status->path_direction[2] = 1;
         return;
     }
 
-    status->fractional_progress = 1 - dist_diff / (1 + dist_path);
+    if (dist_path + 1 > dist_diff) {
+        status->fractional_progress = 1 - dist_diff / (1 + dist_path);
+    } else {
+        status->fractional_progress = 0; // we don't want fractional_progress to become negative
+    }
     status->error = dist_diff;
 
     // Compute direction to travel
-    status->path_direction[0] = diff_north / dist_diff;
-    status->path_direction[1] = diff_east / dist_diff;
+    status->path_direction[0] = diff[0] / dist_diff;
+    status->path_direction[1] = diff[1] / dist_diff;
+    status->path_direction[2] = diff[2] / dist_diff;
 }
 
 /**
@@ -121,51 +137,65 @@ static void path_endpoint(float *start_point, float *end_point, float *cur_point
  * @param[in] end_point Ending point
  * @param[in] cur_point Current location
  * @param[out] status Structure containing progress along path and deviation
+ * @param[in] mode3D set true to include altitude in distance and progress calculation
  */
-static void path_vector(float *start_point, float *end_point, float *cur_point, struct path_status *status)
+static void path_vector(float *start_point, float *end_point, float *cur_point, struct path_status *status, bool mode3D)
 {
-    float path_north, path_east, diff_north, diff_east;
+    float path[3], diff[3];
     float dist_path;
     float dot;
-    float normal[2];
+    float track_point[3];
 
     // Distance to go
-    path_north = end_point[0] - start_point[0];
-    path_east  = end_point[1] - start_point[1];
+    path[0] = end_point[0] - start_point[0];
+    path[1] = end_point[1] - start_point[1];
+    path[2] = mode3D ? end_point[2] - start_point[2] : 0;
 
     // Current progress location relative to start
-    diff_north = cur_point[0] - start_point[0];
-    diff_east  = cur_point[1] - start_point[1];
+    diff[0] = cur_point[0] - start_point[0];
+    diff[1] = cur_point[1] - start_point[1];
+    diff[2] = mode3D ? cur_point[2] - start_point[2]: 0;
 
-    dot = path_north * diff_north + path_east * diff_east;
-    dist_path  = sqrtf(path_north * path_north + path_east * path_east);
+    dot = path[0] * diff[0] + path[1] * diff[1] + path[2] * diff[2];
+    dist_path  = sqrtf(path[0] * path[0] + path[1] * path[1] + path[2] * path[2]);
 
-    if (dist_path < 1e-6f) {
-        // if the path is too short, we cannot determine vector direction.
+    if (dist_path > 1e-6f) {
+        // Compute direction to travel & progress
+        status->path_direction[0] = path[0] / dist_path;
+        status->path_direction[1] = path[1] / dist_path;
+        status->path_direction[2] = path[2] / dist_path;
+        status->fractional_progress = dot / (dist_path * dist_path);
+    } else {
         // Fly towards the endpoint to prevent flying away,
         // but assume progress=1 either way.
-        path_endpoint(start_point, end_point, cur_point, status);
+        path_endpoint(start_point, end_point, cur_point, status, mode3D);
         status->fractional_progress = 1;
         return;
     }
 
-    // Compute the normal to the path
-    normal[0]     = -path_east / dist_path;
-    normal[1]     = path_north / dist_path;
+    // Compute point on track that is closest to our current position.
+    track_point[0] = status->fractional_progress * path[0] + start_point[0];
+    track_point[1] = status->fractional_progress * path[1] + start_point[1];
+    track_point[2] = status->fractional_progress * path[2] + start_point[2];
 
-    status->fractional_progress = dot / (dist_path * dist_path);
-    status->error = normal[0] * diff_north + normal[1] * diff_east;
+    status->correction_direction[0] = track_point[0] - cur_point[0];
+    status->correction_direction[1] = track_point[1] - cur_point[1];
+    status->correction_direction[2] = track_point[2] - cur_point[2];
 
-    // Compute direction to correct error
-    status->correction_direction[0] = (status->error > 0) ? -normal[0] : normal[0];
-    status->correction_direction[1] = (status->error > 0) ? -normal[1] : normal[1];
+    status->error = sqrt(status->correction_direction[0] * status->correction_direction[0] +
+                         status->correction_direction[1] * status->correction_direction[1] +
+                         status->correction_direction[2] * status->correction_direction[2]);
 
-    // Now just want magnitude of error
-    status->error = fabs(status->error);
-
-    // Compute direction to travel
-    status->path_direction[0] = path_north / dist_path;
-    status->path_direction[1] = path_east / dist_path;
+    // Normalize correction_direction but avoid division by zero
+    if (status->error > 1e-6f) {
+        status->correction_direction[0] /= status->error;
+        status->correction_direction[1] /= status->error;
+        status->correction_direction[2] /= status->error;
+    } else {
+        status->correction_direction[0] = 0;
+        status->correction_direction[1] = 0;
+        status->correction_direction[2] = 1;
+    }
 }
 
 /**
@@ -200,8 +230,10 @@ static void path_circle(float *start_point, float *end_point, float *cur_point, 
         status->error = radius;
         status->correction_direction[0] = 0;
         status->correction_direction[1] = 1;
+        status->correction_direction[2] = 0;
         status->path_direction[0] = 1;
         status->path_direction[1] = 0;
+        status->path_direction[2] = 0;
         return;
     }
 
@@ -246,10 +278,12 @@ static void path_circle(float *start_point, float *end_point, float *cur_point, 
     // Compute direction to correct error
     status->correction_direction[0] = (status->error > 0 ? 1 : -1) * diff_north / cradius;
     status->correction_direction[1] = (status->error > 0 ? 1 : -1) * diff_east / cradius;
+    status->correction_direction[2] = 0;
 
     // Compute direction to travel
     status->path_direction[0] = normal[0];
     status->path_direction[1] = normal[1];
+    status->path_direction[2] = 0;
 
     status->error = fabs(status->error);
 }

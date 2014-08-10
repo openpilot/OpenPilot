@@ -33,8 +33,7 @@ DEBUG ?= YES
 # List of modules to include
 MODULES = ManualControl Stabilization GPS
 MODULES += PathPlanner
-MODULES += FixedWingPathFollower
-MODULES += VtolPathFollower
+MODULES += PathFollower
 MODULES += CameraStab
 MODULES += Telemetry
 MODULES += Logging

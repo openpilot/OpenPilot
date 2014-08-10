@@ -132,6 +132,7 @@ static PiOSDeltatimeConfig landdT;
 void plan_setup_land()
 {
     float descendspeed;
+
     plan_setup_positionHold();
 
     FlightModeSettingsLandingVelocityGet(&descendspeed);

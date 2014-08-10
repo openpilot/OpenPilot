@@ -1,18 +1,23 @@
 <xml>
     <object name="VtolPathFollowerSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings for the @ref VtolPathFollowerModule</description>
-        <field name="GuidanceMode" units="" type="enum" elements="1" options="DUAL_LOOP,VELOCITY_CONTROL" defaultvalue="DUAL_LOOP"/>
-        <field name="HorizontalVelMax" units="m/s" type="uint16" elements="1" defaultvalue="2"/>
-        <field name="VerticalVelMax" units="m/s" type="uint16" elements="1" defaultvalue="1"/>
-        <field name="HorizontalPosPI" units="(m/s)/m" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.25,0.02,1"/>
-        <field name="HorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="8,0.5,0.002,4"/>
-        <field name="VerticalPosPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.4,0.02,1"/>
-        <field name="VerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.1,0.01,0,1"/>
+	<field name="TreatCustomCraftAs" units="switch" type="enum" elements="1" options="FixedWing,VTOL" defaultvalue="FixedWing"/>
+        <field name="HorizontalVelMax" units="m/s" type="float" elements="1" defaultvalue="2.0"/>
+        <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="1.0"/>
+        <field name="CourseFeedForward" units="s" type="float" elements="1" defaultvalue="1.0"/>
+        <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.25"/>
+        <field name="VerticalPosP" units="" type="float" elements="1" defaultvalue="0.4"/>
+        <field name="HorizontalVelPI" units="deg/(m/s)" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="8.0, 0.5, 10"/>
+        <field name="VerticalVelPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1, 0.01, 1.0"/>
+        <field name="ThrustLimits" units="" type="float" elementnames="Min,Neutral,Max" defaultvalue="0.2, 0.5, 0.9"/>
         <field name="VelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="2"/>
-        <field name="ThrustControl" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
-        <field name="VelocitySource" units="" type="enum" elements="1" options="STATE_ESTIMATION,GPS_VELNED,GPS_GROUNDSPEED" defaultvalue="STATE_ESTIMATION"/>
+        <field name="ThrustControl" units="" type="enum" elements="1" options="manual,auto" defaultvalue="manual"/>
+        <field name="YawControl" units="" type="enum" elements="1" options="manual,tailin,course,poi" defaultvalue="manual"/>
+	<field name="FlyawayEmergencyFallback" units="switch" type="enum" elements="1" options="disabled,enabled,always,debugtest" defaultvalue="enabled"/>
+	<field name="EmergencyFallbackAttitude" units="deg" type="float" elementnames="Roll,Pitch" defaultvalue="0,-10.0"/>
+	<field name="EmergencyFallbackYawRate" units="(deg/s)/deg" type="float" elementnames="kP,Max" defaultvalue="2.0, 30.0"/>
         <field name="MaxRollPitch" units="deg" type="float" elements="1" defaultvalue="20"/>
-        <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="50"/>
+        <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="50"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

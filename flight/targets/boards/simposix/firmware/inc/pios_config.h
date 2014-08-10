@@ -63,7 +63,7 @@
 
 /* Select the sensors to include */
 // #define PIOS_INCLUDE_BMA180
-// #define PIOS_INCLUDE_HMC5883
+// #define PIOS_INCLUDE_HMC5X83
 // #define PIOS_INCLUDE_MPU6000
 // #define PIOS_MPU6000_ACCEL
 // #define PIOS_INCLUDE_L3GD20

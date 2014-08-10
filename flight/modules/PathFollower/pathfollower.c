@@ -175,7 +175,7 @@ int32_t PathFollowerInitialize()
     resetIntegrals();
 
     // Create object queue
-    pathFollowerCBInfo = PIOS_CALLBACKSCHEDULER_Create(&pathFollowerTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_ALTITUDEHOLD, STACK_SIZE_BYTES);
+    pathFollowerCBInfo = PIOS_CALLBACKSCHEDULER_Create(&pathFollowerTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_PATHFOLLOWER, STACK_SIZE_BYTES);
     FixedWingPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
     VtolPathFollowerSettingsConnectCallback(&SettingsUpdatedCb);
     PathDesiredConnectCallback(SettingsUpdatedCb);

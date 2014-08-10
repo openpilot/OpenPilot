@@ -260,8 +260,11 @@ static float defaultValueForPidOption(const StabilizationSettingsBankX *bank, in
     case TxPIDSettings::PIDS_YAWATTITUDERESP:
         return bank->getYawMax();
 
+    case -1: // The PID Option field was uninitialized.
+        return 0.0f;
+
     default:
-        qDebug() << "getDefaultValueForOption: Incorrect PID option" << pidOption;
+        Q_ASSERT_X(false, "getDefaultValueForOption", "Incorrect PID option");
         return 0.0f;
     }
 }
@@ -273,7 +276,14 @@ float ConfigTxPIDWidget::getDefaultValueForPidOption(int pidOption)
         return stab->getGyroTau();
     }
 
-    uint bankNumber = m_txpid->pidBank->currentIndex() + 1;
+    int pidBankIndex = m_txpid->pidBank->currentIndex();
+
+    if (pidBankIndex == -1) {
+        // The pidBank field was uninitilized.
+        return 0.0f;
+    }
+
+    int bankNumber = pidBankIndex + 1;
 
     if (bankNumber == 1) {
         StabilizationSettingsBank1 *bank = qobject_cast<StabilizationSettingsBank1 *>(getObject(QString("StabilizationSettingsBank1")));
@@ -285,7 +295,7 @@ float ConfigTxPIDWidget::getDefaultValueForPidOption(int pidOption)
         StabilizationSettingsBank3 *bank = qobject_cast<StabilizationSettingsBank3 *>(getObject(QString("StabilizationSettingsBank3")));
         return defaultValueForPidOption(bank, pidOption);
     } else {
-        qDebug() << "getDefaultValueForPidOption: Incorrect bank number:" << bankNumber;
+        Q_ASSERT_X(false, "getDefaultValueForPidOption", "Incorrect bank number");
         return 0.0f;
     }
 }
@@ -307,7 +317,7 @@ void ConfigTxPIDWidget::updateSpinBoxProperties(int selectedPidOption)
         minPID = m_txpid->MinPID3;
         maxPID = m_txpid->MaxPID3;
     } else {
-        qDebug() << "updateSpinBoxProperties: Incorrect sender object";
+        Q_ASSERT_X(false, "updateSpinBoxProperties", "Incorrect sender object");
         return;
     }
 

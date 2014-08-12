@@ -1,13 +1,17 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{
+ * @addtogroup AirspeedModule Airspeed Module
+ * @brief Calculate airspeed as a function of the difference between sequential ground velocity and attitude measurements
+ * @{
  *
- * @file       configtxpidwidget.h
+ * @file       imu_airspeed.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup GCSPlugins GCS Plugins
- * @{
- * @addtogroup ConfigPlugin Config Plugin
- * @{
- * @brief The Configuration Gadget used to configure TxPID module
+ * @brief      Airspeed module, reads temperature and pressure from BMP085
+ *
+ * @see        The GNU Public License (GPL) Version 3
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,27 +28,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGTXPIDWIDGET_H
-#define CONFIGTXPIDWIDGET_H
+#ifndef IMU_AIRSPEED_H
+#define IMU_AIRSPEED_H
 
-#include "ui_txpid.h"
-#include "configtaskwidget.h"
+void imu_airspeedInitialize(const AirspeedSettingsData *airspeedSettings);
+void imu_airspeedGet(AirspeedSensorData *airspeedData, const AirspeedSettingsData *airspeedSettings);
 
-class ConfigTxPIDWidget : public ConfigTaskWidget {
-    Q_OBJECT
+#endif // IMU_AIRSPEED_H
 
-public:
-    ConfigTxPIDWidget(QWidget *parent = 0);
-    ~ConfigTxPIDWidget();
-private:
-    Ui_TxPIDWidget *m_txpid;
-
-private slots:
-    void updateSpinBoxProperties(int selectedPidOption);
-    float getDefaultValueForPidOption(int pidOption);
-    void refreshValues();
-    void applySettings();
-    void saveSettings();
-};
-
-#endif // CONFIGTXPIDWIDGET_H
+/**
+ * @}
+ * @}
+ */

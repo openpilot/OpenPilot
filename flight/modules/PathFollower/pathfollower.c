@@ -122,6 +122,7 @@ static uint8_t updateAutoPilotFixedWing();
 static uint8_t updateAutoPilotVtol();
 static float updateTailInBearing();
 static float updateCourseBearing();
+static float updatePathBearing();
 static float updatePOIBearing();
 static void processPOI();
 static void updatePathVelocity(float kFF, float kH, float kV, bool limited);
@@ -355,8 +356,11 @@ static uint8_t updateAutoPilotVtol()
             case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_TAILIN:
                 yaw = updateTailInBearing();
                 break;
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_COURSE:
+            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
                 yaw = updateCourseBearing();
+                break;
+            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_PATHDIRECTION:
+                yaw = updatePathBearing();
                 break;
             case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_POI:
                 yaw = updatePOIBearing();
@@ -405,6 +409,33 @@ static float updateCourseBearing()
     VelocityStateGet(&v);
     // atan2f always returns in between + and - 180 degrees
     float yaw = RAD2DEG(atan2f(v.East, v.North));
+    // result is in between 0 and 360 degrees
+    if (yaw < 0.0f) {
+        yaw += 360.0f;
+    }
+    return yaw;
+}
+
+/**
+ * Compute bearing of current path direction
+ */
+static float updatePathBearing()
+{
+    PositionStateData positionState;
+
+    PositionStateGet(&positionState);
+
+    float cur[3] = { positionState.North,
+                     positionState.East,
+                     positionState.Down };
+    struct path_status progress;
+
+    path_progress(cast_struct_to_array(pathDesired.Start, pathDesired.Start.North),
+                  cast_struct_to_array(pathDesired.End, pathDesired.End.North),
+                  cur, &progress, pathDesired.Mode);
+
+    // atan2f always returns in between + and - 180 degrees
+    float yaw = RAD2DEG(atan2f(progress.path_direction[1], progress.path_direction[0]));
     // result is in between 0 and 360 degrees
     if (yaw < 0.0f) {
         yaw += 360.0f;

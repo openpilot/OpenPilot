@@ -61,13 +61,14 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     addWidgetBinding("TxPIDSettings", "BankNumber", m_txpid->pidBank, 0, 1, true);
 
-    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID1, TxPIDSettings::PIDS_INSTANCE1);
-    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID2, TxPIDSettings::PIDS_INSTANCE2);
-    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID3, TxPIDSettings::PIDS_INSTANCE3);
-
     addWidgetBinding("TxPIDSettings", "Inputs", m_txpid->Input1, TxPIDSettings::INPUTS_INSTANCE1);
     addWidgetBinding("TxPIDSettings", "Inputs", m_txpid->Input2, TxPIDSettings::INPUTS_INSTANCE2);
     addWidgetBinding("TxPIDSettings", "Inputs", m_txpid->Input3, TxPIDSettings::INPUTS_INSTANCE3);
+
+    // It's important that the PIDx values are populated before the MinPIDx and MaxPIDx,
+    // otherwise the MinPIDx and MaxPIDx will be capped by the old spin box limits. The correct limits
+    // are set when updateSpinBoxProperties is called when the PIDx->currentTextChanged signal is sent.
+    // The binding order is reversed because the values are populated in reverse.
 
     addWidgetBinding("TxPIDSettings", "MinPID", m_txpid->MinPID1, TxPIDSettings::MINPID_INSTANCE1);
     addWidgetBinding("TxPIDSettings", "MinPID", m_txpid->MinPID2, TxPIDSettings::MINPID_INSTANCE2);
@@ -76,6 +77,10 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addWidgetBinding("TxPIDSettings", "MaxPID", m_txpid->MaxPID1, TxPIDSettings::MAXPID_INSTANCE1);
     addWidgetBinding("TxPIDSettings", "MaxPID", m_txpid->MaxPID2, TxPIDSettings::MAXPID_INSTANCE2);
     addWidgetBinding("TxPIDSettings", "MaxPID", m_txpid->MaxPID3, TxPIDSettings::MAXPID_INSTANCE3);
+
+    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID1, TxPIDSettings::PIDS_INSTANCE1);
+    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID2, TxPIDSettings::PIDS_INSTANCE2);
+    addWidgetBinding("TxPIDSettings", "PIDs", m_txpid->PID3, TxPIDSettings::PIDS_INSTANCE3);
 
     addWidgetBinding("TxPIDSettings", "ThrottleRange", m_txpid->ThrottleMin, TxPIDSettings::THROTTLERANGE_MIN);
     addWidgetBinding("TxPIDSettings", "ThrottleRange", m_txpid->ThrottleMax, TxPIDSettings::THROTTLERANGE_MAX);
@@ -94,6 +99,50 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
 ConfigTxPIDWidget::~ConfigTxPIDWidget()
 {
     // Do nothing
+}
+
+static bool isResponsivenessOption(int pidOption)
+{
+    switch (pidOption) {
+    case TxPIDSettings::PIDS_ROLLRATERESP:
+    case TxPIDSettings::PIDS_PITCHRATERESP:
+    case TxPIDSettings::PIDS_ROLLPITCHRATERESP:
+    case TxPIDSettings::PIDS_YAWRATERESP:
+    case TxPIDSettings::PIDS_ROLLATTITUDERESP:
+    case TxPIDSettings::PIDS_PITCHATTITUDERESP:
+    case TxPIDSettings::PIDS_ROLLPITCHATTITUDERESP:
+    case TxPIDSettings::PIDS_YAWATTITUDERESP:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+static bool isAttitudeOption(int pidOption)
+{
+    switch (pidOption) {
+    case TxPIDSettings::PIDS_ROLLATTITUDEKP:
+    case TxPIDSettings::PIDS_PITCHATTITUDEKP:
+    case TxPIDSettings::PIDS_ROLLPITCHATTITUDEKP:
+    case TxPIDSettings::PIDS_YAWATTITUDEKP:
+    case TxPIDSettings::PIDS_ROLLATTITUDEKI:
+    case TxPIDSettings::PIDS_PITCHATTITUDEKI:
+    case TxPIDSettings::PIDS_ROLLPITCHATTITUDEKI:
+    case TxPIDSettings::PIDS_YAWATTITUDEKI:
+    case TxPIDSettings::PIDS_ROLLATTITUDEILIMIT:
+    case TxPIDSettings::PIDS_PITCHATTITUDEILIMIT:
+    case TxPIDSettings::PIDS_ROLLPITCHATTITUDEILIMIT:
+    case TxPIDSettings::PIDS_YAWATTITUDEILIMIT:
+    case TxPIDSettings::PIDS_ROLLATTITUDERESP:
+    case TxPIDSettings::PIDS_PITCHATTITUDERESP:
+    case TxPIDSettings::PIDS_ROLLPITCHATTITUDERESP:
+    case TxPIDSettings::PIDS_YAWATTITUDERESP:
+        return true;
+
+    default:
+        return false;
+    }
 }
 
 template <class StabilizationSettingsBankX>
@@ -151,6 +200,18 @@ static float defaultValueForPidOption(const StabilizationSettingsBankX *bank, in
     case TxPIDSettings::PIDS_YAWRATEILIMIT:
         return bank->getYawRatePID_ILimit();
 
+    case TxPIDSettings::PIDS_ROLLRATERESP:
+        return bank->getManualRate_Roll();
+
+    case TxPIDSettings::PIDS_PITCHRATERESP:
+        return bank->getManualRate_Pitch();
+
+    case TxPIDSettings::PIDS_ROLLPITCHRATERESP:
+        return bank->getManualRate_Roll();
+
+    case TxPIDSettings::PIDS_YAWRATERESP:
+        return bank->getManualRate_Yaw();
+
     case TxPIDSettings::PIDS_ROLLATTITUDEKP:
         return bank->getRollPI_Kp();
 
@@ -187,8 +248,23 @@ static float defaultValueForPidOption(const StabilizationSettingsBankX *bank, in
     case TxPIDSettings::PIDS_YAWATTITUDEILIMIT:
         return bank->getYawPI_ILimit();
 
+    case TxPIDSettings::PIDS_ROLLATTITUDERESP:
+        return (float)bank->getRollMax();
+
+    case TxPIDSettings::PIDS_PITCHATTITUDERESP:
+        return (float)bank->getPitchMax();
+
+    case TxPIDSettings::PIDS_ROLLPITCHATTITUDERESP:
+        return (float)bank->getRollMax();
+
+    case TxPIDSettings::PIDS_YAWATTITUDERESP:
+        return bank->getYawMax();
+
+    case -1: // The PID Option field was uninitialized.
+        return 0.0f;
+
     default:
-        qDebug() << "getDefaultValueForOption: Incorrect PID option" << pidOption;
+        Q_ASSERT_X(false, "getDefaultValueForOption", "Incorrect PID option");
         return 0.0f;
     }
 }
@@ -200,7 +276,14 @@ float ConfigTxPIDWidget::getDefaultValueForPidOption(int pidOption)
         return stab->getGyroTau();
     }
 
-    uint bankNumber = m_txpid->pidBank->currentIndex() + 1;
+    int pidBankIndex = m_txpid->pidBank->currentIndex();
+
+    if (pidBankIndex == -1) {
+        // The pidBank field was uninitilized.
+        return 0.0f;
+    }
+
+    int bankNumber = pidBankIndex + 1;
 
     if (bankNumber == 1) {
         StabilizationSettingsBank1 *bank = qobject_cast<StabilizationSettingsBank1 *>(getObject(QString("StabilizationSettingsBank1")));
@@ -212,7 +295,7 @@ float ConfigTxPIDWidget::getDefaultValueForPidOption(int pidOption)
         StabilizationSettingsBank3 *bank = qobject_cast<StabilizationSettingsBank3 *>(getObject(QString("StabilizationSettingsBank3")));
         return defaultValueForPidOption(bank, pidOption);
     } else {
-        qDebug() << "getDefaultValueForPidOption: Incorrect bank number:" << bankNumber;
+        Q_ASSERT_X(false, "getDefaultValueForPidOption", "Incorrect bank number");
         return 0.0f;
     }
 }
@@ -234,8 +317,33 @@ void ConfigTxPIDWidget::updateSpinBoxProperties(int selectedPidOption)
         minPID = m_txpid->MinPID3;
         maxPID = m_txpid->MaxPID3;
     } else {
-        qDebug() << "updateSpinBoxProperties: Incorrect sender object";
+        Q_ASSERT_X(false, "updateSpinBoxProperties", "Incorrect sender object");
         return;
+    }
+
+    // The ranges need to be setup before the values can be set,
+    // otherwise the value might be incorrectly capped.
+
+    if (isResponsivenessOption(selectedPidOption)) {
+        if (isAttitudeOption(selectedPidOption)) {
+            // Limit to 180 degrees.
+            minPID->setRange(0, 180);
+            maxPID->setRange(0, 180);
+        } else {
+            minPID->setRange(0, 999);
+            maxPID->setRange(0, 999);
+        }
+        minPID->setSingleStep(1);
+        maxPID->setSingleStep(1);
+        minPID->setDecimals(0);
+        maxPID->setDecimals(0);
+    } else {
+        minPID->setRange(0, 99.99);
+        maxPID->setRange(0, 99.99);
+        minPID->setSingleStep(0.000100);
+        maxPID->setSingleStep(0.000100);
+        minPID->setDecimals(6);
+        maxPID->setDecimals(6);
     }
 
     float value = getDefaultValueForPidOption(selectedPidOption);

@@ -29,6 +29,41 @@
 #include <systemalarms.h>
 #include <flightstatus.h>
 #include <pios_notify.h>
+#include <stdbool.h>
+
+#ifdef PIOS_INCLUDE_WS2811
+#include <pios_ws2811.h>
+#endif
+// Private defines
+// Maximum number of notifications enqueued when a higher priority notification is added
+#define MAX_BACKGROUND_NOTIFICATIONS 3
+#define MAX_HANDLED_LED              1
+
+#define BACKGROUND_SEQUENCE          -1
+#define RESET_STEP                   -1
+#define GET_CURRENT_MILLIS           (xTaskGetTickCount() * portTICK_RATE_MS)
+// Private data types definition
+
+// this is the status for a single LED notification led set
+typedef struct {
+    int8_t   queued_priorities[MAX_BACKGROUND_NOTIFICATIONS];
+    LedSequence_t queued_sequences[MAX_BACKGROUND_NOTIFICATIONS];
+    LedSequence_t background_sequence;
+    uint32_t next_run_time;
+    uint32_t sequence_starting_time;
+
+    int8_t   active_sequence_num; // active queued sequence or BACKGROUND_SEQUENCE
+    bool     running; // is this led running?
+    bool     step_phase_on; // true = step on phase, false = step off phase
+    uint8_t  next_sequence_step; // (step number to be executed) << 1 || (0x00 = on phase, 0x01 = off phase)
+    uint8_t  next_step_rep; // next repetition number for next step (valid if step.repeats >1)
+    uint8_t  next_sequence_rep; // next sequence repetition counter (valid if sequence.repeats > 1)
+    uint8_t  led_set; // target led set
+} NotifierLedStatus_t;
+
+#ifdef PIOS_INCLUDE_WS2811
+static bool led_status_initialized = false;
+#endif
 
 #ifdef PIOS_LED_ALARM
 #define ALARM_LED_ON()  PIOS_LED_On(PIOS_LED_ALARM)
@@ -137,6 +172,9 @@ static bool handleAlarms(uint16_t *r_pattern, uint16_t *b_pattern);
 static bool handleNotifications(pios_notify_notification runningNotification, uint16_t *r_pattern, uint16_t *b_pattern);
 static void handleFlightMode(uint16_t *r_pattern, uint16_t *b_pattern);
 static void handleHeartbeat(uint16_t *r_pattern, uint16_t *b_pattern);
+
+static void HandleExtLeds();
+
 void NotificationUpdateStatus()
 {
     started = true;
@@ -150,7 +188,7 @@ void NotificationUpdateStatus()
 
 void NotificationOnboardLedsRun()
 {
-    static portTickType lastRunTimestamp;
+    static uint32_t lastRunTimestamp;
     static uint16_t r_pattern;
     static uint16_t b_pattern;
     static uint8_t cycleCount; // count the number of cycles
@@ -164,11 +202,13 @@ void NotificationOnboardLedsRun()
         STATUS_LENGHT
     } status;
 
-    if (!started || (xTaskGetTickCount() - lastRunTimestamp) < (LED_BLINK_PERIOD_MS * portTICK_RATE_MS / 4)) {
+    HandleExtLeds();
+    const uint32_t current_timestamp = GET_CURRENT_MILLIS;
+    if (!started || (current_timestamp - lastRunTimestamp) < LED_BLINK_PERIOD_MS) {
         return;
     }
 
-    lastRunTimestamp = xTaskGetTickCount();
+    lastRunTimestamp = current_timestamp;
     // the led will show various status information, subdivided in three phases
     // - Notification
     // - Alarm
@@ -294,3 +334,212 @@ static void handleHeartbeat(uint16_t *r_pattern, uint16_t *b_pattern)
     *b_pattern = BLINK_B_HEARTBEAT_PATTERN;
     *r_pattern = BLINK_R_HEARTBEAT_PATTERN;
 }
+
+#ifdef PIOS_INCLUDE_WS2811
+
+NotifierLedStatus_t led_status[MAX_HANDLED_LED];
+
+static void InitExtLed()
+{
+    memset(led_status, 0, sizeof(NotifierLedStatus_t) * MAX_HANDLED_LED);
+    const uint32_t now = GET_CURRENT_MILLIS;
+    for (uint8_t l = 0; l < MAX_HANDLED_LED; l++) {
+        led_status[l].led_set = l;
+        led_status[l].next_run_time = now + 500; // start within half a second
+        for (uint8_t i = 0; i < MAX_BACKGROUND_NOTIFICATIONS; i++) {
+            led_status[l].queued_priorities[i] = NOTIFY_PRIORITY_BACKGROUND;
+        }
+    }
+}
+
+/**
+ * restart current sequence
+ */
+static void restart_sequence(NotifierLedStatus_t *status, bool immediate)
+{
+    status->next_sequence_step = 0;
+    status->next_step_rep = 0;
+    status->step_phase_on = true;
+    status->running = true;
+    if (immediate) {
+        uint32_t currentTime = GET_CURRENT_MILLIS;
+        status->next_run_time = currentTime;
+    }
+    status->sequence_starting_time = status->next_run_time;
+}
+
+/**
+ * modify background sequence or enqueue a new sequence to play
+ */
+static void push_queued_sequence(ExtLedNotification_t *new_notification, NotifierLedStatus_t *status)
+{
+    int8_t updated_sequence = BACKGROUND_SEQUENCE;
+
+    if (new_notification->priority == NOTIFY_PRIORITY_BACKGROUND) {
+        status->background_sequence = new_notification->sequence;
+    } else {
+        // a notification with priority higher than background.
+        // try to enqueue it
+        int8_t insert_point = -1;
+        int8_t first_free   = -1;
+        for (int8_t i = MAX_BACKGROUND_NOTIFICATIONS; i > -1; i--) {
+            const int8_t priority_i = status->queued_priorities[i];
+            if (priority_i == NOTIFY_PRIORITY_BACKGROUND) {
+                first_free   = i;
+                insert_point = i;
+                continue;
+            }
+            if (priority_i > new_notification->priority) {
+                insert_point = i;
+            }
+        }
+
+        if (insert_point != first_free) {
+            // there is a free slot, move everything up one place
+            if (first_free != -1) {
+                for (uint8_t i = MAX_BACKGROUND_NOTIFICATIONS - 1; i > insert_point; i--) {
+                    status->queued_priorities[i] = status->queued_priorities[i - 1];
+                    status->queued_sequences[i]  = status->queued_sequences[i - 1];
+                }
+                if (status->active_sequence_num >= insert_point) {
+                    status->active_sequence_num++;
+                }
+            } else {
+                // no free space, discard lowest priority notification and move everything down
+                for (uint8_t i = 0; i < insert_point; i++) {
+                    status->queued_priorities[i] = status->queued_priorities[i + 1];
+                    status->queued_sequences[i]  = status->queued_sequences[i + 1];
+                }
+                if (status->active_sequence_num <= insert_point) {
+                    status->active_sequence_num--;
+                }
+            }
+        }
+
+        status->queued_priorities[insert_point] = new_notification->priority;
+        status->queued_sequences[insert_point]  = new_notification->sequence;
+        updated_sequence = insert_point;
+    }
+
+    if (status->active_sequence_num < updated_sequence) {
+        status->active_sequence_num = updated_sequence;
+        restart_sequence(status, true);
+    }
+    if (updated_sequence == BACKGROUND_SEQUENCE) {
+        restart_sequence(status, false);
+    }
+}
+
+static bool pop_queued_sequence(NotifierLedStatus_t *status)
+{
+    if (status->active_sequence_num != BACKGROUND_SEQUENCE) {
+        // start the lower priority item
+        status->queued_priorities[status->active_sequence_num] = NOTIFY_PRIORITY_BACKGROUND;
+        status->active_sequence_num--;
+        return true;
+    }
+    // background sequence was completed
+    return false;
+}
+
+/**
+ * advance current sequence pointers for next step
+ */
+static void advance_sequence(NotifierLedStatus_t *status)
+{
+    LedSequence_t *activeSequence =
+        status->active_sequence_num == BACKGROUND_SEQUENCE ?
+        &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
+
+    uint8_t step = status->next_sequence_step;
+    LedStep_t *currentStep = &activeSequence->steps[step];
+
+    // Next step will be the OFF phase, so just update the time and
+    if (status->step_phase_on) {
+        // next will be the off phase
+        status->next_run_time += currentStep->time_on;
+        status->step_phase_on  = false;
+        // check if off phase should be skipped
+        if (currentStep->time_off != 0) {
+            return;
+        }
+    }
+
+    // next step is ON phase. check whether to repeat current step or move to next one
+    status->next_run_time += currentStep->time_off;
+    status->step_phase_on  = true;
+
+    if (status->next_step_rep + 1 < currentStep->repeats) {
+        // setup next repetition
+        status->next_step_rep++;
+        return;
+    }
+
+    // move to next step
+    LedStep_t *nextStep = (step + 1 < NOTIFY_SEQUENCE_MAX_STEPS) ? &activeSequence->steps[step + 1] : 0;
+
+    // next step is null, check whether sequence must be repeated or it must move to lower priority queued or background sequences
+    if (NOTIFY_IS_NULL_STEP(nextStep)) {
+        if (activeSequence->repeats == -1 || status->next_sequence_rep + 1 < activeSequence->repeats) {
+            status->next_sequence_rep++;
+            // restart the sequence
+            restart_sequence(status, false);
+            return;
+        }
+        if (status->active_sequence_num != BACKGROUND_SEQUENCE) {
+            // no repeat, pop enqueued or background sequences
+            pop_queued_sequence(status);
+            restart_sequence(status, false);
+        } else {
+            status->running = false;
+        }
+    } else {
+        status->next_step_rep = 0;
+        status->next_sequence_step++;
+    }
+}
+
+/**
+ * run a led set
+ */
+static void run_led(NotifierLedStatus_t *status)
+{
+    uint32_t currentTime = GET_CURRENT_MILLIS;
+
+    if (!status->running || currentTime < status->next_run_time) {
+        return;
+    }
+    status->next_run_time = currentTime;
+    uint8_t step = status->next_sequence_step;
+
+    LedSequence_t *activeSequence = status->active_sequence_num == BACKGROUND_SEQUENCE ?
+                                    &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
+    if (status->step_phase_on) {
+        PIOS_WS2811_setColorRGB(activeSequence->steps[step].color, status->led_set, true);
+    } else {
+        PIOS_WS2811_setColorRGB(Color_Off, status->led_set, true);
+    }
+    advance_sequence(status);
+}
+
+void HandleExtLeds()
+{
+    // handle incoming sequences
+    if (!led_status_initialized) {
+        InitExtLed();
+        led_status_initialized = true;
+    }
+    static ExtLedNotification_t *newNotification;
+    newNotification = PIOS_NOTIFY_GetNewExtLedSequence(true);
+    if (newNotification) {
+        push_queued_sequence(newNotification, &led_status[0]);
+    }
+
+    // Run Leds
+    for (uint8_t i = 0; i < MAX_HANDLED_LED; i++) {
+        run_led(&led_status[i]);
+    }
+}
+#else /* ifdef PIOS_INCLUDE_WS2811 */
+void HandleExtLeds() {}
+#endif /* ifdef PIOS_INCLUDE_WS2811 */

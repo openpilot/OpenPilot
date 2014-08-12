@@ -44,6 +44,7 @@ extern const Color_t Color_Green;
 extern const Color_t Color_Purple;
 extern const Color_t Color_Teal;
 extern const Color_t Color_Orange;
+extern const Color_t Color_White;
 
 #define COLOR_OFF     { .R = 0x00, .G = 0x00, .B = 0x00 }
 #define COLOR_RED     { .R = 0xFF, .G = 0x00, .B = 0x00 }
@@ -57,5 +58,5 @@ extern const Color_t Color_Orange;
 #define COLOR_PURPLE  { .R = 0x80, .G = 0x00, .B = 0x80 }
 #define COLOR_TEAL    { .R = 0x00, .G = 0x80, .B = 0x80 }
 #define COLOR_ORANGE  { .R = 0xFF, .G = 0xA5, .B = 0x00 }
-
+#define COLOR_WHITE   { .R = 0xAA, .G = 0xAA, .B = 0xAA }
 #endif /* UTIL_H */

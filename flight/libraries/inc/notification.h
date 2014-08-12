@@ -25,6 +25,7 @@
  */
 #ifndef NOTIFICATION_H
 #define NOTIFICATION_H
+#include <optypes.h>
 
 // period of each blink phase
 #define LED_BLINK_PERIOD_MS 200

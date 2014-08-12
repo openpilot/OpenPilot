@@ -38,3 +38,4 @@ const Color_t Color_Green   = COLOR_GREEN;
 const Color_t Color_Purple  = COLOR_PURPLE;
 const Color_t Color_Teal    = COLOR_TEAL;
 const Color_t Color_Orange  = COLOR_ORANGE;
+const Color_t Color_White   = COLOR_WHITE;

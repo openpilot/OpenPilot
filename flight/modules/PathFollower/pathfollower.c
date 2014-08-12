@@ -96,7 +96,8 @@ struct Integrals {
     float power;
     float airspeed;
     float poiRadius;
-    bool  vtolEmergencyFallback;
+    float vtolEmergencyFallback;
+    bool  vtolEmergencyFallbackSwitch;
 };
 
 
@@ -288,6 +289,7 @@ static void resetIntegrals()
     i.airspeed  = 0.0f;
     i.poiRadius = 0.0f;
     i.vtolEmergencyFallback = 0;
+    i.vtolEmergencyFallbackSwitch = false;
 }
 
 static uint8_t updateAutoPilotByFrameType()
@@ -339,7 +341,7 @@ static uint8_t updateAutoPilotFixedWing()
  */
 static uint8_t updateAutoPilotVtol()
 {
-    if (!i.vtolEmergencyFallback) {
+    if (!i.vtolEmergencyFallbackSwitch) {
         if (vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_ALWAYS) {
             updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, vtolPathFollowerSettings.HorizontalPosP, vtolPathFollowerSettings.VerticalPosP, true);
             updateVtolDesiredAttitudeEmergencyFallback();
@@ -366,9 +368,9 @@ static uint8_t updateAutoPilotVtol()
                 yaw = updatePOIBearing();
                 break;
             }
-            updateVtolDesiredAttitude(yaw_attitude, yaw);
+            result = updateVtolDesiredAttitude(yaw_attitude, yaw);
             if (!result && (vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_ENABLED || vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DEBUGTEST)) {
-                i.vtolEmergencyFallback = true;
+                i.vtolEmergencyFallbackSwitch = true;
             }
             return result;
         }
@@ -1120,10 +1122,23 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     }
 
     if ( // emergency flyaway detection
-        (fabsf(i.vel[0]) - vtolPathFollowerSettings.HorizontalVelPI.ILimit < 1e-6f || fabsf(i.vel[1]) - vtolPathFollowerSettings.HorizontalVelPI.ILimit < 1e-6f) && // integral at its limit
-        velocityDesired.North * velocityState.North + velocityDesired.East * velocityState.East < 0.0f // angle between desired and actual velocity >90 degrees
+        ( // integral already at its limit
+            vtolPathFollowerSettings.HorizontalVelPI.ILimit - fabsf(i.vel[0]) < 1e-6f ||
+            vtolPathFollowerSettings.HorizontalVelPI.ILimit - fabsf(i.vel[1]) < 1e-6f
+        ) &&
+        // angle between desired and actual velocity >90 degrees (by dot product)
+        (velocityDesired.North * velocityState.North + velocityDesired.East * velocityState.East < 0.0f) &&
+        // quad is moving at significant speed (during flyaway it would keep speeding up)
+        squaref(velocityState.North) + squaref(velocityState.East) > 1.0f
         ) {
-        result = 0; // trigger alarm - everything else is handled by callers (switch to emergency algorithm, switch to emergency waypoint in pathplanner, alarms, ...)
+        i.vtolEmergencyFallback += dT;
+        if (i.vtolEmergencyFallback >= vtolPathFollowerSettings.FlyawayEmergencyFallbackTriggerTime) {
+            // after emergency timeout, trigger alarm - everything else is handled by callers
+            // (switch to emergency algorithm, switch to emergency waypoint in pathplanner, alarms, ...)
+            result = 0;
+        }
+    } else {
+        i.vtolEmergencyFallback = 0.0f;
     }
 
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the

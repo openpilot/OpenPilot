@@ -29,7 +29,7 @@
 
 #ifdef PIOS_INCLUDE_WS2811
 
-#include "pios_ws2811.h"
+#include "pios_ws2811_cfg.h"
 #include <stm32f4xx_rcc.h>
 #include <pios_stm32.h>
 #include "FreeRTOS.h"

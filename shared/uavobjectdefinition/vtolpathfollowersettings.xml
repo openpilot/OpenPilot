@@ -12,7 +12,7 @@
         <field name="ThrustLimits" units="" type="float" elementnames="Min,Neutral,Max" defaultvalue="0.2, 0.5, 0.9"/>
         <field name="VelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="2"/>
         <field name="ThrustControl" units="" type="enum" elements="1" options="manual,auto" defaultvalue="manual"/>
-        <field name="YawControl" units="" type="enum" elements="1" options="manual,tailin,course,poi" defaultvalue="manual"/>
+        <field name="YawControl" units="" type="enum" elements="1" options="manual,tailin,movementdirection,pathdirection,poi" defaultvalue="manual"/>
 	<field name="FlyawayEmergencyFallback" units="switch" type="enum" elements="1" options="disabled,enabled,always,debugtest" defaultvalue="enabled"/>
 	<field name="EmergencyFallbackAttitude" units="deg" type="float" elementnames="Roll,Pitch" defaultvalue="0,-10.0"/>
 	<field name="EmergencyFallbackYawRate" units="(deg/s)/deg" type="float" elementnames="kP,Max" defaultvalue="2.0, 30.0"/>

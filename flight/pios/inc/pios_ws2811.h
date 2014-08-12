@@ -35,7 +35,7 @@
 #include <stm32f4xx.h>
 #include <stm32f4xx_tim.h>
 #include <stm32f4xx_dma.h>
-
+#include <optypes.h>
 
 #define sign(x) ((x > 0) - (x < 0))
 #define PIOS_WS2811_NUMLEDS            2
@@ -106,12 +106,6 @@
 
 typedef uint16_t ledbuf_t;
 
-typedef struct Color Color;
-struct Color {
-    uint8_t R;
-    uint8_t G;
-    uint8_t B;
-};
 struct pios_ws2811_pin_cfg {
     GPIO_TypeDef     *gpio;
     GPIO_InitTypeDef gpioInit;
@@ -139,9 +133,8 @@ struct pios_ws2811_cfg {
 
 void PIOS_WS2811_Init(const struct pios_ws2811_cfg *ws2811_cfg, const struct pios_ws2811_pin_cfg *ws2811_pin_cfg);
 
-void PIOS_WS2811_setColorRGB(Color c, uint8_t led, bool update);
+void PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update);
 void PIOS_WS2811_Update();
 
 void PIOS_WS2811_DMA_irq_handler();
-
 #endif /* PIOS_WS2811_H_ */

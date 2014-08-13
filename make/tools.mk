@@ -518,7 +518,7 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 #	$(V1) "$(QT_SDK_PREFIX)/patcher.sh" $(QT_SDK_PREFIX)
 # call qmake patcher
 	@$(ECHO) "Executing QtPatch in" $$(call toprel, $(QT_SDK_PREFIX))
-	$(V1) $(QT_SDK_MAINTENANCE_TOOL) --runoperation QtPatch linux $(QT_SDK_PREFIX) qt5
+	$(V1) $(QT_SDK_MAINTENANCE_TOOL) --runoperation QtPatch mac $(QT_SDK_PREFIX) qt5
 
 #Unmount the .dmg file
 	$(V1) hdiutil detach $(QT_SDK_MOUNT_DIR)

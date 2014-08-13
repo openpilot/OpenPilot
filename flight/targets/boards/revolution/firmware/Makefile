@@ -50,6 +50,7 @@ MODULES += FixedWingPathFollower
 MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
+MODULES += Notify
 
 OPTMODULES += ComUsbBridge
 

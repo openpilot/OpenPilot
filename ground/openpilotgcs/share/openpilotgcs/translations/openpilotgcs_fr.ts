@@ -7934,14 +7934,12 @@ Useful if you have accidentally changed some settings.</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avançant) en mode Attitude. Ajouter une valeur d&apos;intégrale en mode Attitude lorsque une intégrale est présente en mode Rate n&apos;est pas recommandé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KP) that is used in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KP) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8233,6 +8231,16 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Motor response time to go from min thrust to max thrust. It allows thrust anticipation on entering/exiting inverted mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Temps de réponse du moteur pour passer de la poussée minimum à la poussée maximum. Cela permet une anticipation lors de l&apos;entrée/sortie du mode inversé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KI) that is used in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KI) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KI) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KI) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -8946,7 +8954,7 @@ les données en cache</translation>
         <translation>Diagramme de Connexion</translation>
     </message>
     <message>
-        <location line="+153"/>
+        <location line="+156"/>
         <source>Save File</source>
         <translation>Enregistrer Fichier</translation>
     </message>
@@ -9297,17 +9305,19 @@ p, li { white-space: pre-wrap; }
         <translation>Hexacoptère</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+8"/>
         <location line="+1"/>
         <source>Hexacopter Coax (Y6)</source>
         <translation>Hexacoptère Coax (Y6)</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-7"/>
+        <location line="+1"/>
         <source>Hexacopter X</source>
         <translation>Hexacoptère X</translation>
     </message>
     <message>
+        <location line="+2"/>
         <location line="+1"/>
         <source>Hexacopter H</source>
         <translation>Hexacoptère H</translation>
@@ -9392,7 +9402,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+261"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+267"/>
         <location line="+76"/>
         <location line="+28"/>
         <location line="+19"/>
@@ -10256,10 +10266,28 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigMultiRotorWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+713"/>
-        <location line="+179"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+696"/>
+        <location line="+24"/>
+        <location line="+31"/>
+        <location line="+31"/>
+        <location line="+25"/>
+        <location line="+24"/>
+        <location line="+24"/>
+        <location line="+41"/>
+        <location line="+200"/>
+        <location line="+70"/>
         <source>Configuration OK</source>
         <translation>Configuration OK</translation>
+    </message>
+    <message>
+        <location line="-302"/>
+        <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign a Yaw channel&lt;/font&gt;</source>
+        <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter le canal de Yaw&lt;/font&gt;</translation>
+    </message>
+    <message>
+        <location line="+367"/>
+        <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign all %1 motor channels&lt;/font&gt;</source>
+        <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter tous les %1 canaux moteurs&lt;/font&gt;</translation>
     </message>
 </context>
 <context>
@@ -10857,7 +10885,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
-        <location line="+44"/>
+        <location line="+47"/>
         <location line="+15"/>
         <location line="+25"/>
         <location line="+13"/>
@@ -10865,7 +10893,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location line="-92"/>
+        <location line="-95"/>
         <source>Vehicle type: </source>
         <translation>Type de véhicule : </translation>
     </message>
@@ -10903,6 +10931,11 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <location line="+3"/>
         <source>Hexacopter Coax (Y6)</source>
         <translation>Hexacoptère Coax (Y6)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Hexacopter H</source>
+        <translation type="unfinished">Hexacoptère H</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -11023,7 +11056,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres matériels</translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+113"/>
         <source>Writing actuator settings</source>
         <translation>Écriture paramètres actionneurs</translation>
     </message>
@@ -11069,7 +11102,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture contrôles manuels par défaut</translation>
     </message>
     <message>
-        <location line="+153"/>
+        <location line="+154"/>
         <source>Preparing mixer settings</source>
         <translation>Préparation des paramètres de mixage</translation>
     </message>
@@ -13938,7 +13971,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>ConfigVehicleTypeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+129"/>
+        <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+130"/>
         <source>Multirotor</source>
         <translation>Multirotor</translation>
     </message>
@@ -13963,7 +13996,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <translation type="unfinished">Personnalisé</translation>
     </message>
     <message>
-        <location line="+270"/>
+        <location line="+273"/>
         <source>http://wiki.openpilot.org/x/44Cf</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
         <translation>http://wiki.openpilot.org/x/IIBqAQ</translation>

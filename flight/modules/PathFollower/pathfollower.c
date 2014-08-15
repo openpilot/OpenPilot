@@ -53,6 +53,7 @@
 #include <CoordinateConversions.h>
 #include <pios_struct_helper.h>
 #include <sin_lookup.h>
+#include <pathdesired.h>
 #include <paths.h>
 #include <sanitycheck.h>
 
@@ -62,7 +63,6 @@
 #include <vtolpathfollowersettings.h>
 #include <flightstatus.h>
 #include <pathstatus.h>
-#include <pathdesired.h>
 #include <positionstate.h>
 #include <velocitystate.h>
 #include <velocitydesired.h>
@@ -432,12 +432,10 @@ static float updatePathBearing()
                      positionState.Down };
     struct path_status progress;
 
-    path_progress(cast_struct_to_array(pathDesired.Start, pathDesired.Start.North),
-                  cast_struct_to_array(pathDesired.End, pathDesired.End.North),
-                  cur, &progress, pathDesired.Mode);
+    path_progress(&pathDesired, cur, &progress);
 
     // atan2f always returns in between + and - 180 degrees
-    float yaw = RAD2DEG(atan2f(progress.path_direction[1], progress.path_direction[0]));
+    float yaw = RAD2DEG(atan2f(progress.path_vector[1], progress.path_vector[0]));
     // result is in between 0 and 360 degrees
     if (yaw < 0.0f) {
         yaw += 360.0f;
@@ -581,40 +579,13 @@ static void updatePathVelocity(float kFF, float kH, float kV, bool limited)
                      positionState.Down + (velocityState.Down * kFF) };
     struct path_status progress;
 
-    path_progress(cast_struct_to_array(pathDesired.Start, pathDesired.Start.North),
-                  cast_struct_to_array(pathDesired.End, pathDesired.End.North),
-                  cur, &progress, pathDesired.Mode);
-
-    float groundspeed;
-    switch (pathDesired.Mode) {
-    case PATHDESIRED_MODE_FLYCIRCLERIGHT:
-    case PATHDESIRED_MODE_DRIVECIRCLERIGHT:
-    case PATHDESIRED_MODE_FLYCIRCLELEFT:
-    case PATHDESIRED_MODE_DRIVECIRCLELEFT:
-        groundspeed = pathDesired.EndingVelocity;
-        break;
-    case PATHDESIRED_MODE_FLYENDPOINT:
-    case PATHDESIRED_MODE_DRIVEENDPOINT:
-    case PATHDESIRED_MODE_FLYVECTOR:
-    case PATHDESIRED_MODE_DRIVEVECTOR:
-    default:
-        groundspeed = pathDesired.StartingVelocity + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) *
-                      boundf(progress.fractional_progress, 0.0f, 1.0f);
-        break;
-    }
-    // make sure groundspeed is not zero
-    if (limited && groundspeed < 1e-6f) {
-        groundspeed = 1e-6f;
-    }
+    path_progress(&pathDesired, cur, &progress);
 
     // calculate velocity - can be zero if waypoints are too close
     VelocityDesiredData velocityDesired;
-    velocityDesired.North = progress.path_direction[0];
-    velocityDesired.East  = progress.path_direction[1];
-    velocityDesired.Down  = progress.path_direction[2];
-
-    float error_speed_horizontal = progress.error * kH;
-    float error_speed_vertical   = progress.error * kV;
+    velocityDesired.North = progress.path_vector[0];
+    velocityDesired.East  = progress.path_vector[1];
+    velocityDesired.Down  = progress.path_vector[2];
 
     if (limited &&
         // if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
@@ -629,39 +600,27 @@ static void updatePathVelocity(float kFF, float kH, float kV, bool limited)
         // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from everything )
         // fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
         // calculating angles < 90 degrees through dot products
-        ((progress.path_direction[0] * velocityState.North + progress.path_direction[1] * velocityState.East + progress.path_direction[2] * velocityState.Down) < 0.0f) &&
-        ((progress.correction_direction[0] * velocityState.North + progress.correction_direction[1] * velocityState.East + progress.correction_direction[2] * velocityState.Down) < 0.0f)) {
-        error_speed_horizontal = 0.0f;
-        error_speed_vertical   = 0.0f;
-    }
-
-    // calculate correction - can also be zero if correction vector is 0 or no error present
-    velocityDesired.North += progress.correction_direction[0] * error_speed_horizontal;
-    velocityDesired.East  += progress.correction_direction[1] * error_speed_horizontal;
-    velocityDesired.Down  += progress.correction_direction[2] * error_speed_vertical;
-
-    // scale to correct length
-    float l = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East + velocityDesired.Down * velocityDesired.Down);
-    if (l > 1e-9f) {
-        velocityDesired.North *= groundspeed / l;
-        velocityDesired.East  *= groundspeed / l;
-        velocityDesired.Down  *= groundspeed / l;
+        (vector_lengthf(progress.path_vector, 2) > 1e-6f) &&
+        ((progress.path_vector[0] * velocityState.North + progress.path_vector[1] * velocityState.East) < 0.0f) &&
+        ((progress.correction_vector[0] * velocityState.North + progress.correction_vector[1] * velocityState.East) < 0.0f)) {
+        ;
     } else {
-        velocityDesired.North = 0.0f;
-        velocityDesired.East  = 0.0f;
-        velocityDesired.Down  = 0.0f;
+        // calculate correction
+        velocityDesired.North += progress.correction_vector[0] * kH;
+        velocityDesired.East  += progress.correction_vector[1] * kH;
     }
+    velocityDesired.Down += progress.correction_vector[2] * kV;
 
     // update pathstatus
-    pathStatus.error = progress.error;
+    pathStatus.error      = progress.error;
     pathStatus.fractional_progress  = progress.fractional_progress;
-    pathStatus.path_direction_north = progress.path_direction[0];
-    pathStatus.path_direction_east  = progress.path_direction[1];
-    pathStatus.path_direction_down  = progress.path_direction[2];
+    pathStatus.path_direction_north = progress.path_vector[0];
+    pathStatus.path_direction_east  = progress.path_vector[1];
+    pathStatus.path_direction_down  = progress.path_vector[2];
 
-    pathStatus.correction_direction_north = progress.correction_direction[0];
-    pathStatus.correction_direction_east  = progress.correction_direction[1];
-    pathStatus.correction_direction_down  = progress.correction_direction[2];
+    pathStatus.correction_direction_north = progress.correction_vector[0];
+    pathStatus.correction_direction_east  = progress.correction_vector[1];
+    pathStatus.correction_direction_down  = progress.correction_vector[2];
 
     VelocityDesiredSet(&velocityDesired);
 }

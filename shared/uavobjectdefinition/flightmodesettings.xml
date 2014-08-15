@@ -114,8 +114,6 @@
         <field name="PositionHoldOffset" units="m" type="float" elementnames="Horizontal,Vertical" defaultvalue="10,2"/>
 	<!-- optimized for current vtolpathfollower,
 	     for fixed wing pathfollower set to Horizontal=500,Vertical=5 -->
-        <field name="PositionHoldStartingVelocity" units="m/s" type="float" elements="1" defaultvalue="20"/>
-	<!-- currently ignored by vtolpathfollower -->
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

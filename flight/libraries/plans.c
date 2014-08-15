@@ -70,8 +70,6 @@ void plan_setup_positionHold()
 
     FlightModeSettingsPositionHoldOffsetData offset;
     FlightModeSettingsPositionHoldOffsetGet(&offset);
-    float startingVelocity;
-    FlightModeSettingsPositionHoldStartingVelocityGet(&startingVelocity);
 
     pathDesired.End.North        = positionState.North;
     pathDesired.End.East         = positionState.East;
@@ -79,7 +77,7 @@ void plan_setup_positionHold()
     pathDesired.Start.North      = positionState.North + offset.Horizontal; // in FlyEndPoint the direction of this vector does not matter
     pathDesired.Start.East       = positionState.East;
     pathDesired.Start.Down       = positionState.Down;
-    pathDesired.StartingVelocity = startingVelocity;
+    pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
     pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 
@@ -110,8 +108,6 @@ void plan_setup_returnToBase()
     destDown = MIN(positionStateDown, takeoffLocation.Down) - destDown;
     FlightModeSettingsPositionHoldOffsetData offset;
     FlightModeSettingsPositionHoldOffsetGet(&offset);
-    float startingVelocity;
-    FlightModeSettingsPositionHoldStartingVelocityGet(&startingVelocity);
 
     pathDesired.End.North        = takeoffLocation.North;
     pathDesired.End.East         = takeoffLocation.East;
@@ -121,7 +117,7 @@ void plan_setup_returnToBase()
     pathDesired.Start.East       = takeoffLocation.East;
     pathDesired.Start.Down       = destDown;
 
-    pathDesired.StartingVelocity = startingVelocity;
+    pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
     pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 
@@ -131,15 +127,12 @@ void plan_setup_returnToBase()
 static PiOSDeltatimeConfig landdT;
 void plan_setup_land()
 {
-    float descendspeed;
-
     plan_setup_positionHold();
 
-    FlightModeSettingsLandingVelocityGet(&descendspeed);
     PathDesiredData pathDesired;
     PathDesiredGet(&pathDesired);
-    pathDesired.StartingVelocity = descendspeed;
-    pathDesired.EndingVelocity   = descendspeed;
+    pathDesired.StartingVelocity = 0.0f;
+    pathDesired.EndingVelocity   = 0.0f;
     PathDesiredSet(&pathDesired);
     PIOS_DELTATIME_Init(&landdT, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
 }
@@ -383,8 +376,6 @@ void plan_setup_AutoCruise()
 
     FlightModeSettingsPositionHoldOffsetData offset;
     FlightModeSettingsPositionHoldOffsetGet(&offset);
-    float startingVelocity;
-    FlightModeSettingsPositionHoldStartingVelocityGet(&startingVelocity);
 
     // initialization is flight in direction of the nose.
     // the velocity is not relevant, as it will be reset by the run function even during first call
@@ -404,7 +395,7 @@ void plan_setup_AutoCruise()
     pathDesired.Start.North      = pathDesired.End.North + offset.Horizontal; // in FlyEndPoint the direction of this vector does not matter
     pathDesired.Start.East       = pathDesired.End.East;
     pathDesired.Start.Down       = pathDesired.End.Down;
-    pathDesired.StartingVelocity = startingVelocity;
+    pathDesired.StartingVelocity = 0.0f;
     pathDesired.EndingVelocity   = 0.0f;
     pathDesired.Mode             = PATHDESIRED_MODE_FLYENDPOINT;
 

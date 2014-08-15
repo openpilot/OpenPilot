@@ -1044,6 +1044,16 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
     ManualControlCommandData manualControlData;
     ManualControlCommandGet(&manualControlData);
 
+    // scale velocity if it is above configured maximum
+    float velH = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
+    if (velH > vtolPathFollowerSettings.HorizontalVelMax) {
+        velocityDesired.North *= vtolPathFollowerSettings.HorizontalVelMax / velH;
+        velocityDesired.East  *= vtolPathFollowerSettings.HorizontalVelMax / velH;
+    }
+    if (fabsf(velocityDesired.Down) > vtolPathFollowerSettings.VerticalVelMax) {
+        velocityDesired.Down *= vtolPathFollowerSettings.VerticalVelMax / fabsf(velocityDesired.Down);
+    }
+
     // Compute desired north command
     northError   = velocityDesired.North - velocityState.North;
     i.vel[0]     = boundf(i.vel[0] + northError * dT * vtolPathFollowerSettings.HorizontalVelPI.Ki,

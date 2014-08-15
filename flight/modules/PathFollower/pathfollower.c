@@ -89,12 +89,13 @@
 #define DEADBAND_LOW           -0.10f
 // Private types
 
-struct Integrals {
-    float vel[3];
-    float course;
-    float speed;
-    float power;
-    float airspeed;
+struct Globals {
+    struct pid PIDposH[2];
+    struct pid PIDposV;
+    struct pid PIDvel[3];
+    struct pid PIDcourse;
+    struct pid PIDspeed;
+    struct pid PIDpower;
     float poiRadius;
     float vtolEmergencyFallback;
     bool  vtolEmergencyFallbackSwitch;
@@ -104,7 +105,7 @@ struct Integrals {
 // Private variables
 static DelayedCallbackInfo *pathFollowerCBInfo;
 static uint32_t updatePeriod = PF_IDLE_UPDATE_RATE_MS;
-static struct Integrals i;
+static struct Globals global;
 static PathStatusData pathStatus;
 static PathDesiredData pathDesired;
 static FixedWingPathFollowerSettingsData fixedWingPathFollowerSettings;
@@ -116,7 +117,7 @@ static float indicatedAirspeedStateBias = 0.0f;
 
 // Private functions
 static void pathFollowerTask(void);
-static void resetIntegrals();
+static void resetGlobals();
 static void SettingsUpdatedCb(UAVObjEvent *ev);
 static uint8_t updateAutoPilotByFrameType();
 static uint8_t updateAutoPilotFixedWing();
@@ -126,7 +127,7 @@ static float updateCourseBearing();
 static float updatePathBearing();
 static float updatePOIBearing();
 static void processPOI();
-static void updatePathVelocity(float kFF, float kH, float kV, bool limited);
+static void updatePathVelocity(float kFF, bool limited);
 static uint8_t updateFixedDesiredAttitude();
 static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction);
 static void updateFixedAttitude();
@@ -174,7 +175,7 @@ int32_t PathFollowerInitialize()
     StabilizationBankInitialize();
 
     // reset integrals
-    resetIntegrals();
+    resetGlobals();
 
     // Create object queue
     pathFollowerCBInfo = PIOS_CALLBACKSCHEDULER_Create(&pathFollowerTask, CALLBACK_PRIORITY, CBTASK_PRIORITY, CALLBACKINFO_RUNNING_PATHFOLLOWER, STACK_SIZE_BYTES);
@@ -198,7 +199,7 @@ static void pathFollowerTask(void)
     FlightStatusGet(&flightStatus);
 
     if (flightStatus.ControlChain.PathFollower != FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
-        resetIntegrals();
+        resetGlobals();
         AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_UNINITIALISED);
         PIOS_CALLBACKSCHEDULER_Schedule(pathFollowerCBInfo, PF_IDLE_UPDATE_RATE_MS, CALLBACK_UPDATEMODE_SOONER);
         return;
@@ -246,7 +247,19 @@ static void pathFollowerTask(void)
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     FixedWingPathFollowerSettingsGet(&fixedWingPathFollowerSettings);
+
+    pid_configure(&global.PIDcourse, fixedWingPathFollowerSettings.CoursePI.Kp, fixedWingPathFollowerSettings.CoursePI.Ki, 0.0f, fixedWingPathFollowerSettings.CoursePI.ILimit);
+    pid_configure(&global.PIDspeed, fixedWingPathFollowerSettings.SpeedPI.Kp, fixedWingPathFollowerSettings.SpeedPI.Ki, 0.0f, fixedWingPathFollowerSettings.SpeedPI.ILimit);
+    pid_configure(&global.PIDpower, fixedWingPathFollowerSettings.PowerPI.Kp, fixedWingPathFollowerSettings.PowerPI.Ki, 0.0f, fixedWingPathFollowerSettings.PowerPI.ILimit);
+
+
     VtolPathFollowerSettingsGet(&vtolPathFollowerSettings);
+
+    pid_configure(&global.PIDvel[0], vtolPathFollowerSettings.HorizontalVelPID.Kp, vtolPathFollowerSettings.HorizontalVelPID.Ki, vtolPathFollowerSettings.HorizontalVelPID.Kd, vtolPathFollowerSettings.HorizontalVelPID.ILimit);
+    pid_configure(&global.PIDvel[1], vtolPathFollowerSettings.HorizontalVelPID.Kp, vtolPathFollowerSettings.HorizontalVelPID.Ki, vtolPathFollowerSettings.HorizontalVelPID.Kd, vtolPathFollowerSettings.HorizontalVelPID.ILimit);
+    pid_configure(&global.PIDvel[2], vtolPathFollowerSettings.VerticalVelPID.Kp, vtolPathFollowerSettings.VerticalVelPID.Ki, vtolPathFollowerSettings.VerticalVelPID.Kd, vtolPathFollowerSettings.VerticalVelPID.ILimit);
+    pid_configure(&global.PIDvel[2], vtolPathFollowerSettings.VerticalVelPID.Kp, vtolPathFollowerSettings.VerticalVelPID.Ki, vtolPathFollowerSettings.VerticalVelPID.Kd, vtolPathFollowerSettings.VerticalVelPID.ILimit);
+
     PathDesiredGet(&pathDesired);
 }
 
@@ -278,18 +291,20 @@ static void airspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 /**
  * reset integrals
  */
-static void resetIntegrals()
+static void resetGlobals()
 {
-    i.vel[0]    = 0.0f;
-    i.vel[1]    = 0.0f;
-    i.vel[2]    = 0.0f;
-    i.course    = 0.0f;
-    i.speed     = 0.0f;
-    i.power     = 0.0f;
-    i.airspeed  = 0.0f;
-    i.poiRadius = 0.0f;
-    i.vtolEmergencyFallback = 0;
-    i.vtolEmergencyFallbackSwitch = false;
+    pid_zero(&global.PIDposH[0]);
+    pid_zero(&global.PIDposH[1]);
+    pid_zero(&global.PIDposV);
+    pid_zero(&global.PIDvel[0]);
+    pid_zero(&global.PIDvel[1]);
+    pid_zero(&global.PIDvel[2]);
+    pid_zero(&global.PIDcourse);
+    pid_zero(&global.PIDspeed);
+    pid_zero(&global.PIDpower);
+    global.poiRadius = 0.0f;
+    global.vtolEmergencyFallback = 0;
+    global.vtolEmergencyFallbackSwitch = false;
 }
 
 static uint8_t updateAutoPilotByFrameType()
@@ -330,7 +345,10 @@ static uint8_t updateAutoPilotByFrameType()
  */
 static uint8_t updateAutoPilotFixedWing()
 {
-    updatePathVelocity(fixedWingPathFollowerSettings.CourseFeedForward, fixedWingPathFollowerSettings.HorizontalPosP, fixedWingPathFollowerSettings.VerticalPosP, true);
+    pid_configure(&global.PIDposH[0], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+    pid_configure(&global.PIDposH[1], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+    pid_configure(&global.PIDposV, fixedWingPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
+    updatePathVelocity(fixedWingPathFollowerSettings.CourseFeedForward, true);
     return updateFixedDesiredAttitude();
 }
 
@@ -341,13 +359,19 @@ static uint8_t updateAutoPilotFixedWing()
  */
 static uint8_t updateAutoPilotVtol()
 {
-    if (!i.vtolEmergencyFallbackSwitch) {
+    if (!global.vtolEmergencyFallbackSwitch) {
         if (vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_ALWAYS) {
-            updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, vtolPathFollowerSettings.HorizontalPosP, vtolPathFollowerSettings.VerticalPosP, true);
+            pid_configure(&global.PIDposH[0], 1.0f, 0.0f, 0.0f, 0.0f);
+            pid_configure(&global.PIDposH[1], 1.0f, 0.0f, 0.0f, 0.0f);
+            pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
+            updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, true);
             updateVtolDesiredAttitudeEmergencyFallback();
             return 1;
         } else {
-            updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, vtolPathFollowerSettings.HorizontalPosP, vtolPathFollowerSettings.VerticalPosP, false);
+            pid_configure(&global.PIDposH[0], vtolPathFollowerSettings.HorizontalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
+            pid_configure(&global.PIDposH[1], vtolPathFollowerSettings.HorizontalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
+            pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
+            updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, false);
             uint8_t result    = 1;
             bool yaw_attitude = true;
             float yaw = 0.0f;
@@ -370,12 +394,15 @@ static uint8_t updateAutoPilotVtol()
             }
             result = updateVtolDesiredAttitude(yaw_attitude, yaw);
             if (!result && (vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_ENABLED || vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DEBUGTEST)) {
-                i.vtolEmergencyFallbackSwitch = true;
+                global.vtolEmergencyFallbackSwitch = true;
             }
             return result;
         }
     } else {
-        updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, vtolPathFollowerSettings.HorizontalPosP, vtolPathFollowerSettings.VerticalPosP, true);
+        pid_configure(&global.PIDposH[0], 1.0f, 0.0f, 0.0f, 0.0f);
+        pid_configure(&global.PIDposH[1], 1.0f, 0.0f, 0.0f, 0.0f);
+        pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
+        updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, true);
         updateVtolDesiredAttitudeEmergencyFallback();
         return 0;
     }
@@ -454,7 +481,7 @@ static float updatePOIBearing()
     PositionStateData positionState;
     PositionStateGet(&positionState);
 
-    float dT  = updatePeriod / 1000.0f;
+    const float dT = updatePeriod / 1000.0f;
     float dLoc[3];
     float yaw = 0;
     /*float elevation = 0;*/
@@ -487,7 +514,7 @@ static float updatePOIBearing()
  **/
 static void processPOI()
 {
-    float dT = updatePeriod / 1000.0f;
+    const float dT = updatePeriod / 1000.0f;
 
 
     PositionStateData positionState;
@@ -536,14 +563,14 @@ static void processPOI()
         pathAngle = -(manualControlData.Roll - DEADBAND_LOW) * dT * 300.0f;
     } else if (manualControlData.Roll >= DEADBAND_LOW && manualControlData.Roll <= DEADBAND_HIGH) {
         // change radius only when not circling
-        i.poiRadius = distance + changeRadius;
+        global.poiRadius = distance + changeRadius;
     }
 
     // don't try to move any closer
-    if (i.poiRadius >= 3.0f || changeRadius > 0) {
+    if (global.poiRadius >= 3.0f || changeRadius > 0) {
         if (fabsf(pathAngle) > 0.0f || fabsf(changeRadius) > 0.0f) {
-            pathDesired.End.North = poi.North + (i.poiRadius * cosf(DEG2RAD(pathAngle + yaw - 180.0f)));
-            pathDesired.End.East  = poi.East + (i.poiRadius * sinf(DEG2RAD(pathAngle + yaw - 180.0f)));
+            pathDesired.End.North = poi.North + (global.poiRadius * cosf(DEG2RAD(pathAngle + yaw - 180.0f)));
+            pathDesired.End.East  = poi.East + (global.poiRadius * sinf(DEG2RAD(pathAngle + yaw - 180.0f)));
             pathDesired.StartingVelocity = 1.0f;
             pathDesired.EndingVelocity   = 0.0f;
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
@@ -565,7 +592,7 @@ static void processPOI()
 /**
  * Compute desired velocity from the current position and path
  */
-static void updatePathVelocity(float kFF, float kH, float kV, bool limited)
+static void updatePathVelocity(float kFF, bool limited)
 {
     PositionStateData positionState;
 
@@ -573,10 +600,12 @@ static void updatePathVelocity(float kFF, float kH, float kV, bool limited)
     VelocityStateData velocityState;
     VelocityStateGet(&velocityState);
 
+    const float dT = updatePeriod / 1000.0f;
+
     // look ahead kFF seconds
-    float cur[3] = { positionState.North + (velocityState.North * kFF),
-                     positionState.East + (velocityState.East * kFF),
-                     positionState.Down + (velocityState.Down * kFF) };
+    float cur[3]   = { positionState.North + (velocityState.North * kFF),
+                       positionState.East + (velocityState.East * kFF),
+                       positionState.Down + (velocityState.Down * kFF) };
     struct path_status progress;
 
     path_progress(&pathDesired, cur, &progress);
@@ -606,10 +635,10 @@ static void updatePathVelocity(float kFF, float kH, float kV, bool limited)
         ;
     } else {
         // calculate correction
-        velocityDesired.North += progress.correction_vector[0] * kH;
-        velocityDesired.East  += progress.correction_vector[1] * kH;
+        velocityDesired.North += pid_apply(&global.PIDposH[0], progress.correction_vector[0], dT);
+        velocityDesired.East  += pid_apply(&global.PIDposH[1], progress.correction_vector[1], dT);
     }
-    velocityDesired.Down += progress.correction_vector[2] * kV;
+    velocityDesired.Down += pid_apply(&global.PIDposV, progress.correction_vector[2], dT);
 
     // update pathstatus
     pathStatus.error      = progress.error;
@@ -750,15 +779,6 @@ static uint8_t updateFixedDesiredAttitude()
     /**
      * Compute desired thrust command
      */
-    // compute saturated integral error thrust response. Make integral leaky for better performance. Approximately 30s time constant.
-    if (fixedWingPathFollowerSettings.PowerPI.Ki > 0.0f) {
-        i.power = boundf(i.power + -descentspeedError * dT,
-                         -fixedWingPathFollowerSettings.PowerPI.ILimit / fixedWingPathFollowerSettings.PowerPI.Ki,
-                         fixedWingPathFollowerSettings.PowerPI.ILimit / fixedWingPathFollowerSettings.PowerPI.Ki
-                         ) * (1.0f - 1.0f / (1.0f + 30.0f / dT));
-    } else {
-        i.power = 0.0f;
-    }
 
     // Compute the cross feed from vertical speed to pitch, with saturation
     float speedErrorToPowerCommandComponent = boundf(
@@ -768,13 +788,12 @@ static uint8_t updateFixedDesiredAttitude()
         );
 
     // Compute final thrust response
-    powerCommand = -descentspeedError * fixedWingPathFollowerSettings.PowerPI.Kp +
-                   i.power * fixedWingPathFollowerSettings.PowerPI.Ki +
+    powerCommand = pid_apply(&global.PIDpower, -descentspeedError, dT) +
                    speedErrorToPowerCommandComponent;
 
     // Output internal state to telemetry
     fixedWingPathFollowerStatus.Error.Power    = descentspeedError;
-    fixedWingPathFollowerStatus.ErrorInt.Power = i.power;
+    fixedWingPathFollowerStatus.ErrorInt.Power = global.PIDpower.iAccumulator;
     fixedWingPathFollowerStatus.Command.Power  = powerCommand;
 
     // set thrust
@@ -803,17 +822,9 @@ static uint8_t updateFixedDesiredAttitude()
         result = 0;
     }
 
-
     /**
      * Compute desired pitch command
      */
-    if (fixedWingPathFollowerSettings.SpeedPI.Ki > 0) {
-        // Integrate with saturation
-        i.airspeed = boundf(i.airspeed + airspeedError * dT,
-                            -fixedWingPathFollowerSettings.SpeedPI.ILimit / fixedWingPathFollowerSettings.SpeedPI.Ki,
-                            fixedWingPathFollowerSettings.SpeedPI.ILimit / fixedWingPathFollowerSettings.SpeedPI.Ki);
-    }
-
     // Compute the cross feed from vertical speed to pitch, with saturation
     float verticalSpeedToPitchCommandComponent = boundf(-descentspeedError * fixedWingPathFollowerSettings.VerticalToPitchCrossFeed.Kp,
                                                         -fixedWingPathFollowerSettings.VerticalToPitchCrossFeed.Max,
@@ -821,12 +832,10 @@ static uint8_t updateFixedDesiredAttitude()
                                                         );
 
     // Compute the pitch command as err*Kp + errInt*Ki + X_feed.
-    pitchCommand = -(airspeedError * fixedWingPathFollowerSettings.SpeedPI.Kp
-                     + i.airspeed * fixedWingPathFollowerSettings.SpeedPI.Ki
-                     ) + verticalSpeedToPitchCommandComponent;
+    pitchCommand = -pid_apply(&global.PIDspeed, airspeedError, dT) + verticalSpeedToPitchCommandComponent;
 
     fixedWingPathFollowerStatus.Error.Speed    = airspeedError;
-    fixedWingPathFollowerStatus.ErrorInt.Speed = i.airspeed;
+    fixedWingPathFollowerStatus.ErrorInt.Speed = global.PIDspeed.iAccumulator;
     fixedWingPathFollowerStatus.Command.Speed  = pitchCommand;
 
     stabDesired.Pitch = boundf(fixedWingPathFollowerSettings.PitchLimit.Neutral + pitchCommand,
@@ -869,14 +878,10 @@ static uint8_t updateFixedDesiredAttitude()
         courseError -= 360.0f;
     }
 
-    i.course = boundf(i.course + courseError * dT * fixedWingPathFollowerSettings.CoursePI.Ki,
-                      -fixedWingPathFollowerSettings.CoursePI.ILimit,
-                      fixedWingPathFollowerSettings.CoursePI.ILimit);
-    courseCommand = (courseError * fixedWingPathFollowerSettings.CoursePI.Kp +
-                     i.course);
+    courseCommand = pid_apply(&global.PIDcourse, courseError, dT);
 
     fixedWingPathFollowerStatus.Error.Course    = courseError;
-    fixedWingPathFollowerStatus.ErrorInt.Course = i.course;
+    fixedWingPathFollowerStatus.ErrorInt.Course = global.PIDcourse.iAccumulator;
     fixedWingPathFollowerStatus.Command.Course  = courseCommand;
 
     stabDesired.Roll = boundf(fixedWingPathFollowerSettings.RollLimit.Neutral +
@@ -1013,7 +1018,7 @@ static bool correctCourse(float *C, float *V, float *F, float s)
  */
 static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 {
-    float dT = updatePeriod / 1000.0f;
+    const float dT = updatePeriod / 1000.0f;
     uint8_t result = 1;
 
     VelocityDesiredData velocityDesired;
@@ -1056,28 +1061,17 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
     // Compute desired north command
     northError   = velocityDesired.North - velocityState.North;
-    i.vel[0]     = boundf(i.vel[0] + northError * dT * vtolPathFollowerSettings.HorizontalVelPI.Ki,
-                          -vtolPathFollowerSettings.HorizontalVelPI.ILimit,
-                          vtolPathFollowerSettings.HorizontalVelPI.ILimit);
-    northCommand = (northError * vtolPathFollowerSettings.HorizontalVelPI.Kp + i.vel[0]
-                    + velocityDesired.North * vtolPathFollowerSettings.VelocityFeedforward);
+    northCommand = pid_apply(&global.PIDvel[0], northError, dT) + velocityDesired.North * vtolPathFollowerSettings.VelocityFeedforward;
 
     // Compute desired east command
-    eastError   = velocityDesired.East - velocityState.East;
-    i.vel[1]    = boundf(i.vel[1] + eastError * dT * vtolPathFollowerSettings.HorizontalVelPI.Ki,
-                         -vtolPathFollowerSettings.HorizontalVelPI.ILimit,
-                         vtolPathFollowerSettings.HorizontalVelPI.ILimit);
-    eastCommand = (eastError * vtolPathFollowerSettings.HorizontalVelPI.Kp + i.vel[1]
-                   + velocityDesired.East * vtolPathFollowerSettings.VelocityFeedforward);
+    eastError    = velocityDesired.East - velocityState.East;
+    eastCommand  = pid_apply(&global.PIDvel[1], eastError, dT) + velocityDesired.East * vtolPathFollowerSettings.VelocityFeedforward;
 
     // Compute desired down command
-    downError   = velocityDesired.Down - velocityState.Down;
+    downError    = velocityDesired.Down - velocityState.Down;
     // Must flip this sign
-    downError   = -downError;
-    i.vel[2]    = boundf(i.vel[2] + downError * dT * vtolPathFollowerSettings.VerticalVelPI.Ki,
-                         -vtolPathFollowerSettings.VerticalVelPI.ILimit,
-                         vtolPathFollowerSettings.VerticalVelPI.ILimit);
-    downCommand = (downError * vtolPathFollowerSettings.VerticalVelPI.Kp + i.vel[2]);
+    downError    = -downError;
+    downCommand  = pid_apply(&global.PIDvel[2], downError, dT);
 
     stabDesired.Thrust = boundf(downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
 
@@ -1092,22 +1086,22 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
 
     if ( // emergency flyaway detection
         ( // integral already at its limit
-            vtolPathFollowerSettings.HorizontalVelPI.ILimit - fabsf(i.vel[0]) < 1e-6f ||
-            vtolPathFollowerSettings.HorizontalVelPI.ILimit - fabsf(i.vel[1]) < 1e-6f
+            vtolPathFollowerSettings.HorizontalVelPID.ILimit - fabsf(global.PIDvel[0].iAccumulator) < 1e-6f ||
+            vtolPathFollowerSettings.HorizontalVelPID.ILimit - fabsf(global.PIDvel[1].iAccumulator) < 1e-6f
         ) &&
         // angle between desired and actual velocity >90 degrees (by dot product)
         (velocityDesired.North * velocityState.North + velocityDesired.East * velocityState.East < 0.0f) &&
         // quad is moving at significant speed (during flyaway it would keep speeding up)
         squaref(velocityState.North) + squaref(velocityState.East) > 1.0f
         ) {
-        i.vtolEmergencyFallback += dT;
-        if (i.vtolEmergencyFallback >= vtolPathFollowerSettings.FlyawayEmergencyFallbackTriggerTime) {
+        global.vtolEmergencyFallback += dT;
+        if (global.vtolEmergencyFallback >= vtolPathFollowerSettings.FlyawayEmergencyFallbackTriggerTime) {
             // after emergency timeout, trigger alarm - everything else is handled by callers
             // (switch to emergency algorithm, switch to emergency waypoint in pathplanner, alarms, ...)
             result = 0;
         }
     } else {
-        i.vtolEmergencyFallback = 0.0f;
+        global.vtolEmergencyFallback = 0.0f;
     }
 
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
@@ -1146,7 +1140,7 @@ static int8_t updateVtolDesiredAttitude(bool yaw_attitude, float yaw_direction)
  */
 static void updateVtolDesiredAttitudeEmergencyFallback()
 {
-    float dT = updatePeriod / 1000.0f;
+    const float dT = updatePeriod / 1000.0f;
 
     VelocityDesiredData velocityDesired;
     VelocityStateData velocityState;
@@ -1182,10 +1176,7 @@ static void updateVtolDesiredAttitudeEmergencyFallback()
     downError   = velocityDesired.Down - velocityState.Down;
     // Must flip this sign
     downError   = -downError;
-    i.vel[2]    = boundf(i.vel[2] + downError * dT * vtolPathFollowerSettings.VerticalVelPI.Ki,
-                         -vtolPathFollowerSettings.VerticalVelPI.ILimit,
-                         vtolPathFollowerSettings.VerticalVelPI.ILimit);
-    downCommand = (downError * vtolPathFollowerSettings.VerticalVelPI.Kp + i.vel[2]);
+    downCommand = pid_apply(&global.PIDvel[2], downError, dT);
 
     stabDesired.Thrust = boundf(downCommand + vtolPathFollowerSettings.ThrustLimits.Neutral, vtolPathFollowerSettings.ThrustLimits.Min, vtolPathFollowerSettings.ThrustLimits.Max);
 

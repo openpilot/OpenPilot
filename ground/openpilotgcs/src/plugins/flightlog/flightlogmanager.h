@@ -94,6 +94,10 @@ public slots:
             setDirty(true);
             if (m_setting != 1 && m_setting != 3) {
                 setPeriod(0);
+            } else {
+                if (!period()) {
+                    setPeriod(500);
+                }
             }
             emit settingChanged(setting);
         }
@@ -178,7 +182,7 @@ class FlightLogManager : public QObject {
     Q_PROPERTY(QStringList logSettings READ logSettings NOTIFY logSettingsChanged)
     Q_PROPERTY(QStringList logStatuses READ logStatuses NOTIFY logStatusesChanged)
     Q_PROPERTY(int loggingEnabled READ loggingEnabled WRITE setLoggingEnabled NOTIFY loggingEnabledChanged)
-
+    Q_PROPERTY(int logEntriesCount READ logEntriesCount NOTIFY logEntriesChanged)
 
 public:
     explicit FlightLogManager(QObject *parent = 0);
@@ -240,7 +244,10 @@ public:
     {
         return m_loggingEnabled;
     }
-
+    int logEntriesCount()
+    {
+        return m_logEntries.count();
+    }
 signals:
     void logEntriesChanged();
     void flightEntriesChanged();

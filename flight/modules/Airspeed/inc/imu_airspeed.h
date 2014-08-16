@@ -2,12 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup Attitude Attitude Module
+ * @addtogroup AirspeedModule Airspeed Module
+ * @brief Calculate airspeed as a function of the difference between sequential ground velocity and attitude measurements
  * @{
  *
- * @file       attitude.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
- * @brief      Acquires sensor data and fuses it into attitude estimate for CC
+ * @file       imu_airspeed.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Airspeed module, reads temperature and pressure from BMP085
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -27,11 +28,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ATTITUDE_H
-#define ATTITUDE_H
+#ifndef IMU_AIRSPEED_H
+#define IMU_AIRSPEED_H
 
-#include "openpilot.h"
+void imu_airspeedInitialize(const AirspeedSettingsData *airspeedSettings);
+void imu_airspeedGet(AirspeedSensorData *airspeedData, const AirspeedSettingsData *airspeedSettings);
 
-int32_t AttitudeInitialize(void);
+#endif // IMU_AIRSPEED_H
 
-#endif // ATTITUDE_H
+/**
+ * @}
+ * @}
+ */

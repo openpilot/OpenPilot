@@ -99,6 +99,7 @@ SRC += $(FLIGHTLIB)/sanitycheck.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 SRC += $(MATHLIB)/mathmisc.c
+SRC += $(MATHLIB)/butterworth.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
 SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c

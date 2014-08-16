@@ -64,7 +64,7 @@ SRC += $(PIOSCOMMON)/pios_etasv3.c
 SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/pios_hcsr04.c
 SRC += $(PIOSCOMMON)/pios_hmc5843.c
-SRC += $(PIOSCOMMON)/pios_hmc5883.c
+SRC += $(PIOSCOMMON)/pios_hmc5x83.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_mpu6000.c
@@ -109,6 +109,7 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 SRC += $(MATHLIB)/mathmisc.c
+SRC += $(MATHLIB)/butterworth.c
 SRC += $(FLIGHTLIB)/printf-stdarg.c
 
 ## Modules

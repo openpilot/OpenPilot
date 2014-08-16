@@ -37,23 +37,13 @@
 
 
 SerialEnumerationThread::SerialEnumerationThread(SerialConnection *serial)
-    : m_serial(serial),
-    m_running(true)
+    : m_serial(serial), m_running(false)
 {}
-
-SerialEnumerationThread::~SerialEnumerationThread()
-{
-    m_running = false;
-    // wait for the thread to terminate
-    if (wait(2100) == false) {
-        qDebug() << "Cannot terminate SerialEnumerationThread";
-    }
-}
 
 void SerialEnumerationThread::run()
 {
+    m_running = true;
     QList <Core::IConnection::device> devices = m_serial->availableDevices();
-
     while (m_running) {
         if (!m_serial->deviceOpened()) {
             QList <Core::IConnection::device> newDev = m_serial->availableDevices();
@@ -62,11 +52,22 @@ void SerialEnumerationThread::run()
                 emit enumerationChanged();
             }
         }
-
-        msleep(2000); // update available devices every two seconds (doesn't need more)
+        // update available devices every two seconds (doesn't need more)
+        msleep(2000);
     }
 }
 
+void SerialEnumerationThread::stop()
+{
+    if (!m_running) {
+        return;
+    }
+    m_running = false;
+    // wait for the thread to terminate
+    if (wait(2100) == false) {
+        qDebug() << "Cannot terminate SerialEnumerationThread";
+    }
+}
 
 SerialConnection::SerialConnection() :
     serialHandle(NULL),
@@ -100,7 +101,9 @@ SerialConnection::SerialConnection() :
 }
 
 SerialConnection::~SerialConnection()
-{}
+{
+    m_enumerateThread.stop();
+}
 
 void SerialConnection::onEnumerationChanged()
 {
@@ -114,12 +117,29 @@ bool sortPorts(const QSerialPortInfo &s1, const QSerialPortInfo &s2)
     return s1.portName() < s2.portName();
 }
 
+QList<QSerialPortInfo> SerialConnection::availablePorts()
+{
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+#if QT_VERSION == 0x050301 && defined(Q_OS_WIN)
+    // workaround to QTBUG-39748 (https://bugreports.qt-project.org/browse/QTBUG-39748)
+    // Qt 5.3.1 reports spurious ports with an empty description...
+    QMutableListIterator<QSerialPortInfo> i(ports);
+    while (i.hasNext()) {
+        if (i.next().description().isEmpty()) {
+            i.remove();
+        }
+    }
+#endif
+    return ports;
+}
+
+
 QList <Core::IConnection::device> SerialConnection::availableDevices()
 {
     QList <Core::IConnection::device> list;
 
     if (enablePolling) {
-        QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+        QList<QSerialPortInfo> ports = availablePorts();
 
         // sort the list by port number (nice idea from PT_Dreamer :))
         qSort(ports.begin(), ports.end(), sortPorts);
@@ -140,18 +160,20 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
     if (serialHandle) {
         closeDevice(deviceName);
     }
-    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    QList<QSerialPortInfo> ports = availablePorts();
     foreach(QSerialPortInfo port, ports) {
         if (port.portName() == deviceName) {
+            // don't specify a parent when constructing the QSerialPort as this object will be moved
+            // to a different thread later on (see telemetrymanager.cpp)
+            serialHandle = new QSerialPort(port);
             // we need to handle port settings here...
-            qDebug() << "Serial telemetry running at " << m_config->speed();
-            serialHandle = new QSerialPort(port, this);
             if (serialHandle->open(QIODevice::ReadWrite)) {
                 if (serialHandle->setBaudRate(m_config->speed().toInt())
                     && serialHandle->setDataBits(QSerialPort::Data8)
                     && serialHandle->setParity(QSerialPort::NoParity)
                     && serialHandle->setStopBits(QSerialPort::OneStop)
                     && serialHandle->setFlowControl(QSerialPort::NoFlowControl)) {
+                    qDebug() << "Serial telemetry running at " << m_config->speed();
                     m_deviceOpened = true;
                 }
             }
@@ -167,11 +189,10 @@ void SerialConnection::closeDevice(const QString &deviceName)
     // we have to delete the serial connection we created
     if (serialHandle) {
         serialHandle->deleteLater();
-        serialHandle   = NULL;
-        m_deviceOpened = false;
+        serialHandle = NULL;
     }
+    m_deviceOpened = false;
 }
-
 
 QString SerialConnection::connectionName()
 {
@@ -199,7 +220,7 @@ void SerialConnection::resumePolling()
     enablePolling = true;
 }
 
-SerialPlugin::SerialPlugin()
+SerialPlugin::SerialPlugin() : m_connection(0)
 {}
 
 SerialPlugin::~SerialPlugin()

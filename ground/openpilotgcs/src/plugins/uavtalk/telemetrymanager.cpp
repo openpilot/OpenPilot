@@ -53,6 +53,12 @@ bool TelemetryManager::isConnected()
 void TelemetryManager::start(QIODevice *dev)
 {
     device = dev;
+    // OP-1383
+    // take ownership of the device by moving it to the TelemetryManager thread (see TelemetryManager constructor)
+    // this removes the following runtime Qt warning and incidentally fixes GCS crashes:
+    // QObject: Cannot create children for a parent that is in a different thread.
+    // (Parent is QSerialPort(0x56af73f8), parent's thread is QThread(0x23f69ae8), current thread is QThread(0x2649cfd8)
+    device->moveToThread(thread());
     emit myStart();
 }
 

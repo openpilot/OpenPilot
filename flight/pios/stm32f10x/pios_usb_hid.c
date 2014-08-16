@@ -84,7 +84,7 @@ static struct pios_usb_hid_dev *PIOS_USB_HID_alloc(void)
 {
     struct pios_usb_hid_dev *usb_hid_dev;
 
-    usb_hid_dev = (struct pios_usb_hid_dev *)pvPortMalloc(sizeof(struct pios_usb_hid_dev));
+    usb_hid_dev = (struct pios_usb_hid_dev *)pios_malloc(sizeof(struct pios_usb_hid_dev));
     if (!usb_hid_dev) {
         return NULL;
     }

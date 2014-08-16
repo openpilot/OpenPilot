@@ -68,7 +68,7 @@ static void SettingsUpdatedCb(UAVObjEvent *ev);
 int32_t AltitudeStart()
 {
     // Start main task
-    xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+    xTaskCreate(altitudeTask, "Altitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ALTITUDE, taskHandle);
 
     return 0;

@@ -111,7 +111,7 @@ int32_t GPSStart(void)
     if (gpsEnabled) {
         if (gpsPort) {
             // Start gps task
-            xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &gpsTaskHandle);
+            xTaskCreate(gpsTask, "GPS", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &gpsTaskHandle);
             PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, gpsTaskHandle);
             return 0;
         }
@@ -175,10 +175,10 @@ int32_t GPSInitialize(void)
         GPSSettingsDataProtocolGet(&gpsProtocol);
         switch (gpsProtocol) {
         case GPSSETTINGS_DATAPROTOCOL_NMEA:
-            gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
+            gps_rx_buffer = pios_malloc(NMEA_MAX_PACKET_LENGTH);
             break;
         case GPSSETTINGS_DATAPROTOCOL_UBX:
-            gps_rx_buffer = pvPortMalloc(sizeof(struct UBXPacket));
+            gps_rx_buffer = pios_malloc(sizeof(struct UBXPacket));
             break;
         default:
             gps_rx_buffer = NULL;

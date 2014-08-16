@@ -29,22 +29,22 @@
 
 #include "ui_revosensors.h"
 #include "configtaskwidget.h"
-#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "calibration/thermal/thermalcalibrationmodel.h"
+#include "calibration/sixpointcalibrationmodel.h"
+#include "calibration/levelcalibrationmodel.h"
+#include "calibration/gyrobiascalibrationmodel.h"
+
 #include <QWidget>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QList>
 #include <QTimer>
 #include <QMutex>
-#include "calibration/thermal/thermalcalibrationmodel.h"
-#include "calibration/sixpointcalibrationmodel.h"
-#include "calibration/levelcalibrationmodel.h"
-#include "calibration/gyrobiascalibrationmodel.h"
-class Ui_Widget;
 
+class Ui_Widget;
 
 class ConfigRevoWidget : public ConfigTaskWidget {
     Q_OBJECT
@@ -54,10 +54,11 @@ public:
     ~ConfigRevoWidget();
 
 private:
-    OpenPilot::SixPointCalibrationModel *m_sixPointCalibrationModel;
-    OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
+    OpenPilot::SixPointCalibrationModel *m_accelCalibrationModel;
+    OpenPilot::SixPointCalibrationModel *m_magCalibrationModel;
     OpenPilot::LevelCalibrationModel *m_levelCalibrationModel;
     OpenPilot::GyroBiasCalibrationModel *m_gyroBiasCalibrationModel;
+    OpenPilot::ThermalCalibrationModel *m_thermalCalibrationModel;
 
     Ui_RevoSensorsWidget *m_ui;
 
@@ -66,19 +67,26 @@ private:
     bool isBoardRotationStored;
 
 private slots:
-    void displayVisualHelp(QString elementID);
     void storeAndClearBoardRotation();
     void recallBoardRotation();
-    void displayInstructions(QString instructions = QString(), bool replace = false);
+    void displayVisualHelp(QString elementID);
+    void clearInstructions();
+    void addInstructions(QString text, WizardModel::MessageType type = WizardModel::Info);
+    void displayTemperature(float tempareture);
+    void displayTemperatureGradient(float temparetureGradient);
+    void displayTemperatureRange(float temparetureRange);
 
     // ! Overriden method from the configTaskWidget to update UI
     virtual void refreshWidgetsValues(UAVObject *object = NULL);
+    virtual void updateObjectsFromWidgets();
 
     // Slot for clearing home location
     void clearHomeLocation();
 
     void disableAllCalibrations();
     void enableAllCalibrations();
+
+    void updateVisualHelp();
 
 protected:
     void showEvent(QShowEvent *event);

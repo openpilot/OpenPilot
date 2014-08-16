@@ -107,6 +107,9 @@ void ConnectionDiagram::setupGraphicsScene()
             case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
                 elementsToShow << "hexa";
                 break;
+            case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
+                elementsToShow << "hexa-x";
+                break;
             case VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y:
                 elementsToShow << "hexa-y";
                 break;

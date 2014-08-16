@@ -73,6 +73,7 @@
 
 #include "paths.h"
 #include "CoordinateConversions.h"
+#include <sanitycheck.h>
 
 #include "cameradesired.h"
 #include "poilearnsettings.h"
@@ -112,7 +113,7 @@ int32_t VtolPathFollowerStart()
 {
     if (vtolpathfollower_enabled) {
         // Start main task
-        xTaskCreate(vtolPathFollowerTask, (signed char *)"VtolPathFollower", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
+        xTaskCreate(vtolPathFollowerTask, "VtolPathFollower", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
     }
 
@@ -128,8 +129,10 @@ int32_t VtolPathFollowerInitialize()
     HwSettingsOptionalModulesData optionalModules;
 
     HwSettingsOptionalModulesGet(&optionalModules);
+    FrameType_t frameType = GetCurrentFrameType();
 
-    if (optionalModules.VtolPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    if ((optionalModules.VtolPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) ||
+        (frameType == FRAME_TYPE_MULTIROTOR)) {
         VtolPathFollowerSettingsInitialize();
         NedAccelInitialize();
         PathDesiredInitialize();
@@ -139,7 +142,6 @@ int32_t VtolPathFollowerInitialize()
         AccessoryDesiredInitialize();
         PoiLearnSettingsInitialize();
         PoiLocationInitialize();
-        HomeLocationInitialize();
         vtolpathfollower_enabled = true;
     } else {
         vtolpathfollower_enabled = false;
@@ -159,7 +161,6 @@ static float eastPosIntegral  = 0;
 static float downPosIntegral  = 0;
 
 static float thrustOffset     = 0;
-static float gravity;
 /**
  * Module thread, should not return.
  */
@@ -183,14 +184,14 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
         // 2. Flight mode is PositionHold and PathDesired.Mode is Endpoint  OR
         // FlightMode is PathPlanner and PathDesired.Mode is Endpoint or Path
 
-        HomeLocationg_eGet(&gravity);
         SystemSettingsGet(&systemSettings);
         if ((systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_QUADP)
             && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXX) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_QUADX)
             && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXAX)
             && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXACOAX) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTO)
             && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTOV) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXP)
-            && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_TRI)) {
+            && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_TRI) && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_HEXAH)
+            && (systemSettings.AirframeType != SYSTEMSETTINGS_AIRFRAMETYPE_OCTOX)) {
             AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_WARNING);
             vTaskDelay(1000);
             continue;
@@ -216,7 +217,7 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
                         updateVtolDesiredAttitude(true);
                         updatePOIBearing();
                     } else {
-                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                     }
                 } else {
                     if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
@@ -224,7 +225,7 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
                         updateVtolDesiredAttitude(false);
                         AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_OK);
                     } else {
-                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                        AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                     }
                 }
             } else {
@@ -249,7 +250,7 @@ static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
                     break;
                 default:
                     pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
-                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_ERROR);
+                    AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE, SYSTEMALARMS_ALARM_CRITICAL);
                     break;
                 }
                 PathStatusSet(&pathStatus);
@@ -686,7 +687,7 @@ static void updateNedAccel()
             accel_ned[i] += Rbe[j][i] * accel[j];
         }
     }
-    accel_ned[2] += gravity;
+    accel_ned[2] += 9.81f;
 
     NedAccelData accelData;
     NedAccelGet(&accelData);

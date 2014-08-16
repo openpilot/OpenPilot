@@ -38,10 +38,11 @@
 #include <systemsettings.h>
 #include <systemalarms.h>
 #include <revosettings.h>
+#include <positionstate.h>
 #include <taskinfo.h>
 
 // a number of useful macros
-#define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_ERROR))
+#define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
 
 
 /****************************
@@ -79,33 +80,22 @@ int32_t configuration_check()
         break;
     default:
         navCapableFusion = false;
+        // check for hitl.  hitl allows to feed position and velocity state via
+        // telemetry, this makes nav possible even with an unsuited algorithm
+        if (PositionStateHandle()) {
+            if (PositionStateReadOnly()) {
+                navCapableFusion = true;
+            }
+        }
     }
 #else
     const bool navCapableFusion = false;
-#endif
+#endif /* ifdef REVOLUTION */
 
 
     // Classify airframe type
-    bool multirotor;
-    uint8_t airframe_type;
+    bool multirotor = (GetCurrentFrameType() == FRAME_TYPE_MULTIROTOR);
 
-    SystemSettingsAirframeTypeGet(&airframe_type);
-    switch (airframe_type) {
-    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTO:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXAX:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOV:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXP:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXACOAX:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_TRI:
-    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXX:
-        multirotor = true;
-        break;
-    default:
-        multirotor = false;
-    }
 
     // For each available flight mode position sanity check the available
     // modes
@@ -151,9 +141,13 @@ int32_t configuration_check()
         }
         // intentionally no break as this also needs pathfollower
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOFPV:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIOLOS:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POSITIONVARIONSEW:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_LAND:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_POI:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
+        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:
             ADDSEVERITY(!coptercontrol);
             ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER));
             ADDSEVERITY(navCapableFusion);
@@ -169,7 +163,12 @@ int32_t configuration_check()
         }
     }
 
-    // TODO: Check on a multirotor no axis supports "None"
+    uint8_t checks_disabled;
+    FlightModeSettingsDisableSanityChecksGet(&checks_disabled);
+    if (checks_disabled == FLIGHTMODESETTINGS_DISABLESANITYCHECKS_TRUE) {
+        severity = SYSTEMALARMS_ALARM_WARNING;
+    }
+
     if (severity != SYSTEMALARMS_ALARM_OK) {
         ExtendedAlarmsSet(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION, severity, alarmstatus, alarmsubstatus);
     } else {
@@ -226,7 +225,7 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
     // coptercontrol cannot do altitude holding
     if (coptercontrol) {
         if (modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
-            || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_VERTICALVELOCITY
+            || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO
             ) {
             return false;
         }
@@ -235,14 +234,14 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
     // check that thrust modes are only set to thrust axis
     for (uint32_t i = 0; i < FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST; i++) {
         if (modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
-            || modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_VERTICALVELOCITY
+            || modes[i] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO
             ) {
             return false;
         }
     }
     if (!(modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_MANUAL
           || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEHOLD
-          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_VERTICALVELOCITY
+          || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_ALTITUDEVARIO
           || modes[FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_THRUST] == FLIGHTMODESETTINGS_STABILIZATION1SETTINGS_CRUISECONTROL
           )) {
         return false;
@@ -254,4 +253,45 @@ static bool check_stabilization_settings(int index, bool multirotor, bool copter
     // (this is checked at compile time by static constraint manualcontrol.h)
 
     return true;
+}
+
+FrameType_t GetCurrentFrameType()
+{
+    uint8_t airframe_type;
+
+    SystemSettingsAirframeTypeGet(&airframe_type);
+    switch ((SystemSettingsAirframeTypeOptions)airframe_type) {
+    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTO:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOX:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXAX:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXAH:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOV:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXP:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HEXACOAX:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_TRI:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXX:
+        return FRAME_TYPE_MULTIROTOR;
+
+    case SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGVTAIL:
+        return FRAME_TYPE_FIXED_WING;
+
+    case SYSTEMSETTINGS_AIRFRAMETYPE_HELICP:
+        return FRAME_TYPE_HELI;
+
+    case SYSTEMSETTINGS_AIRFRAMETYPE_GROUNDVEHICLECAR:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_GROUNDVEHICLEDIFFERENTIAL:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_GROUNDVEHICLEMOTORCYCLE:
+        return FRAME_TYPE_GROUND;
+
+    case SYSTEMSETTINGS_AIRFRAMETYPE_VTOL:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_CUSTOM:
+        return FRAME_TYPE_CUSTOM;
+    }
+    // anyway it should not reach here
+    return FRAME_TYPE_CUSTOM;
 }

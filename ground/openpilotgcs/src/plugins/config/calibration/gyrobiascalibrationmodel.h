@@ -29,34 +29,60 @@
 #ifndef GYROBIASCALIBRATIONMODEL_H
 #define GYROBIASCALIBRATIONMODEL_H
 
-#include <QObject>
+#include "wizardmodel.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+
+#include <gyrostate.h>
+#include <gyrosensor.h>
+#include <attitudesettings.h>
+#include <revocalibration.h>
+#include <accelgyrosettings.h>
+
+#include <QObject>
+
 namespace OpenPilot {
 class GyroBiasCalibrationModel : public QObject {
     Q_OBJECT
+
 public:
     explicit GyroBiasCalibrationModel(QObject *parent = 0);
 
+    bool dirty()
+    {
+        return m_dirty;
+    }
+
 signals:
-    void displayVisualHelp(QString elementID);
-    void displayInstructions(QString instructions, bool replace);
-    void disableAllCalibrations();
-    void enableAllCalibrations();
-    void storeAndClearBoardRotation();
-    void recallBoardRotation();
+    void started();
+    void stopped();
+
     void progressChanged(int value);
+    void displayVisualHelp(QString elementID);
+    void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info);
+
 public slots:
-    // Slots for gyro bias zero
     void start();
+    void save();
+
 private slots:
     void getSample(UAVObject *obj);
 
 private:
+    typedef struct {
+        UAVObject::Metadata gyroStateMetadata;
+        UAVObject::Metadata gyroSensorMetadata;
+        RevoCalibration::DataFields revoCalibrationData;
+        AttitudeSettings::DataFields attitudeSettingsData;
+    } Memento;
+
     QMutex sensorsUpdateLock;
 
     bool collectingData;
+    bool m_dirty;
+
+    Memento memento;
 
     QList<double> gyro_accum_x;
     QList<double> gyro_accum_y;
@@ -64,9 +90,16 @@ private:
     QList<double> gyro_state_accum_x;
     QList<double> gyro_state_accum_y;
     QList<double> gyro_state_accum_z;
-    UAVObject::Metadata initialGyroStateMdata;
-    UAVObject::Metadata initialGyroSensorMdata;
+
+    // convenience pointers
+    GyroState *gyroState;
+    GyroSensor *gyroSensor;
+    RevoCalibration *revoCalibration;
+    AttitudeSettings *attitudeSettings;
+    AccelGyroSettings *accelGyroSettings;
+
     UAVObjectManager *getObjectManager();
 };
 }
+
 #endif // GYROBIASCALIBRATIONMODEL_H

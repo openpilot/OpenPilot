@@ -78,9 +78,9 @@ static int32_t comUsbBridgeStart(void)
 {
     if (bridge_enabled) {
         // Start tasks
-        xTaskCreate(com2UsbBridgeTask, (signed char *)"Com2UsbBridge", C2U_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &com2UsbBridgeTaskHandle);
+        xTaskCreate(com2UsbBridgeTask, "Com2UsbBridge", C2U_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &com2UsbBridgeTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_COM2USBBRIDGE, com2UsbBridgeTaskHandle);
-        xTaskCreate(usb2ComBridgeTask, (signed char *)"Usb2ComBridge", U2C_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &usb2ComBridgeTaskHandle);
+        xTaskCreate(usb2ComBridgeTask, "Usb2ComBridge", U2C_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &usb2ComBridgeTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_USB2COMBRIDGE, usb2ComBridgeTaskHandle);
         return 0;
     }
@@ -115,9 +115,9 @@ static int32_t comUsbBridgeInitialize(void)
 #endif
 
     if (bridge_enabled) {
-        com2usb_buf = pvPortMalloc(BRIDGE_BUF_LEN);
+        com2usb_buf = pios_malloc(BRIDGE_BUF_LEN);
         PIOS_Assert(com2usb_buf);
-        usb2com_buf = pvPortMalloc(BRIDGE_BUF_LEN);
+        usb2com_buf = pios_malloc(BRIDGE_BUF_LEN);
         PIOS_Assert(usb2com_buf);
 
         updateSettings();

@@ -137,6 +137,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         break;
+<<<<<<< HEAD
     case SetupWizard::FIXED_WING_AILERON:
         loadSVGFile(FIXEDWING_SVG_FILE);
 	m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2; //2 for servoCenterSlider! 
@@ -217,6 +218,13 @@ void OutputCalibrationPage::setupVehicle()
         m_actuatorSettings[7].channelMax     = 2400;
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
+=======
+    case SetupWizard::MULTI_ROTOR_HEXA_X:
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+        m_vehicleElementIds << "hexa-x" << "hexa-x-frame" << "hexa-x-m1" << "hexa-x-m2" << "hexa-x-m3" << "hexa-x-m4" << "hexa-x-m5" << "hexa-x-m6";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
+        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+>>>>>>> next
         break;
     default:
         break;

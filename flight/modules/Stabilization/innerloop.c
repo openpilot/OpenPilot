@@ -119,21 +119,21 @@ static void stabilizationInnerloopTask()
             warn = true;
         }
         if (stabSettings.monitor.rateupdates < -(4 * OUTERLOOP_SKIPCOUNT)) {
-            // error if rate loop skipped more than 4 executions
-            error = true;
+            // critical if rate loop skipped more than 4 executions
+            crit = true;
         }
         // check if gyro keeps updating
         if (stabSettings.monitor.gyroupdates < 1) {
-            // critical if gyro didn't update at all!
-            crit = true;
+            // error if gyro didn't update at all!
+            error = true;
         }
         if (stabSettings.monitor.gyroupdates > 1) {
             // warning if we missed a gyro update
             warn = true;
         }
         if (stabSettings.monitor.gyroupdates > 3) {
-            // error if we missed 3 gyro updates
-            error = true;
+            // critical if we missed 3 gyro updates
+            crit = true;
         }
         stabSettings.monitor.gyroupdates = 0;
 

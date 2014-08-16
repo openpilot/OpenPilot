@@ -455,7 +455,7 @@ static const struct pios_adc_cfg pios_adc_cfg = {
             .flags = (DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1),
             .init  = {
                 .NVIC_IRQChannel    = DMA1_Channel1_IRQn,
-                .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+                .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
                 .NVIC_IRQChannelSubPriority        = 0,
                 .NVIC_IRQChannelCmd = ENABLE,
             },

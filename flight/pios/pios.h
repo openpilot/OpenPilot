@@ -81,8 +81,9 @@
 #include "queue.h"
 #include "semphr.h"
 #endif
-
 #include <stdbool.h>
+
+#include <pios_mem.h>
 
 #include <pios_architecture.h>
 
@@ -203,10 +204,10 @@
 #include <pios_hmc5843.h>
 #endif
 
-#ifdef PIOS_INCLUDE_HMC5883
-/* HMC5883 3-Axis Digital Compass */
-/* #define PIOS_HMC5883_HAS_GPIOS */
-#include <pios_hmc5883.h>
+#ifdef PIOS_INCLUDE_HMC5X83
+/* HMC5883/HMC5983 3-Axis Digital Compass */
+/* #define PIOS_HMC5x83_HAS_GPIOS */
+#include <pios_hmc5x83.h>
 #endif
 
 #ifdef PIOS_INCLUDE_BMP085

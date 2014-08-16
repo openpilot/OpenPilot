@@ -56,14 +56,14 @@ struct data {
 static int32_t initwithgps(stateFilter *self);
 static int32_t initwithoutgps(stateFilter *self);
 static int32_t maininit(stateFilter *self);
-static int32_t filter(stateFilter *self, stateEstimation *state);
+static filterResult filter(stateFilter *self, stateEstimation *state);
 
 
 int32_t filterBaroInitialize(stateFilter *handle)
 {
     handle->init      = &initwithgps;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 
@@ -71,7 +71,7 @@ int32_t filterBaroiInitialize(stateFilter *handle)
 {
     handle->init      = &initwithoutgps;
     handle->filter    = &filter;
-    handle->localdata = pvPortMalloc(sizeof(struct data));
+    handle->localdata = pios_malloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 
@@ -105,7 +105,7 @@ static int32_t maininit(stateFilter *self)
     return 0;
 }
 
-static int32_t filter(stateFilter *self, stateEstimation *state)
+static filterResult filter(stateFilter *self, stateEstimation *state)
 {
     struct data *this = (struct data *)self->localdata;
 
@@ -128,7 +128,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         }
         // make sure we raise an error until properly initialized - would not be good if people arm and
         // use altitudehold without initialized barometer filter
-        return 2;
+        // Here, the filter is not initialized, return ERROR
+        return FILTERRESULT_CRITICAL;
     } else {
         // Track barometric altitude offset with a low pass filter
         // based on GPS altitude if available
@@ -141,7 +142,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             this->baroAlt   = state->baro[0];
             state->baro[0] -= this->baroOffset;
         }
-        return 0;
+        return FILTERRESULT_OK;
     }
 }
 

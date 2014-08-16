@@ -103,7 +103,7 @@ static struct pios_usb_cdc_dev *PIOS_USB_CDC_alloc(void)
 {
     struct pios_usb_cdc_dev *usb_cdc_dev;
 
-    usb_cdc_dev = (struct pios_usb_cdc_dev *)pvPortMalloc(sizeof(struct pios_usb_cdc_dev));
+    usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_malloc(sizeof(struct pios_usb_cdc_dev));
     if (!usb_cdc_dev) {
         return NULL;
     }

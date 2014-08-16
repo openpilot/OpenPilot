@@ -420,12 +420,7 @@ static float updateTailInBearing()
     TakeOffLocationData t;
     TakeOffLocationGet(&t);
     // atan2f always returns in between + and - 180 degrees
-    float yaw = RAD2DEG(atan2f(p.East - t.East, p.North - t.North));
-    // result is in between 0 and 360 degrees
-    if (yaw < 0.0f) {
-        yaw += 360.0f;
-    }
-    return yaw;
+    return RAD2DEG(atan2f(p.East - t.East, p.North - t.North));
 }
 
 /**
@@ -437,12 +432,7 @@ static float updateCourseBearing()
 
     VelocityStateGet(&v);
     // atan2f always returns in between + and - 180 degrees
-    float yaw = RAD2DEG(atan2f(v.East, v.North));
-    // result is in between 0 and 360 degrees
-    if (yaw < 0.0f) {
-        yaw += 360.0f;
-    }
-    return yaw;
+    return RAD2DEG(atan2f(v.East, v.North));
 }
 
 /**
@@ -462,12 +452,7 @@ static float updatePathBearing()
     path_progress(&pathDesired, cur, &progress);
 
     // atan2f always returns in between + and - 180 degrees
-    float yaw = RAD2DEG(atan2f(progress.path_vector[1], progress.path_vector[0]));
-    // result is in between 0 and 360 degrees
-    if (yaw < 0.0f) {
-        yaw += 360.0f;
-    }
-    return yaw;
+    return RAD2DEG(atan2f(progress.path_vector[1], progress.path_vector[0]));
 }
 
 /**

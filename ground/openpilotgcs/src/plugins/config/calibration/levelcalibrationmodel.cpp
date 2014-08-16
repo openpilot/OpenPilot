@@ -159,8 +159,8 @@ void LevelCalibrationModel::save()
 
     // Update the biases based on collected data
     // "rotate" the board in the opposite direction as the calculated offset
-    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] -= rot_data_pitch;
-    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL]  -= rot_data_roll;
+    attitudeSettingsData.BoardLevelTrim[AttitudeSettings::BOARDLEVELTRIM_PITCH] -= rot_data_pitch;
+    attitudeSettingsData.BoardLevelTrim[AttitudeSettings::BOARDLEVELTRIM_ROLL]  -= rot_data_roll;
 
     attitudeSettings->setData(attitudeSettingsData);
 

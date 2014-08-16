@@ -69,18 +69,23 @@
 #define TASK_PRIORITY    (tskIDLE_PRIORITY + 3)
 #define SENSOR_PERIOD    2
 
+#define ZERO_ROT_ANGLE   0.00001f
 // Private types
 
 
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
-// static void magOffsetEstimation(MagSensorData *mag);
 
 // Private variables
 static xTaskHandle sensorsTaskHandle;
 RevoCalibrationData cal;
 AccelGyroSettingsData agcal;
+
+#ifdef PIOS_INCLUDE_HMC5X83
+#include <pios_hmc5x83.h>
+extern pios_hmc5x83_dev_t onboard_mag;
+#endif
 
 // These values are initialized by settings but can be updated by the attitude algorithm
 
@@ -200,8 +205,8 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         PIOS_DEBUG_Assert(0);
     }
 
-#if defined(PIOS_INCLUDE_HMC5883)
-    mag_test = PIOS_HMC5883_Test();
+#if defined(PIOS_INCLUDE_HMC5X83)
+    mag_test = PIOS_HMC5x83_Test(onboard_mag);
 #else
     mag_test = 0;
 #endif
@@ -409,11 +414,11 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
         // and make it average zero (weakly)
 
-#if defined(PIOS_INCLUDE_HMC5883)
+#if defined(PIOS_INCLUDE_HMC5X83)
         MagSensorData mag;
-        if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
+        if (PIOS_HMC5x83_NewDataAvailable(onboard_mag) || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
             int16_t values[3];
-            PIOS_HMC5883_ReadMag(values);
+            PIOS_HMC5x83_ReadMag(onboard_mag, values);
             float mags[3] = { (float)values[1] - mag_bias[0],
                               (float)values[0] - mag_bias[1],
                               -(float)values[2] - mag_bias[2] };
@@ -428,7 +433,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             MagSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();
         }
-#endif /* if defined(PIOS_INCLUDE_HMC5883) */
+#endif /* if defined(PIOS_INCLUDE_HMC5X83) */
 
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
@@ -461,20 +466,35 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     AttitudeSettingsGet(&attitudeSettings);
 
     // Indicates not to expend cycles on rotation
-    if (fabsf(attitudeSettings.BoardRotation.Roll) < 0.00001f
-        && fabsf(attitudeSettings.BoardRotation.Pitch) < 0.00001f &&
-        fabsf(attitudeSettings.BoardRotation.Yaw) < 0.00001f) {
+    if (fabsf(attitudeSettings.BoardRotation.Roll) < ZERO_ROT_ANGLE
+        && fabsf(attitudeSettings.BoardRotation.Pitch) < ZERO_ROT_ANGLE &&
+        fabsf(attitudeSettings.BoardRotation.Yaw) < ZERO_ROT_ANGLE) {
         rotate = 0;
     } else {
         rotate = 1;
     }
-    float rotationQuat[4];
+
     const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
                            attitudeSettings.BoardRotation.Pitch,
                            attitudeSettings.BoardRotation.Yaw };
-    RPY2Quaternion(rpy, rotationQuat);
-    Quaternion2R(rotationQuat, R);
 
+    float rotationQuat[4];
+    RPY2Quaternion(rpy, rotationQuat);
+
+    if (fabsf(attitudeSettings.BoardLevelTrim.Roll) > ZERO_ROT_ANGLE ||
+        fabsf(attitudeSettings.BoardLevelTrim.Pitch) > ZERO_ROT_ANGLE) {
+        float trimQuat[4];
+        float sumQuat[4];
+        rotate = 1;
+
+        const float trimRpy[3] = { attitudeSettings.BoardLevelTrim.Roll, attitudeSettings.BoardLevelTrim.Pitch, 0.0f };
+        RPY2Quaternion(trimRpy, trimQuat);
+
+        quat_mult(rotationQuat, trimQuat, sumQuat);
+        Quaternion2R(sumQuat, R);
+    } else {
+        Quaternion2R(rotationQuat, R);
+    }
     matrix_mult_3x3f((float(*)[3])cast_struct_to_array(cal.mag_transform, cal.mag_transform.r0c0), R, mag_transform);
 }
 /**

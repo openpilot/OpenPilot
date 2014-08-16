@@ -204,6 +204,9 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Hexacopter Coax (Y6)"));
             break;
         case SetupWizard::MULTI_ROTOR_HEXA_H:
+            summary.append(tr("Hexacopter H"));
+            break;
+        case SetupWizard::MULTI_ROTOR_HEXA_X:
             summary.append(tr("Hexacopter X"));
             break;
         case SetupWizard::MULTI_ROTOR_OCTO:

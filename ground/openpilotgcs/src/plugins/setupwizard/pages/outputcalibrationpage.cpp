@@ -137,10 +137,16 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
         break;
-<<<<<<< HEAD
+    case SetupWizard::MULTI_ROTOR_HEXA_X:
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
+        m_vehicleElementIds << "hexa-x" << "hexa-x-frame" << "hexa-x-m1" << "hexa-x-m2" << "hexa-x-m3" << "hexa-x-m4" << "hexa-x-m5" << "hexa-x-m6";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
+        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        break;
+    // Fixed Wing
     case SetupWizard::FIXED_WING_AILERON:
         loadSVGFile(FIXEDWING_SVG_FILE);
-	m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2; //2 for servoCenterSlider! 
+        m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2; //2 for servoCenterSlider!
         m_vehicleElementIds << "aileron" << "aileron-frame" << "aileron-motor" << "aileron-ail-left" << "aileron-ail-right" << "aileron-rudder" << "aileron-elevator";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4;
@@ -148,7 +154,7 @@ void OutputCalibrationPage::setupVehicle()
         // see Servo city for an example. 1500 usec is center on MS85mg for example.
         // - http://www.servocity.com/html/hs-85mg__mighty_micro.html
         // make sure Aileron servo one does not go to an extreme value
-	// would also be nice to make these all default to 50hz so we don't shred servos. 
+        // would also be nice to make these all default to 50hz so we don't shred servos.
 
         m_actuatorSettings[1].channelNeutral = 1500;
         // make sure Aileron servo two does not go to an extreme value
@@ -184,7 +190,7 @@ void OutputCalibrationPage::setupVehicle()
         break;
     case SetupWizard::FIXED_WING_ELEVON:
         loadSVGFile(FIXEDWING_SVG_FILE);
-	m_wizardIndexes << 0 << 1 << 2 << 2; //2 for servoCenterSlider! 
+        m_wizardIndexes << 0 << 1 << 2 << 2; //2 for servoCenterSlider!
         m_vehicleElementIds << "elevon" << "elevon-frame" << "elevon-motor" << "elevon-left" << "elevon-right";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3;
         m_channelIndex << 0 << 0 << 1 << 2;
@@ -218,13 +224,6 @@ void OutputCalibrationPage::setupVehicle()
         m_actuatorSettings[7].channelMax     = 2400;
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
-=======
-    case SetupWizard::MULTI_ROTOR_HEXA_X:
-        m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
-        m_vehicleElementIds << "hexa-x" << "hexa-x-frame" << "hexa-x-m1" << "hexa-x-m2" << "hexa-x-m3" << "hexa-x-m4" << "hexa-x-m5" << "hexa-x-m6";
-        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
-        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
->>>>>>> next
         break;
     default:
         break;

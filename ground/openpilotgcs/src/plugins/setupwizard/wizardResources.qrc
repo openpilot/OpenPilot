@@ -29,6 +29,7 @@
         <file>resources/bttn-calculate-up.png</file>
         <file>resources/bttn-turbo-down.png</file>
         <file>resources/bttn-turbo-up.png</file>
+        <file>resources/wizard.png</file>
         <file>resources/multirotor-shapes.svg</file>
 	<!-- these are different from the files in /config/images -->
         <file>resources/fixedwing-shapes.svg</file>

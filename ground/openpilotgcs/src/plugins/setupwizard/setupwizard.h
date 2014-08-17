@@ -78,11 +78,11 @@ public:
         return m_inputType;
     }
 
-    void setESCType(SetupWizard::ESC_TYPE type)
+    void setActuatorType(SetupWizard::ACTUATOR_TYPE type)
     {
         m_escType = type;
     }
-    SetupWizard::ESC_TYPE getESCType() const
+    SetupWizard::ACTUATOR_TYPE getActuatorType() const
     {
         return m_escType;
     }
@@ -168,7 +168,7 @@ private:
     VEHICLE_TYPE m_vehicleType;
     VEHICLE_SUB_TYPE m_vehicleSubType;
     INPUT_TYPE m_inputType;
-    ESC_TYPE m_escType;
+    ACTUATOR_TYPE m_escType;
 
     GPS_SETTING m_gpsSetting;
     RADIO_SETTING m_radioSetting;

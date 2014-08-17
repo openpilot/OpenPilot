@@ -44,10 +44,10 @@ OutputPageFixedwing::~OutputPageFixedwing()
 
 bool OutputPageFixedwing::validatePage()
 {
-    if (ui->rapidESCButton->isChecked()) {
-        getWizard()->setESCType(SetupWizard::ESC_RAPID);
+    if (ui->ServoTypeButton->isChecked()) {
+        getWizard()->setActuatorType(SetupWizard::SERVO_DIGITAL);
     } else {
-        getWizard()->setESCType(SetupWizard::ESC_LEGACY);
+        getWizard()->setActuatorType(SetupWizard::SERVO_LEGACY);
     }
 
     return true;

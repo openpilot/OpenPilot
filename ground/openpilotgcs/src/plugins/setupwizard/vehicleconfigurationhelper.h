@@ -59,6 +59,9 @@ public:
     bool setupHardwareSettings(bool save = true);
     static const qint16 LEGACY_ESC_FREQUENCE;
     static const qint16 RAPID_ESC_FREQUENCE;
+    static const qint16 LEGACY_SERVO_FREQUENCE;
+    static const qint16 DIGITAL_SERVO_FREQUENCE;
+
 
 signals:
     void saveProgress(int total, int current, QString description);
@@ -79,7 +82,7 @@ private:
     void applyHardwareConfiguration();
     void applyVehicleConfiguration();
     void applyActuatorConfiguration();
-    void applyFlighModeConfiguration();
+    void applyFlightModeConfiguration();
     void applySensorBiasConfiguration();
     void applyStabilizationConfiguration();
     void applyManualControlDefaults();

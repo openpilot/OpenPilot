@@ -45,9 +45,9 @@ OutputPage::~OutputPage()
 bool OutputPage::validatePage()
 {
     if (ui->rapidESCButton->isChecked()) {
-        getWizard()->setESCType(SetupWizard::ESC_RAPID);
+        getWizard()->setActuatorType(SetupWizard::ESC_RAPID);
     } else {
-        getWizard()->setESCType(SetupWizard::ESC_LEGACY);
+        getWizard()->setActuatorType(SetupWizard::ESC_LEGACY);
     }
 
     return true;

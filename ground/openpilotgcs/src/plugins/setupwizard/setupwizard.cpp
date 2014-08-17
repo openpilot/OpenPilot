@@ -291,14 +291,21 @@ QString SetupWizard::getSummaryText()
     }
 
     summary.append("<br>");
-    summary.append("<b>").append(tr("ESC type: ")).append("</b>");
-    switch (getESCType()) {
+    summary.append("<b>").append(tr("Actuator type: ")).append("</b>");
+    switch (getActuatorType()) {
     case ESC_LEGACY:
         summary.append(tr("Legacy ESC (50 Hz)"));
         break;
     case ESC_RAPID:
         summary.append(tr("Rapid ESC (400 Hz)"));
         break;
+    case SERVO_LEGACY:
+        summary.append(tr("Legacy Servos (50 Hz)"));
+        break;
+    case SERVO_DIGITAL:
+        summary.append(tr("Digital Servos (333 Hz)"));
+        break;
+
     default:
         summary.append(tr("Unknown"));
     }

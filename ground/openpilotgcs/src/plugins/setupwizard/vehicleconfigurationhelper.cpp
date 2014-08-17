@@ -42,6 +42,8 @@
 
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE = 50;
 const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE  = 400;
+const qint16 VehicleConfigurationHelper::LEGACY_SERVO_FREQUENCE = 50;
+const qint16 VehicleConfigurationHelper::DIGITAL_SERVO_FREQUENCE  = 333;
 
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
     : m_configSource(configSource), m_uavoManager(0),
@@ -68,7 +70,7 @@ bool VehicleConfigurationHelper::setupVehicle(bool save)
     applyHardwareConfiguration();
     applyVehicleConfiguration();
     applyActuatorConfiguration();
-    applyFlighModeConfiguration();
+    applyFlightModeConfiguration();
 
     if (save) {
         applySensorBiasConfiguration();
@@ -237,8 +239,10 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
         break;
     }
     case VehicleConfigurationSource::VEHICLE_HELI:
+        // TODO: Implement settings for Helis
+        break;
     case VehicleConfigurationSource::VEHICLE_SURFACE:
-        // TODO: Implement settings for other vehicle types?
+        // TODO: Implement settings for Surface
         break;
     default:
         break;
@@ -270,7 +274,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         }
 
         qint16 updateFrequence = LEGACY_ESC_FREQUENCE;
-        switch (m_configSource->getESCType()) {
+        switch (m_configSource->getActuatorType()) {
         case VehicleConfigurationSource::ESC_LEGACY:
             updateFrequence = LEGACY_ESC_FREQUENCE;
             break;
@@ -322,18 +326,31 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
     {
         ActuatorSettings::DataFields data = actSettings->getData();
 
-	qDebug() << "Override center, min and max pulses for fixed wing servos\n";
-	// move all but first chan to 1500 center pluse
         QList<actuatorChannelSettings> actuatorSettings = m_configSource->getActuatorSettings();
         for (quint16 i = 1; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
             data.ChannelType[i]    = ActuatorSettings::CHANNELTYPE_PWM;
             data.ChannelAddr[i]    = i;
-            data.ChannelMin[i] = 554; // Arduino library defaults to 554 http://arduino.cc/en/Reference/ServoAttach, 
-				      // 600 is for HS85mg - http://www.servocity.com/html/hs-85mg__mighty_micro.html#.U4JEWhapKBU
-            data.ChannelNeutral[i] = 1500;
-            data.ChannelMax[i] = 2400; // Same rules as above from the Arduino *generic* library and the servo city info for the 85mg
+            data.ChannelMin[i]     = actuatorSettings[i].channelMin;
+            data.ChannelNeutral[i] = actuatorSettings[i].channelNeutral;
+            data.ChannelMax[i]     = actuatorSettings[i].channelMax;
         }
-	qDebug() << "Save Fixed Wing Actuator Data\n";
+
+        for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
+            data.ChannelUpdateFreq[i] = LEGACY_SERVO_FREQUENCE;
+        }
+
+        qint16 updateFrequence = LEGACY_SERVO_FREQUENCE;
+        switch (m_configSource->getActuatorType()) {
+        case VehicleConfigurationSource::SERVO_LEGACY:
+            updateFrequence = LEGACY_SERVO_FREQUENCE;
+            break;
+        case VehicleConfigurationSource::SERVO_DIGITAL:
+            updateFrequence = DIGITAL_SERVO_FREQUENCE;
+            break;
+        default:
+            break;
+        }
+
         actSettings->setData(data);
         addModifiedObject(actSettings, tr("Writing actuator settings"));
 
@@ -389,15 +406,19 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
     }
 
     case VehicleConfigurationSource::VEHICLE_HELI:
-    case VehicleConfigurationSource::VEHICLE_SURFACE:
-        // TODO: Implement settings for other vehicle types?
+        // TODO: Implement settings for Heli vehicle types
         break;
+
+    case VehicleConfigurationSource::VEHICLE_SURFACE:
+        // TODO: Implement settings for ground vehicle types
+        break;
+
     default:
         break;
     }
 }
 
-void VehicleConfigurationHelper::applyFlighModeConfiguration()
+void VehicleConfigurationHelper::applyFlightModeConfiguration()
 {
     FlightModeSettings *modeSettings = FlightModeSettings::GetInstance(m_uavoManager);
     ManualControlSettings *controlSettings = ManualControlSettings::GetInstance(m_uavoManager);

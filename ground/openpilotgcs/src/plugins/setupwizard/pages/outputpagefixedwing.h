@@ -39,7 +39,7 @@ class OutputPageFixedwing : public AbstractWizardPage {
 
 public:
     explicit OutputPageFixedwing(SetupWizard *wizard, QWidget *parent = 0);
-    ~OutputPage();
+    ~OutputPageFixedwing();
     bool validatePage();
 
 private:

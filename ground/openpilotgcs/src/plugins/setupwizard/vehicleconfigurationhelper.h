@@ -59,7 +59,7 @@ public:
     bool setupHardwareSettings(bool save = true);
     static const qint16 LEGACY_ESC_FREQUENCE;
     static const qint16 RAPID_ESC_FREQUENCE;
-    static const qint16 LEGACY_SERVO_FREQUENCE;
+    static const qint16 ANALOG_SERVO_FREQUENCE;
     static const qint16 DIGITAL_SERVO_FREQUENCE;
 
 

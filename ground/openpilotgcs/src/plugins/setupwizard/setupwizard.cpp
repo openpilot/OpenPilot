@@ -314,7 +314,7 @@ QString SetupWizard::getSummaryText()
     case ESC_RAPID:
         summary.append(tr("Rapid ESC (400 Hz)"));
         break;
-    case SERVO_LEGACY:
+    case SERVO_ANALOG:
         summary.append(tr("Analog Servos (50 Hz)"));
         break;
     case SERVO_DIGITAL:

@@ -47,7 +47,7 @@ bool OutputPageFixedwing::validatePage()
     if (ui->ServoTypeButton->isChecked()) {
         getWizard()->setActuatorType(SetupWizard::SERVO_DIGITAL);
     } else {
-        getWizard()->setActuatorType(SetupWizard::SERVO_LEGACY);
+        getWizard()->setActuatorType(SetupWizard::SERVO_ANALOG);
     }
 
     return true;

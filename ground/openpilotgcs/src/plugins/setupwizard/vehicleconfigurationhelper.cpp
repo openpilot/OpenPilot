@@ -42,7 +42,7 @@
 
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE = 50;
 const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE  = 400;
-const qint16 VehicleConfigurationHelper::LEGACY_SERVO_FREQUENCE = 50;
+const qint16 VehicleConfigurationHelper::ANALOG_SERVO_FREQUENCE = 50;
 const qint16 VehicleConfigurationHelper::DIGITAL_SERVO_FREQUENCE  = 333;
 
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
@@ -336,13 +336,13 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         }
 
         for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
-            data.ChannelUpdateFreq[i] = LEGACY_SERVO_FREQUENCE;
+            data.ChannelUpdateFreq[i] = ANALOG_SERVO_FREQUENCE;
         }
 
-        qint16 updateFrequence = LEGACY_SERVO_FREQUENCE;
+        qint16 updateFrequence = ANALOG_SERVO_FREQUENCE;
         switch (m_configSource->getActuatorType()) {
-        case VehicleConfigurationSource::SERVO_LEGACY:
-            updateFrequence = LEGACY_SERVO_FREQUENCE;
+        case VehicleConfigurationSource::SERVO_ANALOG:
+            updateFrequence = ANALOG_SERVO_FREQUENCE;
             break;
         case VehicleConfigurationSource::SERVO_DIGITAL:
             updateFrequence = DIGITAL_SERVO_FREQUENCE;
@@ -353,50 +353,6 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 
         actSettings->setData(data);
         addModifiedObject(actSettings, tr("Writing actuator settings"));
-
-	// I think I need to add a saved stabilizationsettings object also. 
-	// unfortunately not sure this is the right way to do it! 
-	
-	qDebug() << "Saving Fixed Wing Default PID Data\n";
-
-/*
-	qDebug() << "Save Fixed Wing StabilizationBank object\n";
-        StabilizationBank *stabilizationBank = StabilizationBank::GetInstance(m_uavoManager);
-	StabilizationBank::DataFields stabBank = stabilizationBank->getData();
-	Values pulled from ./build/uavobject-synthetics/gcs/stabilizationbank.h 
-        stabBank.PitchPI[StabilizationBank::PITCHPI_ILIMIT] = 1.123;
-        stabilizationBank->setData(stabBank);
-	addModifiedObject(stabilizationBank, tr("Writing stabilization bank"));
-*/
-
-	qDebug() << "Save Fixed Wing StabilizationSettingsBank1 object\n";
-
-	// Values pulled from ./build/uavobject-synthetics/gcs/stabilizationsettingsbank1.h
-        StabilizationSettingsBank1 *stabilizationSettingsBank = StabilizationSettingsBank1::GetInstance(m_uavoManager);
-	StabilizationSettingsBank1::DataFields stabSettingsBank = stabilizationSettingsBank->getData();
-        stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KP] = 2.420;
-        stabSettingsBank.RollRatePID[StabilizationSettingsBank1::ROLLRATEPID_KI] = 2.420;
-        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KP] = 2.420;
-        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_KI] = 2.420;
-
-        stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KP] = 2.420;
-        stabSettingsBank.PitchRatePID[StabilizationSettingsBank1::PITCHRATEPID_KI] = 2.420;
-        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KP] = 2.420;
-        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_KI] = 2.420;
-
-        stabSettingsBank.YawRatePID[StabilizationSettingsBank1::YAWRATEPID_KP] = 2.420;
-        stabSettingsBank.YawRatePID[StabilizationSettingsBank1::YAWRATEPID_KI] = 2.420;
-        stabSettingsBank.YawPI[StabilizationSettingsBank1::YAWPI_KP] = 2.420;
-        stabSettingsBank.YawPI[StabilizationSettingsBank1::YAWPI_KI] = 2.420;
-
-	
-	// need to set max servo throw via iLimit here per my notes in http://forums.openpilot.org/topic/32356-gonna-give-revo-a-run-on-my-bixler-v1-any-suggestions/#entry252556
-        stabSettingsBank.PitchPI[StabilizationSettingsBank1::PITCHPI_ILIMIT] = 1.420;
-        stabSettingsBank.RollPI[StabilizationSettingsBank1::ROLLPI_ILIMIT] = 1.420;
-        stabSettingsBank.YawPI[StabilizationSettingsBank1::YAWPI_ILIMIT] = 1.420;
-
-	stabilizationSettingsBank->setData(stabSettingsBank);
-	addModifiedObject(stabilizationSettingsBank, tr("Writing stabilization bank 1 settings"));
 
 	// Set up model view image here? 
 	// loop through all the window instances and check which are of the type ModelViewGadget.

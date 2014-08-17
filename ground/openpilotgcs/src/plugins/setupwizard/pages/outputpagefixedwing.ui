@@ -62,7 +62,7 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="toolTip">
-        <string>Standard ESC 50Hz</string>
+        <string>Analog Servo 50Hz</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QToolButton { border: none }</string>
@@ -106,7 +106,7 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="toolTip">
-        <string>Turbo PWM ESC 400Hz</string>
+        <string>Digital Servo 333Hz</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QToolButton { border: none }</string>

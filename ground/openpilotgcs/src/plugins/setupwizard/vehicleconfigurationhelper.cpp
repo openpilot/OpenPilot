@@ -231,7 +231,7 @@ void VehicleConfigurationHelper::applyVehicleConfiguration()
             setupElevon();
             break;
         case VehicleConfigurationSource::FIXED_WING_VTAIL:
-//            setupVtail();
+            // TODO: Implement settings for VTail fixed wings
             break;
         default:
             break;
@@ -327,16 +327,12 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         ActuatorSettings::DataFields data = actSettings->getData();
 
         QList<actuatorChannelSettings> actuatorSettings = m_configSource->getActuatorSettings();
-        for (quint16 i = 1; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
+        for (quint16 i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++) {
             data.ChannelType[i]    = ActuatorSettings::CHANNELTYPE_PWM;
             data.ChannelAddr[i]    = i;
             data.ChannelMin[i]     = actuatorSettings[i].channelMin;
             data.ChannelNeutral[i] = actuatorSettings[i].channelNeutral;
             data.ChannelMax[i]     = actuatorSettings[i].channelMax;
-        }
-
-        for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
-            data.ChannelUpdateFreq[i] = ANALOG_SERVO_FREQUENCE;
         }
 
         qint16 updateFrequence = ANALOG_SERVO_FREQUENCE;
@@ -349,6 +345,19 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             break;
         default:
             break;
+        }
+
+        for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                if (i == 1) {
+                    data.ChannelUpdateFreq[i] = ANALOG_SERVO_FREQUENCE;
+                }
+            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                if (i == 2) {
+                    data.ChannelUpdateFreq[i] = ANALOG_SERVO_FREQUENCE;
+                }
+            }
+            data.ChannelUpdateFreq[i] = updateFrequence;
         }
 
         actSettings->setData(data);
@@ -1549,30 +1558,16 @@ void VehicleConfigurationHelper::setupElevon()
     channels[1].type      = MIXER_TYPE_SERVO;
     channels[1].throttle1 = 0;
     channels[1].throttle2 = 0;
-    channels[1].roll      = -127;
-    channels[1].pitch     = 127;
+    channels[1].roll      = -100;
+    channels[1].pitch     = 100;
     channels[1].yaw = 0;
 
     channels[2].type      = MIXER_TYPE_SERVO;
     channels[2].throttle1 = 0;
     channels[2].throttle2 = 0;
-    channels[2].roll      = 127;
-    channels[2].pitch     = -127;
+    channels[2].roll      = 100;
+    channels[2].pitch     = -100;
     channels[2].yaw = 0;
-
-    channels[3].type      = MIXER_TYPE_SERVO;
-    channels[3].throttle1 = 0;
-    channels[3].throttle2 = 0;
-    channels[3].roll      = 0;
-    channels[3].pitch     = 0;
-    channels[3].yaw = 0;
-
-    channels[3].type      = MIXER_TYPE_SERVO;
-    channels[3].throttle1 = 0;
-    channels[3].throttle2 = 0;
-    channels[3].roll      = 0;
-    channels[3].pitch     = 0;
-    channels[3].yaw = 0;
 
     guiSettings.fixedwing.FixedWingThrottle = 1;
     guiSettings.fixedwing.FixedWingRoll1 = 2;
@@ -1620,12 +1615,12 @@ void VehicleConfigurationHelper::setupAileron()
     channels[3].pitch     = 100;
     channels[3].yaw = 0;
 
-    channels[3].type      = MIXER_TYPE_SERVO;
-    channels[3].throttle1 = 0;
-    channels[3].throttle2 = 0;
-    channels[3].roll      = 0;
-    channels[3].pitch     = 0;
-    channels[3].yaw = 100;
+    channels[4].type      = MIXER_TYPE_SERVO;
+    channels[4].throttle1 = 0;
+    channels[4].throttle2 = 0;
+    channels[4].roll      = 0;
+    channels[4].pitch     = 0;
+    channels[4].yaw = 100;
 
     guiSettings.fixedwing.FixedWingThrottle = 1;
     guiSettings.fixedwing.FixedWingRoll1 = 2;

@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       outputpage.cpp
+ * @file       airframestabfixedwingpage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup OutputPage
+ * @addtogroup AirframeStabFixedwingPage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,30 +25,24 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "outputpagefixedwing.h"
-#include "ui_outputpagefixedwing.h"
-#include "setupwizard.h"
+#ifndef AIRFRAMESTABFIXEDWINGPAGE_H
+#define AIRFRAMESTABFIXEDWINGPAGE_H
 
-OutputPageFixedwing::OutputPageFixedwing(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+#include "abstractwizardpage.h"
 
-    ui(new Ui::OutputPageFixedwing)
-{
-    ui->setupUi(this);
+namespace Ui {
+class AirframeStabFixedwingPage;
 }
 
-OutputPageFixedwing::~OutputPageFixedwing()
-{
-    delete ui;
-}
+class AirframeStabFixedwingPage : public AbstractWizardPage {
+    Q_OBJECT
 
-bool OutputPageFixedwing::validatePage()
-{
-    if (ui->ServoTypeButton->isChecked()) {
-        getWizard()->setActuatorType(SetupWizard::SERVO_DIGITAL);
-    } else {
-        getWizard()->setActuatorType(SetupWizard::SERVO_ANALOG);
-    }
+public:
+    explicit AirframeStabFixedwingPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~AirframeStabFixedwingPage();
 
-    return true;
-}
+private:
+    Ui::AirframeStabFixedwingPage *ui;
+};
+
+#endif // AIRFRAMESTABFIXEDWINGPAGE_H

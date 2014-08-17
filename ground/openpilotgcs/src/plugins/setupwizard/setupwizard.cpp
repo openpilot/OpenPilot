@@ -36,7 +36,7 @@
 #include "pages/surfacepage.h"
 #include "pages/inputpage.h"
 #include "pages/outputpage.h"
-#include "pages/outputpagefixedwing.h"
+#include "pages/outputfixedwingpage.h"
 #include "pages/biascalibrationpage.h"
 #include "pages/summarypage.h"
 #include "pages/savepage.h"
@@ -44,7 +44,7 @@
 #include "pages/rebootpage.h"
 #include "pages/outputcalibrationpage.h"
 #include "pages/revocalibrationpage.h"
-#include "pages/airframestabfixedwing.h"
+#include "pages/airframestabfixedwingpage.h"
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
@@ -345,7 +345,7 @@ void SetupWizard::createPages()
     setPage(PAGE_SURFACE, new SurfacePage(this));
     setPage(PAGE_INPUT, new InputPage(this));
     setPage(PAGE_OUTPUT, new OutputPage(this));
-    setPage(PAGE_OUTPUT_FIXEDWING, new OutputPageFixedwing(this));
+    setPage(PAGE_OUTPUT_FIXEDWING, new OutputFixedwingPage(this));
     setPage(PAGE_BIAS_CALIBRATION, new BiasCalibrationPage(this));
     // setPage(PAGE_REVO_CALIBRATION, new RevoCalibrationPage(this));
     setPage(PAGE_OUTPUT_CALIBRATION, new OutputCalibrationPage(this));
@@ -353,7 +353,7 @@ void SetupWizard::createPages()
     setPage(PAGE_SAVE, new SavePage(this));
     setPage(PAGE_REBOOT, new RebootPage(this));
     setPage(PAGE_NOTYETIMPLEMENTED, new NotYetImplementedPage(this));
-    setPage(PAGE_AIRFRAMESTAB_FIXEDWING, new AirframeStabFixedwing(this));
+    setPage(PAGE_AIRFRAMESTAB_FIXEDWING, new AirframeStabFixedwingPage(this));
     setPage(PAGE_END, new OPEndPage(this));
 
     setStartId(PAGE_START);

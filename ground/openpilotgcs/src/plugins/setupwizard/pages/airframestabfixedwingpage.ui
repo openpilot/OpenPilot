@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AirframeStabFixedwing</class>
- <widget class="QWizardPage" name="AirframeStabFixedwing">
+ <class>AirframeStabFixedwingPage</class>
+ <widget class="QWizardPage" name="AirframeStabFixedwingPage">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>170</y>
+     <y>130</y>
      <width>551</width>
-     <height>51</height>
+     <height>191</height>
     </rect>
    </property>
    <property name="text">

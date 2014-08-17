@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       outputpage.h
+ * @file       airframestabfixedwingpage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup OutputPage
+ * @addtogroup AirframeStabFixedwingPage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,25 +25,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OUTPUTPAGEFIXEDWING_H
-#define OUTPUTPAGEFIXEDWING_H
+#include "airframestabfixedwingpage.h"
+#include "ui_airframestabfixedwingpage.h"
 
-#include "abstractwizardpage.h"
-
-namespace Ui {
-class OutputPageFixedwing;
+AirframeStabFixedwingPage::AirframeStabFixedwingPage(SetupWizard *wizard, QWidget *parent) :
+    AbstractWizardPage(wizard, parent),
+    ui(new Ui::AirframeStabFixedwingPage)
+{
+    ui->setupUi(this);
+    setFinalPage(true);
 }
 
-class OutputPageFixedwing : public AbstractWizardPage {
-    Q_OBJECT
-
-public:
-    explicit OutputPageFixedwing(SetupWizard *wizard, QWidget *parent = 0);
-    ~OutputPageFixedwing();
-    bool validatePage();
-
-private:
-    Ui::OutputPageFixedwing *ui;
-};
-
-#endif // OUTPUTPAGEFIXEDWING_H
+AirframeStabFixedwingPage::~AirframeStabFixedwingPage()
+{
+    delete ui;
+}

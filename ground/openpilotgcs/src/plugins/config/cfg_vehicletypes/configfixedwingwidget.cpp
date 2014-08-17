@@ -43,6 +43,33 @@
 
 const QString ConfigFixedWingWidget::CHANNELBOXNAME = QString("fixedWingChannelBox");
 
+ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
+    VehicleConfig(parent), m_aircraft(new Ui_FixedWingConfigWidget()),
+    plane(NULL)
+{
+    m_aircraft->setupUi(this);
+
+    plane = new QGraphicsSvgItem();
+    populateChannelComboBoxes();
+
+    QStringList fixedWingTypes;
+    fixedWingTypes << "Elevator aileron rudder" << "Elevon";
+    m_aircraft->fixedWingType->addItems(fixedWingTypes);
+
+    // Set default model to "Elevator aileron rudder"
+    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+
+    setupUI(m_aircraft->fixedWingType->currentText());
+
+    connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
+    updateEnableControls();
+}
+
+ConfigFixedWingWidget::~ConfigFixedWingWidget()
+{
+    delete m_aircraft;
+}
+
 QStringList ConfigFixedWingWidget::getChannelDescriptions()
 {
     // init a channel_numelem list of channel desc defaults
@@ -78,31 +105,6 @@ QStringList ConfigFixedWingWidget::getChannelDescriptions()
         channelDesc[fixed.FixedWingYaw2 - 1] = QString("FixedWingYaw2");
     }
     return channelDesc;
-}
-
-ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
-    VehicleConfig(parent), m_aircraft(new Ui_FixedWingConfigWidget())
-{
-    m_aircraft->setupUi(this);
-
-    populateChannelComboBoxes();
-
-    QStringList fixedWingTypes;
-    fixedWingTypes << "Elevator aileron rudder" << "Elevon";
-    m_aircraft->fixedWingType->addItems(fixedWingTypes);
-
-    // Set default model to "Elevator aileron rudder"
-    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
-
-    //setupUI(m_aircraft->fixedWingType->currentText());    
-
-    connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
-    updateEnableControls();
-}
-
-ConfigFixedWingWidget::~ConfigFixedWingWidget()
-{
-    delete m_aircraft;
 }
 
 void ConfigFixedWingWidget::setupUI(QString frameType)
@@ -633,15 +635,10 @@ bool ConfigFixedWingWidget::throwConfigError(QString airframeType)
     return error;
 }
 
-/**
-   WHAT DOES THIS DO???
- */
 void ConfigFixedWingWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
-    // Thit fitInView method should only be called now, once the
-    // widget is shown, otherwise it cannot compute its values and
-    // the result is usually a ahrsbargraph that is way too small.
+    Q_ASSERT(plane);
     m_aircraft->planeShape->fitInView(plane, Qt::KeepAspectRatio);
 }
 
@@ -651,6 +648,7 @@ void ConfigFixedWingWidget::showEvent(QShowEvent *event)
 void ConfigFixedWingWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
+    Q_ASSERT(plane);
     m_aircraft->planeShape->fitInView(plane, Qt::KeepAspectRatio);
 }
 

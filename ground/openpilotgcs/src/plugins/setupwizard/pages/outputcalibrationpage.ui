@@ -34,7 +34,7 @@
    <item row="1" column="0">
     <widget class="QStackedWidget" name="calibrationStack">
      <property name="currentIndex">
-      <number>1</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="intro">
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -72,7 +72,7 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/p&gt;&lt;p&gt;To find &lt;span style=&quot; font-weight:600;&quot;&gt;the neutral rate for this engine&lt;/span&gt;, press the Start button below and slide the slider to the right until the engine just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -91,13 +91,13 @@ p, li { white-space: pre-wrap; }
           <number>1000</number>
          </property>
          <property name="maximum">
-          <number>1300</number>
+          <number>1500</number>
          </property>
          <property name="singleStep">
-          <number>10</number>
+          <number>1</number>
          </property>
          <property name="pageStep">
-          <number>20</number>
+          <number>10</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -133,7 +133,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This step calibrates the center position of the servo. To set the center position for this servo, press the Start button below and slide the slider to center the servo. &lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This step calibrates&lt;span style=&quot; font-weight:600;&quot;&gt; the center position of the servo&lt;/span&gt;. To set the center position for this servo, press the Start button below and slide the slider to center the servo. &lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -149,16 +149,16 @@ p, li { white-space: pre-wrap; }
           <bool>false</bool>
          </property>
          <property name="minimum">
-          <number>1000</number>
+          <number>600</number>
          </property>
          <property name="maximum">
-          <number>2000</number>
+          <number>2400</number>
          </property>
          <property name="singleStep">
-          <number>10</number>
+          <number>1</number>
          </property>
          <property name="pageStep">
-          <number>20</number>
+          <number>10</number>
          </property>
          <property name="value">
           <number>1500</number>
@@ -198,12 +198,12 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="servoMinMax">
+     <widget class="QWidget" name="servoMin">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To save the servo and other hardware from damage we have to set the max and min angles for the servo. &lt;/p&gt;&lt;p&gt;To set the minimum angle for the servo, press the Start button below and select the top slider and slide it to the left until min angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To save the servo and other hardware from damage we have to set the max and min angles for the servo. &lt;/p&gt;&lt;p&gt;To set &lt;span style=&quot; font-weight:600;&quot;&gt;the minimum angle for the servo&lt;/span&gt;, press the Start button below and select the top slider and slide it to the left until min angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -219,16 +219,16 @@ p, li { white-space: pre-wrap; }
           <bool>false</bool>
          </property>
          <property name="minimum">
-          <number>1000</number>
+          <number>600</number>
          </property>
          <property name="maximum">
-          <number>1500</number>
+          <number>2400</number>
          </property>
          <property name="singleStep">
-          <number>10</number>
+          <number>1</number>
          </property>
          <property name="pageStep">
-          <number>20</number>
+          <number>10</number>
          </property>
          <property name="value">
           <number>1500</number>
@@ -268,12 +268,12 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page">
+     <widget class="QWidget" name="servoMax">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To set the maximum angle for the servo, press the Start button below and select the top slider and slide it to the right until max angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To set &lt;span style=&quot; font-weight:600;&quot;&gt;the maximum angle for the servo&lt;/span&gt;, press the Start button below and select the top slider and slide it to the right until max angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -289,16 +289,16 @@ p, li { white-space: pre-wrap; }
           <bool>false</bool>
          </property>
          <property name="minimum">
-          <number>1500</number>
+          <number>600</number>
          </property>
          <property name="maximum">
-          <number>2000</number>
+          <number>2400</number>
          </property>
          <property name="singleStep">
-          <number>10</number>
+          <number>1</number>
          </property>
          <property name="pageStep">
-          <number>20</number>
+          <number>10</number>
          </property>
          <property name="value">
           <number>1500</number>

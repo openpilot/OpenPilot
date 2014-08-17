@@ -23,7 +23,6 @@ HEADERS += setupwizardplugin.h \
     pages/surfacepage.h \
     pages/abstractwizardpage.h \
     pages/outputpage.h \
-    pages/outputpagefixedwing.h \
     pages/inputpage.h \
     pages/summarypage.h \
     vehicleconfigurationsource.h \
@@ -37,7 +36,8 @@ HEADERS += setupwizardplugin.h \
     pages/revocalibrationpage.h \
     biascalibrationutil.h \
     pages/biascalibrationpage.h \
-    pages/airframestabfixedwing.h
+    pages/outputfixedwingpage.h \
+    pages/airframestabfixedwingpage.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -52,7 +52,6 @@ SOURCES += setupwizardplugin.cpp \
     pages/surfacepage.cpp \
     pages/abstractwizardpage.cpp \
     pages/outputpage.cpp \
-    pages/outputpagefixedwing.cpp \
     pages/inputpage.cpp \
     pages/summarypage.cpp \
     vehicleconfigurationsource.cpp \
@@ -66,7 +65,8 @@ SOURCES += setupwizardplugin.cpp \
     pages/revocalibrationpage.cpp \
     biascalibrationutil.cpp \
     pages/biascalibrationpage.cpp \
-    pages/airframestabfixedwing.cpp
+    pages/outputfixedwingpage.cpp \
+    pages/airframestabfixedwingpage.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -81,7 +81,6 @@ FORMS += \
     pages/helipage.ui \
     pages/surfacepage.ui \
     pages/outputpage.ui \
-    pages/outputpagefixedwing.ui \
     pages/inputpage.ui \
     pages/summarypage.ui \
     connectiondiagram.ui \
@@ -91,7 +90,8 @@ FORMS += \
     pages/autoupdatepage.ui \
     pages/revocalibrationpage.ui \
     pages/biascalibrationpage.ui \
-    pages/airframestabfixedwing.ui
+    pages/outputfixedwingpage.ui \
+    pages/airframestabfixedwingpage.ui
 
 RESOURCES += \
     wizardResources.qrc

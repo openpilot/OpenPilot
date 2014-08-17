@@ -53,6 +53,7 @@ public:
     }
 
     void loadSVGFile(QString file);
+    void setupActuatorMinMaxAndNeutral(int motorChannelStart, int motorChannelEnd, int totalUsedChannels);
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);

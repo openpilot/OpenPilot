@@ -64,6 +64,33 @@ void OutputCalibrationPage::loadSVGFile(QString file)
     }
 }
 
+void OutputCalibrationPage::setupActuatorMinMaxAndNeutral(int motorChannelStart, int motorChannelEnd, int totalUsedChannels)
+{
+    // Default values for the actuator settings, extra important for
+    // servos since a value out of range can actually destroy the
+    // vehicle if unlucky.
+    // Motors are not that important. REMOVE propellers always!!
+
+    for (int servoid = 0; servoid < 12; servoid++) {
+        if (servoid >= motorChannelStart && servoid <= motorChannelEnd) {
+            // Set to motor safe values
+            m_actuatorSettings[servoid].channelMin     = 1000;
+            m_actuatorSettings[servoid].channelNeutral = 1000;
+            m_actuatorSettings[servoid].channelMax     = 2000;
+        } else if (servoid < totalUsedChannels) {
+            // Set to servo safe values
+            m_actuatorSettings[servoid].channelMin     = 1500;
+            m_actuatorSettings[servoid].channelNeutral = 1500;
+            m_actuatorSettings[servoid].channelMax     = 1500;
+        } else {
+            // "Disable" these channels
+            m_actuatorSettings[servoid].channelMin     = 1000;
+            m_actuatorSettings[servoid].channelNeutral = 1000;
+            m_actuatorSettings[servoid].channelMax     = 1000;
+        }
+    }
+}
+
 void OutputCalibrationPage::setupVehicle()
 {
     m_actuatorSettings = getWizard()->getActuatorSettings();
@@ -93,13 +120,8 @@ void OutputCalibrationPage::setupVehicle()
         // The channel number to configure for each step.
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 3 << 3;
 
-        // Default values for the actuator settings, extra important for
-        // servos since a value out of range can actually destroy the
-        // vehicle if unlucky.
-        // Motors are not that important. REMOVE propellers always!!
-        m_actuatorSettings[3].channelMin     = 1500;
-        m_actuatorSettings[3].channelNeutral = 1500;
-        m_actuatorSettings[3].channelMax     = 1500;
+        setupActuatorMinMaxAndNeutral(0, 1, 3);
+
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
     case SetupWizard::MULTI_ROTOR_QUAD_X:
@@ -108,6 +130,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleElementIds << "quad-x" << "quad-x-frame" << "quad-x-m1" << "quad-x-m2" << "quad-x-m3" << "quad-x-m4";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
+        setupActuatorMinMaxAndNeutral(0, 3, 4);
         break;
     case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
         loadSVGFile(MULTI_SVG_FILE);
@@ -115,6 +138,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleElementIds << "quad-p" << "quad-p-frame" << "quad-p-m1" << "quad-p-m2" << "quad-p-m3" << "quad-p-m4";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
+        setupActuatorMinMaxAndNeutral(0, 3, 4);
         break;
     case SetupWizard::MULTI_ROTOR_HEXA:
         loadSVGFile(MULTI_SVG_FILE);
@@ -122,6 +146,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleElementIds << "hexa" << "hexa-frame" << "hexa-m1" << "hexa-m2" << "hexa-m3" << "hexa-m4" << "hexa-m5" << "hexa-m6";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        setupActuatorMinMaxAndNeutral(0, 5, 6);
         break;
     case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
         loadSVGFile(MULTI_SVG_FILE);
@@ -129,6 +154,7 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleElementIds << "hexa-y6" << "hexa-y6-frame" << "hexa-y6-m2" << "hexa-y6-m1" << "hexa-y6-m4" << "hexa-y6-m3" << "hexa-y6-m6" << "hexa-y6-m5";
         m_vehicleHighlightElementIndexes << 0 << 2 << 1 << 4 << 3 << 6 << 5;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        setupActuatorMinMaxAndNeutral(0, 5, 6);
         break;
     case SetupWizard::MULTI_ROTOR_HEXA_H:
         loadSVGFile(MULTI_SVG_FILE);
@@ -136,92 +162,35 @@ void OutputCalibrationPage::setupVehicle()
         m_vehicleElementIds << "hexa-h" << "hexa-h-frame" << "hexa-h-m1" << "hexa-h-m2" << "hexa-h-m3" << "hexa-h-m4" << "hexa-h-m5" << "hexa-h-m6";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        setupActuatorMinMaxAndNeutral(0, 5, 6);
         break;
     case SetupWizard::MULTI_ROTOR_HEXA_X:
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "hexa-x" << "hexa-x-frame" << "hexa-x-m1" << "hexa-x-m2" << "hexa-x-m3" << "hexa-x-m4" << "hexa-x-m5" << "hexa-x-m6";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4 << 5;
+        setupActuatorMinMaxAndNeutral(0, 5, 6);
         break;
     // Fixed Wing
     case SetupWizard::FIXED_WING_AILERON:
         loadSVGFile(FIXEDWING_SVG_FILE);
-        m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2; //2 for servoCenterSlider!
+        m_wizardIndexes << 0 << 1 << 2 << 3 << 4 << 2 << 3 << 4 << 2 << 3 << 4 << 2 << 3 << 4;
         m_vehicleElementIds << "aileron" << "aileron-frame" << "aileron-motor" << "aileron-ail-left" << "aileron-ail-right" << "aileron-rudder" << "aileron-elevator";
-        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
-        m_channelIndex << 0 << 0 << 1 << 2 << 3 << 4;
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 2 << 2 << 3 << 3 << 3 << 4 << 4 << 4 << 5 << 5 << 5;
+        m_channelIndex << 0 << 3 << 0 << 0 << 0 << 1 << 1 << 1 << 2 << 2 << 2 << 4 << 4 << 4;
 
-        // see Servo city for an example. 1500 usec is center on MS85mg for example.
-        // - http://www.servocity.com/html/hs-85mg__mighty_micro.html
-        // make sure Aileron servo one does not go to an extreme value
-        // would also be nice to make these all default to 50hz so we don't shred servos.
-
-        m_actuatorSettings[1].channelNeutral = 1500;
-        // make sure Aileron servo two does not go to an extreme value
-        m_actuatorSettings[2].channelNeutral = 1500;
-        // make sure Elevator servo one does not go to an extreme value
-        m_actuatorSettings[3].channelNeutral = 1500;
-        // make sure Rudder servo one does not go to an extreme value
-        m_actuatorSettings[4].channelNeutral = 1500;
-        m_actuatorSettings[4].channelNeutral = 1500;
-        m_actuatorSettings[5].channelNeutral = 1500;
-        m_actuatorSettings[6].channelNeutral = 1500;
-        m_actuatorSettings[7].channelNeutral = 1500;
-
-	// Arduino library defaults to 554 http://arduino.cc/en/Reference/ServoAttach,
-	// 600 is for HS85mg - http://www.servocity.com/html/hs-85mg__mighty_micro.html#.U4JEWhapKBU
-	// Same rules as above from the Arduino *generic* library and the servo city info for the 85mg
-        m_actuatorSettings[1].channelMin     = 554;
-        m_actuatorSettings[1].channelMax     = 2400;
-        m_actuatorSettings[2].channelMin     = 554;
-        m_actuatorSettings[2].channelMax     = 2400;
-        m_actuatorSettings[3].channelMin     = 554;
-        m_actuatorSettings[3].channelMax     = 2400;
-        m_actuatorSettings[4].channelMin     = 554;
-        m_actuatorSettings[4].channelMax     = 2400;
-        m_actuatorSettings[5].channelMin     = 554;
-        m_actuatorSettings[5].channelMax     = 2400;
-        m_actuatorSettings[6].channelMin     = 554;
-        m_actuatorSettings[6].channelMax     = 2400;
-        m_actuatorSettings[7].channelMin     = 554;
-        m_actuatorSettings[7].channelMax     = 2400;
+        setupActuatorMinMaxAndNeutral(3, 3, 5);
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
     case SetupWizard::FIXED_WING_ELEVON:
         loadSVGFile(FIXEDWING_SVG_FILE);
-        m_wizardIndexes << 0 << 1 << 2 << 2; //2 for servoCenterSlider!
+        m_wizardIndexes << 0 << 1 << 2 << 3 << 4 << 2 << 3 << 4;
         m_vehicleElementIds << "elevon" << "elevon-frame" << "elevon-motor" << "elevon-left" << "elevon-right";
-        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3;
-        m_channelIndex << 0 << 0 << 1 << 2;
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 2 << 2 << 3 << 3 << 3;
+        m_channelIndex << 0 << 3 << 0 << 0 << 0 << 1 << 1 << 1;
 
-        // make sure elevon servo one does not go to an extreme value
-        m_actuatorSettings[1].channelNeutral = 1500;
-        // make sure elevon servo two does not go to an extreme value
-        m_actuatorSettings[2].channelNeutral = 1500;
-        m_actuatorSettings[3].channelNeutral = 1500;
-        m_actuatorSettings[4].channelNeutral = 1500;
-        m_actuatorSettings[5].channelNeutral = 1500;
-        m_actuatorSettings[6].channelNeutral = 1500;
-        m_actuatorSettings[7].channelNeutral = 1500;
-
-	// Arduino library defaults to 554 http://arduino.cc/en/Reference/ServoAttach,
-	// 600 is for HS85mg - http://www.servocity.com/html/hs-85mg__mighty_micro.html#.U4JEWhapKBU
-	// Same rules as above from the Arduino *generic* library and the servo city info for the 85mg
-        m_actuatorSettings[1].channelMin     = 554;
-        m_actuatorSettings[1].channelMax     = 2400;
-        m_actuatorSettings[2].channelMin     = 554;
-        m_actuatorSettings[2].channelMax     = 2400;
-        m_actuatorSettings[3].channelMin     = 554;
-        m_actuatorSettings[3].channelMax     = 2400;
-        m_actuatorSettings[4].channelMin     = 554;
-        m_actuatorSettings[4].channelMax     = 2400;
-        m_actuatorSettings[5].channelMin     = 554;
-        m_actuatorSettings[5].channelMax     = 2400;
-        m_actuatorSettings[6].channelMin     = 554;
-        m_actuatorSettings[6].channelMax     = 2400;
-        m_actuatorSettings[7].channelMin     = 554;
-        m_actuatorSettings[7].channelMax     = 2400;
+        setupActuatorMinMaxAndNeutral(3, 3, 3);
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
@@ -298,7 +267,7 @@ void OutputCalibrationPage::setWizardPage()
     ui->calibrationStack->setCurrentIndex(currentPageIndex);
 
     int currentChannel = getCurrentChannel();
-    qDebug() << "Current channel: " << currentChannel+1;
+    qDebug() << "Current channel: " << currentChannel + 1;
     if (currentChannel >= 0) {
         if (currentPageIndex == 1) {
             ui->motorNeutralSlider->setValue(m_actuatorSettings[currentChannel].channelNeutral);
@@ -381,7 +350,8 @@ void OutputCalibrationPage::on_motorNeutralButton_toggled(bool checked)
 {
     ui->motorNeutralButton->setText(checked ? tr("Stop") : tr("Start"));
     quint16 channel = getCurrentChannel();
-    onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings[channel].channelNeutral, 1000, ui->motorNeutralSlider);
+    quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
+    onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings[channel].channelNeutral, safeValue, ui->motorNeutralSlider);
 }
 
 void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider)

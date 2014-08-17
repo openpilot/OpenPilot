@@ -68,7 +68,7 @@ p, li { white-space: pre-wrap; }
         <string notr="true">QToolButton { border: none }</string>
        </property>
        <property name="text">
-        <string>Standard Servos</string>
+        <string>Analog Servos</string>
        </property>
        <property name="icon">
         <iconset resource="../wizardResources.qrc">

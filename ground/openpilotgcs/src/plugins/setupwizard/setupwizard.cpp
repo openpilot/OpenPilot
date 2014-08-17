@@ -300,7 +300,7 @@ QString SetupWizard::getSummaryText()
         summary.append(tr("Rapid ESC (400 Hz)"));
         break;
     case SERVO_LEGACY:
-        summary.append(tr("Legacy Servos (50 Hz)"));
+        summary.append(tr("Analog Servos (50 Hz)"));
         break;
     case SERVO_DIGITAL:
         summary.append(tr("Digital Servos (333 Hz)"));

@@ -36,6 +36,7 @@
 #include "pages/surfacepage.h"
 #include "pages/inputpage.h"
 #include "pages/outputpage.h"
+#include "pages/outputpagefixedwing.h"
 #include "pages/biascalibrationpage.h"
 #include "pages/summarypage.h"
 #include "pages/savepage.h"
@@ -113,7 +114,7 @@ int SetupWizard::nextId() const
         return PAGE_OUTPUT;
 
     case PAGE_FIXEDWING:
-        return PAGE_OUTPUT;
+        return PAGE_OUTPUT_FIXEDWING;
 
     case PAGE_INPUT:
         if (isRestartNeeded()) {
@@ -126,6 +127,9 @@ int SetupWizard::nextId() const
         return PAGE_VEHICLES;
 
     case PAGE_OUTPUT:
+        return PAGE_SUMMARY;
+
+    case PAGE_OUTPUT_FIXEDWING:
         return PAGE_SUMMARY;
 
     case PAGE_BIAS_CALIBRATION:
@@ -319,6 +323,7 @@ void SetupWizard::createPages()
     setPage(PAGE_SURFACE, new SurfacePage(this));
     setPage(PAGE_INPUT, new InputPage(this));
     setPage(PAGE_OUTPUT, new OutputPage(this));
+    setPage(PAGE_OUTPUT_FIXEDWING, new OutputPageFixedwing(this));
     setPage(PAGE_BIAS_CALIBRATION, new BiasCalibrationPage(this));
     // setPage(PAGE_REVO_CALIBRATION, new RevoCalibrationPage(this));
     setPage(PAGE_OUTPUT_CALIBRATION, new OutputCalibrationPage(this));

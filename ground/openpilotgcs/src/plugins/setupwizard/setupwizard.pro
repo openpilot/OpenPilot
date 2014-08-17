@@ -23,6 +23,7 @@ HEADERS += setupwizardplugin.h \
     pages/surfacepage.h \
     pages/abstractwizardpage.h \
     pages/outputpage.h \
+    pages/outputpagefixedwing.h \
     pages/inputpage.h \
     pages/summarypage.h \
     vehicleconfigurationsource.h \
@@ -50,6 +51,7 @@ SOURCES += setupwizardplugin.cpp \
     pages/surfacepage.cpp \
     pages/abstractwizardpage.cpp \
     pages/outputpage.cpp \
+    pages/outputpagefixedwing.cpp \
     pages/inputpage.cpp \
     pages/summarypage.cpp \
     vehicleconfigurationsource.cpp \
@@ -77,6 +79,7 @@ FORMS += \
     pages/helipage.ui \
     pages/surfacepage.ui \
     pages/outputpage.ui \
+    pages/outputpagefixedwing.ui \
     pages/inputpage.ui \
     pages/summarypage.ui \
     connectiondiagram.ui \

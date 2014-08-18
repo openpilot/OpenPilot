@@ -57,7 +57,8 @@ typedef struct {
     uint8_t  next_sequence_step; // (step number to be executed) << 1 || (0x00 = on phase, 0x01 = off phase)
     uint8_t  next_step_rep; // next repetition number for next step (valid if step.repeats >1)
     uint8_t  next_sequence_rep; // next sequence repetition counter (valid if sequence.repeats > 1)
-    uint8_t  led_set; // target led set
+    uint8_t  led_set_start; // first target led for this set
+    uint8_t  led_set_end; // last target led for this set
 } NotifierLedStatus_t;
 
 static bool led_status_initialized = false;
@@ -69,7 +70,8 @@ static void InitExtLed()
     memset(led_status, 0, sizeof(NotifierLedStatus_t) * MAX_HANDLED_LED);
     const uint32_t now = GET_CURRENT_MILLIS;
     for (uint8_t l = 0; l < MAX_HANDLED_LED; l++) {
-        led_status[l].led_set = 0;
+        led_status[l].led_set_start = 0;
+        led_status[l].led_set_end   = PIOS_WS2811_NUMLEDS - 1;
         led_status[l].next_run_time = now + 500; // start within half a second
         for (uint8_t i = 0; i < MAX_BACKGROUND_NOTIFICATIONS; i++) {
             led_status[l].queued_priorities[i] = NOTIFY_PRIORITY_BACKGROUND;
@@ -230,7 +232,7 @@ static void advance_sequence(NotifierLedStatus_t *status)
  */
 static void run_led(NotifierLedStatus_t *status)
 {
-    uint32_t currentTime = GET_CURRENT_MILLIS;
+    const uint32_t currentTime = GET_CURRENT_MILLIS;
 
     if (!status->running || currentTime < status->next_run_time) {
         return;
@@ -239,12 +241,13 @@ static void run_led(NotifierLedStatus_t *status)
     uint8_t step = status->next_sequence_step;
 
     LedSequence_t *activeSequence = status->active_sequence_num == BACKGROUND_SEQUENCE ?
-                                    &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
-    if (status->step_phase_on) {
-        PIOS_WS2811_setColorRGB(activeSequence->steps[step].color, status->led_set, true);
-    } else {
-        PIOS_WS2811_setColorRGB(Color_Off, status->led_set, true);
+                                          &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
+    const Color_t color = status->step_phase_on ? activeSequence->steps[step].color : Color_Off;
+
+    for (uint8_t i = status->led_set_start; i < status->led_set_end; i++) {
+        PIOS_WS2811_setColorRGB(color, i, false);
     }
+    PIOS_WS2811_Update();
     advance_sequence(status);
 }
 

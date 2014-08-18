@@ -63,5 +63,6 @@
         <file>qml/images/tab.png</file>
         <file>qml/AboutDialog.qml</file>
         <file alias="qml/AuthorsModel.qml">../../../../../build/openpilotgcs-synthetics/AuthorsModel.qml</file>
+        <file>images/opie_90x120.gif</file>
     </qresource>
 </RCC>

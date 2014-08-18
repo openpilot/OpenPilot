@@ -348,6 +348,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         }
 
         for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
+            data.ChannelUpdateFreq[i] = updateFrequence;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 if (i == 1) {
                     data.ChannelUpdateFreq[i] = ANALOG_SERVO_FREQUENCE;
@@ -357,7 +358,6 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
                     data.ChannelUpdateFreq[i] = ANALOG_SERVO_FREQUENCE;
                 }
             }
-            data.ChannelUpdateFreq[i] = updateFrequence;
         }
 
         actSettings->setData(data);

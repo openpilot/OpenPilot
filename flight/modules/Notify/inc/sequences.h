@@ -31,6 +31,7 @@
 #include <systemalarms.h>
 #include <pios_helpers.h>
 
+// This represent the list of basic light sequences, defined later
 typedef enum {
     NOTIFY_SEQUENCE_ARMED_FM_MANUAL = 0,
     NOTIFY_SEQUENCE_ARMED_FM_STABILIZED1 = 1,
@@ -48,330 +49,120 @@ typedef enum {
     NOTIFY_SEQUENCE_ALM_ERROR_GPS     = 13,
     NOTIFY_SEQUENCE_ALM_WARN_BATTERY  = 14,
     NOTIFY_SEQUENCE_ALM_ERROR_BATTERY = 15,
-    NOTIFY_SEQUENCE_ALM_MAG    = 16,
+    NOTIFY_SEQUENCE_ALM_MAG = 16,
     NOTIFY_SEQUENCE_ALM_CONFIG = 17,
-    NOTIFY_SEQUENCE_DISARMED   = 18,
+    NOTIFY_SEQUENCE_ALM_RECEIVER      = 18,
+    NOTIFY_SEQUENCE_DISARMED = 19,
+    NOTIFY_SEQUENCE_NULL     = 255, // skips any signalling for this condition
 } NotifySequences;
 
+// This structure determine sequences attached to an alarm
 typedef struct {
-    uint32_t timeBetweenNotifications;
-    uint8_t  alarmIndex;
-    uint8_t  warnNotification;
-    uint8_t  errorNotification;
+    uint32_t timeBetweenNotifications; // time in milliseconds to wait between each notification iteration
+    uint8_t  alarmIndex; // Index of the alarm, use one of the SYSTEMALARMS_ALARM_XXXXX defines
+    uint8_t  warnNotification; // index of the sequence to be used when alarm is in warning status(pick one from NotifySequences enum)
+    uint8_t  errorNotification; // index of the sequence to be used when alarm is in error status(pick one from NotifySequences enum)
 } AlarmDefinition_t;
 
-// consts
+
+// This is the list of defined light sequences
+/* how each sequence is defined
+ * [NOTIFY_SEQUENCE_DISARMED] = {  // Sequence ID
+        .repeats = -1,             // Number of repetitions or -1 for infinite
+        .steps   = { // List of steps (until NOTIFY_SEQUENCE_MAX_STEPS steps, default to 5)
+                    {
+                        .time_off = 500,           // Off time for the step
+                        .time_on  = 500,           // On time for the step
+                        .color    = COLOR_TEAL,    // color
+                        .repeats  = 1,             // repetitions for this step
+                    },
+        },
+    },
+ *
+ * There are two kind of sequences:
+ * - "Background" sequences, executed if no higher priority sequence is played;
+ * - "Alarm" sequences, that are "modal", they temporarily suspends background sequences and plays.
+ * Cannot have "-1" repetitions
+ * At the end background sequence are resumed;
+ *
+ */
 const LedSequence_t notifications[] = {
-    [NOTIFY_SEQUENCE_DISARMED] =             {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 1000,
-                                             .time_on  = 1000,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 1000,
-                                             .time_on  = 1000,
-                                             .color    = COLOR_LIME,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 1000,
-                                             .time_on  = 1000,
-                                             .color    = COLOR_RED,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_MANUAL] =      {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 900,
-                                             .time_on  = 100,
-                                             .color    = COLOR_YELLOW,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED1] = {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 900,
-                                             .time_on  = 100,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED2] = {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 100,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 700,
-                                             .time_on  = 100,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED3] = {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 100,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 2,
-                                             },
-                                             {
-                                             .time_off = 500,
-                                             .time_on  = 100,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED4] = {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 900,
-                                             .time_on  = 100,
-                                             .color    = COLOR_PURPLE,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED5] = {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 100,
-                                             .color    = COLOR_PURPLE,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 700,
-                                             .time_on  = 100,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED6] = {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 100,
-                                             .color    = COLOR_PURPLE,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 100,
-                                             .color    = COLOR_PURPLE,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 500,
-                                             .time_on  = 100,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_AUTOTUNE] =    {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 800,
-                                             .time_on  = 200,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
+    [NOTIFY_SEQUENCE_DISARMED] =                   { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 500, .time_on  = 500, .color = COLOR_TEAL, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_MANUAL] =            { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 900, .time_on  = 100, .color = COLOR_YELLOW, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED1] =       { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 900, .time_on  = 100, .color = COLOR_BLUE, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED2] =       { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_BLUE, .repeats = 1, },
+                                                   { .time_off = 700, .time_on  = 100, .color = COLOR_BLUE, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED3] =       { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_BLUE, .repeats = 2, },
+                                                   { .time_off = 500, .time_on  = 100, .color = COLOR_BLUE, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED4] =       { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 900, .time_on  = 100, .color = COLOR_PURPLE, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED5] =       { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_PURPLE, .repeats = 1, },
+                                                   { .time_off = 700, .time_on  = 100, .color = COLOR_BLUE,   .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_STABILIZED6] =       { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_PURPLE, .repeats = 1, },
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_PURPLE, .repeats = 1, },
+                                                   { .time_off = 500, .time_on  = 100, .color = COLOR_BLUE,   .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_AUTOTUNE] =          { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 800, .time_on  = 200, .color = COLOR_BLUE, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_GPS] =               { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 800, .time_on  = 200, .color = COLOR_GREEN, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_RTH] =               { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_GREEN,  .repeats = 1, },
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_YELLOW, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_LAND] =              { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_GREEN, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ARMED_FM_AUTO] =              { .repeats  = -1,  .steps    = {
+                                                   { .time_off = 100, .time_on  = 200, .color = COLOR_GREEN, .repeats = 2, },
+                                                   { .time_off = 500, .time_on  = 200, .color = COLOR_GREEN, .repeats = 1, },
+                                                     }, },
 
-    [NOTIFY_SEQUENCE_ARMED_FM_GPS] =         {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 800,
-                                             .time_on  = 200,
-                                             .color    = COLOR_GREEN,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-
-    [NOTIFY_SEQUENCE_ARMED_FM_RTH] =         {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 200,
-                                             .color    = COLOR_GREEN,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 500,
-                                             .time_on  = 200,
-                                             .color    = COLOR_GREEN,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_LAND] =        {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 200,
-                                             .color    = COLOR_GREEN,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 200,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 200,
-                                             .color    = COLOR_GREEN,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 200,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 200,
-                                             .color    = COLOR_GREEN,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ARMED_FM_AUTO] =        {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 200,
-                                             .color    = COLOR_GREEN,
-                                             .repeats  = 2,
-                                             },
-                                             {
-                                             .time_off = 500,
-                                             .time_on  = 200,
-                                             .color    = COLOR_GREEN,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-
-    [NOTIFY_SEQUENCE_ALM_WARN_GPS] =         {
-        .repeats = 2,
-        .steps   =                           {
-                                             {
-                                             .time_off = 300,
-                                             .time_on  = 300,
-                                             .color    = COLOR_ORANGE,
-                                             .repeats  = 2,
-                                             },
-                                             {
-                                             .time_off = 300,
-                                             .time_on  = 300,
-                                             .color    = COLOR_YELLOW,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ALM_ERROR_GPS] =        {
-        .repeats = 2,
-        .steps   =                           {
-                                             {
-                                             .time_off = 300,
-                                             .time_on  = 300,
-                                             .color    = COLOR_RED,
-                                             .repeats  = 2,
-                                             },
-                                             {
-                                             .time_off = 300,
-                                             .time_on  = 300,
-                                             .color    = COLOR_YELLOW,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ALM_WARN_BATTERY] =     {
-        .repeats = 1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 100,
-                                             .color    = COLOR_ORANGE,
-                                             .repeats  = 10,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ALM_ERROR_BATTERY] =    {
-        .repeats = 1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 100,
-                                             .time_on  = 100,
-                                             .color    = COLOR_RED,
-                                             .repeats  = 10,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ALM_MAG] =              {
-        .repeats = 1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 300,
-                                             .time_on  = 300,
-                                             .color    = COLOR_RED,
-                                             .repeats  = 2,
-                                             },
-                                             {
-                                             .time_off = 300,
-                                             .time_on  = 300,
-                                             .color    = COLOR_GREEN,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
-    [NOTIFY_SEQUENCE_ALM_CONFIG] =           {
-        .repeats = -1,
-        .steps   =                           {
-                                             {
-                                             .time_off = 500,
-                                             .time_on  = 100,
-                                             .color    = COLOR_RED,
-                                             .repeats  = 1,
-                                             },
-        },
-    },
+    [NOTIFY_SEQUENCE_ALM_WARN_GPS] =               { .repeats  = 2,   .steps     = {
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_ORANGE, .repeats = 2, },
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_GREEN,  .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ALM_ERROR_GPS] =              { .repeats  = 2,   .steps     = {
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_RED,   .repeats = 2, },
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_GREEN, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ALM_WARN_BATTERY]  =          { .repeats  = 1,   .steps     = {
+                                                   { .time_off = 100, .time_on   = 100, .color = COLOR_ORANGE, .repeats = 10, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ALM_ERROR_BATTERY] =          { .repeats  = 1,   .steps     = {
+                                                   { .time_off = 100, .time_on   = 100, .color = COLOR_RED, .repeats = 10, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ALM_MAG] =                    { .repeats  = 1,   .steps     = {
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_RED,    .repeats = 2, },
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_PURPLE, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ALM_CONFIG] =                 { .repeats  = 1,   .steps     = {
+                                                   { .time_off = 50,  .time_on    = 50, .color = COLOR_RED, .repeats = 9, },
+                                                   { .time_off = 500, .time_on    = 50, .color = COLOR_RED, .repeats = 1, },
+                                                     }, },
+    [NOTIFY_SEQUENCE_ALM_RECEIVER] =               { .repeats  = 1,   .steps     = {
+                                                   { .time_off = 50,  .time_on    = 50, .color = COLOR_ORANGE, .repeats = 9, },
+                                                   { .time_off = 500, .time_on    = 50, .color = COLOR_ORANGE, .repeats = 1, },
+                                                     }, },
 };
 
+// List of background sequences attached to each flight mode
 const LedSequence_t *flightModeMap[] = {
     [FLIGHTSTATUS_FLIGHTMODE_MANUAL] = &notifications[NOTIFY_SEQUENCE_ARMED_FM_MANUAL],
     [FLIGHTSTATUS_FLIGHTMODE_STABILIZED1]       = &notifications[NOTIFY_SEQUENCE_ARMED_FM_STABILIZED1],
@@ -392,6 +183,7 @@ const LedSequence_t *flightModeMap[] = {
     [FLIGHTSTATUS_FLIGHTMODE_AUTOCRUISE]        = &notifications[NOTIFY_SEQUENCE_ARMED_FM_GPS],
 };
 
+// List of alarms to show with attached sequences for each status
 const AlarmDefinition_t alarmsMap[] = {
     {
         .timeBetweenNotifications = 10000,
@@ -402,7 +194,7 @@ const AlarmDefinition_t alarmsMap[] = {
     {
         .timeBetweenNotifications = 15000,
         .alarmIndex = SYSTEMALARMS_ALARM_MAGNETOMETER,
-        .warnNotification = NOTIFY_SEQUENCE_ALM_MAG,
+        .warnNotification = NOTIFY_SEQUENCE_NULL,
         .errorNotification = NOTIFY_SEQUENCE_ALM_MAG,
     },
     {
@@ -411,7 +203,20 @@ const AlarmDefinition_t alarmsMap[] = {
         .warnNotification = NOTIFY_SEQUENCE_ALM_WARN_BATTERY,
         .errorNotification = NOTIFY_SEQUENCE_ALM_ERROR_BATTERY,
     },
+    {
+        .timeBetweenNotifications = 5000,
+        .alarmIndex = SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION,
+        .warnNotification = NOTIFY_SEQUENCE_NULL,
+        .errorNotification = NOTIFY_SEQUENCE_ALM_CONFIG,
+    },
+    {
+        .timeBetweenNotifications = 5000,
+        .alarmIndex = SYSTEMALARMS_ALARM_RECEIVER,
+        .warnNotification = NOTIFY_SEQUENCE_ALM_RECEIVER,
+        .errorNotification = NOTIFY_SEQUENCE_ALM_RECEIVER,
+    },
 };
+
 const uint8_t alarmsMapSize = NELEMENTS(alarmsMap);
 
 #endif /* SEQUENCES_H_ */

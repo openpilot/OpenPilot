@@ -27,8 +27,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <freeRTOS.h>
-#include <task.h>
+#include <FreeRTOS.h>
+#include <pios.h>
 #include <pios_notify.h>
 #include <pios_ws2811.h>
 
@@ -57,7 +57,8 @@ typedef struct {
     uint8_t  next_sequence_step; // (step number to be executed) << 1 || (0x00 = on phase, 0x01 = off phase)
     uint8_t  next_step_rep; // next repetition number for next step (valid if step.repeats >1)
     uint8_t  next_sequence_rep; // next sequence repetition counter (valid if sequence.repeats > 1)
-    uint8_t  led_set; // target led set
+    uint8_t  led_set_start; // first target led for this set
+    uint8_t  led_set_end; // last target led for this set
 } NotifierLedStatus_t;
 
 static bool led_status_initialized = false;
@@ -69,7 +70,8 @@ static void InitExtLed()
     memset(led_status, 0, sizeof(NotifierLedStatus_t) * MAX_HANDLED_LED);
     const uint32_t now = GET_CURRENT_MILLIS;
     for (uint8_t l = 0; l < MAX_HANDLED_LED; l++) {
-        led_status[l].led_set = 0;
+        led_status[l].led_set_start = 0;
+        led_status[l].led_set_end   = PIOS_WS2811_NUMLEDS - 1;
         led_status[l].next_run_time = now + 500; // start within half a second
         for (uint8_t i = 0; i < MAX_BACKGROUND_NOTIFICATIONS; i++) {
             led_status[l].queued_priorities[i] = NOTIFY_PRIORITY_BACKGROUND;
@@ -105,9 +107,9 @@ static void push_queued_sequence(ExtLedNotification_t *new_notification, Notifie
     } else {
         // a notification with priority higher than background.
         // try to enqueue it
-        int8_t insert_point = -1;
+        int8_t insert_point = MAX_BACKGROUND_NOTIFICATIONS - 1;
         int8_t first_free   = -1;
-        for (int8_t i = MAX_BACKGROUND_NOTIFICATIONS; i > -1; i--) {
+        for (int8_t i = MAX_BACKGROUND_NOTIFICATIONS - 1; i >= 0; i--) {
             const int8_t priority_i = status->queued_priorities[i];
             if (priority_i == NOTIFY_PRIORITY_BACKGROUND) {
                 first_free   = i;
@@ -115,10 +117,14 @@ static void push_queued_sequence(ExtLedNotification_t *new_notification, Notifie
                 continue;
             }
             if (priority_i > new_notification->priority) {
-                insert_point = i;
+                insert_point = ((i > 0) || (first_free > -1)) ? i : -1; // check whether priority is no bigger than lowest queued priority
             }
         }
 
+        // no space left on queue for this new notification, ignore.
+        if (insert_point < 0) {
+            return;
+        }
         if (insert_point != first_free) {
             // there is a free slot, move everything up one place
             if (first_free != -1) {
@@ -230,7 +236,7 @@ static void advance_sequence(NotifierLedStatus_t *status)
  */
 static void run_led(NotifierLedStatus_t *status)
 {
-    uint32_t currentTime = GET_CURRENT_MILLIS;
+    const uint32_t currentTime = GET_CURRENT_MILLIS;
 
     if (!status->running || currentTime < status->next_run_time) {
         return;
@@ -240,11 +246,12 @@ static void run_led(NotifierLedStatus_t *status)
 
     LedSequence_t *activeSequence = status->active_sequence_num == BACKGROUND_SEQUENCE ?
                                     &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
-    if (status->step_phase_on) {
-        PIOS_WS2811_setColorRGB(activeSequence->steps[step].color, status->led_set, true);
-    } else {
-        PIOS_WS2811_setColorRGB(Color_Off, status->led_set, true);
+    const Color_t color = status->step_phase_on ? activeSequence->steps[step].color : Color_Off;
+
+    for (uint8_t i = status->led_set_start; i <= status->led_set_end; i++) {
+        PIOS_WS2811_setColorRGB(color, i, false);
     }
+    PIOS_WS2811_Update();
     advance_sequence(status);
 }
 

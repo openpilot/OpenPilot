@@ -38,7 +38,6 @@
 #include <optypes.h>
 #include <pios_ws2811.h>
 
-#define sign(x) ((x > 0) - (x < 0))
 #define PIOS_WS2811_BUFFER_SIZE        (((PIOS_WS2811_NUMLEDS) * 24))
 #define PIOS_WS2811_MEMORYDATASIZE     DMA_MemoryDataSize_HalfWord
 #define PIOS_WS2811_PERIPHERALDATASIZE DMA_PeripheralDataSize_HalfWord

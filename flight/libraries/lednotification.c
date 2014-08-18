@@ -27,7 +27,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <freeRTOS.h>
+#include <FreeRTOS.h>
 #include <task.h>
 #include <pios_notify.h>
 #include <pios_ws2811.h>

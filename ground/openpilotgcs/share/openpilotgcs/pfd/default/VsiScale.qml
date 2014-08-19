@@ -3,6 +3,14 @@ import QtQuick 2.0
 Item {
     id: sceneItem
     property variant sceneSize
+    property real vert_velocity
+
+    Timer {
+         interval: 100; running: true; repeat: true
+         onTriggered: vert_velocity = (0.9 * vert_velocity) + (0.1 * VelocityState.Down)
+     }
+
+
 
     SvgElementImage {
         id: vsi_window
@@ -31,9 +39,9 @@ Item {
 
         //rotate it around the center
         transform: Rotation {
-            angle: -VelocityDesired.Down*5
-            origin.y : vsi_waypoint.height/2 
-            origin.x : vsi_waypoint.width*33
+            angle: -VelocityDesired.Down * 5
+            origin.y : vsi_waypoint.height / 2 
+            origin.x : vsi_waypoint.width * 33
         }
     }
 
@@ -63,9 +71,9 @@ Item {
 
         //rotate it around the center
         transform: Rotation {
-            angle: -VelocityState.Down*5
-            origin.y : vsi_arrow.height/2 
-            origin.x : vsi_arrow.width*3.15
+            angle: -vert_velocity * 5
+            origin.y : vsi_arrow.height / 2 
+            origin.x : vsi_arrow.width * 3.15
         }
     }
 

@@ -127,12 +127,15 @@ void plan_setup_returnToBase()
 static PiOSDeltatimeConfig landdT;
 void plan_setup_land()
 {
+    float descendspeed;
+
     plan_setup_positionHold();
 
+    FlightModeSettingsLandingVelocityGet(&descendspeed);
     PathDesiredData pathDesired;
     PathDesiredGet(&pathDesired);
-    pathDesired.StartingVelocity = 0.0f;
-    pathDesired.EndingVelocity   = 0.0f;
+    pathDesired.StartingVelocity = descendspeed;
+    pathDesired.EndingVelocity   = descendspeed;
     PathDesiredSet(&pathDesired);
     PIOS_DELTATIME_Init(&landdT, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
 }

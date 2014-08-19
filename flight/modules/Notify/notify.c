@@ -49,7 +49,7 @@
 #include <lednotification.h>
 #include <optypes.h>
 #include <pios_notify.h>
-#include <freeRTOS.h>
+#include <FreeRTOS.h>
 #include <task.h>
 #include <eventdispatcher.h>
 #include "inc/notify.h"

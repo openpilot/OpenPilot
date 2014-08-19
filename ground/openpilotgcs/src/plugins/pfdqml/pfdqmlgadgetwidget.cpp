@@ -69,7 +69,10 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
         "WaypointActive" <<
         "OPLinkStatus" <<
         "FlightStatus" <<
-        "SystemStats";
+        "SystemStats" <<
+        "StabilizationDesired" <<
+        "VtolPathFollowerSettings" <<
+        "HwSettings";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();

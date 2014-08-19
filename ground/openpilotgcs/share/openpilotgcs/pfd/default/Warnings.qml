@@ -16,6 +16,19 @@ Item {
     property variant flightmodeColors : ["gray", "green", "green", "green", "green", "green", "green", "red", 
                                          "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan"]
 
+                      // Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,
+                      // AltitudeHold,AltitudeVario,CruiseControl + Auto mode (VTOL/Wing pathfollower)
+                      // grey : 'disabled' modes
+
+    property variant thrustmodeColors : ["green", "grey", "grey", "grey", "grey", "grey", "grey", "grey", "grey",  
+                                         "green", "green", "green", "cyan"]
+
+    property var thrust_mode: FlightStatus.FlightMode < 7 ? StabilizationDesired.StabilizationMode_Thrust : 
+                              FlightStatus.FlightMode > 7 && HwSettings.OptionalModules_VtolPathFollower == 1 
+                              && VtolPathFollowerSettings.ThrustControl == 1 ? 12 : 
+                              FlightStatus.FlightMode > 7 && HwSettings.OptionalModules_FixedWingPathFollower == 1 ? 12: 0 
+
+
     property real flight_time: Math.round(SystemStats.FlightTime / 1000)
     property real time_h: (flight_time > 0 ? Math.floor(flight_time / 3600) : 0 )
     property real time_m: (flight_time > 0 ? Math.floor((flight_time - time_h*3600)/60) : 0) 
@@ -186,6 +199,35 @@ Item {
                 anchors.centerIn: parent
                 text: ["MANUAL","STAB 1","STAB 2", "STAB 3", "STAB 4", "STAB 5", "STAB 6", "AUTOTUNE", "POS HOLD", "POS VFPV",
                        "POS VLOS", "POS VNSEW", "RTB", "LAND", "PATHPLAN", "POI", "AUTOCRUISE"][FlightStatus.FlightMode]
+                font {
+                    family: "Arial"
+                    pixelSize: Math.floor(parent.height * 0.8)
+                    weight: Font.DemiBold
+                }
+            }
+        }
+    }
+
+    SvgElementPositionItem {
+        id: warning_thrustmode
+        sceneSize: parent.sceneSize
+        elementName: "warning-thrustmode"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        x: scaledBounds.x * sceneItem.width
+        y: scaledBounds.y * sceneItem.height
+
+        Rectangle {
+            anchors.fill: parent
+            color: warnings.thrustmodeColors[thrust_mode.toString()]
+
+                      // Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,
+                      // AltitudeHold,AltitudeVario,CruiseControl
+                      // grey : 'disabled' modes
+            Text {
+                anchors.centerIn: parent
+                text: ["MANUAL"," "," ", " ", " ", " ", " ", " ", " ",
+                       "ALT HOLD", "ALT VARIO", "CRUIZECTRL", "AUTO"][thrust_mode.toString()]
                 font {
                     family: "Arial"
                     pixelSize: Math.floor(parent.height * 0.8)

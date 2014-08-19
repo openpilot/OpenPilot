@@ -13,82 +13,69 @@ Item {
         x: Math.floor(scaledBounds.x * sceneItem.width)
         y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        property double scaleSteps : 8
-        property double scaleStepValue : 1000
-        property double scaleStepHeight : height/scaleSteps
+    }
 
-        SvgElementImage {
-            id: vsi_bar
+    SvgElementImage {
+        id: vsi_waypoint
+        elementName: "vsi-waypoint"
+        sceneSize: sceneItem.sceneSize
 
-            elementName: "vsi-bar"
-            sceneSize: sceneItem.sceneSize
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
 
-            //the scale in 1000 ft/min, convert from VelocityState.Down value in m/s
-            height: (-VelocityState.Down*3.28*60/vsi_window.scaleStepValue)*vsi_window.scaleStepHeight
+        x: scaledBounds.x * sceneItem.width
+        y: scaledBounds.y * sceneItem.height
 
-            anchors.bottom: parent.verticalCenter
-            anchors.left: parent.left
-        }
+        smooth: true
+        visible: VelocityDesired.Down !== 0.0
 
-        SvgElementImage {
-            id: vsi_scale
-
-            elementName: "vsi-scale"
-            sceneSize: sceneItem.sceneSize
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-
-            //Text labels
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.right
-
-                Repeater {
-                    model: [3, 2, 1, 0, 1, 2, 3]
-                    Item {
-                        height: vsi_window.scaleStepHeight
-                        width: vsi_window.width - vsi_scale.width //fill area right to scale
-
-                        Text {
-                            text: modelData
-                            visible: modelData !== 0 //hide "0" label
-                            color: "white"
-                            font.pixelSize: parent.height * 0.5
-                            font.family: "Arial"
-
-                            anchors.centerIn: parent
-                        }
-                    }
-                }
-            }
+        //rotate it around the center
+        transform: Rotation {
+            angle: -VelocityDesired.Down*5
+            origin.y : vsi_waypoint.height/2 
+            origin.x : vsi_waypoint.width*33
         }
     }
 
-
     SvgElementImage {
-        id: vsi_centerline
-        clip: true
-        smooth: true
+        id: vsi_scale
 
-        elementName: "vsi-centerline"
+        elementName: "vsi-scale"
         sceneSize: sceneItem.sceneSize
 
         x: Math.floor(scaledBounds.x * sceneItem.width)
         y: Math.floor(scaledBounds.y * sceneItem.height)
+
     }
 
-    Text {
-        id: vsi_unit_text
-        text: "ft / m"
+    SvgElementImage {
+        id: vsi_arrow
+        elementName: "vsi-arrow"
+        sceneSize: sceneItem.sceneSize
 
-        color: "white"
-        font {
-            family: "Arial"
-            pixelSize: sceneSize.height * 0.02
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+
+        x: scaledBounds.x * sceneItem.width
+        y: scaledBounds.y * sceneItem.height
+
+        smooth: true
+
+        //rotate it around the center
+        transform: Rotation {
+            angle: -VelocityState.Down*5
+            origin.y : vsi_arrow.height/2 
+            origin.x : vsi_arrow.width*3.15
         }
-        anchors.top: vsi_window.bottom
-        anchors.left: vsi_window.left
-        anchors.margins: font.pixelSize * 0.5
+    }
+
+    SvgElementImage {
+        id: foreground
+        elementName: "foreground"
+        sceneSize: sceneItem.sceneSize
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
     }
 }

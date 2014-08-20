@@ -67,21 +67,9 @@ const LedSequence_t notifications[] = {
         .repeats = -1,
         .steps   =                           {
                                              {
-                                             .time_off = 1000,
-                                             .time_on  = 1000,
-                                             .color    = COLOR_BLUE,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 1000,
-                                             .time_on  = 1000,
-                                             .color    = COLOR_LIME,
-                                             .repeats  = 1,
-                                             },
-                                             {
-                                             .time_off = 1000,
-                                             .time_on  = 1000,
-                                             .color    = COLOR_RED,
+                                             .time_off = 500,
+                                             .time_on  = 500,
+                                             .color    = COLOR_TEAL,
                                              .repeats  = 1,
                                              },
         },
@@ -262,7 +250,7 @@ const LedSequence_t notifications[] = {
                                              .repeats  = 1,
                                              },
                                              {
-                                             .time_off = 100,
+                                             .time_off = 600,
                                              .time_on  = 200,
                                              .color    = COLOR_GREEN,
                                              .repeats  = 1,
@@ -361,11 +349,17 @@ const LedSequence_t notifications[] = {
         },
     },
     [NOTIFY_SEQUENCE_ALM_CONFIG] =           {
-        .repeats = -1,
+        .repeats = 1,
         .steps   =                           {
                                              {
+                                             .time_off = 50,
+                                             .time_on  = 50,
+                                             .color    = COLOR_RED,
+                                             .repeats  = 9,
+                                             },
+                                             {
                                              .time_off = 500,
-                                             .time_on  = 100,
+                                             .time_on  = 50,
                                              .color    = COLOR_RED,
                                              .repeats  = 1,
                                              },
@@ -403,7 +397,7 @@ const AlarmDefinition_t alarmsMap[] = {
     {
         .timeBetweenNotifications = 15000,
         .alarmIndex = SYSTEMALARMS_ALARM_MAGNETOMETER,
-        .warnNotification = NOTIFY_SEQUENCE_ALM_MAG,
+        .warnNotification = NOTIFY_SEQUENCE_NULL,
         .errorNotification = NOTIFY_SEQUENCE_ALM_MAG,
     },
     {
@@ -411,6 +405,12 @@ const AlarmDefinition_t alarmsMap[] = {
         .alarmIndex = SYSTEMALARMS_ALARM_BATTERY,
         .warnNotification = NOTIFY_SEQUENCE_ALM_WARN_BATTERY,
         .errorNotification = NOTIFY_SEQUENCE_ALM_ERROR_BATTERY,
+    },
+    {
+        .timeBetweenNotifications = 5000,
+        .alarmIndex = SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION,
+        .warnNotification = NOTIFY_SEQUENCE_NULL,
+        .errorNotification = NOTIFY_SEQUENCE_ALM_CONFIG,
     },
 };
 const uint8_t alarmsMapSize = NELEMENTS(alarmsMap);

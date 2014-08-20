@@ -149,7 +149,6 @@ int32_t configuration_check()
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:
             ADDSEVERITY(!coptercontrol);
-            ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER));
             ADDSEVERITY(navCapableFusion);
             break;
         default:

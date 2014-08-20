@@ -52,4 +52,31 @@ static inline float boundf(float val, float boundary1, float boundary2)
     return val;
 }
 
+static inline float squaref(float x)
+{
+    return x * x;
+}
+
+static inline float vector_lengthf(float *vector, const uint8_t dim)
+{
+    float length = 0.0f;
+
+    for (int t = 0; t < dim; t++) {
+        length += squaref(vector[t]);
+    }
+    return sqrtf(length);
+}
+
+static inline void vector_normalizef(float *vector, const uint8_t dim)
+{
+    float length = vector_lengthf(vector, dim);
+
+    if (length <= 0.0f || isnan(length)) {
+        return;
+    }
+    for (int t = 0; t < dim; t++) {
+        vector[t] /= length;
+    }
+}
+
 #endif /* MATHMISC_H */

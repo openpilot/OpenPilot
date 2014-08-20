@@ -525,9 +525,8 @@ static uint8_t conditionLegRemaining()
     float cur[3] = { positionState.North, positionState.East, positionState.Down };
     struct path_status progress;
 
-    path_progress(cast_struct_to_array(pathDesired.Start, pathDesired.Start.North),
-                  cast_struct_to_array(pathDesired.End, pathDesired.End.North),
-                  cur, &progress, pathDesired.Mode);
+    path_progress(&pathDesired,
+                  cur, &progress);
     if (progress.fractional_progress >= 1.0f - pathAction.ConditionParameters[0]) {
         return true;
     }
@@ -550,9 +549,8 @@ static uint8_t conditionBelowError()
     float cur[3] = { positionState.North, positionState.East, positionState.Down };
     struct path_status progress;
 
-    path_progress(cast_struct_to_array(pathDesired.Start, pathDesired.Start.North),
-                  cast_struct_to_array(pathDesired.End, pathDesired.End.North),
-                  cur, &progress, pathDesired.Mode);
+    path_progress(&pathDesired,
+                  cur, &progress);
     if (progress.error <= pathAction.ConditionParameters[0]) {
         return true;
     }

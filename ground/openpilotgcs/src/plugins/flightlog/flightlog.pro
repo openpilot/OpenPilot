@@ -10,11 +10,9 @@ include(../../plugins/uavobjectutil/uavobjectutil.pri)
 include(../../plugins/uavtalk/uavtalk.pri)
 
 HEADERS += flightlogplugin.h \
-    flightlogmanager.h \
-    flightlogdialog.h
+    flightlogmanager.h
 SOURCES += flightlogplugin.cpp \
-    flightlogmanager.cpp \
-    flightlogdialog.cpp
+    flightlogmanager.cpp
 
 OTHER_FILES += Flightlog.pluginspec \
     FlightLogDialog.qml \

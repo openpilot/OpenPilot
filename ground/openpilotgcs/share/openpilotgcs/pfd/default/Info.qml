@@ -3,6 +3,9 @@ import QtQuick 2.0
 Item {
     id: info
     property variant sceneSize
+    
+    property var tele_status : (OPLinkStatus.LinkState == 1 ? GCSTelemetryStats.Status : 
+                                OPLinkStatus.LinkState == 4 ? GCSTelemetryStats.Status : 0 )
 
     property real home_heading: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East, 
                                                         TakeOffLocation.North - PositionState.North)
@@ -112,7 +115,7 @@ Item {
         elementName: "telemetry-status"
 
         Text {
-            text: ["Disconnected","HandshakeReq","HandshakeAck","Connected"][GCSTelemetryStats.Status]
+            text: ["Disconnected","HandshakeReq","HandshakeAck","Connected"][tele_status.toString()]
 
             anchors.centerIn: parent
             font.pixelSize: Math.floor(parent.height*1.2)
@@ -130,7 +133,8 @@ Item {
             property int minTxRateNumber : index+1
             elementName: "tx" + minTxRateNumber
             sceneSize: info.sceneSize
-            visible: txNumberBar.txRateNumber >= minTxRateNumber
+            visible: txNumberBar.txRateNumber >= minTxRateNumber && ((GCSTelemetryStats.Status ==3 && OPLinkStatus.LinkState == 4 )
+                                                                  || (GCSTelemetryStats.Status ==3 && OPLinkStatus.LinkState == 1 ))
         }
     }
 
@@ -144,7 +148,8 @@ Item {
             property int minRxRateNumber : index+1
             elementName: "rx" + minRxRateNumber
             sceneSize: info.sceneSize
-            visible: rxNumberBar.rxRateNumber >= minRxRateNumber
+            visible: rxNumberBar.rxRateNumber >= minRxRateNumber && ((GCSTelemetryStats.Status ==3 && OPLinkStatus.LinkState == 4 )
+                                                                  || (GCSTelemetryStats.Status ==3 && OPLinkStatus.LinkState == 1 ))
         }
     }
 
@@ -188,7 +193,7 @@ Item {
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
-        visible: true
+        visible: OPLinkStatus.LinkState == 4 //OPLink Connected
 
         MouseArea { id: total_dist_mouseArea; anchors.fill: parent; onClicked: reset_distance()}
 

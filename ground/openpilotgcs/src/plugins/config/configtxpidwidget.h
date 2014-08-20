@@ -40,6 +40,8 @@ private:
     Ui_TxPIDWidget *m_txpid;
 
 private slots:
+    void updateSpinBoxProperties(int selectedPidOption);
+    float getDefaultValueForPidOption(int pidOption);
     void refreshValues();
     void applySettings();
     void saveSettings();

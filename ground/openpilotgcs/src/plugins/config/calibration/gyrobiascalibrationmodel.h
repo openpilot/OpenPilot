@@ -57,8 +57,7 @@ public:
 signals:
     void started();
     void stopped();
-    void storeAndClearBoardRotation();
-    void recallBoardRotation();
+
     void progressChanged(int value);
     void displayVisualHelp(QString elementID);
     void displayInstructions(QString text, WizardModel::MessageType type = WizardModel::Info);

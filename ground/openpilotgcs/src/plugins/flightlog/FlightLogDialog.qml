@@ -7,9 +7,9 @@ import org.openpilot 1.0
 import "functions.js" as Functions
 
 Rectangle {
-    width: 600
+    width: 700
     height: 400
-
+    id: root
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 10
@@ -59,11 +59,11 @@ Rectangle {
                         delegate:
                             Text {
                                 verticalAlignment: Text.AlignVCenter
-                                text: Functions.millisToTime(styleData.value)
+                                text: Functions.microsToTime(styleData.value)
                             }
                     }
                     TableViewColumn {
-                        role: "Type"; title: "Type"; width: 60;
+                        role: "Type"; title: "Type"; width: 50;
                         delegate:
                             Text {
                                 verticalAlignment: Text.AlignVCenter
@@ -72,6 +72,7 @@ Rectangle {
                                     case 0 : text: qsTr("Empty"); break;
                                     case 1 : text: qsTr("Text"); break;
                                     case 2 : text: qsTr("UAVO"); break;
+                                    case 3 : text: qsTr("UAVO(P)"); break;
                                     default: text: qsTr("Unknown"); break;
                                     }
                                 }
@@ -93,12 +94,16 @@ Rectangle {
                         spacing: 10
                         Text {
                             id: totalFlights
-                            text: "<b>" + qsTr("Flights recorded: ") + "</b>" + (logStatus.Flight + 1)
+                            text: "<b>" + qsTr("Flights recorded:") + "</b> " + (logStatus.Flight + 1)
+                        }
+                        Text {
+                            id: totalSlots
+                            text: "<b>" + qsTr("Slots used/free:") + "</b> " +
+                                  logStatus.UsedSlots + "/" + logStatus.FreeSlots
                         }
                         Text {
                             id: totalEntries
-                            text: "<b>" + qsTr("Entries logged (free): ") + "</b>" +
-                                  logStatus.UsedSlots + " (" + logStatus.FreeSlots + ")"
+                            text: "<b>" + qsTr("Entries downloaded:") + "</b> " + logManager.logEntriesCount
                         }
                         Rectangle {
                             Layout.fillHeight: true
@@ -393,7 +398,7 @@ Rectangle {
                 text: qsTr("OK")
                 isDefault: true
                 activeFocusOnPress: true
-                onClicked: dialog.close()
+                onClicked: logDialog.close()
             }
         }
     }

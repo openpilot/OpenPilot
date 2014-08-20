@@ -99,7 +99,7 @@ static uint32_t timeOfLastUpdateMs;
 static struct GPS_RX_STATS gpsRxStats;
 #endif
 #ifdef PIOS_INCLUDE_GPS_UBX_PARSER
-void AuxMagCalibrationUpdatedCb(UAVObjEvent *ev);
+void AuxMagSettingsUpdatedCb(UAVObjEvent *ev);
 #endif
 // ****************
 /**
@@ -157,12 +157,12 @@ int32_t GPSInitialize(void)
     HomeLocationInitialize();
 #ifdef PIOS_INCLUDE_GPS_UBX_PARSER
     AuxMagSensorInitialize();
-    AuxMagCalibrationInitialize();
+    AuxMagSettingsInitialize();
     GPSExtendedStatusInitialize();
 
     // Initialize mag parameters
-    AuxMagCalibrationUpdatedCb(NULL);
-    AuxMagCalibrationConnectCallback(AuxMagCalibrationUpdatedCb);
+    AuxMagSettingsUpdatedCb(NULL);
+    AuxMagSettingsConnectCallback(AuxMagSettingsUpdatedCb);
 #endif
     updateSettings();
 #else
@@ -393,7 +393,7 @@ static void updateSettings()
     }
 }
 #ifdef PIOS_INCLUDE_GPS_UBX_PARSER
-void AuxMagCalibrationUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+void AuxMagSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     load_mag_settings();
 }

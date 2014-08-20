@@ -205,7 +205,7 @@ static void pathFollowerTask(void)
         return;
     }
 
-    if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POI) { // TODO Hack from vtolpathfollower, move that shit into manualcontrol!
+    if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POI) { // TODO Hack from vtolpathfollower, move into manualcontrol!
         processPOI();
     }
 
@@ -257,7 +257,6 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
     pid_configure(&global.PIDvel[0], vtolPathFollowerSettings.HorizontalVelPID.Kp, vtolPathFollowerSettings.HorizontalVelPID.Ki, vtolPathFollowerSettings.HorizontalVelPID.Kd, vtolPathFollowerSettings.HorizontalVelPID.ILimit);
     pid_configure(&global.PIDvel[1], vtolPathFollowerSettings.HorizontalVelPID.Kp, vtolPathFollowerSettings.HorizontalVelPID.Ki, vtolPathFollowerSettings.HorizontalVelPID.Kd, vtolPathFollowerSettings.HorizontalVelPID.ILimit);
-    pid_configure(&global.PIDvel[2], vtolPathFollowerSettings.VerticalVelPID.Kp, vtolPathFollowerSettings.VerticalVelPID.Ki, vtolPathFollowerSettings.VerticalVelPID.Kd, vtolPathFollowerSettings.VerticalVelPID.ILimit);
     pid_configure(&global.PIDvel[2], vtolPathFollowerSettings.VerticalVelPID.Kp, vtolPathFollowerSettings.VerticalVelPID.Ki, vtolPathFollowerSettings.VerticalVelPID.Kd, vtolPathFollowerSettings.VerticalVelPID.ILimit);
 
     PathDesiredGet(&pathDesired);
@@ -505,6 +504,8 @@ static void processPOI()
     PositionStateData positionState;
 
     PositionStateGet(&positionState);
+    // TODO put commented out camera feature code back in place either
+    // permanently or optionally or remove it
     // CameraDesiredData cameraDesired;
     // CameraDesiredGet(&cameraDesired);
     StabilizationDesiredData stabDesired;
@@ -514,6 +515,7 @@ static void processPOI()
 
     float dLoc[3];
     float yaw = 0;
+    // TODO camera feature
     /*float elevation = 0;*/
 
     dLoc[0] = positionState.North - poi.North;
@@ -564,6 +566,7 @@ static void processPOI()
     }
     // not above
     if (distance >= 3.0f) {
+        // TODO camera feature
         // You can feed this into camerastabilization
         /*elevation = RAD2DEG(atan2f(dLoc[2],distance));*/
 

@@ -72,7 +72,8 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
         "SystemStats" <<
         "StabilizationDesired" <<
         "VtolPathFollowerSettings" <<
-        "HwSettings";
+        "HwSettings" <<
+        "ManualControlCommand";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();

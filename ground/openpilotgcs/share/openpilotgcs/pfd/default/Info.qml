@@ -36,6 +36,8 @@ Item {
     property real total_distance
     property bool init_dist: false
 
+    property bool hide_display_rc: false
+
     function reset_distance(){
         total_distance = 0;
     }
@@ -58,6 +60,14 @@ Item {
             return "0" + time;
         else
             return time.toString();
+    }
+
+    function hide_display_rcinput(){
+     console.log("module: "+hide_display_rc);
+    if (hide_display_rc == false)
+           hide_display_rc = true;
+    else
+           hide_display_rc = false;
     }
     
     SvgElementImage {
@@ -461,6 +471,98 @@ Item {
         }
     }
 
+
+    SvgElementImage {
+        id: rc_input_bg
+        elementName: "rc-input-bg"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+        states: State  {
+             name: "fading"
+             when: hide_display_rc !== true
+             PropertyChanges  { target: rc_input_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91);  }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+    }
+
+    SvgElementImage {
+        id: rc_input_labels
+        elementName: "rc-input-labels"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+        states: State  {
+             name: "fading"
+             when: hide_display_rc !== true
+             PropertyChanges  { target: rc_input_labels; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91);  }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+    }
+
+    SvgElementImage {
+        id: rc_input_icon
+        elementName: "rc-input-icon"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+        MouseArea { id: hidedisp_rcinput; anchors.fill: parent; onClicked: hide_display_rcinput()}
+
+        states: State  {
+             name: "fading"
+             when: hide_display_rc !== true
+             PropertyChanges  { target: rc_input_icon; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91);  }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+    }
+
+    SvgElementImage {
+        id: rc_stick
+        elementName: "rc-stick"
+        sceneSize: info.sceneSize
+        
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+
+        x: (scaledBounds.x * sceneItem.width) + (ManualControlCommand.Roll * rc_stick.width *2.5)
+        y: (scaledBounds.y * sceneItem.height) + (ManualControlCommand.Pitch * rc_stick.width * 2.5)
+
+        smooth: true
+        
+        //rotate it around the center of horizon
+        transform: Rotation {
+            angle: ManualControlCommand.Yaw * 90
+            origin.y : rc_stick.height / 2
+            origin.x : rc_stick.width / 2
+        }
+
+        states: State  {
+             name: "fading"
+             when: hide_display_rc !== true
+             PropertyChanges  { target: rc_stick; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91);  }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+    }
 
     SvgElementImage {
         id: info_border

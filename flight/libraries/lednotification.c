@@ -241,7 +241,7 @@ static void run_led(NotifierLedStatus_t *status)
     uint8_t step = status->next_sequence_step;
 
     LedSequence_t *activeSequence = status->active_sequence_num == BACKGROUND_SEQUENCE ?
-                                          &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
+                                    &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
     const Color_t color = status->step_phase_on ? activeSequence->steps[step].color : Color_Off;
 
     for (uint8_t i = status->led_set_start; i < status->led_set_end; i++) {

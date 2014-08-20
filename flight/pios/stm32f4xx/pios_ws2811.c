@@ -347,7 +347,6 @@ void PIOS_WS2811_DMA_irq_handler()
     DMA_Cmd(pios_ws2811_cfg->streamCh2, DISABLE);
     DMA_Cmd(pios_ws2811_cfg->streamCh1, DISABLE);
     DMA_Cmd(pios_ws2811_cfg->streamUpdate, DISABLE);
-
 }
 
 #endif // PIOS_INCLUDE_WS2811

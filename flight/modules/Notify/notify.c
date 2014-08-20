@@ -128,7 +128,7 @@ void checkAlarm(uint8_t alarm, uint8_t *last_alarm, uint32_t *last_alm_time, uin
 {
     if (alarm > SYSTEMALARMS_ALARM_OK) {
         uint32_t current_time = PIOS_DELAY_GetuS();
-        if (*last_alarm < alarm || *last_alm_time + timeBetweenNotifications < current_time) {
+        if (*last_alarm < alarm || *last_alm_time + timeBetweenNotifications * 1000 < current_time) {
             uint8_t sequence = (alarm == SYSTEMALARMS_ALARM_WARNING) ? warn_sequence : error_sequence;
             if(sequence != NOTIFY_SEQUENCE_NULL){
                 PIOS_NOTIFICATION_Default_Ext_Led_Play(

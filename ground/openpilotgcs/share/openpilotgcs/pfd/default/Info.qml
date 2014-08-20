@@ -479,7 +479,7 @@ Item {
         states: State  {
              name: "fading"
              when: hide_display_rc !== true
-             PropertyChanges  { target: rc_input_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91); }
+             PropertyChanges  { target: rc_input_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.85); }
         }
  
         transitions: Transition  {
@@ -498,7 +498,7 @@ Item {
         states: State  {
              name: "fading"
              when: hide_display_rc !== true
-             PropertyChanges  { target: rc_input_labels; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91); }
+             PropertyChanges  { target: rc_input_labels; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.85); }
         }
  
         transitions: Transition  {
@@ -519,7 +519,7 @@ Item {
         states: State  {
              name: "fading"
              when: hide_display_rc !== true
-             PropertyChanges  { target: rc_input_icon; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91); }
+             PropertyChanges  { target: rc_input_icon; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.85); }
         }
  
         transitions: Transition  {
@@ -552,7 +552,7 @@ Item {
         states: State  {
              name: "fading"
              when: hide_display_rc !== true
-             PropertyChanges  { target: rc_stick; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91); }
+             PropertyChanges  { target: rc_stick; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.85); }
         }
  
         transitions: Transition  {

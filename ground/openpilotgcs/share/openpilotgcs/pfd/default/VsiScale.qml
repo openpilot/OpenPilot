@@ -35,7 +35,7 @@ Item {
         y: scaledBounds.y * sceneItem.height
 
         smooth: true
-        visible: VelocityDesired.Down !== 0.0
+        visible: VelocityDesired.Down !== 0.0 && FlightStatus.FlightMode > 7 
 
         //rotate it around the center
         transform: Rotation {

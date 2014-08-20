@@ -23,10 +23,12 @@ Item {
     property variant thrustmodeColors : ["green", "grey", "grey", "grey", "grey", "grey", "grey", "grey", "grey",  
                                          "green", "green", "green", "cyan"]
 
+                      // SystemSettings.AirframeType 3 - 17 : VtolPathFollower, check ThrustControl
+ 
     property var thrust_mode: FlightStatus.FlightMode < 7 ? StabilizationDesired.StabilizationMode_Thrust : 
-                              FlightStatus.FlightMode > 7 && HwSettings.OptionalModules_VtolPathFollower == 1 
+                              FlightStatus.FlightMode > 7 && SystemSettings.AirframeType > 2 && SystemSettings.AirframeType < 18
                               && VtolPathFollowerSettings.ThrustControl == 1 ? 12 : 
-                              FlightStatus.FlightMode > 7 && HwSettings.OptionalModules_FixedWingPathFollower == 1 ? 12: 0 
+                              FlightStatus.FlightMode > 7 && SystemSettings.AirframeType < 3 ? 12: 0 
 
 
     property real flight_time: Math.round(SystemStats.FlightTime / 1000)
@@ -219,7 +221,7 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            color: warnings.thrustmodeColors[thrust_mode.toString()]
+            color: FlightStatus.FlightMode < 1 ? "grey" : warnings.thrustmodeColors[thrust_mode.toString()]
 
                       // Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,
                       // AltitudeHold,AltitudeVario,CruiseControl

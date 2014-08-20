@@ -51,6 +51,7 @@ typedef enum {
     NOTIFY_SEQUENCE_ALM_MAG    = 16,
     NOTIFY_SEQUENCE_ALM_CONFIG = 17,
     NOTIFY_SEQUENCE_DISARMED   = 18,
+    NOTIFY_SEQUENCE_NULL = 255,
 } NotifySequences;
 
 typedef struct {

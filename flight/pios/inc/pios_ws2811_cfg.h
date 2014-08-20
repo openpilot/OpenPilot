@@ -46,8 +46,8 @@
 
 // Following times are keept on the lower side to accounts
 // for bus contentions and irq response time
-#define PIOS_WS2811_T0_HIGH_PERIOD     25 // .35us +/- 150nS
-#define PIOS_WS2811_T1_HIGH_PERIOD     60 // .70us +/- 150nS
+#define PIOS_WS2811_T0_HIGH_PERIOD     32 // .35us +/- 150nS
+#define PIOS_WS2811_T1_HIGH_PERIOD     70 // .70us +/- 150nS
 
 #define PIOS_WS2811_DMA_CH1_CONFIG(channel) \
     { \

@@ -422,7 +422,7 @@ define LINUX_QT_INSTALL_TEMPLATE
 
 qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) if ! $(SEVENZIP) >/dev/null 2>&1; then \
-		$(ECHO) $(MSG_NOTICE) "Please install the p7zip for your distribution. i.e.: sudo apt-get install p7zip." && \
+		$(ECHO) $(MSG_NOTICE) "Please install the p7zip for your distribution. i.e.: sudo apt-get install p7zip-full" && \
 		exit 1; \
 	fi
 	$(call DOWNLOAD_TEMPLATE,$(3),$(5),"$(4)")
@@ -690,7 +690,11 @@ ifeq ($(shell [ -d "$(PYTHON_DIR)" ] && $(ECHO) "exists"), exists)
 else
     # not installed, hope it's in the path...
     # $(info $(EMPTY) WARNING     $(call toprel, $(PYTHON_DIR)) not found, using system PATH)
-    export PYTHON := python
+    ifeq ($(findstring Python 2,$(shell python --version 2>&1)), Python 2)
+        export PYTHON := python
+    else
+        export PYTHON := python2
+    endif
 endif
 
 .PHONY: python_version

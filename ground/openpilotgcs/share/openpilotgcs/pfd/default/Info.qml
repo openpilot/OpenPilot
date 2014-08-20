@@ -63,11 +63,10 @@ Item {
     }
 
     function hide_display_rcinput(){
-     console.log("module: "+hide_display_rc);
-    if (hide_display_rc == false)
-           hide_display_rc = true;
-    else
-           hide_display_rc = false;
+        if (hide_display_rc == false)
+            hide_display_rc = true;
+        else
+            hide_display_rc = false;
     }
     
     SvgElementImage {
@@ -91,7 +90,6 @@ Item {
             visible: FlightBatteryState.ConsumedEnergy > 0
         }
     }
-
 
     Repeater {
         id: satNumberBar
@@ -369,7 +367,7 @@ Item {
         states: State  {
              name: "fading"
              when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width;  }
+             PropertyChanges  { target: home_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
         }
  
         transitions: Transition  {
@@ -390,7 +388,7 @@ Item {
         states: State  {
              name: "fading_heading"
              when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_heading_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width  }
+             PropertyChanges  { target: home_heading_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
         }
  
         transitions: Transition  {
@@ -420,7 +418,7 @@ Item {
         states: State  {
              name: "fading_distance"
              when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_distance_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width;  }
+             PropertyChanges  { target: home_distance_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
         }
  
         transitions: Transition  {
@@ -451,7 +449,7 @@ Item {
         states: State  {
              name: "fading_distance"
              when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_eta_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width;  }
+             PropertyChanges  { target: home_eta_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
         }
  
         transitions: Transition  {
@@ -481,7 +479,7 @@ Item {
         states: State  {
              name: "fading"
              when: hide_display_rc !== true
-             PropertyChanges  { target: rc_input_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91);  }
+             PropertyChanges  { target: rc_input_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91); }
         }
  
         transitions: Transition  {
@@ -500,7 +498,7 @@ Item {
         states: State  {
              name: "fading"
              when: hide_display_rc !== true
-             PropertyChanges  { target: rc_input_labels; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91);  }
+             PropertyChanges  { target: rc_input_labels; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91); }
         }
  
         transitions: Transition  {
@@ -521,7 +519,7 @@ Item {
         states: State  {
              name: "fading"
              when: hide_display_rc !== true
-             PropertyChanges  { target: rc_input_icon; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91);  }
+             PropertyChanges  { target: rc_input_icon; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91); }
         }
  
         transitions: Transition  {
@@ -539,12 +537,12 @@ Item {
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
 
-        x: (scaledBounds.x * sceneItem.width) + (ManualControlCommand.Roll * rc_stick.width *2.5)
+        x: (scaledBounds.x * sceneItem.width) + (ManualControlCommand.Roll * rc_stick.width * 2.5)
         y: (scaledBounds.y * sceneItem.height) + (ManualControlCommand.Pitch * rc_stick.width * 2.5)
 
         smooth: true
         
-        //rotate it around the center of horizon
+        //rotate it around his center
         transform: Rotation {
             angle: ManualControlCommand.Yaw * 90
             origin.y : rc_stick.height / 2
@@ -554,7 +552,7 @@ Item {
         states: State  {
              name: "fading"
              when: hide_display_rc !== true
-             PropertyChanges  { target: rc_stick; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91);  }
+             PropertyChanges  { target: rc_stick; x: Math.floor(scaledBounds.x * sceneItem.width) - (rc_input_bg.width * 0.91); }
         }
  
         transitions: Transition  {

@@ -227,7 +227,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: ["MANUAL"," "," ", " ", " ", " ", " ", " ", " ",
-                       "ALT HOLD", "ALT VARIO", "CRUIZECTRL", "AUTO"][thrust_mode.toString()]
+                       "ALT HOLD", "ALT VARIO", "CRUISECTRL", "AUTO"][thrust_mode.toString()]
                 font {
                     family: "Arial"
                     pixelSize: Math.floor(parent.height * 0.8)

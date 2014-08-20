@@ -358,52 +358,83 @@ static uint8_t updateAutoPilotFixedWing()
  */
 static uint8_t updateAutoPilotVtol()
 {
-    if (!global.vtolEmergencyFallbackSwitch) {
-        if (vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_ALWAYS) {
-            pid_configure(&global.PIDposH[0], 1.0f, 0.0f, 0.0f, 0.0f);
-            pid_configure(&global.PIDposH[1], 1.0f, 0.0f, 0.0f, 0.0f);
-            pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
-            updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, true);
-            updateVtolDesiredAttitudeEmergencyFallback();
-            return 1;
-        } else {
-            pid_configure(&global.PIDposH[0], vtolPathFollowerSettings.HorizontalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
-            pid_configure(&global.PIDposH[1], vtolPathFollowerSettings.HorizontalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
-            pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
-            updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, false);
-            uint8_t result    = 1;
-            bool yaw_attitude = true;
-            float yaw = 0.0f;
-            switch (vtolPathFollowerSettings.YawControl) {
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MANUAL:
-                yaw_attitude = false;
-                break;
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_TAILIN:
-                yaw = updateTailInBearing();
-                break;
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
-                yaw = updateCourseBearing();
-                break;
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_PATHDIRECTION:
-                yaw = updatePathBearing();
-                break;
-            case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_POI:
-                yaw = updatePOIBearing();
-                break;
-            }
-            result = updateVtolDesiredAttitude(yaw_attitude, yaw);
-            if (!result && (vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_ENABLED || vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DEBUGTEST)) {
-                global.vtolEmergencyFallbackSwitch = true;
-            }
-            return result;
-        }
+    enum { RETURN_0 = 0, RETURN_1 = 1, RETURN_RESULT } returnmode;
+    enum { FOLLOWER_REGULAR, FOLLOWER_FALLBACK } followermode;
+    uint8_t result = 0;
+
+    // decide on behaviour based on settings and system state
+    if (global.vtolEmergencyFallbackSwitch) {
+        returnmode   = RETURN_0;
+        followermode = FOLLOWER_FALLBACK;
     } else {
+        if (vtolPathFollowerSettings.FlyawayEmergencyFallback == VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_ALWAYS) {
+            returnmode   = RETURN_1;
+            followermode = FOLLOWER_FALLBACK;
+        } else {
+            returnmode   = RETURN_RESULT;
+            followermode = FOLLOWER_REGULAR;
+        }
+    }
+
+    // vertical positon control PID loops works the same in both regular and fallback modes, setup according to settings
+    pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
+
+    switch (followermode) {
+    case FOLLOWER_REGULAR:
+    {
+        // horizontal position control PID loop works according to settings in regular mode, allowing integral terms
+        pid_configure(&global.PIDposH[0], vtolPathFollowerSettings.HorizontalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
+        pid_configure(&global.PIDposH[1], vtolPathFollowerSettings.HorizontalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
+        updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, false);
+
+        // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm
+        bool yaw_attitude = true;
+        float yaw = 0.0f;
+        switch (vtolPathFollowerSettings.YawControl) {
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MANUAL:
+            yaw_attitude = false;
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_TAILIN:
+            yaw = updateTailInBearing();
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_MOVEMENTDIRECTION:
+            yaw = updateCourseBearing();
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_PATHDIRECTION:
+            yaw = updatePathBearing();
+            break;
+        case VTOLPATHFOLLOWERSETTINGS_YAWCONTROL_POI:
+            yaw = updatePOIBearing();
+            break;
+        }
+        result = updateVtolDesiredAttitude(yaw_attitude, yaw);
+
+        // switch to emergency follower if follower indicates problems
+        if (!result && (vtolPathFollowerSettings.FlyawayEmergencyFallback != VTOLPATHFOLLOWERSETTINGS_FLYAWAYEMERGENCYFALLBACK_DISABLED)) {
+            global.vtolEmergencyFallbackSwitch = true;
+        }
+    }
+    break;
+    case FOLLOWER_FALLBACK:
+    {
+        // fallback loop only cares about intended horizontal flight direction, simplify control behaviour accordingly
         pid_configure(&global.PIDposH[0], 1.0f, 0.0f, 0.0f, 0.0f);
         pid_configure(&global.PIDposH[1], 1.0f, 0.0f, 0.0f, 0.0f);
-        pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
         updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, true);
+
+        // emergency follower has no return value
         updateVtolDesiredAttitudeEmergencyFallback();
-        return 0;
+    }
+    break;
+    }
+
+    switch (returnmode) {
+    case RETURN_RESULT:
+        return result;
+
+    default:
+        // returns either 0 or 1 according to enum definition above
+        return returnmode;
     }
 }
 

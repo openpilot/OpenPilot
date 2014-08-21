@@ -72,8 +72,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset resource="../wizardResources.qrc">
-         <normaloff>:/setupwizard/resources/bttn-ESC-up.png</normaloff>
-         <normalon>:/setupwizard/resources/bttn-ESC-down.png</normalon>:/setupwizard/resources/bttn-ESC-up.png</iconset>
+         <normaloff>:/setupwizard/resources/bttn-servo-standard-up.png</normaloff>
+         <normalon>:/setupwizard/resources/bttn-servo-standard-dwn.png</normalon>:/setupwizard/resources/bttn-servo-standard-up.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -85,7 +85,7 @@ p, li { white-space: pre-wrap; }
         <bool>true</bool>
        </property>
        <property name="checked">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="autoExclusive">
         <bool>true</bool>
@@ -116,8 +116,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset resource="../wizardResources.qrc">
-         <normaloff>:/setupwizard/resources/bttn-turbo-up.png</normaloff>
-         <normalon>:/setupwizard/resources/bttn-turbo-down.png</normalon>:/setupwizard/resources/bttn-turbo-up.png</iconset>
+         <normaloff>:/setupwizard/resources/bttn-servo-digital-up.png</normaloff>
+         <normalon>:/setupwizard/resources/bttn-servo-digital-dwn.png</normalon>:/setupwizard/resources/bttn-servo-digital-up.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -129,7 +129,7 @@ p, li { white-space: pre-wrap; }
         <bool>true</bool>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="autoExclusive">
         <bool>true</bool>

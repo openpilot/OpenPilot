@@ -107,6 +107,18 @@ QStringList ConfigFixedWingWidget::getChannelDescriptions()
     return channelDesc;
 }
 
+void ConfigFixedWingWidget::resetChannelboxesAndSliders()
+{
+    m_aircraft->fwRudder1ChannelBox->setEnabled(false);
+    m_aircraft->fwRudder2ChannelBox->setEnabled(false);
+    m_aircraft->fwElevator1ChannelBox->setEnabled(false);
+    m_aircraft->fwElevator2ChannelBox->setEnabled(false);
+    m_aircraft->fwAileron1ChannelBox->setEnabled(false);
+    m_aircraft->fwAileron2ChannelBox->setEnabled(false);
+    m_aircraft->elevonSlider1->setEnabled(false);
+    m_aircraft->elevonSlider2->setEnabled(false);
+}
+
 void ConfigFixedWingWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
@@ -126,6 +138,8 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
     if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
         plane->setElementId("aileron");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+        resetChannelboxesAndSliders();
+
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
         m_aircraft->fwRudder2ChannelBox->setEnabled(true);
         m_aircraft->fwElevator1ChannelBox->setEnabled(true);
@@ -138,15 +152,12 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->fwElevator1Label->setText("Elevator 1");
         m_aircraft->fwElevator2Label->setText("Elevator 2");
 
-        m_aircraft->elevonSlider1->setEnabled(false);
-        m_aircraft->elevonSlider2->setEnabled(false);
     } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
 	// do nothing for now
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
         plane->setElementId("elevon");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevon"));
-        m_aircraft->fwRudder1ChannelBox->setEnabled(false);
-        m_aircraft->fwRudder2ChannelBox->setEnabled(false);
+        resetChannelboxesAndSliders();
 
         m_aircraft->fwElevator1Label->setText("Elevon 1");
         m_aircraft->fwElevator1ChannelBox->setEnabled(true);
@@ -156,6 +167,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 
         m_aircraft->fwAileron1Label->setText("Aileron 1");
         m_aircraft->fwAileron2Label->setText("Aileron 2");
+
         m_aircraft->elevonLabel1->setText("Roll");
         m_aircraft->elevonLabel2->setText("Pitch");
 

@@ -53,6 +53,7 @@ public:
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
+    void resetChannelboxesAndSliders();
 protected:      									      
     void showEvent(QShowEvent *event);					      
     void resizeEvent(QResizeEvent *event);

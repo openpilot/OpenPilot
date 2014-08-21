@@ -177,7 +177,7 @@ void OutputCalibrationPage::setupVehicle()
         m_wizardIndexes << 0 << 1 << 2 << 3 << 4 << 2 << 3 << 4 << 2 << 3 << 4 << 2 << 3 << 4;
         m_vehicleElementIds << "aileron" << "aileron-frame" << "aileron-motor" << "aileron-ail-left" << "aileron-ail-right" << "aileron-rudder" << "aileron-elevator";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 2 << 2 << 3 << 3 << 3 << 4 << 4 << 4 << 5 << 5 << 5;
-        m_channelIndex << 0 << 3 << 0 << 0 << 0 << 1 << 1 << 1 << 2 << 2 << 2 << 4 << 4 << 4;
+        m_channelIndex << 0 << 2 << 0 << 0 << 0 << 1 << 1 << 1 << 3 << 3 << 3 << 4 << 4 << 4;
 
         setupActuatorMinMaxAndNeutral(3, 3, 5);
 
@@ -188,7 +188,7 @@ void OutputCalibrationPage::setupVehicle()
         m_wizardIndexes << 0 << 1 << 2 << 3 << 4 << 2 << 3 << 4;
         m_vehicleElementIds << "elevon" << "elevon-frame" << "elevon-motor" << "elevon-left" << "elevon-right";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 2 << 2 << 3 << 3 << 3;
-        m_channelIndex << 0 << 3 << 0 << 0 << 0 << 1 << 1 << 1;
+        m_channelIndex << 0 << 2 << 0 << 0 << 0 << 1 << 1 << 1;
 
         setupActuatorMinMaxAndNeutral(3, 3, 3);
 

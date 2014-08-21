@@ -19,7 +19,6 @@
 			<elementname>Airspeed</elementname>
 			<elementname>MagBaro</elementname>
 			<!-- navigation -->
-			<elementname>PathFollower</elementname>
 			<elementname>FlightPlan</elementname>
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>
@@ -52,7 +51,6 @@
 			<elementname>Airspeed</elementname>
 			<elementname>MagBaro</elementname>
 			<!-- navigation -->
-			<elementname>PathFollower</elementname>
 			<elementname>FlightPlan</elementname>
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>
@@ -89,7 +87,6 @@
 			<elementname>Airspeed</elementname>
 			<elementname>MagBaro</elementname>
 			<!-- navigation -->
-			<elementname>PathFollower</elementname>
 			<elementname>FlightPlan</elementname>
 			<!-- telemetry -->
 			<elementname>TelemetryTx</elementname>

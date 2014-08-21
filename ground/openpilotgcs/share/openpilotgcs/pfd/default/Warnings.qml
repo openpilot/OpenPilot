@@ -96,7 +96,7 @@ Item {
                 text: ["DISARMED","ARMING","ARMED"][FlightStatus.Armed]
                 font {
                     family: "Arial"
-                    pixelSize: Math.floor(parent.height * 0.8)
+                    pixelSize: Math.floor(parent.height * 0.74)
                     weight: Font.DemiBold
                 }
             }
@@ -121,7 +121,7 @@ Item {
                 text: "RC INPUT"
                 font {
                     family: "Arial"
-                    pixelSize: Math.floor(parent.height * 0.8)
+                    pixelSize: Math.floor(parent.height * 0.74)
                     weight: Font.DemiBold
                 }
             }
@@ -152,7 +152,7 @@ Item {
                 text: "MASTER CAUTION"
                 font {
                     family: "Arial"
-                    pixelSize: Math.floor(parent.height * 0.8)
+                    pixelSize: Math.floor(parent.height * 0.74)
                     weight: Font.DemiBold
                 }
             }
@@ -177,7 +177,7 @@ Item {
                 text: "AUTOPILOT"
                 font {
                     family: "Arial"
-                    pixelSize: Math.floor(parent.height * 0.8)
+                    pixelSize: Math.floor(parent.height * 0.74)
                     weight: Font.DemiBold
                 }
             }
@@ -203,7 +203,7 @@ Item {
                        "POS VLOS", "POS VNSEW", "RTB", "LAND", "PATHPLAN", "POI", "AUTOCRUISE"][FlightStatus.FlightMode]
                 font {
                     family: "Arial"
-                    pixelSize: Math.floor(parent.height * 0.8)
+                    pixelSize: Math.floor(parent.height * 0.74)
                     weight: Font.DemiBold
                 }
             }
@@ -232,7 +232,7 @@ Item {
                        "ALT HOLD", "ALT VARIO", "CRUISECTRL", "AUTO"][thrust_mode.toString()]
                 font {
                     family: "Arial"
-                    pixelSize: Math.floor(parent.height * 0.8)
+                    pixelSize: Math.floor(parent.height * 0.74)
                     weight: Font.DemiBold
                 }
             }
@@ -245,14 +245,6 @@ Item {
         sceneSize: warnings.sceneSize
 
         visible: SystemAlarms.Alarm_GPS > 1
-    }
-
-    SvgElementImage {
-        id: warning_telemetry
-        elementName: "warning-telemetry"
-        sceneSize: warnings.sceneSize
-
-        visible: SystemAlarms.Alarm_Telemetry > 1
     }
 
     SvgElementImage {

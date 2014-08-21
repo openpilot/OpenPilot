@@ -106,8 +106,7 @@ static int32_t comUsbBridgeInitialize(void)
 
     HwSettingsOptionalModulesGet(&optionalModules);
 
-    if (usart_port && vcp_port &&
-        (optionalModules.ComUsbBridge == HWSETTINGS_OPTIONALMODULES_ENABLED)) {
+    if (usart_port && vcp_port) {
         bridge_enabled = true;
     } else {
         bridge_enabled = false;

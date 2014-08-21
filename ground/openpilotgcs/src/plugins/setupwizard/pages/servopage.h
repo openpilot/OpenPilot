@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       outputpage.h
+ * @file       outputfixedwingpage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
@@ -25,25 +25,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OUTPUTPAGE_H
-#define OUTPUTPAGE_H
+#ifndef OUTPUTFIXEDWINGPAGE_H
+#define OUTPUTFIXEDWINGPAGE_H
 
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class OutputPage;
+class ServoPage;
 }
 
-class OutputPage : public AbstractWizardPage {
+class ServoPage : public AbstractWizardPage {
     Q_OBJECT
 
 public:
-    explicit OutputPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~OutputPage();
+    explicit ServoPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~ServoPage();
     bool validatePage();
 
 private:
-    Ui::OutputPage *ui;
+    Ui::ServoPage *ui;
 };
 
-#endif // OUTPUTPAGE_H
+#endif // OUTPUTFIXEDWINGPAGE_H

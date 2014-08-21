@@ -78,13 +78,22 @@ public:
         return m_inputType;
     }
 
-    void setActuatorType(SetupWizard::ACTUATOR_TYPE type)
+    void setEscType(SetupWizard::ESC_TYPE type)
     {
         m_escType = type;
     }
-    SetupWizard::ACTUATOR_TYPE getActuatorType() const
+    SetupWizard::ESC_TYPE getEscType() const
     {
         return m_escType;
+    }
+
+    void setServoType(SetupWizard::SERVO_TYPE type)
+    {
+        m_servoType = type;
+    }
+    SetupWizard::SERVO_TYPE getServoType() const
+    {
+        return m_servoType;
     }
 
     void setGPSSetting(SetupWizard::GPS_SETTING setting)
@@ -156,8 +165,8 @@ private slots:
     void pageChanged(int currId);
 private:
     enum { PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
-           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_OUTPUT_FIXEDWING,
-           PAGE_BIAS_CALIBRATION,PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION,
+           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_ESC, PAGE_SERVO,
+           PAGE_BIAS_CALIBRATION, PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION,
            PAGE_SAVE, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_AIRFRAMESTAB_FIXEDWING,
            PAGE_REBOOT, PAGE_END, PAGE_UPDATE };
     void createPages();
@@ -168,7 +177,8 @@ private:
     VEHICLE_TYPE m_vehicleType;
     VEHICLE_SUB_TYPE m_vehicleSubType;
     INPUT_TYPE m_inputType;
-    ACTUATOR_TYPE m_escType;
+    ESC_TYPE m_escType;
+    SERVO_TYPE m_servoType;
 
     GPS_SETTING m_gpsSetting;
     RADIO_SETTING m_radioSetting;

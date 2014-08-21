@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       outputfixedwingpage.h
+ * @file       outputfixedwingpage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
@@ -25,25 +25,29 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OUTPUTFIXEDWINGPAGE_H
-#define OUTPUTFIXEDWINGPAGE_H
+#include "servopage.h"
+#include "ui_servopage.h"
+#include "setupwizard.h"
 
-#include "abstractwizardpage.h"
-
-namespace Ui {
-class OutputFixedwingPage;
+ServoPage::ServoPage(SetupWizard *wizard, QWidget *parent) :
+    AbstractWizardPage(wizard, parent),
+    ui(new Ui::ServoPage)
+{
+    ui->setupUi(this);
 }
 
-class OutputFixedwingPage : public AbstractWizardPage {
-    Q_OBJECT
+ServoPage::~ServoPage()
+{
+    delete ui;
+}
 
-public:
-    explicit OutputFixedwingPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~OutputFixedwingPage();
-    bool validatePage();
+bool ServoPage::validatePage()
+{
+    if (ui->ServoTypeButton->isChecked()) {
+        getWizard()->setServoType(SetupWizard::SERVO_DIGITAL);
+    } else {
+        getWizard()->setServoType(SetupWizard::SERVO_ANALOG);
+    }
 
-private:
-    Ui::OutputFixedwingPage *ui;
-};
-
-#endif // OUTPUTFIXEDWINGPAGE_H
+    return true;
+}

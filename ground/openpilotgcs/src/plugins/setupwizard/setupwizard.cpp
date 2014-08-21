@@ -35,8 +35,8 @@
 #include "pages/helipage.h"
 #include "pages/surfacepage.h"
 #include "pages/inputpage.h"
-#include "pages/outputpage.h"
-#include "pages/outputfixedwingpage.h"
+#include "pages/escpage.h"
+#include "pages/servopage.h"
 #include "pages/biascalibrationpage.h"
 #include "pages/summarypage.h"
 #include "pages/savepage.h"
@@ -54,7 +54,8 @@
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
     m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
-    m_calibrationPerformed(false), m_restartNeeded(false), m_connectionManager(0)
+    m_servoType(SERVO_UNKNOWN), m_calibrationPerformed(false), m_restartNeeded(false),
+    m_connectionManager(0)
 {
     setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);
@@ -112,10 +113,10 @@ int SetupWizard::nextId() const
         }
     }
     case PAGE_MULTI:
-        return PAGE_OUTPUT;
+        return PAGE_ESC;
 
     case PAGE_FIXEDWING:
-        return PAGE_OUTPUT_FIXEDWING;
+        return PAGE_SERVO;
 
     case PAGE_INPUT:
         if (isRestartNeeded()) {
@@ -127,10 +128,14 @@ int SetupWizard::nextId() const
     case PAGE_REBOOT:
         return PAGE_VEHICLES;
 
-    case PAGE_OUTPUT:
-        return PAGE_SUMMARY;
+    case PAGE_ESC:
+        if (getVehicleSubType() == MULTI_ROTOR_TRI_Y) {
+            return PAGE_SERVO;
+        } else {
+            return PAGE_SUMMARY;
+        }
 
-    case PAGE_OUTPUT_FIXEDWING:
+    case PAGE_SERVO:
         return PAGE_SUMMARY;
 
     case PAGE_BIAS_CALIBRATION:
@@ -306,23 +311,31 @@ QString SetupWizard::getSummaryText()
     }
 
     summary.append("<br>");
-    summary.append("<b>").append(tr("Actuator type: ")).append("</b>");
-    switch (getActuatorType()) {
+    summary.append("<b>").append(tr("Speed Controller (ESC) type: ")).append("</b>");
+    switch (getEscType()) {
     case ESC_LEGACY:
         summary.append(tr("Legacy ESC (50 Hz)"));
         break;
     case ESC_RAPID:
         summary.append(tr("Rapid ESC (400 Hz)"));
         break;
-    case SERVO_ANALOG:
-        summary.append(tr("Analog Servos (50 Hz)"));
-        break;
-    case SERVO_DIGITAL:
-        summary.append(tr("Digital Servos (333 Hz)"));
-        break;
-
     default:
         summary.append(tr("Unknown"));
+    }
+
+    if (getVehicleSubType() == MULTI_ROTOR_TRI_Y || getVehicleType() == VEHICLE_FIXEDWING) {
+        summary.append("<br>");
+        summary.append("<b>").append(tr("Servo type: ")).append("</b>");
+        switch (getServoType()) {
+        case SERVO_ANALOG:
+            summary.append(tr("Analog Servos (50 Hz)"));
+            break;
+        case SERVO_DIGITAL:
+            summary.append(tr("Digital Servos (333 Hz)"));
+            break;
+        default:
+            summary.append(tr("Unknown"));
+        }
     }
 
     /*
@@ -344,8 +357,8 @@ void SetupWizard::createPages()
     setPage(PAGE_HELI, new HeliPage(this));
     setPage(PAGE_SURFACE, new SurfacePage(this));
     setPage(PAGE_INPUT, new InputPage(this));
-    setPage(PAGE_OUTPUT, new OutputPage(this));
-    setPage(PAGE_OUTPUT_FIXEDWING, new OutputFixedwingPage(this));
+    setPage(PAGE_ESC, new EscPage(this));
+    setPage(PAGE_SERVO, new ServoPage(this));
     setPage(PAGE_BIAS_CALIBRATION, new BiasCalibrationPage(this));
     // setPage(PAGE_REVO_CALIBRATION, new RevoCalibrationPage(this));
     setPage(PAGE_OUTPUT_CALIBRATION, new OutputCalibrationPage(this));

@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       outputfixedwingpage.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @file       escpage.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup OutputPage
+ * @addtogroup EscPage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,29 +25,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "outputfixedwingpage.h"
-#include "ui_outputfixedwingpage.h"
-#include "setupwizard.h"
+#ifndef ESCPAGE_H
+#define ESCPAGE_H
 
-OutputFixedwingPage::OutputFixedwingPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
-    ui(new Ui::OutputFixedwingPage)
-{
-    ui->setupUi(this);
+#include "abstractwizardpage.h"
+
+namespace Ui {
+class EscPage;
 }
 
-OutputFixedwingPage::~OutputFixedwingPage()
-{
-    delete ui;
-}
+class EscPage : public AbstractWizardPage {
+    Q_OBJECT
 
-bool OutputFixedwingPage::validatePage()
-{
-    if (ui->ServoTypeButton->isChecked()) {
-        getWizard()->setActuatorType(SetupWizard::SERVO_DIGITAL);
-    } else {
-        getWizard()->setActuatorType(SetupWizard::SERVO_ANALOG);
-    }
+public:
+    explicit EscPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~EscPage();
+    bool validatePage();
 
-    return true;
-}
+private:
+    Ui::EscPage *ui;
+};
+
+#endif // ESCPAGE_H

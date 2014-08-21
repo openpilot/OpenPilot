@@ -253,6 +253,30 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 {
     ActuatorSettings *actSettings = ActuatorSettings::GetInstance(m_uavoManager);
 
+    qint16 escFrequence = LEGACY_ESC_FREQUENCE;
+    switch (m_configSource->getEscType()) {
+    case VehicleConfigurationSource::ESC_LEGACY:
+        escFrequence = LEGACY_ESC_FREQUENCE;
+        break;
+    case VehicleConfigurationSource::ESC_RAPID:
+        escFrequence = RAPID_ESC_FREQUENCE;
+        break;
+    default:
+        break;
+    }
+
+    qint16 servoFrequence = ANALOG_SERVO_FREQUENCE;
+    switch (m_configSource->getServoType()) {
+    case VehicleConfigurationSource::SERVO_ANALOG:
+        servoFrequence = ANALOG_SERVO_FREQUENCE;
+        break;
+    case VehicleConfigurationSource::SERVO_DIGITAL:
+        servoFrequence = DIGITAL_SERVO_FREQUENCE;
+        break;
+    default:
+        break;
+    }
+
     switch (m_configSource->getVehicleType()) {
     case VehicleConfigurationSource::VEHICLE_MULTI:
     {
@@ -273,31 +297,28 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             data.ChannelUpdateFreq[i] = LEGACY_ESC_FREQUENCE;
         }
 
-        qint16 updateFrequence = LEGACY_ESC_FREQUENCE;
-        switch (m_configSource->getActuatorType()) {
-        case VehicleConfigurationSource::ESC_LEGACY:
-            updateFrequence = LEGACY_ESC_FREQUENCE;
-            break;
-        case VehicleConfigurationSource::ESC_RAPID:
-            updateFrequence = RAPID_ESC_FREQUENCE;
-            break;
-        default:
-            break;
-        }
-
         switch (m_configSource->getVehicleSubType()) {
         case VehicleConfigurationSource::MULTI_ROTOR_TRI_Y:
-            data.ChannelUpdateFreq[0] = updateFrequence;
-            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-                data.ChannelUpdateFreq[1] = updateFrequence;
+            // Servo always on channel 4
+            data.ChannelUpdateFreq[0] = escFrequence;
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
+                       m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) {
+                data.ChannelUpdateFreq[1] = servoFrequence;
+            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                data.ChannelUpdateFreq[1] = escFrequence;
+                data.ChannelUpdateFreq[2] = servoFrequence;
+            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                data.ChannelUpdateFreq[1] = escFrequence;
+                data.ChannelUpdateFreq[2] = escFrequence;
+                data.ChannelUpdateFreq[3] = servoFrequence;
             }
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
         case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
-            data.ChannelUpdateFreq[0] = updateFrequence;
-            data.ChannelUpdateFreq[1] = updateFrequence;
+            data.ChannelUpdateFreq[0] = escFrequence;
+            data.ChannelUpdateFreq[1] = escFrequence;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-                data.ChannelUpdateFreq[2] = updateFrequence;
+                data.ChannelUpdateFreq[2] = escFrequence;
             }
             break;
         case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
@@ -309,10 +330,10 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS:
         case VehicleConfigurationSource::MULTI_ROTOR_OCTO_V:
-            data.ChannelUpdateFreq[0] = updateFrequence;
-            data.ChannelUpdateFreq[1] = updateFrequence;
-            data.ChannelUpdateFreq[2] = updateFrequence;
-            data.ChannelUpdateFreq[3] = updateFrequence;
+            data.ChannelUpdateFreq[0] = escFrequence;
+            data.ChannelUpdateFreq[1] = escFrequence;
+            data.ChannelUpdateFreq[2] = escFrequence;
+            data.ChannelUpdateFreq[3] = escFrequence;
             break;
         default:
             break;
@@ -335,27 +356,15 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             data.ChannelMax[i]     = actuatorSettings[i].channelMax;
         }
 
-        qint16 updateFrequence = ANALOG_SERVO_FREQUENCE;
-        switch (m_configSource->getActuatorType()) {
-        case VehicleConfigurationSource::SERVO_ANALOG:
-            updateFrequence = ANALOG_SERVO_FREQUENCE;
-            break;
-        case VehicleConfigurationSource::SERVO_DIGITAL:
-            updateFrequence = DIGITAL_SERVO_FREQUENCE;
-            break;
-        default:
-            break;
-        }
-
         for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
-            data.ChannelUpdateFreq[i] = updateFrequence;
+            data.ChannelUpdateFreq[i] = servoFrequence;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 if (i == 1) {
-                    data.ChannelUpdateFreq[i] = ANALOG_SERVO_FREQUENCE;
+                    data.ChannelUpdateFreq[i] = escFrequence;
                 }
             } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
                 if (i == 2) {
-                    data.ChannelUpdateFreq[i] = ANALOG_SERVO_FREQUENCE;
+                    data.ChannelUpdateFreq[i] = escFrequence;
                 }
             }
         }

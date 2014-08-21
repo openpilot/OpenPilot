@@ -120,7 +120,7 @@ void OutputCalibrationPage::setupVehicle()
         // The channel number to configure for each step.
         m_channelIndex << 0 << 0 << 1 << 2 << 3 << 3 << 3;
 
-        setupActuatorMinMaxAndNeutral(0, 1, 3);
+        setupActuatorMinMaxAndNeutral(0, 2, 3);
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;

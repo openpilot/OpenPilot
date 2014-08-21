@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       outputpage.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @file       escpage.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup OutputPage
+ * @addtogroup EscPage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,29 +25,29 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "outputpage.h"
-#include "ui_outputpage.h"
+#include "escpage.h"
+#include "ui_escpage.h"
 #include "setupwizard.h"
 
-OutputPage::OutputPage(SetupWizard *wizard, QWidget *parent) :
+EscPage::EscPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
 
-    ui(new Ui::OutputPage)
+    ui(new Ui::EscPage)
 {
     ui->setupUi(this);
 }
 
-OutputPage::~OutputPage()
+EscPage::~EscPage()
 {
     delete ui;
 }
 
-bool OutputPage::validatePage()
+bool EscPage::validatePage()
 {
     if (ui->rapidESCButton->isChecked()) {
-        getWizard()->setActuatorType(SetupWizard::ESC_RAPID);
+        getWizard()->setEscType(SetupWizard::ESC_RAPID);
     } else {
-        getWizard()->setActuatorType(SetupWizard::ESC_LEGACY);
+        getWizard()->setEscType(SetupWizard::ESC_LEGACY);
     }
 
     return true;

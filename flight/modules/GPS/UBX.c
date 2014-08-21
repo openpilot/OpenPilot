@@ -32,6 +32,7 @@
 #include "pios.h"
 #include "CoordinateConversions.h"
 #include "pios_math.h"
+#include <pios_helpers.h>
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 #include "inc/UBX.h"
 #include "inc/GPS.h"
@@ -47,9 +48,55 @@ static GPSPositionSensorSensorTypeOptions sensorType = GPSPOSITIONSENSOR_SENSORT
 static struct UBX_ACK_ACK last_ack;
 static struct UBX_ACK_NAK last_nak;
 static bool usePvt = false;
+static uint32_t lastPvtTime = 0;
+typedef struct {
+    uint8_t msgClass;
+    uint8_t msgID;
+    void (*handler)(struct UBXPacket *, GPSPositionSensorData *GpsPosition);
+} ubx_message_handler;
 
+// parsing functions, roughly ordered by reception rate (higher rate messages on top)
+static void parse_ubx_op_mag(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+
+static void parse_ubx_nav_pvt(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+static void parse_ubx_nav_posllh(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+static void parse_ubx_nav_velned(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+static void parse_ubx_nav_sol(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+static void parse_ubx_nav_dop(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+#ifndef PIOS_GPS_MINIMAL
+static void parse_ubx_nav_timeutc(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+
+static void parse_ubx_op_sys(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+#endif
+static void parse_ubx_ack_ack(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+static void parse_ubx_ack_nak(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+
+static void parse_ubx_mon_ver(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+
+
+const ubx_message_handler ubx_handler_table[] = {
+    { .msgClass = UBX_CLASS_OP_CUST, .msgID = UBX_ID_OP_MAG,      .handler = &parse_ubx_op_mag      },
+
+    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_PVT,     .handler = &parse_ubx_nav_pvt     },
+    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_POSLLH,  .handler = &parse_ubx_nav_posllh  },
+    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_VELNED,  .handler = &parse_ubx_nav_velned  },
+    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_SOL,     .handler = &parse_ubx_nav_sol     },
+    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_DOP,     .handler = &parse_ubx_nav_dop     },
+#ifndef PIOS_GPS_MINIMAL
+    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_SVINFO,  .handler = &parse_ubx_nav_svinfo  },
+    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_TIMEUTC, .handler = &parse_ubx_nav_timeutc },
+
+    { .msgClass = UBX_CLASS_OP_CUST, .msgID = UBX_ID_OP_SYS,      .handler = &parse_ubx_op_sys      },
+#endif
+    { .msgClass = UBX_CLASS_ACK,     .msgID = UBX_ID_ACK_ACK,     .handler = &parse_ubx_ack_ack     },
+    { .msgClass = UBX_CLASS_ACK,     .msgID = UBX_ID_ACK_NAK,     .handler = &parse_ubx_ack_nak     },
+
+    { .msgClass = UBX_CLASS_MON,     .msgID = UBX_ID_MON_VER,     .handler = &parse_ubx_mon_ver     },
+};
+#define UBX_HANDLER_TABLE_SIZE NELEMENTS(ubx_handler_table)
 // If a PVT sentence is received in the last UBX_PVT_TIMEOUT (ms) timeframe it disables VELNED/POSLLH/SOL/TIMEUTC
-#define UBX_PVT_TIMEOUT (1000)
+#define UBX_PVT_TIMEOUT        (1000)
 // parse incoming character stream for messages in UBX binary format
 
 int parse_ubx_stream(uint8_t c, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
@@ -207,11 +254,13 @@ bool checksum_ubx_message(struct UBXPacket *ubx)
     }
 }
 
-void parse_ubx_nav_posllh(struct UBX_NAV_POSLLH *posllh, GPSPositionSensorData *GpsPosition)
+static void parse_ubx_nav_posllh(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
     if (usePvt) {
         return;
     }
+    struct UBX_NAV_POSLLH *posllh = &ubx->payload.nav_posllh;
+
     if (check_msgtracker(posllh->iTOW, POSLLH_RECEIVED)) {
         if (GpsPosition->Status != GPSPOSITIONSENSOR_STATUS_NOFIX) {
             GpsPosition->Altitude  = (float)posllh->hMSL * 0.001f;
@@ -222,11 +271,12 @@ void parse_ubx_nav_posllh(struct UBX_NAV_POSLLH *posllh, GPSPositionSensorData *
     }
 }
 
-void parse_ubx_nav_sol(struct UBX_NAV_SOL *sol, GPSPositionSensorData *GpsPosition)
+static void parse_ubx_nav_sol(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
     if (usePvt) {
         return;
     }
+    struct UBX_NAV_SOL *sol = &ubx->payload.nav_sol;
     if (check_msgtracker(sol->iTOW, SOL_RECEIVED)) {
         GpsPosition->Satellites = sol->numSV;
 
@@ -246,8 +296,10 @@ void parse_ubx_nav_sol(struct UBX_NAV_SOL *sol, GPSPositionSensorData *GpsPositi
     }
 }
 
-void parse_ubx_nav_dop(struct UBX_NAV_DOP *dop, GPSPositionSensorData *GpsPosition)
+static void parse_ubx_nav_dop(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
+    struct UBX_NAV_DOP *dop = &ubx->payload.nav_dop;
+
     if (check_msgtracker(dop->iTOW, DOP_RECEIVED)) {
         GpsPosition->HDOP = (float)dop->hDOP * 0.01f;
         GpsPosition->VDOP = (float)dop->vDOP * 0.01f;
@@ -255,13 +307,13 @@ void parse_ubx_nav_dop(struct UBX_NAV_DOP *dop, GPSPositionSensorData *GpsPositi
     }
 }
 
-void parse_ubx_nav_velned(struct UBX_NAV_VELNED *velned, GPSPositionSensorData *GpsPosition)
+static void parse_ubx_nav_velned(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
     if (usePvt) {
         return;
     }
     GPSVelocitySensorData GpsVelocity;
-
+    struct UBX_NAV_VELNED *velned = &ubx->payload.nav_velned;
     if (check_msgtracker(velned->iTOW, VELNED_RECEIVED)) {
         if (GpsPosition->Status != GPSPOSITIONSENSOR_STATUS_NOFIX) {
             GpsVelocity.North        = (float)velned->velN / 100.0f;
@@ -274,10 +326,12 @@ void parse_ubx_nav_velned(struct UBX_NAV_VELNED *velned, GPSPositionSensorData *
     }
 }
 
-void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPosition)
+static void parse_ubx_nav_pvt(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
-    GPSVelocitySensorData GpsVelocity;
+    lastPvtTime = PIOS_DELAY_GetuS();
 
+    GPSVelocitySensorData GpsVelocity;
+    struct UBX_NAV_PVT *pvt = &ubx->payload.nav_pvt;
     check_msgtracker(pvt->iTOW, (ALL_RECEIVED));
 
     GpsVelocity.North = (float)pvt->velN * 0.001f;
@@ -317,66 +371,14 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
     GpsPosition->SensorType = sensorType;
 }
 
-void parse_ubx_ack_ack(struct UBX_ACK_ACK *ack_ack)
-{
-    last_ack = *ack_ack;
-}
-
-void parse_ubx_ack_nak(struct UBX_ACK_NAK *ack_nak)
-{
-    last_nak = *ack_nak;
-}
-
-void parse_ubx_mon_ver(struct UBX_MON_VER *mon_ver)
-{
-    uint32_t hwVersion = atoi(mon_ver->hwVersion);
-
-    sensorType = (hwVersion >= 8000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX8 :
-                 ((hwVersion >= 7000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX7 : GPSPOSITIONSENSOR_SENSORTYPE_UBX);
-}
-
-
 #if !defined(PIOS_GPS_MINIMAL)
-void parse_ubx_op_sys(struct UBX_OP_SYSINFO *sysinfo)
-{
-    GPSExtendedStatusData data;
-
-    data.FlightTime           = sysinfo->flightTime;
-    data.HeapRemaining        = sysinfo->HeapRemaining;
-    data.IRQStackRemaining    = sysinfo->IRQStackRemaining;
-    data.SysModStackRemaining = sysinfo->SystemModStackRemaining;
-    data.Options = sysinfo->options;
-    data.Status  = GPSEXTENDEDSTATUS_STATUS_GPSV9;
-    GPSExtendedStatusSet(&data);
-}
-#endif
-void parse_ubx_op_mag(struct UBX_OP_MAG *mag)
-{
-    if (!useMag) {
-        return;
-    }
-    float mags[3] = { mag->x - mag_bias[0],
-                      mag->y - mag_bias[1],
-                      mag->z - mag_bias[2] };
-
-    float mag_out[3];
-
-    rot_mult(mag_transform, mags, mag_out);
-
-    AuxMagSensorData data;
-    data.x = mag_out[0];
-    data.y = mag_out[1];
-    data.z = mag_out[2];
-    data.Status = mag->Status;
-    AuxMagSensorSet(&data);
-}
-
-#if !defined(PIOS_GPS_MINIMAL)
-void parse_ubx_nav_timeutc(struct UBX_NAV_TIMEUTC *timeutc)
+static void parse_ubx_nav_timeutc(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
 {
     if (usePvt) {
         return;
     }
+
+    struct UBX_NAV_TIMEUTC *timeutc = &ubx->payload.nav_timeutc;
     // Test if time is valid
     if ((timeutc->valid & TIMEUTC_VALIDTOW) && (timeutc->valid & TIMEUTC_VALIDWKN)) {
         // Time is valid, set GpsTime
@@ -398,10 +400,11 @@ void parse_ubx_nav_timeutc(struct UBX_NAV_TIMEUTC *timeutc)
 #endif /* if !defined(PIOS_GPS_MINIMAL) */
 
 #if !defined(PIOS_GPS_MINIMAL)
-void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
+static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
 {
     uint8_t chan;
     GPSSatellitesData svdata;
+    struct UBX_NAV_SVINFO *svinfo = &ubx->payload.nav_svinfo;
 
     svdata.SatsInView = 0;
     for (chan = 0; chan < svinfo->numCh; chan++) {
@@ -425,14 +428,75 @@ void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
 }
 #endif /* if !defined(PIOS_GPS_MINIMAL) */
 
+static void parse_ubx_ack_ack(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
+{
+    struct UBX_ACK_ACK *ack_ack = &ubx->payload.ack_ack;
+
+    last_ack = *ack_ack;
+}
+
+static void parse_ubx_ack_nak(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
+{
+    struct UBX_ACK_NAK *ack_nak = &ubx->payload.ack_nak;
+
+    last_nak = *ack_nak;
+}
+
+static void parse_ubx_mon_ver(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
+{
+    struct UBX_MON_VER *mon_ver = &ubx->payload.mon_ver;
+    uint32_t hwVersion = atoi(mon_ver->hwVersion);
+
+    sensorType = (hwVersion >= 8000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX8 :
+                 ((hwVersion >= 7000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX7 : GPSPOSITIONSENSOR_SENSORTYPE_UBX);
+}
+
+
+#if !defined(PIOS_GPS_MINIMAL)
+static void parse_ubx_op_sys(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
+{
+    struct UBX_OP_SYSINFO *sysinfo = &ubx->payload.op_sysinfo;
+    GPSExtendedStatusData data;
+
+    data.FlightTime           = sysinfo->flightTime;
+    data.HeapRemaining        = sysinfo->HeapRemaining;
+    data.IRQStackRemaining    = sysinfo->IRQStackRemaining;
+    data.SysModStackRemaining = sysinfo->SystemModStackRemaining;
+    data.Options = sysinfo->options;
+    data.Status  = GPSEXTENDEDSTATUS_STATUS_GPSV9;
+    GPSExtendedStatusSet(&data);
+}
+#endif
+static void parse_ubx_op_mag(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
+{
+    if (!useMag) {
+        return;
+    }
+    struct UBX_OP_MAG *mag = &ubx->payload.op_mag;
+    float mags[3] = { mag->x - mag_bias[0],
+                      mag->y - mag_bias[1],
+                      mag->z - mag_bias[2] };
+
+    float mag_out[3];
+
+    rot_mult(mag_transform, mags, mag_out);
+
+    AuxMagSensorData data;
+    data.x = mag_out[0];
+    data.y = mag_out[1];
+    data.z = mag_out[2];
+    data.Status = mag->Status;
+    AuxMagSensorSet(&data);
+}
+
+
 // UBX message parser
 // returns UAVObjectID if a UAVObject structure is ready for further processing
 
 uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
     uint32_t id = 0;
-    static uint32_t lastPvtTime = 0;
-    static bool ubxInitialized  = false;
+    static bool ubxInitialized = false;
 
     if (!ubxInitialized) {
         // initialize dop values. If no DOP sentence is received it is safer to initialize them to a high value rather than 0.
@@ -443,73 +507,12 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
     }
     // is it using PVT?
     usePvt = (lastPvtTime) && (PIOS_DELAY_GetuSSince(lastPvtTime) < UBX_PVT_TIMEOUT * 1000);
-
-    switch ((ubx_class)ubx->header.class) {
-    case UBX_CLASS_NAV:
-        // Set of messages to be decoded when not using pvt
-        switch ((ubx_class_nav_id)ubx->header.id) {
-        case UBX_ID_NAV_POSLLH:
-            parse_ubx_nav_posllh(&ubx->payload.nav_posllh, GpsPosition);
-            break;
-        case UBX_ID_NAV_SOL:
-            parse_ubx_nav_sol(&ubx->payload.nav_sol, GpsPosition);
-            break;
-        case UBX_ID_NAV_VELNED:
-            parse_ubx_nav_velned(&ubx->payload.nav_velned, GpsPosition);
-            break;
-#if !defined(PIOS_GPS_MINIMAL)
-        case UBX_ID_NAV_TIMEUTC:
-            parse_ubx_nav_timeutc(&ubx->payload.nav_timeutc);
-            break;
-#endif
-        case UBX_ID_NAV_DOP:
-            parse_ubx_nav_dop(&ubx->payload.nav_dop, GpsPosition);
-            break;
-        case UBX_ID_NAV_PVT:
-            parse_ubx_nav_pvt(&ubx->payload.nav_pvt, GpsPosition);
-            lastPvtTime = PIOS_DELAY_GetuS();
-            break;
-#if !defined(PIOS_GPS_MINIMAL)
-        case UBX_ID_NAV_SVINFO:
-            parse_ubx_nav_svinfo(&ubx->payload.nav_svinfo);
-            break;
-#endif
-        default:
+    for (uint8_t i = 0; i < UBX_HANDLER_TABLE_SIZE; i++) {
+        const ubx_message_handler *handler = &ubx_handler_table[i];
+        if (handler->msgClass == ubx->header.class && handler->msgID == ubx->header.id) {
+            handler->handler(ubx, GpsPosition);
             break;
         }
-        break;
-    case UBX_CLASS_MON:
-        switch ((ubx_class_mon_id)ubx->header.id) {
-        case UBX_ID_MON_VER:
-            parse_ubx_mon_ver(&ubx->payload.mon_ver);
-            break;
-        default:
-            break;
-        }
-    case UBX_CLASS_ACK:
-        switch ((ubx_class_ack_id)ubx->header.id) {
-        case UBX_ID_ACK_ACK:
-            parse_ubx_ack_ack(&ubx->payload.ack_ack);
-            break;
-        case UBX_ID_ACK_NAK:
-            parse_ubx_ack_nak(&ubx->payload.ack_nak);
-            break;
-        default:
-            break;
-        }
-        break;
-    case UBX_CLASS_OP_CUST:
-        switch ((ubx_class_op_id)ubx->header.id) {
-#if !defined(PIOS_GPS_MINIMAL)
-        case UBX_ID_OP_SYS:
-            parse_ubx_op_sys(&ubx->payload.op_sysinfo);
-            break;
-#endif
-        case UBX_ID_OP_MAG:
-            parse_ubx_op_mag(&ubx->payload.op_mag);
-            break;
-        }
-        break;
     }
 
     if (msgtracker.msg_received == ALL_RECEIVED) {

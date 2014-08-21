@@ -256,14 +256,6 @@ Item {
     }
 
     SvgElementImage {
-        id: warning_battery
-        elementName: "warning-battery"
-        sceneSize: warnings.sceneSize
-        anchors.right: parent.right
-        visible: SystemAlarms.Alarm_Battery > 1
-    }
-
-    SvgElementImage {
         id: warning_attitude
         elementName: "warning-attitude"
         sceneSize: warnings.sceneSize

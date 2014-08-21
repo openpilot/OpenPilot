@@ -29,6 +29,10 @@
         <file>resources/bttn-calculate-up.png</file>
         <file>resources/bttn-turbo-down.png</file>
         <file>resources/bttn-turbo-up.png</file>
+        <file>resources/bttn-servo-digital-dwn.png</file>
+        <file>resources/bttn-servo-digital-up.png</file>
+        <file>resources/bttn-servo-standard-dwn.png</file>
+        <file>resources/bttn-servo-standard-up.png</file>
         <file>resources/wizard.png</file>
         <file>resources/multirotor-shapes.svg</file>
 	<!-- these are different from the files in /config/images -->

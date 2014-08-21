@@ -36,12 +36,17 @@
 #include "inc/UBX.h"
 #include "inc/GPS.h"
 #include "auxmagsettings.h"
+#include <string.h>
 
 static float mag_bias[3] = { 0, 0, 0 };
 static float mag_transform[3][3] = {
     { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }
 };
 static bool useMag = false;
+static GPSPositionSensorSensorTypeOptions sensorType = GPSPOSITIONSENSOR_SENSORTYPE_UNKNOWN;
+static struct UBX_ACK_ACK last_ack;
+static struct UBX_ACK_NAK last_nak;
+static bool usePvt = false;
 
 // If a PVT sentence is received in the last UBX_PVT_TIMEOUT (ms) timeframe it disables VELNED/POSLLH/SOL/TIMEUTC
 #define UBX_PVT_TIMEOUT (1000)
@@ -204,6 +209,9 @@ bool checksum_ubx_message(struct UBXPacket *ubx)
 
 void parse_ubx_nav_posllh(struct UBX_NAV_POSLLH *posllh, GPSPositionSensorData *GpsPosition)
 {
+    if (usePvt) {
+        return;
+    }
     if (check_msgtracker(posllh->iTOW, POSLLH_RECEIVED)) {
         if (GpsPosition->Status != GPSPOSITIONSENSOR_STATUS_NOFIX) {
             GpsPosition->Altitude  = (float)posllh->hMSL * 0.001f;
@@ -216,6 +224,9 @@ void parse_ubx_nav_posllh(struct UBX_NAV_POSLLH *posllh, GPSPositionSensorData *
 
 void parse_ubx_nav_sol(struct UBX_NAV_SOL *sol, GPSPositionSensorData *GpsPosition)
 {
+    if (usePvt) {
+        return;
+    }
     if (check_msgtracker(sol->iTOW, SOL_RECEIVED)) {
         GpsPosition->Satellites = sol->numSV;
 
@@ -246,6 +257,9 @@ void parse_ubx_nav_dop(struct UBX_NAV_DOP *dop, GPSPositionSensorData *GpsPositi
 
 void parse_ubx_nav_velned(struct UBX_NAV_VELNED *velned, GPSPositionSensorData *GpsPosition)
 {
+    if (usePvt) {
+        return;
+    }
     GPSVelocitySensorData GpsVelocity;
 
     if (check_msgtracker(velned->iTOW, VELNED_RECEIVED)) {
@@ -300,7 +314,28 @@ void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPositi
         GPSTimeSet(&GpsTime);
     }
 #endif
+    GpsPosition->SensorType = sensorType;
 }
+
+void parse_ubx_ack_ack(struct UBX_ACK_ACK *ack_ack)
+{
+    last_ack = *ack_ack;
+}
+
+void parse_ubx_ack_nak(struct UBX_ACK_NAK *ack_nak)
+{
+    last_nak = *ack_nak;
+}
+
+void parse_ubx_mon_ver(struct UBX_MON_VER *mon_ver)
+{
+    uint32_t hwVersion = atoi(mon_ver->hwVersion);
+
+    sensorType = (hwVersion >= 8000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX8 :
+                 ((hwVersion >= 7000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX7 : GPSPOSITIONSENSOR_SENSORTYPE_UBX);
+}
+
+
 #if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_op_sys(struct UBX_OP_SYSINFO *sysinfo)
 {
@@ -339,6 +374,9 @@ void parse_ubx_op_mag(struct UBX_OP_MAG *mag)
 #if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_nav_timeutc(struct UBX_NAV_TIMEUTC *timeutc)
 {
+    if (usePvt) {
+        return;
+    }
     // Test if time is valid
     if ((timeutc->valid & TIMEUTC_VALIDTOW) && (timeutc->valid & TIMEUTC_VALIDWKN)) {
         // Time is valid, set GpsTime
@@ -404,54 +442,70 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
         ubxInitialized    = true;
     }
     // is it using PVT?
-    bool usePvt = (lastPvtTime) && (PIOS_DELAY_GetuSSince(lastPvtTime) < UBX_PVT_TIMEOUT * 1000);
+    usePvt = (lastPvtTime) && (PIOS_DELAY_GetuSSince(lastPvtTime) < UBX_PVT_TIMEOUT * 1000);
 
-    switch (ubx->header.class) {
+    switch ((ubx_class)ubx->header.class) {
     case UBX_CLASS_NAV:
-        if (!usePvt) {
-            // Set of messages to be decoded when not using pvt
-            switch (ubx->header.id) {
-            case UBX_ID_POSLLH:
-                parse_ubx_nav_posllh(&ubx->payload.nav_posllh, GpsPosition);
-                break;
-            case UBX_ID_SOL:
-                parse_ubx_nav_sol(&ubx->payload.nav_sol, GpsPosition);
-                break;
-            case UBX_ID_VELNED:
-                parse_ubx_nav_velned(&ubx->payload.nav_velned, GpsPosition);
-                break;
+        // Set of messages to be decoded when not using pvt
+        switch ((ubx_class_nav_id)ubx->header.id) {
+        case UBX_ID_NAV_POSLLH:
+            parse_ubx_nav_posllh(&ubx->payload.nav_posllh, GpsPosition);
+            break;
+        case UBX_ID_NAV_SOL:
+            parse_ubx_nav_sol(&ubx->payload.nav_sol, GpsPosition);
+            break;
+        case UBX_ID_NAV_VELNED:
+            parse_ubx_nav_velned(&ubx->payload.nav_velned, GpsPosition);
+            break;
 #if !defined(PIOS_GPS_MINIMAL)
-            case UBX_ID_TIMEUTC:
-                parse_ubx_nav_timeutc(&ubx->payload.nav_timeutc);
-                break;
+        case UBX_ID_NAV_TIMEUTC:
+            parse_ubx_nav_timeutc(&ubx->payload.nav_timeutc);
+            break;
 #endif
-            }
-        }
-        // messages used always
-        switch (ubx->header.id) {
-        case UBX_ID_DOP:
+        case UBX_ID_NAV_DOP:
             parse_ubx_nav_dop(&ubx->payload.nav_dop, GpsPosition);
             break;
-
-        case UBX_ID_PVT:
+        case UBX_ID_NAV_PVT:
             parse_ubx_nav_pvt(&ubx->payload.nav_pvt, GpsPosition);
             lastPvtTime = PIOS_DELAY_GetuS();
             break;
 #if !defined(PIOS_GPS_MINIMAL)
-        case UBX_ID_SVINFO:
+        case UBX_ID_NAV_SVINFO:
             parse_ubx_nav_svinfo(&ubx->payload.nav_svinfo);
             break;
 #endif
+        default:
+            break;
+        }
+        break;
+    case UBX_CLASS_MON:
+        switch ((ubx_class_mon_id)ubx->header.id) {
+        case UBX_ID_MON_VER:
+            parse_ubx_mon_ver(&ubx->payload.mon_ver);
+            break;
+        default:
+            break;
+        }
+    case UBX_CLASS_ACK:
+        switch ((ubx_class_ack_id)ubx->header.id) {
+        case UBX_ID_ACK_ACK:
+            parse_ubx_ack_ack(&ubx->payload.ack_ack);
+            break;
+        case UBX_ID_ACK_NAK:
+            parse_ubx_ack_nak(&ubx->payload.ack_nak);
+            break;
+        default:
+            break;
         }
         break;
     case UBX_CLASS_OP_CUST:
-        switch (ubx->header.id) {
+        switch ((ubx_class_op_id)ubx->header.id) {
 #if !defined(PIOS_GPS_MINIMAL)
-        case UBX_ID_SYS:
+        case UBX_ID_OP_SYS:
             parse_ubx_op_sys(&ubx->payload.op_sysinfo);
             break;
 #endif
-        case UBX_ID_MAG:
+        case UBX_ID_OP_MAG:
             parse_ubx_op_mag(&ubx->payload.op_mag);
             break;
         }

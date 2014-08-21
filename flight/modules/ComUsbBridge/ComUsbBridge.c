@@ -42,7 +42,7 @@
 
 static void com2UsbBridgeTask(void *parameters);
 static void usb2ComBridgeTask(void *parameters);
-static void updateSettings();
+static void updateSettings(UAVObjEvent *ev);
 
 // ****************
 // Private constants
@@ -119,8 +119,8 @@ static int32_t comUsbBridgeInitialize(void)
         PIOS_Assert(com2usb_buf);
         usb2com_buf = pios_malloc(BRIDGE_BUF_LEN);
         PIOS_Assert(usb2com_buf);
-
-        updateSettings();
+        HwSettingsConnectCallback(&updateSettings);
+        updateSettings(0);
     }
 
     return 0;
@@ -170,7 +170,7 @@ static void usb2ComBridgeTask(__attribute__((unused)) void *parameters)
 }
 
 
-static void updateSettings()
+static void updateSettings(__attribute__((unused)) UAVObjEvent *ev)
 {
     if (usart_port) {
         // Retrieve settings

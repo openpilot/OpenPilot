@@ -3,7 +3,7 @@ include(openpilotgcs.pri)
 TEMPLATE = subdirs
 
 # Copy Qt runtime libraries into the build directory (to run or package)
-equals(copydata, 1) {
+equals(copyqt, 1) {
 
 GCS_LIBRARY_PATH
 

@@ -43,6 +43,7 @@
 #include "auxmagsensor.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
+#include <pios_com.h>
 
 #include "GPS.h"
 #include "NMEA.h"
@@ -228,7 +229,17 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     // Loop forever
     while (1) {
         uint8_t c;
-
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
+        if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
+            char *buffer   = 0;
+            uint16_t count = 0;
+            ubx_run_management_tasks(&buffer, &count);
+            // Something to send?
+            if (count) {
+                PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);
+            }
+        }
+#endif
         // This blocks the task until there is something on the buffer
         while (PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, xDelay) > 0) {
             int res;

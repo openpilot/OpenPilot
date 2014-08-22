@@ -33,6 +33,7 @@
 #include "CoordinateConversions.h"
 #include "pios_math.h"
 #include <pios_helpers.h>
+#include <pios_delay.h>
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 #include "inc/UBX.h"
 #include "inc/GPS.h"
@@ -43,12 +44,16 @@ static float mag_bias[3] = { 0, 0, 0 };
 static float mag_transform[3][3] = {
     { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }
 };
+
 static bool useMag = false;
 static GPSPositionSensorSensorTypeOptions sensorType = GPSPOSITIONSENSOR_SENSORTYPE_UNKNOWN;
 static struct UBX_ACK_ACK last_ack;
 static struct UBX_ACK_NAK last_nak;
 static bool usePvt = false;
 static uint32_t lastPvtTime = 0;
+
+
+// parse table item
 typedef struct {
     uint8_t msgClass;
     uint8_t msgID;
@@ -95,8 +100,23 @@ const ubx_message_handler ubx_handler_table[] = {
     { .msgClass = UBX_CLASS_MON,     .msgID = UBX_ID_MON_VER,     .handler = &parse_ubx_mon_ver     },
 };
 #define UBX_HANDLER_TABLE_SIZE NELEMENTS(ubx_handler_table)
+
+// COnfiguration support
+typedef enum {
+    INIT_STEP_ASK_VER   = 0,
+    INIT_STEP_WAIT_VER  = 1,
+    INIT_STEP_CONFIGURE = 2,
+    INIT_STEP_DONE = 3,
+} initSteps;
+
+static initSteps currentConfigurationStep;
+// timestamp of last operation
+static uint32_t lastStepTimestampRaw = 0;
+// detected hw version
+static int32_t hwVersion = -1;
+
 // If a PVT sentence is received in the last UBX_PVT_TIMEOUT (ms) timeframe it disables VELNED/POSLLH/SOL/TIMEUTC
-#define UBX_PVT_TIMEOUT        (1000)
+#define UBX_PVT_TIMEOUT (1000)
 // parse incoming character stream for messages in UBX binary format
 
 int parse_ubx_stream(uint8_t c, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
@@ -445,10 +465,11 @@ static void parse_ubx_ack_nak(struct UBXPacket *ubx, __attribute__((unused)) GPS
 static void parse_ubx_mon_ver(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
 {
     struct UBX_MON_VER *mon_ver = &ubx->payload.mon_ver;
-    uint32_t hwVersion = atoi(mon_ver->hwVersion);
 
-    sensorType = (hwVersion >= 8000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX8 :
-                 ((hwVersion >= 7000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX7 : GPSPOSITIONSENSOR_SENSORTYPE_UBX);
+    hwVersion  = atoi(mon_ver->hwVersion);
+
+    sensorType = (hwVersion >= 80000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX8 :
+                 ((hwVersion >= 70000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX7 : GPSPOSITIONSENSOR_SENSORTYPE_UBX);
 }
 
 
@@ -547,4 +568,62 @@ void load_mag_settings()
         useMag = true;
     }
 }
+
+UBXSentPacket_t working_packet;
+void append_checksum(UBXSentPacket_t *packet)
+{
+    uint8_t i;
+    uint8_t ck_a = 0;
+    uint8_t ck_b = 0;
+    uint16_t len = packet->message.header.len + sizeof(UBXSentHeader_t);
+
+    for (i = 2; i < len; i++) {
+        ck_a += packet->buffer[i];
+        ck_b += ck_a;
+    }
+
+    packet->buffer[len]     = ck_a;
+    packet->buffer[len + 1] = ck_b;
+}
+void prepare_packet(UBXSentPacket_t *packet, uint8_t classID, uint8_t messageID, uint16_t len)
+{
+    packet->message.header.prolog[0] = UBX_SYNC1;
+    packet->message.header.prolog[1] = UBX_SYNC2;
+    packet->message.header.class     = classID;
+    packet->message.header.id  = messageID;
+    packet->message.header.len = len;
+    append_checksum(packet);
+}
+
+void build_request(UBXSentPacket_t *packet, uint8_t classID, uint8_t messageID, uint16_t *count)
+{
+    prepare_packet(packet, classID, messageID, 0);
+    *count = packet->message.header.len + sizeof(UBXSentHeader_t) + 2;
+}
+
+void ubx_run_management_tasks(char * *buffer, uint16_t *count)
+{
+    uint32_t elapsed = PIOS_DELAY_DiffuS(lastStepTimestampRaw);
+
+    switch (currentConfigurationStep) {
+    case INIT_STEP_ASK_VER:
+        lastStepTimestampRaw     = PIOS_DELAY_GetRaw();
+        build_request(&working_packet, UBX_CLASS_MON, UBX_ID_MON_VER, count);
+        *buffer = (char *)working_packet.buffer;
+        currentConfigurationStep = INIT_STEP_WAIT_VER;
+        break;
+    case INIT_STEP_WAIT_VER:
+        if (hwVersion > 0) {
+            currentConfigurationStep = INIT_STEP_CONFIGURE;
+        } else if (elapsed > UBX_REPLY_TIMEOUT) {
+            currentConfigurationStep = INIT_STEP_ASK_VER;
+        }
+        return;
+
+    case INIT_STEP_CONFIGURE:
+    case INIT_STEP_DONE:
+        break;
+    }
+}
+
 #endif // PIOS_INCLUDE_GPS_UBX_PARSER

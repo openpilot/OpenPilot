@@ -61,11 +61,17 @@ typedef enum {
 
 typedef struct {
     bool   autoconfigEnabled;
+    bool   storeSettings;
     int8_t navRate;
     ubx_config_dynamicmodel_t dynamicModel;
 } ubx_autoconfig_settings_t;
 
 // Sent messages for configuration support
+typedef struct {
+    uint32_t clearMask;
+    uint32_t saveMask;
+    uint32_t loadMask;
+} __attribute__((packed)) ubx_cfg_cfg_t;
 
 typedef struct {
     uint16_t mask;
@@ -112,9 +118,10 @@ typedef union {
     struct {
         UBXSentHeader_t header;
         union {
+            ubx_cfg_cfg_t  cfg_cfg;
+            ubx_cfg_msg_t  cfg_msg;
             ubx_cfg_nav5_t cfg_nav5;
             ubx_cfg_rate_t cfg_rate;
-            ubx_cfg_msg_t  cfg_msg;
         } payload;
         uint8_t resvd[2]; // added space for checksum bytes
     } message;

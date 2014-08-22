@@ -35,10 +35,10 @@ typedef enum {
     INIT_STEP_START,
     INIT_STEP_ASK_VER,
     INIT_STEP_WAIT_VER,
-    INIT_STEP_CONFIGURE,
-    INIT_STEP_CONFIGURE_WAIT_ACK,
     INIT_STEP_ENABLE_SENTENCES,
     INIT_STEP_ENABLE_SENTENCES_WAIT_ACK,
+    INIT_STEP_CONFIGURE,
+    INIT_STEP_CONFIGURE_WAIT_ACK,
     INIT_STEP_DONE,
     INIT_STEP_ERROR,
 } initSteps_t;
@@ -155,6 +155,15 @@ void config_nav(uint16_t *bytes_to_send)
     status->requiredAck.msgID = UBX_ID_CFG_NAV5;
 }
 
+void config_save(uint16_t *bytes_to_send)
+{
+    memset(status->working_packet.buffer, 0, sizeof(UBXSentHeader_t) + sizeof(ubx_cfg_cfg_t));
+    // mask LSB=ioPort|msgConf|infMsg|navConf|rxmConf|||||rinvConf|antConf|....|= MSB
+    status->working_packet.message.payload.cfg_cfg.saveMask = 0x01 | 0x08; // msgConf + navConf
+    *bytes_to_send = prepare_packet(&status->working_packet, UBX_CLASS_CFG, UBX_ID_CFG_CFG, sizeof(ubx_cfg_cfg_t));
+    status->requiredAck.clsID = UBX_CLASS_CFG;
+    status->requiredAck.msgID = UBX_ID_CFG_CFG;
+}
 static void configure(uint16_t *bytes_to_send)
 {
     switch (status->lastConfigSent) {
@@ -163,6 +172,13 @@ static void configure(uint16_t *bytes_to_send)
         break;
     case LAST_CONFIG_SENT_START + 1:
         config_nav(bytes_to_send);
+        if (!status->currentSettings.storeSettings) {
+            // skips saving
+            status->lastConfigSent = LAST_CONFIG_SENT_COMPLETED;
+        }
+        break;
+    case LAST_CONFIG_SENT_START + 2:
+        config_save(bytes_to_send);
         status->lastConfigSent = LAST_CONFIG_SENT_COMPLETED;
         return;
 
@@ -190,6 +206,7 @@ static void enable_sentences(__attribute__((unused)) uint16_t *bytes_to_send)
         status->lastConfigSent = LAST_CONFIG_SENT_COMPLETED;
     }
 }
+
 void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
 {
     *bytes_to_send = 0;
@@ -213,7 +230,7 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
     case INIT_STEP_WAIT_VER:
         if (ubxHwVersion > 0) {
             status->lastConfigSent = LAST_CONFIG_SENT_START;
-            status->currentStep    = INIT_STEP_CONFIGURE;
+            status->currentStep    = INIT_STEP_ENABLE_SENTENCES;
             status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
             return;
         }
@@ -236,7 +253,7 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
         status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
         if (status->lastConfigSent == LAST_CONFIG_SENT_COMPLETED) {
             status->lastConfigSent = LAST_CONFIG_SENT_START;
-            status->currentStep    = step_configure ? INIT_STEP_ENABLE_SENTENCES : INIT_STEP_DONE;
+            status->currentStep    = step_configure ? INIT_STEP_DONE : INIT_STEP_CONFIGURE;
         } else {
             status->currentStep = step_configure ? INIT_STEP_CONFIGURE_WAIT_ACK : INIT_STEP_ENABLE_SENTENCES_WAIT_ACK;
         }
@@ -288,20 +305,23 @@ void ubx_autoconfig_set(ubx_autoconfig_settings_t config)
     }
 }
 
-int32_t ubx_autoconfig_get_status(){
-    if(!status){
+int32_t ubx_autoconfig_get_status()
+{
+    if (!status) {
         return UBX_AUTOCONFIG_STATUS_DISABLED;
     }
     switch (status->currentStep) {
-        case INIT_STEP_ERROR:
-            return UBX_AUTOCONFIG_STATUS_ERROR;
-        case INIT_STEP_DISABLED:
-            return UBX_AUTOCONFIG_STATUS_DISABLED;
-        case INIT_STEP_DONE:
-            return UBX_AUTOCONFIG_STATUS_DONE;
-        default:
-            break;
+    case INIT_STEP_ERROR:
+        return UBX_AUTOCONFIG_STATUS_ERROR;
+
+    case INIT_STEP_DISABLED:
+        return UBX_AUTOCONFIG_STATUS_DISABLED;
+
+    case INIT_STEP_DONE:
+        return UBX_AUTOCONFIG_STATUS_DONE;
+
+    default:
+        break;
     }
     return UBX_AUTOCONFIG_STATUS_RUNNING;
 }
-

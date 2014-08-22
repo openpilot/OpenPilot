@@ -443,7 +443,8 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
     GPSSettingsUBXRateGet(&newconfig.navRate);
     GPSSettingsUBXDynamicModelGet(&ubxDynamicModel);
 
-    newconfig.autoconfigEnabled = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_TRUE ? true : false;
+    newconfig.autoconfigEnabled = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_FALSE ? false : true;
+    newconfig.storeSettings     = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_STORE;
     newconfig.dynamicModel = ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PORTABLE ? UBX_DYNMODEL_PORTABLE :
                              ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_STATIONARY ? UBX_DYNMODEL_STATIONARY :
                              ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PEDESTRIAN ? UBX_DYNMODEL_PEDESTRIAN :

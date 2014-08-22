@@ -30,6 +30,32 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "UBX.h"
+// defines
+// TODO: NEO8 max rate is for Rom version, flash is limited to 10Hz, need to handle that.
+#define UBX_MAX_RATE_VER8 18
+#define UBX_MAX_RATE_VER7 10
+#define UBX_MAX_RATE      5
+
+// types
+
+// Enumeration options for field UBXDynamicModel
+
+typedef enum {
+    UBX_DYNMODEL_PORTABLE   = 0,
+    UBX_DYNMODEL_STATIONARY = 2,
+    UBX_DYNMODEL_PEDESTRIAN = 3,
+    UBX_DYNMODEL_AUTOMOTIVE = 4,
+    UBX_DYNMODEL_SEA = 5,
+    UBX_DYNMODEL_AIRBORNE1G = 6,
+    UBX_DYNMODEL_AIRBORNE2G = 7,
+    UBX_DYNMODEL_AIRBORNE4G = 8
+} ubx_config_dynamicmodel_t;
+
+typedef struct {
+    bool   autoconfigEnabled;
+    int8_t navRate;
+    ubx_config_dynamicmodel_t dynamicModel;
+} ubx_autoconfig_settings_t;
 
 // Sent messages for configuration support
 
@@ -52,26 +78,26 @@ typedef struct {
     uint16_t reserved2;
     uint32_t reserved3;
     uint32_t reserved4;
-} ubx_cfg_nav5_t;
+} __attribute__((packed)) ubx_cfg_nav5_t;
 
 typedef struct {
     uint16_t measRate;
     uint16_t navRate;
     uint16_t timeRef;
-} ubx_cfg_rate_t;
+} __attribute__((packed)) ubx_cfg_rate_t;
 
 typedef struct {
     uint8_t msgClass;
     uint8_t msgID;
     uint8_t rate;
-} ubx_cfg_msg_t;
+} __attribute__((packed)) ubx_cfg_msg_t;
 
 typedef struct {
     uint8_t  prolog[2];
     uint8_t  class;
     uint8_t  id;
     uint16_t len;
-} UBXSentHeader_t;
+} __attribute__((packed)) UBXSentHeader_t;
 
 typedef union {
     uint8_t buffer[0];
@@ -84,8 +110,9 @@ typedef union {
         } payload;
         uint8_t resvd[2]; // added space for checksum bytes
     } message;
-} UBXSentPacket_t;
+} __attribute__((packed)) UBXSentPacket_t;
 
-void ubx_autoconfig_run(char * *buffer, uint16_t *count);
+void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send);
+void ubx_autoconfig_set(ubx_autoconfig_settings_t config);
 
 #endif /* UBX_AUTOCONFIG_H_ */

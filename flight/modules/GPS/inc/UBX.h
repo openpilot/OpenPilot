@@ -36,6 +36,9 @@
 #include "auxmagsensor.h"
 #include "GPS.h"
 
+#define UBX_HW_VERSION_8  80000
+#define UBX_HW_VERSION_7  70000
+
 #define UBX_REPLY_TIMEOUT (500 * 1000)
 
 #define UBX_SYNC1         0xb5 // UBX protocol synchronization characters

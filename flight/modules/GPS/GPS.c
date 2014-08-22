@@ -55,11 +55,16 @@
 // Private functions
 
 static void gpsTask(void *parameters);
-static void updateSettings();
+static void updateHwSettings();
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 static void setHomeLocation(GPSPositionSensorData *gpsData);
 static float GravityAccel(float latitude, float longitude, float altitude);
+#endif
+
+#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+void AuxMagSettingsUpdatedCb(UAVObjEvent *ev);
+void updateGpsSettings(UAVObjEvent *ev);
 #endif
 
 // ****************
@@ -100,9 +105,7 @@ static uint32_t timeOfLastUpdateMs;
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER) || defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 static struct GPS_RX_STATS gpsRxStats;
 #endif
-#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
-void AuxMagSettingsUpdatedCb(UAVObjEvent *ev);
-#endif
+
 // ****************
 /**
  * Initialise the gps module
@@ -166,7 +169,7 @@ int32_t GPSInitialize(void)
     AuxMagSettingsUpdatedCb(NULL);
     AuxMagSettingsConnectCallback(AuxMagSettingsUpdatedCb);
 #endif
-    updateSettings();
+    updateHwSettings();
 #else
     if (gpsPort && gpsEnabled) {
         GPSPositionSensorInitialize();
@@ -178,7 +181,7 @@ int32_t GPSInitialize(void)
 #if defined(PIOS_GPS_SETS_HOMELOCATION)
         HomeLocationInitialize();
 #endif
-        updateSettings();
+        updateHwSettings();
     }
 #endif /* if defined(REVOLUTION) */
 
@@ -196,7 +199,7 @@ int32_t GPSInitialize(void)
             gps_rx_buffer = NULL;
         }
         PIOS_Assert(gps_rx_buffer);
-
+        GPSSettingsConnectCallback(updateGpsSettings);
         return 0;
     }
 
@@ -227,6 +230,9 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     timeOfLastCommandMs = timeNowMs;
 
     GPSPositionSensorGet(&gpspositionsensor);
+#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+    updateGpsSettings(0);
+#endif
     // Loop forever
     while (1) {
         uint8_t c;
@@ -368,7 +374,7 @@ static void setHomeLocation(GPSPositionSensorData *gpsData)
  * like protocol, etc. Thus the HwSettings object which contains the
  * GPS port speed is used for now.
  */
-static void updateSettings()
+static void updateHwSettings()
 {
     if (gpsPort) {
         // Retrieve settings
@@ -404,12 +410,38 @@ static void updateSettings()
         }
     }
 }
+
 #ifdef PIOS_INCLUDE_GPS_UBX_PARSER
 void AuxMagSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     load_mag_settings();
 }
-#endif
+
+void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
+{
+    uint8_t ubxAutoConfig;
+    uint8_t ubxDynamicModel;
+
+    ubx_autoconfig_settings_t newconfig;
+
+    GPSSettingsUBXAutoConfigGet(&ubxAutoConfig);
+    GPSSettingsUBXRateGet(&newconfig.navRate);
+    GPSSettingsUBXDynamicModelGet(&ubxDynamicModel);
+
+    newconfig.autoconfigEnabled = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_TRUE ? true : false;
+    newconfig.dynamicModel = ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PORTABLE ? UBX_DYNMODEL_PORTABLE :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_STATIONARY ? UBX_DYNMODEL_STATIONARY :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PEDESTRIAN ? UBX_DYNMODEL_PEDESTRIAN :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AUTOMOTIVE ? UBX_DYNMODEL_AUTOMOTIVE :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_SEA ? UBX_DYNMODEL_SEA :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE1G ? UBX_DYNMODEL_AIRBORNE1G :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE2G ? UBX_DYNMODEL_AIRBORNE2G :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE4G ? UBX_DYNMODEL_AIRBORNE4G :
+                             UBX_DYNMODEL_AIRBORNE1G;
+    ubx_autoconfig_set(newconfig);
+}
+
+#endif /* ifdef PIOS_INCLUDE_GPS_UBX_PARSER */
 /**
  * @}
  * @}

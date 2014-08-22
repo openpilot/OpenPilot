@@ -13,6 +13,7 @@
         <field name="HDOP" units="" type="float" elements="1"/>
         <field name="VDOP" units="" type="float" elements="1"/>
         <field name="SensorType" units="" type="enum" elements="1" options="Unknown,NMEA,UBX,UBX7,UBX8" defaultvalue="Unknown" />
+        <field name="AutoConfigStatus" units="" type="enum" elements="1" options="DISABLED,RUNNING,DONE,ERROR" defaultvalue="DISABLED" />
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

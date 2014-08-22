@@ -39,6 +39,13 @@
 #define UBX_REPLY_TIMEOUT (500 * 1000)
 #define UBX_MAX_RETRIES 5
 
+// types
+typedef enum {
+    UBX_AUTOCONFIG_STATUS_DISABLED = 0,
+    UBX_AUTOCONFIG_STATUS_RUNNING,
+    UBX_AUTOCONFIG_STATUS_DONE,
+    UBX_AUTOCONFIG_STATUS_ERROR
+} ubx_autoconfig_status_t;
 // Enumeration options for field UBXDynamicModel
 typedef enum {
     UBX_DYNMODEL_PORTABLE   = 0,
@@ -114,5 +121,5 @@ typedef union {
 
 void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send);
 void ubx_autoconfig_set(ubx_autoconfig_settings_t config);
-
+int32_t ubx_autoconfig_get_status();
 #endif /* UBX_AUTOCONFIG_H_ */

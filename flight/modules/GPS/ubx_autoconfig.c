@@ -51,7 +51,7 @@ typedef struct {
     int8_t lastConfigSent; // index of last configuration string sent
     struct UBX_ACK_ACK requiredAck; // Class and id of the message we are waiting for an ACK from GPS
     uint8_t retryCount;
-} ubx_autoconfig_status_t;
+} status_t;
 
 ubx_cfg_msg_t msg_config_ubx6[] = {
     { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_POSLLH,  .rate = 1  },
@@ -82,7 +82,7 @@ ubx_cfg_msg_t msg_config_ubx7[] = {
 // enable the autoconfiguration system
 static bool enabled;
 
-static ubx_autoconfig_status_t *status = 0;
+static status_t *status = 0;
 
 static void append_checksum(UBXSentPacket_t *packet)
 {
@@ -278,8 +278,8 @@ void ubx_autoconfig_set(ubx_autoconfig_settings_t config)
     enabled = false;
     if (config.autoconfigEnabled) {
         if (!status) {
-            status = (ubx_autoconfig_status_t *)pios_malloc(sizeof(ubx_autoconfig_status_t));
-            memset(status, 0, sizeof(ubx_autoconfig_status_t));
+            status = (status_t *)pios_malloc(sizeof(status_t));
+            memset(status, 0, sizeof(status_t));
             status->currentStep = INIT_STEP_DISABLED;
         }
         status->currentSettings = config;
@@ -287,3 +287,21 @@ void ubx_autoconfig_set(ubx_autoconfig_settings_t config)
         enabled = true;
     }
 }
+
+int32_t ubx_autoconfig_get_status(){
+    if(!status){
+        return UBX_AUTOCONFIG_STATUS_DISABLED;
+    }
+    switch (status->currentStep) {
+        case INIT_STEP_ERROR:
+            return UBX_AUTOCONFIG_STATUS_ERROR;
+        case INIT_STEP_DISABLED:
+            return UBX_AUTOCONFIG_STATUS_DISABLED;
+        case INIT_STEP_DONE:
+            return UBX_AUTOCONFIG_STATUS_DONE;
+        default:
+            break;
+    }
+    return UBX_AUTOCONFIG_STATUS_RUNNING;
+}
+

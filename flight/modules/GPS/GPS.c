@@ -257,8 +257,15 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                 break;
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-            case GPSSETTINGS_DATAPROTOCOL_UBX:
-                res = parse_ubx_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
+            case GPSSETTINGS_DATAPROTOCOL_UBX:{
+                    int32_t ac_status = ubx_autoconfig_get_status();
+                    gpspositionsensor.AutoConfigStatus =
+                            ac_status == UBX_AUTOCONFIG_STATUS_DISABLED ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED :
+                            ac_status == UBX_AUTOCONFIG_STATUS_DONE ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE :
+                            ac_status == UBX_AUTOCONFIG_STATUS_ERROR? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR :
+                            GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING;
+                    res = parse_ubx_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
+                }
                 break;
 #endif
             default:

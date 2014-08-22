@@ -380,7 +380,6 @@ static void parse_ubx_nav_pvt(struct UBXPacket *ubx, GPSPositionSensorData *GpsP
         GPSTimeSet(&GpsTime);
     }
 #endif
-    GpsPosition->SensorType = sensorType;
 }
 
 #if !defined(PIOS_GPS_MINIMAL)
@@ -527,6 +526,8 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
             break;
         }
     }
+
+    GpsPosition->SensorType = sensorType;
 
     if (msgtracker.msg_received == ALL_RECEIVED) {
         GPSPositionSensorSet(GpsPosition);

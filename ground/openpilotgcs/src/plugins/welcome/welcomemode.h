@@ -29,6 +29,7 @@
 #ifndef WELCOMEMODE_H
 #define WELCOMEMODE_H
 
+#include "version_info/version_info.h"
 #include "welcome_global.h"
 
 #include <coreplugin/imode.h>
@@ -44,6 +45,7 @@ struct WelcomeModePrivate;
 
 class WELCOME_EXPORT WelcomeMode : public Core::IMode {
     Q_OBJECT
+    Q_PROPERTY(QString versionString READ versionString)
 
 public:
     WelcomeMode();
@@ -64,6 +66,10 @@ public:
     void setPriority(int priority)
     {
         m_priority = priority;
+    }
+    QString versionString() const
+    {
+        return tr("OpenPilot GCS Version: %1").arg(VersionInfo::revision().left(60));
     }
 
 public slots:

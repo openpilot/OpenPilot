@@ -47,7 +47,7 @@ bool EscPage::validatePage()
     if (ui->rapidESCButton->isChecked()) {
         getWizard()->setEscType(SetupWizard::ESC_RAPID);
     } else {
-        getWizard()->setEscType(SetupWizard::ESC_LEGACY);
+        getWizard()->setEscType(SetupWizard::ESC_STANDARD);
     }
 
     return true;

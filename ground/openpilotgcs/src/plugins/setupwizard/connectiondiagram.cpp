@@ -126,7 +126,7 @@ void ConnectionDiagram::setupGraphicsScene()
                 elementsToShow << "aileron";
                 break;
             case VehicleConfigurationSource::FIXED_WING_AILERON:
-                elementsToShow << "ail2";
+                elementsToShow << "aileron-single";
                 break;
             case VehicleConfigurationSource::FIXED_WING_ELEVON:
                 elementsToShow << "elevon";

@@ -82,11 +82,11 @@ void FixedWingPage::resizeEvent(QResizeEvent *event)
 
 void FixedWingPage::setupFixedWingTypesCombo()
 {
-    ui->typeCombo->addItem(tr("Dual Aileron Servos"), SetupWizard::FIXED_WING_DUAL_AILERON);
-    m_descriptions << tr("This setup expects a traditional airframe setup using two independent aileron servos on their own channel (not connected by Y adapter), an elevator and a rudder. ");
+    ui->typeCombo->addItem(tr("Aileron Dual Servos"), SetupWizard::FIXED_WING_DUAL_AILERON);
+    m_descriptions << tr("This setup expects a traditional airframe using two independent aileron servos on their own channel (not connected by Y adapter) plus an elevator and a rudder. ");
 
-    ui->typeCombo->addItem(tr("Single Aileron Servo"), SetupWizard::FIXED_WING_AILERON);
-    m_descriptions << tr("This setup expects a traditional airframe setup using a single alieron servo or two connected by Y a adapter, an elevator and a rudder. ");
+    ui->typeCombo->addItem(tr("Aileron Single Servo"), SetupWizard::FIXED_WING_AILERON);
+    m_descriptions << tr("This setup expects a traditional airframe using a single alieron servo or two servos connected by a Y adapter plus an elevator and a rudder. ");
 
     ui->typeCombo->addItem(tr("Elevon"), SetupWizard::FIXED_WING_ELEVON);
     m_descriptions << tr("This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet supported. Setup should include only two elevons, and should explicitly not include a rudder.");
@@ -109,7 +109,7 @@ void FixedWingPage::updateImageAndDescription()
         elementId = "aileron";
         break;
     case SetupWizard::FIXED_WING_AILERON:
-        elementId = "ail2";
+        elementId = "aileron-single";
         break;
     case SetupWizard::FIXED_WING_ELEVON:
         elementId = "elevon";

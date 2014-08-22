@@ -255,7 +255,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 
     qint16 escFrequence = LEGACY_ESC_FREQUENCE;
     switch (m_configSource->getEscType()) {
-    case VehicleConfigurationSource::ESC_LEGACY:
+    case VehicleConfigurationSource::ESC_STANDARD:
         escFrequence = LEGACY_ESC_FREQUENCE;
         break;
     case VehicleConfigurationSource::ESC_RAPID:
@@ -1553,6 +1553,7 @@ void VehicleConfigurationHelper::setupElevon()
     mixerChannelSettings channels[10];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
+    // Motor (Chan 3)
     channels[2].type      = MIXER_TYPE_MOTOR;
     channels[2].throttle1 = 100;
     channels[2].throttle2 = 0;
@@ -1560,6 +1561,7 @@ void VehicleConfigurationHelper::setupElevon()
     channels[2].pitch     = 0;
     channels[2].yaw = 0;
 
+    // Elevon Servo 1 (Chan 1)
     channels[0].type      = MIXER_TYPE_SERVO;
     channels[0].throttle1 = 0;
     channels[0].throttle2 = 0;
@@ -1567,6 +1569,7 @@ void VehicleConfigurationHelper::setupElevon()
     channels[0].pitch     = 100;
     channels[0].yaw = 0;
 
+    // Elevon Servo 1 (Chan 2)
     channels[1].type      = MIXER_TYPE_SERVO;
     channels[1].throttle1 = 0;
     channels[1].throttle2 = 0;

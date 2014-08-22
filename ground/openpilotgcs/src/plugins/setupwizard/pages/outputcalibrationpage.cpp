@@ -186,7 +186,7 @@ void OutputCalibrationPage::setupVehicle()
     case SetupWizard::FIXED_WING_AILERON:
         loadSVGFile(FIXEDWING_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 2 << 3 << 4 << 2 << 3 << 4 << 2 << 3 << 4 << 2 << 3 << 4;
-        m_vehicleElementIds << "ail2" << "ail2-frame" << "ail2-motor" << "ail2-ail-left" << "ail2-ail-right" << "ail2-rudder" << "ail2-elevator";
+        m_vehicleElementIds << "aileron-single" << "ail2-frame" << "ail2-motor" << "ail2-ail-left" << "ail2-ail-right" << "ail2-rudder" << "ail2-elevator";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 2 << 2 << 3 << 3 << 3 << 4 << 4 << 4 << 5 << 5 << 5;
         m_channelIndex << 0 << 2 << 0 << 0 << 0 << 1 << 1 << 1 << 3 << 3 << 3 << 4 << 4 << 4;
 

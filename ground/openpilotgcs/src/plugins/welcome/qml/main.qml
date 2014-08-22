@@ -22,19 +22,6 @@ Rectangle {
         width: scale*sourceSize.width
         height: scale*sourceSize.height
         smooth: true
-
-        Text {
-            id: textOpVersion
-            x: 258
-            y: 668
-            color: "#c4c0c0"
-            text: welcomePlugin.versionString
-            font.bold: true
-            styleColor: "#00000000"
-            anchors.horizontalCenter: parent.horizontalCenter
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 14
-        }
     }
 
 
@@ -121,6 +108,19 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             width: Math.min(sourceSize.width, container.width)
             height: Math.min(450, container.height*0.5)
+        }
+
+        Text {
+            id: textOpVersion
+            x: 328
+            y: 417
+            color: "#c4c0c0"
+            text: welcomePlugin.versionString
+            font.bold: true
+            styleColor: "#00000000"
+            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 14
         }
     }
 }

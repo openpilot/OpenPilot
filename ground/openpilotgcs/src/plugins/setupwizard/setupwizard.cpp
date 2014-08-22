@@ -312,19 +312,15 @@ QString SetupWizard::getSummaryText()
 
     summary.append("<br>");
     summary.append("<b>").append(tr("Speed Controller (ESC) type: ")).append("</b>");
-    if (getVehicleType() == VEHICLE_FIXEDWING) {
-        summary.append(tr("Standard ESC (50 Hz)"));
-    } else {
-        switch (getEscType()) {
-        case ESC_STANDARD:
-            summary.append(tr("Legacy ESC (50 Hz)"));
-            break;
-        case ESC_RAPID:
-            summary.append(tr("Rapid ESC (400 Hz)"));
-            break;
-        default:
-            summary.append(tr("Unknown"));
-           }
+    switch (getEscType()) {
+    case ESC_STANDARD:
+        summary.append(tr("Legacy ESC (50 Hz)"));
+        break;
+    case ESC_RAPID:
+        summary.append(tr("Rapid ESC (400 Hz)"));
+        break;
+    default:
+        summary.append(tr("Unknown"));
     }
 
     if (getVehicleSubType() == MULTI_ROTOR_TRI_Y || getVehicleType() == VEHICLE_FIXEDWING) {

@@ -46,6 +46,7 @@ bool VehiclePage::validatePage()
         getWizard()->setVehicleType(SetupWizard::VEHICLE_MULTI);
     } else if (ui->fixedwingButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_FIXEDWING);
+        getWizard()->setEscType(SetupWizard::ESC_STANDARD);
     } else if (ui->heliButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_HELI);
     } else if (ui->surfaceButton->isChecked()) {

@@ -314,7 +314,7 @@ QString SetupWizard::getSummaryText()
     summary.append("<b>").append(tr("Speed Controller (ESC) type: ")).append("</b>");
     switch (getEscType()) {
     case ESC_STANDARD:
-        summary.append(tr("Legacy ESC (50 Hz)"));
+        summary.append(tr("Standard ESC (50 Hz)"));
         break;
     case ESC_RAPID:
         summary.append(tr("Rapid ESC (400 Hz)"));

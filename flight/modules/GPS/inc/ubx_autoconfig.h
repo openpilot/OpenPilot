@@ -27,9 +27,10 @@
 
 #ifndef UBX_AUTOCONFIG_H_
 #define UBX_AUTOCONFIG_H_
+#include "UBX.h"
 #include <stdint.h>
 #include <stdbool.h>
-#include "UBX.h"
+
 // defines
 // TODO: NEO8 max rate is for Rom version, flash is limited to 10Hz, need to handle that.
 #define UBX_MAX_RATE_VER8 18
@@ -37,7 +38,7 @@
 #define UBX_MAX_RATE      5
 
 #define UBX_REPLY_TIMEOUT (500 * 1000)
-#define UBX_MAX_RETRIES 5
+#define UBX_MAX_RETRIES   5
 
 // types
 typedef enum {

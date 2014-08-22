@@ -48,8 +48,9 @@
 #include "GPS.h"
 #include "NMEA.h"
 #include "UBX.h"
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
 #include "inc/ubx_autoconfig.h"
-
+#endif
 
 // ****************
 // Private functions
@@ -64,7 +65,9 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 
 #ifdef PIOS_INCLUDE_GPS_UBX_PARSER
 void AuxMagSettingsUpdatedCb(UAVObjEvent *ev);
+#ifndef PIOS_GPS_MINIMAL
 void updateGpsSettings(UAVObjEvent *ev);
+#endif
 #endif
 
 // ****************
@@ -199,7 +202,9 @@ int32_t GPSInitialize(void)
             gps_rx_buffer = NULL;
         }
         PIOS_Assert(gps_rx_buffer);
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
         GPSSettingsConnectCallback(updateGpsSettings);
+#endif
         return 0;
     }
 
@@ -230,13 +235,13 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     timeOfLastCommandMs = timeNowMs;
 
     GPSPositionSensorGet(&gpspositionsensor);
-#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
     updateGpsSettings(0);
 #endif
     // Loop forever
     while (1) {
         uint8_t c;
-#if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
         if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
             char *buffer   = 0;
             uint16_t count = 0;
@@ -257,16 +262,19 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                 break;
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-            case GPSSETTINGS_DATAPROTOCOL_UBX:{
-                    int32_t ac_status = ubx_autoconfig_get_status();
-                    gpspositionsensor.AutoConfigStatus =
-                            ac_status == UBX_AUTOCONFIG_STATUS_DISABLED ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED :
-                            ac_status == UBX_AUTOCONFIG_STATUS_DONE ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE :
-                            ac_status == UBX_AUTOCONFIG_STATUS_ERROR? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR :
-                            GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING;
-                    res = parse_ubx_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
-                }
-                break;
+            case GPSSETTINGS_DATAPROTOCOL_UBX:
+            {
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+                int32_t ac_status = ubx_autoconfig_get_status();
+                gpspositionsensor.AutoConfigStatus =
+                    ac_status == UBX_AUTOCONFIG_STATUS_DISABLED ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED :
+                    ac_status == UBX_AUTOCONFIG_STATUS_DONE ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE :
+                    ac_status == UBX_AUTOCONFIG_STATUS_ERROR ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR :
+                    GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING;
+#endif
+                res = parse_ubx_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
+            }
+            break;
 #endif
             default:
                 res = NO_PARSER; // this should not happen
@@ -423,7 +431,7 @@ void AuxMagSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     load_mag_settings();
 }
-
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
 void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
 {
     uint8_t ubxAutoConfig;
@@ -447,7 +455,7 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
                              UBX_DYNMODEL_AIRBORNE1G;
     ubx_autoconfig_set(newconfig);
 }
-
+#endif /* if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL) */
 #endif /* ifdef PIOS_INCLUDE_GPS_UBX_PARSER */
 /**
  * @}

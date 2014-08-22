@@ -36,19 +36,43 @@ typedef enum {
     INIT_STEP_ASK_VER,
     INIT_STEP_WAIT_VER,
     INIT_STEP_CONFIGURE,
+    INIT_STEP_CONFIGURE_WAIT_ACK,
     INIT_STEP_ENABLE_SENTENCES,
+    INIT_STEP_ENABLE_SENTENCES_WAIT_ACK,
     INIT_STEP_DONE,
+    INIT_STEP_ERROR,
 } initSteps_t;
 
 typedef struct {
-    initSteps_t     currentConfigurationStep; // Current configuration "fsm" status
-    uint32_t        lastStepTimestampRaw; // timestamp of last operation
-    UBXSentPacket_t working_packet; // outbound "buffer"
+    initSteps_t        currentStep; // Current configuration "fsm" status
+    uint32_t           lastStepTimestampRaw; // timestamp of last operation
+    UBXSentPacket_t    working_packet; // outbound "buffer"
     ubx_autoconfig_settings_t currentSettings;
     int8_t lastConfigSent; // index of last configuration string sent
+    struct UBX_ACK_ACK requiredAck; // Class and id of the message we are waiting for an ACK from GPS
+    uint8_t retryCount;
 } ubx_autoconfig_status_t;
 
+ubx_cfg_msg_t msg_config_ubx6[] = {
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_POSLLH,  .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_DOP,     .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SOL,     .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_STATUS,  .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_VELNED,  .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_TIMEUTC, .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SVINFO,  .rate = 10 },
+};
 
+ubx_cfg_msg_t msg_config_ubx7[] = {
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_PVT,     .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_POSLLH,  .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_DOP,     .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SOL,     .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_STATUS,  .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_VELNED,  .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_TIMEUTC, .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SVINFO,  .rate = 10 },
+};
 // private defines
 #define LAST_CONFIG_SENT_START     (-1)
 #define LAST_CONFIG_SENT_COMPLETED (-2)
@@ -113,6 +137,8 @@ void config_rate(uint16_t *bytes_to_send)
     status->working_packet.message.payload.cfg_rate.navRate  = 1; // must be set to 1
     status->working_packet.message.payload.cfg_rate.timeRef  = 1; // 0 = UTC Time, 1 = GPS Time
     *bytes_to_send = prepare_packet(&status->working_packet, UBX_CLASS_CFG, UBX_ID_CFG_RATE, sizeof(ubx_cfg_rate_t));
+    status->requiredAck.clsID = UBX_CLASS_CFG;
+    status->requiredAck.msgID = UBX_ID_CFG_RATE;
 }
 
 void config_nav(uint16_t *bytes_to_send)
@@ -125,6 +151,8 @@ void config_nav(uint16_t *bytes_to_send)
 
     status->working_packet.message.payload.cfg_nav5.mask     = 0x01 + 0x04; // Dyn Model | posFixMode configuration
     *bytes_to_send = prepare_packet(&status->working_packet, UBX_CLASS_CFG, UBX_ID_CFG_NAV5, sizeof(ubx_cfg_nav5_t));
+    status->requiredAck.clsID = UBX_CLASS_CFG;
+    status->requiredAck.msgID = UBX_ID_CFG_NAV5;
 }
 
 static void configure(uint16_t *bytes_to_send)
@@ -142,10 +170,26 @@ static void configure(uint16_t *bytes_to_send)
         status->lastConfigSent = LAST_CONFIG_SENT_COMPLETED;
         return;
     }
-    status->lastConfigSent++;
 }
 
-static void enable_sentences(__attribute__((unused)) uint16_t *bytes_to_send) {}
+static void enable_sentences(__attribute__((unused)) uint16_t *bytes_to_send)
+{
+    int8_t msg = status->lastConfigSent + 1;
+    uint8_t msg_count = (ubxHwVersion >= UBX_HW_VERSION_7) ?
+                        NELEMENTS(msg_config_ubx7) : NELEMENTS(msg_config_ubx6);
+    ubx_cfg_msg_t *msg_config = (ubxHwVersion >= UBX_HW_VERSION_7) ?
+                                &msg_config_ubx7[0] : &msg_config_ubx6[0];
+
+    if (msg >= 0 && msg < msg_count) {
+        status->working_packet.message.payload.cfg_msg = msg_config[msg];
+
+        *bytes_to_send = prepare_packet(&status->working_packet, UBX_CLASS_CFG, UBX_ID_CFG_MSG, sizeof(ubx_cfg_msg_t));
+        status->requiredAck.clsID = UBX_CLASS_CFG;
+        status->requiredAck.msgID = UBX_ID_CFG_MSG;
+    } else {
+        status->lastConfigSent = LAST_CONFIG_SENT_COMPLETED;
+    }
+}
 void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
 {
     *bytes_to_send = 0;
@@ -153,46 +197,79 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
     if (!status || !enabled) {
         return; // autoconfig not enabled
     }
-    switch (status->currentConfigurationStep) {
+    switch (status->currentStep) {
+    case INIT_STEP_ERROR: // TODO: what to do? retries after a while? maybe gps was disconnected (this can be detected)?
     case INIT_STEP_DISABLED:
     case INIT_STEP_DONE:
         return;
 
     case INIT_STEP_START:
     case INIT_STEP_ASK_VER:
-        status->lastStepTimestampRaw     = PIOS_DELAY_GetRaw();
+        status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
         build_request(&status->working_packet, UBX_CLASS_MON, UBX_ID_MON_VER, bytes_to_send);
-        status->currentConfigurationStep = INIT_STEP_WAIT_VER;
+        status->currentStep = INIT_STEP_WAIT_VER;
         break;
-    case INIT_STEP_WAIT_VER:
 
+    case INIT_STEP_WAIT_VER:
         if (ubxHwVersion > 0) {
             status->lastConfigSent = LAST_CONFIG_SENT_START;
-            status->currentConfigurationStep = INIT_STEP_CONFIGURE;
-            status->lastStepTimestampRaw     = PIOS_DELAY_GetRaw();
+            status->currentStep    = INIT_STEP_CONFIGURE;
+            status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
             return;
         }
 
         if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) > UBX_REPLY_TIMEOUT) {
-            status->currentConfigurationStep = INIT_STEP_ASK_VER;
-        }
-        return;
-
-    case INIT_STEP_CONFIGURE:
-        configure(bytes_to_send);
-        if (status->lastConfigSent == LAST_CONFIG_SENT_COMPLETED) {
-            status->currentConfigurationStep = INIT_STEP_ENABLE_SENTENCES;
-            status->lastStepTimestampRaw     = PIOS_DELAY_GetRaw();
+            status->currentStep = INIT_STEP_ASK_VER;
         }
         return;
 
     case INIT_STEP_ENABLE_SENTENCES:
-        enable_sentences(bytes_to_send);
+    case INIT_STEP_CONFIGURE:
+    {
+        bool step_configure = (status->currentStep == INIT_STEP_CONFIGURE);
+        if (step_configure) {
+            configure(bytes_to_send);
+        } else {
+            enable_sentences(bytes_to_send);
+        }
+
+        status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
         if (status->lastConfigSent == LAST_CONFIG_SENT_COMPLETED) {
-            status->currentConfigurationStep = INIT_STEP_DONE;
-            status->lastStepTimestampRaw     = PIOS_DELAY_GetRaw();
+            status->lastConfigSent = LAST_CONFIG_SENT_START;
+            status->currentStep    = step_configure ? INIT_STEP_ENABLE_SENTENCES : INIT_STEP_DONE;
+        } else {
+            status->currentStep = step_configure ? INIT_STEP_CONFIGURE_WAIT_ACK : INIT_STEP_ENABLE_SENTENCES_WAIT_ACK;
         }
         return;
+    }
+    case INIT_STEP_ENABLE_SENTENCES_WAIT_ACK:
+    case INIT_STEP_CONFIGURE_WAIT_ACK: // Wait for an ack from GPS
+    {
+        bool step_configure = (status->currentStep == INIT_STEP_CONFIGURE_WAIT_ACK);
+        if (ubxLastAck.clsID == status->requiredAck.clsID && ubxLastAck.msgID == status->requiredAck.msgID) {
+            // clear ack
+            ubxLastAck.clsID   = 0x00;
+            ubxLastAck.msgID   = 0x00;
+
+            // Continue with next configuration option
+            status->retryCount = 0;
+            status->lastConfigSent++;
+        } else if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) > UBX_REPLY_TIMEOUT) {
+            // timeout, resend the message or abort
+            status->retryCount++;
+            if (status->retryCount > UBX_MAX_RETRIES) {
+                status->currentStep = INIT_STEP_ERROR;
+                return;
+            }
+        }
+        // no abort condition, continue or retries.,
+        if (step_configure) {
+            status->currentStep = INIT_STEP_CONFIGURE;
+        } else {
+            status->currentStep = INIT_STEP_ENABLE_SENTENCES;
+        }
+        return;
+    }
     }
 }
 
@@ -203,10 +280,10 @@ void ubx_autoconfig_set(ubx_autoconfig_settings_t config)
         if (!status) {
             status = (ubx_autoconfig_status_t *)pios_malloc(sizeof(ubx_autoconfig_status_t));
             memset(status, 0, sizeof(ubx_autoconfig_status_t));
-            status->currentConfigurationStep = INIT_STEP_DISABLED;
+            status->currentStep = INIT_STEP_DISABLED;
         }
         status->currentSettings = config;
-        status->currentConfigurationStep = INIT_STEP_START;
+        status->currentStep     = INIT_STEP_START;
         enabled = true;
     }
 }

@@ -36,10 +36,10 @@
 #define UBX_MAX_RATE_VER7 10
 #define UBX_MAX_RATE      5
 
-// types
+#define UBX_REPLY_TIMEOUT (500 * 1000)
+#define UBX_MAX_RETRIES 5
 
 // Enumeration options for field UBXDynamicModel
-
 typedef enum {
     UBX_DYNMODEL_PORTABLE   = 0,
     UBX_DYNMODEL_STATIONARY = 2,

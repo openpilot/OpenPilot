@@ -118,6 +118,7 @@ Item {
             anchors.centerIn: parent
             font.pixelSize: Math.floor(parent.height*1.3)
             font.family: "Arial"
+            font.weight: Font.DemiBold
             color: "white"
         }
     }
@@ -142,6 +143,7 @@ Item {
             font {
                 family: "Arial"
                 pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
             }
         }
     }
@@ -162,6 +164,7 @@ Item {
             font {
                 family: "Arial"
                 pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
             }
         }
     }
@@ -184,6 +187,7 @@ Item {
             font {
                 family: "Arial"
                 pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
             }
         }
 
@@ -209,6 +213,7 @@ Item {
             font {
                 family: "Arial"
                 pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
             }
         }
     }
@@ -229,6 +234,7 @@ Item {
             font {
                 family: "Arial"
                 pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
             }
         }
     }
@@ -250,6 +256,7 @@ Item {
             font {
                 family: "Arial"
                 pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
             }
         }
     }

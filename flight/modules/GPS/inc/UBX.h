@@ -352,66 +352,14 @@ struct UBXPacket {
     UBXPayload payload;
 };
 
-// Sent messages for configuration support
-
-typedef struct {
-    uint16_t mask;
-    uint8_t  dynModel;
-    uint8_t  fixMode;
-    int32_t  fixedAlt;
-    uint32_t fixedAltVar;
-    int8_t   minElev;
-    uint8_t  drLimit;
-    uint16_t pDop;
-    uint16_t tDop;
-    uint16_t pAcc;
-    uint16_t tAcc;
-    uint8_t  staticHoldThresh;
-    uint8_t  dgpsTimeOut;
-    uint8_t  cnoThreshNumSVs;
-    uint8_t  cnoThresh;
-    uint16_t reserved2;
-    uint32_t reserved3;
-    uint32_t reserved4;
-} ubx_cfg_nav5_t;
-
-typedef struct {
-    uint16_t measRate;
-    uint16_t navRate;
-    uint16_t timeRef;
-} ubx_cfg_rate_t;
-
-typedef struct {
-    uint8_t msgClass;
-    uint8_t msgID;
-    uint8_t rate;
-} ubx_cfg_msg_t;
-
-typedef struct {
-    uint8_t  prolog[2];
-    uint8_t  class;
-    uint8_t  id;
-    uint16_t len;
-} UBXSentHeader_t;
-
-typedef union {
-    uint8_t buffer[0];
-    struct {
-        UBXSentHeader_t header;
-        union {
-            ubx_cfg_nav5_t cfg_nav5;
-            ubx_cfg_rate_t cfg_rate;
-            ubx_cfg_msg_t  cfg_msg;
-        } payload;
-        uint8_t resvd[2]; // added space for checksum bytes
-    } message;
-} UBXSentPacket_t;
-
+// Used by AutoConfig code
+extern int32_t ubxHwVersion;
+extern struct UBX_ACK_ACK ubxLastAck;
+extern struct UBX_ACK_NAK ubxLastNak;
 
 bool checksum_ubx_message(struct UBXPacket *);
 uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionSensorData *);
 
-void ubx_run_management_tasks(char * *buffer, uint16_t *count);
 int parse_ubx_stream(uint8_t, char *, GPSPositionSensorData *, struct GPS_RX_STATS *);
 void load_mag_settings();
 

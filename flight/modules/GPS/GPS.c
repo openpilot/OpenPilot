@@ -48,6 +48,7 @@
 #include "GPS.h"
 #include "NMEA.h"
 #include "UBX.h"
+#include "inc/ubx_autoconfig.h"
 
 
 // ****************
@@ -233,7 +234,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
         if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
             char *buffer   = 0;
             uint16_t count = 0;
-            ubx_run_management_tasks(&buffer, &count);
+            ubx_autoconfig_run(&buffer, &count);
             // Something to send?
             if (count) {
                 PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);

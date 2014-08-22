@@ -427,7 +427,12 @@ Item {
         sceneSize: info.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        MouseArea { id: hidedisp_rcinput; anchors.fill: parent; cursorShape: Qt.WhatsThisCursor; onClicked: hide_display_rcinput()}
+        MouseArea { 
+             id: hidedisp_rcinput; 
+             anchors.fill: parent; 
+             cursorShape: hide_display_bat == false  ? Qt.WhatsThisCursor : Qt.ArrowCursor  
+             onClicked: hide_display_bat == false ? hide_display_rcinput() : 0
+        }
 
         states: State  {
              name: "fading"
@@ -724,7 +729,12 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: 16
 
-        MouseArea { id: hidedisp_battery; anchors.fill: parent; cursorShape: Qt.WhatsThisCursor; onClicked: hide_display_battery()}
+        MouseArea { 
+             id: hidedisp_battery; 
+             anchors.fill: parent; 
+             cursorShape: hide_display_rc == false  ? Qt.WhatsThisCursor : Qt.ArrowCursor
+             onClicked: hide_display_rc == false ? hide_display_battery() : 0
+        }
 
         states: State  {
              name: "fading"

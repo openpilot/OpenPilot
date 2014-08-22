@@ -260,15 +260,15 @@ QString SetupWizard::getSummaryText()
         summary.append("<br>");
         summary.append("<b>").append(tr("Vehicle sub type: ")).append("</b>");
         switch (getVehicleSubType()) {
+        case SetupWizard::FIXED_WING_DUAL_AILERON:
+            summary.append(tr("Dual Aileron"));
+            break;
         case SetupWizard::FIXED_WING_AILERON:
             summary.append(tr("Aileron"));
             break;
         case SetupWizard::FIXED_WING_ELEVON:
             summary.append(tr("Elevon"));
             break;
-//        case SetupWizard::FIXED_WING_VTAIL:
-//            summary.append(tr("Vtail"));
-//            break;
         default:
             summary.append(tr("Unknown"));
             break;

@@ -108,6 +108,7 @@ private:
     void setupOctoCopter();
     void setupVtail();
     void setupElevon();
+    void setupDualAileron();
     void setupAileron();
 
 private slots:

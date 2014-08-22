@@ -122,14 +122,14 @@ void ConnectionDiagram::setupGraphicsScene()
             break;
         case VehicleConfigurationSource::VEHICLE_FIXEDWING:
             switch (m_configSource->getVehicleSubType()) {
-            case VehicleConfigurationSource::FIXED_WING_AILERON:
+            case VehicleConfigurationSource::FIXED_WING_DUAL_AILERON:
                 elementsToShow << "aileron";
+                break;
+            case VehicleConfigurationSource::FIXED_WING_AILERON:
+                elementsToShow << "ail2";
                 break;
             case VehicleConfigurationSource::FIXED_WING_ELEVON:
                 elementsToShow << "elevon";
-                break;
-            case VehicleConfigurationSource::FIXED_WING_VTAIL:
-                elementsToShow << "vtail";
                 break;
             default:
                 break;

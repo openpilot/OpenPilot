@@ -43,9 +43,25 @@ Item {
 
     property bool hide_display_rc: false
     property bool hide_display_bat: false
+    property bool hide_display_sys: false
 
                              // Uninitialised, Ok,   Warning, Critical, Error                      
     property variant batColors : ["#2c2929", "green", "orange", "red", "red"]
+
+    property real smeter_angle
+
+    // Needed to get correctly int8 value
+    property int oplm0_dbm: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_0 : -127
+    //property int oplm1_dbm: OPLinkStatus.PairSignalStrengths_1
+    //property int oplm2_dbm: OPLinkStatus.PairSignalStrengths_2
+    //property int oplm3_dbm: OPLinkStatus.PairSignalStrengths_3
+ 
+    // Filtering for S-meter : -13dBm = S9+60dB
+    Timer {
+         interval: 100; running: true; repeat: true
+         onTriggered: smeter_angle = (0.90 * smeter_angle) + (0.1 * (oplm0_dbm + 13))
+     }
+
 
     function reset_distance(){
         total_distance = 0;
@@ -72,19 +88,29 @@ Item {
     }
 
     function hide_display_rcinput(){
-        if (hide_display_rc == false && hide_display_bat == false)
+        if (hide_display_rc == false && hide_display_bat == false && hide_display_sys == false)
             hide_display_rc = true;
         else
             hide_display_rc = false;
             battery_bg.z = -1
+            system_bg.z = -1
     }
 
     function hide_display_battery(){
-        if (hide_display_bat == false && hide_display_rc == false)
+        if (hide_display_bat == false && hide_display_rc == false && hide_display_sys == false)
             hide_display_bat = true;
         else
             hide_display_bat = false;
             battery_bg.z = 10
+            system_bg.z = -1
+    }
+
+    function hide_display_system(){
+        if (hide_display_sys == false && hide_display_rc == false && hide_display_bat == false)
+            hide_display_sys = true;
+        else
+            hide_display_sys = false;
+            system_bg.z = 20
     }
     
     SvgElementImage {
@@ -430,8 +456,8 @@ Item {
         MouseArea { 
              id: hidedisp_rcinput; 
              anchors.fill: parent; 
-             cursorShape: hide_display_bat == false  ? Qt.WhatsThisCursor : Qt.ArrowCursor  
-             onClicked: hide_display_bat == false ? hide_display_rcinput() : 0
+             cursorShape: hide_display_bat == false && hide_display_sys == false ? Qt.WhatsThisCursor : Qt.ArrowCursor  
+             onClicked: hide_display_bat == false && hide_display_sys == false ? hide_display_rcinput() : 0
         }
 
         states: State  {
@@ -517,7 +543,6 @@ Item {
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: 10
 
-        //visible: !hide_display_rc
         states: State  {
              name: "fading"
              when: hide_display_bat !== true
@@ -732,14 +757,150 @@ Item {
         MouseArea { 
              id: hidedisp_battery; 
              anchors.fill: parent; 
-             cursorShape: hide_display_rc == false  ? Qt.WhatsThisCursor : Qt.ArrowCursor
-             onClicked: hide_display_rc == false ? hide_display_battery() : 0
+             cursorShape: hide_display_rc == false && hide_display_sys == false ? Qt.WhatsThisCursor : Qt.ArrowCursor
+             onClicked: hide_display_rc == false && hide_display_sys == false ? hide_display_battery() : 0
         }
 
         states: State  {
              name: "fading"
              when: hide_display_bat !== true
              PropertyChanges  { target: battery_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) - (battery_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+    }
+
+    //
+    // System panel
+    //
+
+    SvgElementImage {
+        id: system_bg
+        elementName: "system-bg"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: 20
+
+        states: State  {
+             name: "fading"
+             when: hide_display_sys !== true
+             PropertyChanges  { target: system_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+    }
+
+    SvgElementImage {
+        id: smeter_bg
+        elementName: "smeter-bg"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: 21
+
+        states: State  {
+             name: "fading"
+             when: hide_display_sys !== true
+             PropertyChanges  { target: smeter_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+    }
+
+    SvgElementImage {
+        id: smeter_scale
+        elementName: "smeter-scale"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: 22
+
+        states: State  {
+             name: "fading"
+             when: hide_display_sys !== true
+             PropertyChanges  { target: smeter_scale; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+    }
+
+    SvgElementImage {
+        id: smeter_needle
+        elementName: "smeter-needle"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: 23
+
+        states: State  {
+             name: "fading"
+             when: hide_display_sys !== true
+             PropertyChanges  { target: smeter_needle; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        }
+
+        transform: Rotation {
+            angle: smeter_angle.toFixed(1)
+             origin.y : smeter_needle.height 
+        } 
+    }
+
+    SvgElementImage {
+        id: smeter_mask
+        elementName: "smeter-mask"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: 24
+
+        states: State  {
+             name: "fading"
+             when: hide_display_sys !== true
+             PropertyChanges  { target: smeter_mask; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        }
+    }
+
+    SvgElementImage {
+        id: system_mousearea
+        elementName: "system-panel-mousearea"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: 26
+
+        MouseArea { 
+             id: hidedisp_system; 
+             anchors.fill: parent; 
+             cursorShape: hide_display_rc == false && hide_display_bat == false ? Qt.WhatsThisCursor : Qt.ArrowCursor
+             onClicked: hide_display_rc == false && hide_display_bat == false ? hide_display_system() : 0
+        }
+
+        states: State  {
+             name: "fading"
+             when: hide_display_sys !== true
+             PropertyChanges  { target: system_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
         }
  
         transitions: Transition  {

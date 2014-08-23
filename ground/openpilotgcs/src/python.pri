@@ -15,7 +15,12 @@ OPENPILOT_TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
         PYTHON = \"$$ROOT_DIR/tools/$$PYTHON_DIR/python\"
     } else {
         # not found, hope it's in the path...
-        PYTHON = \"$$(PYTHON)\"
+        PYTHON_VER = $$system(python --version 2>&1)
+        contains(PYTHON_VER, "Python 2") {
+            PYTHON = \"python\"
+        } else {
+            PYTHON = \"python2\"
+        }
     }
 }
 

@@ -43,7 +43,7 @@ Item {
 
     property bool hide_display_rc: false
     property bool hide_display_bat: false
-    property bool hide_display_sys: false
+    property bool hide_display_oplm: false
 
                              // Uninitialised, Ok,   Warning, Critical, Error                      
     property variant batColors : ["#2c2929", "green", "orange", "red", "red"]
@@ -51,17 +51,68 @@ Item {
     property real smeter_angle
 
     // Needed to get correctly int8 value
-    property int oplm0_dbm: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_0 : -127
-    //property int oplm1_dbm: OPLinkStatus.PairSignalStrengths_1
-    //property int oplm2_dbm: OPLinkStatus.PairSignalStrengths_2
-    //property int oplm3_dbm: OPLinkStatus.PairSignalStrengths_3
+    property int oplm0_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_0 : -127
+    property int oplm1_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_1 : -127
+    property int oplm2_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_2 : -127
+    property int oplm3_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_3 : -127
  
     // Filtering for S-meter : -13dBm = S9+60dB
     Timer {
+         id: smeter_filter0
          interval: 100; running: true; repeat: true
-         onTriggered: smeter_angle = (0.90 * smeter_angle) + (0.1 * (oplm0_dbm + 13))
+         onTriggered: smeter_angle = (0.90 * smeter_angle) + (0.1 * (oplm0_db + 13))
+    }
+
+    Timer {
+         id: smeter_filter1
+         interval: 100; repeat: true
+         onTriggered: smeter_angle = (0.90 * smeter_angle) + (0.1 * (oplm1_db + 13))
+    }
+
+    Timer {
+         id: smeter_filter2
+         interval: 100; repeat: true
+         onTriggered: smeter_angle = (0.90 * smeter_angle) + (0.1 * (oplm2_db + 13))
      }
 
+    Timer {
+         id: smeter_filter3
+         interval: 100; repeat: true
+         onTriggered: smeter_angle = (0.90 * smeter_angle) + (0.1 * (oplm3_db + 13))
+    }
+
+    property int smeter_filter
+    property variant oplm_pair_id : OPLinkStatus.PairIDs_0
+
+    function select_oplm(index){
+         smeter_filter0.running = false;
+         smeter_filter1.running = false;
+         smeter_filter2.running = false;
+         smeter_filter3.running = false;
+
+         switch(index) {
+            case 0:
+                smeter_filter0.running = true;
+                smeter_filter = 0;
+                oplm_pair_id = OPLinkStatus.PairIDs_0
+                break;
+            case 1:
+                smeter_filter1.running = true;
+                smeter_filter = 1;
+                oplm_pair_id = OPLinkStatus.PairIDs_1
+                break;
+            case 2:
+                smeter_filter2.running = true;
+                smeter_filter = 2;
+                oplm_pair_id = OPLinkStatus.PairIDs_2
+                break;
+            case 3:
+                smeter_filter3.running = true;
+                smeter_filter = 3;
+                oplm_pair_id = OPLinkStatus.PairIDs_3
+                break;
+         }
+     }
 
     function reset_distance(){
         total_distance = 0;
@@ -88,31 +139,31 @@ Item {
     }
 
     function hide_display_rcinput(){
-        if (hide_display_rc == false && hide_display_bat == false && hide_display_sys == false)
+        if (hide_display_rc == false && hide_display_bat == false && hide_display_oplm == false)
             hide_display_rc = true;
         else
             hide_display_rc = false;
             battery_bg.z = -1
-            system_bg.z = -1
+            oplm_bg.z = -1
     }
 
     function hide_display_battery(){
-        if (hide_display_bat == false && hide_display_rc == false && hide_display_sys == false)
+        if (hide_display_bat == false && hide_display_rc == false && hide_display_oplm == false)
             hide_display_bat = true;
         else
             hide_display_bat = false;
             battery_bg.z = 10
-            system_bg.z = -1
+            oplm_bg.z = -1
     }
 
-    function hide_display_system(){
-        if (hide_display_sys == false && hide_display_rc == false && hide_display_bat == false)
-            hide_display_sys = true;
+    function hide_display_oplink(){
+        if (hide_display_oplm == false && hide_display_rc == false && hide_display_bat == false)
+            hide_display_oplm = true;
         else
-            hide_display_sys = false;
-            system_bg.z = 20
+            hide_display_oplm = false;
+            oplm_bg.z = 20
     }
-    
+
     SvgElementImage {
         id: info_bg
         sceneSize: info.sceneSize
@@ -456,8 +507,8 @@ Item {
         MouseArea { 
              id: hidedisp_rcinput; 
              anchors.fill: parent; 
-             cursorShape: hide_display_bat == false && hide_display_sys == false ? Qt.WhatsThisCursor : Qt.ArrowCursor  
-             onClicked: hide_display_bat == false && hide_display_sys == false ? hide_display_rcinput() : 0
+             cursorShape: hide_display_bat == false && hide_display_oplm == false ? Qt.WhatsThisCursor : Qt.ArrowCursor  
+             onClicked: hide_display_bat == false && hide_display_oplm == false ? hide_display_rcinput() : 0
         }
 
         states: State  {
@@ -757,8 +808,8 @@ Item {
         MouseArea { 
              id: hidedisp_battery; 
              anchors.fill: parent; 
-             cursorShape: hide_display_rc == false && hide_display_sys == false ? Qt.WhatsThisCursor : Qt.ArrowCursor
-             onClicked: hide_display_rc == false && hide_display_sys == false ? hide_display_battery() : 0
+             cursorShape: hide_display_rc == false && hide_display_oplm == false ? Qt.WhatsThisCursor : Qt.ArrowCursor
+             onClicked: hide_display_rc == false && hide_display_oplm == false ? hide_display_battery() : 0
         }
 
         states: State  {
@@ -775,20 +826,20 @@ Item {
     }
 
     //
-    // System panel
+    // OPLM panel
     //
 
     SvgElementImage {
-        id: system_bg
-        elementName: "system-bg"
+        id: oplm_bg
+        elementName: "oplm-bg"
         sceneSize: info.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: 20
 
         states: State  {
              name: "fading"
-             when: hide_display_sys !== true
-             PropertyChanges  { target: system_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: hide_display_oplm !== true
+             PropertyChanges  { target: oplm_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
         }
  
         transitions: Transition  {
@@ -807,8 +858,8 @@ Item {
 
         states: State  {
              name: "fading"
-             when: hide_display_sys !== true
-             PropertyChanges  { target: smeter_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: hide_display_oplm !== true
+             PropertyChanges  { target: smeter_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
         }
  
         transitions: Transition  {
@@ -827,8 +878,8 @@ Item {
 
         states: State  {
              name: "fading"
-             when: hide_display_sys !== true
-             PropertyChanges  { target: smeter_scale; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: hide_display_oplm !== true
+             PropertyChanges  { target: smeter_scale; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
         }
  
         transitions: Transition  {
@@ -847,8 +898,8 @@ Item {
 
         states: State  {
              name: "fading"
-             when: hide_display_sys !== true
-             PropertyChanges  { target: smeter_needle; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: hide_display_oplm !== true
+             PropertyChanges  { target: smeter_needle; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
         }
  
         transitions: Transition  {
@@ -872,8 +923,8 @@ Item {
 
         states: State  {
              name: "fading"
-             when: hide_display_sys !== true
-             PropertyChanges  { target: smeter_mask; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: hide_display_oplm !== true
+             PropertyChanges  { target: smeter_mask; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
         }
  
         transitions: Transition  {
@@ -884,23 +935,140 @@ Item {
     }
 
     SvgElementImage {
-        id: system_mousearea
-        elementName: "system-panel-mousearea"
+        id: oplm_button_bg
+        elementName: "oplm-button-bg"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: 25
+
+        states: State  {
+             name: "fading"
+             when: hide_display_oplm !== true
+             PropertyChanges  { target: oplm_button_bg; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        }
+    }
+
+    Repeater {
+        model: 4
+
+        SvgElementImage {
+            z: 25
+            property variant idButton_oplm: "oplm_button_" + index
+            property variant idButton_oplm_mousearea: "oplm_button_mousearea" + index
+            property variant button_color: "button"+index+"_color"
+
+            id: idButton_oplm
+            
+            elementName: "oplm-button-" + index
+            sceneSize: info.sceneSize
+
+            Rectangle {
+                anchors.fill: parent
+                border.color: "red"
+                border.width: parent.width * 0.04
+                radius: border.width*3
+                color: "transparent"
+                opacity: smeter_filter == index ? 0.5 : 0
+            }
+
+            MouseArea { 
+                 id: idButton_oplm_mousearea; 
+                 anchors.fill: parent; 
+                 cursorShape: Qt.PointingHandCursor
+                 onClicked: select_oplm(index)
+            }
+
+            states: State  {
+                 name: "fading"
+                 when: hide_display_oplm !== true
+                 PropertyChanges  { target: idButton_oplm; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+            }
+ 
+            transitions: Transition  {
+            SequentialAnimation  {
+                 PropertyAnimation  { property: "x"; duration: 800 }
+                 }
+            }
+        }
+    }
+
+    SvgElementImage {
+        id: oplm_id_label
+        elementName: "oplm-id-label"
+        sceneSize: info.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: 26
+        states: State  {
+             name: "fading"
+             when: hide_display_oplm !== true
+             PropertyChanges  { target: oplm_id_label; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+    }
+
+    SvgElementPositionItem {
+        id: oplm_id_text
+        sceneSize: info.sceneSize
+        elementName: "oplm-id-text"
+        z: 27
+
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+
+        states: State  {
+             name: "fading"
+             when: hide_display_oplm !== true
+             PropertyChanges  { target: oplm_id_text; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+
+        Text {
+             text: oplm_pair_id > 0 ? oplm_pair_id : "--  --  --  --"
+             anchors.centerIn: parent
+             color: "white"
+             font {
+                 family: "Arial"
+                 pixelSize: Math.floor(parent.height * 1.4)
+                 weight: Font.DemiBold
+             }
+        }
+    }
+
+    SvgElementImage {
+        id: oplm_mousearea
+        elementName: "oplm-panel-mousearea"
         sceneSize: info.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: 26
 
         MouseArea { 
-             id: hidedisp_system; 
+             id: hidedisp_oplm; 
              anchors.fill: parent; 
              cursorShape: hide_display_rc == false && hide_display_bat == false ? Qt.WhatsThisCursor : Qt.ArrowCursor
-             onClicked: hide_display_rc == false && hide_display_bat == false ? hide_display_system() : 0
+             onClicked: hide_display_rc == false && hide_display_bat == false ? hide_display_oplink() : 0
         }
 
         states: State  {
              name: "fading"
-             when: hide_display_sys !== true
-             PropertyChanges  { target: system_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             when: hide_display_oplm !== true
+             PropertyChanges  { target: oplm_mousearea; x: Math.floor(scaledBounds.x * sceneItem.width) - (oplm_bg.width * 0.85); }
         }
  
         transitions: Transition  {

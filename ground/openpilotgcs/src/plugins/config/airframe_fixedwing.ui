@@ -652,5 +652,38 @@ margin:1px;</string>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>elevonSlider1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>elevonSliderLabel1</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>124</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>124</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>elevonSlider2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>elevonSliderLabel2</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>362</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>124</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

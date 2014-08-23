@@ -1040,13 +1040,14 @@ Item {
         } 
 
         Text {
-             text: oplm_pair_id > 0 ? oplm_pair_id : "--  --  --  --"
+             text: oplm_pair_id > 0 ? oplm_pair_id.toString(16) : "--  --  --  --"
              anchors.centerIn: parent
              color: "white"
              font {
                  family: "Arial"
                  pixelSize: Math.floor(parent.height * 1.4)
                  weight: Font.DemiBold
+                 capitalization: Font.AllUppercase
              }
         }
     }

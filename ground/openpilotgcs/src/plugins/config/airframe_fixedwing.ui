@@ -14,19 +14,22 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_10">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QLabel" name="label_5">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+      <widget class="QLabel" name="label">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -34,17 +37,9 @@
         </font>
        </property>
        <property name="text">
-        <string>Airplane type:</string>
+        <string>Airframe Type:</string>
        </property>
       </widget>
-       <widget class="QGraphicsView" name="planeShape">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
      </item>
      <item>
       <widget class="QComboBox" name="fixedWingType"/>
@@ -63,6 +58,16 @@
       </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QGraphicsView" name="planeShape">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -475,9 +480,7 @@ margin:1px;</string>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../coreplugin/core.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>elevonSlider1</sender>

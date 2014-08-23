@@ -198,8 +198,7 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     UAVObjectField *field = system->getField(QString("AirframeType"));
     Q_ASSERT(field);
 
-    // At this stage, we will need to have some hardcoded settings in this code, this
-    // is not ideal, but there you go.
+    // At this stage, we will need to have some hardcoded settings in this code
     QString frameType = field->getValue().toString();
 
     int category = frameCategory(frameType);
@@ -262,8 +261,9 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 
 int ConfigVehicleTypeWidget::frameCategory(QString frameType)
 {
-    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
-        || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
+    if (frameType == "FixedWing" || frameType == "Aileron Dual Servo" || frameType == "Aileron Single Servo"
+        || frameType == "FixedWingElevon" || frameType == "Elevon" || frameType == "FixedWingVtail"
+        || frameType == "Vtail") {
         return ConfigVehicleTypeWidget::FIXED_WING;
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
                || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"

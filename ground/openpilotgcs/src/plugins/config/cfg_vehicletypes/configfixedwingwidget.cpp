@@ -53,11 +53,11 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
     populateChannelComboBoxes();
 
     QStringList fixedWingTypes;
-    fixedWingTypes << "Elevator aileron rudder" << "Elevon";
+    fixedWingTypes << "Aileron Dual Servo" << "Aileron Single Servo" << "Elevon";
     m_aircraft->fixedWingType->addItems(fixedWingTypes);
 
-    // Set default model to "Elevator aileron rudder"
-    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+    // Set default model to "Aileron Dual Servo"
+    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Aileron Dual Servo"));
 
     setupUI(m_aircraft->fixedWingType->currentText());
 
@@ -135,9 +135,9 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 
     qDebug() << "Current Aircraft type: \n" << m_aircraft->fixedWingType->currentText();
 
-    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
+    if (frameType == "FixedWing" || frameType == "Aileron Dual Servo") {
         plane->setElementId("aileron");
-        setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+        setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Aileron Dual Servo"));
         resetChannelboxesAndSliders();
 
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
@@ -151,7 +151,21 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->fwAileron2Label->setText("Aileron 2");
         m_aircraft->fwElevator1Label->setText("Elevator 1");
         m_aircraft->fwElevator2Label->setText("Elevator 2");
+    } else if (frameType == "Aileron Single Servo") {
+        plane->setElementId("aileron-single");
+        setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Aileron Single Servo"));
+        resetChannelboxesAndSliders();
+        m_aircraft->fwRudder1ChannelBox->setEnabled(true);
+        m_aircraft->fwRudder2ChannelBox->setEnabled(true);
+        m_aircraft->fwElevator1ChannelBox->setEnabled(true);
+        m_aircraft->fwElevator2ChannelBox->setEnabled(true);
+        m_aircraft->fwAileron1ChannelBox->setEnabled(true);
+        m_aircraft->fwAileron2ChannelBox->setEnabled(false);
 
+        m_aircraft->fwAileron1Label->setText("Aileron 1");
+        m_aircraft->fwAileron2Label->setText("Aileron 2");
+        m_aircraft->fwElevator1Label->setText("Elevator 1");
+        m_aircraft->fwElevator2Label->setText("Elevator 2");
     } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
 	// do nothing for now
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
@@ -202,7 +216,7 @@ void ConfigFixedWingWidget::setupEnabledControls(QString frameType)
         // enableComboBoxes(this, CHANNELBOXNAME, 3, true);
     } else if (frameType == "Elevon" || frameType == "Elevon") {
         enableComboBoxes(this, CHANNELBOXNAME, 3, true);
-    } else if (frameType == "aileron" || frameType == "Elevator aileron rudder") {
+    } else if (frameType == "aileron" || frameType == "Aileron Dual Servo" || frameType == "Aileron Single Servo") {
         enableComboBoxes(this, CHANNELBOXNAME, 4, true);
     } 
 }
@@ -300,7 +314,7 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
     QString airframeType;
     QList<QString> motor_servo_List;
 
-    if (m_aircraft->fixedWingType->currentText() == "Elevator aileron rudder") {
+    if (m_aircraft->fixedWingType->currentText() == "Aileron Dual Servo" || "aileron-single") {
         airframeType = "FixedWing";
         setupFrameFixedWing(airframeType);
 
@@ -312,7 +326,7 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
 
 	m_aircraft->fwStatusLabel->setText(tr("Configuration OK"));
 
-    } 
+    }
     else if (m_aircraft->fixedWingType->currentText() == "elevon") {
         airframeType = "FixedWingElevon";
         setupFrameElevon(airframeType);

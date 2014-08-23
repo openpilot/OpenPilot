@@ -151,6 +151,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->fwAileron2Label->setText("Aileron 2");
         m_aircraft->fwElevator1Label->setText("Elevator 1");
         m_aircraft->fwElevator2Label->setText("Elevator 2");
+
     } else if (frameType == "Aileron Single Servo") {
         plane->setElementId("aileron-single");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Aileron Single Servo"));
@@ -166,6 +167,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->fwAileron2Label->setText("Aileron 2");
         m_aircraft->fwElevator1Label->setText("Elevator 1");
         m_aircraft->fwElevator2Label->setText("Elevator 2");
+
     } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
 	// do nothing for now
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {

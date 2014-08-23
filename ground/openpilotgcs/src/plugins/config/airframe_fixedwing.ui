@@ -217,6 +217,9 @@ margin:1px;</string>
         </item>
         <item>
          <widget class="QSlider" name="elevonSlider1">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>40</width>
@@ -282,6 +285,9 @@ margin:1px;</string>
         </item>
         <item>
          <widget class="QSlider" name="elevonSlider2">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
             <width>40</width>
@@ -652,38 +658,5 @@ margin:1px;</string>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>elevonSlider1</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>elevonSliderLabel1</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>124</x>
-     <y>126</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>124</x>
-     <y>126</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>elevonSlider2</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>elevonSliderLabel2</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>362</x>
-     <y>299</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>124</x>
-     <y>126</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

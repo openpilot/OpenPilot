@@ -225,7 +225,7 @@ margin:1px;</string>
           </property>
           <property name="toolTip">
            <string>Weight of Roll mixing in percent.
-Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
+Typical values are 100% for + configuration and 50% for X configuration on quads</string>
           </property>
           <property name="maximum">
            <number>100</number>
@@ -436,7 +436,7 @@ Typical value is 50% for + or X configuration on quads.</string>
         </size>
        </property>
        <property name="toolTip">
-        <string>Select the Multirotor frame type here.</string>
+        <string>Select the Multirotor frame type</string>
        </property>
       </widget>
      </item>

@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item row="2" column="0">
-    <widget class="QGroupBox" name="groupBox_10">
+    <widget class="QGroupBox" name="airframeBox">
      <property name="minimumSize">
       <size>
        <width>10</width>
@@ -224,8 +224,7 @@ margin:1px;</string>
            </size>
           </property>
           <property name="toolTip">
-           <string>Weight of Roll mixing in percent.
-Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
+           <string>Weight of mixing in percent</string>
           </property>
           <property name="maximum">
            <number>100</number>
@@ -290,8 +289,7 @@ margin:1px;</string>
            </size>
           </property>
           <property name="toolTip">
-           <string>Weight of Pitch mixing in percent.
-Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
+           <string>Weight of mixing in percent</string>
           </property>
           <property name="maximum">
            <number>100</number>
@@ -331,7 +329,7 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
       <enum>QLayout::SetFixedSize</enum>
      </property>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="aiframeTypelabel">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -364,7 +362,7 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
         </size>
        </property>
        <property name="toolTip">
-        <string>Select the Multirotor frame type here.</string>
+        <string>Select Fixed-wing type</string>
        </property>
       </widget>
      </item>
@@ -489,7 +487,7 @@ margin:1px;</string>
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
+           <string>Assign your output channel</string>
           </property>
          </widget>
         </item>
@@ -513,7 +511,7 @@ margin:1px;</string>
            <bool>true</bool>
           </property>
           <property name="toolTip">
-           <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
+           <string>Assign your output channel</string>
           </property>
          </widget>
         </item>
@@ -537,7 +535,7 @@ margin:1px;</string>
            <bool>true</bool>
           </property>
           <property name="toolTip">
-           <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
+           <string>Assign your output channel</string>
           </property>
          </widget>
         </item>
@@ -571,7 +569,7 @@ margin:1px;</string>
         <item row="0" column="1">
          <widget class="QComboBox" name="fwEngineChannelBox">
           <property name="toolTip">
-           <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
+           <string>Assign your motor output channel</string>
           </property>
          </widget>
         </item>
@@ -592,7 +590,7 @@ margin:1px;</string>
         <item row="1" column="1">
          <widget class="QComboBox" name="fwAileron1ChannelBox">
           <property name="toolTip">
-           <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
+           <string>Assign your output channel</string>
           </property>
          </widget>
         </item>
@@ -613,7 +611,7 @@ margin:1px;</string>
         <item row="2" column="1">
          <widget class="QComboBox" name="fwAileron2ChannelBox">
           <property name="toolTip">
-           <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
+           <string>Assign your output channel</string>
           </property>
          </widget>
         </item>
@@ -634,7 +632,7 @@ margin:1px;</string>
         <item row="3" column="1">
          <widget class="QComboBox" name="fwElevator1ChannelBox">
           <property name="toolTip">
-           <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
+           <string>Assign your output channel</string>
           </property>
          </widget>
         </item>

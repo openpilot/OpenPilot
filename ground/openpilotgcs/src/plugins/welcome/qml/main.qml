@@ -30,10 +30,10 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         // distribute a vertical space between the icons blocks an community widget as:
         // top - 48% - Icons - 27% - CommunityWidget - 25% - bottom
-        y: (parent.height - buttons.height - communityPanel.height) * 0.48
+        y: (parent.height - buttons.height - communityPanel.height - versionInfo.height) * 0.48
         width: parent.width
         height: 600
-        spacing: (parent.height - buttons.height - communityPanel.height) * 0.1
+        spacing: (parent.height - buttons.height - communityPanel.height - versionInfo.height) * 0.1
 
         Row {
             //if the buttons grid overlaps vertically with the wizard buttons,
@@ -110,17 +110,34 @@ Rectangle {
             height: Math.min(450, container.height*0.5)
         }
 
-        Text {
-            id: textOpVersion
-            x: 328
-            y: 417
-            color: "#c4c0c0"
-            text: welcomePlugin.versionString
-            font.bold: true
-            styleColor: "#00000000"
+        Row {
+            id: versionInfo
+
+            height: 18
             anchors.horizontalCenter: parent.horizontalCenter
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 14
+            width: textOpVersion.width + textOpVersionAvailable.width
+            spacing: 16
+            Text {
+                id: textOpVersion
+                color: "#c4c0c0"
+                text: welcomePlugin.versionString
+                anchors.left: parent.anchors.left
+                font.bold: true
+                styleColor: "#00000000"
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 14
+            }
+            Text {
+                id: textOpVersionAvailable
+                color: "#5fcf07"
+                text: welcomePlugin.newVersionText
+                anchors.rightMargin: 0
+                font.bold: true
+                styleColor: "#00000000"
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 14
+                anchors.right: parent.right
+            }
         }
     }
 }

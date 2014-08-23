@@ -59,6 +59,6 @@ bool VehiclePage::validatePage()
 
 void VehiclePage::initializePage()
 {
-    ui->fixedwingButton->setEnabled(getWizard()->getControllerType() == SetupWizard::CONTROLLER_REVO ||
-                                    getWizard()->getControllerType() == SetupWizard::CONTROLLER_NANO);
+    //ui->fixedwingButton->setEnabled(getWizard()->getControllerType() == SetupWizard::CONTROLLER_REVO ||
+    //                                getWizard()->getControllerType() == SetupWizard::CONTROLLER_NANO);
 }

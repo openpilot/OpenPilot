@@ -51,7 +51,6 @@
  */
 
 #include "openpilot.h"
-#include <pios_struct_helper.h>
 #include "txpidsettings.h"
 #include "accessorydesired.h"
 #include "manualcontrolcommand.h"
@@ -195,26 +194,26 @@ static void updatePIDs(UAVObjEvent *ev)
 
     // Loop through every enabled instance
     for (uint8_t i = 0; i < TXPIDSETTINGS_PIDS_NUMELEM; i++) {
-        if (cast_struct_to_array(inst.PIDs, inst.PIDs.Instance1)[i] != TXPIDSETTINGS_PIDS_DISABLED) {
+        if (TxPIDSettingsPIDsToArray(inst.PIDs)[i] != TXPIDSETTINGS_PIDS_DISABLED) {
             float value;
-            if (cast_struct_to_array(inst.Inputs, inst.Inputs.Instance1)[i] == TXPIDSETTINGS_INPUTS_THROTTLE) {
+            if (TxPIDSettingsInputsToArray(inst.Inputs)[i] == TXPIDSETTINGS_INPUTS_THROTTLE) {
                 ManualControlCommandThrottleGet(&value);
                 value = scale(value,
                               inst.ThrottleRange.Min,
                               inst.ThrottleRange.Max,
-                              cast_struct_to_array(inst.MinPID, inst.MinPID.Instance1)[i],
-                              cast_struct_to_array(inst.MaxPID, inst.MaxPID.Instance1)[i]);
+                              TxPIDSettingsMinPIDToArray(inst.MinPID)[i],
+                              TxPIDSettingsMaxPIDToArray(inst.MaxPID)[i]);
             } else if (AccessoryDesiredInstGet(
-                           cast_struct_to_array(inst.Inputs, inst.Inputs.Instance1)[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0,
+                           TxPIDSettingsInputsToArray(inst.Inputs)[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0,
                            &accessory) == 0) {
                 value = scale(accessory.AccessoryVal, -1.0f, 1.0f,
-                              cast_struct_to_array(inst.MinPID, inst.MinPID.Instance1)[i],
-                              cast_struct_to_array(inst.MaxPID, inst.MaxPID.Instance1)[i]);
+                              TxPIDSettingsMinPIDToArray(inst.MinPID)[i],
+                              TxPIDSettingsMaxPIDToArray(inst.MaxPID)[i]);
             } else {
                 continue;
             }
 
-            switch (cast_struct_to_array(inst.PIDs, inst.PIDs.Instance1)[i]) {
+            switch (TxPIDSettingsPIDsToArray(inst.PIDs)[i]) {
             case TXPIDSETTINGS_PIDS_ROLLRATEKP:
                 needsUpdateBank |= update(&bank.RollRatePID.Kp, value);
                 break;

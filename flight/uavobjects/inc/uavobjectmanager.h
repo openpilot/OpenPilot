@@ -51,6 +51,11 @@ typedef void *UAVObjHandle;
 
 #define MetaObjectId(id) ((id) + 1)
 
+#define UAVObjectFieldToArray(type, var) \
+    ({ type *const dummy = &(var); \
+       (((type##Array *)dummy)->array); } \
+    )
+
 /**
  * Object update mode, used by multiple modules (e.g. telemetry and logger)
  */

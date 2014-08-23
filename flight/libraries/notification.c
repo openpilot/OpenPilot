@@ -25,7 +25,6 @@
  */
 #include "inc/notification.h"
 #include <openpilot.h>
-#include <pios_struct_helper.h>
 #include <systemalarms.h>
 #include <flightstatus.h>
 #include <pios_notify.h>

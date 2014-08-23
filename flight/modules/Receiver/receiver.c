@@ -33,7 +33,6 @@
  */
 
 #include <openpilot.h>
-#include <pios_struct_helper.h>
 #include <accessorydesired.h>
 #include <manualcontrolsettings.h>
 #include <manualcontrolcommand.h>
@@ -210,12 +209,12 @@ static void receiverTask(__attribute__((unused)) void *parameters)
         for (uint8_t n = 0; n < MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM && n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM; ++n) {
             extern uint32_t pios_rcvr_group_map[];
 
-            if (cast_struct_to_array(settings.ChannelGroups, settings.ChannelGroups.Roll)[n] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+            if (ManualControlSettingsChannelGroupsToArray(settings.ChannelGroups)[n] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
                 cmd.Channel[n] = PIOS_RCVR_INVALID;
             } else {
                 cmd.Channel[n] = PIOS_RCVR_Read(pios_rcvr_group_map[
-                                                    cast_struct_to_array(settings.ChannelGroups, settings.ChannelGroups.Pitch)[n]],
-                                                cast_struct_to_array(settings.ChannelNumber, settings.ChannelNumber.Pitch)[n]);
+                                                    ManualControlSettingsChannelGroupsToArray(settings.ChannelGroups)[n]],
+                                                ManualControlSettingsChannelNumberToArray(settings.ChannelNumber)[n]);
             }
 
             // If a channel has timed out this is not valid data and we shouldn't update anything
@@ -224,9 +223,9 @@ static void receiverTask(__attribute__((unused)) void *parameters)
                 valid_input_detected = false;
             } else {
                 scaledChannel[n] = scaleChannel(cmd.Channel[n],
-                                                cast_struct_to_array(settings.ChannelMax, settings.ChannelMax.Pitch)[n],
-                                                cast_struct_to_array(settings.ChannelMin, settings.ChannelMin.Pitch)[n],
-                                                cast_struct_to_array(settings.ChannelNeutral, settings.ChannelNeutral.Pitch)[n]);
+                                                ManualControlSettingsChannelMaxToArray(settings.ChannelMax)[n],
+                                                ManualControlSettingsChannelMinToArray(settings.ChannelMin)[n],
+                                                ManualControlSettingsChannelNeutralToArray(settings.ChannelNeutral)[n]);
             }
         }
 
@@ -445,8 +444,8 @@ static void receiverTask(__attribute__((unused)) void *parameters)
         if (pios_usb_rctx_id) {
             PIOS_USB_RCTX_Update(pios_usb_rctx_id,
                                  cmd.Channel,
-                                 cast_struct_to_array(settings.ChannelMin, settings.ChannelMin.Roll),
-                                 cast_struct_to_array(settings.ChannelMax, settings.ChannelMax.Roll),
+                                 ManualControlSettingsChannelMinToArray(settings.ChannelMin),
+                                 ManualControlSettingsChannelMaxToArray(settings.ChannelMax),
                                  NELEMENTS(cmd.Channel));
         }
 #endif /* PIOS_INCLUDE_USB_RCTX */
@@ -661,8 +660,8 @@ static void applyDeadband(float *value, float deadband)
  */
 static void applyLPF(float *value, ManualControlSettingsResponseTimeElem channel, ManualControlSettingsData *settings, float dT)
 {
-    if (cast_struct_to_array(settings->ResponseTime, settings->ResponseTime.Roll)[channel]) {
-        float rt = (float)cast_struct_to_array(settings->ResponseTime, settings->ResponseTime.Roll)[channel];
+    if (ManualControlSettingsResponseTimeToArray(settings->ResponseTime)[channel]) {
+        float rt = (float)ManualControlSettingsResponseTimeToArray(settings->ResponseTime)[channel];
         inputFiltered[channel] = ((rt * inputFiltered[channel]) + (dT * (*value))) / (rt + dT);
         *value = inputFiltered[channel];
     }

@@ -43,7 +43,6 @@
 #include "waypoint.h"
 #include "waypointactive.h"
 #include "flightmodesettings.h"
-#include <pios_struct_helper.h>
 #include "paths.h"
 #include "plans.h"
 

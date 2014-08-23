@@ -1,112 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
+<!-- Written by QtCreator 3.1.2, 2014-08-23T10:12:28. -->
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
-  <value type="int">0</value>
+  <value type="int">-1</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.EditorSettings</variable>
   <valuemap type="QVariantMap">
-   <value key="EditorConfiguration.Codec" type="QByteArray">System</value>
+   <value type="bool" key="EditorConfiguration.AutoIndent">true</value>
+   <value type="bool" key="EditorConfiguration.AutoSpacesForTabs">false</value>
+   <value type="bool" key="EditorConfiguration.CamelCaseNavigation">true</value>
+   <valuemap type="QVariantMap" key="EditorConfiguration.CodeStyle.0">
+    <value type="QString" key="language">Cpp</value>
+    <valuemap type="QVariantMap" key="value">
+     <value type="QByteArray" key="CurrentPreferences">CppGlobal</value>
+    </valuemap>
+   </valuemap>
+   <valuemap type="QVariantMap" key="EditorConfiguration.CodeStyle.1">
+    <value type="QString" key="language">QmlJS</value>
+    <valuemap type="QVariantMap" key="value">
+     <value type="QByteArray" key="CurrentPreferences">QmlJSGlobal</value>
+    </valuemap>
+   </valuemap>
+   <value type="int" key="EditorConfiguration.CodeStyle.Count">2</value>
+   <value type="QByteArray" key="EditorConfiguration.Codec">UTF-8</value>
+   <value type="bool" key="EditorConfiguration.ConstrainTooltips">false</value>
+   <value type="int" key="EditorConfiguration.IndentSize">4</value>
+   <value type="bool" key="EditorConfiguration.KeyboardTooltips">false</value>
+   <value type="int" key="EditorConfiguration.MarginColumn">80</value>
+   <value type="bool" key="EditorConfiguration.MouseHiding">true</value>
+   <value type="bool" key="EditorConfiguration.MouseNavigation">true</value>
+   <value type="int" key="EditorConfiguration.PaddingMode">1</value>
+   <value type="bool" key="EditorConfiguration.ScrollWheelZooming">true</value>
+   <value type="bool" key="EditorConfiguration.ShowMargin">false</value>
+   <value type="int" key="EditorConfiguration.SmartBackspaceBehavior">0</value>
+   <value type="bool" key="EditorConfiguration.SpacesForTabs">true</value>
+   <value type="int" key="EditorConfiguration.TabKeyBehavior">0</value>
+   <value type="int" key="EditorConfiguration.TabSize">8</value>
+   <value type="bool" key="EditorConfiguration.UseGlobal">true</value>
+   <value type="int" key="EditorConfiguration.Utf8BomBehavior">1</value>
+   <value type="bool" key="EditorConfiguration.addFinalNewLine">true</value>
+   <value type="bool" key="EditorConfiguration.cleanIndentation">true</value>
+   <value type="bool" key="EditorConfiguration.cleanWhitespace">true</value>
+   <value type="bool" key="EditorConfiguration.inEntireDocument">false</value>
   </valuemap>
  </data>
  <data>
-  <variable>ProjectExplorer.Project.Target.0</variable>
-  <valuemap type="QVariantMap">
-   <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Desktop</value>
-   <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Target.DesktopTarget</value>
-   <value key="ProjectExplorer.Target.ActiveBuildConfiguration" type="int">0</value>
-   <value key="ProjectExplorer.Target.ActiveRunConfiguration" type="int">0</value>
-   <valuemap key="ProjectExplorer.Target.BuildConfiguration.0" type="QVariantMap">
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.0" type="QVariantMap">
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">qmake</value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">QtProjectManager.QMakeBuildStep</value>
-     <valuelist key="QtProjectManager.QMakeBuildStep.QMakeArguments" type="QVariantList"/>
-    </valuemap>
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.1" type="QVariantMap">
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Make</value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-     <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">false</value>
-     <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList"/>
-     <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.BuildStepsCount" type="int">2</value>
-    <valuemap key="ProjectExplorer.BuildConfiguration.CleanStep.0" type="QVariantMap">
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Make</value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-     <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">true</value>
-     <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList">
-      <value type="QString">clean</value>
-     </valuelist>
-     <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.CleanStepsCount" type="int">1</value>
-    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">false</value>
-    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList"/>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Debug</value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/Users/jcotton81/Documents/Programming/OpenPilot/ground/src/plugins/gcscontrol/sdlgamepad-build-desktop</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
-   </valuemap>
-   <valuemap key="ProjectExplorer.Target.BuildConfiguration.1" type="QVariantMap">
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.0" type="QVariantMap">
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">qmake</value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">QtProjectManager.QMakeBuildStep</value>
-     <valuelist key="QtProjectManager.QMakeBuildStep.QMakeArguments" type="QVariantList"/>
-    </valuemap>
-    <valuemap key="ProjectExplorer.BuildConfiguration.BuildStep.1" type="QVariantMap">
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Make</value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-     <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">false</value>
-     <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList"/>
-     <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.BuildStepsCount" type="int">2</value>
-    <valuemap key="ProjectExplorer.BuildConfiguration.CleanStep.0" type="QVariantMap">
-     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Make</value>
-     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.MakeStep</value>
-     <value key="Qt4ProjectManager.MakeStep.Clean" type="bool">true</value>
-     <valuelist key="Qt4ProjectManager.MakeStep.MakeArguments" type="QVariantList">
-      <value type="QString">clean</value>
-     </valuelist>
-     <value key="Qt4ProjectManager.MakeStep.MakeCommand" type="QString"></value>
-    </valuemap>
-    <value key="ProjectExplorer.BuildConfiguration.CleanStepsCount" type="int">1</value>
-    <value key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment" type="bool">false</value>
-    <valuelist key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges" type="QVariantList"/>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Release</value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.Qt4BuildConfiguration</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.BuildDirectory" type="QString">/Users/jcotton81/Documents/Programming/OpenPilot/ground/src/plugins/gcscontrol/sdlgamepad-build-desktop</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.QtVersionId" type="int">2</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.ToolChain" type="int">0</value>
-    <value key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild" type="bool">true</value>
-   </valuemap>
-   <value key="ProjectExplorer.Target.BuildConfigurationCount" type="int">2</value>
-   <valuemap key="ProjectExplorer.Target.RunConfiguration.0" type="QVariantMap">
-    <valuelist key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments" type="QVariantList"/>
-    <value key="ProjectExplorer.CustomExecutableRunConfiguration.BaseEnvironmentBase" type="int">2</value>
-    <value key="ProjectExplorer.CustomExecutableRunConfiguration.Executable" type="QString"></value>
-    <value key="ProjectExplorer.CustomExecutableRunConfiguration.UseTerminal" type="bool">false</value>
-    <valuelist key="ProjectExplorer.CustomExecutableRunConfiguration.UserEnvironmentChanges" type="QVariantList"/>
-    <value key="ProjectExplorer.CustomExecutableRunConfiguration.UserName" type="QString"></value>
-    <value key="ProjectExplorer.CustomExecutableRunConfiguration.UserSetName" type="bool">false</value>
-    <value key="ProjectExplorer.CustomExecutableRunConfiguration.WorkingDirectory" type="QString">$BUILDDIR</value>
-    <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString">Custom Executable</value>
-    <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.CustomExecutableRunConfiguration</value>
-   </valuemap>
-   <value key="ProjectExplorer.Target.RunConfigurationCount" type="int">1</value>
-  </valuemap>
+  <variable>ProjectExplorer.Project.PluginSettings</variable>
+  <valuemap type="QVariantMap"/>
  </data>
  <data>
   <variable>ProjectExplorer.Project.TargetCount</variable>
-  <value type="int">1</value>
+  <value type="int">0</value>
+ </data>
+ <data>
+  <variable>ProjectExplorer.Project.Updater.EnvironmentId</variable>
+  <value type="QByteArray">{6e1a7efe-f107-41f3-9383-31e878c1f556}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.Updater.FileVersion</variable>
-  <value type="int">4</value>
+  <value type="int">15</value>
  </data>
 </qtcreator>

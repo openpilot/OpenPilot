@@ -45,6 +45,9 @@
 #include <QtCore/QUrl>
 #include <QtCore/QDebug>
 
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+
 #include <QtQuick>
 #include <QQuickView>
 #include <QQmlEngine>
@@ -60,6 +63,7 @@ struct WelcomeModePrivate {
     WelcomeModePrivate();
 
     QQuickView *quickView;
+    QNetworkAccessManager* networkAccess;
 };
 
 WelcomeModePrivate::WelcomeModePrivate()
@@ -68,18 +72,26 @@ WelcomeModePrivate::WelcomeModePrivate()
 // ---  WelcomeMode
 WelcomeMode::WelcomeMode() :
     m_d(new WelcomeModePrivate),
-    m_priority(Core::Constants::P_MODE_WELCOME)
+    m_priority(Core::Constants::P_MODE_WELCOME),
+    m_newVersionText("")
 {
     m_d->quickView = new QQuickView;
     m_d->quickView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_d->quickView->engine()->rootContext()->setContextProperty("welcomePlugin", this);
     m_d->quickView->setSource(QUrl("qrc:/welcome/qml/main.qml"));
     m_container = NULL;
+
+    m_d->networkAccess = new QNetworkAccessManager;
+
+    m_d->networkAccess->get(QNetworkRequest(QUrl("http://www.openpilot.org/opver")));
+
+    connect(m_d->networkAccess, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkResponseReady(QNetworkReply*)));
 }
 
 WelcomeMode::~WelcomeMode()
 {
     delete m_d->quickView;
+    delete m_d->networkAccess;
     delete m_d;
 }
 
@@ -134,5 +146,19 @@ void WelcomeMode::openPage(const QString &page)
 void WelcomeMode::triggerAction(const QString &actionId)
 {
     Core::ModeManager::instance()->triggerAction(actionId);
+}
+
+void WelcomeMode::networkResponseReady(QNetworkReply* reply)
+{
+    if(reply != NULL)
+    {
+        QString version(reply->readAll());
+
+        if(version != VersionInfo::revision())
+        {
+            m_newVersionText = tr("(Update Available: %1)").arg(version);
+            emit newVersionTextChanged();
+        }
+    }
 }
 } // namespace Welcome

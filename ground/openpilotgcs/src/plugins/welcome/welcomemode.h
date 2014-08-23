@@ -38,6 +38,7 @@
 QT_BEGIN_NAMESPACE
 class QWidget;
 class QUrl;
+class QNetworkReply;
 QT_END_NAMESPACE
 
 namespace Welcome {
@@ -46,6 +47,7 @@ struct WelcomeModePrivate;
 class WELCOME_EXPORT WelcomeMode : public Core::IMode {
     Q_OBJECT
     Q_PROPERTY(QString versionString READ versionString)
+    Q_PROPERTY(QString newVersionText READ newVersionText NOTIFY newVersionTextChanged)
 
 public:
     WelcomeMode();
@@ -69,8 +71,15 @@ public:
     }
     QString versionString() const
     {
-        return tr("OpenPilot GCS Version: %1").arg(VersionInfo::revision().left(60));
+        return tr("OpenPilot GCS Version: %1").arg(VersionInfo::revision());
     }
+    QString newVersionText() const
+    {
+        return m_newVersionText;
+    }
+
+signals:
+    void newVersionTextChanged();
 
 public slots:
     void openUrl(const QString &url);
@@ -81,6 +90,10 @@ private:
     QWidget *m_container;
     WelcomeModePrivate *m_d;
     int m_priority;
+    QString m_newVersionText;
+
+ private slots:
+    void networkResponseReady(QNetworkReply* reply);
 };
 } // namespace Welcome
 

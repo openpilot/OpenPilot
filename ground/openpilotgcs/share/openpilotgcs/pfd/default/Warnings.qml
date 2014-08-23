@@ -150,6 +150,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: "MASTER CAUTION"
+                color: "white"
                 font {
                     family: "Arial"
                     pixelSize: Math.floor(parent.height * 0.74)

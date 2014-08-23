@@ -48,8 +48,10 @@ public:
     void initializePage();
     bool validatePage();
 
+    void fitInView();
 protected:
     void resizeEvent(QResizeEvent *event);
+    void showEvent(QShowEvent *event);
 
 private:
     Ui::FixedWingPage *ui;
@@ -60,6 +62,7 @@ private:
 
 private slots:
     void updateImageAndDescription();
+
 };
 
 #endif // FIXEDWINGPAGE_H

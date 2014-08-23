@@ -45,11 +45,8 @@ FixedWingPage::FixedWingPage(SetupWizard *wizard, QWidget *parent) :
     setupFixedWingTypesCombo();
 
     // Default to Aileron setup
-    ui->typeCombo->setCurrentIndex(0);
     connect(ui->typeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(updateImageAndDescription()));
-    ui->typeGraphicsView->setSceneRect(m_fixedwingPic->boundingRect());
-    ui->typeGraphicsView->fitInView(m_fixedwingPic, Qt::KeepAspectRatio);
-
+    ui->typeCombo->setCurrentIndex(0);
 }
 
 FixedWingPage::~FixedWingPage()
@@ -71,13 +68,24 @@ bool FixedWingPage::validatePage()
     return true;
 }
 
-void FixedWingPage::resizeEvent(QResizeEvent *event)
+void FixedWingPage::fitInView()
 {
-    Q_UNUSED(event);
     if (m_fixedwingPic) {
         ui->typeGraphicsView->setSceneRect(m_fixedwingPic->boundingRect());
         ui->typeGraphicsView->fitInView(m_fixedwingPic, Qt::KeepAspectRatio);
     }
+}
+
+void FixedWingPage::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+    fitInView();
+}
+
+void FixedWingPage::showEvent(QShowEvent *event)
+{
+    Q_UNUSED(event);
+    fitInView();
 }
 
 void FixedWingPage::setupFixedWingTypesCombo()
@@ -98,8 +106,6 @@ void FixedWingPage::updateAvailableTypes()
 
 void FixedWingPage::updateImageAndDescription()
 {
-
-
     SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE)ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
     QString elementId   = "";
     QString description = m_descriptions.at(ui->typeCombo->currentIndex());
@@ -125,4 +131,3 @@ void FixedWingPage::updateImageAndDescription()
     ui->typeDescription->setText(description);
 
 }
-

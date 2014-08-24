@@ -51,10 +51,42 @@ typedef void *UAVObjHandle;
 
 #define MetaObjectId(id) ((id) + 1)
 
+/**
+ * helper macro to access multi-element fields as array
+ */
 #define UAVObjectFieldToArray(type, var) \
-    ({ type *const dummy = &(var); \
-       (((type##Array *)dummy)->array); } \
-    )
+    (*({ type *const dummy = &(var); \
+         &(((type##Array *)dummy)->array); } \
+       ))
+
+// we have limited trust in our compiler
+// make sure this macro actually works on all platforms
+
+typedef struct __attribute__((__packed__)) {
+    uint16_t element1;
+    uint16_t element2;
+    uint16_t element3;
+}
+__DummyUAVObjectFieldData;
+
+typedef struct __attribute__((__packed__)) {
+    uint16_t array[3];
+}
+__DummyUAVObjectFieldDataArray;
+
+#define __DummyTA(var) UAVObjectFieldToArray(__DummyUAVObjectFieldData, var)
+
+__attribute__((unused)) static void __DummyTAtest(void)
+{
+    __DummyUAVObjectFieldData t;
+
+    PIOS_STATIC_ASSERT(sizeof(t) == sizeof(__DummyTA(t)));
+    PIOS_STATIC_ASSERT(sizeof(t.element1) == sizeof(__DummyTA(t)[0]));
+    PIOS_STATIC_ASSERT((void *)&t == (void *)&__DummyTA(t));
+    PIOS_STATIC_ASSERT((void *)&t.element1 == (void *)&__DummyTA(t)[0]);
+    PIOS_STATIC_ASSERT((void *)&t.element2 == (void *)&__DummyTA(t)[1]);
+    PIOS_STATIC_ASSERT((void *)&t.element3 == (void *)&__DummyTA(t)[2]);
+}
 
 /**
  * Object update mode, used by multiple modules (e.g. telemetry and logger)

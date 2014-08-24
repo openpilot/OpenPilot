@@ -32,10 +32,11 @@
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
+#include "inc/UBX.h"
+#include "inc/GPS.h"
 
-#include "UBX.h"
-#include "GPS.h"
-
+// If a PVT sentence is received in the last UBX_PVT_TIMEOUT (ms) timeframe it disables VELNED/POSLLH/SOL/TIMEUTC
+#define UBX_PVT_TIMEOUT (1000)
 // parse incoming character stream for messages in UBX binary format
 
 int parse_ubx_stream(uint8_t c, char *gps_rx_buffer, GPSPositionSensorData *GpsData, struct GPS_RX_STATS *gpsRxStats)
@@ -251,25 +252,69 @@ void parse_ubx_nav_velned(struct UBX_NAV_VELNED *velned, GPSPositionSensorData *
     }
 }
 
+void parse_ubx_nav_pvt(struct UBX_NAV_PVT *pvt, GPSPositionSensorData *GpsPosition)
+{
+    GPSVelocitySensorData GpsVelocity;
+
+    check_msgtracker(pvt->iTOW, (ALL_RECEIVED));
+
+    GpsVelocity.North = (float)pvt->velN * 0.001f;
+    GpsVelocity.East  = (float)pvt->velE * 0.001f;
+    GpsVelocity.Down  = (float)pvt->velD * 0.001f;
+    GPSVelocitySensorSet(&GpsVelocity);
+
+    GpsPosition->Groundspeed     = (float)pvt->gSpeed * 0.001f;
+    GpsPosition->Heading         = (float)pvt->heading * 1.0e-5f;
+    GpsPosition->Altitude        = (float)pvt->hMSL * 0.001f;
+    GpsPosition->GeoidSeparation = (float)(pvt->height - pvt->hMSL) * 0.001f;
+    GpsPosition->Latitude        = pvt->lat;
+    GpsPosition->Longitude       = pvt->lon;
+    GpsPosition->Satellites      = pvt->numSV;
+    GpsPosition->PDOP = pvt->pDOP * 0.01f;
+    if (pvt->flags & PVT_FLAGS_GNSSFIX_OK) {
+        GpsPosition->Status = pvt->fixType == PVT_FIX_TYPE_3D ?
+                              GPSPOSITIONSENSOR_STATUS_FIX3D : GPSPOSITIONSENSOR_STATUS_FIX2D;
+    } else {
+        GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_NOFIX;
+    }
+#if !defined(PIOS_GPS_MINIMAL)
+    if (pvt->valid & PVT_VALID_VALIDTIME) {
+        // Time is valid, set GpsTime
+        GPSTimeData GpsTime;
+
+        GpsTime.Year   = pvt->year;
+        GpsTime.Month  = pvt->month;
+        GpsTime.Day    = pvt->day;
+        GpsTime.Hour   = pvt->hour;
+        GpsTime.Minute = pvt->min;
+        GpsTime.Second = pvt->sec;
+
+        GPSTimeSet(&GpsTime);
+    }
+#endif
+}
 #if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_nav_timeutc(struct UBX_NAV_TIMEUTC *timeutc)
 {
-    if (!(timeutc->valid & TIMEUTC_VALIDUTC)) {
+    // Test if time is valid
+    if ((timeutc->valid & TIMEUTC_VALIDTOW) && (timeutc->valid & TIMEUTC_VALIDWKN)) {
+        // Time is valid, set GpsTime
+        GPSTimeData GpsTime;
+
+        GpsTime.Year   = timeutc->year;
+        GpsTime.Month  = timeutc->month;
+        GpsTime.Day    = timeutc->day;
+        GpsTime.Hour   = timeutc->hour;
+        GpsTime.Minute = timeutc->min;
+        GpsTime.Second = timeutc->sec;
+
+        GPSTimeSet(&GpsTime);
+    } else {
+        // Time is not valid, nothing to do
         return;
     }
-
-    GPSTimeData GpsTime;
-
-    GpsTime.Year   = timeutc->year;
-    GpsTime.Month  = timeutc->month;
-    GpsTime.Day    = timeutc->day;
-    GpsTime.Hour   = timeutc->hour;
-    GpsTime.Minute = timeutc->min;
-    GpsTime.Second = timeutc->sec;
-
-    GPSTimeSet(&GpsTime);
 }
-#endif
+#endif /* if !defined(PIOS_GPS_MINIMAL) */
 
 #if !defined(PIOS_GPS_MINIMAL)
 void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
@@ -280,8 +325,8 @@ void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
     svdata.SatsInView = 0;
     for (chan = 0; chan < svinfo->numCh; chan++) {
         if (svdata.SatsInView < GPSSATELLITES_PRN_NUMELEM) {
-            svdata.Azimuth[svdata.SatsInView]   = (float)svinfo->sv[chan].azim;
-            svdata.Elevation[svdata.SatsInView] = (float)svinfo->sv[chan].elev;
+            svdata.Azimuth[svdata.SatsInView]   = svinfo->sv[chan].azim;
+            svdata.Elevation[svdata.SatsInView] = svinfo->sv[chan].elev;
             svdata.PRN[svdata.SatsInView] = svinfo->sv[chan].svid;
             svdata.SNR[svdata.SatsInView] = svinfo->sv[chan].cno;
             svdata.SatsInView++;
@@ -289,8 +334,8 @@ void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
     }
     // fill remaining slots (if any)
     for (chan = svdata.SatsInView; chan < GPSSATELLITES_PRN_NUMELEM; chan++) {
-        svdata.Azimuth[chan]   = (float)0.0f;
-        svdata.Elevation[chan] = (float)0.0f;
+        svdata.Azimuth[chan]   = 0;
+        svdata.Elevation[chan] = 0;
         svdata.PRN[chan] = 0;
         svdata.SNR[chan] = 0;
     }
@@ -305,26 +350,51 @@ void parse_ubx_nav_svinfo(struct UBX_NAV_SVINFO *svinfo)
 uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
     uint32_t id = 0;
+    static uint32_t lastPvtTime = 0;
+    static bool ubxInitialized  = false;
+
+    if (!ubxInitialized) {
+        // initialize dop values. If no DOP sentence is received it is safer to initialize them to a high value rather than 0.
+        GpsPosition->HDOP = 99.99f;
+        GpsPosition->PDOP = 99.99f;
+        GpsPosition->VDOP = 99.99f;
+        ubxInitialized    = true;
+    }
+    // is it using PVT?
+    bool usePvt = (lastPvtTime) && (PIOS_DELAY_GetuSSince(lastPvtTime) < UBX_PVT_TIMEOUT * 1000);
 
     switch (ubx->header.class) {
     case UBX_CLASS_NAV:
+        if (!usePvt) {
+            // Set of messages to be decoded when not using pvt
+            switch (ubx->header.id) {
+            case UBX_ID_POSLLH:
+                parse_ubx_nav_posllh(&ubx->payload.nav_posllh, GpsPosition);
+                break;
+            case UBX_ID_SOL:
+                parse_ubx_nav_sol(&ubx->payload.nav_sol, GpsPosition);
+                break;
+            case UBX_ID_VELNED:
+                parse_ubx_nav_velned(&ubx->payload.nav_velned, GpsPosition);
+                break;
+#if !defined(PIOS_GPS_MINIMAL)
+            case UBX_ID_TIMEUTC:
+                parse_ubx_nav_timeutc(&ubx->payload.nav_timeutc);
+                break;
+#endif
+            }
+        }
+        // messages used always
         switch (ubx->header.id) {
-        case UBX_ID_POSLLH:
-            parse_ubx_nav_posllh(&ubx->payload.nav_posllh, GpsPosition);
-            break;
         case UBX_ID_DOP:
             parse_ubx_nav_dop(&ubx->payload.nav_dop, GpsPosition);
             break;
-        case UBX_ID_SOL:
-            parse_ubx_nav_sol(&ubx->payload.nav_sol, GpsPosition);
-            break;
-        case UBX_ID_VELNED:
-            parse_ubx_nav_velned(&ubx->payload.nav_velned, GpsPosition);
+
+        case UBX_ID_PVT:
+            parse_ubx_nav_pvt(&ubx->payload.nav_pvt, GpsPosition);
+            lastPvtTime = PIOS_DELAY_GetuS();
             break;
 #if !defined(PIOS_GPS_MINIMAL)
-        case UBX_ID_TIMEUTC:
-            parse_ubx_nav_timeutc(&ubx->payload.nav_timeutc);
-            break;
         case UBX_ID_SVINFO:
             parse_ubx_nav_svinfo(&ubx->payload.nav_svinfo);
             break;
@@ -332,6 +402,7 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
         }
         break;
     }
+
     if (msgtracker.msg_received == ALL_RECEIVED) {
         GPSPositionSensorSet(GpsPosition);
         msgtracker.msg_received = NONE_RECEIVED;

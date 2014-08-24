@@ -1,7 +1,7 @@
 <xml>
     <object name="SystemAlarms" singleinstance="true" settings="false" category="System" priority="true">
         <description>Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.  Some modules may have a module defined Status and Substatus fields that details its condition.</description>
-        <field name="Alarm" units="" type="enum" options="Uninitialised,OK,Warning,Error,Critical" defaultvalue="Uninitialised">
+        <field name="Alarm" units="" type="enum" options="Uninitialised,OK,Warning,Critical,Error" defaultvalue="Uninitialised">
 		<elementnames>
 			<elementname>SystemConfiguration</elementname>
 			<elementname>BootFault</elementname>
@@ -10,10 +10,13 @@
 			<elementname>CPUOverload</elementname>
 			<elementname>EventSystem</elementname>
 			<elementname>Telemetry</elementname>
+			<elementname>Receiver</elementname>
 			<elementname>ManualControl</elementname>
 			<elementname>Actuator</elementname>
 			<elementname>Attitude</elementname>
 			<elementname>Sensors</elementname>
+			<elementname>Magnetometer</elementname>
+			<elementname>Airspeed</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>Guidance</elementname>
 			<elementname>PathPlan</elementname>
@@ -21,7 +24,6 @@
 			<elementname>FlightTime</elementname>
 			<elementname>I2C</elementname>
 			<elementname>GPS</elementname>
-			<elementname>Power</elementname>
 		</elementnames>
 	</field>
 	<field name="ExtendedAlarmStatus" units="" type="enum" defaultvalue="None">
@@ -42,8 +44,8 @@
 		</elementnames>
 	</field>
         <access gcs="readwrite" flight="readwrite"/>
-        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
-        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
 	<logging updatemode="manual" period="0"/>
     </object>
 </xml>

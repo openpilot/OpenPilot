@@ -33,6 +33,9 @@
 #include <gcsreceiver.h>
 #include <taskinfo.h>
 
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+#include <pios_instrumentation.h>
+#endif
 /*
  * Pull in the board-specific static HW definitions.
  * Including .c files is a bit ugly but this allows all of
@@ -149,6 +152,10 @@ void PIOS_Board_Init(void)
     PIOS_Assert(led_cfg);
     PIOS_LED_Init(led_cfg);
 #endif /* PIOS_INCLUDE_LED */
+
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+    PIOS_Instrumentation_Init(PIOS_INSTRUMENTATION_MAX_COUNTERS);
+#endif
 
 #if defined(PIOS_INCLUDE_SPI)
     /* Set up the SPI interface to the serial flash */
@@ -302,8 +309,8 @@ void PIOS_Board_Init(void)
             if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
                 PIOS_Assert(0);
             }
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
@@ -321,8 +328,8 @@ void PIOS_Board_Init(void)
             if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
                 PIOS_Assert(0);
             }
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_vcp_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
@@ -341,7 +348,7 @@ void PIOS_Board_Init(void)
             if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
                 PIOS_Assert(0);
             }
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_debug_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
                               NULL, 0,
@@ -375,8 +382,8 @@ void PIOS_Board_Init(void)
             if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
                 PIOS_Assert(0);
             }
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
@@ -419,8 +426,8 @@ void PIOS_Board_Init(void)
                 PIOS_Assert(0);
             }
 
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_generic_id,
@@ -460,7 +467,7 @@ void PIOS_Board_Init(void)
                 PIOS_Assert(0);
             }
 
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_GPS_RX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_generic_id,
                               rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
@@ -522,7 +529,7 @@ void PIOS_Board_Init(void)
                 PIOS_Assert(0);
             }
 
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_debug_id, &pios_usart_com_driver, pios_usart_generic_id,
                               NULL, 0,
@@ -540,9 +547,9 @@ void PIOS_Board_Init(void)
             PIOS_Assert(0);
         }
 
-        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
+        uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
         PIOS_Assert(rx_buffer);
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
         PIOS_Assert(tx_buffer);
         if (PIOS_COM_Init(&pios_com_bridge_id, &pios_usart_com_driver, pios_usart_generic_id,
                           rx_buffer, PIOS_COM_BRIDGE_RX_BUF_LEN,
@@ -558,7 +565,7 @@ void PIOS_Board_Init(void)
             PIOS_Assert(0);
         }
 
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_HKOSD_TX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_HKOSD_TX_BUF_LEN);
         PIOS_Assert(tx_buffer);
         if (PIOS_COM_Init(&pios_com_hkosd_id, &pios_usart_com_driver, pios_usart_hkosd_id,
                           NULL, 0,
@@ -583,8 +590,8 @@ void PIOS_Board_Init(void)
             if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {
                 PIOS_Assert(0);
             }
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_generic_id,
@@ -602,8 +609,8 @@ void PIOS_Board_Init(void)
             PIOS_Assert(0);
         }
 
-        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
+        uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
         PIOS_Assert(rx_buffer);
         PIOS_Assert(tx_buffer);
         if (PIOS_COM_Init(&pios_com_bridge_id, &pios_usart_com_driver, pios_usart_generic_id,
@@ -620,7 +627,7 @@ void PIOS_Board_Init(void)
             if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {
                 PIOS_Assert(0);
             }
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_GPS_RX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_generic_id,
                               rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
@@ -696,7 +703,7 @@ void PIOS_Board_Init(void)
                 PIOS_Assert(0);
             }
 
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_debug_id, &pios_usart_com_driver, pios_usart_generic_id,
                               NULL, 0,
@@ -723,7 +730,7 @@ void PIOS_Board_Init(void)
             PIOS_Assert(0);
         }
 
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_HKOSD_TX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_HKOSD_TX_BUF_LEN);
         PIOS_Assert(tx_buffer);
         if (PIOS_COM_Init(&pios_com_hkosd_id, &pios_usart_com_driver, pios_usart_hkosd_id,
                           NULL, 0,

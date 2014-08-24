@@ -1,130 +1,130 @@
 // This file is part of Eigen, a lightweight C++ template library
-// for linear algebra. Eigen itself is part of the KDE project.
+// for linear algebra.
 //
-// Copyright (C) 2008 Gael Guennebaud <g.gael@free.fr>
-// Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
+// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
+// Copyright (C) 2007-2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
-// Eigen is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// Alternatively, you can redistribute it and/or
-// modify it under the terms of the GNU General Public License as
-// published by the Free Software Foundation; either version 2 of
-// the License, or (at your option) any later version.
-//
-// Eigen is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-// FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License or the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License and a copy of the GNU General Public License along with
-// Eigen. If not, see <http://www.gnu.org/licenses/>.
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_DIAGONALPRODUCT_H
 #define EIGEN_DIAGONALPRODUCT_H
 
-/** \internal Specialization of ei_nested for DiagonalMatrix.
- *  Unlike ei_nested, if the argument is a DiagonalMatrix and if it must be evaluated,
- *  then it evaluated to a DiagonalMatrix having its own argument evaluated.
- */
-template<typename T, int N> struct ei_nested_diagonal : ei_nested<T,N> {};
-template<typename T, int N> struct ei_nested_diagonal<DiagonalMatrix<T>,N >
- : ei_nested<DiagonalMatrix<T>, N, DiagonalMatrix<NestByValue<typename ei_plain_matrix_type<T>::type> > >
-{};
+namespace Eigen { 
 
-// specialization of ProductReturnType
-template<typename Lhs, typename Rhs>
-struct ProductReturnType<Lhs,Rhs,DiagonalProduct>
+namespace internal {
+template<typename MatrixType, typename DiagonalType, int ProductOrder>
+struct traits<DiagonalProduct<MatrixType, DiagonalType, ProductOrder> >
+ : traits<MatrixType>
 {
-  typedef typename ei_nested_diagonal<Lhs,Rhs::ColsAtCompileTime>::type LhsNested;
-  typedef typename ei_nested_diagonal<Rhs,Lhs::RowsAtCompileTime>::type RhsNested;
-
-  typedef Product<LhsNested, RhsNested, DiagonalProduct> Type;
-};
-
-template<typename LhsNested, typename RhsNested>
-struct ei_traits<Product<LhsNested, RhsNested, DiagonalProduct> >
-{
-  // clean the nested types:
-  typedef typename ei_cleantype<LhsNested>::type _LhsNested;
-  typedef typename ei_cleantype<RhsNested>::type _RhsNested;
-  typedef typename _LhsNested::Scalar Scalar;
-
+  typedef typename scalar_product_traits<typename MatrixType::Scalar, typename DiagonalType::Scalar>::ReturnType Scalar;
   enum {
-    LhsFlags = _LhsNested::Flags,
-    RhsFlags = _RhsNested::Flags,
-    RowsAtCompileTime = _LhsNested::RowsAtCompileTime,
-    ColsAtCompileTime = _RhsNested::ColsAtCompileTime,
-    MaxRowsAtCompileTime = _LhsNested::MaxRowsAtCompileTime,
-    MaxColsAtCompileTime = _RhsNested::MaxColsAtCompileTime,
+    RowsAtCompileTime = MatrixType::RowsAtCompileTime,
+    ColsAtCompileTime = MatrixType::ColsAtCompileTime,
+    MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,
+    MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime,
 
-    LhsIsDiagonal = (_LhsNested::Flags&Diagonal)==Diagonal,
-    RhsIsDiagonal = (_RhsNested::Flags&Diagonal)==Diagonal,
+    _StorageOrder = MatrixType::Flags & RowMajorBit ? RowMajor : ColMajor,
+    _ScalarAccessOnDiag =  !((int(_StorageOrder) == ColMajor && int(ProductOrder) == OnTheLeft)
+                          ||(int(_StorageOrder) == RowMajor && int(ProductOrder) == OnTheRight)),
+    _SameTypes = is_same<typename MatrixType::Scalar, typename DiagonalType::Scalar>::value,
+    // FIXME currently we need same types, but in the future the next rule should be the one
+    //_Vectorizable = bool(int(MatrixType::Flags)&PacketAccessBit) && ((!_PacketOnDiag) || (_SameTypes && bool(int(DiagonalType::DiagonalVectorType::Flags)&PacketAccessBit))),
+    _Vectorizable = bool(int(MatrixType::Flags)&PacketAccessBit) && _SameTypes && (_ScalarAccessOnDiag || (bool(int(DiagonalType::DiagonalVectorType::Flags)&PacketAccessBit))),
+    _LinearAccessMask = (RowsAtCompileTime==1 || ColsAtCompileTime==1) ? LinearAccessBit : 0,
 
-    CanVectorizeRhs =  (!RhsIsDiagonal) && (RhsFlags & RowMajorBit) && (RhsFlags & PacketAccessBit)
-                     && (ColsAtCompileTime % ei_packet_traits<Scalar>::size == 0),
-
-    CanVectorizeLhs =  (!LhsIsDiagonal) && (!(LhsFlags & RowMajorBit)) && (LhsFlags & PacketAccessBit)
-                     && (RowsAtCompileTime % ei_packet_traits<Scalar>::size == 0),
-
-    RemovedBits = ~((RhsFlags & RowMajorBit) && (!CanVectorizeLhs) ? 0 : RowMajorBit),
-
-    Flags = ((unsigned int)(LhsFlags | RhsFlags) & HereditaryBits & RemovedBits)
-          | (((CanVectorizeLhs&&RhsIsDiagonal) || (CanVectorizeRhs&&LhsIsDiagonal)) ? PacketAccessBit : 0),
-
-    CoeffReadCost = NumTraits<Scalar>::MulCost + _LhsNested::CoeffReadCost + _RhsNested::CoeffReadCost
+    Flags = ((HereditaryBits|_LinearAccessMask) & (unsigned int)(MatrixType::Flags)) | (_Vectorizable ? PacketAccessBit : 0) | AlignedBit,//(int(MatrixType::Flags)&int(DiagonalType::DiagonalVectorType::Flags)&AlignedBit),
+    CoeffReadCost = NumTraits<Scalar>::MulCost + MatrixType::CoeffReadCost + DiagonalType::DiagonalVectorType::CoeffReadCost
   };
 };
+}
 
-template<typename LhsNested, typename RhsNested> class Product<LhsNested, RhsNested, DiagonalProduct> : ei_no_assignment_operator,
-  public MatrixBase<Product<LhsNested, RhsNested, DiagonalProduct> >
+template<typename MatrixType, typename DiagonalType, int ProductOrder>
+class DiagonalProduct : internal::no_assignment_operator,
+                        public MatrixBase<DiagonalProduct<MatrixType, DiagonalType, ProductOrder> >
 {
-    typedef typename ei_traits<Product>::_LhsNested _LhsNested;
-    typedef typename ei_traits<Product>::_RhsNested _RhsNested;
-
-    enum {
-      RhsIsDiagonal = (_RhsNested::Flags&Diagonal)==Diagonal
-    };
-
   public:
 
-    EIGEN_GENERIC_PUBLIC_INTERFACE(Product)
+    typedef MatrixBase<DiagonalProduct> Base;
+    EIGEN_DENSE_PUBLIC_INTERFACE(DiagonalProduct)
 
-    template<typename Lhs, typename Rhs>
-    inline Product(const Lhs& lhs, const Rhs& rhs)
-      : m_lhs(lhs), m_rhs(rhs)
+    inline DiagonalProduct(const MatrixType& matrix, const DiagonalType& diagonal)
+      : m_matrix(matrix), m_diagonal(diagonal)
     {
-      ei_assert(lhs.cols() == rhs.rows());
+      eigen_assert(diagonal.diagonal().size() == (ProductOrder == OnTheLeft ? matrix.rows() : matrix.cols()));
     }
 
-    inline int rows() const { return m_lhs.rows(); }
-    inline int cols() const { return m_rhs.cols(); }
+    EIGEN_STRONG_INLINE Index rows() const { return m_matrix.rows(); }
+    EIGEN_STRONG_INLINE Index cols() const { return m_matrix.cols(); }
 
-    const Scalar coeff(int row, int col) const
+    EIGEN_STRONG_INLINE const Scalar coeff(Index row, Index col) const
     {
-      const int unique = RhsIsDiagonal ? col : row;
-      return m_lhs.coeff(row, unique) * m_rhs.coeff(unique, col);
+      return m_diagonal.diagonal().coeff(ProductOrder == OnTheLeft ? row : col) * m_matrix.coeff(row, col);
+    }
+    
+    EIGEN_STRONG_INLINE const Scalar coeff(Index idx) const
+    {
+      enum {
+        StorageOrder = int(MatrixType::Flags) & RowMajorBit ? RowMajor : ColMajor
+      };
+      return coeff(int(StorageOrder)==ColMajor?idx:0,int(StorageOrder)==ColMajor?0:idx);
     }
 
     template<int LoadMode>
-    const PacketScalar packet(int row, int col) const
+    EIGEN_STRONG_INLINE PacketScalar packet(Index row, Index col) const
     {
-      if (RhsIsDiagonal)
-      {
-        return ei_pmul(m_lhs.template packet<LoadMode>(row, col), ei_pset1(m_rhs.coeff(col, col)));
-      }
-      else
-      {
-        return ei_pmul(ei_pset1(m_lhs.coeff(row, row)), m_rhs.template packet<LoadMode>(row, col));
-      }
+      enum {
+        StorageOrder = Flags & RowMajorBit ? RowMajor : ColMajor
+      };
+      const Index indexInDiagonalVector = ProductOrder == OnTheLeft ? row : col;
+      return packet_impl<LoadMode>(row,col,indexInDiagonalVector,typename internal::conditional<
+        ((int(StorageOrder) == RowMajor && int(ProductOrder) == OnTheLeft)
+       ||(int(StorageOrder) == ColMajor && int(ProductOrder) == OnTheRight)), internal::true_type, internal::false_type>::type());
+    }
+    
+    template<int LoadMode>
+    EIGEN_STRONG_INLINE PacketScalar packet(Index idx) const
+    {
+      enum {
+        StorageOrder = int(MatrixType::Flags) & RowMajorBit ? RowMajor : ColMajor
+      };
+      return packet<LoadMode>(int(StorageOrder)==ColMajor?idx:0,int(StorageOrder)==ColMajor?0:idx);
     }
 
   protected:
-    const LhsNested m_lhs;
-    const RhsNested m_rhs;
+    template<int LoadMode>
+    EIGEN_STRONG_INLINE PacketScalar packet_impl(Index row, Index col, Index id, internal::true_type) const
+    {
+      return internal::pmul(m_matrix.template packet<LoadMode>(row, col),
+                     internal::pset1<PacketScalar>(m_diagonal.diagonal().coeff(id)));
+    }
+
+    template<int LoadMode>
+    EIGEN_STRONG_INLINE PacketScalar packet_impl(Index row, Index col, Index id, internal::false_type) const
+    {
+      enum {
+        InnerSize = (MatrixType::Flags & RowMajorBit) ? MatrixType::ColsAtCompileTime : MatrixType::RowsAtCompileTime,
+        DiagonalVectorPacketLoadMode = (LoadMode == Aligned && (((InnerSize%16) == 0) || (int(DiagonalType::DiagonalVectorType::Flags)&AlignedBit)==AlignedBit) ? Aligned : Unaligned)
+      };
+      return internal::pmul(m_matrix.template packet<LoadMode>(row, col),
+                     m_diagonal.diagonal().template packet<DiagonalVectorPacketLoadMode>(id));
+    }
+
+    typename MatrixType::Nested m_matrix;
+    typename DiagonalType::Nested m_diagonal;
 };
+
+/** \returns the diagonal matrix product of \c *this by the diagonal matrix \a diagonal.
+  */
+template<typename Derived>
+template<typename DiagonalDerived>
+inline const DiagonalProduct<Derived, DiagonalDerived, OnTheRight>
+MatrixBase<Derived>::operator*(const DiagonalBase<DiagonalDerived> &a_diagonal) const
+{
+  return DiagonalProduct<Derived, DiagonalDerived, OnTheRight>(derived(), a_diagonal.derived());
+}
+
+} // end namespace Eigen
 
 #endif // EIGEN_DIAGONALPRODUCT_H

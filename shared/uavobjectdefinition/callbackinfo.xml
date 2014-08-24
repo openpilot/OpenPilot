@@ -6,8 +6,11 @@
 			<elementname>EventDispatcher</elementname>
 			<elementname>StateEstimation</elementname>
 			<elementname>AltitudeHold</elementname>
+			<elementname>Stabilization0</elementname>
+			<elementname>Stabilization1</elementname>
 			<elementname>PathPlanner0</elementname>
 			<elementname>PathPlanner1</elementname>
+			<elementname>ManualControl</elementname>
 		</elementnames>
 	</field> 
 	<field name="Running" units="bool" type="enum">
@@ -15,8 +18,11 @@
 			<elementname>EventDispatcher</elementname>
 			<elementname>StateEstimation</elementname>
 			<elementname>AltitudeHold</elementname>
+			<elementname>Stabilization0</elementname>
+			<elementname>Stabilization1</elementname>
 			<elementname>PathPlanner0</elementname>
 			<elementname>PathPlanner1</elementname>
+			<elementname>ManualControl</elementname>
 		</elementnames>
 		<options>
 			<option>False</option>
@@ -28,8 +34,11 @@
 			<elementname>EventDispatcher</elementname>
 			<elementname>StateEstimation</elementname>
 			<elementname>AltitudeHold</elementname>
+			<elementname>Stabilization0</elementname>
+			<elementname>Stabilization1</elementname>
 			<elementname>PathPlanner0</elementname>
 			<elementname>PathPlanner1</elementname>
+			<elementname>ManualControl</elementname>
 		</elementnames>
 	</field> 
         <access gcs="readonly" flight="readwrite"/>

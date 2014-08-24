@@ -35,6 +35,12 @@
 #include <oplinkreceiver.h>
 #include <pios_oplinkrcvr_priv.h>
 #include <taskinfo.h>
+#include <pios_ws2811.h>
+
+
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+#include <pios_instrumentation.h>
+#endif
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -51,6 +57,7 @@
  */
 
 #if defined(PIOS_INCLUDE_ADC)
+
 #include "pios_adc_priv.h"
 void PIOS_ADC_DMC_irq_handler(void);
 void DMA2_Stream4_IRQHandler(void) __attribute__((alias("PIOS_ADC_DMC_irq_handler")));
@@ -85,10 +92,16 @@ void PIOS_ADC_DMC_irq_handler(void)
 
 #endif /* if defined(PIOS_INCLUDE_ADC) */
 
-#if defined(PIOS_INCLUDE_HMC5883)
-#include "pios_hmc5883.h"
-static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
-    .vector = PIOS_HMC5883_IRQHandler,
+#if defined(PIOS_INCLUDE_HMC5X83)
+#include "pios_hmc5x83.h"
+pios_hmc5x83_dev_t onboard_mag = 0;
+
+bool pios_board_internal_mag_handler()
+{
+    return PIOS_HMC5x83_IRQHandler(onboard_mag);
+}
+static const struct pios_exti_cfg pios_exti_hmc5x83_cfg __exti_config = {
+    .vector = pios_board_internal_mag_handler,
     .line   = EXTI_Line7,
     .pin    = {
         .gpio = GPIOB,
@@ -118,14 +131,15 @@ static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
     },
 };
 
-static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
-    .exti_cfg  = &pios_exti_hmc5883_cfg,
-    .M_ODR     = PIOS_HMC5883_ODR_75,
-    .Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
-    .Gain = PIOS_HMC5883_GAIN_1_9,
-    .Mode = PIOS_HMC5883_MODE_CONTINUOUS,
+static const struct pios_hmc5x83_cfg pios_hmc5x83_cfg = {
+    .exti_cfg  = &pios_exti_hmc5x83_cfg,
+    .M_ODR     = PIOS_HMC5x83_ODR_75,
+    .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
+    .Gain      = PIOS_HMC5x83_GAIN_1_9,
+    .Mode      = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Driver    = &PIOS_HMC5x83_I2C_DRIVER,
 };
-#endif /* PIOS_INCLUDE_HMC5883 */
+#endif /* PIOS_INCLUDE_HMC5X83 */
 
 /**
  * Configuration for the MS5611 chip
@@ -224,6 +238,7 @@ uint32_t pios_com_debug_id;
 uint32_t pios_com_gps_id       = 0;
 uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telem_rf_id  = 0;
+uint32_t pios_com_rf_id        = 0;
 uint32_t pios_com_bridge_id    = 0;
 uint32_t pios_com_overo_id     = 0;
 uint32_t pios_com_hkosd_id     = 0;
@@ -231,7 +246,7 @@ uint32_t pios_com_hkosd_id     = 0;
 uint32_t pios_com_vcp_id       = 0;
 
 #if defined(PIOS_INCLUDE_RFM22B)
-uint32_t pios_rfm22b_id = 0;
+uint32_t pios_rfm22b_id        = 0;
 #endif
 
 uintptr_t pios_uavo_settings_fs_id;
@@ -249,10 +264,10 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
         PIOS_Assert(0);
     }
 
-    uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(rx_buf_len);
+    uint8_t *rx_buffer = (uint8_t *)pios_malloc(rx_buf_len);
     PIOS_Assert(rx_buffer);
     if (tx_buf_len != (size_t)-1) { // this is the case for rx/tx ports
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(tx_buf_len);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(tx_buf_len);
         PIOS_Assert(tx_buffer);
 
         if (PIOS_COM_Init(pios_com_id, com_driver, pios_usart_id,
@@ -350,6 +365,11 @@ void PIOS_Board_Init(void)
     PIOS_Assert(led_cfg);
     PIOS_LED_Init(led_cfg);
 #endif /* PIOS_INCLUDE_LED */
+
+
+#ifdef PIOS_INCLUDE_INSTRUMENTATION
+    PIOS_Instrumentation_Init(PIOS_INSTRUMENTATION_MAX_COUNTERS);
+#endif
 
     /* Set up the SPI interface to the gyro/acelerometer */
     if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {
@@ -492,8 +512,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_USB_VCPPORT_USBTELEMETRY:
 #if defined(PIOS_INCLUDE_COM)
         {
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
@@ -507,8 +527,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_USB_VCPPORT_COMBRIDGE:
 #if defined(PIOS_INCLUDE_COM)
         {
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_vcp_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
@@ -523,7 +543,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
         {
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_debug_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
                               NULL, 0,
@@ -554,8 +574,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_USB_HIDPORT_USBTELEMETRY:
 #if defined(PIOS_INCLUDE_COM)
         {
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
@@ -749,14 +769,18 @@ void PIOS_Board_Init(void)
         }
 
         /* Configure the radio com interface */
-        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
+        uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
         PIOS_Assert(rx_buffer);
         PIOS_Assert(tx_buffer);
-        if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
+        if (PIOS_COM_Init(&pios_com_rf_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
                           rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
                           tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
             PIOS_Assert(0);
+        }
+        /* Set Telemetry to use OPLinkMini if no other telemetry is configured (USB always overrides anyway) */
+        if (!pios_com_telem_rf_id) {
+            pios_com_telem_rf_id = pios_com_rf_id;
         }
         oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_ENABLED;
 
@@ -928,8 +952,8 @@ void PIOS_Board_Init(void)
     PIOS_ADC_Init(&pios_adc_cfg);
 #endif
 
-#if defined(PIOS_INCLUDE_HMC5883)
-    PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+#if defined(PIOS_INCLUDE_HMC5X83)
+    onboard_mag = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_mag_pressure_adapter_id, 0);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)
@@ -940,6 +964,17 @@ void PIOS_Board_Init(void)
     PIOS_MPU6000_Init(pios_spi_gyro_id, 0, &pios_mpu6000_cfg);
     PIOS_MPU6000_CONFIG_Configure();
 #endif
+
+#ifdef PIOS_INCLUDE_WS2811
+#include <pios_ws2811.h>
+    HwSettingsWS2811LED_OutOptions ws2811_pin_settings;
+    HwSettingsWS2811LED_OutGet(&ws2811_pin_settings);
+
+    if (ws2811_pin_settings != HWSETTINGS_WS2811LED_OUT_DISABLED && ws2811_pin_settings < NELEMENTS(pios_ws2811_pin_cfg)) {
+        PIOS_WS2811_Init(&pios_ws2811_cfg, &pios_ws2811_pin_cfg[ws2811_pin_settings]);
+    }
+
+#endif // PIOS_INCLUDE_WS2811
 }
 
 /**

@@ -102,7 +102,7 @@ void XplaneSimulator::transmitUpdate()
         float ailerons = actData.Roll;
         float elevator = actData.Pitch;
         float rudder   = actData.Yaw;
-        float throttle = actData.Throttle > 0 ? actData.Throttle : 0;
+        float throttle = actData.Thrust > 0 ? actData.Thrust : 0;
         float none     = -999;
         // quint32 none = *((quint32*)&tmp); // get float as 4 bytes
 

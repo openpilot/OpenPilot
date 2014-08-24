@@ -31,6 +31,7 @@
 #ifndef PIOS_USB_BOARD_DATA_H
 #define PIOS_USB_BOARD_DATA_H
 
+// Note : changing below length will require changes to the USB buffer setup
 #define PIOS_USB_BOARD_CDC_DATA_LENGTH 64
 #define PIOS_USB_BOARD_CDC_MGMT_LENGTH 32
 #define PIOS_USB_BOARD_HID_DATA_LENGTH 64

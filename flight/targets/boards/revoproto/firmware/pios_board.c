@@ -81,10 +81,16 @@ void PIOS_ADC_DMC_irq_handler(void)
 
 #endif /* if defined(PIOS_INCLUDE_ADC) */
 
-#if defined(PIOS_INCLUDE_HMC5883)
-#include "pios_hmc5883.h"
-static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
-    .vector = PIOS_HMC5883_IRQHandler,
+#if defined(PIOS_INCLUDE_HMC5X83)
+pios_hmc5x83_dev_t onboard_mag = 0;
+
+bool pios_board_internal_mag_handler()
+{
+    return PIOS_HMC5x83_IRQHandler(onboard_mag);
+}
+#include "pios_hmc5x83.h"
+static const struct pios_exti_cfg pios_exti_hmc5x83_cfg __exti_config = {
+    .vector = pios_board_internal_mag_handler,
     .line   = EXTI_Line5,
     .pin    = {
         .gpio = GPIOB,
@@ -114,14 +120,15 @@ static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
     },
 };
 
-static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
-    .exti_cfg  = &pios_exti_hmc5883_cfg,
-    .M_ODR     = PIOS_HMC5883_ODR_75,
-    .Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
-    .Gain = PIOS_HMC5883_GAIN_1_9,
-    .Mode = PIOS_HMC5883_MODE_CONTINUOUS,
+static const struct pios_hmc5x83_cfg pios_hmc5x83_cfg = {
+    .exti_cfg  = &pios_exti_hmc5x83_cfg,
+    .M_ODR     = PIOS_HMC5x83_ODR_75,
+    .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
+    .Gain      = PIOS_HMC5x83_GAIN_1_9,
+    .Mode      = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Driver    = &PIOS_HMC5x83_I2C_DRIVER,
 };
-#endif /* PIOS_INCLUDE_HMC5883 */
+#endif /* PIOS_INCLUDE_HMC5X83 */
 
 /**
  * Configuration for the MS5611 chip
@@ -321,10 +328,10 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
         PIOS_Assert(0);
     }
 
-    uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(rx_buf_len);
+    uint8_t *rx_buffer = (uint8_t *)pios_malloc(rx_buf_len);
     PIOS_Assert(rx_buffer);
     if (tx_buf_len != (size_t)-1) { // this is the case for rx/tx ports
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(tx_buf_len);
+        uint8_t *tx_buffer = (uint8_t *)pios_malloc(tx_buf_len);
         PIOS_Assert(tx_buffer);
 
         if (PIOS_COM_Init(pios_com_id, com_driver, pios_usart_id,
@@ -529,8 +536,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_USB_VCPPORT_USBTELEMETRY:
 #if defined(PIOS_INCLUDE_COM)
         {
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
@@ -544,8 +551,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_USB_VCPPORT_COMBRIDGE:
 #if defined(PIOS_INCLUDE_COM)
         {
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_BRIDGE_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_vcp_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
@@ -560,7 +567,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
         {
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_debug_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
                               NULL, 0,
@@ -591,8 +598,8 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_USB_HIDPORT_USBTELEMETRY:
 #if defined(PIOS_INCLUDE_COM)
         {
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
@@ -871,8 +878,8 @@ void PIOS_Board_Init(void)
                 PIOS_DEBUG_Assert(0);
             }
             const uint32_t PACKET_SIZE = 1024;
-            uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PACKET_SIZE);
-            uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PACKET_SIZE);
+            uint8_t *rx_buffer = (uint8_t *)pios_malloc(PACKET_SIZE);
+            uint8_t *tx_buffer = (uint8_t *)pios_malloc(PACKET_SIZE);
             PIOS_Assert(rx_buffer);
             PIOS_Assert(tx_buffer);
             if (PIOS_COM_Init(&pios_com_overo_id, &pios_overo_com_driver, pios_overo_id,
@@ -938,8 +945,8 @@ void PIOS_Board_Init(void)
     PIOS_ADC_Init(&pios_adc_cfg);
 #endif
 
-#if defined(PIOS_INCLUDE_HMC5883)
-    PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+#if defined(PIOS_INCLUDE_HMC5X83)
+    onboard_mag = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_pressure_adapter_id, 0);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)

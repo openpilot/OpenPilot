@@ -1,14 +1,12 @@
 <xml>
     <object name="AttitudeSettings" singleinstance="true" settings="true" category="State">
         <description>Settings for the @ref Attitude module used on CopterControl</description>
-        <field name="AccelBias" units="lsb" type="int16" elementnames="X,Y,Z" defaultvalue="0"/>
-        <field name="GyroBias" units="deg/s * 100" type="int16" elementnames="X,Y,Z" defaultvalue="0"/>
-        <field name="BoardRotation" units="deg" type="int16" elementnames="Roll,Pitch,Yaw" defaultvalue="0,0,0"/>
-        <field name="GyroGain" units="(rad/s)/lsb" type="float" elements="1" defaultvalue="0.42"/>
+        <field name="BoardRotation" units="deg" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="0,0,0"/>
+        <field name="BoardLevelTrim" units="deg" type="float" elementnames="Roll,Pitch" defaultvalue="0,0"/>
         <field name="AccelKp" units="channel" type="float" elements="1" defaultvalue="0.05"/>
         <field name="AccelKi" units="channel" type="float" elements="1" defaultvalue="0.0001"/>
-        <field name="MagKi" units="" type="float" elements="1" defaultvalue="0"/>
-        <field name="MagKp" units="" type="float" elements="1" defaultvalue="0"/>
+        <field name="MagKi" units="" type="float" elements="1" defaultvalue="0.000001"/>
+        <field name="MagKp" units="" type="float" elements="1" defaultvalue="0.01"/>
         <field name="AccelTau" units="" type="float" elements="1" defaultvalue="0"/>
         <field name="YawBiasRate" units="channel" type="float" elements="1" defaultvalue="0.000001"/>
         <field name="ZeroDuringArming" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>

@@ -33,7 +33,7 @@
 
 // Private constants
 #define STACK_SAFETYCOUNT 16
-#define STACK_SIZE        (384 + STACK_SAFETYSIZE)
+#define STACK_SIZE        (190 + STACK_SAFETYSIZE)
 #define STACK_SAFETYSIZE  8
 #define MAX_SLEEP         1000
 
@@ -45,7 +45,7 @@ struct DelayedCallbackTaskStruct {
     DelayedCallbackInfo *callbackQueue[CALLBACK_PRIORITY_LOW + 1];
     DelayedCallbackInfo *queueCursor[CALLBACK_PRIORITY_LOW + 1];
     xTaskHandle callbackSchedulerTaskHandle;
-    signed char name[3];
+    char name[3];
     uint32_t    stackSize;
     DelayedCallbackPriorityTask priorityTask;
     xSemaphoreHandle signal;
@@ -273,7 +273,7 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     // if given priorityTask does not exist, create it
     if (!task) {
         // allocate memory if possible
-        task = (struct DelayedCallbackTaskStruct *)pvPortMalloc(sizeof(struct DelayedCallbackTaskStruct));
+        task = (struct DelayedCallbackTaskStruct *)pios_malloc(sizeof(struct DelayedCallbackTaskStruct));
         if (!task) {
             xSemaphoreGiveRecursive(mutex);
             return NULL;
@@ -329,7 +329,7 @@ DelayedCallbackInfo *PIOS_CALLBACKSCHEDULER_Create(
     }
 
     // initialize callback scheduling info
-    DelayedCallbackInfo *info = (DelayedCallbackInfo *)pvPortMalloc(sizeof(DelayedCallbackInfo));
+    DelayedCallbackInfo *info = (DelayedCallbackInfo *)pios_malloc(sizeof(DelayedCallbackInfo));
     if (!info) {
         xSemaphoreGiveRecursive(mutex);
         return NULL; // error - not enough memory

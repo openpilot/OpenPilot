@@ -55,6 +55,7 @@ typedef struct {
     UAVObjEvent  ev; /** The actual event */
     UAVObjEventCallback cb; /** The callback function, or zero if none */
     xQueueHandle queue; /** The queue or zero if none */
+    bool lowpriority; /** set to true for telemetry and other low priority stuffs, prevent raising warning */
 } EventCallbackInfo;
 
 /**
@@ -227,7 +228,7 @@ static int32_t eventPeriodicCreate(UAVObjEvent *ev, UAVObjEventCallback cb, xQue
         }
     }
     // Create handle
-    objEntry = (PeriodicObjectList *)pvPortMalloc(sizeof(PeriodicObjectList));
+    objEntry = (PeriodicObjectList *)pios_malloc(sizeof(PeriodicObjectList));
     if (objEntry == NULL) {
         return -1;
     }
@@ -341,7 +342,7 @@ static int32_t processPeriodicUpdates()
                 }
                 // Push event to queue, if one
                 if (objEntry->evInfo.queue != 0) {
-                    if (xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0) != pdTRUE) { // do not block if queue is full
+                    if (xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0) != pdTRUE && !objEntry->evInfo.ev.lowPriority) { // do not block if queue is full
                         if (objEntry->evInfo.ev.obj != NULL) {
                             mStats.lastErrorID = UAVObjGetID(objEntry->evInfo.ev.obj);
                         }

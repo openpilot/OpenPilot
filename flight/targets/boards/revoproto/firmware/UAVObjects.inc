@@ -1,9 +1,5 @@
-#####
-# Project: OpenPilot
 #
-# Makefile for OpenPilot UAVObject code
-#
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2011.
+# Copyright (c) 2009-2013, The OpenPilot Team, http://www.openpilot.org
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,12 +14,12 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-#####
+#
 
 # These are the UAVObjects supposed to be build as part of the OpenPilot target
 # (all architectures)
-
 UAVOBJSRCFILENAMES =
+UAVOBJSRCFILENAMES += accelgyrosettings
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired
@@ -34,12 +30,16 @@ UAVOBJSRCFILENAMES += gyrostate
 UAVOBJSRCFILENAMES += gyrosensor
 UAVOBJSRCFILENAMES += accelstate
 UAVOBJSRCFILENAMES += accelsensor
-UAVOBJSRCFILENAMES += magstate
 UAVOBJSRCFILENAMES += magsensor
+UAVOBJSRCFILENAMES += magstate
 UAVOBJSRCFILENAMES += barosensor
 UAVOBJSRCFILENAMES += airspeedsensor
 UAVOBJSRCFILENAMES += airspeedsettings
 UAVOBJSRCFILENAMES += airspeedstate
+UAVOBJSRCFILENAMES += debuglogsettings
+UAVOBJSRCFILENAMES += debuglogcontrol
+UAVOBJSRCFILENAMES += debuglogstatus
+UAVOBJSRCFILENAMES += debuglogentry
 UAVOBJSRCFILENAMES += flightbatterysettings
 UAVOBJSRCFILENAMES += firmwareiapobj
 UAVOBJSRCFILENAMES += flightbatterystate
@@ -61,10 +61,12 @@ UAVOBJSRCFILENAMES += homelocation
 UAVOBJSRCFILENAMES += i2cstats
 UAVOBJSRCFILENAMES += manualcontrolcommand
 UAVOBJSRCFILENAMES += manualcontrolsettings
+UAVOBJSRCFILENAMES += flightmodesettings
 UAVOBJSRCFILENAMES += mixersettings
 UAVOBJSRCFILENAMES += mixerstatus
 UAVOBJSRCFILENAMES += nedaccel
 UAVOBJSRCFILENAMES += objectpersistence
+UAVOBJSRCFILENAMES += oplinkreceiver
 UAVOBJSRCFILENAMES += overosyncstats
 UAVOBJSRCFILENAMES += overosyncsettings
 UAVOBJSRCFILENAMES += pathaction
@@ -85,6 +87,7 @@ UAVOBJSRCFILENAMES += stabilizationsettings
 UAVOBJSRCFILENAMES += stabilizationsettingsbank1
 UAVOBJSRCFILENAMES += stabilizationsettingsbank2
 UAVOBJSRCFILENAMES += stabilizationsettingsbank3
+UAVOBJSRCFILENAMES += stabilizationstatus
 UAVOBJSRCFILENAMES += stabilizationbank
 UAVOBJSRCFILENAMES += systemalarms
 UAVOBJSRCFILENAMES += systemsettings
@@ -100,14 +103,17 @@ UAVOBJSRCFILENAMES += receiveractivity
 UAVOBJSRCFILENAMES += cameradesired
 UAVOBJSRCFILENAMES += camerastabsettings
 UAVOBJSRCFILENAMES += altitudeholdsettings
+UAVOBJSRCFILENAMES += oplinksettings
+UAVOBJSRCFILENAMES += oplinkstatus
 UAVOBJSRCFILENAMES += altitudefiltersettings
-UAVOBJSRCFILENAMES += altitudeholddesired
 UAVOBJSRCFILENAMES += altitudeholdstatus
 UAVOBJSRCFILENAMES += waypoint
 UAVOBJSRCFILENAMES += waypointactive
 UAVOBJSRCFILENAMES += poilocation
 UAVOBJSRCFILENAMES += poilearnsettings
 UAVOBJSRCFILENAMES += mpu6000settings
+UAVOBJSRCFILENAMES += txpidsettings
+UAVOBJSRCFILENAMES += takeofflocation
 
 UAVOBJSRC = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),$(OPUAVSYNTHDIR)/$(UAVOBJSRCFILE).c )
 UAVOBJDEFINE = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),-DUAVOBJ_INIT_$(UAVOBJSRCFILE) )

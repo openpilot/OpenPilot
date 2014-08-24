@@ -126,7 +126,7 @@ void opmap_edit_waypoint_dialog::setupModeWidgets()
         ui->modeParam1->setText("pitch");
         ui->modeParam2->setText("roll");
         ui->modeParam3->setText("yaw");
-        ui->modeParam4->setText("throttle");
+        ui->modeParam4->setText("thrust");
         ui->modeParam1->setVisible(true);
         ui->modeParam2->setVisible(true);
         ui->modeParam3->setVisible(true);

@@ -2,7 +2,6 @@
     <qresource prefix="/configgadget">
         <file>images/help2.png</file>
         <file>images/ahrs-calib.svg</file>
-        <file>images/paper-plane.svg</file>
         <file>images/multirotor-shapes.svg</file>
         <file>images/ccpm_setup.svg</file>
         <file>images/PipXtreme.png</file>
@@ -30,5 +29,21 @@
         <file>images/pipx-selected.png</file>
         <file>images/pipx-normal.png</file>
         <file>images/revolution_top.png</file>
+        <file>calibration/WizardStepIndicator.qml</file>
+        <file>images/calibration/board-dwn.png</file>
+        <file>images/calibration/board-enu.png</file>
+        <file>images/calibration/plane-dwn.png</file>
+        <file>images/calibration/plane-enu.png</file>
+        <file>images/calibration/plane-ned.png</file>
+        <file>images/calibration/plane-suw.png</file>
+        <file>images/calibration/plane-use.png</file>
+        <file>images/calibration/plane-wds.png</file>
+        <file>images/calibration/board-ned.png</file>
+        <file>images/calibration/board-suw.png</file>
+        <file>images/calibration/board-use.png</file>
+        <file>images/calibration/board-wds.png</file>
+        <file>images/calibration/empty.png</file>
+        <file>images/calibration/plane-swd.png</file>
+        <file>images/calibration/board-swd.png</file>
     </qresource>
 </RCC>

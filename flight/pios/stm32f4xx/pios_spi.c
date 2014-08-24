@@ -53,7 +53,7 @@ static bool PIOS_SPI_validate(__attribute__((unused)) struct pios_spi_dev *com_d
 #if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_spi_dev *PIOS_SPI_alloc(void)
 {
-    return pvPortMalloc(sizeof(struct pios_spi_dev));
+    return pios_malloc(sizeof(struct pios_spi_dev));
 }
 #else
 static struct pios_spi_dev pios_spi_devs[PIOS_SPI_MAX_DEVS];
@@ -585,6 +585,9 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 
     /* Wait until all bytes have been transmitted/received */
     while (DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel)) {
+#if defined(PIOS_INCLUDE_FREERTOS)
+        vTaskDelay(0);
+#endif
         ;
     }
 

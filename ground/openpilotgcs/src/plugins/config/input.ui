@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>796</width>
-    <height>828</height>
+    <height>591</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -116,8 +116,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>774</width>
-            <height>748</height>
+            <width>772</width>
+            <height>514</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -143,16 +143,16 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_6">
               <property name="leftMargin">
-               <number>12</number>
+               <number>9</number>
               </property>
               <property name="topMargin">
-               <number>0</number>
+               <number>9</number>
               </property>
               <property name="rightMargin">
-               <number>12</number>
+               <number>9</number>
               </property>
               <property name="bottomMargin">
-               <number>0</number>
+               <number>9</number>
               </property>
               <item>
                <widget class="QStackedWidget" name="stackedWidget">
@@ -162,21 +162,21 @@
                 <widget class="QWidget" name="advancedPage">
                  <layout class="QVBoxLayout" name="verticalLayout_3">
                   <property name="leftMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
                   <property name="topMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
                   <property name="rightMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
                   <item>
-                   <layout class="QVBoxLayout" name="channelSettings">
-                    <property name="spacing">
-                     <number>0</number>
+                   <layout class="QGridLayout" name="channelLayout">
+                    <property name="horizontalSpacing">
+                     <number>12</number>
                     </property>
                    </layout>
                   </item>
@@ -198,7 +198,7 @@
                   </item>
                   <item>
                    <layout class="QGridLayout" name="gridLayout_3">
-                    <item row="0" column="4">
+                    <item row="0" column="3">
                      <spacer name="horizontalSpacer_3">
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
@@ -211,14 +211,14 @@
                       </property>
                      </spacer>
                     </item>
-                    <item row="0" column="1">
+                    <item row="0" column="0">
                      <widget class="QLabel" name="labelDeadband">
                       <property name="text">
                        <string>Roll/Pitch/Yaw stick deadband</string>
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="2">
+                    <item row="0" column="1">
                      <widget class="QDoubleSpinBox" name="deadband">
                       <property name="toolTip">
                        <string>Stick deadband in percents of full range (0-10), zero to disable</string>
@@ -234,22 +234,6 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="0">
-                     <spacer name="horizontalSpacer_8">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeType">
-                       <enum>QSizePolicy::Fixed</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>12</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
                    </layout>
                   </item>
                   <item>
@@ -260,7 +244,7 @@
                     <property name="sizeHint" stdset="0">
                      <size>
                       <width>20</width>
-                      <height>40</height>
+                      <height>10</height>
                      </size>
                     </property>
                    </spacer>
@@ -369,6 +353,12 @@
               </item>
               <item>
                <widget class="QPushButton" name="configurationWizard">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>210</width>
@@ -412,6 +402,12 @@
                <widget class="QPushButton" name="runCalibration">
                 <property name="enabled">
                  <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
                 <property name="minimumSize">
                  <size>
@@ -546,8 +542,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>768</width>
-            <height>742</height>
+            <width>724</width>
+            <height>497</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7" rowstretch="1,0,0,0">
@@ -587,7 +583,7 @@
              <property name="title">
               <string>Stabilization Modes Configuration</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0,0,0,0,0,0,0,0">
+             <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0,0,0,0,0,0,0,0,0,0">
               <property name="leftMargin">
                <number>9</number>
               </property>
@@ -626,6 +622,51 @@
                 </property>
                </spacer>
               </item>
+              <item row="1" column="10">
+               <spacer name="horizontalSpacer_15">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>10</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="11">
+               <widget class="QLabel" name="label_11">
+                <property name="minimumSize">
+                 <size>
+                  <width>120</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+margin:1px;
+font:bold;</string>
+                </property>
+                <property name="text">
+                 <string>Thrust</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="9">
                <widget class="QLabel" name="label_10">
                 <property name="minimumSize">
@@ -644,8 +685,8 @@
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Yaw</string>
@@ -673,8 +714,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Pitch</string>
@@ -684,7 +725,7 @@ margin:1px;</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="10">
+              <item row="1" column="12">
                <spacer name="horizontalSpacer_11">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -718,8 +759,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Roll</string>
@@ -750,6 +791,18 @@ margin:1px;</string>
                  <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_13">
+                 <property name="leftMargin">
+                  <number>1</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>1</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>1</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>1</number>
+                 </property>
                  <item>
                   <widget class="QLabel" name="label_14">
                    <property name="text">
@@ -774,6 +827,36 @@ margin:1px;</string>
                   <widget class="QLabel" name="label_22">
                    <property name="text">
                     <string>Stabilized 3</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_114">
+                   <property name="text">
+                    <string>Stabilized 4</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_121">
+                   <property name="text">
+                    <string>Stabilized 5</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_122">
+                   <property name="text">
+                    <string>Stabilized 6</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -831,6 +914,27 @@ margin:1px;</string>
                    </property>
                   </widget>
                  </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos4Roll">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos5Roll">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos6Roll">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
               </item>
@@ -882,6 +986,27 @@ margin:1px;</string>
                    </property>
                   </widget>
                  </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos4Pitch">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos5Pitch">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos6Pitch">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
               </item>
@@ -928,6 +1053,99 @@ margin:1px;</string>
                  </item>
                  <item>
                   <widget class="QComboBox" name="fmsSsPos3Yaw">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos4Yaw">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos5Yaw">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos6Yaw">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="11">
+               <widget class="QFrame" name="frame_7">
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_16">
+                 <property name="leftMargin">
+                  <number>1</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>1</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>1</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>1</number>
+                 </property>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos1Thrust">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos2Thrust">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos3Thrust">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos4Thrust">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos5Thrust">
+                   <property name="focusPolicy">
+                    <enum>Qt::StrongFocus</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="fmsSsPos6Thrust">
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
@@ -989,7 +1207,7 @@ margin:1px;</string>
                <number>6</number>
               </property>
               <item row="0" column="6">
-               <widget class="QLabel" name="label_11">
+               <widget class="QLabel" name="label_111">
                 <property name="minimumSize">
                  <size>
                   <width>80</width>
@@ -1006,8 +1224,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>PID Bank</string>
@@ -1021,7 +1239,7 @@ margin:1px;</string>
                <widget class="QLabel" name="label_16">
                 <property name="minimumSize">
                  <size>
-                  <width>132</width>
+                  <width>138</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -1035,8 +1253,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Flight Mode Count</string>
@@ -1048,12 +1266,6 @@ margin:1px;</string>
               </item>
               <item row="1" column="10">
                <widget class="QSpinBox" name="fmsPosNum">
-                <property name="maximumSize">
-                 <size>
-                  <width>151</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
                 <property name="toolTip">
                  <string>Number of positions your FlightMode switch has.
 
@@ -1078,19 +1290,20 @@ channel value for each flight mode.</string>
               <item row="2" column="10">
                <widget class="QLabel" name="label_15">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
                 <property name="font">
                  <font>
+                  <pointsize>10</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
                 <property name="text">
-                 <string>Avoid &quot;Manual&quot; for multirotors!</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -1102,22 +1315,6 @@ channel value for each flight mode.</string>
               </item>
               <item row="1" column="3">
                <spacer name="horizontalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>10</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="1" column="5">
-               <spacer name="horizontalSpacer_15">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -1164,35 +1361,6 @@ channel value for each flight mode.</string>
                 </property>
                </spacer>
               </item>
-              <item row="0" column="4">
-               <widget class="QLabel" name="label_12">
-                <property name="minimumSize">
-                 <size>
-                  <width>105</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-                </property>
-                <property name="text">
-                 <string>Cruise Control</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="8" rowspan="3">
                <widget class="Line" name="line">
                 <property name="orientation">
@@ -1218,8 +1386,8 @@ margin:1px;</string>
                  <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
 border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
+margin:1px;
+font:bold;</string>
                 </property>
                 <property name="text">
                  <string>Flight Mode</string>
@@ -1227,294 +1395,6 @@ margin:1px;</string>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
                 </property>
-               </widget>
-              </item>
-              <item row="1" column="4" rowspan="2">
-               <widget class="QFrame" name="frame_4">
-                <property name="minimumSize">
-                 <size>
-                  <width>30</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_4">
-                 <property name="spacing">
-                  <number>6</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>1</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>1</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>1</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>1</number>
-                 </property>
-                 <item alignment="Qt::AlignHCenter">
-                  <widget class="QCheckBox" name="cc_box_0">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlFlightModeSwitchPosEnable</string>
-                     <string>index:0</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item alignment="Qt::AlignHCenter">
-                  <widget class="QCheckBox" name="cc_box_1">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #2.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlFlightModeSwitchPosEnable</string>
-                     <string>index:1</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item alignment="Qt::AlignHCenter">
-                  <widget class="QCheckBox" name="cc_box_2">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #3.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlFlightModeSwitchPosEnable</string>
-                     <string>index:2</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item alignment="Qt::AlignHCenter">
-                  <widget class="QCheckBox" name="cc_box_3">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #4.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlFlightModeSwitchPosEnable</string>
-                     <string>index:3</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item alignment="Qt::AlignHCenter">
-                  <widget class="QCheckBox" name="cc_box_4">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #5.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlFlightModeSwitchPosEnable</string>
-                     <string>index:4</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item alignment="Qt::AlignHCenter">
-                  <widget class="QCheckBox" name="cc_box_5">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #6.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                   <property name="layoutDirection">
-                    <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:CruiseControlFlightModeSwitchPosEnable</string>
-                     <string>index:5</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
                </widget>
               </item>
               <item row="1" column="0" rowspan="2">
@@ -1867,7 +1747,7 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
                </widget>
               </item>
               <item row="1" column="6" rowspan="2">
-               <widget class="QFrame" name="frame_7">
+               <widget class="QFrame" name="frame_8">
                 <property name="minimumSize">
                  <size>
                   <width>75</width>
@@ -2164,8 +2044,8 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>768</width>
-            <height>742</height>
+            <width>407</width>
+            <height>138</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

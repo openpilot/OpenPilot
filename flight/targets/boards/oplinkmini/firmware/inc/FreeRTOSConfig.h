@@ -75,11 +75,9 @@
 #endif
 
 /* Enable run time stats collection */
-#ifdef DIAG_TASKS
-#define configCHECK_FOR_STACK_OVERFLOW 2
-
 #define configGENERATE_RUN_TIME_STATS  1
 #define INCLUDE_uxTaskGetRunTime       1
+#define INCLUDE_xTaskGetIdleTaskHandle 1
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() \
     do { \
         (*(unsigned long *)0xe000edfc) |= (1 << 24); /* DEMCR |= DEMCR_TRCENA */ \
@@ -87,6 +85,9 @@
     } \
     while (0)
 #define portGET_RUN_TIME_COUNTER_VALUE() (*(unsigned long *)0xe0001004) /* DWT_CYCCNT */
+
+#ifdef DIAG_TASKS
+#define configCHECK_FOR_STACK_OVERFLOW 2
 #else
 #define configCHECK_FOR_STACK_OVERFLOW 1
 #endif

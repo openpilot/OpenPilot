@@ -33,8 +33,8 @@
 
 bool isFirstRun = true;
 QString debugInfo(DBG_BUFFER_MAX_SIZE, ' ');
-QString pluginFolder(MAX_PATH, ' ');
-QString outputFolder(MAX_PATH, ' ');
+QString pluginFolder(_MAX_PATH, ' ');
+QString outputFolder(_MAX_PATH, ' ');
 
 QList<quint16> videoModes;
 QTime ledTimer;

@@ -404,8 +404,17 @@ static void go_starting(struct pios_i2c_adapter *i2c_adapter)
     PIOS_DEBUG_Assert(i2c_adapter->active_txn >= i2c_adapter->first_txn);
     PIOS_DEBUG_Assert(i2c_adapter->active_txn <= i2c_adapter->last_txn);
 
-    i2c_adapter->active_byte = &(i2c_adapter->active_txn->buf[0]);
-    i2c_adapter->last_byte   = &(i2c_adapter->active_txn->buf[i2c_adapter->active_txn->len - 1]);
+    // check for an empty read/write
+    if (i2c_adapter->active_txn->buf != NULL && i2c_adapter->active_txn->len != 0) {
+        // Data available
+        i2c_adapter->active_byte = &(i2c_adapter->active_txn->buf[0]);
+        i2c_adapter->last_byte   = &(i2c_adapter->active_txn->buf[i2c_adapter->active_txn->len - 1]);
+    } else {
+        // No Data available => Empty read/write
+        i2c_adapter->last_byte   = NULL;
+        i2c_adapter->active_byte = i2c_adapter->last_byte + 1;
+    }
+
 
     I2C_GenerateSTART(i2c_adapter->cfg->regs, ENABLE);
     if (i2c_adapter->active_txn->rw == PIOS_I2C_TXN_READ) {
@@ -826,7 +835,7 @@ static struct pios_i2c_adapter *PIOS_I2C_alloc(void)
 {
     struct pios_i2c_adapter *i2c_adapter;
 
-    i2c_adapter = (struct pios_i2c_adapter *)pvPortMalloc(sizeof(*i2c_adapter));
+    i2c_adapter = (struct pios_i2c_adapter *)pios_malloc(sizeof(*i2c_adapter));
     if (!i2c_adapter) {
         return NULL;
     }
@@ -924,9 +933,9 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
-
-    PIOS_Assert(valid)
+    if (!PIOS_I2C_validate(i2c_adapter)) {
+        return -1;
+    }
 
     PIOS_DEBUG_Assert(txn_list);
     PIOS_DEBUG_Assert(num_txns);
@@ -968,6 +977,14 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
     semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
 #endif
 
+    // Estimate bytes of transmission. Per txns: 1 adress byte + length
+    i2c_adapter->transfer_timeout_ticks = num_txns;
+    for (uint32_t i = 0; i < num_txns; i++) {
+        i2c_adapter->transfer_timeout_ticks += txn_list[i].len;
+    }
+    // timeout if it takes eight times the expected time
+    i2c_adapter->transfer_timeout_ticks <<= 3;
+
     i2c_adapter->bus_error = false;
     i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_START);
 
@@ -983,7 +1000,15 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 
     /* Spin waiting for the transfer to finish */
     while (!i2c_adapter_fsm_terminated(i2c_adapter)) {
-        ;
+        /* sleep 9 clock ticks (1 byte), because FSM can't be faster than one byte
+           FIXME: clock streching could make problems, but citing NPX: alsmost no slave device implements clock stretching
+           three times the expected time should cover clock delay */
+        PIOS_DELAY_WaituS(i2c_adapter->transfer_delay_uS);
+
+        i2c_adapter->transfer_timeout_ticks--;
+        if (i2c_adapter->transfer_timeout_ticks == 0) {
+            break;
+        }
     }
 
     if (i2c_adapter_wait_for_stopped(i2c_adapter)) {
@@ -1010,9 +1035,9 @@ void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
-
-    PIOS_Assert(valid)
+    if (!PIOS_I2C_validate(i2c_adapter)) {
+        return;
+    }
 
     uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
@@ -1136,9 +1161,10 @@ void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
 {
     struct pios_i2c_adapter *i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-    bool valid = PIOS_I2C_validate(i2c_adapter);
+    if (!PIOS_I2C_validate(i2c_adapter)) {
+        return;
+    }
 
-    PIOS_Assert(valid)
 
 #if defined(PIOS_I2C_DIAGNOSTICS)
     uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);

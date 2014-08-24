@@ -8,18 +8,29 @@ Rectangle {
         elementName: "pfd-window"
         fillMode: Image.PreserveAspectFit
         anchors.fill: parent
-
         sceneSize: Qt.size(width, height)
+        
+        Rectangle {
+            width: Math.floor(parent.paintedHeight * 1.319)
+            height: Math.floor(parent.paintedHeight - parent.paintedHeight * 0.008)
+            
+            color: "transparent"
+            border.color: "white"
+            border.width: Math.floor(parent.paintedHeight * 0.008)
+            radius: Math.floor(parent.paintedHeight * 0.01)
+            anchors.centerIn: parent             
+        }
 
         Item {
             id: sceneItem
+
+            width: Math.floor((parent.paintedHeight * 1.32) - (parent.paintedHeight * 0.013))
+            height: Math.floor(parent.paintedHeight - parent.paintedHeight * 0.02)
             property variant viewportSize : Qt.size(width, height)
 
-            width: parent.paintedWidth
-            height: parent.paintedHeight
             anchors.centerIn: parent
             clip: true
-
+           
             Loader {
                 id: worldLoader
                 anchors.fill: parent
@@ -40,33 +51,11 @@ Rectangle {
             }
 
             SvgElementImage {
-                id: foreground
-                elementName: "foreground"
+                id: side_slip_fixed
+                elementName: "sideslip-fixed"
                 sceneSize: sceneItem.viewportSize
 
-                anchors.centerIn: parent
-            }
-
-            SvgElementImage {
-                id: side_slip
-                elementName: "sideslip"
-                sceneSize: sceneItem.viewportSize
-                smooth: true
-
-                property real sideSlip: AccelState.y
-                //smooth side slip changes, a low pass filter replacement
-                //accels are updated once per second
-                Behavior on sideSlip {
-                    SmoothedAnimation {
-                        duration: 1000
-                        velocity: -1
-                    }
-                }
-
-                anchors.horizontalCenter: foreground.horizontalCenter
-                //0.5 coefficient is empirical to limit indicator movement
-                anchors.horizontalCenterOffset: -sideSlip*width*0.5
-                y: scaledBounds.y * sceneItem.height
+                x: scaledBounds.x * sceneItem.width
             }
 
             Compass {
@@ -85,11 +74,6 @@ Rectangle {
             }
 
             VsiScale {
-                anchors.fill: parent
-                sceneSize: sceneItem.viewportSize
-            }
-
-            PfdIndicators {
                 anchors.fill: parent
                 sceneSize: sceneItem.viewportSize
             }

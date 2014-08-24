@@ -14,22 +14,20 @@ HEADERS += \
     uavdataobject.h \
     uavobjectfield.h \
     uavobjectsinit.h \
-    uavobjectsplugin.h \
-    uavobjecthelper.h
-
+    uavobjectsplugin.h
 SOURCES += \
     uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
     uavdataobject.cpp \
     uavobjectfield.cpp \
-    uavobjectsplugin.cpp \
-    uavobjecthelper.cpp
+    uavobjectsplugin.cpp
 
 OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += \
+    $$UAVOBJECT_SYNTHETICS/accelgyrosettings.h \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/barosensor.h \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.h \
@@ -37,7 +35,6 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/airspeedstate.h \
     $$UAVOBJECT_SYNTHETICS/attitudestate.h \
     $$UAVOBJECT_SYNTHETICS/attitudesimulated.h \
-    $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholdstatus.h \
     $$UAVOBJECT_SYNTHETICS/altitudefiltersettings.h \
@@ -64,6 +61,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/overosyncstats.h \
     $$UAVOBJECT_SYNTHETICS/overosyncsettings.h \
     $$UAVOBJECT_SYNTHETICS/systemsettings.h \
+    $$UAVOBJECT_SYNTHETICS/stabilizationstatus.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettingsbank1.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettingsbank2.h \
@@ -71,6 +69,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/stabilizationbank.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.h \
+    $$UAVOBJECT_SYNTHETICS/flightmodesettings.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationdesired.h \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.h \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.h \
@@ -126,9 +125,12 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/osdsettings.h \
     $$UAVOBJECT_SYNTHETICS/waypoint.h \
     $$UAVOBJECT_SYNTHETICS/waypointactive.h \
-    $$UAVOBJECT_SYNTHETICS/mpu6000settings.h
+    $$UAVOBJECT_SYNTHETICS/mpu6000settings.h \
+    $$UAVOBJECT_SYNTHETICS/takeofflocation.h \
+    $$UAVOBJECT_SYNTHETICS/perfcounter.h
 
 SOURCES += \
+    $$UAVOBJECT_SYNTHETICS/accelgyrosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/barosensor.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.cpp \
@@ -136,7 +138,6 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/airspeedstate.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudestate.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudesimulated.cpp \
-    $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholdstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/debuglogsettings.cpp \
@@ -163,6 +164,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/overosyncstats.cpp \
     $$UAVOBJECT_SYNTHETICS/overosyncsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/systemsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/stabilizationstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettingsbank1.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettingsbank2.cpp \
@@ -170,6 +172,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/stabilizationbank.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.cpp \
+    $$UAVOBJECT_SYNTHETICS/flightmodesettings.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.cpp \
@@ -226,4 +229,7 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/osdsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/waypoint.cpp \
     $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
-    $$UAVOBJECT_SYNTHETICS/mpu6000settings.cpp
+    $$UAVOBJECT_SYNTHETICS/mpu6000settings.cpp \
+    $$UAVOBJECT_SYNTHETICS/takeofflocation.cpp \
+    $$UAVOBJECT_SYNTHETICS/perfcounter.cpp
+    

@@ -139,7 +139,24 @@ SECTIONS
 		*(.fast)
 		_efast = . ;
 	} > CCSRAM
-
+	
+	.fastheap (NOLOAD) :
+    {
+        . = ALIGN(4);
+        _sfastheap = . ;
+        
+        /*
+         * This allows us to declare an object or objects up to the minimum acceptable
+         * heap size and receive a linker error if the space available for the heap is
+         * not sufficient.
+         */
+        *(.fastheap)
+        
+        /* extend the fastheap up to the top of CCSRAM */
+        . = ORIGIN(CCSRAM) + LENGTH(CCSRAM) - ABSOLUTE(_sfastheap);
+        _efastheap = .;
+    } > CCSRAM
+    
     /* Stabs debugging sections.  */
     .stab          0 : { *(.stab) }
     .stabstr       0 : { *(.stabstr) }

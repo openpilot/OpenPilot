@@ -10,6 +10,9 @@ Item {
         elementName: "center-arrows"
         sceneSize: background.sceneSize
 
+        width: Math.floor(scaledBounds.width * sceneItem.width)
+        height: Math.floor(scaledBounds.height * sceneItem.height)
+
         x: Math.floor(scaledBounds.x * sceneItem.width)
         y: Math.floor(scaledBounds.y * sceneItem.height)
     }
@@ -18,6 +21,9 @@ Item {
         id: world_center_plane
         elementName: "center-plane"
         sceneSize: background.sceneSize
+
+        width: Math.floor(scaledBounds.width * sceneItem.width)
+        height: Math.floor(scaledBounds.height * sceneItem.height)
 
         x: Math.floor(scaledBounds.x * sceneItem.width)
         y: Math.floor(scaledBounds.y * sceneItem.height)

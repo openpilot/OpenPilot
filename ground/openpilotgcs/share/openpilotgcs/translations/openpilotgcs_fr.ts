@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr">
+<TS version="2.1" language="fr">
 <context>
     <name>Application</name>
     <message>
@@ -14,7 +14,7 @@
         <translation>Impossible de passer les arguments de la ligne de commande à l&apos;instance en cours d&apos;exécution. Elle semble ne pas répondre.</translation>
     </message>
     <message>
-        <location line="+354"/>
+        <location line="+355"/>
         <source>Could not find &apos;Core.pluginspec&apos; in %1</source>
         <translatorcomment>[Platypus]Ajout de &quot;est&quot;</translatorcomment>
         <translation>&apos;Core.pluginspec&apos; est introuvable dans %1</translation>
@@ -301,7 +301,7 @@
         <translation>&amp;Aide...</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+16"/>
         <source>About &amp;Plugins...</source>
         <translatorcomment>[Platypus]Trop long ?</translatorcomment>
         <translation>À propos des &amp;Modules complémentaires...</translation>
@@ -399,17 +399,6 @@
         <location line="+5"/>
         <source>Close</source>
         <translation>Fermer</translation>
-    </message>
-</context>
-<context>
-    <name>Core::Internal::VersionDialog</name>
-    <message>
-        <source>About OpenPilot GCS</source>
-        <translation type="obsolete">A propos d&apos;OpenPilot GCS</translation>
-    </message>
-    <message>
-        <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation type="obsolete">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
@@ -1658,7 +1647,8 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Path executable:</source>
-        <translation>Chemin de l&apos;exécutable :</translation>
+        <translatorcomment>Typo : Cell too short in UI - Truncated</translatorcomment>
+        <translation type="unfinished">Chemin de l&apos;exécutable :</translation>
     </message>
     <message>
         <location/>
@@ -2916,7 +2906,7 @@ uniquement lorsque les valeurs changent</translation>
 <context>
     <name>OPMapGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+440"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+451"/>
         <source>&amp;Zoom </source>
         <translation>&amp;Zoom</translation>
     </message>
@@ -2926,24 +2916,18 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Zoom</translation>
     </message>
     <message>
-        <location line="-28"/>
+        <location line="-29"/>
         <source>Copy</source>
         <translation>Copier</translation>
     </message>
     <message>
         <location line="+93"/>
-        <location line="+23"/>
+        <location line="+24"/>
         <source>Waypoints</source>
         <translation>Waypoints</translation>
     </message>
     <message>
-        <location line="+781"/>
-        <location line="+3"/>
-        <source>Close the context menu</source>
-        <translation>Fermer le menu contextuel</translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="+778"/>
         <source>&amp;Reload map</source>
         <translation>&amp;Recharger carte</translation>
     </message>
@@ -3000,7 +2984,12 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Afficher la boussole</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="-871"/>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+905"/>
         <source>Zoom &amp;In</source>
         <translation>Zoom &amp;Avant</translation>
     </message>
@@ -3065,18 +3054,13 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Centrer la carte à l&apos;endroit où vous avez fait un clic droit de souris</translation>
     </message>
     <message>
-        <location line="-927"/>
-        <source>HOME</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <location line="+29"/>
+        <location line="-911"/>
+        <location line="+28"/>
         <source>UAV</source>
         <translation>Appareil</translation>
     </message>
     <message>
-        <location line="+844"/>
+        <location line="+837"/>
         <source>Show/Hide the compass</source>
         <translation>Affiche/Cache la boussole</translation>
     </message>
@@ -3141,27 +3125,27 @@ uniquement lorsque les valeurs changent</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-1040"/>
+        <location line="-1041"/>
         <source>&amp;Max Update Rate </source>
         <translation>Fréquence d&apos;Actualisation &amp;Max</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+11"/>
         <source> (Normal)</source>
         <translation> (Normal)</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source> (Magic Waypoint)</source>
         <translation> (Waypoint Magique)</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+3"/>
         <source> (Unknown)</source>
         <translation> (Inconnu)</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+13"/>
         <source>Map mode</source>
         <translation>Mode carte</translation>
     </message>
@@ -3176,7 +3160,7 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Rayon Zone Sécurité</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+41"/>
         <source>UAV Trail</source>
         <translation>Parcours UAV</translation>
     </message>
@@ -3196,18 +3180,12 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Distance de parcours UAV</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+56"/>
         <source>&amp;Overlay Opacity </source>
         <translation>&amp;Opacité Recouvrement</translation>
     </message>
     <message>
-        <location line="+773"/>
-        <location line="+3"/>
-        <source>Close menu</source>
-        <translation>Fermer Menu</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+777"/>
         <source>&amp;Rip map</source>
         <translation>&amp;Récupération carte</translation>
     </message>
@@ -3530,13 +3508,6 @@ uniquement lorsque les valeurs changent</translation>
         <location line="+1"/>
         <source>Logging Update Period</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Telemetry</name>
-    <message>
-        <source>Telemetry: priority event queue is full, event lost (%1)</source>
-        <translation type="obsolete">Télémétrie : la file d&apos;attente d&apos;événements prioritaires est pleine, événement perdu (%1)</translation>
     </message>
 </context>
 <context>
@@ -4123,10 +4094,6 @@ Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
         <translation>Formulaire</translation>
     </message>
     <message>
-        <source>Select aircraft type here</source>
-        <translation type="obsolete">Sélectionner ici le type d&apos;appareil</translation>
-    </message>
-    <message>
         <location/>
         <source>Feed Forward</source>
         <translation></translation>
@@ -4145,11 +4112,6 @@ Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
         <location/>
         <source>Mixer Settings</source>
         <translation>Paramètres de Mixage</translation>
-    </message>
-    <message>
-        <source>Vehicle type:</source>
-        <translatorcomment>véhicule / appareil ?</translatorcomment>
-        <translation type="obsolete">Type de Véhicule :</translation>
     </message>
     <message>
         <location/>
@@ -4259,34 +4221,6 @@ p, li { white-space: pre-wrap; }
         <translation>Enregistrer</translation>
     </message>
     <message>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;SETTING UP FEED FORWARD REQUIRES CAUTION&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Beware: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;LA MISE EN PLACE DE FEED FORWARD EXIGE DE LA PRUDENCE&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Attention : L&apos;activation du réglage Feed Forward lancera tous les moteurs à mi-gaz, vous avez été averti !&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Dans un premier temps retirez vos hélices, puis pour affiner assurez-vous que le châssis est maintenu bien en place. Portez des lunettes et protégez-vous le visage et le corps.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -4330,11 +4264,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Armed</source>
-        <translation>Armé</translation>
-    </message>
-    <message>
-        <location/>
         <source>Flight Mode:</source>
         <translation>Mode Vol :</translation>
     </message>
@@ -4342,6 +4271,12 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>UDP Control</source>
         <translation>Contrôle UDP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Arm switch (Accessory0)</source>
+        <translatorcomment>Abbrégé  ?</translatorcomment>
+        <translation type="unfinished">Inter Arm. (Accessory0)</translation>
     </message>
 </context>
 <context>
@@ -4387,9 +4322,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="-76"/>
-        <source>Save GCS Settings too file ..</source>
-        <translatorcomment>Typo too and ... on end without space ? Context ?</translatorcomment>
-        <translation type="unfinished">Enregistre Paramètres GCS vers fichier ..</translation>
+        <source>Save GCS Settings to file...</source>
+        <translation>Enregistre Paramètres GCS vers fichier...</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -4422,7 +4356,13 @@ p, li { white-space: pre-wrap; }
         <translation>. Redémarrer le programme.</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+30"/>
+        <source>http://wiki.openpilot.org/x/OQBj</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/hoBqAQ</translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>All your settings will be deleted!</source>
         <translation>Tous vos réglages seront effacés !</translation>
     </message>
@@ -4503,7 +4443,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Core::UAVConfigInfo</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+181"/>
+        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+162"/>
         <source>Do you want to continue the import?</source>
         <translation>Voulez-vous continuer l&apos;importation ?</translation>
     </message>
@@ -4513,7 +4453,27 @@ p, li { white-space: pre-wrap; }
         <translation>INFO : </translation>
     </message>
     <message>
+        <location line="+0"/>
+        <source> Some of the configured features might not be supported by your version of the plugin. You might want to upgrade the plugin.</source>
+        <translation type="unfinished"> Certaines des fonctionnalités configurées pourraient ne pas être prises en charge par votre version du plugin. Vous pourriez peut-être mettre à jour le plugin.</translation>
+    </message>
+    <message>
         <location line="+6"/>
+        <source> Some configuration is missing in the imported config and will be replaced by default settings.</source>
+        <translation type="unfinished"> Certains paramètres sont manquants dans la configuration importée et seront remplacés par les paramètres par défaut.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source> Major features can&apos;t be imported by your version of the plugin. You should upgrade the plugin to import these settings.</source>
+        <translation type="unfinished"> Des paramètres primordiaux ne peuvent être importés par votre version du plugin. Vous devriez mettre à jour le plugin pour importer ces paramètres.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source> The imported settings are not compatible with this plugin and won&apos;t be imported!</source>
+        <translation type="unfinished"> Les paramètres importés ne sont pas compatibles avec ce plugin et ne seront pas importés !</translation>
+    </message>
+    <message>
+        <location line="-12"/>
         <source>WARNING: </source>
         <translation>ATTENTION : </translation>
     </message>
@@ -4524,8 +4484,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+13"/>
-        <source>Unknown compatibility level: </source>
-        <translation>Niveau de compatibilité inconnu : </translation>
+        <source> Unknown compatibility level: </source>
+        <translation type="unfinished"> Niveau de compatibilité inconnu : </translation>
     </message>
 </context>
 <context>
@@ -5679,6 +5639,11 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <source>Save</source>
         <translation>Enregistrer</translation>
     </message>
+    <message>
+        <location/>
+        <source>GPS protocol :</source>
+        <translation>Protocole GPS :</translation>
+    </message>
 </context>
 <context>
     <name>ccattitude</name>
@@ -5810,7 +5775,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Swashplate config:</source>
-        <translation type="unfinished">Configuration plateau cyclique :</translation>
+        <translation>Configuration plateau cyclique :</translation>
     </message>
     <message>
         <location/>
@@ -5880,7 +5845,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Swashplate Servo Angles</source>
-        <translation type="unfinished">Angles Servos Plateau</translation>
+        <translation>Angles Servos Plateau</translation>
     </message>
     <message>
         <location/>
@@ -6195,22 +6160,10 @@ p, li { white-space: pre-wrap; }
         <translation>Inter. Mode Vol</translation>
     </message>
     <message>
-        <source>Configure each stabilization mode for each axis</source>
-        <translation type="obsolete">Configurer chaque mode de stabilisation, sur chaque axe</translation>
-    </message>
-    <message>
         <location/>
         <source>Yaw</source>
         <translatorcomment>Terme tech à laisser ?</translatorcomment>
         <translation></translation>
-    </message>
-    <message>
-        <source>Stabilized1</source>
-        <translation type="obsolete">Stabilisé 1</translation>
-    </message>
-    <message>
-        <source>Stabilized2</source>
-        <translation type="obsolete">Stabilisé 2</translation>
     </message>
     <message>
         <location/>
@@ -6223,14 +6176,6 @@ p, li { white-space: pre-wrap; }
         <source>Roll</source>
         <translatorcomment>Terme tech à laisser ?</translatorcomment>
         <translation></translation>
-    </message>
-    <message>
-        <source>Stabilized3</source>
-        <translation type="obsolete">Stabilisé 3</translation>
-    </message>
-    <message>
-        <source>FlightMode Switch Positions</source>
-        <translation type="obsolete">Positions Inter Mode de Vol</translation>
     </message>
     <message>
         <location/>
@@ -6280,10 +6225,6 @@ Configurez le canal de mode de vol dans l&apos;onglet Entrées RC si vous ne l&a
         <translation>Sélectionner le mode de stabilisation dans cette position (manuel / stabilisé / auto)</translation>
     </message>
     <message>
-        <source>Number of flight modes:</source>
-        <translation type="obsolete">Nombre de modes de vol :</translation>
-    </message>
-    <message>
         <location/>
         <source>Number of positions your FlightMode switch has.
 
@@ -6301,11 +6242,6 @@ Cela peut être 2 ou 3 dans la plupart des configurations, mais cela peut aller 
 Dans ce cas vous devez configurer les mixages de votre radio pour que la plage mini à 
 maxi soit divisée en N intervalles égaux et ainsi vous pouvez définir une valeur arbitraire 
 du canal de sortie pour chaque mode de vol.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Avoid &quot;Manual&quot; for multirotors!</source>
-        <translation>Éviter &quot;Manuel&quot; pour les Multirotors !</translation>
     </message>
     <message>
         <location/>
@@ -6377,25 +6313,25 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Stabilization Modes Configuration</source>
-        <translation type="unfinished">Configuration des Modes de Stabilisation</translation>
+        <translation>Configuration des Modes de Stabilisation</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 1</source>
-        <translatorcomment>Typo Need translation in selection list above</translatorcomment>
-        <translation type="unfinished">Stabilisé 1   </translation>
+        <translatorcomment>Typo  : Need translation in dropdown menu above</translatorcomment>
+        <translation>Stabilisé 1</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 2</source>
         <translatorcomment>Typo Need translation in selection list above</translatorcomment>
-        <translation type="unfinished">Stabilisé 2</translation>
+        <translation>Stabilisé 2</translation>
     </message>
     <message>
         <location/>
         <source>Stabilized 3</source>
         <translatorcomment>Typo Need translation in selection list above</translatorcomment>
-        <translation type="unfinished">Stabilisé 3</translation>
+        <translation>Stabilisé 3</translation>
     </message>
     <message>
         <location/>
@@ -6406,37 +6342,21 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Flight Mode Switch Positions</source>
-        <translation type="unfinished">Positions Inter Mode de Vol</translation>
+        <translation>Positions Inter Mode de Vol</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode Count</source>
-        <translation type="unfinished">Nombre de modes de vol</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Cruise Control</source>
-        <translation></translation>
+        <translation>Nombre de modes de vol</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode</source>
-        <translation type="unfinished">Mode de Vol</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #1 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>Mode de Vol</translation>
     </message>
     <message>
         <location/>
         <source>objname:StabilizationSettings</source>
-        <translatorcomment>Pas toucher !</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>fieldname:CruiseControlFlightModeSwitchPosEnable</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
     </message>
@@ -6466,19 +6386,9 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #2.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #2 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>index:1</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #3.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #3 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6488,30 +6398,15 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #4.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #4 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>index:3</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #5.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #5 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>index:4</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this checkbox will enable Cruise Control for Flight Mode Switch position #6.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si coché, active Cruize Control pour la position #6 de l&apos;Interrupteur de Mode de Vol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6522,7 +6417,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select which set of roll rates / max bank angles / PIDs you want active on this switch position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionnez quels paramètres de vitesse / angle d&apos;inclinaison / PID vous souhaitez utiliser pour cette position d&apos;interrupteur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionnez quels paramètres de vitesse / angle d&apos;inclinaison / PID vous souhaitez utiliser pour cette position d&apos;interrupteur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -6533,68 +6428,32 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Input Channel Configuration</source>
-        <translation type="unfinished">Configuration Canaux d&apos;Entrée</translation>
-    </message>
-</context>
-<context>
-    <name>inputChannelForm</name>
-    <message>
-        <source>Form</source>
-        <translation type="obsolete">Formulaire</translation>
+        <translation>Configuration Canaux d&apos;Entrée</translation>
     </message>
     <message>
-        <source>Function</source>
-        <translation type="obsolete">Fonction</translation>
+        <location/>
+        <source>Thrust</source>
+        <translation type="unfinished">Poussée</translation>
     </message>
     <message>
-        <source>Type</source>
-        <translation type="obsolete">Type</translation>
+        <location/>
+        <source>Stabilized 4</source>
+        <translation>Stabilisé 4</translation>
     </message>
     <message>
-        <source>Number</source>
-        <translation type="obsolete">Nombre</translation>
+        <location/>
+        <source>Stabilized 5</source>
+        <translation>Stabilisé 5</translation>
     </message>
     <message>
-        <source>Min</source>
-        <translation type="obsolete">Mini</translation>
+        <location/>
+        <source>Stabilized 6</source>
+        <translation>Stabilisé 6</translation>
     </message>
     <message>
-        <source>Neutral</source>
-        <translation type="obsolete">Neutre</translation>
-    </message>
-    <message>
-        <source>Max</source>
-        <translation type="obsolete">Maxi</translation>
-    </message>
-    <message>
-        <source>TextLabel</source>
-        <translation type="obsolete">Label de texte</translation>
-    </message>
-    <message>
-        <source>Rev</source>
-        <translation type="obsolete">Inv</translation>
-    </message>
-    <message>
-        <source>Chan %1</source>
-        <translation type="obsolete">Canal %1</translation>
-    </message>
-    <message>
-        <source>Optional input filter response time.
-
-Range: 0-999ms, 0 disables filter (default).
-
-Warning: this is an expert mode feature, mostly used for aerial video
-camera control (airframe yaw and camera gimbal accessory channels).
-Too high values for main controls can cause undesirable effects and
-even lead to crash. Use with caution.</source>
-        <translation type="obsolete">Filtrage optionnel du temps de réponse d&apos;entrée.
-
-Plage : 0-999ms; 0 désactive le filtre (défaut).
-
-Attention: Ceci est une fonctionnalité en mode expert, principalement utilisée pour le 
-contrôle de la caméra en vidéo aérienne (lacet de l&apos;appareil et canaux accessoires de la nacelle).
-Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des effets indésirables 
-et même conduire au crash. A utiliser avec prudence.</translation>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Éviter &amp;quot;Manuel&amp;quot; pour les multirotors ! Ne jamais sélectionner &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; ou &amp;quot;CruiseControl&amp;quot; sur une aile volante !&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -6837,12 +6696,12 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Output Channel Configuration</source>
-        <translation type="unfinished">Configuration Canaux de Sortie</translation>
+        <translation>Configuration Canaux de Sortie</translation>
     </message>
     <message>
         <location/>
         <source>Live Testing</source>
-        <translation type="unfinished">Test en Temps Réel</translation>
+        <translation>Test en Temps Réel</translation>
     </message>
 </context>
 <context>
@@ -6854,23 +6713,8 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     </message>
     <message>
         <location/>
-        <source>Current value of slider.</source>
-        <translation>Valeur actuelle du curseur.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>0000</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Link</source>
         <translation>Lien</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation></translation>
     </message>
     <message>
         <location/>
@@ -6918,10 +6762,6 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Mode de sortie</translation>
     </message>
     <message>
-        <source>Rev</source>
-        <translation type="obsolete">Inv</translation>
-    </message>
-    <message>
         <location/>
         <source>Maximum PWM value, beware of not overdriving your servo.</source>
         <translation>Valeur maximum PWM, attention de respecter les limites de votre servo.</translation>
@@ -6930,6 +6770,16 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Reversed</source>
         <translation>Inversé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>0:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>-</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6942,17 +6792,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Calibration</source>
-        <translation>Calibration</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Nice paper plane, eh?</source>
-        <translation>Joli avion en papier, hein ?</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Launch a sensor range and bias calibration.</source>
-        <translation>Lancer la calibration de la plage et des ajustements capteurs.</translation>
+        <translation>Étalonnage</translation>
     </message>
     <message>
         <location/>
@@ -6967,45 +6807,12 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Save Position</source>
-        <translation>Enregistre Position</translation>
-    </message>
-    <message>
-        <location/>
-        <source>#2: Sensor noise calibration</source>
-        <translation>#2 . Calibration du bruit capteur</translation>
-    </message>
-    <message>
-        <location/>
-        <source>These are the sensor variance values computed by the AHRS.
-
-Tip: lower is better!</source>
-        <translation>Ce sont les valeurs de variation calculées par le AHRS
-
-Astuce : le plus bas est le meilleur !</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Press to start a calibration procedure, about 15 seconds.
-
-Hint: run this with engines at cruising speed.</source>
-        <translation>Appuyer pour démarrer la procédure de calibration, environ 15 secondes.
-
-Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>#3: Accelerometer Bias calibration</source>
-        <translation>#3 : Calibration Ajustement Accéléromètres</translation>
+        <translation>Enregistrer Position</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
         <translation>Enregistrer</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Six Point Calibration instructions</source>
-        <translation>Instructions de Calibration par Six Points</translation>
     </message>
     <message>
         <location/>
@@ -7016,11 +6823,6 @@ Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
         <location/>
         <source>Clear</source>
         <translation>Effacer tout</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Telemetry link not established.</source>
-        <translation>Lien de télémétrie coupé.</translation>
     </message>
     <message>
         <location/>
@@ -7048,49 +6850,6 @@ en utilisant le bouton spécifique de calibration en haut de l&apos;écran.  </t
         <location/>
         <source>Send settings to the board, and save to the non-volatile memory.</source>
         <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non volatile.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>#1: Magnetometer calibration</source>
-        <translation>#1 : Calibration magnétomètre</translation>
-    </message>
-    <message>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Step #1 and #2 are really necessary. Step #3 will help you achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Multi-Point calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute the scale for all sensors on the INS. Press &amp;quot;Start&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  Note that your HomeLocation must be set first, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Sensor noise calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute sensor variance under standard conditions. You can leave your engines running at low to mid throttle to take their vibration into account before pressing &amp;quot;Start&amp;quot;.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Accelerometer bias calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step will ensure that accelerometer bias is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Les étapes #1 et #2 sont réellement nécessaires. L&apos;étape #3 vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Calibration Multipoints :&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration va calculer l&apos;amplitude de tous les capteurs de la carte. Appuyez sur &amp;quot;Démarrer&amp;quot; pour commencer l&apos;étalonnage puis suivez les instructions qui sont affichées ici. Veuillez noter que votre position Home doit être définie en premier, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Calibration du bruit des capteurs :&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration calcule les variations des capteurs dans des conditions normales. Vous pouvez laisser les moteurs tourner au mini ou à mi-gaz pour tenir compte de leurs vibrations avant d&apos;appuyer sur &amp;quot;Démarrer&amp;quot;.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Calibration de l&apos;ajustement des Accéléromètres :&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette étape fera en sorte que l&apos;ajustement des accéléromètres soit parfait. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur Démarrer ci-dessus et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7239,12 +6998,6 @@ Une valeur de 0.00 désactive le filtre.</translation>
     </message>
     <message>
         <location/>
-        <source>url:http://wiki.openpilot.org/display/Doc/Revo+Configuration</source>
-        <translatorcomment>Wiki FR Calib Revo</translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/FQWJAQ</translation>
-    </message>
-    <message>
-        <location/>
         <source>button:apply</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
@@ -7257,42 +7010,167 @@ Une valeur de 0.00 désactive le filtre.</translation>
     </message>
     <message>
         <location/>
+        <source>Calibration status</source>
+        <translation>Statut de l&apos;étalonnage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calibration instructions</source>
+        <translation>Instructions d&apos;étalonnage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Launch accelerometer range and bias calibration.</source>
+        <translation>Démarrer l&apos;étalonnage des plages et ajustements des accéléromètres.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Launch magnetometer range and bias calibration.</source>
+        <translation>Démarrer l&apos;étalonnage des plages et ajustements du magnétomètre.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>End</source>
+        <translation>Fin</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location/>
+        <source>url:http://wiki.openpilot.org/display/Doc/Revolution+Manual+Sensor+Calibration</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/FQWJAQ</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accelerometer calibration</source>
+        <translation>Étalonnage des accéléromètres</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Magnetometer calibration</source>
+        <translation>Étalonnage du magnétomètre</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Board level calibration</source>
+        <translation>Étalonnage du niveau de la carte</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Gyro bias calibration</source>
+        <translation>Étalonnage de l&apos;ajustement des gyroscopes</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Thermal calibration</source>
+        <translation>Étalonnage de la compensation en température</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;temperature&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;gradient&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;range&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Step #1 and #2 are really necessary. Step #3 will help you achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Multi-Point calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute the scale for all sensors on the INS. Press &amp;quot;Start&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  Note that your HomeLocation must be set first, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Sensor noise calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute sensor variance under standard conditions. You can leave your engines running at low to mid throttle to take their vibration into account before pressing &amp;quot;Start&amp;quot;.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Accelerometer bias calibration:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step will ensure that accelerometer bias is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translatorcomment>Blank text ?</translatorcomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Help</source>
+        <translation>Aide</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Steps 1, 2 and 3 are necessary.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Step 4 is optional but may help achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 1: Accelerometer and Magnetometer calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step will calibrate the scale for the Magnetometer and the Accelerometer sensors. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Press &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; to begin, and follow the instructions for each step. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;For best results with the accelerometer calibration, it is advised that it be performed with a free unmounted flight controller as this allows one to accurately position the board for each orientation in the sequence.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;The magnetometer calibration must be performed with the board mounted in the airframe in order for the measurements to incorporate any bias produced by local onboard metal/magnetic elements.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Note 1: Before the magnetometer or the accelerometer calibration is performed your Home Location must be set. This step is needed in order to determine the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Note 2: There is no need to align the airframe exactly south, north, east or west during the individual steps. The directions indicated serve only to tell you in which direction the airframe should be positioned relative to some point.  One can simply assume that North is in front of you, East is to the right, West is to the left and South is pointing at you.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 2: Board level calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step will ensure that board leveling is accurate. Place the airframe as horizontally as possible (use a spirit level if necessary), then press &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;.  Do not move the airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 3: Gyro bias calculation&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This step will allow you to calibrate the gyro measured value when the board is steady. To perform the calibration leave the board/airframe completely stationary and press &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Step 4: Thermal calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;The calibration will compute sensors bias variations at different temperatures while the board warms up.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;This allows a certain amount of correction of those bias variations against temperature changes.  It improves altitude hold accuracy and reduces yaw drift.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;To perform this calibration disconnect any power from the board and leave it to cool down at room temperature for 15-20 minutes. Then attach the usb connector to the board and press &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Start&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;, leaving the board completely stationary. Wait until complete.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
-&lt;tr&gt;
-&lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Les étapes #1 et #2 sont réellement nécessaires. L&apos;étape #3 vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Calibration Multipoints :&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration va calculer l&apos;amplitude de tous les capteurs de la carte. Appuyez sur &amp;quot;Démarrer&amp;quot; pour commencer l&apos;étalonnage puis suivez les instructions qui sont affichées ici. Veuillez noter que votre position Home doit être définie en premier, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Calibration du bruit des capteurs :&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration calcule les variations des capteurs dans des conditions normales. Vous pouvez laisser les moteurs tourner au mini ou à mi-gaz pour tenir compte de leurs vibrations avant d&apos;appuyer sur &amp;quot;Démarrer&amp;quot;.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Calibration de l&apos;ajustement des Accéléromètres :&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette étape fera en sorte que l&apos;ajustement des accéléromètres soit parfait. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur Démarrer ci-dessus et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Les étapes 1, 2 et 3 sont nécessaires&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;L&apos;étape 4 est optionnelle mais vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 1 : Étalonnage des Accéléromètres et Magnétomètre&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étape va étalonner les échelles des capteurs Accéléromètres ou Magnétomètre. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Appuyez sur &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; pour commencer et suivez les instructions pour chaque étape. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour de meilleurs résultats avec l&apos;étalonnage des accéléromètres, il est conseillé de le réaliser avec le contrôleur de vol démonté, ce qui permet de positionner avec précision la carte pour chaque orientation de la séquence.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;L&apos;étalonnage du magnétomètre devra être effectué avec la carte montée sur votre appareil pour tenir compte des déviations produites par les champs magnétiques / masses métalliques à bord.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Note 1 : Avant de débuter l&apos;étalonnage du magnétomètre ou des accéléromètres votre Position Home devra être réglée. Cela est nécessaire pour déterminer le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e) de votre position.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Note 2 : Vous n&apos;avez pas besoin d&apos;orienter votre appareil exactement vers le sud, nord, est, ouest à chaque étape. Les orientations demandées servent uniquement à vous indiquer dans quelle direction l&apos;appareil doit être positionné par rapport à un point. Vous pouvez simplement admettre que le Nord est face à vous, l&apos;Est est à droite, l&apos;Ouest à gauche et le Sud pointe vers vous.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 2 : Étalonnage du niveau de la carte&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cette étape fera en sorte que la mise de niveau de la carte soit parfait. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;. Ne bougez pas du tout votre appareil jusqu’à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 3 : Étalonnage de l&apos;ajustement des Gyroscopes&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cette étape permet d&apos;étalonner la valeur mesurée sur les gyros lorsque la carte ne bouge pas. Pour effectuer l&apos;étalonnage laissez la carte/l&apos;appareil sans bouger et appuyez sur &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; font-style:italic;&quot;&gt;Étape 4 : Étalonnage de la compensation de température&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Cet étalonnage va calculer les variations des capteurs à plusieurs températures lors du réchauffement de la carte.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Ceci permet un certain niveau de correction sur la variation des ajustements en fonction des changements de température. Il améliore à la fois le maintien d&apos;altitude et les performances sur l&apos;axe de lacet.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Pour effectuer cet étalonnage, déconnectez toutes les alimentations de la carte et laissez-là refroidir à température ambiante pendant 15-20 minutes. Branchez ensuite la prise USB sur la carte, appuyez sur &lt;/span&gt;&lt;span style=&quot; font-size:11pt; font-style:italic;&quot;&gt;Démarrer&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; et ne bougez plus la carte. Attendez jusqu&apos;à la fin du processus.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -7552,11 +7430,6 @@ value as the Kp.</source>
         <location/>
         <source>buttongroup:6,20</source>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Max rate attitude (deg/s)</source>
-        <translation>Vitesse maxi Attitude (deg/s)</translation>
     </message>
     <message>
         <location/>
@@ -7985,35 +7858,14 @@ Useful if you have accidentally changed some settings.</source>
         <translation></translation>
     </message>
     <message>
-        <source>Altitude</source>
-        <translation type="obsolete">Altitude</translation>
-    </message>
-    <message>
         <location/>
         <source>Vario Altitude</source>
         <translation>Altitude Vario</translation>
     </message>
     <message>
         <location/>
-        <source>fieldname:ThrottleRate</source>
-        <translatorcomment>Pas toucher</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Exponential</source>
         <translation>Exponentiel</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle exponential value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Valeur exponentielle du manche des gaz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>fieldname:ThrottleExp</source>
-        <translatorcomment>Pas toucher</translatorcomment>
-        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8024,11 +7876,6 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum allowed vertical velocity in m/s.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vitesse verticale maximale autorisée en m/s.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Throttle Stick Response</source>
-        <translation>Réponse Manche Gaz</translation>
     </message>
     <message>
         <location/>
@@ -8087,14 +7934,12 @@ Useful if you have accidentally changed some settings.</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avançant) en mode Attitude. Ajouter une valeur d&apos;intégrale en mode Attitude lorsque une intégrale est présente en mode Rate n&apos;est pas recommandé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KP) that is used in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KP) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8120,24 +7965,6 @@ Useful if you have accidentally changed some settings.</source>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Higher values will keep larger Ki terms and limits from winding up at partial stick.  Consider increasing this if you have high Ki values and limits and a sudden stick motion from one aircraft bank angle to another causes the aircraft to rotate and then slowly change rotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translatorcomment>A revoir...</translatorcomment>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Des valeurs élevées préviennent la saturation de grandes valeurs de Ki/Limites.&lt;/p&gt;&lt;p&gt;Envisagez l&apos;augmentation de cette valeur si vous avez des valeurs élevées sur Ki/limites et qu&apos;un mouvement brusque de manche provoquant un changement d&apos;inclinaison entraine une rotation puis un changement lent de l&apos;inclinaison.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>fieldname:RattitudeAntiWindup</source>
-        <translatorcomment>Pas toucher !</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Anti-Windup</source>
-        <translatorcomment>Traduction Windup ?</translatorcomment>
-        <translation type="unfinished">Anti-Saturation</translation>
-    </message>
-    <message>
-        <location/>
         <source>buttongroup:98</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
@@ -8145,17 +7972,17 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Velocity Proportional</source>
-        <translation type="unfinished">Proportionnel Vitesse Verticale</translation>
+        <translation>Proportionnel Vitesse Verticale</translation>
     </message>
     <message>
         <location/>
         <source>Altitude Proportional</source>
-        <translation type="unfinished">Proportionnel Altitude</translation>
+        <translation>Proportionnel Altitude</translation>
     </message>
     <message>
         <location/>
         <source>Velocity Integral</source>
-        <translation type="unfinished">Intégrale Vitesse Verticale</translation>
+        <translation>Intégrale Vitesse Verticale</translation>
     </message>
     <message>
         <location/>
@@ -8193,39 +8020,15 @@ Useful if you have accidentally changed some settings.</source>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, or 1.  Cruise Control multiplies the throttle stick by this value if the bank angle is past MaxAngle.  The default is 0 which says to turn the motors off (actually set them to MinThrottle) when inverted.  1 says to use the unboosted throttle stick value.  -1 (DON&apos;T USE, INCOMPLETE, UNTESTED, for use by CP helis using idle up) says to reverse the throttle stick when inverted.
-&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;-1, 0, ou 1.  Cruise Control multiplie la position du manche des gaz par cette valeur si l&apos;angle d&apos;inclinaison a dépassé l&apos;AngleMaxi.&lt;/p&gt;&lt;p&gt;  La valeur par défaut 0 signifie l&apos;arrêt des moteurs (les basculer à la valeur de GazMini) lorsque l&apos;appareil est à l&apos;envers.&lt;/p&gt;
-&lt;p&gt;  La valeur 1 signifie qu&apos;il utilise la valeur du manche des gaz, non modifiée.&lt;/p&gt;&lt;p&gt;  -1 (NE PAS UTILISER, INCOMPLET, NON TESTÉ, pour les hélicoptères CP utilisant le iddle up) signifie une inversion du manche des gaz lorsque l&apos;hélicoptère est à l&apos;envers.
-&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>fieldname:CruiseControlInvertedPowerSwitch</source>
-        <translatorcomment>Pas toucher !</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>buttongroup:16</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the bank angle that CruiseControl goes into inverted / power disabled mode.  The power for inverted mode is controlled by CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci correspond à l&apos;angle d&apos;inclinaison où CruiseControl passe en inversé / mode puissance désactivé. La puissance en mode inversé est contrôlée par CruiseControlInvertedPowerSwitch&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>fieldname:CruiseControlMaxAngle</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 4.0 means it will not use more than 4 times the power the throttle stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Juste une limitation de sécurité. 4.0 signifie qu&apos;il n&apos;utilisera pas plus de 4 fois la puissance demandée par le manche des gaz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8236,23 +8039,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>PowerTrim</source>
-        <translation type="unfinished">AjustPuissance</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This needs to be 0 for all copters except CP helis that are using idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci doit être à 0 pour tous les hélicoptères sauf les hélicos CP qui utilisent l&apos;idle up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>fieldname:CruiseControlNeutralThrust</source>
-        <translatorcomment>Pas toucher !</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that banging the stick around a lot makes the copter climb a bit, adjust this number down a little.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si vous trouvez qu&apos;un petit mouvement de manche fait légèrement monter l&apos;hélicoptère, baissez un petit peu cette valeur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>AjustPuissance</translation>
     </message>
     <message>
         <location/>
@@ -8263,54 +8050,17 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>MaxPowerFactor</source>
-        <translation type="unfinished">FacteurMaxiPuissance</translation>
+        <translation>FacteurMaxiPuissance</translation>
     </message>
     <message>
         <location/>
         <source>MaxAngle</source>
-        <translation type="unfinished">AngleMaxi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>MinThrottle</source>
-        <translation type="unfinished">GazMini</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle stick below this disables Cruise Control.  Also, by default Cruise Control forces the use of this value for throttle when the copter is inverted.  For safety, never set this so low that the trimmed throttle stick cannot get below it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsque le manche des gaz est en dessous de cette valeur, cela désactive Cruize Control. En outre, Cruize Control impose l&apos;utilisation de cette valeur de manche de gaz lorsque l&apos;hélicoptère est à l&apos;envers.&lt;/p&gt;&lt;p&gt; Par mesure de sécurité, ne jamais définir une valeur trop basse pour qu&apos;un manche de gaz baissé puisse descendre en dessous de cette valeur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>fieldname:CruiseControlMinThrottle</source>
-        <translatorcomment>Pas toucher !</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>NeutralThrust</source>
-        <translation type="unfinished">PousséeNeutre</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 90% to 95% to leave some headroom for stabilization.  CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les multicoptères devraient probablement utiliser une valeur de 90% à 95% afin de laisser une certaine marge pour la stabilisation. Les hélicos CP peuvent définir cette valeur à 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>fieldname:CruiseControlMaxThrottle</source>
-        <translatorcomment>Pas toucher !</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>MaxThrottle</source>
-        <translation type="unfinished">GazMaxi</translation>
+        <translation>AngleMaxi</translation>
     </message>
     <message>
         <location/>
         <source>InvertedPower</source>
-        <translation type="unfinished">PuissanceRenversé</translation>
+        <translation>PuissanceRenversé</translation>
     </message>
     <message>
         <location/>
@@ -8327,27 +8077,170 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Use Basic Configuration</source>
-        <translation type="unfinished">Utiliser Configuration Basique</translation>
+        <translation>Utiliser Configuration Basique</translation>
     </message>
     <message>
         <location/>
         <source>Use Advanced Configuration</source>
-        <translation type="unfinished">Utiliser Configuration Avancée</translation>
+        <translation>Utiliser Configuration Avancée</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference. higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle doit monter ou descendre le véhicule pour compenser une certaine différence d&apos;altitude. Des valeurs plus élevées pourraient entraîner un maintien d&apos;altitude plus précis mais aussi des réactions plus violentes, des valeurs inférieures sont plus sûres et donnent un vol plus doux. La valeur par défaut devrait être bonne pour la plupart des appareils.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle doit monter ou descendre le véhicule pour compenser une certaine différence d&apos;altitude. Des valeurs plus élevées pourraient entraîner un maintien d&apos;altitude plus précis mais aussi des réactions plus violentes, des valeurs inférieures sont plus sûres et donnent un vol plus doux. La valeur par défaut devrait être bonne pour la plupart des appareils.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How much the vehicle should throttle up or down to compensate or achieve a certain vertical speed. Higher values lead to more aggressive throttle changes and could lead to oscillations. This is the most likely candidate to change depending on the crafts engine thrust. Heavy craft with weak engines might require higher values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine de combien le véhicule augmente ou diminue les gaz pour compenser ou atteindre une certaine vitesse verticale. Des valeurs plus élevées entraînent des variations de gaz plus agressives qui peuvent produire des oscillations. C&apos;est le paramètre à changer en fonction de la poussée moteur de l&apos;appareil. Des appareils chargés avec des moteurs faibles peuvent demander des valeurs plus élevées.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine de combien le véhicule augmente ou diminue les gaz pour compenser ou atteindre une certaine vitesse verticale. Des valeurs plus élevées entraînent des variations de gaz plus agressives qui peuvent produire des oscillations. C&apos;est le paramètre à changer en fonction de la poussée moteur de l&apos;appareil. Des appareils chargés avec des moteurs faibles peuvent demander des valeurs plus élevées.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should adjust its neutral throttle estimation. Altitude assumes that when engaged the throttle is in the range required to hover. If the throttle is a lot higher or lower, it needs to adjust this &amp;quot;throttle trim&amp;quot; Higher values make it do this adjustment faster, but this could lead to ugly oscillations. Leave at default unless you know what you are doing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle le véhicule doit ajuster son estimation de gaz au neutre. Le Maintien d&apos;Altitude suppose que lorsque il est activé, il est la plage nécessaire pour se maintenir en l&apos;air. Si les gaz est beaucoup plus élevé ou plus bas, il faut ajuster ce &quot;trim&quot;. Des valeurs plus élevées peuvent lui permettre de faire cet ajustement plus rapidement mais cela pourrait conduire à des oscillations. A laisser par défaut, à moins de savoir ce que vous faites.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle le véhicule doit ajuster son estimation de gaz au neutre. Le Maintien d&apos;Altitude suppose que lorsque il est activé, il est la plage nécessaire pour se maintenir en l&apos;air. Si les gaz est beaucoup plus élevé ou plus bas, il faut ajuster ce &quot;trim&quot;. Des valeurs plus élevées peuvent lui permettre de faire cet ajustement plus rapidement mais cela pourrait conduire à des oscillations. A laisser par défaut, à moins de savoir ce que vous faites.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max rate limit (all modes) (deg/s)</source>
+        <translation>Limitation Rate max (tous modes) (deg/s)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Percentage of full stick where the transition from Attitude to Rate occurs. This transition always occurs when the aircraft is exactly inverted (bank angle 180 degrees).  Small values are dangerous because they cause flips at small stick angles.  Values significantly over 100 act like attitude mode and can never flip.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pourcentage d&apos;une position de manche à fond où la transition du mode Attitude vers le mode Rate intervient. Cette transition intervient à chaque fois lorsque l&apos;appareil est exactement à l&apos;envers (inclinaison d&apos;un angle de 180 degrés).  Des valeurs faibles sont dangereuses car elles provoquent des pirouettes avec de petits mouvements aux manches.  Des valeurs significativement au dessus de 100 font que l&apos;appareil ne peut jamais se retourner et reviennent à fonctionner en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:RattitudeModeTransition</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ModeTransition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;CP helis can set this to Reversed to automatically reverse the direction of thrust when inverted. Fixed pitch copters, including multicopters, should leave this set at Unreversed. Unreversed direction with Boosted power may be dangerous because it adds power and the thrust direction moves the aircraft towards the ground.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les hélicos CP peuvent régler ceci à Reversed pour inverser automatiquement la direction de la poussée en vol dos. Les hélicos à pas fixe, multicoptères inclus, doivent laisser ce paramètre à Unreversed. L&apos;association du paramètre Unreversed avec Boosted ci-dessous peut-être dangereuse car elle ajoute de la puissance et la direction de la poussée déplace l&apos;appareil vers le sol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlInvertedThrustReversing</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>InvrtdThrustRev</source>
+        <translation>InversPousséeRenversé</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The bank angle where CruiseControl goes into inverted power mode.  InvertedThrustReverse and InvertedPower control the direction and amount of power when in inverted mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci correspond à l&apos;angle d&apos;inclinaison où CruiseControl passe en mode puissance renversé. InversPousséeRenversé et PuissanceRenversée contrôlent la direction et la quantité de puissance lorsque vous êtes en mode inversé&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Really just a safety limit. 3.0 means it will not use more than 3 times the power the throttle/collective stick is requesting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Juste une limitation de sécurité. 3.0 signifie qu&apos;il n&apos;utilisera pas plus de 3 fois la puissance demandée par le manche de gaz/collectif.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>PowerDelayComp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MinThrust</source>
+        <translation>PousséeMini</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle/Collective stick below this amount disables Cruise Control. Also, by default Cruise Control forces the use of this value for thrust when InvertedPower setting is Zero and the copter is inverted. CP helis probably want this set to -100%. For safety with fixed pitch copters (including multicopters), never set this so low that the trimmed throttle stick cannot get below it or your motor(s) will still run with the throttle stick all the way down. Fixed pitch throttle sticks go from -100 to 0 in the first tiny bit of throttle stick (and then up to 100 using the rest of the throttle range), so for example, a lot of &amp;quot;high throttle trim&amp;quot; will keep the stick from ever commanding less than 5% so it won&apos;t be possible to stop the motors with the throttle stick. Banking the copter in your hand in this state will make the motors speed up.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsque le manche de gaz/collectif est en dessous de cette valeur, cela désactive Cruise Control. En outre, Cruize Control impose l&apos;utilisation de cette valeur de manche de gaz lorsque le paramètre PuissanceInversé est à zéro et l&apos;hélicoptère est à l&apos;envers.&lt;/p&gt;&lt;p&gt;Les hélicos CP auront besoin probablement d&apos;une valeur fixée à -100. Par mesure de sécurité avec les pas fixes (multicoptères inclus), ne jamais définir une valeur trop basse pour qu&apos;un manche de gaz baissé puisse descendre en dessous de cette valeur ou le(s) moteur(s) continuent de tourner avec le manche de gaz au mini. Le manche de gaz pour pas fixe va de -100 à 0 dans la première petite plage de la course du manche (puis jusqu&apos;à 100 dans la plage de gaz restante) donc par exemple un &amp;quot;trim élevé sur le manche de gaz&amp;quot; va maintenir les gaz au dessus de 5% si bien qu&apos;il ne sera pas possible d&apos;arrêter les moteurs avec la manche des gaz. Le fait d&apos;incliner l&apos;appareil à la main dans cet état fera accélérer les moteurs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMinThrust</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Multi-copters should probably use 80% to 90% to leave some headroom for stabilization. CP helis can set this to 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les multicoptères devraient probablement utiliser une valeur de 80% à 90% afin de laisser une certaine marge pour la stabilisation. Les hélicos CP peuvent définir cette valeur à 100%.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlMaxThrust</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MaxThrust</source>
+        <translation>PousséeMaxi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlPowerDelayComp</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you find that quickly moving the stick around a lot makes the copter climb a bit, adjust this number down a little.  It will be a compromise between climbing a little with lots of stick motion and descending a little with minimal stick motion.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si vous trouvez qu&apos;un petit mouvement rapide de manche fait légèrement monter l&apos;hélicoptère, baissez un petit peu cette valeur. Ce sera un compromis entre une montée légère avec beaucoup de mouvements de manche et descente légère avec un mouvement de manche minime.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The amount of power used when in inverted mode. Zero (min throttle stick for fixed pitch copters includding multicopters, neutral collective for CP), Normal (uses stick value), or Boosted (boosted according to bank angle). Beginning multicopter pilots should leave this set to Zero to automatically reduce throttle during flips.   Boosted power with Unreversed direction may be dangerous because it adds power and the thrust direction moves the aircraft towards the ground.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La quantité de puissance utilisée en vol dos. Zero (PousséeMini pour les hélicos à pas fixe, multicoptères inclus, collectif au neutre pour hélicos CP), Normal (utilise la valeur du manche), ou Boosted (boosté en fonction de l&apos;angle d&apos;inclinaison). Les pilotes débutants en multicoptère devraient laisser ce paramètre à Zero pour automatiquement reduire les gaz durant les flips.  L&apos;association du paramètre Boosted  avec Unreversed ci-dessus peut-être dangereuse car elle ajoute de la puissance et la direction de la poussée déplace l&apos;appareil vers le sol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:CruiseControlInvertedPowerOutput</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:ThrustRate</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thrust exponential value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Valeur exponentielle de la poussée.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:ThrustExp</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle/Collective Stick Response</source>
+        <translation>Réponse du manche Gaz/Collectif</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Motor response time to go from min thrust to max thrust. It allows thrust anticipation on entering/exiting inverted mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Temps de réponse du moteur pour passer de la poussée minimum à la poussée maximum. Cela permet une anticipation lors de l&apos;entrée/sortie du mode inversé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KI) that is used in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KI) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KI) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KI) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -8801,7 +8694,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Channels</source>
-        <translation type="unfinished">Canaux</translation>
+        <translation>Canaux</translation>
     </message>
 </context>
 <context>
@@ -9061,7 +8954,7 @@ les données en cache</translation>
         <translation>Diagramme de Connexion</translation>
     </message>
     <message>
-        <location line="+152"/>
+        <location line="+156"/>
         <source>Save File</source>
         <translation>Enregistrer Fichier</translation>
     </message>
@@ -9121,6 +9014,51 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Ready...</source>
         <translation>Prêt...</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.cpp" line="+45"/>
+        <source>Waiting for all OP boards to be disconnected.</source>
+        <translation>Attente de la déconnexion de toutes les cartes OP.</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Please connect the board to the USB port (don&apos;t use external supply).</source>
+        <translation>Veuillez connecter la carte sur le port USB (sans source d&apos;alimentation extérieure).</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Board going into bootloader mode.</source>
+        <translation>Passage de la carte en mode bootloader.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Loading firmware.</source>
+        <translation>Chargement du firmware.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Uploading firmware.</source>
+        <translation>Téléversement du firmware.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Uploading description.</source>
+        <translation>Téléversement de la description.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Booting the board.</source>
+        <translation>Démarrage de la carte.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Board updated, please press &apos;Next&apos; to continue.</source>
+        <translation>Carte mise à jour, cliquer sur &apos;Suivant&apos; pour continuer.</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Something went wrong, you will have to manually upgrade the board using the uploader plugin.</source>
+        <translation>Quelque chose s&apos;est mal passé, vous devrez mettre à jour manuellement la carte en utilisant le plugin uploader.</translation>
     </message>
 </context>
 <context>
@@ -9367,17 +9305,19 @@ p, li { white-space: pre-wrap; }
         <translation>Hexacoptère</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+8"/>
         <location line="+1"/>
         <source>Hexacopter Coax (Y6)</source>
         <translation>Hexacoptère Coax (Y6)</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-7"/>
+        <location line="+1"/>
         <source>Hexacopter X</source>
         <translation>Hexacoptère X</translation>
     </message>
     <message>
+        <location line="+2"/>
         <location line="+1"/>
         <source>Hexacopter H</source>
         <translation>Hexacoptère H</translation>
@@ -9461,12 +9401,8 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;En fonction du véhicule que vous avez sélectionné, les moteurs pilotés par des variateurs et/ou les servos contrôlés directement par la carte OpenPilot devront-être calibrés. Les étapes suivantes vous guideront en toute sécurité dans ce processus. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Plase pay attention to the details and in particular the motors position and its rotation direction.&lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stably. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+261"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+267"/>
         <location line="+76"/>
         <location line="+28"/>
         <location line="+19"/>
@@ -9873,6 +9809,12 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
         <source>Import Summary</source>
         <translation>Sommaire d&apos;Importation</translation>
     </message>
+    <message>
+        <location line="+28"/>
+        <source>http://wiki.openpilot.org/display/Doc/UAV+Settings+import-export</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/IQCJAQ</translation>
+    </message>
 </context>
 <context>
     <name>deviceWidget</name>
@@ -10060,6 +10002,11 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
         <source>I know what I&apos;m doing!</source>
         <translation>Je sais ce que je fais !</translation>
     </message>
+    <message>
+        <location/>
+        <source>filename</source>
+        <translation>Nom de fichier</translation>
+    </message>
 </context>
 <context>
     <name>runningDeviceWidget</name>
@@ -10087,6 +10034,11 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
         <location/>
         <source>Firmware Information</source>
         <translation>Information Firmware</translation>
+    </message>
+    <message>
+        <location/>
+        <source>BlRevision</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10216,21 +10168,6 @@ automatiquement lorsque vous arrêtez une carte en fonctionnement. </translation
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and earlier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;
-&lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;
-&lt;p&gt;Utile si la carte n&apos;arrive pas à booter correctement.&lt;/p&gt;
-&lt;p&gt;La led Bleue clignote rapidement pendant 20-30 secondes lorsque la carte démarre normalement&lt;/p&gt;
-&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez la connexion dans la liste déroulante à droite.&lt;/p&gt;
-&lt;p&gt;A NOTER : Supporté par les bootloaders version 4 et supérieurs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Erase settings</source>
-        <translation>Effacer Paramètres </translation>
-    </message>
-    <message>
-        <location/>
         <source>Auto Update</source>
         <translation>Maj Auto</translation>
     </message>
@@ -10293,6 +10230,16 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and later&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;&lt;p&gt;        Utile si la carte n&apos;arrive pas à démarrer correctement.&lt;/p&gt;&lt;p&gt;        La Led Bleue commence à clignoter rapidement pendant 20-30 secondes puis la carte démarre normalement&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez le lien utilisé avec la liste déroulante située à droite.&lt;/p&gt;&lt;p&gt;VEUILLEZ NOTER : Supporté avec les versions de bootloaders 4.0 et supérieures&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Erase Settings</source>
+        <translation>Effacer Paramètres</translation>
+    </message>
 </context>
 <context>
     <name>XmlConfig</name>
@@ -10319,16 +10266,39 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigMultiRotorWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+713"/>
-        <location line="+179"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+696"/>
+        <location line="+24"/>
+        <location line="+31"/>
+        <location line="+31"/>
+        <location line="+25"/>
+        <location line="+24"/>
+        <location line="+24"/>
+        <location line="+41"/>
+        <location line="+200"/>
+        <location line="+70"/>
         <source>Configuration OK</source>
         <translation>Configuration OK</translation>
+    </message>
+    <message>
+        <location line="-302"/>
+        <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign a Yaw channel&lt;/font&gt;</source>
+        <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter le canal de Yaw&lt;/font&gt;</translation>
+    </message>
+    <message>
+        <location line="+367"/>
+        <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign all %1 motor channels&lt;/font&gt;</source>
+        <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter tous les %1 canaux moteurs&lt;/font&gt;</translation>
     </message>
 </context>
 <context>
     <name>ConfigCCHWWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/config_cc_hw_widget.cpp" line="+112"/>
+        <location filename="../../../src/plugins/config/config_cc_hw_widget.cpp" line="+91"/>
+        <source>Enable GPS module and reboot the board to be able to select GPS protocol</source>
+        <translation>Activez le module GPS et redémarrez la carte pour pouvoir choisir le protocole GPS</translation>
+    </message>
+    <message>
+        <location line="+32"/>
         <source>Warning: you have configured more than one DebugConsole, this currently is not supported</source>
         <translation>Attention : vous avez configuré plus d&apos;une DebugConsole, ce n&apos;est actuellement pas possible</translation>
     </message>
@@ -10348,19 +10318,31 @@ p, li { white-space: pre-wrap; }
         <source>Warning: you have disabled USB Telemetry on both USB HID Port and USB VCP Port, this currently is not supported</source>
         <translation>Attention : vous avez désactivé la télémétrie USB sur les deux ports USB HID et USB VCP, ce n&apos;est actuellement pas possible</translation>
     </message>
+    <message>
+        <location line="+15"/>
+        <source>http://wiki.openpilot.org/x/D4AUAQ</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/HoBqAQ</translation>
+    </message>
 </context>
 <context>
     <name>ConfigCCAttitudeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configccattitudewidget.cpp" line="+154"/>
+        <location filename="../../../src/plugins/config/configccattitudewidget.cpp" line="+159"/>
         <source>Calibration timed out before receiving required updates.</source>
         <translation>Temps d&apos;attente dépassé avant d&apos;avoir reçu les mises à jour demandées.</translation>
+    </message>
+    <message>
+        <location line="+58"/>
+        <source>http://wiki.openpilot.org/x/44Cf</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation type="unfinished">http://wiki.openpilot.org/x/IIBqAQ</translation>
     </message>
 </context>
 <context>
     <name>ConfigGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+252"/>
+        <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+218"/>
         <source>Unsaved changes</source>
         <translation>Modifications non sauvegardées</translation>
     </message>
@@ -10371,28 +10353,30 @@ Do you still want to proceed?</source>
         <translation>L&apos;onglet que vous quittez contient des modifications non sauvegardées, si vous continuez elles seront perdues.
 Voulez-vous toujours continuer ?</translation>
     </message>
-    <message>
-        <source>The tab you are leaving has unsaved changes,if you proceed they will be lost.Do you still want to proceed?</source>
-        <translation type="obsolete">L&apos;onglet que vous quittez contient des modifications non sauvegardées, si vous continuez elles seront perdues. Voulez-vous toujours continuer ?</translation>
-    </message>
 </context>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+351"/>
-        <location line="+1065"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+366"/>
+        <source>http://wiki.openpilot.org/x/04Cf</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/aIBqAQ</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <location line="+1056"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
         <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1064"/>
+        <location line="-1055"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+169"/>
+        <location line="+172"/>
         <source>Welcome to the inputs configuration wizard.
 
 Please follow the instructions on the screen and only move your controls when asked to.
@@ -10578,24 +10562,9 @@ Bougez le manche %1.</translation>
         <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+638"/>
+        <location line="+626"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
         <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
-    </message>
-</context>
-<context>
-    <name>Core::Internal::AuthorsDialog</name>
-    <message>
-        <source>About OpenPilot</source>
-        <translation type="obsolete">À propos d&apos;OpenPilot</translation>
-    </message>
-    <message>
-        <source>From revision %1&lt;br/&gt;</source>
-        <translation type="obsolete">Depuis la révision %1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation type="obsolete">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
@@ -10611,13 +10580,13 @@ Bougez le manche %1.</translation>
         <translation>Connexions :</translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+72"/>
         <source>Disconnect</source>
         <translation>Déconnecter</translation>
     </message>
     <message>
-        <location line="-80"/>
-        <location line="+126"/>
+        <location line="-81"/>
+        <location line="+127"/>
         <source>Connect</source>
         <translation>Connecter</translation>
     </message>
@@ -10633,7 +10602,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>DebugGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/debuggadget/debuggadgetwidget.cpp" line="+113"/>
+        <location filename="../../../src/plugins/debuggadget/debuggadgetwidget.cpp" line="+114"/>
         <source>Save log File As</source>
         <translation>Enregistrer Fichier Journal Sous</translation>
     </message>
@@ -10875,9 +10844,11 @@ Bougez le manche %1.</translation>
 <context>
     <name>ScopeGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+230"/>
-        <source>Click legend to show/hide scope trace</source>
-        <translation>Cliquer sur la légende pour afficher / cacher la tracé du graphique</translation>
+        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+222"/>
+        <source>Click legend to show/hide scope trace.
+Double click legend or plot to show/hide legend.</source>
+        <translation>Cliquer sur la légende pour afficher/cacher le tracé du graphique.
+Double clic sur la légende ou le tracé pour afficher/cacher la légende.</translation>
     </message>
 </context>
 <context>
@@ -10914,7 +10885,7 @@ Bougez le manche %1.</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location line="+44"/>
+        <location line="+47"/>
         <location line="+15"/>
         <location line="+25"/>
         <location line="+13"/>
@@ -10922,7 +10893,7 @@ Bougez le manche %1.</translation>
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location line="-92"/>
+        <location line="-95"/>
         <source>Vehicle type: </source>
         <translation>Type de véhicule : </translation>
     </message>
@@ -10960,6 +10931,11 @@ Bougez le manche %1.</translation>
         <location line="+3"/>
         <source>Hexacopter Coax (Y6)</source>
         <translation>Hexacoptère Coax (Y6)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Hexacopter H</source>
+        <translation type="unfinished">Hexacoptère H</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -11063,7 +11039,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>VehicleConfigurationHelper</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+77"/>
+        <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+79"/>
         <location line="+12"/>
         <source>Done!</source>
         <translation>Terminé !</translation>
@@ -11080,23 +11056,33 @@ Bougez le manche %1.</translation>
         <translation>Écriture paramètres matériels</translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+113"/>
         <source>Writing actuator settings</source>
         <translation>Écriture paramètres actionneurs</translation>
     </message>
     <message>
-        <location line="+37"/>
-        <source>Writing flight mode settings</source>
-        <translation>Écriture paramètres mode vol</translation>
+        <location line="+55"/>
+        <source>Writing flight mode settings 1/2</source>
+        <translation>Écriture paramètres mode de vol 1/2</translation>
     </message>
     <message>
-        <location line="+33"/>
-        <location line="+20"/>
+        <location line="+2"/>
+        <source>Writing flight mode settings 2/2</source>
+        <translation>Écriture paramètres mode de vol 2/2</translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>Writing gyro and accelerometer bias settings</source>
         <translation>Écriture paramètres d&apos;ajustement gyro et accéléromètres</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+14"/>
+        <location line="+12"/>
+        <source>Writing board settings</source>
+        <translation>Écriture paramètres carte</translation>
+    </message>
+    <message>
+        <location line="+18"/>
         <source>Writing stabilization settings</source>
         <translation>Écriture paramètres de stabilisation</translation>
     </message>
@@ -11116,7 +11102,7 @@ Bougez le manche %1.</translation>
         <translation>Écriture contrôles manuels par défaut</translation>
     </message>
     <message>
-        <location line="+153"/>
+        <location line="+154"/>
         <source>Preparing mixer settings</source>
         <translation>Préparation des paramètres de mixage</translation>
     </message>
@@ -11278,83 +11264,189 @@ Bougez le manche %1.</translation>
 <context>
     <name>UploaderGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+391"/>
-        <source>The controller board is armed and can not be halted.
-
-Please make sure the board is not armed and then press halt again to proceed
-or use the rescue option to force a firmware upgrade.</source>
-        <translation>La carte contrôleur est armée et ne peut être arrêtée.
-
-Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau sur arrêt pour continuer ou utilisez l&apos;option sauvetage pour forcer la mise à jour du firmware.</translation>
+        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+278"/>
+        <source>Connected Device</source>
+        <translation>Périphérique Connecté</translation>
     </message>
     <message>
-        <location line="+31"/>
-        <source>The controller board is armed and can not be reset.
-
-Please make sure the board is not armed and then press reset again to proceed
-or power cycle to force a board reset.</source>
-        <translation>La carte contrôleur est armée et ne peut être réinitialisée.
-
-Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau sur réinitialiser pour continuer ou coupez/alimentez la carte pour forcer la réinitialisation.</translation>
+        <location line="+107"/>
+        <source>Bootloader</source>
+        <translation>Bootloader</translation>
     </message>
     <message>
-        <location line="+24"/>
-        <source>Erase Settings</source>
-        <translation>Effacer Paramètres</translation>
+        <location line="+26"/>
+        <location line="+11"/>
+        <source>Bootloader?</source>
+        <translation>Bootloader ?</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Do you want to erase all settings from the board?
-Settings cannot be recovered after this operation.
-The board will be restarted and all the setting erased</source>
-        <translation>Voulez-vous effacer tous les paramètres sur la carte ?
-Les paramètres ne pourront être récupérés après cette opération.
-La carte sera redémarrée et tous les paramètres effacés</translation>
+        <location line="+27"/>
+        <location line="+380"/>
+        <source>Device</source>
+        <translation>Périphérique</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="-305"/>
         <source>http://wiki.openpilot.org/display/Doc/Erase+board+settings</source>
         <translatorcomment>Wiki FR - Uploader</translatorcomment>
         <translation>http://wiki.openpilot.org/x/SYBqAQ</translation>
     </message>
     <message>
-        <location line="+87"/>
-        <location line="+143"/>
-        <location line="+26"/>
-        <source>OpenPilot Uploader</source>
-        <translatorcomment>Téléverseur OpenPilot ?</translatorcomment>
-        <translation type="unfinished">Uploader OpenPilot</translation>
+        <location line="+46"/>
+        <source>Running</source>
+        <translation>En cours d&apos;exécution</translation>
     </message>
     <message>
-        <location line="-169"/>
-        <location line="+143"/>
-        <source>Please disconnect your OpenPilot board</source>
-        <translation>Veuillez déconnecter votre carte OpenPilot</translation>
+        <location line="+43"/>
+        <location line="+161"/>
+        <source>Timed out while waiting for all boards to be disconnected!</source>
+        <translatorcomment>Bof</translatorcomment>
+        <translation type="unfinished">Expiration du temps d&apos;attente de la déconnexion de toutes les cartes !</translation>
     </message>
     <message>
-        <location line="+11"/>
-        <source>Please connect your OpenPilot board (USB only!)</source>
-        <translation>Veuillez connecter votre carte OpenPilot (USB seulement !)</translation>
+        <location line="-152"/>
+        <location line="+167"/>
+        <source>Timed out while waiting for a board to be connected!</source>
+        <translatorcomment>Bof</translatorcomment>
+        <translation type="unfinished">Expiration du temps dans l&apos;attente d&apos;une connexion de carte !</translation>
+    </message>
+    <message>
+        <location line="-23"/>
+        <source>Please disconnect your OpenPilot board.</source>
+        <translation>Veuillez déconnecter votre carte OpenPilot.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+7"/>
+        <location line="+8"/>
+        <location line="+7"/>
+        <source>System Rescue</source>
+        <translation>Sauvetage Système</translation>
+    </message>
+    <message>
+        <location line="-8"/>
+        <source>Please connect your OpenPilot board.</source>
+        <translation>Veuillez connecter votre carte OpenPilot.</translation>
     </message>
     <message>
         <location line="+0"/>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
+        <source>Board must be connected to the USB port!</source>
+        <translation>La carte doit être connectée à un port USB !</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+131"/>
+        <source>Waiting for all OpenPilot boards to be disconnected from USB.</source>
+        <translation type="unfinished">Attente de la déconnexion de toutes les cartes connectées en USB.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location line="+7"/>
+        <source>Timing out in %1 seconds</source>
+        <translation>Expiration dans %1 secondes</translation>
+    </message>
+    <message>
+        <location line="-4"/>
+        <source>Please connect the OpenPilot board to the USB port.</source>
+        <translation>Veuillez connecter la carte OpenPilot sur le port USB.</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Bringing the board into boot loader mode.</source>
+        <translation>Passage de la carte en mode bootloader.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Preparing to upload firmware to the board.</source>
+        <translation>Préparation du téléversement firmware sur la carte.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Uploading firmware to the board.</source>
+        <translation>Téléversement du firmware sur la carte.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Uploading description of the new firmware to the board.</source>
+        <translation>Téléversement de la description du nouveau firmware sur la carte.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Rebooting the board.</source>
+        <translation>Redémarrage de la carte.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Board was updated successfully.</source>
+        <translation>La carte a été mise à jour avec succès.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+9"/>
+        <source>Press OK to finish.</source>
+        <translation>Appuyer sur OK pour terminer.</translation>
+    </message>
+    <message>
+        <location line="-2"/>
+        <source>Something went wrong, you will have to manually upgrade the board.</source>
+        <translation>Quelque chose s&apos;est mal passé, vous devrez mettre à jour la carte manuellement.</translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <source>http://wiki.openpilot.org/x/AoBZ</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/SYBqAQ</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Confirm Settings Erase?</source>
+        <translation>Confirmer l&apos;Effacement des Paramètres ?</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Do you want to erase all settings from the board?</source>
+        <translation>Voulez-vous effacer tous les paramètres sur la carte ?</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Settings cannot be recovered after this operation.
+The board will be restarted and all settings erased.</source>
+        <translation>Les paramètres ne pourront être récupérés après cette opération.
+La carte sera redémarrée et tous les paramètres effacés.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Cannot Halt Board!</source>
+        <translation>Impossible d&apos;Arrêter la Carte !</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The controller board is armed and can not be halted.</source>
+        <translation>La carte contrôleur est armée et ne peut être arrêtée.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Please make sure the board is not armed and then press Halt again to proceed or use Rescue to force a firmware upgrade.</source>
+        <translation>Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau Arrêter pourcontinuer ou utilisez Sauvetage pour forcer une mise à jour du firmware.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Cannot Reset Board!</source>
+        <translation>Impossible de Réinitialiser la Carte !</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The controller board is armed and can not be reset.</source>
+        <translation>La carte contrôleur est armée et la réinitialisation n&apos;est pas possible.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Please make sure the board is not armed and then press reset again to proceed or power cycle to force a board reset.</source>
+        <translation>Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau Réinitialiser pour continuer ou allumer/éteindre la carte pour forcer la réinitialisation.</translation>
+    </message>
+    <message>
+        <location line="-317"/>
         <source></source>
         <translation>Annuler</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>No board connection was detected!</source>
-        <translation>Aucune connexion de carte n&apos;a été détectée !</translation>
-    </message>
-    <message>
-        <location line="+280"/>
-        <source>GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. GCS version: %1 Firmware version: %2.</source>
-        <translation>Les versions de GCS et firmware des objets UAV ne correspondent pas ce qui peut causer des problèmes de configuration. Version GCS : %1 - Version firmware : %2.</translation>
     </message>
 </context>
 <context>
@@ -11443,7 +11535,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Swashplate outputs</source>
-        <translation type="unfinished">Sorties plateau cyclique</translation>
+        <translation>Sorties plateau cyclique</translation>
     </message>
     <message>
         <location/>
@@ -11493,7 +11585,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Swashplate Servo Angles</source>
-        <translation type="unfinished">Angles Servos Plateau</translation>
+        <translation>Angles Servos Plateau</translation>
     </message>
     <message>
         <location/>
@@ -11518,12 +11610,12 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Correction Angle</source>
-        <translation type="unfinished">Correction Angle</translation>
+        <translation>Correction Angle</translation>
     </message>
     <message>
         <location/>
         <source>CCPM Options</source>
-        <translation type="unfinished">Options CCPM</translation>
+        <translation>Options CCPM</translation>
     </message>
     <message>
         <location/>
@@ -11538,12 +11630,12 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Link Cyclic/Collective</source>
-        <translation type="unfinished">Lier Cyclique/collectif</translation>
+        <translation>Lier Cyclique/collectif</translation>
     </message>
     <message>
         <location/>
         <source>Swashplate Layout</source>
-        <translation type="unfinished">Agencement Plateau Cyclique</translation>
+        <translation>Agencement Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -11568,12 +11660,12 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Collective</source>
-        <translation type="unfinished">Collectif</translation>
+        <translation>Collectif</translation>
     </message>
     <message>
         <location/>
         <source>Cyclic</source>
-        <translation type="unfinished">Cyclique</translation>
+        <translation>Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -11588,7 +11680,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Swashplate Levelling</source>
-        <translation type="unfinished">Niveau Plateau Cyclique</translation>
+        <translation>Niveau Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -11648,7 +11740,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Swashplate Adjustment</source>
-        <translation type="unfinished">Réglage Plateau Cyclique</translation>
+        <translation>Réglage Plateau Cyclique</translation>
     </message>
     <message>
         <location/>
@@ -12258,6 +12350,11 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <source>Save</source>
         <translation>Enregistrer</translation>
     </message>
+    <message>
+        <location/>
+        <source>Protocol</source>
+        <translation>Protocole</translation>
+    </message>
 </context>
 <context>
     <name>OPLinkWidget</name>
@@ -12271,12 +12368,6 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <source>button:help</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>url:http://wiki.openpilot.org/x/dACrAQ</source>
-        <translatorcomment>Lien wiki FR </translatorcomment>
-        <translation>url:http://wiki.openpilot.org/x/AwCEAQ</translation>
     </message>
     <message>
         <location/>
@@ -12454,10 +12545,6 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <translation>Rx Défaillants</translation>
     </message>
     <message>
-        <source>Remote Modems</source>
-        <translation type="obsolete">Modems Distants</translation>
-    </message>
-    <message>
         <location/>
         <source>-100dB</source>
         <translation></translation>
@@ -12471,10 +12558,6 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <location/>
         <source>Bind</source>
         <translation>Associer</translation>
-    </message>
-    <message>
-        <source>Coord ID</source>
-        <translation type="obsolete">ID Coord</translation>
     </message>
     <message>
         <location/>
@@ -12552,10 +12635,6 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <translation>Si coché, les données sont uniquement transmises du coordinateur vers le modem Rx.</translation>
     </message>
     <message>
-        <source>One-Way Link</source>
-        <translation type="obsolete">Liaison Unidirectionnelle</translation>
-    </message>
-    <message>
         <location/>
         <source>Only PPM packets will be transmitted.</source>
         <translation>Seulement les paquets PPM seront transmis.</translation>
@@ -12603,27 +12682,33 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>OPLink configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration OPLink</translation>
     </message>
     <message>
         <location/>
         <source>One-Way</source>
-        <translation type="unfinished"></translation>
+        <translation>Unidirectionnel</translation>
     </message>
     <message>
         <location/>
         <source>Remote modems</source>
-        <translation type="unfinished"></translation>
+        <translation>Modems distants</translation>
     </message>
     <message>
         <location/>
         <source>Coordinator ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID Coordinateur</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the coordinator id we currently are bound to.&lt;/p&gt;&lt;p&gt;To manually bind to a specific coordinator, just type&lt;/p&gt;&lt;p&gt;or paste its device id in this box and save.&lt;/p&gt;&lt;p&gt;The device must be rebooted for the binding to take place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci est l&apos;identifiant coordinateur avec lequel vous êtes associé.&lt;/p&gt;&lt;p&gt;Pour s&apos;associer manuellement avec un coordinateur particulier, tapez simplement ou copier/coller l&apos;identifiant de l&apos;appareil dans ce champ puis enregistrer.&lt;/p&gt;&lt;p&gt;L&apos;appareil doit être redémarré pour que l&apos;association soit effective.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>url:http://wiki.openpilot.org/x/hgAGAQ</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/B4BYAQ</translation>
     </message>
 </context>
 <context>
@@ -12805,7 +12890,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigOutputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+138"/>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+140"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
         <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuillez corriger cela avant de tester les sorties.</translation>
     </message>
@@ -12814,22 +12899,25 @@ p, li { white-space: pre-wrap; }
         <source>This option will start your motors by the amount selected on the sliders regardless of transmitter. It is recommended to remove any blades from motors. Are you sure you want to do this?</source>
         <translation>Cette option démarre vos moteurs avec la valeur sélectionnée sur les curseurs, indépendamment de l&apos;émetteur. Il est recommandé d&apos;enlever les hélices des moteurs. Êtes-vous sûr de vouloir faire ça ?</translation>
     </message>
+    <message>
+        <location line="+249"/>
+        <source>http://wiki.openpilot.org/x/WIGf</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/aoBqAQ</translation>
+    </message>
 </context>
 <context>
     <name>ConfigRevoHWWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configrevohwwidget.cpp" line="+88"/>
+        <location filename="../../../src/plugins/config/configrevohwwidget.cpp" line="+92"/>
         <source>Disabled</source>
         <translation>Désactivé</translation>
     </message>
-</context>
-<context>
-    <name>ConfigRevoWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+529"/>
-        <location line="+380"/>
-        <source>&lt;p&gt;HomeLocation not SET.&lt;/p&gt;&lt;p&gt;Please set your HomeLocation and try again. Aborting calibration!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;Position Home non définie.&lt;/p&gt;&lt;p&gt;Veuillez définir votre position Home et essayez à nouveau. Calibration abandonnée !&lt;/p&gt;</translation>
+        <location line="+201"/>
+        <source>http://wiki.openpilot.org/x/GgDBAQ</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/TYRNAQ</translation>
     </message>
 </context>
 <context>
@@ -12912,7 +13000,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>BiasCalibrationUtil</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/biascalibrationutil.cpp" line="+119"/>
+        <location filename="../../../src/plugins/setupwizard/biascalibrationutil.cpp" line="+120"/>
         <source>Calibration timed out before receiving required updates.</source>
         <translation>Temps d&apos;attente dépassé avant d&apos;avoir reçu les mises à jour demandées.</translation>
     </message>
@@ -12958,6 +13046,11 @@ p, li { white-space: pre-wrap; }
         <translation>Version Firmware Personnelle</translation>
     </message>
     <message>
+        <location line="+5"/>
+        <source>No file loaded</source>
+        <translation>Pas de fichier chargé</translation>
+    </message>
+    <message>
         <location line="+50"/>
         <location line="+24"/>
         <source>Tagged officially released firmware build</source>
@@ -12970,7 +13063,7 @@ p, li { white-space: pre-wrap; }
         <translation>Firmware non certifié ou version personnelle</translation>
     </message>
     <message>
-        <location line="+72"/>
+        <location line="+80"/>
         <source>Can&apos;t calculate, file too big for device</source>
         <translation>Ne peut calculer, fichier trop gros pour le périphérique</translation>
     </message>
@@ -13005,18 +13098,23 @@ p, li { white-space: pre-wrap; }
         <translation>ATTENTION : Le firmware chargé n&apos;est pas empaqueté avec le format OpenPilot. Ne mettez pas à jour sans savoir ce que vous faites.</translation>
     </message>
     <message>
-        <location line="+234"/>
-        <location line="+16"/>
+        <location line="+7"/>
+        <source>Firmware loaded: </source>
+        <translation>Firmware chargé : </translation>
+    </message>
+    <message>
+        <location line="+227"/>
+        <location line="+15"/>
         <source>Select firmware file</source>
         <translation>Sélectionner le fichier de firmware</translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location line="-13"/>
         <source>Firmware Files (*.opfw *.bin)</source>
         <translation>Fichiers Firmware (*.opfw *.bin)</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+15"/>
         <source>Firmware Files (*.bin)</source>
         <translation>Fichiers Firmware (*.bin)</translation>
     </message>
@@ -13034,7 +13132,12 @@ p, li { white-space: pre-wrap; }
         <translation>CRC Firmware : </translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+33"/>
+        <source>BL version: </source>
+        <translation>Version BL : </translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <location line="+4"/>
         <location line="+8"/>
         <source>Firmware tag: </source>
@@ -13081,7 +13184,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripper.cpp" line="+49"/>
         <location line="+2"/>
         <source>No valid selection</source>
-        <translation type="unfinished">Sélection non valide</translation>
+        <translation>Sélection non valide</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -13110,10 +13213,6 @@ Veuillez sélectionner une zone de la carte à télécharger avec &lt;CTRL&gt;+C
 <context>
     <name>AboutDialog</name>
     <message>
-        <source>OpenPilot GCS</source>
-        <translation type="obsolete">OpenPilot GCS</translation>
-    </message>
-    <message>
         <location filename="../../../src/plugins/coreplugin/qml/AboutDialog.qml" line="+75"/>
         <source>OpenPilot Ground Control Station</source>
         <translation>Station de Contrôle au Sol OpenPilot (GCS)</translation>
@@ -13133,10 +13232,6 @@ The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRAN
         <location line="+28"/>
         <source>Ok</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>&lt;h4&gt;These people have been key contributors to the OpenPilot project. Without the work of the people in this list, OpenPilot would not be what it is today.&lt;/h4&gt;&lt;p&gt;This list is sorted alphabetically by name&lt;/p&gt;</source>
-        <translation type="obsolete">&lt;h4&gt;Ces personnes ont été des contributeurs déterminants pour le projet OpenPilot. Sans le travail des personnes figurant sur cette liste, OpenPilot ne serait pas ce qu&apos;il est aujourd&apos;hui.&lt;/h4&gt;&lt;p&gt;Cette liste est triée par ordre alphabétique&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/aboutdialog.cpp" line="+48"/>
@@ -13330,43 +13425,24 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>main</name>
-    <message>
-        <source>Flight Data</source>
-        <translation type="obsolete">Données de Vol</translation>
-    </message>
-    <message>
-        <source>Configuration</source>
-        <translation type="obsolete">Configuration</translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="obsolete">Système</translation>
-    </message>
-    <message>
-        <source>Scopes</source>
-        <translation type="obsolete">Graphiques</translation>
-    </message>
-</context>
-<context>
     <name>FlightLogDialog</name>
     <message>
-        <location filename="../../../src/plugins/flightlog/FlightLogDialog.qml" line="+27"/>
+        <location filename="../../../src/plugins/flightlog/FlightLogDialog.qml" line="+29"/>
         <source>Log entries</source>
         <translation>Entrées log</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+20"/>
         <source>Flight</source>
         <translation>Vol</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+9"/>
         <source>Time</source>
         <translation>Temps</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+14"/>
         <source>Empty</source>
         <translation>Vide</translation>
     </message>
@@ -13386,47 +13462,129 @@ p, li { white-space: pre-wrap; }
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Data</source>
         <translation>Données</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+13"/>
         <source>Flights recorded: </source>
         <translation>Vols enregistrés : </translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Entries logged (free): </source>
-        <translation type="unfinished">Vols enregistrés (libres) : </translation>
+        <translation>Vols enregistrés (libres) : </translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Flight to download:</source>
+        <translation>Vols à télécharger :</translation>
     </message>
     <message>
         <location line="+15"/>
-        <source>Flight to download:</source>
-        <translation type="unfinished">Vols à télécharger :</translation>
-    </message>
-    <message>
-        <location line="+16"/>
         <source>Download logs</source>
         <translation>Télécharger logs</translation>
     </message>
     <message>
-        <location line="+17"/>
-        <source>Export...</source>
-        <translation>Exporter...</translation>
-    </message>
-    <message>
-        <location line="+7"/>
+        <location line="-31"/>
         <source>Adjust timestamps</source>
         <translation>Ajuster horodatage</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+47"/>
         <source>Clear all logs</source>
         <translation>Effacer tous les logs</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+7"/>
+        <source>Export logs...</source>
+        <translation>Exporter logs...</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <location line="+128"/>
+        <source>Settings</source>
+        <translation>Paramètres</translation>
+    </message>
+    <message>
+        <location line="-121"/>
+        <source>When to log: </source>
+        <translation>Démarrer un log : </translation>
+    </message>
+    <message>
+        <location line="+107"/>
+        <source>UAVObject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Period</source>
+        <translation>Période</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Load...</source>
+        <translation>Charger...</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Loads settings for all objects from a file.</source>
+        <translation>Charger paramètres pour tous les objets du fichier.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Save...</source>
+        <translation>Enregistrer...</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Saves settings for all objects in a file.</source>
+        <translation>Enregistre les paramètres pour tous les objets dans le fichier.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Reset</source>
+        <translation>Réinitialiser</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Resets all settings to the values currently set on the board.</source>
+        <translation>Réinitialiser tous les paramètres aux valeurs actuellement dans la carte.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Clear</source>
+        <translation>Effacer</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Clears all settings to default values.</source>
+        <translation>Effacer tous les paramètres aux valeurs par défaut.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Save to board</source>
+        <translation>Enregistrer sur la carte</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Saves the logging configurations to the boards flash memory.</source>
+        <translation>Enregistre les configuration de logging dans la mémoire flash de la carte.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <location line="+7"/>
+        <source>Settings...</source>
+        <translation>Paramètres...</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Logs...</source>
+        <translation>Logs...</translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -13436,45 +13594,135 @@ p, li { white-space: pre-wrap; }
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/flightlog/flightlogdialog.cpp" line="+45"/>
         <source>Manage flight side logs</source>
-        <translation>Gérer les logs de vol</translation>
+        <translation type="vanished">Gérer les logs de vol</translation>
     </message>
 </context>
 <context>
     <name>FlightLogManager</name>
     <message>
-        <location filename="../../../src/plugins/flightlog/flightlogmanager.cpp" line="+205"/>
-        <source>Save Log</source>
-        <translation>Enregistrer Log</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OP-%0.opl</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Log (*.opl)</source>
-        <translation>Journal OpenPilot (*.opl)</translation>
-    </message>
-    <message>
-        <location line="+20"/>
+        <location filename="../../../src/plugins/flightlog/flightlogmanager.cpp" line="+274"/>
         <source>_flight-%1</source>
         <translation>_vol-%1</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+84"/>
+        <source>OpenPilot Log file %1</source>
+        <translation>Fichier Log OpenPilot %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Text file %1</source>
+        <translation>Fichier Texte %1</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+36"/>
+        <location line="+58"/>
+        <source>XML file %1</source>
+        <translation>fichier XML %1</translation>
+    </message>
+    <message>
+        <location line="-90"/>
+        <source>Save Log Entries</source>
+        <translation type="unfinished">Enregistre Entrées Log</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>Load Log Settings</source>
+        <translation type="unfinished">Charger Paramètres Log</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>The file has the wrong version or could not parse version information.</source>
+        <translation>Le fichier possède une mauvaise version ou les informations de version n&apos;ont pu être analysées.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Could not parse enabled attribute.</source>
+        <translation>Impossible d&apos;analyser l&apos;attribut activé.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Could not parse period attribute, or object with name &apos;%1&apos; could not be found.</source>
+        <translation>Impossible d&apos;analyser l&apos;attribut période, ou l&apos;objet avec le nom &apos;%1&apos; ne peut être trouvé.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Could not parse level attribute on setting &apos;%1&apos;</source>
+        <translation>Impossible d&apos;analyser l&apos;attribut level dans le paramètre &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Settings file corrupt.</source>
+        <translation>Fichier paramètres corrompu.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The file loaded is not in the correct format.
+Please check the file.
+%1</source>
+        <translation>Le fichier chargé n&apos;est pas au bon format.
+Veuillez vérifier le fichier.
+%1</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Save Log Settings</source>
+        <translation>Enregistrer Paramètres Log</translation>
+    </message>
+    <message>
+        <location line="+79"/>
         <source>All</source>
         <translation>Tout</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>Disabled</source>
+        <translation>Désactivé</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Periodically</source>
+        <translation>Périodiquement</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>When updated</source>
+        <translation>Lorsque modifié</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Throttled</source>
+        <translation type="unfinished">Modifié + Ralenti</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Never</source>
+        <translation>Jamais</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Only when Armed</source>
+        <translation>Uniquement Armé</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Always</source>
+        <translation>Tout le temps</translation>
     </message>
 </context>
 <context>
     <name>FlightLogPlugin</name>
     <message>
-        <location filename="../../../src/plugins/flightlog/flightlogplugin.cpp" line="+60"/>
+        <location filename="../../../src/plugins/flightlog/flightlogplugin.cpp" line="+61"/>
         <source>Manage flight side logs...</source>
         <translation>Gérer les logs de vol...</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Manage flight side logs</source>
+        <translation type="unfinished">Gérer les logs de vol</translation>
     </message>
 </context>
 <context>
@@ -13506,7 +13754,7 @@ p, li { white-space: pre-wrap; }
         <location line="+9"/>
         <location line="+9"/>
         <source>Unbind</source>
-        <translation type="unfinished"></translation>
+        <translation>Dissocier</translation>
     </message>
     <message>
         <location line="-27"/>
@@ -13514,7 +13762,7 @@ p, li { white-space: pre-wrap; }
         <location line="+9"/>
         <location line="+9"/>
         <source>Bind</source>
-        <translation type="unfinished">Associer</translation>
+        <translation>Associer</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -13524,12 +13772,13 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+107"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>To apply the changes when binding/unbinding the board must be rebooted or power cycled.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>détachement ou dissociation ~ unbinding ? tr Bof</translatorcomment>
+        <translation type="unfinished">Pour appliquer les changements d&apos;association/dissociation la carte doit être redémarrée ou débranchée/rebranchée.</translation>
     </message>
 </context>
 <context>
@@ -13681,12 +13930,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>TextLabel</source>
-        <translatorcomment>Pas toucher ! ?</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Channel max</source>
         <translation>Valeur maxi canal</translation>
     </message>
@@ -13715,15 +13958,20 @@ Des valeurs trop élevées pour les contrôles principaux peuvent entraîner des
 et même conduire au crash. A utiliser avec prudence.</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+171"/>
+        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+138"/>
         <source>Chan %1</source>
         <translation>Canal %1</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/config/inputchannelform.ui"/>
+        <source>Text</source>
+        <translation type="unfinished">Texte</translation>
     </message>
 </context>
 <context>
     <name>ConfigVehicleTypeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+129"/>
+        <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+130"/>
         <source>Multirotor</source>
         <translation>Multirotor</translation>
     </message>
@@ -13746,6 +13994,301 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location line="+1"/>
         <source>Custom</source>
         <translation type="unfinished">Personnalisé</translation>
+    </message>
+    <message>
+        <location line="+273"/>
+        <source>http://wiki.openpilot.org/x/44Cf</source>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/IIBqAQ</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::GyroBiasCalibrationModel</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/gyrobiascalibrationmodel.cpp" line="+100"/>
+        <source>Calibrating the gyroscopes. Keep the vehicle steady...</source>
+        <translation>Étalonnage en cours des gyroscopes. Maintenez l&apos;appareil sans le bouger...</translation>
+    </message>
+    <message>
+        <location line="+55"/>
+        <source>Gyroscope calibration completed successfully.</source>
+        <translation>Étalonnage des gyroscopes calculé avec succès.</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::LevelCalibrationModel</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/levelcalibrationmodel.cpp" line="+72"/>
+        <source>Place horizontally and press Save Position...</source>
+        <translation>Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Hold...</source>
+        <translation>Maintenir en position...</translation>
+    </message>
+    <message>
+        <location line="+40"/>
+        <source>Leave horizontally, rotate 180° along yaw axis and press Save Position...</source>
+        <translation>Garder horizontalement, tourner de 180° sur l&apos;axe de Yaw et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Board level calibration completed successfully.</source>
+        <translation>Mise à niveau de la carte calculé avec succès.</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::SixPointCalibrationModel</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/sixpointcalibrationmodel.cpp" line="+59"/>
+        <source>Place horizontally, nose pointing north and press Save Position...</source>
+        <translation>Positionner horizontalement, le nez en direction du nord et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place with nose down, right side west and press Save Position...</source>
+        <translation>Positionner avec le nez vers le bas, le coté droit vers l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place right side down, nose west and press Save Position...</source>
+        <translation>Positionner le flanc droit vers le bas, le nez en direction de l&apos;ouest et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place upside down, nose east and press Save Position...</source>
+        <translation>Positionner à l&apos;envers, le nez vers l&apos;est et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place with nose up, left side north and press Save Position...</source>
+        <translation>Positionner le nez vers le haut, le flanc gauche vers le nord et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place with left side down, nose south and press Save Position...</source>
+        <translation>Positionner avec le flanc gauche vers le bas, le nez vers le sud et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Place horizontally and press Save Position...</source>
+        <translation>Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place with nose down and press Save Position...</source>
+        <translation>Positionner avec le nez vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place right side down and press Save Position...</source>
+        <translation>Positionner le flanc droit vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place upside down and press Save Position...</source>
+        <translation>Positionner à l&apos;envers et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place with nose up and press Save Position...</source>
+        <translation>Positionner avec le nez vers le haut et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Place with left side down and press Save Position...</source>
+        <translation>Positionner le flanc gauche vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
+    </message>
+    <message>
+        <location line="+44"/>
+        <source>Home location not set, please set your home location and retry.</source>
+        <translation>Position Home non définie, veuillez régler votre position Home et essayez à nouveau.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Aborting calibration!</source>
+        <translation>Étalonnage abandonné !</translation>
+    </message>
+    <message>
+        <location line="+120"/>
+        <source>Hold...</source>
+        <translation>Maintenir en position...</translation>
+    </message>
+    <message>
+        <location line="+214"/>
+        <source>Magnetometer calibration completed successfully.</source>
+        <translation>Étalonnage du magnétomètre terminé avec succès.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Accelerometer calibration completed successfully.</source>
+        <translation>Étalonnage des accéléromètres terminé avec succès.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Calibration failed! Please review the help and retry.</source>
+        <translation>Échec étalonnage ! Veuillez lire les instructions et essayer à nouveau.</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::CompensationCalculationTransition</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/compensationcalculationtransition.h" line="+59"/>
+        <source>Thermal calibration completed successfully.</source>
+        <translation>Étalonnage température terminé avec succès.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Calibration failed! Please review the help and retry.</source>
+        <translation>Échec étalonnage ! Veuillez relire les instructions et essayer à nouveau.</translation>
+    </message>
+</context>
+<context>
+    <name>TelemetryPlugin</name>
+    <message>
+        <location filename="../../../src/plugins/telemetry/telemetryplugin.cpp" line="+157"/>
+        <source>Firmware Version Mismatch!</source>
+        <translation>Incompatibilité des Versions de Firmware !</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>GCS and firmware versions of the UAV objects set do not match which can cause configuration problems.</source>
+        <translation>Les versions des objets UAV de GCS et du firmware ne correspondent pas ce qui peut causer des problèmes de configuration.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>GCS version: %1</source>
+        <translation>Version GCS : %1</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Firmware version: %1</source>
+        <translation>Version Firmware : %1</translation>
+    </message>
+</context>
+<context>
+    <name>TimedDialog</name>
+    <message>
+        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="-658"/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location line="+9"/>
+        <source>Timing out in %1 seconds</source>
+        <translatorcomment>Expiration du temps d&apos;attente dans %1 secondes - Shorted / size allowed</translatorcomment>
+        <translation>Expiration dans %1 secondes</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Timed out after %1 seconds</source>
+        <translatorcomment>Expiration du temps d&apos;attente après %1 secondes Shorted : size allowed</translatorcomment>
+        <translation>Expiration après %1 secondes</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::BoardSetupTransition</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/boardsetuptransition.h" line="+75"/>
+        <source>Configuring board for calibration.</source>
+        <translation>Configuration de la carte pour la calibration.</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::DataAcquisitionTransition</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/dataacquisitiontransition.h" line="+63"/>
+        <source>Please wait during samples acquisition. This can take several minutes...</source>
+        <translation>Veuillez attendre pendant l&apos;acquisition des échantillons. Cela peut prendre plusieurs minutes...</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Acquisition will run until the rate of temperature change is less than %1°C/min.</source>
+        <translation>L&apos;acquisition s&apos;effectue jusqu&apos;à ce que le changement de température soit inférieur à %1°C/min.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>For the calibration to be valid, the temperature span during acquisition must be greater than %1°C.</source>
+        <translation>Pour que la calibration soit valide, la différence de température durant l&apos;acquisition doit être supérieure à %1°C.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Estimating acquisition duration...</source>
+        <translation>Estimation de la durée d&apos;acquisition...</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::BoardStatusSaveTransition</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/settingshandlingtransitions.h" line="+75"/>
+        <source>Saving initial settings.</source>
+        <translation>Enregistrement des paramètres initiaux.</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::BoardStatusRestoreTransition</name>
+    <message>
+        <location line="+40"/>
+        <source>Restoring board configuration.</source>
+        <translation>Restauration des paramètres de la carte.</translation>
+    </message>
+</context>
+<context>
+    <name>OpenPilot::ThermalCalibrationHelper</name>
+    <message>
+        <location filename="../../../src/plugins/config/calibration/thermal/thermalcalibrationhelper.cpp" line="+318"/>
+        <source>Barometer is calibrated.</source>
+        <translation>Le baromètre est calibré.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Failed to calibrate barometer!</source>
+        <translation>Échec de la calibration du baromètre !</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Gyro is calibrated.</source>
+        <translation>Les gyroscopes sont calibrés.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Failed to calibrate gyro!</source>
+        <translation>Échec de la calibration des gyroscopes !</translation>
+    </message>
+    <message>
+        <location line="+63"/>
+        <source>Target temperature span has been acquired. Acquisition may be ended or, preferably, continued.</source>
+        <translation>La différence de température a été atteinte. Vous pouvez arrêter maintenant, mais il est préférable de continuer.</translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>m&apos;&apos;s&apos;&apos;&apos;&apos;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Estimated acquisition duration is %1.</source>
+        <translation>La durée estimée de l&apos;acquisition est de %1.</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigRevoWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+328"/>
+        <source>Temperature: %1°C</source>
+        <translation>Température : %1°C</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Gradient: %1°C/min</source>
+        <translation>Variation : %1°C/min</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Sampled range: %1°C</source>
+        <translation>Plage d&apos;échantillonnage : %1°C</translation>
     </message>
 </context>
 </TS>

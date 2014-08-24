@@ -79,7 +79,6 @@ int32_t $(NAME)Initialize(void)
 void $(NAME)SetDefaults(UAVObjHandle obj, uint16_t instId)
 {
     $(NAME)Data data;
-    UAVObjMetadata metadata;
 
     // Initialize object fields to their default values
     UAVObjGetInstanceData(obj, instId, &data);
@@ -88,18 +87,21 @@ $(INITFIELDS)
     UAVObjSetInstanceData(obj, instId, &data);
 
     // Initialize object metadata to their default values
-    metadata.flags =
-        $(FLIGHTACCESS) << UAVOBJ_ACCESS_SHIFT |
-        $(GCSACCESS) << UAVOBJ_GCS_ACCESS_SHIFT |
-        $(FLIGHTTELEM_ACKED) << UAVOBJ_TELEMETRY_ACKED_SHIFT |
-        $(GCSTELEM_ACKED) << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
-        $(FLIGHTTELEM_UPDATEMODE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
-        $(GCSTELEM_UPDATEMODE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT |
-        $(LOGGING_UPDATEMODE) << UAVOBJ_LOGGING_UPDATE_MODE_SHIFT;
-    metadata.telemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
-    metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
-    metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
-    UAVObjSetMetadata(obj, &metadata);
+    if ( instId == 0 ) {
+        UAVObjMetadata metadata;
+        metadata.flags =
+            $(FLIGHTACCESS) << UAVOBJ_ACCESS_SHIFT |
+            $(GCSACCESS) << UAVOBJ_GCS_ACCESS_SHIFT |
+            $(FLIGHTTELEM_ACKED) << UAVOBJ_TELEMETRY_ACKED_SHIFT |
+            $(GCSTELEM_ACKED) << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
+            $(FLIGHTTELEM_UPDATEMODE) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |
+            $(GCSTELEM_UPDATEMODE) << UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT |
+            $(LOGGING_UPDATEMODE) << UAVOBJ_LOGGING_UPDATE_MODE_SHIFT;
+        metadata.telemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
+        metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
+        metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
+        UAVObjSetMetadata(obj, &metadata);
+    }
 }
 
 /**

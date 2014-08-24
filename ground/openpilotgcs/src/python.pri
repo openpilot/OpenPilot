@@ -1,7 +1,7 @@
 # We use python to extract git version info and generate some other files,
 # but it may be installed locally. The expected python version should be
 # kept in sync with make/tools.mk.
-PYTHON_DIR = qt-5.3.1/Tools/mingw48_32/opt/bin
+PYTHON_DIR = qt-5.3.1/Tools/mingw482_32/opt/bin
 
 ROOT_DIR = $$GCS_SOURCE_TREE/../..
 

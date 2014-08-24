@@ -3,10 +3,16 @@ import QtQuick 2.0
 Item {
     id: info
     property variant sceneSize
-    
-    property var tele_status : (OPLinkStatus.LinkState == 1 ? GCSTelemetryStats.Status : 
-                                OPLinkStatus.LinkState == 4 ? GCSTelemetryStats.Status : 0 )
 
+    //
+    // Waypoint functions
+    //
+
+    property real posEast_old
+    property real posNorth_old
+    property real total_distance
+    property bool init_dist: false
+    
     property real home_heading: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East, 
                                                         TakeOffLocation.North - PositionState.North)
 
@@ -36,27 +42,77 @@ Item {
     property real est_time_m: (est_flight_time > 0 ? Math.floor((est_flight_time - est_time_h*3600)/60) : 0) 
     property real est_time_s: (est_flight_time > 0 ? Math.floor(est_flight_time - est_time_h*3600 - est_time_m*60) : 0)
 
-    property real posEast_old
-    property real posNorth_old
-    property real total_distance
-    property bool init_dist: false
+    function reset_distance(){
+        total_distance = 0;
+    }
+
+    function compute_distance(posEast,posNorth) {
+        if (total_distance == 0 && !init_dist){init_dist = "true"; posEast_old = posEast; posNorth_old = posNorth;}
+        if (posEast > posEast_old+3 || posEast < posEast_old-3 || posNorth > posNorth_old+3 || posNorth < posNorth_old-3) {
+        total_distance += Math.sqrt(Math.pow((posEast - posEast_old ),2) + Math.pow((posNorth - posNorth_old),2));    
+
+        posEast_old = posEast;
+        posNorth_old = posNorth;
+        return total_distance;
+        } 
+    }
+
+    function formatTime(time) {
+        if (time === 0)
+            return "00"
+        if (time < 10)
+            return "0" + time;
+        else
+            return time.toString();
+    }
+
+    //
+    // Panel functions
+    //
 
     property bool hide_display_rc: false
     property bool hide_display_bat: false
     property bool hide_display_oplm: false
+
+    function hide_display_rcinput(){
+        if (hide_display_rc == false && hide_display_bat == false && hide_display_oplm == false)
+            hide_display_rc = true;
+        else
+            hide_display_rc = false;
+            battery_bg.z = -1
+            oplm_bg.z = -1
+    }
+
+    function hide_display_battery(){
+        if (hide_display_bat == false && hide_display_rc == false && hide_display_oplm == false)
+            hide_display_bat = true;
+        else
+            hide_display_bat = false;
+            battery_bg.z = 10
+            oplm_bg.z = -1
+    }
+
+    function hide_display_oplink(){
+        if (hide_display_oplm == false && hide_display_rc == false && hide_display_bat == false)
+            hide_display_oplm = true;
+        else
+            hide_display_oplm = false;
+            oplm_bg.z = 20
+    }
 
                              // Uninitialised, Ok,   Warning, Critical, Error                      
     property variant batColors : ["#2c2929", "green", "orange", "red", "red"]
 
     property real smeter_angle
 
-    // Needed to get correctly int8 value
+    // Needed to get correctly int8 value, reset value (-127) on disconnect
     property int oplm0_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_0 : -127
     property int oplm1_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_1 : -127
     property int oplm2_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_2 : -127
     property int oplm3_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_3 : -127
  
-    // Filtering for S-meter : -13dBm = S9+60dB
+    // Filtering for S-meter. Smeter range -127dB <--> -13dB = S9+60dB
+
     Timer {
          id: smeter_filter0
          interval: 100; running: true; repeat: true
@@ -114,55 +170,9 @@ Item {
          }
      }
 
-    function reset_distance(){
-        total_distance = 0;
-    }
-
-    function compute_distance(posEast,posNorth) {
-        if (total_distance == 0 && !init_dist){init_dist = "true"; posEast_old = posEast; posNorth_old = posNorth;}
-        if (posEast > posEast_old+3 || posEast < posEast_old-3 || posNorth > posNorth_old+3 || posNorth < posNorth_old-3) {
-        total_distance += Math.sqrt(Math.pow((posEast - posEast_old ),2) + Math.pow((posNorth - posNorth_old),2));    
-
-        posEast_old = posEast;
-        posNorth_old = posNorth;
-        return total_distance;
-        } 
-    }
-
-    function formatTime(time) {
-        if (time === 0)
-            return "00"
-        if (time < 10)
-            return "0" + time;
-        else
-            return time.toString();
-    }
-
-    function hide_display_rcinput(){
-        if (hide_display_rc == false && hide_display_bat == false && hide_display_oplm == false)
-            hide_display_rc = true;
-        else
-            hide_display_rc = false;
-            battery_bg.z = -1
-            oplm_bg.z = -1
-    }
-
-    function hide_display_battery(){
-        if (hide_display_bat == false && hide_display_rc == false && hide_display_oplm == false)
-            hide_display_bat = true;
-        else
-            hide_display_bat = false;
-            battery_bg.z = 10
-            oplm_bg.z = -1
-    }
-
-    function hide_display_oplink(){
-        if (hide_display_oplm == false && hide_display_rc == false && hide_display_bat == false)
-            hide_display_oplm = true;
-        else
-            hide_display_oplm = false;
-            oplm_bg.z = 20
-    }
+    // End Functions
+    // 
+    // Start Drawing
 
     SvgElementImage {
         id: info_bg
@@ -170,6 +180,10 @@ Item {
         elementName: "info-bg"
         width: parent.width
     }
+
+    // 
+    // GPS Info (Top)
+    //  
 
     Repeater {
         id: satNumberBar
@@ -201,7 +215,7 @@ Item {
     }
 
     // 
-    // Waypoint Info
+    // Waypoint Info (Top)
     //
 
     SvgElementPositionItem {
@@ -343,6 +357,10 @@ Item {
         elementName: "satbar-mask"
         sceneSize: info.sceneSize
     }
+
+    //
+    // Home info (visible after arming)
+    //
 
     SvgElementImage {
         id: home_bg

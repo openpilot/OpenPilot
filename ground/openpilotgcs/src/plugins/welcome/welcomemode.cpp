@@ -155,6 +155,8 @@ void WelcomeMode::networkResponseReady(QNetworkReply* reply)
         QString version(reply->readAll());
         QString trimmedVersion = version.trimmed();
 
+        reply->deleteLater();
+
         if(trimmedVersion != VersionInfo::tagOrHash8())
         {
             m_newVersionText = tr("(Update Available: %1) ").arg(trimmedVersion);

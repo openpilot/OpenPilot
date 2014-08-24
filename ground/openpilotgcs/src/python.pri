@@ -16,7 +16,7 @@ OPENPILOT_TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
     } else {
         # not found, hope it's in the path...
            !macx: { PYTHON = \"$$(PYTHON)\" }
-           macx: { PYTHON = \"python\"}
+           macx: { PYTHON = \"python\" }
     }
 }
 

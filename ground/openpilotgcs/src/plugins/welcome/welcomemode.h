@@ -71,7 +71,7 @@ public:
     }
     QString versionString() const
     {
-        return tr("OpenPilot GCS Version: %1").arg(VersionInfo::revision());
+        return tr("OpenPilot GCS Version: %1 ").arg(VersionInfo::tagOrHash8());
     }
     QString newVersionText() const
     {

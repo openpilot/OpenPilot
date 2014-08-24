@@ -117,10 +117,12 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             width: textOpVersion.width + textOpVersionAvailable.width
             spacing: 16
+
             Text {
                 id: textOpVersion
                 color: "#c4c0c0"
                 text: welcomePlugin.versionString
+                verticalAlignment: Text.AlignTop
                 anchors.left: parent.anchors.left
                 font.bold: true
                 styleColor: "#00000000"
@@ -136,7 +138,13 @@ Rectangle {
                 styleColor: "#00000000"
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 14
-                anchors.right: parent.right
+                anchors.left: textOpVersion.right
+
+                MouseArea{
+                    width: parent.width
+                    height: parent.height
+                    onClicked: welcomePlugin.openUrl("http://wiki.openpilot.org/display/BUILDS/OpenPilot+Software+Downloads")
+                }
             }
         }
     }

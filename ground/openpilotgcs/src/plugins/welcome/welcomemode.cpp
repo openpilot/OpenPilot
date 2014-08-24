@@ -153,10 +153,11 @@ void WelcomeMode::networkResponseReady(QNetworkReply* reply)
     if(reply != NULL)
     {
         QString version(reply->readAll());
+        QString trimmedVersion = version.trimmed();
 
-        if(version != VersionInfo::revision())
+        if(trimmedVersion != VersionInfo::tagOrHash8())
         {
-            m_newVersionText = tr("(Update Available: %1)").arg(version);
+            m_newVersionText = tr("(Update Available: %1) ").arg(trimmedVersion);
             emit newVersionTextChanged();
         }
     }

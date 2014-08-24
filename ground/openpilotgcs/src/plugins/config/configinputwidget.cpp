@@ -395,6 +395,9 @@ void ConfigInputWidget::goToWizard()
     flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
     flightModeSettingsObj->setData(flightModeSettingsData);
 
+    // Use faster input update rate.
+    fastMdata();
+
     // start the wizard
     wizardSetUpStep(wizardWelcome);
     ui->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio);
@@ -464,6 +467,10 @@ void ConfigInputWidget::wzNext()
         break;
     case wizardFinish:
         wizardStep = wizardNone;
+
+        // Restore original input update rate.
+        restoreMdata();
+
         // Leave setting the throttle neutral until the final Next press,
         // else the throttle scaling causes the graphical stick movement to not
         // match the tx stick
@@ -628,8 +635,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         accessoryDesiredObj2 = AccessoryDesired::GetInstance(getObjectManager(), 2);
         setTxMovement(nothing);
         ui->wzText->setText(QString(tr("Please move all controls to their maximum extents on both directions.\n\nPress Next when ready.")));
-        fastMdata();
-        manualSettingsData = manualSettingsObj->getData();
+        manualSettingsData   = manualSettingsObj->getData();
         for (uint i = 0; i < ManualControlSettings::CHANNELMAX_NUMELEM; ++i) {
             // Preserve the inverted status
             if (manualSettingsData.ChannelMin[i] <= manualSettingsData.ChannelMax[i]) {
@@ -665,7 +671,6 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         }
         connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         ui->wzText->setText(QString(tr("Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.")));
-        fastMdata();
         break;
     case wizardFinish:
         dimOtherControls(false);
@@ -675,7 +680,6 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         ui->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture mimics your sticks movement.\n\n"
                                        "IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings "
                                        "tab where you can set your desired arming sequence and save the configuration.")));
-        fastMdata();
         break;
     default:
         Q_ASSERT(0);
@@ -732,7 +736,6 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         disconnect(flightStatusObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         disconnect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         manualSettingsObj->setData(manualSettingsData);
-        restoreMdata();
         setTxMovement(nothing);
         break;
     case wizardIdentifyInverted:
@@ -747,7 +750,6 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         }
         extraWidgets.clear();
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
-        restoreMdata();
         break;
     case wizardFinish:
         dimOtherControls(false);
@@ -755,7 +757,6 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         disconnect(flightStatusObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         disconnect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
-        restoreMdata();
         break;
     default:
         Q_ASSERT(0);

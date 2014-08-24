@@ -91,7 +91,10 @@ WelcomeMode::WelcomeMode() :
 WelcomeMode::~WelcomeMode()
 {
     delete m_d->quickView;
-    delete m_d->networkAccess;
+
+    // This may or may not have been scheduled for deletion elsewhere. Should
+    // be safe to call this again if it has already been scheduled.
+    m_d->networkAccess->deleteLater();
     delete m_d;
 }
 
@@ -153,13 +156,14 @@ void WelcomeMode::networkResponseReady(QNetworkReply* reply)
     if(reply != NULL)
     {
         QString version(reply->readAll());
-        QString trimmedVersion = version.trimmed();
+        version = version.trimmed();
 
         reply->deleteLater();
+        m_d->networkAccess->deleteLater();
 
-        if(trimmedVersion != VersionInfo::tagOrHash8())
+        if(version != VersionInfo::tagOrHash8())
         {
-            m_newVersionText = tr("(Update Available: %1) ").arg(trimmedVersion);
+            m_newVersionText = tr("(Update Available: %1)").arg(version);
             emit newVersionTextChanged();
         }
     }

@@ -1779,7 +1779,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>true</useOpenGL>
+          <useOpenGL>false</useOpenGL>
         </data>
       </Google__PCT__20Sat>
       <Memory__PCT__20Only>
@@ -1799,7 +1799,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>airplanepip.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>true</useOpenGL>
+          <useOpenGL>false</useOpenGL>
         </data>
       </Memory__PCT__20Only>
       <default>
@@ -1819,7 +1819,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>true</useOpenGL>
+          <useOpenGL>false</useOpenGL>
         </data>
       </default>
     </OPMapGadget>    

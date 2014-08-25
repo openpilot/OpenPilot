@@ -31,7 +31,7 @@
 #include "uavobjectmanager.h"
 
 const QString OutputCalibrationPage::MULTI_SVG_FILE = QString(":/setupwizard/resources/multirotor-shapes.svg");
-const QString OutputCalibrationPage::FIXEDWING_SVG_FILE = QString(":/setupwizard/resources/fixedwing-shapes.svg");
+const QString OutputCalibrationPage::FIXEDWING_SVG_FILE = QString(":/setupwizard/resources/fixedwing-shapes-wizard.svg");
 
 OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent), ui(new Ui::OutputCalibrationPage), m_vehicleBoundsItem(0),

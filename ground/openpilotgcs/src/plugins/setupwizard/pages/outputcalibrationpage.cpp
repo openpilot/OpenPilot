@@ -403,7 +403,8 @@ void OutputCalibrationPage::enableServoSliders(bool enabled)
     ui->servoCenterAngleSlider->setEnabled(enabled);
     ui->servoMinAngleSlider->setEnabled(enabled);
     ui->servoMaxAngleSlider->setEnabled(enabled);
-    ui->reverseCheckbox->setEnabled(!enabled);
+    //ui->reverseCheckbox->setEnabled(!enabled);
+    ui->reverseCheckbox->setEnabled(false);
 }
 
 bool OutputCalibrationPage::checkAlarms()

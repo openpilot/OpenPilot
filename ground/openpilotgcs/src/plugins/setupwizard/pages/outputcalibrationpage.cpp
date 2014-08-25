@@ -45,16 +45,6 @@ OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *paren
     // move the code that was here to setupVehicle() so we can determine which image to use. 
     m_vehicleScene = new QGraphicsScene(this);
     ui->vehicleView->setScene(m_vehicleScene);
-
-    connect(ui->motorNeutralButton, SIGNAL(toggled(bool)), this, SLOT(on_motorNeutralButton_toggled(bool)));
-    connect(ui->motorNeutralSlider, SIGNAL(valueChanged(int)), this, SLOT(on_motorNeutralSlider_valueChanged(int)));
-
-    connect(ui->servoButton, SIGNAL(toggled(bool)), this, SLOT(on_servoButton_toggled(bool)));
-    connect(ui->servoMinAngleSlider, SIGNAL(valueChanged(int)), this, SLOT(on_servoMinAngleSlider_valueChanged(int)));
-    connect(ui->servoCenterAngleSlider, SIGNAL(valueChanged(int)), this, SLOT(on_servoCenterAngleSlider_valueChanged(int)));
-    connect(ui->servoMaxAngleSlider, SIGNAL(valueChanged(int)), this, SLOT(on_servoMaxAngleSlider_valueChanged(int)));
-
-    connect(ui->reverseCheckbox, SIGNAL(toggled(bool)), this, SLOT(on_reverseCheckbox_toggled(bool)));
 }
 
 OutputCalibrationPage::~OutputCalibrationPage()
@@ -292,6 +282,12 @@ void OutputCalibrationPage::setWizardPage()
         if (currentPageIndex == 1) {
             ui->motorNeutralSlider->setValue(m_actuatorSettings[currentChannel].channelNeutral);
         } else if (currentPageIndex == 2) {
+            if (m_actuatorSettings[currentChannel].channelMax < m_actuatorSettings[currentChannel].channelMin &&
+                    !ui->reverseCheckbox->isChecked()) {
+                ui->reverseCheckbox->setChecked(true);
+            } else {
+                ui->reverseCheckbox->setChecked(false);
+            }
             enableServoSliders(false);
             if (ui->reverseCheckbox->isChecked()) {
                 ui->servoMaxAngleSlider->setValue(m_actuatorSettings[currentChannel].channelMax);
@@ -403,8 +399,7 @@ void OutputCalibrationPage::enableServoSliders(bool enabled)
     ui->servoCenterAngleSlider->setEnabled(enabled);
     ui->servoMinAngleSlider->setEnabled(enabled);
     ui->servoMaxAngleSlider->setEnabled(enabled);
-    //ui->reverseCheckbox->setEnabled(!enabled);
-    ui->reverseCheckbox->setEnabled(false);
+    ui->reverseCheckbox->setEnabled(!enabled);
 }
 
 bool OutputCalibrationPage::checkAlarms()
@@ -547,14 +542,29 @@ void OutputCalibrationPage::on_servoMaxAngleSlider_valueChanged(int position)
 
 void OutputCalibrationPage::on_reverseCheckbox_toggled(bool checked)
 {
-    if (m_actuatorSettings[getCurrentChannel()].channelMax > m_actuatorSettings[getCurrentChannel()].channelMin) {
+    if (checked && m_actuatorSettings[getCurrentChannel()].channelMax > m_actuatorSettings[getCurrentChannel()].channelMin) {
         quint16 oldMax = m_actuatorSettings[getCurrentChannel()].channelMax;
         m_actuatorSettings[getCurrentChannel()].channelMax = m_actuatorSettings[getCurrentChannel()].channelMin;
         m_actuatorSettings[getCurrentChannel()].channelMin = oldMax;
-    } else if (m_actuatorSettings[getCurrentChannel()].channelMax < m_actuatorSettings[getCurrentChannel()].channelMin) {
+    } else if (!checked && m_actuatorSettings[getCurrentChannel()].channelMax < m_actuatorSettings[getCurrentChannel()].channelMin) {
         quint16 oldMax = m_actuatorSettings[getCurrentChannel()].channelMax;
         m_actuatorSettings[getCurrentChannel()].channelMax = m_actuatorSettings[getCurrentChannel()].channelMin;
         m_actuatorSettings[getCurrentChannel()].channelMin = oldMax;
     }
-    setWizardPage();
+    ui->servoCenterAngleSlider->setInvertedAppearance(checked);
+    ui->servoCenterAngleSlider->setInvertedControls(checked);
+    ui->servoMinAngleSlider->setInvertedAppearance(checked);
+    ui->servoMinAngleSlider->setInvertedControls(checked);
+    ui->servoMaxAngleSlider->setInvertedAppearance(checked);
+    ui->servoMaxAngleSlider->setInvertedControls(checked);
+
+    if (ui->reverseCheckbox->isChecked()) {
+        ui->servoMaxAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMax);
+        ui->servoCenterAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelNeutral);
+        ui->servoMinAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMin);
+    } else {
+        ui->servoMinAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMin);
+        ui->servoCenterAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelNeutral);
+        ui->servoMaxAngleSlider->setValue(m_actuatorSettings[getCurrentChannel()].channelMax);
+    }
 }

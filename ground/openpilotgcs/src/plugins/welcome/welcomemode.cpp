@@ -63,7 +63,6 @@ struct WelcomeModePrivate {
     WelcomeModePrivate();
 
     QQuickView *quickView;
-    QNetworkAccessManager* networkAccess;
 };
 
 WelcomeModePrivate::WelcomeModePrivate()
@@ -81,20 +80,28 @@ WelcomeMode::WelcomeMode() :
     m_d->quickView->setSource(QUrl("qrc:/welcome/qml/main.qml"));
     m_container = NULL;
 
-    m_d->networkAccess = new QNetworkAccessManager;
+    QNetworkAccessManager* networkAccessManager = new QNetworkAccessManager;
 
-    m_d->networkAccess->get(QNetworkRequest(QUrl("http://www.openpilot.org/opver")));
+    // Only attempt to request our version info if the network is accessible
+    if(networkAccessManager->networkAccessible() == QNetworkAccessManager::Accessible)
+    {
+        connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkResponseReady(QNetworkReply*)));
 
-    connect(m_d->networkAccess, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkResponseReady(QNetworkReply*)));
+        // This will delete the network access manager instance when we're done
+        connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)), networkAccessManager, SLOT(deleteLater()));
+
+        networkAccessManager->get(QNetworkRequest(QUrl("http://www.openpilot.org/opver")));
+    }
+    else
+    {
+        // No network, can delete this now as we don't need it.
+        delete networkAccessManager;
+    }
 }
 
 WelcomeMode::~WelcomeMode()
 {
     delete m_d->quickView;
-
-    // This may or may not have been scheduled for deletion elsewhere. Should
-    // be safe to call this again if it has already been scheduled.
-    m_d->networkAccess->deleteLater();
     delete m_d;
 }
 
@@ -159,7 +166,6 @@ void WelcomeMode::networkResponseReady(QNetworkReply* reply)
         version = version.trimmed();
 
         reply->deleteLater();
-        m_d->networkAccess->deleteLater();
 
         if(version != VersionInfo::tagOrHash8())
         {

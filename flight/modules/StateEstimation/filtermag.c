@@ -143,9 +143,6 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
     }
 
     if (temp_status != MAGSTATUS_INVALID) {
-        temp_mag[0]    *= this->invMagBe;
-        temp_mag[1]    *= this->invMagBe;
-        temp_mag[2]    *= this->invMagBe;
         state->mag[0]   = temp_mag[0];
         state->mag[1]   = temp_mag[1];
         state->mag[2]   = temp_mag[2];

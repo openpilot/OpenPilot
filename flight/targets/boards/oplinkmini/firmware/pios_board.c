@@ -78,6 +78,7 @@ uint8_t *pios_uart_rx_buffer;
 uint8_t *pios_uart_tx_buffer;
 
 uintptr_t pios_uavo_settings_fs_id;
+uintptr_t pios_user_fs_id = 0;
 
 uint8_t servo_count = 0;
 

@@ -1,3 +1,19 @@
+--- RELEASE-14.06.01 RC1 --- 
+This is the first maintenance release for 14.06.
+This mainly fixes a bug causing flips when switching to Weaklevel flight mode.
+
+The full list of features, improvements and bugfixes in this release is accessible here:
+
+http://progress.openpilot.org/issues/?filter=11660
+
+**Bugs
+	* [OP-1241] - TxPID Does not work for Bank 3 PID settings
+	* [OP-1432] - Hexa config : "Reverse all motors" do not reflect current config after reload
+	* [OP-1454] - weak leveling code buggy, causes NAN and crash!
+
+** New Feature & Improvements
+	* [OP-1450] - GCS fonts are blurry on OSX and retina displays
+	
 --- RELEASE-14.06 --- Peanuts Schnapps ---
 This is the Mid 2014 release. 
 This version supports the CopterControl, CC3D, Atom and the Revolution Flight controllers as well as the OPLink Modems.
@@ -5,7 +21,7 @@ This version supports the CopterControl, CC3D, Atom and the Revolution Flight co
 This release includes many additions, improvements and fixes, it is the result of many thousands of hours of development and testing.
  
 Some key additions in this release:
--  Many additions and changes aimed at gps/navigation functionality for the Revolution platform including GPS assisted flight modes: Return To Base, Position Hold, AutoCruise and Position Vario(LOS, FPV and NSEW).
+- Many additions and changes aimed at gps/navigation functionality for the Revolution platform including GPS assisted flight modes: Return To Base, Position Hold, AutoCruise and Position Vario(LOS, FPV and NSEW).
 - Stabilization refactoring and enhancements for even better flight performance.
 - Completely new sensor calibration routines and greatly enhanced GUI. 
 - Additional 3rd Party Hardware support, notably the MS4525DO based airspeed sensors and WS281x LED drivers.

@@ -65,14 +65,11 @@ private slots:
     void on_motorNeutralButton_toggled(bool checked);
     void on_motorNeutralSlider_valueChanged(int value);
 
-    void on_servoCenterButton_toggled(bool checked);
-    void on_servoCenterSlider_valueChanged(int position);
-
-    void on_servoMinAngleButton_toggled(bool checked);
+    void on_servoButton_toggled(bool checked);
+    void on_servoCenterAngleSlider_valueChanged(int position);
     void on_servoMinAngleSlider_valueChanged(int position);
-
-    void on_servoMaxAngleButton_toggled(bool checked);
     void on_servoMaxAngleSlider_valueChanged(int position);
+    void on_reverseCheckbox_toggled(bool checked);
 
 private:
     void setupVehicle();
@@ -81,6 +78,7 @@ private:
     void setupVehicleHighlightedPart();
     void setWizardPage();
     void enableButtons(bool enable);
+    void enableServoSliders(bool enabled);
     void onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider);
     bool checkAlarms();
     void debugLogChannelValues();

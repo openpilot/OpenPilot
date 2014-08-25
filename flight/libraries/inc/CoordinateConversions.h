@@ -82,7 +82,8 @@ void rot_mult(float R[3][3], const float vec[3], float vec_out[3]);
  * @param b
  * @param result
  */
-inline void matrix_mult_3x3f(float a[3][3], float b[3][3], float result[3][3])
+
+static inline void matrix_mult_3x3f(float a[3][3], float b[3][3], float result[3][3])
 {
     result[0][0] = a[0][0] * b[0][0] + a[1][0] * b[0][1] + a[2][0] * b[0][2];
     result[0][1] = a[0][1] * b[0][0] + a[1][1] * b[0][1] + a[2][1] * b[0][2];

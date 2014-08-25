@@ -147,6 +147,7 @@ uint32_t PIOS_IAP_ReadBootCmd(uint8_t number)
 {
     if (PIOS_IAP_CMD_COUNT < number) {
         PIOS_Assert(0);
+	return(0);
     } else {
         return PIOS_BKP_ReadRegister(pios_iap_cmd_list[number]);
     }

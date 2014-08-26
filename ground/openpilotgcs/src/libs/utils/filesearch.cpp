@@ -43,19 +43,19 @@ using namespace Utils;
 
 static inline QString msgCanceled(const QString &searchTerm, int numMatches, int numFilesSearched)
 {
-    return QCoreApplication::translate(tr("Utils::FileSearch"), tr("%1: canceled. %n occurrences found in %2 files."),
+    return QCoreApplication::translate("Utils::FileSearch", "%1: canceled. %n occurrences found in %2 files.",
                                        0, numMatches).arg(searchTerm).arg(numFilesSearched);
 }
 
 static inline QString msgFound(const QString &searchTerm, int numMatches, int numFilesSearched)
 {
-    return QCoreApplication::translate(tr("Utils::FileSearch"), tr("%1: %n occurrences found in %2 files."),
+    return QCoreApplication::translate("Utils::FileSearch", "%1: %n occurrences found in %2 files.",
                                        0, numMatches).arg(searchTerm).arg(numFilesSearched);
 }
 
 static inline QString msgFound(const QString &searchTerm, int numMatches, int numFilesSearched, int filesSize)
 {
-    return QCoreApplication::translate(tr("Utils::FileSearch"), tr("%1: %n occurrences found in %2 of %3 files."),
+    return QCoreApplication::translate("Utils::FileSearch", "%1: %n occurrences found in %2 of %3 files.",
                                        0, numMatches).arg(searchTerm).arg(numFilesSearched).arg(filesSize);
 }
 

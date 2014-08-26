@@ -40,10 +40,10 @@
 #include "revocalibration.h"
 #include "accelgyrosettings.h"
 
-const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE = 50;
-const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE  = 400;
-const qint16 VehicleConfigurationHelper::ANALOG_SERVO_FREQUENCE = 50;
-const qint16 VehicleConfigurationHelper::DIGITAL_SERVO_FREQUENCE  = 333;
+const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE    = 50;
+const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE     = 400;
+const qint16 VehicleConfigurationHelper::ANALOG_SERVO_FREQUENCE  = 50;
+const qint16 VehicleConfigurationHelper::DIGITAL_SERVO_FREQUENCE = 333;
 
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
     : m_configSource(configSource), m_uavoManager(0),
@@ -254,6 +254,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
     ActuatorSettings *actSettings = ActuatorSettings::GetInstance(m_uavoManager);
 
     qint16 escFrequence = LEGACY_ESC_FREQUENCE;
+
     switch (m_configSource->getEscType()) {
     case VehicleConfigurationSource::ESC_STANDARD:
         escFrequence = LEGACY_ESC_FREQUENCE;
@@ -302,7 +303,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             // Servo always on channel 4
             data.ChannelUpdateFreq[0] = escFrequence;
             if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
-                       m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) {
+                m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) {
                 data.ChannelUpdateFreq[1] = servoFrequence;
             } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
                 data.ChannelUpdateFreq[1] = escFrequence;
@@ -1549,7 +1550,6 @@ void VehicleConfigurationHelper::setupOctoCopter()
 
 void VehicleConfigurationHelper::setupElevon()
 {
-
     mixerChannelSettings channels[10];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
@@ -1559,7 +1559,7 @@ void VehicleConfigurationHelper::setupElevon()
     channels[2].throttle2 = 0;
     channels[2].roll      = 0;
     channels[2].pitch     = 0;
-    channels[2].yaw = 0;
+    channels[2].yaw       = 0;
 
     // Elevon Servo 1 (Chan 1)
     channels[0].type      = MIXER_TYPE_SERVO;
@@ -1567,7 +1567,7 @@ void VehicleConfigurationHelper::setupElevon()
     channels[0].throttle2 = 0;
     channels[0].roll      = -100;
     channels[0].pitch     = 100;
-    channels[0].yaw = 0;
+    channels[0].yaw       = 0;
 
     // Elevon Servo 1 (Chan 2)
     channels[1].type      = MIXER_TYPE_SERVO;
@@ -1575,11 +1575,11 @@ void VehicleConfigurationHelper::setupElevon()
     channels[1].throttle2 = 0;
     channels[1].roll      = 100;
     channels[1].pitch     = -100;
-    channels[1].yaw = 0;
+    channels[1].yaw       = 0;
 
     guiSettings.fixedwing.FixedWingThrottle = 3;
-    guiSettings.fixedwing.FixedWingPitch1 = 1;
-    guiSettings.fixedwing.FixedWingPitch2  = 2;
+    guiSettings.fixedwing.FixedWingPitch1   = 1;
+    guiSettings.fixedwing.FixedWingPitch2   = 2;
 
     applyMixerConfiguration(channels);
     applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON, guiSettings);
@@ -1601,7 +1601,7 @@ void VehicleConfigurationHelper::setupDualAileron()
     channels[2].throttle2 = 0;
     channels[2].roll      = 0;
     channels[2].pitch     = 0;
-    channels[2].yaw = 0;
+    channels[2].yaw       = 0;
 
     // Aileron Servo 1 (Chan 1)
     channels[0].type      = MIXER_TYPE_SERVO;
@@ -1609,7 +1609,7 @@ void VehicleConfigurationHelper::setupDualAileron()
     channels[0].throttle2 = 0;
     channels[0].roll      = -100;
     channels[0].pitch     = 0;
-    channels[0].yaw = 0;
+    channels[0].yaw       = 0;
 
     // Aileron Servo 2 (Chan 6)
     channels[5].type      = MIXER_TYPE_SERVO;
@@ -1617,7 +1617,7 @@ void VehicleConfigurationHelper::setupDualAileron()
     channels[5].throttle2 = 0;
     channels[5].roll      = 100;
     channels[5].pitch     = 0;
-    channels[5].yaw = 0;
+    channels[5].yaw       = 0;
 
     // Elevator Servo (Chan 2)
     channels[1].type      = MIXER_TYPE_SERVO;
@@ -1625,7 +1625,7 @@ void VehicleConfigurationHelper::setupDualAileron()
     channels[1].throttle2 = 0;
     channels[1].roll      = 0;
     channels[1].pitch     = 100;
-    channels[1].yaw = 0;
+    channels[1].yaw       = 0;
 
     // Rudder Servo (Chan 4)
     channels[3].type      = MIXER_TYPE_SERVO;
@@ -1633,13 +1633,13 @@ void VehicleConfigurationHelper::setupDualAileron()
     channels[3].throttle2 = 0;
     channels[3].roll      = 0;
     channels[3].pitch     = 0;
-    channels[3].yaw = 100;
+    channels[3].yaw       = 100;
 
     guiSettings.fixedwing.FixedWingThrottle = 3;
-    guiSettings.fixedwing.FixedWingRoll1 = 1;
-    guiSettings.fixedwing.FixedWingRoll2  = 6;
-    guiSettings.fixedwing.FixedWingPitch1 = 2;
-    guiSettings.fixedwing.FixedWingYaw1  = 4;
+    guiSettings.fixedwing.FixedWingRoll1    = 1;
+    guiSettings.fixedwing.FixedWingRoll2    = 6;
+    guiSettings.fixedwing.FixedWingPitch1   = 2;
+    guiSettings.fixedwing.FixedWingYaw1     = 4;
 
     applyMixerConfiguration(channels);
     applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWING, guiSettings);
@@ -1661,7 +1661,7 @@ void VehicleConfigurationHelper::setupAileron()
     channels[2].throttle2 = 0;
     channels[2].roll      = 0;
     channels[2].pitch     = 0;
-    channels[2].yaw = 0;
+    channels[2].yaw       = 0;
 
     // Aileron Servo (Chan 1)
     channels[0].type      = MIXER_TYPE_SERVO;
@@ -1669,7 +1669,7 @@ void VehicleConfigurationHelper::setupAileron()
     channels[0].throttle2 = 0;
     channels[0].roll      = 100;
     channels[0].pitch     = 0;
-    channels[0].yaw = 0;
+    channels[0].yaw       = 0;
 
     // Elevator Servo (Chan 2)
     channels[1].type      = MIXER_TYPE_SERVO;
@@ -1677,7 +1677,7 @@ void VehicleConfigurationHelper::setupAileron()
     channels[1].throttle2 = 0;
     channels[1].roll      = 0;
     channels[1].pitch     = 100;
-    channels[1].yaw = 0;
+    channels[1].yaw       = 0;
 
     // Rudder Servo (Chan 4)
     channels[3].type      = MIXER_TYPE_SERVO;
@@ -1685,12 +1685,12 @@ void VehicleConfigurationHelper::setupAileron()
     channels[3].throttle2 = 0;
     channels[3].roll      = 0;
     channels[3].pitch     = 0;
-    channels[3].yaw = 100;
+    channels[3].yaw       = 100;
 
     guiSettings.fixedwing.FixedWingThrottle = 3;
-    guiSettings.fixedwing.FixedWingRoll1 = 1;
-    guiSettings.fixedwing.FixedWingPitch1 = 2;
-    guiSettings.fixedwing.FixedWingYaw1  = 4;
+    guiSettings.fixedwing.FixedWingRoll1    = 1;
+    guiSettings.fixedwing.FixedWingPitch1   = 2;
+    guiSettings.fixedwing.FixedWingYaw1     = 4;
 
     applyMixerConfiguration(channels);
     applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWING, guiSettings);

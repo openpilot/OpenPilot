@@ -62,7 +62,6 @@ private:
 
 private slots:
     void updateImageAndDescription();
-
 };
 
 #endif // AIRSPEEDPAGE_H

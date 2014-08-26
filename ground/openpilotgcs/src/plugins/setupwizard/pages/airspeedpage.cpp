@@ -60,7 +60,7 @@ void AirSpeedPage::initializePage()
     updateImageAndDescription();
 }
 
-//TODO
+// TODO
 bool AirSpeedPage::validatePage()
 {
     SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE)ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
@@ -89,7 +89,7 @@ void AirSpeedPage::showEvent(QShowEvent *event)
     fitInView();
 }
 
-//TODO
+// TODO
 void AirSpeedPage::setupAirSpeedPageTypesCombo()
 {
     ui->typeCombo->addItem(tr("Aileron Dual Servos"), SetupWizard::FIXED_WING_DUAL_AILERON);
@@ -103,10 +103,9 @@ void AirSpeedPage::setupAirSpeedPageTypesCombo()
 }
 
 void AirSpeedPage::updateAvailableTypes()
-{
-}
+{}
 
-//TODO
+// TODO
 void AirSpeedPage::updateImageAndDescription()
 {
     SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE)ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
@@ -132,5 +131,4 @@ void AirSpeedPage::updateImageAndDescription()
     ui->typeGraphicsView->fitInView(m_airspeedPic, Qt::KeepAspectRatio);
 
     ui->typeDescription->setText(description);
-
 }

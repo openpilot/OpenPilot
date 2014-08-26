@@ -148,7 +148,8 @@ int SetupWizard::nextId() const
         switch (getVehicleType()) {
         case VEHICLE_FIXEDWING:
             return PAGE_AIRFRAMESTAB_FIXEDWING;
-        //TODO: Pages for Multi and heli
+
+        // TODO: Pages for Multi and heli
         case VEHICLE_MULTI:
         case VEHICLE_HELI:
         case VEHICLE_SURFACE:
@@ -255,7 +256,7 @@ QString SetupWizard::getSummaryText()
 
         break;
     case VEHICLE_FIXEDWING:
-	summary.append(tr("Fixed wing"));
+        summary.append(tr("Fixed wing"));
 
         summary.append("<br>");
         summary.append("<b>").append(tr("Vehicle sub type: ")).append("</b>");
@@ -272,7 +273,7 @@ QString SetupWizard::getSummaryText()
         default:
             summary.append(tr("Unknown"));
             break;
-	}
+        }
 
         break;
     case VEHICLE_HELI:

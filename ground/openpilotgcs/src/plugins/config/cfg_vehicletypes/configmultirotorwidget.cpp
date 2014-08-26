@@ -481,11 +481,11 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
 
             // get motor 2 value for Yaw and Roll
             channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
-            value    = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+            value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
             setYawMixLevel(qRound(value / 1.27));
 
-            channel  = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
-            value    = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+            value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
             m_aircraft->mrRollMixLevel->setValue(-qRound(value / 1.27));
         }
     } else if (frameType == "HexaCoax") {

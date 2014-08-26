@@ -101,8 +101,7 @@ void FixedWingPage::setupFixedWingTypesCombo()
 }
 
 void FixedWingPage::updateAvailableTypes()
-{
-}
+{}
 
 void FixedWingPage::updateImageAndDescription()
 {
@@ -129,5 +128,4 @@ void FixedWingPage::updateImageAndDescription()
     ui->typeGraphicsView->fitInView(m_fixedwingPic, Qt::KeepAspectRatio);
 
     ui->typeDescription->setText(description);
-
 }

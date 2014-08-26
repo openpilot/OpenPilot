@@ -72,8 +72,8 @@ public:
     virtual VehicleConfigurationSource::VEHICLE_TYPE getVehicleType() const = 0;
     virtual VehicleConfigurationSource::VEHICLE_SUB_TYPE getVehicleSubType() const = 0;
     virtual VehicleConfigurationSource::INPUT_TYPE getInputType() const       = 0;
-    virtual VehicleConfigurationSource::ESC_TYPE getEscType() const      = 0;
-    virtual VehicleConfigurationSource::SERVO_TYPE getServoType() const      = 0;
+    virtual VehicleConfigurationSource::ESC_TYPE getEscType() const           = 0;
+    virtual VehicleConfigurationSource::SERVO_TYPE getServoType() const       = 0;
 
     virtual VehicleConfigurationSource::GPS_SETTING getGPSSetting() const     = 0;
     virtual VehicleConfigurationSource::RADIO_SETTING getRadioSetting() const = 0;

@@ -54,8 +54,8 @@ public:
     virtual QString updateConfigObjectsFromWidgets();
 
     void resetChannelboxesAndSliders();
-protected:      									      
-    void showEvent(QShowEvent *event);					      
+protected:
+    void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
     void enableControls(bool enable);
 

@@ -30,7 +30,7 @@
 #include "systemalarms.h"
 #include "uavobjectmanager.h"
 
-const QString OutputCalibrationPage::MULTI_SVG_FILE = QString(":/setupwizard/resources/multirotor-shapes.svg");
+const QString OutputCalibrationPage::MULTI_SVG_FILE     = QString(":/setupwizard/resources/multirotor-shapes.svg");
 const QString OutputCalibrationPage::FIXEDWING_SVG_FILE = QString(":/setupwizard/resources/fixedwing-shapes-wizard.svg");
 
 OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *parent) :
@@ -42,8 +42,8 @@ OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *paren
     qDebug() << "calling output calibration page";
     m_vehicleRenderer = new QSvgRenderer();
 
-    // move the code that was here to setupVehicle() so we can determine which image to use. 
-    m_vehicleScene = new QGraphicsScene(this);
+    // move the code that was here to setupVehicle() so we can determine which image to use.
+    m_vehicleScene    = new QGraphicsScene(this);
     ui->vehicleView->setScene(m_vehicleScene);
 }
 
@@ -283,7 +283,7 @@ void OutputCalibrationPage::setWizardPage()
             ui->motorNeutralSlider->setValue(m_actuatorSettings[currentChannel].channelNeutral);
         } else if (currentPageIndex == 2) {
             if (m_actuatorSettings[currentChannel].channelMax < m_actuatorSettings[currentChannel].channelMin &&
-                    !ui->reverseCheckbox->isChecked()) {
+                !ui->reverseCheckbox->isChecked()) {
                 ui->reverseCheckbox->setChecked(true);
             } else {
                 ui->reverseCheckbox->setChecked(false);
@@ -369,7 +369,7 @@ void OutputCalibrationPage::on_motorNeutralButton_toggled(bool checked)
 {
     ui->motorNeutralButton->setText(checked ? tr("Stop") : tr("Start"));
     ui->motorNeutralSlider->setEnabled(checked);
-    quint16 channel = getCurrentChannel();
+    quint16 channel   = getCurrentChannel();
     quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
     onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings[channel].channelNeutral, safeValue, ui->motorNeutralSlider);
 }
@@ -457,7 +457,7 @@ void OutputCalibrationPage::on_servoButton_toggled(bool checked)
 {
     ui->servoButton->setText(checked ? tr("Stop") : tr("Start"));
     quint16 channel   = getCurrentChannel();
-    quint16 safeValue = m_actuatorSettings[channel].channelNeutral;    
+    quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
     onStartButtonToggle(ui->servoButton, channel, safeValue, safeValue, ui->servoCenterAngleSlider);
 }
 
@@ -497,17 +497,17 @@ void OutputCalibrationPage::on_servoMinAngleSlider_valueChanged(int position)
 
     // Adjust neutral and max
     if (ui->reverseCheckbox->isChecked()) {
-        if(value <= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
+        if (value <= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
             ui->servoCenterAngleSlider->setValue(value);
         }
-        if(value <= m_actuatorSettings[getCurrentChannel()].channelMax) {
+        if (value <= m_actuatorSettings[getCurrentChannel()].channelMax) {
             ui->servoMaxAngleSlider->setValue(value);
         }
     } else {
-        if(value >= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
+        if (value >= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
             ui->servoCenterAngleSlider->setValue(value);
         }
-        if(value >= m_actuatorSettings[getCurrentChannel()].channelMax) {
+        if (value >= m_actuatorSettings[getCurrentChannel()].channelMax) {
             ui->servoMaxAngleSlider->setValue(value);
         }
     }
@@ -523,17 +523,17 @@ void OutputCalibrationPage::on_servoMaxAngleSlider_valueChanged(int position)
 
     // Adjust neutral and min
     if (ui->reverseCheckbox->isChecked()) {
-        if(value >= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
+        if (value >= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
             ui->servoCenterAngleSlider->setValue(value);
         }
-        if(value >= m_actuatorSettings[getCurrentChannel()].channelMin) {
+        if (value >= m_actuatorSettings[getCurrentChannel()].channelMin) {
             ui->servoMinAngleSlider->setValue(value);
         }
     } else {
-        if(value <= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
+        if (value <= m_actuatorSettings[getCurrentChannel()].channelNeutral) {
             ui->servoCenterAngleSlider->setValue(value);
         }
-        if(value <= m_actuatorSettings[getCurrentChannel()].channelMin) {
+        if (value <= m_actuatorSettings[getCurrentChannel()].channelMin) {
             ui->servoMinAngleSlider->setValue(value);
         }
     }

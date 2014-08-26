@@ -481,11 +481,11 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
 
             // get motor 2 value for Yaw and Roll
             channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
-            value    = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+            value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
             setYawMixLevel(qRound(value / 1.27));
 
-            channel  = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
-            value    = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
+            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+            value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
             m_aircraft->mrRollMixLevel->setValue(-qRound(value / 1.27));
         }
     } else if (frameType == "HexaCoax") {
@@ -968,11 +968,11 @@ void ConfigMultiRotorWidget::setupQuadMotor(int channel, double pitch, double ro
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
 
     Q_ASSERT(mixer);
-    
-    //Normalize mixer values, allow a well balanced mixer saved
+
+    // Normalize mixer values, allow a well balanced mixer saved
     pitch = (pitch < 0) ? qFloor(pitch * 127) : qCeil(pitch * 127);
-    roll = (roll < 0) ? qFloor(roll * 127) : qCeil(roll * 127);
-    yaw = (yaw < 0) ? qFloor(yaw * 127) : qCeil(yaw * 127);
+    roll  = (roll < 0) ? qFloor(roll * 127) : qCeil(roll * 127);
+    yaw   = (yaw < 0) ? qFloor(yaw * 127) : qCeil(yaw * 127);
 
     setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
 

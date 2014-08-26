@@ -970,23 +970,9 @@ void ConfigMultiRotorWidget::setupQuadMotor(int channel, double pitch, double ro
     Q_ASSERT(mixer);
     
     //Normalize mixer values, allow a well balanced mixer saved
-    if(pitch < 0) {
-    pitch = qFloor(pitch * 127);
-    } else {
-    pitch = qCeil(pitch * 127);
-    }
-
-    if(roll < 0) {
-    roll = qFloor(roll * 127);
-    } else {
-    roll = qCeil(roll * 127);
-    }
-
-    if(yaw < 0) {
-    yaw = qFloor(yaw * 127);
-    } else {
-    yaw = qCeil(yaw * 127);
-    }
+    pitch = (pitch < 0) ? qFloor(pitch * 127) : qCeil(pitch * 127);
+    roll = (roll < 0) ? qFloor(roll * 127) : qCeil(roll * 127);
+    yaw = (yaw < 0) ? qFloor(yaw * 127) : qCeil(yaw * 127);
 
     setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
 

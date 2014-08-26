@@ -37,6 +37,7 @@
 #include "stabilizationsettings.h"
 #include "revocalibration.h"
 #include "accelgyrosettings.h"
+#include <QtCore/qmath.h>
 
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE = 50;
 const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE  = 400;

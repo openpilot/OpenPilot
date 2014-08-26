@@ -49,11 +49,11 @@ p, li { white-space: pre-wrap; }
          </property>
          <item>
           <widget class="QLabel" name="label_2">
-           <property name="minimumSize">
-            <size>
-             <width>125</width>
-             <height>36</height>
-            </size>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
            <property name="font">
             <font>
@@ -69,6 +69,12 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <widget class="QComboBox" name="typeCombo">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>125</width>
@@ -82,7 +88,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QTextEdit" name="typeDescription">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>

@@ -33,7 +33,6 @@ AirframeStabFixedwingPage::AirframeStabFixedwingPage(SetupWizard *wizard, QWidge
     ui(new Ui::AirframeStabFixedwingPage)
 {
     ui->setupUi(this);
-    setFinalPage(true);
 }
 
 AirframeStabFixedwingPage::~AirframeStabFixedwingPage()

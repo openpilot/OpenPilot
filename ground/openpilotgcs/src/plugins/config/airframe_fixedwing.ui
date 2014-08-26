@@ -469,6 +469,12 @@ margin:1px;</string>
         </property>
         <item row="0" column="0">
          <widget class="QLabel" name="fwElevator2Label">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -499,6 +505,12 @@ margin:1px;</string>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="fwRudder1Label">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -523,6 +535,12 @@ margin:1px;</string>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="fwRudder2Label">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -560,6 +578,12 @@ margin:1px;</string>
         </property>
         <item row="0" column="0">
          <widget class="QLabel" name="fwEngineLabel">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -581,6 +605,12 @@ margin:1px;</string>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="fwAileron1Label">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -602,6 +632,12 @@ margin:1px;</string>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="fwAileron2Label">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -623,6 +659,12 @@ margin:1px;</string>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="fwElevator1Label">
+          <property name="minimumSize">
+           <size>
+            <width>70</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);

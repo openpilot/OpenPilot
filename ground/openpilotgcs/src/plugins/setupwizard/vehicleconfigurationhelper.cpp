@@ -440,8 +440,8 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         Q_ASSERT(field);
         field->setValue((channels[i].throttle1 * 127) / 100, 0);
         field->setValue((channels[i].throttle2 * 127) / 100, 1);
-        field->setValue((channels[i].roll * 127) / 100, 2);
-        field->setValue((channels[i].pitch * 127) / 100, 3);
+        field->setValue(qRound(((double)channels[i].roll * 127) / 100), 2);
+        field->setValue(qRound(((double)channels[i].pitch * 127) / 100), 3);
         field->setValue((channels[i].yaw * 127) / 100, 4);
     }
 
@@ -1014,7 +1014,7 @@ void VehicleConfigurationHelper::setupHexaCopter()
     }
     case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
     {
-        frame = SystemSettings::AIRFRAMETYPE_HEXAH;
+        frame = SystemSettings::AIRFRAMETYPE_HEXAX;
         // HexaX according to new mixer table and pitch-roll-yaw mixing at 100%
         // Pitch Roll Yaw
         // M1 {  1, -0.5, -1 },

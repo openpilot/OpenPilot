@@ -190,7 +190,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>40</width>
+            <width>50</width>
             <height>0</height>
            </size>
           </property>
@@ -222,7 +222,7 @@ margin:1px;</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>40</width>
+            <width>50</width>
             <height>0</height>
            </size>
           </property>
@@ -264,7 +264,7 @@ margin:1px;</string>
          <widget class="QLabel" name="elevonLabel2">
           <property name="minimumSize">
            <size>
-            <width>40</width>
+            <width>50</width>
             <height>0</height>
            </size>
           </property>
@@ -290,7 +290,7 @@ margin:1px;</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>40</width>
+            <width>50</width>
             <height>0</height>
            </size>
           </property>

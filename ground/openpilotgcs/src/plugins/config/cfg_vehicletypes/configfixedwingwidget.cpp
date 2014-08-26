@@ -165,7 +165,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 
         m_aircraft->fwAileron1Label->setText("Aileron 1");
         m_aircraft->fwAileron2Label->setText("Aileron 2");
-        m_aircraft->elevonLabel1->setText("Rudd");
+        m_aircraft->elevonLabel1->setText("Rudder");
         m_aircraft->elevonLabel2->setText("Pitch");
 
         m_aircraft->elevonSlider1->setEnabled(true);

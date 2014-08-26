@@ -35,7 +35,7 @@ FixedWingPage::FixedWingPage(SetupWizard *wizard, QWidget *parent) :
 {
     ui->setupUi(this);
     QSvgRenderer *renderer = new QSvgRenderer();
-    renderer->load(QString(":/configgadget/images/fixedwing-shapes.svg"));
+    renderer->load(QString(":/setupwizard/resources/fixedwing-shapes-wizard-no-numbers.svg"));
     m_fixedwingPic = new QGraphicsSvgItem();
     m_fixedwingPic->setSharedRenderer(renderer);
     QGraphicsScene *scene = new QGraphicsScene(this);

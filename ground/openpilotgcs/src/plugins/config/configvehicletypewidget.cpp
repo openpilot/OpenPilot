@@ -261,9 +261,8 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 
 int ConfigVehicleTypeWidget::frameCategory(QString frameType)
 {
-    if (frameType == "FixedWing" || frameType == "Aileron Dual Servo" || frameType == "Aileron Single Servo"
-        || frameType == "FixedWingElevon" || frameType == "Elevon" || frameType == "FixedWingVtail"
-        || frameType == "Vtail") {
+    if (frameType == "FixedWing" || frameType == "Aileron" || frameType == "FixedWingElevon"
+        || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
         return ConfigVehicleTypeWidget::FIXED_WING;
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
                || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"

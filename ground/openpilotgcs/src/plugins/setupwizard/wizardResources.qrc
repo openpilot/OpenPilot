@@ -36,6 +36,7 @@
         <file>resources/wizard.png</file>
         <file>resources/multirotor-shapes.svg</file>
         <file>resources/fixedwing-shapes-wizard.svg</file>
+        <file>resources/fixedwing-shapes-wizard-no-numbers.svg</file>
 	<!-- these are different from the files in /config/images -->
         <file>resources/bttn-illustration-down.png</file>
         <file>resources/bttn-illustration-up.png</file>

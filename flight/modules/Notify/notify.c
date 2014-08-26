@@ -55,6 +55,7 @@
 #include "inc/notify.h"
 #include "inc/sequences.h"
 #include <pios_mem.h>
+#include <hwsettings.h>
 
 #define SAMPLE_PERIOD_MS 250
 // private types
@@ -71,17 +72,26 @@ static void checkAlarm(uint8_t alarm, uint8_t *last_alarm, uint32_t *last_alm_ti
 static AlarmStatus_t *alarmStatus;
 int32_t NotifyInitialize(void)
 {
-    alarmStatus = (AlarmStatus_t *)pios_malloc(sizeof(AlarmStatus_t) * alarmsMapSize);
-    for (uint8_t i = 0; i < alarmsMapSize; i++) {
-        alarmStatus[i].lastAlarm     = SYSTEMALARMS_ALARM_OK;
-        alarmStatus[i].lastAlarmTime = 0;
-    }
+    uint8_t ws281xOutStatus;
 
-    FlightStatusConnectCallback(&updatedCb);
-    updatedCb(0);
-    static UAVObjEvent ev;
-    memset(&ev, 0, sizeof(UAVObjEvent));
-    EventPeriodicCallbackCreate(&ev, onTimerCb, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+    HwSettingsWS2811LED_OutGet(&ws281xOutStatus);
+    // Todo: Until further applications exists for WS2811 notify enabled status is tied to ws281x output configuration
+    bool enabled = ws281xOutStatus != HWSETTINGS_WS2811LED_OUT_DISABLED;
+
+    if (enabled) {
+        alarmStatus = (AlarmStatus_t *)pios_malloc(sizeof(AlarmStatus_t) * alarmsMapSize);
+        for (uint8_t i = 0; i < alarmsMapSize; i++) {
+            alarmStatus[i].lastAlarm     = SYSTEMALARMS_ALARM_OK;
+            alarmStatus[i].lastAlarmTime = 0;
+        }
+
+        FlightStatusConnectCallback(&updatedCb);
+        static UAVObjEvent ev;
+        memset(&ev, 0, sizeof(UAVObjEvent));
+        EventPeriodicCallbackCreate(&ev, onTimerCb, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+
+        updatedCb(0);
+    }
     return 0;
 }
 MODULE_INITCALL(NotifyInitialize, 0);

@@ -1,4 +1,4 @@
---- RELEASE-14.06.01 RC1 --- 
+--- RELEASE-14.06.01 --- 
 This is the first maintenance release for 14.06.
 This mainly fixes a bug causing flips when switching to Weaklevel flight mode.
 

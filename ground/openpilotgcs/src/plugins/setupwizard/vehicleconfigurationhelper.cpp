@@ -440,9 +440,25 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         Q_ASSERT(field);
         field->setValue((channels[i].throttle1 * 127) / 100, 0);
         field->setValue((channels[i].throttle2 * 127) / 100, 1);
-        field->setValue(qRound(((double)channels[i].roll * 127) / 100), 2);
-        field->setValue(qRound(((double)channels[i].pitch * 127) / 100), 3);
-        field->setValue((channels[i].yaw * 127) / 100, 4);
+
+        //Normalize mixer values, allow a well balanced mixer saved
+        if(channels[i].roll < 0) {
+        field->setValue(qFloor((double)(channels[i].roll * 127) / 100), 2);
+        } else {
+        field->setValue(qCeil((double)(channels[i].roll * 127) / 100), 2);
+        }
+
+        if(channels[i].pitch < 0) {
+        field->setValue(qFloor((double)(channels[i].pitch * 127) / 100), 3);
+        } else {
+        field->setValue(qCeil((double)(channels[i].pitch * 127) / 100), 3);
+        }
+
+        if(channels[i].yaw < 0) {
+        field->setValue(qFloor((double)(channels[i].yaw * 127) / 100), 4);
+        } else {
+        field->setValue(qCeil((double)(channels[i].yaw * 127) / 100), 4);
+        }
     }
 
     // Apply updates

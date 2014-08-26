@@ -30,6 +30,7 @@
 
 #include <QList>
 #include <QPair>
+#include <QtCore/qmath.h>
 #include "vehicleconfigurationsource.h"
 #include "uavobjectmanager.h"
 #include "systemsettings.h"

@@ -968,14 +968,33 @@ void ConfigMultiRotorWidget::setupQuadMotor(int channel, double pitch, double ro
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
 
     Q_ASSERT(mixer);
+    
+    //Normalize mixer values, allow a well balanced mixer saved
+    if(pitch < 0) {
+    pitch = qFloor(pitch * 127);
+    } else {
+    pitch = qCeil(pitch * 127);
+    }
+
+    if(roll < 0) {
+    roll = qFloor(roll * 127);
+    } else {
+    roll = qCeil(roll * 127);
+    }
+
+    if(yaw < 0) {
+    yaw = qFloor(yaw * 127);
+    } else {
+    yaw = qCeil(yaw * 127);
+    }
 
     setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
 
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 0);
-    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, roll * 127);
-    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, pitch * 127);
-    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, yaw * 127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, roll);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, pitch);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, yaw);
 }
 
 /**

@@ -228,7 +228,11 @@ static void stabilizationOuterloopTask()
                 // That would be changed to Attitude mode max angle affecting Kp
                 // Also does not take dT into account
             {
-                float rate_input    = cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t] * stabilizationDesiredAxis[t] / cast_struct_to_array(stabSettings.stabBank, stabSettings.stabBank.RollMax)[t];
+                float stickinput[3];
+                stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
+                stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
+                stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
+                float rate_input    = stickinput[t] * cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t];
                 float weak_leveling = local_error[t] * stabSettings.settings.WeakLevelingKp;
                 weak_leveling = boundf(weak_leveling, -stabSettings.settings.MaxWeakLevelingRate, stabSettings.settings.MaxWeakLevelingRate);
 

@@ -107,7 +107,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
 
-     m_aircraft->planeShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_aircraft->planeShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_aircraft->planeShape->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/configgadget/images/fixedwing-shapes.svg"));
@@ -137,7 +137,9 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->fwAileron1Label->setText("Elevon 1");
         m_aircraft->fwAileron2Label->setText("Elevon 2");
         m_aircraft->fwElevator1ChannelBox->setEnabled(false);
+        m_aircraft->fwElevator1ChannelBox->setCurrentIndex(0);
         m_aircraft->fwElevator2ChannelBox->setEnabled(false);
+        m_aircraft->fwElevator2ChannelBox->setCurrentIndex(0);
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
         m_aircraft->fwRudder2ChannelBox->setEnabled(true);
 
@@ -149,11 +151,12 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonSlider1->setEnabled(true);
         m_aircraft->elevonSlider2->setEnabled(true);
     } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
-        planeimg->setElementId("aileron");
+        planeimg->setElementId("vtail");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Vtail"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(false);
+        m_aircraft->fwRudder1ChannelBox->setCurrentIndex(0);
         m_aircraft->fwRudder2ChannelBox->setEnabled(false);
-
+        m_aircraft->fwRudder2ChannelBox->setCurrentIndex(0);
         m_aircraft->fwElevator1Label->setText("Vtail 1");
         m_aircraft->fwElevator1ChannelBox->setEnabled(true);
 

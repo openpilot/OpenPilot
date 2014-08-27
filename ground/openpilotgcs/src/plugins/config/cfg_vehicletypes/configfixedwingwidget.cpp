@@ -174,6 +174,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
     QGraphicsScene *scene = new QGraphicsScene();
     scene->addItem(planeimg);
     scene->setSceneRect(planeimg->boundingRect());
+    m_aircraft->planeShape->fitInView(planeimg, Qt::KeepAspectRatio);
     m_aircraft->planeShape->setScene(scene);
 
 }
@@ -619,4 +620,19 @@ bool ConfigFixedWingWidget::throwConfigError(QString airframeType)
     }
 
     return error;
+}
+
+
+void ConfigFixedWingWidget::resizeEvent(QResizeEvent *)
+{
+    if (planeimg) {
+        m_aircraft->planeShape->fitInView(planeimg, Qt::KeepAspectRatio);
+    }
+}
+
+void ConfigFixedWingWidget::showEvent(QShowEvent *)
+{
+    if (planeimg) {
+        m_aircraft->planeShape->fitInView(planeimg, Qt::KeepAspectRatio);
+    }
 }

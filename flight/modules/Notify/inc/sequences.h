@@ -49,10 +49,11 @@ typedef enum {
     NOTIFY_SEQUENCE_ALM_ERROR_GPS     = 13,
     NOTIFY_SEQUENCE_ALM_WARN_BATTERY  = 14,
     NOTIFY_SEQUENCE_ALM_ERROR_BATTERY = 15,
-    NOTIFY_SEQUENCE_ALM_MAG    = 16,
+    NOTIFY_SEQUENCE_ALM_MAG = 16,
     NOTIFY_SEQUENCE_ALM_CONFIG = 17,
-    NOTIFY_SEQUENCE_DISARMED   = 18,
-    NOTIFY_SEQUENCE_NULL = 255, // skips any signalling for this condition
+    NOTIFY_SEQUENCE_ALM_RECEIVER      = 18,
+    NOTIFY_SEQUENCE_DISARMED = 19,
+    NOTIFY_SEQUENCE_NULL     = 255, // skips any signalling for this condition
 } NotifySequences;
 
 // This structure determine sequences attached to an alarm
@@ -155,6 +156,10 @@ const LedSequence_t notifications[] = {
                                                    { .time_off = 50,  .time_on    = 50, .color = COLOR_RED, .repeats = 9, },
                                                    { .time_off = 500, .time_on    = 50, .color = COLOR_RED, .repeats = 1, },
                                                      }, },
+    [NOTIFY_SEQUENCE_ALM_RECEIVER] =               { .repeats  = 1,   .steps     = {
+                                                   { .time_off = 50,  .time_on    = 50, .color = COLOR_ORANGE, .repeats = 9, },
+                                                   { .time_off = 500, .time_on    = 50, .color = COLOR_ORANGE, .repeats = 1, },
+                                                     }, },
 };
 
 // List of background sequences attached to each flight mode
@@ -203,6 +208,12 @@ const AlarmDefinition_t alarmsMap[] = {
         .alarmIndex = SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION,
         .warnNotification = NOTIFY_SEQUENCE_NULL,
         .errorNotification = NOTIFY_SEQUENCE_ALM_CONFIG,
+    },
+    {
+        .timeBetweenNotifications = 5000,
+        .alarmIndex = SYSTEMALARMS_ALARM_RECEIVER,
+        .warnNotification = NOTIFY_SEQUENCE_ALM_RECEIVER,
+        .errorNotification = NOTIFY_SEQUENCE_ALM_RECEIVER,
     },
 };
 

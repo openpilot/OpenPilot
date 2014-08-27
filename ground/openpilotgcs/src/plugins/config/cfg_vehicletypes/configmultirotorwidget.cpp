@@ -621,7 +621,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox2, multi.VTOLMotorNE);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox3, multi.VTOLMotorS);
-        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorS);
         setComboCurrentIndex(m_aircraft->triYawChannelBox, multi.TRIYaw);
 
         int channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;

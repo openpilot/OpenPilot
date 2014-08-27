@@ -137,9 +137,9 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->fwAileron1Label->setText("Elevon 1");
         m_aircraft->fwAileron2Label->setText("Elevon 2");
         m_aircraft->fwElevator1ChannelBox->setEnabled(false);
-        m_aircraft->fwElevator1ChannelBox->setCurrentIndex(0);
+        m_aircraft->fwElevator1ChannelBox->setCurrentText("None");
         m_aircraft->fwElevator2ChannelBox->setEnabled(false);
-        m_aircraft->fwElevator2ChannelBox->setCurrentIndex(0);
+        m_aircraft->fwElevator2ChannelBox->setCurrentText("None");
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
         m_aircraft->fwRudder2ChannelBox->setEnabled(true);
 
@@ -154,9 +154,9 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         planeimg->setElementId("vtail");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Vtail"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(false);
-        m_aircraft->fwRudder1ChannelBox->setCurrentIndex(0);
+        m_aircraft->fwRudder1ChannelBox->setCurrentText("None");
         m_aircraft->fwRudder2ChannelBox->setEnabled(false);
-        m_aircraft->fwRudder2ChannelBox->setCurrentIndex(0);
+        m_aircraft->fwRudder2ChannelBox->setCurrentText("None");
         m_aircraft->fwElevator1Label->setText("Vtail 1");
         m_aircraft->fwElevator1ChannelBox->setEnabled(true);
 

@@ -218,7 +218,7 @@ margin:1px;</string>
         <item>
          <widget class="QSlider" name="elevonSlider1">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="minimumSize">
            <size>
@@ -286,7 +286,7 @@ margin:1px;</string>
         <item>
          <widget class="QSlider" name="elevonSlider2">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="minimumSize">
            <size>
@@ -737,4 +737,3 @@ margin:1px;</string>
   </connection>
  </connections>
 </ui>
-

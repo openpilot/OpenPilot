@@ -74,8 +74,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
         channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
         break;
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
-        // do nothing for vtail support for the time being.
-        // channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
         break;
     case SystemSettings::AIRFRAMETYPE_HELICP:
         // helicp

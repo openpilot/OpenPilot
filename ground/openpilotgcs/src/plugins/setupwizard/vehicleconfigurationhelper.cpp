@@ -462,6 +462,60 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         }
     }
 
+    MixerSettings *mixSettings = MixerSettings::GetInstance(m_uavoManager);
+
+    // Save mixer values for sliders
+    switch (m_configSource->getVehicleType()) {
+        case VehicleConfigurationSource::VEHICLE_MULTI:
+        {
+            switch (m_configSource->getVehicleSubType()) {
+            case VehicleConfigurationSource::MULTI_ROTOR_TRI_Y:
+            case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
+            case VehicleConfigurationSource::MULTI_ROTOR_HEXA_H:
+            case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
+                mixSettings->setMixerValueRoll(100);
+                mixSettings->setMixerValuePitch(100);
+                mixSettings->setMixerValueYaw(100);               
+                break;
+            case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
+                mixSettings->setMixerValueRoll(50);
+                mixSettings->setMixerValuePitch(50);
+                mixSettings->setMixerValueYaw(50);         
+                break;
+            case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
+                mixSettings->setMixerValueRoll(100);
+                mixSettings->setMixerValuePitch(100);
+                mixSettings->setMixerValueYaw(50);         
+                break;
+            case VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y:
+                mixSettings->setMixerValueRoll(100);
+                mixSettings->setMixerValuePitch(50);
+                mixSettings->setMixerValueYaw(66);  
+                break;
+            case VehicleConfigurationSource::MULTI_ROTOR_OCTO:
+            case VehicleConfigurationSource::MULTI_ROTOR_OCTO_X:
+                mixSettings->setMixerValueRoll(100);
+                mixSettings->setMixerValuePitch(100);
+                mixSettings->setMixerValueYaw(100);               
+                break;
+            case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X:
+            case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS:
+            case VehicleConfigurationSource::MULTI_ROTOR_OCTO_V:
+                break;
+            default:
+                break;
+            }
+        break;
+    }
+    case VehicleConfigurationSource::VEHICLE_FIXEDWING:
+    case VehicleConfigurationSource::VEHICLE_HELI:
+    case VehicleConfigurationSource::VEHICLE_SURFACE:
+        // TODO: Implement mixer / sliders settings for other vehicle types?
+        break;
+    default:
+        break;
+    }
+
     // Apply updates
     mSettings->setData(mSettings->getData());
     addModifiedObject(mSettings, tr("Writing mixer settings"));

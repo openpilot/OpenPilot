@@ -122,15 +122,11 @@ const LedSequence_t notifications[] = {
                                                    { .time_off = 800, .time_on  = 200, .color = COLOR_GREEN, .repeats = 1, },
                                                      }, },
     [NOTIFY_SEQUENCE_ARMED_FM_RTH] =               { .repeats  = -1,  .steps    = {
-                                                   { .time_off = 100, .time_on  = 200, .color = COLOR_GREEN, .repeats = 1, },
-                                                   { .time_off = 500, .time_on  = 200, .color = COLOR_GREEN, .repeats = 1, },
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_GREEN,  .repeats = 1, },
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_YELLOW, .repeats = 1, },
                                                      }, },
     [NOTIFY_SEQUENCE_ARMED_FM_LAND] =              { .repeats  = -1,  .steps    = {
-                                                   { .time_off = 100, .time_on  = 200, .color = COLOR_GREEN, .repeats = 1, },
-                                                   { .time_off = 100, .time_on  = 200, .color = COLOR_BLUE,  .repeats = 1, },
-                                                   { .time_off = 100, .time_on  = 200, .color = COLOR_GREEN, .repeats = 1, },
-                                                   { .time_off = 100, .time_on  = 200, .color = COLOR_BLUE,  .repeats = 1, },
-                                                   { .time_off = 600, .time_on  = 200, .color = COLOR_GREEN, .repeats = 1, },
+                                                   { .time_off = 100, .time_on  = 100, .color = COLOR_GREEN, .repeats = 1, },
                                                      }, },
     [NOTIFY_SEQUENCE_ARMED_FM_AUTO] =              { .repeats  = -1,  .steps    = {
                                                    { .time_off = 100, .time_on  = 200, .color = COLOR_GREEN, .repeats = 2, },
@@ -139,11 +135,11 @@ const LedSequence_t notifications[] = {
 
     [NOTIFY_SEQUENCE_ALM_WARN_GPS] =               { .repeats  = 2,   .steps     = {
                                                    { .time_off = 300, .time_on   = 300, .color = COLOR_ORANGE, .repeats = 2, },
-                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_YELLOW, .repeats = 1, },
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_GREEN,  .repeats = 1, },
                                                      }, },
     [NOTIFY_SEQUENCE_ALM_ERROR_GPS] =              { .repeats  = 2,   .steps     = {
-                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_RED,    .repeats = 2, },
-                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_YELLOW, .repeats = 1, },
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_RED,   .repeats = 2, },
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_GREEN, .repeats = 1, },
                                                      }, },
     [NOTIFY_SEQUENCE_ALM_WARN_BATTERY]  =          { .repeats  = 1,   .steps     = {
                                                    { .time_off = 100, .time_on   = 100, .color = COLOR_ORANGE, .repeats = 10, },
@@ -152,8 +148,8 @@ const LedSequence_t notifications[] = {
                                                    { .time_off = 100, .time_on   = 100, .color = COLOR_RED, .repeats = 10, },
                                                      }, },
     [NOTIFY_SEQUENCE_ALM_MAG] =                    { .repeats  = 1,   .steps     = {
-                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_RED,   .repeats = 2, },
-                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_GREEN, .repeats = 1, },
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_RED,    .repeats = 2, },
+                                                   { .time_off = 300, .time_on   = 300, .color = COLOR_PURPLE, .repeats = 1, },
                                                      }, },
     [NOTIFY_SEQUENCE_ALM_CONFIG] =                 { .repeats  = 1,   .steps     = {
                                                    { .time_off = 50,  .time_on    = 50, .color = COLOR_RED, .repeats = 9, },

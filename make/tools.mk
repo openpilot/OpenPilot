@@ -493,7 +493,7 @@ define MAC_QT_INSTALL_TEMPLATE
 
 qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) if ! $(SEVENZIP) >/dev/null 2>&1; then \
-		$(ECHO) $(MSG_NOTICE) "Please install the p7zip for your distribution. i.e.: sudo brew install p7zip." && \
+		$(ECHO) $(MSG_NOTICE) "Please install the p7zip for your distribution. i.e.: brew install p7zip." && \
 		exit 1; \
 	fi
 	$(call DOWNLOAD_TEMPLATE,$(3),$(5),"$(4)")

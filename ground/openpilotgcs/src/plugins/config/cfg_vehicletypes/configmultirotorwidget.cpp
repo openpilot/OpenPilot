@@ -366,14 +366,12 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox2, multi.VTOLMotorE);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox3, multi.VTOLMotorS);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorW);
-
     } else if (frameType == "QuadX") {
         // Motors 1/2/3/4 are: NW / NE / SE / SW
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox2, multi.VTOLMotorNE);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox3, multi.VTOLMotorSE);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorSW);
-
     } else if (frameType == "Hexa") {
         // Motors 1/2/3 4/5/6 are: N / NE / SE / S / SW / NW
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorN);
@@ -382,7 +380,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorS);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox5, multi.VTOLMotorSW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox6, multi.VTOLMotorNW);
-
     } else if (frameType == "HexaX") {
         // Motors 1/2/3 4/5/6 are: NE / E / SE / SW / W / NW
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNE);
@@ -391,7 +388,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorSW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox5, multi.VTOLMotorW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox6, multi.VTOLMotorNW);
-
     } else if (frameType == "HexaH") {
         // Motors 1/2/3 4/5/6 are: NE / E / SE / SW / W / NW
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNE);
@@ -400,7 +396,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorSW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox5, multi.VTOLMotorW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox6, multi.VTOLMotorNW);
-
     } else if (frameType == "HexaCoax") {
         // Motors 1/2/3 4/5/6 are: NW/W NE/E S/SE
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNW);
@@ -409,7 +404,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorE);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox5, multi.VTOLMotorS);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox6, multi.VTOLMotorSE);
-
     } else if (frameType == "Octo" || frameType == "OctoV" || frameType == "OctoCoaxP") {
         // Motors 1 to 8 are N / NE / E / etc
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorN);
@@ -420,7 +414,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox6, multi.VTOLMotorSW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox7, multi.VTOLMotorW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox8, multi.VTOLMotorNW);
-
     } else if (frameType == "OctoX") {
         // Motors 1 to 8 are NNE / ENE / ESE / etc
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNNE);
@@ -431,7 +424,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox6, multi.VTOLMotorWSW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox7, multi.VTOLMotorWNW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox8, multi.VTOLMotorNNW);
-
     } else if (frameType == "OctoCoaxX") {
         // Motors 1 to 8 are N / NE / E / etc
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNW);
@@ -442,7 +434,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox6, multi.VTOLMotorS);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox7, multi.VTOLMotorSW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox8, multi.VTOLMotorW);
-
     } else if (frameType == "Tri") {
         // Motors 1 to 8 are N / NE / E / etc
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNW);
@@ -450,7 +441,7 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox3, multi.VTOLMotorS);
         setComboCurrentIndex(m_aircraft->triYawChannelBox, multi.TRIYaw);
     }
-    
+
     // Now, read mixing values stored on board and applies values on sliders.
     m_aircraft->mrPitchMixLevel->setValue(getMixerValue(mixer, "MixerValuePitch"));
     m_aircraft->mrRollMixLevel->setValue(getMixerValue(mixer, "MixerValueRoll"));

@@ -268,7 +268,7 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
     vconfig->setMixerValue(mixer, "MaxAccel", m_aircraft->maxAccelSlider->value());
 
     // call refreshWidgetsValues() to reflect actual saved values ?
-    callrefreshWidgetsValues();
+    refreshWidgetsValues();
     updateFeedForwardUI();
 }
 

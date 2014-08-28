@@ -130,6 +130,7 @@ ConfigCustomWidget::ConfigCustomWidget(QWidget *parent) :
     VehicleConfig(parent), m_aircraft(new Ui_CustomConfigWidget())
 {
     m_aircraft->setupUi(this);
+    m_aircraft->customMixerTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // Put combo boxes in line one of the custom mixer table:
     UAVDataObject *mixer  = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
@@ -205,6 +206,18 @@ void ConfigCustomWidget::refreshWidgetsValues(QString frameType)
     Q_ASSERT(m_aircraft);
 
     setupUI(frameType);
+
+    UAVDataObject *system = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("SystemSettings")));
+    Q_ASSERT(system);
+    QPointer<UAVObjectField> field = system->getField(QString("AirframeType"));
+
+    // Do not allow table edit until AirframeType == Custom
+    // First save set AirframeType to 'Custom' and next modify.
+    if (field->getValue().toString() != "Custom") {
+        m_aircraft->customMixerTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    } else {
+        m_aircraft->customMixerTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    }
 
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);

@@ -2,6 +2,9 @@
     <object name="MixerSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings for the @ref ActuatorModule that controls the channel assignments for the mixer based on AircraftType</description>
         <field name="MaxAccel" units="units/sec" type="float" elements="1" defaultvalue="1000"/>
+        <field name="MixerValueRoll" units="percent" type="int8" elements="1" defaultvalue="100"/>  
+        <field name="MixerValuePitch" units="percent" type="int8" elements="1" defaultvalue="100"/>
+        <field name="MixerValueYaw" units="percent" type="int8" elements="1" defaultvalue="50"/>
         <field name="FeedForward" units="" type="float" elements="1" defaultvalue="0"/>
         <field name="AccelTime" units="ms" type="float" elements="1" defaultvalue="0"/>
         <field name="DecelTime" units="ms" type="float" elements="1" defaultvalue="0"/>

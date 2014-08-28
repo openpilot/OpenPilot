@@ -437,9 +437,8 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.1ThirdPartySoftware_Listing.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_essentials.7z" | grep -v Extracting
-	$(V1) if [ -f "$(1)/qt.53.$(6)/5.3.1-0icu_51_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0icu_51_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
-	$(V1) if [ -f "$(1)/qt.53.$(6)/5.3.1-0icu_51_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0icu_51_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
-#	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6).essentials/5.3.1icu_path_patcher.sh.7z" | grep -v Extracting
+	$(V1) if [ -f "$(1)/qt.53.$(6)/5.3.1-0icu_52_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0icu_52_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
+	$(V1) if [ -f "$(1)/qt.53.$(6)/5.3.1-0icu_52_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0icu_52_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_addons.7z" | grep -v Extracting
 # go to OpenPilot/tools/5.3.1/gcc_64 and call patcher.sh
 	@$(ECHO)
@@ -493,7 +492,7 @@ define MAC_QT_INSTALL_TEMPLATE
 
 qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) if ! $(SEVENZIP) >/dev/null 2>&1; then \
-		$(ECHO) $(MSG_NOTICE) "Please install the p7zip for your distribution. i.e.: sudo brew install p7zip." && \
+		$(ECHO) $(MSG_NOTICE) "Please install the p7zip for your distribution. i.e.: brew install p7zip." && \
 		exit 1; \
 	fi
 	$(call DOWNLOAD_TEMPLATE,$(3),$(5),"$(4)")

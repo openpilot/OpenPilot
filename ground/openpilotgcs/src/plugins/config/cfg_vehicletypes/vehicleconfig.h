@@ -131,7 +131,7 @@ typedef struct {
 
 
 typedef union {
-    uint UAVObject[5]; // 32 bits * 4
+    uint UAVObject[5]; // 32 bits * 5
     heliGUISettingsStruct   heli; // 128 bits
     fixedGUISettingsStruct  fixedwing;
     multiGUISettingsStruct  multi;

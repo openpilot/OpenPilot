@@ -101,12 +101,42 @@ typedef struct {
     quint32 padding3; // 128 bits
 } __attribute__((packed))  groundGUISettingsStruct;
 
+typedef struct {
+    uint    Motor1 : 4;
+    uint    Motor2 : 4;
+    uint    Motor3 : 4;
+    uint    Motor4 : 4;
+    uint    Motor5 : 4;
+    uint    Motor6 : 4;
+    uint    Motor7 : 4;
+    uint    Motor8 : 4;  // 32 bits
+    uint    Servo1 : 4;
+    uint    Servo2 : 4;
+    uint    Servo3 : 4;
+    uint    Servo4 : 4;
+    uint    Servo5 : 4;
+    uint    Servo6 : 4;
+    uint    Servo7 : 4;
+    uint    Servo8 : 4;  // 64 bits
+    uint    RevMotor1 : 4;
+    uint    RevMotor2 : 4;
+    uint    RevMotor3 : 4;
+    uint    RevMotor4 : 4;
+    uint    RevMotor5 : 4;
+    uint    RevMotor6 : 4;
+    uint    RevMotor7 : 4;
+    uint    RevMotor8 : 4;  // 96 bits
+    quint32 padding; // 128 bits
+} __attribute__((packed))  customGUISettingsStruct;
+
+
 typedef union {
-    uint UAVObject[4]; // 32 bits * 4
+    uint UAVObject[5]; // 32 bits * 4
     heliGUISettingsStruct   heli; // 128 bits
     fixedGUISettingsStruct  fixedwing;
     multiGUISettingsStruct  multi;
     groundGUISettingsStruct ground;
+    customGUISettingsStruct custom;
 } GUIConfigDataUnion;
 
 class ConfigTaskWidget;

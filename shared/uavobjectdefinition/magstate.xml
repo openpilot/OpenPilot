@@ -1,9 +1,10 @@
 <xml>
     <object name="MagState" singleinstance="true" settings="false" category="State">
         <description>The filtered magnet vector.</description>
-	<field name="x" units="mGa" type="float" elements="1"/>
-	<field name="y" units="mGa" type="float" elements="1"/>
-	<field name="z" units="mGa" type="float" elements="1"/>
+        <field name="x" units="mGa" type="float" elements="1"/>
+        <field name="y" units="mGa" type="float" elements="1"/>
+        <field name="z" units="mGa" type="float" elements="1"/>
+        <field name="Source" units="" type="enum" elements="1" options="Invalid,Ok,Aux" defaultvalue="Invalid"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

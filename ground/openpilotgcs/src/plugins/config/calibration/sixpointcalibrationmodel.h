@@ -31,10 +31,13 @@
 #include "wizardmodel.h"
 #include "calibration/calibrationutils.h"
 #include <revocalibration.h>
+
+#include <auxmagsettings.h>
 #include <accelgyrosettings.h>
 #include <homelocation.h>
 #include <accelstate.h>
-#include <magstate.h>
+#include <magsensor.h>
+#include <auxmagsensor.h>
 
 #include <QMutex>
 #include <QObject>
@@ -87,17 +90,21 @@ public:
 
     typedef struct {
         UAVObject::Metadata accelStateMetadata;
-        UAVObject::Metadata magStateMetadata;
-        RevoCalibration::DataFields revoCalibrationData;
+        UAVObject::Metadata magSensorMetadata;
+        UAVObject::Metadata auxMagSensorMetadata;
+        AuxMagSettings::DataFields auxMagSettings;
+        RevoCalibration::DataFields   revoCalibrationData;
         AccelGyroSettings::DataFields accelGyroSettingsData;
     } Memento;
 
     typedef struct {
         RevoCalibration::DataFields   revoCalibrationData;
+        AuxMagSettings::DataFields auxMagSettingsData;
         AccelGyroSettings::DataFields accelGyroSettingsData;
     } Result;
 
     bool calibratingMag;
+    bool externalMagAvailable;
     bool calibratingAccel;
 
     QList<CalibrationStep> calibrationStepsMag;
@@ -114,7 +121,6 @@ public:
     QMutex sensorsUpdateLock;
 
     double accel_data_x[6], accel_data_y[6], accel_data_z[6];
-    double mag_data_x[6], mag_data_y[6], mag_data_z[6];
 
     QList<double> accel_accum_x;
     QList<double> accel_accum_y;
@@ -122,15 +128,23 @@ public:
     QList<double> mag_accum_x;
     QList<double> mag_accum_y;
     QList<double> mag_accum_z;
+    QList<double> aux_mag_accum_x;
+    QList<double> aux_mag_accum_y;
+    QList<double> aux_mag_accum_z;
     QList<float> mag_fit_x;
     QList<float> mag_fit_y;
     QList<float> mag_fit_z;
+    QList<float> aux_mag_fit_x;
+    QList<float> aux_mag_fit_y;
+    QList<float> aux_mag_fit_z;
 
     // convenience pointers
     RevoCalibration *revoCalibration;
     AccelGyroSettings *accelGyroSettings;
+    AuxMagSettings *auxMagSettings;
     AccelState *accelState;
-    MagState *magState;
+    MagSensor *magSensor;
+    AuxMagSensor *auxMagSensor;
     HomeLocation *homeLocation;
 
     void start(bool calibrateAccel, bool calibrateMag);
@@ -138,6 +152,7 @@ public:
     void compute();
     void showHelp(QString image);
     UAVObjectManager *getObjectManager();
+    void CalcCalibration(QList<float> x, QList<float> y, QList<float> z, double Be_length, float calibrationMatrix[], float bias[]);
 };
 }
 

@@ -98,6 +98,8 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/osdsettings.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/magsensor.c
+    SRC += $(OPUAVSYNTHDIR)/auxmagsensor.c
+    SRC += $(OPUAVSYNTHDIR)/gpsextendedstatus.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

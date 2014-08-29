@@ -82,6 +82,11 @@ void PIOS_DEBUG_Panic(const char *msg)
     int b = 0;
     int a = (2 / b);
     b = a;
+
+    // Stay put
+    while (1) {
+        ;
+    }
 }
 
 /**

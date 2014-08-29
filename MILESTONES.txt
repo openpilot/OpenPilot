@@ -169,32 +169,6 @@ C: Kavin Gustafson (k_g)
 D: October 2012
 V: http://www.youtube.com/watch?v=MGO68TqIwKk
 
-M: First successful flight using just a mobile phone
-C: Jose (please complete details), demoed in Portugal
-D: 
-V: 
-
-M: First CopterControl over 10km FixedWing navigation flight
-C: 
-D: 
-V: 
-
-M: First successful flight using the GCS only and no RC TX
-C: 
-D: 
-V: 
-
-M: First CopterControl Navigation on RC Ground Vechicle
-C: 
-D: 
-V: 
-
-M: First CopterControl Navigation on RC Water Vechicle
-C: 
-D: 
-V: 
-
-
 M: First Revo Navigated flight on a FixedWing
 C: It got done somewhere along the line, likely Corvus.
 
@@ -227,16 +201,6 @@ D:
 V:
 
 M: First Revo 5km Navigated flight on a Heli
-C:
-D:
-V:
-
-M: First Revo Altitude Hold using Sonar
-C: 
-D: 
-V: 
-
-M: First use of the Magic Waypoint feature
 C:
 D:
 V:

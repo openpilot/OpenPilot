@@ -123,15 +123,6 @@ void ConfigRevoHWWidget::updateObjectsFromWidgets()
         data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = HwSettings::OPTIONALMODULES_DISABLED;
     }
 
-    // If any port is configured to be ComBridge port, enable UsbComBridge module if it is not enabled.
-    // Otherwise disable UsbComBridge module.
-    if (m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_COMBRIDGE || m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_COMBRIDGE ||
-        m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_COMBRIDGE) {
-        data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] = HwSettings::OPTIONALMODULES_ENABLED;
-    } else {
-        data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] = HwSettings::OPTIONALMODULES_DISABLED;
-    }
-
     hwSettings->setData(data);
 }
 

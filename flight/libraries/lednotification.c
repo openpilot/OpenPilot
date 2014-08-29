@@ -244,7 +244,7 @@ static void run_led(NotifierLedStatus_t *status)
                                     &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
     const Color_t color = status->step_phase_on ? activeSequence->steps[step].color : Color_Off;
 
-    for (uint8_t i = status->led_set_start; i < status->led_set_end; i++) {
+    for (uint8_t i = status->led_set_start; i <= status->led_set_end; i++) {
         PIOS_WS2811_setColorRGB(color, i, false);
     }
     PIOS_WS2811_Update();

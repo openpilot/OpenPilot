@@ -86,6 +86,9 @@ void ConnectionDiagram::setupGraphicsScene()
         case VehicleConfigurationSource::CONTROLLER_REVO:
             elementsToShow << "controller-revo";
             break;
+        case VehicleConfigurationSource::CONTROLLER_NANO:
+            elementsToShow << "controller-nano";
+            break;
         case VehicleConfigurationSource::CONTROLLER_OPLINK:
         default:
             elementsToShow << "controller-cc";
@@ -142,18 +145,34 @@ void ConnectionDiagram::setupGraphicsScene()
 
         switch (m_configSource->getInputType()) {
         case VehicleConfigurationSource::INPUT_PWM:
-            elementsToShow << "pwm";
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                elementsToShow << "pwm-nano";
+            } else {
+                elementsToShow << "pwm";
+            }
             break;
         case VehicleConfigurationSource::INPUT_PPM:
-            elementsToShow << "ppm";
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                elementsToShow << "ppm-nano";
+            } else {
+                elementsToShow << "ppm";
+            }
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
-            elementsToShow << "sbus";
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                elementsToShow << "sbus-nano";
+            } else {
+                elementsToShow << "sbus";
+            }
             break;
         case VehicleConfigurationSource::INPUT_DSMX10:
         case VehicleConfigurationSource::INPUT_DSMX11:
         case VehicleConfigurationSource::INPUT_DSM2:
-            elementsToShow << "satellite";
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                elementsToShow << "satellite-nano";
+            } else {
+                elementsToShow << "satellite";
+            }
             break;
         default:
             break;

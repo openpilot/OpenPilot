@@ -1095,13 +1095,18 @@ openocd_clean:
 STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash
 
 .PHONY: stm32flash_install
-stm32flash_install: STM32FLASH_URL := http://stm32flash.googlecode.com/svn/trunk
-stm32flash_install: STM32FLASH_REV := 61
+stm32flash_install: STM32FLASH_URL := https://code.google.com/p/stm32flash/
+stm32flash_install: STM32FLASH_REV := a358bd1f025d
 stm32flash_install: stm32flash_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(STM32FLASH_URL) @ r$(STM32FLASH_REV)"
-	$(V1) svn export -q -r "$(STM32FLASH_REV)" "$(STM32FLASH_URL)" "$(STM32FLASH_DIR)"
-
+	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -rf "$(STM32FLASH_DIR)"
+	$(V1) mkdir -p "$(STM32FLASH_DIR)"
+	$(V1) git clone --no-checkout $(STM32FLASH_URL) "$(STM32FLASH_DIR)"
+	$(V1) ( \
+	  cd $(STM32FLASH_DIR) ; \
+	  git checkout -q $(STM32FLASH_REV) ; \
+	)
         # build
 	$(V0) @echo " BUILD        $(STM32FLASH_DIR)"
 	$(V1) $(MAKE) --silent -C $(STM32FLASH_DIR) all

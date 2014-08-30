@@ -1,12 +1,10 @@
 /**
  ******************************************************************************
  *
- * @file       pios_ws2811.h
+ * @file       lednotification.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      A driver for ws2811 rgb led controller.
- *             this is a plain PiOS port of the very clever solution
- *             implemented by Omri Iluz in the chibios driver here:
- *             https://github.com/omriiluz/WS2812B-LED-Driver-ChibiOS
+ * @brief      led notification library
+ *             --
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -25,15 +23,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef PIOS_WS2811_H_
-#define PIOS_WS2811_H_
-
-#include <stdint.h>
+#ifndef LEDNOTIFICATION_H_
+#define LEDNOTIFICATION_H_
 #include <optypes.h>
 
-#define PIOS_WS2811_NUMLEDS 2
+void LedNotificationExtLedsRun();
 
-void PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update);
-void PIOS_WS2811_Update();
 
-#endif /* PIOS_WS2811_H_ */
+#endif /* LEDNOTIFICATION_H_ */

@@ -49,6 +49,7 @@ MODULES += PathFollower
 MODULES += Osd/osdoutout
 MODULES += Logging
 MODULES += Telemetry
+MODULES += Notify
 
 OPTMODULES += ComUsbBridge
 
@@ -87,6 +88,7 @@ ifndef TESTAPP
     SRC += $(FLIGHTLIB)/plans.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
+    SRC += $(FLIGHTLIB)/lednotification.c    
 
     ## UAVObjects
     include ./UAVObjects.inc

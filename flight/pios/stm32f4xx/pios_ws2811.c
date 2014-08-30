@@ -29,7 +29,7 @@
 
 #ifdef PIOS_INCLUDE_WS2811
 
-#include "pios_ws2811.h"
+#include "pios_ws2811_cfg.h"
 #include <stm32f4xx_rcc.h>
 #include <pios_stm32.h>
 #include "FreeRTOS.h"
@@ -177,7 +177,7 @@ void PIOS_WS2811_Init(const struct pios_ws2811_cfg *ws2811_cfg, const struct pio
 
     fb = (ledbuf_t *)pios_malloc(PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
     memset(fb, 0, PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
-    Color ledoff = { 0, 0, 0 };
+    const Color_t ledoff = Color_Off;
     for (uint8_t i = 0; i < PIOS_WS2811_NUMLEDS; i++) {
         PIOS_WS2811_setColorRGB(ledoff, i, false);
     }
@@ -302,7 +302,7 @@ void setColor(uint8_t color, ledbuf_t *buf)
  * @param led led number
  * @param update Perform an update after changing led color
  */
-void PIOS_WS2811_setColorRGB(Color c, uint8_t led, bool update)
+void PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update)
 {
     if (led >= PIOS_WS2811_NUMLEDS) {
         return;

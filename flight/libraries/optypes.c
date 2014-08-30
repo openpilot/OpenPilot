@@ -1,12 +1,10 @@
 /**
  ******************************************************************************
  *
- * @file       pios_ws2811.h
+ * @file       optypes.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      A driver for ws2811 rgb led controller.
- *             this is a plain PiOS port of the very clever solution
- *             implemented by Omri Iluz in the chibios driver here:
- *             https://github.com/omriiluz/WS2812B-LED-Driver-ChibiOS
+ * @brief      OP Generic data type library
+ *             --
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -25,15 +23,19 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef PIOS_WS2811_H_
-#define PIOS_WS2811_H_
 
-#include <stdint.h>
 #include <optypes.h>
 
-#define PIOS_WS2811_NUMLEDS 2
-
-void PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update);
-void PIOS_WS2811_Update();
-
-#endif /* PIOS_WS2811_H_ */
+const Color_t Color_Off     = COLOR_OFF;
+const Color_t Color_Red     = COLOR_RED;
+const Color_t Color_Lime    = COLOR_LIME;
+const Color_t Color_Blue    = COLOR_BLUE;
+const Color_t Color_Yellow  = COLOR_YELLOW;
+const Color_t Color_Cian    = COLOR_CIAN;
+const Color_t Color_Magenta = COLOR_MAGENTA;
+const Color_t Color_Navy    = COLOR_NAVY;
+const Color_t Color_Green   = COLOR_GREEN;
+const Color_t Color_Purple  = COLOR_PURPLE;
+const Color_t Color_Teal    = COLOR_TEAL;
+const Color_t Color_Orange  = COLOR_ORANGE;
+const Color_t Color_White   = COLOR_WHITE;

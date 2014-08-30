@@ -310,6 +310,7 @@ void PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update)
     setColor(c.G, fb + (led * 24));
     setColor(c.R, fb + 8 + (led * 24));
     setColor(c.B, fb + 16 + (led * 24));
+
     if (update) {
         PIOS_WS2811_Update();
     }
@@ -327,6 +328,10 @@ void PIOS_WS2811_Update()
 
     // reset counters for synchronization
     pios_ws2811_cfg->timer->CNT = PIOS_WS2811_TIM_PERIOD - 1;
+
+    DMA_Cmd(pios_ws2811_cfg->streamCh2, ENABLE);
+    DMA_Cmd(pios_ws2811_cfg->streamCh1, ENABLE);
+    DMA_Cmd(pios_ws2811_cfg->streamUpdate, ENABLE);
     // Start a new cycle
     TIM_Cmd(pios_ws2811_cfg->timer, ENABLE);
 }
@@ -339,6 +344,9 @@ void PIOS_WS2811_DMA_irq_handler()
 {
     pios_ws2811_cfg->timer->CR1 &= (uint16_t) ~TIM_CR1_CEN;
     DMA_ClearFlag(pios_ws2811_cfg->streamCh1, pios_ws2811_cfg->irq.flags);
+    DMA_Cmd(pios_ws2811_cfg->streamCh2, DISABLE);
+    DMA_Cmd(pios_ws2811_cfg->streamCh1, DISABLE);
+    DMA_Cmd(pios_ws2811_cfg->streamUpdate, DISABLE);
 }
 
 #endif // PIOS_INCLUDE_WS2811

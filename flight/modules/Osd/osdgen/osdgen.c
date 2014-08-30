@@ -38,6 +38,7 @@
 // #define DEBUG_STUFF
 // #define SIMULATE_DATA
 #define TEMP_GPS_STATUS_WORKAROUND
+#define AUTO_DETECT_3S_4S
 
 #include <openpilot.h>
 
@@ -2063,6 +2064,31 @@ void accumulate_current(double current_amp, double *current_total)
 }
 
 
+void alarm_string(SystemAlarmsAlarmOptions alarm, char *tmp)
+{
+    switch (alarm) {
+    case 0:
+        sprintf(tmp, "UNINIT");
+        break;
+    case 1:
+        sprintf(tmp, "OK");
+        break;
+    case 2:
+        sprintf(tmp, "WARNING");
+        break;
+    case 3:
+        sprintf(tmp, "CRITICAL");
+        break;
+    case 4:
+        sprintf(tmp, "ERROR");
+        break;
+    default:
+        sprintf(tmp, "UNKNOWN");
+        break;
+    }
+}
+
+
 #define WARN_ON_TIME         500                    // [ms]
 #define WARN_OFF_TIME        250                    // [ms]
 #define WARN_DO_NOT_MOVE     0x0001
@@ -2088,6 +2114,24 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
     }
 
     if (WarnMask && current_time - on_off_time < WARN_ON_TIME) {
+        if (0) {    // show some systemalarms if > SYSTEMALARMS_ALARM_OK
+            char tmp[10] = { 0 };
+            SystemAlarmsAlarmOptions alarm;
+            alarm = AlarmsGet(SYSTEMALARMS_ALARM_MAGNETOMETER);
+            if (alarm > SYSTEMALARMS_ALARM_OK) {
+                alarm_string(alarm, tmp);
+                sprintf(temp, "MAGNETOMETER %s", tmp);
+                write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+                d_y += v_spacing;
+            }
+            alarm = AlarmsGet(SYSTEMALARMS_ALARM_GPS);
+            if (alarm > SYSTEMALARMS_ALARM_OK) {
+                alarm_string(alarm, tmp);
+                sprintf(temp, "GPS %s", tmp);
+                write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
+                d_y += v_spacing;
+            }
+        }
         if (WarnMask & WARN_DO_NOT_MOVE) {
             sprintf(temp, "DO NOT MOVE");
             write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
@@ -2124,11 +2168,13 @@ void draw_warnings(uint32_t WarnMask, int16_t x, int16_t y, int8_t v_spacing, in
                     write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
                     d_y += v_spacing;
                     int8_t Hour;
+#if 0
                     Hour = TIME_ZONE_WET + DAYLIGHT_SAVING + gpsTime.Hour;
                     Hour = Hour <  0 ? Hour + 24 : Hour < 24 ? Hour : Hour - 24;
                     sprintf(temp, "%02u:%02u:%02u WEST", Hour, gpsTime.Minute, gpsTime.Second);
                     write_string(temp, x, y + d_y, 0, 0, TEXT_VA_MIDDLE, TEXT_HA_CENTER, 0, char_size);
                     d_y += v_spacing;
+#endif
                     Hour = TIME_ZONE_MET + DAYLIGHT_SAVING + gpsTime.Hour;
                     Hour = Hour <  0 ? Hour + 24 : Hour < 24 ? Hour : Hour - 24;
                     sprintf(temp, "%02u:%02u:%02u MEST", Hour, gpsTime.Minute, gpsTime.Second);
@@ -2704,6 +2750,7 @@ void updateGraphics()
             }
         }
         // ADC Sensor voltage
+#ifndef AUTO_DETECT_3S_4S
         if (OsdSettings2.SensorVoltage) {
             filteredADC.volt = filteredADC.volt * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_VOLT) * ADC_REFERENCE * OsdSettings2.SensorVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorVoltageCalibration.Offset) * ADC_FILTER;
             WarnMask |= filteredADC.volt < (double)OsdSettings2.SensorVoltageCalibration.Warning ? WARN_BATT_SVOLT_LOW : 0x00;
@@ -2712,6 +2759,34 @@ void updateGraphics()
                 write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorVoltageSetup.CharSize);
             }
         }
+#else
+        if (OsdSettings2.SensorVoltage) {
+            filteredADC.volt = filteredADC.volt * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_VOLT) * ADC_REFERENCE * OsdSettings2.SensorVoltageCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorVoltageCalibration.Offset) * ADC_FILTER;
+            if (OsdSettings2.SensorVoltageCalibration.Warning < 4.2f) {
+                static int cell_count = 350;
+                if (cell_count < 100) {
+                    WarnMask |= filteredADC.volt < (double)(OsdSettings2.SensorVoltageCalibration.Warning * (float)cell_count) ? WARN_BATT_SVOLT_LOW : 0x00;
+                    sprintf(temp, "%ds", cell_count);
+                    sprintf(&temp[2], "%5.2fV", filteredADC.volt);  // workaround for not working sprintf(temp, "%ds%5.2fV", cell_count, filteredADC.volt);
+                } else if (cell_count == 100) {
+                    cell_count = (int)(filteredADC.volt / (double)4.2f) + 1;
+                    sprintf(temp, " ");
+                } else {
+                    cell_count--;
+                    sprintf(temp, "CT%5.2fV", filteredADC.volt);
+                }
+                if (check_enable_and_srceen(OsdSettings2.SensorVoltage, (OsdSettingsWarningsSetupData *)&OsdSettings2.SensorVoltageSetup, screen, &x, &y)) {
+                    write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorVoltageSetup.CharSize);
+                }
+            } else {
+                WarnMask |= filteredADC.volt < (double)OsdSettings2.SensorVoltageCalibration.Warning ? WARN_BATT_SVOLT_LOW : 0x00;
+                if (check_enable_and_srceen(OsdSettings2.SensorVoltage, (OsdSettingsWarningsSetupData *)&OsdSettings2.SensorVoltageSetup, screen, &x, &y)) {
+                    sprintf(temp, "SV%5.2fV", filteredADC.volt);
+                    write_string(temp, x, y, 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, OsdSettings2.SensorVoltageSetup.CharSize);
+                }
+            }
+        }
+#endif
         // ADC Sensor current or ADC Sensor current consumed
         if (OsdSettings2.SensorCurrent || OsdSettings2.SensorCurrentConsumed || OsdSettings2.AirborneResetTime) {
             filteredADC.curr = filteredADC.curr * ((double)1.0f - ADC_FILTER) + (double)(PIOS_ADC_PinGet(ADC_CURR) * ADC_REFERENCE * OsdSettings2.SensorCurrentCalibration.Factor / ADC_RESOLUTION + OsdSettings2.SensorCurrentCalibration.Offset) * ADC_FILTER;
@@ -2794,7 +2869,7 @@ void updateGraphics()
 #ifdef DEBUG_ALARMS
         // show alarms
         int k;
-        for (k = 0; k <= 17; k++) {
+        for (k = 0; k < SYSTEMALARMS_ALARM_NUMELEM; k++) {
             SystemAlarmsAlarmOptions alarm = AlarmsGet(k);
             if (alarm > SYSTEMALARMS_ALARM_OK) {
                 sprintf(temp, "A%2d:%d", k, alarm);

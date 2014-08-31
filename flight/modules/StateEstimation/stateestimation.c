@@ -162,14 +162,17 @@ static float gyroDelta[3];
 
 // preconfigured filter chains selectable via revoSettings.FusionAlgorithm
 static const filterPipeline *cfQueue = &(filterPipeline) {
-    .filter = &airFilter,
+    .filter = &magFilter,
     .next   = &(filterPipeline) {
-        .filter = &baroiFilter,
+        .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &altitudeFilter,
+            .filter = &baroiFilter,
             .next   = &(filterPipeline) {
-                .filter = &cfFilter,
-                .next   = NULL,
+                .filter = &altitudeFilter,
+                .next   = &(filterPipeline) {
+                    .filter = &cfFilter,
+                    .next   = NULL,
+                }
             }
         }
     }

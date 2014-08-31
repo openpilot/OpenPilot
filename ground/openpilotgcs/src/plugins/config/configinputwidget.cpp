@@ -55,7 +55,10 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     transmitterType(acro),
     //
     loop(NULL),
-    skipflag(false)
+    skipflag(false),
+    nextDelayedTimer(new QTimer()),
+    nextDelayedTick(0),
+    nextDelayedLatestActivityTick(0)
 {
     manualCommandObj      = ManualControlCommand::GetInstance(getObjectManager());
     manualSettingsObj     = ManualControlSettings::GetInstance(getObjectManager());
@@ -420,6 +423,9 @@ void ConfigInputWidget::wzCancel()
 {
     dimOtherControls(false);
 
+    // Cancel any ongoing delayd next trigger.
+    wzNextDelayedCancel();
+
     // Restore original input update rate.
     restoreMdata();
 
@@ -436,8 +442,45 @@ void ConfigInputWidget::wzCancel()
     flightModeSettingsObj->setData(previousFlightModeSettingsData);
 }
 
+void ConfigInputWidget::registerControlActivity()
+{
+    nextDelayedLatestActivityTick = nextDelayedTick;
+}
+
+void ConfigInputWidget::wzNextDelayed()
+{
+    nextDelayedTick++;
+
+    // Call next after the full 2500 ms timeout has been reached,
+    // or if no input activity has occurred the last 500 ms.
+    if (nextDelayedTick == 25 ||
+        nextDelayedTick - nextDelayedLatestActivityTick >= 5) {
+        wzNext();
+    }
+}
+
+void ConfigInputWidget::wzNextDelayedStart()
+{
+    // Call wzNextDelayed every 100 ms, to see if it's time to go to the next page.
+    connect(nextDelayedTimer, SIGNAL(timeout()), this, SLOT(wzNextDelayed()));
+    nextDelayedTimer->start(100);
+}
+
+// Cancel the delayed next timer, if it's active.
+void ConfigInputWidget::wzNextDelayedCancel()
+{
+    nextDelayedTick = 0;
+    nextDelayedLatestActivityTick = 0;
+    if (nextDelayedTimer->isActive()) {
+        nextDelayedTimer->stop();
+        disconnect(nextDelayedTimer, SIGNAL(timeout()), this, SLOT(wzNextDelayed()));
+    }
+}
+
 void ConfigInputWidget::wzNext()
 {
+    wzNextDelayedCancel();
+
     // In identify sticks mode the next button can indicate
     // channel advance
     if (wizardStep != wizardNone &&
@@ -506,6 +549,8 @@ void ConfigInputWidget::wzNext()
 
 void ConfigInputWidget::wzBack()
 {
+    wzNextDelayedCancel();
+
     if (wizardStep != wizardNone &&
         wizardStep != wizardIdentifySticks) {
         wizardTearDownStep(wizardStep);
@@ -888,6 +933,7 @@ void ConfigInputWidget::identifyControls()
     }
 
     if (channelDetected) {
+        registerControlActivity();
         return;
     }
 
@@ -936,7 +982,7 @@ void ConfigInputWidget::identifyControls()
     // m_config->wzText->clear();
     setTxMovement(nothing);
 
-    QTimer::singleShot(2500, this, SLOT(wzNext()));
+    wzNextDelayedStart();
 }
 
 void ConfigInputWidget::identifyLimits()

@@ -96,6 +96,11 @@ private:
     QEventLoop *loop;
     bool skipflag;
 
+    // Variables to support delayed transitions when detecting input controls.
+    QTimer *nextDelayedTimer;
+    int nextDelayedTick;
+    int nextDelayedLatestActivityTick;
+
     int currentChannelNum;
     QList<int> heliChannelOrder;
     QList<int> acroChannelOrder;
@@ -161,8 +166,14 @@ private:
     void wizardSetUpStep(enum wizardSteps);
     void wizardTearDownStep(enum wizardSteps);
 
+    void registerControlActivity();
+
+    void wzNextDelayedStart();
+    void wzNextDelayedCancel();
+
 private slots:
     void wzNext();
+    void wzNextDelayed();
     void wzBack();
     void wzCancel();
     void goToWizard();

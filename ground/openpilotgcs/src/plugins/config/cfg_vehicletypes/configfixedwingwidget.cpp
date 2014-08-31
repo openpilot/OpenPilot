@@ -427,7 +427,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
     if (channel > -1) {
         setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
         value   = (double)(m_aircraft->elevonSlider2->value() * 1.27);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, value);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, -value);
         value   = (double)(m_aircraft->elevonSlider1->value() * 1.27);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, value);
 
@@ -436,7 +436,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
         value   = (double)(m_aircraft->elevonSlider2->value() * 1.27);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, value);
         value   = (double)(m_aircraft->elevonSlider1->value() * 1.27);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, -value);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, value);
     }
 
     m_aircraft->fwStatusLabel->setText("Mixer generated");
@@ -498,7 +498,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
 
         channel = m_aircraft->fwAileron2ChannelBox->currentIndex() - 1;
         setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, -127);
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, 127);
     }
 
     // vtail

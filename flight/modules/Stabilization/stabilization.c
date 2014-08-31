@@ -33,7 +33,6 @@
 
 
 #include <openpilot.h>
-#include <pios_struct_helper.h>
 #include <pid.h>
 #include <manualcontrolcommand.h>
 #include <flightmodesettings.h>
@@ -134,54 +133,54 @@ static void StabilizationDesiredUpdatedCb(__attribute__((unused)) UAVObjEvent *e
 
     StabilizationDesiredStabilizationModeGet(&mode);
     for (t = 0; t < AXES; t++) {
-        switch (cast_struct_to_array(mode, mode.Roll)[t]) {
+        switch (StabilizationDesiredStabilizationModeToArray(mode)[t]) {
         case STABILIZATIONDESIRED_STABILIZATIONMODE_MANUAL:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_DIRECT;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_DIRECT;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_RATE;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_RATE;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_RATE;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_RATE;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_AXISLOCK;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_AXISLOCK;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_RATE;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_RATE;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_RATTITUDE;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_RATE;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_RATTITUDE;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_RATE;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_RELAYTUNING;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_RELAYTUNING;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_RELAYTUNING;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_RELAYTUNING;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEHOLD:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_ALTITUDEVARIO:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_ALTITUDEVARIO;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
             break;
         case STABILIZATIONDESIRED_STABILIZATIONMODE_CRUISECONTROL:
-            cast_struct_to_array(status.OuterLoop, status.OuterLoop.Roll)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
-            cast_struct_to_array(status.InnerLoop, status.InnerLoop.Roll)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
+            StabilizationStatusOuterLoopToArray(status.OuterLoop)[t] = STABILIZATIONSTATUS_OUTERLOOP_DIRECT;
+            StabilizationStatusInnerLoopToArray(status.InnerLoop)[t] = STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL;
             break;
         }
     }

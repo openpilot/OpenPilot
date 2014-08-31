@@ -51,7 +51,6 @@
 #include <math.h>
 #include <pid.h>
 #include <CoordinateConversions.h>
-#include <pios_struct_helper.h>
 #include <sin_lookup.h>
 #include <pathdesired.h>
 #include <paths.h>

@@ -878,36 +878,60 @@ void ConfigInputWidget::prevChannel()
 
 void ConfigInputWidget::identifyControls()
 {
+    static const int DEBOUNCE_COUNT = 4;
     static int debounce = 0;
 
     receiverActivityData = receiverActivityObj->getData();
+
     if (receiverActivityData.ActiveChannel == 255) {
         return;
     }
+
     if (channelDetected) {
         return;
-    } else {
-        receiverActivityData  = receiverActivityObj->getData();
-        currentChannel.group  = receiverActivityData.ActiveGroup;
-        currentChannel.number = receiverActivityData.ActiveChannel;
-        if (currentChannel == lastChannel) {
-            ++debounce;
-        }
+    }
+
+    receiverActivityData  = receiverActivityObj->getData();
+    currentChannel.group  = receiverActivityData.ActiveGroup;
+    currentChannel.number = receiverActivityData.ActiveChannel;
+
+    if (debounce == 0) {
+        // Register a channel to be debounced.
         lastChannel.group  = currentChannel.group;
         lastChannel.number = currentChannel.number;
         lastChannel.channelIndex = currentChannelNum;
-        if (!usedChannels.contains(lastChannel) && debounce > 1) {
-            channelDetected    = true;
-            debounce = 0;
-            usedChannels.append(lastChannel);
-            manualSettingsData = manualSettingsObj->getData();
-            manualSettingsData.ChannelGroups[currentChannelNum] = currentChannel.group;
-            manualSettingsData.ChannelNumber[currentChannelNum] = currentChannel.number;
-            manualSettingsObj->setData(manualSettingsData);
-        } else {
-            return;
-        }
+        ++debounce;
+        return;
     }
+
+    if (currentChannel != lastChannel) {
+        // A new channel was seen. Only register it if we count down to 0.
+        --debounce;
+        return;
+    }
+
+    if (debounce < DEBOUNCE_COUNT) {
+        // We still haven't seen enough enough activity on this channel yet.
+        ++debounce;
+        return;
+    }
+
+    // Channel has been debounced and it's enough record it.
+
+    if (usedChannels.contains(lastChannel)) {
+        // Channel is already recorded.
+        return;
+    }
+
+    // Record the channel.
+
+    channelDetected    = true;
+    debounce = 0;
+    usedChannels.append(lastChannel);
+    manualSettingsData = manualSettingsObj->getData();
+    manualSettingsData.ChannelGroups[currentChannelNum] = currentChannel.group;
+    manualSettingsData.ChannelNumber[currentChannelNum] = currentChannel.number;
+    manualSettingsObj->setData(manualSettingsData);
 
     // m_config->wzText->clear();
     setTxMovement(nothing);

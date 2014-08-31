@@ -82,6 +82,10 @@ private:
         {
             return (group == rhs.group) && (number == rhs.number);
         }
+        bool operator !=(const channelsStruct & rhs)  const
+        {
+            return !operator==(rhs);
+        }
         int group;
         int number;
         int channelIndex;

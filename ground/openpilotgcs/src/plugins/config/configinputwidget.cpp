@@ -415,7 +415,10 @@ void ConfigInputWidget::disableWizardButton(int value)
 void ConfigInputWidget::wzCancel()
 {
     dimOtherControls(false);
-    manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
+
+    // Restore original input update rate.
+    restoreMdata();
+
     ui->stackedWidget->setCurrentIndex(0);
 
     if (wizardStep != wizardNone) {

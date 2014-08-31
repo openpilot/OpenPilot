@@ -1649,8 +1649,8 @@ void VehicleConfigurationHelper::setupElevon()
     channels[1].yaw       = 0;
 
     guiSettings.fixedwing.FixedWingThrottle = 3;
-    guiSettings.fixedwing.FixedWingPitch1   = 1;
-    guiSettings.fixedwing.FixedWingPitch2   = 2;
+    guiSettings.fixedwing.FixedWingRoll1    = 1;
+    guiSettings.fixedwing.FixedWingRoll2    = 2;
 
     applyMixerConfiguration(channels);
     applyMultiGUISettings(SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON, guiSettings);

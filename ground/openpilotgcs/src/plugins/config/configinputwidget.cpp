@@ -56,7 +56,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     //
     loop(NULL),
     skipflag(false),
-    nextDelayedTimer(new QTimer()),
+    nextDelayedTimer(),
     nextDelayedTick(0),
     nextDelayedLatestActivityTick(0)
 {
@@ -462,8 +462,8 @@ void ConfigInputWidget::wzNextDelayed()
 void ConfigInputWidget::wzNextDelayedStart()
 {
     // Call wzNextDelayed every 100 ms, to see if it's time to go to the next page.
-    connect(nextDelayedTimer, SIGNAL(timeout()), this, SLOT(wzNextDelayed()));
-    nextDelayedTimer->start(100);
+    connect(&nextDelayedTimer, SIGNAL(timeout()), this, SLOT(wzNextDelayed()));
+    nextDelayedTimer.start(100);
 }
 
 // Cancel the delayed next timer, if it's active.
@@ -471,9 +471,9 @@ void ConfigInputWidget::wzNextDelayedCancel()
 {
     nextDelayedTick = 0;
     nextDelayedLatestActivityTick = 0;
-    if (nextDelayedTimer->isActive()) {
-        nextDelayedTimer->stop();
-        disconnect(nextDelayedTimer, SIGNAL(timeout()), this, SLOT(wzNextDelayed()));
+    if (nextDelayedTimer.isActive()) {
+        nextDelayedTimer.stop();
+        disconnect(&nextDelayedTimer, SIGNAL(timeout()), this, SLOT(wzNextDelayed()));
     }
 }
 

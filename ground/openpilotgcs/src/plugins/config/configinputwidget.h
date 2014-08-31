@@ -97,7 +97,7 @@ private:
     bool skipflag;
 
     // Variables to support delayed transitions when detecting input controls.
-    QTimer *nextDelayedTimer;
+    QTimer nextDelayedTimer;
     int nextDelayedTick;
     int nextDelayedLatestActivityTick;
 

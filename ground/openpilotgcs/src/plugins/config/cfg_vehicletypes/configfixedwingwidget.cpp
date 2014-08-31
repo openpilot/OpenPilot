@@ -176,7 +176,6 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
     scene->setSceneRect(planeimg->boundingRect());
     m_aircraft->planeShape->fitInView(planeimg, Qt::KeepAspectRatio);
     m_aircraft->planeShape->setScene(scene);
-
 }
 
 void ConfigFixedWingWidget::registerWidgets(ConfigTaskWidget &parent)

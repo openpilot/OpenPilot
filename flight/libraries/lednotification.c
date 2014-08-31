@@ -109,18 +109,21 @@ static void push_queued_sequence(ExtLedNotification_t *new_notification, Notifie
         // try to enqueue it
         int8_t insert_point = -1;
         int8_t first_free   = -1;
-        for (int8_t i = MAX_BACKGROUND_NOTIFICATIONS; i > -1; i--) {
+        for (int8_t i = MAX_BACKGROUND_NOTIFICATIONS - 1; i >= 0; i--) {
             const int8_t priority_i = status->queued_priorities[i];
             if (priority_i == NOTIFY_PRIORITY_BACKGROUND) {
                 first_free   = i;
                 insert_point = i;
                 continue;
             }
-            if (priority_i > new_notification->priority) {
+            if (priority_i < new_notification->priority) {
                 insert_point = i;
             }
         }
-
+        // no space left on queue for this new notification, ignore.
+        if (insert_point == -1) {
+            return;
+        }
         if (insert_point != first_free) {
             // there is a free slot, move everything up one place
             if (first_free != -1) {

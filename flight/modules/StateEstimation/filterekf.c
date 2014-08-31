@@ -31,7 +31,6 @@
  */
 
 #include "inc/stateestimation.h"
-#include <pios_struct_helper.h>
 
 #include <ekfconfiguration.h>
 #include <ekfstatevariance.h>
@@ -165,17 +164,17 @@ static int32_t maininit(stateFilter *self)
     int t;
     // plausibility check
     for (t = 0; t < EKFCONFIGURATION_P_NUMELEM; t++) {
-        if (invalid_var(cast_struct_to_array(this->ekfConfiguration.P, this->ekfConfiguration.P.AttitudeQ1)[t])) {
+        if (invalid_var(EKFConfigurationPToArray(this->ekfConfiguration.P)[t])) {
             return 2;
         }
     }
     for (t = 0; t < EKFCONFIGURATION_Q_NUMELEM; t++) {
-        if (invalid_var(cast_struct_to_array(this->ekfConfiguration.Q, this->ekfConfiguration.Q.AccelX)[t])) {
+        if (invalid_var(EKFConfigurationQToArray(this->ekfConfiguration.Q)[t])) {
             return 2;
         }
     }
     for (t = 0; t < EKFCONFIGURATION_R_NUMELEM; t++) {
-        if (invalid_var(cast_struct_to_array(this->ekfConfiguration.R, this->ekfConfiguration.R.BaroZ)[t])) {
+        if (invalid_var(EKFConfigurationRToArray(this->ekfConfiguration.R)[t])) {
             return 2;
         }
     }
@@ -295,7 +294,7 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
 
             INSSetState(this->work.pos, (float *)zeros, this->work.attitude, (float *)zeros, (float *)zeros);
 
-            INSResetP(cast_struct_to_array(this->ekfConfiguration.P, this->ekfConfiguration.P.AttitudeQ1));
+            INSResetP(EKFConfigurationPToArray(this->ekfConfiguration.P));
         } else {
             // Run prediction a bit before any corrections
 
@@ -422,12 +421,12 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
 
     EKFStateVarianceData vardata;
     EKFStateVarianceGet(&vardata);
-    INSGetP(cast_struct_to_array(vardata.P, vardata.P.AttitudeQ1));
+    INSGetP(EKFStateVariancePToArray(vardata.P));
     EKFStateVarianceSet(&vardata);
     int t;
     for (t = 0; t < EKFSTATEVARIANCE_P_NUMELEM; t++) {
-        if (!IS_REAL(cast_struct_to_array(vardata.P, vardata.P.AttitudeQ1)[t]) || cast_struct_to_array(vardata.P, vardata.P.AttitudeQ1)[t] <= 0.0f) {
-            INSResetP(cast_struct_to_array(this->ekfConfiguration.P, this->ekfConfiguration.P.AttitudeQ1));
+        if (!IS_REAL(EKFStateVariancePToArray(vardata.P)[t]) || EKFStateVariancePToArray(vardata.P)[t] <= 0.0f) {
+            INSResetP(EKFConfigurationPToArray(this->ekfConfiguration.P));
             this->init_stage = -1;
             break;
         }

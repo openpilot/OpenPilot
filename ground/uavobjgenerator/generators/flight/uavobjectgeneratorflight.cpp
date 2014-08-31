@@ -131,7 +131,11 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
                 for (int f = 0; f < info->fields[n]->elementNames.count(); f++) {
                     structType.append(QString("    %1 %2;\n").arg(type).arg(info->fields[n]->elementNames[f]));
                 }
-                structType.append(QString("}  %1 ;\n\n").arg(structTypeName));
+                structType.append(QString("}  %1 ;\n").arg(structTypeName));
+                structType.append(QString("typedef struct __attribute__ ((__packed__)) {\n"));
+                structType.append(QString("    %1 array[%2];\n").arg(type).arg(info->fields[n]->elementNames.count()));
+                structType.append(QString("}  %1Array ;\n").arg(structTypeName));
+                structType.append(QString("#define %1%2ToArray( var ) UAVObjectFieldToArray( %3, var )\n\n").arg(info->name).arg(info->fields[n]->name).arg(structTypeName));
 
                 dataStructures.append(structType);
 

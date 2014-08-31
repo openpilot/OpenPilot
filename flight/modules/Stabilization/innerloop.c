@@ -32,7 +32,6 @@
  */
 
 #include <openpilot.h>
-#include <pios_struct_helper.h>
 #include <pid.h>
 #include <callbackinfo.h>
 #include <ratedesired.h>
@@ -165,21 +164,21 @@ static void stabilizationInnerloopTask()
     dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
 
     for (t = 0; t < AXES; t++) {
-        bool reinit = (cast_struct_to_array(enabled, enabled.Roll)[t] != previous_mode[t]);
-        previous_mode[t] = cast_struct_to_array(enabled, enabled.Roll)[t];
+        bool reinit = (StabilizationStatusInnerLoopToArray(enabled)[t] != previous_mode[t]);
+        previous_mode[t] = StabilizationStatusInnerLoopToArray(enabled)[t];
 
         if (t < STABILIZATIONSTATUS_INNERLOOP_THRUST) {
             if (reinit) {
                 stabSettings.innerPids[t].iAccumulator = 0;
             }
-            switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
+            switch (StabilizationStatusInnerLoopToArray(enabled)[t]) {
             case STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR:
                 stabilization_virtual_flybar(gyro_filtered[t], rate[t], &actuatorDesiredAxis[t], dT, reinit, t, &stabSettings.settings);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_RELAYTUNING:
                 rate[t] = boundf(rate[t],
-                                 -cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t],
-                                 cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t]
+                                 -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t],
+                                 StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
                                  );
                 stabilization_relay_rate(rate[t] - gyro_filtered[t], &actuatorDesiredAxis[t], t, reinit);
                 break;
@@ -198,8 +197,8 @@ static void stabilizationInnerloopTask()
             case STABILIZATIONSTATUS_INNERLOOP_RATE:
                 // limit rate to maximum configured limits (once here instead of 5 times in outer loop)
                 rate[t] = boundf(rate[t],
-                                 -cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t],
-                                 cast_struct_to_array(stabSettings.stabBank.MaximumRate, stabSettings.stabBank.MaximumRate.Roll)[t]
+                                 -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t],
+                                 StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
                                  );
                 actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT);
                 break;
@@ -209,7 +208,7 @@ static void stabilizationInnerloopTask()
                 break;
             }
         } else {
-            switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
+            switch (StabilizationStatusInnerLoopToArray(enabled)[t]) {
             case STABILIZATIONSTATUS_INNERLOOP_CRUISECONTROL:
                 actuatorDesiredAxis[t] = cruisecontrol_apply_factor(rate[t]);
                 break;

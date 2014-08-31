@@ -30,7 +30,10 @@ GCS_LIBRARY_PATH
                   libQt5Qml.so.5 \
                   libQt5DBus.so.5 \
                   libQt5QuickParticles.so.5 \
-                  libqgsttools_p.so.1
+                  libqgsttools_p.so.1 \
+                  libicui18n.so.52 \
+                  libicuuc.so.52 \
+                  libicudata.so.52
 
         data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_LIBRARY_PATH\") $$addNewline()
         for(lib, QT_LIBS) {

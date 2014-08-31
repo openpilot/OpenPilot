@@ -1,7 +1,7 @@
 # We use python to extract git version info and generate some other files,
 # but it may be installed locally. The expected python version should be
 # kept in sync with make/tools.mk.
-PYTHON_DIR = qt-5.3.1/Tools/mingw48_32/opt/bin
+PYTHON_DIR = qt-5.3.1/Tools/mingw482_32/opt/bin
 
 ROOT_DIR = $$GCS_SOURCE_TREE/../..
 
@@ -15,7 +15,12 @@ OPENPILOT_TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
         PYTHON = \"$$ROOT_DIR/tools/$$PYTHON_DIR/python\"
     } else {
         # not found, hope it's in the path...
-        PYTHON = \"$$(PYTHON)\"
+        PYTHON_VER = "$$system(python --version 2>&1)"
+        contains(PYTHON_VER, "Python 2.*") {
+            PYTHON = \"python\"
+        } else {
+            PYTHON = \"python2\"
+        }
     }
 }
 

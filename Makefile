@@ -740,6 +740,9 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
     export PACKAGE_NAME := OpenPilot
     export PACKAGE_SEP  := -
 
+    # Copy the Qt libraries regardless whether the building machine needs them to run GCS
+    export FORCE_COPY_QT := true
+
     # We can only package release builds
     ifneq ($(GCS_BUILD_CONF),release)
         $(error Packaging is currently supported for release builds only)

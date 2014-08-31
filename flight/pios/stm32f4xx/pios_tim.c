@@ -171,7 +171,7 @@ int32_t PIOS_TIM_InitChannels(uint32_t *tim_id, const struct pios_tim_channel *c
  */                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       // commented out for now as f4 starts all clocks
         GPIO_Init(chan->pin.gpio, &chan->pin.init);
 
-        PIOS_DEBUG_Assert(chan->remaP);
+        PIOS_DEBUG_Assert(chan->remap);
 
         // Second parameter should technically be PinSource but they are numerically the same
         GPIO_PinAFConfig(chan->pin.gpio, chan->pin.pin_source, chan->remap);

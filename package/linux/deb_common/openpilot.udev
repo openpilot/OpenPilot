@@ -1,18 +1,41 @@
-    # OpenPilot Flight Control board
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4117", MODE="0664", GROUP="plugdev"
-    # OpenPilot OP board
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415a", MODE="0664", GROUP="plugdev"
-    # OpenPilot CopterControl flight control board
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415b", MODE="0664", GROUP="plugdev"
-    # OpenPilot OPlink Mini radio modem board
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415c", MODE="0664", GROUP="plugdev"
-    # OpenPilot CopterControl3D flight control board
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415d", MODE="0664", GROUP="plugdev"
-    # OpenPilot Revolution flight control board
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415e", MODE="0664", GROUP="plugdev"
-    # unprogrammed openpilot flight control board
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5750", MODE="0664", GROUP="plugdev"
-    # FTDI FT2232C Dual USB-UART/FIFO IC
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", MODE="0664", GROUP="plugdev"
-    # Olimex Ltd. OpenOCD JTAG TINY
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="15ba", ATTRS{idProduct}=="0004", MODE="0664", GROUP="plugdev"
+# Skip this section below if this device is not connected by USB
+SUBSYSTEM!="usb", GOTO="op_rules_end"
+
+# OpenPilot openpilot flight control board
+SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4117", GOTO="op_rules"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415a", GOTO="op_rules"
+
+# OpenPilot coptercontrol flight control board
+SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415b", GOTO="op_rules"
+
+# OpenPilot OPLink Mini radio modem board
+SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415c", GOTO="op_rules"
+
+# OpenPilot Revolution board
+SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415e", GOTO="op_rules"
+
+# Other OpenPilot reserved pids
+SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415d", GOTO="op_rules" 
+SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4194", GOTO="op_rules"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="4195", GOTO="op_rules"
+
+
+# unprogrammed openpilot flight control board
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5750", GOTO="op_rules"
+# FTDI FT2232C Dual USB-UART/FIFO IC
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", GOTO="op_rules"
+# Olimex Ltd. OpenOCD JTAG TINY
+SUBSYSTEM=="usb", ATTRS{idVendor}=="15ba", ATTRS{idProduct}=="0004", GOTO="op_rules"
+
+GOTO="op_rules_end"
+
+LABEL="op_rules"
+# Allow any seated user to access the board.
+# uaccess: modern ACL-enabled udev
+# udev-acl: for Ubuntu 12.10 and older
+TAG+="uaccess", TAG+="udev-acl"
+
+# Grant members of the "plugdev" group access to receiver (useful for SSH users)
+#MODE="0664", GROUP="plugdev"
+
+LABEL="op_rules_end"

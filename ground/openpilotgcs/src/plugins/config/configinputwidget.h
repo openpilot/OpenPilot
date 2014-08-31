@@ -96,20 +96,25 @@ private:
     QList<int> heliChannelOrder;
     QList<int> acroChannelOrder;
 
+    UAVObject::Metadata manualControlMdata;
     ManualControlCommand *manualCommandObj;
     ManualControlCommand::DataFields manualCommandData;
+
     FlightStatus *flightStatusObj;
     FlightStatus::DataFields flightStatusData;
+
+    UAVObject::Metadata accessoryDesiredMdata0;
     AccessoryDesired *accessoryDesiredObj0;
     AccessoryDesired *accessoryDesiredObj1;
     AccessoryDesired *accessoryDesiredObj2;
     AccessoryDesired::DataFields accessoryDesiredData0;
     AccessoryDesired::DataFields accessoryDesiredData1;
     AccessoryDesired::DataFields accessoryDesiredData2;
-    UAVObject::Metadata manualControlMdata;
+
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
     ManualControlSettings::DataFields previousManualSettingsData;
+
     FlightModeSettings *flightModeSettingsObj;
     FlightModeSettings::DataFields flightModeSettingsData;
     FlightModeSettings::DataFields previousFlightModeSettingsData;

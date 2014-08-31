@@ -395,6 +395,10 @@ void ConfigInputWidget::goToWizard()
     flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
     flightModeSettingsObj->setData(flightModeSettingsData);
 
+    accessoryDesiredObj0           = AccessoryDesired::GetInstance(getObjectManager(), 0);
+    accessoryDesiredObj1           = AccessoryDesired::GetInstance(getObjectManager(), 1);
+    accessoryDesiredObj2           = AccessoryDesired::GetInstance(getObjectManager(), 2);
+
     // Use faster input update rate.
     fastMdata();
 
@@ -633,12 +637,9 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         break;
     case wizardIdentifyLimits:
     {
-        accessoryDesiredObj0 = AccessoryDesired::GetInstance(getObjectManager(), 0);
-        accessoryDesiredObj1 = AccessoryDesired::GetInstance(getObjectManager(), 1);
-        accessoryDesiredObj2 = AccessoryDesired::GetInstance(getObjectManager(), 2);
         setTxMovement(nothing);
         ui->wzText->setText(QString(tr("Please move all controls to their maximum extents on both directions.\n\nPress Next when ready.")));
-        manualSettingsData   = manualSettingsObj->getData();
+        manualSettingsData = manualSettingsObj->getData();
         for (uint i = 0; i < ManualControlSettings::CHANNELMAX_NUMELEM; ++i) {
             // Preserve the inverted status
             if (manualSettingsData.ChannelMin[i] <= manualSettingsData.ChannelMax[i]) {
@@ -766,16 +767,27 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
     }
 }
 
+static void fastMdataSingle(UAVDataObject *object, UAVObject::Metadata *savedMdata)
+{
+    *savedMdata = object->getMetadata();
+    UAVObject::Metadata mdata = *savedMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 150;
+    object->setMetadata(mdata);
+}
+
+static void restoreMdataSingle(UAVDataObject *object, UAVObject::Metadata *savedMdata)
+{
+    object->setMetadata(*savedMdata);
+}
+
 /**
  * Set manual control command to fast updates
  */
 void ConfigInputWidget::fastMdata()
 {
-    manualControlMdata = manualCommandObj->getMetadata();
-    UAVObject::Metadata mdata = manualControlMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 150;
-    manualCommandObj->setMetadata(mdata);
+    fastMdataSingle(manualCommandObj, &manualControlMdata);
+    fastMdataSingle(accessoryDesiredObj0, &accessoryDesiredMdata0);
 }
 
 /**
@@ -783,7 +795,8 @@ void ConfigInputWidget::fastMdata()
  */
 void ConfigInputWidget::restoreMdata()
 {
-    manualCommandObj->setMetadata(manualControlMdata);
+    restoreMdataSingle(manualCommandObj, &manualControlMdata);
+    restoreMdataSingle(accessoryDesiredObj0, &accessoryDesiredMdata0);
 }
 
 /**

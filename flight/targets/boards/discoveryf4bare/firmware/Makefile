@@ -35,6 +35,7 @@ USE_DSP_LIB ?= NO
 #MODULES += Airspeed
 #MODULES += AltitudeHold
 #MODULES += Stabilization
+MODULES += Notify 
 MODULES += VtolPathFollower
 MODULES += ManualControl
 MODULES += Actuator

@@ -35,32 +35,62 @@
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class SubVehiclePage;
+class SelectionPage;
 }
 
-class SubVehiclePage : public AbstractWizardPage {
+class SelectionItem : public QObject {
+    Q_OBJECT
+public:
+    SelectionItem(QString name, QString description, QString shapeId, int id);
+    ~SelectionItem();
+
+    QString name() { return m_name; }
+    QString description() { return m_description; }
+    QString shapeId() { return m_shapeId; }
+    int id() { return m_id; }
+
+private:
+    QString m_name;
+    QString m_description;
+    QString m_shapeId;
+    int m_id;
+};
+
+class Selection {
+public:
+    virtual void addItem(QString name, QString description, QString shapeId, int id) = 0;
+    virtual void setTitleLabel(QString text) = 0;
+};
+
+class SelectionPage : public AbstractWizardPage, Selection {
     Q_OBJECT
 
 public:
-    explicit SubVehiclePage(SetupWizard *wizard, QWidget *parent = 0);
-    ~SubVehiclePage();
+    explicit SelectionPage(SetupWizard *wizard, QString shapeFile, QWidget *parent = 0);
+    ~SelectionPage();
 
     void initializePage();
     bool validatePage();
+    void addItem(QString name, QString description, QString shapeId, int id);
+    void setTitleLabel(QString text);
+
+    virtual void setupSelection(Selection *selection) = 0;
+    virtual bool validatePage(SelectionItem *selectedItem) = 0;
 
 protected:
     void resizeEvent(QResizeEvent *event);
+    void showEvent(QShowEvent * event);
 
 private:
-    Ui::SubVehiclePage *ui;
-    void setupMultiTypesCombo();
-    QSvgRenderer* m_renderer;
-    QGraphicsSvgItem *m_multiPic;
-    void updateAvailableTypes();
-    QList<QString> m_descriptions;
+    Ui::SelectionPage *ui;
+    QGraphicsSvgItem *m_shape;
+    QList<SelectionItem*> m_selectionItems;
 
 private slots:
-    void updateImageAndDescription();
+    void selectionChanged(int index);
+    void fitImage();
+
+
 };
 
 #endif // SUBVEHICLEPAGEPAGE_H

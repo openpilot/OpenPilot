@@ -38,7 +38,7 @@ HEADERS += setupwizardplugin.h \
     pages/airframestabfixedwingpage.h \
     pages/escpage.h \
     pages/servopage.h \
-    pages/subvehiclepage.h
+    pages/selectionpage.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -68,7 +68,7 @@ SOURCES += setupwizardplugin.cpp \
     pages/airframestabfixedwingpage.cpp \
     pages/escpage.cpp \
     pages/servopage.cpp \
-    pages/subvehiclepage.cpp
+    pages/selectionpage.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -94,7 +94,7 @@ FORMS += \
     pages/airframestabfixedwingpage.ui \
     pages/escpage.ui \
     pages/servopage.ui \
-    pages/subvehiclepage.ui
+    pages/selectionpage.ui
 
 RESOURCES += \
     wizardResources.qrc

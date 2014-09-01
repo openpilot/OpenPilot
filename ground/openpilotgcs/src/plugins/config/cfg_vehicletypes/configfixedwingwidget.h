@@ -71,7 +71,6 @@ protected:
 private slots:
     virtual void setupUI(QString airframeType);
     virtual bool throwConfigError(QString airframeType);
-
 };
 
 #endif // CONFIGFIXEDWINGWIDGET_H

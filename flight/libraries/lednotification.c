@@ -118,10 +118,12 @@ static void push_queued_sequence(ExtLedNotification_t *new_notification, Notifie
             }
             if (priority_i < new_notification->priority) {
                 insert_point = i;
+                break;
             }
         }
+
         // no space left on queue for this new notification, ignore.
-        if (insert_point == -1) {
+        if (insert_point < 0) {
             return;
         }
         if (insert_point != first_free) {

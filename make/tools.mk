@@ -1093,7 +1093,9 @@ openocd_clean:
 	$(V1) [ ! -d "$(OPENOCD_DIR)" ] || $(RM) -r "$(OPENOCD_DIR)"
 
 STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash
-
+ifeq ($(UNAME), Windows)
+	STM32FLASH_BUILD_OPTIONS := "CC=GCC"
+endif
 .PHONY: stm32flash_install
 stm32flash_install: STM32FLASH_URL := https://code.google.com/p/stm32flash/
 stm32flash_install: STM32FLASH_REV := a358bd1f025d
@@ -1109,12 +1111,12 @@ stm32flash_install: stm32flash_clean
 	)
         # build
 	$(V0) @echo " BUILD        $(STM32FLASH_DIR)"
-	$(V1) $(MAKE) --silent -C $(STM32FLASH_DIR) all
+	$(V1) $(MAKE) --silent -C $(STM32FLASH_DIR) all $(STM32FLASH_BUILD_OPTIONS) 
 
 .PHONY: stm32flash_clean
 stm32flash_clean:
 	$(V0) @echo " CLEAN        $(STM32FLASH_DIR)"
-	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -r "$(STM32FLASH_DIR)"
+	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -rf "$(STM32FLASH_DIR)"
 
 DFUUTIL_DIR := $(TOOLS_DIR)/dfu-util
 

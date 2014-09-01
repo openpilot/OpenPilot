@@ -379,9 +379,12 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
         plotData = new SequentialPlotData(uavObject, uavFieldSubField);
     } else if (m_plotType == ChronoPlot) {
         plotData = new ChronoPlotData(uavObject, uavFieldSubField);
+    } else {
+        // else if (m_plotType == UAVObjectPlot)
+        // plotData = new UAVObjectPlotData(uavObject, uavField);
+        Q_ASSERT(false);
+        return;
     }
-    // else if (m_plotType == UAVObjectPlot)
-    // plotData = new UAVObjectPlotData(uavObject, uavField);
 
     plotData->m_xWindowSize = m_xWindowSize;
     plotData->scalePower    = scaleOrderFactor;

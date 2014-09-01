@@ -175,3 +175,7 @@ win32 {
     # The ((packet)) pragma is used in uav metadata struct and other places
     QMAKE_CXXFLAGS += -mno-ms-bitfields
 }
+
+macx {
+    QMAKE_CXXFLAGS += -Wno-gnu-static-float-init
+}

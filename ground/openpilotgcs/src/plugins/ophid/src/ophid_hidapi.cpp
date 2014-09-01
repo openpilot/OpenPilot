@@ -159,7 +159,7 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
             devices_found = false;
         } else {
             OPHID_DEBUG("HID Device Found");
-            OPHID_DEBUG("  type:............VID(%04hx).PID(%04hx)", vid, pid);
+            OPHID_DEBUG("  type:............VID(%04hx).PID(%04hx)", (unsigned short)vid, (unsigned short)pid);
             devices_found = true;
         }
     } else {

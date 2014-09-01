@@ -155,7 +155,7 @@ void UAVConfigInfo::read(QSettings *qs)
     qs->endGroup();
 }
 
-bool UAVConfigInfo::askToAbort(int compat, QString message)
+bool UAVConfigInfo::askToAbort(Compatibility compat, QString message)
 {
     QMessageBox msgBox;
 
@@ -194,7 +194,7 @@ bool UAVConfigInfo::askToAbort(int compat, QString message)
         return true;
 
     default:
-        msgBox.setText("INTERNAL ERROR: " + message + tr(" Unknown compatibility level: " + compat));
+        Q_ASSERT("Unkown Compatibility enum value");
     }
     if (result == QMessageBox::Ok) {
         return false;
@@ -211,7 +211,7 @@ void UAVConfigInfo::notify(QString message)
     msgBox.exec();
 }
 
-int UAVConfigInfo::checkCompatibilityWith(UAVConfigVersion programVersion)
+UAVConfigInfo::Compatibility UAVConfigInfo::checkCompatibilityWith(UAVConfigVersion programVersion)
 {
     if (m_version.majorNr != programVersion.majorNr) {
         return NotCompatible;

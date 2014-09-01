@@ -299,7 +299,7 @@ OP_DFU::Status DFUObject::UploadDescription(QVariant desc)
     cout << "Starting uploading description\n";
     QByteArray array;
 
-    if (desc.type() == QMetaType::QString) {
+    if (desc.type() == QVariant::String) {
         QString description = desc.toString();
         if (description.length() % 4 != 0) {
             int pad = description.length() / 4;
@@ -310,7 +310,7 @@ OP_DFU::Status DFUObject::UploadDescription(QVariant desc)
             description.append(padding);
         }
         array = description.toLatin1();
-    } else if (desc.type() == QMetaType::QByteArray) {
+    } else if (desc.type() == QVariant::ByteArray) {
         array = desc.toByteArray();
     }
 

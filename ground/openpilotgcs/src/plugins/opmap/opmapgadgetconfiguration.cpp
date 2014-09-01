@@ -105,23 +105,12 @@ IUAVGadgetConfiguration *OPMapGadgetConfiguration::clone()
 
     return m;
 }
-void OPMapGadgetConfiguration::saveConfig() const
+void OPMapGadgetConfiguration::save() const
 {
     if (!m_settings) {
         return;
     }
-    m_settings->setValue("mapProvider", m_mapProvider);
-    m_settings->setValue("defaultZoom", m_defaultZoom);
-    m_settings->setValue("defaultLatitude", m_defaultLatitude);
-    m_settings->setValue("defaultLongitude", m_defaultLongitude);
-    m_settings->setValue("useOpenGL", m_useOpenGL);
-    m_settings->setValue("showTileGridLines", m_showTileGridLines);
-    m_settings->setValue("accessMode", m_accessMode);
-    m_settings->setValue("useMemoryCache", m_useMemoryCache);
-    m_settings->setValue("uavSymbol", m_uavSymbol);
-    m_settings->setValue("cacheLocation", Utils::PathUtils().RemoveStoragePath(m_cacheLocation));
-    m_settings->setValue("maxUpdateRate", m_maxUpdateRate);
-    m_settings->setValue("overlayOpacity", m_opacity);
+    saveConfig(m_settings);
 }
 void OPMapGadgetConfiguration::saveConfig(QSettings *qSettings) const
 {

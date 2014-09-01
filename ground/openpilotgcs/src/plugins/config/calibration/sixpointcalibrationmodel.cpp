@@ -481,7 +481,7 @@ void SixPointCalibrationModel::save()
     if (calibratingMag) {
         RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
 
-        for (int i = 0; i < RevoCalibration::MAG_TRANSFORM_NUMELEM; i++) {
+        for (quint32 i = 0; i < RevoCalibration::MAG_TRANSFORM_NUMELEM; i++) {
             revoCalibrationData.mag_transform[i] = result.revoCalibrationData.mag_transform[i];
         }
         for (int i = 0; i < 3; i++) {

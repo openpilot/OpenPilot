@@ -45,7 +45,7 @@ void OPMapGadget::saveDefaultLocation(double lng, double lat, double zoom)
         m_config->setLatitude(lat);
         m_config->setLongitude(lng);
         m_config->setZoom(zoom);
-        m_config->saveConfig();
+        m_config->save();
     }
 }
 

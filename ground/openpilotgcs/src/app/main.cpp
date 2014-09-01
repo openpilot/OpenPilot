@@ -289,8 +289,13 @@ void systemInit()
 #endif
 }
 
-void logInit()
+#ifdef QT_NO_DEBUG
+void logInit(bool enable)
 {
+    if (!enable) {
+        return;
+    }
+
     qInstallMessageHandler(mainMessageOutput);
     QFile file(QDir::tempPath() + "/gcs.log");
     if (file.exists()) {
@@ -299,6 +304,7 @@ void logInit()
         }
     }
 }
+#endif
 
 inline QStringList getPluginPaths()
 {
@@ -458,7 +464,7 @@ int main(int argc, char * *argv)
     systemInit();
 
 #ifdef QT_NO_DEBUG
-// logInit();
+    logInit(false);
 #endif
 
     // create application

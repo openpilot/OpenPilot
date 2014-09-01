@@ -92,8 +92,8 @@ public:
         m_locked = locked;
     }
 
-    int checkCompatibilityWith(UAVConfigVersion programVersion);
-    bool askToAbort(int compat, QString message);
+    Compatibility checkCompatibilityWith(UAVConfigVersion programVersion);
+    bool askToAbort(Compatibility compat, QString message);
     void notify(QString message);
     bool standardVersionHandlingOK(UAVConfigVersion programVersion);
     bool standardVersionHandlingOK(QString programVersion)

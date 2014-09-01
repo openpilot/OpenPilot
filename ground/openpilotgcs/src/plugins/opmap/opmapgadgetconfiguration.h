@@ -101,7 +101,7 @@ public:
     {
         return m_opacity;
     }
-    void saveConfig() const;
+    void save() const;
 public slots:
     void setMapProvider(QString provider)
     {

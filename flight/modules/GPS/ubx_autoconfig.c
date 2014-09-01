@@ -54,25 +54,64 @@ typedef struct {
 } status_t;
 
 ubx_cfg_msg_t msg_config_ubx6[] = {
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_POSLLH,  .rate = 1  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_DOP,     .rate = 1  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SOL,     .rate = 1  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_STATUS,  .rate = 1  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_VELNED,  .rate = 1  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_TIMEUTC, .rate = 1  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SVINFO,  .rate = 10 },
+    // messages to disable
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_CLOCK,     .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_POSECEF,   .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SBAS,      .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_TIMEGPS,   .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_VELECEF,   .rate = 0  },
+
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_HW,        .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_HW2,       .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_IO,        .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_MSGPP,     .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_RXBUFF,    .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_RXR,       .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_TXBUF,     .rate = 0  },
+
+    { .msgClass = UBX_CLASS_RXM, .msgID = UBX_ID_RXM_SVSI,      .rate = 0  },
+
+    // message to enable
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_POSLLH,    .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_DOP,       .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SOL,       .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_STATUS,    .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_VELNED,    .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_TIMEUTC,   .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SVINFO,    .rate = 10 },
 };
 
 ubx_cfg_msg_t msg_config_ubx7[] = {
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_PVT,     .rate = 1  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_POSLLH,  .rate = 0  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_DOP,     .rate = 1  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SOL,     .rate = 0  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_STATUS,  .rate = 0  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_VELNED,  .rate = 0  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_TIMEUTC, .rate = 0  },
-    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SVINFO,  .rate = 10 },
+    // messages to disable
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_AOPSTATUS, .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_CLOCK,     .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_DGPS,      .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_POSECEF,   .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SBAS,      .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_TIMEGPS,   .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_VELECEF,   .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SOL,       .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_STATUS,    .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_VELNED,    .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_TIMEUTC,   .rate = 0  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_POSLLH,    .rate = 0  },
+
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_HW,        .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_HW2,       .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_IO,        .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_MSGPP,     .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_RXBUFF,    .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_RXR,       .rate = 0  },
+    { .msgClass = UBX_CLASS_MON, .msgID = UBX_ID_MON_TXBUF,     .rate = 0  },
+
+    { .msgClass = UBX_CLASS_RXM, .msgID = UBX_ID_RXM_SVSI,      .rate = 0  },
+
+    // message to enable
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_PVT,       .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_DOP,       .rate = 1  },
+    { .msgClass = UBX_CLASS_NAV, .msgID = UBX_ID_NAV_SVINFO,    .rate = 10 },
 };
+
 // private defines
 #define LAST_CONFIG_SENT_START     (-1)
 #define LAST_CONFIG_SENT_COMPLETED (-2)

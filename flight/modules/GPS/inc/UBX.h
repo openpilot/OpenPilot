@@ -51,18 +51,29 @@ typedef enum {
     UBX_CLASS_CFG     = 0x06,
     UBX_CLASS_MON     = 0x0A,
     UBX_CLASS_OP_CUST = 0x99,
+    UBX_CLASS_AID     = 0x0B,
+    // unused class IDs, used for disabling them
+    UBX_CLASS_RXM     = 0x02,
 } ubx_class;
 
 // Message IDs
 typedef enum {
-    UBX_ID_NAV_POSLLH  = 0x02,
-    UBX_ID_NAV_STATUS  = 0x03,
-    UBX_ID_NAV_DOP     = 0x04,
-    UBX_ID_NAV_SOL     = 0x06,
-    UBX_ID_NAV_VELNED  = 0x12,
-    UBX_ID_NAV_TIMEUTC = 0x21,
-    UBX_ID_NAV_SVINFO  = 0x30,
-    UBX_ID_NAV_PVT     = 0x07,
+    UBX_ID_NAV_POSLLH    = 0x02,
+    UBX_ID_NAV_STATUS    = 0x03,
+    UBX_ID_NAV_DOP       = 0x04,
+    UBX_ID_NAV_SOL       = 0x06,
+    UBX_ID_NAV_VELNED    = 0x12,
+    UBX_ID_NAV_TIMEUTC   = 0x21,
+    UBX_ID_NAV_SVINFO    = 0x30,
+    UBX_ID_NAV_PVT       = 0x07,
+
+    UBX_ID_NAV_AOPSTATUS = 0x60,
+    UBX_ID_NAV_CLOCK     = 0x22,
+    UBX_ID_NAV_DGPS      = 0x31,
+    UBX_ID_NAV_POSECEF   = 0x01,
+    UBX_ID_NAV_SBAS      = 0x32,
+    UBX_ID_NAV_TIMEGPS   = 0x20,
+    UBX_ID_NAV_VELECEF   = 0x11
 } ubx_class_nav_id;
 
 typedef enum {
@@ -71,15 +82,23 @@ typedef enum {
 } ubx_class_op_id;
 
 typedef enum {
-    UBX_ID_MON_VER = 0x04,
+    UBX_ID_MON_VER    = 0x04,
+    // unused messages IDs, used for disabling them
+    UBX_ID_MON_HW2    = 0x0B,
+    UBX_ID_MON_HW     = 0x09,
+    UBX_ID_MON_IO     = 0x02,
+    UBX_ID_MON_MSGPP  = 0x06,
+    UBX_ID_MON_RXBUFF = 0x07,
+    UBX_ID_MON_RXR    = 0x21,
+    UBX_ID_MON_TXBUF  = 0x08,
 } ubx_class_mon_id;
-
 
 typedef enum {
     UBX_ID_CFG_NAV5 = 0x24,
     UBX_ID_CFG_RATE = 0x08,
     UBX_ID_CFG_MSG  = 0x01,
     UBX_ID_CFG_CFG  = 0x09,
+    UBX_ID_CFG_SBAS = 0x16,
 } ubx_class_cfg_id;
 
 typedef enum {
@@ -87,6 +106,25 @@ typedef enum {
     UBX_ID_ACK_NAK = 0x00,
 } ubx_class_ack_id;
 
+typedef enum {
+    UBX_ID_AID_ALM    = 0x0B,
+    UBX_ID_AID_ALPSRV = 0x32,
+    UBX_ID_AID_ALP    = 0x50,
+    UBX_ID_AID_AOP    = 0x33,
+    UBX_ID_AID_DATA   = 0x10,
+    UBX_ID_AID_EPH    = 0x31,
+    UBX_ID_AID_HUI    = 0x02,
+    UBX_ID_AID_INI    = 0x01,
+    UBX_ID_AID_REQ    = 0x00,
+} ubx_class_aid_id;
+
+typedef enum {
+    UBX_ID_RXM_ALM  = 0x30,
+    UBX_ID_RXM_EPH  = 0x31,
+    UBX_ID_RXM_RAW  = 0x10,
+    UBX_ID_RXM_SFRB = 0x11,
+    UBX_ID_RXM_SVSI = 0x20,
+} ubx_class_rxm_id;
 // private structures
 
 // Geodetic Position Solution

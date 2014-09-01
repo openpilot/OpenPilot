@@ -159,7 +159,8 @@ void config_save(uint16_t *bytes_to_send)
 {
     memset(status->working_packet.buffer, 0, sizeof(UBXSentHeader_t) + sizeof(ubx_cfg_cfg_t));
     // mask LSB=ioPort|msgConf|infMsg|navConf|rxmConf|||||rinvConf|antConf|....|= MSB
-    status->working_packet.message.payload.cfg_cfg.saveMask = 0x01 | 0x08; // msgConf + navConf
+    status->working_packet.message.payload.cfg_cfg.saveMask   = 0x01 | 0x08; // msgConf + navConf
+    status->working_packet.message.payload.cfg_cfg.deviceMask = UBX_CFG_CFG_ALL_DEVICES_MASK;
     *bytes_to_send = prepare_packet(&status->working_packet, UBX_CLASS_CFG, UBX_ID_CFG_CFG, sizeof(ubx_cfg_cfg_t));
     status->requiredAck.clsID = UBX_CLASS_CFG;
     status->requiredAck.msgID = UBX_ID_CFG_CFG;

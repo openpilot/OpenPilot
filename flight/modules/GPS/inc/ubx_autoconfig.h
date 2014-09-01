@@ -66,11 +66,15 @@ typedef struct {
     ubx_config_dynamicmodel_t dynamicModel;
 } ubx_autoconfig_settings_t;
 
+// Mask for "all supported devices": battery backed RAM, Flash, EEPROM, SPI Flash
+#define UBX_CFG_CFG_ALL_DEVICES_MASK (0x01 | 0x02 | 0x04 | 0x10)
+
 // Sent messages for configuration support
 typedef struct {
     uint32_t clearMask;
     uint32_t saveMask;
     uint32_t loadMask;
+    uint8_t  deviceMask;
 } __attribute__((packed)) ubx_cfg_cfg_t;
 
 typedef struct {

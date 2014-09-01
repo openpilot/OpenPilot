@@ -30,50 +30,38 @@ Item {
     function close_panels(){
         if (show_panels == true)
             show_panels = false;
-            rc_input_bg.z = 10
-            battery_bg.z = 20
-            oplm_bg.z = 30
-            system_bg.z = 40
     }
 
     function hide_display_rcinput(){
-        if (show_panels == false)
-            show_panels = true;
-        else
-            rc_input_bg.z = 10
-            battery_bg.z = -1
-            oplm_bg.z = -1
-            system_bg.z = -1         
+        show_panels = true;
+        rc_input_bg.z = 10
+        battery_bg.z = -1
+        oplm_bg.z = -1
+        system_bg.z = -1         
     }
 
     function hide_display_battery(){
-        if (show_panels == false)
-            show_panels = true;
-        else
-            rc_input_bg.z = -1
-            battery_bg.z = 20
-            oplm_bg.z = -1
-            system_bg.z = -1
+        show_panels = true;
+        rc_input_bg.z = 10
+        battery_bg.z = 20
+        oplm_bg.z = -1
+        system_bg.z = -1
     }
 
     function hide_display_oplink(){
-        if (show_panels == false)
-            show_panels = true;
-        else
-            rc_input_bg.z = -1
-            battery_bg.z = -1
-            oplm_bg.z = 30
-            system_bg.z = -1
+        show_panels = true;
+        rc_input_bg.z = 10
+        battery_bg.z = 20
+        oplm_bg.z = 30
+        system_bg.z = -1
     }
 
     function hide_display_system(){
-        if (show_panels == false)
-            show_panels = true;
-        else
-            rc_input_bg.z = -1
-            battery_bg.z = -1
-            oplm_bg.z = -1
-            system_bg.z = 40
+        show_panels = true;
+        rc_input_bg.z = 10
+        battery_bg.z = 20
+        oplm_bg.z = 30
+        system_bg.z = 40
     }
 
                              // Uninitialised, Ok,   Warning, Critical, Error                      
@@ -199,7 +187,6 @@ Item {
               }
         } 
     }
-
 
     //
     // Rc-Input panel

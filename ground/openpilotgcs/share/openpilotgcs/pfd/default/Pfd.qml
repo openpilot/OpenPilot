@@ -88,7 +88,6 @@ Rectangle {
                 sceneSize: sceneItem.viewportSize
             }
 
-
             Warnings {
                 anchors.fill: parent
                 sceneSize: sceneItem.viewportSize

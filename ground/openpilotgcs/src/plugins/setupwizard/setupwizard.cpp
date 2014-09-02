@@ -32,6 +32,8 @@
 #include "pages/vehiclepage.h"
 #include "pages/multipage.h"
 #include "pages/fixedwingpage.h"
+#include "pages/airspeedpage.h"
+#include "pages/gpspage.h"
 #include "pages/helipage.h"
 #include "pages/surfacepage.h"
 #include "pages/inputpage.h"
@@ -132,11 +134,25 @@ int SetupWizard::nextId() const
         if (getVehicleSubType() == MULTI_ROTOR_TRI_Y) {
             return PAGE_SERVO;
         } else {
-            return PAGE_SUMMARY;
-        }
+            switch (getControllerType()) {
+            case CONTROLLER_REVO:
+            case CONTROLLER_NANO:
+                return PAGE_GPS;
+            default:
+                return PAGE_SUMMARY;
+           }
+       }
 
     case PAGE_SERVO:
-        return PAGE_SUMMARY;
+    {
+        switch (getControllerType()) {
+        case CONTROLLER_REVO:
+        case CONTROLLER_NANO:
+            return PAGE_GPS;
+        default:
+            return PAGE_SUMMARY;
+       }
+    }
 
     case PAGE_BIAS_CALIBRATION:
         return PAGE_OUTPUT_CALIBRATION;
@@ -149,7 +165,7 @@ int SetupWizard::nextId() const
         case VEHICLE_FIXEDWING:
             return PAGE_AIRFRAMESTAB_FIXEDWING;
 
-        // TODO: Pages for Multi and heli
+        // TODO: PID selection pages for multi and heli
         case VEHICLE_MULTI:
         case VEHICLE_HELI:
         case VEHICLE_SURFACE:
@@ -157,6 +173,18 @@ int SetupWizard::nextId() const
             return PAGE_SAVE;
         }
     }
+
+
+    case PAGE_GPS:
+        switch (getVehicleType()) {
+        case VEHICLE_FIXEDWING:
+            return PAGE_AIRSPEED;
+        default:
+            return PAGE_SUMMARY;
+    }
+
+    case PAGE_AIRSPEED:
+        return PAGE_SUMMARY;
 
     case PAGE_AIRFRAMESTAB_FIXEDWING:
         return PAGE_SAVE;
@@ -167,8 +195,12 @@ int SetupWizard::nextId() const
         case CONTROLLER_CC:
         case CONTROLLER_CC3D:
         case CONTROLLER_REVO:
-            return PAGE_BIAS_CALIBRATION;
-
+            switch (getVehicleType()) {
+                case VEHICLE_FIXEDWING:
+                return PAGE_OUTPUT_CALIBRATION;
+            default:
+                return PAGE_BIAS_CALIBRATION;
+            }
         default:
             return PAGE_NOTYETIMPLEMENTED;
         }
@@ -355,6 +387,8 @@ void SetupWizard::createPages()
     setPage(PAGE_VEHICLES, new VehiclePage(this));
     setPage(PAGE_MULTI, new MultiPage(this));
     setPage(PAGE_FIXEDWING, new FixedWingPage(this));
+    setPage(PAGE_AIRSPEED, new AirSpeedPage(this));
+    setPage(PAGE_GPS, new GpsPage(this));
     setPage(PAGE_HELI, new HeliPage(this));
     setPage(PAGE_SURFACE, new SurfacePage(this));
     setPage(PAGE_INPUT, new InputPage(this));

@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedpage.h
+ * @file       gpspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup AirSpeedPage
+ * @addtogroup GpsPage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,21 +25,21 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef AIRSPEEDPAGE_H
-#define AIRSPEEDPAGE_H
+#ifndef GPSPAGE_H
+#define GPSPAGE_H
 
 #include "selectionpage.h"
 
-class AirSpeedPage : public SelectionPage {
+class GpsPage : public SelectionPage {
     Q_OBJECT
 
 public:
-    explicit AirSpeedPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~AirSpeedPage();
+    explicit GpsPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~GpsPage();
 
 public:
     bool validatePage(SelectionItem *selectedItem);
     void setupSelection(Selection *selection);
 };
 
-#endif // AIRSPEEDPAGE_H
+#endif // GPSPAGE_H

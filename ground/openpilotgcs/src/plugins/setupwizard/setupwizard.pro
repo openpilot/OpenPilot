@@ -19,6 +19,8 @@ HEADERS += setupwizardplugin.h \
     pages/notyetimplementedpage.h \
     pages/multipage.h \
     pages/fixedwingpage.h \
+    pages/airspeedpage.h \
+    pages/gpspage.h \
     pages/helipage.h \
     pages/surfacepage.h \
     pages/abstractwizardpage.h \
@@ -49,6 +51,8 @@ SOURCES += setupwizardplugin.cpp \
     pages/notyetimplementedpage.cpp \
     pages/multipage.cpp \
     pages/fixedwingpage.cpp \
+    pages/airspeedpage.cpp \
+    pages/gpspage.cpp \
     pages/helipage.cpp \
     pages/surfacepage.cpp \
     pages/abstractwizardpage.cpp \

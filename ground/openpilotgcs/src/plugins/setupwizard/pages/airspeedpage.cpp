@@ -26,109 +26,47 @@
  */
 
 #include "airspeedpage.h"
-#include "ui_airspeed.h"
 #include "setupwizard.h"
 
 AirSpeedPage::AirSpeedPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
-    ui(new Ui::AirSpeedPage)
-{
-    ui->setupUi(this);
-    QSvgRenderer *renderer = new QSvgRenderer();
-    renderer->load(QString(":/configgadget/images/fixedwing-shapes.svg"));
-    m_airspeedPic = new QGraphicsSvgItem();
-    m_airspeedPic->setSharedRenderer(renderer);
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    scene->addItem(m_airspeedPic);
-    ui->typeGraphicsView->setScene(scene);
-
-    setupAirSpeedPageTypesCombo();
-
-    // Default to Software Estimation
-    connect(ui->typeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(updateImageAndDescription()));
-    ui->typeCombo->setCurrentIndex(0);
-}
+    SelectionPage(wizard, QString(":/setupwizard/resources/airspeed-shapes.svg"), parent)
+{}
 
 AirSpeedPage::~AirSpeedPage()
-{
-    delete ui;
-}
+{}
 
-void AirSpeedPage::initializePage()
+bool AirSpeedPage::validatePage(SelectionItem *selectedItem)
 {
-    updateAvailableTypes();
-    updateImageAndDescription();
-}
-
-// TODO
-bool AirSpeedPage::validatePage()
-{
-    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE)ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
-
-    getWizard()->setVehicleSubType(type);
+    getWizard()->setAirspeedType((SetupWizard::AIRSPEED_TYPE)selectedItem->id());
     return true;
 }
 
-void AirSpeedPage::fitInView()
+void AirSpeedPage::setupSelection(Selection *selection)
 {
-    if (m_airspeedPic) {
-        ui->typeGraphicsView->setSceneRect(m_airspeedPic->boundingRect());
-        ui->typeGraphicsView->fitInView(m_airspeedPic, Qt::KeepAspectRatio);
-    }
-}
+    selection->setTitle(tr("OpenPilot Airspeed Sensor Selection"));
+    selection->setText(tr("This part of the wizard will help you select and configure a way to obtain "
+                          "airspeed data. OpenPilot support three methods to achieve this, one is a "
+                          "software estimation technique and the other two utilize hardware sensors.\n\n"
+                          "Please select how you wish to obtain airspeed data below:"));
+    selection->addItem(tr("Estimated"),
+                       tr("This option uses an intelligent estimation algorithm which utilizes the OpenPilot INS/GPS "
+                          "to estimate wind speed and subtract it from ground speed obtained from the GPS.\n\n"
+                          "This solution is highly accurate in normal level flight with the drawback of being less "
+                          "accurate in rapid altitude changes.\n\n"),
+                       "estimated",
+                       SetupWizard::ESTIMATE);
 
-void AirSpeedPage::resizeEvent(QResizeEvent *event)
-{
-    Q_UNUSED(event);
-    fitInView();
-}
+    selection->addItem(tr("EagleTree"),
+                       tr("Select this option to use the Airspeed MicroSensor V3 from EagleTree, this is an accurate "
+                          "airspeed sensor that includes on-board Temperature Compensation.\n\n"
+                          "Selecting this option will set your board's Flexi-Port in to I2C mode."),
+                       "eagletree",
+                       SetupWizard::EAGLETREE);
 
-void AirSpeedPage::showEvent(QShowEvent *event)
-{
-    Q_UNUSED(event);
-    fitInView();
-}
-
-// TODO
-void AirSpeedPage::setupAirSpeedPageTypesCombo()
-{
-    ui->typeCombo->addItem(tr("Aileron Dual Servos"), SetupWizard::FIXED_WING_DUAL_AILERON);
-    m_descriptions << tr("This setup expects a traditional airframe using two independent aileron servos on their own channel (not connected by Y adapter) plus an elevator and a rudder. ");
-
-    ui->typeCombo->addItem(tr("Aileron Single Servo"), SetupWizard::FIXED_WING_AILERON);
-    m_descriptions << tr("This setup expects a traditional airframe using a single alieron servo or two servos connected by a Y adapter plus an elevator and a rudder. ");
-
-    ui->typeCombo->addItem(tr("Elevon"), SetupWizard::FIXED_WING_ELEVON);
-    m_descriptions << tr("This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet supported. Setup should include only two elevons, and should explicitly not include a rudder.");
-}
-
-void AirSpeedPage::updateAvailableTypes()
-{}
-
-// TODO
-void AirSpeedPage::updateImageAndDescription()
-{
-    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE)ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
-    QString elementId   = "";
-    QString description = m_descriptions.at(ui->typeCombo->currentIndex());
-
-    switch (type) {
-    case SetupWizard::FIXED_WING_DUAL_AILERON:
-        elementId = "aileron";
-        break;
-    case SetupWizard::FIXED_WING_AILERON:
-        elementId = "aileron-single";
-        break;
-    case SetupWizard::FIXED_WING_ELEVON:
-        elementId = "elevon";
-        break;
-    default:
-        elementId = "";
-        break;
-    }
-    m_airspeedPic->setElementId(elementId);
-    ui->typeGraphicsView->setSceneRect(m_airspeedPic->boundingRect());
-    ui->typeGraphicsView->fitInView(m_airspeedPic, Qt::KeepAspectRatio);
-
-    ui->typeDescription->setText(description);
+    selection->addItem(tr("MS4525 Based"),
+                       tr("Select this option to use an airspeed sensor based on the MS4525DO  pressure transducer "
+                          "from Measurement Specialties. This includes the PixHawk sensor and their clones.\n\n"
+                          "Selecting this option will set your board's Flexi-Port in to I2C mode."),
+                       "ms4525",
+                       SetupWizard::MS4525);
 }

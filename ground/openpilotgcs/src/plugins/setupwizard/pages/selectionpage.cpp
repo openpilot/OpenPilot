@@ -122,7 +122,3 @@ SelectionItem::SelectionItem(QString name, QString description, QString shapeId,
     m_name(name), m_description(description), m_shapeId(shapeId), m_id(id)
 {
 }
-
-SelectionItem::~SelectionItem()
-{
-}

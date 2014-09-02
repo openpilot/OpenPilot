@@ -51,7 +51,7 @@ void AirSpeedPage::setupSelection(Selection *selection)
                           "Please select how you wish to obtain airspeed data below:"));
     selection->addItem(tr("Estimated"),
                        tr("This option uses an intelligent estimation algorithm which utilizes the OpenPilot INS/GPS "
-                          "to estimate wind speed and subtract it from ground speed obtained from the GPS.\n"
+                          "to estimate wind speed and subtract it from ground speed obtained from the GPS.\n\n"
                           "This solution is highly accurate in normal level flight with the drawback of being less "
                           "accurate in rapid altitude changes.  "),
                        "estimated",
@@ -59,14 +59,14 @@ void AirSpeedPage::setupSelection(Selection *selection)
 
     selection->addItem(tr("EagleTree"),
                        tr("Select this option to use the Airspeed MicroSensor V3 from EagleTree, this is an accurate "
-                          "airspeed sensor that includes on-board Temperature Compensation.\n"
+                          "airspeed sensor that includes on-board Temperature Compensation.\n\n"
                           "Selecting this option will put your Flexi-Port in to I2C mode."),
                        "eagletree",
                        SetupWizard::EAGLETREE);
 
     selection->addItem(tr("MS4525 Based"),
                        tr("Select this option to use an airspeed sensor based on the MS4525DO  pressure transducer "
-                          "from Measurement Specialties. This includes the PixHawk sensor and their clones.\n"
+                          "from Measurement Specialties. This includes the PixHawk sensor and their clones.\n\n"
                           "Selecting this option will put your Flexi-Port in to I2C mode."),
                        "ms4525",
                        SetupWizard::MS4525);

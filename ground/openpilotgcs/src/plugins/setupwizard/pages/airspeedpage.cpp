@@ -60,14 +60,14 @@ void AirSpeedPage::setupSelection(Selection *selection)
     selection->addItem(tr("EagleTree"),
                        tr("Select this option to use the Airspeed MicroSensor V3 from EagleTree, this is an accurate "
                           "airspeed sensor that includes on-board Temperature Compensation.\n\n"
-                          "Selecting this option will put your Flexi-Port in to I2C mode."),
+                          "Selecting this option will set your board's Flexi-Port in to I2C mode."),
                        "eagletree",
                        SetupWizard::EAGLETREE);
 
     selection->addItem(tr("MS4525 Based"),
                        tr("Select this option to use an airspeed sensor based on the MS4525DO  pressure transducer "
                           "from Measurement Specialties. This includes the PixHawk sensor and their clones.\n\n"
-                          "Selecting this option will put your Flexi-Port in to I2C mode."),
+                          "Selecting this option will set your board's Flexi-Port in to I2C mode."),
                        "ms4525",
                        SetupWizard::MS4525);
 }

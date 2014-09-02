@@ -20,6 +20,7 @@ HEADERS += setupwizardplugin.h \
     pages/multipage.h \
     pages/fixedwingpage.h \
     pages/airspeedpage.h \
+    pages/gpspage.h \
     pages/helipage.h \
     pages/surfacepage.h \
     pages/abstractwizardpage.h \
@@ -51,6 +52,7 @@ SOURCES += setupwizardplugin.cpp \
     pages/multipage.cpp \
     pages/fixedwingpage.cpp \
     pages/airspeedpage.cpp \
+    pages/gpspage.cpp \
     pages/helipage.cpp \
     pages/surfacepage.cpp \
     pages/abstractwizardpage.cpp \

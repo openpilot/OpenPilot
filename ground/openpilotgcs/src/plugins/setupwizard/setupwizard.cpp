@@ -33,6 +33,7 @@
 #include "pages/multipage.h"
 #include "pages/fixedwingpage.h"
 #include "pages/airspeedpage.h"
+#include "pages/gpspage.h"
 #include "pages/helipage.h"
 #include "pages/surfacepage.h"
 #include "pages/inputpage.h"
@@ -133,11 +134,23 @@ int SetupWizard::nextId() const
         if (getVehicleSubType() == MULTI_ROTOR_TRI_Y) {
             return PAGE_SERVO;
         } else {
-            return PAGE_SUMMARY;
-        }
+            switch (getControllerType()) {
+                case CONTROLLER_REVO:
+                return PAGE_GPS;
+            default:
+                return PAGE_SUMMARY;
+           }
+       }
 
     case PAGE_SERVO:
-        return PAGE_SUMMARY;
+    {
+        switch (getControllerType()) {
+        case CONTROLLER_REVO:
+            return PAGE_GPS;
+        default:
+            return PAGE_SUMMARY;
+       }
+    }
 
     case PAGE_BIAS_CALIBRATION:
         return PAGE_OUTPUT_CALIBRATION;
@@ -148,9 +161,9 @@ int SetupWizard::nextId() const
     {
         switch (getVehicleType()) {
         case VEHICLE_FIXEDWING:
-            return PAGE_AIRSPEED;
+            return PAGE_AIRFRAMESTAB_FIXEDWING;
 
-        // TODO: Pages for Multi and heli
+        // TODO: PID selection pages for multi and heli
         case VEHICLE_MULTI:
         case VEHICLE_HELI:
         case VEHICLE_SURFACE:
@@ -159,8 +172,17 @@ int SetupWizard::nextId() const
         }
     }
 
+
+    case PAGE_GPS:
+        switch (getVehicleType()) {
+        case VEHICLE_FIXEDWING:
+            return PAGE_AIRSPEED;
+        default:
+            return PAGE_SUMMARY;
+    }
+
     case PAGE_AIRSPEED:
-        return PAGE_AIRFRAMESTAB_FIXEDWING;
+        return PAGE_SUMMARY;
 
     case PAGE_AIRFRAMESTAB_FIXEDWING:
         return PAGE_SAVE;
@@ -364,6 +386,7 @@ void SetupWizard::createPages()
     setPage(PAGE_MULTI, new MultiPage(this));
     setPage(PAGE_FIXEDWING, new FixedWingPage(this));
     setPage(PAGE_AIRSPEED, new AirSpeedPage(this));
+    setPage(PAGE_GPS, new GpsPage(this));
     setPage(PAGE_HELI, new HeliPage(this));
     setPage(PAGE_SURFACE, new SurfacePage(this));
     setPage(PAGE_INPUT, new InputPage(this));

@@ -65,7 +65,7 @@ public:
     enum SERVO_TYPE { SERVO_ANALOG, SERVO_DIGITAL, SERVO_UNKNOWN };
     enum INPUT_TYPE { INPUT_PWM, INPUT_PPM, INPUT_SBUS, INPUT_DSMX10, INPUT_DSMX11, INPUT_DSM2, INPUT_UNKNOWN };
     enum AIRSPEED_TYPE { ESTIMATE, EAGLETREE, MS4525 };
-    enum GPS_SETTING { GPS_PLAT, GPS_UBX, GPS_NMEA, GPS_DISABLED };
+    enum GPS_TYPE { GPS_PLAT, GPS_UBX, GPS_NMEA, GPS_DISABLED };
     enum RADIO_SETTING { RADIO_TELEMETRY, RADIO_DISABLED };
 
     virtual VehicleConfigurationSource::CONTROLLER_TYPE getControllerType() const  = 0;
@@ -75,7 +75,7 @@ public:
     virtual VehicleConfigurationSource::ESC_TYPE getEscType() const           = 0;
     virtual VehicleConfigurationSource::SERVO_TYPE getServoType() const       = 0;
     virtual VehicleConfigurationSource::AIRSPEED_TYPE getAirspeedType() const = 0;
-    virtual VehicleConfigurationSource::GPS_SETTING getGPSSetting() const     = 0;
+    virtual VehicleConfigurationSource::GPS_TYPE getGpsType() const     = 0;
     virtual VehicleConfigurationSource::RADIO_SETTING getRadioSetting() const = 0;
 
     virtual bool isCalibrationPerformed() const = 0;

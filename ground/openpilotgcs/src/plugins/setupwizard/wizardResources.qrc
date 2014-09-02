@@ -40,6 +40,8 @@
 	<!-- these are different from the files in /config/images -->
         <file>resources/bttn-illustration-down.png</file>
         <file>resources/bttn-illustration-up.png</file>
+        <file>resources/bttn-illustration-color-up.png</file>
+        <file>resources/bttn-illustration-color-down.png</file>
         <file>resources/bttn-save-down.png</file>
         <file>resources/bttn-save-up.png</file>
         <file>resources/bttn-flash-down.png</file>

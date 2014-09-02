@@ -300,7 +300,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             // we appear to be receiving GPS sentences OK, we've had an update
             // criteria for GPS-OK taken from this post...
             // http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
-            if ((gpspositionsensor.PDOP < gpsSettings.MaxPDOP) && (gpspositionsensor.Satellites >= gpsSettings.MinSattelites) &&
+            if ((gpspositionsensor.PDOP < gpsSettings.MaxPDOP) && (gpspositionsensor.Satellites >= gpsSettings.MinSatellites) &&
                 (gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
                 (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
                 AlarmsClear(SYSTEMALARMS_ALARM_GPS);
@@ -442,9 +442,9 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
     GPSSettingsUBXAutoConfigGet(&ubxAutoConfig);
     GPSSettingsUBXRateGet(&newconfig.navRate);
     GPSSettingsUBXDynamicModelGet(&ubxDynamicModel);
+    newconfig.autoconfigEnabled = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED ? false : true;
+    newconfig.storeSettings     = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_CONFIGUREANDSTORE;
 
-    newconfig.autoconfigEnabled = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_FALSE ? false : true;
-    newconfig.storeSettings     = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_STORE;
     newconfig.dynamicModel = ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PORTABLE ? UBX_DYNMODEL_PORTABLE :
                              ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_STATIONARY ? UBX_DYNMODEL_STATIONARY :
                              ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PEDESTRIAN ? UBX_DYNMODEL_PEDESTRIAN :

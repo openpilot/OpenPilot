@@ -26,106 +26,46 @@
  */
 
 #include "fixedwingpage.h"
-#include "ui_fixedwingpage.h"
 #include "setupwizard.h"
 
 FixedWingPage::FixedWingPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
-    ui(new Ui::FixedWingPage)
+    SelectionPage(wizard, QString(":/setupwizard/resources/fixedwing-shapes-wizard-no-numbers.svg"), parent)
 {
-    ui->setupUi(this);
-    QSvgRenderer *renderer = new QSvgRenderer();
-    renderer->load(QString(":/setupwizard/resources/fixedwing-shapes-wizard-no-numbers.svg"));
-    m_fixedwingPic = new QGraphicsSvgItem();
-    m_fixedwingPic->setSharedRenderer(renderer);
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    scene->addItem(m_fixedwingPic);
-    ui->typeGraphicsView->setScene(scene);
-
-    setupFixedWingTypesCombo();
-
-    // Default to Aileron setup
-    connect(ui->typeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(updateImageAndDescription()));
-    ui->typeCombo->setCurrentIndex(0);
 }
 
 FixedWingPage::~FixedWingPage()
 {
-    delete ui;
 }
 
-void FixedWingPage::initializePage()
+bool FixedWingPage::validatePage(SelectionItem *seletedItem)
 {
-    updateAvailableTypes();
-    updateImageAndDescription();
-}
-
-bool FixedWingPage::validatePage()
-{
-    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE)ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
-
-    getWizard()->setVehicleSubType(type);
+    getWizard()->setVehicleSubType((SetupWizard::VEHICLE_SUB_TYPE)seletedItem->id());
     return true;
 }
 
-void FixedWingPage::fitInView()
+void FixedWingPage::setupSelection(Selection *selection)
 {
-    if (m_fixedwingPic) {
-        ui->typeGraphicsView->setSceneRect(m_fixedwingPic->boundingRect());
-        ui->typeGraphicsView->fitInView(m_fixedwingPic, Qt::KeepAspectRatio);
-    }
-}
+    selection->setTitle(tr("OpenPilot Fixed-wing Configuration"));
+    selection->setText(tr("This part of the wizard will set up the OpenPilot controller for use with a fixed-wing "
+                          "flying aircraft utilizing servos. The wizard supports the most common types of fixed-wing "
+                          "aircraft, other variants of fixed-wing aircraft can be configured by using custom "
+                          "configuration options in the Configuration plugin in the GCS.\n\n"
+                          "Please select the type of fixed-wing you want to create a configuration for below:"));
+    selection->addItem(tr("Aileron Dual Servos"),
+                       tr("This setup expects a traditional airframe using two independent aileron servos "
+                       "on their own channel (not connected by Y adapter) plus an elevator and a rudder."),
+                       "aileron",
+                       SetupWizard::FIXED_WING_DUAL_AILERON);
 
-void FixedWingPage::resizeEvent(QResizeEvent *event)
-{
-    Q_UNUSED(event);
-    fitInView();
-}
+    selection->addItem(tr("Aileron Single Servo"),
+                       tr("This setup expects a traditional airframe using a single alieron servo or two servos "
+                        "connected by a Y adapter plus an elevator and a rudder."),
+                       "aileron-single",
+                        SetupWizard::FIXED_WING_AILERON);
 
-void FixedWingPage::showEvent(QShowEvent *event)
-{
-    Q_UNUSED(event);
-    fitInView();
-}
-
-void FixedWingPage::setupFixedWingTypesCombo()
-{
-    ui->typeCombo->addItem(tr("Aileron Dual Servos"), SetupWizard::FIXED_WING_DUAL_AILERON);
-    m_descriptions << tr("This setup expects a traditional airframe using two independent aileron servos on their own channel (not connected by Y adapter) plus an elevator and a rudder. ");
-
-    ui->typeCombo->addItem(tr("Aileron Single Servo"), SetupWizard::FIXED_WING_AILERON);
-    m_descriptions << tr("This setup expects a traditional airframe using a single alieron servo or two servos connected by a Y adapter plus an elevator and a rudder. ");
-
-    ui->typeCombo->addItem(tr("Elevon"), SetupWizard::FIXED_WING_ELEVON);
-    m_descriptions << tr("This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet supported. Setup should include only two elevons, and should explicitly not include a rudder.");
-}
-
-void FixedWingPage::updateAvailableTypes()
-{}
-
-void FixedWingPage::updateImageAndDescription()
-{
-    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE)ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
-    QString elementId   = "";
-    QString description = m_descriptions.at(ui->typeCombo->currentIndex());
-
-    switch (type) {
-    case SetupWizard::FIXED_WING_DUAL_AILERON:
-        elementId = "aileron";
-        break;
-    case SetupWizard::FIXED_WING_AILERON:
-        elementId = "aileron-single";
-        break;
-    case SetupWizard::FIXED_WING_ELEVON:
-        elementId = "elevon";
-        break;
-    default:
-        elementId = "";
-        break;
-    }
-    m_fixedwingPic->setElementId(elementId);
-    ui->typeGraphicsView->setSceneRect(m_fixedwingPic->boundingRect());
-    ui->typeGraphicsView->fitInView(m_fixedwingPic, Qt::KeepAspectRatio);
-
-    ui->typeDescription->setText(description);
+    selection->addItem(tr("Elevon"),
+                       tr("This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet "
+                       "supported. Setup should include only two elevons, and should explicitly not include a rudder."),
+                       "elevon",
+                       SetupWizard::FIXED_WING_ELEVON);
 }

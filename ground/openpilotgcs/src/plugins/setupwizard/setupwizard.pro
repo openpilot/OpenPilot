@@ -78,8 +78,6 @@ FORMS += \
     pages/controllerpage.ui \
     pages/vehiclepage.ui \
     pages/notyetimplementedpage.ui \
-    pages/multipage.ui \
-    pages/fixedwingpage.ui \
     pages/helipage.ui \
     pages/surfacepage.ui \
     pages/inputpage.ui \

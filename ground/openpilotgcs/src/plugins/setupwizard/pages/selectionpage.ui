@@ -16,11 +16,31 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>13</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>placeholder_text</string>
      </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
      <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="text">
+     <property name="text">
+      <string>TextLabel</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -55,13 +75,6 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
            </property>
            <property name="text">
             <string>Select:</string>
@@ -119,7 +132,7 @@
         <bool>true</bool>
        </property>
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::NoFrame</enum>
        </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
@@ -156,6 +169,9 @@
        </property>
        <property name="interactive">
         <bool>false</bool>
+       </property>
+       <property name="renderHints">
+        <set>QPainter::Antialiasing|QPainter::HighQualityAntialiasing</set>
        </property>
       </widget>
      </item>

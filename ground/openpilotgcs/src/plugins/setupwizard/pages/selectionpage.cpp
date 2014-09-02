@@ -30,7 +30,7 @@
 #include "setupwizard.h"
 
 SelectionPage::SelectionPage(SetupWizard *wizard, QString shapeFile, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage(wizard, parent), Selection(),
     ui(new Ui::SelectionPage)
 {
     ui->setupUi(this);
@@ -108,12 +108,21 @@ void SelectionPage::addItem(QString name, QString description, QString shapeId, 
     m_selectionItems << new SelectionItem(name, description, shapeId, id);
 }
 
-void SelectionPage::setTitleLabel(QString text)
+void SelectionPage::setTitle(QString title)
 {
-    ui->label->setText(text);
+    ui->label->setText(title);
+}
+
+void SelectionPage::setText(QString text)
+{
+    ui->text->setText(text);
 }
 
 SelectionItem::SelectionItem(QString name, QString description, QString shapeId, int id) :
     m_name(name), m_description(description), m_shapeId(shapeId), m_id(id)
+{
+}
+
+SelectionItem::~SelectionItem()
 {
 }

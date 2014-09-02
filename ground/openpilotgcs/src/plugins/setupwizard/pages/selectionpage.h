@@ -38,8 +38,7 @@ namespace Ui {
 class SelectionPage;
 }
 
-class SelectionItem : public QObject {
-    Q_OBJECT
+class SelectionItem {
 public:
     SelectionItem(QString name, QString description, QString shapeId, int id);
     ~SelectionItem();
@@ -58,11 +57,13 @@ private:
 
 class Selection {
 public:
+    Selection() {}
     virtual void addItem(QString name, QString description, QString shapeId, int id) = 0;
-    virtual void setTitleLabel(QString text) = 0;
+    virtual void setTitle(QString title) = 0;
+    virtual void setText(QString text) = 0;
 };
 
-class SelectionPage : public AbstractWizardPage, Selection {
+class SelectionPage : public AbstractWizardPage, public Selection {
     Q_OBJECT
 
 public:
@@ -72,7 +73,8 @@ public:
     void initializePage();
     bool validatePage();
     void addItem(QString name, QString description, QString shapeId, int id);
-    void setTitleLabel(QString text);
+    void setTitle(QString title);
+    void setText(QString text);
 
     virtual void setupSelection(Selection *selection) = 0;
     virtual bool validatePage(SelectionItem *selectedItem) = 0;
@@ -89,8 +91,6 @@ private:
 private slots:
     void selectionChanged(int index);
     void fitImage();
-
-
 };
 
 #endif // SUBVEHICLEPAGEPAGE_H

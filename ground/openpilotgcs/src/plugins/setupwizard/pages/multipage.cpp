@@ -50,6 +50,7 @@ void MultiPage::setupSelection(Selection *selection)
                        "The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom "
                        "configuration options in the Configuration plugin in the GCS.\n\n"
                        "Please select the type of multirotor you want to create a configuration for below:"));
+
     selection->addItem(tr("Tricopter"),
                        tr("The Tricopter uses three motors and one servo. The servo is used to give yaw authority to the rear motor. "
                        "The front motors are rotating in opposite directions. The Tricopter is known for its sweeping yaw movement and "

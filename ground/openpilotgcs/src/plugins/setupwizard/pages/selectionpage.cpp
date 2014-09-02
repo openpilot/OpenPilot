@@ -65,7 +65,7 @@ void SelectionPage::initializePage()
 
         // Default to first item if any
         if (ui->typeCombo->count() > 0) {
-            ui->typeCombo->setCurrentIndex(1);
+            ui->typeCombo->setCurrentIndex(0);
         }
     }
 }

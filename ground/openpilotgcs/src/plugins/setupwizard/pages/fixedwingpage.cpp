@@ -35,9 +35,9 @@ FixedWingPage::FixedWingPage(SetupWizard *wizard, QWidget *parent) :
 FixedWingPage::~FixedWingPage()
 {}
 
-bool FixedWingPage::validatePage(SelectionItem *seletedItem)
+bool FixedWingPage::validatePage(SelectionItem *selectedItem)
 {
-    getWizard()->setVehicleSubType((SetupWizard::VEHICLE_SUB_TYPE)seletedItem->id());
+    getWizard()->setVehicleSubType((SetupWizard::VEHICLE_SUB_TYPE)selectedItem->id());
     return true;
 }
 

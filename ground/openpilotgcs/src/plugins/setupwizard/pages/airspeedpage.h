@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       fixedwingpage.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @file       airspeedpage.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup FixedWingPage
+ * @addtogroup AirSpeedPage
  * @{
  * @brief
  *****************************************************************************/
@@ -38,7 +38,7 @@ public:
     ~AirSpeedPage();
 
 public:
-    bool validatePage(SelectionItem *seletedItem);
+    bool validatePage(SelectionItem *selectedItem);
     void setupSelection(Selection *selection);
 };
 

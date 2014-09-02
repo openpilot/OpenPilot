@@ -29,15 +29,15 @@
 #include "setupwizard.h"
 
 GpsPage::GpsPage(SetupWizard *wizard, QWidget *parent) :
-    SelectionPage(wizard, QString(":/setupwizard/resources/airspeed-shapes.svg"), parent)
+    SelectionPage(wizard, QString(":/setupwizard/resources/gps-shapes.svg"), parent)
 {}
 
 GpsPage::~GpsPage()
 {}
 
-bool GpsPage::validatePage(SelectionItem *seletedItem)
+bool GpsPage::validatePage(SelectionItem *selectedItem)
 {
-    getWizard()->setGpsType((SetupWizard::GPS_TYPE)seletedItem->id());
+    getWizard()->setGpsType((SetupWizard::GPS_TYPE)selectedItem->id());
     return true;
 }
 

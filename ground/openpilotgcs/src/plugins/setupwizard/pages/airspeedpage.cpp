@@ -35,9 +35,9 @@ AirSpeedPage::AirSpeedPage(SetupWizard *wizard, QWidget *parent) :
 AirSpeedPage::~AirSpeedPage()
 {}
 
-bool AirSpeedPage::validatePage(SelectionItem *seletedItem)
+bool AirSpeedPage::validatePage(SelectionItem *selectedItem)
 {
-    getWizard()->setAirspeedType((SetupWizard::AIRSPEED_TYPE)seletedItem->id());
+    getWizard()->setAirspeedType((SetupWizard::AIRSPEED_TYPE)selectedItem->id());
     return true;
 }
 

@@ -38,7 +38,6 @@
         <file>resources/fixedwing-shapes-wizard.svg</file>
         <file>resources/fixedwing-shapes-wizard-no-numbers.svg</file>
         <file>resources/airspeed-shapes.svg</file>
-	<!-- these are different from the files in /config/images -->
         <file>resources/bttn-illustration-down.png</file>
         <file>resources/bttn-illustration-up.png</file>
         <file>resources/bttn-save-down.png</file>
@@ -47,5 +46,6 @@
         <file>resources/bttn-flash-up.png</file>
         <file>resources/bttn-upgrade-down.png</file>
         <file>resources/bttn-upgrade-up.png</file>
+        <file>resources/gps-shapes.svg</file>
     </qresource>
 </RCC>

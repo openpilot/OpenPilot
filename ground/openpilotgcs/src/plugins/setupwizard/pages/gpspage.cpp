@@ -44,9 +44,9 @@ bool GpsPage::validatePage(SelectionItem *seletedItem)
 void GpsPage::setupSelection(Selection *selection)
 {
     selection->setTitle(tr("OpenPilot GPS Selection"));
-    selection->setText(tr("Please select the type of GPS you have below. As well as OpenPilot hardware "
-                          "OpenPilot works hard to support 3rd party GPSs as well, although performance could
-                          "be less than with using OpenPilot produced hardware; not all GPSs are created equal.\n\n"
+    selection->setText(tr("Please select the type of GPS you wish to use. As well as OpenPilot hardware, "
+                          "3rd party GPSs are supported also, although please note that performance could "
+                          "be less than optimal as not all GPSs are created equal.\n\n"
                           "Please select your GPS type data below:"));
 
     selection->addItem(tr("Disabled"),

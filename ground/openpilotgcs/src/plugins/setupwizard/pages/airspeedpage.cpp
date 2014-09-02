@@ -44,16 +44,15 @@ bool AirSpeedPage::validatePage(SelectionItem *seletedItem)
 void AirSpeedPage::setupSelection(Selection *selection)
 {
     selection->setTitle(tr("OpenPilot Airspeed Sensor Selection"));
-    selection->setText(tr("This part of the wizard will help you select and configure an airspeed sensor which "
-                          "are also commonly called Pitot tubes. OpenPilot support three methods to obtain "
-                          "airspeed data, one is a software estimation technique and the other two "
-                          "utilize hardware sensors.\n\n"
+    selection->setText(tr("This part of the wizard will help you select and configure a way to obtain "
+                          "airspeed data. OpenPilot support three methods to achieve this, one is a "
+                          "software estimation technique and the other two utilize hardware sensors.\n\n"
                           "Please select how you wish to obtain airspeed data below:"));
     selection->addItem(tr("Estimated"),
                        tr("This option uses an intelligent estimation algorithm which utilizes the OpenPilot INS/GPS "
                           "to estimate wind speed and subtract it from ground speed obtained from the GPS.\n\n"
                           "This solution is highly accurate in normal level flight with the drawback of being less "
-                          "accurate in rapid altitude changes.  "),
+                          "accurate in rapid altitude changes.\n\n"),
                        "estimated",
                        SetupWizard::ESTIMATE);
 

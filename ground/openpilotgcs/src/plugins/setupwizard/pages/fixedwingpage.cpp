@@ -30,12 +30,10 @@
 
 FixedWingPage::FixedWingPage(SetupWizard *wizard, QWidget *parent) :
     SelectionPage(wizard, QString(":/setupwizard/resources/fixedwing-shapes-wizard-no-numbers.svg"), parent)
-{
-}
+{}
 
 FixedWingPage::~FixedWingPage()
-{
-}
+{}
 
 bool FixedWingPage::validatePage(SelectionItem *seletedItem)
 {
@@ -53,19 +51,19 @@ void FixedWingPage::setupSelection(Selection *selection)
                           "Please select the type of fixed-wing you want to create a configuration for below:"));
     selection->addItem(tr("Aileron Dual Servos"),
                        tr("This setup expects a traditional airframe using two independent aileron servos "
-                       "on their own channel (not connected by Y adapter) plus an elevator and a rudder."),
+                          "on their own channel (not connected by Y adapter) plus an elevator and a rudder."),
                        "aileron",
                        SetupWizard::FIXED_WING_DUAL_AILERON);
 
     selection->addItem(tr("Aileron Single Servo"),
                        tr("This setup expects a traditional airframe using a single alieron servo or two servos "
-                        "connected by a Y adapter plus an elevator and a rudder."),
+                          "connected by a Y adapter plus an elevator and a rudder."),
                        "aileron-single",
-                        SetupWizard::FIXED_WING_AILERON);
+                       SetupWizard::FIXED_WING_AILERON);
 
     selection->addItem(tr("Elevon"),
                        tr("This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet "
-                       "supported. Setup should include only two elevons, and should explicitly not include a rudder."),
+                          "supported. Setup should include only two elevons, and should explicitly not include a rudder."),
                        "elevon",
                        SetupWizard::FIXED_WING_ELEVON);
 }

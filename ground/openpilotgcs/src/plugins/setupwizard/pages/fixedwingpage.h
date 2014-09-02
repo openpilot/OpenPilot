@@ -38,7 +38,7 @@ public:
     ~FixedWingPage();
 
 public:
-    bool validatePage(SelectionItem* seletedItem);
+    bool validatePage(SelectionItem *seletedItem);
     void setupSelection(Selection *selection);
 };
 

@@ -56,10 +56,10 @@ SelectionPage::~SelectionPage()
 
 void SelectionPage::initializePage()
 {
-    //lazy init
+    // lazy init
     if (m_selectionItems.isEmpty()) {
         setupSelection(this);
-        foreach (SelectionItem * item, m_selectionItems) {
+        foreach(SelectionItem * item, m_selectionItems) {
             ui->typeCombo->addItem(item->name());
         }
 
@@ -98,6 +98,7 @@ void SelectionPage::showEvent(QShowEvent *event)
 void SelectionPage::selectionChanged(int index)
 {
     SelectionItem *item = m_selectionItems.at(index);
+
     m_shape->setElementId(item->shapeId());
     ui->typeDescription->setText(item->description());
     fitImage();
@@ -120,5 +121,4 @@ void SelectionPage::setText(QString text)
 
 SelectionItem::SelectionItem(QString name, QString description, QString shapeId, int id) :
     m_name(name), m_description(description), m_shapeId(shapeId), m_id(id)
-{
-}
+{}

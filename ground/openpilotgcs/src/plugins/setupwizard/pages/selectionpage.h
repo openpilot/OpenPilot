@@ -41,12 +41,24 @@ class SelectionPage;
 class SelectionItem {
 public:
     SelectionItem(QString name, QString description, QString shapeId, int id);
-//    ~SelectionItem();
+// ~SelectionItem();
 
-    QString name() { return m_name; }
-    QString description() { return m_description; }
-    QString shapeId() { return m_shapeId; }
-    int id() { return m_id; }
+    QString name()
+    {
+        return m_name;
+    }
+    QString description()
+    {
+        return m_description;
+    }
+    QString shapeId()
+    {
+        return m_shapeId;
+    }
+    int id()
+    {
+        return m_id;
+    }
 
 private:
     QString m_name;
@@ -60,7 +72,7 @@ public:
     Selection() {}
     virtual void addItem(QString name, QString description, QString shapeId, int id) = 0;
     virtual void setTitle(QString title) = 0;
-    virtual void setText(QString text) = 0;
+    virtual void setText(QString text)   = 0;
 };
 
 class SelectionPage : public AbstractWizardPage, public Selection {
@@ -81,12 +93,12 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event);
-    void showEvent(QShowEvent * event);
+    void showEvent(QShowEvent *event);
 
 private:
     Ui::SelectionPage *ui;
     QGraphicsSvgItem *m_shape;
-    QList<SelectionItem*> m_selectionItems;
+    QList<SelectionItem *> m_selectionItems;
 
 private slots:
     void selectionChanged(int index);

@@ -30,12 +30,10 @@
 
 MultiPage::MultiPage(SetupWizard *wizard, QWidget *parent) :
     SelectionPage(wizard, QString(":/configgadget/images/multirotor-shapes.svg"), parent)
-{
-}
+{}
 
 MultiPage::~MultiPage()
-{
-}
+{}
 
 bool MultiPage::validatePage(SelectionItem *selectedItem)
 {
@@ -47,31 +45,31 @@ void MultiPage::setupSelection(Selection *selection)
 {
     selection->setTitle(tr("OpenPilot Multirotor Configuration"));
     selection->setText(tr("This part of the wizard will set up the OpenPilot controller for use with a flying platform utilizing multiple rotors. "
-                       "The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom "
-                       "configuration options in the Configuration plugin in the GCS.\n\n"
-                       "Please select the type of multirotor you want to create a configuration for below:"));
+                          "The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom "
+                          "configuration options in the Configuration plugin in the GCS.\n\n"
+                          "Please select the type of multirotor you want to create a configuration for below:"));
 
     selection->addItem(tr("Tricopter"),
                        tr("The Tricopter uses three motors and one servo. The servo is used to give yaw authority to the rear motor. "
-                       "The front motors are rotating in opposite directions. The Tricopter is known for its sweeping yaw movement and "
-                       "it is very well suited for FPV since the front rotors are spread wide apart."),
+                          "The front motors are rotating in opposite directions. The Tricopter is known for its sweeping yaw movement and "
+                          "it is very well suited for FPV since the front rotors are spread wide apart."),
                        "tri",
                        SetupWizard::MULTI_ROTOR_TRI_Y);
 
     selection->addItem(tr("Quadcopter X"),
                        tr("The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotate clockwise "
-                       "and two counter clockwise. The motors positioned diagonal to each other rotate in the same direction. "
-                       "This setup is perfect for sport flying and is also commonly used for FPV platforms."),
+                          "and two counter clockwise. The motors positioned diagonal to each other rotate in the same direction. "
+                          "This setup is perfect for sport flying and is also commonly used for FPV platforms."),
                        "quad-x",
                        SetupWizard::MULTI_ROTOR_QUAD_X);
 
     selection->addItem(tr("Quadcopter +"),
-                        tr("The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. "
-                        "The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. "
-                        "This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited "
-                        "for FPV since the fore rotor tend to be in the way of the camera."),
-                        "quad-plus",
-                        SetupWizard::MULTI_ROTOR_QUAD_PLUS);
+                       tr("The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. "
+                          "The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. "
+                          "This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited "
+                          "for FPV since the fore rotor tend to be in the way of the camera."),
+                       "quad-plus",
+                       SetupWizard::MULTI_ROTOR_QUAD_PLUS);
 
     selection->addItem(tr("Hexacopter"),
                        tr("A multirotor with six motors, one motor in front."),

@@ -135,7 +135,8 @@ int SetupWizard::nextId() const
             return PAGE_SERVO;
         } else {
             switch (getControllerType()) {
-                case CONTROLLER_REVO:
+            case CONTROLLER_REVO:
+            case CONTROLLER_NANO:
                 return PAGE_GPS;
             default:
                 return PAGE_SUMMARY;
@@ -146,6 +147,7 @@ int SetupWizard::nextId() const
     {
         switch (getControllerType()) {
         case CONTROLLER_REVO:
+        case CONTROLLER_NANO:
             return PAGE_GPS;
         default:
             return PAGE_SUMMARY;

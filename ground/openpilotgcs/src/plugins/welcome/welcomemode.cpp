@@ -169,7 +169,7 @@ void WelcomeMode::networkResponseReady(QNetworkReply* reply)
 
         if(version != VersionInfo::tagOrHash8())
         {
-            m_newVersionText = tr("(Update Available: %1)").arg(version);
+            m_newVersionText = tr("Update Available: %1").arg(version);
             emit newVersionTextChanged();
         }
     }

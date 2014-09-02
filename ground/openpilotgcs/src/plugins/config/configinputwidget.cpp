@@ -911,7 +911,7 @@ void ConfigInputWidget::prevChannel()
     for (int i = 1; i < order.length(); i++) {
         if (order[i] == currentChannelNum) {
             if (!usedChannels.isEmpty() &&
-                usedChannels.back().channelIndex == currentChannelNum) {
+                usedChannels.back().channelIndex == order[i - 1]) {
                 usedChannels.removeLast();
             }
             setChannel(order[i - 1]);

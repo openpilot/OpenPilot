@@ -102,7 +102,7 @@ public:
     }
     SetupWizard::AIRSPEED_TYPE getAirspeedType() const
     {
-        return  m_airspeedType;
+        return m_airspeedType;
     }
 
 

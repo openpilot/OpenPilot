@@ -96,6 +96,16 @@ public:
         return m_servoType;
     }
 
+    void setAirspeedType(SetupWizard::AIRSPEED_TYPE setting)
+    {
+        m_airspeedType = setting;
+    }
+    SetupWizard::AIRSPEED_TYPE getAirspeedType() const
+    {
+        return  m_airspeedType;
+    }
+
+
     void setGPSSetting(SetupWizard::GPS_SETTING setting)
     {
         m_gpsSetting = setting;
@@ -165,7 +175,7 @@ private slots:
     void pageChanged(int currId);
 private:
     enum { PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
-           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_ESC, PAGE_SERVO,
+           PAGE_AIRSPEED, PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_ESC, PAGE_SERVO,
            PAGE_BIAS_CALIBRATION, PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION,
            PAGE_SAVE, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_AIRFRAMESTAB_FIXEDWING,
            PAGE_REBOOT, PAGE_END, PAGE_UPDATE };
@@ -179,7 +189,7 @@ private:
     INPUT_TYPE m_inputType;
     ESC_TYPE m_escType;
     SERVO_TYPE m_servoType;
-
+    AIRSPEED_TYPE m_airspeedType;
     GPS_SETTING m_gpsSetting;
     RADIO_SETTING m_radioSetting;
 

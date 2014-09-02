@@ -28,40 +28,18 @@
 #ifndef AIRSPEEDPAGE_H
 #define AIRSPEEDPAGE_H
 
-#include <QtSvg/QGraphicsSvgItem>
-#include <QtSvg/QSvgRenderer>
-#include <QList>
+#include "selectionpage.h"
 
-#include "abstractwizardpage.h"
-
-namespace Ui {
-class AirSpeedPage;
-}
-
-class AirSpeedPage : public AbstractWizardPage {
+class AirSpeedPage : public SelectionPage {
     Q_OBJECT
 
 public:
     explicit AirSpeedPage(SetupWizard *wizard, QWidget *parent = 0);
     ~AirSpeedPage();
 
-    void initializePage();
-    bool validatePage();
-
-    void fitInView();
-protected:
-    void resizeEvent(QResizeEvent *event);
-    void showEvent(QShowEvent *event);
-
-private:
-    Ui::AirSpeedPage *ui;
-    void setupAirSpeedPageTypesCombo();
-    QGraphicsSvgItem *m_fixedwingPic;
-    void updateAvailableTypes();
-    QList<QString> m_descriptions;
-
-private slots:
-    void updateImageAndDescription();
+public:
+    bool validatePage(SelectionItem *seletedItem);
+    void setupSelection(Selection *selection);
 };
 
 #endif // AIRSPEEDPAGE_H

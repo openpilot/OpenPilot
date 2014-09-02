@@ -32,6 +32,7 @@
 #include "pages/vehiclepage.h"
 #include "pages/multipage.h"
 #include "pages/fixedwingpage.h"
+#include "pages/airspeedpage.h"
 #include "pages/helipage.h"
 #include "pages/surfacepage.h"
 #include "pages/inputpage.h"
@@ -147,7 +148,7 @@ int SetupWizard::nextId() const
     {
         switch (getVehicleType()) {
         case VEHICLE_FIXEDWING:
-            return PAGE_AIRFRAMESTAB_FIXEDWING;
+            return PAGE_AIRSPEED;
 
         // TODO: Pages for Multi and heli
         case VEHICLE_MULTI:
@@ -157,6 +158,9 @@ int SetupWizard::nextId() const
             return PAGE_SAVE;
         }
     }
+
+    case PAGE_AIRSPEED:
+        return PAGE_AIRFRAMESTAB_FIXEDWING;
 
     case PAGE_AIRFRAMESTAB_FIXEDWING:
         return PAGE_SAVE;
@@ -355,6 +359,7 @@ void SetupWizard::createPages()
     setPage(PAGE_VEHICLES, new VehiclePage(this));
     setPage(PAGE_MULTI, new MultiPage(this));
     setPage(PAGE_FIXEDWING, new FixedWingPage(this));
+    setPage(PAGE_AIRSPEED, new AirSpeedPage(this));
     setPage(PAGE_HELI, new HeliPage(this));
     setPage(PAGE_SURFACE, new SurfacePage(this));
     setPage(PAGE_INPUT, new InputPage(this));

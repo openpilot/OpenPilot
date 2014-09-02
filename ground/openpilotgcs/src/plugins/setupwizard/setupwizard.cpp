@@ -171,8 +171,12 @@ int SetupWizard::nextId() const
         case CONTROLLER_CC:
         case CONTROLLER_CC3D:
         case CONTROLLER_REVO:
-            return PAGE_BIAS_CALIBRATION;
-
+            switch (getVehicleType()) {
+                case VEHICLE_FIXEDWING:
+                return PAGE_OUTPUT_CALIBRATION;
+            default:
+                return PAGE_BIAS_CALIBRATION;
+            }
         default:
             return PAGE_NOTYETIMPLEMENTED;
         }

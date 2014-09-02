@@ -29,7 +29,7 @@
 #include "setupwizard.h"
 
 AirSpeedPage::AirSpeedPage(SetupWizard *wizard, QWidget *parent) :
-    SelectionPage(wizard, QString(":/setupwizard/resources/fixedwing-shapes-wizard-no-numbers.svg"), parent)
+    SelectionPage(wizard, QString(":/setupwizard/resources/airspeed-shapes.svg"), parent)
 {}
 
 AirSpeedPage::~AirSpeedPage()
@@ -44,26 +44,30 @@ bool AirSpeedPage::validatePage(SelectionItem *seletedItem)
 void AirSpeedPage::setupSelection(Selection *selection)
 {
     selection->setTitle(tr("OpenPilot Airspeed Sensor Selection"));
-    selection->setText(tr("This part of the wizard will help you select and configure  "
-                          "flying aircraft utilizing servos. The wizard supports the most common types of fixed-wing "
-                          "aircraft, other variants of fixed-wing aircraft can be configured by using custom "
-                          "configuration options in the Configuration plugin in the GCS.\n\n"
-                          "Please select the type of fixed-wing you want to create a configuration for below:"));
+    selection->setText(tr("This part of the wizard will help you select and configure an airspeed sensor which "
+                          "are also commonly called Pitot tubes. OpenPilot support three methods to obtain "
+                          "airspeed data, one is a software estimation technique and the other two "
+                          "utilize hardware sensors.\n\n"
+                          "Please select how you wish to obtain airspeed data below:"));
     selection->addItem(tr("Estimated"),
-                       tr("This setup expects a traditional airframe using two independent aileron servos "
-                          "on their own channel (not connected by Y adapter) plus an elevator and a rudder."),
-                       "aileron",
+                       tr("This option uses an intelligent estimation algorithm which utilizes the OpenPilot INS/GPS "
+                          "to estimate wind speed and subtract it from ground speed obtained from the GPS.\n"
+                          "This solution is highly accurate in normal level flight with the drawback of being less "
+                          "accurate in rapid altitude changes.  "),
+                       "estimated",
                        SetupWizard::ESTIMATE);
 
     selection->addItem(tr("EagleTree"),
-                       tr("This setup expects a traditional airframe using a single alieron servo or two servos "
-                          "connected by a Y adapter plus an elevator and a rudder."),
-                       "aileron-single",
+                       tr("Select this option to use the Airspeed MicroSensor V3 from EagleTree, this is an accurate "
+                          "airspeed sensor that includes on-board Temperature Compensation.\n"
+                          "Selecting this option will put your Flexi-Port in to I2C mode."),
+                       "eagletree",
                        SetupWizard::EAGLETREE);
 
     selection->addItem(tr("MS4525 Based"),
-                       tr("This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet "
-                          "supported. Setup should include only two elevons, and should explicitly not include a rudder."),
-                       "elevon",
+                       tr("Select this option to use an airspeed sensor based on the MS4525DO  pressure transducer "
+                          "from Measurement Specialties. This includes the PixHawk sensor and their clones.\n"
+                          "Selecting this option will put your Flexi-Port in to I2C mode."),
+                       "ms4525",
                        SetupWizard::MS4525);
 }

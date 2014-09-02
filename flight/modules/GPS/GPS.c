@@ -436,15 +436,17 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
 {
     uint8_t ubxAutoConfig;
     uint8_t ubxDynamicModel;
-
+    uint8_t ubxSbasMode;
     ubx_autoconfig_settings_t newconfig;
+    uint8_t ubxSbasSats;
 
-    GPSSettingsUBXAutoConfigGet(&ubxAutoConfig);
-    GPSSettingsUBXRateGet(&newconfig.navRate);
-    GPSSettingsUBXDynamicModelGet(&ubxDynamicModel);
+    GPSSettingsUbxRateGet(&newconfig.navRate);
+
+    GPSSettingsUbxAutoConfigGet(&ubxAutoConfig);
     newconfig.autoconfigEnabled = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED ? false : true;
     newconfig.storeSettings     = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_CONFIGUREANDSTORE;
 
+    GPSSettingsUbxDynamicModelGet(&ubxDynamicModel);
     newconfig.dynamicModel = ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PORTABLE ? UBX_DYNMODEL_PORTABLE :
                              ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_STATIONARY ? UBX_DYNMODEL_STATIONARY :
                              ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PEDESTRIAN ? UBX_DYNMODEL_PEDESTRIAN :
@@ -454,6 +456,51 @@ void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
                              ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE2G ? UBX_DYNMODEL_AIRBORNE2G :
                              ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE4G ? UBX_DYNMODEL_AIRBORNE4G :
                              UBX_DYNMODEL_AIRBORNE1G;
+
+    GPSSettingsUbxSBASModeGet(&ubxSbasMode);
+    switch ((GPSSettingsUbxSBASModeOptions)ubxSbasMode) {
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTION:
+    case GPSSETTINGS_UBXSBASMODE_CORRECTION:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTIONINTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_CORRECTIONINTEGRITY:
+        newconfig.SBASCorrection = true;
+        break;
+    default:
+        newconfig.SBASCorrection = false;
+    }
+
+    switch ((GPSSettingsUbxSBASModeOptions)ubxSbasMode) {
+    case GPSSETTINGS_UBXSBASMODE_RANGING:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTION:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGINTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTIONINTEGRITY:
+        newconfig.SBASRanging = true;
+        break;
+    default:
+        newconfig.SBASRanging = false;
+    }
+
+    switch ((GPSSettingsUbxSBASModeOptions)ubxSbasMode) {
+    case GPSSETTINGS_UBXSBASMODE_INTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGINTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTIONINTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_CORRECTIONINTEGRITY:
+        newconfig.SBASIntegrity = true;
+        break;
+    default:
+        newconfig.SBASIntegrity = false;
+    }
+
+    GPSSettingsUbxSBASChannelsUsedGet(&newconfig.SBASChannelsUsed);
+
+    GPSSettingsUbxSBASSatsGet(&ubxSbasSats);
+
+    newconfig.SBASSats = ubxSbasSats == GPSSETTINGS_UBXSBASSATS_WAAS ? UBX_SBAS_SATS_WAAS :
+                         ubxSbasSats == GPSSETTINGS_UBXSBASSATS_EGNOS ? UBX_SBAS_SATS_EGNOS :
+                         ubxSbasSats == GPSSETTINGS_UBXSBASSATS_MSAS ? UBX_SBAS_SATS_MSAS :
+                         ubxSbasSats == GPSSETTINGS_UBXSBASSATS_GAGAN ? UBX_SBAS_SATS_GAGAN :
+                         ubxSbasSats == GPSSETTINGS_UBXSBASSATS_SDCM ? UBX_SBAS_SATS_SDCM : UBX_SBAS_SATS_AUTOSCAN;
+
     ubx_autoconfig_set(newconfig);
 }
 #endif /* if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL) */

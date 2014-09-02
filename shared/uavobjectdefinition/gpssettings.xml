@@ -12,6 +12,10 @@
         <!-- Ubx dynamic model, see UBX datasheet for more details -->
         <field name="UbxDynamicModel" units="" type="enum" elements="1" 
         options="Portable,Stationary,Pedestrian,Automotive,Sea,Airborne1G,Airborne2G,Airborne4G" defaultvalue="Airborne1G" />
+        <!-- Ubx SBAS settings -->
+        <field name="UbxSBASMode" units="" type="enum" elements="1" options="Disabled,Ranging,Correction,Integrity,Ranging+Correction,Ranging+Integrity,Ranging+Correction+Integrity,Correction+Integrity" defaultvalue="Ranging+Integrity" />
+        <field name="UbxSBASChannelsUsed" units="" type="uint8" elements="1" defaultvalue="3"/>
+        <field name="UbxSBASSats" units="" type="enum" elements="1" options="AutoScan,WAAS,EGNOS,MSAS,GAGAN,SDCM" defaultvalue="Auto-Scan" />
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

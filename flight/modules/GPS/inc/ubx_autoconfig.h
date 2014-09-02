@@ -59,10 +59,27 @@ typedef enum {
     UBX_DYNMODEL_AIRBORNE4G = 8
 } ubx_config_dynamicmodel_t;
 
+typedef enum {
+    UBX_SBAS_SATS_AUTOSCAN = 0,
+    UBX_SBAS_SATS_WAAS     = 1,
+    UBX_SBAS_SATS_EGNOS    = 2,
+    UBX_SBAS_SATS_MSAS     = 3,
+    UBX_SBAS_SATS_GAGAN    = 4,
+    UBX_SBAS_SATS_SDCM     = 5
+} ubx_config_sats_t;
+
+#define UBX_
 typedef struct {
-    bool   autoconfigEnabled;
-    bool   storeSettings;
-    int8_t navRate;
+    bool    autoconfigEnabled;
+    bool    storeSettings;
+
+    bool    SBASRanging;
+    bool    SBASCorrection;
+    bool    SBASIntegrity;
+    ubx_config_sats_t SBASSats;
+    uint8_t SBASChannelsUsed;
+
+    int8_t  navRate;
     ubx_config_dynamicmodel_t dynamicModel;
 } ubx_autoconfig_settings_t;
 
@@ -110,6 +127,36 @@ typedef struct {
     uint8_t rate;
 } __attribute__((packed)) ubx_cfg_msg_t;
 
+#define UBX_CFG_SBAS_MODE_ENABLED    0x01
+#define UBX_CFG_SBAS_MODE_TEST       0x02
+#define UBX_CFG_SBAS_USAGE_RANGE     0x01
+#define UBX_CFG_SBAS_USAGE_DIFFCORR  0x02
+#define UBX_CFG_SBAS_USAGE_INTEGRITY 0x04
+
+// SBAS used satellite PNR bitmask (120-151)
+// -------------------------------------1---------1---------1---------1
+// -------------------------------------5---------4---------3---------2
+// ------------------------------------10987654321098765432109876543210
+// WAAS 122, 133, 134, 135, 138---------|---------|---------|---------|
+#define UBX_CFG_SBAS_SCANMODE1_WAAS  0b00000000000001001110000000000100
+// EGNOS 120, 124, 126, 131-------------|---------|---------|---------|
+#define UBX_CFG_SBAS_SCANMODE1_EGNOS 0b00000000000000000000100001010001
+// MSAS 129, 137------------------------|---------|---------|---------|
+#define UBX_CFG_SBAS_SCANMODE1_MSAS  0b00000000000000100000001000000000
+// GAGAN 127, 128-----------------------|---------|---------|---------|
+#define UBX_CFG_SBAS_SCANMODE1_GAGAN 0b00000000000000000000000110000000
+// SDCM 125, 140, 141-------------------|---------|---------|---------|
+#define UBX_CFG_SBAS_SCANMODE1_SDCM  0b00000000001100000000000000100000
+
+#define UBX_CFG_SBAS_SCANMODE2       0x00
+typedef struct {
+    uint8_t  mode;
+    uint8_t  usage;
+    uint8_t  maxSBAS;
+    uint8_t  scanmode2;
+    uint32_t scanmode1;
+} __attribute__((packed)) ubx_cfg_sbas_t;
+
 typedef struct {
     uint8_t  prolog[2];
     uint8_t  class;
@@ -126,6 +173,7 @@ typedef union {
             ubx_cfg_msg_t  cfg_msg;
             ubx_cfg_nav5_t cfg_nav5;
             ubx_cfg_rate_t cfg_rate;
+            ubx_cfg_sbas_t cfg_sbas;
         } payload;
         uint8_t resvd[2]; // added space for checksum bytes
     } message;

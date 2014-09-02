@@ -194,6 +194,35 @@ void config_nav(uint16_t *bytes_to_send)
     status->requiredAck.msgID = UBX_ID_CFG_NAV5;
 }
 
+void config_sbas(uint16_t *bytes_to_send)
+{
+    memset(status->working_packet.buffer, 0, sizeof(UBXSentHeader_t) + sizeof(ubx_cfg_sbas_t));
+
+    status->working_packet.message.payload.cfg_sbas.maxSBAS = status->currentSettings.SBASChannelsUsed < 4 ?
+                                                              status->currentSettings.SBASChannelsUsed : 3;
+
+    status->working_packet.message.payload.cfg_sbas.usage   =
+        (status->currentSettings.SBASCorrection ? UBX_CFG_SBAS_USAGE_DIFFCORR : 0) |
+        (status->currentSettings.SBASIntegrity ? UBX_CFG_SBAS_USAGE_INTEGRITY : 0) |
+        (status->currentSettings.SBASRanging ? UBX_CFG_SBAS_USAGE_RANGE : 0);
+    // If sbas is used for anything then set mode as enabled
+    status->working_packet.message.payload.cfg_sbas.mode =
+        status->working_packet.message.payload.cfg_sbas.usage != 0 ? UBX_CFG_SBAS_MODE_ENABLED : 0;
+
+    status->working_packet.message.payload.cfg_sbas.scanmode1 =
+        status->currentSettings.SBASSats == UBX_SBAS_SATS_WAAS ? UBX_CFG_SBAS_SCANMODE1_WAAS :
+        status->currentSettings.SBASSats == UBX_SBAS_SATS_EGNOS ? UBX_CFG_SBAS_SCANMODE1_EGNOS :
+        status->currentSettings.SBASSats == UBX_SBAS_SATS_MSAS ? UBX_CFG_SBAS_SCANMODE1_MSAS :
+        status->currentSettings.SBASSats == UBX_SBAS_SATS_GAGAN ? UBX_CFG_SBAS_SCANMODE1_GAGAN :
+        status->currentSettings.SBASSats == UBX_SBAS_SATS_SDCM ? UBX_CFG_SBAS_SCANMODE1_SDCM : UBX_SBAS_SATS_AUTOSCAN;
+
+    status->working_packet.message.payload.cfg_sbas.scanmode2 = UBX_CFG_SBAS_SCANMODE2;
+
+    *bytes_to_send = prepare_packet(&status->working_packet, UBX_CLASS_CFG, UBX_ID_CFG_SBAS, sizeof(ubx_cfg_sbas_t));
+    status->requiredAck.clsID = UBX_CLASS_CFG;
+    status->requiredAck.msgID = UBX_ID_CFG_SBAS;
+}
+
 void config_save(uint16_t *bytes_to_send)
 {
     memset(status->working_packet.buffer, 0, sizeof(UBXSentHeader_t) + sizeof(ubx_cfg_cfg_t));
@@ -212,12 +241,15 @@ static void configure(uint16_t *bytes_to_send)
         break;
     case LAST_CONFIG_SENT_START + 1:
         config_nav(bytes_to_send);
+        break;
+    case LAST_CONFIG_SENT_START + 2:
+        config_sbas(bytes_to_send);
         if (!status->currentSettings.storeSettings) {
             // skips saving
             status->lastConfigSent = LAST_CONFIG_SENT_COMPLETED;
         }
         break;
-    case LAST_CONFIG_SENT_START + 2:
+    case LAST_CONFIG_SENT_START + 3:
         config_save(bytes_to_send);
         status->lastConfigSent = LAST_CONFIG_SENT_COMPLETED;
         return;

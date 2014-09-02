@@ -174,9 +174,9 @@ void OutputCalibrationPage::setupVehicle()
     case SetupWizard::FIXED_WING_DUAL_AILERON:
         loadSVGFile(FIXEDWING_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2;
-        m_vehicleElementIds << "aileron" << "aileron-frame" << "aileron-motor" << "aileron-ail-left" << "aileron-ail-right" << "aileron-rudder" << "aileron-elevator";
+        m_vehicleElementIds << "aileron" << "aileron-frame" << "aileron-motor" << "aileron-ail-left" << "aileron-ail-right" << "aileron-elevator" << "aileron-rudder";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
-        m_channelIndex << 0 << 2 << 0 << 1 << 3 << 4;
+        m_channelIndex << 0 << 2 << 0 << 5 << 1 << 3;
 
         setupActuatorMinMaxAndNeutral(2, 2, 5);
 
@@ -185,9 +185,9 @@ void OutputCalibrationPage::setupVehicle()
     case SetupWizard::FIXED_WING_AILERON:
         loadSVGFile(FIXEDWING_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 2 << 2 << 2;
-        m_vehicleElementIds << "aileron-single" << "ail2-frame" << "ail2-motor" << "ail2-aileron" << "ail2-rudder" << "ail2-elevator";
+        m_vehicleElementIds << "aileron-single" << "ail2-frame" << "ail2-motor" << "ail2-aileron" << "ail2-elevator" << "ail2-rudder";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
-        m_channelIndex << 0 << 2 << 0 << 4 << 1;
+        m_channelIndex << 0 << 2 << 0 << 1 << 3;
 
         setupActuatorMinMaxAndNeutral(2, 2, 4);
 

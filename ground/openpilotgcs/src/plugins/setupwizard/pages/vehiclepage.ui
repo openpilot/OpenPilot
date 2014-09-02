@@ -100,50 +100,6 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="heliButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>CCPM Helicopters</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QToolButton { border: none }</string>
-       </property>
-       <property name="text">
-        <string>Helicopter</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../wizardResources.qrc">
-         <normaloff>:/setupwizard/resources/bttn-heli-up.png</normaloff>
-         <normalon>:/setupwizard/resources/bttn-heli-down.png</normalon>:/setupwizard/resources/bttn-heli-up.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>100</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextUnderIcon</enum>
-       </property>
-       <property name="autoRaise">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QToolButton" name="fixedwingButton">
        <property name="enabled">
         <bool>true</bool>
@@ -178,6 +134,50 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="checked">
         <bool>false</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="heliButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>CCPM Helicopters</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QToolButton { border: none }</string>
+       </property>
+       <property name="text">
+        <string>Helicopter</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../wizardResources.qrc">
+         <normaloff>:/setupwizard/resources/bttn-heli-up.png</normaloff>
+         <normalon>:/setupwizard/resources/bttn-heli-down.png</normalon>:/setupwizard/resources/bttn-heli-up.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
        <property name="autoExclusive">
         <bool>true</bool>

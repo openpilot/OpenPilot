@@ -41,7 +41,7 @@ class SelectionPage;
 class SelectionItem {
 public:
     SelectionItem(QString name, QString description, QString shapeId, int id);
-    ~SelectionItem();
+//    ~SelectionItem();
 
     QString name() { return m_name; }
     QString description() { return m_description; }

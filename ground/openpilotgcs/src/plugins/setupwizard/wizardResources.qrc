@@ -46,6 +46,5 @@
         <file>resources/bttn-flash-up.png</file>
         <file>resources/bttn-upgrade-down.png</file>
         <file>resources/bttn-upgrade-up.png</file>
-        <file>resources/gps-shapes.svg</file>
     </qresource>
 </RCC>

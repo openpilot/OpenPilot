@@ -29,7 +29,7 @@
 #include "setupwizard.h"
 
 AirSpeedPage::AirSpeedPage(SetupWizard *wizard, QWidget *parent) :
-    SelectionPage(wizard, QString(":/setupwizard/resources/airspeed-shapes.svg"), parent)
+    SelectionPage(wizard, QString(":/setupwizard/resources/sensor-shapes.svg"), parent)
 {}
 
 AirSpeedPage::~AirSpeedPage()

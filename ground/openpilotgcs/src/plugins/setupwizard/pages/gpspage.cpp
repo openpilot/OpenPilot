@@ -29,7 +29,7 @@
 #include "setupwizard.h"
 
 GpsPage::GpsPage(SetupWizard *wizard, QWidget *parent) :
-    SelectionPage(wizard, QString(":/setupwizard/resources/gps-shapes.svg"), parent)
+    SelectionPage(wizard, QString(":/setupwizard/resources/sensor-shapes.svg"), parent)
 {}
 
 GpsPage::~GpsPage()
@@ -47,30 +47,31 @@ void GpsPage::setupSelection(Selection *selection)
     selection->setText(tr("Please select the type of GPS you wish to use. As well as OpenPilot hardware, "
                           "3rd party GPSs are supported also, although please note that performance could "
                           "be less than optimal as not all GPSs are created equal.\n\n"
+                          "Note: NMEA only GPSs perform poorly on VTOL aircraft and are not recommended for Helis and MultiRotors.\n\n"
                           "Please select your GPS type data below:"));
 
     selection->addItem(tr("Disabled"),
                        tr("GPS Features are not to be enabled"),
-                       "disabled",
+                       "no-gps",
                        SetupWizard::GPS_DISABLED);
 
     selection->addItem(tr("OpenPilot Platinum"),
                        tr("Select this option to use the OpenPilot Platinum GPS with integrated Magnetometer "
                           "and Microcontroller connected to the Main Port of your controller.\n\n"
                           "Note: for the OpenPilot v8 GPS please select the U-Blox option."),
-                       "platinum",
+                       "OPGPS-v9",
                        SetupWizard::GPS_PLAT);
 
     selection->addItem(tr("U-Blox Based"),
                        tr("Select this option for the OpenPilot V8 GPS or generic U-Blox chipset GPSs connected"
                           "to the Main Port of your controller."),
-                       "ublox",
+                       "OPGPS-v8-ublox",
                        SetupWizard::GPS_UBX);
 
     selection->addItem(tr("NMEA Based"),
                        tr("Select this option for a generic NMEA based GPS connected to the Main Port of your"
                           "controller."),
-                       "nmea",
+                       "generic-nmea",
                        SetupWizard::GPS_NMEA);
 
 }

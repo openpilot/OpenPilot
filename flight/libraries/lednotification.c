@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <FreeRTOS.h>
-#include <task.h>
+#include <pios.h>
 #include <pios_notify.h>
 #include <pios_ws2811.h>
 
@@ -107,7 +107,7 @@ static void push_queued_sequence(ExtLedNotification_t *new_notification, Notifie
     } else {
         // a notification with priority higher than background.
         // try to enqueue it
-        int8_t insert_point = -1;
+        int8_t insert_point = MAX_BACKGROUND_NOTIFICATIONS -1;
         int8_t first_free   = -1;
         for (int8_t i = MAX_BACKGROUND_NOTIFICATIONS - 1; i >= 0; i--) {
             const int8_t priority_i = status->queued_priorities[i];
@@ -116,9 +116,8 @@ static void push_queued_sequence(ExtLedNotification_t *new_notification, Notifie
                 insert_point = i;
                 continue;
             }
-            if (priority_i < new_notification->priority) {
-                insert_point = i;
-                break;
+            if (priority_i > new_notification->priority) {
+                insert_point = i > 0 ? i : -1; // check whether priority is no bigger than lowest queued priority
             }
         }
 

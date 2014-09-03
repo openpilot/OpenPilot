@@ -1,0 +1,6 @@
+#ifndef PIOS_CONFIG_H
+#define PIOS_CONFIG_H
+
+#define PIOS_INCLUDE_FREERTOS
+
+#endif /* PIOS_CONFIG_H */

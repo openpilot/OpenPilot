@@ -117,7 +117,7 @@ static void push_queued_sequence(ExtLedNotification_t *new_notification, Notifie
                 continue;
             }
             if (priority_i > new_notification->priority) {
-                insert_point = i > 0 ? i : -1; // check whether priority is no bigger than lowest queued priority
+                insert_point = ((i > 0) || (first_free > -1)) ? i : -1; // check whether priority is no bigger than lowest queued priority
             }
         }
 

@@ -53,7 +53,7 @@ void AirSpeedPage::setupSelection(Selection *selection)
                           "to estimate wind speed and subtract it from ground speed obtained from the GPS.\n\n"
                           "This solution is highly accurate in normal level flight with the drawback of being less "
                           "accurate in rapid altitude changes.\n\n"),
-                       "estimated",
+                       "estimated-airspeed-sensor",
                        SetupWizard::ESTIMATE);
 
     selection->addItem(tr("EagleTree"),

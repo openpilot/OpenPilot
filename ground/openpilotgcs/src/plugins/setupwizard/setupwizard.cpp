@@ -356,6 +356,7 @@ QString SetupWizard::getSummaryText()
         summary.append(tr("Unknown"));
     }
 
+    // If Tricopter show tail servo speed
     if (getVehicleSubType() == MULTI_ROTOR_TRI_Y || getVehicleType() == VEHICLE_FIXEDWING) {
         summary.append("<br>");
         summary.append("<b>").append(tr("Servo type: ")).append("</b>");
@@ -371,6 +372,24 @@ QString SetupWizard::getSummaryText()
         }
     }
 
+    // Show GPS Type
+    if (getControllerType() == CONTROLLER_REVO || getControllerType() == CONTROLLER_NANO) {
+        summary.append("<br>");
+        summary.append("<b>").append(tr("GPS type: ")).append("</b>");
+        switch (getGpsType()) {
+            case GPS_PLAT:
+                summary.append(tr("OpenPilot Platinum"));
+                break;
+            case GPS_UBX:
+                summary.append(tr("OpenPilot v8 or Generic UBLOX GPS"));
+                break;
+            case GPS_NMEA:
+                summary.append(tr("Generic NMEA GPS"));
+                break;
+            default:
+                summary.append(tr("None"));
+                }
+    }
     /*
        summary.append("<br>");
        summary.append("<b>").append(tr("Reboot required: ")).append("</b>");

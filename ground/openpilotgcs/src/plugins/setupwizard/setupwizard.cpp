@@ -390,6 +390,26 @@ QString SetupWizard::getSummaryText()
                 summary.append(tr("None"));
                 }
     }
+
+    // Show Airspeed sensor type
+    if ((getControllerType() == CONTROLLER_REVO || getControllerType() == CONTROLLER_NANO) && getVehicleType() == VEHICLE_FIXEDWING) {
+        summary.append("<br>");
+        summary.append("<b>").append(tr("Airspeed Sensor: ")).append("</b>");
+        switch (getAirspeedType()) {
+            case ESTIMATE:
+                summary.append(tr("Software Estimated"));
+                break;
+            case EAGLETREE:
+                summary.append(tr("EagleTree on Flexi-Port"));
+                break;
+            case MS4525:
+                summary.append(tr("MS4525 based on Flexi-Port"));
+                break;
+            default:
+                summary.append(tr("Unknown"));
+                }
+    }
+
     /*
        summary.append("<br>");
        summary.append("<b>").append(tr("Reboot required: ")).append("</b>");

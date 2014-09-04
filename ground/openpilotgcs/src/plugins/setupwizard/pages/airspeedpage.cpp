@@ -67,6 +67,6 @@ void AirSpeedPage::setupSelection(Selection *selection)
                        tr("Select this option to use an airspeed sensor based on the MS4525DO  pressure transducer "
                           "from Measurement Specialties. This includes the PixHawk sensor and their clones.\n\n"
                           "Selecting this option will set your board's Flexi-Port in to I2C mode."),
-                       "ms4525",
+                       "ms4525-speed-sensor",
                        SetupWizard::MS4525);
 }

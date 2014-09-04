@@ -10,23 +10,22 @@ extern "C" {
 
 #include "lednotification.c"
 
-void PIOS_WS2811_setColorRGB(__attribute__((unused)) Color_t c, __attribute__((unused)) uint8_t led, __attribute__((unused)) bool update){
-
-}
-void PIOS_WS2811_Update(){
-
-}
+void PIOS_WS2811_setColorRGB(__attribute__((unused)) Color_t c, __attribute__((unused)) uint8_t led, __attribute__((unused)) bool update) {}
+void PIOS_WS2811_Update() {}
 }
 
 class LedNotificationTest : public testing::Test {};
 
-void insert (NotifierLedStatus_t *status, pios_notify_priority priority){
+void insert(NotifierLedStatus_t *status, pios_notify_priority priority)
+{
     ExtLedNotification_t notification;
+
     notification.priority = priority;
     push_queued_sequence(&notification, status);
 }
 
-void init(NotifierLedStatus_t *status, pios_notify_priority priority){
+void init(NotifierLedStatus_t *status, pios_notify_priority priority)
+{
     for (uint8_t i = 0; i < MAX_BACKGROUND_NOTIFICATIONS; i++) {
         status->queued_priorities[i] = priority;
     }
@@ -48,7 +47,6 @@ TEST_F(LedNotificationTest, TestQueueOrder1) {
     EXPECT_EQ(NOTIFY_PRIORITY_CRITICAL, status.queued_priorities[2]);
     EXPECT_EQ(NOTIFY_PRIORITY_CRITICAL, status.queued_priorities[3]);
     EXPECT_EQ(NOTIFY_PRIORITY_BACKGROUND, status.queued_priorities[4]);
-
 }
 
 TEST_F(LedNotificationTest, TestQueueOrder2) {

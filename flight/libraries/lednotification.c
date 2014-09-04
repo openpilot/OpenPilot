@@ -107,7 +107,7 @@ static void push_queued_sequence(ExtLedNotification_t *new_notification, Notifie
     } else {
         // a notification with priority higher than background.
         // try to enqueue it
-        int8_t insert_point = MAX_BACKGROUND_NOTIFICATIONS -1;
+        int8_t insert_point = MAX_BACKGROUND_NOTIFICATIONS - 1;
         int8_t first_free   = -1;
         for (int8_t i = MAX_BACKGROUND_NOTIFICATIONS - 1; i >= 0; i--) {
             const int8_t priority_i = status->queued_priorities[i];

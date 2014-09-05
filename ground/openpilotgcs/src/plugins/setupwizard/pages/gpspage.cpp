@@ -73,5 +73,4 @@ void GpsPage::setupSelection(Selection *selection)
                           "controller."),
                        "generic-nmea",
                        SetupWizard::GPS_NMEA);
-
 }

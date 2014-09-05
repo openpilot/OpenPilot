@@ -138,10 +138,11 @@ int SetupWizard::nextId() const
             case CONTROLLER_REVO:
             case CONTROLLER_NANO:
                 return PAGE_GPS;
+
             default:
                 return PAGE_SUMMARY;
-           }
-       }
+            }
+        }
 
     case PAGE_SERVO:
     {
@@ -149,9 +150,10 @@ int SetupWizard::nextId() const
         case CONTROLLER_REVO:
         case CONTROLLER_NANO:
             return PAGE_GPS;
+
         default:
             return PAGE_SUMMARY;
-       }
+        }
     }
 
     case PAGE_BIAS_CALIBRATION:
@@ -169,9 +171,10 @@ int SetupWizard::nextId() const
         switch (getVehicleType()) {
         case VEHICLE_FIXEDWING:
             return PAGE_AIRSPEED;
+
         default:
             return PAGE_SUMMARY;
-    }
+        }
 
     case PAGE_AIRSPEED:
         return PAGE_SUMMARY;
@@ -183,8 +186,9 @@ int SetupWizard::nextId() const
         case CONTROLLER_CC3D:
         case CONTROLLER_REVO:
             switch (getVehicleType()) {
-                case VEHICLE_FIXEDWING:
+            case VEHICLE_FIXEDWING:
                 return PAGE_OUTPUT_CALIBRATION;
+
             default:
                 return PAGE_BIAS_CALIBRATION;
             }
@@ -364,18 +368,18 @@ QString SetupWizard::getSummaryText()
         summary.append("<br>");
         summary.append("<b>").append(tr("GPS type: ")).append("</b>");
         switch (getGpsType()) {
-            case GPS_PLAT:
-                summary.append(tr("OpenPilot Platinum"));
-                break;
-            case GPS_UBX:
-                summary.append(tr("OpenPilot v8 or Generic UBLOX GPS"));
-                break;
-            case GPS_NMEA:
-                summary.append(tr("Generic NMEA GPS"));
-                break;
-            default:
-                summary.append(tr("None"));
-                }
+        case GPS_PLAT:
+            summary.append(tr("OpenPilot Platinum"));
+            break;
+        case GPS_UBX:
+            summary.append(tr("OpenPilot v8 or Generic UBLOX GPS"));
+            break;
+        case GPS_NMEA:
+            summary.append(tr("Generic NMEA GPS"));
+            break;
+        default:
+            summary.append(tr("None"));
+        }
     }
 
     // Show Airspeed sensor type
@@ -383,18 +387,18 @@ QString SetupWizard::getSummaryText()
         summary.append("<br>");
         summary.append("<b>").append(tr("Airspeed Sensor: ")).append("</b>");
         switch (getAirspeedType()) {
-            case ESTIMATE:
-                summary.append(tr("Software Estimated"));
-                break;
-            case EAGLETREE:
-                summary.append(tr("EagleTree on Flexi-Port"));
-                break;
-            case MS4525:
-                summary.append(tr("MS4525 based on Flexi-Port"));
-                break;
-            default:
-                summary.append(tr("Unknown"));
-                }
+        case ESTIMATE:
+            summary.append(tr("Software Estimated"));
+            break;
+        case EAGLETREE:
+            summary.append(tr("EagleTree on Flexi-Port"));
+            break;
+        case MS4525:
+            summary.append(tr("MS4525 based on Flexi-Port"));
+            break;
+        default:
+            summary.append(tr("Unknown"));
+        }
     }
 
     /*

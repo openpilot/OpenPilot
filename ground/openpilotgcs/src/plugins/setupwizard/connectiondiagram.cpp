@@ -31,8 +31,10 @@
 #include "connectiondiagram.h"
 #include "ui_connectiondiagram.h"
 
+const char* ConnectionDiagram::FILE_NAME = ":/setupwizard/resources/connection-diagrams.svg";
+
 ConnectionDiagram::ConnectionDiagram(QWidget *parent, VehicleConfigurationSource *configSource) :
-    QDialog(parent), ui(new Ui::ConnectionDiagram), m_configSource(configSource), m_background(0)
+    QDialog(parent), ui(new Ui::ConnectionDiagram), m_configSource(configSource)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Connection Diagram"));
@@ -48,33 +50,24 @@ void ConnectionDiagram::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 
-    ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
+    ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 void ConnectionDiagram::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
 
-    ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
+    ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 void ConnectionDiagram::setupGraphicsScene()
 {
     m_renderer = new QSvgRenderer();
-    if (QFile::exists(QString(":/setupwizard/resources/connection-diagrams.svg")) &&
-        m_renderer->load(QString(":/setupwizard/resources/connection-diagrams.svg")) &&
+    if (QFile::exists(QString(FILE_NAME)) &&
+        m_renderer->load(QString(FILE_NAME)) &&
         m_renderer->isValid()) {
         m_scene = new QGraphicsScene(this);
         ui->connectionDiagram->setScene(m_scene);
-        // ui->connectionDiagram->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-
-        m_background = new QGraphicsSvgItem();
-        m_background->setSharedRenderer(m_renderer);
-        m_background->setElementId("background");
-        m_background->setOpacity(0);
-        // m_background->setFlags(QGraphicsItem::ItemClipsToShape);
-        m_background->setZValue(-1);
-        m_scene->addItem(m_background);
 
         QList<QString> elementsToShow;
 
@@ -178,10 +171,62 @@ void ConnectionDiagram::setupGraphicsScene()
             break;
         }
 
+        switch (m_configSource->getGpsType()) {
+        case VehicleConfigurationSource::GPS_DISABLED:
+            break;
+        case VehicleConfigurationSource::GPS_NMEA:
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                elementsToShow << "nano-generic-nmea";
+            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                elementsToShow << "generic-nmea";
+            }
+            break;
+        case VehicleConfigurationSource::GPS_PLATINUM:
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                elementsToShow << "nano-OPGPS-v9";
+            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                elementsToShow << "OPGPS-v9";
+            }
+            break;
+        case VehicleConfigurationSource::GPS_UBX:
+            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                elementsToShow << "nano-OPGPS-v8-ublox";
+            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                elementsToShow << "OPGPS-v8-ublox";
+            }
+            break;
+        default:
+            break;
+        }
+
+        if (m_configSource->getVehicleType() == VehicleConfigurationSource::VEHICLE_FIXEDWING &&
+                m_configSource->getAirspeedType() != VehicleConfigurationSource::AIRSPEED_ESTIMATE) {
+            switch (m_configSource->getAirspeedType()) {
+            case VehicleConfigurationSource::AIRSPEED_EAGLETREE:
+                if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                    elementsToShow << "nano-eagletree-speed-sensor";
+                } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                    elementsToShow << "eagletree-speed-sensor";
+                }
+                break;
+            case VehicleConfigurationSource::AIRSPEED_MS4525:
+                if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+                    elementsToShow << "nano-ms4525-speed-sensor";
+                } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                    elementsToShow << "ms4525-speed-sensor";
+                }
+                break;
+            default:
+                break;
+            }
+        }
+
         setupGraphicsSceneItems(elementsToShow);
 
-        ui->connectionDiagram->setSceneRect(m_background->boundingRect());
-        ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
+        ui->connectionDiagram->setSceneRect(m_scene->itemsBoundingRect());
+        //ui->connectionDiagram->setSceneRect(m_background);
+        ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+        //ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
 
         qDebug() << "Scene complete";
     }
@@ -190,8 +235,6 @@ void ConnectionDiagram::setupGraphicsScene()
 void ConnectionDiagram::setupGraphicsSceneItems(QList<QString> elementsToShow)
 {
     qreal z = 0;
-
-    // QRectF backgBounds = m_renderer->boundsOnElement("background");
 
     foreach(QString elementId, elementsToShow) {
         if (m_renderer->elementExists(elementId)) {
@@ -204,10 +247,6 @@ void ConnectionDiagram::setupGraphicsSceneItems(QList<QString> elementsToShow)
             QMatrix matrix = m_renderer->matrixForElement(elementId);
             QRectF orig    = matrix.mapRect(m_renderer->boundsOnElement(elementId));
             element->setPos(orig.x(), orig.y());
-
-            // QRectF orig = m_renderer->boundsOnElement(elementId);
-            // element->setPos(orig.x() - backgBounds.x(), orig.y() - backgBounds.y());
-
             m_scene->addItem(element);
             qDebug() << "Adding " << elementId << " to scene at " << element->pos();
         } else {

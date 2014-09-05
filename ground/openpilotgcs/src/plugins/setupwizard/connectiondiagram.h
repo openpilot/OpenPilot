@@ -48,11 +48,11 @@ public:
     ~ConnectionDiagram();
 
 private:
+    static const char *FILE_NAME;
     Ui::ConnectionDiagram *ui;
     VehicleConfigurationSource *m_configSource;
 
     QSvgRenderer *m_renderer;
-    QGraphicsSvgItem *m_background;
     QGraphicsScene *m_scene;
 
     void setupGraphicsScene();

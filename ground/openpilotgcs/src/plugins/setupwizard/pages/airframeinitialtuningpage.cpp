@@ -25,17 +25,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "airframestabfixedwingpage.h"
-#include "ui_airframestabfixedwingpage.h"
+#include "airframeinitialtuningpage.h"
+#include "ui_airframeinitialtuningpage.h"
 
-AirframeStabFixedwingPage::AirframeStabFixedwingPage(SetupWizard *wizard, QWidget *parent) :
+AirframeInitialTuningPage::AirframeInitialTuningPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::AirframeStabFixedwingPage)
+    ui(new Ui::AirframeInitialTuningPage)
 {
     ui->setupUi(this);
 }
 
-AirframeStabFixedwingPage::~AirframeStabFixedwingPage()
+AirframeInitialTuningPage::~AirframeInitialTuningPage()
 {
     delete ui;
 }

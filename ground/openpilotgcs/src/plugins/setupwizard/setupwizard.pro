@@ -37,10 +37,10 @@ HEADERS += setupwizardplugin.h \
     pages/revocalibrationpage.h \
     biascalibrationutil.h \
     pages/biascalibrationpage.h \
-    pages/airframestabfixedwingpage.h \
     pages/escpage.h \
     pages/servopage.h \
-    pages/selectionpage.h
+    pages/selectionpage.h \
+    pages/airframeinitialtuningpage.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -69,10 +69,10 @@ SOURCES += setupwizardplugin.cpp \
     pages/revocalibrationpage.cpp \
     biascalibrationutil.cpp \
     pages/biascalibrationpage.cpp \
-    pages/airframestabfixedwingpage.cpp \
     pages/escpage.cpp \
     pages/servopage.cpp \
-    pages/selectionpage.cpp
+    pages/selectionpage.cpp \
+    pages/airframeinitialtuningpage.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -93,10 +93,10 @@ FORMS += \
     pages/autoupdatepage.ui \
     pages/revocalibrationpage.ui \
     pages/biascalibrationpage.ui \
-    pages/airframestabfixedwingpage.ui \
     pages/escpage.ui \
     pages/servopage.ui \
-    pages/selectionpage.ui
+    pages/selectionpage.ui \
+    pages/airframeinitialtuningpage.ui
 
 RESOURCES += \
     wizardResources.qrc

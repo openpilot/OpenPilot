@@ -46,7 +46,7 @@
 #include "pages/rebootpage.h"
 #include "pages/outputcalibrationpage.h"
 #include "pages/revocalibrationpage.h"
-#include "pages/airframestabfixedwingpage.h"
+#include "pages/airframeinitialtuningpage.h"
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
@@ -163,7 +163,7 @@ int SetupWizard::nextId() const
     {
         switch (getVehicleType()) {
         case VEHICLE_FIXEDWING:
-            return PAGE_AIRFRAMESTAB_FIXEDWING;
+            return PAGE_AIRFRAME_INITIAL_TUNING;
 
         // TODO: PID selection pages for multi and heli
         case VEHICLE_MULTI:
@@ -186,7 +186,7 @@ int SetupWizard::nextId() const
     case PAGE_AIRSPEED:
         return PAGE_SUMMARY;
 
-    case PAGE_AIRFRAMESTAB_FIXEDWING:
+    case PAGE_AIRFRAME_INITIAL_TUNING:
         return PAGE_SAVE;
 
     case PAGE_SUMMARY:
@@ -440,7 +440,7 @@ void SetupWizard::createPages()
     setPage(PAGE_SAVE, new SavePage(this));
     setPage(PAGE_REBOOT, new RebootPage(this));
     setPage(PAGE_NOTYETIMPLEMENTED, new NotYetImplementedPage(this));
-    setPage(PAGE_AIRFRAMESTAB_FIXEDWING, new AirframeStabFixedwingPage(this));
+    setPage(PAGE_AIRFRAME_INITIAL_TUNING, new AirframeInitialTuningPage(this));
     setPage(PAGE_END, new OPEndPage(this));
 
     setStartId(PAGE_START);

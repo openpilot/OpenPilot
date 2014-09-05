@@ -35,6 +35,11 @@ GpsPage::GpsPage(SetupWizard *wizard, QWidget *parent) :
 GpsPage::~GpsPage()
 {}
 
+void GpsPage::initializePage(VehicleConfigurationSource *settings)
+{
+    Q_UNUSED(settings);
+}
+
 bool GpsPage::validatePage(SelectionItem *selectedItem)
 {
     getWizard()->setGpsType((SetupWizard::GPS_TYPE)selectedItem->id());
@@ -60,7 +65,7 @@ void GpsPage::setupSelection(Selection *selection)
                           "and Microcontroller connected to the Main Port of your controller.\n\n"
                           "Note: for the OpenPilot v8 GPS please select the U-Blox option."),
                        "OPGPS-v9",
-                       SetupWizard::GPS_PLAT);
+                       SetupWizard::GPS_PLATINUM);
 
     selection->addItem(tr("U-Blox Based"),
                        tr("Select this option for the OpenPilot V8 GPS or generic U-Blox chipset GPSs connected"

@@ -68,6 +68,7 @@ void SelectionPage::initializePage()
             ui->typeCombo->setCurrentIndex(0);
         }
     }
+    initializePage(getWizard());
 }
 
 bool SelectionPage::validatePage()
@@ -104,9 +105,9 @@ void SelectionPage::selectionChanged(int index)
     fitImage();
 }
 
-void SelectionPage::addItem(QString name, QString description, QString shapeId, int id)
+void SelectionPage::addItem(QString name, QString description, QString shapeId, int id, bool disabled)
 {
-    m_selectionItems << new SelectionItem(name, description, shapeId, id);
+    m_selectionItems << new SelectionItem(name, description, shapeId, id, disabled);
 }
 
 void SelectionPage::setTitle(QString title)
@@ -119,6 +120,16 @@ void SelectionPage::setText(QString text)
     ui->text->setText(text);
 }
 
-SelectionItem::SelectionItem(QString name, QString description, QString shapeId, int id) :
-    m_name(name), m_description(description), m_shapeId(shapeId), m_id(id)
+void SelectionPage::setItemDisabled(int id, bool disabled)
+{
+    for (int i = 0; i < m_selectionItems.count(); i++) {
+        if (id < 0 || m_selectionItems.at(i)->id() == id) {
+            m_selectionItems.at(i)->setDisabled(disabled);
+            ui->typeCombo->setItemData(i, disabled ? 0 : 33, Qt::UserRole - 1);
+        }
+    }
+}
+
+SelectionItem::SelectionItem(QString name, QString description, QString shapeId, int id, bool disabled) :
+    m_name(name), m_description(description), m_shapeId(shapeId), m_id(id), m_disabled(disabled)
 {}

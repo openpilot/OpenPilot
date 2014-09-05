@@ -35,6 +35,11 @@ MultiPage::MultiPage(SetupWizard *wizard, QWidget *parent) :
 MultiPage::~MultiPage()
 {}
 
+void MultiPage::initializePage(VehicleConfigurationSource *settings)
+{
+    Q_UNUSED(settings);
+}
+
 bool MultiPage::validatePage(SelectionItem *selectedItem)
 {
     getWizard()->setVehicleSubType((SetupWizard::VEHICLE_SUB_TYPE)selectedItem->id());

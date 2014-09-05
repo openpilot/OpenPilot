@@ -35,6 +35,20 @@ AirSpeedPage::AirSpeedPage(SetupWizard *wizard, QWidget *parent) :
 AirSpeedPage::~AirSpeedPage()
 {}
 
+void AirSpeedPage::initializePage(VehicleConfigurationSource *settings)
+{
+    // Enable all
+    setItemDisabled(-1, false);
+    if (settings->getInputType() == VehicleConfigurationSource::INPUT_SBUS ||
+            settings->getInputType() == VehicleConfigurationSource::INPUT_DSM2 ||
+            settings->getInputType() == VehicleConfigurationSource::INPUT_DSMX10 ||
+            settings->getInputType() == VehicleConfigurationSource::INPUT_DSMX11) {
+        // Disable non estimated sensors if ports are taken by receivers
+        setItemDisabled(VehicleConfigurationSource::AIRSPEED_EAGLETREE, true);
+        setItemDisabled(VehicleConfigurationSource::AIRSPEED_MS4525, true);
+    }
+}
+
 bool AirSpeedPage::validatePage(SelectionItem *selectedItem)
 {
     getWizard()->setAirspeedType((SetupWizard::AIRSPEED_TYPE)selectedItem->id());
@@ -46,7 +60,9 @@ void AirSpeedPage::setupSelection(Selection *selection)
     selection->setTitle(tr("OpenPilot Airspeed Sensor Selection"));
     selection->setText(tr("This part of the wizard will help you select and configure a way to obtain "
                           "airspeed data. OpenPilot support three methods to achieve this, one is a "
-                          "software estimation technique and the other two utilize hardware sensors.\n\n"
+                          "software estimation technique and the other two utilize hardware sensors.\n"
+                          "Note: if previously selected input combinations use the Flexi-port for input, "
+                          "only estimated airspeed will be avilible.\n\n"
                           "Please select how you wish to obtain airspeed data below:"));
     selection->addItem(tr("Estimated"),
                        tr("This option uses an intelligent estimation algorithm which utilizes the OpenPilot INS/GPS "
@@ -54,19 +70,20 @@ void AirSpeedPage::setupSelection(Selection *selection)
                           "This solution is highly accurate in normal level flight with the drawback of being less "
                           "accurate in rapid altitude changes.\n\n"),
                        "estimated-airspeed-sensor",
-                       SetupWizard::ESTIMATE);
+                       SetupWizard::AIRSPEED_ESTIMATE);
 
     selection->addItem(tr("EagleTree"),
                        tr("Select this option to use the Airspeed MicroSensor V3 from EagleTree, this is an accurate "
                           "airspeed sensor that includes on-board Temperature Compensation.\n\n"
                           "Selecting this option will set your board's Flexi-Port in to I2C mode."),
                        "eagletree-speed-sensor",
-                       SetupWizard::EAGLETREE);
+                       SetupWizard::AIRSPEED_EAGLETREE);
 
     selection->addItem(tr("MS4525 Based"),
                        tr("Select this option to use an airspeed sensor based on the MS4525DO  pressure transducer "
                           "from Measurement Specialties. This includes the PixHawk sensor and their clones.\n\n"
                           "Selecting this option will set your board's Flexi-Port in to I2C mode."),
                        "ms4525-speed-sensor",
-                       SetupWizard::MS4525);
+                       SetupWizard::AIRSPEED_MS4525);
 }
+

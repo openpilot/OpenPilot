@@ -37,9 +37,11 @@ public:
     explicit AirSpeedPage(SetupWizard *wizard, QWidget *parent = 0);
     ~AirSpeedPage();
 
-public:
+protected:
+    void initializePage(VehicleConfigurationSource *settings);
     bool validatePage(SelectionItem *selectedItem);
     void setupSelection(Selection *selection);
+
 };
 
 #endif // AIRSPEEDPAGE_H

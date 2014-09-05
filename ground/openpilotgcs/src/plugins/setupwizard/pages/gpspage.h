@@ -38,6 +38,7 @@ public:
     ~GpsPage();
 
 public:
+    void initializePage(VehicleConfigurationSource *settings);
     bool validatePage(SelectionItem *selectedItem);
     void setupSelection(Selection *selection);
 };

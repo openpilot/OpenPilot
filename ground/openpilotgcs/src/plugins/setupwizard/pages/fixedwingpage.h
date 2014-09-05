@@ -37,7 +37,8 @@ public:
     explicit FixedWingPage(SetupWizard *wizard, QWidget *parent = 0);
     ~FixedWingPage();
 
-public:
+protected:
+    void initializePage(VehicleConfigurationSource *settings);
     bool validatePage(SelectionItem *selectedItem);
     void setupSelection(Selection *selection);
 };

@@ -40,8 +40,7 @@ class SelectionPage;
 
 class SelectionItem {
 public:
-    SelectionItem(QString name, QString description, QString shapeId, int id);
-// ~SelectionItem();
+    SelectionItem(QString name, QString description, QString shapeId, int id, bool disabled = false);
 
     QString name()
     {
@@ -59,20 +58,28 @@ public:
     {
         return m_id;
     }
+    void setDisabled(bool disabled) {
+        m_disabled = disabled;
+    }
+    bool disabled() {
+        return m_disabled;
+    }
 
 private:
     QString m_name;
     QString m_description;
     QString m_shapeId;
     int m_id;
+    bool m_disabled;
 };
 
 class Selection {
 public:
     Selection() {}
-    virtual void addItem(QString name, QString description, QString shapeId, int id) = 0;
+    virtual void addItem(QString name, QString description, QString shapeId, int id, bool disabled = false) = 0;
     virtual void setTitle(QString title) = 0;
     virtual void setText(QString text)   = 0;
+    virtual void setItemDisabled(int id, bool disabled) = 0;
 };
 
 class SelectionPage : public AbstractWizardPage, public Selection {
@@ -84,14 +91,15 @@ public:
 
     void initializePage();
     bool validatePage();
-    void addItem(QString name, QString description, QString shapeId, int id);
+    void addItem(QString name, QString description, QString shapeId, int id, bool disabled = false);
     void setTitle(QString title);
     void setText(QString text);
-
-    virtual void setupSelection(Selection *selection) = 0;
-    virtual bool validatePage(SelectionItem *selectedItem) = 0;
+    void setItemDisabled(int id, bool disabled);
 
 protected:
+    virtual void setupSelection(Selection *selection) = 0;
+    virtual void initializePage(VehicleConfigurationSource *settings) = 0;
+    virtual bool validatePage(SelectionItem *selectedItem) = 0;
     void resizeEvent(QResizeEvent *event);
     void showEvent(QShowEvent *event);
 

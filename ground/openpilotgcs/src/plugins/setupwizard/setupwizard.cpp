@@ -88,6 +88,7 @@ int SetupWizard::nextId() const
         case CONTROLLER_CC:
         case CONTROLLER_CC3D:
         case CONTROLLER_REVO:
+        case CONTROLLER_NANO:
             return PAGE_INPUT;
 
         case CONTROLLER_OPLINK:
@@ -159,8 +160,6 @@ int SetupWizard::nextId() const
     case PAGE_BIAS_CALIBRATION:
         return PAGE_OUTPUT_CALIBRATION;
 
-    // case PAGE_REVO_CALIBRATION:
-    // return PAGE_OUTPUT_CALIBRATION;
     case PAGE_OUTPUT_CALIBRATION:
         return PAGE_AIRFRAME_INITIAL_TUNING;
 
@@ -170,8 +169,11 @@ int SetupWizard::nextId() const
     case PAGE_GPS:
         switch (getVehicleType()) {
         case VEHICLE_FIXEDWING:
-            return PAGE_AIRSPEED;
-
+            if (getGpsType() != GPS_DISABLED) {
+                return PAGE_AIRSPEED;
+            } else {
+                return PAGE_SUMMARY;
+            }
         default:
             return PAGE_SUMMARY;
         }
@@ -185,10 +187,10 @@ int SetupWizard::nextId() const
         case CONTROLLER_CC:
         case CONTROLLER_CC3D:
         case CONTROLLER_REVO:
+        case CONTROLLER_NANO:
             switch (getVehicleType()) {
             case VEHICLE_FIXEDWING:
                 return PAGE_OUTPUT_CALIBRATION;
-
             default:
                 return PAGE_BIAS_CALIBRATION;
             }
@@ -221,6 +223,9 @@ QString SetupWizard::getSummaryText()
         break;
     case CONTROLLER_REVO:
         summary.append(tr("OpenPilot Revolution"));
+        break;
+    case CONTROLLER_NANO:
+        summary.append(tr("OpenPilot Nano"));
         break;
     case CONTROLLER_OPLINK:
         summary.append(tr("OpenPilot OPLink Radio Modem"));
@@ -368,7 +373,7 @@ QString SetupWizard::getSummaryText()
         summary.append("<br>");
         summary.append("<b>").append(tr("GPS type: ")).append("</b>");
         switch (getGpsType()) {
-        case GPS_PLAT:
+        case GPS_PLATINUM:
             summary.append(tr("OpenPilot Platinum"));
             break;
         case GPS_UBX:
@@ -387,25 +392,19 @@ QString SetupWizard::getSummaryText()
         summary.append("<br>");
         summary.append("<b>").append(tr("Airspeed Sensor: ")).append("</b>");
         switch (getAirspeedType()) {
-        case ESTIMATE:
+        case AIRSPEED_ESTIMATE:
             summary.append(tr("Software Estimated"));
             break;
-        case EAGLETREE:
+        case AIRSPEED_EAGLETREE:
             summary.append(tr("EagleTree on Flexi-Port"));
             break;
-        case MS4525:
+        case AIRSPEED_MS4525:
             summary.append(tr("MS4525 based on Flexi-Port"));
             break;
         default:
             summary.append(tr("Unknown"));
         }
     }
-
-    /*
-       summary.append("<br>");
-       summary.append("<b>").append(tr("Reboot required: ")).append("</b>");
-       summary.append(isRestartNeeded() ? tr("<font color='red'>Yes</font>") : tr("<font color='green'>No</font>"));
-     */
     return summary;
 }
 
@@ -425,7 +424,6 @@ void SetupWizard::createPages()
     setPage(PAGE_ESC, new EscPage(this));
     setPage(PAGE_SERVO, new ServoPage(this));
     setPage(PAGE_BIAS_CALIBRATION, new BiasCalibrationPage(this));
-    // setPage(PAGE_REVO_CALIBRATION, new RevoCalibrationPage(this));
     setPage(PAGE_OUTPUT_CALIBRATION, new OutputCalibrationPage(this));
     setPage(PAGE_SUMMARY, new SummaryPage(this));
     setPage(PAGE_SAVE, new SavePage(this));

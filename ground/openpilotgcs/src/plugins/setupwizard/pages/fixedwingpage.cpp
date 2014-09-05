@@ -35,6 +35,11 @@ FixedWingPage::FixedWingPage(SetupWizard *wizard, QWidget *parent) :
 FixedWingPage::~FixedWingPage()
 {}
 
+void FixedWingPage::initializePage(VehicleConfigurationSource *settings)
+{
+    Q_UNUSED(settings);
+}
+
 bool FixedWingPage::validatePage(SelectionItem *selectedItem)
 {
     getWizard()->setVehicleSubType((SetupWizard::VEHICLE_SUB_TYPE)selectedItem->id());

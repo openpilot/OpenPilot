@@ -160,20 +160,10 @@ int SetupWizard::nextId() const
     // case PAGE_REVO_CALIBRATION:
     // return PAGE_OUTPUT_CALIBRATION;
     case PAGE_OUTPUT_CALIBRATION:
-    {
-        switch (getVehicleType()) {
-        case VEHICLE_FIXEDWING:
-            return PAGE_AIRFRAME_INITIAL_TUNING;
+        return PAGE_AIRFRAME_INITIAL_TUNING;
 
-        // TODO: PID selection pages for multi and heli
-        case VEHICLE_MULTI:
-        case VEHICLE_HELI:
-        case VEHICLE_SURFACE:
-        case VEHICLE_UNKNOWN:
-            return PAGE_SAVE;
-        }
-    }
-
+    case PAGE_AIRFRAME_INITIAL_TUNING:
+        return PAGE_SAVE;
 
     case PAGE_GPS:
         switch (getVehicleType()) {
@@ -185,9 +175,6 @@ int SetupWizard::nextId() const
 
     case PAGE_AIRSPEED:
         return PAGE_SUMMARY;
-
-    case PAGE_AIRFRAME_INITIAL_TUNING:
-        return PAGE_SAVE;
 
     case PAGE_SUMMARY:
     {

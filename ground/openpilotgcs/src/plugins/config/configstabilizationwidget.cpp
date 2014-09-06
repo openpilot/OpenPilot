@@ -168,6 +168,7 @@ void ConfigStabilizationWidget::updateObjectsFromWidgets()
 void ConfigStabilizationWidget::updateThrottleCurveFromObject()
 {
     StabilizationSettings *stabSettings = dynamic_cast<StabilizationSettings *>(getObjectManager()->getObject(QString("StabilizationSettings")));
+
     Q_ASSERT(stabSettings);
 
     QList<double> curve;
@@ -183,6 +184,7 @@ void ConfigStabilizationWidget::updateThrottleCurveFromObject()
 void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
 {
     StabilizationSettings *stabSettings = dynamic_cast<StabilizationSettings *>(getObjectManager()->getObject(QString("StabilizationSettings")));
+
     Q_ASSERT(stabSettings);
 
     QList<double> curve = ui->thrustPIDScalingCurve->getCurve();
@@ -191,12 +193,13 @@ void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
     }
 
     stabSettings->setEnableThrustPIDScaling(ui->enableThrustPIDScalingCheckBox->isChecked() ?
-                                                StabilizationSettings::ENABLETHRUSTPIDSCALING_TRUE : StabilizationSettings::ENABLETHRUSTPIDSCALING_FALSE);
+                                            StabilizationSettings::ENABLETHRUSTPIDSCALING_TRUE : StabilizationSettings::ENABLETHRUSTPIDSCALING_FALSE);
 }
 
 void ConfigStabilizationWidget::resetThrottleCurveToDefault()
 {
     StabilizationSettings defaultSettings;
+
     QList<double> curve;
     for (quint32 i = 0; i < StabilizationSettings::THRUSTPIDSCALECURVE_NUMELEM; i++) {
         curve.append(defaultSettings.getThrustPIDScaleCurve(i));

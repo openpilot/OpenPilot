@@ -225,7 +225,7 @@ void MixerCurveWidget::showEvent(QShowEvent *event)
     // the result is usually a ahrsbargraph that is way too small.
 
     QRectF rect = plot->boundingRect();
-    fitInView(rect.adjusted(-15, -15, 15, 15), Qt::KeepAspectRatio);
+    fitInView(rect.adjusted(-12, -12, 12, 12), Qt::KeepAspectRatio);
 }
 
 void MixerCurveWidget::resizeEvent(QResizeEvent *event)
@@ -233,7 +233,7 @@ void MixerCurveWidget::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
 
     QRectF rect = plot->boundingRect();
-    fitInView(rect.adjusted(-15, -15, 15, 15), Qt::KeepAspectRatio);
+    fitInView(rect.adjusted(-12, -12, 12, 12), Qt::KeepAspectRatio);
 }
 
 void MixerCurveWidget::changeEvent(QEvent *event)

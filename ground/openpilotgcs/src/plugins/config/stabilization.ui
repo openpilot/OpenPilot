@@ -136,8 +136,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>798</width>
-            <height>705</height>
+            <width>782</width>
+            <height>726</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -7837,8 +7837,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>565</width>
-            <height>733</height>
+            <width>782</width>
+            <height>721</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -16299,8 +16299,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>829</width>
-            <height>691</height>
+            <width>831</width>
+            <height>683</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -23904,6 +23904,9 @@ font:bold;</string>
          <property name="lineWidth">
           <number>0</number>
          </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
@@ -23912,70 +23915,31 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>665</width>
-            <height>435</height>
+            <width>798</width>
+            <height>699</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_19">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetDefaultConstraint</enum>
+           </property>
            <item>
-            <widget class="QGroupBox" name="gridGroupBox">
-             <property name="title">
-              <string>Rattitude</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_24">
-              <property name="leftMargin">
-               <number>9</number>
-              </property>
-              <property name="topMargin">
-               <number>9</number>
-              </property>
-              <property name="rightMargin">
-               <number>9</number>
-              </property>
-              <property name="bottomMargin">
-               <number>9</number>
-              </property>
-              <item row="0" column="0">
-               <spacer name="horizontalSpacer_54">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+            <widget class="QFrame" name="frame">
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QGroupBox" name="thrustPIDScalingGroup">
+                <property name="title">
+                 <string>Thrust PID Scaling</string>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="1">
-               <widget class="QPushButton" name="pushButton_10">
-                <property name="text">
-                 <string>Default</string>
-                </property>
-                <property name="objrelation" stdset="0">
-                 <stringlist>
-                  <string>objname:StabilizationSettings</string>
-                  <string>button:default</string>
-                  <string>buttongroup:15</string>
-                 </stringlist>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="2">
-               <widget class="QGroupBox" name="gridGroupBox_2">
-                <property name="styleSheet">
-                 <string notr="true">QGroupBox{border: 0px;}</string>
-                </property>
-                <property name="flat">
+                <property name="checkable">
                  <bool>true</bool>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_26">
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
                  <property name="leftMargin">
                   <number>0</number>
                  </property>
                  <property name="topMargin">
-                  <number>9</number>
+                  <number>0</number>
                  </property>
                  <property name="rightMargin">
                   <number>0</number>
@@ -23983,124 +23947,250 @@ font:bold;</string>
                  <property name="bottomMargin">
                   <number>0</number>
                  </property>
-                 <item row="1" column="0">
-                  <spacer name="horizontalSpacer_55">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeType">
-                    <enum>QSizePolicy::Fixed</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>90</width>
-                     <height>11</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QDoubleSpinBox" name="RattitudeModeTransition">
+                 <item>
+                  <widget class="MixerCurve" name="thrustPIDScalingCurve" native="true">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>5</width>
-                     <height>22</height>
+                     <width>200</width>
+                     <height>200</height>
                     </size>
                    </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>175</width>
-                     <height>22</height>
-                    </size>
+                  </widget>
+                 </item>
+                 <item alignment="Qt::AlignTop">
+                  <widget class="QFrame" name="frame_2">
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
                    </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
                    </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Percentage of full stick where the transition from Attitude to Rate occurs. This transition always occurs when the aircraft is exactly inverted (bank angle 180 degrees).  Small values are dangerous because they cause flips at small stick angles.  Values significantly over 100 act like attitude mode and can never flip.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <layout class="QVBoxLayout" name="verticalLayout_20">
+                    <property name="topMargin">
+                     <number>9</number>
+                    </property>
+                    <item alignment="Qt::AlignTop">
+                     <widget class="QPushButton" name="defaultThrottleCurveButton">
+                      <property name="text">
+                       <string>Default</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="gridGroupBox">
+                <property name="title">
+                 <string>Rattitude</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_24">
+                 <property name="leftMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>9</number>
+                 </property>
+                 <item row="2" column="0" colspan="2">
+                  <widget class="QGroupBox" name="gridGroupBox_2">
+                   <property name="styleSheet">
+                    <string notr="true">QGroupBox{border: 0px;}</string>
                    </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="accelerated">
+                   <property name="flat">
                     <bool>true</bool>
                    </property>
-                   <property name="decimals">
-                    <number>0</number>
-                   </property>
-                   <property name="minimum">
-                    <double>25.000000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>255.000000000000000</double>
-                   </property>
-                   <property name="value">
-                    <double>80.000000000000000</double>
+                   <layout class="QGridLayout" name="gridLayout_26">
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>9</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item row="1" column="2">
+                     <spacer name="horizontalSpacer_56">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>300</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QDoubleSpinBox" name="RattitudeModeTransition">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>5</width>
+                        <height>22</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>175</width>
+                        <height>22</height>
+                       </size>
+                      </property>
+                      <property name="focusPolicy">
+                       <enum>Qt::StrongFocus</enum>
+                      </property>
+                      <property name="toolTip">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Percentage of full stick where the transition from Attitude to Rate occurs. This transition always occurs when the aircraft is exactly inverted (bank angle 180 degrees).  Small values are dangerous because they cause flips at small stick angles.  Values significantly over 100 act like attitude mode and can never flip.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                      <property name="accelerated">
+                       <bool>true</bool>
+                      </property>
+                      <property name="decimals">
+                       <number>0</number>
+                      </property>
+                      <property name="minimum">
+                       <double>25.000000000000000</double>
+                      </property>
+                      <property name="maximum">
+                       <double>255.000000000000000</double>
+                      </property>
+                      <property name="value">
+                       <double>80.000000000000000</double>
+                      </property>
+                      <property name="objrelation" stdset="0">
+                       <stringlist>
+                        <string>objname:StabilizationSettings</string>
+                        <string>fieldname:RattitudeModeTransition</string>
+                        <string>haslimits:no</string>
+                        <string>scale:1</string>
+                        <string>buttongroup:15</string>
+                       </stringlist>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLabel" name="label_3">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>144</width>
+                        <height>16</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>175</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <weight>75</weight>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                      </property>
+                      <property name="text">
+                       <string>ModeTransition</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <spacer name="horizontalSpacer_55">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::Fixed</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>90</width>
+                        <height>11</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item row="2" column="1">
+                     <spacer name="verticalSpacer_12">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::MinimumExpanding</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QPushButton" name="pushButton_10">
+                   <property name="text">
+                    <string>Default</string>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:StabilizationSettings</string>
-                     <string>fieldname:RattitudeModeTransition</string>
-                     <string>haslimits:no</string>
-                     <string>scale:1</string>
+                     <string>button:default</string>
                      <string>buttongroup:15</string>
                     </stringlist>
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="1">
-                  <widget class="QLabel" name="label_3">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>144</width>
-                     <height>16</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>175</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;</string>
-                   </property>
-                   <property name="text">
-                    <string>ModeTransition</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
-                  <spacer name="horizontalSpacer_56">
+                 <item row="1" column="0">
+                  <spacer name="horizontalSpacer_54">
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
-                     <width>300</width>
+                     <width>40</width>
                      <height>20</height>
                     </size>
                    </property>
@@ -24111,22 +24201,6 @@ border-radius: 5;</string>
               </item>
              </layout>
             </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_12">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item>
             <widget class="QGroupBox" name="gridGroupBox_1">
@@ -24767,7 +24841,7 @@ border-radius: 5;</string>
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer_11">
+            <spacer name="verticalSpacer_5">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
@@ -24818,8 +24892,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>478</width>
-            <height>518</height>
+            <width>798</width>
+            <height>699</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -27841,6 +27915,12 @@ Useful if you have accidentally changed some settings.</string>
    <class>QTabBar</class>
    <extends>QWidget</extends>
    <header>qtabbar.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MixerCurve</class>
+   <extends>QWidget</extends>
+   <header location="global">mixercurve.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

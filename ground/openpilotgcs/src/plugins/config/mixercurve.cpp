@@ -75,6 +75,7 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
 {
     m_curveType = curveType;
 
+    m_mixerUI->buttonGroup->show();
     m_mixerUI->CurveMin->setMaximum(1.0);
     m_mixerUI->CurveMax->setMaximum(1.0);
 
@@ -95,6 +96,16 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
         m_mixerUI->CurveMax->setMinimum(-1.0);
         break;
     }
+    case MixerCurve::MIXERCURVE_TPA:
+    {
+        m_mixerUI->SettingsGroup->setTitle("Thrust PID Scale");
+        m_mixerUI->buttonGroup->hide();
+        m_curve->setRange(-1.0, 1.0);
+        m_mixerUI->CurveMin->setMinimum(-1.0);
+        m_mixerUI->CurveMax->setMinimum(-1.0);
+    }
+    default:
+        break;
     }
 
     m_spinDelegate->setRange(m_mixerUI->CurveMin->minimum(), m_mixerUI->CurveMax->maximum());

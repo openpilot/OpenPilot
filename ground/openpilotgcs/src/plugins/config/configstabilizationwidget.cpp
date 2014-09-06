@@ -123,6 +123,16 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(ui->advancedResponsivenessCheckBox);
     connect(ui->advancedResponsivenessCheckBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
 
+    connect(ui->defaultThrottleCurveButton, SIGNAL(clicked()), this, SLOT(resetThrottleCurveToDefault()));
+    connect(ui->thrustPIDScalingGroup, SIGNAL(toggled(bool)), ui->thrustPIDScalingCurve, SLOT(setEnabled(bool)));
+    ui->thrustPIDScalingCurve->setMixerType(MixerCurve::MIXERCURVE_TPA);
+    ui->thrustPIDScalingCurve->setMin(-1);
+    ui->thrustPIDScalingCurve->setMax(1);
+
+    addWidget(ui->thrustPIDScalingGroup);
+    addWidget(ui->thrustPIDScalingCurve);
+    addWidget(ui->thrustPIDScalingCurve->getCurveWidget());
+
     connect(this, SIGNAL(widgetContentsChanged(QWidget *)), this, SLOT(processLinkedWidgets(QWidget *)));
 
     connect(this, SIGNAL(autoPilotConnected()), this, SLOT(onBoardConnected()));
@@ -140,8 +150,56 @@ void ConfigStabilizationWidget::refreshWidgetsValues(UAVObject *o)
 {
     ConfigTaskWidget::refreshWidgetsValues(o);
 
+    updateThrottleCurveFromObject();
+
     ui->basicResponsivenessCheckBox->setChecked(ui->rateRollKp_3->value() == ui->ratePitchKp_4->value() &&
                                                 ui->rateRollKi_3->value() == ui->ratePitchKi_4->value());
+}
+
+void ConfigStabilizationWidget::updateObjectsFromWidgets()
+{
+    updateObjectFromThrottleCurve();
+    ConfigTaskWidget::updateObjectsFromWidgets();
+}
+
+void ConfigStabilizationWidget::updateThrottleCurveFromObject()
+{
+    StabilizationSettings *stabSettings = dynamic_cast<StabilizationSettings *>(getObjectManager()->getObject(QString("StabilizationSettings")));
+    Q_ASSERT(stabSettings);
+
+    QList<double> curve;
+    for (quint32 i = 0; i < StabilizationSettings::THRUSTPIDSCALECURVE_NUMELEM; i++) {
+        curve.append(stabSettings->getThrustPIDScaleCurve(i));
+    }
+
+    ui->thrustPIDScalingCurve->setCurve(&curve);
+    ui->thrustPIDScalingGroup->setChecked(stabSettings->getEnableThrustPIDScaling() == StabilizationSettings::ENABLETHRUSTPIDSCALING_TRUE);
+    ui->thrustPIDScalingCurve->setEnabled(stabSettings->getEnableThrustPIDScaling() == StabilizationSettings::ENABLETHRUSTPIDSCALING_TRUE);
+}
+
+void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
+{
+    StabilizationSettings *stabSettings = dynamic_cast<StabilizationSettings *>(getObjectManager()->getObject(QString("StabilizationSettings")));
+    Q_ASSERT(stabSettings);
+
+    QList<double> curve = ui->thrustPIDScalingCurve->getCurve();
+    for (quint32 i = 0; i < StabilizationSettings::THRUSTPIDSCALECURVE_NUMELEM; i++) {
+        stabSettings->setThrustPIDScaleCurve(i, curve.at(i));
+    }
+
+    stabSettings->setEnableThrustPIDScaling(ui->thrustPIDScalingGroup->isChecked() ?
+                                                StabilizationSettings::ENABLETHRUSTPIDSCALING_TRUE : StabilizationSettings::ENABLETHRUSTPIDSCALING_FALSE);
+}
+
+void ConfigStabilizationWidget::resetThrottleCurveToDefault()
+{
+    StabilizationSettings defaultSettings;
+    QList<double> curve;
+    for (quint32 i = 0; i < StabilizationSettings::THRUSTPIDSCALECURVE_NUMELEM; i++) {
+        curve.append(defaultSettings.getThrustPIDScaleCurve(i));
+    }
+
+    ui->thrustPIDScalingCurve->setCurve(&curve);
 }
 
 void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)

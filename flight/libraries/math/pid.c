@@ -140,3 +140,57 @@ void pid_configure(struct pid *pid, float p, float i, float d, float iLim)
     pid->d    = d;
     pid->iLim = iLim;
 }
+
+float pid_scale_factor_from_line(float x, struct point *p0, struct point *p1)
+{
+    // Setup line y = m * x + b.
+    const float dY1 = p1->y - p0->y;
+    const float dX1 = p1->x - p0->x;
+    const float m   = dY1 / dX1; // == dY0 / dX0 == (p0.y - b) / (p0.x - 0.0f) ==>
+    const float b   = p0->y - m * p0->x;
+
+    // Scale according to given x.
+    float y = m * x + b;
+
+    return 1.0f + y;
+}
+
+float pid_scale_factor(pid_scaler *scaler)
+{
+    const int length = sizeof(scaler->points) / sizeof(typeof(scaler->points[0]));
+
+    // Find the two points where is within scaler->x. Use the outer points if
+    // scaler->x is smaller than the first x value or larger than the last x value.
+    int end_point = length - 1;
+
+    for (int i = 1; i < length; i++) {
+        if (scaler->x < scaler->points[i].x) {
+            end_point = i;
+            break;
+        }
+    }
+
+    return pid_scale_factor_from_line(scaler->x, &scaler->points[end_point - 1], &scaler->points[end_point]);
+}
+
+float pid_apply_setpoint_scaled(struct pid *pid, const float factor, const float setpoint, const float measured, float dT,
+                                pid_scaler *scaler)
+{
+    // Save PD values.
+    float p     = pid->p;
+    float d     = pid->d;
+
+    // Scale PD values.
+    float scale = pid_scale_factor(scaler);
+
+    pid->p *= scale;
+    pid->d *= scale;
+
+    float value = pid_apply_setpoint(pid, factor, setpoint, measured, dT);
+
+    // Restore PD values.
+    pid->p = p;
+    pid->d = d;
+
+    return value;
+}

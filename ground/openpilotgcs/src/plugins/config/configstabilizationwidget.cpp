@@ -112,6 +112,8 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(ui->pushButton_5);
     addWidget(ui->pushButton_6);
     addWidget(ui->pushButton_9);
+    addWidget(ui->pushButton_10);
+    addWidget(ui->pushButton_11);
     addWidget(ui->pushButton_20);
     addWidget(ui->pushButton_22);
     addWidget(ui->pushButton_23);
@@ -124,12 +126,13 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     connect(ui->advancedResponsivenessCheckBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
 
     connect(ui->defaultThrottleCurveButton, SIGNAL(clicked()), this, SLOT(resetThrottleCurveToDefault()));
-    connect(ui->thrustPIDScalingGroup, SIGNAL(toggled(bool)), ui->thrustPIDScalingCurve, SLOT(setEnabled(bool)));
+    connect(ui->enableThrustPIDScalingCheckBox, SIGNAL(toggled(bool)), ui->thrustPIDScalingCurve, SLOT(setEnabled(bool)));
     ui->thrustPIDScalingCurve->setMixerType(MixerCurve::MIXERCURVE_TPA);
     ui->thrustPIDScalingCurve->setMin(-1);
     ui->thrustPIDScalingCurve->setMax(1);
 
-    addWidget(ui->thrustPIDScalingGroup);
+    addWidget(ui->defaultThrottleCurveButton);
+    addWidget(ui->enableThrustPIDScalingCheckBox);
     addWidget(ui->thrustPIDScalingCurve);
     addWidget(ui->thrustPIDScalingCurve->getCurveWidget());
 
@@ -173,7 +176,7 @@ void ConfigStabilizationWidget::updateThrottleCurveFromObject()
     }
 
     ui->thrustPIDScalingCurve->setCurve(&curve);
-    ui->thrustPIDScalingGroup->setChecked(stabSettings->getEnableThrustPIDScaling() == StabilizationSettings::ENABLETHRUSTPIDSCALING_TRUE);
+    ui->enableThrustPIDScalingCheckBox->setChecked(stabSettings->getEnableThrustPIDScaling() == StabilizationSettings::ENABLETHRUSTPIDSCALING_TRUE);
     ui->thrustPIDScalingCurve->setEnabled(stabSettings->getEnableThrustPIDScaling() == StabilizationSettings::ENABLETHRUSTPIDSCALING_TRUE);
 }
 
@@ -187,7 +190,7 @@ void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
         stabSettings->setThrustPIDScaleCurve(i, curve.at(i));
     }
 
-    stabSettings->setEnableThrustPIDScaling(ui->thrustPIDScalingGroup->isChecked() ?
+    stabSettings->setEnableThrustPIDScaling(ui->enableThrustPIDScalingCheckBox->isChecked() ?
                                                 StabilizationSettings::ENABLETHRUSTPIDSCALING_TRUE : StabilizationSettings::ENABLETHRUSTPIDSCALING_FALSE);
 }
 

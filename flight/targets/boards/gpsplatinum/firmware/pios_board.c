@@ -44,7 +44,7 @@
 #include "../board_hw_defs.c"
 
 #define PIOS_COM_MAIN_RX_BUF_LEN     16
-#define PIOS_COM_MAIN_TX_BUF_LEN     64
+#define PIOS_COM_MAIN_TX_BUF_LEN     255
 
 uint32_t pios_com_main_id;
 
@@ -75,7 +75,7 @@ void PIOS_Board_Init(void)
     }
 
 #ifdef PIOS_INCLUDE_HMC5X83
-    PIOS_SPI_SetPrescalar(pios_spi_mag_flash_id, SPI_BaudRatePrescaler_16);
+    PIOS_SPI_SetClockSpeed(pios_spi_mag_flash_id, SPI_BaudRatePrescaler_16);
     PIOS_HMC5x83_Init(&pios_mag_cfg, pios_spi_mag_flash_id, 0);
 #endif
 

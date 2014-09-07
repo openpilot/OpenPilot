@@ -43,7 +43,7 @@
 // private includes
 #include "inc/gpsdsysmod.h"
 #include <pios_hmc5x83.h>
-
+#include <pios_ubx_ddc.h>
 
 // UAVOs
 #include <systemstats.h>
@@ -58,18 +58,14 @@ extern uint32_t pios_com_main_id;
 #define DEBUG_MSG(format, ...)
 #endif
 
-#define GPS_I2C_ADDRESS              (0x42 << 1)
-#define GPS_I2C_STREAM_REG           0xFF
-#define GPS_I2C_STREAM_SIZE_HIGH_REG 0xFD
-#define GPS_I2C_STREAM_SIZE_LOW_REG  0xFE
 
 // Private constants
-#define SYSTEM_UPDATE_PERIOD_MS      2
+#define SYSTEM_UPDATE_PERIOD_MS 2
 
-#define STACK_SIZE_BYTES             450
+#define STACK_SIZE_BYTES        450
 
-#define TASK_PRIORITY                (tskIDLE_PRIORITY + 1)
-#define BUFFER_SIZE                  128
+#define TASK_PRIORITY           (tskIDLE_PRIORITY + 1)
+#define BUFFER_SIZE             64
 uint8_t buffer[BUFFER_SIZE];
 char outbuf[40];
 
@@ -262,36 +258,12 @@ void ReadMag()
 
 void ReadGPS()
 {
-    uint16_t bytesToRead   = 2;
-    uint8_t tmp[2];
-    uint8_t addr_buffer[1] = { GPS_I2C_STREAM_SIZE_HIGH_REG };
-    struct pios_i2c_txn txn_list[] = {
-        {
-            .info = __func__,
-            .addr = GPS_I2C_ADDRESS,
-            .rw   = PIOS_I2C_TXN_WRITE,
-            .len  = 1,
-            .buf  = addr_buffer,
-        }
-        ,
-        {
-            .info = __func__,
-            .addr = GPS_I2C_ADDRESS,
-            .rw   = PIOS_I2C_TXN_READ,
-            .len  = 2,
-            .buf  = tmp,
-        }
-    };
+    int32_t datacounter = PIOS_UBX_DDC_GetAvailableBytes(PIOS_I2C_GPS);
 
-    if (PIOS_I2C_Transfer(PIOS_I2C_GPS, txn_list, NELEMENTS(txn_list)) == 0) {
-        bytesToRead     = (tmp[0] << 8) | tmp[1];
-        bytesToRead     = bytesToRead < 255 ? bytesToRead : 254;
-        addr_buffer[0]  = GPS_I2C_STREAM_REG;
-        txn_list[1].len = bytesToRead > BUFFER_SIZE ? BUFFER_SIZE : bytesToRead;
-        txn_list[1].buf = buffer;
-        if (bytesToRead > 0 && PIOS_I2C_Transfer(PIOS_I2C_GPS, txn_list, NELEMENTS(txn_list)) == 0) {
-            PIOS_COM_SendBuffer(pios_com_main_id, buffer, bytesToRead);
-        }
+    if (datacounter > 0) {
+        uint8_t toread = datacounter > BUFFER_SIZE ? BUFFER_SIZE : (uint8_t)datacounter;
+        PIOS_UBX_DDC_ReadData(PIOS_I2C_GPS, buffer, toread);
+        PIOS_COM_SendBuffer(pios_com_main_id, buffer, toread);
     }
 }
 

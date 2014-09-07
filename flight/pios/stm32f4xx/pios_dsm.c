@@ -181,7 +181,7 @@ static void PIOS_DSM_ResetState(struct pios_dsm_dev *dsm_dev)
 static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
 {
     struct pios_dsm_state *state = &(dsm_dev->state);
-    uint8_t resolution=10;
+    uint8_t resolution = 10;
 
 #ifdef DSM_LOST_FRAME_COUNTER
     /* increment the lost frame counter */
@@ -191,16 +191,16 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
 #endif
 
     /* check the frame type assuming master satellite stream */
-    
-    switch(dsm_dev->proto) {
+
+    switch (dsm_dev->proto) {
     case PIOS_DSM_PROTO_DSM210BIT:
     case PIOS_DSM_PROTO_DSMX10BIT:
-      resolution = 10;
-      break;
+        resolution = 10;
+        break;
     case PIOS_DSM_PROTO_DSM211BIT:
     case PIOS_DSM_PROTO_DSMX11BIT:
-      resolution = 11;
-      break;
+        resolution = 11;
+        break;
     }
 
     /* unroll channels */

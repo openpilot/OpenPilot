@@ -58,19 +58,20 @@ extern uint32_t pios_com_main_id;
 #define DEBUG_MSG(format, ...)
 #endif
 
-#define GPS_I2C_ADDRESS (0x42<<1)
-#define GPS_I2C_STREAM_REG 0xFF
+#define GPS_I2C_ADDRESS              (0x42 << 1)
+#define GPS_I2C_STREAM_REG           0xFF
 #define GPS_I2C_STREAM_SIZE_HIGH_REG 0xFD
-#define GPS_I2C_STREAM_SIZE_LOW_REG 0xFE
+#define GPS_I2C_STREAM_SIZE_LOW_REG  0xFE
 
 // Private constants
-#define SYSTEM_UPDATE_PERIOD_MS 100
+#define SYSTEM_UPDATE_PERIOD_MS      10
 
-#define STACK_SIZE_BYTES        400
+#define STACK_SIZE_BYTES             450
 
-#define TASK_PRIORITY           (tskIDLE_PRIORITY + 1)
-#define BUFFER_SIZE 254
+#define TASK_PRIORITY                (tskIDLE_PRIORITY + 1)
+#define BUFFER_SIZE                  128
 uint8_t buffer[BUFFER_SIZE];
+
 // Private types
 
 // Private variables
@@ -144,7 +145,7 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
         updateStats();
         PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
         // Update the system alarms
-        PIOS_COM_SendBuffer(pios_com_main_id,(uint8_t*) &"0000", 4);
+        PIOS_COM_SendBuffer(pios_com_main_id, (uint8_t *)&"0000", 4);
         vTaskDelay(SYSTEM_UPDATE_PERIOD_MS * configTICK_RATE_HZ / 1000);
         ReadGPS();
         ReadMag();
@@ -248,33 +249,50 @@ void vApplicationMallocFailedHook(void)
 
 union {
     uint8_t outbuff[11];
-    struct{
+    struct {
         uint8_t pre;
         uint8_t header[3];
         int16_t mag[3];
         uint8_t tail;
-    }data;
+    } dataMag;
+    struct {
+        uint8_t pre;
+        uint8_t header[3];
+        uint8_t data[4];
+        uint8_t tail;
+    } dataId;
 } magbuf;
 
 
-void ReadMag() {
-    magbuf.data.pre = '\n';
-    magbuf.data.header[0] = 'M';
-    magbuf.data.header[1] = 'a';
-    magbuf.data.header[2] = 'G';
-    magbuf.data.tail = '\n';
-    if(PIOS_HMC5x83_ReadMag(magbuf.data.mag)< 0){
+void ReadMag()
+{
+    PIOS_HMC5x83_ReadID(magbuf.dataId.data);
+    magbuf.dataId.data[3]   = '!';
+    magbuf.dataId.pre       = '\n';
+    magbuf.dataId.header[0] = 'M';
+    magbuf.dataId.header[1] = 'a';
+    magbuf.dataId.header[2] = 'g';
+    magbuf.dataId.tail      = '\n';
+
+
+    if (PIOS_HMC5x83_ReadMag(magbuf.dataMag.mag) < 0) {
+        PIOS_COM_SendBuffer(pios_com_main_id, magbuf.outbuff, 9);
         return;
     }
-
-    PIOS_COM_SendBuffer(pios_com_main_id,magbuf.outbuff, 11);
-
+    PIOS_COM_SendBuffer(pios_com_main_id, magbuf.outbuff, 11);
 }
 
 void ReadGPS(){
-    uint16_t bytesToRead = BUFFER_SIZE;
-    if(I2C_ReadBuffer(I2C1,buffer, GPS_I2C_STREAM_REG,&bytesToRead, GPS_I2C_ADDRESS) == 0){
-     //   PIOS_COM_SendBuffer(pios_com_main_id,buffer, BUFFER_SIZE - bytesToRead);
+    uint16_t bytesToRead = 2;
+    uint16_t bytesToSend = 0;
+    uint8_t tmp[2];
+    if(I2C_ReadBuffer(I2C1,tmp, GPS_I2C_STREAM_SIZE_HIGH_REG,&bytesToRead, GPS_I2C_ADDRESS) == 0){
+        bytesToRead = (tmp[0] << 8) | tmp[1];
+        bytesToRead = bytesToRead < 255 ? bytesToRead : 254;
+        bytesToSend = bytesToRead;
+        if(bytesToRead > 0 && I2C_ReadBuffer(I2C1,buffer, GPS_I2C_STREAM_REG,&bytesToRead, GPS_I2C_ADDRESS) == 0){
+            PIOS_COM_SendBuffer(pios_com_main_id,buffer, bytesToSend - bytesToRead);
+        }
     }
 }
 

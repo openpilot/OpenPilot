@@ -44,10 +44,10 @@
 #include "../board_hw_defs.c"
 
 #define PIOS_COM_MAIN_RX_BUF_LEN 32
-#define PIOS_COM_MAIN_TX_BUF_LEN 150
+#define PIOS_COM_MAIN_TX_BUF_LEN 128
 
 uint32_t pios_com_main_id;
-
+uintptr_t flash_id;
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -76,6 +76,9 @@ void PIOS_Board_Init(void)
 #ifdef PIOS_INCLUDE_HMC5X83
     PIOS_SPI_SetClockSpeed(pios_spi_mag_flash_id, SPI_BaudRatePrescaler_16);
     PIOS_HMC5x83_Init(&pios_mag_cfg, pios_spi_mag_flash_id, 0);
+    if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_mag_flash_id, 1)) {
+        PIOS_DEBUG_Assert(0);
+    }
 #endif
 
 #endif
@@ -119,7 +122,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_I2C)
     {
         if (PIOS_I2C_Init(&pios_i2c_gps_id, &pios_i2c_gps_cfg)) {
-            PIOS_Assert(0);
+            flash_id = -1;
         }
     }
 #endif /* PIOS_INCLUDE_I2C */

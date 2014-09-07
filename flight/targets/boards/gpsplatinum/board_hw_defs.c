@@ -199,6 +199,10 @@ void PIOS_SPI_mag_flash_irq_handler(void)
     PIOS_SPI_IRQ_Handler(pios_spi_mag_flash_id);
 }
 
+#ifdef PIOS_INCLUDE_FLASH
+#include "pios_flash_jedec_priv.h"
+#include "pios_flash.h"
+#endif /* PIOS_INCLUDE_FLASH */
 
 #if defined(PIOS_INCLUDE_HMC5X83)
 #include "pios_hmc5x83.h"

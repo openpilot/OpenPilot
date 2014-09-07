@@ -43,8 +43,8 @@
  */
 #include "../board_hw_defs.c"
 
-#define PIOS_COM_MAIN_RX_BUF_LEN 16
-#define PIOS_COM_MAIN_TX_BUF_LEN 128
+#define PIOS_COM_MAIN_RX_BUF_LEN 32
+#define PIOS_COM_MAIN_TX_BUF_LEN 150
 
 uint32_t pios_com_main_id;
 

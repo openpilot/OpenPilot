@@ -55,6 +55,7 @@ SRC += $(OPSYSTEM)/pios_board.c
 #SRC += $(OPUAVOBJ)/eventdispatcher.c
 
 SRC += $(PIOSCOMMON)/pios_hmc5x83.c
+SRC += $(PIOSCOMMON)/pios_ubx_dcc.c
 
 ## UAVObjects
 SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c

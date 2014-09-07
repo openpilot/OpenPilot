@@ -120,6 +120,7 @@ extern uint32_t pios_i2c_gps_adapter_id;
 // -------------------------
 #define PIOS_COM_MAX_DEVS 1
 extern uint32_t pios_com_main_id;
+#define PIOS_COM_TELEM_USB pios_com_main_id
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 
 #define PIOS_COM_DEBUG    (pios_com_main_id)

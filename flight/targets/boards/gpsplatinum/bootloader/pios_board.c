@@ -36,7 +36,7 @@
  */
 #include "../board_hw_defs.c"
 
-uint32_t pios_com_telem_rf_id;
+uint32_t PIOS_COM_TELEM_USB;
 
 static void setupCom();
 /**
@@ -72,7 +72,7 @@ void setupCom(){
     if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
             PIOS_Assert(0);
     }
-    if (PIOS_COM_MSG_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_generic_id)) {
+    if (PIOS_COM_MSG_Init(&PIOS_COM_TELEM_USB, &pios_usart_com_driver, pios_usart_generic_id)) {
             PIOS_Assert(0);
     }
 }

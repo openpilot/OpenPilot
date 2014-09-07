@@ -206,7 +206,7 @@ uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count)
 
 uint8_t processRX()
 {
-    if (PIOS_COM_MSG_Receive(PIOS_COM_TELEM_RF, mReceive_Buffer, sizeof(mReceive_Buffer))) {
+    if (PIOS_COM_MSG_Receive(PIOS_COM_TELEM_USB, mReceive_Buffer, sizeof(mReceive_Buffer))) {
         processComand(mReceive_Buffer);
     }
     return true;

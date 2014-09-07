@@ -180,7 +180,7 @@ static void PIOS_DSM_ResetState(struct pios_dsm_dev *dsm_dev)
 static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
 {
     struct pios_dsm_state *state = &(dsm_dev->state);
-    uint8_t resolution;
+    uint8_t resolution = 10;
 
 #ifdef DSM_LOST_FRAME_COUNTER
     /* increment the lost frame counter */
@@ -190,35 +190,16 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
 #endif
 
     /* check the frame type assuming master satellite stream */
-    uint8_t type = state->received_data[1];
-    switch (type) {
-    case 0x01:
-    case 0x02:
-    case 0x12:
-        /* DSM2, DSMJ stream */
-        if (dsm_dev->proto == PIOS_DSM_PROTO_DSM210BIT || PIOS_DSM_PROTO_DSM211BIT) {
-            /* DSM2/DSMJ resolution is known from the header */
-            resolution = (type & DSM_DSM2_RES_MASK) ? 11 : 10;
-        } else {
-            /* DSMX resolution should explicitly be selected */
-            goto stream_error;
-        }
+
+    switch (dsm_dev->proto) {
+    case PIOS_DSM_PROTO_DSM210BIT:
+    case PIOS_DSM_PROTO_DSMX10BIT:
+        resolution = 10;
         break;
-    case 0xA2:
-    case 0xB2:
-        /* DSMX stream */
-        if (dsm_dev->proto == PIOS_DSM_PROTO_DSMX10BIT) {
-            resolution = 10;
-        } else if (dsm_dev->proto == PIOS_DSM_PROTO_DSMX11BIT) {
-            resolution = 11;
-        } else {
-            /* DSMX resolution should explicitly be selected */
-            goto stream_error;
-        }
+    case PIOS_DSM_PROTO_DSM211BIT:
+    case PIOS_DSM_PROTO_DSMX11BIT:
+        resolution = 11;
         break;
-    default:
-        /* unknown yet data stream */
-        goto stream_error;
     }
 
     /* unroll channels */

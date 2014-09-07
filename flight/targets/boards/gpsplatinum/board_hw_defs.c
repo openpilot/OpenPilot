@@ -245,9 +245,10 @@ static const struct pios_hmc5x83_cfg pios_mag_cfg = {
 #endif
     .M_ODR     = PIOS_HMC5x83_ODR_75,
     .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
-    .Gain      = PIOS_HMC5x83_GAIN_1_9,
-    .Mode      = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Gain             = PIOS_HMC5x83_GAIN_1_9,
+    .Mode             = PIOS_HMC5x83_MODE_CONTINUOUS,
     .Driver    = &PIOS_HMC5x83_SPI_DRIVER,
+    .TempCompensation = true,
 };
 #endif /* PIOS_INCLUDE_HMC5883 */
 

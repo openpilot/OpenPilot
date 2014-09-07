@@ -32,6 +32,7 @@
 #include "ui_connectiondiagram.h"
 
 const char* ConnectionDiagram::FILE_NAME = ":/setupwizard/resources/connection-diagrams.svg";
+const int ConnectionDiagram::IMAGE_PADDING = 10;
 
 ConnectionDiagram::ConnectionDiagram(QWidget *parent, VehicleConfigurationSource *configSource) :
     QDialog(parent), ui(new Ui::ConnectionDiagram), m_configSource(configSource)
@@ -49,15 +50,21 @@ ConnectionDiagram::~ConnectionDiagram()
 void ConnectionDiagram::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-
-    ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect().adjusted(-5,-5,5,5), Qt::KeepAspectRatio);
+    fitInView();
 }
 
 void ConnectionDiagram::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
+    fitInView();
+}
 
-    ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect().adjusted(-5,-5,5,5), Qt::KeepAspectRatio);
+void ConnectionDiagram::fitInView()
+{
+    ui->connectionDiagram->setSceneRect(m_scene->itemsBoundingRect());
+    ui->connectionDiagram->fitInView(
+                m_scene->itemsBoundingRect().adjusted(-IMAGE_PADDING,-IMAGE_PADDING, IMAGE_PADDING, IMAGE_PADDING),
+                Qt::KeepAspectRatio);
 }
 
 void ConnectionDiagram::setupGraphicsScene()
@@ -222,12 +229,7 @@ void ConnectionDiagram::setupGraphicsScene()
         }
 
         setupGraphicsSceneItems(elementsToShow);
-
-        ui->connectionDiagram->setSceneRect(m_scene->itemsBoundingRect());
-        //ui->connectionDiagram->setSceneRect(m_background);
-        ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect().adjusted(-5,-5,5,5), Qt::KeepAspectRatio);
-        //ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
-
+        fitInView();
         qDebug() << "Scene complete";
     }
 }
@@ -259,7 +261,7 @@ void ConnectionDiagram::on_saveButton_clicked()
 {
     QImage image(2200, 1100, QImage::Format_ARGB32);
 
-    image.fill(0);
+    image.fill(Qt::white);
     QPainter painter(&image);
     m_scene->render(&painter);
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("Images (*.png *.xpm *.jpg)"));

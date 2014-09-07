@@ -655,15 +655,19 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_PPM_FLEXI */
         break;
-    case HWSETTINGS_CC_FLEXIPORT_DSM2:
+    case HWSETTINGS_CC_FLEXIPORT_DSM210BIT:
+    case HWSETTINGS_CC_FLEXIPORT_DSM211BIT:
     case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
     case HWSETTINGS_CC_FLEXIPORT_DSMX11BIT:
 #if defined(PIOS_INCLUDE_DSM)
         {
             enum pios_dsm_proto proto;
             switch (hwsettings_cc_flexiport) {
-            case HWSETTINGS_CC_FLEXIPORT_DSM2:
-                proto = PIOS_DSM_PROTO_DSM2;
+            case HWSETTINGS_CC_FLEXIPORT_DSM210BIT:
+                proto = PIOS_DSM_PROTO_DSM210BIT;
+                break;
+            case HWSETTINGS_CC_FLEXIPORT_DSM211BIT:
+                proto = PIOS_DSM_PROTO_DSM211BIT;
                 break;
             case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
                 proto = PIOS_DSM_PROTO_DSMX10BIT;

@@ -196,7 +196,7 @@ static int PIOS_DSM_UnrollChannels(struct pios_dsm_dev *dsm_dev)
     case 0x02:
     case 0x12:
         /* DSM2, DSMJ stream */
-        if (dsm_dev->proto == PIOS_DSM_PROTO_DSM2) {
+        if (dsm_dev->proto == PIOS_DSM_PROTO_DSM210BIT || PIOS_DSM_PROTO_DSM211BIT) {
             /* DSM2/DSMJ resolution is known from the header */
             resolution = (type & DSM_DSM2_RES_MASK) ? 11 : 10;
         } else {

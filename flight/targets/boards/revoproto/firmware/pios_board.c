@@ -670,14 +670,18 @@ void PIOS_Board_Init(void)
         PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
         break;
 
-    case HWSETTINGS_RV_AUXPORT_DSM2:
+    case HWSETTINGS_RV_AUXPORT_DSM210BIT:
+    case HWSETTINGS_RV_AUXPORT_DSM211BIT:
     case HWSETTINGS_RV_AUXPORT_DSMX10BIT:
     case HWSETTINGS_RV_AUXPORT_DSMX11BIT:
     {
         enum pios_dsm_proto proto;
         switch (hwsettings_rv_auxport) {
-        case HWSETTINGS_RV_AUXPORT_DSM2:
-            proto = PIOS_DSM_PROTO_DSM2;
+        case HWSETTINGS_RV_AUXPORT_DSM210BIT:
+            proto = PIOS_DSM_PROTO_DSM210BIT;
+            break;
+        case HWSETTINGS_RV_AUXPORT_DSM211BIT:
+            proto = PIOS_DSM_PROTO_DSM211BIT;
             break;
         case HWSETTINGS_RV_AUXPORT_DSMX10BIT:
             proto = PIOS_DSM_PROTO_DSMX10BIT;
@@ -734,14 +738,18 @@ void PIOS_Board_Init(void)
 #endif /* PIOS_INCLUDE_SBUS */
         break;
 
-    case HWSETTINGS_RV_AUXSBUSPORT_DSM2:
+    case HWSETTINGS_RV_AUXSBUSPORT_DSM210BIT:
+    case HWSETTINGS_RV_AUXSBUSPORT_DSM211BIT:
     case HWSETTINGS_RV_AUXSBUSPORT_DSMX10BIT:
     case HWSETTINGS_RV_AUXSBUSPORT_DSMX11BIT:
     {
         enum pios_dsm_proto proto;
         switch (hwsettings_rv_auxsbusport) {
-        case HWSETTINGS_RV_AUXSBUSPORT_DSM2:
-            proto = PIOS_DSM_PROTO_DSM2;
+        case HWSETTINGS_RV_AUXSBUSPORT_DSM210BIT:
+            proto = PIOS_DSM_PROTO_DSM210BIT;
+            break;
+        case HWSETTINGS_RV_AUXSBUSPORT_DSM211BIT:
+            proto = PIOS_DSM_PROTO_DSM211BIT;
             break;
         case HWSETTINGS_RV_AUXSBUSPORT_DSMX10BIT:
             proto = PIOS_DSM_PROTO_DSMX10BIT;
@@ -787,14 +795,18 @@ void PIOS_Board_Init(void)
 #endif /* PIOS_INCLUDE_I2C */
         break;
 
-    case HWSETTINGS_RV_FLEXIPORT_DSM2:
+    case HWSETTINGS_RV_FLEXIPORT_DSM210BIT:
+    case HWSETTINGS_RV_FLEXIPORT_DSM211BIT:
     case HWSETTINGS_RV_FLEXIPORT_DSMX10BIT:
     case HWSETTINGS_RV_FLEXIPORT_DSMX11BIT:
     {
         enum pios_dsm_proto proto;
         switch (hwsettings_rv_flexiport) {
-        case HWSETTINGS_RV_FLEXIPORT_DSM2:
-            proto = PIOS_DSM_PROTO_DSM2;
+        case HWSETTINGS_RV_FLEXIPORT_DSM210BIT:
+            proto = PIOS_DSM_PROTO_DSM210BIT;
+            break;
+        case HWSETTINGS_RV_FLEXIPORT_DSM211BIT:
+            proto = PIOS_DSM_PROTO_DSM211BIT;
             break;
         case HWSETTINGS_RV_FLEXIPORT_DSMX10BIT:
             proto = PIOS_DSM_PROTO_DSMX10BIT;

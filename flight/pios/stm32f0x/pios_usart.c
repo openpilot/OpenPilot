@@ -65,9 +65,14 @@ struct pios_usart_dev {
     uint32_t rx_dropped;
 };
 
-static bool PIOS_USART_validate(struct pios_usart_dev *usart_dev)
+static struct pios_usart_dev *PIOS_USART_validate(uint32_t usart_id)
 {
-    return usart_dev->magic == PIOS_USART_DEV_MAGIC;
+    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
+
+    bool valid = (usart_dev->magic == PIOS_USART_DEV_MAGIC);
+
+    PIOS_Assert(valid);
+    return usart_dev;
 }
 
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -145,7 +150,7 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
 
     usart_dev = (struct pios_usart_dev *)PIOS_USART_alloc();
     if (!usart_dev) {
-        goto out_fail;
+        return -1;
     }
 
     /* Bind the configuration to the device instance */
@@ -153,78 +158,54 @@ int32_t PIOS_USART_Init(uint32_t *usart_id, const struct pios_usart_cfg *cfg)
 
     /* Enable the USART Pins Software Remapping */
     if (usart_dev->cfg->remap) {
-        GPIO_PinAFConfig(usart_dev->cfg->rx.gpio,
-                         __builtin_ctz(usart_dev->cfg->rx.init.GPIO_Pin),
-                         usart_dev->cfg->remap);
-        GPIO_PinAFConfig(usart_dev->cfg->tx.gpio,
-                         __builtin_ctz(usart_dev->cfg->tx.init.GPIO_Pin),
-                         usart_dev->cfg->remap);
+        GPIO_PinAFConfig(cfg->rx.gpio, __builtin_ctz(cfg->rx.init.GPIO_Pin), cfg->remap);
+        GPIO_PinAFConfig(cfg->tx.gpio, __builtin_ctz(cfg->tx.init.GPIO_Pin), cfg->remap);
     }
 
     /* Initialize the USART Rx and Tx pins */
-    GPIO_Init(usart_dev->cfg->rx.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->rx.init);
-    GPIO_Init(usart_dev->cfg->tx.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->tx.init);
+    GPIO_Init(cfg->rx.gpio, (GPIO_InitTypeDef *)&cfg->rx.init);
+    GPIO_Init(cfg->tx.gpio, (GPIO_InitTypeDef *)&cfg->tx.init);
 
     /* Enable USART clock */
-    switch ((uint32_t)usart_dev->cfg->regs) {
+    switch ((uint32_t)cfg->regs) {
     case (uint32_t)USART1:
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+        PIOS_USART_1_id = (uint32_t)usart_dev;
         break;
     case (uint32_t)USART2:
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+        PIOS_USART_2_id = (uint32_t)usart_dev;
         break;
     case (uint32_t)USART3:
         RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+        PIOS_USART_3_id = (uint32_t)usart_dev;
         break;
     }
 
     /* Configure the USART */
-    USART_Init(usart_dev->cfg->regs, (USART_InitTypeDef *)&usart_dev->cfg->init);
-
+    USART_Init(cfg->regs, (USART_InitTypeDef *)&cfg->init);
     *usart_id = (uint32_t)usart_dev;
 
-    /* Configure USART Interrupts */
-    switch ((uint32_t)usart_dev->cfg->regs) {
-    case (uint32_t)USART1:
-        PIOS_USART_1_id = (uint32_t)usart_dev;
-        break;
-    case (uint32_t)USART2:
-        PIOS_USART_2_id = (uint32_t)usart_dev;
-        break;
-    case (uint32_t)USART3:
-        PIOS_USART_3_id = (uint32_t)usart_dev;
-        break;
-    }
-    NVIC_Init((NVIC_InitTypeDef *)&usart_dev->cfg->irq.init);
-    USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
-    USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
-
+    NVIC_Init((NVIC_InitTypeDef *)&cfg->irq.init);
+    USART_ITConfig(cfg->regs, USART_IT_RXNE, ENABLE);
+    USART_ITConfig(cfg->regs, USART_IT_TXE, ENABLE);
+    USART_ITConfig(cfg->regs, USART_IT_ORE, DISABLE);
+    USART_ITConfig(cfg->regs, USART_IT_TC, DISABLE);
     /* Enable USART */
-    USART_Cmd(usart_dev->cfg->regs, ENABLE);
+    USART_Cmd(cfg->regs, ENABLE);
 
     return 0;
-
-out_fail:
-    return -1;
 }
 
 static void PIOS_USART_RxStart(uint32_t usart_id, __attribute__((unused)) uint16_t rx_bytes_avail)
 {
-    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
-
-    bool valid = PIOS_USART_validate(usart_dev);
-
-    PIOS_Assert(valid);
+    const struct pios_usart_dev *usart_dev = PIOS_USART_validate(usart_id);
 
     USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
 }
 static void PIOS_USART_TxStart(uint32_t usart_id, __attribute__((unused)) uint16_t tx_bytes_avail)
 {
-    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
-
-    bool valid = PIOS_USART_validate(usart_dev);
-
-    PIOS_Assert(valid);
+    const struct pios_usart_dev *usart_dev = PIOS_USART_validate(usart_id);
 
     USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
 }
@@ -236,11 +217,7 @@ static void PIOS_USART_TxStart(uint32_t usart_id, __attribute__((unused)) uint16
  */
 static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud)
 {
-    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
-
-    bool valid = PIOS_USART_validate(usart_dev);
-
-    PIOS_Assert(valid);
+    const struct pios_usart_dev *usart_dev = PIOS_USART_validate(usart_id);
 
     USART_InitTypeDef USART_InitStructure;
 
@@ -258,12 +235,7 @@ static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud)
 
 static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback rx_in_cb, uint32_t context)
 {
-    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
-
-    bool valid = PIOS_USART_validate(usart_dev);
-
-    PIOS_Assert(valid);
-
+    struct pios_usart_dev *usart_dev = PIOS_USART_validate(usart_id);
     /*
      * Order is important in these assignments since ISR uses _cb
      * field to determine if it's ok to dereference _cb and _context
@@ -274,11 +246,7 @@ static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback r
 
 static void PIOS_USART_RegisterTxCallback(uint32_t usart_id, pios_com_callback tx_out_cb, uint32_t context)
 {
-    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
-
-    bool valid = PIOS_USART_validate(usart_dev);
-
-    PIOS_Assert(valid);
+    struct pios_usart_dev *usart_dev = PIOS_USART_validate(usart_id);
 
     /*
      * Order is important in these assignments since ISR uses _cb
@@ -290,20 +258,16 @@ static void PIOS_USART_RegisterTxCallback(uint32_t usart_id, pios_com_callback t
 
 static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 {
-    struct pios_usart_dev *usart_dev = (struct pios_usart_dev *)usart_id;
-
-    bool valid = PIOS_USART_validate(usart_dev);
-
-    PIOS_Assert(valid);
+    struct pios_usart_dev *usart_dev = PIOS_USART_validate(usart_id);
 
     /* Force read of dr after sr to make sure to clear error flags */
-    volatile uint16_t sr = usart_dev->cfg->regs->ISR;
-    volatile uint8_t dr  = usart_dev->cfg->regs->RDR;
+
 
     /* Check if RXNE flag is set */
     bool rx_need_yield   = false;
-    if (sr & USART_ISR_RXNE) {
-        uint8_t byte = dr;
+    if(USART_GetITStatus(usart_dev->cfg->regs, USART_IT_RXNE) != RESET) {
+
+        uint8_t byte = USART_ReceiveData(usart_dev->cfg->regs) & 0x00FF;
         if (usart_dev->rx_in_cb) {
             uint16_t rc;
             rc = (usart_dev->rx_in_cb)(usart_dev->rx_in_context, &byte, 1, NULL, &rx_need_yield);
@@ -316,7 +280,7 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 
     /* Check if TXE flag is set */
     bool tx_need_yield = false;
-    if (sr & USART_ISR_TXE) {
+    if (USART_GetITStatus(usart_dev->cfg->regs, USART_IT_TXE) != RESET) {
         if (usart_dev->tx_out_cb) {
             uint8_t b;
             uint16_t bytes_to_send;
@@ -325,7 +289,7 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 
             if (bytes_to_send > 0) {
                 /* Send the byte we've been given */
-                usart_dev->cfg->regs->TDR = b;
+                USART_SendData(usart_dev->cfg->regs, b);
             } else {
                 /* No bytes to send, disable TXE interrupt */
                 USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, DISABLE);
@@ -335,7 +299,8 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
             USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, DISABLE);
         }
     }
-
+    USART_ClearITPendingBit(usart_dev->cfg->regs, USART_IT_ORE);
+    USART_ClearITPendingBit(usart_dev->cfg->regs, USART_IT_TC);
 #if defined(PIOS_INCLUDE_FREERTOS)
     if (rx_need_yield || tx_need_yield) {
         vPortYield();

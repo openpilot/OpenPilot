@@ -140,8 +140,11 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         case VehicleConfigurationSource::INPUT_DSMX11:
             data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DSMX11BIT;
             break;
-        case VehicleConfigurationSource::INPUT_DSM2:
-            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DSM2;
+        case VehicleConfigurationSource::INPUT_DSM2_10:
+            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DSM210BIT;
+            break;
+        case VehicleConfigurationSource::INPUT_DSM2_11:
+            data.CC_FlexiPort = HwSettings::CC_FLEXIPORT_DSM211BIT;
             break;
         default:
             break;
@@ -173,8 +176,11 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         case VehicleConfigurationSource::INPUT_DSMX11:
             data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSMX11BIT;
             break;
-        case VehicleConfigurationSource::INPUT_DSM2:
-            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSM2;
+        case VehicleConfigurationSource::INPUT_DSM2_10:
+            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSM210BIT;
+            break;
+        case VehicleConfigurationSource::INPUT_DSM2_11:
+            data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DSM211BIT;
             break;
         default:
             break;
@@ -557,7 +563,8 @@ void VehicleConfigurationHelper::applyManualControlDefaults()
         break;
     case VehicleConfigurationSource::INPUT_DSMX10:
     case VehicleConfigurationSource::INPUT_DSMX11:
-    case VehicleConfigurationSource::INPUT_DSM2:
+    case VehicleConfigurationSource::INPUT_DSM2_10:
+    case VehicleConfigurationSource::INPUT_DSM2_11:
         channelType = ManualControlSettings::CHANNELGROUPS_DSMMAINPORT;
         break;
     default:

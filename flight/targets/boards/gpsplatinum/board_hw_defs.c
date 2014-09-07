@@ -207,9 +207,9 @@ void PIOS_SPI_mag_flash_irq_handler(void)
 #if defined(PIOS_INCLUDE_HMC5X83)
 pios_hmc5x83_dev_t onboard_mag;
 #include "pios_hmc5x83.h"
-#ifdef PIOS_HMC5x83_HAS_GPIOS
-bool pios_board_mag_handler(){
-    PIOS_HMC5x83_IRQHandler(onboard_mag);
+#ifdef PIOS_HMC5X83_HAS_GPIOS
+bool pios_board_mag_handler() {
+    return PIOS_HMC5x83_IRQHandler(onboard_mag);
 }
 static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
     .vector = pios_board_mag_handler,
@@ -218,7 +218,7 @@ static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
         .gpio = GPIOB,
         .init = {
             .GPIO_Pin   = GPIO_Pin_7,
-            .GPIO_Speed = GPIO_Speed_100MHz,
+            .GPIO_Speed = GPIO_Speed_Level_3,
             .GPIO_Mode  = GPIO_Mode_IN,
             .GPIO_OType = GPIO_OType_OD,
             .GPIO_PuPd  = GPIO_PuPd_NOPULL,
@@ -226,9 +226,8 @@ static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
     },
     .irq                                       = {
         .init                                  = {
-            .NVIC_IRQChannel    = EXTI9_5_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannel    = EXTI4_15_IRQn,
+            .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_LOW,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
@@ -241,10 +240,10 @@ static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
         },
     },
 };
-#endif /* ifdef PIOS_HMC5x83_HAS_GPIOS */
+#endif /* ifdef PIOS_HMC5X83_HAS_GPIOS */
 
 static const struct pios_hmc5x83_cfg pios_mag_cfg = {
-#ifdef PIOS_HMC5x83_HAS_GPIOS
+#ifdef PIOS_HMC5X83_HAS_GPIOS
     .exti_cfg  = &pios_exti_mag_cfg,
 #endif
     .M_ODR     = PIOS_HMC5x83_ODR_30,

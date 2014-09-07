@@ -477,19 +477,15 @@ void PIOS_Board_Init(void)
         }
 #endif /* PIOS_INCLUDE_GPS */
         break;
-    case HWSETTINGS_CC_MAINPORT_DSM210BIT:
-    case HWSETTINGS_CC_MAINPORT_DSM211BIT:
+    case HWSETTINGS_CC_MAINPORT_DSM2:
     case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
     case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
 #if defined(PIOS_INCLUDE_DSM)
         {
             enum pios_dsm_proto proto;
             switch (hwsettings_cc_mainport) {
-            case HWSETTINGS_CC_MAINPORT_DSM210BIT:
-                proto = PIOS_DSM_PROTO_DSM210BIT;
-                break;
-            case HWSETTINGS_CC_MAINPORT_DSM211BIT:
-                proto = PIOS_DSM_PROTO_DSM211BIT;
+            case HWSETTINGS_CC_MAINPORT_DSM2:
+                proto = PIOS_DSM_PROTO_DSM2;
                 break;
             case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
                 proto = PIOS_DSM_PROTO_DSMX10BIT;

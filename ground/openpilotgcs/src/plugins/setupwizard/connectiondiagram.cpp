@@ -139,8 +139,7 @@ void ConnectionDiagram::setupGraphicsScene()
             break;
         case VehicleConfigurationSource::INPUT_DSMX10:
         case VehicleConfigurationSource::INPUT_DSMX11:
-        case VehicleConfigurationSource::INPUT_DSM2_10:
-        case VehicleConfigurationSource::INPUT_DSM2_11:
+        case VehicleConfigurationSource::INPUT_DSM2:
             elementsToShow << "satellite";
             break;
         default:

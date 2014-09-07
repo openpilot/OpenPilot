@@ -111,8 +111,7 @@
 
 /* DSM protocol variations */
 enum pios_dsm_proto {
-    PIOS_DSM_PROTO_DSM210BIT,
-    PIOS_DSM_PROTO_DSM211BIT,
+    PIOS_DSM_PROTO_DSM2,
     PIOS_DSM_PROTO_DSMX10BIT,
     PIOS_DSM_PROTO_DSMX11BIT,
 };

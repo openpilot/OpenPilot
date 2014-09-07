@@ -56,7 +56,7 @@ void PIOS_Board_Init(void)
     FLASH_PrefetchBufferCmd(ENABLE);
 
 #if defined(PIOS_INCLUDE_LED)
-    const struct pios_gpio_cfg *led_cfg  = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
+    const struct pios_gpio_cfg *led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
     PIOS_Assert(led_cfg);
     PIOS_LED_Init(led_cfg);
 #endif /* PIOS_INCLUDE_LED */
@@ -66,6 +66,7 @@ void PIOS_Board_Init(void)
 void setupCom()
 {
     uint32_t pios_usart_generic_id;
+
     if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
         PIOS_Assert(0);
     }

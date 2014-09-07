@@ -133,7 +133,7 @@ int main()
         case DFUidle:
             period1 = 5000;
             sweep_steps1 = 100;
-            //PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+            // PIOS_LED_Off(PIOS_LED_HEARTBEAT);
             period2 = 0;
             break;
         case uploading:
@@ -145,7 +145,7 @@ int main()
         case downloading:
             period1 = 2500;
             sweep_steps1 = 50;
-            //PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+            // PIOS_LED_Off(PIOS_LED_HEARTBEAT);
             period2 = 0;
             break;
         case BLidle:

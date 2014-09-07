@@ -57,8 +57,8 @@
 // ------------------------
 // BOOTLOADER_SETTINGS
 // ------------------------
-#define BOARD_READABLE        TRUE
-#define BOARD_WRITABLE        TRUE
+#define BOARD_READABLE        true
+#define BOARD_WRITABLE        true
 #define MAX_DEL_RETRYS        3
 
 // ------------------------
@@ -122,6 +122,7 @@ extern uint32_t pios_i2c_gps_adapter_id;
 
 extern uint32_t pios_com_telem_rf_id;
 #define PIOS_COM_TELEM_RF (pios_com_telem_rf_id)
+#define PIOS_COM_TELEM_USB (pios_com_telem_rf_id)
 
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 extern uint32_t pios_com_debug_id;

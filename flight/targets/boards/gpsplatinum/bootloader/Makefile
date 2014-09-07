@@ -20,11 +20,16 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-## The standard CMSIS startup
-SRC += $(CMSIS_DEVICEDIR)/Source/system_stm32f0xx.c
+PIOS_OMITS_USB = YES
+PIOS_APPS_MINIMAL = YES
 
 include ../board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
+
+## The standard CMSIS startup
+SRC += $(CMSIS_DEVICEDIR)/system_stm32f0xx.c
+
+
 include $(ROOT_DIR)/make/boot-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk
 

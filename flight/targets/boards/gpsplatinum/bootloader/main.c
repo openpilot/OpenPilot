@@ -27,6 +27,8 @@
  */
 
 #include <pios.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <pios_board_info.h>
 #include <op_dfu.h>
 #include <pios_iap.h>
@@ -36,7 +38,6 @@
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
-#define BSL_HOLD_STATE ((PIOS_USB_DETECT_GPIO_PORT->IDR & PIOS_USB_DETECT_GPIO_PIN) ? 0 : 1)
 
 /* Private typedef -----------------------------------------------------------*/
 typedef void (*pFunction)(void);
@@ -59,10 +60,9 @@ uint8_t tempcount = 0;
 /* Extern variables ----------------------------------------------------------*/
 DFUStates DeviceState;
 int16_t status           = 0;
-uint8_t JumpToApp        = FALSE;
-uint8_t GO_dfu           = FALSE;
-uint8_t USB_connected    = FALSE;
-uint8_t User_DFU_request = FALSE;
+bool JumpToApp        = false;
+bool GO_dfu           = false;
+bool User_DFU_request = false;
 static uint8_t mReceive_Buffer[63];
 /* Private function prototypes -----------------------------------------------*/
 uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count);
@@ -75,36 +75,33 @@ int main()
     PIOS_Board_Init();
     PIOS_IAP_Init();
 
-    USB_connected = FALSE;
-
-    if (PIOS_IAP_CheckRequest() == TRUE) {
+    if (PIOS_IAP_CheckRequest() == false) {
         PIOS_DELAY_WaitmS(1000);
-        User_DFU_request = TRUE;
+        User_DFU_request = false;
         PIOS_IAP_ClearRequest();
     }
 
-    GO_dfu = (USB_connected == TRUE) || (User_DFU_request == TRUE);
+    GO_dfu = (User_DFU_request == true);
 
-    if (GO_dfu == TRUE) {
-        PIOS_Board_Init();
-        if (User_DFU_request == TRUE) {
+    if (GO_dfu == true) {
+        if (User_DFU_request == true) {
             DeviceState = DFUidle;
         } else {
             DeviceState = BLidle;
         }
     } else {
-        JumpToApp = TRUE;
+        JumpToApp = true;
     }
 
     uint32_t stopwatch  = 0;
     uint32_t prev_ticks = PIOS_DELAY_GetuS();
-    while (TRUE) {
+    while (true) {
         /* Update the stopwatch */
         uint32_t elapsed_ticks = PIOS_DELAY_GetuSSince(prev_ticks);
         prev_ticks += elapsed_ticks;
         stopwatch  += elapsed_ticks;
 
-        if (JumpToApp == TRUE) {
+        if (JumpToApp == true) {
             jump_to_app();
         }
 
@@ -164,8 +161,8 @@ int main()
         if (stopwatch > 50 * 1000 * 1000) {
             stopwatch = 0;
         }
-        if ((stopwatch > 6 * 1000 * 1000) && ((DeviceState == BLidle) || (DeviceState == DFUidle && !USB_connected))) {
-            JumpToApp = TRUE;
+        if ((stopwatch > 6 * 1000 * 1000) && ((DeviceState == BLidle) || (DeviceState == DFUidle))) {
+            JumpToApp = true;
         }
 
         processRX();
@@ -183,8 +180,7 @@ void jump_to_app()
         RCC_APB1PeriphResetCmd(0xffffffff, ENABLE);
         RCC_APB2PeriphResetCmd(0xffffffff, DISABLE);
         RCC_APB1PeriphResetCmd(0xffffffff, DISABLE);
-        _SetCNTR(0); // clear interrupt mask
-        _SetISTR(0); // clear all requests
+
         JumpAddress = *(__IO uint32_t *)(bdinfo->fw_base + 4);
         Jump_To_Application = (pFunction)JumpAddress;
         /* Initialize user application's Stack Pointer */
@@ -210,8 +206,8 @@ uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count)
 
 uint8_t processRX()
 {
-//    if (PIOS_COM_MSG_Receive(PIOS_COM_TELEM_USB, mReceive_Buffer, sizeof(mReceive_Buffer))) {
-//        processComand(mReceive_Buffer);
-//    }
-    return TRUE;
+    if (PIOS_COM_MSG_Receive(PIOS_COM_TELEM_RF, mReceive_Buffer, sizeof(mReceive_Buffer))) {
+        processComand(mReceive_Buffer);
+    }
+    return true;
 }

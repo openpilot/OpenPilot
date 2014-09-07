@@ -36,8 +36,9 @@
  */
 #include "../board_hw_defs.c"
 
-uint32_t pios_com_telem_usb_id;
+uint32_t pios_com_telem_rf_id;
 
+void setupCom();
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -49,12 +50,6 @@ void PIOS_Board_Init(void)
     if (board_init_complete) {
         return;
     }
-
-    /* Enable Prefetch Buffer */
-    FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
-
-    /* Flash 2 wait state */
-    FLASH_SetLatency(FLASH_Latency_2);
 
     /* Delay system */
     PIOS_DELAY_Init();
@@ -68,6 +63,16 @@ void PIOS_Board_Init(void)
 #endif /* PIOS_INCLUDE_LED */
 
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE); // TODO Tirar
+    setupCom();
     board_init_complete = true;
 }
 
+void setupCom(){
+    uint32_t pios_usart_generic_id;
+    if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
+            PIOS_Assert(0);
+    }
+    if (PIOS_COM_MSG_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_generic_id)) {
+            PIOS_Assert(0);
+    }
+}

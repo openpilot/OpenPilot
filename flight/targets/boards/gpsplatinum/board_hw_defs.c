@@ -25,10 +25,31 @@
  */
 
 #define BOARD_REVISION_GPSP 1
-
+/*
+ * GPS Platinum board.
+ * pins allocation:
+ * port         |  Pins
+ * -------------|-------------
+ * GPS I2C      | PB7 SDA
+ *              | PB6 SCL
+ * ---------------------------
+ * Led HB       | PB4
+ * ---------------------------
+ * Mag/Flash SPI| PA4 MAG SS
+ *              | PA5 SCK
+ *              | PA6 MISO
+ *              | PA7 MOSI
+ *              | PB1 FLASH SS
+ *              | PB0 Mag Int
+ *----------------------------
+ * Main Port    | PA9  TX
+ *              | PA10 RX
+ *----------------------------
+ */
 #if defined(PIOS_INCLUDE_LED)
 
 #include <pios_led_priv.h>
+
 static const struct pios_gpio pios_leds_gpsp[] = {
     // PB4
     [PIOS_LED_HEARTBEAT] = {
@@ -36,11 +57,12 @@ static const struct pios_gpio pios_leds_gpsp[] = {
             .gpio = GPIOB,
             .init =             {
                 .GPIO_Pin   = GPIO_Pin_4,
-                .GPIO_Mode  = GPIO_OType_OD,
+                .GPIO_Mode  = GPIO_Mode_OUT,
+                .GPIO_OType  =  GPIO_OType_OD,
                 .GPIO_Speed = GPIO_Speed_Level_1,
             },
         },
-        .active_low         = true
+        .active_low         = false
     },
 };
 
@@ -208,6 +230,7 @@ static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
 
 static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
     .regs = USART1,
+    .remap = GPIO_AF_0,
     .init = {
         .USART_BaudRate   = 57600,
         .USART_WordLength = USART_WordLength_8b,
@@ -219,8 +242,7 @@ static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
     .irq                                       = {
         .init                                  = {
             .NVIC_IRQChannel    = USART1_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_MID,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
@@ -229,7 +251,8 @@ static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
         .init = {
             .GPIO_Pin   = GPIO_Pin_10,
             .GPIO_Speed = GPIO_Speed_2MHz,
-            .GPIO_Mode  = GPIO_Mode_IPU,
+            .GPIO_OType = GPIO_OType_OD,
+            .GPIO_Mode  = GPIO_Mode_AF,
         },
     },
     .tx                                        = {
@@ -237,7 +260,8 @@ static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
         .init = {
             .GPIO_Pin   = GPIO_Pin_9,
             .GPIO_Speed = GPIO_Speed_2MHz,
-            .GPIO_Mode  = GPIO_Mode_AF_PP,
+            .GPIO_OType = GPIO_OType_PP,
+            .GPIO_Mode  = GPIO_Mode_AF,
         },
     },
 };

@@ -45,6 +45,7 @@
 #include "inc/gpsdsysmod.h"
 #include <pios_hmc5x83.h>
 #include <pios_ubx_ddc.h>
+#include <ubx_utils.h>
 
 // UAVOs
 #include <systemstats.h>
@@ -53,70 +54,44 @@ SystemStatsData systemStats;
 extern uintptr_t flash_id;
 #define DEBUG_THIS_FILE
 extern uint32_t pios_com_main_id;
-// #define PIOS_COM_DEBUG pios_com_main_id
-#if defined(PIOS_INCLUDE_DEBUG_CONSOLE) && defined(DEBUG_THIS_FILE)
-#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, format,##__VA_ARGS__)
-#else
-#define DEBUG_MSG(format, ...)
-#endif
 
-static bool getLastSentence(uint8_t *data, uint16_t bufferCount, uint8_t * *lastSentence, uint16_t *lenght);
+
 extern struct pios_flash_driver pios_jedec_flash_driver;
 extern pios_hmc5x83_dev_t onboard_mag;
 extern uintptr_t flash_id;
 
 // Private constants
-#define SYSTEM_UPDATE_PERIOD_MS 2
+#define SYSTEM_UPDATE_PERIOD_MS 1
 
 #define STACK_SIZE_BYTES        450
 #define STAT_RATE               1
 #define TASK_PRIORITY           (tskIDLE_PRIORITY + 1)
 #define BUFFER_SIZE             200
-uint8_t buffer[BUFFER_SIZE];
+
+const char cfg_settings[] = {};
+    // cfg-prt I2C. In UBX+RTCM, Out UBX, Slave Addr 0x42
+//    "\xB5\x62\x06\x00\x14\x00\x00\x00\x00\x00\x84\x00\x00\x00\x00\x00\x00\x00\x07\x00\x01\x00\x00\x00\x00\x00\xA6\xC6"
+    // cfg-msg: nav-pvt rate 1
+//    "\xB5\x62\x06\x01\x03\x00\x01\x07\x01\x13\x51"
+    // cfg-msg: nav-svinfo rate 10
+//    "\xB5\x62\x06\x01\x03\x00\x01\x30\x0A\x45\xAC"
+    // CFG-RATE meas period 100ms, nav rate 1
+//    "\xB5\x62\x06\x08\x06\x00\x64\x00\x01\x00\x01\x00\x7A\x12";
+
 // Private types
 
 // Private variables
+uint8_t buffer[BUFFER_SIZE];
 static xTaskHandle systemTaskHandle;
 static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_CRITICAL = 3 } stackOverflow;
+
+// Private functions
 static bool mallocFailed;
 static void ReadGPS();
 static void ReadMag();
 static void SetupGPS();
-// Private functions
 static void updateStats();
-
 static void gpspSystemTask(void *parameters);
-
-const char cfg_settings[] =
-    // cfg-prt I2C. In UBX+RTCM, Out UBX, Slave Addr 0x42
-    "\xB5\x62\x06\x00\x14\x00\x00\x00\x00\x00\x84\x00\x00\x00\x00\x00\x00\x00\x07\x00\x01\x00\x00\x00\x00\x00\xA6\xC6"
-    // cfg-msg: nav-pvt rate 1
-    "\xB5\x62\x06\x01\x03\x00\x01\x07\x01\x13\x51"
-    // cfg-msg: nav-svinfo rate 10
-    "\xB5\x62\x06\x01\x03\x00\x01\x30\x0A\x45\xAC"
-    // CFG-RATE meas period 100ms, nav rate 1
-    "\xB5\x62\x06\x08\x06\x00\x64\x00\x01\x00\x01\x00\x7A\x12";
-
-typedef struct {
-    uint8_t  syn1;
-    uint8_t  syn2;
-    uint8_t  class;
-    uint8_t  id;
-    uint16_t len;
-} __attribute__((packed)) UBXHeader_t;
-
-typedef struct {
-    uint8_t chk1;
-    uint8_t chk2;
-} __attribute__((packed)) UBXFooter_t;
-
-typedef union {
-    uint8_t bynarystream[0];
-    struct {
-        UBXHeader_t header;
-        uint8_t     payload[0];
-    } packet;
-} UBXPacket_t;
 
 
 typedef struct {
@@ -152,14 +127,8 @@ typedef union {
     UBXPacket_t packet;
 } SysUbxPkt;
 
-void ubx_appendChecksum_message(UBXPacket_t *pkt);
-void ubx_build_packet(UBXPacket_t *pkt, uint8_t packetClass, uint8_t packetId, uint16_t len);
 
 #define SYS_DATA_OPTIONS_FLASH 0x01
-#define UBX_HEADER_LEN         (sizeof(UBXHeader_t))
-
-#define UBX_SYN1               0xB5
-#define UBX_SYN2               0x62
 
 #define UBX_OP_CUST_CLASS      0x99
 #define UBX_OP_SYS             0x01
@@ -283,7 +252,7 @@ static void updateStats()
     sysPkt.fragments.data.IRQStackRemaining = GetFreeIrqStackSize();
     sysPkt.fragments.data.SystemModStackRemaining = uxTaskGetStackHighWaterMark(NULL) * 4;
     sysPkt.fragments.data.options = flash_id > 0 ? SYS_DATA_OPTIONS_FLASH : 0;
-    ubx_build_packet(&sysPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_SYS, sizeof(SysData));
+    ubx_buildPacket(&sysPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_SYS, sizeof(SysData));
     PIOS_COM_SendBuffer(pios_com_main_id, sysPkt.packet.bynarystream, sizeof(SysUbxPkt));
 }
 
@@ -345,7 +314,7 @@ void ReadMag()
         magPkt.fragments.data.Y = mag[0];
         magPkt.fragments.data.Z = mag[2];
         magPkt.fragments.data.status = 1;
-        ubx_build_packet(&magPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_MAG, sizeof(MagData));
+        ubx_buildPacket(&magPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_MAG, sizeof(MagData));
         PIOS_COM_SendBuffer(pios_com_main_id, magPkt.packet.bynarystream, sizeof(MagUbxPkt));
         return;
     }
@@ -366,7 +335,7 @@ void ReadGPS()
 
             uint8_t *lastSentence;
             static uint16_t lastSentenceLenght;
-            completeSentenceSent = getLastSentence(buffer, toRead, &lastSentence, &lastSentenceLenght);
+            completeSentenceSent = ubx_getLastSentence(buffer, toRead, &lastSentence, &lastSentenceLenght);
             if (completeSentenceSent) {
                 toSend = (uint8_t)(lastSentence - buffer + lastSentenceLenght);
             } else {
@@ -388,30 +357,6 @@ void ReadGPS()
     } while (maxCount--);
 }
 
-
-bool getLastSentence(uint8_t *data, uint16_t bufferCount, uint8_t * *lastSentence, uint16_t *lenght)
-{
-    const uint8_t packet_overhead = UBX_HEADER_LEN + 2;
-    uint8_t *current = data + bufferCount - packet_overhead;
-
-    while (current >= data) {
-        // look for a ubx a sentence
-        if (current[0] == UBX_SYN1 && current[1] == UBX_SYN2) {
-            // check whether it fits the current buffer (whole sentence is into buffer)
-            uint16_t len = current[4] + (current[5] << 8);
-            if (len + packet_overhead + current <= data + bufferCount) {
-                *lastSentence = current;
-                *lenght = len + packet_overhead;
-                return true;
-            }
-        }
-        current--;
-    }
-    // no complete sentence found
-    return false;
-}
-
-
 typedef struct {
     uint8_t size;
     const uint8_t *sentence;
@@ -424,38 +369,11 @@ const ubx_init_sentence gps_config[] = {
         .size     = sizeof(cfg_settings),
     },
 };
-void ubx_build_packet(UBXPacket_t *pkt, uint8_t packetClass, uint8_t packetId, uint16_t len)
-{
-    pkt->packet.header.syn1 = UBX_SYN1;
-    pkt->packet.header.syn2 = UBX_SYN2;
 
-    // don't make any assumption on alignments...
-    ((uint8_t *)&pkt->packet.header.len)[0] = len & 0xFF;
-    ((uint8_t *)&pkt->packet.header.len)[1] = (len >> 8) & 0xFF;
-
-    pkt->packet.header.class = packetClass;
-    pkt->packet.header.id    = packetId;
-    ubx_appendChecksum_message(pkt);
-}
-
-void ubx_appendChecksum_message(UBXPacket_t *pkt)
-{
-    uint8_t chkA = 0;
-    uint8_t chkB = 0;
-    uint16_t len = ((uint8_t *)&pkt->packet.header.len)[0] | ((uint8_t *)&pkt->packet.header.len)[1] << 8;
-
-    // From class field to the end of payload
-    for (uint8_t i = 2; i < len + UBX_HEADER_LEN; i++) {
-        chkA += pkt->bynarystream[i];
-        chkB += chkA;
-    }
-    ;
-    pkt->packet.payload[len]     = chkA;
-    pkt->packet.payload[len + 1] = chkB;
-}
 
 void SetupGPS()
 {
+    PIOS_COM_ChangeBaud(pios_com_main_id, 115200);
     for (uint8_t i = 0; i < NELEMENTS(gps_config); i++) {
         PIOS_UBX_DDC_WriteData(PIOS_I2C_GPS, gps_config[i].sentence, gps_config[i].size);
     }

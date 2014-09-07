@@ -205,10 +205,14 @@ void PIOS_SPI_mag_flash_irq_handler(void)
 #endif /* PIOS_INCLUDE_FLASH */
 
 #if defined(PIOS_INCLUDE_HMC5X83)
+pios_hmc5x83_dev_t onboard_mag;
 #include "pios_hmc5x83.h"
 #ifdef PIOS_HMC5x83_HAS_GPIOS
+bool pios_board_mag_handler(){
+    PIOS_HMC5x83_IRQHandler(onboard_mag);
+}
 static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
-    .vector = PIOS_HMC5x83_IRQHandler,
+    .vector = pios_board_mag_handler,
     .line   = EXTI_Line7,
     .pin    = {
         .gpio = GPIOB,
@@ -243,7 +247,7 @@ static const struct pios_hmc5x83_cfg pios_mag_cfg = {
 #ifdef PIOS_HMC5x83_HAS_GPIOS
     .exti_cfg  = &pios_exti_mag_cfg,
 #endif
-    .M_ODR     = PIOS_HMC5x83_ODR_75,
+    .M_ODR     = PIOS_HMC5x83_ODR_30,
     .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
     .Gain             = PIOS_HMC5x83_GAIN_1_9,
     .Mode             = PIOS_HMC5x83_MODE_CONTINUOUS,

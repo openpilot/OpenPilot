@@ -75,7 +75,7 @@ void PIOS_Board_Init(void)
 
 #ifdef PIOS_INCLUDE_HMC5X83
     PIOS_SPI_SetClockSpeed(pios_spi_mag_flash_id, SPI_BaudRatePrescaler_16);
-    PIOS_HMC5x83_Init(&pios_mag_cfg, pios_spi_mag_flash_id, 0);
+    onboard_mag = PIOS_HMC5x83_Init(&pios_mag_cfg, pios_spi_mag_flash_id, 0);
     if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_mag_flash_id, 1)) {
         PIOS_DEBUG_Assert(0);
     }

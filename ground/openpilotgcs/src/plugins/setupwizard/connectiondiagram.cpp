@@ -50,14 +50,14 @@ void ConnectionDiagram::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 
-    ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect().adjusted(-5,-5,5,5), Qt::KeepAspectRatio);
 }
 
 void ConnectionDiagram::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
 
-    ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect().adjusted(-5,-5,5,5), Qt::KeepAspectRatio);
 }
 
 void ConnectionDiagram::setupGraphicsScene()
@@ -225,7 +225,7 @@ void ConnectionDiagram::setupGraphicsScene()
 
         ui->connectionDiagram->setSceneRect(m_scene->itemsBoundingRect());
         //ui->connectionDiagram->setSceneRect(m_background);
-        ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+        ui->connectionDiagram->fitInView(m_scene->itemsBoundingRect().adjusted(-5,-5,5,5), Qt::KeepAspectRatio);
         //ui->connectionDiagram->fitInView(m_background, Qt::KeepAspectRatio);
 
         qDebug() << "Scene complete";

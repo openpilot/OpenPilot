@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
             cout << "| -p <file>            : program hw (requires:-d - optionals:-v,-w)      |\n";
             cout << "| -v                   : verify     (requires:-d)                        |\n";
             cout << "| -dn <file>           : download firmware to file (requires:-d)         |\n";
-            // cout<<"| -dd <file>           : download discription (requires:-d)         |\n";
+            // cout << "| -dd <file>           : download discription (requires:-d)              |\n";
             cout << "| -d <number Of Device : (requires: -p or -dn)                           |\n";
             cout << "| -w <description>     : (requires: -p)                                  |\n";
             cout << "| -ca <file>           : compares byte by byte current firmware with file|\n";
@@ -198,8 +198,9 @@ int main(int argc, char *argv[])
                 cout << "Error:Invalid Device";
                 return -1;
             }
-// if(dfu.numberOfDevices==1)
-// dfu.use_delay=false;
+            if (dfu.numberOfDevices == 1) {
+                dfu.use_delay = false;
+            }
             if (!dfu.enterDFU(device)) {
                 cout << "Error:Could not enter DFU mode\n";
                 return -1;
@@ -251,7 +252,9 @@ int main(int argc, char *argv[])
         } else if (action == OP_DFU::actionJump) {
             dfu.JumpToApp(false, false);
         }
-
+        while(!dfu.isFinished()){
+            QThread::msleep(500);
+        }
         return 0;
     }
     return a.exec();

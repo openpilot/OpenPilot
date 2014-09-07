@@ -63,10 +63,13 @@ public:
     uint32_t RxError;
     uint32_t TxError;
     uint16_t flags;
-    port(QString name);
+    port(QString name, bool debug);
     virtual ~port();
     portstatus status();
 private:
+    bool debug;
+    QByteArray rxDebugBuff;
+    QByteArray txDebugBuff;
     portstatus mstatus;
     QTime timer;
     QSerialPort *sport;

@@ -26,7 +26,8 @@
  */
 #include "port.h"
 #include "delay.h"
-port::port(QString name) : mstatus(port::closed)
+#include <QDebug>
+port::port(QString name, bool debug) : mstatus(port::closed), debug(debug)
 {
     timer.start();
     sport = new QSerialPort();
@@ -56,12 +57,20 @@ port::portstatus port::status()
 {
     return mstatus;
 }
+
 int16_t port::pfSerialRead(void)
 {
     char c[1];
-
-    if (sport->bytesAvailable()) {
+    sport->waitForBytesWritten(5);
+    if (sport->bytesAvailable() || sport->waitForReadyRead(1)) {
         sport->read(c, 1);
+        if (debug) {
+            if (((uint8_t)c[0]) == 0xe1 || rxDebugBuff.count() > 50) {
+                qDebug() << "PORT R " << rxDebugBuff.toHex();
+                rxDebugBuff.clear();
+            }
+            rxDebugBuff.append(c[0]);
+        }
     } else { return -1; }
     return (uint8_t)c[0];
 }
@@ -72,6 +81,14 @@ void port::pfSerialWrite(uint8_t c)
 
     cc[0] = c;
     sport->write(cc, 1);
+    if (debug) {
+        if (((uint8_t)cc[0]) == 0xe1 || rxDebugBuff.count() > 50) {
+            qDebug() << "PORT T " << txDebugBuff.toHex();
+            txDebugBuff.clear();
+        }
+        txDebugBuff.append(cc[0]);
+    }
+    sport->waitForBytesWritten(1);
 }
 
 uint32_t port::pfGetTime(void)

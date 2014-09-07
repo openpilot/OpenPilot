@@ -2,9 +2,9 @@
 #define OP_DFU_H
 
 #include <QByteArray>
-//#include <ophid/inc/ophid_hidapi.h>
-//#include <ophid/inc/ophid_usbmon.h>
-//#include <ophid/inc/ophid_usbsignal.h>
+// #include <ophid/inc/ophid_hidapi.h>
+// #include <ophid/inc/ophid_usbmon.h>
+// #include <ophid/inc/ophid_usbsignal.h>
 #include <QDebug>
 #include <QFile>
 #include <QThread>
@@ -41,19 +41,19 @@ enum CompareType {
     bytetobytecompare
 };
 // Command Line Options
-#define DOWNLOAD            "-dn"    // done
-#define DEVICE              "-d"     // done
-// #define DOWNDESCRIPTION     "-dd"    //done
-#define PROGRAMFW           "-p"     // done
-#define PROGRAMDESC         "-w"     // done
-#define VERIFY              "-v"     // done
-#define COMPARECRC          "-cc"
-#define COMPAREALL          "-ca"
-#define STATUSREQUEST       "-s"    // done
-#define LISTDEVICES         "-ls"   // done
-#define RESET               "-r"
-#define JUMP                "-j"
-#define USE_SERIAL          "-t"
+#define DOWNLOAD        "-dn"    // done
+#define DEVICE          "-d"     // done
+#define DOWNDESCRIPTION "-dd" // done
+#define PROGRAMFW       "-p"     // done
+#define PROGRAMDESC     "-w"     // done
+#define VERIFY          "-v"     // done
+#define COMPARECRC      "-cc"
+#define COMPAREALL      "-ca"
+#define STATUSREQUEST   "-s"    // done
+#define LISTDEVICES     "-ls"   // done
+#define RESET           "-r"
+#define JUMP            "-j"
+#define USE_SERIAL      "-t"
 
 Q_ENUMS(Status)
 enum Status {
@@ -197,7 +197,7 @@ private:
 
 
     // USB Bootloader:
-    //opHID_hidapi hidHandle;
+    // opHID_hidapi hidHandle;
     int setStartBit(int command)
     {
         return command | 0x20;

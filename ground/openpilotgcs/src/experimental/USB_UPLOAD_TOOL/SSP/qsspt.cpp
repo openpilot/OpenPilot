@@ -34,7 +34,6 @@ void qsspt::run()
     while (!endthread) {
         receivestatus = this->ssp_ReceiveProcess();
         sendstatus    = this->ssp_SendProcess();
-        msleep(1);
         sendbufmutex.lock();
         if (datapending && receivestatus == SSP_TX_IDLE) {
             this->ssp_SendData(mbuf, msize);
@@ -48,6 +47,13 @@ void qsspt::run()
 }
 bool qsspt::sendData(uint8_t *buf, uint16_t size)
 {
+    if (debug) {
+        QByteArray data;
+        for (int i = 0; i < size; i++) {
+            data.append((uint8_t)buf[i]);
+        }
+        qDebug() << "SSP TX " << data.toHex();
+    }
     if (datapending) {
         return false;
     }
@@ -89,6 +95,9 @@ int qsspt::read_Packet(void *data)
     }
     QByteArray arr = queue.dequeue();
     memcpy(data, (uint8_t *)arr.data(), arr.length());
+    if (debug) {
+        qDebug() << "SSP RX " << arr.toHex();
+    }
     mutex.unlock();
     return arr.length();
 }

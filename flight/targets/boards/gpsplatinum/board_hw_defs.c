@@ -199,6 +199,55 @@ void PIOS_SPI_mag_flash_irq_handler(void)
     PIOS_SPI_IRQ_Handler(pios_spi_mag_flash_id);
 }
 
+
+#if defined(PIOS_INCLUDE_HMC5X83)
+#include "pios_hmc5x83.h"
+#ifdef PIOS_HMC5x83_HAS_GPIOS
+static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
+    .vector = PIOS_HMC5x83_IRQHandler,
+    .line   = EXTI_Line7,
+    .pin    = {
+        .gpio = GPIOB,
+        .init = {
+            .GPIO_Pin   = GPIO_Pin_7,
+            .GPIO_Speed = GPIO_Speed_100MHz,
+            .GPIO_Mode  = GPIO_Mode_IN,
+            .GPIO_OType = GPIO_OType_OD,
+            .GPIO_PuPd  = GPIO_PuPd_NOPULL,
+        },
+    },
+    .irq                                       = {
+        .init                                  = {
+            .NVIC_IRQChannel    = EXTI9_5_IRQn,
+            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannelCmd = ENABLE,
+        },
+    },
+    .exti                                      = {
+        .init                                  = {
+            .EXTI_Line    = EXTI_Line7, // matches above GPIO pin
+            .EXTI_Mode    = EXTI_Mode_Interrupt,
+            .EXTI_Trigger = EXTI_Trigger_Rising,
+            .EXTI_LineCmd = ENABLE,
+        },
+    },
+};
+#endif
+
+static const struct pios_hmc5x83_cfg pios_mag_cfg = {
+#ifdef PIOS_HMC5x83_HAS_GPIOS
+    .exti_cfg  = &pios_exti_mag_cfg,
+#endif
+    .M_ODR     = PIOS_HMC5x83_ODR_75,
+    .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
+    .Gain = PIOS_HMC5x83_GAIN_1_9,
+    .Mode = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Driver = &PIOS_HMC5x83_SPI_DRIVER,
+};
+#endif /* PIOS_INCLUDE_HMC5883 */
+
+
 #endif /* PIOS_INCLUDE_SPI */
 
 #if defined(PIOS_INCLUDE_USART)

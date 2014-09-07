@@ -74,6 +74,10 @@ void PIOS_Board_Init(void)
         PIOS_Assert(0);
     }
 
+#ifdef PIOS_INCLUDE_HMC5X83
+    PIOS_SPI_SetPrescalar(pios_spi_mag_flash_id, SPI_BaudRatePrescaler_16);
+    PIOS_HMC5x83_Init(&pios_mag_cfg, pios_spi_mag_flash_id, 0);
+#endif
 
 #endif
 /* Initialize the task monitor */

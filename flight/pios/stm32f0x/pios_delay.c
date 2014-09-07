@@ -81,28 +81,10 @@ int32_t PIOS_DELAY_Init(void)
  */
 int32_t PIOS_DELAY_WaituS(uint32_t uS)
 {
-    uint32_t elapsed    = 0;
     uint32_t last_count = DELAY_COUNTER;
 
-    for (;;) {
-        uint32_t current_count = DELAY_COUNTER;
-        uint32_t elapsed_uS;
-
-        /* measure the time elapsed since the last time we checked */
-        elapsed   += current_count - last_count;
-        last_count = current_count;
-
-        /* convert to microseconds */
-        elapsed_uS = elapsed;
-        if (elapsed_uS >= uS) {
-            break;
-        }
-
-        /* reduce the delay by the elapsed time */
-        uS -= elapsed_uS;
-
-        /* keep fractional microseconds for the next iteration */
-        elapsed = 0;
+    while (DELAY_COUNTER - last_count <= uS) {
+        ;
     }
 
     /* No error */
@@ -146,7 +128,7 @@ uint32_t PIOS_DELAY_GetuS(void)
  */
 uint32_t PIOS_DELAY_GetuSSince(uint32_t t)
 {
-    return PIOS_DELAY_GetuS() - t;
+    return DELAY_COUNTER - t;
 }
 
 /**

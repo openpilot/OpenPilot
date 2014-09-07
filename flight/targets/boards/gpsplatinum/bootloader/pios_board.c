@@ -37,6 +37,11 @@
 #include "../board_hw_defs.c"
 #include <pios_com_msg.h>
 uint32_t PIOS_COM_TELEM_USB;
+#define PIOS_COM_MAIN_RX_BUF_LEN 256
+#define PIOS_COM_MAIN_TX_BUF_LEN 256
+uint8_t rx_buffer[PIOS_COM_MAIN_RX_BUF_LEN];
+uint8_t tx_buffer[PIOS_COM_MAIN_TX_BUF_LEN];
+
 
 static void setupCom();
 /**
@@ -47,6 +52,8 @@ static void setupCom();
 void PIOS_Board_Init(void)
 {
     const struct pios_board_info *bdinfo = &pios_board_info_blob;
+
+    FLASH_PrefetchBufferCmd(ENABLE);
 
 #if defined(PIOS_INCLUDE_LED)
     const struct pios_gpio_cfg *led_cfg  = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
@@ -62,7 +69,9 @@ void setupCom()
     if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
         PIOS_Assert(0);
     }
-    if (PIOS_COM_MSG_Init(&PIOS_COM_TELEM_USB, &pios_usart_com_driver, pios_usart_generic_id)) {
+    if (PIOS_COM_Init(&PIOS_COM_TELEM_USB, &pios_usart_com_driver, pios_usart_generic_id,
+                      rx_buffer, PIOS_COM_MAIN_RX_BUF_LEN,
+                      tx_buffer, PIOS_COM_MAIN_TX_BUF_LEN)) {
         PIOS_Assert(0);
     }
 }

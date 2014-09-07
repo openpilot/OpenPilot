@@ -236,6 +236,7 @@ static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud)
 static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback rx_in_cb, uint32_t context)
 {
     struct pios_usart_dev *usart_dev = PIOS_USART_validate(usart_id);
+
     /*
      * Order is important in these assignments since ISR uses _cb
      * field to determine if it's ok to dereference _cb and _context
@@ -264,9 +265,9 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 
 
     /* Check if RXNE flag is set */
-    bool rx_need_yield   = false;
-    if(USART_GetITStatus(usart_dev->cfg->regs, USART_IT_RXNE) != RESET) {
+    bool rx_need_yield = false;
 
+    if (USART_GetITStatus(usart_dev->cfg->regs, USART_IT_RXNE) != RESET) {
         uint8_t byte = USART_ReceiveData(usart_dev->cfg->regs) & 0x00FF;
         if (usart_dev->rx_in_cb) {
             uint16_t rc;

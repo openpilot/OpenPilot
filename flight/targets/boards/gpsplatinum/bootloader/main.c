@@ -33,22 +33,22 @@
 #include <op_dfu.h>
 #include <pios_iap.h>
 #include <fifo_buffer.h>
-#include <pios_com_msg.h>
+#include <pios_com.h>
 #include <ssp.h>
 #include <pios_delay.h>
 
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
-
+int32_t platform_senddata(const uint8_t *msg, uint16_t msg_len);
 /* Private typedef -----------------------------------------------------------*/
 typedef void (*pFunction)(void);
 /* Private define ------------------------------------------------------------*/
 #define MAX_PACKET_DATA_LEN 255
 #define MAX_PACKET_BUF_SIZE (1 + 1 + MAX_PACKET_DATA_LEN + 2)
-#define UART_BUFFER_SIZE    512
+#define UART_BUFFER_SIZE    256
 #define BL_WAIT_TIME        6 * 1000 * 1000
-#define DFU_BUFFER_SIZE 63
+#define DFU_BUFFER_SIZE     63
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -56,21 +56,21 @@ pFunction Jump_To_Application;
 static uint32_t JumpAddress;
 
 /// LEDs PWM
-static uint16_t period1; // 5 mS
-static uint16_t sweep_steps1; // * 5 mS -> 500 mS
-//static uint16_t period2 = 5000; // 5 mS
-//static uint16_t sweep_steps2 = 100; // * 5 mS -> 500 mS
+uint32_t period1 = 5000; // 5 mS
+uint32_t sweep_steps1 = 100; // * 5 mS -> 500 mS
+uint32_t period2 = 5000; // 5 mS
+uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 
-static uint8_t mReceive_Buffer[DFU_BUFFER_SIZE];
+static uint8_t process_buffer[DFU_BUFFER_SIZE];
 static uint8_t rx_buffer[UART_BUFFER_SIZE];
-static uint8_t ssp_txBuf[MAX_PACKET_BUF_SIZE];
-static uint8_t ssp_rxBuf[MAX_PACKET_BUF_SIZE];
+static uint8_t txBuf[MAX_PACKET_BUF_SIZE];
+static uint8_t rxBuf[MAX_PACKET_BUF_SIZE];
 
 /* Extern variables ----------------------------------------------------------*/
 DFUStates DeviceState = DFUidle;
 int16_t status = 0;
 bool JumpToApp = false;
-bool GO_dfu    = false;
+bool ssp_dfu   = false; // signal that ssp data has been received
 bool User_DFU_request = true;
 
 
@@ -84,19 +84,19 @@ static void jump_to_app();
 static void SSP_CallBack(uint8_t *buf, uint16_t len);
 static int16_t SSP_SerialRead(void);
 static void SSP_SerialWrite(uint8_t);
-static uint32_t SSP_GetTime(void);
+
 
 static const PortConfig_t ssp_portConfig = {
-    .rxBuf         = ssp_rxBuf,
+    .rxBuf         = rxBuf,
     .rxBufSize     = MAX_PACKET_DATA_LEN,
-    .txBuf         = ssp_txBuf,
+    .txBuf         = txBuf,
     .txBufSize     = MAX_PACKET_DATA_LEN,
-    .max_retry     = 10,
-    .timeoutLen    = 1000,
+    .max_retry     = 1,
+    .timeoutLen    = 5000,
     .pfCallBack    = SSP_CallBack,
     .pfSerialRead  = SSP_SerialRead,
     .pfSerialWrite = SSP_SerialWrite,
-    .pfGetTime     = SSP_GetTime,
+    .pfGetTime     = PIOS_DELAY_GetuS,
 };
 
 static Port_t ssp_port;
@@ -109,53 +109,70 @@ int main()
     PIOS_IAP_Init();
 
     if (PIOS_IAP_CheckRequest() == false) {
-        PIOS_DELAY_WaitmS(1000);
+        PIOS_DELAY_WaitmS(500);
         User_DFU_request = false;
         DeviceState = BLidle;
         PIOS_IAP_ClearRequest();
     }
 
-
     // Initialize the SSP layer between serial port and DFU
     fifoBuf_init(&ssp_buffer, rx_buffer, UART_BUFFER_SIZE);
     ssp_Init(&ssp_port, &ssp_portConfig);
 
-    GO_dfu = User_DFU_request;
-    JumpToApp = !User_DFU_request;
-
-    uint32_t stopwatch  = 0;
+    uint32_t stopwatch = 0;
     const uint32_t start_time = PIOS_DELAY_GetuS();
     while (true) {
         /* Update the stopwatch */
-        stopwatch  = PIOS_DELAY_GetuSSince(start_time);
-
-        if (JumpToApp == true) {
-            jump_to_app();
-        }
+        stopwatch = PIOS_DELAY_GetuSSince(start_time);
 
         processRX();
 
         switch (DeviceState) {
+        case Last_operation_Success:
+        case uploadingStarting:
+        case DFUidle:
+            period1 = 5000;
+            sweep_steps1 = 100;
+            //PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+            period2 = 0;
+            break;
         case uploading:
+            period1 = 5000;
+            sweep_steps1 = 100;
+            period2 = 2500;
+            sweep_steps2 = 50;
+            break;
         case downloading:
             period1 = 2500;
             sweep_steps1 = 50;
+            //PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+            period2 = 0;
             break;
         case BLidle:
             period1 = 0;
+            sweep_steps1 = 100;
+            PIOS_LED_On(PIOS_LED_HEARTBEAT);
+            period2 = 0;
             break;
-        default:
+        default: // error
             period1 = 5000;
             sweep_steps1 = 100;
+            period2 = 5000;
+            sweep_steps2 = 100;
         }
-        led_pwm_step(period1, sweep_steps1, stopwatch, true);
-//        led_pwm_step(period2, sweep_steps2, stopwatch, false);
+        led_pwm_step(period1, sweep_steps1, stopwatch, false);
+        led_pwm_step(period2, sweep_steps2, stopwatch, true);
         JumpToApp |= (stopwatch > BL_WAIT_TIME) && ((DeviceState == BLidle) || (DeviceState == DFUidle));
         DataDownload(start);
+
+        if (JumpToApp == true && !ssp_dfu) {
+            jump_to_app();
+        }
     }
 }
 
-void led_pwm_step(uint16_t pwm_period, uint16_t pwm_sweep_steps, uint32_t stopwatch, bool default_state){
+void led_pwm_step(uint16_t pwm_period, uint16_t pwm_sweep_steps, uint32_t stopwatch, bool default_state)
+{
     if (pwm_period != 0) {
         if (LedPWM(pwm_period, pwm_sweep_steps, stopwatch)) {
             PIOS_LED_On(PIOS_LED_HEARTBEAT);
@@ -163,7 +180,7 @@ void led_pwm_step(uint16_t pwm_period, uint16_t pwm_sweep_steps, uint32_t stopwa
             PIOS_LED_Off(PIOS_LED_HEARTBEAT);
         }
     } else {
-        if(default_state){
+        if (default_state) {
             PIOS_LED_On(PIOS_LED_HEARTBEAT);
         } else {
             PIOS_LED_Off(PIOS_LED_HEARTBEAT);
@@ -195,7 +212,7 @@ void jump_to_app()
 uint32_t LedPWM(uint16_t pwm_period, uint16_t pwm_sweep_steps, uint32_t count)
 {
     const uint32_t curr_step  = (count / pwm_period) % pwm_sweep_steps; /* 0 - pwm_sweep_steps */
-    uint32_t pwm_duty   = pwm_period * curr_step / pwm_sweep_steps; /* fraction of pwm_period */
+    uint32_t pwm_duty = pwm_period * curr_step / pwm_sweep_steps; /* fraction of pwm_period */
 
     const uint32_t curr_sweep = (count / (pwm_period * pwm_sweep_steps)); /* ticks once per full sweep */
 
@@ -204,24 +221,30 @@ uint32_t LedPWM(uint16_t pwm_period, uint16_t pwm_sweep_steps, uint32_t count)
     }
     return ((count % pwm_period) > pwm_duty) ? 1 : 0;
 }
-
+uint32_t process_count = 0;
 void processRX()
 {
-    do{
+    do {
         ssp_ReceiveProcess(&ssp_port);
         status = ssp_SendProcess(&ssp_port);
-    }while ((status != SSP_TX_IDLE) && (status != SSP_TX_ACKED));
+    } while ((status != SSP_TX_IDLE) && (status != SSP_TX_ACKED));
 
     if (fifoBuf_getUsed(&ssp_buffer) >= DFU_BUFFER_SIZE) {
         for (int32_t x = 0; x < DFU_BUFFER_SIZE; ++x) {
-            mReceive_Buffer[x] = fifoBuf_getByte(&ssp_buffer);
+            process_buffer[x] = fifoBuf_getByte(&ssp_buffer);
         }
-        processComand(mReceive_Buffer);
+        process_count++;
+        processComand(process_buffer);
     }
 }
-
+uint32_t callback_cnt = 0;
+uint32_t read_cnt     = 0;
+uint32_t write_cnt    = 0;
+uint32_t rx_check_cnt = 0;
 void SSP_CallBack(uint8_t *buf, uint16_t len)
 {
+    ssp_dfu = true;
+    callback_cnt++;
     fifoBuf_putData(&ssp_buffer, buf, len);
 }
 
@@ -229,20 +252,22 @@ int16_t SSP_SerialRead(void)
 {
     uint8_t byte;
 
-    if (PIOS_COM_MSG_Receive(PIOS_COM_TELEM_USB, &byte, 1) == 1) {
+    rx_check_cnt++;
+    if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB, &byte, 1, 0) == 1) {
+        read_cnt++;
         return byte;
     } else {
         return -1;
     }
 }
 
+int32_t platform_senddata(const uint8_t *msg, uint16_t msg_len)
+{
+    return ssp_SendData(&ssp_port, msg, msg_len);
+}
 
 void SSP_SerialWrite(uint8_t value)
 {
-    PIOS_COM_MSG_Send(PIOS_COM_TELEM_USB, &value, 1);
-}
-
-uint32_t SSP_GetTime(void)
-{
-    return PIOS_DELAY_GetuS();
+    write_cnt++;
+    PIOS_COM_SendChar(PIOS_COM_TELEM_USB, value);
 }

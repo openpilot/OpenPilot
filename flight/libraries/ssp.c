@@ -305,7 +305,6 @@ uint16_t ssp_SendDataBlock(Port_t *thisport, uint8_t *data, uint16_t length)
         packet_status = ssp_SendProcess(thisport); // check the send status
     }
     return packet_status == SSP_TX_ACKED; // figure out what happened to the packet
-
 }
 
 /*!

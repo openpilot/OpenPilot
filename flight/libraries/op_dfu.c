@@ -31,7 +31,6 @@
 #include <stdbool.h>
 #include "op_dfu.h"
 #include "pios_bl_helper.h"
-#include "pios_com_msg.h"
 #include <pios_board_info.h>
 // programmable devices
 Device devicesTable[10];
@@ -71,6 +70,7 @@ DFUTransfer downType = 0;
 /* Extern variables ----------------------------------------------------------*/
 extern DFUStates DeviceState;
 extern uint8_t JumpToApp;
+extern int32_t platform_senddata(const uint8_t *msg, uint16_t msg_len);
 /* Private function prototypes -----------------------------------------------*/
 static uint32_t baseOfAdressType(uint8_t type);
 static uint8_t isBiggerThanAvailable(uint8_t type, uint32_t size);
@@ -135,12 +135,7 @@ static void pack_uint32(uint32_t value, uint8_t *buffer)
 
 void processComand(uint8_t *xReceive_Buffer)
 {
-    Command = xReceive_Buffer[COMMAND];
-#ifdef DEBUG_SSP
-    char str[63] = { 0 };
-    sprintf(str, "Received COMMAND:%d|", Command);
-    PIOS_COM_SendString(PIOS_COM_TELEM_USB, str);
-#endif
+    Command     = xReceive_Buffer[COMMAND];
     EchoReqFlag = (Command >> 7);
     EchoAnsFlag = (Command >> 6) & 0x01;
     StartFlag   = (Command >> 5) & 0x01;
@@ -343,14 +338,7 @@ void processComand(uint8_t *xReceive_Buffer)
         }
         break;
     case Download_Req:
-#ifdef DEBUG_SSP
-        sprintf(str, "COMMAND:DOWNLOAD_REQ 1 Status=%d|", DeviceState);
-        PIOS_COM_SendString(PIOS_COM_TELEM_USB, str);
-#endif
         if (DeviceState == DFUidle) {
-#ifdef DEBUG_SSP
-            PIOS_COM_SendString(PIOS_COM_TELEM_USB, "COMMAND:DOWNLOAD_REQ 1|");
-#endif
             downType = Data0;
             downPacketTotal = Count;
             downSizeOfLastPacket = Data1;
@@ -468,7 +456,7 @@ uint32_t CalcFirmCRC()
 }
 void sendData(uint8_t *buf, uint16_t size)
 {
-    PIOS_COM_MSG_Send(PIOS_COM_TELEM_USB, buf, size);
+    platform_senddata(buf, size);
 }
 
 bool flash_read(uint8_t *buffer, uint32_t adr, DFUProgType type)

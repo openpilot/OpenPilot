@@ -18,6 +18,8 @@
 #define FALSE             0
 #endif
 
+#define SPP_USES_CRC
+
 #define SSP_TX_IDLE       0   // not expecting a ACK packet (no current transmissions in progress)
 #define SSP_TX_WAITING    1   // waiting for a valid ACK to arrive
 #define SSP_TX_TIMEOUT    2   // failed to receive a valid ACK in the timeout period, after retrying.

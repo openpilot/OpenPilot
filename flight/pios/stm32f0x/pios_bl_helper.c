@@ -87,12 +87,7 @@ static bool erase_flash(uint32_t startAddress, uint32_t endAddress)
                 fail = true;
             }
         }
-
-#ifdef STM32F10X_HD
-        pageAddress += 2048;
-#elif defined(STM32F10X_MD)
         pageAddress += 1024;
-#endif
     }
     return !fail;
 }

@@ -70,31 +70,10 @@ void PIOS_Board_Init(void)
 
 #if defined(PIOS_INCLUDE_SPI)
     /* Set up the SPI interface to the serial flash */
-    if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg_cc3d)) {
+    if (PIOS_SPI_Init(&pios_spi_mag_flash_id, &pios_spi_mag_flash_cfg)) {
         PIOS_Assert(0);
     }
 
-    uintptr_t flash_id;
-    switch (bdinfo->board_rev) {
-    case BOARD_REVISION_CC:
-        if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_accel_id, 1)) {
-            PIOS_DEBUG_Assert(0);
-        }
-        if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_w25x_cfg, &pios_jedec_flash_driver, flash_id)) {
-            PIOS_DEBUG_Assert(0);
-        }
-        break;
-    case BOARD_REVISION_CC3D:
-        if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_accel_id, 0)) {
-            PIOS_DEBUG_Assert(0);
-        }
-        if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id)) {
-            PIOS_DEBUG_Assert(0);
-        }
-        break;
-    default:
-        PIOS_DEBUG_Assert(0);
-    }
 
 #endif
 /* Initialize the task monitor */

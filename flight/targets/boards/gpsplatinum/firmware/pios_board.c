@@ -43,13 +43,10 @@
  */
 #include "../board_hw_defs.c"
 
-#define PIOS_COM_MAIN_RX_BUF_LEN     32
-#define PIOS_COM_MAIN_TX_BUF_LEN     12
+#define PIOS_COM_MAIN_RX_BUF_LEN     16
+#define PIOS_COM_MAIN_TX_BUF_LEN     64
 
 uint32_t pios_com_main_id;
-
-uintptr_t pios_uavo_settings_fs_id;
-uintptr_t pios_user_fs_id = 0;
 
 
 /**
@@ -99,72 +96,42 @@ void PIOS_Board_Init(void)
         PIOS_DEBUG_Assert(0);
     }
 
-    /* Initialize the task monitor */
-    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
-        PIOS_Assert(0);
-    }
-
-    /* Initialize the delayed callback library */
-    PIOS_CALLBACKSCHEDULER_Initialize();
-
-    /* Initialize UAVObject libraries */
-    EventDispatcherInitialize();
-    UAVObjInitialize();
 #endif
-
+/* Initialize the task monitor */
+if (PIOS_TASK_MONITOR_Initialize(3)) {
+    PIOS_Assert(0);
+}
 #if defined(PIOS_INCLUDE_RTC)
     /* Initialize the real-time clock and its associated tick */
     PIOS_RTC_Init(&pios_rtc_main_cfg);
 #endif
     PIOS_IAP_Init();
-    // check for safe mode commands from gcs
-#ifdef PIOS_INCLUDE_FLASH_LOGFS_SETTINGS
-    if (PIOS_IAP_ReadBootCmd(0) == PIOS_IAP_CLEAR_FLASH_CMD_0 &&
-        PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
-        PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
-        PIOS_FLASHFS_Format(pios_uavo_settings_fs_id);
-        PIOS_IAP_WriteBootCmd(0, 0);
-        PIOS_IAP_WriteBootCmd(1, 0);
-        PIOS_IAP_WriteBootCmd(2, 0);
-    }
-#endif
 
-    HwSettingsInitialize();
-
-#ifndef ERASE_FLASH
-    /* Initialize watchdog as early as possible to catch faults during init */
+/* Initialize watchdog as early as possible to catch faults during init */
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_Init();
 #endif
-#endif
-
-    /* Initialize the alarms library */
-    AlarmsInitialize();
 
     /* Check for repeated boot failures */
     uint16_t boot_count = PIOS_IAP_ReadBootCount();
     if (boot_count < 3) {
         PIOS_IAP_WriteBootCount(++boot_count);
-        AlarmsClear(SYSTEMALARMS_ALARM_BOOTFAULT);
-    } else {
-        /* Too many failed boot attempts, force hwsettings to defaults */
-        HwSettingsSetDefaults(HwSettingsHandle(), 0);
-        AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
     }
+
 #if defined(PIOS_INCLUDE_COM)
     {
         uint32_t pios_usart_generic_id;
         if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
             PIOS_Assert(0);
         }
-        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_MAIN_RX_LEN);
+        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_MAIN_RX_BUF_LEN);
         PIOS_Assert(rx_buffer);
 
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_MAIN_TX_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_MAIN_TX_BUF_LEN);
         PIOS_Assert(tx_buffer);
         if (PIOS_COM_Init(&pios_com_main_id, &pios_usart_com_driver, pios_usart_generic_id,
-                          rx_buffer, PIOS_COM_MAIN_RX_LEN,
-                          tx_buffer, PIOS_COM_MAIN_TX_LEN)) {
+                          rx_buffer, PIOS_COM_MAIN_RX_BUF_LEN,
+                          tx_buffer, PIOS_COM_MAIN_TX_BUF_LEN)) {
             PIOS_Assert(0);
         }
     }
@@ -172,7 +139,7 @@ void PIOS_Board_Init(void)
 
 #if defined(PIOS_INCLUDE_I2C)
     {
-        if (PIOS_I2C_Init(&pios_i2c_flexi_adapter_id, &pios_i2c_flexi_adapter_cfg)) {
+        if (PIOS_I2C_Init(&pios_i2c_gps_id, &pios_i2c_gps_cfg)) {
             PIOS_Assert(0);
         }
     }

@@ -31,11 +31,11 @@ USE_DSP_LIB ?= NO
 ERASE_FLASH ?= NO
 
 # List of mandatory modules to include
-MODULES += FirmwareIAP
+#MODULES += FirmwareIAP
 
 
 # Include all camera options
-CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF
+CDEFS += -DPIOS_APPS_MINIMAL
 
 # Erase flash firmware should be buildable from command line
 ifeq ($(ERASE_FLASH), YES)
@@ -48,24 +48,19 @@ endif
 SRC += $(CMSIS_DEVICEDIR)/system_stm32f0xx.c
 
 ## Application Core
-SRC += $(OPMODULEDIR)/System/systemmod.c
 SRC += $(OPSYSTEM)/gpsp.c
 SRC += $(OPSYSTEM)/pios_board.c
-SRC += $(FLIGHTLIB)/alarms.c
-SRC += $(OPUAVTALK)/uavtalk.c
+#SRC += $(FLIGHTLIB)/alarms.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 
+
 ## UAVObjects
-SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
-SRC += $(OPUAVSYNTHDIR)/systemstats.c
-SRC += $(OPUAVSYNTHDIR)/systemsettings.c
-SRC += $(OPUAVSYNTHDIR)/i2cstats.c
-SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
 SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
-SRC += $(OPUAVSYNTHDIR)/taskinfo.c
-SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
+SRC += $(OPUAVSYNTHDIR)/systemstats.c
 
 PIOS_OMITS_USB = YES
+PIOS_APPS_MINIMAL = YES
+
 include $(ROOT_DIR)/make/apps-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk

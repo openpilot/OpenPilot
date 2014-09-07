@@ -61,9 +61,9 @@
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_RTC
 //#define PIOS_INCLUDE_TIM
-//#define PIOS_INCLUDE_USART
+#define PIOS_INCLUDE_USART
 //#define PIOS_INCLUDE_ADC
-/* #define PIOS_INCLUDE_I2C */
+//#define PIOS_INCLUDE_I2C
 //#define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
@@ -129,7 +129,8 @@
 /* #define PIOS_INCLUDE_UDP */
 
 /* PIOS abstract comms interface with options */
-//#define PIOS_INCLUDE_COM
+#define PIOS_INCLUDE_COM
+#define PIOS_INCLUDE_DEBUG_CONSOLE
 /* #define PIOS_INCLUDE_COM_MSG */
 //#define PIOS_INCLUDE_TELEMETRY_RF
 /* #define PIOS_INCLUDE_COM_TELEM */

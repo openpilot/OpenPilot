@@ -193,44 +193,13 @@ void PIOS_SPI_flash_irq_handler(void)
 
 #endif /* PIOS_INCLUDE_SPI */
 
-#if defined(PIOS_INCLUDE_FLASH)
-#include "pios_flashfs_logfs_priv.h"
-#include "pios_flash_jedec_priv.h"
-
-static const struct flashfs_logfs_cfg flashfs_w25x_cfg = {
-    .fs_magic      = 0x99abcdef,
-    .total_fs_size = 0x00080000, /* 512K bytes (128 sectors = entire chip) */
-    .arena_size    = 0x00010000, /* 256 * slot size */
-    .slot_size     = 0x00000100, /* 256 bytes */
-
-    .start_offset  = 0,          /* start at the beginning of the chip */
-    .sector_size   = 0x00001000, /* 4K bytes */
-    .page_size     = 0x00000100, /* 256 bytes */
-};
-
-
-static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
-    .fs_magic      = 0x99abceef,
-    .total_fs_size = 0x00200000, /* 2M bytes (32 sectors = entire chip) */
-    .arena_size    = 0x00010000, /* 256 * slot size */
-    .slot_size     = 0x00000100, /* 256 bytes */
-
-    .start_offset  = 0,          /* start at the beginning of the chip */
-    .sector_size   = 0x00010000, /* 64K bytes */
-    .page_size     = 0x00000100, /* 256 bytes */
-};
-
-#include "pios_flash.h"
-
-#endif /* PIOS_INCLUDE_FLASH */
-
 #if defined(PIOS_INCLUDE_USART)
 
 #include "pios_usart_priv.h"
 
 static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
     .regs = USART1,
-    .remap = GPIO_AF_0,
+    .remap = GPIO_AF_1,
     .init = {
         .USART_BaudRate   = 57600,
         .USART_WordLength = USART_WordLength_8b,
@@ -309,70 +278,66 @@ void PIOS_RTC_IRQ_Handler(void)
  * I2C Adapters
  */
 
-void PIOS_I2C_flexi_adapter_ev_irq_handler(void);
-void PIOS_I2C_flexi_adapter_er_irq_handler(void);
-void I2C2_EV_IRQHandler() __attribute__((alias("PIOS_I2C_flexi_adapter_ev_irq_handler")));
-void I2C2_ER_IRQHandler() __attribute__((alias("PIOS_I2C_flexi_adapter_er_irq_handler")));
+void PIOS_I2C_gps_irq_handler(void);
+void I2C2_IRQHandler() __attribute__((alias("PIOS_I2C_gps_irq_handler")));
 
-static const struct pios_i2c_adapter_cfg pios_i2c_flexi_adapter_cfg = {
+static const struct pios_i2c_adapter_cfg pios_i2c_gps_cfg = {
     .regs = I2C2,
     .init = {
         .I2C_Mode = I2C_Mode_I2C,
         .I2C_OwnAddress1                       = 0,
         .I2C_Ack  = I2C_Ack_Enable,
         .I2C_AcknowledgedAddress               = I2C_AcknowledgedAddress_7bit,
-        .I2C_DutyCycle                         = I2C_DutyCycle_2,
-        .I2C_ClockSpeed                        = 400000,                      /* bits/s */
+        /* (3) Timing register value is computed with the AN4235 xls file,
+               fast Mode @400kHz with I2CCLK = 48MHz, rise time = 140ns,
+               fall time = 40ns */
+        .I2C_Timing                        = (uint32_t)0x00B01A4B,
     },
     .transfer_timeout_ms                       = 50,
     .scl                                       = {
         .gpio = GPIOB,
         .init = {
+            .GPIO_Speed = GPIO_Speed_2MHz,
+            .GPIO_OType = GPIO_OType_OD,
+            .GPIO_Mode  = GPIO_Mode_AF,
             .GPIO_Pin   = GPIO_Pin_10,
-            .GPIO_Speed = GPIO_Speed_10MHz,
-            .GPIO_Mode  = GPIO_Mode_AF_OD,
         },
     },
     .sda                                       = {
         .gpio = GPIOB,
         .init = {
             .GPIO_Pin   = GPIO_Pin_11,
-            .GPIO_Speed = GPIO_Speed_10MHz,
-            .GPIO_Mode  = GPIO_Mode_AF_OD,
+            .GPIO_Speed = GPIO_Speed_2MHz,
+            .GPIO_OType = GPIO_OType_OD,
+            .GPIO_Mode  = GPIO_Mode_AF,
         },
     },
     .event                                     = {
         .flags = 0,               /* FIXME: check this */
         .init  = {
-            .NVIC_IRQChannel    = I2C2_EV_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
-            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannel    = I2C2_IRQn,
+            .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_HIGHEST,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
     .error                                     = {
         .flags = 0,               /* FIXME: check this */
         .init  = {
-            .NVIC_IRQChannel    = I2C2_ER_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
-            .NVIC_IRQChannelSubPriority        = 0,
+            .NVIC_IRQChannel    = I2C2_IRQn,
+            .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_HIGHEST,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
 };
 
-uint32_t pios_i2c_flexi_adapter_id;
-void PIOS_I2C_flexi_adapter_ev_irq_handler(void)
+uint32_t pios_i2c_gps_id;
+void PIOS_I2C_gps_irq_handler(void)
 {
     /* Call into the generic code to handle the IRQ for this specific device */
-    PIOS_I2C_EV_IRQ_Handler(pios_i2c_flexi_adapter_id);
+    PIOS_I2C_IRQ_Handler(pios_i2c_gps_id);
 }
 
-void PIOS_I2C_flexi_adapter_er_irq_handler(void)
-{
-    /* Call into the generic code to handle the IRQ for this specific device */
-    PIOS_I2C_ER_IRQ_Handler(pios_i2c_flexi_adapter_id);
-}
+
 
 #endif /* PIOS_INCLUDE_I2C */
 

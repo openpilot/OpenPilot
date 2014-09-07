@@ -67,16 +67,6 @@ int main()
      * */
     PIOS_Board_Init();
 
-#ifdef ERASE_FLASH
-    PIOS_Flash_Jedec_EraseChip();
-#if defined(PIOS_LED_HEARTBEAT)
-    PIOS_LED_Off(PIOS_LED_HEARTBEAT);
-#endif /* PIOS_LED_HEARTBEAT */
-    while (1) {
-        ;
-    }
-#endif
-
     /* Initialize modules */
     MODULE_INITIALISE_ALL
     /* swap the stack to use the IRQ stack */
@@ -89,11 +79,6 @@ int main()
      * while loops, which explains why each module has a while(1){} segment. Thus,
      * the OpenPilot software actually starts at the vTaskStartScheduler() function,
      * even though this is somewhat obscure.
-     *
-     * In addition, there are many main() functions in the OpenPilot firmware source tree
-     * This is because each main() refers to a separate hardware platform. Of course,
-     * C only allows one main(), so only the relevant main() function is compiled when
-     * making a specific firmware.
      *
      */
     vTaskStartScheduler();

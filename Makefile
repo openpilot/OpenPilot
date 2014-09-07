@@ -207,7 +207,7 @@ osd_short              := 'osd '
 revoproto_short        := 'revp'
 simposix_short         := 'posx'
 discoveryf4bare_short  := 'df4b'
-gpsplatinum_short      := 'osd '
+gpsplatinum_short      := 'gps9 '
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.

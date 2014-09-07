@@ -38,7 +38,7 @@
 
 uint32_t pios_com_telem_rf_id;
 
-void setupCom();
+static void setupCom();
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware

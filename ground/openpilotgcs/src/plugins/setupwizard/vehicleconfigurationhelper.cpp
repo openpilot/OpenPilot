@@ -39,6 +39,8 @@
 #include "stabilizationsettingsbank1.h"
 #include "revocalibration.h"
 #include "accelgyrosettings.h"
+#include "gpssettings.h"
+#include "airspeedsettings.h"
 #include <QtCore/qmath.h>
 
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE    = 50;
@@ -116,6 +118,12 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
     HwSettings *hwSettings = HwSettings::GetInstance(m_uavoManager);
     HwSettings::DataFields data = hwSettings->getData();
 
+    GPSSettings *gpsSettings = NULL;
+    data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 0;
+
+    AirspeedSettings *airspeedSettings = NULL;
+    data.OptionalModules[HwSettings::OPTIONALMODULES_AIRSPEED] = 0;
+
     switch (m_configSource->getControllerType()) {
     case VehicleConfigurationSource::CONTROLLER_CC:
     case VehicleConfigurationSource::CONTROLLER_CC3D:
@@ -160,6 +168,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         data.RM_MainPort  = HwSettings::RM_MAINPORT_TELEMETRY;
 
         data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_DISABLED;
+
         switch (m_configSource->getInputType()) {
         case VehicleConfigurationSource::INPUT_PWM:
             data.RM_RcvrPort = HwSettings::RM_RCVRPORT_PWM;
@@ -168,7 +177,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             data.RM_RcvrPort = HwSettings::RM_RCVRPORT_PPM;
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
-            // We have to set teletry on flexport since s.bus needs the mainport.
+            // We have to set telemetry on flexport since s.bus needs the mainport.
             data.RM_MainPort  = HwSettings::RM_MAINPORT_SBUS;
             data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_TELEMETRY;
             break;
@@ -184,9 +193,76 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         default:
             break;
         }
+
+        if (m_configSource->getGpsType() != VehicleConfigurationSource::GPS_DISABLED) {
+
+            gpsSettings = GPSSettings::GetInstance(m_uavoManager);
+            GPSSettings::DataFields gpsData = gpsSettings->getData();
+
+            switch (m_configSource->getGpsType()) {
+            case VehicleConfigurationSource::GPS_NMEA:
+                data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
+                data.RM_MainPort = HwSettings::RM_MAINPORT_GPS;
+                data.GPSSpeed = HwSettings::GPSSPEED_57600;
+                gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_NMEA;
+                break;
+            case VehicleConfigurationSource::GPS_UBX:
+                data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
+                data.RM_MainPort = HwSettings::RM_MAINPORT_GPS;
+                data.GPSSpeed = HwSettings::GPSSPEED_57600;
+                gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_UBX;
+                break;
+            case VehicleConfigurationSource::GPS_PLATINUM:
+                data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
+                data.RM_MainPort = HwSettings::RM_MAINPORT_GPS;
+                data.GPSSpeed = HwSettings::GPSSPEED_57600;
+                //gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_PLATINUM;
+                break;
+            default:
+                data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 0;
+                break;
+            }
+
+            gpsSettings->setData(gpsData);
+        }
+
+        if (m_configSource->getVehicleType() == VehicleConfigurationSource::VEHICLE_FIXEDWING &&
+                m_configSource->getAirspeedType() != VehicleConfigurationSource::AIRSPEED_DISABLED) {
+
+            airspeedSettings = AirspeedSettings::GetInstance(m_uavoManager);
+            AirspeedSettings::DataFields airspeedData = airspeedSettings->getData();
+
+            switch (m_configSource->getAirspeedType()) {
+            case VehicleConfigurationSource::AIRSPEED_ESTIMATE:
+                data.OptionalModules[HwSettings::OPTIONALMODULES_AIRSPEED] = 1;
+                airspeedData.AirspeedSensorType = AirspeedSettings::AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION;
+                break;
+            case VehicleConfigurationSource::AIRSPEED_EAGLETREE:
+                data.OptionalModules[HwSettings::OPTIONALMODULES_AIRSPEED] = 1;
+                data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_I2C;
+                airspeedData.AirspeedSensorType = AirspeedSettings::AIRSPEEDSENSORTYPE_EAGLETREEAIRSPEEDV3;
+                break;
+            case VehicleConfigurationSource::AIRSPEED_MS4525:
+                data.OptionalModules[HwSettings::OPTIONALMODULES_AIRSPEED] = 1;
+                data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_I2C;
+                airspeedData.AirspeedSensorType = AirspeedSettings::AIRSPEEDSENSORTYPE_PIXHAWKAIRSPEEDMS4525DO;
+                break;
+            default:
+                data.OptionalModules[HwSettings::OPTIONALMODULES_AIRSPEED] = 0;
+                break;
+            }
+
+            airspeedSettings->setData(airspeedData);
+        }
         break;
     default:
         break;
+    }
+    if (gpsSettings != NULL) {
+        addModifiedObject(gpsSettings, tr("Writing GPS sensor settings"));
+    }
+    if (airspeedSettings != NULL) {
+        addModifiedObject(airspeedSettings, tr("Writing Airspeed sensor settings"));
     }
     hwSettings->setData(data);
     addModifiedObject(hwSettings, tr("Writing hardware settings"));

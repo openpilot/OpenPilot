@@ -1,6 +1,5 @@
 #include <QtCore/QCoreApplication>
 #include <QThread>
-#include <../../plugins/rawhid/pjrc_rawhid.h>
 #include "op_dfu.h"
 #include <QStringList>
 
@@ -160,7 +159,7 @@ int main(int argc, char *argv[])
         }
 
         ///////////////////////////////////ACTIONS START///////////////////////////////////////////////////
-        OP_DFU dfu(debug, use_serial, serialport, umodereset);
+        OP_DFU::DFUObject dfu(debug, use_serial, serialport);
         if (!dfu.ready()) {
             return -1;
         }
@@ -211,15 +210,15 @@ int main(int argc, char *argv[])
                     return false;
                 }
 
-                OP_DFU::Status retstatus = dfu.UploadFirmware(file.toAscii(), verify, device);
-                if (retstatus != OP_DFU::Last_operation_Success) {
-                    cout << "Upload failed with code:" << dfu.StatusToString(retstatus).toLatin1().data();
+                bool retstatus = dfu.UploadFirmware(file.toLatin1(), verify, device);
+                if (!retstatus) {
+                    cout << "Upload failed with code:" << retstatus;
                     return -1;
                 }
                 if (!description.isEmpty()) {
                     retstatus = dfu.UploadDescription(description);
                     if (retstatus != OP_DFU::Last_operation_Success) {
-                        cout << "Upload failed with code:" << dfu.StatusToString(retstatus).toLatin1().data();
+                        cout << "Upload failed with code:" << retstatus;
                         return -1;
                     }
                 }
@@ -230,17 +229,19 @@ int main(int argc, char *argv[])
                     return false;
                 }
                 qint32 size = ((OP_DFU::device)dfu.devices[device]).SizeOfCode;
-                bool ret    = dfu.SaveByteArrayToFile(file.toAscii(), dfu.StartDownload(size, OP_DFU::FW));
+                QByteArray fw;
+                dfu.DownloadFirmware(&fw, 0);
+                bool ret    = dfu.SaveByteArrayToFile(file.toLatin1(), fw);
                 return ret;
             } else if (action == OP_DFU::actionCompareCrc) {
-                dfu.CompareFirmware(file.toAscii(), OP_DFU::crccompare, device);
+                dfu.CompareFirmware(file.toLatin1(), OP_DFU::crccompare, device);
                 return 1;
             } else if (action == OP_DFU::actionCompareAll) {
                 if (((OP_DFU::device)dfu.devices[device]).Readable == false) {
                     cout << "ERROR device not readable\n";
                     return false;
                 }
-                dfu.CompareFirmware(file.toAscii(), OP_DFU::bytetobytecompare, device);
+                dfu.CompareFirmware(file.toLatin1(), OP_DFU::bytetobytecompare, device);
                 return 1;
             }
         } else if (action == OP_DFU::actionStatusReq) {
@@ -248,7 +249,7 @@ int main(int argc, char *argv[])
         } else if (action == OP_DFU::actionReset) {
             dfu.ResetDevice();
         } else if (action == OP_DFU::actionJump) {
-            dfu.JumpToApp();
+            dfu.JumpToApp(false, false);
         }
 
         return 0;

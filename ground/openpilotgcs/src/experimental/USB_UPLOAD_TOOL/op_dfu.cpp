@@ -1,22 +1,48 @@
+/**
+ ******************************************************************************
+ *
+ * @file       op_dfu.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup Uploader Uploader Plugin
+ * @{
+ * @brief The uploader plugin
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 #include "op_dfu.h"
 #include <cmath>
 #include <qwaitcondition.h>
-#include <QMutex>
+#include <QMetaType>
+#include <QtWidgets/QApplication>
 
-OP_DFU::OP_DFU(bool _debug, bool _use_serial, QString portname, bool umodereset) : debug(_debug), use_serial(_use_serial), mready(true)
+using namespace OP_DFU;
+
+DFUObject::DFUObject(bool _debug, bool _use_serial, QString portname) :
+    debug(_debug), use_serial(_use_serial), mready(true)
 {
+    info = NULL;
+    numberOfDevices = 0;
+
+    qRegisterMetaType<OP_DFU::Status>("Status");
+
     if (use_serial) {
-        cout << "Connect hw now and press any key";
-        // getch();
-        // delay::msleep(2000);
-        PortSettings settings;
-        settings.BaudRate    = BAUD57600;
-        settings.DataBits    = DATA_8;
-        settings.FlowControl = FLOW_OFF;
-        settings.Parity = PAR_NONE;
-        settings.StopBits    = STOP_1;
-        settings.Timeout_Millisec = 1000;
-        info = new port(settings, portname);
+        info = new port(portname);
         info->rxBuf      = sspRxBuf;
         info->rxBufSize  = MAX_PACKET_DATA_LEN;
         info->txBuf      = sspTxBuf;
@@ -28,56 +54,85 @@ OP_DFU::OP_DFU(bool _debug, bool _use_serial, QString portname, bool umodereset)
             mready = false;
             return;
         }
-        if (umodereset) {
-            sendReset();
-        }
-        delay::msleep(5000);
         serialhandle = new qsspt(info, debug);
 
-        while (serialhandle->ssp_Synchronise() == false) {
+        int count = 0;
+        while ((serialhandle->ssp_Synchronise() == false) && (count < 10)) {
             if (debug) {
                 qDebug() << "SYNC failed, resending";
             }
+            count++;
+        }
+        if (count == 10) {
+            mready = false;
+            return;
         }
         qDebug() << "SYNC Succeded";
         serialhandle->start();
-        // serialhandle->start();
-    } else {
-        send_delay = 10;
-        use_delay  = true;
-        int numDevices = 0;
-        cout << "Please connect device now\n";
-        int count = 0;
-        while (numDevices == 0) {
-            cout << ".";
-            delay::msleep(500);
-            numDevices = hidHandle.open(1, 0x20a0, 0x415A, 0, 0); // 0xff9c,0x0001);
-            if (numDevices == 0) {
-                numDevices = hidHandle.open(1, 0x20a0, 0x415B, 0, 0); // 0xff9c,0x0001);
+/*    } else {
+        mready = false;
+        QEventLoop m_eventloop;
+        QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
+        m_eventloop.exec();
+        QList<USBPortInfo> devices;
+        devices = USBMonitor::instance()->availableDevices(0x20a0, -1, -1, USBMonitor::Bootloader);
+        if (devices.length() == 1) {
+            if (hidHandle.open(1, devices.first().vendorID, devices.first().productID, 0, 0) == 1) {
+                mready = true;
+                QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
+                m_eventloop.exec();
+            } else {
+                hidHandle.close(0);
             }
-            if (++count == 10) {
-                cout << "\r";
-                cout << "           ";
-                cout << "\r";
-                count = 0;
-            }
-        }
-        if (debug) {
-            qDebug() << numDevices << " device(s) opened";
-        }
-        if (umodereset) {
-            sendReset();
+        } else {
+            // Wait for the board to appear on the USB bus:
+            USBSignalFilter filter(0x20a0, -1, -1, USBMonitor::Bootloader);
+            connect(&filter, SIGNAL(deviceDiscovered()), &m_eventloop, SLOT(quit()));
+            for (int x = 0; x < 4; ++x) {
+                qDebug() << "OP_DFU trying to detect bootloader:" << x;
 
-            qDebug() << "before delay";
-            delay::msleep(5000);
-            qDebug() << "after delay";
-            if (hidHandle.open(1, 0x20a0, 0x4117, 0, 0) == 0) {
-                mready = false;
+                if (x == 0) {
+                    QTimer::singleShot(10000, &m_eventloop, SLOT(quit()));
+                } else {
+                    QTimer::singleShot(2000, &m_eventloop, SLOT(quit()));
+                }
+                m_eventloop.exec();
+                devices = USBMonitor::instance()->availableDevices(0x20a0, -1, -1, USBMonitor::Bootloader);
+                qDebug() << "Devices length: " << devices.length();
+                if (devices.length() == 1) {
+                    qDebug() << "Opening device";
+                    if (hidHandle.open(1, devices.first().vendorID, devices.first().productID, 0, 0) == 1) {
+                        QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
+                        m_eventloop.exec();
+                        qDebug() << "OP_DFU detected after delay";
+                        mready = true;
+                        qDebug() << "Detected";
+                        break;
+                    } else {
+                        hidHandle.close(0);
+                    }
+                } else {
+                    qDebug() << devices.length() << " device(s) detected, don't know what to do!";
+                    mready = false;
+                }
             }
-        }
+        }*/
     }
 }
-void OP_DFU::sendReset(void)
+
+DFUObject::~DFUObject()
+{
+    if (use_serial) {
+        if (mready) {
+            delete serialhandle;
+            delete info;
+        }
+    } /*else {
+        hidHandle.close(0);
+    }*/
+}
+
+void DFUObject::sendReset(void)
 {
     qDebug() << "Requesting user mode reset";
     char aa[255] = { 0x02, 0x3E, 0x3C, 0x20, 0x75, 0x00, 0x20, 0x4F, 0x67, 0x34, 0x62, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // 63
@@ -87,7 +142,7 @@ void OP_DFU::sendReset(void)
     char ab[255] = { 0x02, 0x3D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x47, 0x1B, 0x19, 0x00, 0x00, 0x76 };
     char cb[255] = { 0x02, 0x3D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x66, 0x78, 0x1C, 0x00, 0x00, 0x25 };
     // 125
-    if (!use_serial) {
+    /*if (!use_serial) {
         hidHandle.send(0, aa, 64, 5000);
         hidHandle.send(0, ab, 64, 5000);
         delay::msleep(600);
@@ -98,7 +153,7 @@ void OP_DFU::sendReset(void)
         hidHandle.send(0, cb, 64, 5000);
         delay::msleep(100);
         hidHandle.close(1);
-    } else {
+    } else {*/
         char a[255];
         char b[255];
         char c[255];
@@ -119,17 +174,16 @@ void OP_DFU::sendReset(void)
         for (int x = 0; x < 123; ++x) {
             info->pfSerialWrite(c[x]);
         }
-    }
+    //}
 }
 
-bool OP_DFU::SaveByteArrayToFile(QString const & sfile, const QByteArray &array)
+bool DFUObject::SaveByteArrayToFile(QString const & sfile, const QByteArray &array)
 {
     QFile file(sfile);
 
-    // QFile file("in.txt");
     if (!file.open(QIODevice::WriteOnly)) {
         if (debug) {
-            qDebug() << "Cant open file";
+            qDebug() << "Can't open file";
         }
         return false;
     }
@@ -138,7 +192,10 @@ bool OP_DFU::SaveByteArrayToFile(QString const & sfile, const QByteArray &array)
     return true;
 }
 
-bool OP_DFU::enterDFU(int const &devNumber)
+/**
+   Tells the mainboard to enter DFU Mode.
+ */
+bool DFUObject::enterDFU(int const &devNumber)
 {
     char buf[BUF_LEN];
 
@@ -158,11 +215,17 @@ bool OP_DFU::enterDFU(int const &devNumber)
         return false;
     }
     if (debug) {
-        qDebug() << result << " bytes sent";
+        qDebug() << "EnterDFU: " << result << " bytes sent";
     }
     return true;
 }
-bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & type, quint32 crc)
+
+/**
+   Tells the board to get ready for an upload. It will in particular
+   erase the memory to make room for the data. You will have to query
+   its status to wait until erase is done before doing the actual upload.
+ */
+bool DFUObject::StartUpload(qint32 const & numberOfBytes, TransferTypes const & type, quint32 crc)
 {
     int lastPacketCount;
     qint32 numberOfPackets = numberOfBytes / 4 / 14;
@@ -190,8 +253,10 @@ bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & typ
     if (debug) {
         qDebug() << "Number of packets:" << numberOfPackets << " Size of last packet:" << lastPacketCount;
     }
+
     int result = sendData(buf, BUF_LEN);
     delay::msleep(1000);
+
     if (debug) {
         qDebug() << result << " bytes sent";
     }
@@ -200,7 +265,13 @@ bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & typ
     }
     return false;
 }
-bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray & data)
+
+
+/**
+   Does the actual data upload to the board. Needs to be called once the
+   board is ready to accept data following a StartUpload command, and it is erased.
+ */
+bool DFUObject::UploadData(qint32 const & numberOfBytes, QByteArray & data)
 {
     int lastPacketCount;
     qint32 numberOfPackets = numberOfBytes / 4 / 14;
@@ -220,7 +291,7 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray & data)
     buf[1] = OP_DFU::Upload; // DFU Command
     int packetsize;
     float percentage;
-    int laspercentage;
+    int laspercentage = 0;
     for (qint32 packetcount = 0; packetcount < numberOfPackets; ++packetcount) {
         percentage = (float)(packetcount + 1) / numberOfPackets * 100;
         if (laspercentage != (int)percentage) {
@@ -250,7 +321,8 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray & data)
         // }
         // qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
         // delay::msleep(send_delay);
-        // if(int ret=StatusRequest()!=OP_DFU::uploading) return false;
+
+        // if(StatusRequest()!=OP_DFU::uploading) return false;
         int result = sendData(buf, BUF_LEN);
         // qDebug()<<"sent:"<<result;
         if (result < 1) {
@@ -263,67 +335,121 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray & data)
     // while(true){}
     return true;
 }
-OP_DFU::Status OP_DFU::UploadDescription(QString & description)
+
+/**
+   Sends the firmware description to the device
+ */
+OP_DFU::Status DFUObject::UploadDescription(QVariant desc)
 {
     cout << "Starting uploading description\n";
-    if (description.length() % 4 != 0) {
-        int pad = description.length() / 4;
-        pad = (pad + 1) * 4;
-        pad = pad - description.length();
-        QString padding;
-        padding.fill(' ', pad);
-        description.append(padding);
+    QByteArray array;
+
+    if (desc.type() == QMetaType::QString) {
+        QString description = desc.toString();
+        if (description.length() % 4 != 0) {
+            int pad = description.length() / 4;
+            pad = (pad + 1) * 4;
+            pad = pad - description.length();
+            QString padding;
+            padding.fill(' ', pad);
+            description.append(padding);
+        }
+        array = description.toLatin1();
+    } else if (desc.type() == QMetaType::QByteArray) {
+        array = desc.toByteArray();
     }
-    if (!StartUpload(description.length(), OP_DFU::Descript, 0)) {
+
+    if (!StartUpload(array.length(), OP_DFU::Descript, 0)) {
         return OP_DFU::abort;
     }
-    QByteArray array = description.toAscii();
-    if (!UploadData(description.length(), array)) {
+    if (!UploadData(array.length(), array)) {
         return OP_DFU::abort;
     }
     if (!EndOperation()) {
         return OP_DFU::abort;
     }
-    int ret = StatusRequest();
+    OP_DFU::Status ret = StatusRequest();
+
 
     if (debug) {
-        qDebug() << "Upload description Status=" << ret;
+        qDebug() << "Upload description Status=" << StatusToString(ret);
     }
-    return (OP_DFU::Status)ret;
+    return ret;
 }
-QString OP_DFU::DownloadDescription(int const & numberOfChars)
-{
-    // enterDFU(devNumber);
-    QByteArray arr = StartDownload(numberOfChars, Descript);
-    QString str(arr);
 
-    return str;
+
+/**
+   Downloads the description string for the current device.
+   You have to call enterDFU before calling this function.
+ */
+QString DFUObject::DownloadDescription(int const & numberOfChars)
+{
+    QByteArray arr;
+
+    StartDownloadT(&arr, numberOfChars, OP_DFU::Descript);
+
+    int index = arr.indexOf(255);
+    return QString((index == -1) ? arr : arr.left(index));
 }
-void OP_DFU::test()
+
+QByteArray DFUObject::DownloadDescriptionAsBA(int const & numberOfChars)
 {
-    char buf[BUF_LEN];
-    int result;
+    QByteArray arr;
 
-    buf[0]  = 0x02;
-    buf[1]  = 11;
-    buf[2]  = 11;
-    buf[63] = 333;
-    while (true) {
-        buf[0] = 0x02;
-        ++buf[1];
-        ++buf[2];
-        ++buf[63];
-        sendData(buf, BUF_LEN);
-        result = receiveData(buf, BUF_LEN);
+    StartDownloadT(&arr, numberOfChars, OP_DFU::Descript);
 
-        qDebug() << "Result=" << result;
-        qDebug() << (int)buf[0] << ":" << (int)buf[1] << ":" << (int)buf[2] << ":" << (int)buf[63];
+    return arr;
+}
+
+/**
+   Starts a firmware download
+   @param firmwareArray: pointer to the location where we should store the firmware
+   @package device: the device to use for the download
+ */
+bool DFUObject::DownloadFirmware(QByteArray *firmwareArray, int device)
+{
+    if (isRunning()) {
+        return false;
+    }
+    requestedOperation  = OP_DFU::Download;
+    requestSize = devices[device].SizeOfCode;
+    requestTransferType = OP_DFU::FW;
+    requestStorage = firmwareArray;
+    start();
+    return true;
+}
+
+
+/**
+   Runs the upload or download operations.
+ */
+void DFUObject::run()
+{
+    switch (requestedOperation) {
+    case OP_DFU::Download:
+        StartDownloadT(requestStorage, requestSize, requestTransferType);
+        emit(downloadFinished());
+        break;
+    case OP_DFU::Upload:
+    {
+        OP_DFU::Status ret = UploadFirmwareT(requestFilename, requestVerify, requestDevice);
+        emit(uploadFinished(ret));
+        break;
+    }
+    default:
+        break;
     }
 }
 
-QByteArray OP_DFU::StartDownload(qint32 const & numberOfBytes, TransferTypes const & type)
+/**
+   Downloads a certain number of bytes from a certain location, and stores in an array whose
+   pointer is passed as an argument
+ */
+bool DFUObject::StartDownloadT(QByteArray *fw, qint32 const & numberOfBytes, TransferTypes const & type)
 {
     int lastPacketCount;
+
+    // First of all, work out the number of DFU packets we should ask for:
     qint32 numberOfPackets = numberOfBytes / 4 / 14;
     int pad = (numberOfBytes - numberOfPackets * 4 * 14) / 4;
 
@@ -333,8 +459,9 @@ QByteArray OP_DFU::StartDownload(qint32 const & numberOfBytes, TransferTypes con
         ++numberOfPackets;
         lastPacketCount = pad;
     }
-    QByteArray ret;
+
     char buf[BUF_LEN];
+
     buf[0] = 0x02; // reportID
     buf[1] = OP_DFU::Download_Req; // DFU Command
     buf[2] = numberOfPackets >> 24; // DFU Count
@@ -351,49 +478,57 @@ QByteArray OP_DFU::StartDownload(qint32 const & numberOfBytes, TransferTypes con
         qDebug() << "StartDownload:" << numberOfPackets << "packets" << " Last Packet Size=" << lastPacketCount << " " << result << " bytes sent";
     }
     float percentage;
-    int laspercentage;
+    int laspercentage = 0;
+
+    // Now get those packets:
     for (qint32 x = 0; x < numberOfPackets; ++x) {
+        int size;
         percentage = (float)(x + 1) / numberOfPackets * 100;
         if (laspercentage != (int)percentage) {
             printProgBar((int)percentage, "DOWNLOADING");
         }
         laspercentage = (int)percentage;
 
-
-        // qDebug()<<"Status="<<StatusToString(StatusRequest());
         result = receiveData(buf, BUF_LEN);
         if (debug) {
             qDebug() << result << " bytes received" << " Count=" << x << "-" << (int)buf[2] << ";" << (int)buf[3] << ";" << (int)buf[4] << ";" << (int)buf[5] << " Data=" << (int)buf[6] << ";" << (int)buf[7] << ";" << (int)buf[8] << ";" << (int)buf[9];
         }
-        int size;
         if (x == numberOfPackets - 1) {
             size = lastPacketCount * 4;
         } else {
             size = 14 * 4;
         }
-        ret.append(buf + 6, size);
+        fw->append(buf + 6, size);
     }
-    cout << "\n";
+
     StatusRequest();
-    return ret;
+    return true;
 }
-void OP_DFU::ResetDevice(void)
+
+
+/**
+   Resets the device
+ */
+int DFUObject::ResetDevice(void)
 {
     char buf[BUF_LEN];
 
     buf[0] = 0x02; // reportID
     buf[1] = OP_DFU::Reset; // DFU Command
     buf[2] = 0;
-    buf[3] = 0;
+--    buf[3] = 0;
     buf[4] = 0;
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
     buf[8] = 0;
     buf[9] = 0;
-    int result = sendData(buf, BUF_LEN);
+
+    return sendData(buf, BUF_LEN);
+    // return hidHandle.send(0,buf, BUF_LEN, 500);
 }
-void OP_DFU::AbortOperation(void)
+
+int DFUObject::AbortOperation(void)
 {
     char buf[BUF_LEN];
 
@@ -407,9 +542,13 @@ void OP_DFU::AbortOperation(void)
     buf[7] = 0;
     buf[8] = 0;
     buf[9] = 0;
-    int result = sendData(buf, BUF_LEN);
+
+    return sendData(buf, BUF_LEN);
 }
-void OP_DFU::JumpToApp()
+/**
+   Starts the firmware (leaves bootloader and boots the main software)
+ */
+int DFUObject::JumpToApp(bool safeboot, bool erase)
 {
     char buf[BUF_LEN];
 
@@ -421,12 +560,51 @@ void OP_DFU::JumpToApp()
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
-    buf[8] = 0;
-    buf[9] = 0;
+    if (safeboot) {
+        /* force system to safe boot mode (hwsettings == defaults) */
+        buf[8] = 0x5A;
+        buf[9] = 0xFE;
+    } else {
+        buf[8] = 0;
+        buf[9] = 0;
+    }
+    if (erase) {
+        // force data flash clear
+        buf[10] = 0x00;
+        buf[11] = 0x00;
+        buf[12] = 0xFA;
+        buf[13] = 0x5F;
 
-    int result = sendData(buf, BUF_LEN);
+        buf[14] = 0x00;
+        buf[15] = 0x00;
+        buf[16] = 0x00;
+        buf[17] = 0x01;
+
+        buf[18] = 0x00;
+        buf[19] = 0x00;
+        buf[20] = 0x00;
+        buf[21] = 0x00;
+    } else {
+        buf[10] = 0x00;
+        buf[11] = 0x00;
+        buf[12] = 0x00;
+        buf[13] = 0x00;
+
+        buf[14] = 0x00;
+        buf[15] = 0x00;
+        buf[16] = 0x00;
+        buf[17] = 0x00;
+
+        buf[18] = 0x00;
+        buf[19] = 0x00;
+        buf[20] = 0x00;
+        buf[21] = 0x00;
+    }
+
+    return sendData(buf, BUF_LEN);
 }
-OP_DFU::Status OP_DFU::StatusRequest()
+
+OP_DFU::Status DFUObject::StatusRequest()
 {
     char buf[BUF_LEN];
 
@@ -443,11 +621,11 @@ OP_DFU::Status OP_DFU::StatusRequest()
 
     int result = sendData(buf, BUF_LEN);
     if (debug) {
-        qDebug() << result << " bytes sent";
+        qDebug() << "StatusRequest: " << result << " bytes sent";
     }
     result = receiveData(buf, BUF_LEN);
     if (debug) {
-        qDebug() << result << " bytes received";
+        qDebug() << "StatusRequest: " << result << " bytes received";
     }
     if (buf[1] == OP_DFU::Status_Rep) {
         return (OP_DFU::Status)buf[6];
@@ -455,7 +633,11 @@ OP_DFU::Status OP_DFU::StatusRequest()
         return OP_DFU::abort;
     }
 }
-bool OP_DFU::findDevices()
+
+/**
+   Ask the bootloader for the list of devices available
+ */
+bool DFUObject::findDevices()
 {
     devices.clear();
     char buf[BUF_LEN];
@@ -469,18 +651,20 @@ bool OP_DFU::findDevices()
     buf[7] = 0;
     buf[8] = 0;
     buf[9] = 0;
+
     int result = sendData(buf, BUF_LEN);
     if (result < 1) {
         return false;
     }
+
     result = receiveData(buf, BUF_LEN);
     if (result < 1) {
         return false;
     }
+
     numberOfDevices = buf[7];
     RWFlags = buf[8];
     RWFlags = RWFlags << 8 | buf[9];
-
 
     if (buf[1] == OP_DFU::Rep_Capabilities) {
         for (int x = 0; x < numberOfDevices; ++x) {
@@ -498,9 +682,8 @@ bool OP_DFU::findDevices()
             buf[7] = 0;
             buf[8] = 0;
             buf[9] = 0;
-            int result = sendData(buf, BUF_LEN);
-            result = receiveData(buf, BUF_LEN);
-            // devices[x].ID=buf[9];
+            sendData(buf, BUF_LEN);
+            receiveData(buf, BUF_LEN);
             devices[x].ID = buf[14];
             devices[x].ID = devices[x].ID << 8 | (quint8)buf[15];
             devices[x].BL_Version = buf[7];
@@ -522,7 +705,7 @@ bool OP_DFU::findDevices()
             devices[x].SizeOfCode = aux;
         }
         if (debug) {
-            qDebug() << "Found " << numberOfDevices;
+            qDebug() << "Found " << numberOfDevices << " devices";
             for (int x = 0; x < numberOfDevices; ++x) {
                 qDebug() << "Device #" << x + 1;
                 qDebug() << "Device ID=" << devices[x].ID;
@@ -537,7 +720,9 @@ bool OP_DFU::findDevices()
     }
     return true;
 }
-bool OP_DFU::EndOperation()
+
+
+bool DFUObject::EndOperation()
 {
     char buf[BUF_LEN];
 
@@ -553,7 +738,6 @@ bool OP_DFU::EndOperation()
     buf[9] = 0;
 
     int result = sendData(buf, BUF_LEN);
-    // hidHandle.receive(0,buf,BUF_LEN,5000);
     if (debug) {
         qDebug() << result << " bytes sent";
     }
@@ -562,19 +746,42 @@ bool OP_DFU::EndOperation()
     }
     return false;
 }
-OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify, int device)
+
+
+//
+/**
+   Starts a firmware upload (asynchronous)
+ */
+bool DFUObject::UploadFirmware(const QString &sfile, const bool &verify, int device)
+{
+    if (isRunning()) {
+        return false;
+    }
+    requestedOperation = OP_DFU::Upload;
+    requestFilename    = sfile;
+    requestDevice = device;
+    requestVerify = verify;
+    start();
+    return true;
+}
+
+OP_DFU::Status DFUObject::UploadFirmwareT(const QString &sfile, const bool &verify, int device)
 {
     OP_DFU::Status ret;
 
-    cout << "Starting Firmware Uploading...\n";
+    if (debug) {
+        qDebug() << "Starting Firmware Uploading...";
+    }
+
     QFile file(sfile);
-    // QFile file("in.txt");
+
     if (!file.open(QIODevice::ReadOnly)) {
         if (debug) {
             qDebug() << "Cant open file";
         }
         return OP_DFU::abort;
     }
+
     QByteArray arr = file.readAll();
 
     if (debug) {
@@ -587,73 +794,92 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify, 
         pad = pad - arr.length();
         arr.append(QByteArray(pad, 255));
     }
-    if (devices[device].SizeOfCode < arr.length()) {
-        cout << "ERROR file to big for device\n";
+    if (devices[device].SizeOfCode < (quint32)arr.length()) {
+        if (debug) {
+            qDebug() << "ERROR file to big for device";
+        }
         return OP_DFU::abort;;
     }
-    quint32 crc = CRCFromQBArray(arr, devices[device].SizeOfCode);
-    cout << "NEW FIRMWARE CRC=" << crc << "\n";
-    if (!StartUpload(arr.length(), FW, crc)) {
+
+    quint32 crc = DFUObject::CRCFromQBArray(arr, devices[device].SizeOfCode);
+    if (debug) {
+        qDebug() << "NEW FIRMWARE CRC=" << crc;
+    }
+
+    if (!StartUpload(arr.length(), OP_DFU::FW, crc)) {
+        ret = StatusRequest();
         if (debug) {
             qDebug() << "StartUpload failed";
-            OP_DFU::Status ret = StatusRequest();
             qDebug() << "StartUpload returned:" << StatusToString(ret);
         }
-        return OP_DFU::abort;
+        return ret;
     }
-    cout << "Erasing memory\n";
+
+    emit operationProgress(QString("Erasing, please wait..."));
+
+    if (debug) {
+        qDebug() << "Erasing memory";
+    }
     if (StatusRequest() == OP_DFU::abort) {
         return OP_DFU::abort;
     }
+
+    // TODO: why is there a loop there? The "if" statement
+    // will cause a break or return anyway!!
     for (int x = 0; x < 3; ++x) {
-        OP_DFU::Status ret = StatusRequest();
+        ret = StatusRequest();
         if (debug) {
-            qDebug() << "Erase returned:" << StatusToString(ret);
+            qDebug() << "Erase returned: " << StatusToString(ret);
         }
         if (ret == OP_DFU::uploading) {
             break;
         } else {
-            return OP_DFU::abort;
+            return ret;
         }
     }
+
+    emit operationProgress(QString("Uploading firmware"));
     if (!UploadData(arr.length(), arr)) {
+        ret = StatusRequest();
         if (debug) {
             qDebug() << "Upload failed (upload data)";
-            OP_DFU::Status ret = StatusRequest();
-            qDebug() << "StartUpload returned:" << StatusToString(ret);
+            qDebug() << "UploadData returned:" << StatusToString(ret);
         }
-        return OP_DFU::abort;
-    }
-    if (!EndOperation()) {
-        if (debug) {
-            qDebug() << "Upload failed (end operation)";
-            OP_DFU::Status ret = StatusRequest();
-            qDebug() << "StartUpload returned:" << StatusToString(ret);
-        }
-        return OP_DFU::abort;
-    }
-    ret = StatusRequest();
-    if (ret == OP_DFU::Last_operation_Success) {} else {
         return ret;
     }
+    if (!EndOperation()) {
+        ret = StatusRequest();
+        if (debug) {
+            qDebug() << "Upload failed (end operation)";
+            qDebug() << "EndOperation returned:" << StatusToString(ret);
+        }
+        return ret;
+    }
+    ret = StatusRequest();
+    if (ret != OP_DFU::Last_operation_Success) {
+        return ret;
+    }
+
     if (verify) {
+        emit operationProgress(QString("Verifying firmware"));
         cout << "Starting code verification\n";
-        if (arr == StartDownload(arr.length(), OP_DFU::FW)) {
-            cout << "Verify:PASSED\n";
-        } else {
+        QByteArray arr2;
+        StartDownloadT(&arr2, arr.length(), OP_DFU::FW);
+        if (arr != arr2) {
             cout << "Verify:FAILED\n";
             return OP_DFU::abort;
         }
-    } else {
-        return ret;
     }
+
     if (debug) {
         qDebug() << "Status=" << ret;
     }
     cout << "Firmware Uploading succeeded\n";
     return ret;
 }
-OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &type, int device)
+
+
+OP_DFU::Status DFUObject::CompareFirmware(const QString &sfile, const CompareType &type, int device)
 {
     cout << "Starting Firmware Compare...\n";
     QFile file(sfile);
@@ -676,7 +902,7 @@ OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &
         arr.append(QByteArray(pad, 255));
     }
     if (type == OP_DFU::crccompare) {
-        quint32 crc = CRCFromQBArray(arr, devices[device].SizeOfCode);
+        quint32 crc = DFUObject::CRCFromQBArray(arr, devices[device].SizeOfCode);
         if (crc == devices[device].FW_CRC) {
             cout << "Compare Successfull CRC MATCH!\n";
         } else {
@@ -684,7 +910,9 @@ OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &
         }
         return StatusRequest();
     } else {
-        if (arr == StartDownload(arr.length(), OP_DFU::FW)) {
+        QByteArray arr2;
+        StartDownloadT(&arr2, arr.length(), OP_DFU::FW);
+        if (arr == arr2) {
             cout << "Compare Successfull ALL Bytes MATCH!\n";
         } else {
             cout << "Compare failed Bytes DONT MATCH!\n";
@@ -693,7 +921,7 @@ OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &
     }
 }
 
-void OP_DFU::CopyWords(char *source, char *destination, int count)
+void DFUObject::CopyWords(char *source, char *destination, int count)
 {
     for (int x = 0; x < count; x = x + 4) {
         *(destination + x)     = source[x + 3];
@@ -702,7 +930,7 @@ void OP_DFU::CopyWords(char *source, char *destination, int count)
         *(destination + x + 3) = source[x + 0];
     }
 }
-QString OP_DFU::StatusToString(OP_DFU::Status const & status)
+QString DFUObject::StatusToString(OP_DFU::Status const & status)
 {
     switch (status) {
     case DFUidle:
@@ -751,25 +979,39 @@ QString OP_DFU::StatusToString(OP_DFU::Status const & status)
         return "unknown";
     }
 }
-void OP_DFU::printProgBar(int const & percent, QString const & label)
+
+/**
+   Prints a progress bar with percentage & label during an operation.
+
+   Also outputs to stdout if we are in debug mode.
+ */
+void DFUObject::printProgBar(int const & percent, QString const & label)
 {
     std::string bar;
 
-    for (int i = 0; i < 50; i++) {
-        if (i < (percent / 2)) {
-            bar.replace(i, 1, "=");
-        } else if (i == (percent / 2)) {
-            bar.replace(i, 1, ">");
-        } else {
-            bar.replace(i, 1, " ");
-        }
-    }
+    emit(progressUpdated(percent));
 
-    std::cout << "\r" << label.toLatin1().data() << "[" << bar << "] ";
-    std::cout.width(3);
-    std::cout << percent << "%     " << std::flush;
+    if (debug) {
+        for (int i = 0; i < 50; i++) {
+            if (i < (percent / 2)) {
+                bar.replace(i, 1, "=");
+            } else if (i == (percent / 2)) {
+                bar.replace(i, 1, ">");
+            } else {
+                bar.replace(i, 1, " ");
+            }
+        }
+
+        std::cout << "\r" << label.toLatin1().data() << "[" << bar << "] ";
+        std::cout.width(3);
+        std::cout << percent << "%     " << std::flush;
+    }
 }
-quint32 OP_DFU::CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer)
+
+/**
+   Utility function
+ */
+quint32 DFUObject::CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer)
 {
     // Size = Size >> 2; // /4  Size passed in as a byte count, assumed to be a multiple of 4
 
@@ -797,9 +1039,13 @@ quint32 OP_DFU::CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer)
 
     return Crc;
 }
-quint32 OP_DFU::CRCFromQBArray(QByteArray array, quint32 Size)
+
+/**
+   Utility function
+ */
+quint32 DFUObject::CRCFromQBArray(QByteArray array, quint32 Size)
 {
-    int pad = Size - array.length();
+    quint32 pad = Size - array.length();
 
     array.append(QByteArray(pad, 255));
     quint32 t[Size / 4];
@@ -814,39 +1060,91 @@ quint32 OP_DFU::CRCFromQBArray(QByteArray array, quint32 Size)
         aux += (char)array[x * 4 + 0] & 0xFF;
         t[x] = aux;
     }
-    return CRC32WideFast(0xFFFFFFFF, Size / 4, (quint32 *)t);
+    return DFUObject::CRC32WideFast(0xFFFFFFFF, Size / 4, (quint32 *)t);
 }
-int OP_DFU::sendData(void *data, int size)
+
+
+/**
+   Send data to the bootloader, either through the serial port
+   of through the HID handle, depending on the mode we're using
+ */
+int DFUObject::sendData(void *data, int size)
 {
-    if (!use_serial) {
+    /*if (!use_serial) {
         return hidHandle.send(0, data, size, 5000);
-    } else {
-        if (serialhandle->sendData((uint8_t *)data + 1, size - 1)) {
-            if (debug) {
-                qDebug() << "packet sent" << "data0" << ((uint8_t *)data + 1)[0];
-            }
-            return size;
-        }
+    }*/
+
+    // Serial Mode:
+    if (serialhandle->sendData((uint8_t *)data + 1, size - 1)) {
         if (debug) {
-            qDebug() << "Serial send OVERRUN";
+            qDebug() << "packet sent" << "data0" << ((uint8_t *)data + 1)[0];
+        }
+        return size;
+    }
+    if (debug) {
+        qDebug() << "Serial send OVERRUN";
+    }
+    return -1;
+}
+
+
+/**
+   Receive data from the bootloader, either through the serial port
+   of through the HID handle, depending on the mode we're using
+ */
+int DFUObject::receiveData(void *data, int size)
+{
+    /*if (!use_serial) {
+        return hidHandle.receive(0, data, size, 10000);
+    }*/
+
+    // Serial Mode:
+    int x;
+    QTime time;
+    time.start();
+    while (true) {
+        if ((x = serialhandle->read_Packet(((char *)data) + 1) != -1) || time.elapsed() > 10000) {
+            if (time.elapsed() > 10000) {
+                qDebug() << "____timeout";
+            }
+            return x;
         }
     }
 }
-int OP_DFU::receiveData(void *data, int size)
+
+#define BOARD_ID_MB   1
+#define BOARD_ID_INS  2
+#define BOARD_ID_PIP  3
+#define BOARD_ID_CC   4
+#define BOARD_ID_REVO 9
+
+/**
+   Gets the type of board connected
+ */
+OP_DFU::eBoardType DFUObject::GetBoardType(int boardNum)
 {
-    if (!use_serial) {
-        return hidHandle.receive(0, data, size, 10000);
-    } else {
-        int x;
-        QTime time;
-        time.start();
-        while (true) {
-            if (x = serialhandle->read_Packet(((char *)data) + 1) != -1 || time.elapsed() > 10000) {
-                if (time.elapsed() > 10000) {
-                    qDebug() << "____timeout";
-                }
-                return x;
-            }
-        }
+    OP_DFU::eBoardType brdType = eBoardUnkwn;
+
+    // First of all, check what Board type we are talking to
+    int board = devices[boardNum].ID;
+
+    qDebug() << "Board model: " << board;
+    switch (board >> 8) {
+    case BOARD_ID_MB: // Mainboard family
+        brdType = eBoardMainbrd;
+        break;
+    case BOARD_ID_INS: // Inertial Nav
+        brdType = eBoardINS;
+        break;
+    case BOARD_ID_PIP: // PIP RF Modem
+        brdType = eBoardPip;
+        break;
+    case BOARD_ID_CC: // CopterControl family
+        brdType = eBoardCC;
+        break;
+    case BOARD_ID_REVO: // Revo board
+        brdType = eBoardRevo;
+        break;
     }
+    return brdType;
 }

@@ -67,12 +67,14 @@ void PIOS_Board_Init(void)
     board_init_complete = true;
 }
 
-void setupCom(){
+void setupCom()
+{
     uint32_t pios_usart_generic_id;
+
     if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
-            PIOS_Assert(0);
+        PIOS_Assert(0);
     }
     if (PIOS_COM_MSG_Init(&PIOS_COM_TELEM_USB, &pios_usart_com_driver, pios_usart_generic_id)) {
-            PIOS_Assert(0);
+        PIOS_Assert(0);
     }
 }

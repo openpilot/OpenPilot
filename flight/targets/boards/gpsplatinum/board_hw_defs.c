@@ -58,7 +58,7 @@ static const struct pios_gpio pios_leds_gpsp[] = {
             .init =             {
                 .GPIO_Pin   = GPIO_Pin_4,
                 .GPIO_Mode  = GPIO_Mode_OUT,
-                .GPIO_OType  =  GPIO_OType_OD,
+                .GPIO_OType = GPIO_OType_OD,
                 .GPIO_Speed = GPIO_Speed_Level_1,
             },
         },
@@ -89,19 +89,19 @@ void DMA1_Channel2_3_IRQHandler() __attribute__((alias("PIOS_SPI_mag_flash_irq_h
 static uint32_t pios_spi_mag_flash_id;
 static const struct pios_spi_cfg pios_spi_mag_flash_cfg = {
     .remap = GPIO_AF_0,
-    .regs = SPI1,
-    .init = {
+    .regs  = SPI1,
+    .init  = {
         .SPI_Mode              = SPI_Mode_Master,
         .SPI_Direction         = SPI_Direction_2Lines_FullDuplex,
         .SPI_DataSize          = SPI_DataSize_8b,
-        .SPI_NSS               = SPI_NSS_Soft,
+        .SPI_NSS                         = SPI_NSS_Soft,
         .SPI_FirstBit          = SPI_FirstBit_MSB,
         .SPI_CRCPolynomial     = 7,
         .SPI_CPOL              = SPI_CPOL_High,
         .SPI_CPHA              = SPI_CPHA_2Edge,
         .SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8,
     },
-    .dma     = {
+    .dma                                 = {
         .ahb_clk = RCC_AHBPeriph_DMA1,
 
         .irq     = {
@@ -113,37 +113,37 @@ static const struct pios_spi_cfg pios_spi_mag_flash_cfg = {
             },
         },
 
-        .rx                                        = {
+        .rx                              = {
             .channel = DMA1_Channel2,
             .init    = {
-                .DMA_PeripheralBaseAddr            = (uint32_t)&(SPI1->DR),
-                .DMA_DIR                           = DMA_DIR_PeripheralSRC,
+                .DMA_PeripheralBaseAddr  = (uint32_t)&(SPI1->DR),
+                .DMA_DIR                 = DMA_DIR_PeripheralSRC,
                 .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
                 .DMA_MemoryInc          = DMA_MemoryInc_Enable,
                 .DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
                 .DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
                 .DMA_Mode     = DMA_Mode_Normal,
                 .DMA_Priority = DMA_Priority_Medium,
-                .DMA_M2M                           = DMA_M2M_Disable,
+                .DMA_M2M                 = DMA_M2M_Disable,
             },
         },
-        .tx                                        = {
+        .tx                              = {
             .channel = DMA1_Channel3,
             .init    = {
-                .DMA_PeripheralBaseAddr            = (uint32_t)&(SPI1->DR),
-                .DMA_DIR                           = DMA_DIR_PeripheralDST,
+                .DMA_PeripheralBaseAddr  = (uint32_t)&(SPI1->DR),
+                .DMA_DIR                 = DMA_DIR_PeripheralDST,
                 .DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
                 .DMA_MemoryInc          = DMA_MemoryInc_Enable,
                 .DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
                 .DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
                 .DMA_Mode     = DMA_Mode_Normal,
                 .DMA_Priority = DMA_Priority_Medium,
-                .DMA_M2M                           = DMA_M2M_Disable,
+                .DMA_M2M                 = DMA_M2M_Disable,
             },
         },
     },
     .use_crc = false,
-    .sclk                                          = {
+    .sclk    = {
         .gpio = GPIOA,
         .init = {
             .GPIO_Pin   = GPIO_Pin_5,
@@ -152,7 +152,7 @@ static const struct pios_spi_cfg pios_spi_mag_flash_cfg = {
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-    .miso                                          = {
+    .miso                                = {
         .gpio = GPIOA,
         .init = {
             .GPIO_Pin   = GPIO_Pin_6,
@@ -161,7 +161,7 @@ static const struct pios_spi_cfg pios_spi_mag_flash_cfg = {
             .GPIO_OType = GPIO_OType_OD,
         },
     },
-    .mosi                                          = {
+    .mosi                                = {
         .gpio = GPIOA,
         .init = {
             .GPIO_Pin   = GPIO_Pin_7,
@@ -170,8 +170,8 @@ static const struct pios_spi_cfg pios_spi_mag_flash_cfg = {
             .GPIO_OType = GPIO_OType_PP,
         },
     },
-    .slave_count                                   = 2,
-    .ssel                                          = {
+    .slave_count                         = 2,
+    .ssel                                = {
         {
             .gpio = GPIOA,
             .init = {
@@ -233,7 +233,7 @@ static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
         },
     },
 };
-#endif
+#endif /* ifdef PIOS_HMC5x83_HAS_GPIOS */
 
 static const struct pios_hmc5x83_cfg pios_mag_cfg = {
 #ifdef PIOS_HMC5x83_HAS_GPIOS
@@ -241,9 +241,9 @@ static const struct pios_hmc5x83_cfg pios_mag_cfg = {
 #endif
     .M_ODR     = PIOS_HMC5x83_ODR_75,
     .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
-    .Gain = PIOS_HMC5x83_GAIN_1_9,
-    .Mode = PIOS_HMC5x83_MODE_CONTINUOUS,
-    .Driver = &PIOS_HMC5x83_SPI_DRIVER,
+    .Gain      = PIOS_HMC5x83_GAIN_1_9,
+    .Mode      = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Driver    = &PIOS_HMC5x83_SPI_DRIVER,
 };
 #endif /* PIOS_INCLUDE_HMC5883 */
 
@@ -255,24 +255,24 @@ static const struct pios_hmc5x83_cfg pios_mag_cfg = {
 #include "pios_usart_priv.h"
 
 static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
-    .regs = USART1,
+    .regs  = USART1,
     .remap = GPIO_AF_1,
-    .init = {
+    .init  = {
         .USART_BaudRate   = 115200,
         .USART_WordLength = USART_WordLength_8b,
         .USART_Parity     = USART_Parity_No,
         .USART_StopBits   = USART_StopBits_1,
-        .USART_HardwareFlowControl             = USART_HardwareFlowControl_None,
-        .USART_Mode                            = USART_Mode_Rx | USART_Mode_Tx,
+        .USART_HardwareFlowControl   = USART_HardwareFlowControl_None,
+        .USART_Mode                  = USART_Mode_Rx | USART_Mode_Tx,
     },
-    .irq                                       = {
-        .init                                  = {
+    .irq                             = {
+        .init                        = {
             .NVIC_IRQChannel    = USART1_IRQn,
             .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_MID,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
-    .rx                                        = {
+    .rx                              = {
         .gpio = GPIOA,
         .init = {
             .GPIO_Pin   = GPIO_Pin_10,
@@ -281,7 +281,7 @@ static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
             .GPIO_Mode  = GPIO_Mode_AF,
         },
     },
-    .tx                                        = {
+    .tx                              = {
         .gpio = GPIOA,
         .init = {
             .GPIO_Pin   = GPIO_Pin_9,
@@ -311,8 +311,8 @@ void RTC_IRQHandler() __attribute__((alias("PIOS_RTC_IRQ_Handler")));
 static const struct pios_rtc_cfg pios_rtc_main_cfg = {
     .clksrc    = RCC_RTCCLKSource_LSI,
     .prescaler = 100,
-    .irq                                       = {
-        .init                                  = {
+    .irq                             = {
+        .init                        = {
             .NVIC_IRQChannel    = RTC_IRQn,
             .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_MID,
             .NVIC_IRQChannelCmd = ENABLE,
@@ -336,52 +336,56 @@ void PIOS_RTC_IRQ_Handler(void)
  */
 
 void PIOS_I2C_gps_irq_handler(void);
-void I2C2_IRQHandler() __attribute__((alias("PIOS_I2C_gps_irq_handler")));
+void I2C1_IRQHandler() __attribute__((alias("PIOS_I2C_gps_irq_handler")));
 
 static const struct pios_i2c_adapter_cfg pios_i2c_gps_cfg = {
-    .regs = I2C2,
-    .init = {
-        .I2C_Mode = I2C_Mode_I2C,
-        .I2C_OwnAddress1                       = 0,
-        .I2C_Ack  = I2C_Ack_Enable,
-        .I2C_AcknowledgedAddress               = I2C_AcknowledgedAddress_7bit,
-        /* (3) Timing register value is computed with the AN4235 xls file,
-               fast Mode @400kHz with I2CCLK = 48MHz, rise time = 140ns,
-               fall time = 40ns */
-        .I2C_Timing                        = (uint32_t)0x00B01A4B,
+    .remap = GPIO_AF_1,
+    .regs  = I2C1,
+    .init  = {
+        .I2C_Mode                    = I2C_Mode_I2C,
+        .I2C_AnalogFilter  = I2C_AnalogFilter_Enable,
+        .I2C_DigitalFilter = 0x00,
+        .I2C_OwnAddress1   = 0x00,
+        .I2C_Ack    = I2C_Ack_Enable,
+        .I2C_AcknowledgedAddress     = I2C_AcknowledgedAddress_7bit,
+        .I2C_Timing = (uint32_t)0x00210507,
     },
-    .transfer_timeout_ms                       = 50,
-    .scl                                       = {
+    .transfer_timeout_ms             = 50,
+    .scl                             = {
         .gpio = GPIOB,
         .init = {
+            .GPIO_Pin   = GPIO_Pin_6,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_OType = GPIO_OType_OD,
+            .GPIO_PuPd  = GPIO_PuPd_NOPULL,
             .GPIO_Mode  = GPIO_Mode_AF,
-            .GPIO_Pin   = GPIO_Pin_10,
         },
+        .pin_source                  = GPIO_PinSource6,
     },
-    .sda                                       = {
+    .sda                             = {
         .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_11,
+            .GPIO_Pin   = GPIO_Pin_7,
             .GPIO_Speed = GPIO_Speed_2MHz,
             .GPIO_OType = GPIO_OType_OD,
+            .GPIO_PuPd  = GPIO_PuPd_NOPULL,
             .GPIO_Mode  = GPIO_Mode_AF,
         },
+        .pin_source                  = GPIO_PinSource7,
     },
-    .event                                     = {
-        .flags = 0,               /* FIXME: check this */
+    .event                           = {
+        .flags = 0,
         .init  = {
-            .NVIC_IRQChannel    = I2C2_IRQn,
-            .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_HIGHEST,
+            .NVIC_IRQChannel    = I2C1_IRQn,
+            .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_HIGH,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
-    .error                                     = {
-        .flags = 0,               /* FIXME: check this */
+    .error                           = {
+        .flags = 0,
         .init  = {
-            .NVIC_IRQChannel    = I2C2_IRQn,
-            .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_HIGHEST,
+            .NVIC_IRQChannel    = I2C1_IRQn,
+            .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_HIGH,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
@@ -393,7 +397,6 @@ void PIOS_I2C_gps_irq_handler(void)
     /* Call into the generic code to handle the IRQ for this specific device */
     PIOS_I2C_IRQ_Handler(pios_i2c_gps_id);
 }
-
 
 
 #endif /* PIOS_INCLUDE_I2C */

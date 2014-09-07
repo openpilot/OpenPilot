@@ -43,11 +43,10 @@
  */
 #include "../board_hw_defs.c"
 
-#define PIOS_COM_MAIN_RX_BUF_LEN     16
-#define PIOS_COM_MAIN_TX_BUF_LEN     255
+#define PIOS_COM_MAIN_RX_BUF_LEN 16
+#define PIOS_COM_MAIN_TX_BUF_LEN 128
 
 uint32_t pios_com_main_id;
-
 
 /**
  * PIOS_Board_Init()
@@ -80,10 +79,7 @@ void PIOS_Board_Init(void)
 #endif
 
 #endif
-/* Initialize the task monitor */
-if (PIOS_TASK_MONITOR_Initialize(3)) {
-    PIOS_Assert(0);
-}
+
 #if defined(PIOS_INCLUDE_RTC)
     /* Initialize the real-time clock and its associated tick */
     PIOS_RTC_Init(&pios_rtc_main_cfg);
@@ -127,7 +123,6 @@ if (PIOS_TASK_MONITOR_Initialize(3)) {
         }
     }
 #endif /* PIOS_INCLUDE_I2C */
-
 }
 
 /**

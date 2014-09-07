@@ -59,9 +59,9 @@ uint8_t tempcount = 0;
 
 /* Extern variables ----------------------------------------------------------*/
 DFUStates DeviceState;
-int16_t status           = 0;
-bool JumpToApp        = false;
-bool GO_dfu           = false;
+int16_t status = 0;
+bool JumpToApp = false;
+bool GO_dfu    = false;
 bool User_DFU_request = false;
 static uint8_t mReceive_Buffer[63];
 /* Private function prototypes -----------------------------------------------*/

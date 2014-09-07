@@ -51,8 +51,8 @@ SRC += $(CMSIS_DEVICEDIR)/system_stm32f0xx.c
 SRC += $(OPSYSTEM)/gpsp.c
 SRC += $(OPSYSTEM)/pios_board.c
 #SRC += $(FLIGHTLIB)/alarms.c
-SRC += $(OPUAVOBJ)/uavobjectmanager.c
-SRC += $(OPUAVOBJ)/eventdispatcher.c
+#SRC += $(OPUAVOBJ)/uavobjectmanager.c
+#SRC += $(OPUAVOBJ)/eventdispatcher.c
 
 SRC += $(PIOSCOMMON)/pios_hmc5x83.c
 

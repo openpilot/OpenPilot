@@ -98,8 +98,8 @@
 // See also pios_board.c
 // ------------------------
 #define PIOS_I2C_MAX_DEVS     1
-extern uint32_t pios_i2c_gps_adapter_id;
-#define PIOS_I2C_GPS          (pios_i2c_gps_adapter_id)
+extern uint32_t pios_i2c_gps_id;
+#define PIOS_I2C_GPS          (pios_i2c_gps_id)
 
 // -------------------------
 // SPI

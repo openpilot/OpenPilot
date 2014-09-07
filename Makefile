@@ -224,7 +224,7 @@ EF_BOARDS  := $(ALL_BOARDS)
 # SimPosix doesn't have a BL, BU or EF target so we need to
 # filter them out to prevent errors on the all_flight target.
 BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
-BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
+BU_BOARDS  := $(filter-out simposix gpsplatinum, $(BU_BOARDS))
 EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
 
 # Generate the targets for whatever boards are left in each list

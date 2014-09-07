@@ -42,7 +42,7 @@ DFUObject::DFUObject(bool _debug, bool _use_serial, QString portname) :
     qRegisterMetaType<OP_DFU::Status>("Status");
 
     if (use_serial) {
-        info = new port(portname, debug);
+        info = new port(portname, false);
         info->rxBuf      = sspRxBuf;
         info->rxBufSize  = MAX_PACKET_DATA_LEN;
         info->txBuf      = sspTxBuf;
@@ -54,7 +54,7 @@ DFUObject::DFUObject(bool _debug, bool _use_serial, QString portname) :
             mready = false;
             return;
         }
-        serialhandle = new qsspt(info, debug);
+        serialhandle = new qsspt(info, false);
 
         int count = 0;
         while ((serialhandle->ssp_Synchronise() == false) && (count < 10)) {
@@ -311,25 +311,30 @@ bool DFUObject::UploadData(qint32 const & numberOfBytes, QByteArray & data)
         buf[5]  = packetcount; // DFU Count
         char *pointer = data.data();
         pointer = pointer + 4 * 14 * packetcount;
-        qDebug()<<"Packet Number="<<packetcount<<"Data0="<<(int)data[0]<<" Data1="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
+        // if (debug) {
+        // qDebug() << "Packet Number=" << packetcount << "Data0=" << (int)data[0] << " Data1=" << (int)data[1] << " Data0=" << (int)data[2] << " Data0=" << (int)data[3] << " buf6=" << (int)buf[6] << " buf7=" << (int)buf[7] << " buf8=" << (int)buf[8] << " buf9=" << (int)buf[9];
+        // }
         CopyWords(pointer, buf + 6, packetsize * 4);
-        //for (int y=0;y<packetsize*4;++y) {
-        //    qDebug()<<y<<":"<<(int)data[packetcount*14*4+y]<<"---"<<(int)buf[6+y];
-        //}
-        //qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
+        // for (int y=0;y<packetsize*4;++y) {
+        // qDebug()<<y<<":"<<(int)data[packetcount*14*4+y]<<"---"<<(int)buf[6+y];
+        // }
+        // qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
         // delay::msleep(send_delay);
 
-        if(StatusRequest()!=OP_DFU::uploading) return false;
+        if (StatusRequest() != OP_DFU::uploading) {
+            return false;
+        }
         int result = sendData(buf, BUF_LEN);
-        qDebug()<<"sent:"<<result;
+        // if (debug) {
+        // qDebug() << "sent:" << result;
+        // }
         if (result < 1) {
             return false;
         }
-
-        qDebug() << "UPLOAD:"<<"Data="<<(int)buf[6]<<(int)buf[7]<<(int)buf[8]<<(int)buf[9]<<";"<<result << " bytes sent";
+        // if (debug) {
+        // qDebug() << "UPLOAD:" << "Data=" << (int)buf[6] << (int)buf[7] << (int)buf[8] << (int)buf[9] << ";" << result << " bytes sent";
+        // }
     }
-    cout << "\n";
-    // while(true){}
     return true;
 }
 
@@ -510,16 +515,16 @@ int DFUObject::ResetDevice(void)
 {
     char buf[BUF_LEN];
 
-    buf[0]   = 0x02; // reportID
-    buf[1]   = OP_DFU::Reset; // DFU Command
-    buf[2]   = 0;
-    buf[3]   = 0;
-    buf[4]   = 0;
-    buf[5]   = 0;
-    buf[6]   = 0;
-    buf[7]   = 0;
-    buf[8]   = 0;
-    buf[9]   = 0;
+    buf[0] = 0x02; // reportID
+    buf[1] = OP_DFU::Reset; // DFU Command
+    buf[2] = 0;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    buf[8] = 0;
+    buf[9] = 0;
 
     return sendData(buf, BUF_LEN);
     // return hidHandle.send(0,buf, BUF_LEN, 500);

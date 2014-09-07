@@ -282,7 +282,7 @@ uint16_t qssp::ssp_SendDataBlock(uint8_t *data, uint16_t length)
  * \note
  *
  */
-int16_t qssp::  ssp_SendData(const uint8_t *data, const uint16_t length)
+int16_t qssp::ssp_SendData(const uint8_t *data, const uint16_t length)
 {
     int16_t value = SSP_TX_WAITING;
 

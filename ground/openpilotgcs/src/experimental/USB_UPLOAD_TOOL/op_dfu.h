@@ -54,6 +54,7 @@ enum CompareType {
 #define RESET           "-r"
 #define JUMP            "-j"
 #define USE_SERIAL      "-t"
+#define NO_COUNTDOWN    "-i"
 
 Q_ENUMS(Status)
 enum Status {

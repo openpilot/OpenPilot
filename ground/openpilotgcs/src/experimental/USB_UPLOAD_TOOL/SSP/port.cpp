@@ -61,8 +61,9 @@ port::portstatus port::status()
 int16_t port::pfSerialRead(void)
 {
     char c[1];
-    sport->waitForBytesWritten(5);
-    if (sport->bytesAvailable() || sport->waitForReadyRead(1)) {
+
+    sport->waitForBytesWritten(1);
+    if (sport->bytesAvailable() || sport->waitForReadyRead(0)) {
         sport->read(c, 1);
         if (debug) {
             if (((uint8_t)c[0]) == 0xe1 || rxDebugBuff.count() > 50) {

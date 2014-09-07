@@ -58,7 +58,11 @@ private:
     void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
 
     void assignOutputChannel(UAVDataObject *obj, QString &str);
+
     OutputChannelForm *getOutputChannelForm(const int index) const;
+
+    void sendAllChannelTests();
+
     int mccDataRate;
 
     UAVObject::Metadata accInitialData;

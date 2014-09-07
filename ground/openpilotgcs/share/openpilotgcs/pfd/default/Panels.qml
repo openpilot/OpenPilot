@@ -69,6 +69,8 @@ Item {
 
     property real smeter_angle
 
+    property real memory_free : SystemStats.HeapRemaining > 1024 ? SystemStats.HeapRemaining / 1024 : SystemStats.HeapRemaining 
+
     // Needed to get correctly int8 value, reset value (-127) on disconnect
     property int oplm0_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_0 : -127
     property int oplm1_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_1 : -127
@@ -844,9 +846,9 @@ Item {
         } 
     }
 
-    SvgElementImage {
-        id: system_text
-        elementName: "system-text-tmp"
+    SvgElementPositionItem {
+        id: system_frametype
+        elementName: "system-frame-type"
         sceneSize: panels.sceneSize
         y: Math.floor(scaledBounds.y * sceneItem.height)
         z: system_bg.z+1
@@ -854,13 +856,90 @@ Item {
         states: State  {
              name: "fading"
              when: show_panels !== true
-             PropertyChanges  { target: system_text; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+             PropertyChanges  { target: system_frametype; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
         }
  
         transitions: Transition  {
         SequentialAnimation  {
               PropertyAnimation  { property: "x"; duration: 800 }
               }
+        }
+
+        Text {
+             text: ["FixedWing", "FixedWingElevon", "FixedWingVtail", "VTOL", "HeliCP", "QuadX", "QuadP",
+                    "Hexa+", "Octo+", "Custom", "HexaX", "HexaH", "OctoV", "OctoCoaxP", "OctoCoaxX", "OctoX", "HexaCoax",
+                    "Tricopter", "GroundVehicleCar", "GroundVehicleDiff", "GroundVehicleMoto"][SystemSettings.AirframeType]
+             anchors.centerIn: parent
+             color: "white"
+             font {
+                 family: "Arial"
+                 pixelSize: Math.floor(parent.height * 1.4)
+                 weight: Font.DemiBold
+             }
+        } 
+    }
+
+    SvgElementPositionItem {
+        id: system_cpuloadtemp
+        elementName: "system-cpu-load-temp"
+        sceneSize: panels.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: system_bg.z+1
+
+        states: State  {
+             name: "fading"
+             when: show_panels !== true
+             PropertyChanges  { target: system_cpuloadtemp; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+
+        Text {
+             // CC3D hack, Cputemp not working
+             text: SystemStats.CPULoad+"% - "+ 
+                   [String(SystemStats.CPUTemp).charCodeAt(0) == "64" ? "??" : String(SystemStats.CPUTemp).charCodeAt(0)] +"°C"
+             anchors.centerIn: parent
+             color: "white"
+             font {
+                 family: "Arial"
+                 pixelSize: Math.floor(parent.height * 1.4)
+                 weight: Font.DemiBold
+             }
+        } 
+    }
+
+    SvgElementPositionItem {
+        id: system_memfree
+        elementName: "system-mem-free"
+        sceneSize: panels.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: system_bg.z+1
+
+        states: State  {
+             name: "fading"
+             when: show_panels !== true
+             PropertyChanges  { target: system_memfree; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+
+        Text {
+             text: SystemStats.HeapRemaining > 1024 ? memory_free.toFixed(2) +"Kb" : memory_free +"bytes"
+             anchors.centerIn: parent
+             color: "white"
+             font {
+                 family: "Arial"
+                 pixelSize: Math.floor(parent.height * 1.4)
+                 weight: Font.DemiBold
+             }
         } 
     }
 

@@ -48,6 +48,7 @@ endif
 SRC += $(CMSIS_DEVICEDIR)/system_stm32f0xx.c
 
 ## Application Core
+SRC += $(OPMODULEDIR)/gpsp/gpsdsysmod.c
 SRC += $(OPSYSTEM)/gpsp.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(FLIGHTLIB)/ubx_utils.c

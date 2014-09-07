@@ -46,6 +46,11 @@ void AirSpeedPage::initializePage(VehicleConfigurationSource *settings)
         // Disable non estimated sensors if ports are taken by receivers
         setItemDisabled(VehicleConfigurationSource::AIRSPEED_EAGLETREE, true);
         setItemDisabled(VehicleConfigurationSource::AIRSPEED_MS4525, true);
+        if (getSelectedItem()->id() == VehicleConfigurationSource::AIRSPEED_EAGLETREE ||
+                getSelectedItem()->id() == VehicleConfigurationSource::AIRSPEED_MS4525) {
+            // If previously selected invalid sensor, reset to estimated
+            setSelectedItem(VehicleConfigurationSource::AIRSPEED_ESTIMATE);
+        }
     }
 }
 

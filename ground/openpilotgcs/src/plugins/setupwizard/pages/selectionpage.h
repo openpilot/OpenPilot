@@ -95,6 +95,8 @@ public:
     void setTitle(QString title);
     void setText(QString text);
     void setItemDisabled(int id, bool disabled);
+    void setSelectedItem(int id);
+    SelectionItem *getSelectedItem();
 
 protected:
     virtual void setupSelection(Selection *selection) = 0;

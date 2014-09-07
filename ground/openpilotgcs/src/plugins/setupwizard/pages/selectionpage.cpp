@@ -130,6 +130,20 @@ void SelectionPage::setItemDisabled(int id, bool disabled)
     }
 }
 
+void SelectionPage::setSelectedItem(int id)
+{
+    for (int i = 0; i < m_selectionItems.count(); i++) {
+        if (m_selectionItems.at(i)->id() == id) {
+            ui->typeCombo->setCurrentIndex(i);
+        }
+    }
+}
+
+SelectionItem *SelectionPage::getSelectedItem()
+{
+    return m_selectionItems.at(ui->typeCombo->currentIndex());
+}
+
 SelectionItem::SelectionItem(QString name, QString description, QString shapeId, int id, bool disabled) :
     m_name(name), m_description(description), m_shapeId(shapeId), m_id(id), m_disabled(disabled)
 {}

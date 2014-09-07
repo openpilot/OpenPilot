@@ -43,6 +43,9 @@ void GpsPage::initializePage(VehicleConfigurationSource *settings)
 bool GpsPage::validatePage(SelectionItem *selectedItem)
 {
     getWizard()->setGpsType((SetupWizard::GPS_TYPE)selectedItem->id());
+    if (getWizard()->getGpsType() == SetupWizard::GPS_DISABLED) {
+        getWizard()->setAirspeedType(VehicleConfigurationSource::AIRSPEED_DISABLED);
+    }
     return true;
 }
 

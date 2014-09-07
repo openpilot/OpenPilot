@@ -28,6 +28,9 @@ include $(ROOT_DIR)/make/firmware-defs.mk
 
 ## The standard CMSIS startup
 SRC += $(CMSIS_DEVICEDIR)/system_stm32f0xx.c
+SRC += $(FLIGHTLIB)/ssp.c
+SRC += $(FLIGHTLIB)/fifo_buffer.c
+
 
 
 include $(ROOT_DIR)/make/boot-defs.mk

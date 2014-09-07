@@ -208,7 +208,8 @@ void PIOS_SPI_mag_flash_irq_handler(void)
 pios_hmc5x83_dev_t onboard_mag;
 #include "pios_hmc5x83.h"
 #ifdef PIOS_HMC5X83_HAS_GPIOS
-bool pios_board_mag_handler() {
+bool pios_board_mag_handler()
+{
     return PIOS_HMC5x83_IRQHandler(onboard_mag);
 }
 static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
@@ -224,15 +225,15 @@ static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
             .GPIO_PuPd  = GPIO_PuPd_NOPULL,
         },
     },
-    .irq                                       = {
-        .init                                  = {
+    .irq                             = {
+        .init                        = {
             .NVIC_IRQChannel    = EXTI4_15_IRQn,
             .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_LOW,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
-    .exti                                      = {
-        .init                                  = {
+    .exti                            = {
+        .init                        = {
             .EXTI_Line    = EXTI_Line7, // matches above GPIO pin
             .EXTI_Mode    = EXTI_Mode_Interrupt,
             .EXTI_Trigger = EXTI_Trigger_Rising,
@@ -266,7 +267,7 @@ static const struct pios_usart_cfg pios_usart_generic_main_cfg = {
     .regs  = USART1,
     .remap = GPIO_AF_1,
     .init  = {
-        .USART_BaudRate   = 115200,
+        .USART_BaudRate   = 57600,
         .USART_WordLength = USART_WordLength_8b,
         .USART_Parity     = USART_Parity_No,
         .USART_StopBits   = USART_StopBits_1,

@@ -35,7 +35,7 @@
  * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
  */
 #include "../board_hw_defs.c"
-
+#include <pios_com_msg.h>
 uint32_t PIOS_COM_TELEM_USB;
 
 static void setupCom();
@@ -44,16 +44,8 @@ static void setupCom();
  * initializes all the core subsystems on this specific hardware
  * called from System/openpilot.c
  */
-static bool board_init_complete = false;
 void PIOS_Board_Init(void)
 {
-    if (board_init_complete) {
-        return;
-    }
-
-    /* Delay system */
-    PIOS_DELAY_Init();
-
     const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
 #if defined(PIOS_INCLUDE_LED)
@@ -61,16 +53,12 @@ void PIOS_Board_Init(void)
     PIOS_Assert(led_cfg);
     PIOS_LED_Init(led_cfg);
 #endif /* PIOS_INCLUDE_LED */
-
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE); // TODO Tirar
     setupCom();
-    board_init_complete = true;
 }
 
 void setupCom()
 {
     uint32_t pios_usart_generic_id;
-
     if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
         PIOS_Assert(0);
     }

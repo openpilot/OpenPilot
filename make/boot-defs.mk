@@ -115,6 +115,8 @@ EXTRA_LIBS +=
 
 # Compiler flags
 CDEFS += 
+# enable bootloader specific stuffs
+CDEFS += -DBOOTLOADER
 
 # Set linker-script name depending on selected submodel name
 ifeq ($(MCU),cortex-m3)

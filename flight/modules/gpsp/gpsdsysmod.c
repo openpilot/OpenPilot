@@ -62,13 +62,13 @@ extern uint32_t pios_com_main_id;
 
 static bool getLastSentence(uint8_t *data, uint16_t bufferCount, uint8_t * *lastSentence, uint16_t *lenght);
 extern struct pios_flash_driver pios_jedec_flash_driver;
+extern pios_hmc5x83_dev_t onboard_mag;
 extern uintptr_t flash_id;
 
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 2
 
 #define STACK_SIZE_BYTES        450
-#define MAG_RATE                50
 #define STAT_RATE               1
 #define TASK_PRIORITY           (tskIDLE_PRIORITY + 1)
 #define BUFFER_SIZE             200
@@ -333,19 +333,16 @@ void vApplicationMallocFailedHook(void)
 
 void ReadMag()
 {
-    static uint32_t lastUpdate;
-
-    if (PIOS_DELAY_DiffuS(lastUpdate) < 1000 * configTICK_RATE_HZ / MAG_RATE) {
+    if (!PIOS_HMC5x83_NewDataAvailable(onboard_mag)) {
         return;
     }
-    lastUpdate = PIOS_DELAY_GetRaw();
     static int16_t mag[3];
 
-    if (PIOS_HMC5x83_ReadMag(mag) == 0) {
+    if (PIOS_HMC5x83_ReadMag(onboard_mag, mag) == 0) {
         MagUbxPkt magPkt;
         // swap axis so that if side with connector is aligned to revo side with connectors, mags data are aligned
-        magPkt.fragments.data.X = mag[0];
-        magPkt.fragments.data.Y = - mag[1];
+        magPkt.fragments.data.X = -mag[1];
+        magPkt.fragments.data.Y = mag[0];
         magPkt.fragments.data.Z = mag[2];
         magPkt.fragments.data.status = 1;
         ubx_build_packet(&magPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_MAG, sizeof(MagData));
@@ -419,7 +416,6 @@ typedef struct {
     uint8_t size;
     const uint8_t *sentence;
 } ubx_init_sentence;
-
 
 
 const ubx_init_sentence gps_config[] = {

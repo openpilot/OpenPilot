@@ -38,6 +38,9 @@
 #include <QFile>
 #include <stdint.h>
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QJsonObject>
+
 #include "uavobjectfield.h"
 
 #define UAVOBJ_ACCESS_SHIFT                    0
@@ -129,7 +132,13 @@ public:
     QString toString();
     QString toStringBrief();
     QString toStringData();
+
     void toXML(QXmlStreamWriter *xmlWriter);
+    void fromXML(QXmlStreamReader *xmlReader);
+
+    void toJson(QJsonObject *jsonObject);
+    void fromJson(const QJsonObject *jsonObject);
+
     void emitTransactionCompleted(bool success);
     void emitNewInstance(UAVObject *);
 

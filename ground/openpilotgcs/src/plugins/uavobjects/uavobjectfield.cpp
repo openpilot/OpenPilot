@@ -673,6 +673,21 @@ void UAVObjectField::toXML(QXmlStreamWriter *xmlWriter)
     xmlWriter->writeEndElement(); // field
 }
 
+void UAVObjectField::fromXML(QXmlStreamReader *xmlReader)
+{
+
+}
+
+void UAVObjectField::toJson(QJsonObject *jsonObject)
+{
+
+}
+
+void UAVObjectField::fromJson(const QJsonObject *jsonObject)
+{
+
+}
+
 qint32 UAVObjectField::pack(quint8 *dataOut)
 {
     QMutexLocker locker(obj->getMutex());

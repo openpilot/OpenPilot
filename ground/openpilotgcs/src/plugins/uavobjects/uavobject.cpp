@@ -532,6 +532,21 @@ void UAVObject::toXML(QXmlStreamWriter *xmlWriter)
     xmlWriter->writeEndElement(); // object
 }
 
+void UAVObject::fromXML(QXmlStreamReader *xmlReader)
+{
+
+}
+
+void UAVObject::toJson(QJsonObject *jsonObject)
+{
+
+}
+
+void UAVObject::fromJson(const QJsonObject *jsonObject)
+{
+
+}
+
 /**
  * Emit the transactionCompleted event (used by the UAVTalk plugin)
  */

@@ -72,6 +72,10 @@ isEmpty(GCS_BUILD_TREE) {
     GCS_BUILD_TREE = $$cleanPath($$OUT_PWD)
     GCS_BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
 }
+
+TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
+isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$GCS_SOURCE_TREE/../../tools)
+
 GCS_APP_PATH = $$GCS_BUILD_TREE/bin
 macx {
     GCS_APP_TARGET   = "OpenPilot GCS"
@@ -97,8 +101,6 @@ macx {
         GCS_QT_PLUGINS_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/plugins
         GCS_QT_QML_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/qt5/qml
 
-        TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
-        isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$GCS_SOURCE_TREE/../../tools)
         QT_INSTALL_DIR = $$clean_path($$[QT_INSTALL_LIBS]/../../../..)
         equals(QT_INSTALL_DIR, $$TOOLS_DIR) {
             copyqt = 1

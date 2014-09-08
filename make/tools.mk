@@ -1101,21 +1101,21 @@ stm32flash_install: STM32FLASH_URL := https://code.google.com/p/stm32flash/
 stm32flash_install: STM32FLASH_REV := a358bd1f025d
 stm32flash_install: stm32flash_clean
         # download the source
-	$(V0) @echo " DOWNLOAD     $(STM32FLASH_URL) @ r$(STM32FLASH_REV)"
+	$(V0) @$(ECHO) " DOWNLOAD     $(STM32FLASH_URL) @ r$(STM32FLASH_REV)"
 	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -rf "$(STM32FLASH_DIR)"
-	$(V1) mkdir -p "$(STM32FLASH_DIR)"
-	$(V1) git clone --no-checkout $(STM32FLASH_URL) "$(STM32FLASH_DIR)"
+	$(V1) $(MKDIR) -p "$(STM32FLASH_DIR)"
+	$(V1) $(GIT) clone --no-checkout $(STM32FLASH_URL) "$(STM32FLASH_DIR)"
 	$(V1) ( \
-	  cd $(STM32FLASH_DIR) ; \
-	  git checkout -q $(STM32FLASH_REV) ; \
+	  $(CD) $(STM32FLASH_DIR) ; \
+	  $(GIT) checkout -q $(STM32FLASH_REV) ; \
 	)
         # build
-	$(V0) @echo " BUILD        $(STM32FLASH_DIR)"
+	$(V0) @$(ECHO) " BUILD        $(STM32FLASH_DIR)"
 	$(V1) $(MAKE) --silent -C $(STM32FLASH_DIR) all $(STM32FLASH_BUILD_OPTIONS) 
 
 .PHONY: stm32flash_clean
 stm32flash_clean:
-	$(V0) @echo " CLEAN        $(STM32FLASH_DIR)"
+	$(V0) @$(ECHO) " CLEAN        $(STM32FLASH_DIR)"
 	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -rf "$(STM32FLASH_DIR)"
 
 DFUUTIL_DIR := $(TOOLS_DIR)/dfu-util

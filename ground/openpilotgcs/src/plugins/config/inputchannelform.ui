@@ -120,6 +120,9 @@ margin:1px;</string>
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::UpDownArrows</enum>
      </property>
+     <property name="keyboardTracking">
+      <bool>false</bool>
+     </property>
      <property name="maximum">
       <number>9999</number>
      </property>
@@ -670,6 +673,9 @@ margin:1px;</string>
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::UpDownArrows</enum>
      </property>
+     <property name="keyboardTracking">
+      <bool>false</bool>
+     </property>
      <property name="maximum">
       <number>9999</number>
      </property>
@@ -761,6 +767,9 @@ margin:1px;</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="keyboardTracking">
+         <bool>false</bool>
         </property>
         <property name="maximum">
          <number>9999</number>

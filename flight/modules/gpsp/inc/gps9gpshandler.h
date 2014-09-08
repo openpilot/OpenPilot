@@ -1,14 +1,10 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{
- * @addtogroup SystemModule GPSV9 System Module
- * @{
  *
- * @file       gpsdsysmod.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      System module
- *
+ * @file       gps9gpshandler.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      handler for GPSV9 onboard ubx gps module.
+ *             --
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,13 +23,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef GPSSYSTEMMOD_H
-#define GPSSYSTEMMOD_H
-#include <openpilot.h>
-#include <pios_struct_helper.h>
-#include <pios_helpers.h>
-#include <ubx_utils.h>
+#ifndef GPS9GPSHANDLER_H_
+#define GPS9GPSHANDLER_H_
 
-int32_t GPSPSystemModInitialize(void);
+#define BUFFER_SIZE 200
 
-#endif // GPSSYSTEMMOD_H
+void handleGPS();
+void setupGPS();
+
+#endif /* GPS9GPSHANDLER_H_ */

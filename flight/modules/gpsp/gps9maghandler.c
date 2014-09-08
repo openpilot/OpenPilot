@@ -1,14 +1,10 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{
- * @addtogroup SystemModule GPSV9 System Module
- * @{
  *
- * @file       gpsdsysmod.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      System module
- *
+ * @file       gps9maghandler.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      handles GPSV9 onboard magnetometer and sends its data.
+ *             --
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,13 +23,31 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef GPSSYSTEMMOD_H
-#define GPSSYSTEMMOD_H
 #include <openpilot.h>
 #include <pios_struct_helper.h>
 #include <pios_helpers.h>
 #include <ubx_utils.h>
+#include <pios_hmc5x83.h>
+#include "inc/gps9protocol.h"
 
-int32_t GPSPSystemModInitialize(void);
+extern pios_hmc5x83_dev_t onboard_mag;
 
-#endif // GPSSYSTEMMOD_H
+void handleMag()
+{
+    if (!PIOS_HMC5x83_NewDataAvailable(onboard_mag)) {
+        return;
+    }
+    static int16_t mag[3];
+
+    if (PIOS_HMC5x83_ReadMag(onboard_mag, mag) == 0) {
+        MagUbxPkt magPkt;
+        // swap axis so that if side with connector is aligned to revo side with connectors, mags data are aligned
+        magPkt.fragments.data.X = -mag[1];
+        magPkt.fragments.data.Y = mag[0];
+        magPkt.fragments.data.Z = mag[2];
+        magPkt.fragments.data.status = 1;
+        ubx_buildPacket(&magPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_MAG, sizeof(MagData));
+        PIOS_COM_SendBuffer(pios_com_main_id, magPkt.packet.bynarystream, sizeof(MagUbxPkt));
+        return;
+    }
+}

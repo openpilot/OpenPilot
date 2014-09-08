@@ -1,14 +1,10 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{
- * @addtogroup SystemModule GPSV9 System Module
- * @{
  *
- * @file       gpsdsysmod.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      System module
- *
+ * @file       gps9maghandler.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      brief goes here.
+ *             --
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,13 +23,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef GPSSYSTEMMOD_H
-#define GPSSYSTEMMOD_H
-#include <openpilot.h>
-#include <pios_struct_helper.h>
-#include <pios_helpers.h>
-#include <ubx_utils.h>
+#ifndef GPS9MAGHANDLER_H
+#define GPS9MAGHANDLER_H
 
-int32_t GPSPSystemModInitialize(void);
+void handleMag();
 
-#endif // GPSSYSTEMMOD_H
+
+#endif

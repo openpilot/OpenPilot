@@ -32,15 +32,10 @@ ERASE_FLASH ?= NO
 
 # List of mandatory modules to include
 #MODULES += FirmwareIAP
-
+MODULES += gpsp
 
 # Include all camera options
 CDEFS += -DPIOS_APPS_MINIMAL
-
-# Erase flash firmware should be buildable from command line
-ifeq ($(ERASE_FLASH), YES)
-    CDEFS += -DERASE_FLASH
-endif
 
 # List C source files here (C dependencies are automatically generated).
 # Use file-extension c for "c-only"-files
@@ -48,13 +43,9 @@ endif
 SRC += $(CMSIS_DEVICEDIR)/system_stm32f0xx.c
 
 ## Application Core
-SRC += $(OPMODULEDIR)/gpsp/gpsdsysmod.c
 SRC += $(OPSYSTEM)/gpsp.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(FLIGHTLIB)/ubx_utils.c
-#SRC += $(FLIGHTLIB)/alarms.c
-#SRC += $(OPUAVOBJ)/uavobjectmanager.c
-#SRC += $(OPUAVOBJ)/eventdispatcher.c
 
 SRC += $(PIOSCOMMON)/pios_hmc5x83.c
 SRC += $(PIOSCOMMON)/pios_ubx_dcc.c

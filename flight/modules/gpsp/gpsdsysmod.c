@@ -8,15 +8,15 @@
  * (currently only STM32 supported)
  *
  * @{
- * @addtogroup SystemModule System Module
+ * @addtogroup SystemModule GPSV9 System Module
  * @brief Initializes PIOS and other modules runs monitoring
  * After initializing all the modules (currently selected by Makefile but in
  * future controlled by configuration on SD card) runs basic monitoring and
  * alarms.
  * @{
  *
- * @file       systemmod.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       gpsdsystemmod.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @brief      System module
  *
  * @see        The GNU Public License (GPL) Version 3
@@ -38,15 +38,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <openpilot.h>
-#include <pios_struct_helper.h>
-#include <pios_helpers.h>
+
 // private includes
 #include "inc/gpsdsysmod.h"
-#include <pios_hmc5x83.h>
-#include <pios_ubx_ddc.h>
-#include <ubx_utils.h>
-
+#include "inc/gps9maghandler.h"
+#include "inc/gps9gpshandler.h"
+#include "inc/gps9protocol.h"
 // UAVOs
 #include <systemstats.h>
 SystemStatsData systemStats;
@@ -57,7 +54,6 @@ extern uint32_t pios_com_main_id;
 
 
 extern struct pios_flash_driver pios_jedec_flash_driver;
-extern pios_hmc5x83_dev_t onboard_mag;
 extern uintptr_t flash_id;
 
 // Private constants
@@ -65,74 +61,22 @@ extern uintptr_t flash_id;
 
 #define STACK_SIZE_BYTES        450
 #define STAT_RATE               1
-#define TASK_PRIORITY           (tskIDLE_PRIORITY + 1)
-#define BUFFER_SIZE             200
-
-const char cfg_settings[] = {};
-    // cfg-prt I2C. In UBX+RTCM, Out UBX, Slave Addr 0x42
-//    "\xB5\x62\x06\x00\x14\x00\x00\x00\x00\x00\x84\x00\x00\x00\x00\x00\x00\x00\x07\x00\x01\x00\x00\x00\x00\x00\xA6\xC6"
-    // cfg-msg: nav-pvt rate 1
-//    "\xB5\x62\x06\x01\x03\x00\x01\x07\x01\x13\x51"
-    // cfg-msg: nav-svinfo rate 10
-//    "\xB5\x62\x06\x01\x03\x00\x01\x30\x0A\x45\xAC"
-    // CFG-RATE meas period 100ms, nav rate 1
-//    "\xB5\x62\x06\x08\x06\x00\x64\x00\x01\x00\x01\x00\x7A\x12";
+#define TASK_PRIORITY           (tskIDLE_PRIORITY + 2)
 
 // Private types
 
 // Private variables
-uint8_t buffer[BUFFER_SIZE];
 static xTaskHandle systemTaskHandle;
 static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_CRITICAL = 3 } stackOverflow;
 
 // Private functions
 static bool mallocFailed;
-static void ReadGPS();
-static void ReadMag();
-static void SetupGPS();
+
 static void updateStats();
 static void gpspSystemTask(void *parameters);
 
-
-typedef struct {
-    int16_t  X;
-    int16_t  Y;
-    int16_t  Z;
-    uint16_t status;
-} __attribute__((packed)) MagData;
-
-typedef union {
-    struct {
-        UBXHeader_t header;
-        MagData     data;
-        UBXFooter_t footer;
-    } __attribute__((packed)) fragments;
-    UBXPacket_t packet;
-} MagUbxPkt;
-
-typedef struct {
-    uint32_t flightTime;
-    uint16_t HeapRemaining;
-    uint16_t IRQStackRemaining;
-    uint16_t SystemModStackRemaining;
-    uint16_t options;
-} __attribute__((packed)) SysData;
-
-typedef union {
-    struct {
-        UBXHeader_t header;
-        SysData     data;
-        UBXFooter_t footer;
-    } fragments;
-    UBXPacket_t packet;
-} SysUbxPkt;
-
-
 #define SYS_DATA_OPTIONS_FLASH 0x01
 
-#define UBX_OP_CUST_CLASS      0x99
-#define UBX_OP_SYS             0x01
-#define UBX_OP_MAG             0x02
 
 /**
  * Create the module task.
@@ -181,8 +125,9 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
     /* Record a successful boot */
     PIOS_IAP_WriteBootCount(0);
 #endif
+    PIOS_COM_ChangeBaud(pios_com_main_id, 115200);
     static TickType_t lastUpdate;
-    SetupGPS();
+    setupGPS();
     uint8_t counter = 0;
     while (1) {
         // NotificationUpdateStatus();
@@ -192,8 +137,8 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
         }
         vTaskDelayUntil(&lastUpdate, SYSTEM_UPDATE_PERIOD_MS * configTICK_RATE_HZ / 1000);
 
-        ReadGPS();
-        ReadMag();
+        handleGPS();
+        handleMag();
         updateStats();
     }
 }
@@ -299,85 +244,6 @@ void vApplicationMallocFailedHook(void)
 #endif
 }
 
-
-void ReadMag()
-{
-    if (!PIOS_HMC5x83_NewDataAvailable(onboard_mag)) {
-        return;
-    }
-    static int16_t mag[3];
-
-    if (PIOS_HMC5x83_ReadMag(onboard_mag, mag) == 0) {
-        MagUbxPkt magPkt;
-        // swap axis so that if side with connector is aligned to revo side with connectors, mags data are aligned
-        magPkt.fragments.data.X = -mag[1];
-        magPkt.fragments.data.Y = mag[0];
-        magPkt.fragments.data.Z = mag[2];
-        magPkt.fragments.data.status = 1;
-        ubx_buildPacket(&magPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_MAG, sizeof(MagData));
-        PIOS_COM_SendBuffer(pios_com_main_id, magPkt.packet.bynarystream, sizeof(MagUbxPkt));
-        return;
-    }
-}
-
-uint32_t lastUnsentData = 0;
-void ReadGPS()
-{
-    bool completeSentenceSent = false;
-    int8_t maxCount = 3;
-
-    do {
-        int32_t datacounter = PIOS_UBX_DDC_GetAvailableBytes(PIOS_I2C_GPS);
-        if (datacounter > 0) {
-            uint8_t toRead = (uint32_t)datacounter > BUFFER_SIZE - lastUnsentData ? BUFFER_SIZE - lastUnsentData : (uint8_t)datacounter;
-            uint8_t toSend = toRead;
-            PIOS_UBX_DDC_ReadData(PIOS_I2C_GPS, buffer, toRead);
-
-            uint8_t *lastSentence;
-            static uint16_t lastSentenceLenght;
-            completeSentenceSent = ubx_getLastSentence(buffer, toRead, &lastSentence, &lastSentenceLenght);
-            if (completeSentenceSent) {
-                toSend = (uint8_t)(lastSentence - buffer + lastSentenceLenght);
-            } else {
-                lastUnsentData = 0;
-            }
-
-            PIOS_COM_SendBuffer(pios_com_main_id, buffer, toSend);
-            if (toRead > toSend) {
-                // move unsent data at the beginning of buffer to be sent next time
-                lastUnsentData = toRead - toSend;
-                memcpy(buffer, (buffer + toSend), lastUnsentData);
-            }
-        }
-
-        datacounter = PIOS_COM_ReceiveBuffer(pios_com_main_id, buffer, BUFFER_SIZE, 0);
-        if (datacounter > 0) {
-            PIOS_UBX_DDC_WriteData(PIOS_I2C_GPS, buffer, datacounter);
-        }
-    } while (maxCount--);
-}
-
-typedef struct {
-    uint8_t size;
-    const uint8_t *sentence;
-} ubx_init_sentence;
-
-
-const ubx_init_sentence gps_config[] = {
-    [0] = {
-        .sentence = (uint8_t *)cfg_settings,
-        .size     = sizeof(cfg_settings),
-    },
-};
-
-
-void SetupGPS()
-{
-    PIOS_COM_ChangeBaud(pios_com_main_id, 115200);
-    for (uint8_t i = 0; i < NELEMENTS(gps_config); i++) {
-        PIOS_UBX_DDC_WriteData(PIOS_I2C_GPS, gps_config[i].sentence, gps_config[i].size);
-    }
-}
 /**
  * @}
  * @}

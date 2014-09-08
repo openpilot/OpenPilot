@@ -1,14 +1,10 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{
- * @addtogroup SystemModule GPSV9 System Module
- * @{
  *
- * @file       gpsdsysmod.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      System module
- *
+ * @file       gpsv9protocol.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      brief goes here.
+ *             --
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,13 +23,50 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef GPSSYSTEMMOD_H
-#define GPSSYSTEMMOD_H
+#ifndef GPSV9PROTOCOL_H_
+#define GPSV9PROTOCOL_H_
+
 #include <openpilot.h>
 #include <pios_struct_helper.h>
 #include <pios_helpers.h>
 #include <ubx_utils.h>
 
-int32_t GPSPSystemModInitialize(void);
+#define UBX_OP_CUST_CLASS 0x99
+#define UBX_OP_SYS        0x01
+#define UBX_OP_MAG        0x02
 
-#endif // GPSSYSTEMMOD_H
+typedef struct {
+    int16_t  X;
+    int16_t  Y;
+    int16_t  Z;
+    uint16_t status;
+} __attribute__((packed)) MagData;
+
+typedef union {
+    struct {
+        UBXHeader_t header;
+        MagData     data;
+        UBXFooter_t footer;
+    } __attribute__((packed)) fragments;
+    UBXPacket_t packet;
+} MagUbxPkt;
+
+typedef struct {
+    uint32_t flightTime;
+    uint16_t HeapRemaining;
+    uint16_t IRQStackRemaining;
+    uint16_t SystemModStackRemaining;
+    uint16_t options;
+} __attribute__((packed)) SysData;
+
+typedef union {
+    struct {
+        UBXHeader_t header;
+        SysData     data;
+        UBXFooter_t footer;
+    } fragments;
+    UBXPacket_t packet;
+} SysUbxPkt;
+
+
+#endif /* GPSV9PROTOCOL_H_ */

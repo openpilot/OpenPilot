@@ -45,7 +45,7 @@ namespace OpenPilot {
 SixPointCalibrationModel::SixPointCalibrationModel(QObject *parent) :
     QObject(parent),
     calibratingMag(false),
-    externalMagAvailable(false),
+    calibratingAuxMag(false),
     calibratingAccel(false),
     calibrationStepsMag(),
     calibrationStepsAccelOnly(),
@@ -334,7 +334,7 @@ void SixPointCalibrationModel::getSample(UAVObject *obj)
                 aux_mag_accum_x.append(auxMagData.x);
                 aux_mag_accum_y.append(auxMagData.y);
                 aux_mag_accum_z.append(auxMagData.z);
-                externalMagAvailable = true;
+                calibratingAuxMag = true;
 #ifndef FITTING_USING_CONTINOUS_ACQUISITION
                 aux_mag_fit_x.append(auxMagData.x);
                 aux_mag_fit_y.append(auxMagData.y);
@@ -425,7 +425,7 @@ void SixPointCalibrationModel::continouslyGetMagSamples(UAVObject *obj)
             aux_mag_fit_x.append(auxMagData.x);
             aux_mag_fit_y.append(auxMagData.y);
             aux_mag_fit_z.append(auxMagData.z);
-            externalMagAvailable = true;
+            calibratingAuxMag = true;
         }
     }
 }
@@ -463,10 +463,10 @@ void SixPointCalibrationModel::compute()
 
         qDebug() << "-----------------------------------";
         qDebug() << "Onboard Mag";
-        CalcCalibration(mag_fit_x, mag_fit_y, mag_fit_z, Be_length, revoCalibrationData.mag_transform, revoCalibrationData.mag_bias);
-        if (externalMagAvailable) {
+        calcCalibration(mag_fit_x, mag_fit_y, mag_fit_z, Be_length, revoCalibrationData.mag_transform, revoCalibrationData.mag_bias);
+        if (calibratingAuxMag) {
             qDebug() << "Aux Mag";
-            CalcCalibration(aux_mag_fit_x, aux_mag_fit_y, aux_mag_fit_z, Be_length, auxCalibrationData.mag_transform, auxCalibrationData.mag_bias);
+            calcCalibration(aux_mag_fit_x, aux_mag_fit_y, aux_mag_fit_z, Be_length, auxCalibrationData.mag_transform, auxCalibrationData.mag_bias);
         }
     }
     // Restore the previous setting
@@ -491,7 +491,7 @@ void SixPointCalibrationModel::compute()
         good_calibration &= !IS_NAN(revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X]);
         good_calibration &= !IS_NAN(revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y]);
         good_calibration &= !IS_NAN(revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z]);
-        if (externalMagAvailable) {
+        if (calibratingAuxMag) {
             good_calibration &= !IS_NAN(auxCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0]);
             good_calibration &= !IS_NAN(auxCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C1]);
             good_calibration &= !IS_NAN(auxCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C2]);
@@ -537,7 +537,7 @@ void SixPointCalibrationModel::compute()
     position = -1;
 }
 
-void SixPointCalibrationModel::CalcCalibration(QList<float> x, QList<float> y, QList<float> z, double Be_length, float calibrationMatrix[], float bias[])
+void SixPointCalibrationModel::calcCalibration(QList<float> x, QList<float> y, QList<float> z, double Be_length, float calibrationMatrix[], float bias[])
 {
     int vectSize = x.count();
     Eigen::VectorXf samples_x(vectSize);
@@ -589,7 +589,7 @@ void SixPointCalibrationModel::save()
         }
 
         revoCalibration->setData(revoCalibrationData);
-        if (externalMagAvailable) {
+        if (calibratingAuxMag) {
             AuxMagSettings::DataFields auxCalibrationData = auxMagSettings->getData();
             // Note that Revo/AuxMag MAG_TRANSFORM_RxCx are interchangeable, an assertion at initialization enforces the structs are equal
             for (int i = 0; i < RevoCalibration::MAG_TRANSFORM_NUMELEM; i++) {

@@ -104,7 +104,7 @@ public:
     } Result;
 
     bool calibratingMag;
-    bool externalMagAvailable;
+    bool calibratingAuxMag;
     bool calibratingAccel;
 
     QList<CalibrationStep> calibrationStepsMag;
@@ -125,15 +125,17 @@ public:
     QList<double> accel_accum_x;
     QList<double> accel_accum_y;
     QList<double> accel_accum_z;
+
     QList<double> mag_accum_x;
     QList<double> mag_accum_y;
     QList<double> mag_accum_z;
-    QList<double> aux_mag_accum_x;
-    QList<double> aux_mag_accum_y;
-    QList<double> aux_mag_accum_z;
     QList<float> mag_fit_x;
     QList<float> mag_fit_y;
     QList<float> mag_fit_z;
+
+    QList<double> aux_mag_accum_x;
+    QList<double> aux_mag_accum_y;
+    QList<double> aux_mag_accum_z;
     QList<float> aux_mag_fit_x;
     QList<float> aux_mag_fit_y;
     QList<float> aux_mag_fit_z;
@@ -152,7 +154,7 @@ public:
     void compute();
     void showHelp(QString image);
     UAVObjectManager *getObjectManager();
-    void CalcCalibration(QList<float> x, QList<float> y, QList<float> z, double Be_length, float calibrationMatrix[], float bias[]);
+    void calcCalibration(QList<float> x, QList<float> y, QList<float> z, double Be_length, float calibrationMatrix[], float bias[]);
 };
 }
 

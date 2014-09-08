@@ -483,7 +483,7 @@ static void StateEstimationCb(void)
             s.z = states.mag[2];
             switch (states.magStatus) {
             case MAGSTATUS_OK:
-                s.Source = MAGSTATE_SOURCE_OK;
+                s.Source = MAGSTATE_SOURCE_ONBOARD;
                 break;
             case MAGSTATUS_AUX:
                 s.Source = MAGSTATE_SOURCE_AUX;

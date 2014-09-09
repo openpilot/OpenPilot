@@ -95,7 +95,7 @@ Item {
 
     Timer {
          id: telemetry_activity
-         interval: 700; running: true; repeat: true
+         interval: 1200; running: true; repeat: true
          onTriggered: telemetry_check()
     }
 

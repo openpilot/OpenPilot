@@ -72,11 +72,33 @@ Item {
     property real memory_free : SystemStats.HeapRemaining > 1024 ? SystemStats.HeapRemaining / 1024 : SystemStats.HeapRemaining 
 
     // Needed to get correctly int8 value, reset value (-127) on disconnect
-    property int oplm0_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_0 : -127
-    property int oplm1_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_1 : -127
-    property int oplm2_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_2 : -127
-    property int oplm3_db: OPLinkStatus.LinkState == 4 ? OPLinkStatus.PairSignalStrengths_3 : -127
- 
+    property int oplm0_db: telemetry_link == 1 ? OPLinkStatus.PairSignalStrengths_0 : -127
+    property int oplm1_db: telemetry_link == 1 ? OPLinkStatus.PairSignalStrengths_1 : -127
+    property int oplm2_db: telemetry_link == 1 ? OPLinkStatus.PairSignalStrengths_2 : -127
+    property int oplm3_db: telemetry_link == 1 ? OPLinkStatus.PairSignalStrengths_3 : -127
+
+    property real telemetry_sum
+    property real telemetry_sum_old
+    property bool telemetry_link
+
+    // Hack : check if telemetry is active. Works with real link and log replay
+    function telemetry_check(){
+       telemetry_sum = OPLinkStatus.RXRate + OPLinkStatus.RXRate
+       
+       if (telemetry_sum != telemetry_sum_old){
+           telemetry_link = 1
+       } else {
+           telemetry_link = 0
+       }
+       telemetry_sum_old = telemetry_sum
+    } 
+
+    Timer {
+         id: telemetry_activity
+         interval: 700; running: true; repeat: true
+         onTriggered: telemetry_check()
+    }
+
     // Filtering for S-meter. Smeter range -127dB <--> -13dB = S9+60dB
 
     Timer {

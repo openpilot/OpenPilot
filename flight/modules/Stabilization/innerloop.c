@@ -44,8 +44,6 @@
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
 #include <actuatordesired.h>
-#include <tpsdebug.h>
-#include <pid.h> // FIXME: Temporary debugging
 
 #include <stabilization.h>
 #include <relay_tuning.h>
@@ -86,7 +84,6 @@ void stabilizationInnerloopInit()
     ManualControlCommandInitialize();
     StabilizationDesiredInitialize();
     ActuatorDesiredInitialize();
-    TPSDebugInitialize();
 #ifdef REVOLUTION
     AirspeedStateInitialize();
     AirspeedStateConnectCallback(AirSpeedUpdatedCb);
@@ -142,27 +139,6 @@ static inline pid_scaler create_pid_scaler()
             { 1.0f,  stabSettings.settings.ThrustPIDScaleCurve[4] }
         }
     };
-
-    // FIXME: Temporary debugging
-    static int pidDebugCount = 0;
-
-    pidDebugCount++;
-    if (pidDebugCount == 100) {
-        struct pid *pid = &stabSettings.innerPids[0];
-
-        TPSDebugData tpsDebug;
-        TPSDebugGet(&tpsDebug);
-
-        tpsDebug.thrust   = scaler.x;
-        tpsDebug.p = pid->p;
-        tpsDebug.d = pid->d;
-        tpsDebug.factor   = pid_scale_factor(&scaler);
-        tpsDebug.p_scaled = tpsDebug.p * tpsDebug.factor;
-        tpsDebug.d_scaled = tpsDebug.d * tpsDebug.factor;
-
-        TPSDebugSet(&tpsDebug);
-        pidDebugCount     = 0;
-    }
 
     return scaler;
 }

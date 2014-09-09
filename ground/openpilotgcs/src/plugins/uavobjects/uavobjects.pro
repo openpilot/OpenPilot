@@ -127,8 +127,7 @@ HEADERS += \
     $$UAVOBJECT_SYNTHETICS/waypointactive.h \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.h \
-    $$UAVOBJECT_SYNTHETICS/perfcounter.h \
-    $$UAVOBJECT_SYNTHETICS/tpsdebug.h
+    $$UAVOBJECT_SYNTHETICS/perfcounter.h
 
 SOURCES += \
     $$UAVOBJECT_SYNTHETICS/accelgyrosettings.cpp \
@@ -232,6 +231,5 @@ SOURCES += \
     $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.cpp \
     $$UAVOBJECT_SYNTHETICS/takeofflocation.cpp \
-    $$UAVOBJECT_SYNTHETICS/perfcounter.cpp \
-    $$UAVOBJECT_SYNTHETICS/tpsdebug.cpp
+    $$UAVOBJECT_SYNTHETICS/perfcounter.cpp
     

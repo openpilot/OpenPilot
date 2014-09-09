@@ -177,6 +177,11 @@ C: Eric Price (Corvus Corax)
 D: March 2012
 V: 
 
+M: First Revo 20km Navigated flight on a FixedWing
+C: Eric Price / Team OP
+D: Greece 2013
+V: https://vimeo.com/71956880
+
 M: First Auto spot landing on a fixed Wing using Revo
 C: Eric Price (Corvus Corax)
 D: Greece 2013

@@ -31,6 +31,8 @@
 #ifndef PID_H
 #define PID_H
 
+#include "mathmisc.h"
+
 // !
 struct pid {
     float p;
@@ -43,11 +45,8 @@ struct pid {
 };
 
 typedef struct pid_scaler {
-    float x;
-    struct point {
-        float x;
-        float y;
-    } points[5];
+    float  x;
+    pointf points[5];
 } pid_scaler;
 
 // ! Methods to use the pid structures

@@ -82,10 +82,11 @@ Item {
     property bool telemetry_link
 
     // Hack : check if telemetry is active. Works with real link and log replay
+
     function telemetry_check(){
        telemetry_sum = OPLinkStatus.RXRate + OPLinkStatus.RXRate
        
-       if (telemetry_sum != telemetry_sum_old){
+       if (telemetry_sum != telemetry_sum_old || OPLinkStatus.LinkState == 4){
            telemetry_link = 1
        } else {
            telemetry_link = 0

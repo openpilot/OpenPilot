@@ -32,6 +32,7 @@
 #define MATHMISC_H
 
 #include <math.h>
+#include <stdint.h>
 
 // returns min(boundary1,boundary2) if val<min(boundary1,boundary2)
 // returns max(boundary1,boundary2) if val>max(boundary1,boundary2)

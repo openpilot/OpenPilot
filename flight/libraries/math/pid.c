@@ -140,3 +140,32 @@ void pid_configure(struct pid *pid, float p, float i, float d, float iLim)
     pid->d    = d;
     pid->iLim = iLim;
 }
+
+float pid_scale_factor(pid_scaler *scaler)
+{
+    float y = y_on_curve(scaler->x, scaler->points, sizeof(scaler->points) / sizeof(scaler->points[0]));
+
+    return 1.0f + (IS_REAL(y) ? y : 0.0f);
+}
+
+float pid_apply_setpoint_scaled(struct pid *pid, const float factor, const float setpoint, const float measured, float dT,
+                                pid_scaler *scaler)
+{
+    // Save PD values.
+    float p     = pid->p;
+    float d     = pid->d;
+
+    // Scale PD values.
+    float scale = pid_scale_factor(scaler);
+
+    pid->p *= scale;
+    pid->d *= scale;
+
+    float value = pid_apply_setpoint(pid, factor, setpoint, measured, dT);
+
+    // Restore PD values.
+    pid->p = p;
+    pid->d = d;
+
+    return value;
+}

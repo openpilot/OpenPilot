@@ -31,6 +31,8 @@
 #ifndef PID_H
 #define PID_H
 
+#include "mathmisc.h"
+
 // !
 struct pid {
     float p;
@@ -42,11 +44,19 @@ struct pid {
     float lastDer;
 };
 
+typedef struct pid_scaler {
+    float  x;
+    pointf points[5];
+} pid_scaler;
+
 // ! Methods to use the pid structures
 float pid_apply(struct pid *pid, const float err, float dT);
 float pid_apply_setpoint(struct pid *pid, const float factor, const float setpoint, const float measured, float dT);
+float pid_apply_setpoint_scaled(struct pid *pid, const float factor, const float setpoint, const float measured, float dT,
+                                pid_scaler *scaler);
 void pid_zero(struct pid *pid);
 void pid_configure(struct pid *pid, float p, float i, float d, float iLim);
 void pid_configure_derivative(float cutoff, float gamma);
+float pid_scale_factor(pid_scaler *scaler);
 
 #endif /* PID_H */

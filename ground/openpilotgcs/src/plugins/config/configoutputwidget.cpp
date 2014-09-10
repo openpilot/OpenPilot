@@ -127,6 +127,17 @@ void ConfigOutputWidget::enableControls(bool enable)
 }
 
 /**
+   Force update all channels with the values in the OutputChannelForms.
+ */
+void ConfigOutputWidget::sendAllChannelTests()
+{
+    for (unsigned int i = 0; i < ActuatorCommand::CHANNEL_NUMELEM; i++) {
+        OutputChannelForm *form = getOutputChannelForm(i);
+        sendChannelTest(i, form->neutral());
+    }
+}
+
+/**
    Toggles the channel testing mode by making the GCS take over
    the ActuatorCommand objects
  */
@@ -178,6 +189,11 @@ void ConfigOutputWidget::runChannelTests(bool state)
     }
     obj->setMetadata(mdata);
     obj->updated();
+
+    // Setup the correct initial channel values when the channel testing mode is turned on.
+    if (state) {
+        sendAllChannelTests();
+    }
 }
 
 OutputChannelForm *ConfigOutputWidget::getOutputChannelForm(const int index) const

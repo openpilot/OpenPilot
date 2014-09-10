@@ -42,6 +42,8 @@
 #include <flightstatus.h>
 #include <manualcontrolcommand.h>
 #include <stabilizationbank.h>
+#include <stabilizationdesired.h>
+#include <actuatordesired.h>
 
 #include <stabilization.h>
 #include <relay_tuning.h>
@@ -80,6 +82,8 @@ void stabilizationInnerloopInit()
     StabilizationStatusInitialize();
     FlightStatusInitialize();
     ManualControlCommandInitialize();
+    StabilizationDesiredInitialize();
+    ActuatorDesiredInitialize();
 #ifdef REVOLUTION
     AirspeedStateInitialize();
     AirspeedStateConnectCallback(AirSpeedUpdatedCb);
@@ -93,6 +97,58 @@ void stabilizationInnerloopInit()
     PIOS_CALLBACKSCHEDULER_Schedule(callbackHandle, FAILSAFE_TIMEOUT_MS, CALLBACK_UPDATEMODE_LATER);
 }
 
+static float get_pid_scale_source_value()
+{
+    float value;
+
+    switch (stabSettings.settings.ThrustPIDScaleSource) {
+    case STABILIZATIONSETTINGS_THRUSTPIDSCALESOURCE_MANUALCONTROLTHROTTLE:
+        ManualControlCommandThrottleGet(&value);
+        break;
+    case STABILIZATIONSETTINGS_THRUSTPIDSCALESOURCE_STABILIZATIONDESIREDTHRUST:
+        StabilizationDesiredThrustGet(&value);
+        break;
+    case STABILIZATIONSETTINGS_THRUSTPIDSCALESOURCE_ACTUATORDESIRETHRUST:
+        ActuatorDesiredThrustGet(&value);
+        break;
+    default:
+        ManualControlCommandThrottleGet(&value);
+        break;
+    }
+
+    if (value < 0) {
+        value = 0.0f;
+    }
+
+    return value;
+}
+
+static inline pid_scaler create_pid_scaler()
+{
+    float throttle;
+
+    ManualControlCommandThrottleGet(&throttle);
+
+    struct pid_scaler scaler = {
+        .x      = get_pid_scale_source_value(),
+        .points = {
+            { 0.0f,  stabSettings.settings.ThrustPIDScaleCurve[0] },
+            { 0.25f, stabSettings.settings.ThrustPIDScaleCurve[1] },
+            { 0.50f, stabSettings.settings.ThrustPIDScaleCurve[2] },
+            { 0.75f, stabSettings.settings.ThrustPIDScaleCurve[3] },
+            { 1.0f,  stabSettings.settings.ThrustPIDScaleCurve[4] }
+        }
+    };
+
+    return scaler;
+}
+
+static int is_pid_scaled_for_axis(int axis)
+{
+    return stabSettings.settings.EnableThrustPIDScaling
+           && (axis == 0 // Roll
+               || axis == 1); // Pitch
+}
 
 /**
  * WARNING! This callback executes with critical flight control priority every
@@ -200,7 +256,12 @@ static void stabilizationInnerloopTask()
                                  -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t],
                                  StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
                                  );
-                actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT);
+                if (is_pid_scaled_for_axis(t)) {
+                    pid_scaler scaler = create_pid_scaler();
+                    actuatorDesiredAxis[t] = pid_apply_setpoint_scaled(&stabSettings.innerPids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT, &scaler);
+                } else {
+                    actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT);
+                }
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
             default:

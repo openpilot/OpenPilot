@@ -62,7 +62,6 @@
 #include <CoordinateConversions.h>
 
 #include <pios_board_info.h>
-#include <pios_struct_helper.h>
 
 // Private constants
 #define STACK_SIZE_BYTES 1000
@@ -495,7 +494,7 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     } else {
         Quaternion2R(rotationQuat, R);
     }
-    matrix_mult_3x3f((float(*)[3])cast_struct_to_array(cal.mag_transform, cal.mag_transform.r0c0), R, mag_transform);
+    matrix_mult_3x3f((float(*)[3])RevoCalibrationmag_transformToArray(cal.mag_transform), R, mag_transform);
 }
 /**
  * @}

@@ -29,7 +29,6 @@
  */
 
 #include "inc/manualcontrol.h"
-#include <pios_struct_helper.h>
 #include <manualcontrolcommand.h>
 #include <stabilizationdesired.h>
 #include <flightmodesettings.h>
@@ -70,27 +69,27 @@ void stabilizedHandler(bool newinit)
     FlightStatusGet(&flightStatus);
     switch (flightStatus.FlightMode) {
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
-        stab_settings = cast_struct_to_array(settings.Stabilization1Settings, settings.Stabilization1Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization1SettingsToArray(settings.Stabilization1Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
-        stab_settings = cast_struct_to_array(settings.Stabilization2Settings, settings.Stabilization2Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization2SettingsToArray(settings.Stabilization2Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
-        stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization3Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization3SettingsToArray(settings.Stabilization3Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
-        stab_settings = cast_struct_to_array(settings.Stabilization4Settings, settings.Stabilization4Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization4SettingsToArray(settings.Stabilization4Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
-        stab_settings = cast_struct_to_array(settings.Stabilization5Settings, settings.Stabilization5Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization5SettingsToArray(settings.Stabilization5Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-        stab_settings = cast_struct_to_array(settings.Stabilization6Settings, settings.Stabilization6Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization6SettingsToArray(settings.Stabilization6Settings);
         break;
     default:
         // Major error, this should not occur because only enter this block when one of these is true
         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
-        stab_settings = cast_struct_to_array(settings.Stabilization1Settings, settings.Stabilization1Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization1SettingsToArray(settings.Stabilization1Settings);
         return;
     }
 

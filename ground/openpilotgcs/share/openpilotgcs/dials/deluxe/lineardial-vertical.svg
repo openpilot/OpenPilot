@@ -14,8 +14,8 @@
    height="322.58304"
    id="svg10068"
    version="1.1"
-   inkscape:version="0.48.2 r9819"
-   sodipodi:docname="lineardial-vertical-old2.svg"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="lineardial-vertical.svg"
    inkscape:export-filename="H:\Documents\Hobbies\W433\My Gauges\vbat-001.png"
    inkscape:export-xdpi="103.61"
    inkscape:export-ydpi="103.61"
@@ -757,16 +757,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.87"
-     inkscape:cx="0.68217946"
-     inkscape:cy="151.28502"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="26.078149"
+     inkscape:cy="28.131038"
      inkscape:document-units="px"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1680"
-     inkscape:window-height="957"
+     inkscape:window-width="1280"
+     inkscape:window-height="928"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:object-paths="true"
      showguides="true"
@@ -782,7 +782,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <dc:creator>
           <cc:Agent>
             <dc:title>Edouard Lafargue</dc:title>
@@ -925,15 +925,15 @@
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:none"
        id="field"
-       width="46.305515"
+       width="44.714523"
        height="12.626906"
-       x="129.09726"
-       y="157.31393"
+       x="130.68825"
+       y="155.43594"
        inkscape:label="#rect2878" />
     <rect
        inkscape:label="#rect2878"
-       y="170.91206"
-       x="129.9335"
+       y="174.43594"
+       x="130.46382"
        height="12.626906"
        width="45.176544"
        id="value"

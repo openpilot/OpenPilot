@@ -29,7 +29,6 @@
  */
 
 #include "inc/manualcontrol.h"
-#include <pios_struct_helper.h>
 #include <sanitycheck.h>
 #include <manualcontrolcommand.h>
 #include <accessorydesired.h>
@@ -259,7 +258,7 @@ static bool okToArm(void)
 
     // Check each alarm
     for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++) {
-        if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[i] >= SYSTEMALARMS_ALARM_CRITICAL) { // found an alarm thats set
+        if (SystemAlarmsAlarmToArray(alarms.Alarm)[i] >= SYSTEMALARMS_ALARM_CRITICAL) { // found an alarm thats set
             if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY) {
                 continue;
             }

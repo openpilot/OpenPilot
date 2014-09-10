@@ -51,7 +51,6 @@
 #include <math.h>
 #include <pid.h>
 #include <CoordinateConversions.h>
-#include <pios_struct_helper.h>
 #include <sin_lookup.h>
 #include <pathdesired.h>
 #include <paths.h>
@@ -377,7 +376,7 @@ static uint8_t updateAutoPilotVtol()
     }
 
     // vertical positon control PID loops works the same in both regular and fallback modes, setup according to settings
-    pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
+    pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.VerticalPosPI.Ki, 0.0f, vtolPathFollowerSettings.VerticalPosPI.ILimit);
 
     switch (followermode) {
     case FOLLOWER_REGULAR:

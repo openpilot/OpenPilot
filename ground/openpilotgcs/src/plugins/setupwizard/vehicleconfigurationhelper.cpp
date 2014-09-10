@@ -37,6 +37,7 @@
 #include "stabilizationsettings.h"
 #include "revocalibration.h"
 #include "accelgyrosettings.h"
+#include <QtCore/qmath.h>
 
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE = 50;
 const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE  = 400;
@@ -440,9 +441,79 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         Q_ASSERT(field);
         field->setValue((channels[i].throttle1 * 127) / 100, 0);
         field->setValue((channels[i].throttle2 * 127) / 100, 1);
-        field->setValue((channels[i].roll * 127) / 100, 2);
-        field->setValue((channels[i].pitch * 127) / 100, 3);
-        field->setValue((channels[i].yaw * 127) / 100, 4);
+
+        // Normalize mixer values, allow a well balanced mixer saved
+        if (channels[i].roll < 0) {
+            field->setValue(qFloor((double)(channels[i].roll * 127) / 100), 2);
+        } else {
+            field->setValue(qCeil((double)(channels[i].roll * 127) / 100), 2);
+        }
+
+        if (channels[i].pitch < 0) {
+            field->setValue(qFloor((double)(channels[i].pitch * 127) / 100), 3);
+        } else {
+            field->setValue(qCeil((double)(channels[i].pitch * 127) / 100), 3);
+        }
+
+        if (channels[i].yaw < 0) {
+            field->setValue(qFloor((double)(channels[i].yaw * 127) / 100), 4);
+        } else {
+            field->setValue(qCeil((double)(channels[i].yaw * 127) / 100), 4);
+        }
+    }
+
+    MixerSettings *mixSettings = MixerSettings::GetInstance(m_uavoManager);
+
+    // Save mixer values for sliders
+    switch (m_configSource->getVehicleType()) {
+    case VehicleConfigurationSource::VEHICLE_MULTI:
+    {
+        switch (m_configSource->getVehicleSubType()) {
+        case VehicleConfigurationSource::MULTI_ROTOR_TRI_Y:
+        case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
+        case VehicleConfigurationSource::MULTI_ROTOR_HEXA_H:
+        case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
+            mixSettings->setMixerValueRoll(100);
+            mixSettings->setMixerValuePitch(100);
+            mixSettings->setMixerValueYaw(100);
+            break;
+        case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
+            mixSettings->setMixerValueRoll(50);
+            mixSettings->setMixerValuePitch(50);
+            mixSettings->setMixerValueYaw(50);
+            break;
+        case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
+            mixSettings->setMixerValueRoll(100);
+            mixSettings->setMixerValuePitch(100);
+            mixSettings->setMixerValueYaw(50);
+            break;
+        case VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y:
+            mixSettings->setMixerValueRoll(100);
+            mixSettings->setMixerValuePitch(50);
+            mixSettings->setMixerValueYaw(66);
+            break;
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO:
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO_X:
+            mixSettings->setMixerValueRoll(100);
+            mixSettings->setMixerValuePitch(100);
+            mixSettings->setMixerValueYaw(100);
+            break;
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_X:
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO_COAX_PLUS:
+        case VehicleConfigurationSource::MULTI_ROTOR_OCTO_V:
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+    case VehicleConfigurationSource::VEHICLE_FIXEDWING:
+    case VehicleConfigurationSource::VEHICLE_HELI:
+    case VehicleConfigurationSource::VEHICLE_SURFACE:
+        // TODO: Implement mixer / sliders settings for other vehicle types?
+        break;
+    default:
+        break;
     }
 
     // Apply updates
@@ -1014,7 +1085,7 @@ void VehicleConfigurationHelper::setupHexaCopter()
     }
     case VehicleConfigurationSource::MULTI_ROTOR_HEXA_X:
     {
-        frame = SystemSettings::AIRFRAMETYPE_HEXAH;
+        frame = SystemSettings::AIRFRAMETYPE_HEXAX;
         // HexaX according to new mixer table and pitch-roll-yaw mixing at 100%
         // Pitch Roll Yaw
         // M1 {  1, -0.5, -1 },

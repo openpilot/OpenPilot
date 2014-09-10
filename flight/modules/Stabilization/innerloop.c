@@ -123,12 +123,8 @@ static float get_pid_scale_source_value()
     return value;
 }
 
-static inline pid_scaler create_pid_scaler()
+static float get_pid_scale_factor()
 {
-    float throttle;
-
-    ManualControlCommandThrottleGet(&throttle);
-
     struct pid_scaler scaler = {
         .x      = get_pid_scale_source_value(),
         .points = {
@@ -140,7 +136,7 @@ static inline pid_scaler create_pid_scaler()
         }
     };
 
-    return scaler;
+    return pid_scale_factor(&scaler);
 }
 
 static int is_pid_scaled_for_axis(int axis)
@@ -256,12 +252,11 @@ static void stabilizationInnerloopTask()
                                  -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t],
                                  StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
                                  );
+                float scaleFactor = speedScaleFactor;
                 if (is_pid_scaled_for_axis(t)) {
-                    pid_scaler scaler = create_pid_scaler();
-                    actuatorDesiredAxis[t] = pid_apply_setpoint_scaled(&stabSettings.innerPids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT, &scaler);
-                } else {
-                    actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT);
+                    scaleFactor *= get_pid_scale_factor();
                 }
+                actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], scaleFactor, rate[t], gyro_filtered[t], dT);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
             default:

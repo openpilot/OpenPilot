@@ -147,25 +147,3 @@ float pid_scale_factor(pid_scaler *scaler)
 
     return 1.0f + (IS_REAL(y) ? y : 0.0f);
 }
-
-float pid_apply_setpoint_scaled(struct pid *pid, const float factor, const float setpoint, const float measured, float dT,
-                                pid_scaler *scaler)
-{
-    // Save PD values.
-    float p     = pid->p;
-    float d     = pid->d;
-
-    // Scale PD values.
-    float scale = pid_scale_factor(scaler);
-
-    pid->p *= scale;
-    pid->d *= scale;
-
-    float value = pid_apply_setpoint(pid, factor, setpoint, measured, dT);
-
-    // Restore PD values.
-    pid->p = p;
-    pid->d = d;
-
-    return value;
-}

@@ -196,7 +196,7 @@ D: Greece 2013
 V: 
 
 M: First Revo 5km Navigated flight on a MultiRotor
-C: RoddersNZ
+C: Rodney Grainger (roddersNZ)
 D: September 2014
 V: https://www.youtube.com/watch?v=DYawRGz5KYM
 

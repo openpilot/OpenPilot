@@ -30,20 +30,14 @@
 
 #include "openpilot.h"
 #include "pios.h"
-#include "CoordinateConversions.h"
 #include "pios_math.h"
 #include <pios_helpers.h>
 #include <pios_delay.h>
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 #include "inc/UBX.h"
 #include "inc/GPS.h"
-#include "auxmagsettings.h"
 #include <string.h>
-
-static float mag_bias[3] = { 0, 0, 0 };
-static float mag_transform[3][3] = {
-    { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }
-};
+#include <auxmagsupport.h>
 
 static bool useMag = false;
 static GPSPositionSensorSensorTypeOptions sensorType = GPSPOSITIONSENSOR_SENSORTYPE_UNKNOWN;
@@ -485,20 +479,8 @@ static void parse_ubx_op_mag(struct UBXPacket *ubx, __attribute__((unused)) GPSP
         return;
     }
     struct UBX_OP_MAG *mag = &ubx->payload.op_mag;
-    float mags[3] = { mag->x - mag_bias[0],
-                      mag->y - mag_bias[1],
-                      mag->z - mag_bias[2] };
-
-    float mag_out[3];
-
-    rot_mult(mag_transform, mags, mag_out);
-
-    AuxMagSensorData data;
-    data.x = mag_out[0];
-    data.y = mag_out[1];
-    data.z = mag_out[2];
-    data.Status = mag->Status;
-    AuxMagSensorSet(&data);
+    float mags[3] = { mag->x, mag->y, mag->z };
+    auxmagsupport_publish_samples(mags, AUXMAGSENSOR_STATUS_OK);
 }
 
 
@@ -537,30 +519,17 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
     return id;
 }
 
-
 void load_mag_settings()
 {
-    AuxMagSettingsTypeOptions option;
+    auxmagsupport_reload_settings();
 
-    AuxMagSettingsTypeGet(&option);
-    if (option != AUXMAGSETTINGS_TYPE_GPSV9) {
+    if (auxmagsupport_get_type() != AUXMAGSETTINGS_TYPE_GPSV9) {
         useMag = false;
         const uint8_t status = AUXMAGSENSOR_STATUS_NONE;
         // next sample from other external mags will provide the right status if present
         AuxMagSensorStatusSet((uint8_t *)&status);
     } else {
-        float a[3][3];
-        float b[3][3];
-        float rotz;
-        AuxMagSettingsmag_transformArrayGet((float *)a);
-        AuxMagSettingsOrientationGet(&rotz);
-        rotz = DEG2RAD(rotz);
-        rot_about_axis_z(rotz, b);
-        matrix_mult_3x3f(a, b, mag_transform);
-        AuxMagSettingsmag_biasArrayGet(mag_bias);
         useMag = true;
     }
 }
-
-
 #endif // PIOS_INCLUDE_GPS_UBX_PARSER

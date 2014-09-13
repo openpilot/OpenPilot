@@ -70,6 +70,7 @@ ifndef TESTAPP
 
     ## Misc library functions
     SRC += $(FLIGHTLIB)/WorldMagModel.c
+    SRC += $(FLIGHTLIB)/auxmagsupport.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c

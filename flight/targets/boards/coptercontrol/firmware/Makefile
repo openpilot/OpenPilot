@@ -76,6 +76,7 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
+    SRC += $(FLIGHTLIB)/auxmagsupport.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/accessorydesired.c

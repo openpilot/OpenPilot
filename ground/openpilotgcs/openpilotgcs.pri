@@ -84,6 +84,7 @@ isEmpty(TOOLS_DIR) {
 }
 
 SDL_DIR = $${TOOLS_DIR}/SDL-1.2.15
+OPENSSL_DIR = $${TOOLS_DIR}/openssl-1.0.1e-win32
 
 GCS_APP_PATH = $$GCS_BUILD_TREE/bin
 macx {

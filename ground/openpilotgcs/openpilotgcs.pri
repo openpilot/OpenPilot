@@ -76,6 +76,8 @@ isEmpty(GCS_BUILD_TREE) {
 TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
 isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$GCS_SOURCE_TREE/../../tools)
 
+SDL_DIR = $${TOOLS_DIR}/SDL-1.2.15
+
 GCS_APP_PATH = $$GCS_BUILD_TREE/bin
 macx {
     GCS_APP_TARGET   = "OpenPilot GCS"

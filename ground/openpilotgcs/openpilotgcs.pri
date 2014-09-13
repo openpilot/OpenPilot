@@ -73,8 +73,15 @@ isEmpty(GCS_BUILD_TREE) {
     GCS_BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
 }
 
-TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
-isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$GCS_SOURCE_TREE/../../tools)
+# Find the tools directory,
+# try from Makefile (not run by Qt Creator),
+TOOLS_DIR = $$(TOOLS_DIR)
+isEmpty(TOOLS_DIR) {
+    # check for custom enviroment variable,
+    TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
+    # fallback to default location.
+    isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$GCS_SOURCE_TREE/../../tools)
+}
 
 SDL_DIR = $${TOOLS_DIR}/SDL-1.2.15
 

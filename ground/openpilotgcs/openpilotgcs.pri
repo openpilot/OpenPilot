@@ -104,6 +104,9 @@ macx {
         OPENSSL_DIR = $$(OPENSSL_DIR)
         isEmpty(OPENSSL_DIR):OPENSSL_DIR = $${TOOLS_DIR}/openssl-1.0.1e-win32
 
+        MESAWIN_DIR = $$(MESAWIN_DIR)
+        isEmpty(MESAWIN_DIR):MESAWIN_DIR = $${TOOLS_DIR}/mesawin
+
         contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
         GCS_APP_TARGET   = openpilotgcs
         copyqt = $$copydata

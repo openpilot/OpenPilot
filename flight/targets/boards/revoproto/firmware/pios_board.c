@@ -946,7 +946,7 @@ void PIOS_Board_Init(void)
 #endif
 
 #if defined(PIOS_INCLUDE_HMC5X83)
-    onboard_mag = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_pressure_adapter_id, 0);
+    onboard_mag = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_mag_adapter_id, 0);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)

@@ -108,11 +108,11 @@ static float get_pid_scale_source_value()
     case STABILIZATIONSETTINGS_THRUSTPIDSCALESOURCE_STABILIZATIONDESIREDTHRUST:
         StabilizationDesiredThrustGet(&value);
         break;
-    case STABILIZATIONSETTINGS_THRUSTPIDSCALESOURCE_ACTUATORDESIRETHRUST:
+    case STABILIZATIONSETTINGS_THRUSTPIDSCALESOURCE_ACTUATORDESIREDTHRUST:
         ActuatorDesiredThrustGet(&value);
         break;
     default:
-        ManualControlCommandThrottleGet(&value);
+        ActuatorDesiredThrustGet(&value);
         break;
     }
 

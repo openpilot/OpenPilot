@@ -83,9 +83,6 @@ isEmpty(TOOLS_DIR) {
     isEmpty(TOOLS_DIR):TOOLS_DIR = $$clean_path($$GCS_SOURCE_TREE/../../tools)
 }
 
-SDL_DIR = $${TOOLS_DIR}/SDL-1.2.15
-OPENSSL_DIR = $${TOOLS_DIR}/openssl-1.0.1e-win32
-
 GCS_APP_PATH = $$GCS_BUILD_TREE/bin
 macx {
     GCS_APP_TARGET   = "OpenPilot GCS"
@@ -101,6 +98,12 @@ macx {
 } else {
     !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
     win32 {
+        SDL_DIR = $$(SDL_DIR)
+        isEmpty(SDL_DIR):SDL_DIR = $${TOOLS_DIR}/SDL-1.2.15
+
+        OPENSSL_DIR = $$(OPENSSL_DIR)
+        isEmpty(OPENSSL_DIR):OPENSSL_DIR = $${TOOLS_DIR}/openssl-1.0.1e-win32
+
         contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
         GCS_APP_TARGET   = openpilotgcs
         copyqt = $$copydata

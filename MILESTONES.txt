@@ -211,9 +211,9 @@ D:
 V:
 
 M: First Revo 8km Navigated flight on a MultiRotor
-C:
-D:
-V:
+C: Jim Allen Thibodaux
+D: September 2014
+V: http://www.youtube.com/watch?v=oeJF8U2k9FA
 
 M: First Revo 9km Navigated flight on a MultiRotor
 C:

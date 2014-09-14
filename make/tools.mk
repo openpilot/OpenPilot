@@ -100,7 +100,8 @@ endif
 
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
 
-# Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
+# When changing PYTHON_DIR, you must also update it in ground/openpilotgcs/src/python.pri
+# When changing SDL_DIR or OPENSSL_DIR, you must also update them in ground/openpilotgcs/openpilotgcs.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_8-2014q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.3.1
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32

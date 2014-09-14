@@ -38,6 +38,7 @@
 #include <homelocation.h>
 #include <auxmagsettings.h>
 #include <CoordinateConversions.h>
+#include <mathmisc.h>
 
 // Private constants
 //
@@ -82,8 +83,8 @@ static int32_t init(stateFilter *self)
     this->magBias[0]   = this->magBias[1] = this->magBias[2] = 0.0f;
     this->warningcount = this->errorcount = 0;
     HomeLocationBeGet(this->homeLocationBe);
-    // magBe holds the squared magnetic vector length (extpected)
-    this->magBe    = sqrtf(this->homeLocationBe[0] * this->homeLocationBe[0] + this->homeLocationBe[1] * this->homeLocationBe[1] + this->homeLocationBe[2] * this->homeLocationBe[2]);
+    // magBe holds the squared magnetic vector length (expected)
+    this->magBe    = vector_lengthf(this->homeLocationBe, 3);
     this->invMagBe = 1.0f / this->magBe;
     RevoCalibrationGet(&this->revoCalibration);
     RevoSettingsGet(&this->revoSettings);
@@ -195,7 +196,7 @@ static bool checkMagValidity(struct data *this, float error, bool setAlarms)
 static float getMagError(struct data *this, float mag[3])
 {
     // vector norm
-    float magnitude = sqrtf(mag[0] * mag[0] + mag[1] * mag[1] + mag[2] * mag[2]);
+    float magnitude = vector_lengthf(mag, 3);
     // absolute value of relative error against Be
     float error     = fabsf(magnitude - this->magBe) * this->invMagBe;
 

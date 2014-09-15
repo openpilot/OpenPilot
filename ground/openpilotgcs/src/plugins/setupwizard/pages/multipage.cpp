@@ -99,7 +99,7 @@ void MultiPage::setupMultiTypesCombo()
                          "for FPV since the fore rotor tend to be in the way of the camera.");
 
     ui->typeCombo->addItem(tr("Quadcopter H"), SetupWizard::MULTI_ROTOR_QUAD_H);
-    m_descriptions << tr("Quadcopter H, Blackout mini");
+    m_descriptions << tr("Quadcopter H, Blackout miniH");
 
     ui->typeCombo->addItem(tr("Hexacopter"), SetupWizard::MULTI_ROTOR_HEXA);
     m_descriptions << tr("Hexacopter");

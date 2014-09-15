@@ -534,25 +534,22 @@
 <context>
     <name>Utils::FileSearch</name>
     <message numerus="yes">
-        <location filename="../../../src/libs/utils/filesearch.cpp" line="+46"/>
         <source>%1: canceled. %n occurrences found in %2 files.</source>
-        <translation>
+        <translation type="vanished">
             <numerusform>%1 : annulé. %n entrée trouvée dans %2 fichiers.</numerusform>
             <numerusform>%1 : annulé. %n entrées trouvées dans %2 fichiers.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+8"/>
         <source>%1: %n occurrences found in %2 files.</source>
-        <translation>
+        <translation type="vanished">
             <numerusform>%1 : %n occurrence trouvée dans %2 fichiers.</numerusform>
             <numerusform>%1 : %n occurrences trouvées dans %2 fichiers.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+8"/>
         <source>%1: %n occurrences found in %2 of %3 files.</source>
-        <translation>
+        <translation type="vanished">
             <numerusform>%1 : %n occurence trouvée dans %2 de %3 fichiers.</numerusform>
             <numerusform>%1 : %n occurences trouvées dans %2 de %3 fichiers.</numerusform>
         </translation>
@@ -1475,9 +1472,19 @@ Raison : %3</translation>
 <context>
     <name>Welcome::WelcomeMode</name>
     <message>
-        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+88"/>
+        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+107"/>
         <source>Welcome</source>
         <translation>Accueil</translation>
+    </message>
+    <message>
+        <location line="+60"/>
+        <source>Update Available: %1</source>
+        <translation>Mise à jour disponible : %1</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/welcome/welcomemode.h" line="+73"/>
+        <source>OpenPilot GCS Version: %1 </source>
+        <translation>OpenPilot GCS Version : %1 </translation>
     </message>
 </context>
 <context>
@@ -4455,22 +4462,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+0"/>
         <source> Some of the configured features might not be supported by your version of the plugin. You might want to upgrade the plugin.</source>
-        <translation type="unfinished"> Certaines des fonctionnalités configurées pourraient ne pas être prises en charge par votre version du plugin. Vous pourriez peut-être mettre à jour le plugin.</translation>
+        <translation> Certaines des fonctionnalités configurées pourraient ne pas être prises en charge par votre version du plugin. Vous pourriez peut-être mettre à jour le plugin.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source> Some configuration is missing in the imported config and will be replaced by default settings.</source>
-        <translation type="unfinished"> Certains paramètres sont manquants dans la configuration importée et seront remplacés par les paramètres par défaut.</translation>
+        <translation> Certains paramètres sont manquants dans la configuration importée et seront remplacés par les paramètres par défaut.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source> Major features can&apos;t be imported by your version of the plugin. You should upgrade the plugin to import these settings.</source>
-        <translation type="unfinished"> Des paramètres primordiaux ne peuvent être importés par votre version du plugin. Vous devriez mettre à jour le plugin pour importer ces paramètres.</translation>
+        <translation> Des paramètres primordiaux ne peuvent être importés par votre version du plugin. Vous devriez mettre à jour le plugin pour importer ces paramètres.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source> The imported settings are not compatible with this plugin and won&apos;t be imported!</source>
-        <translation type="unfinished"> Les paramètres importés ne sont pas compatibles avec ce plugin et ne seront pas importés !</translation>
+        <translation> Les paramètres importés ne sont pas compatibles avec ce plugin et ne seront pas importés !</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -4485,7 +4492,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+13"/>
         <source> Unknown compatibility level: </source>
-        <translation type="unfinished"> Niveau de compatibilité inconnu : </translation>
+        <translation> Niveau de compatibilité inconnu : </translation>
     </message>
 </context>
 <context>
@@ -6337,7 +6344,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>PID Bank</source>
         <translatorcomment>Typo Need translation for &quot;Bank1&quot; &quot;Bank 2&quot;... in selection list below</translatorcomment>
-        <translation type="unfinished">Banque PID</translation>
+        <translation>Banque PID</translation>
     </message>
     <message>
         <location/>
@@ -6453,7 +6460,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid &amp;quot;Manual&amp;quot; for multirotors! Never select &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; or &amp;quot;CruiseControl&amp;quot; on a fixed wing!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Éviter &amp;quot;Manuel&amp;quot; pour les multirotors ! Ne jamais sélectionner &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; ou &amp;quot;CruiseControl&amp;quot; sur une aile volante !&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Éviter &amp;quot;Manuel&amp;quot; pour les multirotors ! Ne jamais sélectionner &amp;quot;Altitude&amp;quot;, &amp;quot;VelocityControl&amp;quot; ou &amp;quot;CruiseControl&amp;quot; sur une aile volante !&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -10233,7 +10240,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and later&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;&lt;p&gt;        Utile si la carte n&apos;arrive pas à démarrer correctement.&lt;/p&gt;&lt;p&gt;        La Led Bleue commence à clignoter rapidement pendant 20-30 secondes puis la carte démarre normalement&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez le lien utilisé avec la liste déroulante située à droite.&lt;/p&gt;&lt;p&gt;VEUILLEZ NOTER : Supporté avec les versions de bootloaders 4.0 et supérieures&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;&lt;p&gt;        Utile si la carte n&apos;arrive pas à démarrer correctement.&lt;/p&gt;&lt;p&gt;        La Led Bleue commence à clignoter rapidement pendant 20-30 secondes puis la carte démarre normalement&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez le lien utilisé avec la liste déroulante située à droite.&lt;/p&gt;&lt;p&gt;VEUILLEZ NOTER : Supporté avec les versions de bootloaders 4.0 et supérieures&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -10266,26 +10273,26 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigMultiRotorWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+696"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+509"/>
         <location line="+24"/>
         <location line="+31"/>
         <location line="+31"/>
         <location line="+25"/>
         <location line="+24"/>
         <location line="+24"/>
-        <location line="+41"/>
-        <location line="+200"/>
+        <location line="+43"/>
+        <location line="+205"/>
         <location line="+70"/>
         <source>Configuration OK</source>
         <translation>Configuration OK</translation>
     </message>
     <message>
-        <location line="-302"/>
+        <location line="-309"/>
         <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign a Yaw channel&lt;/font&gt;</source>
         <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter le canal de Yaw&lt;/font&gt;</translation>
     </message>
     <message>
-        <location line="+367"/>
+        <location line="+378"/>
         <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign all %1 motor channels&lt;/font&gt;</source>
         <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter tous les %1 canaux moteurs&lt;/font&gt;</translation>
     </message>
@@ -10673,7 +10680,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>LoggingThread</name>
     <message>
-        <location line="+162"/>
+        <location line="+164"/>
         <source>Logging: retrieve settings objects from the autopilot (%1 objects)</source>
         <translation>Journalisation : récupération des objets de configuration de l&apos;autopilote (%1 objets)</translation>
     </message>
@@ -10935,7 +10942,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+3"/>
         <source>Hexacopter H</source>
-        <translation type="unfinished">Hexacoptère H</translation>
+        <translation>Hexacoptère H</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -11039,7 +11046,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
 <context>
     <name>VehicleConfigurationHelper</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+79"/>
+        <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+80"/>
         <location line="+12"/>
         <source>Done!</source>
         <translation>Terminé !</translation>
@@ -11087,7 +11094,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres de stabilisation</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+99"/>
         <source>Writing mixer settings</source>
         <translation>Écriture paramètres mixeur</translation>
     </message>
@@ -12890,7 +12897,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigOutputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+140"/>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+151"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
         <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuillez corriger cela avant de tester les sorties.</translation>
     </message>
@@ -12900,7 +12907,7 @@ p, li { white-space: pre-wrap; }
         <translation>Cette option démarre vos moteurs avec la valeur sélectionnée sur les curseurs, indépendamment de l&apos;émetteur. Il est recommandé d&apos;enlever les hélices des moteurs. Êtes-vous sûr de vouloir faire ça ?</translation>
     </message>
     <message>
-        <location line="+249"/>
+        <location line="+254"/>
         <source>http://wiki.openpilot.org/x/WIGf</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
         <translation>http://wiki.openpilot.org/x/aoBqAQ</translation>
@@ -12914,7 +12921,7 @@ p, li { white-space: pre-wrap; }
         <translation>Désactivé</translation>
     </message>
     <message>
-        <location line="+201"/>
+        <location line="+192"/>
         <source>http://wiki.openpilot.org/x/GgDBAQ</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
         <translation>http://wiki.openpilot.org/x/TYRNAQ</translation>
@@ -13457,7 +13464,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
@@ -13467,17 +13474,15 @@ p, li { white-space: pre-wrap; }
         <translation>Données</translation>
     </message>
     <message>
-        <location line="+13"/>
         <source>Flights recorded: </source>
-        <translation>Vols enregistrés : </translation>
+        <translation type="vanished">Vols enregistrés : </translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Entries logged (free): </source>
-        <translation>Vols enregistrés (libres) : </translation>
+        <translation type="vanished">Vols enregistrés (libres) : </translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+46"/>
         <source>Flight to download:</source>
         <translation>Vols à télécharger :</translation>
     </message>
@@ -13492,7 +13497,27 @@ p, li { white-space: pre-wrap; }
         <translation>Ajuster horodatage</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="-39"/>
+        <source>UAVO(P)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Flights recorded:</source>
+        <translation type="unfinished">Vols enregistrés :</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Slots used/free:</source>
+        <translation type="unfinished">Emplacements utilisés/disponibles :</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Entries downloaded:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+55"/>
         <source>Clear all logs</source>
         <translation>Effacer tous les logs</translation>
     </message>
@@ -13601,7 +13626,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>FlightLogManager</name>
     <message>
-        <location filename="../../../src/plugins/flightlog/flightlogmanager.cpp" line="+274"/>
+        <location filename="../../../src/plugins/flightlog/flightlogmanager.cpp" line="+300"/>
         <source>_flight-%1</source>
         <translation>_vol-%1</translation>
     </message>

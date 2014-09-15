@@ -1,10 +1,11 @@
-Connor Abbott
+﻿Connor Abbott
 Sergiy Anikeyev
 David Ankers
 Fredrik Arvidsson
 Pedro Assuncao
 Werner Backes
 Jose Barros
+Alex Beck
 Andre Bernet
 Mikael Blomqvist
 Pete Boehl
@@ -13,11 +14,13 @@ Joel Brueziere
 Thierry Bugeat
 Glenn Campigli
 David Carlson
+Mike Carr
 Stefan Cenkov
 Andrés Chavarría Krauser
 Cosimo Corrado
 James Cotton
 Steve Doll
+James Duley
 Piotr Esden-Tempski
 Peter Farnworth
 Ed Faulkner
@@ -25,6 +28,7 @@ Andrew Finegan
 Kevin Finisterre
 Richard Flay
 Darren Furniss
+Oliver Gaste
 Cliff Geerdes
 Frederic Goddeeris
 Daniel Godin
@@ -43,6 +47,7 @@ Mark James
 Michael Johnston
 Ricky King
 Thorsten Klose
+Karl Knutsson
 Sami Korhonen
 Hallvard Kristiansen
 Alan Krum
@@ -63,6 +68,7 @@ Gary Mortimer
 Cathy Moss
 Les Newell
 Ken Northup
+Craig Nuttall
 Bertrand Oresve
 Angus Peart
 John Pike
@@ -93,6 +99,7 @@ Alex Sowa
 Pete Stapley
 Vova Starikh
 Rowan Taubitz
+Jim Allen Thibodaux
 Andrew Thoms
 Vladimir Timofeev
 Jasper Van Loenen

@@ -16945,7 +16945,7 @@ margin:1px;
 font:bold;</string>
                    </property>
                    <property name="text">
-                    <string>Weak Leveling Kp </string>
+                    <string>Weak Leveling Gain </string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -20634,7 +20634,7 @@ margin:1px;
 font:bold;</string>
                    </property>
                    <property name="text">
-                    <string>AccelKp</string>
+                    <string>Accel P</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -21251,7 +21251,7 @@ margin:1px;
 font:bold;</string>
                    </property>
                    <property name="text">
-                    <string>AccelKi</string>
+                    <string>Accel I</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>

@@ -380,6 +380,12 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox2, multi.VTOLMotorNE);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox3, multi.VTOLMotorSE);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorSW);
+    } else if (frameType == "QuadH") {
+        // Motors 1/2/3/4 are: NW / NE / SE / SW
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2, multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3, multi.VTOLMotorSE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorSW);
     } else if (frameType == "Hexa") {
         // Motors 1/2/3 4/5/6 are: N / NE / SE / S / SW / NW
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorN);

@@ -10,7 +10,7 @@
 
 	<field name="RollRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.0025,0.004,0.00002,0.3" limits="%BE:0:0.01; %BE:0:0.01; ; "/>
 	<field name="PitchRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.0025,0.004,0.00002,0.3" limits="%BE:0:0.01; %BE:0:0.01; ; "/>
-	<field name="YawRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.00620,0.01000,0.00005,0.3" limits="%BE:0:0.01; %BE:0:0.01 ; ; "/>
+	<field name="YawRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.00620,0.02000,0.00005,0.3" limits="%BE:0:0.01; %BE:0:0.02 ; ; "/>
 	<field name="RollPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
 	<field name="PitchPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
 	<field name="YawPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>

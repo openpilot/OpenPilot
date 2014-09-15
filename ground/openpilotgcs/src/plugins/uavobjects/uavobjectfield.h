@@ -80,8 +80,8 @@ public:
     void toXML(QXmlStreamWriter *xmlWriter);
     void fromXML(QXmlStreamReader *xmlReader);
 
-    void toJson(QJsonObject *jsonObject);
-    void fromJson(const QJsonObject *jsonObject);
+    void toJson(QJsonObject &jsonObject);
+    void fromJson(const QJsonObject &jsonObject);
 
     bool isWithinLimits(QVariant var, quint32 index, int board = 0);
     QVariant getMaxLimit(quint32 index, int board = 0);

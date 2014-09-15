@@ -28,6 +28,7 @@
 #include "uavobjectfield.h"
 #include <QtEndian>
 #include <QDebug>
+#include <QtWidgets>
 
 UAVObjectField::UAVObjectField(const QString & name, const QString & units, FieldType type, quint32 numElements, const QStringList & options, const QString &limits)
 {
@@ -675,17 +676,46 @@ void UAVObjectField::toXML(QXmlStreamWriter *xmlWriter)
 
 void UAVObjectField::fromXML(QXmlStreamReader *xmlReader)
 {
-
+    // Assert we have the correct field by name
+    Q_ASSERT(xmlReader->name() == "field");
+    Q_ASSERT(xmlReader->attributes().value("name") == getName());
+    // Read values, skip overflowing ones if any
+    while (xmlReader->readNextStartElement()) {
+        if (xmlReader->name() == "value") {
+            int index = getElementNames().indexOf(xmlReader->attributes().value("name").toString());
+            if (index >= 0) {
+                setValue(xmlReader->readElementText(), index);
+            }
+        }
+    }
 }
 
-void UAVObjectField::toJson(QJsonObject *jsonObject)
+void UAVObjectField::toJson(QJsonObject &jsonObject)
 {
-
+    jsonObject["name"] = getName();
+    jsonObject["type"] = getTypeAsString();
+    jsonObject["unit"] = getUnits();
+    QJsonArray values;
+    for (unsigned int n = 0; n < numElements; ++n) {
+        QJsonObject value;
+        value["name"] = getElementNames().at(n);
+        value["value"] = QJsonValue::fromVariant(getValue(n));
+        values.append(value);
+    }
+    jsonObject["values"] = values;
 }
 
-void UAVObjectField::fromJson(const QJsonObject *jsonObject)
+void UAVObjectField::fromJson(const QJsonObject &jsonObject)
 {
-
+    Q_ASSERT(jsonObject["name"].toString() == getName());
+    QJsonArray jsonValues = jsonObject["values"].toArray();
+    for (int i = 0; i < jsonValues.size(); i++) {
+        QJsonObject jsonValue = jsonValues.at(i).toObject();
+        int index = getElementNames().indexOf(jsonValue["name"].toString());
+        if (index >= 0) {
+            setValue(((QJsonValue)jsonValue["value"]).toVariant(), index);
+        }
+    }
 }
 
 qint32 UAVObjectField::pack(quint8 *dataOut)

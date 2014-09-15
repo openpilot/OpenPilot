@@ -136,8 +136,8 @@ public:
     void toXML(QXmlStreamWriter *xmlWriter);
     void fromXML(QXmlStreamReader *xmlReader);
 
-    void toJson(QJsonObject *jsonObject);
-    void fromJson(const QJsonObject *jsonObject);
+    void toJson(QJsonObject &jsonObject);
+    void fromJson(const QJsonObject &jsonObject);
 
     void emitTransactionCompleted(bool success);
     void emitNewInstance(UAVObject *);

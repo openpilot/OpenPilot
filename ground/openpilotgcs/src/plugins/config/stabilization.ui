@@ -20082,7 +20082,7 @@ margin:1px;
 font:bold;</string>
                    </property>
                    <property name="text">
-                    <string>Gyro Noise Rejection</string>
+                    <string>Gyro Noise Filtering</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>

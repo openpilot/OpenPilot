@@ -667,6 +667,9 @@ bool UploaderGadgetWidget::autoUpdate()
     case 0x903:
         filename = "fw_revolution";
         break;
+    case 0x904:
+        filename = "fw_discoveryf4bare";
+        break;
     default:
         emit autoUpdateSignal(FAILURE, QVariant());
         return false;

@@ -83,7 +83,7 @@ static int32_t init(stateFilter *self)
     this->magBias[0]   = this->magBias[1] = this->magBias[2] = 0.0f;
     this->warningcount = this->errorcount = 0;
     HomeLocationBeGet(this->homeLocationBe);
-    // magBe holds the squared magnetic vector length (expected)
+    // magBe holds the magnetic vector length (expected)
     this->magBe    = vector_lengthf(this->homeLocationBe, 3);
     this->invMagBe = 1.0f / this->magBe;
     RevoCalibrationGet(&this->revoCalibration);

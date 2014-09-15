@@ -761,7 +761,7 @@ void ConfigMultiRotorWidget::updateAirframe(QString frameType)
     } else if (frameType == "QuadP" || frameType == "Quad +") {
         elementId = "quad-plus";
     } else if (frameType == "QuadH" || frameType == "Quad H") {
-        elementId = "quad-H";
+        elementId = "quad-h";
     } else if (frameType == "Hexa" || frameType == "Hexacopter") {
         elementId = "quad-hexa";
     } else if (frameType == "HexaX" || frameType == "Hexacopter X") {

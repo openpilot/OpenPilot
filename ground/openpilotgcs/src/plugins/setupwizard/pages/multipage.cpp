@@ -158,7 +158,7 @@ void MultiPage::updateImageAndDescription()
         elementId = "quad-plus";
         break;
     case SetupWizard::MULTI_ROTOR_QUAD_H:
-        elementId = "quad-H";
+        elementId = "quad-h";
         break;
     case SetupWizard::MULTI_ROTOR_HEXA:
         elementId = "quad-hexa";

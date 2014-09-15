@@ -57,7 +57,6 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     // Set up fake tab widget stuff for pid banks support
     m_pidTabBars.append(ui->basicPIDBankTabBar);
     m_pidTabBars.append(ui->advancedPIDBankTabBar);
-    m_pidTabBars.append(ui->expertPIDBankTabBar);
     foreach(QTabBar * tabBar, m_pidTabBars) {
         for (int i = 0; i < m_pidBankCount; i++) {
             tabBar->addTab(tr("PID Bank %1").arg(i + 1));
@@ -111,7 +110,6 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(ui->pushButton_4);
     addWidget(ui->pushButton_5);
     addWidget(ui->pushButton_6);
-    addWidget(ui->pushButton_9);
     addWidget(ui->pushButton_20);
     addWidget(ui->pushButton_22);
     addWidget(ui->pushButton_23);
@@ -193,14 +191,10 @@ void ConfigStabilizationWidget::processLinkedWidgets(QWidget *widget)
             ui->RatePitchKp->setValue(ui->RateRollKp_2->value());
         } else if (widget == ui->RateRollKi_2) {
             ui->RatePitchKi->setValue(ui->RateRollKi_2->value());
-        } else if (widget == ui->RateRollILimit_2) {
-            ui->RatePitchILimit->setValue(ui->RateRollILimit_2->value());
         } else if (widget == ui->RatePitchKp) {
             ui->RateRollKp_2->setValue(ui->RatePitchKp->value());
         } else if (widget == ui->RatePitchKi) {
             ui->RateRollKi_2->setValue(ui->RatePitchKi->value());
-        } else if (widget == ui->RatePitchILimit) {
-            ui->RateRollILimit_2->setValue(ui->RatePitchILimit->value());
         } else if (widget == ui->RollRateKd) {
             ui->PitchRateKd->setValue(ui->RollRateKd->value());
         } else if (widget == ui->PitchRateKd) {
@@ -213,14 +207,10 @@ void ConfigStabilizationWidget::processLinkedWidgets(QWidget *widget)
             ui->AttitudePitchKp_2->setValue(ui->AttitudeRollKp->value());
         } else if (widget == ui->AttitudeRollKi) {
             ui->AttitudePitchKi_2->setValue(ui->AttitudeRollKi->value());
-        } else if (widget == ui->AttitudeRollILimit) {
-            ui->AttitudePitchILimit_2->setValue(ui->AttitudeRollILimit->value());
         } else if (widget == ui->AttitudePitchKp_2) {
             ui->AttitudeRollKp->setValue(ui->AttitudePitchKp_2->value());
         } else if (widget == ui->AttitudePitchKi_2) {
             ui->AttitudeRollKi->setValue(ui->AttitudePitchKi_2->value());
-        } else if (widget == ui->AttitudePitchILimit_2) {
-            ui->AttitudeRollILimit->setValue(ui->AttitudePitchILimit_2->value());
         }
     }
 

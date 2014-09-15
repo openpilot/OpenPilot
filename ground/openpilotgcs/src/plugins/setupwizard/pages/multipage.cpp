@@ -98,6 +98,9 @@ void MultiPage::setupMultiTypesCombo()
                          "This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited "
                          "for FPV since the fore rotor tend to be in the way of the camera.");
 
+    ui->typeCombo->addItem(tr("Quadcopter H"), SetupWizard::MULTI_ROTOR_QUAD_H);
+    m_descriptions << tr("Quadcopter H, Blackout mini");
+
     ui->typeCombo->addItem(tr("Hexacopter"), SetupWizard::MULTI_ROTOR_HEXA);
     m_descriptions << tr("Hexacopter");
 
@@ -153,6 +156,9 @@ void MultiPage::updateImageAndDescription()
         break;
     case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
         elementId = "quad-plus";
+        break;
+    case SetupWizard::MULTI_ROTOR_QUAD_H:
+        elementId = "quad-H";
         break;
     case SetupWizard::MULTI_ROTOR_HEXA:
         elementId = "quad-hexa";

@@ -112,7 +112,7 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
 
     if (mallocFailed) {
         // Nothing to do, this condition needs to be trapped during development.
-        while (wait_here) {
+        while (true) {
             ;
         }
     }

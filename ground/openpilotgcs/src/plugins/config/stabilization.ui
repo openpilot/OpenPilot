@@ -95,7 +95,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>3</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -16345,7 +16345,7 @@ border-radius: 5;</string>
                    <stringlist>
                     <string>objname:StabilizationSettings</string>
                     <string>button:default</string>
-                    <string>buttongroup:20</string>
+                    <string>buttongroup:25</string>
                    </stringlist>
                   </property>
                  </widget>
@@ -16409,7 +16409,7 @@ border-radius: 5;</string>
                        <string>fieldname:MaxWeakLevelingRate</string>
                        <string>haslimits:no</string>
                        <string>scale:1</string>
-                       <string>buttongroup:20</string>
+                       <string>buttongroup:25</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -17568,7 +17568,7 @@ font:bold;</string>
                        <string>fieldname:WeakLevelingKp</string>
                        <string>haslimits:no</string>
                        <string>scale:1</string>
-                       <string>buttongroup:20</string>
+                       <string>buttongroup:25</string>
                       </stringlist>
                      </property>
                     </widget>

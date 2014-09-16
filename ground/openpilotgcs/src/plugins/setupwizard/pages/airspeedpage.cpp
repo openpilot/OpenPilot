@@ -40,14 +40,14 @@ void AirSpeedPage::initializePage(VehicleConfigurationSource *settings)
     // Enable all
     setItemDisabled(-1, false);
     if (settings->getInputType() == VehicleConfigurationSource::INPUT_SBUS ||
-            settings->getInputType() == VehicleConfigurationSource::INPUT_DSM2 ||
-            settings->getInputType() == VehicleConfigurationSource::INPUT_DSMX10 ||
-            settings->getInputType() == VehicleConfigurationSource::INPUT_DSMX11) {
+        settings->getInputType() == VehicleConfigurationSource::INPUT_DSM2 ||
+        settings->getInputType() == VehicleConfigurationSource::INPUT_DSMX10 ||
+        settings->getInputType() == VehicleConfigurationSource::INPUT_DSMX11) {
         // Disable non estimated sensors if ports are taken by receivers
         setItemDisabled(VehicleConfigurationSource::AIRSPEED_EAGLETREE, true);
         setItemDisabled(VehicleConfigurationSource::AIRSPEED_MS4525, true);
         if (getSelectedItem()->id() == VehicleConfigurationSource::AIRSPEED_EAGLETREE ||
-                getSelectedItem()->id() == VehicleConfigurationSource::AIRSPEED_MS4525) {
+            getSelectedItem()->id() == VehicleConfigurationSource::AIRSPEED_MS4525) {
             // If previously selected invalid sensor, reset to estimated
             setSelectedItem(VehicleConfigurationSource::AIRSPEED_ESTIMATE);
         }
@@ -90,4 +90,3 @@ void AirSpeedPage::setupSelection(Selection *selection)
                        "ms4525-speed-sensor",
                        SetupWizard::AIRSPEED_MS4525);
 }
-

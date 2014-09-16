@@ -137,7 +137,7 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
     m_aircraft->quadShape->setScene(scene);
 
     QStringList multiRotorTypes;
-    multiRotorTypes << "Tricopter Y" << "Quad +" << "Quad X" << "Quad H" << "Hexacopter" << "Hexacopter X" << "Hexacopter H" 
+    multiRotorTypes << "Tricopter Y" << "Quad +" << "Quad X" << "Quad H" << "Hexacopter" << "Hexacopter X" << "Hexacopter H"
                     << "Hexacopter Y6" << "Octocopter" << "Octocopter X" << "Octocopter V" << "Octo Coax +" << "Octo Coax X";
     m_aircraft->multirotorFrameType->addItems(multiRotorTypes);
 

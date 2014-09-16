@@ -68,9 +68,9 @@ bool SetupWizardPlugin::initialize(const QStringList & args, QString *errMsg)
     ac->addAction(cmd, "Wizard");
 
     cmd = am->registerAction(new QAction(this),
-                                            "SetupWizardPlugin.ExportJSon",
-                                            QList<int>() <<
-                                            Core::Constants::C_GLOBAL_ID);
+                             "SetupWizardPlugin.ExportJSon",
+                             QList<int>() <<
+                             Core::Constants::C_GLOBAL_ID);
     cmd->action()->setText(tr("Export Stabilization Settings"));
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(exportSettings()));
 
@@ -114,12 +114,11 @@ void SetupWizardPlugin::exportSettings()
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *uavoManager = pm->getObject<UAVObjectManager>();
-    StabilizationSettings* settings = StabilizationSettings::GetInstance(uavoManager);
+    StabilizationSettings *settings    = StabilizationSettings::GetInstance(uavoManager);
     settings->toJson(exportObject);
 
     QJsonDocument saveDoc(exportObject);
     saveFile.write(saveDoc.toJson());
-
 }
 
 void SetupWizardPlugin::wizardTerminated()

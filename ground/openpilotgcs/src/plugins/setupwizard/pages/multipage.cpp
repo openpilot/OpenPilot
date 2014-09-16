@@ -79,7 +79,7 @@ void MultiPage::setupSelection(Selection *selection)
     selection->addItem(tr("Quadcopter H"),
                        tr("Quadcopter H, Blackout miniH"),
                        "quad-h",
-                      SetupWizard::MULTI_ROTOR_QUAD_H);
+                       SetupWizard::MULTI_ROTOR_QUAD_H);
 
     selection->addItem(tr("Hexacopter"),
                        tr("A multirotor with six motors, one motor in front."),

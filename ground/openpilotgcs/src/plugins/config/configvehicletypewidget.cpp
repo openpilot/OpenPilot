@@ -265,7 +265,7 @@ int ConfigVehicleTypeWidget::frameCategory(QString frameType)
         || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
         return ConfigVehicleTypeWidget::FIXED_WING;
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
-               || frameType == "QuadP" || frameType == "Quad +" || frameType == "Quad H" || frameType == "QuadH" 
+               || frameType == "QuadP" || frameType == "Quad +" || frameType == "Quad H" || frameType == "QuadH"
                || frameType == "Hexa" || frameType == "Hexacopter"
                || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
                || frameType == "HexaH" || frameType == "Hexacopter H" || frameType == "Hexacopter Y6"

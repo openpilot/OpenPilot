@@ -542,7 +542,7 @@ void UAVObject::fromXML(QXmlStreamReader *xmlReader)
     Q_ASSERT(xmlReader->attributes().value("name") == getName());
     Q_ASSERT(xmlReader->attributes().value("instance") == QString("%1").arg(getInstID()));
     QXmlStreamReader::TokenType token = xmlReader->readNext();
-    if(token == QXmlStreamReader::StartElement && xmlReader->name() == "fields") {
+    if (token == QXmlStreamReader::StartElement && xmlReader->name() == "fields") {
         while (xmlReader->readNextStartElement()) {
             if (xmlReader->name() == "field") {
                 QStringRef fieldName = xmlReader->attributes().value("name");
@@ -556,12 +556,13 @@ void UAVObject::fromXML(QXmlStreamReader *xmlReader)
 
 void UAVObject::toJson(QJsonObject &jsonObject)
 {
-    jsonObject["name"] = getName();
-    jsonObject["id"] = QString("%1").arg(getObjID(), 1, 16).toUpper();
+    jsonObject["name"]     = getName();
+    jsonObject["id"]       = QString("%1").arg(getObjID(), 1, 16).toUpper();
     jsonObject["instance"] = (int)getInstID();
     QJsonArray jSonFields;
     foreach(UAVObjectField * field, fields) {
         QJsonObject jSonField;
+
         field->toJson(jSonField);
         jSonFields.append(jSonField);
     }

@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configfixedwidget.cpp
+ * @file       configfixedwingwidget.cpp
  * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief ccpm configuration panel
+ * @brief fixed wing configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

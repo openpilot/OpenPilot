@@ -27,6 +27,7 @@
 #include <optypes.h>
 
 const Color_t Color_Off     = COLOR_OFF;
+const Color_t Color_Black   = COLOR_BLACK;
 const Color_t Color_Red     = COLOR_RED;
 const Color_t Color_Lime    = COLOR_LIME;
 const Color_t Color_Blue    = COLOR_BLUE;

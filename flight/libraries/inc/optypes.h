@@ -33,6 +33,7 @@ typedef struct {
 } Color_t;
 
 extern const Color_t Color_Off;
+extern const Color_t Color_Black;
 extern const Color_t Color_Red;
 extern const Color_t Color_Lime;
 extern const Color_t Color_Blue;
@@ -46,7 +47,8 @@ extern const Color_t Color_Teal;
 extern const Color_t Color_Orange;
 extern const Color_t Color_White;
 
-#define COLOR_OFF     { .R = 0x00, .G = 0x00, .B = 0x00 }
+#define COLOR_BLACK   { .R = 0x00, .G = 0x00, .B = 0x00 }
+#define COLOR_OFF     COLOR_BLACK
 #define COLOR_RED     { .R = 0xFF, .G = 0x00, .B = 0x00 }
 #define COLOR_LIME    { .R = 0x00, .G = 0xFF, .B = 0x00 }
 #define COLOR_BLUE    { .R = 0x00, .G = 0x00, .B = 0xFF }

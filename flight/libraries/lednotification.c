@@ -35,19 +35,18 @@
 // Private defines
 
 // Maximum number of notifications enqueued when a higher priority notification is added
-#define MAX_BACKGROUND_NOTIFICATIONS 5
+#define MAX_BACKGROUND_NOTIFICATIONS 6
 #define MAX_HANDLED_LED              1
 
-#define BACKGROUND_SEQUENCE          -1
+#define BACKGROUND_SEQUENCE          0
 #define RESET_STEP                   -1
 #define GET_CURRENT_MILLIS           (xTaskGetTickCount() * portTICK_RATE_MS)
 
 // Private data types definition
 // this is the status for a single notification led set
 typedef struct {
-    int8_t   queued_priorities[MAX_BACKGROUND_NOTIFICATIONS];
-    LedSequence_t queued_sequences[MAX_BACKGROUND_NOTIFICATIONS];
-    LedSequence_t background_sequence;
+    int8_t   queued_priorities[MAX_BACKGROUND_NOTIFICATIONS]; // slot 0 is reserved for background
+    LedSequence_t queued_sequences[MAX_BACKGROUND_NOTIFICATIONS]; // slot 0 is reserved for background
     uint32_t next_run_time;
     uint32_t sequence_starting_time;
 
@@ -100,74 +99,62 @@ static void restart_sequence(NotifierLedStatus_t *status, bool immediate)
  */
 static void push_queued_sequence(ExtLedNotification_t *new_notification, NotifierLedStatus_t *status)
 {
-    int8_t updated_sequence = BACKGROUND_SEQUENCE;
+    int8_t updated_sequence;
+
+    int8_t lowest_priority_index = -1;
+    int8_t lowest_priority = new_notification->priority;
 
     if (new_notification->priority == NOTIFY_PRIORITY_BACKGROUND) {
-        status->background_sequence = new_notification->sequence;
+        lowest_priority_index = BACKGROUND_SEQUENCE;
     } else {
-        // a notification with priority higher than background.
-        // try to enqueue it
-        int8_t insert_point = MAX_BACKGROUND_NOTIFICATIONS - 1;
-        int8_t first_free   = -1;
-        for (int8_t i = MAX_BACKGROUND_NOTIFICATIONS - 1; i >= 0; i--) {
-            const int8_t priority_i = status->queued_priorities[i];
-            if (priority_i == NOTIFY_PRIORITY_BACKGROUND) {
-                first_free   = i;
-                insert_point = i;
-                continue;
-            }
-            if (priority_i > new_notification->priority) {
-                insert_point = ((i > 0) || (first_free > -1)) ? i : -1; // check whether priority is no bigger than lowest queued priority
+        // slot 0 is reserved for Background sequence
+        for (int8_t i = 1; i < MAX_BACKGROUND_NOTIFICATIONS; i++) {
+            if (status->queued_priorities[i] < lowest_priority) {
+                lowest_priority_index = i;
+                lowest_priority = status->queued_priorities[i];
             }
         }
-
-        // no space left on queue for this new notification, ignore.
-        if (insert_point < 0) {
-            return;
-        }
-        if (insert_point != first_free) {
-            // there is a free slot, move everything up one place
-            if (first_free != -1) {
-                for (uint8_t i = MAX_BACKGROUND_NOTIFICATIONS - 1; i > insert_point; i--) {
-                    status->queued_priorities[i] = status->queued_priorities[i - 1];
-                    status->queued_sequences[i]  = status->queued_sequences[i - 1];
-                }
-                if (status->active_sequence_num >= insert_point) {
-                    status->active_sequence_num++;
-                }
-            } else {
-                // no free space, discard lowest priority notification and move everything down
-                for (uint8_t i = 0; i < insert_point; i++) {
-                    status->queued_priorities[i] = status->queued_priorities[i + 1];
-                    status->queued_sequences[i]  = status->queued_sequences[i + 1];
-                }
-                if (status->active_sequence_num <= insert_point) {
-                    status->active_sequence_num--;
-                }
-            }
-        }
-
-        status->queued_priorities[insert_point] = new_notification->priority;
-        status->queued_sequences[insert_point]  = new_notification->sequence;
-        updated_sequence = insert_point;
     }
 
-    if (status->active_sequence_num < updated_sequence) {
+    // no items with priority lower than the one we are trying to enqueue. skip
+    if (lowest_priority_index < 0) {
+        return;
+    }
+
+    status->queued_priorities[lowest_priority_index] = new_notification->priority;
+    status->queued_sequences[lowest_priority_index]  = new_notification->sequence;
+    updated_sequence = lowest_priority_index;;
+
+
+    // check whether we should preempt the current notification and play this new one
+    if (status->queued_priorities[status->active_sequence_num] < new_notification->priority) {
         status->active_sequence_num = updated_sequence;
-        restart_sequence(status, true);
     }
-    if (updated_sequence == BACKGROUND_SEQUENCE) {
-        restart_sequence(status, false);
+
+    if (status->active_sequence_num == updated_sequence) {
+        restart_sequence(status, true);
     }
 }
 
 static bool pop_queued_sequence(NotifierLedStatus_t *status)
 {
-    if (status->active_sequence_num != BACKGROUND_SEQUENCE) {
-        // start the lower priority item
+    if (status->active_sequence_num > BACKGROUND_SEQUENCE) {
+        // set the last active slot as empty
         status->queued_priorities[status->active_sequence_num] = NOTIFY_PRIORITY_BACKGROUND;
-        status->active_sequence_num--;
-        return true;
+
+        // search the highest priority item
+        int8_t highest_priority_index = BACKGROUND_SEQUENCE;
+        int8_t highest_priority = NOTIFY_PRIORITY_BACKGROUND;
+
+        for (int8_t i = 1; i < MAX_BACKGROUND_NOTIFICATIONS; i++) {
+            if (status->queued_priorities[i] > highest_priority) {
+                highest_priority_index = i;
+                highest_priority = status->queued_priorities[i];
+            }
+        }
+        // set the next sequence to activate (or BACKGROUND_SEQUENCE when all slots are empty)
+        status->active_sequence_num = highest_priority_index;
+        return highest_priority_index != BACKGROUND_SEQUENCE;
     }
     // background sequence was completed
     return false;
@@ -178,9 +165,7 @@ static bool pop_queued_sequence(NotifierLedStatus_t *status)
  */
 static void advance_sequence(NotifierLedStatus_t *status)
 {
-    LedSequence_t *activeSequence =
-        status->active_sequence_num == BACKGROUND_SEQUENCE ?
-        &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
+    LedSequence_t *activeSequence = &status->queued_sequences[status->active_sequence_num];
 
     uint8_t step = status->next_sequence_step;
     LedStep_t *currentStep = &activeSequence->steps[step];
@@ -244,8 +229,7 @@ static void run_led(NotifierLedStatus_t *status)
     status->next_run_time = currentTime;
     uint8_t step = status->next_sequence_step;
 
-    LedSequence_t *activeSequence = status->active_sequence_num == BACKGROUND_SEQUENCE ?
-                                    &status->background_sequence : &status->queued_sequences[status->active_sequence_num];
+    LedSequence_t *activeSequence = &status->queued_sequences[status->active_sequence_num];
     const Color_t color = status->step_phase_on ? activeSequence->steps[step].color : Color_Off;
 
     for (uint8_t i = status->led_set_start; i <= status->led_set_end; i++) {

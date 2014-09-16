@@ -489,7 +489,7 @@ static bool nmeaProcessGPGGA(GPSPositionSensorData *GpsData, bool *gpsDataUpdate
 
     // geoid separation
     GpsData->GeoidSeparation = NMEA_real_to_float(param[11]);
-
+    GpsData->SensorType = GPSPOSITIONSENSOR_SENSORTYPE_NMEA;
     return true;
 }
 

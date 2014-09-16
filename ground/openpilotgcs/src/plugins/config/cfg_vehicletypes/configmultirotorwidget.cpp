@@ -137,8 +137,8 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
     m_aircraft->quadShape->setScene(scene);
 
     QStringList multiRotorTypes;
-    multiRotorTypes << "Tricopter Y" << "Quad +" << "Quad X" << "Hexacopter" << "Hexacopter X" << "Hexacopter H" << "Hexacopter Y6"
-                    << "Octocopter" << "Octocopter X" << "Octocopter V" << "Octo Coax +" << "Octo Coax X";
+    multiRotorTypes << "Tricopter Y" << "Quad +" << "Quad X" << "Quad H" << "Hexacopter" << "Hexacopter X" << "Hexacopter H" 
+                    << "Hexacopter Y6" << "Octocopter" << "Octocopter X" << "Octocopter V" << "Octo Coax +" << "Octo Coax X";
     m_aircraft->multirotorFrameType->addItems(multiRotorTypes);
 
     // Set default model to "Quad X"
@@ -175,6 +175,12 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
         // init mixer levels
         m_aircraft->mrRollMixLevel->setValue(50);
         m_aircraft->mrPitchMixLevel->setValue(50);
+        setYawMixLevel(50);
+    } else if (frameType == "QuadH" || frameType == "Quad H") {
+        setComboCurrentIndex(m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Quad H"));
+
+        m_aircraft->mrRollMixLevel->setValue(50);
+        m_aircraft->mrPitchMixLevel->setValue(70);
         setYawMixLevel(50);
     } else if (frameType == "QuadP" || frameType == "Quad +") {
         setComboCurrentIndex(m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Quad +"));
@@ -270,6 +276,8 @@ void ConfigMultiRotorWidget::setupEnabledControls(QString frameType)
     } else if (frameType == "QuadX" || frameType == "Quad X") {
         enableComboBoxes(this, CHANNELBOXNAME, 4, true);
     } else if (frameType == "QuadP" || frameType == "Quad +") {
+        enableComboBoxes(this, CHANNELBOXNAME, 4, true);
+    } else if (frameType == "QuadH" || frameType == "Quad H") {
         enableComboBoxes(this, CHANNELBOXNAME, 4, true);
     } else if (frameType == "Hexa" || frameType == "Hexacopter") {
         enableComboBoxes(this, CHANNELBOXNAME, 6, true);
@@ -367,6 +375,12 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox3, multi.VTOLMotorS);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorW);
     } else if (frameType == "QuadX") {
+        // Motors 1/2/3/4 are: NW / NE / SE / SW
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNW);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox2, multi.VTOLMotorNE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox3, multi.VTOLMotorSE);
+        setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorSW);
+    } else if (frameType == "QuadH") {
         // Motors 1/2/3/4 are: NW / NE / SE / SW
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox2, multi.VTOLMotorNE);
@@ -489,6 +503,9 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
         setupQuad(true);
     } else if (m_aircraft->multirotorFrameType->currentText() == "Quad X") {
         airframeType = "QuadX";
+        setupQuad(false);
+    } else if (m_aircraft->multirotorFrameType->currentText() == "Quad H") {
+        airframeType = "QuadH";
         setupQuad(false);
     } else if (m_aircraft->multirotorFrameType->currentText() == "Hexacopter") {
         airframeType = "Hexa";
@@ -763,6 +780,8 @@ void ConfigMultiRotorWidget::updateAirframe(QString frameType)
         elementId = "quad-x";
     } else if (frameType == "QuadP" || frameType == "Quad +") {
         elementId = "quad-plus";
+    } else if (frameType == "QuadH" || frameType == "Quad H") {
+        elementId = "quad-h";
     } else if (frameType == "Hexa" || frameType == "Hexacopter") {
         elementId = "quad-hexa";
     } else if (frameType == "HexaX" || frameType == "Hexacopter X") {
@@ -894,7 +913,7 @@ bool ConfigMultiRotorWidget::setupQuad(bool pLayout)
     setupMotors(motorList);
 
     // Now, setup the mixer:
-    // Motor 1 to 4, X Layout:
+    // Motor 1 to 4, X Layout and Hlayout
     // pitch   roll    yaw
     // {0.5    ,0.5    ,-0.5     //Front left motor (CW)
     // {0.5    ,-0.5   ,0.5   //Front right motor(CCW)

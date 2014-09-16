@@ -131,6 +131,12 @@ void OutputCalibrationPage::setupVehicle()
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
         setupActuatorMinMaxAndNeutral(0, 3, 4);
         break;
+    case SetupWizard::MULTI_ROTOR_QUAD_H:
+        m_wizardIndexes << 0 << 1 << 1 << 1 << 1;
+        m_vehicleElementIds << "quad-h" << "quad-h-frame" << "quad-h-m1" << "quad-h-m2" << "quad-h-m3" << "quad-h-m4";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
+        m_channelIndex << 0 << 0 << 1 << 2 << 3;
+        break;
     case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
         loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1;

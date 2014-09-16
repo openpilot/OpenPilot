@@ -253,6 +253,9 @@ QString SetupWizard::getSummaryText()
         case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
             summary.append(tr("Quadcopter +"));
             break;
+        case SetupWizard::MULTI_ROTOR_QUAD_H:
+            summary.append(tr("Quadcopter H"));
+            break;
         case SetupWizard::MULTI_ROTOR_HEXA:
             summary.append(tr("Hexacopter"));
             break;

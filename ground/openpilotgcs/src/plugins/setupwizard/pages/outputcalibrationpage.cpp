@@ -132,10 +132,12 @@ void OutputCalibrationPage::setupVehicle()
         setupActuatorMinMaxAndNeutral(0, 3, 4);
         break;
     case SetupWizard::MULTI_ROTOR_QUAD_H:
+        loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "quad-h" << "quad-h-frame" << "quad-h-m1" << "quad-h-m2" << "quad-h-m3" << "quad-h-m4";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4;
         m_channelIndex << 0 << 0 << 1 << 2 << 3;
+        setupActuatorMinMaxAndNeutral(0, 3, 4);
         break;
     case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
         loadSVGFile(MULTI_SVG_FILE);
@@ -170,6 +172,7 @@ void OutputCalibrationPage::setupVehicle()
         setupActuatorMinMaxAndNeutral(0, 5, 6);
         break;
     case SetupWizard::MULTI_ROTOR_HEXA_X:
+        loadSVGFile(MULTI_SVG_FILE);
         m_wizardIndexes << 0 << 1 << 1 << 1 << 1 << 1 << 1;
         m_vehicleElementIds << "hexa-x" << "hexa-x-frame" << "hexa-x-m1" << "hexa-x-m2" << "hexa-x-m3" << "hexa-x-m4" << "hexa-x-m5" << "hexa-x-m6";
         m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5 << 6;

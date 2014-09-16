@@ -406,7 +406,7 @@
       <item alignment="Qt::AlignRight">
        <widget class="QPushButton" name="ImportButton">
         <property name="text">
-         <string>Import...</string>
+         <string>Select Image...</string>
         </property>
        </widget>
       </item>

@@ -27,6 +27,8 @@
  */
 #include "uavobjectmanager.h"
 
+#include <QtWidgetsDepends>
+
 /**
  * Constructor
  */
@@ -294,6 +296,61 @@ qint32 UAVObjectManager::getNumInstances(const QString & name)
 qint32 UAVObjectManager::getNumInstances(quint32 objId)
 {
     return getNumInstances(NULL, objId);
+}
+
+void UAVObjectManager::toJson(QJsonObject &jsonObject, UAVObjectManager::JSON_EXPORT_OPTION what)
+{
+    QList<UAVObject *> objects;
+    QList< QList<UAVObject *> > allObjects = getObjects();
+    foreach(QList<UAVObject *> instances, allObjects) {
+        foreach(UAVObject * object, instances) {
+            if (what == JSON_EXPORT_ALL ||
+                (what == JSON_EXPORT_DATA && !object->isSettingsObject()) ||
+                (what == JSON_EXPORT_SETTINGS && object->isSettingsObject()) ||
+                (what == JSON_EXPORT_SETTINGS && object->isMetaDataObject())) {
+                objects << object;
+            }
+        }
+    }
+    toJson(jsonObject, objects);
+}
+
+void UAVObjectManager::toJson(QJsonObject &jsonObject, const QList<QString> &objectsToExport)
+{
+    QList<UAVObject *> objects;
+    foreach(QString objectName, objectsToExport) {
+        QList<UAVObject *> instances = getObjectInstances(objectName);
+        foreach(UAVObject * object, instances) {
+            objects << object;
+        }
+    }
+    toJson(jsonObject, objects);
+}
+
+void UAVObjectManager::toJson(QJsonObject &jsonObject, const QList<UAVObject *> &objectsToExport)
+{
+    QJsonArray jObjects;
+
+    foreach(UAVObject * object, objectsToExport) {
+        QJsonObject jObject;
+
+        object->toJson(jObject);
+        jObjects.append(jObject);
+    }
+    jsonObject["objects"] = jObjects;
+}
+
+void UAVObjectManager::fromJson(const QJsonObject &jsonObject)
+{
+    QJsonArray jObjects = jsonObject["objects"].toArray();
+
+    for (int i = 0; i < jObjects.size(); i++) {
+        QJsonObject jObject = jObjects.at(i).toObject();
+        UAVObject *object   = getObject(jObject["name"].toString(), jObject["instance"].toInt());
+        if (object != NULL) {
+            object->fromJson(jObject);
+        }
+    }
 }
 
 /**

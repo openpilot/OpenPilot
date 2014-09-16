@@ -191,6 +191,7 @@ int SetupWizard::nextId() const
             switch (getVehicleType()) {
             case VEHICLE_FIXEDWING:
                 return PAGE_OUTPUT_CALIBRATION;
+
             default:
                 return PAGE_BIAS_CALIBRATION;
             }

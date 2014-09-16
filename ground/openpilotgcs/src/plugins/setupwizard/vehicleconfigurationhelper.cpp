@@ -116,6 +116,7 @@ void VehicleConfigurationHelper::clearModifiedObjects()
 void VehicleConfigurationHelper::applyHardwareConfiguration()
 {
     HwSettings *hwSettings = HwSettings::GetInstance(m_uavoManager);
+
     Q_ASSERT(hwSettings);
     HwSettings::DataFields data = hwSettings->getData();
 
@@ -193,7 +194,6 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         }
 
         if (m_configSource->getGpsType() != VehicleConfigurationSource::GPS_DISABLED) {
-
             GPSSettings *gpsSettings = GPSSettings::GetInstance(m_uavoManager);
             Q_ASSERT(gpsSettings);
             GPSSettings::DataFields gpsData = gpsSettings->getData();
@@ -201,28 +201,28 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             switch (m_configSource->getGpsType()) {
             case VehicleConfigurationSource::GPS_NMEA:
                 data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
-                data.RM_MainPort = HwSettings::RM_MAINPORT_GPS;
-                data.GPSSpeed = HwSettings::GPSSPEED_57600;
+                data.RM_MainPort     = HwSettings::RM_MAINPORT_GPS;
+                data.GPSSpeed        = HwSettings::GPSSPEED_57600;
                 gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_NMEA;
                 break;
             case VehicleConfigurationSource::GPS_UBX:
                 data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
-                data.RM_MainPort = HwSettings::RM_MAINPORT_GPS;
-                data.GPSSpeed = HwSettings::GPSSPEED_57600;
+                data.RM_MainPort     = HwSettings::RM_MAINPORT_GPS;
+                data.GPSSpeed        = HwSettings::GPSSPEED_57600;
                 gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_UBX;
                 break;
             case VehicleConfigurationSource::GPS_PLATINUM:
                 data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
                 data.RM_MainPort = HwSettings::RM_MAINPORT_GPS;
-                data.GPSSpeed = HwSettings::GPSSPEED_115200;
+                data.GPSSpeed    = HwSettings::GPSSPEED_115200;
                 /*
-                gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_UBLOX;
-                AuxMagSettings *magSettings = AuxMagSettings::GetInstance(m_uavoManager);
-                AuxMagSettings::DataFields magsData = magSettings->getData();
-                magsData.usage = AuxMagSettings::Both;
-                magSettings->setData(magsData);
-                addModifiedObject(magSettings, tr("Writing External Mag sensor settings"));
-                */
+                   gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_UBLOX;
+                   AuxMagSettings *magSettings = AuxMagSettings::GetInstance(m_uavoManager);
+                   AuxMagSettings::DataFields magsData = magSettings->getData();
+                   magsData.usage = AuxMagSettings::Both;
+                   magSettings->setData(magsData);
+                   addModifiedObject(magSettings, tr("Writing External Mag sensor settings"));
+                 */
                 break;
             default:
                 data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 0;
@@ -234,8 +234,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         }
 
         if (m_configSource->getVehicleType() == VehicleConfigurationSource::VEHICLE_FIXEDWING &&
-                m_configSource->getAirspeedType() != VehicleConfigurationSource::AIRSPEED_DISABLED) {
-
+            m_configSource->getAirspeedType() != VehicleConfigurationSource::AIRSPEED_DISABLED) {
             AirspeedSettings *airspeedSettings = AirspeedSettings::GetInstance(m_uavoManager);
             Q_ASSERT(airspeedSettings);
             AirspeedSettings::DataFields airspeedData = airspeedSettings->getData();

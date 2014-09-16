@@ -58,10 +58,12 @@ public:
     {
         return m_id;
     }
-    void setDisabled(bool disabled) {
+    void setDisabled(bool disabled)
+    {
         m_disabled = disabled;
     }
-    bool disabled() {
+    bool disabled()
+    {
         return m_disabled;
     }
 

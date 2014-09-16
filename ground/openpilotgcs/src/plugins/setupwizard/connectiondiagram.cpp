@@ -31,7 +31,7 @@
 #include "connectiondiagram.h"
 #include "ui_connectiondiagram.h"
 
-const char* ConnectionDiagram::FILE_NAME = ":/setupwizard/resources/connection-diagrams.svg";
+const char *ConnectionDiagram::FILE_NAME   = ":/setupwizard/resources/connection-diagrams.svg";
 const int ConnectionDiagram::IMAGE_PADDING = 10;
 
 ConnectionDiagram::ConnectionDiagram(QWidget *parent, VehicleConfigurationSource *configSource) :
@@ -50,12 +50,14 @@ ConnectionDiagram::~ConnectionDiagram()
 void ConnectionDiagram::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
+
     fitInView();
 }
 
 void ConnectionDiagram::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
+
     fitInView();
 }
 
@@ -63,8 +65,8 @@ void ConnectionDiagram::fitInView()
 {
     ui->connectionDiagram->setSceneRect(m_scene->itemsBoundingRect());
     ui->connectionDiagram->fitInView(
-                m_scene->itemsBoundingRect().adjusted(-IMAGE_PADDING,-IMAGE_PADDING, IMAGE_PADDING, IMAGE_PADDING),
-                Qt::KeepAspectRatio);
+        m_scene->itemsBoundingRect().adjusted(-IMAGE_PADDING, -IMAGE_PADDING, IMAGE_PADDING, IMAGE_PADDING),
+        Qt::KeepAspectRatio);
 }
 
 void ConnectionDiagram::setupGraphicsScene()
@@ -207,7 +209,7 @@ void ConnectionDiagram::setupGraphicsScene()
         }
 
         if (m_configSource->getVehicleType() == VehicleConfigurationSource::VEHICLE_FIXEDWING &&
-                m_configSource->getAirspeedType() != VehicleConfigurationSource::AIRSPEED_ESTIMATE) {
+            m_configSource->getAirspeedType() != VehicleConfigurationSource::AIRSPEED_ESTIMATE) {
             switch (m_configSource->getAirspeedType()) {
             case VehicleConfigurationSource::AIRSPEED_EAGLETREE:
                 if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {

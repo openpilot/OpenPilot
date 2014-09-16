@@ -698,7 +698,7 @@ void UAVObjectField::toJson(QJsonObject &jsonObject)
     QJsonArray values;
     for (unsigned int n = 0; n < numElements; ++n) {
         QJsonObject value;
-        value["name"] = getElementNames().at(n);
+        value["name"]  = getElementNames().at(n);
         value["value"] = QJsonValue::fromVariant(getValue(n));
         values.append(value);
     }

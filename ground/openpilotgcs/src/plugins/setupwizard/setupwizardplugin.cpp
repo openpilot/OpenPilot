@@ -36,8 +36,7 @@
 #include <coreplugin/icore.h>
 #include <QKeySequence>
 #include <coreplugin/modemanager.h>
-#include <QJsonDocument>
-#include "stabilizationsettings.h"
+#include "vehicletemplateexportdialog.h"
 
 SetupWizardPlugin::SetupWizardPlugin() : wizardRunning(false)
 {}
@@ -68,17 +67,16 @@ bool SetupWizardPlugin::initialize(const QStringList & args, QString *errMsg)
     ac->addAction(cmd, "Wizard");
 
     cmd = am->registerAction(new QAction(this),
-                                            "SetupWizardPlugin.ExportJSon",
-                                            QList<int>() <<
-                                            Core::Constants::C_GLOBAL_ID);
-    cmd->action()->setText(tr("Export Stabilization Settings"));
+                             "SetupWizardPlugin.ExportJSon",
+                             QList<int>() <<
+                             Core::Constants::C_GLOBAL_ID);
+    cmd->action()->setText(tr("Export Wizard Vehicle Template"));
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(exportSettings()));
 
     Core::ModeManager::instance()->addAction(cmd, 1);
     ac->menu()->addSeparator();
     ac->appendGroup("Wizard");
     ac->addAction(cmd, "Wizard");
-
 
     return true;
 }
@@ -103,23 +101,9 @@ void SetupWizardPlugin::showSetupWizard()
 
 void SetupWizardPlugin::exportSettings()
 {
-    QFile saveFile(QStringLiteral("/home/fredrik/export.json"));
+    VehicleTemplateExportDialog dialog;
 
-    if (!saveFile.open(QIODevice::WriteOnly)) {
-        qWarning("Couldn't open save file.");
-        return;
-    }
-
-    QJsonObject exportObject;
-
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *uavoManager = pm->getObject<UAVObjectManager>();
-    StabilizationSettings* settings = StabilizationSettings::GetInstance(uavoManager);
-    settings->toJson(exportObject);
-
-    QJsonDocument saveDoc(exportObject);
-    saveFile.write(saveDoc.toJson());
-
+    dialog.exec();
 }
 
 void SetupWizardPlugin::wizardTerminated()

@@ -40,7 +40,8 @@ HEADERS += setupwizardplugin.h \
     pages/escpage.h \
     pages/servopage.h \
     pages/selectionpage.h \
-    pages/airframeinitialtuningpage.h
+    pages/airframeinitialtuningpage.h \
+    vehicletemplateexportdialog.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -72,7 +73,8 @@ SOURCES += setupwizardplugin.cpp \
     pages/escpage.cpp \
     pages/servopage.cpp \
     pages/selectionpage.cpp \
-    pages/airframeinitialtuningpage.cpp
+    pages/airframeinitialtuningpage.cpp \
+    vehicletemplateexportdialog.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -96,7 +98,8 @@ FORMS += \
     pages/escpage.ui \
     pages/servopage.ui \
     pages/selectionpage.ui \
-    pages/airframeinitialtuningpage.ui
+    pages/airframeinitialtuningpage.ui \
+    vehicletemplateexportdialog.ui
 
 RESOURCES += \
     wizardResources.qrc

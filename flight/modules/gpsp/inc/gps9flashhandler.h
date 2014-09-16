@@ -1,9 +1,9 @@
-/**magPkt
+/**
  ******************************************************************************
  *
- * @file       gps9maghandler.h
+ * @file       gps9flashhandler.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      brief goes here.
+ * @brief      Flash handler for GPSV9
  *             --
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -23,10 +23,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef GPS9MAGHANDLER_H
-#define GPS9MAGHANDLER_H
+#ifndef GPS9FLASHHANDLER_H_
+#define GPS9FLASHHANDLER_H_
+#include <openpilot.h>
 
-void handleMag();
+bool flash_available();
 
 
-#endif
+#endif /* GPS9FLASHHANDLER_H_ */

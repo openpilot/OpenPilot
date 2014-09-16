@@ -31,9 +31,13 @@
 #include <pios_helpers.h>
 #include <ubx_utils.h>
 
-#define UBX_OP_CUST_CLASS 0x99
-#define UBX_OP_SYS        0x01
-#define UBX_OP_MAG        0x02
+#define UBX_OP_CUST_CLASS      0x99
+#define UBX_OP_SYS             0x01
+#define UBX_OP_MAG             0x02
+
+#define SYS_DATA_OPTIONS_FLASH 0x01
+#define SYS_DATA_OPTIONS_MAG   0x02
+
 
 typedef struct {
     int16_t  X;

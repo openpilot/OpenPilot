@@ -9,15 +9,13 @@
  *
  * @{
  * @addtogroup SystemModule GPSV9 System Module
- * @brief Initializes PIOS and other modules runs monitoring
- * After initializing all the modules (currently selected by Makefile but in
- * future controlled by configuration on SD card) runs basic monitoring and
- * alarms.
+ * @brief Initializes PIOS and other modules runs monitoring, executes mag and gps handlers
+ *
  * @{
  *
  * @file       gpsdsystemmod.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      System module
+ * @brief      GPS System module
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -43,18 +41,15 @@
 #include "inc/gpsdsysmod.h"
 #include "inc/gps9maghandler.h"
 #include "inc/gps9gpshandler.h"
+#include "inc/gps9flashhandler.h"
 #include "inc/gps9protocol.h"
+
 // UAVOs
 #include <systemstats.h>
+
 SystemStatsData systemStats;
 
-extern uintptr_t flash_id;
-#define DEBUG_THIS_FILE
 extern uint32_t pios_com_main_id;
-
-
-extern struct pios_flash_driver pios_jedec_flash_driver;
-extern uintptr_t flash_id;
 
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1
@@ -74,9 +69,6 @@ static bool mallocFailed;
 
 static void updateStats();
 static void gpspSystemTask(void *parameters);
-
-#define SYS_DATA_OPTIONS_FLASH 0x01
-
 
 /**
  * Create the module task.
@@ -119,17 +111,20 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
     MODULE_TASKCREATE_ALL;
 
     if (mallocFailed) {
-        /* We failed to malloc during task creation,
-         * system behaviour is undefined.  Reset and let
-         * the BootFault code recover for us.
-         */
-        PIOS_SYS_Reset();
+        // Nothing to do, this condition needs to be trapped during development.
+        while (wait_here) {
+            ;
+        }
     }
-#if defined(PIOS_INCLUDE_IAP)
 
-    /* Record a successful boot */
+#if defined(PIOS_INCLUDE_IAP)
     PIOS_IAP_WriteBootCount(0);
 #endif
+    /* Right now there is no configuration and uart speed is fixed at 115200.
+     * TODO:
+     * 1) add a tiny ubx parser on gps side to intercept CFG-RINV and use that for config storage;
+     * 2) second ubx parser on uart side that intercept custom configuration message and flash commands.
+     */
     PIOS_COM_ChangeBaud(pios_com_main_id, 115200);
     static TickType_t lastUpdate;
     setupGPS();
@@ -190,10 +185,10 @@ uint16_t GetFreeIrqStackSize(void)
 /**
  * Called periodically to update the system stats
  */
-SysUbxPkt sysPkt;
 static void updateStats()
 {
     static uint32_t lastUpdate;
+    static SysUbxPkt sysPkt;
 
     if (PIOS_DELAY_DiffuS(lastUpdate) < 1000 * configTICK_RATE_HZ / STAT_RATE) {
         return;
@@ -204,21 +199,18 @@ static void updateStats()
     sysPkt.fragments.data.HeapRemaining     = xPortGetFreeHeapSize();
     sysPkt.fragments.data.IRQStackRemaining = GetFreeIrqStackSize();
     sysPkt.fragments.data.SystemModStackRemaining = uxTaskGetStackHighWaterMark(NULL) * 4;
-    sysPkt.fragments.data.options = flash_id > 0 ? SYS_DATA_OPTIONS_FLASH : 0;
+    sysPkt.fragments.data.options = SYS_DATA_OPTIONS_MAG | (flash_available() ? SYS_DATA_OPTIONS_FLASH : 0);
+
     ubx_buildPacket(&sysPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_SYS, sizeof(SysData));
     PIOS_COM_SendBuffer(pios_com_main_id, sysPkt.packet.bynarystream, sizeof(SysUbxPkt));
 }
 
-/**
- * Update system alarms
- */
+
 /**
  * Called by the RTOS when the CPU is idle,
  */
 void vApplicationIdleHook(void)
-{
-    // NotificationOnboardLedsRun();
-}
+{}
 /**
  * Called by the RTOS when a stack overflow is detected.
  */

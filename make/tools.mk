@@ -100,7 +100,8 @@ endif
 
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
 
-# Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
+# When changing PYTHON_DIR, you must also update it in ground/openpilotgcs/src/python.pri
+# When changing SDL_DIR or OPENSSL_DIR, you must also update them in ground/openpilotgcs/openpilotgcs.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_8-2014q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.3.1
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
@@ -1093,23 +1094,30 @@ openocd_clean:
 	$(V1) [ ! -d "$(OPENOCD_DIR)" ] || $(RM) -r "$(OPENOCD_DIR)"
 
 STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash
-
+ifeq ($(UNAME), Windows)
+	STM32FLASH_BUILD_OPTIONS := "CC=GCC"
+endif
 .PHONY: stm32flash_install
-stm32flash_install: STM32FLASH_URL := http://stm32flash.googlecode.com/svn/trunk
-stm32flash_install: STM32FLASH_REV := 61
+stm32flash_install: STM32FLASH_URL := https://code.google.com/p/stm32flash/
+stm32flash_install: STM32FLASH_REV := a358bd1f025d
 stm32flash_install: stm32flash_clean
         # download the source
-	$(V0) @echo " DOWNLOAD     $(STM32FLASH_URL) @ r$(STM32FLASH_REV)"
-	$(V1) svn export -q -r "$(STM32FLASH_REV)" "$(STM32FLASH_URL)" "$(STM32FLASH_DIR)"
-
+	$(V0) @$(ECHO) " DOWNLOAD     $(STM32FLASH_URL) @ r$(STM32FLASH_REV)"
+	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -rf "$(STM32FLASH_DIR)"
+	$(V1) $(MKDIR) -p "$(STM32FLASH_DIR)"
+	$(V1) $(GIT) clone --no-checkout $(STM32FLASH_URL) "$(STM32FLASH_DIR)"
+	$(V1) ( \
+	  $(CD) $(STM32FLASH_DIR) ; \
+	  $(GIT) checkout -q $(STM32FLASH_REV) ; \
+	)
         # build
-	$(V0) @echo " BUILD        $(STM32FLASH_DIR)"
-	$(V1) $(MAKE) --silent -C $(STM32FLASH_DIR) all
+	$(V0) @$(ECHO) " BUILD        $(STM32FLASH_DIR)"
+	$(V1) $(MAKE) --silent -C $(STM32FLASH_DIR) all $(STM32FLASH_BUILD_OPTIONS) 
 
 .PHONY: stm32flash_clean
 stm32flash_clean:
-	$(V0) @echo " CLEAN        $(STM32FLASH_DIR)"
-	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -r "$(STM32FLASH_DIR)"
+	$(V0) @$(ECHO) " CLEAN        $(STM32FLASH_DIR)"
+	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -rf "$(STM32FLASH_DIR)"
 
 DFUUTIL_DIR := $(TOOLS_DIR)/dfu-util
 

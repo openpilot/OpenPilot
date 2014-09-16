@@ -80,20 +80,17 @@ WelcomeMode::WelcomeMode() :
     m_d->quickView->setSource(QUrl("qrc:/welcome/qml/main.qml"));
     m_container = NULL;
 
-    QNetworkAccessManager* networkAccessManager = new QNetworkAccessManager;
+    QNetworkAccessManager *networkAccessManager = new QNetworkAccessManager;
 
     // Only attempt to request our version info if the network is accessible
-    if(networkAccessManager->networkAccessible() == QNetworkAccessManager::Accessible)
-    {
-        connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkResponseReady(QNetworkReply*)));
+    if (networkAccessManager->networkAccessible() == QNetworkAccessManager::Accessible) {
+        connect(networkAccessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(networkResponseReady(QNetworkReply *)));
 
         // This will delete the network access manager instance when we're done
-        connect(networkAccessManager, SIGNAL(finished(QNetworkReply*)), networkAccessManager, SLOT(deleteLater()));
+        connect(networkAccessManager, SIGNAL(finished(QNetworkReply *)), networkAccessManager, SLOT(deleteLater()));
 
         networkAccessManager->get(QNetworkRequest(QUrl("http://www.openpilot.org/opver")));
-    }
-    else
-    {
+    } else {
         // No network, can delete this now as we don't need it.
         delete networkAccessManager;
     }
@@ -158,18 +155,16 @@ void WelcomeMode::triggerAction(const QString &actionId)
     Core::ModeManager::instance()->triggerAction(actionId);
 }
 
-void WelcomeMode::networkResponseReady(QNetworkReply* reply)
+void WelcomeMode::networkResponseReady(QNetworkReply *reply)
 {
-    if(reply != NULL)
-    {
+    if (reply != NULL) {
         QString version(reply->readAll());
         version = version.trimmed();
 
         reply->deleteLater();
 
-        if(version != VersionInfo::tagOrHash8())
-        {
-            m_newVersionText = tr("(Update Available: %1)").arg(version);
+        if (version != VersionInfo::tagOrHash8()) {
+            m_newVersionText = tr("Update Available: %1").arg(version);
             emit newVersionTextChanged();
         }
     }

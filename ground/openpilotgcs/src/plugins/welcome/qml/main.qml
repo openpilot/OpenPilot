@@ -135,15 +135,20 @@ Rectangle {
                 text: welcomePlugin.newVersionText
                 anchors.rightMargin: 0
                 font.bold: true
+                font.underline: true
                 styleColor: "#00000000"
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 14
                 anchors.left: textOpVersion.right
-
                 MouseArea{
+                    id: mouseAreaOpVersionAvailable
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
                     width: parent.width
                     height: parent.height
-                    onClicked: welcomePlugin.openUrl("http://wiki.openpilot.org/display/BUILDS/OpenPilot+Software+Downloads")
+                    onClicked: {
+                        welcomePlugin.openUrl("http://wiki.openpilot.org/display/BUILDS/OpenPilot+Software+Downloads")
+                    }
                 }
             }
         }

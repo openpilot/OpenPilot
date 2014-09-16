@@ -89,7 +89,9 @@ int32_t GPSPSystemModStart(void)
     mallocFailed  = false;
     // Create system task
     xTaskCreate(gpspSystemTask, (const char *)"G-Sys", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
-
+#ifdef PIOS_INCLUDE_WDG
+    PIOS_WDG_RegisterFlag(PIOS_WDG_SYSTEM);
+#endif
     return 0;
 }
 
@@ -110,6 +112,9 @@ MODULE_INITCALL(GPSPSystemModInitialize, 0);
  */
 static void gpspSystemTask(__attribute__((unused)) void *parameters)
 {
+#ifdef PIOS_INCLUDE_WDG
+    PIOS_WDG_UpdateFlag(PIOS_WDG_SYSTEM);
+#endif
     /* create all modules thread */
     MODULE_TASKCREATE_ALL;
 
@@ -130,6 +135,9 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
     setupGPS();
     uint8_t counter = 0;
     while (1) {
+#ifdef PIOS_INCLUDE_WDG
+        PIOS_WDG_UpdateFlag(PIOS_WDG_SYSTEM);
+#endif
         // NotificationUpdateStatus();
         // Update the system statistics
         if (!(++counter & 0x7F)) {

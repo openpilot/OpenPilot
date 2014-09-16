@@ -64,8 +64,8 @@
 // ------------------------
 // WATCHDOG_SETTINGS
 // ------------------------
-#define PIOS_WATCHDOG_TIMEOUT 250
-#define PIOS_WDG_REGISTER     BKP_DR4
+#define PIOS_WATCHDOG_TIMEOUT 400
+#define PIOS_WDG_REGISTER     RTC_BKP_DR4
 #define PIOS_WDG_SYSTEM       0x0001
 #define PIOS_WDG_GPS          0x0002
 #define PIOS_WDG_MAG          0x0004

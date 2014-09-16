@@ -67,6 +67,10 @@ void PIOS_Board_Init(void)
     PIOS_LED_Init(led_cfg);
 #endif /* PIOS_INCLUDE_LED */
 
+    /* Initialize watchdog as early as possible to catch faults during init */
+#ifdef PIOS_INCLUDE_WDG
+    PIOS_WDG_Init();
+#endif
 #if defined(PIOS_INCLUDE_SPI)
     /* Set up the SPI interface to the serial flash */
     if (PIOS_SPI_Init(&pios_spi_mag_flash_id, &pios_spi_mag_flash_cfg)) {
@@ -88,11 +92,6 @@ void PIOS_Board_Init(void)
     PIOS_RTC_Init(&pios_rtc_main_cfg);
 #endif
     PIOS_IAP_Init();
-
-/* Initialize watchdog as early as possible to catch faults during init */
-#ifdef PIOS_INCLUDE_WDG
-    PIOS_WDG_Init();
-#endif
 
     /* Check for repeated boot failures */
     uint16_t boot_count = PIOS_IAP_ReadBootCount();

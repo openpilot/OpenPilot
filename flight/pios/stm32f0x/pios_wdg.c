@@ -36,14 +36,16 @@
 
 #ifdef PIOS_INCLUDE_WDG
 
-#include "stm32f10x_iwdg.h"
-#include "stm32f10x_dbgmcu.h"
+#include <stm32f0xx_iwdg.h>
+#include <stm32f0xx_rcc.h>
+#include <stm32f0xx_dbgmcu.h>
+#include <pios_bkp.h>
 
 static struct wdg_configuration {
     uint16_t used_flags;
     uint16_t bootup_flags;
 } wdg_configuration;
-
+#define LSI_FREQ 50000
 /**
  * @brief Initialize the watchdog timer for a specified timeout
  *
@@ -62,15 +64,16 @@ static struct wdg_configuration {
  */
 uint16_t PIOS_WDG_Init()
 {
-    uint16_t delay = ((uint32_t)PIOS_WATCHDOG_TIMEOUT * 60) / 16;
+    uint16_t delay = (((uint32_t)PIOS_WATCHDOG_TIMEOUT * LSI_FREQ) / (1000 * 32));
 
     if (delay > 0x0fff) {
         delay = 0x0fff;
     }
 #if defined(PIOS_INCLUDE_WDG)
-    DBGMCU_Config(DBGMCU_IWDG_STOP, ENABLE); // make the watchdog stop counting in debug mode
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_WWDG, ENABLE);
+    DBGMCU_APB1PeriphConfig(DBGMCU_IWDG_STOP, ENABLE); // make the watchdog stop counting in debug mode
     IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-    IWDG_SetPrescaler(IWDG_Prescaler_16);
+    IWDG_SetPrescaler(IWDG_Prescaler_32);
     IWDG_SetReload(delay);
     IWDG_ReloadCounter();
     IWDG_Enable();
@@ -78,8 +81,8 @@ uint16_t PIOS_WDG_Init()
     // watchdog flags now stored in backup registers
     PWR_BackupAccessCmd(ENABLE);
 
-    BKP_WriteBackupRegister(PIOS_WDG_REGISTER, 0x0);
-    wdg_configuration.bootup_flags = BKP_ReadBackupRegister(PIOS_WDG_REGISTER);
+    PIOS_BKP_WriteRegister(PIOS_WDG_REGISTER, 0x0);
+    wdg_configuration.bootup_flags = PIOS_BKP_ReadRegister(PIOS_WDG_REGISTER);
 #endif
     return delay;
 }
@@ -130,14 +133,14 @@ bool PIOS_WDG_UpdateFlag(uint16_t flag)
     // efficiency and not blocking critical tasks.  race condition could
     // overwrite their flag update, but unlikely to block _all_ of them
     // for the timeout window
-    uint16_t cur_flags = BKP_ReadBackupRegister(PIOS_WDG_REGISTER);
+    uint16_t cur_flags = PIOS_BKP_ReadRegister(PIOS_WDG_REGISTER);
 
     if ((cur_flags | flag) == wdg_configuration.used_flags) {
         PIOS_WDG_Clear();
-        BKP_WriteBackupRegister(PIOS_WDG_REGISTER, flag);
+        PIOS_BKP_WriteRegister(PIOS_WDG_REGISTER, flag);
         return true;
     } else {
-        BKP_WriteBackupRegister(PIOS_WDG_REGISTER, cur_flags | flag);
+        PIOS_BKP_WriteRegister(PIOS_WDG_REGISTER, cur_flags | flag);
         return false;
     }
 }
@@ -164,7 +167,7 @@ uint16_t PIOS_WDG_GetBootupFlags()
  */
 uint16_t PIOS_WDG_GetActiveFlags()
 {
-    return BKP_ReadBackupRegister(PIOS_WDG_REGISTER);
+    return PIOS_BKP_ReadRegister(PIOS_WDG_REGISTER);
 }
 
 /**

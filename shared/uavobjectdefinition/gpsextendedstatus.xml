@@ -1,0 +1,15 @@
+<xml>
+    <object name="GPSExtendedStatus" singleinstance="true" settings="false" category="Sensors">
+        <description>Extended GPS status.</description>
+        <field name="Status" units="" type="enum" elements="1" options="NONE,GPSV9" defaultvalue="NONE"/>
+        <field name="FlightTime" units="" type="uint32" elements="1"/>
+        <field name="HeapRemaining" units="bytes" type="uint32" elements="1"/>
+        <field name="IRQStackRemaining" units="bytes" type="uint16" elements="1"/>
+        <field name="SysModStackRemaining" units="bytes" type="uint16" elements="1"/>
+        <field name="Options" units="" type="uint16" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

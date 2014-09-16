@@ -101,7 +101,7 @@ SixPointCalibrationModel::SixPointCalibrationModel(QObject *parent) :
     revoCalibration   = RevoCalibration::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
 
-    auxMagSettings = AuxMagSettings::GetInstance(getObjectManager());
+    auxMagSettings    = AuxMagSettings::GetInstance(getObjectManager());
     Q_ASSERT(auxMagSettings);
 
     accelGyroSettings = AccelGyroSettings::GetInstance(getObjectManager());
@@ -440,7 +440,7 @@ void SixPointCalibrationModel::compute()
     double Be_length;
 
     RevoCalibration::DataFields revoCalibrationData     = revoCalibration->getData();
-    AuxMagSettings::DataFields auxCalibrationData    = auxMagSettings->getData();
+    AuxMagSettings::DataFields auxCalibrationData       = auxMagSettings->getData();
     AccelGyroSettings::DataFields accelGyroSettingsData = accelGyroSettings->getData();
 
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
@@ -521,8 +521,8 @@ void SixPointCalibrationModel::compute()
     if (good_calibration) {
         m_dirty = true;
         if (calibratingMag) {
-            result.revoCalibrationData   = revoCalibrationData;
-            result.auxMagSettingsData = auxCalibrationData;
+            result.revoCalibrationData = revoCalibrationData;
+            result.auxMagSettingsData  = auxCalibrationData;
             displayInstructions(tr("Magnetometer calibration completed successfully."), WizardModel::Success);
         }
         if (calibratingAccel) {

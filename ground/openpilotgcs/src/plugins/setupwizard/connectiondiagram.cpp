@@ -109,6 +109,9 @@ void ConnectionDiagram::setupGraphicsScene()
             case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
                 elementsToShow << "quad-p";
                 break;
+            case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
+                elementsToShow << "quad-h";
+                break;
             case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
                 elementsToShow << "hexa";
                 break;

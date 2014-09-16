@@ -19003,7 +19003,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                         </property>
                         <property name="text">
-                         <string>ModeTransition</string>
+                         <string>Mode Transition</string>
                         </property>
                         <property name="alignment">
                          <set>Qt::AlignCenter</set>

@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configmultirotorwidget.cpp
+ * @file       configcustomwidget.cpp
  * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief ccpm configuration panel
+ * @brief custom configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,84 @@ QStringList ConfigCustomWidget::getChannelDescriptions()
     for (int i = 0; i < (int)VehicleConfig::CHANNEL_NUMELEM; i++) {
         channelDesc.append(QString("-"));
     }
+    // get the gui config data
+    GUIConfigDataUnion configData  = getConfigData();
+    customGUISettingsStruct custom = configData.custom;
+
+    if (custom.Motor1 > 0 && custom.Motor1 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Motor1 - 1] = QString("Motor1");
+    }
+    if (custom.Motor2 > 0 && custom.Motor2 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Motor2 - 1] = QString("Motor2");
+    }
+    if (custom.Motor3 > 0 && custom.Motor3 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Motor3 - 1] = QString("Motor3");
+    }
+    if (custom.Motor4 > 0 && custom.Motor4 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Motor4 - 1] = QString("Motor4");
+    }
+    if (custom.Motor5 > 0 && custom.Motor5 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Motor5 - 1] = QString("Motor5");
+    }
+    if (custom.Motor6 > 0 && custom.Motor6 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Motor6 - 1] = QString("Motor6");
+    }
+    if (custom.Motor7 > 0 && custom.Motor7 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Motor7 - 1] = QString("Motor7");
+    }
+    if (custom.Motor8 > 0 && custom.Motor8 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Motor8 - 1] = QString("Motor8");
+    }
+
+    if (custom.RevMotor1 > 0 && custom.RevMotor1 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.RevMotor1 - 1] = QString("RevMotor1");
+    }
+    if (custom.RevMotor2 > 0 && custom.RevMotor2 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.RevMotor2 - 1] = QString("RevMotor2");
+    }
+    if (custom.RevMotor3 > 0 && custom.RevMotor3 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.RevMotor3 - 1] = QString("RevMotor3");
+    }
+    if (custom.RevMotor4 > 0 && custom.RevMotor4 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.RevMotor4 - 1] = QString("RevMotor4");
+    }
+    if (custom.RevMotor5 > 0 && custom.RevMotor5 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.RevMotor5 - 1] = QString("RevMotor5");
+    }
+    if (custom.RevMotor6 > 0 && custom.RevMotor6 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.RevMotor6 - 1] = QString("RevMotor6");
+    }
+    if (custom.RevMotor7 > 0 && custom.RevMotor7 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.RevMotor7 - 1] = QString("RevMotor7");
+    }
+    if (custom.RevMotor8 > 0 && custom.RevMotor8 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.RevMotor8 - 1] = QString("RevMotor8");
+    }
+
+    if (custom.Servo1 > 0 && custom.Servo1 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Servo1 - 1] = QString("Servo1");
+    }
+    if (custom.Servo2 > 0 && custom.Servo2 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Servo2 - 1] = QString("Servo2");
+    }
+    if (custom.Servo3 > 0 && custom.Servo3 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Servo3 - 1] = QString("Servo3");
+    }
+    if (custom.Servo4 > 0 && custom.Servo4 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Servo4 - 1] = QString("Servo4");
+    }
+    if (custom.Servo5 > 0 && custom.Servo5 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Servo5 - 1] = QString("Servo5");
+    }
+    if (custom.Servo6 > 0 && custom.Servo6 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Servo6 - 1] = QString("Servo6");
+    }
+    if (custom.Servo7 > 0 && custom.Servo7 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Servo7 - 1] = QString("Servo7");
+    }
+    if (custom.Servo8 > 0 && custom.Servo8 <= VehicleConfig::CHANNEL_NUMELEM) {
+        channelDesc[custom.Servo8 - 1] = QString("Servo8");
+    }
     return channelDesc;
 }
 
@@ -52,6 +130,7 @@ ConfigCustomWidget::ConfigCustomWidget(QWidget *parent) :
     VehicleConfig(parent), m_aircraft(new Ui_CustomConfigWidget())
 {
     m_aircraft->setupUi(this);
+    m_aircraft->customMixerTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // Put combo boxes in line one of the custom mixer table:
     UAVDataObject *mixer  = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
@@ -93,7 +172,30 @@ void ConfigCustomWidget::registerWidgets(ConfigTaskWidget &parent)
 
 void ConfigCustomWidget::resetActuators(GUIConfigDataUnion *configData)
 {
-    Q_UNUSED(configData);
+    configData->custom.Motor1    = 0;
+    configData->custom.Motor2    = 0;
+    configData->custom.Motor3    = 0;
+    configData->custom.Motor4    = 0;
+    configData->custom.Motor5    = 0;
+    configData->custom.Motor6    = 0;
+    configData->custom.Motor7    = 0;
+    configData->custom.Motor8    = 0;
+    configData->custom.RevMotor1 = 0;
+    configData->custom.RevMotor2 = 0;
+    configData->custom.RevMotor3 = 0;
+    configData->custom.RevMotor4 = 0;
+    configData->custom.RevMotor5 = 0;
+    configData->custom.RevMotor6 = 0;
+    configData->custom.RevMotor7 = 0;
+    configData->custom.RevMotor8 = 0;
+    configData->custom.Servo1    = 0;
+    configData->custom.Servo2    = 0;
+    configData->custom.Servo3    = 0;
+    configData->custom.Servo4    = 0;
+    configData->custom.Servo5    = 0;
+    configData->custom.Servo6    = 0;
+    configData->custom.Servo7    = 0;
+    configData->custom.Servo8    = 0;
 }
 
 /**
@@ -105,8 +207,22 @@ void ConfigCustomWidget::refreshWidgetsValues(QString frameType)
 
     setupUI(frameType);
 
+    UAVDataObject *system = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("SystemSettings")));
+    Q_ASSERT(system);
+    QPointer<UAVObjectField> field = system->getField(QString("AirframeType"));
+
+    // Do not allow table edit until AirframeType == Custom
+    // First save set AirframeType to 'Custom' and next modify.
+    if (field->getValue().toString() != "Custom") {
+        m_aircraft->customMixerTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    } else {
+        m_aircraft->customMixerTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    }
+
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
+
+    getChannelDescriptions();
 
     QList<double> curveValues;
     getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, &curveValues);
@@ -162,60 +278,125 @@ void ConfigCustomWidget::refreshWidgetsValues(QString frameType)
     }
 }
 
+
 /**
    Helper function to
  */
 QString ConfigCustomWidget::updateConfigObjectsFromWidgets()
 {
-    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+    UAVDataObject *system = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("SystemSettings")));
 
-    Q_ASSERT(mixer);
+    Q_ASSERT(system);
 
-    setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->customThrottle1Curve->getCurve());
-    setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, m_aircraft->customThrottle2Curve->getCurve());
+    QPointer<UAVObjectField> field = system->getField(QString("AirframeType"));
 
-    // Update the table:
-    for (int channel = 0; channel < (int)VehicleConfig::CHANNEL_NUMELEM; channel++) {
-        QComboBox *q = (QComboBox *)m_aircraft->customMixerTable->cellWidget(0, channel);
-        if (q->currentText() == "Disabled") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
-        } else if (q->currentText() == "Motor") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
-        } else if (q->currentText() == "ReversableMotor") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_REVERSABLEMOTOR);
-        } else if (q->currentText() == "Servo") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
-        } else if (q->currentText() == "CameraRoll") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAROLL);
-        } else if (q->currentText() == "CameraPitch") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAPITCH);
-        } else if (q->currentText() == "CameraYaw") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAYAW);
-        } else if (q->currentText() == "Accessory0") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY0);
-        } else if (q->currentText() == "Accessory1") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY1);
-        } else if (q->currentText() == "Accessory2") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY2);
-        } else if (q->currentText() == "Accessory3") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY3);
-        } else if (q->currentText() == "Accessory4") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY4);
-        } else if (q->currentText() == "Accessory5") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY5);
+    // Do not allow changes until AirframeType == Custom
+    // If user want to save custom mixer : first set AirframeType to 'Custom' without changes and next modify.
+    if (field->getValue().toString() == "Custom") {
+        UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+
+        Q_ASSERT(mixer);
+
+        setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->customThrottle1Curve->getCurve());
+        setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, m_aircraft->customThrottle2Curve->getCurve());
+
+        GUIConfigDataUnion configData = getConfigData();
+        resetActuators(&configData);
+
+        // Update the table:
+        for (int channel = 0; channel < (int)VehicleConfig::CHANNEL_NUMELEM; channel++) {
+            QComboBox *q = (QComboBox *)m_aircraft->customMixerTable->cellWidget(0, channel);
+            if (q->currentText() == "Disabled") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
+            } else if (q->currentText() == "Motor") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
+                if (configData.custom.Motor1 == 0) {
+                    configData.custom.Motor1 = channel + 1;
+                } else if (configData.custom.Motor2 == 0) {
+                    configData.custom.Motor2 = channel + 1;
+                } else if (configData.custom.Motor3 == 0) {
+                    configData.custom.Motor3 = channel + 1;
+                } else if (configData.custom.Motor4 == 0) {
+                    configData.custom.Motor4 = channel + 1;
+                } else if (configData.custom.Motor5 == 0) {
+                    configData.custom.Motor5 = channel + 1;
+                } else if (configData.custom.Motor6 == 0) {
+                    configData.custom.Motor6 = channel + 1;
+                } else if (configData.custom.Motor7 == 0) {
+                    configData.custom.Motor7 = channel + 1;
+                } else if (configData.custom.Motor8 == 0) {
+                    configData.custom.Motor8 = channel + 1;
+                }
+            } else if (q->currentText() == "ReversableMotor") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_REVERSABLEMOTOR);
+                if (configData.custom.RevMotor1 == 0) {
+                    configData.custom.RevMotor1 = channel + 1;
+                } else if (configData.custom.RevMotor2 == 0) {
+                    configData.custom.RevMotor2 = channel + 1;
+                } else if (configData.custom.RevMotor3 == 0) {
+                    configData.custom.RevMotor3 = channel + 1;
+                } else if (configData.custom.RevMotor4 == 0) {
+                    configData.custom.RevMotor4 = channel + 1;
+                } else if (configData.custom.RevMotor5 == 0) {
+                    configData.custom.RevMotor5 = channel + 1;
+                } else if (configData.custom.RevMotor6 == 0) {
+                    configData.custom.RevMotor6 = channel;
+                } else if (configData.custom.RevMotor7 == 0) {
+                    configData.custom.RevMotor7 = channel;
+                } else if (configData.custom.RevMotor8 == 0) {
+                    configData.custom.RevMotor8 = channel;
+                }
+            } else if (q->currentText() == "Servo") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+                if (configData.custom.Servo1 == 0) {
+                    configData.custom.Servo1 = channel + 1;
+                } else if (configData.custom.Servo2 == 0) {
+                    configData.custom.Servo2 = channel + 1;
+                } else if (configData.custom.Servo3 == 0) {
+                    configData.custom.Servo3 = channel + 1;
+                } else if (configData.custom.Servo4 == 0) {
+                    configData.custom.Servo4 = channel + 1;
+                } else if (configData.custom.Servo5 == 0) {
+                    configData.custom.Servo5 = channel + 1;
+                } else if (configData.custom.Servo6 == 0) {
+                    configData.custom.Servo6 = channel + 1;
+                } else if (configData.custom.Servo7 == 0) {
+                    configData.custom.Servo7 = channel + 1;
+                } else if (configData.custom.Servo8 == 0) {
+                    configData.custom.Servo8 = channel + 1;
+                }
+            } else if (q->currentText() == "CameraRoll") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAROLL);
+            } else if (q->currentText() == "CameraPitch") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAPITCH);
+            } else if (q->currentText() == "CameraYaw") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAYAW);
+            } else if (q->currentText() == "Accessory0") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY0);
+            } else if (q->currentText() == "Accessory1") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY1);
+            } else if (q->currentText() == "Accessory2") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY2);
+            } else if (q->currentText() == "Accessory3") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY3);
+            } else if (q->currentText() == "Accessory4") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY4);
+            } else if (q->currentText() == "Accessory5") {
+                setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY5);
+            }
+            setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1,
+                                m_aircraft->customMixerTable->item(1, channel)->text().toDouble());
+            setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2,
+                                m_aircraft->customMixerTable->item(2, channel)->text().toDouble());
+            setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL,
+                                m_aircraft->customMixerTable->item(3, channel)->text().toDouble());
+            setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH,
+                                m_aircraft->customMixerTable->item(4, channel)->text().toDouble());
+            setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW,
+                                m_aircraft->customMixerTable->item(5, channel)->text().toDouble());
         }
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1,
-                            m_aircraft->customMixerTable->item(1, channel)->text().toDouble());
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2,
-                            m_aircraft->customMixerTable->item(2, channel)->text().toDouble());
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL,
-                            m_aircraft->customMixerTable->item(3, channel)->text().toDouble());
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH,
-                            m_aircraft->customMixerTable->item(4, channel)->text().toDouble());
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW,
-                            m_aircraft->customMixerTable->item(5, channel)->text().toDouble());
+        setConfigData(configData);
     }
-
     return "Custom";
 }
 

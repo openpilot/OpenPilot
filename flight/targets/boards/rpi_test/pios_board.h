@@ -209,8 +209,8 @@ extern uint32_t pios_com_vcp_id;
 // -------------------------
 // Receiver PWM input
 // -------------------------
-// #define PIOS_PWM_MAX_DEVS            1
-// #define PIOS_PWM_NUM_INPUTS          8
+#define PIOS_PWM_MAX_DEVS            1
+#define PIOS_PWM_NUM_INPUTS          8
 
 // -------------------------
 // Receiver SPEKTRUM input

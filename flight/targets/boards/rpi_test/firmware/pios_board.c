@@ -155,6 +155,19 @@ void PIOS_Board_Init(void)
 	PIOS_Servo_Init();
 #endif
 
+#if defined(PIOS_INCLUDE_PWM)
+	/* Set up the receiver port.  Later this should be optional */
+    uint32_t pios_pwm_id;
+
+    PIOS_PWM_Init(&pios_pwm_id);
+
+    uint32_t pios_pwm_rcvr_id;
+    if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
+        PIOS_Assert(0);
+    }
+    pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
+#endif /* PIOS_INCLUDE_PWM */
+
     /* Configure Telemetry port */
     uint8_t hwsettings_rv_telemetryport;
     HwSettingsRV_TelemetryPortGet(&hwsettings_rv_telemetryport);

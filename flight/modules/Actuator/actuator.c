@@ -106,7 +106,6 @@ typedef struct {
  */
 int32_t ActuatorStart()
 {
-printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
     // Start main task
     xTaskCreate(actuatorTask, "Actuator", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ACTUATOR, taskHandle);
@@ -122,7 +121,6 @@ printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
  */
 int32_t ActuatorInitialize()
 {
-printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
     // Register for notification of changes to ActuatorSettings
     ActuatorSettingsInitialize();
     ActuatorSettingsConnectCallback(ActuatorSettingsUpdatedCb);
@@ -459,7 +457,6 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
         if (!success) {
             command.NumFailedUpdates++;
             ActuatorCommandSet(&command);
-printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
             AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
         }
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
@@ -612,7 +609,6 @@ static void setFailsafe(const ActuatorSettingsData *actuatorSettings, const Mixe
     }
 
     // Set alarm
-printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
     AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
 
     // Update servo outputs
@@ -784,7 +780,6 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuator
 {
     static uint16_t prevChannelUpdateFreq[ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM];
 
-printf("%s:%d %s() -->\n", __FILE__, __LINE__, __func__);
     // check if the any rate setting is changed
     if (force_update ||
         memcmp(prevChannelUpdateFreq,

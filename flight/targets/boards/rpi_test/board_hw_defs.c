@@ -70,6 +70,17 @@ const struct pios_udp_cfg pios_udp_aux_cfg = {
 
 #endif /* PIOS_INCLUDE_COM */
 
+/*
+ * PWM Inputs
+ */
+#if defined(PIOS_INCLUDE_PWM)
+/* #include <pios_pwm_priv.h>
+ * pios_pwm_priv.h include pios_stm32.h and I do not wan't to change it
+ * so I use this hack
+ * */
+extern const struct pios_rcvr_driver pios_pwm_rcvr_driver;
+#endif /* if defined(PIOS_INCLUDE_PWM) */
+
 #if defined(PIOS_INCLUDE_FLASH)
 #include "pios_flashfs_logfs_priv.h"
 #endif

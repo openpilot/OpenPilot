@@ -59,7 +59,7 @@ int32_t MpuStart()
         return 0;
     }
     // Start main task
-    xTaskCreate(mpuTask, (signed char *)"MPU_9150", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+    xTaskCreate(mpuTask, "MPU_9150", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
 
 
     //PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_???, taskHandle);
@@ -170,6 +170,13 @@ typedef struct mpu_9150_data_t_tag{
 	long temperature; // in q16 format
 } mpu_9150_data_t;
 
+void mpu_print_data(mpu_9150_data_t *mpu_data)
+{
+	printf("gyro X[%05hi], Y[%05hi], Z[%05hi], accel X[%05hi], Y[%05hi], Z[%05hi]\n",
+		   mpu_data->raw_gyro[0], mpu_data->raw_gyro[1], -mpu_data->raw_gyro[2],
+		   mpu_data->raw_accel[0], mpu_data->raw_accel[1], -mpu_data->raw_accel[2]);
+}
+
 int mpu_read_data(mpu_9150_data_t *mpu_data)
 {
 	short data_ready;
@@ -234,6 +241,7 @@ static void mpuTask(__attribute__((unused)) void *parameters)
 			mpu6000_data.temperature = (int16_t) ((mpu_data.temperature & 0x00FFFF00) >> 8);
 
 			xQueueSendToBack(queue, (void *)&mpu6000_data, 0);
+//mpu_print_data(&mpu_data);
 		}
 
 		//* Looks like vTaskDelay in posix works like sleep_ms() */

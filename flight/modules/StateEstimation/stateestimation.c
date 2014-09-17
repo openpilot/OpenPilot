@@ -401,7 +401,7 @@ static void StateEstimationCb(void)
                     current = current->next;
                 }
                 if (error) {
-                    AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+                    //AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
                     return;
                 } else {
                     // set new fusion algortithm
@@ -499,15 +499,15 @@ static void StateEstimationCb(void)
         }
 
         // clear alarms if everything is alright, then schedule callback execution after timeout
-        if (lastAlarm == FILTERRESULT_WARNING) {
+        /*if (lastAlarm == FILTERRESULT_WARNING) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
         } else if (lastAlarm == FILTERRESULT_CRITICAL) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
         } else if (lastAlarm >= FILTERRESULT_ERROR) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-        } else {
+        } else {*/
             AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
-        }
+        //}
 
         // we are done, re-schedule next self execution
         runState = RUNSTATE_LOAD;

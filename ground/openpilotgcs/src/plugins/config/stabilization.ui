@@ -95,7 +95,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>2</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -17644,7 +17644,7 @@ font:bold;</string>
                    <stringlist>
                     <string>objname:StabilizationSettings</string>
                     <string>button:default</string>
-                    <string>buttongroup:10</string>
+                    <string>buttongroup:31</string>
                    </stringlist>
                   </property>
                  </widget>
@@ -17711,7 +17711,7 @@ font:bold;</string>
                        <string>fieldname:MaxAxisLock</string>
                        <string>haslimits:no</string>
                        <string>scale:1</string>
-                       <string>buttongroup:10</string>
+                       <string>buttongroup:31</string>
                       </stringlist>
                      </property>
                     </widget>
@@ -18870,7 +18870,7 @@ font:bold;</string>
                        <string>fieldname:MaxAxisLockRate</string>
                        <string>haslimits:no</string>
                        <string>scale:1</string>
-                       <string>buttongroup:10</string>
+                       <string>buttongroup:31</string>
                       </stringlist>
                      </property>
                     </widget>

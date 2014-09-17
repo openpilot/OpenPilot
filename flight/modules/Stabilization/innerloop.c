@@ -123,7 +123,7 @@ static void stabilizationInnerloopTask()
 // RPi hack --------------------------------------------------
 /* slowing down this task for tests purposes */
 // horrible hack but we are still slow
-            //crit = true;
+            crit = true;
 //------------------------------------------------------------
         }
         // check if gyro keeps updating
@@ -132,7 +132,7 @@ static void stabilizationInnerloopTask()
 // RPi hack --------------------------------------------------
 /* slowing down this task for tests purposes */
 // horrible hack but gyro is updated slowly now
-            //error = true;
+            error = true;
 //------------------------------------------------------------
         }
         if (stabSettings.monitor.gyroupdates > 1) {

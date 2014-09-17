@@ -1006,10 +1006,10 @@ help:
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO)
-	@$(ECHO) "   [UPLOADER TOOL]"
+	@$(ECHO) "   [Uploader Tool]"
 	@$(ECHO) "     uploader             - Build the serial uploader tool (debug|release)"
 	@$(ECHO) "                            Skip qmake: QMAKE_SKIP=1"
-	@$(ECHO) "                            Example: make gcs QMAKE_SKIP=1"
+	@$(ECHO) "                            Example: make uploader QMAKE_SKIP=1"
 	@$(ECHO) "     uploader_clean       - Remove the serial uploader tool (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO)

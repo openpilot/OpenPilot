@@ -240,7 +240,7 @@ void ConfigStabilizationWidget::onBoardConnected()
 
     Q_ASSERT(utilMngr);
     boardModel = utilMngr->getBoardModel();
-    // If Revolution board enable misc tab, otherwise disable it
+    // If Revolution board enable Althold tab, otherwise disable it
     ui->AltitudeHold->setEnabled((boardModel & 0xff00) == 0x0900);
 }
 

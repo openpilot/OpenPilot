@@ -966,6 +966,99 @@ Item {
         } 
     }
 
+    SvgElementPositionItem {
+        id: system_fusion_algo
+        elementName: "system-attitude-estimation-algo"
+        sceneSize: panels.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: system_bg.z+1
+
+        states: State  {
+             name: "fading"
+             when: show_panels !== true
+             PropertyChanges  { target: system_fusion_algo; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+
+        Text {
+             text: ["None", "Complementary", "CompMag", "Comp+Mag+GPS", "EKFIndoor", "EKFOutdoor"][RevoSettings.FusionAlgorithm]
+             anchors.centerIn: parent
+             color: "white"
+             font {
+                 family: "Arial"
+                 pixelSize: Math.floor(parent.height * 1.2)
+                 weight: Font.DemiBold
+             }
+        } 
+    }
+
+    SvgElementPositionItem {
+        id: system_mag_used
+        elementName: "system-mag-used"
+        sceneSize: panels.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: system_bg.z+1
+
+        states: State  {
+             name: "fading"
+             when: show_panels !== true
+             PropertyChanges  { target: system_mag_used; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+
+        Text {
+             text: ["Invalid", "OnBoard", "External"][MagState.Source]
+             anchors.centerIn: parent
+             color: "white"
+             font {
+                 family: "Arial"
+                 pixelSize: Math.floor(parent.height * 1.4)
+                 weight: Font.DemiBold
+             }
+        } 
+    }
+
+    SvgElementPositionItem {
+        id: system_gpstype
+        elementName: "system-gps-type"
+        sceneSize: panels.sceneSize
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        z: system_bg.z+1
+
+        states: State  {
+             name: "fading"
+             when: show_panels !== true
+             PropertyChanges  { target: system_gpstype; x: Math.floor(scaledBounds.x * sceneItem.width) - (system_bg.width * 0.85); }
+        }
+ 
+        transitions: Transition  {
+        SequentialAnimation  {
+              PropertyAnimation  { property: "x"; duration: 800 }
+              }
+        } 
+
+        Text {
+             text: ["Unknown", "NMEA", "UBX", "UBX7", "UBX8"][GPSPositionSensor.SensorType]
+             anchors.centerIn: parent
+             color: "white"
+             font {
+                 family: "Arial"
+                 pixelSize: Math.floor(parent.height * 1.4)
+                 weight: Font.DemiBold
+             }
+        } 
+    }
+
     SvgElementImage {
         id: system_mousearea
         elementName: "system-panel-mousearea"

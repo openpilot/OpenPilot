@@ -376,14 +376,14 @@ static uint8_t updateAutoPilotVtol()
     }
 
     // vertical positon control PID loops works the same in both regular and fallback modes, setup according to settings
-    pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, 0.0f, 0.0f, 0.0f);
+    pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
 
     switch (followermode) {
     case FOLLOWER_REGULAR:
     {
         // horizontal position control PID loop works according to settings in regular mode, allowing integral terms
-        pid_configure(&global.PIDposH[0], vtolPathFollowerSettings.HorizontalPosPI.Kp, 0.0f, 0.0f, 0.0f);
-        pid_configure(&global.PIDposH[1], vtolPathFollowerSettings.HorizontalPosPI.Kp, 0.0f, 0.0f, 0.0f);
+        pid_configure(&global.PIDposH[0], vtolPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+        pid_configure(&global.PIDposH[1], vtolPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
         updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, false);
 
         // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm

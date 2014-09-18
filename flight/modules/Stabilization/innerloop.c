@@ -101,14 +101,14 @@ static float get_pid_scale_source_value()
 {
     float value;
 
-    switch (stabSettings.settings.ThrustPIDScaleSource) {
-    case STABILIZATIONSETTINGS_THRUSTPIDSCALESOURCE_MANUALCONTROLTHROTTLE:
+    switch (stabSettings.stabBank.ThrustPIDScaleSource) {
+    case STABILIZATIONBANK_THRUSTPIDSCALESOURCE_MANUALCONTROLTHROTTLE:
         ManualControlCommandThrottleGet(&value);
         break;
-    case STABILIZATIONSETTINGS_THRUSTPIDSCALESOURCE_STABILIZATIONDESIREDTHRUST:
+    case STABILIZATIONBANK_THRUSTPIDSCALESOURCE_STABILIZATIONDESIREDTHRUST:
         StabilizationDesiredThrustGet(&value);
         break;
-    case STABILIZATIONSETTINGS_THRUSTPIDSCALESOURCE_ACTUATORDESIREDTHRUST:
+    case STABILIZATIONBANK_THRUSTPIDSCALESOURCE_ACTUATORDESIREDTHRUST:
         ActuatorDesiredThrustGet(&value);
         break;
     default:
@@ -128,11 +128,11 @@ static float get_pid_scale_factor()
     struct pid_scaler scaler = {
         .x      = get_pid_scale_source_value(),
         .points = {
-            { 0.0f,  stabSettings.settings.ThrustPIDScaleCurve[0] },
-            { 0.25f, stabSettings.settings.ThrustPIDScaleCurve[1] },
-            { 0.50f, stabSettings.settings.ThrustPIDScaleCurve[2] },
-            { 0.75f, stabSettings.settings.ThrustPIDScaleCurve[3] },
-            { 1.0f,  stabSettings.settings.ThrustPIDScaleCurve[4] }
+            { 0.0f,  stabSettings.stabBank.ThrustPIDScaleCurve[0] },
+            { 0.25f, stabSettings.stabBank.ThrustPIDScaleCurve[1] },
+            { 0.50f, stabSettings.stabBank.ThrustPIDScaleCurve[2] },
+            { 0.75f, stabSettings.stabBank.ThrustPIDScaleCurve[3] },
+            { 1.0f,  stabSettings.stabBank.ThrustPIDScaleCurve[4] }
         }
     };
 
@@ -141,7 +141,7 @@ static float get_pid_scale_factor()
 
 static int is_pid_scaled_for_axis(int axis)
 {
-    return stabSettings.settings.EnableThrustPIDScaling
+    return stabSettings.stabBank.EnableThrustPIDScaling
            && (axis == 0 // Roll
                || axis == 1); // Pitch
 }

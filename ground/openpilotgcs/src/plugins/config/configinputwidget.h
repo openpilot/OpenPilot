@@ -82,6 +82,10 @@ private:
         {
             return (group == rhs.group) && (number == rhs.number);
         }
+        bool operator !=(const channelsStruct & rhs)  const
+        {
+            return !operator==(rhs);
+        }
         int group;
         int number;
         int channelIndex;
@@ -92,24 +96,34 @@ private:
     QEventLoop *loop;
     bool skipflag;
 
+    // Variables to support delayed transitions when detecting input controls.
+    QTimer nextDelayedTimer;
+    int nextDelayedTick;
+    int nextDelayedLatestActivityTick;
+
     int currentChannelNum;
     QList<int> heliChannelOrder;
     QList<int> acroChannelOrder;
 
+    UAVObject::Metadata manualControlMdata;
     ManualControlCommand *manualCommandObj;
     ManualControlCommand::DataFields manualCommandData;
+
     FlightStatus *flightStatusObj;
     FlightStatus::DataFields flightStatusData;
+
+    UAVObject::Metadata accessoryDesiredMdata0;
     AccessoryDesired *accessoryDesiredObj0;
     AccessoryDesired *accessoryDesiredObj1;
     AccessoryDesired *accessoryDesiredObj2;
     AccessoryDesired::DataFields accessoryDesiredData0;
     AccessoryDesired::DataFields accessoryDesiredData1;
     AccessoryDesired::DataFields accessoryDesiredData2;
-    UAVObject::Metadata manualControlMdata;
+
     ManualControlSettings *manualSettingsObj;
     ManualControlSettings::DataFields manualSettingsData;
     ManualControlSettings::DataFields previousManualSettingsData;
+
     FlightModeSettings *flightModeSettingsObj;
     FlightModeSettings::DataFields flightModeSettingsData;
     FlightModeSettings::DataFields previousFlightModeSettingsData;
@@ -152,8 +166,14 @@ private:
     void wizardSetUpStep(enum wizardSteps);
     void wizardTearDownStep(enum wizardSteps);
 
+    void registerControlActivity();
+
+    void wzNextDelayedStart();
+    void wzNextDelayedCancel();
+
 private slots:
     void wzNext();
+    void wzNextDelayed();
     void wzBack();
     void wzCancel();
     void goToWizard();

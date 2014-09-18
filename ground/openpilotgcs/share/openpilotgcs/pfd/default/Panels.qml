@@ -892,7 +892,7 @@ Item {
              text: ["FixedWing", "FixedWingElevon", "FixedWingVtail", "VTOL", "HeliCP", "QuadX", "QuadP",
                     "Hexa+", "Octo+", "Custom", "HexaX", "HexaH", "OctoV", "OctoCoaxP", "OctoCoaxX", "OctoX", "HexaCoax",
                     "Tricopter", "GroundVehicleCar", "GroundVehicleDiff", "GroundVehicleMoto"][SystemSettings.AirframeType]
-             anchors.centerIn: parent
+             anchors.right: parent.right
              color: "white"
              font {
                  family: "Arial"
@@ -925,7 +925,7 @@ Item {
              // CC3D hack, Cputemp not working
              text: SystemStats.CPULoad+"% - "+ 
                    [String(SystemStats.CPUTemp).charCodeAt(0) == "64" ? "??" : String(SystemStats.CPUTemp).charCodeAt(0)] +"°C"
-             anchors.centerIn: parent
+             anchors.right: parent.right
              color: "white"
              font {
                  family: "Arial"
@@ -956,7 +956,7 @@ Item {
 
         Text {
              text: SystemStats.HeapRemaining > 1024 ? memory_free.toFixed(2) +"Kb" : memory_free +"bytes"
-             anchors.centerIn: parent
+             anchors.right: parent.right
              color: "white"
              font {
                  family: "Arial"
@@ -987,7 +987,7 @@ Item {
 
         Text {
              text: ["None", "Complementary", "CompMag", "Comp+Mag+GPS", "EKFIndoor", "EKFOutdoor"][RevoSettings.FusionAlgorithm]
-             anchors.centerIn: parent
+             anchors.right: parent.right
              color: "white"
              font {
                  family: "Arial"
@@ -1018,7 +1018,7 @@ Item {
 
         Text {
              text: ["Invalid", "OnBoard", "External"][MagState.Source]
-             anchors.centerIn: parent
+             anchors.right: parent.right
              color: "white"
              font {
                  family: "Arial"
@@ -1049,7 +1049,7 @@ Item {
 
         Text {
              text: ["Unknown", "NMEA", "UBX", "UBX7", "UBX8"][GPSPositionSensor.SensorType]
-             anchors.centerIn: parent
+             anchors.right: parent.right
              color: "white"
              font {
                  family: "Arial"

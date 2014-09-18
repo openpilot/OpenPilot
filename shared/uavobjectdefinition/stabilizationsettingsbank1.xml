@@ -18,6 +18,7 @@
 	<field name="EnableThrustPIDScaling" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
 	<field name="ThrustPIDScaleCurve" units="percent" type="float" elementnames="0,25,50,75,100" defaultvalue="0.3,0.15,0,-0.15,-0.3"/>
 	<field name="ThrustPIDScaleSource" units="" type="enum" elements="1" options="ManualControlThrottle,StabilizationDesiredThrust,ActuatorDesiredThrust" defaultvalue="ActuatorDesiredThrust" />
+	<field name="ThrustPIDScaleTarget" units="" type="enum" elements="1" options="PID,PI,PD,ID,P,I,D" defaultvalue="PID" />
 
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

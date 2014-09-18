@@ -123,27 +123,88 @@ static float get_pid_scale_source_value()
     return value;
 }
 
-static float get_pid_scale_factor()
-{
-    struct pid_scaler scaler = {
-        .x      = get_pid_scale_source_value(),
-        .points = {
-            { 0.0f,  stabSettings.stabBank.ThrustPIDScaleCurve[0] },
-            { 0.25f, stabSettings.stabBank.ThrustPIDScaleCurve[1] },
-            { 0.50f, stabSettings.stabBank.ThrustPIDScaleCurve[2] },
-            { 0.75f, stabSettings.stabBank.ThrustPIDScaleCurve[3] },
-            { 1.0f,  stabSettings.stabBank.ThrustPIDScaleCurve[4] }
-        }
-    };
-
-    return pid_scale_factor(&scaler);
-}
-
-static int is_pid_scaled_for_axis(int axis)
+static int is_pid_thrust_scaled_for_axis(int axis)
 {
     return stabSettings.stabBank.EnableThrustPIDScaling
            && (axis == 0 // Roll
                || axis == 1); // Pitch
+}
+
+static bool is_p_scaling_enabled()
+{
+    uint8_t target = stabSettings.stabBank.ThrustPIDScaleTarget;
+
+    return target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PI ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PD ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_P;
+}
+
+static bool is_i_scaling_enabled()
+{
+    uint8_t target = stabSettings.stabBank.ThrustPIDScaleTarget;
+
+    return target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PI ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_ID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_I;
+}
+
+static bool is_d_scaling_enabled()
+{
+    uint8_t target = stabSettings.stabBank.ThrustPIDScaleTarget;
+
+    return target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PD ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_ID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_D;
+}
+
+typedef struct pid_curve_scaler {
+    float  x;
+    pointf points[5];
+} pid_curve_scaler;
+
+static float pid_curve_value(const pid_curve_scaler *scaler)
+{
+    float y = y_on_curve(scaler->x, scaler->points, sizeof(scaler->points) / sizeof(scaler->points[0]));
+
+    return 1.0f + (IS_REAL(y) ? y : 0.0f);
+}
+
+static pid_scaler create_pid_scaler(int axis)
+{
+    pid_scaler scaler;
+
+    // Always scaled with the this.
+    scaler.p = scaler.i = scaler.d = speedScaleFactor;
+
+    if (is_pid_thrust_scaled_for_axis(axis)) {
+        const pid_curve_scaler curve_scaler = {
+            .x      = get_pid_scale_source_value(),
+            .points = {
+                { 0.00f, stabSettings.stabBank.ThrustPIDScaleCurve[0] },
+                { 0.25f, stabSettings.stabBank.ThrustPIDScaleCurve[1] },
+                { 0.50f, stabSettings.stabBank.ThrustPIDScaleCurve[2] },
+                { 0.75f, stabSettings.stabBank.ThrustPIDScaleCurve[3] },
+                { 1.00f, stabSettings.stabBank.ThrustPIDScaleCurve[4] }
+            }
+        };
+
+        float curve_value = pid_curve_value(&curve_scaler);
+
+        if (is_p_scaling_enabled()) {
+            scaler.p *= curve_value;
+        }
+        if (is_i_scaling_enabled()) {
+            scaler.i *= curve_value;
+        }
+        if (is_d_scaling_enabled()) {
+            scaler.d *= curve_value;
+        }
+    }
+
+    return scaler;
 }
 
 /**
@@ -252,11 +313,8 @@ static void stabilizationInnerloopTask()
                                  -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t],
                                  StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
                                  );
-                float scaleFactor = speedScaleFactor;
-                if (is_pid_scaled_for_axis(t)) {
-                    scaleFactor *= get_pid_scale_factor();
-                }
-                actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], scaleFactor, rate[t], gyro_filtered[t], dT);
+                pid_scaler scaler = create_pid_scaler(t);
+                actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], &scaler, rate[t], gyro_filtered[t], dT);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
             default:

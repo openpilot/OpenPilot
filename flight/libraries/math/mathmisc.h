@@ -88,7 +88,7 @@ typedef struct pointf {
 } pointf;
 
 // Returns the y value, given x, on the line passing through the points p0 and p1.
-static inline float y_on_line(float x, pointf *p0, pointf *p1)
+static inline float y_on_line(float x, const pointf *p0, const pointf *p1)
 {
     // Setup line y = m * x + b.
     const float dY1 = p1->y - p0->y;
@@ -102,7 +102,7 @@ static inline float y_on_line(float x, pointf *p0, pointf *p1)
 
 // Returns the y value, given x, on the curve defined by the points array.
 // The fist and last line of the curve extends beyond the first resp. last points.
-static inline float y_on_curve(float x, pointf points[], int num_points)
+static inline float y_on_curve(float x, const pointf points[], int num_points)
 {
     // Find the two points x is within.
     // If x is smaller than the first point's x value, use the first line of the curve.

@@ -73,7 +73,7 @@ GUIConfigDataUnion VehicleConfig::getConfigData()
     }
 
     // sanity check
-    Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM == (sizeof(configData.UAVObject) / sizeof(configData.UAVObject[0])));
+    //Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM == (sizeof(configData.UAVObject) / sizeof(configData.UAVObject[0])));
 
     return configData;
 }

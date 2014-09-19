@@ -4,6 +4,9 @@ Item {
     id: info
     property variant sceneSize
 
+                             // Uninitialised, Ok,   Warning, Critical, Error                      
+    property variant batColors : ["black", "green", "orange", "red", "red"]
+
     //
     // Waypoint functions
     //
@@ -11,6 +14,8 @@ Item {
     property real posEast_old
     property real posNorth_old
     property real total_distance
+    property real total_distance_km
+   
     property bool init_dist: false
     
     property real home_heading: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East, 
@@ -44,7 +49,8 @@ Item {
     function compute_distance(posEast,posNorth) {
         if (total_distance == 0 && !init_dist){init_dist = "true"; posEast_old = posEast; posNorth_old = posNorth;}
         if (posEast > posEast_old+3 || posEast < posEast_old-3 || posNorth > posNorth_old+3 || posNorth < posNorth_old-3) {
-        total_distance += Math.sqrt(Math.pow((posEast - posEast_old ),2) + Math.pow((posNorth - posNorth_old),2));    
+        total_distance += Math.sqrt(Math.pow((posEast - posEast_old ),2) + Math.pow((posNorth - posNorth_old),2)); 
+        total_distance_km = total_distance / 1000;   
 
         posEast_old = posEast;
         posNorth_old = posNorth;
@@ -107,7 +113,16 @@ Item {
 
     // 
     // Waypoint Info (Top)
-    //
+    // Only visible when PathPlan is active (WP loaded)
+
+    SvgElementImage  {
+        sceneSize: info.sceneSize
+        elementName: "waypoint-labels"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan == 1
+    }
 
     SvgElementPositionItem {
         sceneSize: info.sceneSize
@@ -157,6 +172,7 @@ Item {
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan == 1
 
         MouseArea { id: total_dist_mouseArea; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: reset_distance()}
 
@@ -241,6 +257,153 @@ Item {
             }
         }
     }
+
+    // 
+    // Battery Info (Top)
+    // Only visible when PathPlan not active and Battery module enabled
+
+    SvgElementImage  {
+        sceneSize: info.sceneSize
+        elementName: "topbattery-labels"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+    }
+
+    SvgElementPositionItem {
+        id: topbattery_volt
+        sceneSize: info.sceneSize
+        elementName: "topbattery-volt-text"
+        
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+
+        Rectangle {
+            anchors.fill: parent
+            color: info.batColors[SystemAlarms.Alarm_Battery]
+            border.color: info.batColors[SystemAlarms.Alarm_Battery]
+            border.width: topbattery_volt.width * 0.02
+
+            Text {
+               text: FlightBatteryState.Voltage.toFixed(2)
+               anchors.centerIn: parent
+               color: "white"
+               font {
+                   family: "Arial"
+                   pixelSize: Math.floor(parent.height * 0.6)
+                   weight: Font.DemiBold
+               }
+            }
+        }
+    }
+
+    SvgElementPositionItem {
+        id: topbattery_amp
+        sceneSize: info.sceneSize
+        elementName: "topbattery-amp-text"
+
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+
+        Rectangle {
+            anchors.fill: parent
+            color: info.batColors[SystemAlarms.Alarm_Battery]
+            border.color: info.batColors[SystemAlarms.Alarm_Battery]
+            border.width: topbattery_volt.width * 0.02
+
+            Text {
+               text: FlightBatteryState.Current.toFixed(2)
+               anchors.centerIn: parent
+               color: "white"
+               font {
+                   family: "Arial"
+                   pixelSize: Math.floor(parent.height * 0.6)
+                   weight: Font.DemiBold
+               }
+            }
+        }
+    }
+
+    SvgElementPositionItem {
+        id: topbattery_milliamp
+        sceneSize: info.sceneSize
+        elementName: "topbattery-milliamp-text"
+
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+
+        Rectangle {
+            anchors.fill: parent
+
+            // Alarm based on FlightBatteryState.EstimatedFlightTime < 120s orange, < 60s red
+            color: (FlightBatteryState.EstimatedFlightTime <= 120 && FlightBatteryState.EstimatedFlightTime > 60 ? "orange" :
+                   (FlightBatteryState.EstimatedFlightTime <= 60 ? "red": info.batColors[SystemAlarms.Alarm_Battery]))
+
+            border.color: "white"
+            border.width: topbattery_volt.width * 0.01
+            radius: border.width * 4
+
+            Text {
+               text: FlightBatteryState.ConsumedEnergy.toFixed(0)
+               anchors.centerIn: parent
+               color: "white"
+               font {
+                   family: "Arial"
+                   pixelSize: Math.floor(parent.height * 0.6)
+                   weight: Font.DemiBold
+               }
+            }
+        }
+    }
+
+    // 
+    // Default counter
+    // Only visible when PathPlan not active
+
+    SvgElementImage  {
+        sceneSize: info.sceneSize
+        elementName: "topbattery-total-distance-label"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan != 1
+    }
+
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "topbattery-total-distance-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan != 1
+
+        MouseArea { id: total_dist_mouseArea2; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: reset_distance()}
+
+        Text {
+            text:  total_distance > 1000 ? total_distance_km.toFixed(2) +" Km" : total_distance.toFixed(0)+" m"
+            anchors.right: parent.right
+            color: "cyan"
+
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1)
+                weight: Font.DemiBold
+            }
+        }
+
+        Timer {
+            interval: 1000; running: true; repeat: true;
+            onTriggered: {if (GPSPositionSensor.Status == 3) compute_distance(PositionState.East,PositionState.North)}
+        }
+    }
+
 
     SvgElementImage {
         id: mask_SatBar

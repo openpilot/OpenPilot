@@ -123,11 +123,42 @@ static float get_pid_scale_source_value()
     return value;
 }
 
+static bool is_roll_pid_thrust_scaled()
+{
+    uint8_t axes = stabSettings.stabBank.ThrustPIDScaleAxes;
+
+    return axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCH ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLL;
+}
+
+static bool is_pitch_pid_thrust_scaled()
+{
+    uint8_t axes = stabSettings.stabBank.ThrustPIDScaleAxes;
+
+    return axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCH ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_PITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_PITCH;
+}
+
+static bool is_yaw_pid_thrust_scaled()
+{
+    uint8_t axes = stabSettings.stabBank.ThrustPIDScaleAxes;
+
+    return axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_PITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_YAW;
+}
+
 static int is_pid_thrust_scaled_for_axis(int axis)
 {
     return stabSettings.stabBank.EnableThrustPIDScaling
-           && (axis == 0 // Roll
-               || axis == 1); // Pitch
+           && ((axis == 0 && is_roll_pid_thrust_scaled())
+               || (axis == 1 && is_pitch_pid_thrust_scaled())
+               || (axis == 2 && is_yaw_pid_thrust_scaled()));
 }
 
 static bool is_p_scaling_enabled()

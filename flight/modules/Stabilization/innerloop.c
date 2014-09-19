@@ -123,74 +123,6 @@ static float get_pid_scale_source_value()
     return value;
 }
 
-static bool is_roll_pid_thrust_scaled()
-{
-    uint8_t axes = stabSettings.stabBank.ThrustPIDScaleAxes;
-
-    return axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCHYAW ||
-           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCH ||
-           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLYAW ||
-           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLL;
-}
-
-static bool is_pitch_pid_thrust_scaled()
-{
-    uint8_t axes = stabSettings.stabBank.ThrustPIDScaleAxes;
-
-    return axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCHYAW ||
-           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCH ||
-           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_PITCHYAW ||
-           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_PITCH;
-}
-
-static bool is_yaw_pid_thrust_scaled()
-{
-    uint8_t axes = stabSettings.stabBank.ThrustPIDScaleAxes;
-
-    return axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCHYAW ||
-           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLYAW ||
-           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_PITCHYAW ||
-           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_YAW;
-}
-
-static int is_pid_thrust_scaled_for_axis(int axis)
-{
-    return stabSettings.stabBank.EnableThrustPIDScaling
-           && ((axis == 0 && is_roll_pid_thrust_scaled())
-               || (axis == 1 && is_pitch_pid_thrust_scaled())
-               || (axis == 2 && is_yaw_pid_thrust_scaled()));
-}
-
-static bool is_p_scaling_enabled()
-{
-    uint8_t target = stabSettings.stabBank.ThrustPIDScaleTarget;
-
-    return target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PID ||
-           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PI ||
-           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PD ||
-           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_P;
-}
-
-static bool is_i_scaling_enabled()
-{
-    uint8_t target = stabSettings.stabBank.ThrustPIDScaleTarget;
-
-    return target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PID ||
-           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PI ||
-           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_ID ||
-           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_I;
-}
-
-static bool is_d_scaling_enabled()
-{
-    uint8_t target = stabSettings.stabBank.ThrustPIDScaleTarget;
-
-    return target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PID ||
-           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PD ||
-           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_ID ||
-           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_D;
-}
-
 typedef struct pid_curve_scaler {
     float  x;
     pointf points[5];
@@ -210,7 +142,9 @@ static pid_scaler create_pid_scaler(int axis)
     // Always scaled with the this.
     scaler.p = scaler.i = scaler.d = speedScaleFactor;
 
-    if (is_pid_thrust_scaled_for_axis(axis)) {
+    if (stabSettings.thrust_pid_scaling_enabled[axis][0]
+        || stabSettings.thrust_pid_scaling_enabled[axis][1]
+        || stabSettings.thrust_pid_scaling_enabled[axis][2]) {
         const pid_curve_scaler curve_scaler = {
             .x      = get_pid_scale_source_value(),
             .points = {
@@ -224,13 +158,13 @@ static pid_scaler create_pid_scaler(int axis)
 
         float curve_value = pid_curve_value(&curve_scaler);
 
-        if (is_p_scaling_enabled()) {
+        if (stabSettings.thrust_pid_scaling_enabled[axis][0]) {
             scaler.p *= curve_value;
         }
-        if (is_i_scaling_enabled()) {
+        if (stabSettings.thrust_pid_scaling_enabled[axis][1]) {
             scaler.i *= curve_value;
         }
-        if (is_d_scaling_enabled()) {
+        if (stabSettings.thrust_pid_scaling_enabled[axis][2]) {
             scaler.d *= curve_value;
         }
     }

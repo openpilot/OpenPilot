@@ -146,6 +146,7 @@ static const filterPipeline *filterChain = NULL;
 static stateFilter magFilter;
 static stateFilter baroFilter;
 static stateFilter baroiFilter;
+static stateFilter velocityFilter;
 static stateFilter altitudeFilter;
 static stateFilter airFilter;
 static stateFilter stationaryFilter;
@@ -235,7 +236,10 @@ static const filterPipeline *ekf13Queue = &(filterPipeline) {
                 .filter = &baroFilter,
                 .next   = &(filterPipeline) {
                     .filter = &ekf13Filter,
-                    .next   = NULL,
+                    .next   = &(filterPipeline) {
+                        .filter = &velocityFilter,
+                        .next   = NULL,
+                    }
                 }
             }
         }
@@ -298,6 +302,7 @@ int32_t StateEstimationInitialize(void)
     stack_required = maxint32_t(stack_required, filterMagInitialize(&magFilter));
     stack_required = maxint32_t(stack_required, filterBaroiInitialize(&baroiFilter));
     stack_required = maxint32_t(stack_required, filterBaroInitialize(&baroFilter));
+    stack_required = maxint32_t(stack_required, filterVelocityInitialize(&velocityFilter));
     stack_required = maxint32_t(stack_required, filterAltitudeInitialize(&altitudeFilter));
     stack_required = maxint32_t(stack_required, filterAirInitialize(&airFilter));
     stack_required = maxint32_t(stack_required, filterStationaryInitialize(&stationaryFilter));

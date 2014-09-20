@@ -262,6 +262,23 @@ Item {
     // Battery Info (Top)
     // Only visible when PathPlan not active and Battery module enabled
 
+    SvgElementPositionItem {
+        id: topbattery_voltamp_bg
+        sceneSize: info.sceneSize
+        elementName: "topbattery-label-voltamp-bg"
+        
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+
+        Rectangle {
+            anchors.fill: parent
+            color:  FlightBatterySettings.NbCells > 0 ? info.batColors[SystemAlarms.Alarm_Battery] : "black"
+
+        }
+    }
+
     SvgElementImage  {
         sceneSize: info.sceneSize
         elementName: "topbattery-labels"
@@ -283,9 +300,7 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            color: info.batColors[SystemAlarms.Alarm_Battery]
-            border.color: info.batColors[SystemAlarms.Alarm_Battery]
-            border.width: topbattery_volt.width * 0.02
+            color: "transparent"
 
             Text {
                text: FlightBatteryState.Voltage.toFixed(2)
@@ -312,9 +327,7 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            color: info.batColors[SystemAlarms.Alarm_Battery]
-            border.color: info.batColors[SystemAlarms.Alarm_Battery]
-            border.width: topbattery_volt.width * 0.02
+            color: "transparent"
 
             Text {
                text: FlightBatteryState.Current.toFixed(2)

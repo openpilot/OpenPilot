@@ -47,10 +47,6 @@
 	<field name="ScaleToAirspeed" units="m/s" type="float" elements="1" defaultvalue="0"/>
 	<field name="ScaleToAirspeedLimits" units="" type="float" elementnames="Min,Max" defaultvalue="0.05,3"/>
 
-	<field name="EnableThrustPIDScaling" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
-	<field name="ThrustPIDScaleCurve" units="percent" type="float" elementnames="0,25,50,75,100" defaultvalue="0.3,0.15,0,-0.15,-0.3"/>
-	<field name="ThrustPIDScaleSource" units="" type="enum" elements="1" options="ManualControlThrottle,StabilizationDesiredThrust,ActuatorDesiredThrust" defaultvalue="ActuatorDesiredThrust" />
-
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 	<telemetryflight acked="true" updatemode="onchange" period="0"/>

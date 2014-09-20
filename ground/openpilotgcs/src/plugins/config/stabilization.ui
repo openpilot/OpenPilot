@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>839</width>
-    <height>785</height>
+    <width>882</width>
+    <height>789</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -136,8 +136,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>801</width>
-            <height>726</height>
+            <width>860</width>
+            <height>703</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -7836,8 +7836,8 @@ border-radius: 5;</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-299</y>
-            <width>801</width>
+            <y>0</y>
+            <width>844</width>
             <height>998</height>
            </rect>
           </property>
@@ -16207,7 +16207,7 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="3" rowspan="3">
+                 <item row="0" column="3" rowspan="3" alignment="Qt::AlignTop">
                   <widget class="QFrame" name="frame_2">
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
@@ -16836,7 +16836,7 @@ border-radius: 5;</string>
                     </item>
                     <item>
                      <widget class="QComboBox" name="ThrustPIDSource">
-                      <property name="Objrelation" stdset="0">
+                      <property name="objrelation" stdset="0">
                        <stringlist>
                         <string>objname:StabilizationSettingsBankX</string>
                         <string>fieldname:ThrustPIDScaleSource</string>
@@ -17961,7 +17961,7 @@ border-radius: 5;</string>
                       <property name="objrelation" stdset="0">
                        <stringlist>
                         <string>objname:StabilizationSettingsBankX</string>
-                        <string>fieldname:ThrustPIDScaleAxis</string>
+                        <string>fieldname:ThrustPIDScaleAxes</string>
                         <string>buttongroup:99</string>
                        </stringlist>
                       </property>
@@ -18103,8 +18103,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>817</width>
-            <height>699</height>
+            <width>860</width>
+            <height>703</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -24046,8 +24046,8 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>817</width>
-            <height>699</height>
+            <width>860</width>
+            <height>703</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">

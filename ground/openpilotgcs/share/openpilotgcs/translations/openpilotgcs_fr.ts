@@ -4283,7 +4283,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Arm switch (Accessory0)</source>
         <translatorcomment>Abbrégé  ?</translatorcomment>
-        <translation type="unfinished">Inter Arm. (Accessory0)</translation>
+        <translation>Inter Arm. (Accessory0)</translation>
     </message>
 </context>
 <context>
@@ -6440,7 +6440,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Thrust</source>
-        <translation type="unfinished">Poussée</translation>
+        <translation>Poussée</translation>
     </message>
     <message>
         <location/>
@@ -7487,19 +7487,9 @@ value as the Kp.</source>
     </message>
     <message>
         <location/>
-        <source>Weak Leveling / Axis Lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>buttongroup:10</source>
         <translatorcomment>pas toucher !</translatorcomment>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Weak Leveling Kp </source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -7541,32 +7531,8 @@ value as the Kp.</source>
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>Integral Limits</source>
-        <translation>Limites Intégrale</translation>
-    </message>
-    <message>
-        <location/>
-        <source>buttongroup:13</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>element:ILimit</source>
-        <translatorcomment>pas toucher !</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>ILimit Attitude</source>
-        <translatorcomment>pas toucher !</translatorcomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>ILimit Rate</source>
-        <translatorcomment>pas toucher !</translatorcomment>
-        <translation></translation>
+        <translation type="vanished">Limites Intégrale</translation>
     </message>
     <message>
         <location/>
@@ -7599,24 +7565,9 @@ value as the Kp.</source>
     </message>
     <message>
         <location/>
-        <source>GyroTau</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>AccelKp</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>fieldname:GyroTau</source>
         <translatorcomment>pas toucher !</translatorcomment>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>AccelKi</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -7955,9 +7906,8 @@ Useful if you have accidentally changed some settings.</source>
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>Misc</source>
-        <translation>Divers</translation>
+        <translation type="vanished">Divers</translation>
     </message>
     <message>
         <location/>
@@ -8124,11 +8074,6 @@ Useful if you have accidentally changed some settings.</source>
     </message>
     <message>
         <location/>
-        <source>ModeTransition</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;CP helis can set this to Reversed to automatically reverse the direction of thrust when inverted. Fixed pitch copters, including multicopters, should leave this set at Unreversed. Unreversed direction with Boosted power may be dangerous because it adds power and the thrust direction moves the aircraft towards the ground.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Les hélicos CP peuvent régler ceci à Reversed pour inverser automatiquement la direction de la poussée en vol dos. Les hélicos à pas fixe, multicoptères inclus, doivent laisser ce paramètre à Unreversed. L&apos;association du paramètre Unreversed avec Boosted ci-dessous peut-être dangereuse car elle ajoute de la puissance et la direction de la poussée déplace l&apos;appareil vers le sol.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -8240,14 +8185,57 @@ Useful if you have accidentally changed some settings.</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Temps de réponse du moteur pour passer de la poussée minimum à la poussée maximum. Cela permet une anticipation lors de l&apos;entrée/sortie du mode inversé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KI) that is used in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KI) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KI) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KI) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KI) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KI) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KI) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>Weak Leveling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:25</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weak Leveling Gain </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Axis Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:31</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode Transition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accel I</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Gyro Noise Filtering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accel P</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10364,26 +10352,26 @@ Voulez-vous toujours continuer ?</translation>
 <context>
     <name>ConfigInputWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+366"/>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+369"/>
         <source>http://wiki.openpilot.org/x/04Cf</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
         <translation>http://wiki.openpilot.org/x/aIBqAQ</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+1056"/>
+        <location line="+1140"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
         <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1055"/>
+        <location line="-1139"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+172"/>
+        <location line="+228"/>
         <source>Welcome to the inputs configuration wizard.
 
 Please follow the instructions on the screen and only move your controls when asked to.
@@ -10503,7 +10491,7 @@ If your FlightMode switch has only two positions, leave it in either position.</
 Si votre interrupteur de Mode de Vol a seulement deux positions, laissez-le dans n&apos;importe quelle position.</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+6"/>
         <source>Please move all controls to their maximum extents on both directions.
 
 Press Next when ready.</source>
@@ -10512,12 +10500,12 @@ Press Next when ready.</source>
 Appuyez sur Suivant lorsque vous êtes prêt.</translation>
     </message>
     <message>
-        <location line="+37"/>
+        <location line="+36"/>
         <source>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</source>
         <translation>Veuillez vérifier l&apos;image ci-dessous et corriger les manches qui s&apos;affichent en sens inverse. Appuyer sur Suivant lorsque vous êtes prêt.</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+7"/>
         <source>You have completed this wizard, please check below if the picture mimics your sticks movement.
 
 IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings tab where you can set your desired arming sequence and save the configuration.</source>
@@ -10526,7 +10514,7 @@ IMPORTANT: These new settings have not been saved to the board yet. After pressi
 IMPORTANT : Ces nouveaux paramètres ne sont pas encore enregistrés sur la carte. Après avoir appuyé sur Suivant vous serez dirigé vers l&apos;onglet Paramètres d&apos;Armement où vous pourrez choisir votre séquence d&apos;armement et enregistrer la configuration.</translation>
     </message>
     <message>
-        <location line="+116"/>
+        <location line="+124"/>
         <source>Please enable throttle hold mode.
 
 Move the Collective Pitch stick.</source>
@@ -10569,7 +10557,7 @@ Bougez le manche %1.</translation>
         <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+626"/>
+        <location line="+651"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
         <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
     </message>
@@ -11343,7 +11331,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+131"/>
         <source>Waiting for all OpenPilot boards to be disconnected from USB.</source>
-        <translation type="unfinished">Attente de la déconnexion de toutes les cartes connectées en USB.</translation>
+        <translation>Attente de la déconnexion de toutes les cartes connectées en USB.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -13461,7 +13449,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>UAVO</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
@@ -13499,22 +13487,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="-39"/>
         <source>UAVO(P)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Flights recorded:</source>
-        <translation type="unfinished">Vols enregistrés :</translation>
+        <translation>Vols enregistrés :</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Slots used/free:</source>
-        <translation type="unfinished">Emplacements utilisés/disponibles :</translation>
+        <translation>Emplacements utilisés/disponibles :</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Entries downloaded:</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrées téléchargées :</translation>
     </message>
     <message>
         <location line="+55"/>
@@ -13540,7 +13528,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+107"/>
         <source>UAVObject</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+21"/>
@@ -13650,12 +13638,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="-90"/>
         <source>Save Log Entries</source>
-        <translation type="unfinished">Enregistre Entrées Log</translation>
+        <translation>Enregistre Entrées Log</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Load Log Settings</source>
-        <translation type="unfinished">Charger Paramètres Log</translation>
+        <translation>Charger Paramètres Log</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -13719,7 +13707,7 @@ Veuillez vérifier le fichier.
     <message>
         <location line="+0"/>
         <source>Throttled</source>
-        <translation type="unfinished">Modifié + Ralenti</translation>
+        <translation>Modifié + Ralenti</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -13809,7 +13797,7 @@ Veuillez vérifier le fichier.
 <context>
     <name>ConfigStabilizationWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configstabilizationwidget.cpp" line="+63"/>
+        <location filename="../../../src/plugins/config/configstabilizationwidget.cpp" line="+62"/>
         <source>PID Bank %1</source>
         <translation>Banque PID %1</translation>
     </message>
@@ -13817,50 +13805,72 @@ Veuillez vérifier le fichier.
 <context>
     <name>ModelUavoProxy</name>
     <message>
-        <location filename="../../../src/plugins/opmap/modeluavoproxy.cpp" line="+80"/>
         <source>Path Plan Upload Successful</source>
-        <translation>Téléversement Réussi du Projet de Trajet</translation>
+        <translation type="vanished">Téléversement Réussi du Projet de Trajet</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>Path plan upload was successful.</source>
-        <translation>Le téléversement du projet de trajet est réussi.</translation>
+        <translation type="vanished">Le téléversement du projet de trajet est réussi.</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+238"/>
+        <location filename="../../../src/plugins/opmap/modeluavoproxy.cpp" line="+357"/>
         <source>Path Plan Upload Failed</source>
         <translation>Échec Téléversement Projet de Trajet</translation>
     </message>
     <message>
-        <location line="-238"/>
         <source>Failed to upload the path plan !</source>
-        <translation>Échec du téléversement du projet de trajet !</translation>
+        <translation type="vanished">Échec du téléversement du projet de trajet !</translation>
     </message>
     <message>
-        <location line="+37"/>
         <source>Path Plan Download Successful</source>
-        <translation>Téléchargement Projet de Trajet Réussi</translation>
+        <translation type="vanished">Téléchargement Projet de Trajet Réussi</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>Path plan download was successful.</source>
-        <translation>Le téléchargement du projet de trajet est réussi.</translation>
+        <translation type="vanished">Le téléchargement du projet de trajet est réussi.</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <location line="+190"/>
+        <location line="-8"/>
         <location line="+4"/>
         <source>Path Plan Download Failed</source>
         <translation>Échec Téléchargement Projet de Trajet</translation>
     </message>
     <message>
-        <location line="-194"/>
         <source>Failed to download the path plan !</source>
-        <translation>Échec du téléchargement du projet de trajet !</translation>
+        <translation type="vanished">Échec du téléchargement du projet de trajet !</translation>
     </message>
     <message>
-        <location line="+190"/>
+        <location line="-300"/>
+        <source>Sending the path plan to the board... </source>
+        <translation>Envoi du projet de trajet vers la carte... </translation>
+    </message>
+    <message>
+        <location line="+39"/>
+        <source>Sending Path Plan Failed!</source>
+        <translation>Échec Envoi Projet Trajet !</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Failed to send the path plan to the board.</source>
+        <translation>Échec de l&apos;envoi du projet de trajet.</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Receiving the path plan from the board... </source>
+        <translation>Réception du projet de trajet depuis la carte... </translation>
+    </message>
+    <message>
+        <location line="+58"/>
+        <source>Receiving Path Plan Failed!</source>
+        <translation>Échec Réception Projet Trajet !</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Failed to receive the path plan from the board.</source>
+        <translation>Échec de la réception du projet de trajet depuis la carte.</translation>
+    </message>
+    <message>
+        <location line="+191"/>
         <source>Path plan way point count error !</source>
         <translation>Erreur sur le nombre de waypoints dans le projet de trajet !</translation>
     </message>
@@ -14021,7 +14031,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <translation type="unfinished">Personnalisé</translation>
     </message>
     <message>
-        <location line="+273"/>
+        <location line="+289"/>
         <source>http://wiki.openpilot.org/x/44Cf</source>
         <translatorcomment>Lien Wiki FR</translatorcomment>
         <translation>http://wiki.openpilot.org/x/IIBqAQ</translation>
@@ -14066,7 +14076,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>OpenPilot::SixPointCalibrationModel</name>
     <message>
-        <location filename="../../../src/plugins/config/calibration/sixpointcalibrationmodel.cpp" line="+59"/>
+        <location filename="../../../src/plugins/config/calibration/sixpointcalibrationmodel.cpp" line="+60"/>
         <source>Place horizontally, nose pointing north and press Save Position...</source>
         <translation>Positionner horizontalement, le nez en direction du nord et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
@@ -14096,7 +14106,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <translation>Positionner avec le flanc gauche vers le bas, le nez vers le sud et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+19"/>
         <source>Place horizontally and press Save Position...</source>
         <translation>Positionner horizontalement et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
@@ -14126,7 +14136,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <translation>Positionner le flanc gauche vers le bas et cliquer sur le bouton Enregistrer Position...</translation>
     </message>
     <message>
-        <location line="+44"/>
+        <location line="+50"/>
         <source>Home location not set, please set your home location and retry.</source>
         <translation>Position Home non définie, veuillez régler votre position Home et essayez à nouveau.</translation>
     </message>
@@ -14136,12 +14146,12 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <translation>Étalonnage abandonné !</translation>
     </message>
     <message>
-        <location line="+120"/>
+        <location line="+152"/>
         <source>Hold...</source>
         <translation>Maintenir en position...</translation>
     </message>
     <message>
-        <location line="+214"/>
+        <location line="+224"/>
         <source>Magnetometer calibration completed successfully.</source>
         <translation>Étalonnage du magnétomètre terminé avec succès.</translation>
     </message>

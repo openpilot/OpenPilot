@@ -103,7 +103,7 @@ static filterResult filter(__attribute__((unused)) stateFilter *self, stateEstim
         GPSPositionSensorGet(&gpsdata);
 
         // check if we have a valid GPS signal (not checked by StateEstimation istelf)
-        if ((gpsdata.PDOP < this->settings.MaxPDOP) && (gpsdata.Satellites >= this->settings.MinSattelites) &&
+        if ((gpsdata.PDOP < this->settings.MaxPDOP) && (gpsdata.Satellites >= this->settings.MinSatellites) &&
             (gpsdata.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
             (gpsdata.Latitude != 0 || gpsdata.Longitude != 0)) {
             int32_t LLAi[3] = {

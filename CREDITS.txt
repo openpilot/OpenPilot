@@ -12,6 +12,7 @@ Pete Boehl
 Berkely Brown
 Joel Brueziere
 Thierry Bugeat
+Samuel Brugger
 Glenn Campigli
 David Carlson
 Mike Carr
@@ -45,6 +46,7 @@ Patrick Huebner
 Ryan Hunt
 Mark James
 Michael Johnston
+Stefan Karlsson
 Ricky King
 Thorsten Klose
 Karl Knutsson

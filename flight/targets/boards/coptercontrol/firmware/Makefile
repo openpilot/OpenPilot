@@ -76,6 +76,7 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
+    SRC += $(FLIGHTLIB)/auxmagsupport.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/accessorydesired.c
@@ -128,6 +129,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/airspeedstate.c
     SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
     SRC += $(OPUAVSYNTHDIR)/perfcounter.c
+    SRC += $(OPUAVSYNTHDIR)/auxmagsensor.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

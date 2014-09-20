@@ -90,10 +90,8 @@
 
 struct Globals {
     struct pid PIDposH[2];
-    float PIDposHLeakAlpha;
     struct pid PIDposV;
     struct pid PIDvel[3];
-    float PIDposVLeakAlpha;
     struct pid PIDcourse;
     struct pid PIDspeed;
     struct pid PIDpower;
@@ -347,9 +345,7 @@ static uint8_t updateAutoPilotFixedWing()
 {
     pid_configure(&global.PIDposH[0], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
     pid_configure(&global.PIDposH[1], fixedWingPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
-    global.PIDposHLeakAlpha = 1.0f;
     pid_configure(&global.PIDposV, fixedWingPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
-    global.PIDposVLeakAlpha = 1.0f;
     updatePathVelocity(fixedWingPathFollowerSettings.CourseFeedForward, true);
     return updateFixedDesiredAttitude();
 }
@@ -380,16 +376,14 @@ static uint8_t updateAutoPilotVtol()
     }
 
     // vertical positon control PID loops works the same in both regular and fallback modes, setup according to settings
-    pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosPI.Kp, vtolPathFollowerSettings.VerticalPosPI.Ki, 0.0f, vtolPathFollowerSettings.VerticalPosPI.ILimit);
-    global.PIDposVLeakAlpha = vtolPathFollowerSettings.VerticalPosPI.ILeak;
+    pid_configure(&global.PIDposV, vtolPathFollowerSettings.VerticalPosP, 0.0f, 0.0f, 0.0f);
 
     switch (followermode) {
     case FOLLOWER_REGULAR:
     {
         // horizontal position control PID loop works according to settings in regular mode, allowing integral terms
-        pid_configure(&global.PIDposH[0], vtolPathFollowerSettings.HorizontalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
-        pid_configure(&global.PIDposH[1], vtolPathFollowerSettings.HorizontalPosPI.Kp, vtolPathFollowerSettings.HorizontalPosPI.Ki, 0.0f, vtolPathFollowerSettings.HorizontalPosPI.ILimit);
-        global.PIDposHLeakAlpha = vtolPathFollowerSettings.HorizontalPosPI.ILeak;
+        pid_configure(&global.PIDposH[0], vtolPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
+        pid_configure(&global.PIDposH[1], vtolPathFollowerSettings.HorizontalPosP, 0.0f, 0.0f, 0.0f);
         updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, false);
 
         // yaw behaviour is configurable in vtolpathfollower, select yaw control algorithm
@@ -425,7 +419,6 @@ static uint8_t updateAutoPilotVtol()
         // fallback loop only cares about intended horizontal flight direction, simplify control behaviour accordingly
         pid_configure(&global.PIDposH[0], 1.0f, 0.0f, 0.0f, 0.0f);
         pid_configure(&global.PIDposH[1], 1.0f, 0.0f, 0.0f, 0.0f);
-        global.PIDposVLeakAlpha = 1.0f;
         updatePathVelocity(vtolPathFollowerSettings.CourseFeedForward, true);
 
         // emergency follower has no return value
@@ -662,14 +655,11 @@ static void updatePathVelocity(float kFF, bool limited)
         // calculate correction
         velocityDesired.North += pid_apply(&global.PIDposH[0], progress.correction_vector[0], dT);
         velocityDesired.East  += pid_apply(&global.PIDposH[1], progress.correction_vector[1], dT);
-        global.PIDposH[0].iAccumulator *= global.PIDposHLeakAlpha;
-        global.PIDposH[1].iAccumulator *= global.PIDposHLeakAlpha;
     }
     velocityDesired.Down += pid_apply(&global.PIDposV, progress.correction_vector[2], dT);
-    global.PIDposV.iAccumulator *= global.PIDposVLeakAlpha;
 
     // update pathstatus
-    pathStatus.error = progress.error;
+    pathStatus.error      = progress.error;
     pathStatus.fractional_progress  = progress.fractional_progress;
     pathStatus.path_direction_north = progress.path_vector[0];
     pathStatus.path_direction_east  = progress.path_vector[1];

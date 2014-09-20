@@ -92,14 +92,14 @@ public:
         UAVObject::Metadata accelStateMetadata;
         UAVObject::Metadata magSensorMetadata;
         UAVObject::Metadata auxMagSensorMetadata;
-        AuxMagSettings::DataFields auxMagSettings;
+        AuxMagSettings::DataFields    auxMagSettings;
         RevoCalibration::DataFields   revoCalibrationData;
         AccelGyroSettings::DataFields accelGyroSettingsData;
     } Memento;
 
     typedef struct {
         RevoCalibration::DataFields   revoCalibrationData;
-        AuxMagSettings::DataFields auxMagSettingsData;
+        AuxMagSettings::DataFields    auxMagSettingsData;
         AccelGyroSettings::DataFields accelGyroSettingsData;
     } Result;
 

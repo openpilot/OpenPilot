@@ -52,10 +52,10 @@ void handleGPS()
             PIOS_UBX_DDC_ReadData(PIOS_I2C_GPS, buffer, toRead);
 
             uint8_t *lastSentence;
-            static uint16_t lastSentenceLenght;
-            completeSentenceSent = ubx_getLastSentence(buffer, toRead, &lastSentence, &lastSentenceLenght);
+            uint16_t lastSentenceLength;
+            completeSentenceSent = ubx_getLastSentence(buffer, toRead, &lastSentence, &lastSentenceLength);
             if (completeSentenceSent) {
-                toSend = (uint8_t)(lastSentence - buffer + lastSentenceLenght);
+                toSend = (uint8_t)(lastSentence - buffer + lastSentenceLength);
             } else {
                 lastUnsentData = 0;
             }

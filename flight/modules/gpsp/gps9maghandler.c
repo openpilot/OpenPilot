@@ -47,7 +47,7 @@ void handleMag()
         magPkt.fragments.data.Z = mag[2];
         magPkt.fragments.data.status = 1;
         ubx_buildPacket(&magPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_MAG, sizeof(MagData));
-        PIOS_COM_SendBuffer(pios_com_main_id, magPkt.packet.bynarystream, sizeof(MagUbxPkt));
+        PIOS_COM_SendBuffer(pios_com_main_id, magPkt.packet.binarystream, sizeof(MagUbxPkt));
         return;
     }
 }

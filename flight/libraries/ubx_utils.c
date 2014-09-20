@@ -24,7 +24,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include <ubx_utils.h>
-bool ubx_getLastSentence(uint8_t *data, uint16_t bufferCount, uint8_t * *lastSentence, uint16_t *lenght)
+bool ubx_getLastSentence(uint8_t *data, uint16_t bufferCount, uint8_t * *lastSentence, uint16_t *length)
 {
     const uint8_t packet_overhead = UBX_HEADER_LEN + 2;
     uint8_t *current = data + bufferCount - packet_overhead;
@@ -36,7 +36,7 @@ bool ubx_getLastSentence(uint8_t *data, uint16_t bufferCount, uint8_t * *lastSen
             uint16_t len = current[4] + (current[5] << 8);
             if (len + packet_overhead + current <= data + bufferCount) {
                 *lastSentence = current;
-                *lenght = len + packet_overhead;
+                *length = len + packet_overhead;
                 return true;
             }
         }
@@ -68,7 +68,7 @@ void ubx_appendChecksum(UBXPacket_t *pkt)
 
     // From class field to the end of payload
     for (uint8_t i = 2; i < len + UBX_HEADER_LEN; i++) {
-        chkA += pkt->bynarystream[i];
+        chkA += pkt->binarystream[i];
         chkB += chkA;
     }
     ;

@@ -43,7 +43,7 @@ typedef struct {
 } __attribute__((packed)) UBXFooter_t;
 
 typedef union {
-    uint8_t bynarystream[0];
+    uint8_t binarystream[0];
     struct {
         UBXHeader_t header;
         uint8_t     payload[0];

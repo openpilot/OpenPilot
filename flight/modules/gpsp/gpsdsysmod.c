@@ -202,7 +202,7 @@ static void updateStats()
     sysPkt.fragments.data.options = SYS_DATA_OPTIONS_MAG | (flash_available() ? SYS_DATA_OPTIONS_FLASH : 0);
 
     ubx_buildPacket(&sysPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_SYS, sizeof(SysData));
-    PIOS_COM_SendBuffer(pios_com_main_id, sysPkt.packet.bynarystream, sizeof(SysUbxPkt));
+    PIOS_COM_SendBuffer(pios_com_main_id, sysPkt.packet.binarystream, sizeof(SysUbxPkt));
 }
 
 

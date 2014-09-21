@@ -245,7 +245,9 @@ static void gpsTask(__attribute__((unused)) void *parameters)
         if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
             char *buffer   = 0;
             uint16_t count = 0;
-            ubx_autoconfig_run(&buffer, &count);
+            uint8_t status;
+            GPSPositionSensorStatusGet(&status);
+            ubx_autoconfig_run(&buffer, &count, status != GPSPOSITIONSENSOR_STATUS_NOGPS);
             // Something to send?
             if (count) {
                 PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);

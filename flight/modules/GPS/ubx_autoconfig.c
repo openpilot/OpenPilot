@@ -46,6 +46,7 @@ typedef enum {
 typedef struct {
     initSteps_t        currentStep; // Current configuration "fsm" status
     uint32_t           lastStepTimestampRaw; // timestamp of last operation
+    uint32_t           lastConnectedRaw; // timestamp of last time gps was connected
     UBXSentPacket_t    working_packet; // outbound "buffer"
     ubx_autoconfig_settings_t currentSettings;
     int8_t lastConfigSent; // index of last configuration string sent
@@ -279,15 +280,38 @@ static void enable_sentences(__attribute__((unused)) uint16_t *bytes_to_send)
     }
 }
 
-void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
+void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connected)
 {
     *bytes_to_send = 0;
     *buffer = (char *)status->working_packet.buffer;
-    if (!status || !enabled) {
+    if (!status || !enabled || status->currentStep == INIT_STEP_DISABLED) {
         return; // autoconfig not enabled
     }
+
+    // when gps is disconnected it will replay the autoconfig sequence.
+    if (!gps_connected) {
+        if (status->currentStep == INIT_STEP_DONE) {
+            // if some operation is in progress and it is not running into issues it maybe that
+            // the disconnection is only due to wrong message rates, so reinit only when done.
+            // errors caused by disconnection are handled by error retry logic
+            if (PIOS_DELAY_DiffuS(status->lastConnectedRaw) > UBX_CONNECTION_TIMEOUT) {
+                status->currentStep = INIT_STEP_START;
+                return;
+            }
+        }
+    } else {
+        // reset connection timer
+        status->lastConnectedRaw = PIOS_DELAY_GetRaw();
+    }
+
     switch (status->currentStep) {
-    case INIT_STEP_ERROR: // TODO: what to do? retries after a while? maybe gps was disconnected (this can be detected)?
+    case INIT_STEP_ERROR:
+        if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) > UBX_ERROR_RETRY_TIMEOUT) {
+            status->currentStep = INIT_STEP_START;
+            status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
+        }
+        return;
+
     case INIT_STEP_DISABLED:
     case INIT_STEP_DONE:
         return;
@@ -348,6 +372,7 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send)
             status->retryCount++;
             if (status->retryCount > UBX_MAX_RETRIES) {
                 status->currentStep = INIT_STEP_ERROR;
+                status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
                 return;
             }
         }
@@ -374,12 +399,16 @@ void ubx_autoconfig_set(ubx_autoconfig_settings_t config)
         status->currentSettings = config;
         status->currentStep     = INIT_STEP_START;
         enabled = true;
+    } else {
+        if (!status) {
+            status->currentStep = INIT_STEP_DISABLED;
+        }
     }
 }
 
 int32_t ubx_autoconfig_get_status()
 {
-    if (!status) {
+    if (!status || !enabled) {
         return UBX_AUTOCONFIG_STATUS_DISABLED;
     }
     switch (status->currentStep) {

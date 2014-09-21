@@ -36,8 +36,8 @@
 #include "mixercurvepoint.h"
 #include "mixercurvewidget.h"
 
-MixerNode::MixerNode(MixerCurveWidget *graphWidget)
-    : m_graph(graphWidget)
+MixerNode::MixerNode(MixerCurveWidget *graphWidget, QGraphicsItem* graphItem)
+    : m_graph(graphWidget), m_graphItem(graphItem)
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
@@ -136,7 +136,7 @@ void MixerNode::verticalMove(bool flag)
 
 double MixerNode::value()
 {
-    double h     = m_graph->sceneRect().height();
+    double h     = m_graphItem->boundingRect().height();
     double ratio = (h - pos().y()) / h;
 
     return ((m_graph->getMax() - m_graph->getMin()) * ratio) + m_graph->getMin();
@@ -146,7 +146,7 @@ double MixerNode::value()
 QVariant MixerNode::itemChange(GraphicsItemChange change, const QVariant &val)
 {
     QPointF newPos = val.toPointF();
-    double h = m_graph->sceneRect().height();
+    double h = m_graphItem->boundingRect().height();
 
     switch (change) {
     case ItemPositionChange:

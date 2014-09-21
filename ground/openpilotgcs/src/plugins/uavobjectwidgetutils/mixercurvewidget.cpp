@@ -60,7 +60,7 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) :
 
     setFrameStyle(QFrame::NoFrame);
     setStyleSheet("background:transparent");
-
+    setRenderHint(QPainter::HighQualityAntialiasing, true);
     QGraphicsScene *scene  = new QGraphicsScene(this);
     QSvgRenderer *renderer = new QSvgRenderer();
     m_plot = new QGraphicsSvgItem();
@@ -149,7 +149,7 @@ void MixerCurveWidget::initNodes(int numPoints)
     // Create the nodes and edges
     MixerNode *prevNode = 0;
     for (int i = 0; i < numPoints; i++) {
-        MixerNode *node = new MixerNode(this);
+        MixerNode *node = new MixerNode(this, m_plot);
 
         m_nodeList.append(node);
         scene()->addItem(node);
@@ -183,7 +183,6 @@ void MixerCurveWidget::setupYAxisLabel()
             m_yAxisTextItem->setPlainText(m_yAxisString);
         } else {
             m_yAxisTextItem = new QGraphicsTextItem(m_yAxisString, m_plot);
-            // m_yAxisTextItem->setTransformOriginPoint(m_yAxisTextItem->boundingRect().height(), m_yAxisTextItem->boundingRect().left());
             m_yAxisTextItem->setRotation(270);
             scene()->addItem(m_yAxisTextItem);
         }

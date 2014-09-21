@@ -45,7 +45,7 @@ class UAVOBJECTWIDGETUTILS_EXPORT MixerNode : public QObject, public QGraphicsIt
     Q_OBJECT
                                   Q_INTERFACES(QGraphicsItem)
 public:
-    MixerNode(MixerCurveWidget *graphWidget);
+    MixerNode(MixerCurveWidget *graphWidget, QGraphicsItem* graphItem);
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
 
@@ -103,6 +103,7 @@ private:
     QList<Edge *> m_edgeList;
     QPointF m_newPos;
     MixerCurveWidget *m_graph;
+    QGraphicsItem* m_graphItem;
 
     qreal m_alpha;
     QColor m_positiveColor;

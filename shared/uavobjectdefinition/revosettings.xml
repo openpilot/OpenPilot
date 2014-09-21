@@ -18,7 +18,7 @@
 
 	<!-- Coefficient for velocity estimate post processing low pass filter
 	     - filters velocity bias based on delta position to compensate offsets coming from EKF -->
-	<field name="VelocityPostProcessingLowPassAlpha" units="" type="float" elements="1" defaultvalue="0.9999"/>
+	<field name="VelocityPostProcessingLowPassAlpha" units="" type="float" elements="1" defaultvalue="0.999"/>
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

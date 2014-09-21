@@ -219,7 +219,10 @@ static const filterPipeline *ekf13iQueue = &(filterPipeline) {
                 .filter = &stationaryFilter,
                 .next   = &(filterPipeline) {
                     .filter = &ekf13iFilter,
-                    .next   = NULL,
+                    .next   = &(filterPipeline) {
+                        .filter = &velocityFilter,
+                        .next   = NULL,
+                    }
                 }
             }
         }

@@ -58,6 +58,13 @@ pios_notify_notification PIOS_NOTIFY_GetActiveNotification(bool clear)
  */
 void PIOS_NOTIFICATION_Default_Ext_Led_Play(const LedSequence_t *sequence, pios_notify_priority priority)
 {
+    // alert and alarms are repeated if condition persists. bacground notification instead are set once, so try to prevent loosing any update
+    if (newNotification && priority != NOTIFY_PRIORITY_BACKGROUND) {
+        // prevent overwriting higher priority or background notifications
+        if (extLedNotification.priority == NOTIFY_PRIORITY_BACKGROUND || extLedNotification.priority > priority) {
+            return;
+        }
+    }
     extLedNotification.priority = priority;
     extLedNotification.sequence = *sequence;
     newNotification = true;

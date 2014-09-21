@@ -129,14 +129,15 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     connect(ui->enableThrustPIDScalingCheckBox, SIGNAL(toggled(bool)), ui->ThrustPIDTarget, SLOT(setEnabled(bool)));
     connect(ui->enableThrustPIDScalingCheckBox, SIGNAL(toggled(bool)), ui->ThrustPIDAxis, SLOT(setEnabled(bool)));
     connect(ui->enableThrustPIDScalingCheckBox, SIGNAL(toggled(bool)), ui->thrustPIDScalingCurve, SLOT(setEnabled(bool)));
-    ui->thrustPIDScalingCurve->setMixerType(MixerCurve::MIXERCURVE_TPA);
-    ui->thrustPIDScalingCurve->setMin(-1);
-    ui->thrustPIDScalingCurve->setMax(1);
+    ui->thrustPIDScalingCurve->setXAxisLabel(tr("Thrust"));
+    ui->thrustPIDScalingCurve->setYAxisLabel(tr("Scaling factor"));
+    ui->thrustPIDScalingCurve->setMin(-0.5);
+    ui->thrustPIDScalingCurve->setMax(0.5);
 
     addWidget(ui->defaultThrottleCurveButton);
     addWidget(ui->enableThrustPIDScalingCheckBox);
     addWidget(ui->thrustPIDScalingCurve);
-    addWidget(ui->thrustPIDScalingCurve->getCurveWidget());
+    addWidget(ui->thrustPIDScalingCurve);
     connect(this, SIGNAL(widgetContentsChanged(QWidget *)), this, SLOT(processLinkedWidgets(QWidget *)));
 
     connect(this, SIGNAL(autoPilotConnected()), this, SLOT(onBoardConnected()));
@@ -169,6 +170,7 @@ void ConfigStabilizationWidget::updateObjectsFromWidgets()
 void ConfigStabilizationWidget::updateThrottleCurveFromObject()
 {
     UAVObject *stabBank = getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
+
     Q_ASSERT(stabBank);
     qDebug() << "updatingCurveFromObject" << stabBank->getName();
 
@@ -194,13 +196,14 @@ void ConfigStabilizationWidget::updateThrottleCurveFromObject()
 void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
 {
     UAVObject *stabBank = getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
+
     Q_ASSERT(stabBank);
     qDebug() << "updatingObjectFromCurve" << stabBank->getName();
 
     UAVObjectField *field = stabBank->getField("ThrustPIDScaleCurve");
     Q_ASSERT(field);
 
-    QList<double> curve = ui->thrustPIDScalingCurve->getCurve();
+    QList<double> curve   = ui->thrustPIDScalingCurve->getCurve();
     for (quint32 i = 0; i < field->getNumElements(); i++) {
         field->setValue(curve.at(i), i);
         qDebug() << field->getName() << field->getElementNames().at(i) << "<=" << curve.at(i);
@@ -213,7 +216,8 @@ void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
 
 void ConfigStabilizationWidget::resetThrottleCurveToDefault()
 {
-    UAVDataObject *defaultStabBank = (UAVDataObject*)getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
+    UAVDataObject *defaultStabBank = (UAVDataObject *)getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
+
     Q_ASSERT(defaultStabBank);
     defaultStabBank = defaultStabBank->dirtyClone();
 

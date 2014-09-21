@@ -136,8 +136,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>860</width>
-            <height>703</height>
+            <width>844</width>
+            <height>726</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -7836,7 +7836,7 @@ border-radius: 5;</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-295</y>
             <width>844</width>
             <height>998</height>
            </rect>
@@ -16192,7 +16192,7 @@ border-radius: 5;</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_27">
                  <item row="0" column="1">
-                  <widget class="MixerCurve" name="thrustPIDScalingCurve" native="true">
+                  <widget class="MixerCurveWidget" name="thrustPIDScalingCurve" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                      <horstretch>0</horstretch>
@@ -16204,6 +16204,11 @@ border-radius: 5;</string>
                      <width>200</width>
                      <height>200</height>
                     </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <pointsize>7</pointsize>
+                    </font>
                    </property>
                   </widget>
                  </item>
@@ -27072,9 +27077,9 @@ Useful if you have accidentally changed some settings.</string>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>MixerCurve</class>
+   <class>MixerCurveWidget</class>
    <extends>QWidget</extends>
-   <header location="global">mixercurve.h</header>
+   <header location="global">mixercurvewidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

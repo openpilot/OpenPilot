@@ -52,7 +52,7 @@ public:
 
 
     /* Enumeration options for ThrottleCurves */
-    typedef enum { MIXERCURVE_THROTTLE = 0, MIXERCURVE_PITCH = 1, MIXERCURVE_TPA = 2 } MixerCurveType;
+    typedef enum { MIXERCURVE_THROTTLE = 0, MIXERCURVE_PITCH = 1 } MixerCurveType;
 
     void setMixerType(MixerCurveType curveType);
     void initCurve(const QList<double> *points);
@@ -67,6 +67,9 @@ public:
     double getCurveMax();
     double getCurveStep();
     double setRange(double min, double max);
+
+    void setXAxisLabel(QString label);
+    void setYAxisLabel(QString label);
 
     MixerCurveWidget *getCurveWidget()
     {

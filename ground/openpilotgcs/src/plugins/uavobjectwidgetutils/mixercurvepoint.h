@@ -59,27 +59,32 @@ public:
 
     void setPositiveColor(QColor color = "#609FF2")
     {
-        positiveColor = color;
+        m_positiveColor = color;
     }
 
     void setNegativeColor(QColor color = "#EF5F5F")
     {
-        negativeColor = color;
+        m_negativeColor = color;
+    }
+
+    void setAlpha(qreal alpha)
+    {
+        m_alpha = alpha;
     }
 
     void setImage(QImage img)
     {
-        image = img;
+        m_image = img;
     }
 
     void setDrawNode(bool draw)
     {
-        drawNode = draw;
+        m_drawNode = draw;
     }
 
     void setDrawText(bool draw)
     {
-        drawText = draw;
+        m_drawText = draw;
     }
 
     QRectF boundingRect() const;
@@ -95,22 +100,23 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    QList<Edge *> edgeList;
-    QPointF newPos;
-    MixerCurveWidget *graph;
+    QList<Edge *> m_edgeList;
+    QPointF m_newPos;
+    MixerCurveWidget *m_graph;
 
-    QColor positiveColor;
-    QColor neutralColor;
-    QColor negativeColor;
-    QColor disabledColor;
-    QColor disabledTextColor;
+    qreal m_alpha;
+    QColor m_positiveColor;
+    QColor m_neutralColor;
+    QColor m_negativeColor;
+    QColor m_disabledColor;
+    QColor m_disabledTextColor;
 
-    QImage image;
+    QImage m_image;
 
-    bool vertical;
-    bool drawNode;
-    bool drawText;
-    int index;
+    bool m_vertical;
+    bool m_drawNode;
+    bool m_drawText;
+    int m_index;
 };
 
 #endif // MIXERCURVEPOINT_H

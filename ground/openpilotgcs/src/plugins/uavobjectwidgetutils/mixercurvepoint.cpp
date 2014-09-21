@@ -37,32 +37,33 @@
 #include "mixercurvewidget.h"
 
 MixerNode::MixerNode(MixerCurveWidget *graphWidget)
-    : graph(graphWidget)
+    : m_graph(graphWidget)
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
-    vertical          = false;
-    drawNode          = true;
-    drawText          = true;
+    m_vertical          = false;
+    m_drawNode          = true;
+    m_drawText          = true;
 
-    positiveColor     = "#609FF2";  // blueish?
-    neutralColor      = "#14CE24";  // greenish?
-    negativeColor     = "#EF5F5F";  // redish?
-    disabledColor     = "#dddddd";
-    disabledTextColor = "#aaaaaa";
+    m_alpha             = 0.7;
+    m_positiveColor     = "#609FF2";  // blueish?
+    m_neutralColor      = "#14CE24";  // greenish?
+    m_negativeColor     = "#EF5F5F";  // redish?
+    m_disabledColor     = "#dddddd";
+    m_disabledTextColor = "#aaaaaa";
 }
 
 void MixerNode::addEdge(Edge *edge)
 {
-    edgeList << edge;
+    m_edgeList << edge;
     edge->adjust();
 }
 
 QList<Edge *> MixerNode::edges() const
 {
-    return edgeList;
+    return m_edgeList;
 }
 
 
@@ -83,18 +84,19 @@ void MixerNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 {
     QString text = QString().sprintf("%.2f", value());
 
-    painter->setFont(graph->font());
-    if (drawNode) {
+    painter->setFont(m_graph->font());
+    if (m_drawNode) {
         QRadialGradient gradient(-3, -3, 10);
 
         QColor color;
         if (value() < 0) {
-            color = negativeColor;
+            color = m_negativeColor;
         } else if (value() == 0) {
-            color = neutralColor;
+            color = m_neutralColor;
         } else {
-            color = positiveColor;
+            color = m_positiveColor;
         }
+        color.setAlphaF(m_alpha);
 
         if (option->state & QStyle::State_Sunken) {
             gradient.setCenter(3, 3);
@@ -104,23 +106,23 @@ void MixerNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             gradient.setColorAt(1, selColor.darker());
             gradient.setColorAt(0, selColor);
         } else {
-            gradient.setColorAt(0, graph->isEnabled() ? color : disabledColor);
-            gradient.setColorAt(1, graph->isEnabled() ? color.darker() : disabledColor);
+            gradient.setColorAt(0, m_graph->isEnabled() ? color : m_disabledColor);
+            gradient.setColorAt(1, m_graph->isEnabled() ? color.darker() : m_disabledColor);
         }
         painter->setBrush(gradient);
-        painter->setPen(graph->isEnabled() ? QPen(Qt::black, 0) : QPen(disabledTextColor));
+        painter->setPen(m_graph->isEnabled() ? QPen(Qt::black, 0) : QPen(m_disabledTextColor));
         painter->drawEllipse(boundingRect());
 
-        if (!image.isNull()) {
-            painter->drawImage(boundingRect().adjusted(1, 1, -1, -1), image);
+        if (!m_image.isNull()) {
+            painter->drawImage(boundingRect().adjusted(1, 1, -1, -1), m_image);
         }
     }
 
-    if (drawText) {
-        if (graph->isEnabled()) {
-            painter->setPen(QPen(drawNode ? Qt::white : Qt::black, 0));
+    if (m_drawText) {
+        if (m_graph->isEnabled()) {
+            painter->setPen(QPen(m_drawNode ? Qt::white : Qt::black, 0));
         } else {
-            painter->setPen(QPen(disabledTextColor));
+            painter->setPen(QPen(m_disabledTextColor));
         }
 
         painter->drawText((value() < 0) ? -10 : -8, 3, text);
@@ -129,27 +131,27 @@ void MixerNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 void MixerNode::verticalMove(bool flag)
 {
-    vertical = flag;
+    m_vertical = flag;
 }
 
 double MixerNode::value()
 {
-    double h     = graph->sceneRect().height();
+    double h     = m_graph->sceneRect().height();
     double ratio = (h - pos().y()) / h;
 
-    return ((graph->getMax() - graph->getMin()) * ratio) + graph->getMin();
+    return ((m_graph->getMax() - m_graph->getMin()) * ratio) + m_graph->getMin();
 }
 
 
 QVariant MixerNode::itemChange(GraphicsItemChange change, const QVariant &val)
 {
     QPointF newPos = val.toPointF();
-    double h = graph->sceneRect().height();
+    double h = m_graph->sceneRect().height();
 
     switch (change) {
     case ItemPositionChange:
     {
-        if (!vertical) {
+        if (!m_vertical) {
             break;
         }
 
@@ -169,12 +171,12 @@ QVariant MixerNode::itemChange(GraphicsItemChange change, const QVariant &val)
     }
     case ItemPositionHasChanged:
     {
-        foreach(Edge * edge, edgeList)
+        foreach(Edge * edge, m_edgeList)
         edge->adjust();
 
         update();
 
-        graph->itemMoved(value());
+        m_graph->itemMoved(value());
         break;
     }
     default:

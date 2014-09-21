@@ -96,14 +96,6 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
         m_mixerUI->CurveMax->setMinimum(-1.0);
         break;
     }
-    case MixerCurve::MIXERCURVE_TPA:
-    {
-        m_mixerUI->SettingsGroup->setTitle("Thrust PID Scale");
-        m_mixerUI->buttonGroup->hide();
-        m_curve->setRange(-1.0, 1.0);
-        m_mixerUI->CurveMin->setMinimum(-1.0);
-        m_mixerUI->CurveMax->setMinimum(-1.0);
-    }
     default:
         break;
     }
@@ -302,6 +294,16 @@ double MixerCurve::getMax()
 double MixerCurve::setRange(double min, double max)
 {
     return m_curve->setRange(min, max);
+}
+
+void MixerCurve::setXAxisLabel(QString label)
+{
+    m_curve->setXAxisLabel(label);
+}
+
+void MixerCurve::setYAxisLabel(QString label)
+{
+    m_curve->setYAxisLabel(label);
 }
 
 double MixerCurve::getCurveMin()

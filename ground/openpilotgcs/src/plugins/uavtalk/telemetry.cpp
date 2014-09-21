@@ -48,10 +48,12 @@ Telemetry::Telemetry(UAVTalk *utalk, UAVObjectManager *objMngr) : objMngr(objMng
     }
 
     // Listen to new object creations
-    connect(objMngr, SIGNAL(newObject(UAVObject *)), this, SLOT(newObject(UAVObject *)));
-    connect(objMngr, SIGNAL(newInstance(UAVObject *)), this, SLOT(newInstance(UAVObject *)));
+    // connection must be direct, if not, it is not possible to create and send (or request) an object in one go
+    connect(objMngr, SIGNAL(newObject(UAVObject *)), this, SLOT(newObject(UAVObject *)), Qt::DirectConnection);
+    connect(objMngr, SIGNAL(newInstance(UAVObject *)), this, SLOT(newInstance(UAVObject *)), Qt::DirectConnection);
 
     // Listen to transaction completions
+    // these slots will be executed in the telemetry thread
     // TODO should send a status (SUCCESS, FAILED, TIMEOUT)
     connect(utalk, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
 
@@ -568,12 +570,20 @@ void Telemetry::newObject(UAVObject *obj)
 {
     QMutexLocker locker(mutex);
 
+#ifdef VERBOSE_TELEMETRY
+    qDebug() << "Telemetry - new object" << obj->toStringBrief();
+#endif
+
     registerObject(obj);
 }
 
 void Telemetry::newInstance(UAVObject *obj)
 {
     QMutexLocker locker(mutex);
+
+#ifdef VERBOSE_TELEMETRY
+    qDebug() << "Telemetry - new object instance" << obj->toStringBrief();
+#endif
 
     registerObject(obj);
 }

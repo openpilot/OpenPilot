@@ -41,12 +41,25 @@
 
 /* Linux includes */
 #include <sys/time.h>
+#include <pthread.h>
 
 #define GRAV                 9.81f
 #define STACK_SIZE_BYTES     2048
 #define TASK_PRIORITY        (tskIDLE_PRIORITY + 4) // device driver
 /* in Hz */
 #define MPU_9150_SAMPLE_RATE 20
+
+/* internal data type */
+typedef struct mpu_9150_data_t_tag{
+	short raw_gyro[3];
+	short raw_accel[3];
+	long raw_quat[4];
+	short raw_mag[3];
+	long temperature; // in q16 format
+} mpu_9150_data_t;
+
+static mpu_9150_data_t mpu_current_data; // holds last read out or zeros at the beginning
+static pthread_mutex_t mpu_9150_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static xTaskHandle taskHandle;
 xQueueHandle queue;
@@ -161,15 +174,6 @@ int mpu_i2c_read(unsigned char slave_addr, unsigned char reg_addr, unsigned char
 	return 0;
 }
 
-/* internal data type */
-typedef struct mpu_9150_data_t_tag{
-	short raw_gyro[3];
-	short raw_accel[3];
-	long raw_quat[4];
-	short raw_mag[3];
-	long temperature; // in q16 format
-} mpu_9150_data_t;
-
 void mpu_print_data(mpu_9150_data_t *mpu_data)
 {
 	printf("gyro X[%05hi], Y[%05hi], Z[%05hi], accel X[%05hi], Y[%05hi], Z[%05hi]\n",
@@ -218,7 +222,6 @@ int mpu_read_data(mpu_9150_data_t *mpu_data)
  */
 static void mpuTask(__attribute__((unused)) void *parameters)
 {
-	mpu_9150_data_t mpu_data;
 	struct pios_mpu6000_data mpu6000_data;
 
 	/* no queue, no task, many problems */
@@ -228,21 +231,23 @@ static void mpuTask(__attribute__((unused)) void *parameters)
     }
 
 	while (1) {
-		if (mpu_read_data(&mpu_data) == 0) {
+		pthread_mutex_lock(&mpu_9150_mutex);
+		if (mpu_read_data(&mpu_current_data) == 0) {
 			// 180DEG rotation for Z
-			mpu6000_data.gyro_x = mpu_data.raw_gyro[0];
-			mpu6000_data.gyro_y = mpu_data.raw_gyro[1];
-			mpu6000_data.gyro_z = - mpu_data.raw_gyro[2];
+			mpu6000_data.gyro_x = mpu_current_data.raw_gyro[0];
+			mpu6000_data.gyro_y = mpu_current_data.raw_gyro[1];
+			mpu6000_data.gyro_z = - mpu_current_data.raw_gyro[2];
 #if defined(PIOS_MPU6000_ACCEL)
-			mpu6000_data.accel_x = mpu_data.raw_accel[0];
-			mpu6000_data.accel_y = mpu_data.raw_accel[1];
-			mpu6000_data.accel_z = - mpu_data.raw_accel[2];
+			mpu6000_data.accel_x = mpu_current_data.raw_accel[0];
+			mpu6000_data.accel_y = mpu_current_data.raw_accel[1];
+			mpu6000_data.accel_z = - mpu_current_data.raw_accel[2];
 #endif /* PIOS_MPU6000_ACCEL */
-			mpu6000_data.temperature = (int16_t) ((mpu_data.temperature & 0x00FFFF00) >> 8);
+			mpu6000_data.temperature = (int16_t) ((mpu_current_data.temperature & 0x00FFFF00) >> 8);
 
 			xQueueSendToBack(queue, (void *)&mpu6000_data, 0);
-//mpu_print_data(&mpu_data);
+//mpu_print_data(&mpu_current_data);
 		}
+		pthread_mutex_unlock(&mpu_9150_mutex);
 
 		//* Looks like vTaskDelay in posix works like sleep_ms() */
 		vTaskDelay(35);
@@ -250,20 +255,21 @@ static void mpuTask(__attribute__((unused)) void *parameters)
 }
 
 int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data *buffer) {
-	/* ******************************************
-	 * need to fix this function
-	 * stub for now
-	 * ******************************************/
+	if (NULL == buffer) {
+		return 0;
+	}
 
-	buffer->gyro_x = 0;
-	buffer->gyro_y = 0;
-	buffer->gyro_z = 0;
+	pthread_mutex_lock(&mpu_9150_mutex);
+	buffer->gyro_x = mpu_current_data.raw_gyro[0];
+	buffer->gyro_y = mpu_current_data.raw_gyro[1];
+	buffer->gyro_z = - mpu_current_data.raw_gyro[2];
 #if defined(PIOS_MPU6000_ACCEL)
-	buffer->accel_x = 0;
-	buffer->accel_y = 0;
-	buffer->accel_z = 0;
+	buffer->accel_x = mpu_current_data.raw_accel[0];
+	buffer->accel_y = mpu_current_data.raw_accel[1];
+	buffer->accel_z = - mpu_current_data.raw_accel[2];
 #endif /* PIOS_MPU6000_ACCEL */
-	buffer->temperature = 0;
+	buffer->temperature = (int16_t) ((mpu_current_data.temperature & 0x00FFFF00) >> 8);
+	pthread_mutex_unlock(&mpu_9150_mutex);
 
 	return 0;
 }

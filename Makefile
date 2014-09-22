@@ -638,7 +638,7 @@ uavo-collections_clean:
 #
 ##############################
 
-ALL_UNITTESTS := logfs
+ALL_UNITTESTS := logfs math
 
 # Build the directory for the unit tests
 UT_OUT_DIR := $(BUILD_DIR)/unit_tests

@@ -45,7 +45,7 @@ void ModelUavoProxy::sendPathPlan()
 {
     modelToObjects();
 
-    PathPlan *pathPlan = PathPlan::GetInstance(objMngr);
+    PathPlan *pathPlan      = PathPlan::GetInstance(objMngr);
 
     const int waypointCount = pathPlan->getWaypointCount();
     const int actionCount   = pathPlan->getPathActionCount();
@@ -98,6 +98,7 @@ void ModelUavoProxy::sendPathPlan()
 void ModelUavoProxy::receivePathPlan()
 {
     QProgressDialog progress(tr("Receiving the path plan from the board... "), "", 0, 0);
+
     progress.setWindowModality(Qt::WindowModal);
     progress.setCancelButton(NULL);
     progress.show();

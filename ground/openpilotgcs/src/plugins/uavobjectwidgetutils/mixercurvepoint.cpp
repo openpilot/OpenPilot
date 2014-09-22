@@ -36,7 +36,7 @@
 #include "mixercurvepoint.h"
 #include "mixercurvewidget.h"
 
-MixerNode::MixerNode(MixerCurveWidget *graphWidget, QGraphicsItem* graphItem)
+MixerNode::MixerNode(MixerCurveWidget *graphWidget, QGraphicsItem *graphItem)
     : m_graph(graphWidget), m_graphItem(graphItem)
 {
     setFlag(ItemIsMovable);

@@ -229,6 +229,66 @@ static void SettingsBankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     StabilizationBankSet(&stabSettings.stabBank);
 }
 
+static bool use_tps_for_roll()
+{
+    uint8_t axes = stabSettings.stabBank.ThrustPIDScaleAxes;
+
+    return axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCH ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLL;
+}
+
+static bool use_tps_for_pitch()
+{
+    uint8_t axes = stabSettings.stabBank.ThrustPIDScaleAxes;
+
+    return axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCH ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_PITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_PITCH;
+}
+
+static bool use_tps_for_yaw()
+{
+    uint8_t axes = stabSettings.stabBank.ThrustPIDScaleAxes;
+
+    return axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLPITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_ROLLYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_PITCHYAW ||
+           axes == STABILIZATIONBANK_THRUSTPIDSCALEAXES_YAW;
+}
+
+static bool use_tps_for_p()
+{
+    uint8_t target = stabSettings.stabBank.ThrustPIDScaleTarget;
+
+    return target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PI ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PD ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_P;
+}
+
+static bool use_tps_for_i()
+{
+    uint8_t target = stabSettings.stabBank.ThrustPIDScaleTarget;
+
+    return target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PI ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_ID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_I;
+}
+
+static bool use_tps_for_d()
+{
+    uint8_t target = stabSettings.stabBank.ThrustPIDScaleTarget;
+
+    return target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_PD ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_ID ||
+           target == STABILIZATIONBANK_THRUSTPIDSCALETARGET_D;
+}
+
 static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     StabilizationBankGet(&stabSettings.stabBank);
@@ -268,6 +328,24 @@ static void BankUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
                   stabSettings.stabBank.YawPI.Ki,
                   0,
                   stabSettings.stabBank.YawPI.ILimit);
+
+    bool tps_for_axis[3] = {
+        use_tps_for_roll(),
+        use_tps_for_pitch(),
+        use_tps_for_yaw()
+    };
+    bool tps_for_pid[3] = {
+        use_tps_for_p(),
+        use_tps_for_i(),
+        use_tps_for_d()
+    };
+    for (int axis = 0; axis < 3; axis++) {
+        for (int pid = 0; pid < 3; pid++) {
+            stabSettings.thrust_pid_scaling_enabled[axis][pid] = stabSettings.stabBank.EnableThrustPIDScaling
+                                                                 && tps_for_axis[axis]
+                                                                 && tps_for_pid[pid];
+        }
+    }
 }
 
 

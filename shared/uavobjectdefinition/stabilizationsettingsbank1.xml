@@ -14,6 +14,13 @@
 	<field name="RollPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
 	<field name="PitchPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
 	<field name="YawPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
+
+	<field name="EnableThrustPIDScaling" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+	<field name="ThrustPIDScaleCurve" units="percent" type="float" elementnames="0,25,50,75,100" defaultvalue="0.3,0.15,0,-0.15,-0.3"/>
+	<field name="ThrustPIDScaleSource" units="" type="enum" elements="1" options="ManualControlThrottle,StabilizationDesiredThrust,ActuatorDesiredThrust" defaultvalue="ActuatorDesiredThrust" />
+	<field name="ThrustPIDScaleTarget" units="" type="enum" elements="1" options="PID,PI,PD,ID,P,I,D" defaultvalue="PID" />
+	<field name="ThrustPIDScaleAxes" units="" type="enum" elements="1" options="Roll Pitch Yaw,Roll Pitch,Roll Yaw,Roll,Pitch Yaw,Pitch,Yaw" defaultvalue="Roll Pitch" />
+
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 	<telemetryflight acked="true" updatemode="onchange" period="0"/>

@@ -42,6 +42,8 @@
 #include <flightstatus.h>
 #include <manualcontrolcommand.h>
 #include <stabilizationbank.h>
+#include <stabilizationdesired.h>
+#include <actuatordesired.h>
 
 #include <stabilization.h>
 #include <relay_tuning.h>
@@ -80,6 +82,8 @@ void stabilizationInnerloopInit()
     StabilizationStatusInitialize();
     FlightStatusInitialize();
     ManualControlCommandInitialize();
+    StabilizationDesiredInitialize();
+    ActuatorDesiredInitialize();
 #ifdef REVOLUTION
     AirspeedStateInitialize();
     AirspeedStateConnectCallback(AirSpeedUpdatedCb);
@@ -93,6 +97,80 @@ void stabilizationInnerloopInit()
     PIOS_CALLBACKSCHEDULER_Schedule(callbackHandle, FAILSAFE_TIMEOUT_MS, CALLBACK_UPDATEMODE_LATER);
 }
 
+static float get_pid_scale_source_value()
+{
+    float value;
+
+    switch (stabSettings.stabBank.ThrustPIDScaleSource) {
+    case STABILIZATIONBANK_THRUSTPIDSCALESOURCE_MANUALCONTROLTHROTTLE:
+        ManualControlCommandThrottleGet(&value);
+        break;
+    case STABILIZATIONBANK_THRUSTPIDSCALESOURCE_STABILIZATIONDESIREDTHRUST:
+        StabilizationDesiredThrustGet(&value);
+        break;
+    case STABILIZATIONBANK_THRUSTPIDSCALESOURCE_ACTUATORDESIREDTHRUST:
+        ActuatorDesiredThrustGet(&value);
+        break;
+    default:
+        ActuatorDesiredThrustGet(&value);
+        break;
+    }
+
+    if (value < 0) {
+        value = 0.0f;
+    }
+
+    return value;
+}
+
+typedef struct pid_curve_scaler {
+    float  x;
+    pointf points[5];
+} pid_curve_scaler;
+
+static float pid_curve_value(const pid_curve_scaler *scaler)
+{
+    float y = y_on_curve(scaler->x, scaler->points, sizeof(scaler->points) / sizeof(scaler->points[0]));
+
+    return 1.0f + (IS_REAL(y) ? y : 0.0f);
+}
+
+static pid_scaler create_pid_scaler(int axis)
+{
+    pid_scaler scaler;
+
+    // Always scaled with the this.
+    scaler.p = scaler.i = scaler.d = speedScaleFactor;
+
+    if (stabSettings.thrust_pid_scaling_enabled[axis][0]
+        || stabSettings.thrust_pid_scaling_enabled[axis][1]
+        || stabSettings.thrust_pid_scaling_enabled[axis][2]) {
+        const pid_curve_scaler curve_scaler = {
+            .x      = get_pid_scale_source_value(),
+            .points = {
+                { 0.00f, stabSettings.stabBank.ThrustPIDScaleCurve[0] },
+                { 0.25f, stabSettings.stabBank.ThrustPIDScaleCurve[1] },
+                { 0.50f, stabSettings.stabBank.ThrustPIDScaleCurve[2] },
+                { 0.75f, stabSettings.stabBank.ThrustPIDScaleCurve[3] },
+                { 1.00f, stabSettings.stabBank.ThrustPIDScaleCurve[4] }
+            }
+        };
+
+        float curve_value = pid_curve_value(&curve_scaler);
+
+        if (stabSettings.thrust_pid_scaling_enabled[axis][0]) {
+            scaler.p *= curve_value;
+        }
+        if (stabSettings.thrust_pid_scaling_enabled[axis][1]) {
+            scaler.i *= curve_value;
+        }
+        if (stabSettings.thrust_pid_scaling_enabled[axis][2]) {
+            scaler.d *= curve_value;
+        }
+    }
+
+    return scaler;
+}
 
 /**
  * WARNING! This callback executes with critical flight control priority every
@@ -200,7 +278,8 @@ static void stabilizationInnerloopTask()
                                  -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t],
                                  StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
                                  );
-                actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], speedScaleFactor, rate[t], gyro_filtered[t], dT);
+                pid_scaler scaler = create_pid_scaler(t);
+                actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], &scaler, rate[t], gyro_filtered[t], dT);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
             default:

@@ -36,7 +36,7 @@ void yaffs_bug_fn(const char *file_name, int line_no);
 #define _Y(x) x
 
 #ifndef Y_LOFF_T
-#define Y_LOFF_T loff_t
+#define Y_LOFF_T uint32_t
 #endif
 
 #define yaffs_strcat(a, b)	strcat(a, b)

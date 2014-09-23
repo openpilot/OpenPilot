@@ -33,6 +33,7 @@
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <taskinfo.h>
+$include "yaffsfs.h"
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -118,6 +119,11 @@ void PIOS_Board_Init(void)
 {
     /* Delay system */
     PIOS_DELAY_Init();
+
+    // Initiaise the yaffs2 file system
+    if (yaffs_start_up()) {
+        PIOS_Assert(0);
+    }
 
     // Initialize dosfs fake flash logfs
     if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, NULL, NULL, 0)) {

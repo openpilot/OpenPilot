@@ -65,8 +65,6 @@ private:
 
 protected:
     void enableControls(bool enable);
-    void resizeEvent(QResizeEvent *);
-    void showEvent(QShowEvent *);
 
 private slots:
     virtual void setupUI(QString airframeType);

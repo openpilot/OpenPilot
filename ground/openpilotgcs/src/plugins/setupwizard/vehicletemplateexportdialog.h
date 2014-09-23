@@ -45,6 +45,7 @@ public:
 
 public slots:
     void accept();
+    void updateStatus();
 
 private slots:
     void importImage();
@@ -52,10 +53,13 @@ private slots:
 private:
     Ui::VehicleTemplateExportDialog *ui;
     UAVObjectManager *m_uavoManager;
-    QString setupVehicleType();
     VehicleConfigurationSource::VEHICLE_TYPE m_type;
     VehicleConfigurationSource::VEHICLE_SUB_TYPE m_subType;
     QPixmap m_image;
+
+    QString getTypeDirectory();
+    QString setupVehicleType();
+    QString fixFilenameString(QString input, int truncate = 100);
 };
 
 #endif // VEHICLETEMPLATEEXPORTDIALOG_H

@@ -1,4 +1,4 @@
-yaffs2 library
+yaffs2 library in flight/pios/common/libraries/yaffs2
 
 Implementation of core Yaffs Direct:
 	yaffs_allocator.c 	Allocates Yaffs object and tnode structures.
@@ -15,11 +15,17 @@ Implementation of core Yaffs Direct:
 	yaffs_hweight.c		Linux hweight implementation equivalent (Is this in OP TODO)
 	yaffs_list.c		Linked list implementation
 	yaffs_tarsmarshall.c
-Interface to Yaffs Direct:
-	yaffsfs.h		and interface structures and functions defined here
-Interface between Yaffs and OP:
+Interface between Yaffs and OP PiOS or Posix:
 	ydirectenv.h 		Environment wrappers for Yaffs direct to suit the OP firmware environment
 	yaffs_osglue.h		Interface for Yaffs to use to access OS method
-	yportenv.h		Low level defines
-Other:	
-	yafscfg.h
+Interface to Yaffs Direct:
+	yaffsfs.h		and interface structures and functions defined here
+
+POSIX Implementation in flight/pios/common/libraries/posix
+PiOS Implementation in flight/pios/common/libraries/PiOS
+
+CHANGE LOG:
+1. Initial import
+2. ydirectenv.h		Defined Y_LOFF_T to be uint32_t TODO change to largest required file size
+3. library.mk		Compiler defines to set yaffs2 diect mode and port options
+4. TODO			Define simposix version of yaffs_osglue.h methods

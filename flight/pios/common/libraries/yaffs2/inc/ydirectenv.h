@@ -20,6 +20,7 @@
 #ifndef __YDIRECTENV_H__
 #define __YDIRECTENV_H__
 
+#include "stdint.h"
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"

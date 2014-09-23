@@ -52,6 +52,9 @@ SystemStatsData systemStats;
 extern uint32_t pios_com_main_id;
 
 // Private constants
+#define SYSTEM_UPDATE_PERIOD_MS    1
+#define HB_LED_BLINK_ON_PERIOD_MS  100
+#define HB_LED_BLINK_OFF_PERIOD_MS 1900
 #define SYSTEM_UPDATE_PERIOD_MS 1
 
 #define STACK_SIZE_BYTES        450
@@ -128,16 +131,23 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
     PIOS_COM_ChangeBaud(pios_com_main_id, 115200);
     static TickType_t lastUpdate;
     setupGPS();
-    uint8_t counter = 0;
+    uint32_t ledTimer = 0;
     while (1) {
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SYSTEM);
 #endif
         // NotificationUpdateStatus();
         // Update the system statistics
-        if (!(++counter & 0x7F)) {
-            PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+        uint32_t ledPeriod = PIOS_DELAY_DiffuS(ledTimer) / 1000;
+        if (ledPeriod < HB_LED_BLINK_ON_PERIOD_MS) {
+            PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+        } else {
+            PIOS_LED_On(PIOS_LED_HEARTBEAT);
         }
+        if (ledPeriod > (HB_LED_BLINK_ON_PERIOD_MS + HB_LED_BLINK_OFF_PERIOD_MS)) {
+            ledTimer = PIOS_DELAY_GetRaw();
+        }
+
         vTaskDelayUntil(&lastUpdate, SYSTEM_UPDATE_PERIOD_MS * configTICK_RATE_HZ / 1000);
 
         handleGPS();

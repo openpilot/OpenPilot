@@ -43,11 +43,7 @@
 #include "inc/gps9gpshandler.h"
 #include "inc/gps9flashhandler.h"
 #include "inc/gps9protocol.h"
-
-// UAVOs
-#include <systemstats.h>
-
-SystemStatsData systemStats;
+#include "pios_board_info.h"
 
 extern uint32_t pios_com_main_id;
 
@@ -55,11 +51,9 @@ extern uint32_t pios_com_main_id;
 #define SYSTEM_UPDATE_PERIOD_MS    1
 #define HB_LED_BLINK_ON_PERIOD_MS  100
 #define HB_LED_BLINK_OFF_PERIOD_MS 1900
-#define SYSTEM_UPDATE_PERIOD_MS 1
-
-#define STACK_SIZE_BYTES        450
-#define STAT_RATE               1
-#define TASK_PRIORITY           (tskIDLE_PRIORITY + 2)
+#define STACK_SIZE_BYTES           450
+#define STAT_UPDATE_PERIOD_MS      5000
+#define TASK_PRIORITY              (tskIDLE_PRIORITY + 2)
 
 // Private types
 
@@ -67,12 +61,14 @@ extern uint32_t pios_com_main_id;
 static xTaskHandle systemTaskHandle;
 static enum { STACKOVERFLOW_NONE = 0, STACKOVERFLOW_WARNING = 1, STACKOVERFLOW_CRITICAL = 3 } stackOverflow;
 
-// Private functions
-static bool mallocFailed;
 
+static bool mallocFailed;
+static SysUbxPkt sysPkt;
+
+// Private functions
 static void updateStats();
 static void gpspSystemTask(void *parameters);
-
+static void readFirmwareInfo();
 /**
  * Create the module task.
  * \returns 0 on success or -1 if initialization failed
@@ -132,6 +128,9 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
     static TickType_t lastUpdate;
     setupGPS();
     uint32_t ledTimer = 0;
+
+    readFirmwareInfo();
+
     while (1) {
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SYSTEM);
@@ -198,23 +197,31 @@ uint16_t GetFreeIrqStackSize(void)
 static void updateStats()
 {
     static uint32_t lastUpdate;
-    static SysUbxPkt sysPkt;
 
-    if (PIOS_DELAY_DiffuS(lastUpdate) < 1000 * configTICK_RATE_HZ / STAT_RATE) {
+    if (PIOS_DELAY_DiffuS(lastUpdate) < STAT_UPDATE_PERIOD_MS * configTICK_RATE_HZ / 1000) {
         return;
     }
     lastUpdate = PIOS_DELAY_GetRaw();
-    // Get stats and update
-    sysPkt.fragments.data.flightTime        = xTaskGetTickCount() * portTICK_RATE_MS;
-    sysPkt.fragments.data.HeapRemaining     = xPortGetFreeHeapSize();
-    sysPkt.fragments.data.IRQStackRemaining = GetFreeIrqStackSize();
-    sysPkt.fragments.data.SystemModStackRemaining = uxTaskGetStackHighWaterMark(NULL) * 4;
-    sysPkt.fragments.data.options = SYS_DATA_OPTIONS_MAG | (flash_available() ? SYS_DATA_OPTIONS_FLASH : 0);
 
+    // Get stats and update
+    sysPkt.fragments.data.flightTime = xTaskGetTickCount() * portTICK_RATE_MS;
+    sysPkt.fragments.data.options    = SYS_DATA_OPTIONS_MAG | (flash_available() ? SYS_DATA_OPTIONS_FLASH : 0);
     ubx_buildPacket(&sysPkt.packet, UBX_OP_CUST_CLASS, UBX_OP_SYS, sizeof(SysData));
     PIOS_COM_SendBuffer(pios_com_main_id, sysPkt.packet.binarystream, sizeof(SysUbxPkt));
 }
 
+// retrieve firmware info and fill syspkt
+static void readFirmwareInfo()
+{
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
+
+    sysPkt.fragments.data.board_revision = bdinfo->board_rev;
+    sysPkt.fragments.data.board_type     = bdinfo->board_type;
+    struct fw_version_info *fwinfo = (struct fw_version_info *)(bdinfo->fw_base + bdinfo->fw_size);
+
+    memcpy(&sysPkt.fragments.data.commit_tag_name, &fwinfo->commit_tag_name, sizeof(sysPkt.fragments.data.commit_tag_name));
+    memcpy(&sysPkt.fragments.data.sha1sum, &fwinfo->commit_tag_name, sizeof(sysPkt.fragments.data.sha1sum));
+}
 
 /**
  * Called by the RTOS when the CPU is idle,

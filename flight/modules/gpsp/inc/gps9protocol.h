@@ -57,10 +57,11 @@ typedef union {
 
 typedef struct {
     uint32_t flightTime;
-    uint16_t HeapRemaining;
-    uint16_t IRQStackRemaining;
-    uint16_t SystemModStackRemaining;
     uint16_t options;
+    uint8_t  board_type;
+    uint8_t  board_revision;
+    uint8_t  commit_tag_name[26];
+    uint8_t  sha1sum[8];
 } __attribute__((packed)) SysData;
 
 typedef union {

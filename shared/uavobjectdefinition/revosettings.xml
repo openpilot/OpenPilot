@@ -15,6 +15,11 @@
               bias = a + b * temp + c * temp^2 + d * temp^3 --> 
         <field name="BaroTempCorrectionPolynomial" units="" type="float" elements="4" elementnames="a,b,c,d" defaultvalue="0,0,0,0"/>
         <field name="BaroTempCorrectionExtent" units="" type="float" elements="2" elementnames="min,max" defaultvalue="0,0"/>
+
+	<!-- Coefficient for velocity estimate post processing low pass filter
+	     - filters velocity bias based on delta position to compensate offsets coming from EKF -->
+	<field name="VelocityPostProcessingLowPassAlpha" units="" type="float" elements="1" defaultvalue="0.999"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

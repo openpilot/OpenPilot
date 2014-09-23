@@ -168,11 +168,29 @@ int main(int argc, char *argv[])
             }
             standardOutput << "Uploading..." << endl;
             bool retstatus = dfu.UploadFirmware(file.toLatin1(), verify, device);
+
             if (!retstatus) {
                 standardOutput << "Upload failed with code:" << retstatus << endl;
                 return -1;
             }
-            if (!description.isEmpty()) {
+            while (!dfu.isFinished()) {
+                QThread::msleep(500);
+            }
+            if (file.endsWith("opfw")) {
+                QByteArray firmware;
+                QFile fwfile(file);
+                if (!fwfile.open(QIODevice::ReadOnly)) {
+                    standardOutput << "Cannot open file " << file << endl;
+                    return -1;
+                }
+                firmware = fwfile.readAll();
+                QByteArray desc = firmware.right(100);
+                OP_DFU::Status status = dfu.UploadDescription(desc);
+                if (status != OP_DFU::Last_operation_Success) {
+                    standardOutput << "Upload failed with code:" << retstatus << endl;
+                    return -1;
+                }
+            } else if (!description.isEmpty()) {
                 retstatus = dfu.UploadDescription(description);
                 if (retstatus != OP_DFU::Last_operation_Success) {
                     standardOutput << "Upload failed with code:" << retstatus << endl;

@@ -343,11 +343,12 @@ struct UBX_MON_VER {
 // OP custom messages
 struct UBX_OP_SYSINFO {
     uint32_t flightTime;
-    uint16_t HeapRemaining;
-    uint16_t IRQStackRemaining;
-    uint16_t SystemModStackRemaining;
     uint16_t options;
-};
+    uint8_t  board_type;
+    uint8_t  board_revision;
+    uint8_t  commit_tag_name[26];
+    uint8_t  sha1sum[8];
+} __attribute__((packed));
 
 // OP custom messages
 struct UBX_OP_MAG {

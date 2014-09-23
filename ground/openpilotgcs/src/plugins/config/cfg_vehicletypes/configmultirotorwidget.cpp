@@ -150,6 +150,9 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
 
     // Connect the multirotor motor reverse checkbox
     connect(m_aircraft->MultirotorRevMixerCheckBox, SIGNAL(clicked(bool)), this, SLOT(reverseMultirotorMotor()));
+
+    m_aircraft->multiThrottleCurve->setXAxisLabel(tr("Input"));
+    m_aircraft->multiThrottleCurve->setYAxisLabel(tr("Output"));
     updateEnableControls();
 }
 

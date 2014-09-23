@@ -83,6 +83,7 @@ int SetupWizard::nextId() const
         case CONTROLLER_CC:
         case CONTROLLER_CC3D:
         case CONTROLLER_REVO:
+        case CONTROLLER_DISCOVERYF4:
             return PAGE_INPUT;
 
         case CONTROLLER_OPLINK:
@@ -141,6 +142,10 @@ int SetupWizard::nextId() const
         case CONTROLLER_REVO:
             return PAGE_BIAS_CALIBRATION;
 
+        case CONTROLLER_DISCOVERYF4:
+            // Skip calibration.
+            return PAGE_OUTPUT_CALIBRATION;
+
         default:
             return PAGE_NOTYETIMPLEMENTED;
         }
@@ -173,6 +178,9 @@ QString SetupWizard::getSummaryText()
         break;
     case CONTROLLER_OPLINK:
         summary.append(tr("OpenPilot OPLink Radio Modem"));
+        break;
+    case CONTROLLER_DISCOVERYF4:
+        summary.append(tr("OpenPilot DiscoveryF4 Development Board"));
         break;
     default:
         summary.append(tr("Unknown"));

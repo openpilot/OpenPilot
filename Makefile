@@ -638,7 +638,7 @@ uavo-collections_clean:
 #
 ##############################
 
-ALL_UNITTESTS := logfs
+ALL_UNITTESTS := logfs math
 
 # Build the directory for the unit tests
 UT_OUT_DIR := $(BUILD_DIR)/unit_tests
@@ -698,7 +698,8 @@ endif
 ##############################
 
 # Firmware files to package
-PACKAGE_FW_TARGETS  := $(filter-out fw_simposix fw_discoveryf4bare, $(FW_TARGETS))
+PACKAGE_FW_EXCLUDE  := fw_simposix $(if $(PACKAGE_FW_INCLUDE_DISCOVERYF4BARE),,fw_discoveryf4bare)
+PACKAGE_FW_TARGETS  := $(filter-out $(PACKAGE_FW_EXCLUDE), $(FW_TARGETS))
 PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.

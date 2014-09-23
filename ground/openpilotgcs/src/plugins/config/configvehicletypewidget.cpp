@@ -198,12 +198,27 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     // is not ideal, but there you go.
     QString frameType = field->getValue().toString();
 
-    int category = frameCategory(frameType);
+    // Always update custom tab from others airframe settings : debug/learn hardcoded mixers
+    int category = frameCategory("Custom");
     m_aircraft->aircraftType->setCurrentIndex(category);
 
     VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
+
     if (vehicleConfig) {
-        vehicleConfig->refreshWidgetsValues(frameType);
+        vehicleConfig->refreshWidgetsValues("Custom");
+    }
+
+    // Switch to Airframe currently used
+    category = frameCategory(frameType);
+
+    if (frameType != "Custom") {
+        m_aircraft->aircraftType->setCurrentIndex(category);
+
+        VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
+
+        if (vehicleConfig) {
+            vehicleConfig->refreshWidgetsValues(frameType);
+        }
     }
 
     updateFeedForwardUI();
@@ -252,7 +267,8 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
     vconfig->setMixerValue(mixer, "DecelTime", m_aircraft->decelTime->value());
     vconfig->setMixerValue(mixer, "MaxAccel", m_aircraft->maxAccelSlider->value());
 
-    // TODO call refreshWidgetsValues() to reflect actual saved values ?
+    // call refreshWidgetsValues() to reflect actual saved values
+    refreshWidgetsValues();
     updateFeedForwardUI();
 }
 

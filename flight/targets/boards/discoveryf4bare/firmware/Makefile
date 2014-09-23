@@ -34,8 +34,9 @@ USE_DSP_LIB ?= NO
 #MODULES += Altitude/revolution
 #MODULES += Airspeed
 #MODULES += AltitudeHold
-#MODULES += Stabilization
+MODULES += Stabilization
 MODULES += ManualControl
+MODULES += Receiver
 MODULES += Actuator
 MODULES += GPS
 MODULES += TxPID
@@ -86,6 +87,7 @@ ifndef TESTAPP
 	SRC += $(FLIGHTLIB)/plans.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
+    SRC += $(FLIGHTLIB)/auxmagsupport.c
 
     ## UAVObjects
     include ./UAVObjects.inc

@@ -94,6 +94,7 @@ bool InputPage::restartNeeded(VehicleConfigurationSource::INPUT_TYPE selectedTyp
         break;
     }
     case SetupWizard::CONTROLLER_REVO:
+    case SetupWizard::CONTROLLER_DISCOVERYF4:
     {
         switch (selectedType) {
         case VehicleConfigurationSource::INPUT_PWM:

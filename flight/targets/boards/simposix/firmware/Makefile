@@ -70,6 +70,8 @@ UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
 include $(PIOS)/common/libraries/FreeRTOS/library.mk
+include $(PIOS)/common/libraries/yaffs2/library.mk
+include $(PIOS)/common/libraries/yaffs2/posix_ramsim/posix_ramsim.mk
 #include $(FLIGHTLIB)/PyMite/pymite.mk
 
 # List C source files here. (C dependencies are automatically generated.)

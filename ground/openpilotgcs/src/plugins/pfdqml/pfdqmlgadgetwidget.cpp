@@ -74,7 +74,10 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
         "VtolPathFollowerSettings" <<
         "HwSettings" <<
         "ManualControlCommand" <<
-        "SystemSettings";
+        "SystemSettings" <<
+        "RevoSettings" <<
+        "MagState" <<
+        "FlightBatterySettings";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();

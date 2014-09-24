@@ -56,8 +56,8 @@
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
     m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
-    m_servoType(SERVO_UNKNOWN), m_calibrationPerformed(false), m_restartNeeded(false),
-    m_connectionManager(0)
+    m_servoType(SERVO_UNKNOWN), m_vehicleTemplate(NULL),
+    m_calibrationPerformed(false), m_restartNeeded(false), m_connectionManager(0)
 {
     setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);
@@ -68,6 +68,14 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfiguratio
     setMinimumSize(600, 600);
     resize(600, 600);
     createPages();
+}
+
+SetupWizard::~SetupWizard()
+{
+    if (m_vehicleTemplate != NULL) {
+        delete m_vehicleTemplate;
+        m_vehicleTemplate = NULL;
+    }
 }
 
 int SetupWizard::nextId() const
@@ -189,13 +197,10 @@ int SetupWizard::nextId() const
         case CONTROLLER_CC3D:
         case CONTROLLER_REVO:
         case CONTROLLER_NANO:
+        case CONTROLLER_DISCOVERYF4:
             switch (getVehicleType()) {
             case VEHICLE_FIXEDWING:
                 return PAGE_OUTPUT_CALIBRATION;
-
-        case CONTROLLER_DISCOVERYF4:
-            // Skip calibration.
-            return PAGE_OUTPUT_CALIBRATION;
 
             default:
                 return PAGE_BIAS_CALIBRATION;

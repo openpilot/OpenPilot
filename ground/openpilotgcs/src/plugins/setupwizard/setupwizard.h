@@ -40,6 +40,7 @@ class SetupWizard : public QWizard, public VehicleConfigurationSource {
 
 public:
     SetupWizard(QWidget *parent = 0);
+    ~SetupWizard();
     int nextId() const;
 
     void setControllerType(SetupWizard::CONTROLLER_TYPE type)
@@ -124,6 +125,15 @@ public:
         return m_radioSetting;
     }
 
+    void setVehicleTemplate(QJsonObject *templ)
+    {
+        m_vehicleTemplate = templ;
+    }
+    QJsonObject *getVehicleTemplate() const
+    {
+        return m_vehicleTemplate;
+    }
+
     void setLevellingBias(accelGyroBias bias)
     {
         m_calibrationBias = bias; m_calibrationPerformed = true;
@@ -192,6 +202,8 @@ private:
     AIRSPEED_TYPE m_airspeedType;
     GPS_TYPE m_gpsType;
     RADIO_SETTING m_radioSetting;
+
+    QJsonObject *m_vehicleTemplate;
 
     bool m_calibrationPerformed;
     accelGyroBias m_calibrationBias;

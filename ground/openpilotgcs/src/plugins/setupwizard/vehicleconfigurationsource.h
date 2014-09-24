@@ -29,6 +29,7 @@
 #define VEHICLECONFIGURATIONSOURCE_H
 
 #include <QString>
+#include <QJsonObject>
 #include "actuatorsettings.h"
 
 struct accelGyroBias {
@@ -77,8 +78,9 @@ public:
     virtual VehicleConfigurationSource::AIRSPEED_TYPE getAirspeedType() const = 0;
     virtual VehicleConfigurationSource::GPS_TYPE getGpsType() const     = 0;
     virtual VehicleConfigurationSource::RADIO_SETTING getRadioSetting() const = 0;
+    virtual QJsonObject *getVehicleTemplate() const  = 0;
 
-    virtual bool isCalibrationPerformed() const = 0;
+    virtual bool isCalibrationPerformed() const      = 0;
     virtual accelGyroBias getCalibrationBias() const = 0;
 
     virtual bool isMotorCalibrationPerformed() const = 0;

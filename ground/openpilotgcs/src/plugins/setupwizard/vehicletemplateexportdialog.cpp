@@ -43,12 +43,12 @@
 #include "stabilizationsettingsbank3.h"
 #include "ekfconfiguration.h"
 
-const char* VehicleTemplateExportDialog::EXPORT_BASE_NAME = "../share/openpilotgcs/cloudconfig";
-const char* VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME = "fixedwing";
-const char* VehicleTemplateExportDialog::EXPORT_MULTI_NAME = "multirotor";
-const char* VehicleTemplateExportDialog::EXPORT_HELI_NAME = "helicopter";
-const char* VehicleTemplateExportDialog::EXPORT_SURFACE_NAME = "surface";
-const char* VehicleTemplateExportDialog::EXPORT_CUSTOM_NAME = "custom";
+const char *VehicleTemplateExportDialog::EXPORT_BASE_NAME      = "../share/openpilotgcs/cloudconfig";
+const char *VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME = "fixedwing";
+const char *VehicleTemplateExportDialog::EXPORT_MULTI_NAME     = "multirotor";
+const char *VehicleTemplateExportDialog::EXPORT_HELI_NAME      = "helicopter";
+const char *VehicleTemplateExportDialog::EXPORT_SURFACE_NAME   = "surface";
+const char *VehicleTemplateExportDialog::EXPORT_CUSTOM_NAME    = "custom";
 
 VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     QDialog(parent),
@@ -165,11 +165,11 @@ QString VehicleTemplateExportDialog::setupVehicleType()
 QString VehicleTemplateExportDialog::fixFilenameString(QString input, int truncate)
 {
     return input.replace(' ', "").replace('|', "").replace('/', "")
-            .replace('\\', "").replace(':', "").replace('"', "")
-            .replace('\'', "").replace('?', "").replace('*', "")
-            .replace('>', "").replace('<', "")
-            .replace('}', "").replace('{', "")
-            .left(truncate);
+           .replace('\\', "").replace(':', "").replace('"', "")
+           .replace('\'', "").replace('?', "").replace('*', "")
+           .replace('>', "").replace('<', "")
+           .replace('}', "").replace('{', "")
+           .left(truncate);
 }
 
 
@@ -203,28 +203,29 @@ void VehicleTemplateExportDialog::accept()
     QByteArray bytes;
     QBuffer buffer(&bytes);
     buffer.open(QIODevice::WriteOnly);
-    m_image.scaled(IMAGE_SCALE_WIDTH, IMAGE_SCALE_HEIGHT, Qt::KeepAspectRatio).save(&buffer, "PNG");
-    exportObject["photo"] = bytes.toBase64().data();
+    m_image.scaled(IMAGE_SCALE_WIDTH, IMAGE_SCALE_HEIGHT, Qt::KeepAspectRatio,
+                   Qt::SmoothTransformation).save(&buffer, "PNG");
+    exportObject["photo"] = QString::fromLatin1(bytes.toBase64().data());
 
     QJsonDocument saveDoc(exportObject);
 
     QString fileName = QString("%1/%2/%3-%4-%5-%6.optmpl")
-            .arg(EXPORT_BASE_NAME)
-            .arg(getTypeDirectory())
-            .arg(fixFilenameString(ui->ForumNick->text(), 15))
-            .arg(fixFilenameString(ui->Name->text(), 20))
-            .arg(fixFilenameString(ui->Type->text(), 30))
-            .arg(fixFilenameString(QUuid::createUuid().toString().right(12)));
+                       .arg(EXPORT_BASE_NAME)
+                       .arg(getTypeDirectory())
+                       .arg(fixFilenameString(ui->ForumNick->text(), 15))
+                       .arg(fixFilenameString(ui->Name->text(), 20))
+                       .arg(fixFilenameString(ui->Type->text(), 30))
+                       .arg(fixFilenameString(QUuid::createUuid().toString().right(12)));
     QFile saveFile(fileName);
     QDir dir;
     dir.mkpath(QFileInfo(saveFile).absoluteDir().absolutePath());
     if (saveFile.open(QIODevice::WriteOnly)) {
         saveFile.write(saveDoc.toJson());
         saveFile.close();
-        QMessageBox::information(this, "Export", tr("Settings were exported to \n%1").arg(QFileInfo(saveFile).absoluteFilePath()),QMessageBox::Ok);
+        QMessageBox::information(this, "Export", tr("Settings were exported to \n%1").arg(QFileInfo(saveFile).absoluteFilePath()), QMessageBox::Ok);
     } else {
         QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1.\nPlease try again.")
-                                 .arg(QFileInfo(saveFile).absoluteFilePath()),QMessageBox::Ok);
+                                 .arg(QFileInfo(saveFile).absoluteFilePath()), QMessageBox::Ok);
     }
     QDialog::accept();
 }
@@ -243,15 +244,19 @@ void VehicleTemplateExportDialog::importImage()
 
 QString VehicleTemplateExportDialog::getTypeDirectory()
 {
-    switch(m_type) {
+    switch (m_type) {
     case VehicleConfigurationSource::VEHICLE_FIXEDWING:
         return EXPORT_FIXEDWING_NAME;
+
     case VehicleConfigurationSource::VEHICLE_MULTI:
         return EXPORT_MULTI_NAME;
+
     case VehicleConfigurationSource::VEHICLE_HELI:
         return EXPORT_HELI_NAME;
+
     case VehicleConfigurationSource::VEHICLE_SURFACE:
         return EXPORT_SURFACE_NAME;
+
     default:
         return EXPORT_CUSTOM_NAME;
     }
@@ -260,7 +265,6 @@ QString VehicleTemplateExportDialog::getTypeDirectory()
 void VehicleTemplateExportDialog::updateStatus()
 {
     ui->acceptBtn->setEnabled(ui->Name->text().length() > 3 && ui->Owner->text().length() > 2 &&
-            ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
-            ui->Weight->text().length() > 0);
-
+                              ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
+                              ui->Weight->text().length() > 0);
 }

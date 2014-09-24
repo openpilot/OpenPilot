@@ -29,6 +29,7 @@
 #define AIRFRAMEINITIALTUNINGPAGE_H
 
 #include "abstractwizardpage.h"
+#include <QJsonObject>
 
 namespace Ui {
 class AirframeInitialTuningPage;
@@ -40,9 +41,30 @@ class AirframeInitialTuningPage : public AbstractWizardPage {
 public:
     explicit AirframeInitialTuningPage(SetupWizard *wizard, QWidget *parent = 0);
     ~AirframeInitialTuningPage();
+    void initializePage();
+    bool validatePage();
+    bool isComplete() const;
+
+public slots:
+    void templateSelectionChanged();
+
+protected:
+    void resizeEvent(QResizeEvent *);
+    void showEvent(QShowEvent *);
 
 private:
     Ui::AirframeInitialTuningPage *ui;
+    const char *m_dir;
+    QMap<QString, QJsonObject *> m_templates;
+    QGraphicsPixmapItem *m_photoItem;
+
+    void loadValidFiles();
+    void setupTemplateList();
+    QString getTemplateKey(QJsonObject *templ);
+    void updatePhoto(QJsonObject *templ);
+    void updateDescription(QJsonObject *templ);
 };
+
+Q_DECLARE_METATYPE(QJsonObject *)
 
 #endif // AIRFRAMEINITIALTUNINGPAGE_H

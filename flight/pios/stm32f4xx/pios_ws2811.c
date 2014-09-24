@@ -342,6 +342,7 @@ void PIOS_WS2811_Update()
 
 void PIOS_WS2811_DMA_irq_handler()
 {
+    pios_ws2811_pin_cfg->gpio->BSRRH = dmaSource[0];
     pios_ws2811_cfg->timer->CR1 &= (uint16_t) ~TIM_CR1_CEN;
     DMA_ClearFlag(pios_ws2811_cfg->streamCh1, pios_ws2811_cfg->irq.flags);
     DMA_Cmd(pios_ws2811_cfg->streamCh2, DISABLE);

@@ -1,5 +1,5 @@
 /*
- * YAFFS: Yet another Flash File System . A NAND-flash specific file system. 
+ * YAFFS: Yet another Flash File System . A NAND-flash specific file system.
  *
  * Copyright (C) 2002-2011 Aleph One Ltd.
  *   for Toby Churchill Ltd and Brightstar Engineering
@@ -13,19 +13,12 @@
  * Note: Only YAFFS headers are LGPL, YAFFS C code is covered by GPL.
  */
 
-/*  NAND RAM Simulator for testing YAFFS */
 
-#ifndef __YAFFS_RAM_SIM_H__
-#define __YAFFS_RAM_SIM_H__
+#ifndef __YAFFS_NOR_DRV_H__
+#define __YAFFS_NOR_DRV_H__
 
-
-#include "yaffs_guts.h"
-
-#define N_RAM_SIM_DEVS  2
-
-struct yaffs_dev *yramsim_CreateRamSim(const YCHAR *name,
-						u32 devId, u32 nBlocks,
-						u32 start_block, u32 end_block);
+struct yaffs_dev;
+struct yaffs_dev *yaffs_nor_install_drv(const char *name);
 
 #endif
 

@@ -43,6 +43,13 @@
 #include "stabilizationsettingsbank3.h"
 #include "ekfconfiguration.h"
 
+const char* VehicleTemplateExportDialog::EXPORT_BASE_NAME = "../share/openpilotgcs/cloudconfig";
+const char* VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME = "fixedwing";
+const char* VehicleTemplateExportDialog::EXPORT_MULTI_NAME = "multirotor";
+const char* VehicleTemplateExportDialog::EXPORT_HELI_NAME = "helicopter";
+const char* VehicleTemplateExportDialog::EXPORT_SURFACE_NAME = "surface";
+const char* VehicleTemplateExportDialog::EXPORT_CUSTOM_NAME = "custom";
+
 VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::VehicleTemplateExportDialog)
@@ -196,12 +203,13 @@ void VehicleTemplateExportDialog::accept()
     QByteArray bytes;
     QBuffer buffer(&bytes);
     buffer.open(QIODevice::WriteOnly);
-    m_image.scaled(500, 500, Qt::KeepAspectRatio).save(&buffer, "PNG");
+    m_image.scaled(IMAGE_SCALE_WIDTH, IMAGE_SCALE_HEIGHT, Qt::KeepAspectRatio).save(&buffer, "PNG");
     exportObject["photo"] = bytes.toBase64().data();
 
     QJsonDocument saveDoc(exportObject);
 
-    QString fileName = QString("../share/openpilotgcs/cloudconfig/%1/%2-%3-%4-%5.optmpl")
+    QString fileName = QString("%1/%2/%3-%4-%5-%6.optmpl")
+            .arg(EXPORT_BASE_NAME)
             .arg(getTypeDirectory())
             .arg(fixFilenameString(ui->ForumNick->text(), 15))
             .arg(fixFilenameString(ui->Name->text(), 20))
@@ -214,6 +222,9 @@ void VehicleTemplateExportDialog::accept()
         saveFile.write(saveDoc.toJson());
         saveFile.close();
         QMessageBox::information(this, "Export", tr("Settings were exported to \n%1").arg(QFileInfo(saveFile).absoluteFilePath()),QMessageBox::Ok);
+    } else {
+        QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1.\nPlease try again.")
+                                 .arg(QFileInfo(saveFile).absoluteFilePath()),QMessageBox::Ok);
     }
     QDialog::accept();
 }
@@ -234,15 +245,15 @@ QString VehicleTemplateExportDialog::getTypeDirectory()
 {
     switch(m_type) {
     case VehicleConfigurationSource::VEHICLE_FIXEDWING:
-        return "fixedwing";
+        return EXPORT_FIXEDWING_NAME;
     case VehicleConfigurationSource::VEHICLE_MULTI:
-        return "multirotor";
+        return EXPORT_MULTI_NAME;
     case VehicleConfigurationSource::VEHICLE_HELI:
-        return "helicopter";
+        return EXPORT_HELI_NAME;
     case VehicleConfigurationSource::VEHICLE_SURFACE:
-        return "surface";
+        return EXPORT_SURFACE_NAME;
     default:
-        return "custom";
+        return EXPORT_CUSTOM_NAME;
     }
 }
 

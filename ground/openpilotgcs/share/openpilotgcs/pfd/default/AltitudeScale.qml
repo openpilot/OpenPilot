@@ -4,11 +4,15 @@ Item {
     id: sceneItem
     property variant sceneSize
 
+    property real altitude : -qmlWidget.altitudeFactor * PositionState.Down
+
     SvgElementImage {
         id: altitude_window
         elementName: "altitude-window"
         sceneSize: sceneItem.sceneSize
         clip: true
+
+        visible: qmlWidget.altitudeUnit != 0
 
         property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "altitude-window")
 
@@ -22,25 +26,25 @@ Item {
             sceneSize: sceneItem.sceneSize
 
             anchors.verticalCenter: parent.verticalCenter
-            // The altitude scale represents 30 meters,
-            // move it in 0..5m range
-            anchors.verticalCenterOffset: -height/30 * (PositionState.Down-Math.floor(PositionState.Down/5*qmlWidget.altitudeFactor)*5)
+            // The altitude scale represents 10 units (ft or meters),
+            // move using decimal term from value to display
+            anchors.verticalCenterOffset: height/10 * (altitude - Math.floor(altitude))
             anchors.left: parent.left
 
-            property int topNumber: 15-Math.floor(PositionState.Down/5*qmlWidget.altitudeFactor)*5
+            property int topNumber: Math.floor(altitude)+5
 
             // Altitude numbers
             Column {
                 Repeater {
-                    model: 7
+                    model: 10
                     Item {
-                        height: altitude_scale.height / 6
+                        height: altitude_scale.height / 10
                         width: altitude_window.width
 
                         Text {
-                            text: altitude_scale.topNumber - index*5
+                            text: altitude_scale.topNumber - index
                             color: "white"
-                            font.pixelSize: parent.height / 4
+                            font.pixelSize: parent.height / 3
                             font.family: "Arial"
 
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -56,7 +60,7 @@ Item {
             elementName: "altitude-vector"
             sceneSize: sceneItem.sceneSize
 
-            height: -NedAccel.Down * altitude_scale.height/30
+            height: -NedAccel.Down * altitude_scale.height/10
 
             anchors.left: parent.left
             anchors.bottom: parent.verticalCenter
@@ -71,13 +75,15 @@ Item {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
 
-            anchors.verticalCenterOffset: -altitude_scale.height/30 * (PositionState.Down - PathDesired.End_Down)
+            anchors.verticalCenterOffset: -altitude_scale.height/10 * (PositionState.Down - PathDesired.End_Down) * qmlWidget.altitudeFactor
         }
     }
 
     SvgElementImage {
         id: altitude_box
         clip: true
+
+        visible: qmlWidget.altitudeUnit != 0
 
         elementName: "altitude-box"
         sceneSize: sceneItem.sceneSize
@@ -91,26 +97,39 @@ Item {
 
         Text {
             id: altitude_text
-            text: Math.floor(-PositionState.Down * qmlWidget.altitudeFactor).toFixed()
+            text: "  " +altitude.toFixed(1)
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 0.4
+                pixelSize: parent.height * 0.35
+                weight: Font.DemiBold
             }
             anchors.centerIn: parent
         }
     }
 
-    Text {
-        id: altitude_unit_text
-        text: qmlWidget.altitudeUnit
-        color: "white"
-        font {
-            family: "Arial"
-            pixelSize: sceneSize.height * 0.025
-        }
+    SvgElementImage {
+        id: altitude_unit_box
+        elementName: "altitude-unit-box"
+        sceneSize: sceneItem.sceneSize
+
+        visible: qmlWidget.altitudeUnit != 0
+
         anchors.top: altitude_window.bottom
         anchors.right: altitude_window.right
-        anchors.margins: font.pixelSize * 0.3
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+
+        Text {
+            id: altitude_unit_text
+            text: qmlWidget.altitudeUnit
+            color: "white"
+            font {
+                family: "Arial"
+                pixelSize: parent.height * 0.6
+                weight: Font.DemiBold
+            }
+            anchors.centerIn: parent
+        }
     }
 }

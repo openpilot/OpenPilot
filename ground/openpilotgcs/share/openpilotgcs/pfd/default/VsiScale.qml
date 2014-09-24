@@ -77,13 +77,4 @@ Item {
         }
     }
 
-    SvgElementImage {
-        id: foreground
-        elementName: "foreground"
-        sceneSize: sceneItem.sceneSize
-
-        x: Math.floor(scaledBounds.x * sceneItem.width)
-        y: Math.floor(scaledBounds.y * sceneItem.height)
-
-    }
 }

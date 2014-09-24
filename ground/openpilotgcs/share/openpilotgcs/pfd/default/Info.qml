@@ -70,6 +70,17 @@ Item {
     // End Functions
     // 
     // Start Drawing
+    // Foreground (gradient)
+
+    SvgElementImage {
+        id: foreground
+        elementName: "foreground"
+        sceneSize: info.sceneSize
+
+        x: Math.floor(scaledBounds.x * info.width)
+        y: Math.floor(scaledBounds.y * info.height)
+
+    }
 
     SvgElementImage {
         id: info_bg

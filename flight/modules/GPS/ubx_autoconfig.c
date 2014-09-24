@@ -287,7 +287,9 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connec
     if (!status || !enabled || status->currentStep == INIT_STEP_DISABLED) {
         return; // autoconfig not enabled
     }
-
+    if (PIOS_DELAY_DiffuS(status->lastStepTimestampRaw) < UBX_STEP_WAIT_TIME) {
+        return;
+    }
     // when gps is disconnected it will replay the autoconfig sequence.
     if (!gps_connected) {
         if (status->currentStep == INIT_STEP_DONE) {
@@ -318,6 +320,10 @@ void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connec
 
     case INIT_STEP_START:
     case INIT_STEP_ASK_VER:
+        // clear ack
+        ubxLastAck.clsID = 0x00;
+        ubxLastAck.msgID = 0x00;
+
         status->lastStepTimestampRaw = PIOS_DELAY_GetRaw();
         build_request(&status->working_packet, UBX_CLASS_MON, UBX_ID_MON_VER, bytes_to_send);
         status->currentStep = INIT_STEP_WAIT_VER;

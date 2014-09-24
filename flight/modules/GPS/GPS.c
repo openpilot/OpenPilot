@@ -268,11 +268,17 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             {
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
                 int32_t ac_status = ubx_autoconfig_get_status();
+                static uint8_t lastStatus = 0;
+
                 gpspositionsensor.AutoConfigStatus =
                     ac_status == UBX_AUTOCONFIG_STATUS_DISABLED ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED :
                     ac_status == UBX_AUTOCONFIG_STATUS_DONE ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE :
                     ac_status == UBX_AUTOCONFIG_STATUS_ERROR ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR :
                     GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING;
+                if (gpspositionsensor.AutoConfigStatus != lastStatus) {
+                    GPSPositionSensorAutoConfigStatusSet(&gpspositionsensor.AutoConfigStatus);
+                    lastStatus = gpspositionsensor.AutoConfigStatus;
+                }
 #endif
                 res = parse_ubx_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
             }
@@ -292,7 +298,8 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 
         // Check for GPS timeout
         timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-        if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS) {
+        if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS ||
+            (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX && gpspositionsensor.AutoConfigStatus == GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR)) {
             // we have not received any valid GPS sentences for a while.
             // either the GPS is not plugged in or a hardware problem or the GPS has locked up.
             uint8_t status = GPSPOSITIONSENSOR_STATUS_NOGPS;

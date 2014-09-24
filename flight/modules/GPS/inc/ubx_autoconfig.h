@@ -45,7 +45,8 @@
 #define UBX_REPLY_TIMEOUT       (500 * 1000)
 // max retries in case of timeout
 #define UBX_MAX_RETRIES         5
-
+// pause between each configuration step
+#define UBX_STEP_WAIT_TIME      (10 * 1000)
 // types
 typedef enum {
     UBX_AUTOCONFIG_STATUS_DISABLED = 0,

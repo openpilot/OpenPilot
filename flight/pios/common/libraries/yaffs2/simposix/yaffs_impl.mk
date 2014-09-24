@@ -10,7 +10,7 @@
 #
 # Directory containing this makefile
 #
-YAFFS2_POSIX_RAMSIM_DIR			:=	$(dir $(lastword $(MAKEFILE_LIST)))
+YAFFS2_SIMPOSIX_DIR			:=	$(dir $(lastword $(MAKEFILE_LIST)))
 
 # Compiler options 
 #
@@ -23,5 +23,5 @@ CDEFS				+= -DCONFIG_YAFFSFS_PROVIDE_VALUES
 #
 # Yaffs2 device library source and includes
 #
-SRC				+=	$(sort $(wildcard $(YAFFS2_POSIX_RAMSIM_DIR)*.c))
+SRC				+=	$(sort $(wildcard $(YAFFS2_SIMPOSIX_DIR)*.c))
 #EXTRAINCDIRS			+=	$(YAFFS2_DIR)/inc

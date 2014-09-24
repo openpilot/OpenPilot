@@ -33,7 +33,7 @@
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <taskinfo.h>
-$include "yaffsfs.h"
+#include "yaffsfs.h"
 
 /*
  * Pull in the board-specific static HW definitions.

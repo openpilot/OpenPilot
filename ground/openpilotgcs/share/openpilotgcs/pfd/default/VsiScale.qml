@@ -46,9 +46,22 @@ Item {
     }
 
     SvgElementImage {
-        id: vsi_scale
+        id: vsi_scale_meter
 
-        elementName: "vsi-scale"
+        visible: qmlWidget.altitudeUnit == "m"
+        elementName: "vsi-scale-meter"
+        sceneSize: sceneItem.sceneSize
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+    }
+
+    SvgElementImage {
+        id: vsi_scale_ft
+
+        visible: qmlWidget.altitudeUnit == "ft"
+        elementName: "vsi-scale-ft"
         sceneSize: sceneItem.sceneSize
 
         x: Math.floor(scaledBounds.x * sceneItem.width)
@@ -74,6 +87,23 @@ Item {
             angle: -vert_velocity * 5
             origin.y : vsi_arrow.height / 2 
             origin.x : vsi_arrow.width * 3.15
+        }
+    }
+
+    SvgElementPositionItem {
+        id: vsi_unit_text
+        elementName: "vsi-unit-text"
+        sceneSize: sceneItem.sceneSize
+
+        Text {
+            text: qmlWidget.altitudeUnit == "m" ? "m/s" : "ft/s"
+            color: "white"
+            font {
+                family: "Arial"
+                pixelSize: parent.height * 1.7
+                weight: Font.DemiBold
+            }
+            anchors.centerIn: parent
         }
     }
 

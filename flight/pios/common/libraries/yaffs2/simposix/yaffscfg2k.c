@@ -19,37 +19,48 @@
  */
 
 #include "yaffscfg.h"
+#include "yaffs_guts.h"
 #include "yaffsfs.h"
 #include "yaffs_trace.h"
-#include "yramsim.h"
+#include "yaffs_osglue.h"
 
-unsigned yaffs_trace_mask = 
 
-	YAFFS_TRACE_SCAN |  
+#include <errno.h>
+
+unsigned yaffs_trace_mask =
+
+	YAFFS_TRACE_SCAN |
 	YAFFS_TRACE_GC |
-	YAFFS_TRACE_ERASE | 
-	YAFFS_TRACE_ERROR | 
-	YAFFS_TRACE_TRACING | 
-	YAFFS_TRACE_ALLOCATE | 
+	YAFFS_TRACE_ERASE |
+	YAFFS_TRACE_ERROR |
+	YAFFS_TRACE_TRACING |
+	YAFFS_TRACE_ALLOCATE |
 	YAFFS_TRACE_BAD_BLOCKS |
-	YAFFS_TRACE_VERIFY | 
-	
+	YAFFS_TRACE_VERIFY |
 	0;
-        
+
+int random_seed;
+int simulate_power_failure = 0;
 
 
-// Configuration
+/* Configure the devices that will be used */
 
+#include "yaffs_nor_drv.h"
 
 int yaffs_start_up(void)
 {
-	// Stuff to configure YAFFS
-	// Stuff to initialise anything special (eg lock semaphore).
+	static int start_up_called = 0;
+
+	if(start_up_called)
+		return 0;
+	start_up_called = 1;
+
+	/* Call the OS initialisation (eg. set up lock semaphore */
 	yaffsfs_OSInitialisation();
-	yramsim_CreateRamSim("yaffs2",1,1000,0,0);
-	yramsim_CreateRamSim("p0",0,0x400,1,0xff);
-	yramsim_CreateRamSim("p1",0,0x400,1,0);
-	
+
+	/* Install the various devices and their device drivers */
+	yaffs_nor_install_drv("nor");
+
 	return 0;
 }
 

@@ -10,19 +10,6 @@ Item {
          onTriggered: vert_velocity = (0.9 * vert_velocity) + (0.1 * VelocityState.Down)
      }
 
-
-
-    SvgElementImage {
-        id: vsi_window
-        elementName: "vsi-window"
-        sceneSize: sceneItem.sceneSize
-        clip: true
-
-        x: Math.floor(scaledBounds.x * sceneItem.width)
-        y: Math.floor(scaledBounds.y * sceneItem.height)
-
-    }
-
     SvgElementImage {
         id: vsi_waypoint
         elementName: "vsi-waypoint"

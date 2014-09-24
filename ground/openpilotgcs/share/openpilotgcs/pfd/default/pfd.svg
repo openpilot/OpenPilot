@@ -328,11 +328,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.51875"
-     inkscape:cx="320"
-     inkscape:cy="240"
+     inkscape:zoom="0.53695921"
+     inkscape:cx="434.93494"
+     inkscape:cy="91.012892"
      inkscape:document-units="px"
-     inkscape:current-layer="layer99"
+     inkscape:current-layer="layer69"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -443,14 +443,7 @@
      id="layer69"
      inkscape:label="foreground_layer"
      style="display:inline"
-     sodipodi:insensitive="true">
-    <path
-       style="fill:url(#radialGradient4865);fill-opacity:1;stroke:none"
-       d="M -0.5,-0.5 L 642,-0.5 L 642,481 L -0.5,481 z"
-       id="foreground"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccc" />
-  </g>
+     sodipodi:insensitive="true" />
   <g
      inkscape:groupmode="layer"
      id="layer14"
@@ -6308,14 +6301,12 @@
      inkscape:groupmode="layer"
      id="layer38"
      inkscape:label="vsi"
-     style="display:inline"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <g
        inkscape:groupmode="layer"
        id="layer39"
        inkscape:label="vsi-window"
-       style="display:inline"
-       sodipodi:insensitive="true">
+       style="display:inline">
       <path
          style="fill:#000000;fill-opacity:0.25098039;stroke:#ffffff;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
          d="M 608.03211,91.918678 C 647.68617,91.918678 918,217 918,217 C 918,217 648.35504,341.91868 608.03211,341.91868 C 567.70918,341.91868 558.0321,280.40448 558.0321,216.91868 C 558.0321,153.43288 568.37805,91.918678 608.03211,91.918678 z"

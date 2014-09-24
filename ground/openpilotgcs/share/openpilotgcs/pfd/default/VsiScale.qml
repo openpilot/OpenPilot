@@ -97,7 +97,7 @@ Item {
 
         Text {
             text: qmlWidget.altitudeUnit == "m" ? "m/s" : "ft/s"
-            color: "white"
+            color: "cyan"
             font {
                 family: "Arial"
                 pixelSize: parent.height * 1.7

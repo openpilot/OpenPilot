@@ -123,7 +123,7 @@ Item {
         Text {
             id: altitude_unit_text
             text: qmlWidget.altitudeUnit
-            color: "white"
+            color: "cyan"
             font {
                 family: "Arial"
                 pixelSize: parent.height * 0.6

@@ -113,7 +113,7 @@ Item {
         Text {
            id: speed_unit_text
            text: qmlWidget.speedUnit
-           color: "white"
+           color: "cyan"
            font {
                 family: "Arial"
                 pixelSize: parent.height * 0.6

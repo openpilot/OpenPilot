@@ -540,6 +540,25 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>Type</tabstop>
+  <tabstop>Name</tabstop>
+  <tabstop>Owner</tabstop>
+  <tabstop>ForumNick</tabstop>
+  <tabstop>Size</tabstop>
+  <tabstop>Weight</tabstop>
+  <tabstop>Motor</tabstop>
+  <tabstop>Esc</tabstop>
+  <tabstop>Servo</tabstop>
+  <tabstop>Battery</tabstop>
+  <tabstop>Propeller</tabstop>
+  <tabstop>Controllers</tabstop>
+  <tabstop>Comment</tabstop>
+  <tabstop>ImportButton</tabstop>
+  <tabstop>acceptBtn</tabstop>
+  <tabstop>cancelBtn</tabstop>
+  <tabstop>Photo</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -340,7 +340,7 @@ void UAVObjectManager::toJson(QJsonObject &jsonObject, const QList<UAVObject *> 
     jsonObject["objects"] = jObjects;
 }
 
-void UAVObjectManager::fromJson(const QJsonObject &jsonObject)
+void UAVObjectManager::fromJson(const QJsonObject &jsonObject, QList<UAVObject *> *updatedObjects)
 {
     QJsonArray jObjects = jsonObject["objects"].toArray();
 
@@ -349,6 +349,9 @@ void UAVObjectManager::fromJson(const QJsonObject &jsonObject)
         UAVObject *object   = getObject(jObject["name"].toString(), jObject["instance"].toInt());
         if (object != NULL) {
             object->fromJson(jObject);
+            if (updatedObjects != NULL) {
+                updatedObjects->append(object);
+            }
         }
     }
 }

@@ -12,6 +12,8 @@ Item {
         sceneSize: sceneItem.sceneSize
         clip: true
 
+        visible: qmlWidget.speedUnit != 0
+
         x: Math.floor(scaledBounds.x * sceneItem.width)
         y: Math.floor(scaledBounds.y * sceneItem.height)
 
@@ -22,12 +24,12 @@ Item {
             sceneSize: sceneItem.sceneSize
 
             anchors.verticalCenter: parent.verticalCenter
-            // The speed scale represents 30 meters,
-            // move it in 0..5m range
-            anchors.verticalCenterOffset: height/30 * (sceneItem.groundSpeed-Math.floor(sceneItem.groundSpeed/5)*5)
+            // The speed scale represents 10 units,
+            // move using decimal term from value to display
+            anchors.verticalCenterOffset: height/10 * (sceneItem.groundSpeed-Math.floor(sceneItem.groundSpeed))
             anchors.right: parent.right
 
-            property int topNumber: Math.floor(sceneItem.groundSpeed/5)*5+15
+            property int topNumber: Math.floor(sceneItem.groundSpeed)+5
 
             // speed numbers
             Column {
@@ -35,18 +37,18 @@ Item {
                 anchors.right: speed_scale.right
 
                 Repeater {
-                    model: 7
+                    model: 10
                     Item {
-                        height: speed_scale.height / 6
+                        height: speed_scale.height / 10
                         width: speed_window.width
 
                         Text {
                             //don't show negative numbers
-                            text: speed_scale.topNumber - index*5
+                            text: speed_scale.topNumber - index
                             color: "white"
-                            visible: speed_scale.topNumber - index*5 >= 0
+                            visible: speed_scale.topNumber - index >= 0
 
-                            font.pixelSize: parent.height / 4
+                            font.pixelSize: parent.height / 3
                             font.family: "Arial"
 
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -66,16 +68,17 @@ Item {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
 
-            anchors.verticalCenterOffset: speed_scale.height/30 * (sceneItem.groundSpeed - PathDesired.EndingVelocity)
+            anchors.verticalCenterOffset: speed_scale.height/10 * (sceneItem.groundSpeed - (PathDesired.EndingVelocity * qmlWidget.speedFactor))
         }
     }
 
     SvgElementImage {
         id: speed_box
         clip: true
-
         elementName: "speed-box"
         sceneSize: sceneItem.sceneSize
+
+        visible: qmlWidget.speedUnit != 0
 
         x: scaledBounds.x * sceneItem.width
         y: scaledBounds.y * sceneItem.height
@@ -84,26 +87,39 @@ Item {
 
         Text {
             id: speed_text
-            text: Math.round(sceneItem.groundSpeed).toFixed()
+            text: sceneItem.groundSpeed.toFixed(1)+"  "
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 0.4
+                pixelSize: parent.height * 0.35
+                weight: Font.DemiBold
             }
             anchors.centerIn: parent
         }
     }
 
-    Text {
-        id: speed_unit_text
-        text: qmlWidget.speedUnit
-        color: "white"
-        font {
-            family: "Arial"
-            pixelSize: sceneSize.height * 0.025
-        }
+    SvgElementImage {
+        id: speed_unit_box
+        elementName: "speed-unit-box"
+        sceneSize: sceneItem.sceneSize
+
+        visible: qmlWidget.speedUnit != 0
+
         anchors.top: speed_window.bottom
         anchors.right: speed_window.right
-        anchors.margins: font.pixelSize * 0.3
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+
+        Text {
+           id: speed_unit_text
+           text: qmlWidget.speedUnit
+           color: "cyan"
+           font {
+                family: "Arial"
+                pixelSize: parent.height * 0.6
+                weight: Font.DemiBold
+            }
+            anchors.centerIn: parent
+        }
     }
 }

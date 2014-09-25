@@ -55,7 +55,10 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     transmitterType(acro),
     //
     loop(NULL),
-    skipflag(false)
+    skipflag(false),
+    nextDelayedTimer(),
+    nextDelayedTick(0),
+    nextDelayedLatestActivityTick(0)
 {
     manualCommandObj      = ManualControlCommand::GetInstance(getObjectManager());
     manualSettingsObj     = ManualControlSettings::GetInstance(getObjectManager());
@@ -395,6 +398,13 @@ void ConfigInputWidget::goToWizard()
     flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
     flightModeSettingsObj->setData(flightModeSettingsData);
 
+    accessoryDesiredObj0           = AccessoryDesired::GetInstance(getObjectManager(), 0);
+    accessoryDesiredObj1           = AccessoryDesired::GetInstance(getObjectManager(), 1);
+    accessoryDesiredObj2           = AccessoryDesired::GetInstance(getObjectManager(), 2);
+
+    // Use faster input update rate.
+    fastMdata();
+
     // start the wizard
     wizardSetUpStep(wizardWelcome);
     ui->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio);
@@ -412,7 +422,13 @@ void ConfigInputWidget::disableWizardButton(int value)
 void ConfigInputWidget::wzCancel()
 {
     dimOtherControls(false);
-    manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
+
+    // Cancel any ongoing delayd next trigger.
+    wzNextDelayedCancel();
+
+    // Restore original input update rate.
+    restoreMdata();
+
     ui->stackedWidget->setCurrentIndex(0);
 
     if (wizardStep != wizardNone) {
@@ -426,8 +442,45 @@ void ConfigInputWidget::wzCancel()
     flightModeSettingsObj->setData(previousFlightModeSettingsData);
 }
 
+void ConfigInputWidget::registerControlActivity()
+{
+    nextDelayedLatestActivityTick = nextDelayedTick;
+}
+
+void ConfigInputWidget::wzNextDelayed()
+{
+    nextDelayedTick++;
+
+    // Call next after the full 2500 ms timeout has been reached,
+    // or if no input activity has occurred the last 500 ms.
+    if (nextDelayedTick == 25 ||
+        nextDelayedTick - nextDelayedLatestActivityTick >= 5) {
+        wzNext();
+    }
+}
+
+void ConfigInputWidget::wzNextDelayedStart()
+{
+    // Call wzNextDelayed every 100 ms, to see if it's time to go to the next page.
+    connect(&nextDelayedTimer, SIGNAL(timeout()), this, SLOT(wzNextDelayed()));
+    nextDelayedTimer.start(100);
+}
+
+// Cancel the delayed next timer, if it's active.
+void ConfigInputWidget::wzNextDelayedCancel()
+{
+    nextDelayedTick = 0;
+    nextDelayedLatestActivityTick = 0;
+    if (nextDelayedTimer.isActive()) {
+        nextDelayedTimer.stop();
+        disconnect(&nextDelayedTimer, SIGNAL(timeout()), this, SLOT(wzNextDelayed()));
+    }
+}
+
 void ConfigInputWidget::wzNext()
 {
+    wzNextDelayedCancel();
+
     // In identify sticks mode the next button can indicate
     // channel advance
     if (wizardStep != wizardNone &&
@@ -464,6 +517,10 @@ void ConfigInputWidget::wzNext()
         break;
     case wizardFinish:
         wizardStep = wizardNone;
+
+        // Restore original input update rate.
+        restoreMdata();
+
         // Leave setting the throttle neutral until the final Next press,
         // else the throttle scaling causes the graphical stick movement to not
         // match the tx stick
@@ -492,6 +549,8 @@ void ConfigInputWidget::wzNext()
 
 void ConfigInputWidget::wzBack()
 {
+    wzNextDelayedCancel();
+
     if (wizardStep != wizardNone &&
         wizardStep != wizardIdentifySticks) {
         wizardTearDownStep(wizardStep);
@@ -623,12 +682,8 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         break;
     case wizardIdentifyLimits:
     {
-        accessoryDesiredObj0 = AccessoryDesired::GetInstance(getObjectManager(), 0);
-        accessoryDesiredObj1 = AccessoryDesired::GetInstance(getObjectManager(), 1);
-        accessoryDesiredObj2 = AccessoryDesired::GetInstance(getObjectManager(), 2);
         setTxMovement(nothing);
         ui->wzText->setText(QString(tr("Please move all controls to their maximum extents on both directions.\n\nPress Next when ready.")));
-        fastMdata();
         manualSettingsData = manualSettingsObj->getData();
         for (uint i = 0; i < ManualControlSettings::CHANNELMAX_NUMELEM; ++i) {
             // Preserve the inverted status
@@ -665,7 +720,6 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         }
         connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         ui->wzText->setText(QString(tr("Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.")));
-        fastMdata();
         break;
     case wizardFinish:
         dimOtherControls(false);
@@ -675,7 +729,6 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         ui->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture mimics your sticks movement.\n\n"
                                        "IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings "
                                        "tab where you can set your desired arming sequence and save the configuration.")));
-        fastMdata();
         break;
     default:
         Q_ASSERT(0);
@@ -732,7 +785,6 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         disconnect(flightStatusObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         disconnect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         manualSettingsObj->setData(manualSettingsData);
-        restoreMdata();
         setTxMovement(nothing);
         break;
     case wizardIdentifyInverted:
@@ -747,7 +799,6 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         }
         extraWidgets.clear();
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
-        restoreMdata();
         break;
     case wizardFinish:
         dimOtherControls(false);
@@ -755,11 +806,24 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         disconnect(flightStatusObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
         disconnect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(moveSticks()));
-        restoreMdata();
         break;
     default:
         Q_ASSERT(0);
     }
+}
+
+static void fastMdataSingle(UAVDataObject *object, UAVObject::Metadata *savedMdata)
+{
+    *savedMdata = object->getMetadata();
+    UAVObject::Metadata mdata = *savedMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 150;
+    object->setMetadata(mdata);
+}
+
+static void restoreMdataSingle(UAVDataObject *object, UAVObject::Metadata *savedMdata)
+{
+    object->setMetadata(*savedMdata);
 }
 
 /**
@@ -767,11 +831,8 @@ void ConfigInputWidget::wizardTearDownStep(enum wizardSteps step)
  */
 void ConfigInputWidget::fastMdata()
 {
-    manualControlMdata = manualCommandObj->getMetadata();
-    UAVObject::Metadata mdata = manualControlMdata;
-    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-    mdata.flightTelemetryUpdatePeriod = 150;
-    manualCommandObj->setMetadata(mdata);
+    fastMdataSingle(manualCommandObj, &manualControlMdata);
+    fastMdataSingle(accessoryDesiredObj0, &accessoryDesiredMdata0);
 }
 
 /**
@@ -779,7 +840,8 @@ void ConfigInputWidget::fastMdata()
  */
 void ConfigInputWidget::restoreMdata()
 {
-    manualCommandObj->setMetadata(manualControlMdata);
+    restoreMdataSingle(manualCommandObj, &manualControlMdata);
+    restoreMdataSingle(accessoryDesiredObj0, &accessoryDesiredMdata0);
 }
 
 /**
@@ -849,7 +911,7 @@ void ConfigInputWidget::prevChannel()
     for (int i = 1; i < order.length(); i++) {
         if (order[i] == currentChannelNum) {
             if (!usedChannels.isEmpty() &&
-                usedChannels.back().channelIndex == currentChannelNum) {
+                usedChannels.back().channelIndex == order[i - 1]) {
                 usedChannels.removeLast();
             }
             setChannel(order[i - 1]);
@@ -861,41 +923,66 @@ void ConfigInputWidget::prevChannel()
 
 void ConfigInputWidget::identifyControls()
 {
+    static const int DEBOUNCE_COUNT = 4;
     static int debounce = 0;
 
     receiverActivityData = receiverActivityObj->getData();
+
     if (receiverActivityData.ActiveChannel == 255) {
         return;
     }
+
     if (channelDetected) {
+        registerControlActivity();
         return;
-    } else {
-        receiverActivityData  = receiverActivityObj->getData();
-        currentChannel.group  = receiverActivityData.ActiveGroup;
-        currentChannel.number = receiverActivityData.ActiveChannel;
-        if (currentChannel == lastChannel) {
-            ++debounce;
-        }
+    }
+
+    receiverActivityData  = receiverActivityObj->getData();
+    currentChannel.group  = receiverActivityData.ActiveGroup;
+    currentChannel.number = receiverActivityData.ActiveChannel;
+
+    if (debounce == 0) {
+        // Register a channel to be debounced.
         lastChannel.group  = currentChannel.group;
         lastChannel.number = currentChannel.number;
         lastChannel.channelIndex = currentChannelNum;
-        if (!usedChannels.contains(lastChannel) && debounce > 1) {
-            channelDetected    = true;
-            debounce = 0;
-            usedChannels.append(lastChannel);
-            manualSettingsData = manualSettingsObj->getData();
-            manualSettingsData.ChannelGroups[currentChannelNum] = currentChannel.group;
-            manualSettingsData.ChannelNumber[currentChannelNum] = currentChannel.number;
-            manualSettingsObj->setData(manualSettingsData);
-        } else {
-            return;
-        }
+        ++debounce;
+        return;
     }
+
+    if (currentChannel != lastChannel) {
+        // A new channel was seen. Only register it if we count down to 0.
+        --debounce;
+        return;
+    }
+
+    if (debounce < DEBOUNCE_COUNT) {
+        // We still haven't seen enough enough activity on this channel yet.
+        ++debounce;
+        return;
+    }
+
+    // Channel has been debounced and it's enough record it.
+
+    if (usedChannels.contains(lastChannel)) {
+        // Channel is already recorded.
+        return;
+    }
+
+    // Record the channel.
+
+    channelDetected    = true;
+    debounce = 0;
+    usedChannels.append(lastChannel);
+    manualSettingsData = manualSettingsObj->getData();
+    manualSettingsData.ChannelGroups[currentChannelNum] = currentChannel.group;
+    manualSettingsData.ChannelNumber[currentChannelNum] = currentChannel.number;
+    manualSettingsObj->setData(manualSettingsData);
 
     // m_config->wzText->clear();
     setTxMovement(nothing);
 
-    QTimer::singleShot(2500, this, SLOT(wzNext()));
+    wzNextDelayedStart();
 }
 
 void ConfigInputWidget::identifyLimits()

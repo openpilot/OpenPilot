@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief ccpm configuration panel
+ * @brief ground vehicle configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

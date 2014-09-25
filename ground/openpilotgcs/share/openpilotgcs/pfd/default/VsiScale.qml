@@ -10,19 +10,6 @@ Item {
          onTriggered: vert_velocity = (0.9 * vert_velocity) + (0.1 * VelocityState.Down)
      }
 
-
-
-    SvgElementImage {
-        id: vsi_window
-        elementName: "vsi-window"
-        sceneSize: sceneItem.sceneSize
-        clip: true
-
-        x: Math.floor(scaledBounds.x * sceneItem.width)
-        y: Math.floor(scaledBounds.y * sceneItem.height)
-
-    }
-
     SvgElementImage {
         id: vsi_waypoint
         elementName: "vsi-waypoint"
@@ -46,9 +33,22 @@ Item {
     }
 
     SvgElementImage {
-        id: vsi_scale
+        id: vsi_scale_meter
 
-        elementName: "vsi-scale"
+        visible: qmlWidget.altitudeUnit == "m"
+        elementName: "vsi-scale-meter"
+        sceneSize: sceneItem.sceneSize
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+    }
+
+    SvgElementImage {
+        id: vsi_scale_ft
+
+        visible: qmlWidget.altitudeUnit == "ft"
+        elementName: "vsi-scale-ft"
         sceneSize: sceneItem.sceneSize
 
         x: Math.floor(scaledBounds.x * sceneItem.width)
@@ -77,13 +77,21 @@ Item {
         }
     }
 
-    SvgElementImage {
-        id: foreground
-        elementName: "foreground"
+    SvgElementPositionItem {
+        id: vsi_unit_text
+        elementName: "vsi-unit-text"
         sceneSize: sceneItem.sceneSize
 
-        x: Math.floor(scaledBounds.x * sceneItem.width)
-        y: Math.floor(scaledBounds.y * sceneItem.height)
-
+        Text {
+            text: qmlWidget.altitudeUnit == "m" ? "m/s" : "ft/s"
+            color: "cyan"
+            font {
+                family: "Arial"
+                pixelSize: parent.height * 1.7
+                weight: Font.DemiBold
+            }
+            anchors.centerIn: parent
+        }
     }
+
 }

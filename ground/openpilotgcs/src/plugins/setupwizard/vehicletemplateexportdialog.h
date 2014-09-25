@@ -40,22 +40,35 @@ class VehicleTemplateExportDialog : public QDialog {
     Q_OBJECT
 
 public:
+    static const char *EXPORT_BASE_NAME;
+    static const char *EXPORT_FIXEDWING_NAME;
+    static const char *EXPORT_MULTI_NAME;
+    static const char *EXPORT_HELI_NAME;
+    static const char *EXPORT_SURFACE_NAME;
+    static const char *EXPORT_CUSTOM_NAME;
+
     explicit VehicleTemplateExportDialog(QWidget *parent = 0);
     ~VehicleTemplateExportDialog();
 
 public slots:
     void accept();
+    void updateStatus();
 
 private slots:
     void importImage();
 
 private:
+    static const int IMAGE_SCALE_WIDTH  = 500;
+    static const int IMAGE_SCALE_HEIGHT = 500;
     Ui::VehicleTemplateExportDialog *ui;
     UAVObjectManager *m_uavoManager;
-    QString setupVehicleType();
     VehicleConfigurationSource::VEHICLE_TYPE m_type;
     VehicleConfigurationSource::VEHICLE_SUB_TYPE m_subType;
     QPixmap m_image;
+
+    QString getTypeDirectory();
+    QString setupVehicleType();
+    QString fixFilenameString(QString input, int truncate = 100);
 };
 
 #endif // VEHICLETEMPLATEEXPORTDIALOG_H

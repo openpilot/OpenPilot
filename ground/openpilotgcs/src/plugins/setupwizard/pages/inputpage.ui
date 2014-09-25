@@ -152,7 +152,7 @@ p, li { white-space: pre-wrap; }
         <string notr="true">QToolButton { border: none }</string>
        </property>
        <property name="text">
-        <string>Futaba</string>
+        <string>S.Bus</string>
        </property>
        <property name="icon">
         <iconset resource="../wizardResources.qrc">
@@ -193,7 +193,7 @@ p, li { white-space: pre-wrap; }
         <string notr="true">QToolButton { border: none }</string>
        </property>
        <property name="text">
-        <string>Spektrum</string>
+        <string>DSM Sat</string>
        </property>
        <property name="icon">
         <iconset resource="../wizardResources.qrc">

@@ -147,6 +147,7 @@ static const filterPipeline *filterChain = NULL;
 static stateFilter magFilter;
 static stateFilter baroFilter;
 static stateFilter baroiFilter;
+static stateFilter velocityFilter;
 static stateFilter altitudeFilter;
 static stateFilter airFilter;
 static stateFilter stationaryFilter;
@@ -162,17 +163,14 @@ static float gyroDelta[3];
 
 // preconfigured filter chains selectable via revoSettings.FusionAlgorithm
 static const filterPipeline *cfQueue = &(filterPipeline) {
-    .filter = &magFilter,
+    .filter = &airFilter,
     .next   = &(filterPipeline) {
-        .filter = &airFilter,
+        .filter = &baroiFilter,
         .next   = &(filterPipeline) {
-            .filter = &baroiFilter,
+            .filter = &altitudeFilter,
             .next   = &(filterPipeline) {
-                .filter = &altitudeFilter,
-                .next   = &(filterPipeline) {
-                    .filter = &cfFilter,
-                    .next   = NULL,
-                }
+                .filter = &cfFilter,
+                .next   = NULL,
             }
         }
     }
@@ -222,7 +220,10 @@ static const filterPipeline *ekf13iQueue = &(filterPipeline) {
                 .filter = &stationaryFilter,
                 .next   = &(filterPipeline) {
                     .filter = &ekf13iFilter,
-                    .next   = NULL,
+                    .next   = &(filterPipeline) {
+                        .filter = &velocityFilter,
+                        .next   = NULL,
+                    }
                 }
             }
         }
@@ -239,7 +240,10 @@ static const filterPipeline *ekf13Queue = &(filterPipeline) {
                 .filter = &baroFilter,
                 .next   = &(filterPipeline) {
                     .filter = &ekf13Filter,
-                    .next   = NULL,
+                    .next   = &(filterPipeline) {
+                        .filter = &velocityFilter,
+                        .next   = NULL,
+                    }
                 }
             }
         }
@@ -304,6 +308,7 @@ int32_t StateEstimationInitialize(void)
     stack_required = maxint32_t(stack_required, filterMagInitialize(&magFilter));
     stack_required = maxint32_t(stack_required, filterBaroiInitialize(&baroiFilter));
     stack_required = maxint32_t(stack_required, filterBaroInitialize(&baroFilter));
+    stack_required = maxint32_t(stack_required, filterVelocityInitialize(&velocityFilter));
     stack_required = maxint32_t(stack_required, filterAltitudeInitialize(&altitudeFilter));
     stack_required = maxint32_t(stack_required, filterAirInitialize(&airFilter));
     stack_required = maxint32_t(stack_required, filterStationaryInitialize(&stationaryFilter));

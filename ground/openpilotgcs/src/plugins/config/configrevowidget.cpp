@@ -101,6 +101,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     addUAVObject("AttitudeSettings");
     addUAVObject("RevoSettings");
     addUAVObject("AccelGyroSettings");
+    addUAVObject("AuxMagSettings");
     autoLoadWidgets();
 
     // accel calibration

@@ -34,11 +34,21 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QUuid>
+#include <QDebug>
+#include <QMessageBox>
 #include "stabilizationsettings.h"
 #include "stabilizationsettingsbank1.h"
 #include "stabilizationsettingsbank2.h"
 #include "stabilizationsettingsbank3.h"
 #include "ekfconfiguration.h"
+
+const char *VehicleTemplateExportDialog::EXPORT_BASE_NAME      = "../share/openpilotgcs/cloudconfig";
+const char *VehicleTemplateExportDialog::EXPORT_FIXEDWING_NAME = "fixedwing";
+const char *VehicleTemplateExportDialog::EXPORT_MULTI_NAME     = "multirotor";
+const char *VehicleTemplateExportDialog::EXPORT_HELI_NAME      = "helicopter";
+const char *VehicleTemplateExportDialog::EXPORT_SURFACE_NAME   = "surface";
+const char *VehicleTemplateExportDialog::EXPORT_CUSTOM_NAME    = "custom";
 
 VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     QDialog(parent),
@@ -50,6 +60,12 @@ VehicleTemplateExportDialog::VehicleTemplateExportDialog(QWidget *parent) :
     m_uavoManager = pm->getObject<UAVObjectManager>();
     ui->Photo->setScene(new QGraphicsScene(this));
     ui->Type->setText(setupVehicleType());
+
+    connect(ui->Name, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
+    connect(ui->Owner, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
+    connect(ui->ForumNick, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
+    connect(ui->Size, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
+    connect(ui->Weight, SIGNAL(textChanged(QString)), this, SLOT(updateStatus()));
 }
 
 VehicleTemplateExportDialog::~VehicleTemplateExportDialog()
@@ -146,52 +162,70 @@ QString VehicleTemplateExportDialog::setupVehicleType()
     }
 }
 
+QString VehicleTemplateExportDialog::fixFilenameString(QString input, int truncate)
+{
+    return input.replace(' ', "").replace('|', "").replace('/', "")
+           .replace('\\', "").replace(':', "").replace('"', "")
+           .replace('\'', "").replace('?', "").replace('*', "")
+           .replace('>', "").replace('<', "")
+           .replace('}', "").replace('{', "")
+           .left(truncate);
+}
+
 
 void VehicleTemplateExportDialog::accept()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export template"), "", tr("Template (*.optmpl)"));
+    QJsonObject exportObject;
 
-    if (!fileName.isEmpty()) {
-        if (!fileName.endsWith(".optmpl")) {
-            fileName += ".optmpl";
-        }
-        QFile saveFile(fileName);
-        if (saveFile.open(QIODevice::WriteOnly)) {
-            QJsonObject exportObject;
+    QList<UAVObject *> objectsToExport;
+    objectsToExport << StabilizationSettings::GetInstance(m_uavoManager);
+    objectsToExport << StabilizationSettingsBank1::GetInstance(m_uavoManager);
+    objectsToExport << StabilizationSettingsBank2::GetInstance(m_uavoManager);
+    objectsToExport << StabilizationSettingsBank3::GetInstance(m_uavoManager);
+    objectsToExport << EKFConfiguration::GetInstance(m_uavoManager);
+    m_uavoManager->toJson(exportObject, objectsToExport);
 
-            QList<UAVObject *> objectsToExport;
-            objectsToExport << StabilizationSettings::GetInstance(m_uavoManager);
-            objectsToExport << StabilizationSettingsBank1::GetInstance(m_uavoManager);
-            objectsToExport << StabilizationSettingsBank2::GetInstance(m_uavoManager);
-            objectsToExport << StabilizationSettingsBank3::GetInstance(m_uavoManager);
-            objectsToExport << EKFConfiguration::GetInstance(m_uavoManager);
-            m_uavoManager->toJson(exportObject, objectsToExport);
+    exportObject["type"]       = m_type;
+    exportObject["subtype"]    = m_subType;
+    exportObject["name"]       = ui->Name->text();
+    exportObject["owner"]      = ui->Owner->text();
+    exportObject["nick"]       = ui->ForumNick->text();
+    exportObject["size"]       = ui->Size->text();
+    exportObject["weight"]     = ui->Weight->text();
+    exportObject["motor"]      = ui->Motor->text();
+    exportObject["esc"]        = ui->Esc->text();
+    exportObject["servo"]      = ui->Servo->text();
+    exportObject["battery"]    = ui->Battery->text();
+    exportObject["propeller"]  = ui->Propeller->text();
+    exportObject["controller"] = ui->Controllers->currentText();
+    exportObject["comment"]    = ui->Comment->document()->toPlainText();
 
-            exportObject["type"]       = m_type;
-            exportObject["subtype"]    = m_subType;
-            exportObject["name"]       = ui->Name->text();
-            exportObject["owner"]      = ui->Owner->text();
-            exportObject["nick"]       = ui->ForumNick->text();
-            exportObject["size"]       = ui->Size->text();
-            exportObject["weight"]     = ui->Weight->text();
-            exportObject["motor"]      = ui->Motor->text();
-            exportObject["esc"]        = ui->Esc->text();
-            exportObject["servo"]      = ui->Servo->text();
-            exportObject["battery"]    = ui->Battery->text();
-            exportObject["propeller"]  = ui->Propeller->text();
-            exportObject["controller"] = ui->Controllers->currentText();
-            exportObject["comment"]    = ui->Comment->document()->toPlainText();
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+    buffer.open(QIODevice::WriteOnly);
+    m_image.scaled(IMAGE_SCALE_WIDTH, IMAGE_SCALE_HEIGHT, Qt::KeepAspectRatio,
+                   Qt::SmoothTransformation).save(&buffer, "PNG");
+    exportObject["photo"] = QString::fromLatin1(bytes.toBase64().data());
 
-            QByteArray bytes;
-            QBuffer buffer(&bytes);
-            buffer.open(QIODevice::WriteOnly);
-            m_image.save(&buffer, "PNG");
-            exportObject["photo"] = bytes.toBase64().data();
+    QJsonDocument saveDoc(exportObject);
 
-            QJsonDocument saveDoc(exportObject);
-            saveFile.write(saveDoc.toJson());
-            saveFile.close();
-        }
+    QString fileName = QString("%1/%2/%3-%4-%5-%6.optmpl")
+                       .arg(EXPORT_BASE_NAME)
+                       .arg(getTypeDirectory())
+                       .arg(fixFilenameString(ui->ForumNick->text(), 15))
+                       .arg(fixFilenameString(ui->Name->text(), 20))
+                       .arg(fixFilenameString(ui->Type->text(), 30))
+                       .arg(fixFilenameString(QUuid::createUuid().toString().right(12)));
+    QFile saveFile(fileName);
+    QDir dir;
+    dir.mkpath(QFileInfo(saveFile).absoluteDir().absolutePath());
+    if (saveFile.open(QIODevice::WriteOnly)) {
+        saveFile.write(saveDoc.toJson());
+        saveFile.close();
+        QMessageBox::information(this, "Export", tr("Settings were exported to \n%1").arg(QFileInfo(saveFile).absoluteFilePath()), QMessageBox::Ok);
+    } else {
+        QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1.\nPlease try again.")
+                                 .arg(QFileInfo(saveFile).absoluteFilePath()), QMessageBox::Ok);
     }
     QDialog::accept();
 }
@@ -206,4 +240,31 @@ void VehicleTemplateExportDialog::importImage()
         ui->Photo->setSceneRect(ui->Photo->scene()->itemsBoundingRect());
         ui->Photo->fitInView(ui->Photo->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
     }
+}
+
+QString VehicleTemplateExportDialog::getTypeDirectory()
+{
+    switch (m_type) {
+    case VehicleConfigurationSource::VEHICLE_FIXEDWING:
+        return EXPORT_FIXEDWING_NAME;
+
+    case VehicleConfigurationSource::VEHICLE_MULTI:
+        return EXPORT_MULTI_NAME;
+
+    case VehicleConfigurationSource::VEHICLE_HELI:
+        return EXPORT_HELI_NAME;
+
+    case VehicleConfigurationSource::VEHICLE_SURFACE:
+        return EXPORT_SURFACE_NAME;
+
+    default:
+        return EXPORT_CUSTOM_NAME;
+    }
+}
+
+void VehicleTemplateExportDialog::updateStatus()
+{
+    ui->acceptBtn->setEnabled(ui->Name->text().length() > 3 && ui->Owner->text().length() > 2 &&
+                              ui->ForumNick->text().length() > 2 && ui->Size->text().length() > 0 &&
+                              ui->Weight->text().length() > 0);
 }

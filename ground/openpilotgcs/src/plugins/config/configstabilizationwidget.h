@@ -57,11 +57,15 @@ private:
     int boardModel;
     int m_pidBankCount;
     int m_currentPIDBank;
+
+    void updateThrottleCurveFromObject();
+    void updateObjectFromThrottleCurve();
 protected:
     QString mapObjectName(const QString objectName);
 
 protected slots:
     void refreshWidgetsValues(UAVObject *o = NULL);
+    void updateObjectsFromWidgets();
 
 private slots:
     void realtimeUpdatesSlot(bool value);
@@ -69,6 +73,7 @@ private slots:
     void processLinkedWidgets(QWidget *);
     void onBoardConnected();
     void pidBankChanged(int index);
+    void resetThrottleCurveToDefault();
 };
 
 #endif // ConfigStabilizationWidget_H

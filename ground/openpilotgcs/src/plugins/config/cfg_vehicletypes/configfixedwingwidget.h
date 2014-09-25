@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configairframetwidget.h
+ * @file       configfixedwingwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief Airframe configuration panel
+ * @brief fixed wing configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -65,8 +65,6 @@ private:
 
 protected:
     void enableControls(bool enable);
-    void resizeEvent(QResizeEvent *);
-    void showEvent(QShowEvent *);
 
 private slots:
     virtual void setupUI(QString airframeType);

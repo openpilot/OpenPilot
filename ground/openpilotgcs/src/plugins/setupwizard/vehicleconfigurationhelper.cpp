@@ -753,11 +753,12 @@ void VehicleConfigurationHelper::applyManualControlDefaults()
 void VehicleConfigurationHelper::applyTemplateSettings()
 {
     if (m_configSource->getVehicleTemplate() != NULL) {
-        QJsonObject* json = m_configSource->getVehicleTemplate();
-        QList<UAVObject*> updatedObjects;
+        QJsonObject *json = m_configSource->getVehicleTemplate();
+        QList<UAVObject *> updatedObjects;
         m_uavoManager->fromJson(*json, &updatedObjects);
-        foreach (UAVObject* object, updatedObjects) {
-            UAVDataObject *dataObj = dynamic_cast<UAVDataObject*>(object);
+        foreach(UAVObject * object, updatedObjects) {
+            UAVDataObject *dataObj = dynamic_cast<UAVDataObject *>(object);
+
             if (dataObj != NULL) {
                 addModifiedObject(dataObj, QString(tr("Writing template settings for %1")).arg(object->getName()));
             }

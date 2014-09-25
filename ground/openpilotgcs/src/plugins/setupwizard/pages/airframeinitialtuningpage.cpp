@@ -162,6 +162,7 @@ void AirframeInitialTuningPage::loadValidFiles()
     QStringList files = templateDir.entryList();
     foreach(QString fileName, files) {
         QFile file(QString("%1/%2").arg(templateDir.absolutePath()).arg(fileName));
+
         if (file.open(QFile::ReadOnly)) {
             QByteArray jsonData = file.readAll();
             QJsonDocument templateDoc = QJsonDocument::fromJson(jsonData);
@@ -185,6 +186,7 @@ void AirframeInitialTuningPage::setupTemplateList()
     item->setData(Qt::UserRole + 1, QVariant::fromValue((QJsonObject *)NULL));
     foreach(QString templ, m_templates.keys()) {
         QJsonObject *json = m_templates[templ];
+
         item = new QListWidgetItem(json->value("name").toString(), ui->templateList);
         item->setData(Qt::UserRole + 1, QVariant::fromValue(json));
     }

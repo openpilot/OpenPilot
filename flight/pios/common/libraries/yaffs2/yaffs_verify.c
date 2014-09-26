@@ -201,7 +201,7 @@ void yaffs_verify_oh(struct yaffs_obj *obj, struct yaffs_obj_hdr *oh,
 			tags->obj_id, oh->parent_obj_id);
 
 	if (parent_check && obj->parent &&
-	    oh->parent_obj_id != obj->parent->obj_id &&
+	    oh->parent_obj_id != (s32)obj->parent->obj_id &&
 	    (oh->parent_obj_id != YAFFS_OBJECTID_UNLINKED ||
 	     obj->parent->obj_id != YAFFS_OBJECTID_DELETED))
 		yaffs_trace(YAFFS_TRACE_VERIFY,
@@ -224,7 +224,7 @@ void yaffs_verify_file(struct yaffs_obj *obj)
 {
 	u32 x;
 	int required_depth;
-	int actual_depth;
+	//int actual_depth;
 	int last_chunk;
 	u32 offset_in_chunk;
 	u32 the_chunk;
@@ -256,7 +256,7 @@ void yaffs_verify_file(struct yaffs_obj *obj)
 		required_depth++;
 	}
 
-	actual_depth = obj->variant.file_variant.top_level;
+	// actual_depth = obj->variant.file_variant.top_level;  // unused
 
 	/* Check that the chunks in the tnode tree are all correct.
 	 * We do this by scanning through the tnode tree and
@@ -266,7 +266,7 @@ void yaffs_verify_file(struct yaffs_obj *obj)
 	if (yaffs_skip_nand_verification(dev))
 		return;
 
-	for (i = 1; i <= last_chunk; i++) {
+	for (i = 1; i <= (u32)last_chunk; i++) {
 		tn = yaffs_find_tnode_0(dev, &obj->variant.file_variant, i);
 
 		if (!tn)

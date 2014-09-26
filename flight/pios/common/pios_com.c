@@ -207,9 +207,12 @@ static uint16_t PIOS_COM_RxInCallback(uint32_t context, uint8_t *buf, uint16_t b
 
     PIOS_Assert(valid);
     PIOS_Assert(com_dev->has_rx);
-
-    uint16_t bytes_into_fifo = fifoBuf_putData(&com_dev->rx, buf, buf_len);
-
+    uint16_t bytes_into_fifo;
+    if (buf_len == 1) {
+        bytes_into_fifo = fifoBuf_putByte(&com_dev->rx, buf[0]);
+    } else {
+        bytes_into_fifo = fifoBuf_putData(&com_dev->rx, buf, buf_len);
+    }
     if (bytes_into_fifo > 0) {
         /* Data has been added to the buffer */
         PIOS_COM_UnblockRx(com_dev, need_yield);

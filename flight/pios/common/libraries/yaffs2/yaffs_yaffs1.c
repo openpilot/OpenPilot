@@ -23,7 +23,7 @@ int yaffs1_scan(struct yaffs_dev *dev)
 {
 	struct yaffs_ext_tags tags;
 	int blk;
-	int result;
+	//int result;
 	int chunk;
 	int c;
 	int deleted;
@@ -95,8 +95,11 @@ int yaffs1_scan(struct yaffs_dev *dev)
 			/* Read the tags and decide what to do */
 			chunk = blk * dev->param.chunks_per_block + c;
 
-			result = yaffs_rd_chunk_tags_nand(dev, chunk, NULL,
-							  &tags);
+			if (!yaffs_rd_chunk_tags_nand(dev, chunk, NULL, &tags))
+
+			{
+			    yaffs_trace(YAFFS_TRACE_ERROR, "yaffs1_scan: unhandled error from rd_chunk_tags_nand");
+			}
 
 			/* Let's have a good look at this chunk... */
 
@@ -163,7 +166,7 @@ int yaffs1_scan(struct yaffs_dev *dev)
 				    in->variant_type ==
 				     YAFFS_OBJECT_TYPE_FILE &&
 				    in->variant.file_variant.scanned_size <
-				      endpos) {
+				      (s32)endpos) {
 					in->variant.file_variant.scanned_size =
 					    endpos;
 					if (!dev->param.use_header_file_size) {
@@ -181,9 +184,12 @@ int yaffs1_scan(struct yaffs_dev *dev)
 				yaffs_set_chunk_bit(dev, blk, c);
 				bi->pages_in_use++;
 
-				result = yaffs_rd_chunk_tags_nand(dev, chunk,
-								  chunk_data,
-								  NULL);
+				if (!yaffs_rd_chunk_tags_nand(dev, chunk, chunk_data, NULL))
+
+				{
+				    yaffs_trace(YAFFS_TRACE_ERROR, 	
+					"yaffs1_scan: unhandled error from rd_chunk_tags_nand");
+				}
 
 				oh = (struct yaffs_obj_hdr *)chunk_data;
 

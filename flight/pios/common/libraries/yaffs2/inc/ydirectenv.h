@@ -37,7 +37,7 @@ void yaffs_bug_fn(const char *file_name, int line_no);
 #define _Y(x) x
 
 #ifndef Y_LOFF_T
-#define Y_LOFF_T uint32_t
+#define Y_LOFF_T int32_t  // note CONFIG_YAFFS_OP changes dependent on type for max file size
 #endif
 
 #define yaffs_strcat(a, b)	strcat(a, b)

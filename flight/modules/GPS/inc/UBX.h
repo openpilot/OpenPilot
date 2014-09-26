@@ -400,7 +400,7 @@ extern struct UBX_ACK_NAK ubxLastNak;
 bool checksum_ubx_message(struct UBXPacket *);
 uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionSensorData *);
 
-int parse_ubx_stream(uint8_t, char *, GPSPositionSensorData *, struct GPS_RX_STATS *);
+int parse_ubx_stream(uint8_t *rx, uint8_t len, char *, GPSPositionSensorData *, struct GPS_RX_STATS *);
 void load_mag_settings();
 
 #endif /* UBX_H */

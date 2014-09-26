@@ -30,8 +30,12 @@
 #define NAME_MAX	256
 #endif
 
+#ifdef CONFIG_YAFFS_OP
+#define YAFFS_MAX_FILE_SIZE (Y_LOFF_T)16000000
+#else
 #define YAFFS_MAX_FILE_SIZE \
 	( (sizeof(Y_LOFF_T) < 8) ? YAFFS_MAX_FILE_SIZE_32 : (0x800000000LL - 1) )
+#endif
 
 
 #ifdef __cplusplus

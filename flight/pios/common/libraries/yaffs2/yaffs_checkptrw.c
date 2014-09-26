@@ -387,8 +387,11 @@ int yaffs2_checkpt_rd(struct yaffs_dev *dev, void *data, int n_bytes)
 						offset_chunk,
 						dev->checkpt_buffer,
 						&tags);
-
+#ifdef CONFIG_YAFFS_OP
+			if (tags.chunk_id != (u32)(dev->checkpt_page_seq + 1) ||
+#else
 			if (tags.chunk_id != (dev->checkpt_page_seq + 1) ||
+#endif
 			    tags.ecc_result > YAFFS_ECC_RESULT_FIXED ||
 			    tags.seq_number != YAFFS_SEQUENCE_CHECKPOINT_DATA) {
 				ok = 0;

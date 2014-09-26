@@ -199,6 +199,8 @@ void VehicleTemplateExportDialog::accept()
     exportObject["propeller"]  = ui->Propeller->text();
     exportObject["controller"] = ui->Controllers->currentText();
     exportObject["comment"]    = ui->Comment->document()->toPlainText();
+    QUuid uuid = QUuid::createUuid();
+    exportObject["uuid"]       = uuid.toString();
 
     QByteArray bytes;
     QBuffer buffer(&bytes);
@@ -209,13 +211,12 @@ void VehicleTemplateExportDialog::accept()
 
     QJsonDocument saveDoc(exportObject);
 
-    QString fileName = QString("%1/%2/%3-%4-%5-%6.optmpl")
+    QString fileName = QString("%1/%2/%3-%4-%5.optmpl")
                        .arg(EXPORT_BASE_NAME)
                        .arg(getTypeDirectory())
-                       .arg(fixFilenameString(ui->ForumNick->text(), 15))
                        .arg(fixFilenameString(ui->Name->text(), 20))
                        .arg(fixFilenameString(ui->Type->text(), 30))
-                       .arg(fixFilenameString(QUuid::createUuid().toString().right(12)));
+                       .arg(fixFilenameString(uuid.toString().right(12)));
     QFile saveFile(fileName);
     QDir dir;
     dir.mkpath(QFileInfo(saveFile).absoluteDir().absolutePath());

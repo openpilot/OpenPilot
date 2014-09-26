@@ -42,6 +42,7 @@
 #include "gpssettings.h"
 #include "airspeedsettings.h"
 #include <QtCore/qmath.h>
+#include <QJsonObject>
 
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE    = 50;
 const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE     = 400;
@@ -81,6 +82,8 @@ bool VehicleConfigurationHelper::setupVehicle(bool save)
 
     applyStabilizationConfiguration();
     applyManualControlDefaults();
+
+    applyTemplateSettings();
 
     bool result = saveChangesToController(save);
     emit saveProgress(m_modifiedObjects.count() + 1, ++m_progress, result ? tr("Done!") : tr("Failed!"));
@@ -745,6 +748,22 @@ void VehicleConfigurationHelper::applyManualControlDefaults()
 
     mcSettings->setData(cData);
     addModifiedObject(mcSettings, tr("Writing manual control defaults"));
+}
+
+void VehicleConfigurationHelper::applyTemplateSettings()
+{
+    if (m_configSource->getVehicleTemplate() != NULL) {
+        QJsonObject *json = m_configSource->getVehicleTemplate();
+        QList<UAVObject *> updatedObjects;
+        m_uavoManager->fromJson(*json, &updatedObjects);
+        foreach(UAVObject * object, updatedObjects) {
+            UAVDataObject *dataObj = dynamic_cast<UAVDataObject *>(object);
+
+            if (dataObj != NULL) {
+                addModifiedObject(dataObj, QString(tr("Writing template settings for %1")).arg(object->getName()));
+            }
+        }
+    }
 }
 
 bool VehicleConfigurationHelper::saveChangesToController(bool save)

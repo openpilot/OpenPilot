@@ -87,6 +87,7 @@ private:
     void applySensorBiasConfiguration();
     void applyStabilizationConfiguration();
     void applyManualControlDefaults();
+    void applyTemplateSettings();
 
     void applyMixerConfiguration(mixerChannelSettings channels[]);
 

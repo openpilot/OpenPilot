@@ -59,7 +59,7 @@ public:
     void toJson(QJsonObject &jsonObject, JSON_EXPORT_OPTION what = JSON_EXPORT_ALL);
     void toJson(QJsonObject &jsonObject, const QList<QString> &objectsToExport);
     void toJson(QJsonObject &jsonObject, const QList<UAVObject *> &objectsToExport);
-    void fromJson(const QJsonObject &jsonObject);
+    void fromJson(const QJsonObject &jsonObject, QList<UAVObject *> *updatedObjects = NULL);
 
 signals:
     void newObject(UAVObject *obj);

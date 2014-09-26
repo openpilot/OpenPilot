@@ -88,6 +88,7 @@ void yaffs_load_current_time(struct yaffs_obj *obj, int do_a, int do_c)
 #endif
 }
 
+#ifndef CONFIG_YAFFS_OP  // unused yaffs code
 static Y_LOFF_T yaffs_get_file_size(struct yaffs_obj *obj)
 {
 	YCHAR *alias = NULL;
@@ -105,4 +106,5 @@ static Y_LOFF_T yaffs_get_file_size(struct yaffs_obj *obj)
 		return 0;
 	}
 }
+#endif
 

@@ -60,7 +60,7 @@ static int yaffs_tags_marshall_read(struct yaffs_dev *dev,
 				   int nand_chunk, u8 *data,
 				   struct yaffs_ext_tags *tags)
 {
-	int retval = 0;
+	//int retval = 0;
 	int local_data = 0;
 	u8 spare_buffer[100];
 	enum yaffs_ecc_result ecc_result;
@@ -84,15 +84,15 @@ static int yaffs_tags_marshall_read(struct yaffs_dev *dev,
 	}
 
 	if (dev->param.inband_tags || (data && !tags))
-		retval = dev->drv.drv_read_chunk_fn(dev, nand_chunk,
+		dev->drv.drv_read_chunk_fn(dev, nand_chunk,
 					data, dev->param.total_bytes_per_chunk,
 					NULL, 0,
-					&ecc_result);
+					&ecc_result); //TODO check retval
 	else if (tags)
-		retval = dev->drv.drv_read_chunk_fn(dev, nand_chunk,
+		dev->drv.drv_read_chunk_fn(dev, nand_chunk,
 					data, dev->param.total_bytes_per_chunk,
 					spare_buffer, packed_tags_size,
-					&ecc_result);
+					&ecc_result); //TODO check retval
 	else
 		BUG();
 
@@ -118,7 +118,7 @@ static int yaffs_tags_marshall_read(struct yaffs_dev *dev,
 		dev->n_ecc_unfixed++;
 	}
 
-	if (tags && ecc_result == -YAFFS_ECC_RESULT_FIXED) {
+	if (tags && ecc_result == YAFFS_ECC_RESULT_FIXED) {
 		if (tags->ecc_result <= YAFFS_ECC_RESULT_NO_ERROR)
 			tags->ecc_result = YAFFS_ECC_RESULT_FIXED;
 		dev->n_ecc_fixed++;

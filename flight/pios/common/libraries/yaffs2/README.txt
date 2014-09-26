@@ -26,6 +26,7 @@ PiOS Implementation in flight/pios/common/libraries/PiOS
 
 CHANGE LOG:
 1. Initial import
-2. ydirectenv.h		Defined Y_LOFF_T to be uint32_t TODO change to largest required file size
+2. ydirectenv.h		Defined Y_LOFF_T to be int32_t.  Needs to be signed to return -1 for lseek invalid
 3. library.mk		Compiler defines to set yaffs2 diect mode and port options
-4. TODO			Define simposix version of yaffs_osglue.h methods
+4. simposix		Added simposix implementation of lower layers
+5. arm compilation	Addressed compile errors in arm toolchain. Generally marked changes with CONFIG_YAFFS_OP

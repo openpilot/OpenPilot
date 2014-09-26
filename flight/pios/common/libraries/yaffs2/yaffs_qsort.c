@@ -150,10 +150,10 @@ loop:	SWAPINIT(a, es);
 	r = min((long)(pd - pc), (long)(pn - pd - es));
 	vecswap(pb, pn - r, r);
 	r = pb - pa;
-	if (r > es)
+	if (r > (int)es)
 		yaffs_qsort(a, r / es, es, cmp);
 	r = pd - pc;
-	if (r > es) {
+	if (r > (int)es) {
 		/* Iterate rather than recurse to save stack space */
 		a = pn - r;
 		n = r / es;

@@ -1161,10 +1161,12 @@ static int yaffsfs_do_read(int handle, void *vbuf, unsigned int nbyte,
 		/* Not a reading handle */
 		yaffsfs_SetError(-EINVAL);
 		totalRead = -1;
-	} else if (nbyte > YAFFS_MAX_FILE_SIZE) {
+	} 
+ 	else if (nbyte > YAFFS_MAX_FILE_SIZE) {
 		yaffsfs_SetError(-EINVAL);
 		totalRead = -1;
-	} else {
+	} 
+	else {
 		if (isPread)
 			startPos = offset;
 		else
@@ -1177,16 +1179,16 @@ static int yaffsfs_do_read(int handle, void *vbuf, unsigned int nbyte,
 		else
 			maxRead = 0;
 
-		if (nbyte > maxRead)
+		if ((s32)nbyte > maxRead)
 			nbyte = maxRead;
 
 		yaffsfs_GetHandle(handle);
 
 		endPos = pos + nbyte;
-
 		if (pos < 0 || pos > YAFFS_MAX_FILE_SIZE ||
-		    nbyte > YAFFS_MAX_FILE_SIZE ||
-		    endPos < 0 || endPos > YAFFS_MAX_FILE_SIZE) {
+		    nbyte > YAFFS_MAX_FILE_SIZE || 
+		    endPos < 0 ||
+		    endPos > YAFFS_MAX_FILE_SIZE) {
 			totalRead = -1;
 			nbyte = 0;
 		}
@@ -1194,7 +1196,7 @@ static int yaffsfs_do_read(int handle, void *vbuf, unsigned int nbyte,
 		while (nbyte > 0) {
 			nToRead = YAFFSFS_RW_SIZE -
 			    (pos & (YAFFSFS_RW_SIZE - 1));
-			if (nToRead > nbyte)
+			if (nToRead > (s32)nbyte)
 				nToRead = nbyte;
 
 			/* Tricky bit...
@@ -1297,9 +1299,10 @@ static int yaffsfs_do_write(int handle, const void *vbuf, unsigned int nbyte,
 		pos = startPos;
 		endPos = pos + nbyte;
 
-		if (pos < 0 || pos > YAFFS_MAX_FILE_SIZE ||
-		    nbyte > YAFFS_MAX_FILE_SIZE ||
-		    endPos < 0 || endPos > YAFFS_MAX_FILE_SIZE) {
+		if (pos < 0 || pos > YAFFS_MAX_FILE_SIZE || 
+		    nbyte > YAFFS_MAX_FILE_SIZE || 
+		    endPos < 0 ||  
+		    endPos > YAFFS_MAX_FILE_SIZE) {
 			totalWritten = -1;
 			nbyte = 0;
 		}
@@ -1308,7 +1311,7 @@ static int yaffsfs_do_write(int handle, const void *vbuf, unsigned int nbyte,
 
 			nToWrite = YAFFSFS_RW_SIZE -
 			    (pos & (YAFFSFS_RW_SIZE - 1));
-			if (nToWrite > nbyte)
+			if (nToWrite > (s32)nbyte)
 				nToWrite = nbyte;
 
 			/* Tricky bit...

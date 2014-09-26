@@ -191,10 +191,13 @@ int yaffs_summary_read(struct yaffs_dev *dev,
 	struct yaffs_summary_header hdr;
 	struct yaffs_block_info *bi = yaffs_get_block_info(dev, blk);
 	int sum_bytes_per_chunk = dev->data_bytes_per_chunk - sizeof(hdr);
+#ifndef CONFIG_YAFFS_OP
 	int sum_tags_bytes;
 
 	sum_tags_bytes = sizeof(struct yaffs_summary_tags) *
 				dev->chunks_per_summary;
+#endif //unused code
+
 	buffer = yaffs_get_temp_buffer(dev);
 	n_bytes = sizeof(struct yaffs_summary_tags) * dev->chunks_per_summary;
 	chunk_in_block = dev->chunks_per_summary;
@@ -208,7 +211,7 @@ int yaffs_summary_read(struct yaffs_dev *dev,
 		result = yaffs_rd_chunk_tags_nand(dev, chunk_in_nand,
 						buffer, &tags);
 
-		if (tags.chunk_id != chunk_id ||
+		if ((int)tags.chunk_id != chunk_id ||
 			tags.obj_id != YAFFS_OBJECTID_SUMMARY ||
 			tags.chunk_used == 0 ||
 			tags.ecc_result > YAFFS_ECC_RESULT_FIXED ||

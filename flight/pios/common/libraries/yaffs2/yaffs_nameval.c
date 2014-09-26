@@ -44,7 +44,7 @@ static int nval_find(const char *xb, int xb_size, const YCHAR *name,
 			return pos;
 		}
 		pos += size;
-		if (pos < xb_size - sizeof(int))
+		if (pos < xb_size - (int)sizeof(int))
 			memcpy(&size, xb + pos, sizeof(int));
 		else
 			size = 0;
@@ -62,7 +62,7 @@ static int nval_used(const char *xb, int xb_size)
 	memcpy(&size, xb + pos, sizeof(int));
 	while (size > 0 && (size < xb_size) && (pos + size < xb_size)) {
 		pos += size;
-		if (pos < xb_size - sizeof(int))
+		if (pos < xb_size - (int)sizeof(int))
 			memcpy(&size, xb + pos, sizeof(int));
 		else
 			size = 0;
@@ -173,7 +173,7 @@ int nval_list(const char *xb, int xb_size, char *buf, int bsize)
 	int filled = 0;
 
 	memcpy(&size, xb + pos, sizeof(int));
-	while (size > sizeof(int) &&
+	while (size > (int)sizeof(int) &&
 		size <= xb_size &&
 		(pos + size) < xb_size &&
 		!filled) {
@@ -194,7 +194,7 @@ int nval_list(const char *xb, int xb_size, char *buf, int bsize)
 			filled = 1;
 		}
 		pos += size;
-		if (pos < xb_size - sizeof(int))
+		if (pos < xb_size - (int)sizeof(int))
 			memcpy(&size, xb + pos, sizeof(int));
 		else
 			size = 0;

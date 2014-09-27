@@ -85,18 +85,21 @@ void updateGpsSettings(UAVObjEvent *ev);
 
 #define GPS_LOOP_DELAY_MS          6
 
-#define GPS_READ_BUFFER            128
-
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
         #define STACK_SIZE_BYTES   1024
 #else
 #if defined(PIOS_GPS_MINIMAL)
+        #define GPS_READ_BUFFER     32
         #define STACK_SIZE_BYTES   500
 #else
         #define STACK_SIZE_BYTES   650
 #endif // PIOS_GPS_MINIMAL
 #endif // PIOS_GPS_SETS_HOMELOCATION
+
+#ifndef GPS_READ_BUFFER
+#define GPS_READ_BUFFER            128
+#endif
 
 #define TASK_PRIORITY              (tskIDLE_PRIORITY + 1)
 

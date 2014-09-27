@@ -7838,7 +7838,7 @@ border-radius: 5;</string>
             <x>0</x>
             <y>0</y>
             <width>954</width>
-            <height>742</height>
+            <height>750</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -7864,7 +7864,7 @@ border-radius: 5;</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_7">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="9,3">
+               <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="4,3">
                 <item>
                  <widget class="QGroupBox" name="advancedResponsivenessGroupBox">
                   <property name="enabled">
@@ -7916,6 +7916,70 @@ border-radius: 5;</string>
                    <property name="horizontalSpacing">
                     <number>6</number>
                    </property>
+                   <item row="1" column="0">
+                    <widget class="QCheckBox" name="advancedResponsivenessCheckBox">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Use Advanced Configuration</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="2">
+                    <widget class="QPushButton" name="pushButton_3">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>Reset all values to GCS defaults</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <property name="text">
+                      <string>Default</string>
+                     </property>
+                     <property name="objrelation" stdset="0">
+                      <stringlist>
+                       <string>objname:StabilizationSettings</string>
+                       <string>button:default</string>
+                       <string>buttongroup:6</string>
+                      </stringlist>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <spacer name="horizontalSpacer_14">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
                    <item row="2" column="0" colspan="3">
                     <widget class="QGroupBox" name="advancedResponsivenessControls">
                      <property name="enabled">
@@ -10661,70 +10725,6 @@ border-radius: 5;</string>
                      </layout>
                     </widget>
                    </item>
-                   <item row="1" column="0">
-                    <widget class="QCheckBox" name="advancedResponsivenessCheckBox">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Use Advanced Configuration</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="2">
-                    <widget class="QPushButton" name="pushButton_3">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="toolTip">
-                      <string>Reset all values to GCS defaults</string>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true"/>
-                     </property>
-                     <property name="text">
-                      <string>Default</string>
-                     </property>
-                     <property name="objrelation" stdset="0">
-                      <stringlist>
-                       <string>objname:StabilizationSettings</string>
-                       <string>button:default</string>
-                       <string>buttongroup:6</string>
-                      </stringlist>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <spacer name="horizontalSpacer_14">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
                   </layout>
                  </widget>
                 </item>
@@ -10736,90 +10736,27 @@ border-radius: 5;</string>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
                   <property name="title">
                    <string>Thrust PID Scaling</string>
                   </property>
                   <property name="checkable">
                    <bool>false</bool>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_27">
-                   <item row="0" column="1">
-                    <widget class="MixerCurveWidget" name="thrustPIDScalingCurve" native="true">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
+                  <layout class="QGridLayout" name="gridLayout_27" rowstretch="0,0,0" columnminimumwidth="0,0,0">
+                   <item row="1" column="0" rowspan="2">
+                    <widget class="QFrame" name="frame_3">
                      <property name="minimumSize">
                       <size>
-                       <width>200</width>
-                       <height>200</height>
+                       <width>140</width>
+                       <height>0</height>
                       </size>
                      </property>
-                     <property name="font">
-                      <font>
-                       <pointsize>7</pointsize>
-                      </font>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="3" rowspan="3" alignment="Qt::AlignTop">
-                    <widget class="QFrame" name="frame_2">
-                     <property name="frameShape">
-                      <enum>QFrame::NoFrame</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                     </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_20">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item alignment="Qt::AlignTop">
-                       <widget class="QPushButton" name="defaultThrottleCurveButton">
-                        <property name="text">
-                         <string>Default</string>
-                        </property>
-                        <property name="objrelation" stdset="0">
-                         <stringlist>
-                          <string>objname:StabilizationSettings</string>
-                          <string>button:default</string>
-                          <string>buttongroup:99</string>
-                         </stringlist>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item row="0" column="2">
-                    <spacer name="horizontalSpacer_61">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeType">
-                      <enum>QSizePolicy::Expanding</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item row="0" column="0">
-                    <widget class="QFrame" name="frame_3">
                      <property name="frameShape">
                       <enum>QFrame::NoFrame</enum>
                      </property>
@@ -10830,7 +10767,7 @@ border-radius: 5;</string>
                       <item>
                        <widget class="QCheckBox" name="enableThrustPIDScalingCheckBox">
                         <property name="text">
-                         <string>Enable Thrust PID Scaling</string>
+                         <string>Enable TPS</string>
                         </property>
                         <property name="objrelation" stdset="0">
                          <stringlist>
@@ -12524,7 +12461,51 @@ border-radius: 5;</string>
                         </property>
                        </widget>
                       </item>
+                      <item>
+                       <widget class="QPushButton" name="defaultThrottleCurveButton">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="layoutDirection">
+                         <enum>Qt::LeftToRight</enum>
+                        </property>
+                        <property name="text">
+                         <string>Default</string>
+                        </property>
+                        <property name="objrelation" stdset="0">
+                         <stringlist>
+                          <string>objname:StabilizationSettings</string>
+                          <string>button:default</string>
+                          <string>buttongroup:99</string>
+                         </stringlist>
+                        </property>
+                       </widget>
+                      </item>
                      </layout>
+                    </widget>
+                   </item>
+                   <item row="1" column="1" rowspan="2">
+                    <widget class="MixerCurveWidget" name="thrustPIDScalingCurve" native="true">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>180</width>
+                       <height>180</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <pointsize>7</pointsize>
+                      </font>
+                     </property>
                     </widget>
                    </item>
                   </layout>
@@ -26928,7 +26909,7 @@ border-radius: 5;</string>
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../coreplugin/core.qrc">
+        <iconset>
          <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
        </property>
        <property name="iconSize">

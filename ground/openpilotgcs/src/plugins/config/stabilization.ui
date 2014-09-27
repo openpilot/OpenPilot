@@ -95,7 +95,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -7838,7 +7838,7 @@ border-radius: 5;</string>
             <x>0</x>
             <y>0</y>
             <width>954</width>
-            <height>750</height>
+            <height>732</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -7916,7 +7916,7 @@ border-radius: 5;</string>
                    <property name="horizontalSpacing">
                     <number>6</number>
                    </property>
-                   <item row="1" column="0">
+                   <item row="1" column="0" alignment="Qt::AlignTop">
                     <widget class="QCheckBox" name="advancedResponsivenessCheckBox">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -7929,7 +7929,20 @@ border-radius: 5;</string>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="2">
+                   <item row="1" column="1">
+                    <spacer name="horizontalSpacer_14">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="1" column="2" alignment="Qt::AlignTop">
                     <widget class="QPushButton" name="pushButton_3">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -7966,19 +7979,6 @@ border-radius: 5;</string>
                       </stringlist>
                      </property>
                     </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <spacer name="horizontalSpacer_14">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
                    </item>
                    <item row="2" column="0" colspan="3">
                     <widget class="QGroupBox" name="advancedResponsivenessControls">
@@ -8424,8 +8424,11 @@ border-radius: 5;</string>
                      <property name="flat">
                       <bool>true</bool>
                      </property>
-                     <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0" columnstretch="0,0,1,0,1,0,1,0">
+                     <layout class="QGridLayout" name="gridLayout_6" rowstretch="0,0,0,0" columnstretch="0,0,0,0,0,0,0">
                       <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
                        <number>0</number>
                       </property>
                       <property name="rightMargin">
@@ -8437,1473 +8440,6 @@ border-radius: 5;</string>
                       <property name="verticalSpacing">
                        <number>0</number>
                       </property>
-                      <item row="1" column="4">
-                       <widget class="QDoubleSpinBox" name="ratePitchKp_4">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="focusPolicy">
-                         <enum>Qt::StrongFocus</enum>
-                        </property>
-                        <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true"/>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                        </property>
-                        <property name="decimals">
-                         <number>0</number>
-                        </property>
-                        <property name="maximum">
-                         <double>180.000000000000000</double>
-                        </property>
-                        <property name="singleStep">
-                         <double>1.000000000000000</double>
-                        </property>
-                        <property name="objrelation" stdset="0">
-                         <stringlist>
-                          <string>objname:StabilizationSettingsBankX</string>
-                          <string>fieldname:PitchMax</string>
-                          <string>haslimits:no</string>
-                          <string>scale:1</string>
-                          <string>buttongroup:6,20</string>
-                         </stringlist>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="3" column="0">
-                       <widget class="QLabel" name="label_22">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>128</width>
-                          <height>16</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>16777215</height>
-                         </size>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true"/>
-                        </property>
-                        <property name="text">
-                         <string>Max rate limit (all modes) (deg/s)</string>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="3" column="2">
-                       <widget class="QDoubleSpinBox" name="rateRollILimit_3">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="focusPolicy">
-                         <enum>Qt::StrongFocus</enum>
-                        </property>
-                        <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degrees per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true"/>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                        </property>
-                        <property name="decimals">
-                         <number>0</number>
-                        </property>
-                        <property name="maximum">
-                         <double>1000000.000000000000000</double>
-                        </property>
-                        <property name="singleStep">
-                         <double>1.000000000000000</double>
-                        </property>
-                        <property name="objrelation" stdset="0">
-                         <stringlist>
-                          <string>objname:StabilizationSettingsBankX</string>
-                          <string>fieldname:MaximumRate</string>
-                          <string>element:Roll</string>
-                          <string>haslimits:no</string>
-                          <string>scale:1</string>
-                          <string>buttongroup:6,20</string>
-                         </stringlist>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="2" column="1">
-                       <spacer name="horizontalSpacer_30">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                         <enum>QSizePolicy::Fixed</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>10</width>
-                          <height>10</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                      <item row="2" column="6">
-                       <widget class="QDoubleSpinBox" name="rateYawKi_3">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="focusPolicy">
-                         <enum>Qt::StrongFocus</enum>
-                        </property>
-                        <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the degrees per second that your vehicle will tilt/rotate at full stick input when in all modes except Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true"/>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                        </property>
-                        <property name="decimals">
-                         <number>0</number>
-                        </property>
-                        <property name="maximum">
-                         <double>1000000.000000000000000</double>
-                        </property>
-                        <property name="singleStep">
-                         <double>1.000000000000000</double>
-                        </property>
-                        <property name="objrelation" stdset="0">
-                         <stringlist>
-                          <string>objname:StabilizationSettingsBankX</string>
-                          <string>fieldname:ManualRate</string>
-                          <string>element:Yaw</string>
-                          <string>haslimits:no</string>
-                          <string>scale:1</string>
-                          <string>buttongroup:6,20</string>
-                         </stringlist>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="6">
-                       <widget class="QDoubleSpinBox" name="rateYawKp_3">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="focusPolicy">
-                         <enum>Qt::StrongFocus</enum>
-                        </property>
-                        <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true"/>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                        </property>
-                        <property name="decimals">
-                         <number>0</number>
-                        </property>
-                        <property name="maximum">
-                         <double>180.000000000000000</double>
-                        </property>
-                        <property name="singleStep">
-                         <double>1.000000000000000</double>
-                        </property>
-                        <property name="objrelation" stdset="0">
-                         <stringlist>
-                          <string>objname:StabilizationSettingsBankX</string>
-                          <string>fieldname:YawMax</string>
-                          <string>haslimits:no</string>
-                          <string>scale:1</string>
-                          <string>buttongroup:6,20</string>
-                         </stringlist>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="3" column="4">
-                       <widget class="QDoubleSpinBox" name="ratePitchILimit_4">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>16777215</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="focusPolicy">
-                         <enum>Qt::StrongFocus</enum>
-                        </property>
-                        <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degrees per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true"/>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                        </property>
-                        <property name="decimals">
-                         <number>0</number>
-                        </property>
-                        <property name="maximum">
-                         <double>1000000.000000000000000</double>
-                        </property>
-                        <property name="singleStep">
-                         <double>1.000000000000000</double>
-                        </property>
-                        <property name="objrelation" stdset="0">
-                         <stringlist>
-                          <string>objname:StabilizationSettingsBankX</string>
-                          <string>fieldname:MaximumRate</string>
-                          <string>element:Pitch</string>
-                          <string>haslimits:no</string>
-                          <string>scale:1</string>
-                          <string>buttongroup:6,20</string>
-                         </stringlist>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="0" column="6">
-                       <widget class="QLabel" name="label_38">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="palette">
-                         <palette>
-                          <active>
-                           <colorrole role="WindowText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Button">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Light">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>58</red>
-                              <green>58</green>
-                              <blue>58</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Midlight">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>48</red>
-                              <green>48</green>
-                              <blue>48</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Dark">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Mid">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>26</red>
-                              <green>26</green>
-                              <blue>26</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Text">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="BrightText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ButtonText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Base">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Window">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Shadow">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="AlternateBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>220</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                          </active>
-                          <inactive>
-                           <colorrole role="WindowText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Button">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Light">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>58</red>
-                              <green>58</green>
-                              <blue>58</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Midlight">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>48</red>
-                              <green>48</green>
-                              <blue>48</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Dark">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Mid">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>26</red>
-                              <green>26</green>
-                              <blue>26</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Text">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="BrightText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ButtonText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Base">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Window">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Shadow">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="AlternateBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>220</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                          </inactive>
-                          <disabled>
-                           <colorrole role="WindowText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Button">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Light">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>58</red>
-                              <green>58</green>
-                              <blue>58</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Midlight">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>48</red>
-                              <green>48</green>
-                              <blue>48</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Dark">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Mid">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>26</red>
-                              <green>26</green>
-                              <blue>26</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Text">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="BrightText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ButtonText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Base">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Window">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Shadow">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="AlternateBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>39</red>
-                              <green>39</green>
-                              <blue>39</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>220</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                          </disabled>
-                         </palette>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <weight>75</weight>
-                          <bold>true</bold>
-                         </font>
-                        </property>
-                        <property name="autoFillBackground">
-                         <bool>false</bool>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;</string>
-                        </property>
-                        <property name="text">
-                         <string>Yaw</string>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignCenter</set>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="2" column="3">
-                       <spacer name="horizontalSpacer_31">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                         <enum>QSizePolicy::Fixed</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>10</width>
-                          <height>10</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                      <item row="2" column="5">
-                       <spacer name="horizontalSpacer_32">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                         <enum>QSizePolicy::Fixed</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>10</width>
-                          <height>10</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                      <item row="0" column="4">
-                       <widget class="QLabel" name="label_37">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                        <property name="palette">
-                         <palette>
-                          <active>
-                           <colorrole role="WindowText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Button">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Light">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>58</red>
-                              <green>58</green>
-                              <blue>58</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Midlight">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>48</red>
-                              <green>48</green>
-                              <blue>48</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Dark">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Mid">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>26</red>
-                              <green>26</green>
-                              <blue>26</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Text">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="BrightText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ButtonText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Base">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Window">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Shadow">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="AlternateBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>220</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                          </active>
-                          <inactive>
-                           <colorrole role="WindowText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Button">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Light">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>58</red>
-                              <green>58</green>
-                              <blue>58</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Midlight">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>48</red>
-                              <green>48</green>
-                              <blue>48</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Dark">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Mid">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>26</red>
-                              <green>26</green>
-                              <blue>26</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Text">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="BrightText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ButtonText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Base">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Window">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Shadow">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="AlternateBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>220</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                          </inactive>
-                          <disabled>
-                           <colorrole role="WindowText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Button">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Light">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>58</red>
-                              <green>58</green>
-                              <blue>58</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Midlight">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>48</red>
-                              <green>48</green>
-                              <blue>48</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Dark">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>19</red>
-                              <green>19</green>
-                              <blue>19</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Mid">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>26</red>
-                              <green>26</green>
-                              <blue>26</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Text">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="BrightText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ButtonText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>255</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Base">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Window">
-                            <brush brushstyle="LinearGradientPattern">
-                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
-                              <gradientstop position="0.208955000000000">
-                               <color alpha="255">
-                                <red>74</red>
-                                <green>74</green>
-                                <blue>74</blue>
-                               </color>
-                              </gradientstop>
-                              <gradientstop position="0.786070000000000">
-                               <color alpha="255">
-                                <red>36</red>
-                                <green>36</green>
-                                <blue>36</blue>
-                               </color>
-                              </gradientstop>
-                             </gradient>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="Shadow">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="AlternateBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>39</red>
-                              <green>39</green>
-                              <blue>39</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipBase">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>255</red>
-                              <green>255</green>
-                              <blue>220</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                           <colorrole role="ToolTipText">
-                            <brush brushstyle="SolidPattern">
-                             <color alpha="255">
-                              <red>0</red>
-                              <green>0</green>
-                              <blue>0</blue>
-                             </color>
-                            </brush>
-                           </colorrole>
-                          </disabled>
-                         </palette>
-                        </property>
-                        <property name="font">
-                         <font>
-                          <weight>75</weight>
-                          <bold>true</bold>
-                         </font>
-                        </property>
-                        <property name="autoFillBackground">
-                         <bool>false</bool>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;</string>
-                        </property>
-                        <property name="text">
-                         <string>Pitch</string>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignCenter</set>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="0">
-                       <widget class="QLabel" name="label_39">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>69</width>
-                          <height>16</height>
-                         </size>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true"/>
-                        </property>
-                        <property name="text">
-                         <string>Attitude mode response (deg)</string>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                        </property>
-                       </widget>
-                      </item>
                       <item row="2" column="4">
                        <widget class="QDoubleSpinBox" name="ratePitchKi_4">
                         <property name="sizePolicy">
@@ -9956,22 +8492,6 @@ border-radius: 5;</string>
                          </stringlist>
                         </property>
                        </widget>
-                      </item>
-                      <item row="0" column="0">
-                       <spacer name="horizontalSpacer_29">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                         <enum>QSizePolicy::Fixed</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>140</width>
-                          <height>16</height>
-                         </size>
-                        </property>
-                       </spacer>
                       </item>
                       <item row="0" column="2">
                        <widget class="QLabel" name="label_33">
@@ -10631,6 +9151,20 @@ border-radius: 5;</string>
                         </property>
                        </widget>
                       </item>
+                      <item row="2" column="0">
+                       <widget class="QLabel" name="label_40">
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <property name="text">
+                         <string>Rate mode
+response (deg/s)</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                       </widget>
+                      </item>
                       <item row="3" column="6">
                        <widget class="QDoubleSpinBox" name="rateYawILimit_3">
                         <property name="sizePolicy">
@@ -10684,10 +9218,10 @@ border-radius: 5;</string>
                         </property>
                        </widget>
                       </item>
-                      <item row="2" column="0">
-                       <widget class="QLabel" name="label_40">
+                      <item row="3" column="2">
+                       <widget class="QDoubleSpinBox" name="rateRollILimit_3">
                         <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
@@ -10695,35 +9229,1449 @@ border-radius: 5;</string>
                         <property name="minimumSize">
                          <size>
                           <width>0</width>
-                          <height>16</height>
+                          <height>22</height>
                          </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="focusPolicy">
+                         <enum>Qt::StrongFocus</enum>
+                        </property>
+                        <property name="toolTip">
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degrees per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                         </property>
                         <property name="styleSheet">
                          <string notr="true"/>
                         </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                        <property name="decimals">
+                         <number>0</number>
+                        </property>
+                        <property name="maximum">
+                         <double>1000000.000000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>1.000000000000000</double>
+                        </property>
+                        <property name="objrelation" stdset="0">
+                         <stringlist>
+                          <string>objname:StabilizationSettingsBankX</string>
+                          <string>fieldname:MaximumRate</string>
+                          <string>element:Roll</string>
+                          <string>haslimits:no</string>
+                          <string>scale:1</string>
+                          <string>buttongroup:6,20</string>
+                         </stringlist>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="1">
+                       <spacer name="horizontalSpacer_30">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeType">
+                         <enum>QSizePolicy::Fixed</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>10</width>
+                          <height>10</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item row="2" column="6">
+                       <widget class="QDoubleSpinBox" name="rateYawKi_3">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="focusPolicy">
+                         <enum>Qt::StrongFocus</enum>
+                        </property>
+                        <property name="toolTip">
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the degrees per second that your vehicle will tilt/rotate at full stick input when in all modes except Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                        <property name="decimals">
+                         <number>0</number>
+                        </property>
+                        <property name="maximum">
+                         <double>1000000.000000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>1.000000000000000</double>
+                        </property>
+                        <property name="objrelation" stdset="0">
+                         <stringlist>
+                          <string>objname:StabilizationSettingsBankX</string>
+                          <string>fieldname:ManualRate</string>
+                          <string>element:Yaw</string>
+                          <string>haslimits:no</string>
+                          <string>scale:1</string>
+                          <string>buttongroup:6,20</string>
+                         </stringlist>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="6">
+                       <widget class="QDoubleSpinBox" name="rateYawKp_3">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="focusPolicy">
+                         <enum>Qt::StrongFocus</enum>
+                        </property>
+                        <property name="toolTip">
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                        <property name="decimals">
+                         <number>0</number>
+                        </property>
+                        <property name="maximum">
+                         <double>180.000000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>1.000000000000000</double>
+                        </property>
+                        <property name="objrelation" stdset="0">
+                         <stringlist>
+                          <string>objname:StabilizationSettingsBankX</string>
+                          <string>fieldname:YawMax</string>
+                          <string>haslimits:no</string>
+                          <string>scale:1</string>
+                          <string>buttongroup:6,20</string>
+                         </stringlist>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="3">
+                       <spacer name="horizontalSpacer_31">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeType">
+                         <enum>QSizePolicy::Fixed</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>10</width>
+                          <height>10</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item row="0" column="4">
+                       <widget class="QLabel" name="label_37">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                        <property name="palette">
+                         <palette>
+                          <active>
+                           <colorrole role="WindowText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Button">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Light">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>58</red>
+                              <green>58</green>
+                              <blue>58</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Midlight">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>48</red>
+                              <green>48</green>
+                              <blue>48</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Dark">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Mid">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>26</red>
+                              <green>26</green>
+                              <blue>26</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Text">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="BrightText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ButtonText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Base">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Window">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Shadow">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="AlternateBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>220</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                          </active>
+                          <inactive>
+                           <colorrole role="WindowText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Button">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Light">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>58</red>
+                              <green>58</green>
+                              <blue>58</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Midlight">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>48</red>
+                              <green>48</green>
+                              <blue>48</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Dark">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Mid">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>26</red>
+                              <green>26</green>
+                              <blue>26</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Text">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="BrightText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ButtonText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Base">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Window">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Shadow">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="AlternateBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>220</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                          </inactive>
+                          <disabled>
+                           <colorrole role="WindowText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Button">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Light">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>58</red>
+                              <green>58</green>
+                              <blue>58</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Midlight">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>48</red>
+                              <green>48</green>
+                              <blue>48</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Dark">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Mid">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>26</red>
+                              <green>26</green>
+                              <blue>26</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Text">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="BrightText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ButtonText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Base">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Window">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Shadow">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="AlternateBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>39</red>
+                              <green>39</green>
+                              <blue>39</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>220</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                          </disabled>
+                         </palette>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <weight>75</weight>
+                          <bold>true</bold>
+                         </font>
+                        </property>
+                        <property name="autoFillBackground">
+                         <bool>false</bool>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                        </property>
                         <property name="text">
-                         <string>Rate mode response (deg/s)</string>
+                         <string>Pitch</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="5">
+                       <spacer name="horizontalSpacer_32">
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="sizeType">
+                         <enum>QSizePolicy::Fixed</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>10</width>
+                          <height>10</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item row="3" column="4">
+                       <widget class="QDoubleSpinBox" name="ratePitchILimit_4">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="focusPolicy">
+                         <enum>Qt::StrongFocus</enum>
+                        </property>
+                        <property name="toolTip">
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degrees per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                        <property name="decimals">
+                         <number>0</number>
+                        </property>
+                        <property name="maximum">
+                         <double>1000000.000000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>1.000000000000000</double>
+                        </property>
+                        <property name="objrelation" stdset="0">
+                         <stringlist>
+                          <string>objname:StabilizationSettingsBankX</string>
+                          <string>fieldname:MaximumRate</string>
+                          <string>element:Pitch</string>
+                          <string>haslimits:no</string>
+                          <string>scale:1</string>
+                          <string>buttongroup:6,20</string>
+                         </stringlist>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="6">
+                       <widget class="QLabel" name="label_38">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                        <property name="palette">
+                         <palette>
+                          <active>
+                           <colorrole role="WindowText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Button">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Light">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>58</red>
+                              <green>58</green>
+                              <blue>58</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Midlight">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>48</red>
+                              <green>48</green>
+                              <blue>48</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Dark">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Mid">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>26</red>
+                              <green>26</green>
+                              <blue>26</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Text">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="BrightText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ButtonText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Base">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Window">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Shadow">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="AlternateBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>220</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                          </active>
+                          <inactive>
+                           <colorrole role="WindowText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Button">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Light">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>58</red>
+                              <green>58</green>
+                              <blue>58</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Midlight">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>48</red>
+                              <green>48</green>
+                              <blue>48</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Dark">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Mid">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>26</red>
+                              <green>26</green>
+                              <blue>26</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Text">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="BrightText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ButtonText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Base">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Window">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Shadow">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="AlternateBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>220</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                          </inactive>
+                          <disabled>
+                           <colorrole role="WindowText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Button">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Light">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>58</red>
+                              <green>58</green>
+                              <blue>58</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Midlight">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>48</red>
+                              <green>48</green>
+                              <blue>48</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Dark">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>19</red>
+                              <green>19</green>
+                              <blue>19</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Mid">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>26</red>
+                              <green>26</green>
+                              <blue>26</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Text">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="BrightText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ButtonText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>255</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Base">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Window">
+                            <brush brushstyle="LinearGradientPattern">
+                             <gradient startx="0.507000000000000" starty="0.000000000000000" endx="0.507000000000000" endy="0.772000000000000" type="LinearGradient" spread="ReflectSpread" coordinatemode="ObjectBoundingMode">
+                              <gradientstop position="0.208955000000000">
+                               <color alpha="255">
+                                <red>74</red>
+                                <green>74</green>
+                                <blue>74</blue>
+                               </color>
+                              </gradientstop>
+                              <gradientstop position="0.786070000000000">
+                               <color alpha="255">
+                                <red>36</red>
+                                <green>36</green>
+                                <blue>36</blue>
+                               </color>
+                              </gradientstop>
+                             </gradient>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="Shadow">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="AlternateBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>39</red>
+                              <green>39</green>
+                              <blue>39</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipBase">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>255</red>
+                              <green>255</green>
+                              <blue>220</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                           <colorrole role="ToolTipText">
+                            <brush brushstyle="SolidPattern">
+                             <color alpha="255">
+                              <red>0</red>
+                              <green>0</green>
+                              <blue>0</blue>
+                             </color>
+                            </brush>
+                           </colorrole>
+                          </disabled>
+                         </palette>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <weight>75</weight>
+                          <bold>true</bold>
+                         </font>
+                        </property>
+                        <property name="autoFillBackground">
+                         <bool>false</bool>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;</string>
+                        </property>
+                        <property name="text">
+                         <string>Yaw</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="label_39">
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <property name="text">
+                         <string>Attitude mode
+response (deg)</string>
                         </property>
                         <property name="alignment">
                          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                         </property>
                        </widget>
                       </item>
-                      <item row="1" column="7">
-                       <spacer name="horizontalSpacer_33">
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
+                      <item row="1" column="4">
+                       <widget class="QDoubleSpinBox" name="ratePitchKp_4">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
                         </property>
-                        <property name="sizeHint" stdset="0">
+                        <property name="minimumSize">
                          <size>
-                          <width>20</width>
-                          <height>20</height>
+                          <width>0</width>
+                          <height>22</height>
                          </size>
                         </property>
-                       </spacer>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="focusPolicy">
+                         <enum>Qt::StrongFocus</enum>
+                        </property>
+                        <property name="toolTip">
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                        <property name="decimals">
+                         <number>0</number>
+                        </property>
+                        <property name="maximum">
+                         <double>180.000000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>1.000000000000000</double>
+                        </property>
+                        <property name="objrelation" stdset="0">
+                         <stringlist>
+                          <string>objname:StabilizationSettingsBankX</string>
+                          <string>fieldname:PitchMax</string>
+                          <string>haslimits:no</string>
+                          <string>scale:1</string>
+                          <string>buttongroup:6,20</string>
+                         </stringlist>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="0">
+                       <widget class="QLabel" name="label_22">
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <property name="text">
+                         <string>Max rate limit
+(all modes) (deg/s)</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                       </widget>
                       </item>
                      </layout>
                     </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <spacer name="verticalSpacer_8">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                   </layout>
                  </widget>
@@ -10748,7 +10696,13 @@ border-radius: 5;</string>
                   <property name="checkable">
                    <bool>false</bool>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_27" rowstretch="0,0,0" columnminimumwidth="0,0,0">
+                  <layout class="QGridLayout" name="gridLayout_27" rowstretch="0,0,0" columnminimumwidth="0,0">
+                   <property name="leftMargin">
+                    <number>9</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>9</number>
+                   </property>
                    <item row="1" column="0" rowspan="2">
                     <widget class="QFrame" name="frame_3">
                      <property name="minimumSize">
@@ -10764,6 +10718,18 @@ border-radius: 5;</string>
                       <enum>QFrame::Raised</enum>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_17">
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>0</number>
+                      </property>
                       <item>
                        <widget class="QCheckBox" name="enableThrustPIDScalingCheckBox">
                         <property name="text">
@@ -26909,7 +26875,7 @@ border-radius: 5;</string>
         <string/>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="../coreplugin/core.qrc">
          <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
        </property>
        <property name="iconSize">

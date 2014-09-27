@@ -133,6 +133,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     ui->thrustPIDScalingCurve->setYAxisLabel(tr("Scaling factor"));
     ui->thrustPIDScalingCurve->setMin(-0.5);
     ui->thrustPIDScalingCurve->setMax(0.5);
+    ui->thrustPIDScalingCurve->initLinearCurve(5, -0.25, 0.25);
 
     addWidget(ui->defaultThrottleCurveButton);
     addWidget(ui->enableThrustPIDScalingCheckBox);

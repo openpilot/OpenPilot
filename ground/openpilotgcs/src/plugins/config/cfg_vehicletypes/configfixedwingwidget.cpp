@@ -84,12 +84,15 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
     populateChannelComboBoxes();
 
     QStringList fixedWingTypes;
-    fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";
+    fixedWingTypes << "Aileron" << "Elevon" << "Vtail";
     m_aircraft->fixedWingType->addItems(fixedWingTypes);
 
-    // Set default model to "Elevator aileron rudder"
+    m_aircraft->planeShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_aircraft->planeShape->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    // Set default model to "Aileron"
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
-    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Aileron"));
     setupUI(m_aircraft->fixedWingType->currentText());
 }
 
@@ -104,9 +107,14 @@ ConfigFixedWingWidget::~ConfigFixedWingWidget()
 void ConfigFixedWingWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
+    QSvgRenderer *renderer = new QSvgRenderer();
+    renderer->load(QString(":/configgadget/images/fixedwing-shapes.svg"));
+    planeimg = new QGraphicsSvgItem();
+    planeimg->setSharedRenderer(renderer);
 
-    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
-        setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+    if (frameType == "FixedWing" || frameType == "Aileron") {
+        planeimg->setElementId("aileron");
+        setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Aileron"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
         m_aircraft->fwRudder2ChannelBox->setEnabled(true);
         m_aircraft->fwElevator1ChannelBox->setEnabled(true);
@@ -122,14 +130,16 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonSlider1->setEnabled(false);
         m_aircraft->elevonSlider2->setEnabled(false);
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
+        planeimg->setElementId("elevon");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevon"));
         m_aircraft->fwAileron1Label->setText("Elevon 1");
         m_aircraft->fwAileron2Label->setText("Elevon 2");
         m_aircraft->fwElevator1ChannelBox->setEnabled(false);
         m_aircraft->fwElevator2ChannelBox->setEnabled(false);
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
+        m_aircraft->fwElevator1ChannelBox->setCurrentText("None");
         m_aircraft->fwRudder2ChannelBox->setEnabled(true);
-
+        m_aircraft->fwElevator2ChannelBox->setCurrentText("None");
         m_aircraft->fwElevator1Label->setText("Elevator 1");
         m_aircraft->fwElevator2Label->setText("Elevator 2");
         m_aircraft->elevonLabel1->setText("Roll");
@@ -138,9 +148,12 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonSlider1->setEnabled(true);
         m_aircraft->elevonSlider2->setEnabled(true);
     } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
+        planeimg->setElementId("vtail");
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Vtail"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(false);
+        m_aircraft->fwRudder1ChannelBox->setCurrentText("None");
         m_aircraft->fwRudder2ChannelBox->setEnabled(false);
+        m_aircraft->fwRudder2ChannelBox->setCurrentText("None");
 
         m_aircraft->fwElevator1Label->setText("Vtail 1");
         m_aircraft->fwElevator1ChannelBox->setEnabled(true);
@@ -156,6 +169,11 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonSlider1->setEnabled(true);
         m_aircraft->elevonSlider2->setEnabled(true);
     }
+    QGraphicsScene *scene = new QGraphicsScene();
+    scene->addItem(planeimg);
+    scene->setSceneRect(planeimg->boundingRect());
+    m_aircraft->planeShape->fitInView(planeimg, Qt::KeepAspectRatio);
+    m_aircraft->planeShape->setScene(scene);
 }
 
 void ConfigFixedWingWidget::registerWidgets(ConfigTaskWidget &parent)
@@ -264,7 +282,7 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
     setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->fixedWingThrottle->getCurve());
 
     // All airframe types must start with "FixedWing"
-    if (m_aircraft->fixedWingType->currentText() == "Elevator aileron rudder") {
+    if (m_aircraft->fixedWingType->currentText() == "Aileron") {
         airframeType = "FixedWing";
         setupFrameFixedWing(airframeType);
     } else if (m_aircraft->fixedWingType->currentText() == "Elevon") {
@@ -599,4 +617,19 @@ bool ConfigFixedWingWidget::throwConfigError(QString airframeType)
     }
 
     return error;
+}
+
+
+void ConfigFixedWingWidget::resizeEvent(QResizeEvent *)
+{
+    if (planeimg) {
+        m_aircraft->planeShape->fitInView(planeimg, Qt::KeepAspectRatio);
+    }
+}
+
+void ConfigFixedWingWidget::showEvent(QShowEvent *)
+{
+    if (planeimg) {
+        m_aircraft->planeShape->fitInView(planeimg, Qt::KeepAspectRatio);
+    }
 }

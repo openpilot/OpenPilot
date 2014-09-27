@@ -144,8 +144,6 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
     // Set default model to "Quad X"
     m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Quad X"));
 
-    // setupUI(m_aircraft->multirotorFrameType->currentText());
-
     connect(m_aircraft->multirotorFrameType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
 
     // Connect the multirotor motor reverse checkbox

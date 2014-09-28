@@ -43,7 +43,6 @@
 #include <manualcontrolcommand.h>
 #include <stabilizationbank.h>
 #include <stabilizationdesired.h>
-#include <actuatordesired.h>
 
 #include <stabilization.h>
 #include <relay_tuning.h>
@@ -62,6 +61,8 @@
 // Private variables
 static DelayedCallbackInfo *callbackHandle;
 static float gyro_filtered[3] = { 0, 0, 0 };
+static uint32_t gyro_timestamp  = 0;
+static uint32_t gyro_delay      = 0;
 static float axis_lock_accum[3] = { 0, 0, 0 };
 static uint8_t previous_mode[AXES] = { 255, 255, 255, 255 };
 static PiOSDeltatimeConfig timeval;
@@ -301,9 +302,20 @@ static void stabilizationInnerloopTask()
         actuatorDesiredAxis[t] = boundf(actuatorDesiredAxis[t], -1.0f, 1.0f);
     }
 
-    actuator.UpdateTime = dT * 1000;
+    // actuator.UpdateTime = dT * 1000;
 
     if (cchain.Stabilization == FLIGHTSTATUS_CONTROLCHAIN_TRUE) {
+        // instrumentation
+        actuator.Iteration++;
+        actuator.Timestamp          = gyro_timestamp;
+        actuator.Delay.currenttotal = (uint32_t)(PIOS_DELAY_GetuS() - gyro_timestamp);
+        actuator.Delay.current      = actuator.Delay.currenttotal - gyro_delay;
+        actuator.Delay.average      = 0.999f * actuator.Delay.average + 0.001f * actuator.Delay.current;
+        actuator.Delay.variance     = 0.999f * actuator.Delay.variance + 0.001f * fabsf(actuator.Delay.current - actuator.Delay.average);
+        actuator.Delay.max         *= 0.9999f; // decay max val
+        if (actuator.Delay.current > actuator.Delay.max) {
+            actuator.Delay.max = actuator.Delay.current;
+        }
         ActuatorDesiredSet(&actuator);
     } else {
         // Force all axes to reinitialize when engaged
@@ -337,6 +349,8 @@ static void GyroStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     gyro_filtered[0] = gyro_filtered[0] * stabSettings.gyro_alpha + gyroState.x * (1 - stabSettings.gyro_alpha);
     gyro_filtered[1] = gyro_filtered[1] * stabSettings.gyro_alpha + gyroState.y * (1 - stabSettings.gyro_alpha);
     gyro_filtered[2] = gyro_filtered[2] * stabSettings.gyro_alpha + gyroState.z * (1 - stabSettings.gyro_alpha);
+    gyro_timestamp   = gyroState.Timestamp;
+    gyro_delay = gyroState.Delay.current;
 
     PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);
     stabSettings.monitor.gyroupdates++;

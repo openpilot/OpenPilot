@@ -5,8 +5,9 @@
         <field name="Pitch" units="%" type="float" elements="1"/>
         <field name="Yaw" units="%" type="float" elements="1"/>
         <field name="Thrust" units="%" type="float" elements="1"/>
-        <field name="UpdateTime" units="ms" type="float" elements="1"/>
-        <field name="NumLongUpdates" units="ms" type="float" elements="1"/>
+	<field name="Iteration" units="#" type="uint32" elements="1"/>
+	<field name="Timestamp" units="us" type="uint32" elements="1"/>
+	<field name="Delay" units="us" type="float" elementnames="average,variance,max,current,currenttotal"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

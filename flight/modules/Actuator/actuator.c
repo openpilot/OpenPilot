@@ -431,10 +431,16 @@ static void actuatorTask(__attribute__((unused)) void *parameters)
             }
         }
 
-        // Store update time
-        command.UpdateTime = dTMilliseconds;
-        if (command.UpdateTime > command.MaxUpdateTime) {
-            command.MaxUpdateTime = command.UpdateTime;
+        // instrumentation
+        command.Iteration++;
+        command.Timestamp          = desired.Timestamp;
+        command.Delay.currenttotal = (uint32_t)(PIOS_DELAY_GetuS() - command.Timestamp);
+        command.Delay.current      = command.Delay.currenttotal - desired.Delay.currenttotal;
+        command.Delay.average      = 0.999f * command.Delay.average + 0.001f * command.Delay.current;
+        command.Delay.variance     = 0.999f * command.Delay.variance + 0.001f * fabsf(command.Delay.current - command.Delay.average);
+        command.Delay.max         *= 0.9999f; // decay max val
+        if (command.Delay.current > command.Delay.max) {
+            command.Delay.max = command.Delay.current;
         }
 
         // Update output object

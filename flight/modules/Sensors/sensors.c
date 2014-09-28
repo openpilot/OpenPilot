@@ -224,6 +224,8 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
     lastSysTime = xTaskGetTickCount();
     bool error = false;
     uint32_t mag_update_time = PIOS_DELAY_GetRaw();
+    AccelSensorData accelSensorData;
+    GyroSensorData gyroSensorData = { .Iteration = 0 };
     while (1) {
         // TODO: add timeouts to the sensor reads and set an error if the fail
         sensor_dt_us = PIOS_DELAY_DiffuS(timeval);
@@ -241,16 +243,12 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             AlarmsClear(SYSTEMALARMS_ALARM_SENSORS);
         }
 
-
         for (int i = 0; i < 3; i++) {
             accel_accum[i] = 0;
             gyro_accum[i]  = 0;
         }
         accel_samples = 0;
         gyro_samples  = 0;
-
-        AccelSensorData accelSensorData;
-        GyroSensorData gyroSensorData;
 
         switch (bdinfo->board_rev) {
         case 0x01: // L3GD20 + BMA180 board
@@ -349,6 +347,10 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         default:
             PIOS_DEBUG_Assert(0);
         }
+
+        // instrumentation
+        gyroSensorData.Iteration++;
+        gyroSensorData.Timestamp = PIOS_DELAY_GetuS();
 
         // Scale the accels
         float accels[3] = { (float)accel_accum[0] / accel_samples,

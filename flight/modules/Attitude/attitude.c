@@ -295,7 +295,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
         PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 
         AccelStateData accelState;
-        GyroStateData gyros;
+        static GyroStateData gyros = { .Iteration = 0 };
         int32_t retval = 0;
 
         if (cc3d) {
@@ -432,6 +432,9 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
     gyro_correct_int[2] += -gyros->z * yawBiasRate;
     PERF_TIMED_SECTION_END(counterUpd);
 
+    // instrumentation
+    gyros->Timestamp = PIOS_DELAY_GetuS();
+    gyros->Iteration++;
     GyroStateSet(gyros);
     AccelStateSet(accelState);
 
@@ -524,6 +527,10 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     // and make it average zero (weakly)
     gyro_correct_int[2] += -gyrosData->z * yawBiasRate;
     PERF_TIMED_SECTION_END(counterUpd);
+
+    // instrumentation
+    gyrosData->Timestamp = PIOS_DELAY_GetuS();
+    gyrosData->Iteration++;
     GyroStateSet(gyrosData);
     AccelStateSet(accelStateData);
 

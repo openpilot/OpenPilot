@@ -585,11 +585,21 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
         updatedSensors |= SENSORUPDATES_gyro;
         // shortcut - update GyroState right away
         GyroSensorData s;
-        GyroStateData t;
+        static GyroStateData t = { .Iteration = 0 };
         GyroSensorGet(&s);
         t.x = s.x + gyroDelta[0];
         t.y = s.y + gyroDelta[1];
         t.z = s.z + gyroDelta[2];
+        // instrumentation
+        t.Timestamp      = s.Timestamp;
+        t.Iteration++;
+        t.Delay.current  = (uint32_t)(PIOS_DELAY_GetuS() - s.Timestamp);
+        t.Delay.average  = 0.999f * t.Delay.average + 0.001f * t.Delay.current;
+        t.Delay.variance = 0.999f * t.Delay.variance + 0.001f * fabsf(t.Delay.current - t.Delay.average);
+        t.Delay.max     *= 0.9999f; // decay max val
+        if (t.Delay.current > t.Delay.max) {
+            t.Delay.max = t.Delay.current;
+        }
         GyroStateSet(&t);
     }
 

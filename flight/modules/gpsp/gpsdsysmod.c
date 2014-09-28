@@ -52,7 +52,7 @@ extern uint32_t pios_com_main_id;
 #define HB_LED_BLINK_ON_PERIOD_MS  100
 #define HB_LED_BLINK_OFF_PERIOD_MS 1900
 #define STACK_SIZE_BYTES           450
-#define STAT_UPDATE_PERIOD_MS      5000
+#define STAT_UPDATE_PERIOD_MS      10000
 #define TASK_PRIORITY              (tskIDLE_PRIORITY + 2)
 
 // Private types
@@ -198,7 +198,7 @@ static void updateStats()
 {
     static uint32_t lastUpdate;
 
-    if (PIOS_DELAY_DiffuS(lastUpdate) < STAT_UPDATE_PERIOD_MS * configTICK_RATE_HZ / 1000) {
+    if (PIOS_DELAY_DiffuS(lastUpdate) < STAT_UPDATE_PERIOD_MS * 1000) {
         return;
     }
     lastUpdate = PIOS_DELAY_GetRaw();

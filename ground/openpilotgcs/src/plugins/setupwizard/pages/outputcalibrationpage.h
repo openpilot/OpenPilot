@@ -52,6 +52,8 @@ public:
         return m_currentWizardIndex >= m_wizardIndexes.size() - 1;
     }
 
+    void loadSVGFile(QString file);
+    void setupActuatorMinMaxAndNeutral(int motorChannelStart, int motorChannelEnd, int totalUsedChannels);
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -63,14 +65,11 @@ private slots:
     void on_motorNeutralButton_toggled(bool checked);
     void on_motorNeutralSlider_valueChanged(int value);
 
-    void on_servoCenterButton_toggled(bool checked);
-    void on_servoCenterSlider_valueChanged(int position);
-
-    void on_servoMinAngleButton_toggled(bool checked);
+    void on_servoButton_toggled(bool checked);
+    void on_servoCenterAngleSlider_valueChanged(int position);
     void on_servoMinAngleSlider_valueChanged(int position);
-
-    void on_servoMaxAngleButton_toggled(bool checked);
     void on_servoMaxAngleSlider_valueChanged(int position);
+    void on_reverseCheckbox_toggled(bool checked);
 
 private:
     void setupVehicle();
@@ -79,6 +78,7 @@ private:
     void setupVehicleHighlightedPart();
     void setWizardPage();
     void enableButtons(bool enable);
+    void enableServoSliders(bool enabled);
     void onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider);
     bool checkAlarms();
     void debugLogChannelValues();
@@ -100,6 +100,9 @@ private:
     QList<actuatorChannelSettings> m_actuatorSettings;
 
     OutputCalibrationUtil *m_calibrationUtil;
+
+    static const QString MULTI_SVG_FILE;
+    static const QString FIXEDWING_SVG_FILE;
 };
 
 #endif // OUTPUTCALIBRATIONPAGE_H

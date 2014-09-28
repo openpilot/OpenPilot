@@ -27,14 +27,33 @@
       <string>Output calibration</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QGraphicsView" name="vehicleView">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>200</height>
+      </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
      </property>
     </widget>
    </item>
    <item row="1" column="0">
     <widget class="QStackedWidget" name="calibrationStack">
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="intro">
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -65,8 +84,14 @@ p, li { white-space: pre-wrap; }
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QLabel" name="label_4">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/p&gt;&lt;p&gt;To find &lt;span style=&quot; font-weight:600;&quot;&gt;the neutral rate for this motor&lt;/span&gt;, press the Start button below and slide the slider to the right until the motor just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -85,7 +110,7 @@ p, li { white-space: pre-wrap; }
           <number>1000</number>
          </property>
          <property name="maximum">
-          <number>1300</number>
+          <number>1500</number>
          </property>
          <property name="singleStep">
           <number>1</number>
@@ -127,7 +152,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This step calibrates the center position of the servo. To set the center position for this servo, press the Start button below and slide the slider to center the servo. &lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This step calibrates&lt;span style=&quot; font-weight:600;&quot;&gt; the minimum, center and maximum angle of the servo&lt;/span&gt;. To set the angles for this servo, press the Start button below and slide the slider for the angle to set. The servo will follow the sliders position. &lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;p&gt;Check Reverse to reverse servo action.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -138,47 +163,435 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QSlider" name="servoCenterSlider">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <number>1000</number>
-         </property>
-         <property name="maximum">
-          <number>2000</number>
-         </property>
-         <property name="singleStep">
-          <number>10</number>
-         </property>
-         <property name="pageStep">
-          <number>20</number>
-         </property>
-         <property name="value">
-          <number>1500</number>
-         </property>
-         <property name="tracking">
-          <bool>true</bool>
-         </property>
+        <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="invertedAppearance">
-          <bool>false</bool>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-         <property name="invertedControls">
-          <bool>false</bool>
-         </property>
-         <property name="tickPosition">
-          <enum>QSlider::TicksBelow</enum>
-         </property>
-         <property name="tickInterval">
-          <number>40</number>
-         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QFormLayout" name="formLayout">
+          <property name="horizontalSpacing">
+           <number>6</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>6</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="QSlider" name="servoMinAngleSlider">
+            <property name="styleSheet">
+             <string notr="true">QSlider::groove:horizontal {
+    border: 1px solid rgb(196, 196, 196);
+    background: white;
+    height: 6px;
+    border-radius: 2px;
+    margin 10px 10px;
+}
+
+QSlider::add-page:horizontal {
+    background: #fff;
+    border: 1px solid #777;
+    height: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal:disabled {
+    background: #eee;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal {
+    background: rgb(78, 147, 246);
+    border: 1px solid #777;
+    height: 1px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal:disabled {
+    background: #ccc;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: rgb(196, 196, 196);
+    width: 18px;
+    height: 28px;
+    margin: -2px 0;
+    border-radius: 3px;
+    border: 1px solid #777;
+}
+
+QSlider::groove:vertical {
+    border: 1px solid rgb(196, 196, 196);
+    background: white;
+    width: 6px;
+    border-radius: 2px;
+    margin 0px -10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+QSlider::sub-page:vertical {
+    background: #fff;
+    border: 1px solid #777;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:vertical:disabled {
+    background: #eee;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:vertical {
+    background: rgb(78, 147, 246);
+    border: 1px solid #777;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:vertical:disabled {
+    background: #ccc;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::handle:vertical {
+    background: rgb(196, 196, 196);
+    width: 18px;
+    margin: -6 -6;
+    border-radius: 3px;
+    border: 1px solid #777;
+}
+
+QSlider::handle:vertical:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #ddd);
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #ddd);
+    border: 1px solid #444;
+    border-radius: 4px;
+}</string>
+            </property>
+            <property name="minimum">
+             <number>600</number>
+            </property>
+            <property name="maximum">
+             <number>2400</number>
+            </property>
+            <property name="value">
+             <number>1500</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSlider" name="servoCenterAngleSlider">
+            <property name="styleSheet">
+             <string notr="true">QSlider::groove:horizontal {
+    border: 1px solid rgb(196, 196, 196);
+    background: white;
+    height: 6px;
+    border-radius: 2px;
+    margin 10px 10px;
+}
+
+QSlider::add-page:horizontal {
+    background: rgb(78, 147, 246);
+    border: 1px solid #777;
+    height: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal:disabled {
+    background: #eee;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal {
+    background: rgb(78, 147, 246);
+    border: 1px solid #777;
+    height: 1px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal:disabled {
+    background: #eee;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: rgb(196, 196, 196);
+    width: 18px;
+    height: 28px;
+    margin: -2px 0;
+    border-radius: 3px;
+    border: 1px solid #777;
+}
+
+QSlider::groove:vertical {
+    border: 1px solid rgb(196, 196, 196);
+    background: white;
+    width: 6px;
+    border-radius: 2px;
+    margin 0px -10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+QSlider::sub-page:vertical {
+    background: #fff;
+    border: 1px solid #777;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:vertical:disabled {
+    background: #eee;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:vertical {
+    background: rgb(78, 147, 246);
+    border: 1px solid #777;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:vertical:disabled {
+    background: #ccc;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::handle:vertical {
+    background: rgb(196, 196, 196);
+    width: 18px;
+    margin: -6 -6;
+    border-radius: 3px;
+    border: 1px solid #777;
+}
+
+QSlider::handle:vertical:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #ddd);
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #ddd);
+    border: 1px solid #444;
+    border-radius: 4px;
+}</string>
+            </property>
+            <property name="minimum">
+             <number>600</number>
+            </property>
+            <property name="maximum">
+             <number>2400</number>
+            </property>
+            <property name="value">
+             <number>1500</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QSlider" name="servoMaxAngleSlider">
+            <property name="styleSheet">
+             <string notr="true">QSlider::groove:horizontal {
+    border: 1px solid rgb(196, 196, 196);
+    background: white;
+    height: 6px;
+    border-radius: 2px;
+    margin 10px 10px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #fff;
+    border: 1px solid #777;
+    height: 1px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal:disabled {
+    background: #eee;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: rgb(78, 147, 246);
+    border: 1px solid #777;
+    height: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal:disabled {
+    background: #ccc;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: rgb(196, 196, 196);
+    width: 18px;
+    height: 28px;
+    margin: -2px 0;
+    border-radius: 3px;
+    border: 1px solid #777;
+}
+
+QSlider::groove:vertical {
+    border: 1px solid rgb(196, 196, 196);
+    background: white;
+    width: 6px;
+    border-radius: 2px;
+    margin 0px -10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+QSlider::sub-page:vertical {
+    background: #fff;
+    border: 1px solid #777;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:vertical:disabled {
+    background: #eee;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:vertical {
+    background: rgb(78, 147, 246);
+    border: 1px solid #777;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:vertical:disabled {
+    background: #ccc;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::handle:vertical {
+    background: rgb(196, 196, 196);
+    width: 18px;
+    margin: -6 -6;
+    border-radius: 3px;
+    border: 1px solid #777;
+}
+
+QSlider::handle:vertical:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #ddd);
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #ddd);
+    border: 1px solid #444;
+    border-radius: 4px;
+}</string>
+            </property>
+            <property name="minimum">
+             <number>600</number>
+            </property>
+            <property name="maximum">
+             <number>2400</number>
+            </property>
+            <property name="value">
+             <number>1500</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="invertedAppearance">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QCheckBox" name="reverseCheckbox">
+            <property name="text">
+             <string>Reverse</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Min</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Center</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Max</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="servoCenterButton">
+        <widget class="QPushButton" name="servoButton">
          <property name="text">
           <string>Start</string>
          </property>
@@ -192,234 +605,10 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="servoMinMax">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To save the servo and other hardware from damage we have to set the max and min angles for the servo. &lt;/p&gt;&lt;p&gt;To set the minimum angle for the servo, press the Start button below and select the top slider and slide it to the left until min angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSlider" name="servoMinAngleSlider">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <number>1000</number>
-         </property>
-         <property name="maximum">
-          <number>1500</number>
-         </property>
-         <property name="singleStep">
-          <number>10</number>
-         </property>
-         <property name="pageStep">
-          <number>20</number>
-         </property>
-         <property name="value">
-          <number>1500</number>
-         </property>
-         <property name="tracking">
-          <bool>true</bool>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="invertedAppearance">
-          <bool>false</bool>
-         </property>
-         <property name="invertedControls">
-          <bool>false</bool>
-         </property>
-         <property name="tickPosition">
-          <enum>QSlider::TicksBelow</enum>
-         </property>
-         <property name="tickInterval">
-          <number>40</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="servoMinAngleButton">
-         <property name="text">
-          <string>Start</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To set the maximum angle for the servo, press the Start button below and select the top slider and slide it to the right until max angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSlider" name="servoMaxAngleSlider">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <number>1500</number>
-         </property>
-         <property name="maximum">
-          <number>2000</number>
-         </property>
-         <property name="singleStep">
-          <number>10</number>
-         </property>
-         <property name="pageStep">
-          <number>20</number>
-         </property>
-         <property name="value">
-          <number>1500</number>
-         </property>
-         <property name="tracking">
-          <bool>true</bool>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="invertedAppearance">
-          <bool>false</bool>
-         </property>
-         <property name="invertedControls">
-          <bool>false</bool>
-         </property>
-         <property name="tickPosition">
-          <enum>QSlider::TicksBelow</enum>
-         </property>
-         <property name="tickInterval">
-          <number>40</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="servoMaxAngleButton">
-         <property name="text">
-          <string>Start</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QGraphicsView" name="vehicleView">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>200</width>
-       <height>200</height>
-      </size>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>motorNeutralButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>motorNeutralSlider</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>147</x>
-     <y>291</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>150</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>servoMinAngleButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>servoMinAngleSlider</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>147</x>
-     <y>291</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>150</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>servoMaxAngleButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>servoMaxAngleSlider</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>147</x>
-     <y>291</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>150</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>servoCenterButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>servoCenterSlider</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>147</x>
-     <y>291</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>150</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

@@ -54,6 +54,7 @@ public:
 
 private:
     Ui_FixedWingConfigWidget *m_aircraft;
+    QGraphicsSvgItem *planeimg;
 
     virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
@@ -64,10 +65,13 @@ private:
 
 protected:
     void enableControls(bool enable);
+    void resizeEvent(QResizeEvent *);
+    void showEvent(QShowEvent *);
 
 private slots:
     virtual void setupUI(QString airframeType);
     virtual bool throwConfigError(QString airframeType);
+
 };
 
 #endif // CONFIGFIXEDWINGWIDGET_H

@@ -40,6 +40,7 @@ class SetupWizard : public QWizard, public VehicleConfigurationSource {
 
 public:
     SetupWizard(QWidget *parent = 0);
+    ~SetupWizard();
     int nextId() const;
 
     void setControllerType(SetupWizard::CONTROLLER_TYPE type)
@@ -78,22 +79,41 @@ public:
         return m_inputType;
     }
 
-    void setESCType(SetupWizard::ESC_TYPE type)
+    void setEscType(SetupWizard::ESC_TYPE type)
     {
         m_escType = type;
     }
-    SetupWizard::ESC_TYPE getESCType() const
+    SetupWizard::ESC_TYPE getEscType() const
     {
         return m_escType;
     }
 
-    void setGPSSetting(SetupWizard::GPS_SETTING setting)
+    void setServoType(SetupWizard::SERVO_TYPE type)
     {
-        m_gpsSetting = setting;
+        m_servoType = type;
     }
-    SetupWizard::GPS_SETTING getGPSSetting() const
+    SetupWizard::SERVO_TYPE getServoType() const
     {
-        return m_gpsSetting;
+        return m_servoType;
+    }
+
+    void setAirspeedType(SetupWizard::AIRSPEED_TYPE setting)
+    {
+        m_airspeedType = setting;
+    }
+    SetupWizard::AIRSPEED_TYPE getAirspeedType() const
+    {
+        return m_airspeedType;
+    }
+
+
+    void setGpsType(SetupWizard::GPS_TYPE setting)
+    {
+        m_gpsType = setting;
+    }
+    SetupWizard::GPS_TYPE getGpsType() const
+    {
+        return m_gpsType;
     }
 
     void setRadioSetting(SetupWizard::RADIO_SETTING setting)
@@ -103,6 +123,15 @@ public:
     SetupWizard::RADIO_SETTING getRadioSetting() const
     {
         return m_radioSetting;
+    }
+
+    void setVehicleTemplate(QJsonObject *templ)
+    {
+        m_vehicleTemplate = templ;
+    }
+    QJsonObject *getVehicleTemplate() const
+    {
+        return m_vehicleTemplate;
     }
 
     void setLevellingBias(accelGyroBias bias)
@@ -156,9 +185,10 @@ private slots:
     void pageChanged(int currId);
 private:
     enum { PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
-           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_BIAS_CALIBRATION,
-           PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION, PAGE_SAVE, PAGE_SUMMARY,
-           PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END, PAGE_UPDATE };
+           PAGE_AIRSPEED, PAGE_GPS, PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_ESC, PAGE_SERVO,
+           PAGE_BIAS_CALIBRATION, PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION,
+           PAGE_SAVE, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_AIRFRAME_INITIAL_TUNING,
+           PAGE_REBOOT, PAGE_END, PAGE_UPDATE };
     void createPages();
     bool saveHardwareSettings() const;
     bool canAutoUpdate() const;
@@ -168,9 +198,12 @@ private:
     VEHICLE_SUB_TYPE m_vehicleSubType;
     INPUT_TYPE m_inputType;
     ESC_TYPE m_escType;
-
-    GPS_SETTING m_gpsSetting;
+    SERVO_TYPE m_servoType;
+    AIRSPEED_TYPE m_airspeedType;
+    GPS_TYPE m_gpsType;
     RADIO_SETTING m_radioSetting;
+
+    QJsonObject *m_vehicleTemplate;
 
     bool m_calibrationPerformed;
     accelGyroBias m_calibrationBias;

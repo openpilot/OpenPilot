@@ -36,9 +36,6 @@
 uint32_t lastUnsentData = 0;
 uint8_t buffer[BUFFER_SIZE];
 
-// cfg-prt I2C. In UBX+RTCM, Out UBX, Slave Addr 0x42
-const char cfg_settings[] = "\xB5\x62\x06\x00\x14\x00\x00\x00\x00\x00\x84\x00\x00\x00\x00\x00\x00\x00\x07\x00\x01\x00\x00\x00\x00\x00\xA6\xC6";
-
 void handleGPS()
 {
     bool completeSentenceSent = false;
@@ -80,17 +77,21 @@ typedef struct {
     const uint8_t *sentence;
 } ubx_init_sentence;
 
-const ubx_init_sentence gps_config[] = {
-    [0] = {
-        .sentence = (uint8_t *)cfg_settings,
-        .size     = sizeof(cfg_settings),
-    },
-};
-
 
 void setupGPS()
 {
-    for (uint8_t i = 0; i < NELEMENTS(gps_config); i++) {
-        PIOS_UBX_DDC_WriteData(PIOS_I2C_GPS, gps_config[i].sentence, gps_config[i].size);
-    }
+    CfgPrtPkt cfgprt;
+
+    cfgprt.fragments.data.portID       = CFG_PRT_DATA_PORTID_DDC;
+    cfgprt.fragments.data.reserved0    = 0;
+    cfgprt.fragments.data.txReady      = CFG_PRT_DATA_TXREADI_DISABLED;
+    cfgprt.fragments.data.mode = CFG_PRT_DATA_MODE_ADDR;
+    cfgprt.fragments.data.reserved3    = 0;
+    cfgprt.fragments.data.inProtoMask  = CFG_PRT_DATA_PROTO_UBX | CFG_PRT_DATA_PROTO_RTCM;
+    cfgprt.fragments.data.outProtoMask = CFG_PRT_DATA_PROTO_UBX;
+    cfgprt.fragments.data.flags = 0;
+    cfgprt.fragments.data.reserved5    = 0;
+
+    ubx_buildPacket(&cfgprt.packet, UBX_CFG_CLASS, UBX_CFG_PRT, sizeof(CfgPrtData));
+    PIOS_UBX_DDC_WriteData(PIOS_I2C_GPS, cfgprt.packet.binarystream, sizeof(CfgPrtPkt));
 }

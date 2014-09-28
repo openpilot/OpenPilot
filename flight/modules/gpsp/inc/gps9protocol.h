@@ -31,12 +31,24 @@
 #include <pios_helpers.h>
 #include <ubx_utils.h>
 
-#define UBX_OP_CUST_CLASS      0x99
-#define UBX_OP_SYS             0x01
-#define UBX_OP_MAG             0x02
+#define UBX_CFG_CLASS                 0x06
+#define UBX_CFG_PRT                   0x00
+#define UBX_OP_CUST_CLASS             0x99
+#define UBX_OP_SYS                    0x01
+#define UBX_OP_MAG                    0x02
 
-#define SYS_DATA_OPTIONS_FLASH 0x01
-#define SYS_DATA_OPTIONS_MAG   0x02
+
+#define SYS_DATA_OPTIONS_FLASH        0x01
+#define SYS_DATA_OPTIONS_MAG          0x02
+
+#define CFG_PRT_DATA_PORTID_DDC       0x00
+#define CFG_PRT_DATA_TXREADI_DISABLED 0x00
+#define CFG_PRT_DATA_PORTID_DDC       0x00
+#define CFG_PRT_DATA_MODE_ADDR        (0x42 << 1)
+#define CFG_PRT_DATA_PROTO_UBX        0x01
+#define CFG_PRT_DATA_PROTO_NMEA       0x02
+#define CFG_PRT_DATA_PROTO_RTCM       0x04
+#define CFG_PRT_DATA_FLAGS_EXTTIMEOUT 0x02
 
 
 typedef struct {
@@ -73,5 +85,26 @@ typedef union {
     UBXPacket_t packet;
 } SysUbxPkt;
 
+
+typedef struct {
+    uint8_t  portID;
+    uint8_t  reserved0;
+    uint16_t txReady;
+    uint32_t mode;
+    uint32_t reserved3;
+    uint16_t inProtoMask;
+    uint16_t outProtoMask;
+    uint16_t flags;
+    uint16_t reserved5;
+} __attribute__((packed)) CfgPrtData;
+
+typedef union {
+    struct {
+        UBXHeader_t header;
+        CfgPrtData  data;
+        UBXFooter_t footer;
+    } fragments;
+    UBXPacket_t packet;
+} CfgPrtPkt;
 
 #endif /* GPSV9PROTOCOL_H_ */

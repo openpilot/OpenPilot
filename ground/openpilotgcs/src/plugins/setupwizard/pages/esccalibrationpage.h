@@ -26,7 +26,6 @@
  */
 
 
-
 #ifndef ESCCALIBRATIONPAGE_H
 #define ESCCALIBRATIONPAGE_H
 

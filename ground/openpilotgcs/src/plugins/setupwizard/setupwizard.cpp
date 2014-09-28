@@ -40,6 +40,7 @@
 #include "pages/escpage.h"
 #include "pages/servopage.h"
 #include "pages/biascalibrationpage.h"
+#include "pages/esccalibrationpage.h"
 #include "pages/summarypage.h"
 #include "pages/savepage.h"
 #include "pages/notyetimplementedpage.h"
@@ -167,6 +168,9 @@ int SetupWizard::nextId() const
     }
 
     case PAGE_BIAS_CALIBRATION:
+        return PAGE_ESC_CALIBRATION;
+
+    case PAGE_ESC_CALIBRATION:
         return PAGE_OUTPUT_CALIBRATION;
 
     case PAGE_OUTPUT_CALIBRATION:
@@ -441,6 +445,7 @@ void SetupWizard::createPages()
     setPage(PAGE_ESC, new EscPage(this));
     setPage(PAGE_SERVO, new ServoPage(this));
     setPage(PAGE_BIAS_CALIBRATION, new BiasCalibrationPage(this));
+    setPage(PAGE_ESC_CALIBRATION, new EscCalibrationPage(this));
     setPage(PAGE_OUTPUT_CALIBRATION, new OutputCalibrationPage(this));
     setPage(PAGE_SUMMARY, new SummaryPage(this));
     setPage(PAGE_SAVE, new SavePage(this));

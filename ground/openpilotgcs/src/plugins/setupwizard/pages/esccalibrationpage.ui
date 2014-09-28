@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BiasCalibrationPage</class>
- <widget class="QWizardPage" name="BiasCalibrationPage">
+ <class>EscCalibrationPage</class>
+ <widget class="QWizardPage" name="EscCalibrationPage">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -66,8 +66,6 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../wizardResources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

@@ -32,6 +32,7 @@
 
 EscCalibrationPage::EscCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
+
     ui(new Ui::EscCalibrationPage)
 {
     ui->setupUi(this);

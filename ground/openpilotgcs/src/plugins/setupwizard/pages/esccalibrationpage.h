@@ -25,6 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+
 #ifndef ESCCALIBRATIONPAGE_H
 #define ESCCALIBRATIONPAGE_H
 
@@ -41,23 +43,9 @@ public:
     explicit EscCalibrationPage(SetupWizard *wizard, QWidget *parent = 0);
     ~EscCalibrationPage();
     bool validatePage();
-    bool isComplete() const;
-
-private slots:
-    void performCalibration();
-    void calibrationProgress(long current, long total);
-    void calibrationDone(accelGyroBias bias);
-    void calibrationTimeout(QString message);
 
 private:
-    static const int BIAS_CYCLES = 200;
-    static const int BIAS_RATE   = 50;
-
     Ui::EscCalibrationPage *ui;
-    BiasCalibrationUtil *m_calibrationUtil;
-
-    void stopCalibration();
-    void enableButtons(bool enable);
 };
 
 #endif // ESCCALIBRATIONPAGE_H

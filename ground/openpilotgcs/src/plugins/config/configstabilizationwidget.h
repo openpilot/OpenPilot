@@ -74,6 +74,6 @@ private slots:
     void onBoardConnected();
     void pidBankChanged(int index);
     void resetThrottleCurveToDefault();
+    void throttleCurveUpdated();
 };
-
 #endif // ConfigStabilizationWidget_H

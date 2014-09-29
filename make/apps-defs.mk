@@ -111,6 +111,7 @@ SRC += $(MATHLIB)/pid.c
 SRC += $(MATHLIB)/mathmisc.c
 SRC += $(MATHLIB)/butterworth.c
 SRC += $(FLIGHTLIB)/printf-stdarg.c
+SRC += $(FLIGHTLIB)/optypes.c
 
 ## Modules
 SRC += $(foreach mod, $(MODULES), $(sort $(wildcard $(OPMODULEDIR)/$(mod)/*.c)))

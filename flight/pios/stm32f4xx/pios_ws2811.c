@@ -29,7 +29,7 @@
 
 #ifdef PIOS_INCLUDE_WS2811
 
-#include "pios_ws2811.h"
+#include "pios_ws2811_cfg.h"
 #include <stm32f4xx_rcc.h>
 #include <pios_stm32.h>
 #include "FreeRTOS.h"
@@ -177,7 +177,7 @@ void PIOS_WS2811_Init(const struct pios_ws2811_cfg *ws2811_cfg, const struct pio
 
     fb = (ledbuf_t *)pios_malloc(PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
     memset(fb, 0, PIOS_WS2811_BUFFER_SIZE * sizeof(ledbuf_t));
-    Color ledoff = { 0, 0, 0 };
+    const Color_t ledoff = Color_Off;
     for (uint8_t i = 0; i < PIOS_WS2811_NUMLEDS; i++) {
         PIOS_WS2811_setColorRGB(ledoff, i, false);
     }
@@ -302,7 +302,7 @@ void setColor(uint8_t color, ledbuf_t *buf)
  * @param led led number
  * @param update Perform an update after changing led color
  */
-void PIOS_WS2811_setColorRGB(Color c, uint8_t led, bool update)
+void PIOS_WS2811_setColorRGB(Color_t c, uint8_t led, bool update)
 {
     if (led >= PIOS_WS2811_NUMLEDS) {
         return;
@@ -310,6 +310,7 @@ void PIOS_WS2811_setColorRGB(Color c, uint8_t led, bool update)
     setColor(c.G, fb + (led * 24));
     setColor(c.R, fb + 8 + (led * 24));
     setColor(c.B, fb + 16 + (led * 24));
+
     if (update) {
         PIOS_WS2811_Update();
     }
@@ -327,6 +328,10 @@ void PIOS_WS2811_Update()
 
     // reset counters for synchronization
     pios_ws2811_cfg->timer->CNT = PIOS_WS2811_TIM_PERIOD - 1;
+
+    DMA_Cmd(pios_ws2811_cfg->streamCh2, ENABLE);
+    DMA_Cmd(pios_ws2811_cfg->streamCh1, ENABLE);
+    DMA_Cmd(pios_ws2811_cfg->streamUpdate, ENABLE);
     // Start a new cycle
     TIM_Cmd(pios_ws2811_cfg->timer, ENABLE);
 }
@@ -337,8 +342,12 @@ void PIOS_WS2811_Update()
 
 void PIOS_WS2811_DMA_irq_handler()
 {
+    pios_ws2811_pin_cfg->gpio->BSRRH = dmaSource[0];
     pios_ws2811_cfg->timer->CR1 &= (uint16_t) ~TIM_CR1_CEN;
     DMA_ClearFlag(pios_ws2811_cfg->streamCh1, pios_ws2811_cfg->irq.flags);
+    DMA_Cmd(pios_ws2811_cfg->streamCh2, DISABLE);
+    DMA_Cmd(pios_ws2811_cfg->streamCh1, DISABLE);
+    DMA_Cmd(pios_ws2811_cfg->streamUpdate, DISABLE);
 }
 
 #endif // PIOS_INCLUDE_WS2811

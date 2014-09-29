@@ -28,7 +28,8 @@
 
 static volatile pios_notify_notification currentNotification = NOTIFY_NONE;
 static volatile pios_notify_priority currentPriority;
-
+static volatile ExtLedNotification_t extLedNotification;
+static volatile bool newNotification;
 
 void PIOS_NOTIFY_StartNotification(pios_notify_notification notification, pios_notify_priority priority)
 {
@@ -46,4 +47,37 @@ pios_notify_notification PIOS_NOTIFY_GetActiveNotification(bool clear)
         currentNotification = NOTIFY_NONE;
     }
     return ret;
+}
+
+
+/*
+ * Play a sequence on the default external led. Sequences with priority higher than NOTIFY_PRIORITY_LOW
+ * are repeated only once if repeat = -1
+ * @param sequence Sequence to be played
+ * @param priority Priority of the sequence being played
+ */
+void PIOS_NOTIFICATION_Default_Ext_Led_Play(const LedSequence_t *sequence, pios_notify_priority priority)
+{
+    // alert and alarms are repeated if condition persists. bacground notification instead are set once, so try to prevent loosing any update
+    if (newNotification && priority != NOTIFY_PRIORITY_BACKGROUND) {
+        // prevent overwriting higher priority or background notifications
+        if (extLedNotification.priority == NOTIFY_PRIORITY_BACKGROUND || extLedNotification.priority > priority) {
+            return;
+        }
+    }
+    extLedNotification.priority = priority;
+    extLedNotification.sequence = *sequence;
+    newNotification = true;
+}
+
+
+ExtLedNotification_t *PIOS_NOTIFY_GetNewExtLedSequence(bool clear)
+{
+    if (!newNotification) {
+        return 0;
+    }
+    if (clear) {
+        newNotification = false;
+    }
+    return (ExtLedNotification_t *)&extLedNotification;
 }

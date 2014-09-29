@@ -344,6 +344,7 @@ void ConfigStabilizationWidget::onBoardConnected()
 void ConfigStabilizationWidget::pidBankChanged(int index)
 {
     bool dirty = isDirty();
+
     updateObjectFromThrottleCurve();
     foreach(QTabBar * tabBar, m_pidTabBars) {
         disconnect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));

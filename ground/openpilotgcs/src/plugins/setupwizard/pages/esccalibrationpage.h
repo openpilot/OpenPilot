@@ -30,6 +30,7 @@
 #define ESCCALIBRATIONPAGE_H
 
 #include "abstractwizardpage.h"
+#include "outputcalibrationutil.h"
 
 namespace Ui {
 class EscCalibrationPage;
@@ -43,8 +44,17 @@ public:
     ~EscCalibrationPage();
     bool validatePage();
 
+private slots:
+    void startStopButtonClicked();
+    void enableButtons(bool enable);
+
 private:
+    const int LOW_OUTPUT_VALUE  = 1000;
+    const int HIGH_OUTPUT_VALUE = 2000;
     Ui::EscCalibrationPage *ui;
+    bool m_isCalibrating;
+
+    QList<OutputCalibrationUtil *> m_outputs;
 };
 
 #endif // ESCCALIBRATIONPAGE_H

@@ -29,13 +29,17 @@
 #include "esccalibrationpage.h"
 #include "ui_esccalibrationpage.h"
 #include "setupwizard.h"
+#include "mixersettings.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjectmanager.h"
+#include "vehicleconfigurationhelper.h"
 
 EscCalibrationPage::EscCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-
-    ui(new Ui::EscCalibrationPage)
+    ui(new Ui::EscCalibrationPage), m_isCalibrating(false)
 {
     ui->setupUi(this);
+    connect(ui->startStopButton, SIGNAL(clicked()), this, SLOT(startStopButtonClicked()));
 }
 
 EscCalibrationPage::~EscCalibrationPage()
@@ -46,4 +50,52 @@ EscCalibrationPage::~EscCalibrationPage()
 bool EscCalibrationPage::validatePage()
 {
     return true;
+}
+
+void EscCalibrationPage::enableButtons(bool enable)
+{
+    getWizard()->button(QWizard::NextButton)->setEnabled(enable);
+    getWizard()->button(QWizard::CancelButton)->setEnabled(enable);
+    getWizard()->button(QWizard::BackButton)->setEnabled(enable);
+    getWizard()->button(QWizard::CustomButton1)->setEnabled(enable);
+    QApplication::processEvents();
+}
+
+void EscCalibrationPage::startStopButtonClicked()
+{
+    if (!m_isCalibrating) {
+        m_isCalibrating = true;
+        ui->startStopButton->setEnabled(false);
+        enableButtons(false);
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        UAVObjectManager *uavoManager = pm->getObject<UAVObjectManager>();
+        Q_ASSERT(uavoManager);
+        MixerSettings *mSettings = MixerSettings::GetInstance(uavoManager);
+        Q_ASSERT(mSettings);
+        QString mixerTypePattern = "Mixer%1Type";
+        for (int i = 0; i < 12; i++) {
+            UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
+            Q_ASSERT(field);
+            if (field->getValue().toString() == field->getOptions().at(VehicleConfigurationHelper::MIXER_TYPE_MOTOR)) {
+                OutputCalibrationUtil *output = new OutputCalibrationUtil();
+                output->startChannelOutput(i, LOW_OUTPUT_VALUE);
+                output->setChannelOutputValue(HIGH_OUTPUT_VALUE);
+                m_outputs << output;
+            }
+        }
+        ui->startStopButton->setText(tr("Stop"));
+        ui->startStopButton->setEnabled(true);
+    } else {
+        m_isCalibrating = false;
+        ui->startStopButton->setEnabled(false);
+        foreach(OutputCalibrationUtil * output, m_outputs) {
+            output->stopChannelOutput();
+            delete output;
+        }
+        m_outputs.clear();
+        m_isCalibrating = false;
+        ui->startStopButton->setText("Start");
+        ui->startStopButton->setEnabled(true);
+        enableButtons(true);
+    }
 }

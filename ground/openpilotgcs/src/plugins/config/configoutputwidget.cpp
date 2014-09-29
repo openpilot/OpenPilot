@@ -148,7 +148,8 @@ void ConfigOutputWidget::runChannelTests(bool state)
 
     if (state && systemAlarms.Alarm[SystemAlarms::ALARM_ACTUATOR] != SystemAlarms::ALARM_OK) {
         QMessageBox mbox;
-        mbox.setText(QString(tr("The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.")));
+        mbox.setText(QString(tr("The actuator module is in an error state. This can also occur because there are no inputs. "
+                                "Please fix these before testing outputs.")));
         mbox.setStandardButtons(QMessageBox::Ok);
         mbox.exec();
 
@@ -162,7 +163,8 @@ void ConfigOutputWidget::runChannelTests(bool state)
     // Confirm this is definitely what they want
     if (state) {
         QMessageBox mbox;
-        mbox.setText(QString(tr("This option will start your motors by the amount selected on the sliders regardless of transmitter. It is recommended to remove any blades from motors. Are you sure you want to do this?")));
+        mbox.setText(QString(tr("This option will start your motors by the amount selected on the sliders regardless of transmitter."
+                                "It is recommended to remove any blades from motors. Are you sure you want to do this?")));
         mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         int retval = mbox.exec();
         if (retval != QMessageBox::Yes) {

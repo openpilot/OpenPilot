@@ -139,7 +139,7 @@ public:
     void autoLoadWidgets();
 
     bool isDirty();
-    void setDirty(bool value);
+    virtual void setDirty(bool value);
 
     bool allObjectsUpdated();
     void setOutOfLimitsStyle(QString style)

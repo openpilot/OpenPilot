@@ -515,6 +515,14 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
         GPSPositionSensorSet(GpsPosition);
         msgtracker.msg_received = NONE_RECEIVED;
         id = GPSPOSITIONSENSOR_OBJID;
+    } else {
+        uint8_t status;
+        GPSPositionSensorStatusGet(&status);
+        if (status == GPSPOSITIONSENSOR_STATUS_NOGPS) {
+            // Some ubx thing has been received so GPS is there
+            status = GPSPOSITIONSENSOR_STATUS_NOFIX;
+            GPSPositionSensorStatusSet(&status);
+        }
     }
     return id;
 }

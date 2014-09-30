@@ -27,7 +27,7 @@
 #define NOTIFICATION_H
 
 // period of each blink phase
-#define LED_BLINK_PERIOD_MS 200
+#define LED_BLINK_PERIOD_MS 50
 
 // update the status snapshot used by notifcations
 void NotificationUpdateStatus();

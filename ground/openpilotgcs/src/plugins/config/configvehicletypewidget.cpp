@@ -68,9 +68,12 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     QStringList channelDesc;
     switch (systemSettingsData.AirframeType) {
     case SystemSettings::AIRFRAMETYPE_FIXEDWING:
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        break;
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        break;
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
-        // fixed wing
         channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
         break;
     case SystemSettings::AIRFRAMETYPE_HELICP:
@@ -81,6 +84,7 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     case SystemSettings::AIRFRAMETYPE_TRI:
     case SystemSettings::AIRFRAMETYPE_QUADX:
     case SystemSettings::AIRFRAMETYPE_QUADP:
+    case SystemSettings::AIRFRAMETYPE_QUADH:
     case SystemSettings::AIRFRAMETYPE_OCTOV:
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXX:
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXP:
@@ -194,8 +198,7 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     UAVObjectField *field = system->getField(QString("AirframeType"));
     Q_ASSERT(field);
 
-    // At this stage, we will need to have some hardcoded settings in this code, this
-    // is not ideal, but there you go.
+    // At this stage, we will need to have some hardcoded settings in this code
     QString frameType = field->getValue().toString();
 
     // Always update custom tab from others airframe settings : debug/learn hardcoded mixers
@@ -274,11 +277,12 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 
 int ConfigVehicleTypeWidget::frameCategory(QString frameType)
 {
-    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
+    if (frameType == "FixedWing" || frameType == "Aileron" || frameType == "FixedWingElevon"
         || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
         return ConfigVehicleTypeWidget::FIXED_WING;
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
-               || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
+               || frameType == "QuadP" || frameType == "Quad +" || frameType == "Quad H" || frameType == "QuadH"
+               || frameType == "Hexa" || frameType == "Hexacopter"
                || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
                || frameType == "HexaH" || frameType == "Hexacopter H" || frameType == "Hexacopter Y6"
                || frameType == "Octo" || frameType == "Octocopter"

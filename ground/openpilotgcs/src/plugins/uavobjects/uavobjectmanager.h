@@ -35,11 +35,13 @@
 #include <QList>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QJsonObject>
 
 class UAVOBJECTS_EXPORT UAVObjectManager : public QObject {
     Q_OBJECT
 
 public:
+    enum JSON_EXPORT_OPTION { JSON_EXPORT_ALL, JSON_EXPORT_METADATA, JSON_EXPORT_SETTINGS, JSON_EXPORT_DATA };
     UAVObjectManager();
     ~UAVObjectManager();
 
@@ -53,6 +55,11 @@ public:
     QList<UAVObject *> getObjectInstances(quint32 objId);
     qint32 getNumInstances(const QString & name);
     qint32 getNumInstances(quint32 objId);
+
+    void toJson(QJsonObject &jsonObject, JSON_EXPORT_OPTION what = JSON_EXPORT_ALL);
+    void toJson(QJsonObject &jsonObject, const QList<QString> &objectsToExport);
+    void toJson(QJsonObject &jsonObject, const QList<UAVObject *> &objectsToExport);
+    void fromJson(const QJsonObject &jsonObject, QList<UAVObject *> *updatedObjects = NULL);
 
 signals:
     void newObject(UAVObject *obj);

@@ -33,13 +33,20 @@
 
 // defines
 // TODO: NEO8 max rate is for Rom version, flash is limited to 10Hz, need to handle that.
-#define UBX_MAX_RATE_VER8 18
-#define UBX_MAX_RATE_VER7 10
-#define UBX_MAX_RATE      5
+#define UBX_MAX_RATE_VER8       18
+#define UBX_MAX_RATE_VER7       10
+#define UBX_MAX_RATE            5
 
-#define UBX_REPLY_TIMEOUT (500 * 1000)
-#define UBX_MAX_RETRIES   5
-
+// time to wait before reinitializing the fsm due to disconnection
+#define UBX_CONNECTION_TIMEOUT  (2000 * 1000)
+// times between retries in case an error does occurs
+#define UBX_ERROR_RETRY_TIMEOUT (1000 * 1000)
+// timeout for ack reception
+#define UBX_REPLY_TIMEOUT       (500 * 1000)
+// max retries in case of timeout
+#define UBX_MAX_RETRIES         5
+// pause between each configuration step
+#define UBX_STEP_WAIT_TIME      (10 * 1000)
 // types
 typedef enum {
     UBX_AUTOCONFIG_STATUS_DISABLED = 0,
@@ -179,7 +186,7 @@ typedef union {
     } message;
 } __attribute__((packed)) UBXSentPacket_t;
 
-void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send);
+void ubx_autoconfig_run(char * *buffer, uint16_t *bytes_to_send, bool gps_connected);
 void ubx_autoconfig_set(ubx_autoconfig_settings_t config);
 int32_t ubx_autoconfig_get_status();
 #endif /* UBX_AUTOCONFIG_H_ */

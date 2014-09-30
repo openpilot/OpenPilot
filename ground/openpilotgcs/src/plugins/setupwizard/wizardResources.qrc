@@ -29,9 +29,19 @@
         <file>resources/bttn-calculate-up.png</file>
         <file>resources/bttn-turbo-down.png</file>
         <file>resources/bttn-turbo-up.png</file>
+        <file>resources/bttn-rapid-up.png</file>
+        <file>resources/bttn-rapid-dwn.png</file>
+        <file>resources/bttn-servo-digital-dwn.png</file>
+        <file>resources/bttn-servo-digital-up.png</file>
+        <file>resources/bttn-servo-standard-dwn.png</file>
+        <file>resources/bttn-servo-standard-up.png</file>
+        <file>resources/wizard.png</file>
         <file>resources/multirotor-shapes.svg</file>
-        <file>resources/bttn-illustration-down.png</file>
-        <file>resources/bttn-illustration-up.png</file>
+        <file>resources/fixedwing-shapes-wizard.svg</file>
+        <file>resources/fixedwing-shapes-wizard-no-numbers.svg</file>
+        <file>resources/sensor-shapes.svg</file>
+        <file>resources/bttn-illustration-color-up.png</file>
+        <file>resources/bttn-illustration-color-down.png</file>
         <file>resources/bttn-save-down.png</file>
         <file>resources/bttn-save-up.png</file>
         <file>resources/bttn-flash-down.png</file>

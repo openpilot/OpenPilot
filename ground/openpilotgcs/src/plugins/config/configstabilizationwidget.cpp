@@ -133,6 +133,8 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     ui->thrustPIDScalingCurve->setYAxisLabel(tr("Scaling factor"));
     ui->thrustPIDScalingCurve->setMin(-0.5);
     ui->thrustPIDScalingCurve->setMax(0.5);
+    ui->thrustPIDScalingCurve->initLinearCurve(5, -0.25, 0.25);
+    connect(ui->thrustPIDScalingCurve, SIGNAL(curveUpdated()), this, SLOT(throttleCurveUpdated()));
 
     addWidget(ui->defaultThrottleCurveButton);
     addWidget(ui->enableThrustPIDScalingCheckBox);
@@ -169,6 +171,7 @@ void ConfigStabilizationWidget::updateObjectsFromWidgets()
 
 void ConfigStabilizationWidget::updateThrottleCurveFromObject()
 {
+    bool dirty = isDirty();
     UAVObject *stabBank = getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
 
     Q_ASSERT(stabBank);
@@ -191,6 +194,7 @@ void ConfigStabilizationWidget::updateThrottleCurveFromObject()
     bool enabled = field->getValue() == "TRUE";
     ui->enableThrustPIDScalingCheckBox->setChecked(enabled);
     ui->thrustPIDScalingCurve->setEnabled(enabled);
+    setDirty(dirty);
 }
 
 void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
@@ -239,6 +243,11 @@ void ConfigStabilizationWidget::resetThrottleCurveToDefault()
     ui->thrustPIDScalingCurve->setEnabled(enabled);
 
     delete defaultStabBank;
+}
+
+void ConfigStabilizationWidget::throttleCurveUpdated()
+{
+    setDirty(true);
 }
 
 void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)
@@ -334,6 +343,8 @@ void ConfigStabilizationWidget::onBoardConnected()
 
 void ConfigStabilizationWidget::pidBankChanged(int index)
 {
+    bool dirty = isDirty();
+
     updateObjectFromThrottleCurve();
     foreach(QTabBar * tabBar, m_pidTabBars) {
         disconnect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
@@ -350,6 +361,7 @@ void ConfigStabilizationWidget::pidBankChanged(int index)
     m_currentPIDBank = index;
     qDebug() << "current bank:" << m_currentPIDBank;
     updateThrottleCurveFromObject();
+    setDirty(dirty);
 }
 
 bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)

@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       outputpage.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @file       escpage.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup OutputPage
+ * @addtogroup EscPage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,25 +25,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OUTPUTPAGE_H
-#define OUTPUTPAGE_H
+#ifndef ESCPAGE_H
+#define ESCPAGE_H
 
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class OutputPage;
+class EscPage;
 }
 
-class OutputPage : public AbstractWizardPage {
+class EscPage : public AbstractWizardPage {
     Q_OBJECT
 
 public:
-    explicit OutputPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~OutputPage();
+    explicit EscPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~EscPage();
     bool validatePage();
 
 private:
-    Ui::OutputPage *ui;
+    Ui::EscPage *ui;
 };
 
-#endif // OUTPUTPAGE_H
+#endif // ESCPAGE_H

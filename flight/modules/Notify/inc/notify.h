@@ -1,13 +1,12 @@
 /**
  ******************************************************************************
  *
- * @file       outputpage.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup
- * @{
- * @addtogroup OutputPage
- * @{
- * @brief
+ * @file       notify.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      Notify module, show events and status on external led.
+ *
+ * @see        The GNU Public License (GPL) Version 3
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,31 +23,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef NOTIFY_H_
+#define NOTIFY_H_
 
-#include "outputpage.h"
-#include "ui_outputpage.h"
-#include "setupwizard.h"
 
-OutputPage::OutputPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+int32_t NotifyInitialize(void);
 
-    ui(new Ui::OutputPage)
-{
-    ui->setupUi(this);
-}
 
-OutputPage::~OutputPage()
-{
-    delete ui;
-}
-
-bool OutputPage::validatePage()
-{
-    if (ui->rapidESCButton->isChecked()) {
-        getWizard()->setESCType(SetupWizard::ESC_RAPID);
-    } else {
-        getWizard()->setESCType(SetupWizard::ESC_LEGACY);
-    }
-
-    return true;
-}
+#endif /* NOTIFY_H_ */

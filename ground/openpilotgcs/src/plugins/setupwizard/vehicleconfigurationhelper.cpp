@@ -45,7 +45,7 @@
 #include <QJsonObject>
 
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE    = 50;
-const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE     = 400;
+const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE     = 500;
 const qint16 VehicleConfigurationHelper::ANALOG_SERVO_FREQUENCE  = 50;
 const qint16 VehicleConfigurationHelper::DIGITAL_SERVO_FREQUENCE = 333;
 

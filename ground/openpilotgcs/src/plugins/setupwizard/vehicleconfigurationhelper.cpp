@@ -935,7 +935,7 @@ void VehicleConfigurationHelper::setupTriCopter()
     // 2. Setup GUI data
     // 3. Apply changes
 
-    mixerChannelSettings channels[12];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
     channels[0].type      = MIXER_TYPE_MOTOR;
@@ -988,7 +988,7 @@ GUIConfigDataUnion VehicleConfigurationHelper::getGUIConfigData()
 
 void VehicleConfigurationHelper::setupQuadCopter()
 {
-    mixerChannelSettings channels[12];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
     SystemSettings::AirframeTypeOptions frame = SystemSettings::AIRFRAMETYPE_QUADX;
 
@@ -1116,7 +1116,7 @@ void VehicleConfigurationHelper::setupQuadCopter()
 
 void VehicleConfigurationHelper::setupHexaCopter()
 {
-    mixerChannelSettings channels[12];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
     SystemSettings::AirframeTypeOptions frame = SystemSettings::AIRFRAMETYPE_HEXA;
 

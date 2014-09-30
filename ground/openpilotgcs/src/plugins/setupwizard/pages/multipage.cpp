@@ -38,6 +38,7 @@ MultiPage::~MultiPage()
 void MultiPage::initializePage(VehicleConfigurationSource *settings)
 {
     Q_UNUSED(settings);
+    setSelectedItem(SetupWizard::MULTI_ROTOR_QUAD_X);
 }
 
 bool MultiPage::validatePage(SelectionItem *selectedItem)

@@ -116,8 +116,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset resource="../wizardResources.qrc">
-         <normaloff>:/setupwizard/resources/bttn-turbo-up.png</normaloff>
-         <normalon>:/setupwizard/resources/bttn-turbo-down.png</normalon>:/setupwizard/resources/bttn-turbo-up.png</iconset>
+         <normaloff>:/setupwizard/resources/bttn-rapid-up.png</normaloff>
+         <normalon>:/setupwizard/resources/bttn-rapid-dwn.png</normalon>:/setupwizard/resources/bttn-rapid-up.png</iconset>
        </property>
        <property name="iconSize">
         <size>

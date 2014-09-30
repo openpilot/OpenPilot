@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
  *
- * @file       notification.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
- * @brief      notification library
- *             --
+ * @file       notify.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      Notify module, show events and status on external led.
+ *
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,16 +23,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef NOTIFICATION_H
-#define NOTIFICATION_H
+#ifndef NOTIFY_H_
+#define NOTIFY_H_
 
-// period of each blink phase
-#define LED_BLINK_PERIOD_MS 50
 
-// update the status snapshot used by notifcations
-void NotificationUpdateStatus();
+int32_t NotifyInitialize(void);
 
-// run the led notifications
-void NotificationOnboardLedsRun();
 
-#endif /* NOTIFICATION_H */
+#endif /* NOTIFY_H_ */

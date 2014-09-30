@@ -28,6 +28,11 @@
 #include <systemalarms.h>
 #include <flightstatus.h>
 #include <pios_notify.h>
+#include <stdbool.h>
+
+
+#define GET_CURRENT_MILLIS (xTaskGetTickCount() * portTICK_RATE_MS)
+// Private data types definition
 
 #ifdef PIOS_LED_ALARM
 #define ALARM_LED_ON()  PIOS_LED_On(PIOS_LED_ALARM)
@@ -136,6 +141,8 @@ static bool handleAlarms(uint16_t *r_pattern, uint16_t *b_pattern);
 static bool handleNotifications(pios_notify_notification runningNotification, uint16_t *r_pattern, uint16_t *b_pattern);
 static void handleFlightMode(uint16_t *r_pattern, uint16_t *b_pattern);
 static void handleHeartbeat(uint16_t *r_pattern, uint16_t *b_pattern);
+
+
 void NotificationUpdateStatus()
 {
     started = true;
@@ -149,7 +156,7 @@ void NotificationUpdateStatus()
 
 void NotificationOnboardLedsRun()
 {
-    static portTickType lastRunTimestamp;
+    static uint32_t lastRunTimestamp;
     static uint16_t r_pattern;
     static uint16_t b_pattern;
     static uint8_t cycleCount; // count the number of cycles
@@ -163,11 +170,13 @@ void NotificationOnboardLedsRun()
         STATUS_LENGHT
     } status;
 
-    if (!started || (xTaskGetTickCount() - lastRunTimestamp) < (LED_BLINK_PERIOD_MS * portTICK_RATE_MS / 4)) {
+    const uint32_t current_timestamp = GET_CURRENT_MILLIS;
+
+    if (!started || (current_timestamp - lastRunTimestamp) < LED_BLINK_PERIOD_MS) {
         return;
     }
 
-    lastRunTimestamp = xTaskGetTickCount();
+    lastRunTimestamp = current_timestamp;
     // the led will show various status information, subdivided in three phases
     // - Notification
     // - Alarm

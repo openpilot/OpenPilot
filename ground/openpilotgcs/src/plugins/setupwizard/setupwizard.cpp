@@ -371,7 +371,7 @@ QString SetupWizard::getSummaryText()
         summary.append(tr("Standard ESC (50 Hz)"));
         break;
     case ESC_RAPID:
-        summary.append(tr("Rapid ESC (400 Hz)"));
+        summary.append(tr("Rapid ESC (500 Hz)"));
         break;
     default:
         summary.append(tr("Unknown"));

@@ -57,11 +57,11 @@ public:
     VehicleConfigurationHelper(VehicleConfigurationSource *configSource);
     bool setupVehicle(bool save = true);
     bool setupHardwareSettings(bool save = true);
-    static const qint16 LEGACY_ESC_FREQUENCE    = 50;
-    static const qint16 RAPID_ESC_FREQUENCE     = 400;
-    static const qint16 ANALOG_SERVO_FREQUENCE  = 50;
-    static const qint16 DIGITAL_SERVO_FREQUENCE = 333;
-    static const int MIXER_TYPE_DISABLED = 0;
+    static const qint16 LEGACY_ESC_FREQUENCY    = 50;
+    static const qint16 RAPID_ESC_FREQUENCY     = 500;
+    static const qint16 ANALOG_SERVO_FREQUENCY  = 50;
+    static const qint16 DIGITAL_SERVO_FREQUENCY = 333;
+    static const int MIXER_TYPE_NONE = 0;
     static const int MIXER_TYPE_MOTOR = 1;
     static const int MIXER_TYPE_REVERSABLEMOTOR = 2;
     static const int MIXER_TYPE_SERVO = 3;

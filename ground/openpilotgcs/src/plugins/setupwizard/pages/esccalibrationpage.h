@@ -49,8 +49,8 @@ private slots:
     void enableButtons(bool enable);
 
 private:
-    const int LOW_OUTPUT_VALUE  = 1000;
-    const int HIGH_OUTPUT_VALUE = 2000;
+    const int LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS  = 1000;
+    const int HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS = 2000;
     Ui::EscCalibrationPage *ui;
     bool m_isCalibrating;
 

@@ -33,6 +33,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "vehicleconfigurationhelper.h"
+#include "actuatorsettings.h"
 
 EscCalibrationPage::EscCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
@@ -73,13 +74,13 @@ void EscCalibrationPage::startStopButtonClicked()
         MixerSettings *mSettings = MixerSettings::GetInstance(uavoManager);
         Q_ASSERT(mSettings);
         QString mixerTypePattern = "Mixer%1Type";
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
             UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
             Q_ASSERT(field);
             if (field->getValue().toString() == field->getOptions().at(VehicleConfigurationHelper::MIXER_TYPE_MOTOR)) {
                 OutputCalibrationUtil *output = new OutputCalibrationUtil();
-                output->startChannelOutput(i, LOW_OUTPUT_VALUE);
-                output->setChannelOutputValue(HIGH_OUTPUT_VALUE);
+                output->startChannelOutput(i, LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
+                output->setChannelOutputValue(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
                 m_outputs << output;
             }
         }
@@ -94,7 +95,7 @@ void EscCalibrationPage::startStopButtonClicked()
         }
         m_outputs.clear();
         m_isCalibrating = false;
-        ui->startStopButton->setText("Start");
+        ui->startStopButton->setText(tr("Start"));
         ui->startStopButton->setEnabled(true);
         enableButtons(true);
     }

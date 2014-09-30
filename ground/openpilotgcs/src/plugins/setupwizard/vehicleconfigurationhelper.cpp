@@ -333,26 +333,26 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
 {
     ActuatorSettings *actSettings = ActuatorSettings::GetInstance(m_uavoManager);
 
-    qint16 escFrequence = LEGACY_ESC_FREQUENCE;
+    qint16 escFrequence = LEGACY_ESC_FREQUENCY;
 
     switch (m_configSource->getEscType()) {
     case VehicleConfigurationSource::ESC_STANDARD:
-        escFrequence = LEGACY_ESC_FREQUENCE;
+        escFrequence = LEGACY_ESC_FREQUENCY;
         break;
     case VehicleConfigurationSource::ESC_RAPID:
-        escFrequence = RAPID_ESC_FREQUENCE;
+        escFrequence = RAPID_ESC_FREQUENCY;
         break;
     default:
         break;
     }
 
-    qint16 servoFrequence = ANALOG_SERVO_FREQUENCE;
+    qint16 servoFrequence = ANALOG_SERVO_FREQUENCY;
     switch (m_configSource->getServoType()) {
     case VehicleConfigurationSource::SERVO_ANALOG:
-        servoFrequence = ANALOG_SERVO_FREQUENCE;
+        servoFrequence = ANALOG_SERVO_FREQUENCY;
         break;
     case VehicleConfigurationSource::SERVO_DIGITAL:
-        servoFrequence = DIGITAL_SERVO_FREQUENCE;
+        servoFrequence = DIGITAL_SERVO_FREQUENCY;
         break;
     default:
         break;
@@ -375,7 +375,7 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
         data.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
 
         for (quint16 i = 0; i < ActuatorSettings::CHANNELUPDATEFREQ_NUMELEM; i++) {
-            data.ChannelUpdateFreq[i] = LEGACY_ESC_FREQUENCE;
+            data.ChannelUpdateFreq[i] = LEGACY_ESC_FREQUENCY;
         }
 
         switch (m_configSource->getVehicleSubType()) {
@@ -592,7 +592,7 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
     // Set Mixer types and values
     QString mixerTypePattern   = "Mixer%1Type";
     QString mixerVectorPattern = "Mixer%1Vector";
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
         UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
         Q_ASSERT(field);
         field->setValue(field->getOptions().at(channels[i].type));

@@ -41,7 +41,11 @@
 #include <openpilot.h>
 // private includes
 #include "inc/systemmod.h"
-#include "notification.h"
+
+#include <notification.h>
+#ifdef PIOS_INCLUDE_WS2811
+#include <lednotification.h>
+#endif
 
 // UAVOs
 #include <objectpersistence.h>
@@ -54,6 +58,7 @@
 #include <callbackinfo.h>
 #include <hwsettings.h>
 #include <pios_flashfs.h>
+#include <pios_notify.h>
 
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
 #include <instrumentation.h>
@@ -632,6 +637,9 @@ static void updateSystemAlarms()
 void vApplicationIdleHook(void)
 {
     NotificationOnboardLedsRun();
+#ifdef PIOS_INCLUDE_WS2811
+    LedNotificationExtLedsRun();
+#endif
 }
 /**
  * Called by the RTOS when a stack overflow is detected.

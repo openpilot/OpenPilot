@@ -61,7 +61,7 @@ void FixedWingPage::setupSelection(Selection *selection)
                        SetupWizard::FIXED_WING_DUAL_AILERON);
 
     selection->addItem(tr("Aileron Single Servo"),
-                       tr("This setup expects a traditional airframe using a single alieron servo or two servos "
+                       tr("This setup expects a traditional airframe using a single aileron servo or two servos "
                           "connected by a Y adapter plus an elevator and a rudder."),
                        "aileron-single",
                        SetupWizard::FIXED_WING_AILERON);

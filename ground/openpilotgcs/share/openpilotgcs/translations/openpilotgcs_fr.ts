@@ -6611,10 +6611,9 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Fréquence de rafraîchissement :</translation>
     </message>
     <message>
-        <location/>
         <source>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
 Leave at 50Hz for fixed wing.</source>
-        <translation>Configurer ici &quot;TurboPWM&quot; : valeur classique pour les multirotors.
+        <translation type="vanished">Configurer ici &quot;TurboPWM&quot; : valeur classique pour les multirotors.
 Laisser à 50Hz pour une aile volante.</translation>
     </message>
     <message>
@@ -6709,6 +6708,17 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Live Testing</source>
         <translation>Test en Temps Réel</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Setup &quot;RapidESC&quot; here: usual value is 500 Hz for multirotor airframes.
+</source>
+        <translation>Configurer ici &quot;TurboPWM&quot; : 500Hz est une valeur classique pour les multirotors.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>500</source>
+        <translation>500</translation>
     </message>
 </context>
 <context>
@@ -7744,14 +7754,12 @@ Useful if you have accidentally changed some settings.</source>
         <translation>Mettre à jour le contrôleur de vol en temps réel</translation>
     </message>
     <message>
-        <location/>
         <source>Attitude mode response (deg)</source>
-        <translation>Réponse mode Attitude (deg)</translation>
+        <translation type="vanished">Réponse mode Attitude (deg)</translation>
     </message>
     <message>
-        <location/>
         <source>Rate mode response (deg/s)</source>
-        <translation>Vitesse mode Rate (deg/s)</translation>
+        <translation type="vanished">Vitesse mode Rate (deg/s)</translation>
     </message>
     <message>
         <location/>
@@ -7912,7 +7920,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Rattitude</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8057,9 +8065,8 @@ Useful if you have accidentally changed some settings.</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle le véhicule doit ajuster son estimation de gaz au neutre. Le Maintien d&apos;Altitude suppose que lorsque il est activé, il est la plage nécessaire pour se maintenir en l&apos;air. Si les gaz est beaucoup plus élevé ou plus bas, il faut ajuster ce &quot;trim&quot;. Des valeurs plus élevées peuvent lui permettre de faire cet ajustement plus rapidement mais cela pourrait conduire à des oscillations. A laisser par défaut, à moins de savoir ce que vous faites.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>Max rate limit (all modes) (deg/s)</source>
-        <translation>Limitation Rate max (tous modes) (deg/s)</translation>
+        <translation type="vanished">Limitation Rate max (tous modes) (deg/s)</translation>
     </message>
     <message>
         <location/>
@@ -8245,9 +8252,8 @@ Useful if you have accidentally changed some settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
         <source>Enable Thrust PID Scaling</source>
-        <translation>Activer Thrust PID Scaling</translation>
+        <translation type="vanished">Activer Thrust PID Scaling</translation>
     </message>
     <message>
         <location/>
@@ -8287,6 +8293,32 @@ Useful if you have accidentally changed some settings.</source>
         <source>fieldname:ThrustPIDScaleAxes</source>
         <translatorcomment>Pas toucher !</translatorcomment>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rate mode
+response (deg/s)</source>
+        <translation type="unfinished">Réponse mode Rate
+(en degrés/seconde)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude mode
+response (deg)</source>
+        <translation type="unfinished">Réponse mode Attitude
+(en degrés)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max rate limit
+(all modes) (deg/s)</source>
+        <translation type="unfinished">Limitation Vitesse Max
+(tous modes, en degrés/seconde)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable TPS</source>
+        <translation type="unfinished">Activer TPS</translation>
     </message>
 </context>
 <context>
@@ -8995,12 +9027,12 @@ les données en cache</translation>
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/connectiondiagram.cpp" line="+38"/>
+        <location filename="../../../src/plugins/setupwizard/connectiondiagram.cpp" line="+41"/>
         <source>Connection Diagram</source>
         <translation>Diagramme de Connexion</translation>
     </message>
     <message>
-        <location line="+156"/>
+        <location line="+231"/>
         <source>Save File</source>
         <translation>Enregistrer Fichier</translation>
     </message>
@@ -9018,7 +9050,6 @@ les données en cache</translation>
         <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -9032,7 +9063,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Ensure your board is powered down &amp;amp; no LED&apos;s are active.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When you are ready you can start the upgrade below by pushing the button and follow the onscreen prompts, it is critical that nothing disturbs the board while the firmware is being written.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9106,6 +9137,35 @@ p, li { white-space: pre-wrap; }
         <source>Something went wrong, you will have to manually upgrade the board using the uploader plugin.</source>
         <translation>Quelque chose s&apos;est mal passé, vous devrez mettre à jour manuellement la carte en utilisant le plugin uploader.</translation>
     </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.ui"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Firmware Update&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It is necessary that your firmware and ground control software are the same version.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;To update your firmware to the correct version now:&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Unplug all batteries and USB from OpenPilot&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Ensure your board is powered down &amp;amp; no LED&apos;s are active.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When you are ready you can start the upgrade below by pushing the button and follow the onscreen prompts, it is critical that nothing disturbs the board while the firmware is being written.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Mise à jour Firmware&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Il est nécessaire que la version de firmware et la version du logiciel GCS soient identiques.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Pour même à jour votre firmware avec la bonne version :&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Débrancher toutes les batteries et le port USB de la carte OpenPilot&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Vérifier que la carte n&apos;est pas alimentée et qu&apos;aucune LED ne soit alumée.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Lorsque vous êtes prêt pour démarrer la mise à jour, appuyez sur le bouton et suivez les instructions à l&apos;écran. Il est essentiel que rien ne vienne perturber le processus durant l&apos;écriture du firmware.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>ControllerPage</name>
@@ -9115,7 +9175,6 @@ p, li { white-space: pre-wrap; }
         <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -9128,7 +9187,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;If your board is not connected, please connect the board to a USB port on your computer and select the device from the list below.  Then press &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Connect&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translatorcomment>&apos;moyen de connexion&apos;, à affiner...</translatorcomment>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9191,28 +9250,99 @@ p, li { white-space: pre-wrap; }
         <source>Disconnect</source>
         <translation>Déconnecter</translation>
     </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/controllerpage.ui"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Board Identification&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To continue, the wizard needs to determine the configuration required for the type of OpenPilot controller you have. When connected, the wizard will attempt to automatically detect the type of board.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;If the board is already connected and successfully detected, the board type will already be displayed. You can &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Disconnect&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; and select another device if you need to detect another board.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;If your board is not connected, please connect the board to a USB port on your computer and select the device from the list below.  Then press &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Connect&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Identification de la Carte OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Avant de continuer l&apos;assistant doit déterminer la configuration nécessaire à la carte OpenPilot que vous possédez. Lors de la connection, l&apos;assistant va essayer de déterminer automatiquement le type de carte.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Si la carte est déjà connectée et détectée avec succès, le type de carte est déjà affiché. Vous pouvez appuyer sur &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Déconnecter&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; et sélectionner une autre carte si besoin.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Si votre carte n&apos;est pas connectée, veuillez brancher cotre carte sur le port USB de votre ordinateur e tla sélectionner dans la liste ci-dessous. Appuyez ensuite sur &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Connecter&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>FixedWingPage</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/fixedwingpage.ui"/>
         <source>WizardPage</source>
-        <translation>Page d&apos;Assistant</translation>
+        <translation type="vanished">Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;The Fixed Wing section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;La partie Voilure Fixe de l&apos;Assistant de Configuration OpenPilot n&apos;est pas encore implémentée.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/fixedwingpage.cpp" line="+51"/>
+        <source>OpenPilot Fixed-wing Configuration</source>
+        <translation type="unfinished">Configuration OpenPilot - Voilure fixe</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This part of the wizard will set up the OpenPilot controller for use with a fixed-wing flying aircraft utilizing servos. The wizard supports the most common types of fixed-wing aircraft, other variants of fixed-wing aircraft can be configured by using custom configuration options in the Configuration plugin in the GCS.
+
+Please select the type of fixed-wing you want to create a configuration for below:</source>
+        <translation type="unfinished">Cette partie de l&apos;assistant va configurer le contrôleur OpenPilot pour utiliser une voilure fixe avec des servos. L&apos;assistant supporte les types de voilure fixe les plus communs, d&apos;autres variantes de voilures fixes peuvent être configurées dans l&apos;onglet &quot;Véhicule&quot; &gt; &quot;Personnalisé&quot; du plugin de configuration de GCS.
+
+Veuillez sélectionner la configuration de voilure fixe désirée ci-dessous :</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Aileron Dual Servos</source>
+        <translation type="unfinished">Aileron Deux Servos</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup expects a traditional airframe using two independent aileron servos on their own channel (not connected by Y adapter) plus an elevator and a rudder.</source>
+        <translation type="unfinished">Cette configuration concerne une plateforme volante classique utilisant deux servos d&apos;ailerons indépendants ayant leur propre branchement (pas connectés avec un adaptateur en Y) plus un volet de profondeur et une dérive.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Aileron Single Servo</source>
+        <translation type="unfinished">Aileron Servo Unique</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup expects a traditional airframe using a single aileron servo or two servos connected by a Y adapter plus an elevator and a rudder.</source>
+        <translation type="unfinished">Cette configuration concerne une plateforme volante classique utilisant un servo d&apos;ailerons unique ou deux servos branchés avec un cordon Y plus un volet de profondeur et une dérive.</translation>
+    </message>
+    <message>
+        <source>This setup expects a traditional airframe using a single alieron servo or two servos connected by a Y adapter plus an elevator and a rudder.</source>
+        <translation type="obsolete">Cette configuration concerne une plateforme volante classique utilisant un servo d&apos;ailerons unique ou deux servos branchés avec un cordon Y plus un volet de profondeur et une dérive.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Elevon</source>
+        <translation type="unfinished">Elevon</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This setup currently expects a flying-wing setup, an elevon plus rudder setup is not yet supported. Setup should include only two elevons, and should explicitly not include a rudder.</source>
+        <translation type="unfinished">Cette configuration concerne les ailes volantes, la dérive n&apos;est pas encore supportée actuellement.  La configuration s&apos;applique à deux servos d&apos;élevons, sans dérive.</translation>
     </message>
 </context>
 <context>
@@ -9246,7 +9376,6 @@ p, li { white-space: pre-wrap; }
         <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -9256,7 +9385,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The OpenPilot controller supports many different types of input signals. Please select the type of input that matches your receiver configuration. If you are unsure, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Some input options require the OpenPilot controller to be rebooted before the changes can take place. If an option that requires a reboot is selected, you will be instructed to do so on the next page of this wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9306,21 +9435,40 @@ p, li { white-space: pre-wrap; }
         <source>DSM Sat</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Input Signal Configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The OpenPilot controller supports many different types of input signals. Please select the type of input that matches your receiver configuration. If you are unsure, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Some input options require the OpenPilot controller to be rebooted before the changes can take place. If an option that requires a reboot is selected, you will be instructed to do so on the next page of this wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Configuration OpenPilot des Signaux d&apos;Entrée&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Le contrôleur OpenPilot supporte plusieurs types de signaux d&apos;entrée. Veuillez sélectionner le type d&apos;entrée qui correspond à votre configuration de récepteur. Si vous avez un doute, laissez l&apos;option sélectionnée par défaut et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Certaines configurations demandent un redémarrage du contrôleur OpenPilot pour que les changements soient effectifs. Vous serrez informé si un redémarrage est nécessaire à l&apos;écran suivant de cet assistant.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>MultiPage</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/multipage.ui"/>
         <source>WizardPage</source>
-        <translation>Page d&apos;Assistant</translation>
+        <translation type="vanished">Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>Multirotor type:</source>
-        <translation>Type de multirotor :</translation>
+        <translation type="vanished">Type de multirotor :</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/multipage.cpp" line="+85"/>
+        <location filename="../../../src/plugins/setupwizard/pages/multipage.cpp" line="+57"/>
         <source>Tricopter</source>
         <translation>Tricoptère</translation>
     </message>
@@ -9330,7 +9478,7 @@ p, li { white-space: pre-wrap; }
         <translation>Le tricoptère utilise trois moteurs et un servo. Le servo est utilisé pour permettre au moteur arrière d&apos;agir sur le Yaw (Lacet). Les moteurs de devant tournent dans des sens opposés. Le tricoptère est connu pour son mouvement de balayage en lacet et il est très adapté pour le FPV car les moteurs de devant sont écartés.</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+6"/>
         <source>Quadcopter X</source>
         <translation>Quadricoptère X</translation>
     </message>
@@ -9340,7 +9488,7 @@ p, li { white-space: pre-wrap; }
         <translation>Le Quadricoptère X utilise quatre moteurs et c&apos;est la configuration la plus commune en multirotor. Deux des moteurs tournent dans le sens horaire et les deux dans le sens antihoraire. Les moteurs situés en diagonale tournent dans le même sens. Cette configuration est idéale pour le vol sportif et couramment utilisé pour des plates-formes FPV.</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+6"/>
         <source>Quadcopter +</source>
         <translation>Quadricoptère +</translation>
     </message>
@@ -9350,31 +9498,70 @@ p, li { white-space: pre-wrap; }
         <translation>Le Quadricoptère (+) utilise quatre moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens antihoraire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+7"/>
+        <source>Quadcopter H</source>
+        <translation>Quadricoptère H</translation>
+    </message>
+    <message>
         <location line="+1"/>
+        <source>Quadcopter H, Blackout miniH</source>
+        <translation>Quadricoptère H, blackout miniH</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Hexacopter</source>
         <translation>Hexacoptère</translation>
     </message>
     <message>
-        <location line="+8"/>
         <location line="+1"/>
+        <source>A multirotor with six motors, one motor in front.</source>
+        <translation type="unfinished">Un multirotor avec six moteurs, un moteur sur l&apos;avant.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>A multirotor with six motors, two motors in front.</source>
+        <translation type="unfinished">Un multirotor avec six moteurs, deux moteurs sur l&apos;avant.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>A multirotor with six motors in two rows.</source>
+        <translation type="unfinished">Un multirotor avec six moteurs alignés sur deux lignes.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Hexacopter Coax (Y6)</source>
         <translation>Hexacoptère Coax (Y6)</translation>
     </message>
     <message>
-        <location line="-7"/>
         <location line="+1"/>
+        <source>A multirotor with six motors mounted in a coaxial fashion.</source>
+        <translation type="unfinished">Un multirotor avec six moteurs montés de manière coaxiale.</translation>
+    </message>
+    <message>
+        <location line="-11"/>
         <source>Hexacopter X</source>
         <translation>Hexacoptère X</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-38"/>
+        <source>OpenPilot Multirotor Configuration</source>
+        <translation type="unfinished">Configuration Multirotor OpenPilot</translation>
+    </message>
+    <message>
         <location line="+1"/>
+        <source>This part of the wizard will set up the OpenPilot controller for use with a flying platform utilizing multiple rotors. The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom configuration options in the Configuration plugin in the GCS.
+
+Please select the type of multirotor you want to create a configuration for below:</source>
+        <translation type="unfinished">Cette partie de l&apos;assistant va permettre le configuration du contrôleur OpenPilot pour fonctionner avec des plateformes volantes utilisant plusieurs moteurs. L&apos;assistant supporte les types de configurations les plus courants. D&apos;autres variantes de multirotors peuvent être configurées dans l&apos;onglet &quot;Véhicule&quot; &gt; &quot;Personnalisé&quot; du plugin de configuration de GCS.
+
+Veuillez sélectionner le type de multirotor désiré pour la configuration ci-dessous :</translation>
+    </message>
+    <message>
+        <location line="+42"/>
         <source>Hexacopter H</source>
         <translation>Hexacoptère H</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/multipage.ui"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -9384,7 +9571,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the wizard will set up the OpenPilot controller for use with a flying platform utilizing multiple rotors. The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom configuration options in the Configuration plugin in the GCS.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Please select the type of multirotor you want to create a configuration for below:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9453,38 +9640,31 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+267"/>
-        <location line="+76"/>
-        <location line="+28"/>
-        <location line="+19"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+379"/>
+        <location line="+88"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This step calibrates the center position of the servo. To set the center position for this servo, press the Start button below and slide the slider to center the servo. &lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette étape calibre la position centrale d&apos;un servo. Pour régler la position centrale pour ce servo, appuyez sur le bouton Démarrer ci-dessous et bougez le curseur pour centrer le servo. &lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette étape calibre la position centrale d&apos;un servo. Pour régler la position centrale pour ce servo, appuyez sur le bouton Démarrer ci-dessous et bougez le curseur pour centrer le servo. &lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To save the servo and other hardware from damage we have to set the max and min angles for the servo. &lt;/p&gt;&lt;p&gt;To set the minimum angle for the servo, press the Start button below and select the top slider and slide it to the left until min angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pour protéger le servo ou tout autre matériel contre des dommages nous devons régler l&apos;angle maxi et mini pour le servo. &lt;/p&gt;&lt;p&gt;Pour régler l&apos;angle minimum du servo, appuyez sur le bouton Démarrer ci-dessous, sélectionnez le curseur du haut puis bougez-le vers la gauche jusqu&apos;à atteindre l&apos;angle minimum.&lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pour protéger le servo ou tout autre matériel contre des dommages nous devons régler l&apos;angle maxi et mini pour le servo. &lt;/p&gt;&lt;p&gt;Pour régler l&apos;angle minimum du servo, appuyez sur le bouton Démarrer ci-dessous, sélectionnez le curseur du haut puis bougez-le vers la gauche jusqu&apos;à atteindre l&apos;angle minimum.&lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To set the maximum angle for the servo, press the Start button below and select the top slider and slide it to the right until max angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pour régler l&apos;angle maximum du servo, appuyez sur le bouton Démarrer ci-dessous, sélectionnez le curseur du haut puis bougez-le vers la droite jusqu&apos;à atteindre l&apos;angle maximum.&lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pour régler l&apos;angle maximum du servo, appuyez sur le bouton Démarrer ci-dessous, sélectionnez le curseur du haut puis bougez-le vers la droite jusqu&apos;à atteindre l&apos;angle maximum.&lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-123"/>
-        <location line="+76"/>
-        <location line="+28"/>
-        <location line="+19"/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-88"/>
+        <location line="+88"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location line="-88"/>
+        <location line="-41"/>
         <source>The actuator module is in an error state.
 
 Please make sure the correct firmware version is used then restart the wizard and try again. If the problem persists please consult the openpilot.org support forum.</source>
@@ -9493,20 +9673,47 @@ Please make sure the correct firmware version is used then restart the wizard an
 Soyez certain d&apos;utiliser la bonne version de firmware puis redémarrer l&apos;assistant et essayez à nouveau. Si le problème persiste, consultez le forum openpilot.org.</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation. Soyez certain que les moteurs tournent dans le bon sens comme indiqué sur le diagramme. Permutez deux fils d&apos;un moteur pour changer son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation. Soyez certain que les moteurs tournent dans le bon sens comme indiqué sur le diagramme. Permutez deux fils d&apos;un moteur pour changer son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Please pay attention to the details and in particular the motors position and its rotation direction. Ensure the motors are spinning in the correct direction as shown in the diagram. Swap any 2 motor wires to change the direction of a motor. &lt;/p&gt;&lt;p&gt;To find &lt;span style=&quot; font-weight:600;&quot;&gt;the neutral rate for this motor&lt;/span&gt;, press the Start button below and slide the slider to the right until the motor just starts to spin stable. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A cette étapes nous allons ajuster le neutre du moteur mis en évidence dans l&apos;illustration à droite. &lt;br/&gt;Veuillez faire attention aux détails et en particulier à la position et au sens de rotation du moteur concerné. Soyez certain que le moteur tourne dans le bon sens comme indiqué sur l&apos;illustration ci-contre. Vous pouvez intervertir deux fils du moteur pour changer son sens de rotation. &lt;/p&gt;&lt;p&gt;Pour trouver &lt;span style=&quot; font-weight:600;&quot;&gt;le neutre de ce moteur&lt;/span&gt;, appuyez sur le bouton &quot;Démarrer&quot; ci-dessous et bougez le curseur vers la droite jusqu&apos;à ce que le moteur démarre et tourne de manière régulière. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est réglé, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This step calibrates&lt;span style=&quot; font-weight:600;&quot;&gt; the minimum, center and maximum angle of the servo&lt;/span&gt;. To set the angles for this servo, press the Start button below and slide the slider for the angle to set. The servo will follow the sliders position. &lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;p&gt;Check Reverse to reverse servo action.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette étape va ajuster&lt;span style=&quot; font-weight:600;&quot;&gt; l&apos;angle minimum, centré et maximum du servo&lt;/span&gt;. Pour ajuster les positions de ce servo, appuyez sur &quot;Démarrer&quot; et déplacez les curseurs en fonction de l&apos;angle désiré. Le servo bouge en fonction de la position du curseur central. &lt;br/&gt;Lorsque vous avez terminé, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;p&gt;Cochez &quot;Inverser&quot; pour changer la direction de mouvement du servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reverse</source>
+        <translation type="unfinished">Inverser</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation type="unfinished">Mini</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Center</source>
+        <translation type="unfinished">Centré</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation type="unfinished">Maxi</translation>
     </message>
 </context>
 <context>
     <name>OutputPage</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/outputpage.ui"/>
         <source>WizardPage</source>
-        <translation>Page d&apos;Assistant</translation>
+        <translation type="vanished">Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -9518,7 +9725,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Please select one of the options below. If you are unsure about the capabilities of your ESCs, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To read more regarding ESC refresh rates, please see &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/HIEu&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;this article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; in the OpenPilot Wiki&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9531,24 +9738,20 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Pour en savoir plus à propos des fréquences de rafraîchissement des variateurs, veuillez consulter &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/5IBwAQ&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;cet article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; sur le Wiki OpenPilot (en anglais)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location/>
         <source>Standard ESC 50Hz</source>
-        <translation>Variateur Standard 50Hz</translation>
+        <translation type="vanished">Variateur Standard 50Hz</translation>
     </message>
     <message>
-        <location/>
         <source>Standard ESC</source>
-        <translation>Variateur Standard</translation>
+        <translation type="vanished">Variateur Standard</translation>
     </message>
     <message>
-        <location/>
         <source>Turbo PWM ESC 400Hz</source>
-        <translation>Variateur Turbo PWM 400Hz</translation>
+        <translation type="vanished">Variateur Turbo PWM 400Hz</translation>
     </message>
     <message>
-        <location/>
         <source>Turbo PWM</source>
-        <translation>Turbo PWM</translation>
+        <translation type="vanished">Turbo PWM</translation>
     </message>
 </context>
 <context>
@@ -9669,7 +9872,6 @@ Connectez votre carte OpenPilot et essayez à nouveau.</translation>
         <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -9682,7 +9884,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To continue the wizard and go through some basic configuration steps, please continue to the next step of this wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The following steps require that your OpenPilot controller is set up according to the diagram, it is &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;connected to the computer&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; by USB, and that the vehicle is&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt; powered by a battery&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9700,6 +9902,31 @@ p, li { white-space: pre-wrap; }
         <source>Show connection diagram for configuration</source>
         <translatorcomment>Afficher le diagramme de branchement pour la configuration</translatorcomment>
         <translation>Afficher le diagramme de branchement pour la configuration</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Configuration Summary&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The first part of this wizard is now complete. All information required to create a basic OpenPilot controller configuration for a specific vehicle has been collected.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Below is a summary of the configuration and a button that links to a diagram illustrating how to connect required hardware and the OpenPilot Controller with the current configuration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To continue the wizard and go through some basic configuration steps, please continue to the next step of this wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The following steps require that your OpenPilot controller is set up according to the diagram, it is &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;connected to the computer&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; by USB, and that the vehicle is&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt; powered by a battery&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Sommaire Configuration OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;La première partie de l&apos;assistant est à présent terminée. Toutes les informations nécessaires à une configuration de base du contrôleur OpenPilot pour un appareil spécifique ont été collectées.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Ci-dessous vous trouverez un résumé de la configuration et un bouton qui permet d&apos;afficher un schéma de câblage représentant les branchements nécessaires entre le matériel et le contrôleur OpenPilot pour la configuration actuelle.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Pour continuer avec des étapes de configuration de base, veuillez passer à l&apos;étape suivante de cet assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Les étapes suivantes requièrent que le contrôleur OpenPilot soit branché comme sur le schéma de câblage, &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;connecté à l&apos;ordinateur&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; en USB et &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;alimenté par une batterie&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -9733,7 +9960,6 @@ p, li { white-space: pre-wrap; }
         <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -9745,7 +9971,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Go ahead and select the type of vehicle for which you want to create a configuration.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;(The current version only provides functionality for multirotors.)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -9796,6 +10022,31 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Surface</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Vehicle Type Selection&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To continue, the wizard needs to know what type of vehicle the OpenPilot controller board is going to be used with. This step is crucial since much of the following configuration is unique per vehicle type.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Go ahead and select the type of vehicle for which you want to create a configuration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The current version only provides functionality for Multirotors and Fixed-wing aircraft.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Sélection Type Véhicule&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour continuer, l&apos;assistant doit connaître le type de véhicule utilisé avec la carte contrôleur OpenPilot. Cette étape est cruciale et va déterminer la configuration à mettre en place en fonction du type de véhicule.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Poursuivez et sélectionnez le type de véhicule désiré pour créer la configuration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La version actuelle supporte les Multirotors et les Voilures Fixes.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -10317,17 +10568,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ConfigMultiRotorWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+154"/>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+152"/>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrée</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Output</source>
-        <translation type="unfinished">Sortie</translation>
+        <translation>Sortie</translation>
     </message>
     <message>
-        <location line="+357"/>
+        <location line="+394"/>
         <location line="+24"/>
         <location line="+31"/>
         <location line="+31"/>
@@ -10335,18 +10586,18 @@ p, li { white-space: pre-wrap; }
         <location line="+24"/>
         <location line="+24"/>
         <location line="+43"/>
-        <location line="+205"/>
+        <location line="+207"/>
         <location line="+70"/>
         <source>Configuration OK</source>
         <translation>Configuration OK</translation>
     </message>
     <message>
-        <location line="-309"/>
+        <location line="-311"/>
         <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign a Yaw channel&lt;/font&gt;</source>
         <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter le canal de Yaw&lt;/font&gt;</translation>
     </message>
     <message>
-        <location line="+378"/>
+        <location line="+380"/>
         <source>&lt;font color=&apos;red&apos;&gt;ERROR: Assign all %1 motor channels&lt;/font&gt;</source>
         <translation>&lt;font color=&apos;red&apos;&gt;ERREUR : Veuillez affecter tous les %1 canaux moteurs&lt;/font&gt;</translation>
     </message>
@@ -10915,12 +11166,12 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
 <context>
     <name>SetupWizard</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+57"/>
+        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+62"/>
         <source>OpenPilot Setup Wizard</source>
         <translation>Assistant Configuration OpenPilot</translation>
     </message>
     <message>
-        <location line="+111"/>
+        <location line="+165"/>
         <source>Controller type: </source>
         <translation>Type de contrôleur : </translation>
     </message>
@@ -10941,25 +11192,33 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
+        <source>OpenPilot Nano</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>OpenPilot OPLink Radio Modem</source>
         <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot DiscoveryF4 Development Board</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
-        <location line="+47"/>
-        <location line="+15"/>
+        <location line="+50"/>
+        <location line="+21"/>
+        <location line="+12"/>
         <location line="+25"/>
         <location line="+13"/>
+        <location line="+15"/>
+        <location line="+38"/>
         <source>Unknown</source>
         <translation>Inconnu</translation>
     </message>
     <message>
-        <location line="-95"/>
+        <location line="-169"/>
         <source>Vehicle type: </source>
         <translation>Type de véhicule : </translation>
     </message>
@@ -10970,23 +11229,29 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
+        <location line="+48"/>
         <source>Vehicle sub type: </source>
         <translation>Sous-type véhicule : </translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="-45"/>
         <source>Tricopter</source>
         <translation>Tricoptère</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Quadcopter X</source>
-        <translation>Quadricopter X</translation>
+        <translation>Quadricoptère X</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Quadcopter +</source>
-        <translation>Quadricopter +</translation>
+        <translation>Quadricoptère +</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Quadcopter H</source>
+        <translation>Quadricoptère H</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -11034,7 +11299,22 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Aile</translation>
     </message>
     <message>
+        <location line="+6"/>
+        <source>Dual Aileron</source>
+        <translation>Aileron Double</translation>
+    </message>
+    <message>
         <location line="+3"/>
+        <source>Aileron</source>
+        <translation>Aileron</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Elevon</source>
+        <translation>Elevon</translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>Helicopter</source>
         <translation>Hélicoptère</translation>
     </message>
@@ -11080,32 +11360,109 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+7"/>
+        <source>Speed Controller (ESC) type: </source>
+        <translation>Type Contrôleur (Esc) : </translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Standard ESC (50 Hz)</source>
+        <translation>Contrôleur Standard (50 Hz)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Rapid ESC (500 Hz)</source>
+        <translation>Contrôleur Rapide (500Hz)</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Servo type: </source>
+        <translation>Type Servo : </translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Analog Servos (50 Hz)</source>
+        <translation>Servo Analogique (50Hz)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Digital Servos (333 Hz)</source>
+        <translation>Servo Digital (333Hz)</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>GPS type: </source>
+        <translation>Type GPS : </translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OpenPilot Platinum</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OpenPilot v8 or Generic UBLOX GPS</source>
+        <translation>OpenPilot v8 ou GPS Ublox générique</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Generic NMEA GPS</source>
+        <translation>GPS NMEA générique</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>None</source>
+        <translation>Aucun</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Airspeed Sensor: </source>
+        <translation>Capteur Vitesse Air : </translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Software Estimated</source>
+        <translation>Estimation Logicielle</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>EagleTree on Flexi-Port</source>
+        <translation>EagleTree sur Flexi-Port</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>MS4525 based on Flexi-Port</source>
+        <translation>MS4525 sur Flexi-Port</translation>
+    </message>
+    <message>
         <source>ESC type: </source>
-        <translation>Type de variateur : </translation>
+        <translation type="vanished">Type de variateur : </translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Legacy ESC (50 Hz)</source>
-        <translation>Variateur Classique (50Hz)</translation>
+        <translation type="vanished">Variateur Classique (50Hz)</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>Rapid ESC (400 Hz)</source>
-        <translation>Variateur Rapide (400Hz)</translation>
+        <translation type="vanished">Variateur Rapide (400Hz)</translation>
     </message>
 </context>
 <context>
     <name>SetupWizardPlugin</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/setupwizardplugin.cpp" line="+60"/>
+        <location filename="../../../src/plugins/setupwizard/setupwizardplugin.cpp" line="+61"/>
         <source>Vehicle Setup Wizard</source>
         <translation>Assistant Configuration Véhicule</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Export Wizard Vehicle Template</source>
+        <translation>Exporter Modèle Assitant Véhicule</translation>
     </message>
 </context>
 <context>
     <name>VehicleConfigurationHelper</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+80"/>
+        <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+89"/>
         <location line="+12"/>
         <source>Done!</source>
         <translation>Terminé !</translation>
@@ -11117,17 +11474,28 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Échoué !</translation>
     </message>
     <message>
-        <location line="+96"/>
+        <location line="+136"/>
+        <source>Writing GPS sensor settings</source>
+        <translation type="unfinished">Écriture paramètres capteur GPS</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>Writing Airspeed sensor settings</source>
+        <translation type="unfinished">Écriture paramètres capteur Vitesse Air</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Writing hardware settings</source>
         <translation>Écriture paramètres matériels</translation>
     </message>
     <message>
-        <location line="+113"/>
+        <location line="+155"/>
+        <location line="+31"/>
         <source>Writing actuator settings</source>
         <translation>Écriture paramètres actionneurs</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+60"/>
         <source>Writing flight mode settings 1/2</source>
         <translation>Écriture paramètres mode de vol 1/2</translation>
     </message>
@@ -11153,7 +11521,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres de stabilisation</translation>
     </message>
     <message>
-        <location line="+99"/>
+        <location line="+104"/>
         <source>Writing mixer settings</source>
         <translation>Écriture paramètres mixeur</translation>
     </message>
@@ -11168,7 +11536,12 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture contrôles manuels par défaut</translation>
     </message>
     <message>
-        <location line="+154"/>
+        <location line="+13"/>
+        <source>Writing template settings for %1</source>
+        <translation type="unfinished">Écriture modèle de configuration pour %1</translation>
+    </message>
+    <message>
+        <location line="+157"/>
         <source>Preparing mixer settings</source>
         <translation>Préparation des paramètres de mixage</translation>
     </message>
@@ -11197,7 +11570,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
 <context>
     <name>UAVObjectField</name>
     <message>
-        <location filename="../../../src/plugins/uavobjects/uavobjectfield.cpp" line="+89"/>
+        <location filename="../../../src/plugins/uavobjects/uavobjectfield.cpp" line="+90"/>
         <source>0</source>
         <translation></translation>
     </message>
@@ -11958,9 +12331,8 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Formulaire</translation>
     </message>
     <message>
-        <location/>
         <source>Airplane type:</source>
-        <translation>Type d&apos;avion :</translation>
+        <translation type="vanished">Type d&apos;avion :</translation>
     </message>
     <message>
         <location/>
@@ -11968,14 +12340,12 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Affectation Canaux de Sortie</translation>
     </message>
     <message>
-        <location/>
         <source>Engine</source>
-        <translation>Moteur</translation>
+        <translation type="vanished">Moteur</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the engine</source>
-        <translation>Sélectionner le canal de sortie pour le moteur</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour le moteur</translation>
     </message>
     <message>
         <location/>
@@ -11983,9 +12353,8 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Aileron 1</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the first aileron (or elevon)</source>
-        <translation>Sélectionner le canal de sortie pour le premier aileron (ou élevon)</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour le premier aileron (ou élevon)</translation>
     </message>
     <message>
         <location/>
@@ -11993,9 +12362,8 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Aileron 2</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the second aileron (or elevon)</source>
-        <translation>Sélectionner le canal de sortie pour le second aileron (ou élevon)</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour le second aileron (ou élevon)</translation>
     </message>
     <message>
         <location/>
@@ -12003,9 +12371,8 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Profondeur 1</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the first elevator</source>
-        <translation>Sélectionner le canal de sortie pour la profondeur principale</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour la profondeur principale</translation>
     </message>
     <message>
         <location/>
@@ -12013,9 +12380,8 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Profondeur 2</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for a secondary elevator</source>
-        <translation>Sélectionner le canal de sortie pour la profondeur secondaire</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour la profondeur secondaire</translation>
     </message>
     <message>
         <location/>
@@ -12023,9 +12389,8 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Dérive 1</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for the first rudder</source>
-        <translation>Sélectionner le canal de sortie pour la dérive principale</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour la dérive principale</translation>
     </message>
     <message>
         <location/>
@@ -12033,19 +12398,16 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Dérive 2</translation>
     </message>
     <message>
-        <location/>
         <source>Select output channel for a secondary rudder</source>
-        <translation>Sélectionner le canal de sortie pour la dérive secondaire</translation>
+        <translation type="vanished">Sélectionner le canal de sortie pour la dérive secondaire</translation>
     </message>
     <message>
-        <location/>
         <source>Elevon Mix</source>
-        <translation>Mixage</translation>
+        <translation type="vanished">Mixage</translation>
     </message>
     <message>
-        <location/>
         <source>Rudder %</source>
-        <translation>Dérive %</translation>
+        <translation type="vanished">Dérive %</translation>
     </message>
     <message>
         <location/>
@@ -12053,9 +12415,8 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>Pitch %</source>
-        <translation>Profondeur %</translation>
+        <translation type="vanished">Profondeur %</translation>
     </message>
     <message>
         <location/>
@@ -12066,6 +12427,56 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <location/>
         <source>Mixer OK</source>
         <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Airframe</source>
+        <translation>Plateforme</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mixer</source>
+        <translation>Mixage</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight of mixing in percent</source>
+        <translation>Quantité de mixage en pourcent</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Airframe Type:</source>
+        <translation>Type Plateforme :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select Fixed-wing type</source>
+        <translation>Sélectionner le type de voilure fixe</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assign your output channel</source>
+        <translation>Affecter votre canal de sortie</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor</source>
+        <translation>Moteur</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assign your motor output channel</source>
+        <translation>Affecter votre canal de sortie moteur</translation>
     </message>
 </context>
 <context>
@@ -12199,9 +12610,8 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation>Formulaire</translation>
     </message>
     <message>
-        <location/>
         <source>Frame</source>
-        <translation>Châssis</translation>
+        <translation type="vanished">Châssis</translation>
     </message>
     <message>
         <location/>
@@ -12219,10 +12629,9 @@ La carte sera redémarrée et tous les paramètres effacés.</translation>
         <translation></translation>
     </message>
     <message>
-        <location/>
         <source>Weight of Roll mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
-        <translation>Quantité de mixage Roll en pourcentage.
+        <translation type="vanished">Quantité de mixage Roll en pourcentage.
 Les valeurs classiques sont de 100% en configuration + et 50% en configuration X sur les quadricoptères.</translation>
     </message>
     <message>
@@ -12255,14 +12664,12 @@ Typical value is 50% for + or X configuration on quads.</source>
 Les valeurs classiques sont de 50% en configuration + et X sur les quadricoptères.</translation>
     </message>
     <message>
-        <location/>
         <source>Frame Type:</source>
-        <translation>Type Châssis :</translation>
+        <translation type="vanished">Type Châssis :</translation>
     </message>
     <message>
-        <location/>
         <source>Select the Multirotor frame type here.</source>
-        <translation>Sélectionner ici le type de châssis de Multirotor.</translation>
+        <translation type="vanished">Sélectionner ici le type de châssis de Multirotor.</translation>
     </message>
     <message>
         <location/>
@@ -12333,6 +12740,28 @@ Les valeurs classiques sont de 50% en configuration + et X sur les quadricoptèr
         <location/>
         <source>Reverse all motors</source>
         <translation>Inverser tous les moteurs</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Airframe</source>
+        <translation>Châssis</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight of Roll mixing in percent.
+Typical values are 100% for + configuration and 50% for X configuration on quads</source>
+        <translation>Quantité de mixage Roll en pourcentage.
+Les valeurs classiques sont de 100% en configuration + et 50% en configuration X sur les quadricoptères</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Airframe Type:</source>
+        <translation>Type Châssis :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the Multirotor frame type</source>
+        <translation>Sélectionner ici le type de châssis Multirotor</translation>
     </message>
 </context>
 <context>
@@ -12850,7 +13279,6 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
         <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -12860,7 +13288,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The wizard needs to get information from the controller to determine in which position the vehicle is normally considered to be level. To be able to successfully perform these measurements, you need to place the vehicle on a surface that is as flat and level as possible. Examples of such surfaces could be a table top or the floor. Be careful to ensure that the vehicle really is level, since this step will affect the accelerometer and gyro bias in the controller software.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To perform the calibration, please push the Calculate button and wait for the process to finish. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -12897,6 +13325,27 @@ Connectez votre carte OpenPilot et essayez à nouveau.</translation>
         <source>&lt;font color=&apos;green&apos;&gt;Done!&lt;/font&gt;</source>
         <translation>&lt;font color=&apos;green&apos;&gt;Terminé !&lt;/font&gt;</translation>
     </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/biascalibrationpage.ui"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Sensor Calibration Procedure&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The wizard needs to get information from the controller to determine in which position the vehicle is normally considered to be level. To be able to successfully perform these measurements, you need to place the vehicle on a surface that is as flat and level as possible. Examples of such surfaces could be a table top or the floor. Be careful to ensure that the vehicle really is level, since this step will affect the accelerometer and gyro bias in the controller software.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To perform the calibration, please push the Calculate button and wait for the process to finish.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Procédure d&apos;étalonnage des capteurs OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;L&apos;assistant a besoin de récupérer des informations du contrôleur pour déterminer dans quelle position l&apos;appareil est normalement considéré de niveau. Afin de réaliser avec succès ces mesures, vous devez placer le véhicule sur une surface aussi plane et horizontale que possible. Des exemples de ces surfaces pourraient être un dessus de table ou le sol. Veillez à ce que le véhicule soit vraiment de niveau puisque cette étape aura une incidence sur l&apos;ajustement des accéléromètres et des gyroscopes dans le logiciel du contrôleur.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour effectuer l&apos;étalonnage, veuillez appuyer sur le bouton Calculer et attendez la fin du processus. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>RevoCalibrationPage</name>
@@ -12906,12 +13355,32 @@ Connectez votre carte OpenPilot et essayez à nouveau.</translation>
         <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Revolution controller sensor calibration procedure&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The calibration procedure for the OpenPilot Revolution controller is not yet implemented in this setup wizard. To calibrate your OpenPilot Revolution controller please use the calibration utility found in the configuration plugin after you have finished this wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Future versions of will have an easy to use calibration procedure implemented.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Procédure calibration capteurs sur carte OpenPilot Revolution&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La procédure de calibration pour le contrôleur OpenPilot Revolution n&apos;est pas encore implémentée dans cet assistant  de configuration. Pour calibrer votre contrôleur OpenPilot Revolution veuillez utiliser l&apos;utilitaire de calibration que vous trouverez dans l&apos;onglet Configuration à la fin de cet assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les futures versions de cet assistant posséderont une procédure de calibration simplifiée.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Revolution Calibration Procedure&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The calibration procedure for the OpenPilot Revolution controller is not yet implemented in this setup wizard. To calibrate your OpenPilot Revolution controller please use the calibration utility found in the configuration plugin after you have finished this wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -13279,12 +13748,12 @@ Veuillez sélectionner une zone de la carte à télécharger avec &lt;CTRL&gt;+C
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/qml/AboutDialog.qml" line="+75"/>
+        <location filename="../../../src/plugins/coreplugin/qml/AboutDialog.qml" line="+86"/>
         <source>OpenPilot Ground Control Station</source>
         <translation>Station de Contrôle au Sol OpenPilot (GCS)</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+26"/>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.</source>
         <translation>Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier dans le cadre des termes de la licence GNU General Public Licence publiée par la Free Software Foundation; soit à la version 3 de la Licence, ou (en option) à une version ultérieure. Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.</translation>
@@ -13363,7 +13832,6 @@ Configuration n&apos;est pas chargé dans l&apos;espace de travail actuel.</tran
         <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
-        <location/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -13378,6 +13846,43 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;FROM THE VEHICLE BEFORE PROCEEDING!&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Disregarding this warning puts you at&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risk of very serious injury&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Now that your props are removed we can get started. Ready?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Bienvenue sur l&apos;Assistant de Configuration d&apos;OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cet assistant va vous guider à travers les étapes de base nécessaires à la configuration de votre contrôleur OpenPilot pour la première fois. Des questions vous seront posées sur votre plate-forme (multirotor / hélicoptère / voilure fixe), cet assistant les utilisera afin de configurer votre appareil pour son premier vol. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cet assistant ne configure pas tous les paramètres avancés disponibles dans le module GCS Configuration. Tous les paramètres de base et avancés pourront être modifiés plus tard en utilisant l&apos;onglet Configuration de GCS.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;ATTENTION : VOUS DEVEZ RETIRER TOUTES LES HELICES&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;DU VEHICULE AVANT DE CONTINUER !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Ne pas tenir compte de cet avertissement vous expose à des&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risques de blessures très graves &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Maintenant que vos hélices sont retirées nous pouvons continuer. Êtes-vous prêt ?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Welcome to the OpenPilot Setup Wizard&lt;/span&gt;&lt;img src=&quot;:/setupwizard/resources/wizard.png&quot; style=&quot;float: right;&quot; /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;right&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This wizard will guide you through the basic steps required to setup your OpenPilot controller for the first time.  You will be asked questions about your platform (multirotor/heli/fixed-wing) which this wizard will use to configure your controller for its first flight.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This wizard does not configure all of the advanced settings available in the GCS Configuration. All basic and advanced configuration parameters can be modified later by using the GCS Configuration plugin.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;WARNING: YOU MUST REMOVE ALL PROPELLERS &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;FROM THE VEHICLE BEFORE PROCEEDING!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Disregarding this warning puts you at&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risk of injury&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Now that your props are removed we can get started. Ready?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -13806,7 +14311,7 @@ Veuillez vérifier le fichier.
     <message>
         <location line="+20"/>
         <source>Manage flight side logs</source>
-        <translation type="unfinished">Gérer les logs de vol</translation>
+        <translation>Gérer les logs de vol</translation>
     </message>
 </context>
 <context>
@@ -14087,14 +14592,14 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>ConfigVehicleTypeWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+130"/>
+        <location filename="../../../src/plugins/config/configvehicletypewidget.cpp" line="+134"/>
         <source>Multirotor</source>
         <translation>Multirotor</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Fixed Wing</source>
-        <translation type="unfinished">Aile</translation>
+        <translation>Voilure Fixe</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -14104,12 +14609,12 @@ et même conduire au crash. A utiliser avec prudence.</translation>
     <message>
         <location line="+1"/>
         <source>Ground</source>
-        <translation type="unfinished">Voiture</translation>
+        <translation>Voiture</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Custom</source>
-        <translation type="unfinished">Personnalisé</translation>
+        <translation>Personnalisé</translation>
     </message>
     <message>
         <location line="+289"/>
@@ -14392,7 +14897,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>ConfigRevoWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+328"/>
+        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+329"/>
         <source>Temperature: %1°C</source>
         <translation>Température : %1°C</translation>
     </message>
@@ -14405,6 +14910,641 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location line="+5"/>
         <source>Sampled range: %1°C</source>
         <translation>Plage d&apos;échantillonnage : %1°C</translation>
+    </message>
+</context>
+<context>
+    <name>AirframeInitialTuningPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.ui"/>
+        <source>WizardPage</source>
+        <translation>Page d&apos;Assistant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Initial Tuning&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;;&quot;&gt;This section of the OpenPilot Wizard allows you to select a set of initial tunning parameters for your airframe. Presented below is a list of common airframe types, select the one that matches your airframe the closest, if unsure select the generic variant.&lt;/span&gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Réglages de Départ&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;;&quot;&gt;Cette partie de l&apos;assistant de configuration vous permet de sélectionner des paramètres prédéfinis pour votre appareil. Vous trouverez ci-dessous une liste d&apos;appareils couramment utilisés, sélectionnez-en un qui correspond le mieux à votre appareil ou un modèle générique si vous avez un doute.&lt;/span&gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Information about the Vehicle in short.</source>
+        <translation type="unfinished">Résumé d&apos;informations sur le Véhicule.</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.cpp" line="+119"/>
+        <source>Name of Vehicle: </source>
+        <translation type="unfinished">Nom du Véhicule : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name of Owner: </source>
+        <translation type="unfinished">Nom du Propriétaire : </translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Size: </source>
+        <translation type="unfinished">Taille : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Weight: </source>
+        <translation type="unfinished">Masse : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Motor(s): </source>
+        <translation type="unfinished">Moteur(s) : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>ESC(s): </source>
+        <translation type="unfinished">Esc(s) : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Servo(s): </source>
+        <translation type="unfinished">Servo(s) : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Battery: </source>
+        <translation type="unfinished">Batterie : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Propellers(s): </source>
+        <translation type="unfinished">Hélice(s) : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Controller: </source>
+        <translation type="unfinished">Carte Contrôleur : </translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Comments: </source>
+        <translation type="unfinished">Commentaires : </translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>No vehicle selected!</source>
+        <translation type="unfinished">Pas de véhicule sélectionné !</translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <source>None</source>
+        <translation type="unfinished">Aucun</translation>
+    </message>
+</context>
+<context>
+    <name>EscPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/escpage.ui"/>
+        <source>WizardPage</source>
+        <translation>Page d&apos;Assistant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Output Signal Configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To set an optimal configuration of the output signals powering your motors, the wizard needs to know what type of Electronic Speed Controllers (ESCs) you will use and what their capabilities are.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Please select one of the options below. If you are unsure about the capabilities of your ESCs, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Configuration OpenPilot des Signaux de Sortie&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Afin de régler de manière optimale la configuration des signaux de sortie qui pilotent vos moteurs, l&apos;assistant doit connaître le type de contrôleur de vitesse (ESC) utilisé et leurs capacités.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Veuillez sélectionner une des options ci-dessous. En cas de doute sur les possibilités de vos ESC, laissez l&apos;option sélectionnée par défaut et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Standard ESC 50Hz</source>
+        <translation>Variateur Standard 50Hz</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Standard ESC</source>
+        <translation>Variateur Standard</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Turbo PWM ESC 400Hz</source>
+        <translatorcomment>or 500Hz ?</translatorcomment>
+        <translation type="unfinished">Variateur Turbo PWM 400Hz</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid ESC</source>
+        <translation>ESC Rapide</translation>
+    </message>
+</context>
+<context>
+    <name>SelectionPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/selectionpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished">Page d&apos;Assistant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>placeholder_text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select:</source>
+        <translation type="unfinished">Sélectionner :</translation>
+    </message>
+</context>
+<context>
+    <name>ServoPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/servopage.ui"/>
+        <source>WizardPage</source>
+        <translation>Page d&apos;Assistant</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Output Signal Configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To set an optimal configuration of the output signals powering your servos, the wizard needs to know what type of servos you will use and what their capabilities are.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Please select one of the options below. If you are unsure about the capabilities of your servos, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Configuration OpenPilot des Signaux de Sortie&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Afin de régler de manière optimale la configuration des signaux de sortie qui pilotent vos servos, l&apos;assistant doit connaître le type de servo utilisé et leurs capacités.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Veuillez sélectionner une des options ci-dessous. En cas de doute sur les possibilités de vos servos, laissez l&apos;option sélectionnée par défaut et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Analog Servo 50Hz</source>
+        <translation>Servo Analogique 50Hz</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Analog Servos</source>
+        <translation>Servo Analogique</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Digital Servo 333Hz</source>
+        <translation>Servo Digital 333Hz</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Digital Servos</source>
+        <translation>Servo Digital</translation>
+    </message>
+</context>
+<context>
+    <name>VehicleTemplateExportDialog</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.ui"/>
+        <source>Vehicle Template Export</source>
+        <translation>Exportation Modèle Véhicule</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight:</source>
+        <translation>Masse :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Size and angle</source>
+        <translation>Taille et pas</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Battery:</source>
+        <translation>Batterie :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Size of the vehicle in mm</source>
+        <translation>Taille du véhicule en mm</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor:</source>
+        <translation>Moteur :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name:</source>
+        <translation>Nom :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo:</source>
+        <translation>Servo :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Brand and name</source>
+        <translation>Nom et marque</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Your name</source>
+        <translation>Votre nom</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Propeller:</source>
+        <translation>Hélice :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Forum name:</source>
+        <translation>Nom forum :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The name of the vehicle, brand etc</source>
+        <translation>Le nom du véhicule, la marque, etc</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Owner:</source>
+        <translation>Propriétaire :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Brand, size and Kv</source>
+        <translation>Marque, taille et Kv</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Size:</source>
+        <translation>Taille :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>How many cells etc?</source>
+        <translation>Combien de cellules, etc ?</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Controller:</source>
+        <translation>Carte Contrôleur :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>ESC:</source>
+        <translation>ESC :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>None</source>
+        <translation>Aucun</translation>
+    </message>
+    <message>
+        <location/>
+        <source>CC</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>CC3D</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Atom</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Revolution</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Nano</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Type:</source>
+        <translation>Type :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Forum nickname</source>
+        <translation>Nom sur le forum</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight in grams</source>
+        <translation>Masse en grammes</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Comment:</source>
+        <translation>Commentaire :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Put comments here that doesn&apos;t fit in the categories above</source>
+        <translation>Indiquez ici les commentaires  ne correspondant pas aux catégories ci-dessus</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Photo:</source>
+        <translation>Photo :</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Photo will be scaled to 500x500px</source>
+        <translation>La photo sera ajustée à une taille de 500x500 pixels</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select Image...</source>
+        <translation>Sélectionner image...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ok</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.cpp" line="+87"/>
+        <source>Fixed Wing - Aileron</source>
+        <translation>Voilure Fixe - Aileron</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Fixed Wing - Elevon</source>
+        <translation>Voilure Fixe - Elevon</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Fixed Wing - V-Tail</source>
+        <translation>Voilure Fixe - V-Tail</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Helicopter</source>
+        <translation>Hélicoptère</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Tricopter</source>
+        <translation>Multirotor - Tricoptère</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Quadrocopter X</source>
+        <translation>Multirotor - Quadricoptère X</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Quadrocopter +</source>
+        <translation>Multirotor - Quadricoptère +</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Octocopter V</source>
+        <translation>Multirotor - Octocoptère V</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Octocopter X8X</source>
+        <translation>Multirotor - Octocoptère X8X</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Octocopter X8+</source>
+        <translation>Multirotor - Octocoptère X8+</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Octocopter +</source>
+        <translation>Multirotor - Octocoptère +</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Octocopter X</source>
+        <translation>Multirotor - Octocoptère X</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Hexacopter X</source>
+        <translation>Multirotor - Hexacoptère X</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Hexacopter Y6</source>
+        <translation>Multirotor - Hexacoptère Y6</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Hexacopter +</source>
+        <translation>Multirotor - Hexacoptère +</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Unsupported</source>
+        <translation>Non Supporté</translation>
+    </message>
+    <message>
+        <location line="+65"/>
+        <source>Settings were exported to 
+%1</source>
+        <translation>Les paramètres ont été exportés vers
+%1</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Settings could not be exported to 
+%1.
+Please try again.</source>
+        <translation>Les paramètres n&apos;ont pas été exportés vers
+%1.
+Veuillez essayer à nouveau.</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Import Image</source>
+        <translation>Importer Image</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Images (*.png *.jpg)</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>AirSpeedPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/airspeedpage.cpp" line="+65"/>
+        <source>OpenPilot Airspeed Sensor Selection</source>
+        <translation>Sélection Capteur Vitesse Air OpenPilot</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This part of the wizard will help you select and configure a way to obtain airspeed data. OpenPilot support three methods to achieve this, one is a software estimation technique and the other two utilize hardware sensors.
+
+Note: if previously selected input combinations use the Flexi-port for input, only estimated airspeed will be available.
+
+</source>
+        <translation>Cette partie de l&apos;assistant va vous aider à sélectionner et configurer une solution pour obtenir les données de vitesse air. OpenPilot supporte trois méthodes pour l&apos;obtenir, une par estimation logicielle et deux à partir de capteurs externes.
+
+A Noter : Si vous avez précédemment sélectionné une entrée par le Flexi-port, seule l&apos;estimation logicelle sera disponnible.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Estimated</source>
+        <translation>Estimée</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This option uses an intelligent estimation algorithm which utilizes the OpenPilot INS/GPS to estimate wind speed and subtract it from ground speed obtained from the GPS.
+
+This solution is highly accurate in normal level flight with the drawback of being less accurate in rapid altitude changes.
+
+</source>
+        <translation>Cette option utilise un algorithme d&apos;estimation intelligent basé sur OpenPilot INS/GPS pour estimer la vitesse du vent et soustrait la vitesse sol obtenue par le GPS.
+
+Cette solution est très précise en vol normal avec l&apos;inconvénient d&apos;être moins précis lors de changements rapides d&apos;altitude.
+
+</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>EagleTree</source>
+        <translation>EagleTree</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Select this option to use the Airspeed MicroSensor V3 from EagleTree, this is an accurate airspeed sensor that includes on-board Temperature Compensation.
+
+Selecting this option will set your board&apos;s Flexi-Port in to I2C mode.</source>
+        <translation>Sélectionner cette option pour utiliser le capteur de vitesse air v3 de chez EagleTree, c&apos;est une capteur précis qui inclut une compensation en température.
+
+Le choix de cette option va paramétrer le Flexi-Port de votre carte en mode I2C.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>MS4525 Based</source>
+        <translation>Basé sur MS4525</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Select this option to use an airspeed sensor based on the MS4525DO  pressure transducer from Measurement Specialties. This includes the PixHawk sensor and their clones.
+
+Selecting this option will set your board&apos;s Flexi-Port in to I2C mode.</source>
+        <translation>Sléectionnez cette option pour utiliser un capteur basé sur le transducteur de pression MS4525DO de &quot;Measurement Specialties&quot;. Cette option inclut  le capteur PixHawk et ses clones.
+
+Le choix de cette option va paramétrer le Flexi-Port de votre carte en mode I2C.</translation>
+    </message>
+</context>
+<context>
+    <name>GpsPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/gpspage.cpp" line="+54"/>
+        <source>OpenPilot GPS Selection</source>
+        <translation>Sélection GPS OpenPilot</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Please select the type of GPS you wish to use. As well as OpenPilot hardware, 3rd party GPSs are supported also, although please note that performance could be less than optimal as not all GPSs are created equal.
+
+Note: NMEA only GPSs perform poorly on VTOL aircraft and are not recommended for Helis and MultiRotors.
+
+Please select your GPS type data below:</source>
+        <translation>Veuillez sélectionner le type de GPS que vous souhaitez utiliser. Aussi bien que le matériel OpenPilot, d&apos;autres GPS sont également supportés mais vous remarquerez que les performances peuvent-être moindres car tous les GPS ne sont fabriqués de la même manière.
+
+A noter : Les GPS NMEA donnent des performances réduites sur des appreils VTOL et ne sont pas recommandés sur des Multirotors ou Hélicoptères.
+
+Veuillez sélectionner votre type de GPS ci-dessous :</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Disabled</source>
+        <translation>Désactivé</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>GPS Features are not to be enabled</source>
+        <translation>Les possibilités GPS ne seront pas activées</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>OpenPilot Platinum</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Select this option to use the OpenPilot Platinum GPS with integrated Magnetometer and Microcontroller connected to the Main Port of your controller.
+
+Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
+        <translation>Sélectionnez cette option pour utiliser le GPS OpenPilot Platinum avec Magnétomètre et Microcontrôleur intégré connecté sur le Main Port de votre contrôleur.
+
+A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>U-Blox Based</source>
+        <translation>Basé sur U-Blox</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Select this option for the OpenPilot V8 GPS or generic U-Blox chipset GPSs connectedto the Main Port of your controller.</source>
+        <translation>Sélectionnez cette option pour utiliser le GPS OpenPilot v8 ou un GPS U-Blox générique connecté sur le Main Port de votre contrôleur.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>NMEA Based</source>
+        <translation>Basé sur NMEA</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Select this option for a generic NMEA based GPS connected to the Main Port of yourcontroller.</source>
+        <translation>Sélectionnez cette option pour utiliser un GPS NMEA générique connecté sur le Main Port de votre contrôleur.</translation>
     </message>
 </context>
 </TS>

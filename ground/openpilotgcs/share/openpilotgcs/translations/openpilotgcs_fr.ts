@@ -9684,7 +9684,7 @@ Soyez certain d&apos;utiliser la bonne version de firmware puis redémarrer l&ap
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This step calibrates&lt;span style=&quot; font-weight:600;&quot;&gt; the minimum, center and maximum angle of the servo&lt;/span&gt;. To set the angles for this servo, press the Start button below and slide the slider for the angle to set. The servo will follow the sliders position. &lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;p&gt;Check Reverse to reverse servo action.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette étape va ajuster&lt;span style=&quot; font-weight:600;&quot;&gt; l&apos;angle minimum, centré et maximum du servo&lt;/span&gt;. Pour ajuster les positions de ce servo, appuyez sur &quot;Démarrer&quot; et déplacez les curseurs en fonction de l&apos;angle désiré. Le servo bouge en fonction de la position du curseur central. &lt;br/&gt;Lorsque vous avez terminé, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;p&gt;Cochez &quot;Inverser&quot; pour changer la direction de mouvement du servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette étape va ajuster&lt;span style=&quot; font-weight:600;&quot;&gt; l&apos;angle minimum, centré et maximum du servo&lt;/span&gt;. Pour ajuster les positions de ce servo, appuyez sur &quot;Démarrer&quot; et déplacez les curseurs en fonction de l&apos;angle désiré. Le servo bouge en fonction de la position du curseur en cours.&lt;br/&gt;Lorsque vous avez terminé, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;p&gt;Cochez &quot;Inverser&quot; pour changer la direction de mouvement du servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -11456,7 +11456,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+12"/>
         <source>Export Wizard Vehicle Template</source>
-        <translation>Exporter Modèle Assitant Véhicule</translation>
+        <translation type="unfinished">Exporter Modèle Véhicule Assistant</translation>
     </message>
 </context>
 <context>
@@ -15193,12 +15193,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Forum name:</source>
-        <translation>Nom forum :</translation>
+        <translation>Pseudo :</translation>
     </message>
     <message>
         <location/>
         <source>The name of the vehicle, brand etc</source>
-        <translation>Le nom du véhicule, la marque, etc</translation>
+        <translation>Nom du véhicule, marque, etc</translation>
     </message>
     <message>
         <location/>
@@ -15218,7 +15218,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>How many cells etc?</source>
-        <translation>Combien de cellules, etc ?</translation>
+        <translation>Nb cellules, capacité ?</translation>
     </message>
     <message>
         <location/>

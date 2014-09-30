@@ -29,6 +29,8 @@
         <file>resources/bttn-calculate-up.png</file>
         <file>resources/bttn-turbo-down.png</file>
         <file>resources/bttn-turbo-up.png</file>
+        <file>resources/bttn-rapid-up.png</file>
+        <file>resources/bttn-rapid-dwn.png</file>
         <file>resources/bttn-servo-digital-dwn.png</file>
         <file>resources/bttn-servo-digital-up.png</file>
         <file>resources/bttn-servo-standard-dwn.png</file>

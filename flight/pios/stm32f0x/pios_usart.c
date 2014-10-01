@@ -34,6 +34,7 @@
 
 #include <pios_usart_priv.h>
 
+#define PIOS_UART_TX_BUFFER 10
 /* Provide a COM driver */
 static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud);
 static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback rx_in_cb, uint32_t context);
@@ -63,6 +64,10 @@ struct pios_usart_dev {
     uint32_t tx_out_context;
 
     uint32_t rx_dropped;
+
+    uint8_t tx_buffer[PIOS_UART_TX_BUFFER];
+    uint8_t tx_len;
+    uint8_t tx_pos;
 };
 
 static struct pios_usart_dev *PIOS_USART_validate(uint32_t usart_id)
@@ -283,14 +288,16 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
     bool tx_need_yield = false;
     if (USART_GetITStatus(usart_dev->cfg->regs, USART_IT_TXE) != RESET) {
         if (usart_dev->tx_out_cb) {
-            uint8_t b;
-            uint16_t bytes_to_send;
-
-            bytes_to_send = (usart_dev->tx_out_cb)(usart_dev->tx_out_context, &b, 1, NULL, &tx_need_yield);
-
-            if (bytes_to_send > 0) {
+            //uint8_t b;
+            //uint16_t bytes_to_send;
+            if(!usart_dev->tx_len){
+                usart_dev->tx_len = (usart_dev->tx_out_cb)(usart_dev->tx_out_context, usart_dev->tx_buffer, PIOS_UART_TX_BUFFER, NULL, &tx_need_yield);
+                usart_dev->tx_pos = 0;
+            }
+            if (usart_dev->tx_len > 0) {
                 /* Send the byte we've been given */
-                USART_SendData(usart_dev->cfg->regs, b);
+                USART_SendData(usart_dev->cfg->regs, usart_dev->tx_buffer[usart_dev->tx_pos++]);
+                usart_dev->tx_len--;
             } else {
                 /* No bytes to send, disable TXE interrupt */
                 USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, DISABLE);

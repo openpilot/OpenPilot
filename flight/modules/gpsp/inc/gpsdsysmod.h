@@ -34,6 +34,8 @@
 #include <pios_helpers.h>
 #include <ubx_utils.h>
 
+#define GPS_MODULE_DEFAULT_BAUDRATE 57600
+
 int32_t GPSPSystemModInitialize(void);
 
 #endif // GPSSYSTEMMOD_H

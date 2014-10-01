@@ -39,12 +39,13 @@ uint8_t buffer[BUFFER_SIZE];
 void handleGPS()
 {
     bool completeSentenceSent = false;
-    int8_t maxCount = 3;
+    int8_t maxCount = 2;
 
     do {
         int32_t datacounter = PIOS_UBX_DDC_GetAvailableBytes(PIOS_I2C_GPS);
         if (datacounter > 0) {
             uint8_t toRead = (uint32_t)datacounter > BUFFER_SIZE - lastUnsentData ? BUFFER_SIZE - lastUnsentData : (uint8_t)datacounter;
+            //uint8_t toRead = (uint32_t)datacounter > BUFFER_SIZE ? BUFFER_SIZE  : (uint8_t)datacounter;
             uint8_t toSend = toRead;
             PIOS_UBX_DDC_ReadData(PIOS_I2C_GPS, buffer, toRead);
 
@@ -58,6 +59,7 @@ void handleGPS()
             }
 
             PIOS_COM_SendBuffer(pios_com_main_id, buffer, toSend);
+
             if (toRead > toSend) {
                 // move unsent data at the beginning of buffer to be sent next time
                 lastUnsentData = toRead - toSend;
@@ -68,6 +70,11 @@ void handleGPS()
         datacounter = PIOS_COM_ReceiveBuffer(pios_com_main_id, buffer, BUFFER_SIZE, 0);
         if (datacounter > 0) {
             PIOS_UBX_DDC_WriteData(PIOS_I2C_GPS, buffer, datacounter);
+        }
+        if(maxCount){
+            // Note: this delay is needed as querying too quickly the UBX module's I2C(DDC)
+            // port causes a lot of weird issues (it stops sending nav sentences)
+            vTaskDelay(2 * configTICK_RATE_HZ / 1000);
         }
     } while (maxCount--);
 }
@@ -87,7 +94,7 @@ void setupGPS()
     cfgprt.fragments.data.txReady      = CFG_PRT_DATA_TXREADI_DISABLED;
     cfgprt.fragments.data.mode = CFG_PRT_DATA_MODE_ADDR;
     cfgprt.fragments.data.reserved3    = 0;
-    cfgprt.fragments.data.inProtoMask  = CFG_PRT_DATA_PROTO_UBX | CFG_PRT_DATA_PROTO_RTCM;
+    cfgprt.fragments.data.inProtoMask  = CFG_PRT_DATA_PROTO_UBX | CFG_PRT_DATA_PROTO_NMEA |CFG_PRT_DATA_PROTO_RTCM;
     cfgprt.fragments.data.outProtoMask = CFG_PRT_DATA_PROTO_UBX;
     cfgprt.fragments.data.flags = 0;
     cfgprt.fragments.data.reserved5    = 0;

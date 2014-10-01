@@ -119,24 +119,21 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
 #if defined(PIOS_INCLUDE_IAP)
     PIOS_IAP_WriteBootCount(0);
 #endif
-    /* Right now there is no configuration and uart speed is fixed at 115200.
+    /* Right now there is no configuration and uart speed is fixed at 57600.
      * TODO:
      * 1) add a tiny ubx parser on gps side to intercept CFG-RINV and use that for config storage;
      * 2) second ubx parser on uart side that intercept custom configuration message and flash commands.
      */
-    PIOS_COM_ChangeBaud(pios_com_main_id, 115200);
-    static TickType_t lastUpdate;
+    PIOS_COM_ChangeBaud(pios_com_main_id, GPS_MODULE_DEFAULT_BAUDRATE);
     setupGPS();
     uint32_t ledTimer = 0;
-
+    static TickType_t lastUpdate;
     readFirmwareInfo();
 
     while (1) {
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SYSTEM);
 #endif
-        // NotificationUpdateStatus();
-        // Update the system statistics
         uint32_t ledPeriod = PIOS_DELAY_DiffuS(ledTimer) / 1000;
         if (ledPeriod < HB_LED_BLINK_ON_PERIOD_MS) {
             PIOS_LED_Off(PIOS_LED_HEARTBEAT);
@@ -147,11 +144,10 @@ static void gpspSystemTask(__attribute__((unused)) void *parameters)
             ledTimer = PIOS_DELAY_GetRaw();
         }
 
-        vTaskDelayUntil(&lastUpdate, SYSTEM_UPDATE_PERIOD_MS * configTICK_RATE_HZ / 1000);
-
         handleGPS();
         handleMag();
         updateStats();
+        vTaskDelayUntil(&lastUpdate, SYSTEM_UPDATE_PERIOD_MS * configTICK_RATE_HZ / 1000);
     }
 }
 

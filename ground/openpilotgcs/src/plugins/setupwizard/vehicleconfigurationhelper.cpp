@@ -598,7 +598,7 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
     // Set Mixer types and values
     QString mixerTypePattern   = "Mixer%1Type";
     QString mixerVectorPattern = "Mixer%1Vector";
-    for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+    for (quint32 i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
         UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
         Q_ASSERT(field);
         field->setValue(field->getOptions().at(channels[i].type));

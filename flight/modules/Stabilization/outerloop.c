@@ -32,7 +32,6 @@
  */
 
 #include <openpilot.h>
-#include <pios_struct_helper.h>
 #include <pid.h>
 #include <callbackinfo.h>
 #include <ratedesired.h>
@@ -115,7 +114,7 @@ static void stabilizationOuterloopTask()
         float q_error[4];
 
         for (t = 0; t < 3; t++) {
-            switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
+            switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
             case STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE:
             case STABILIZATIONSTATUS_OUTERLOOP_RATTITUDE:
             case STABILIZATIONSTATUS_OUTERLOOP_WEAKLEVELING:
@@ -150,14 +149,14 @@ static void stabilizationOuterloopTask()
 #endif /* if defined(PIOS_QUATERNION_STABILIZATION) */
     }
     for (t = 0; t < AXES; t++) {
-        bool reinit = (cast_struct_to_array(enabled, enabled.Roll)[t] != previous_mode[t]);
-        previous_mode[t] = cast_struct_to_array(enabled, enabled.Roll)[t];
+        bool reinit = (StabilizationStatusOuterLoopToArray(enabled)[t] != previous_mode[t]);
+        previous_mode[t] = StabilizationStatusOuterLoopToArray(enabled)[t];
 
         if (t < STABILIZATIONSTATUS_OUTERLOOP_THRUST) {
             if (reinit) {
                 stabSettings.outerPids[t].iAccumulator = 0;
             }
-            switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
+            switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
             case STABILIZATIONSTATUS_OUTERLOOP_ATTITUDE:
                 rateDesiredAxis[t] = pid_apply(&stabSettings.outerPids[t], local_error[t], dT);
                 break;
@@ -167,11 +166,11 @@ static void stabilizationOuterloopTask()
                 stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
                 stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
                 stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
-                float rateDesiredAxisRate = stickinput[t] * cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t];
+                float rateDesiredAxisRate = stickinput[t] * StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t];
                 // limit corrective rate to maximum rates to not give it overly large impact over manual rate when joined together
                 rateDesiredAxis[t] = boundf(pid_apply(&stabSettings.outerPids[t], local_error[t], dT),
-                                            -cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t],
-                                            cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t]
+                                            -StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t],
+                                            StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t]
                                             );
                 // Compute the weighted average rate desired
                 // Using max() rather than sqrt() for cpu speed;
@@ -228,7 +227,11 @@ static void stabilizationOuterloopTask()
                 // That would be changed to Attitude mode max angle affecting Kp
                 // Also does not take dT into account
             {
-                float rate_input    = cast_struct_to_array(stabSettings.stabBank.ManualRate, stabSettings.stabBank.ManualRate.Roll)[t] * stabilizationDesiredAxis[t] / cast_struct_to_array(stabSettings.stabBank, stabSettings.stabBank.RollMax)[t];
+                float stickinput[3];
+                stickinput[0] = boundf(stabilizationDesiredAxis[0] / stabSettings.stabBank.RollMax, -1.0f, 1.0f);
+                stickinput[1] = boundf(stabilizationDesiredAxis[1] / stabSettings.stabBank.PitchMax, -1.0f, 1.0f);
+                stickinput[2] = boundf(stabilizationDesiredAxis[2] / stabSettings.stabBank.YawMax, -1.0f, 1.0f);
+                float rate_input    = stickinput[t] * StabilizationBankManualRateToArray(stabSettings.stabBank.ManualRate)[t];
                 float weak_leveling = local_error[t] * stabSettings.settings.WeakLevelingKp;
                 weak_leveling = boundf(weak_leveling, -stabSettings.settings.MaxWeakLevelingRate, stabSettings.settings.MaxWeakLevelingRate);
 
@@ -242,7 +245,7 @@ static void stabilizationOuterloopTask()
                 break;
             }
         } else {
-            switch (cast_struct_to_array(enabled, enabled.Roll)[t]) {
+            switch (StabilizationStatusOuterLoopToArray(enabled)[t]) {
 #ifdef REVOLUTION
             case STABILIZATIONSTATUS_OUTERLOOP_ALTITUDE:
                 rateDesiredAxis[t] = stabilizationAltitudeHold(stabilizationDesiredAxis[t], ALTITUDEHOLD, reinit);
@@ -282,10 +285,10 @@ static void stabilizationOuterloopTask()
 
 static void AttitudeStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    // to reduce CPU utilisation, outer loop is not executed every state update
-    static uint8_t cpusafer = 0;
+    // to reduce CPU utilization, outer loop is not executed on every state update
+    static uint8_t cpusaver = 0;
 
-    if ((cpusafer++ % OUTERLOOP_SKIPCOUNT) == 0) {
+    if ((cpusaver++ % OUTERLOOP_SKIPCOUNT) == 0) {
         // this does not need mutex protection as both eventdispatcher and stabi run in same callback task!
         AttitudeStateGet(&attitude);
         PIOS_CALLBACKSCHEDULER_Dispatch(callbackHandle);

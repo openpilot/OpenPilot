@@ -45,6 +45,9 @@
 #include <QtCore/QUrl>
 #include <QtCore/QDebug>
 
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+
 #include <QtQuick>
 #include <QQuickView>
 #include <QQmlEngine>
@@ -68,13 +71,29 @@ WelcomeModePrivate::WelcomeModePrivate()
 // ---  WelcomeMode
 WelcomeMode::WelcomeMode() :
     m_d(new WelcomeModePrivate),
-    m_priority(Core::Constants::P_MODE_WELCOME)
+    m_priority(Core::Constants::P_MODE_WELCOME),
+    m_newVersionText("")
 {
     m_d->quickView = new QQuickView;
     m_d->quickView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_d->quickView->engine()->rootContext()->setContextProperty("welcomePlugin", this);
     m_d->quickView->setSource(QUrl("qrc:/welcome/qml/main.qml"));
     m_container = NULL;
+
+    QNetworkAccessManager *networkAccessManager = new QNetworkAccessManager;
+
+    // Only attempt to request our version info if the network is accessible
+    if (networkAccessManager->networkAccessible() == QNetworkAccessManager::Accessible) {
+        connect(networkAccessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(networkResponseReady(QNetworkReply *)));
+
+        // This will delete the network access manager instance when we're done
+        connect(networkAccessManager, SIGNAL(finished(QNetworkReply *)), networkAccessManager, SLOT(deleteLater()));
+
+        networkAccessManager->get(QNetworkRequest(QUrl("http://www.openpilot.org/opver")));
+    } else {
+        // No network, can delete this now as we don't need it.
+        delete networkAccessManager;
+    }
 }
 
 WelcomeMode::~WelcomeMode()
@@ -134,5 +153,20 @@ void WelcomeMode::openPage(const QString &page)
 void WelcomeMode::triggerAction(const QString &actionId)
 {
     Core::ModeManager::instance()->triggerAction(actionId);
+}
+
+void WelcomeMode::networkResponseReady(QNetworkReply *reply)
+{
+    if (reply != NULL) {
+        QString version(reply->readAll());
+        version = version.trimmed();
+
+        reply->deleteLater();
+
+        if (version != VersionInfo::tagOrHash8()) {
+            m_newVersionText = tr("Update Available: %1").arg(version);
+            emit newVersionTextChanged();
+        }
+    }
 }
 } // namespace Welcome

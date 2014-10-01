@@ -57,6 +57,7 @@
  */
 
 #if defined(PIOS_INCLUDE_ADC)
+
 #include "pios_adc_priv.h"
 void PIOS_ADC_DMC_irq_handler(void);
 void DMA2_Stream4_IRQHandler(void) __attribute__((alias("PIOS_ADC_DMC_irq_handler")));
@@ -91,10 +92,16 @@ void PIOS_ADC_DMC_irq_handler(void)
 
 #endif /* if defined(PIOS_INCLUDE_ADC) */
 
-#if defined(PIOS_INCLUDE_HMC5883)
-#include "pios_hmc5883.h"
-static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
-    .vector = PIOS_HMC5883_IRQHandler,
+#if defined(PIOS_INCLUDE_HMC5X83)
+#include "pios_hmc5x83.h"
+pios_hmc5x83_dev_t onboard_mag = 0;
+
+bool pios_board_internal_mag_handler()
+{
+    return PIOS_HMC5x83_IRQHandler(onboard_mag);
+}
+static const struct pios_exti_cfg pios_exti_hmc5x83_cfg __exti_config = {
+    .vector = pios_board_internal_mag_handler,
     .line   = EXTI_Line7,
     .pin    = {
         .gpio = GPIOB,
@@ -124,14 +131,15 @@ static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
     },
 };
 
-static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
-    .exti_cfg  = &pios_exti_hmc5883_cfg,
-    .M_ODR     = PIOS_HMC5883_ODR_75,
-    .Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
-    .Gain = PIOS_HMC5883_GAIN_1_9,
-    .Mode = PIOS_HMC5883_MODE_CONTINUOUS,
+static const struct pios_hmc5x83_cfg pios_hmc5x83_cfg = {
+    .exti_cfg  = &pios_exti_hmc5x83_cfg,
+    .M_ODR     = PIOS_HMC5x83_ODR_75,
+    .Meas_Conf = PIOS_HMC5x83_MEASCONF_NORMAL,
+    .Gain      = PIOS_HMC5x83_GAIN_1_9,
+    .Mode      = PIOS_HMC5x83_MODE_CONTINUOUS,
+    .Driver    = &PIOS_HMC5x83_I2C_DRIVER,
 };
-#endif /* PIOS_INCLUDE_HMC5883 */
+#endif /* PIOS_INCLUDE_HMC5X83 */
 
 /**
  * Configuration for the MS5611 chip
@@ -209,6 +217,7 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN     512
 
 #define PIOS_COM_GPS_RX_BUF_LEN          32
+#define PIOS_COM_GPS_TX_BUF_LEN          32
 
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN    65
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN    65
@@ -601,7 +610,7 @@ void PIOS_Board_Init(void)
         PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
         break;
     case HWSETTINGS_RM_MAINPORT_GPS:
-        PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_GPS_RX_BUF_LEN, -1, &pios_usart_com_driver, &pios_com_gps_id);
+        PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_GPS_RX_BUF_LEN, PIOS_COM_GPS_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_gps_id);
         break;
     case HWSETTINGS_RM_MAINPORT_SBUS:
 #if defined(PIOS_INCLUDE_SBUS)
@@ -691,7 +700,7 @@ void PIOS_Board_Init(void)
 #endif /* PIOS_INCLUDE_I2C */
         break;
     case HWSETTINGS_RM_FLEXIPORT_GPS:
-        PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_GPS_RX_BUF_LEN, -1, &pios_usart_com_driver, &pios_com_gps_id);
+        PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_GPS_RX_BUF_LEN, PIOS_COM_GPS_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_gps_id);
         break;
     case HWSETTINGS_RM_FLEXIPORT_DSM2:
     case HWSETTINGS_RM_FLEXIPORT_DSMX10BIT:
@@ -944,8 +953,8 @@ void PIOS_Board_Init(void)
     PIOS_ADC_Init(&pios_adc_cfg);
 #endif
 
-#if defined(PIOS_INCLUDE_HMC5883)
-    PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+#if defined(PIOS_INCLUDE_HMC5X83)
+    onboard_mag = PIOS_HMC5x83_Init(&pios_hmc5x83_cfg, pios_i2c_mag_pressure_adapter_id, 0);
 #endif
 
 #if defined(PIOS_INCLUDE_MS5611)

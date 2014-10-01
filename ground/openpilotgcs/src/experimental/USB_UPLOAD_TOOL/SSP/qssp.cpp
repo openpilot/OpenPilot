@@ -21,7 +21,7 @@
 // Make larger sized integers from smaller sized integers
 #define MAKEWORD16(ub, lb)          ((uint16_t)0x0000 | ((uint16_t)(ub) << 8) | (uint16_t)(lb))
 #define MAKEWORD32(uw, lw)          ((uint32_t)(0x0UL | ((uint32_t)(uw) << 16) | (uint32_t)(lw)))
-#define MAKEWORD32B(b3, b2, b1, b0) ((uint32_t)((uint32_t)(b3) << 24) | ((uint32_t)(b2) << 16) | ((uint32_t)(b1) << 8) | ((uint32_t)(b0))
+#define MAKEWORD32B(b3, b2, b1, b0) ((uint32_t)((uint32_t)(b3) << 24) | ((uint32_t)(b2) << 16) | ((uint32_t)(b1) << 8) | ((uint32_t)(b0)))
 
 
 // Used to extract smaller integers from larger sized intergers

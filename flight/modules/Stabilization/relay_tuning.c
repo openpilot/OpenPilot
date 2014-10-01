@@ -32,7 +32,6 @@
  */
 
 #include "openpilot.h"
-#include <pios_struct_helper.h>
 #include "stabilization.h"
 #include "relaytuning.h"
 #include "relaytuningsettings.h"
@@ -72,8 +71,8 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
     // On first run initialize estimates to something reasonable
     if (reinit) {
         rateRelayRunning[axis] = false;
-        cast_struct_to_array(relay.Period, relay.Period.Roll)[axis] = 200;
-        cast_struct_to_array(relay.Gain, relay.Gain.Roll)[axis]     = 0;
+        RelayTuningPeriodToArray(relay.Period)[axis] = 200;
+        RelayTuningGainToArray(relay.Gain)[axis]     = 0;
 
         accum_sin   = 0;
         accum_cos   = 0;
@@ -96,14 +95,14 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
     /**** The code below here is to estimate the properties of the oscillation ****/
 
     // Make sure the period can't go below limit
-    if (cast_struct_to_array(relay.Period, relay.Period.Roll)[axis] < DEGLITCH_TIME) {
-        cast_struct_to_array(relay.Period, relay.Period.Roll)[axis] = DEGLITCH_TIME;
+    if (RelayTuningPeriodToArray(relay.Period)[axis] < DEGLITCH_TIME) {
+        RelayTuningPeriodToArray(relay.Period)[axis] = DEGLITCH_TIME;
     }
 
     // Project the error onto a sine and cosine of the same frequency
     // to accumulate the average amplitude
     int32_t dT  = thisTime - lastHighTime;
-    float phase = ((float)360 * (float)dT) / cast_struct_to_array(relay.Period, relay.Period.Roll)[axis];
+    float phase = ((float)360 * (float)dT) / RelayTuningPeriodToArray(relay.Period)[axis];
     if (phase >= 360) {
         phase = 0;
     }
@@ -126,15 +125,15 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 
         if (rateRelayRunning[axis] == false) {
             rateRelayRunning[axis] = true;
-            cast_struct_to_array(relay.Period, relay.Period.Roll)[axis] = 200;
-            cast_struct_to_array(relay.Gain, relay.Gain.Roll)[axis] = 0;
+            RelayTuningPeriodToArray(relay.Period)[axis] = 200;
+            RelayTuningGainToArray(relay.Gain)[axis] = 0;
         } else {
             // Low pass filter each amplitude and period
-            cast_struct_to_array(relay.Gain, relay.Gain.Roll)[axis]     =
-                cast_struct_to_array(relay.Gain, relay.Gain.Roll)[axis] *
+            RelayTuningGainToArray(relay.Gain)[axis]     =
+                RelayTuningGainToArray(relay.Gain)[axis] *
                 AMPLITUDE_ALPHA + this_gain * (1 - AMPLITUDE_ALPHA);
-            cast_struct_to_array(relay.Period, relay.Period.Roll)[axis] =
-                cast_struct_to_array(relay.Period, relay.Period.Roll)[axis] *
+            RelayTuningPeriodToArray(relay.Period)[axis] =
+                RelayTuningPeriodToArray(relay.Period)[axis] *
                 PERIOD_ALPHA + dT * (1 - PERIOD_ALPHA);
         }
         lastHighTime = thisTime;

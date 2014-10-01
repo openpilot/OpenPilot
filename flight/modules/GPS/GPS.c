@@ -40,24 +40,34 @@
 #include "gpssettings.h"
 #include "taskinfo.h"
 #include "hwsettings.h"
-
+#include "auxmagsensor.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
+#include <pios_com.h>
 
 #include "GPS.h"
 #include "NMEA.h"
 #include "UBX.h"
-
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+#include "inc/ubx_autoconfig.h"
+#endif
 
 // ****************
 // Private functions
 
 static void gpsTask(void *parameters);
-static void updateSettings();
+static void updateHwSettings();
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 static void setHomeLocation(GPSPositionSensorData *gpsData);
 static float GravityAccel(float latitude, float longitude, float altitude);
+#endif
+
+#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+void AuxMagSettingsUpdatedCb(UAVObjEvent *ev);
+#ifndef PIOS_GPS_MINIMAL
+void updateGpsSettings(UAVObjEvent *ev);
+#endif
 #endif
 
 // ****************
@@ -153,8 +163,16 @@ int32_t GPSInitialize(void)
     GPSTimeInitialize();
     GPSSatellitesInitialize();
     HomeLocationInitialize();
-    updateSettings();
+#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+    AuxMagSensorInitialize();
+    AuxMagSettingsInitialize();
+    GPSExtendedStatusInitialize();
 
+    // Initialize mag parameters
+    AuxMagSettingsUpdatedCb(NULL);
+    AuxMagSettingsConnectCallback(AuxMagSettingsUpdatedCb);
+#endif
+    updateHwSettings();
 #else
     if (gpsPort && gpsEnabled) {
         GPSPositionSensorInitialize();
@@ -166,7 +184,7 @@ int32_t GPSInitialize(void)
 #if defined(PIOS_GPS_SETS_HOMELOCATION)
         HomeLocationInitialize();
 #endif
-        updateSettings();
+        updateHwSettings();
     }
 #endif /* if defined(REVOLUTION) */
 
@@ -184,7 +202,9 @@ int32_t GPSInitialize(void)
             gps_rx_buffer = NULL;
         }
         PIOS_Assert(gps_rx_buffer);
-
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+        GPSSettingsConnectCallback(updateGpsSettings);
+#endif
         return 0;
     }
 
@@ -215,10 +235,25 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     timeOfLastCommandMs = timeNowMs;
 
     GPSPositionSensorGet(&gpspositionsensor);
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+    updateGpsSettings(0);
+#endif
     // Loop forever
     while (1) {
         uint8_t c;
-
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+        if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
+            char *buffer   = 0;
+            uint16_t count = 0;
+            uint8_t status;
+            GPSPositionSensorStatusGet(&status);
+            ubx_autoconfig_run(&buffer, &count, status != GPSPOSITIONSENSOR_STATUS_NOGPS);
+            // Something to send?
+            if (count) {
+                PIOS_COM_SendBuffer(gpsPort, (uint8_t *)buffer, count);
+            }
+        }
+#endif
         // This blocks the task until there is something on the buffer
         while (PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, xDelay) > 0) {
             int res;
@@ -230,8 +265,24 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
             case GPSSETTINGS_DATAPROTOCOL_UBX:
+            {
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+                int32_t ac_status = ubx_autoconfig_get_status();
+                static uint8_t lastStatus = 0;
+
+                gpspositionsensor.AutoConfigStatus =
+                    ac_status == UBX_AUTOCONFIG_STATUS_DISABLED ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DISABLED :
+                    ac_status == UBX_AUTOCONFIG_STATUS_DONE ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_DONE :
+                    ac_status == UBX_AUTOCONFIG_STATUS_ERROR ? GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR :
+                    GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_RUNNING;
+                if (gpspositionsensor.AutoConfigStatus != lastStatus) {
+                    GPSPositionSensorAutoConfigStatusSet(&gpspositionsensor.AutoConfigStatus);
+                    lastStatus = gpspositionsensor.AutoConfigStatus;
+                }
+#endif
                 res = parse_ubx_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
-                break;
+            }
+            break;
 #endif
             default:
                 res = NO_PARSER; // this should not happen
@@ -247,7 +298,8 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 
         // Check for GPS timeout
         timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-        if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS) {
+        if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS ||
+            (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX && gpspositionsensor.AutoConfigStatus == GPSPOSITIONSENSOR_AUTOCONFIGSTATUS_ERROR)) {
             // we have not received any valid GPS sentences for a while.
             // either the GPS is not plugged in or a hardware problem or the GPS has locked up.
             uint8_t status = GPSPOSITIONSENSOR_STATUS_NOGPS;
@@ -257,7 +309,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             // we appear to be receiving GPS sentences OK, we've had an update
             // criteria for GPS-OK taken from this post...
             // http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
-            if ((gpspositionsensor.PDOP < gpsSettings.MaxPDOP) && (gpspositionsensor.Satellites >= gpsSettings.MinSattelites) &&
+            if ((gpspositionsensor.PDOP < gpsSettings.MaxPDOP) && (gpspositionsensor.Satellites >= gpsSettings.MinSatellites) &&
                 (gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
                 (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
                 AlarmsClear(SYSTEMALARMS_ALARM_GPS);
@@ -346,7 +398,7 @@ static void setHomeLocation(GPSPositionSensorData *gpsData)
  * like protocol, etc. Thus the HwSettings object which contains the
  * GPS port speed is used for now.
  */
-static void updateSettings()
+static void updateHwSettings()
 {
     if (gpsPort) {
         // Retrieve settings
@@ -376,10 +428,92 @@ static void updateSettings()
         case HWSETTINGS_GPSSPEED_115200:
             PIOS_COM_ChangeBaud(gpsPort, 115200);
             break;
+        case HWSETTINGS_GPSSPEED_230400:
+            PIOS_COM_ChangeBaud(gpsPort, 230400);
+            break;
         }
     }
 }
 
+#ifdef PIOS_INCLUDE_GPS_UBX_PARSER
+void AuxMagSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    load_mag_settings();
+}
+#if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
+void updateGpsSettings(__attribute__((unused)) UAVObjEvent *ev)
+{
+    uint8_t ubxAutoConfig;
+    uint8_t ubxDynamicModel;
+    uint8_t ubxSbasMode;
+    ubx_autoconfig_settings_t newconfig;
+    uint8_t ubxSbasSats;
+
+    GPSSettingsUbxRateGet(&newconfig.navRate);
+
+    GPSSettingsUbxAutoConfigGet(&ubxAutoConfig);
+    newconfig.autoconfigEnabled = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_DISABLED ? false : true;
+    newconfig.storeSettings     = ubxAutoConfig == GPSSETTINGS_UBXAUTOCONFIG_CONFIGUREANDSTORE;
+
+    GPSSettingsUbxDynamicModelGet(&ubxDynamicModel);
+    newconfig.dynamicModel = ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PORTABLE ? UBX_DYNMODEL_PORTABLE :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_STATIONARY ? UBX_DYNMODEL_STATIONARY :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_PEDESTRIAN ? UBX_DYNMODEL_PEDESTRIAN :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AUTOMOTIVE ? UBX_DYNMODEL_AUTOMOTIVE :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_SEA ? UBX_DYNMODEL_SEA :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE1G ? UBX_DYNMODEL_AIRBORNE1G :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE2G ? UBX_DYNMODEL_AIRBORNE2G :
+                             ubxDynamicModel == GPSSETTINGS_UBXDYNAMICMODEL_AIRBORNE4G ? UBX_DYNMODEL_AIRBORNE4G :
+                             UBX_DYNMODEL_AIRBORNE1G;
+
+    GPSSettingsUbxSBASModeGet(&ubxSbasMode);
+    switch ((GPSSettingsUbxSBASModeOptions)ubxSbasMode) {
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTION:
+    case GPSSETTINGS_UBXSBASMODE_CORRECTION:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTIONINTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_CORRECTIONINTEGRITY:
+        newconfig.SBASCorrection = true;
+        break;
+    default:
+        newconfig.SBASCorrection = false;
+    }
+
+    switch ((GPSSettingsUbxSBASModeOptions)ubxSbasMode) {
+    case GPSSETTINGS_UBXSBASMODE_RANGING:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTION:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGINTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTIONINTEGRITY:
+        newconfig.SBASRanging = true;
+        break;
+    default:
+        newconfig.SBASRanging = false;
+    }
+
+    switch ((GPSSettingsUbxSBASModeOptions)ubxSbasMode) {
+    case GPSSETTINGS_UBXSBASMODE_INTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGINTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_RANGINGCORRECTIONINTEGRITY:
+    case GPSSETTINGS_UBXSBASMODE_CORRECTIONINTEGRITY:
+        newconfig.SBASIntegrity = true;
+        break;
+    default:
+        newconfig.SBASIntegrity = false;
+    }
+
+    GPSSettingsUbxSBASChannelsUsedGet(&newconfig.SBASChannelsUsed);
+
+    GPSSettingsUbxSBASSatsGet(&ubxSbasSats);
+
+    newconfig.SBASSats = ubxSbasSats == GPSSETTINGS_UBXSBASSATS_WAAS ? UBX_SBAS_SATS_WAAS :
+                         ubxSbasSats == GPSSETTINGS_UBXSBASSATS_EGNOS ? UBX_SBAS_SATS_EGNOS :
+                         ubxSbasSats == GPSSETTINGS_UBXSBASSATS_MSAS ? UBX_SBAS_SATS_MSAS :
+                         ubxSbasSats == GPSSETTINGS_UBXSBASSATS_GAGAN ? UBX_SBAS_SATS_GAGAN :
+                         ubxSbasSats == GPSSETTINGS_UBXSBASSATS_SDCM ? UBX_SBAS_SATS_SDCM : UBX_SBAS_SATS_AUTOSCAN;
+
+    ubx_autoconfig_set(newconfig);
+}
+#endif /* if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL) */
+#endif /* ifdef PIOS_INCLUDE_GPS_UBX_PARSER */
 /**
  * @}
  * @}

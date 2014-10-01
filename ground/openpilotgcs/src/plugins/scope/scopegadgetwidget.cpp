@@ -264,7 +264,7 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 
     // Only start the timer if we are already connected
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    if (cm->getCurrentConnection() && replotTimer) {
+    if (cm->isConnected() && replotTimer) {
         if (!replotTimer->isActive()) {
             replotTimer->start(m_refreshInterval);
         } else {

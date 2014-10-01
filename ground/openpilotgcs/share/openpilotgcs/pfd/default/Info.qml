@@ -4,6 +4,20 @@ Item {
     id: info
     property variant sceneSize
 
+                             // Uninitialised, Ok,   Warning, Critical, Error                      
+    property variant batColors : ["black", "green", "orange", "red", "red"]
+
+    //
+    // Waypoint functions
+    //
+
+    property real posEast_old
+    property real posNorth_old
+    property real total_distance
+    property real total_distance_km
+   
+    property bool init_dist: false
+    
     property real home_heading: 180/3.1415 * Math.atan2(TakeOffLocation.East - PositionState.East, 
                                                         TakeOffLocation.North - PositionState.North)
 
@@ -28,11 +42,6 @@ Item {
     property real wp_eta_m: (wp_eta > 0 ? Math.floor((wp_eta - wp_eta_h*3600)/60) : 0) 
     property real wp_eta_s: (wp_eta > 0 ? Math.floor(wp_eta - wp_eta_h*3600 - wp_eta_m*60) : 0)
 
-    property real posEast_old
-    property real posNorth_old
-    property real total_distance
-    property bool init_dist: false
-
     function reset_distance(){
         total_distance = 0;
     }
@@ -40,7 +49,8 @@ Item {
     function compute_distance(posEast,posNorth) {
         if (total_distance == 0 && !init_dist){init_dist = "true"; posEast_old = posEast; posNorth_old = posNorth;}
         if (posEast > posEast_old+3 || posEast < posEast_old-3 || posNorth > posNorth_old+3 || posNorth < posNorth_old-3) {
-        total_distance += Math.sqrt(Math.pow((posEast - posEast_old ),2) + Math.pow((posNorth - posNorth_old),2));    
+        total_distance += Math.sqrt(Math.pow((posEast - posEast_old ),2) + Math.pow((posNorth - posNorth_old),2)); 
+        total_distance_km = total_distance / 1000;   
 
         posEast_old = posEast;
         posNorth_old = posNorth;
@@ -56,7 +66,11 @@ Item {
         else
             return time.toString();
     }
-    
+
+    // End Functions
+    // 
+    // Start Drawing
+
     SvgElementImage {
         id: info_bg
         sceneSize: info.sceneSize
@@ -64,21 +78,9 @@ Item {
         width: parent.width
     }
 
-    SvgElementImage {
-        id: batinfo_energy
-        elementName: "warning-low-energy"
-        sceneSize: info.sceneSize
-        Rectangle {
-            anchors.fill: batinfo_energy
-            border.width: 0
-            // Alarm based on FlightBatteryState.EstimatedFlightTime < 120s orange, < 60s red
-            color: (FlightBatteryState.EstimatedFlightTime <= 120 && FlightBatteryState.EstimatedFlightTime > 60 ? "orange" :
-                   (FlightBatteryState.EstimatedFlightTime <= 60 ? "red": "black"))
-
-            visible: FlightBatteryState.ConsumedEnergy > 0
-        }
-    }
-
+    // 
+    // GPS Info (Top)
+    //  
 
     Repeater {
         id: satNumberBar
@@ -100,52 +102,26 @@ Item {
         elementName: "gps-mode-text"
 
         Text {
-            text: ["No GPS", "No Fix", "Fix2D", "Fix3D"][GPSPositionSensor.Status]
+            text: ["NO GPS", "NO FIX", "FIX 2D", "FIX 3D"][GPSPositionSensor.Status]
             anchors.centerIn: parent
-            font.pixelSize: Math.floor(parent.height*1.2)
+            font.pixelSize: Math.floor(parent.height*1.3)
+            font.family: "Arial"
+            font.weight: Font.DemiBold
             color: "white"
         }
     }
 
-    SvgElementPositionItem {
+    // 
+    // Waypoint Info (Top)
+    // Only visible when PathPlan is active (WP loaded)
+
+    SvgElementImage  {
         sceneSize: info.sceneSize
-        elementName: "telemetry-status"
-
-        Text {
-            text: ["Disconnected","HandshakeReq","HandshakeAck","Connected"][GCSTelemetryStats.Status]
-
-            anchors.centerIn: parent
-            font.pixelSize: Math.floor(parent.height*1.2)
-            color: "white"
-        }
-    }
-
-    Repeater {
-        id: txNumberBar
-
-        property int txRateNumber : GCSTelemetryStats.TxDataRate.toFixed()/10 // 250 max
-
-        model: 25
-        SvgElementImage {
-            property int minTxRateNumber : index+1
-            elementName: "tx" + minTxRateNumber
-            sceneSize: info.sceneSize
-            visible: txNumberBar.txRateNumber >= minTxRateNumber
-        }
-    }
-
-    Repeater {
-        id: rxNumberBar
-
-        property int rxRateNumber : GCSTelemetryStats.RxDataRate.toFixed()/100 // 2500 max
-
-        model: 25
-        SvgElementImage {
-            property int minRxRateNumber : index+1
-            elementName: "rx" + minRxRateNumber
-            sceneSize: info.sceneSize
-            visible: rxNumberBar.rxRateNumber >= minRxRateNumber
-        }
+        elementName: "waypoint-labels"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan == 1
     }
 
     SvgElementPositionItem {
@@ -158,10 +134,14 @@ Item {
 
         Text {
             text: "   "+wp_heading.toFixed(1)+"°"
-
             anchors.centerIn: parent
-            font.pixelSize: parent.height*1.1
-            color: "magenta"
+            color: "cyan"
+
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
+            }
         }
     }
 
@@ -175,10 +155,14 @@ Item {
 
         Text {
             text: "  "+wp_distance.toFixed(0)+" m"
-
             anchors.centerIn: parent
-            font.pixelSize: parent.height*1.1
-            color: "magenta"
+            color: "cyan"
+
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
+            }
         }
     }
 
@@ -188,16 +172,20 @@ Item {
         width: scaledBounds.width * sceneItem.width
         height: scaledBounds.height * sceneItem.height
         y: Math.floor(scaledBounds.y * sceneItem.height)
-        visible: true
+        visible: SystemAlarms.Alarm_PathPlan == 1
 
-        MouseArea { id: total_dist_mouseArea; anchors.fill: parent; onClicked: reset_distance()}
+        MouseArea { id: total_dist_mouseArea; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: reset_distance()}
 
         Text {
             text: "  "+total_distance.toFixed(0)+" m"
-
             anchors.centerIn: parent
-            font.pixelSize: parent.height*1.1
-            color: "magenta"
+            color: "cyan"
+
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
+            }
         }
 
         Timer {
@@ -216,10 +204,14 @@ Item {
 
         Text {
             text: formatTime(wp_eta_h) + ":" + formatTime(wp_eta_m) + ":" + formatTime(wp_eta_s)
-
             anchors.centerIn: parent
-            font.pixelSize: parent.height*1.1
-            color: "magenta"
+            color: "cyan"
+
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
+            }
         }
     }
 
@@ -233,10 +225,14 @@ Item {
 
         Text {
             text: (WaypointActive.Index+1)+" / "+PathPlan.WaypointCount
-
             anchors.centerIn: parent
-            font.pixelSize: parent.height*1.1
-            color: "magenta"
+            color: "cyan"
+
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
+            }
         }
     }
 
@@ -249,83 +245,178 @@ Item {
         visible: SystemAlarms.Alarm_PathPlan == 1
 
         Text {
-            text: ["Fly End Point","Fly Vector","Fly Circle Right","Fly Circle Left","Drive End Point","Drive Vector","Drive Circle Right",
-                   "Drive Circle Left","Fixed Attitude","Set Accessory","Land","Disarm Alarm"][PathDesired.Mode]
-
+            text: ["FLY END POINT","FLY VECTOR","FLY CIRCLE RIGHT","FLY CIRCLE LEFT","DRIVE END POINT","DRIVE VECTOR","DRIVE CIRCLE LEFT",
+                   "DRIVE CIRCLE RIGHT","FIXED ATTITUDE","SET ACCESSORY","LAND","DISARM ALARM"][PathDesired.Mode]
             anchors.centerIn: parent
-            font.pixelSize: parent.height*1.1
-            color: "magenta"
+            color: "cyan"
+
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1.5)
+                weight: Font.DemiBold
+            }
         }
     }
 
-    SvgElementPositionItem {
-        sceneSize: info.sceneSize
-        elementName: "battery-volt-text"
-        visible: FlightBatteryState.Voltage > 0
+    // 
+    // Battery Info (Top)
+    // Only visible when PathPlan not active and Battery module enabled
 
-        Text {
-            text: FlightBatteryState.Voltage.toFixed(2)
-            anchors.centerIn: parent
-            color: "white"
-            font {
-                family: "Arial"
-                pixelSize: Math.floor(parent.height * 1.2)
+    SvgElementPositionItem {
+        id: topbattery_voltamp_bg
+        sceneSize: info.sceneSize
+        elementName: "topbattery-label-voltamp-bg"
+        
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+
+        Rectangle {
+            anchors.fill: parent
+            color:  FlightBatterySettings.NbCells > 0 ? info.batColors[SystemAlarms.Alarm_Battery] : "black"
+
+        }
+    }
+
+    SvgElementImage  {
+        sceneSize: info.sceneSize
+        elementName: "topbattery-labels"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+    }
+
+    SvgElementPositionItem {
+        id: topbattery_volt
+        sceneSize: info.sceneSize
+        elementName: "topbattery-volt-text"
+        
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+
+        Rectangle {
+            anchors.fill: parent
+            color: "transparent"
+
+            Text {
+               text: FlightBatteryState.Voltage.toFixed(2)
+               anchors.centerIn: parent
+               color: "white"
+               font {
+                   family: "Arial"
+                   pixelSize: Math.floor(parent.height * 0.6)
+                   weight: Font.DemiBold
+               }
             }
         }
     }
 
     SvgElementPositionItem {
+        id: topbattery_amp
         sceneSize: info.sceneSize
-        elementName: "battery-amp-text"
-        visible: FlightBatteryState.Current > 0
+        elementName: "topbattery-amp-text"
 
-        Text {
-            text: FlightBatteryState.Current.toFixed(2)
-            anchors.centerIn: parent
-            color: "white"
-            font {
-                family: "Arial"
-                pixelSize: Math.floor(parent.height * 1.2)
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+
+        Rectangle {
+            anchors.fill: parent
+            color: "transparent"
+
+            Text {
+               text: FlightBatteryState.Current.toFixed(2)
+               anchors.centerIn: parent
+               color: "white"
+               font {
+                   family: "Arial"
+                   pixelSize: Math.floor(parent.height * 0.6)
+                   weight: Font.DemiBold
+               }
             }
         }
     }
 
     SvgElementPositionItem {
+        id: topbattery_milliamp
         sceneSize: info.sceneSize
-        elementName: "battery-milliamp-text"
-        visible: FlightBatteryState.ConsumedEnergy > 0
+        elementName: "topbattery-milliamp-text"
 
-        Text {
-            text: FlightBatteryState.ConsumedEnergy.toFixed()
-            anchors.centerIn: parent
-            color: "white"
-            font {
-                family: "Arial"
-                pixelSize: Math.floor(parent.height * 1.2)
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: scaledBounds.y * sceneItem.height
+        visible: (SystemAlarms.Alarm_PathPlan != 1) && (HwSettings.OptionalModules_Battery == 1)
+
+        Rectangle {
+            anchors.fill: parent
+
+            // Alarm based on FlightBatteryState.EstimatedFlightTime < 120s orange, < 60s red
+            color: (FlightBatteryState.EstimatedFlightTime <= 120 && FlightBatteryState.EstimatedFlightTime > 60 ? "orange" :
+                   (FlightBatteryState.EstimatedFlightTime <= 60 ? "red": info.batColors[SystemAlarms.Alarm_Battery]))
+
+            border.color: "white"
+            border.width: topbattery_volt.width * 0.01
+            radius: border.width * 4
+
+            Text {
+               text: FlightBatteryState.ConsumedEnergy.toFixed(0)
+               anchors.centerIn: parent
+               color: "white"
+               font {
+                   family: "Arial"
+                   pixelSize: Math.floor(parent.height * 0.6)
+                   weight: Font.DemiBold
+               }
             }
         }
     }
 
-    Repeater {
-        id: throttleNumberBar
+    // 
+    // Default counter
+    // Only visible when PathPlan not active
 
-        property int throttleNumber : ActuatorDesired.Thrust.toFixed(1)*10
+    SvgElementImage  {
+        sceneSize: info.sceneSize
+        elementName: "topbattery-total-distance-label"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan != 1
+    }
 
-        model: 10
-        SvgElementImage {
-            property int minThrottleNumber : index+1
-            elementName: "eng" + minThrottleNumber
-            sceneSize: info.sceneSize
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "topbattery-total-distance-text"
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        visible: SystemAlarms.Alarm_PathPlan != 1
 
-            visible: throttleNumberBar.throttleNumber >= minThrottleNumber
+        MouseArea { id: total_dist_mouseArea2; anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: reset_distance()}
+
+        Text {
+            text:  total_distance > 1000 ? total_distance_km.toFixed(2) +" Km" : total_distance.toFixed(0)+" m"
+            anchors.right: parent.right
+            color: "cyan"
+
+            font {
+                family: "Arial"
+                pixelSize: Math.floor(parent.height * 1)
+                weight: Font.DemiBold
+            }
+        }
+
+        Timer {
+            interval: 1000; running: true; repeat: true;
+            onTriggered: {if (GPSPositionSensor.Status == 3) compute_distance(PositionState.East,PositionState.North)}
         }
     }
 
-    SvgElementImage {
-        id: mask_ThrottleBar
-        elementName: "throttle-mask"
-        sceneSize: info.sceneSize
-    }
 
     SvgElementImage {
         id: mask_SatBar
@@ -333,17 +424,9 @@ Item {
         sceneSize: info.sceneSize
     }
 
-    SvgElementImage {
-        id: mask_telemetryTx
-        elementName: "tx-mask"
-        sceneSize: info.sceneSize
-    }
-
-    SvgElementImage {
-        id: mask_telemetryRx
-        elementName: "rx-mask"
-        sceneSize: info.sceneSize
-    }
+    //
+    // Home info (visible after arming)
+    //
 
     SvgElementImage {
         id: home_bg
@@ -354,7 +437,7 @@ Item {
         states: State  {
              name: "fading"
              when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width;  }
+             PropertyChanges  { target: home_bg; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
         }
  
         transitions: Transition  {
@@ -375,7 +458,7 @@ Item {
         states: State  {
              name: "fading_heading"
              when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_heading_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width  }
+             PropertyChanges  { target: home_heading_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
         }
  
         transitions: Transition  {
@@ -405,7 +488,7 @@ Item {
         states: State  {
              name: "fading_distance"
              when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_distance_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width;  }
+             PropertyChanges  { target: home_distance_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
         }
  
         transitions: Transition  {
@@ -436,7 +519,7 @@ Item {
         states: State  {
              name: "fading_distance"
              when: TakeOffLocation.Status !== 0
-             PropertyChanges  { target: home_eta_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width;  }
+             PropertyChanges  { target: home_eta_text; x: Math.floor(scaledBounds.x * sceneItem.width) + home_bg.width; }
         }
  
         transitions: Transition  {
@@ -455,7 +538,6 @@ Item {
             }
         }
     }
-
 
     SvgElementImage {
         id: info_border

@@ -39,7 +39,7 @@
 	<field name="CruiseControlPowerDelayComp"      units="sec" type="float" elements="1" defaultvalue="0.25"/>
 	<field name="CruiseControlFlightModeSwitchPosEnable" units="" type="enum" elements="6" options="FALSE,TRUE" defaultvalue="FALSE"/>
 
-	<field name="CruiseControlInvertedThrustReversing" units="" type="enum" elements="1" options="Unreversed,Reversed" defaultvalue="Unchanged"/>
+	<field name="CruiseControlInvertedThrustReversing" units="" type="enum" elements="1" options="Unreversed,Reversed" defaultvalue="Unreversed"/>
 	<field name="CruiseControlInvertedPowerOutput"     units="" type="enum" elements="1" options="Zero,Normal,Boosted" defaultvalue="Zero"/>
 
 	<field name="LowThrottleZeroIntegral" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>

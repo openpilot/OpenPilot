@@ -638,7 +638,7 @@ uavo-collections_clean:
 #
 ##############################
 
-ALL_UNITTESTS := logfs
+ALL_UNITTESTS := logfs math lednotification
 
 # Build the directory for the unit tests
 UT_OUT_DIR := $(BUILD_DIR)/unit_tests
@@ -698,7 +698,8 @@ endif
 ##############################
 
 # Firmware files to package
-PACKAGE_FW_TARGETS  := $(filter-out fw_simposix fw_discoveryf4bare, $(FW_TARGETS))
+PACKAGE_FW_EXCLUDE  := fw_simposix $(if $(PACKAGE_FW_INCLUDE_DISCOVERYF4BARE),,fw_discoveryf4bare)
+PACKAGE_FW_TARGETS  := $(filter-out $(PACKAGE_FW_EXCLUDE), $(FW_TARGETS))
 PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.
@@ -739,6 +740,9 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
     export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
     export PACKAGE_NAME := OpenPilot
     export PACKAGE_SEP  := -
+
+    # Copy the Qt libraries regardless whether the building machine needs them to run GCS
+    export FORCE_COPY_QT := true
 
     # We can only package release builds
     ifneq ($(GCS_BUILD_CONF),release)
@@ -881,6 +885,7 @@ help:
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
 	@$(ECHO) "     sdl_install          - Install the SDL library (Windows only)"
+	@$(ECHO) "     mesawin_install      - Install the OpenGL32 DLL (Windows only)"
 	@$(ECHO) "     openssl_install      - Install the OpenSSL libraries (Windows only)"
 	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     doxygen_install      - Install the Doxygen documentation generator"

@@ -41,6 +41,8 @@ class UAVOBJECTWIDGETUTILS_EXPORT MixerCurveWidget : public QGraphicsView {
     Q_OBJECT
 
 public:
+    static const int NODE_NUMELEM = 5;
+
     MixerCurveWidget(QWidget *parent = 0);
     ~MixerCurveWidget();
 
@@ -57,34 +59,44 @@ public:
     double getMax();
     double setRange(double min, double max);
 
-    static const int NODE_NUMELEM = 5;
+public slots:
+    void setXAxisLabel(QString label);
+    void setYAxisLabel(QString label);
 
 signals:
     void curveUpdated();
     void curveMinChanged(double value);
     void curveMaxChanged(double value);
 
-private slots:
-
-private:
-    QGraphicsSvgItem *plot;
-
-    QList<Edge *> edgeList;
-    QList<MixerNode *> nodeList;
-
-    double curveMin;
-    double curveMax;
-    bool curveUpdating;
-
-    void  initNodes(int numPoints);
-    void setPositiveColor(QString color);
-    void setNegativeColor(QString color);
-
-    void  resizeCommands();
-
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
     void changeEvent(QEvent *event);
+
+private slots:
+    void positionAxisLabels();
+
+private:
+    QGraphicsSvgItem *m_plot;
+    QGraphicsTextItem *m_xAxisTextItem;
+    QGraphicsTextItem *m_yAxisTextItem;
+
+    QList<Edge *> m_edgeList;
+    QList<MixerNode *> m_nodeList;
+
+    QString m_xAxisString;
+    QString m_yAxisString;
+
+    double m_curveMin;
+    double m_curveMax;
+    bool m_curveUpdating;
+
+    void initNodes(int numPoints);
+    void setupXAxisLabel();
+    void setupYAxisLabel();
+    void setPositiveColor(QString color);
+    void setNegativeColor(QString color);
+
+    void  resizeCommands();
 };
 #endif /* MIXERCURVEWIDGET_H_ */

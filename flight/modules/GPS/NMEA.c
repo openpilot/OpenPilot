@@ -489,7 +489,7 @@ static bool nmeaProcessGPGGA(GPSPositionSensorData *GpsData, bool *gpsDataUpdate
 
     // geoid separation
     GpsData->GeoidSeparation = NMEA_real_to_float(param[11]);
-
+    GpsData->SensorType = GPSPOSITIONSENSOR_SENSORTYPE_NMEA;
     return true;
 }
 
@@ -687,8 +687,8 @@ static bool nmeaProcessGPGSV(__attribute__((unused)) GPSPositionSensorData *GpsD
 
             // Get sat info
             gsv_partial.PRN[sat_index]       = atoi(param[parIdx++]);
-            gsv_partial.Elevation[sat_index] = NMEA_real_to_float(param[parIdx++]);
-            gsv_partial.Azimuth[sat_index]   = NMEA_real_to_float(param[parIdx++]);
+            gsv_partial.Elevation[sat_index] = atoi(param[parIdx++]);
+            gsv_partial.Azimuth[sat_index]   = atoi(param[parIdx++]);
             gsv_partial.SNR[sat_index]       = atoi(param[parIdx++]);
 #ifdef NMEA_DEBUG_GSV
             DEBUG_MSG(" %d", gsv_partial.PRN[sat_index]);

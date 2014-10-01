@@ -68,9 +68,12 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     QStringList channelDesc;
     switch (systemSettingsData.AirframeType) {
     case SystemSettings::AIRFRAMETYPE_FIXEDWING:
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        break;
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        break;
     case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
-        // fixed wing
         channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
         break;
     case SystemSettings::AIRFRAMETYPE_HELICP:
@@ -81,10 +84,12 @@ QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
     case SystemSettings::AIRFRAMETYPE_TRI:
     case SystemSettings::AIRFRAMETYPE_QUADX:
     case SystemSettings::AIRFRAMETYPE_QUADP:
+    case SystemSettings::AIRFRAMETYPE_QUADH:
     case SystemSettings::AIRFRAMETYPE_OCTOV:
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXX:
     case SystemSettings::AIRFRAMETYPE_OCTOCOAXP:
     case SystemSettings::AIRFRAMETYPE_OCTO:
+    case SystemSettings::AIRFRAMETYPE_OCTOX:
     case SystemSettings::AIRFRAMETYPE_HEXAX:
     case SystemSettings::AIRFRAMETYPE_HEXACOAX:
     case SystemSettings::AIRFRAMETYPE_HEXA:
@@ -193,16 +198,30 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     UAVObjectField *field = system->getField(QString("AirframeType"));
     Q_ASSERT(field);
 
-    // At this stage, we will need to have some hardcoded settings in this code, this
-    // is not ideal, but there you go.
+    // At this stage, we will need to have some hardcoded settings in this code
     QString frameType = field->getValue().toString();
 
-    int category = frameCategory(frameType);
+    // Always update custom tab from others airframe settings : debug/learn hardcoded mixers
+    int category = frameCategory("Custom");
     m_aircraft->aircraftType->setCurrentIndex(category);
 
     VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
+
     if (vehicleConfig) {
-        vehicleConfig->refreshWidgetsValues(frameType);
+        vehicleConfig->refreshWidgetsValues("Custom");
+    }
+
+    // Switch to Airframe currently used
+    category = frameCategory(frameType);
+
+    if (frameType != "Custom") {
+        m_aircraft->aircraftType->setCurrentIndex(category);
+
+        VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
+
+        if (vehicleConfig) {
+            vehicleConfig->refreshWidgetsValues(frameType);
+        }
     }
 
     updateFeedForwardUI();
@@ -251,20 +270,25 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
     vconfig->setMixerValue(mixer, "DecelTime", m_aircraft->decelTime->value());
     vconfig->setMixerValue(mixer, "MaxAccel", m_aircraft->maxAccelSlider->value());
 
-    // TODO call refreshWidgetsValues() to reflect actual saved values ?
+    // call refreshWidgetsValues() to reflect actual saved values
+    refreshWidgetsValues();
     updateFeedForwardUI();
 }
 
 int ConfigVehicleTypeWidget::frameCategory(QString frameType)
 {
-    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
+    if (frameType == "FixedWing" || frameType == "Aileron" || frameType == "FixedWingElevon"
         || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
         return ConfigVehicleTypeWidget::FIXED_WING;
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
-               || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
+               || frameType == "QuadP" || frameType == "Quad +" || frameType == "Quad H" || frameType == "QuadH"
+               || frameType == "Hexa" || frameType == "Hexacopter"
                || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
-               || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
-               || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
+               || frameType == "HexaH" || frameType == "Hexacopter H" || frameType == "Hexacopter Y6"
+               || frameType == "Octo" || frameType == "Octocopter"
+               || frameType == "OctoX" || frameType == "Octocopter X"
+               || frameType == "OctoV" || frameType == "Octocopter V"
+               || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
                || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
         return ConfigVehicleTypeWidget::MULTIROTOR;
     } else if (frameType == "HeliCP") {

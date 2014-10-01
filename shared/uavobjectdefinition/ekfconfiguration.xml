@@ -5,7 +5,7 @@
 		10.0, 10.0, 10.0,
 		1.0, 1.0, 1.0,
 		0.007, 0.007, 0.007, 0.007,
-		0.0001, 0.0001, 0.0001">
+		0.000001, 0.000001, 0.000001">
 		<elementnames>
 			<elementname>PositionNorth</elementname>
 			<elementname>PositionEast</elementname>
@@ -24,8 +24,8 @@
 	</field>
 	<field name="Q" units="1^2" type="float" defaultvalue="
 		0.01, 0.01, 0.01,
-		0.1, 0.1, 0.1,
-		0.0000001, 0.0000001, 0.0000001">
+		0.01, 0.01, 0.01,
+		0.000001, 0.000001, 0.000001">
 		<elementnames>
 			<elementname>GyroX</elementname>
 			<elementname>GyroY</elementname>
@@ -39,10 +39,10 @@
 		</elementnames>
 	</field>
 	<field name="R" units="1^2" type="float" defaultvalue="
-		10, 10, 1000,
-		1, 1, 1,
-		5000, 5000, 5000,
-		1">
+		1, 1, 1000000,
+		0.001, 0.001, 0.001,
+		10, 10, 10,
+		0.01">
 		<elementnames>
 			<elementname>GPSPosNorth</elementname>
 			<elementname>GPSPosEast</elementname>

@@ -163,9 +163,13 @@ static void altitudeHoldTask(void)
     dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
     switch (thrustMode) {
     case ALTITUDEHOLD:
+    {
         // altitude control loop
-        altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, 1.0f, thrustSetpoint, positionStateDown, dT);
-        break;
+        // No scaling.
+        const pid_scaler scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
+        altitudeHoldStatus.VelocityDesired = pid_apply_setpoint(&pid0, &scaler, thrustSetpoint, positionStateDown, dT);
+    }
+    break;
     case ALTITUDEVARIO:
         altitudeHoldStatus.VelocityDesired = thrustSetpoint;
         break;
@@ -181,10 +185,13 @@ static void altitudeHoldTask(void)
         thrustDemand = thrustSetpoint;
         break;
     default:
+    {
         // velocity control loop
-        thrustDemand = startThrust - pid_apply_setpoint(&pid1, 1.0f, altitudeHoldStatus.VelocityDesired, velocityStateDown, dT);
-
-        break;
+        // No scaling.
+        const pid_scaler scaler = { .p = 1.0f, .i = 1.0f, .d = 1.0f };
+        thrustDemand = startThrust - pid_apply_setpoint(&pid1, &scaler, altitudeHoldStatus.VelocityDesired, velocityStateDown, dT);
+    }
+    break;
     }
 }
 

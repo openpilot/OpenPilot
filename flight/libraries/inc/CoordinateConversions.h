@@ -50,6 +50,21 @@ void RPY2Quaternion(const float rpy[3], float q[4]);
 // ** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
 void Quaternion2R(float q[4], float Rbe[3][3]);
 
+// ** Find first row of Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** This vector corresponds to the fuselage/roll vector xB **
+void QuaternionC2xB(const float q0, const float q1, const float q2, const float q3, float x[3]);
+void Quaternion2xB(const float q[4], float x[3]);
+
+// ** Find second row of Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** This vector corresponds to the spanwise/pitch vector yB **
+void QuaternionC2yB(const float q0, const float q1, const float q2, const float q3, float y[3]);
+void Quaternion2yB(const float q[4], float y[3]);
+
+// ** Find third row of Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** This vector corresponds to the vertical/yaw vector zB **
+void QuaternionC2zB(const float q0, const float q1, const float q2, const float q3, float z[3]);
+void Quaternion2zB(const float q[4], float z[3]);
+
 // ****** Express LLA in a local NED Base Frame ********
 void LLA2Base(int32_t LLAi[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
 
@@ -97,5 +112,73 @@ static inline void matrix_mult_3x3f(float a[3][3], float b[3][3], float result[3
     result[2][2] = a[0][2] * b[2][0] + a[1][2] * b[2][1] + a[2][2] * b[2][2];
 }
 
+inline void matrix_inline_scale_3f(float a[3][3], float scale)
+{
+    a[0][0] *= scale;
+    a[0][1] *= scale;
+    a[0][2] *= scale;
+
+    a[1][0] *= scale;
+    a[1][1] *= scale;
+    a[1][2] *= scale;
+
+    a[2][0] *= scale;
+    a[2][1] *= scale;
+    a[2][2] *= scale;
+}
+
+inline void rot_about_axis_x(const float rotation, float R[3][3])
+{
+    float s = sinf(rotation);
+    float c = cosf(rotation);
+
+    R[0][0] = 1;
+    R[0][1] = 0;
+    R[0][2] = 0;
+
+    R[1][0] = 0;
+    R[1][1] = c;
+    R[1][2] = -s;
+
+    R[2][0] = 0;
+    R[2][1] = s;
+    R[2][2] = c;
+}
+
+inline void rot_about_axis_y(const float rotation, float R[3][3])
+{
+    float s = sinf(rotation);
+    float c = cosf(rotation);
+
+    R[0][0] = c;
+    R[0][1] = 0;
+    R[0][2] = s;
+
+    R[1][0] = 0;
+    R[1][1] = 1;
+    R[1][2] = 0;
+
+    R[2][0] = -s;
+    R[2][1] = 0;
+    R[2][2] = c;
+}
+
+inline void rot_about_axis_z(const float rotation, float R[3][3])
+{
+    float s = sinf(rotation);
+    float c = cosf(rotation);
+
+    R[0][0] = c;
+    R[0][1] = -s;
+    R[0][2] = 0;
+
+    R[1][0] = s;
+    R[1][1] = c;
+    R[1][2] = 0;
+
+    R[2][0] = 0;
+    R[2][1] = 0;
+    R[2][2] = 1;
+}
 
 #endif // COORDINATECONVERSIONS_H_

@@ -3,92 +3,95 @@ import QtQuick 2.0
 Item {
     id: sceneItem
     property variant sceneSize
+    property real vert_velocity
+
+    Timer {
+         interval: 100; running: true; repeat: true
+         onTriggered: vert_velocity = (0.9 * vert_velocity) + (0.1 * VelocityState.Down)
+     }
 
     SvgElementImage {
-        id: vsi_window
-        elementName: "vsi-window"
+        id: vsi_waypoint
+        elementName: "vsi-waypoint"
         sceneSize: sceneItem.sceneSize
-        clip: true
+
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+
+        x: scaledBounds.x * sceneItem.width
+        y: scaledBounds.y * sceneItem.height
+
+        smooth: true
+        visible: VelocityDesired.Down !== 0.0 && FlightStatus.FlightMode > 7 
+
+        //rotate it around the center
+        transform: Rotation {
+            angle: -VelocityDesired.Down * 5
+            origin.y : vsi_waypoint.height / 2 
+            origin.x : vsi_waypoint.width * 33
+        }
+    }
+
+    SvgElementImage {
+        id: vsi_scale_meter
+
+        visible: qmlWidget.altitudeUnit == "m"
+        elementName: "vsi-scale-meter"
+        sceneSize: sceneItem.sceneSize
 
         x: Math.floor(scaledBounds.x * sceneItem.width)
         y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        property double scaleSteps : 8
-        property double scaleStepValue : 1000
-        property double scaleStepHeight : height/scaleSteps
-
-        SvgElementImage {
-            id: vsi_bar
-
-            elementName: "vsi-bar"
-            sceneSize: sceneItem.sceneSize
-
-            //the scale in 1000 ft/min, convert from VelocityState.Down value in m/s
-            height: (-VelocityState.Down*3.28*60/vsi_window.scaleStepValue)*vsi_window.scaleStepHeight
-
-            anchors.bottom: parent.verticalCenter
-            anchors.left: parent.left
-        }
-
-        SvgElementImage {
-            id: vsi_scale
-
-            elementName: "vsi-scale"
-            sceneSize: sceneItem.sceneSize
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-
-            //Text labels
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.right
-
-                Repeater {
-                    model: [3, 2, 1, 0, 1, 2, 3]
-                    Item {
-                        height: vsi_window.scaleStepHeight
-                        width: vsi_window.width - vsi_scale.width //fill area right to scale
-
-                        Text {
-                            text: modelData
-                            visible: modelData !== 0 //hide "0" label
-                            color: "white"
-                            font.pixelSize: parent.height * 0.5
-                            font.family: "Arial"
-
-                            anchors.centerIn: parent
-                        }
-                    }
-                }
-            }
-        }
     }
 
+    SvgElementImage {
+        id: vsi_scale_ft
+
+        visible: qmlWidget.altitudeUnit == "ft"
+        elementName: "vsi-scale-ft"
+        sceneSize: sceneItem.sceneSize
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+    }
 
     SvgElementImage {
-        id: vsi_centerline
-        clip: true
+        id: vsi_arrow
+        elementName: "vsi-arrow"
+        sceneSize: sceneItem.sceneSize
+
+        width: scaledBounds.width * sceneItem.width
+        height: scaledBounds.height * sceneItem.height
+
+        x: scaledBounds.x * sceneItem.width
+        y: scaledBounds.y * sceneItem.height
+
         smooth: true
 
-        elementName: "vsi-centerline"
+        //rotate it around the center
+        transform: Rotation {
+            angle: -vert_velocity * 5
+            origin.y : vsi_arrow.height / 2 
+            origin.x : vsi_arrow.width * 3.15
+        }
+    }
+
+    SvgElementPositionItem {
+        id: vsi_unit_text
+        elementName: "vsi-unit-text"
         sceneSize: sceneItem.sceneSize
 
-        x: Math.floor(scaledBounds.x * sceneItem.width)
-        y: Math.floor(scaledBounds.y * sceneItem.height)
-    }
-
-    Text {
-        id: vsi_unit_text
-        text: "ft / m"
-
-        color: "white"
-        font {
-            family: "Arial"
-            pixelSize: sceneSize.height * 0.02
+        Text {
+            text: qmlWidget.altitudeUnit == "m" ? "m/s" : "ft/s"
+            color: "cyan"
+            font {
+                family: "Arial"
+                pixelSize: parent.height * 1.7
+                weight: Font.DemiBold
+            }
+            anchors.centerIn: parent
         }
-        anchors.top: vsi_window.bottom
-        anchors.left: vsi_window.left
-        anchors.margins: font.pixelSize * 0.5
     }
+
 }

@@ -45,6 +45,9 @@ SummaryPage::~SummaryPage()
 
 bool SummaryPage::validatePage()
 {
+    // Save settings so far.
+    VehicleConfigurationHelper helper(getWizard());
+    helper.setupVehicle(false);
     return true;
 }
 

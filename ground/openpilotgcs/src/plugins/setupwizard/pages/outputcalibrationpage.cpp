@@ -217,9 +217,6 @@ void OutputCalibrationPage::setupVehicle()
         break;
     }
 
-    VehicleConfigurationHelper helper(getWizard());
-    helper.setupVehicle(false);
-
     if (m_calibrationUtil) {
         delete m_calibrationUtil;
         m_calibrationUtil = 0;

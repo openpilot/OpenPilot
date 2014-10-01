@@ -206,6 +206,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             GPSSettings *gpsSettings = GPSSettings::GetInstance(m_uavoManager);
             Q_ASSERT(gpsSettings);
             GPSSettings::DataFields gpsData = gpsSettings->getData();
+            gpsData.UbxAutoConfig = GPSSettings::UBXAUTOCONFIG_DISABLED;
 
             switch (m_configSource->getGpsType()) {
             case VehicleConfigurationSource::GPS_NMEA:
@@ -217,6 +218,7 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
             case VehicleConfigurationSource::GPS_PLATINUM:
             {
                 gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_UBX;
+                gpsData.UbxAutoConfig = GPSSettings::UBXAUTOCONFIG_CONFIGURE;
                 AuxMagSettings *magSettings = AuxMagSettings::GetInstance(m_uavoManager);
                 Q_ASSERT(magSettings);
                 AuxMagSettings::DataFields magsData = magSettings->getData();
@@ -1375,7 +1377,7 @@ void VehicleConfigurationHelper::setupHexaCopter()
 
 void VehicleConfigurationHelper::setupOctoCopter()
 {
-    mixerChannelSettings channels[10];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
     SystemSettings::AirframeTypeOptions frame = SystemSettings::AIRFRAMETYPE_OCTO;
 
@@ -1762,7 +1764,7 @@ void VehicleConfigurationHelper::setupOctoCopter()
 
 void VehicleConfigurationHelper::setupElevon()
 {
-    mixerChannelSettings channels[10];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
     // Motor (Chan 3)
@@ -1804,7 +1806,7 @@ void VehicleConfigurationHelper::setupDualAileron()
     // 2. Setup GUI data
     // 3. Apply changes
 
-    mixerChannelSettings channels[10];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
     // Motor (Chan 3)
@@ -1864,7 +1866,7 @@ void VehicleConfigurationHelper::setupAileron()
     // 2. Setup GUI data
     // 3. Apply changes
 
-    mixerChannelSettings channels[10];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
     // Motor (Chan 3)

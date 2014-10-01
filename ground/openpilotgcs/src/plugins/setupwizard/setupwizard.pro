@@ -36,6 +36,7 @@ HEADERS += setupwizardplugin.h \
     pages/autoupdatepage.h \
     pages/revocalibrationpage.h \
     biascalibrationutil.h \
+    pages/esccalibrationpage.h \
     pages/biascalibrationpage.h \
     pages/escpage.h \
     pages/servopage.h \
@@ -70,6 +71,7 @@ SOURCES += setupwizardplugin.cpp \
     pages/revocalibrationpage.cpp \
     biascalibrationutil.cpp \
     pages/biascalibrationpage.cpp \
+    pages/esccalibrationpage.cpp \
     pages/escpage.cpp \
     pages/servopage.cpp \
     pages/selectionpage.cpp \
@@ -95,6 +97,7 @@ FORMS += \
     pages/autoupdatepage.ui \
     pages/revocalibrationpage.ui \
     pages/biascalibrationpage.ui \
+    pages/esccalibrationpage.ui \
     pages/escpage.ui \
     pages/servopage.ui \
     pages/selectionpage.ui \

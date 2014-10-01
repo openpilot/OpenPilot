@@ -85,7 +85,7 @@ bool AirframeInitialTuningPage::validatePage()
     if (getWizard()->getVehicleTemplate() != NULL) {
         delete getWizard()->getVehicleTemplate();
     }
-    getWizard()->setVehicleTemplate(new QJsonObject(*templ));
+    getWizard()->setVehicleTemplate(templ != NULL ? new QJsonObject(*templ) : NULL);
     return true;
 }
 

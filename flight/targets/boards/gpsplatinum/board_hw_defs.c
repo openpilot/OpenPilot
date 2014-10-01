@@ -214,11 +214,11 @@ bool pios_board_mag_handler()
 }
 static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
     .vector = pios_board_mag_handler,
-    .line   = EXTI_Line7,
+    .line   = EXTI_Line0,
     .pin    = {
         .gpio = GPIOB,
         .init = {
-            .GPIO_Pin   = GPIO_Pin_7,
+            .GPIO_Pin   = GPIO_Pin_0,
             .GPIO_Speed = GPIO_Speed_Level_3,
             .GPIO_Mode  = GPIO_Mode_IN,
             .GPIO_OType = GPIO_OType_OD,
@@ -227,14 +227,14 @@ static const struct pios_exti_cfg pios_exti_mag_cfg __exti_config = {
     },
     .irq                             = {
         .init                        = {
-            .NVIC_IRQChannel    = EXTI4_15_IRQn,
+            .NVIC_IRQChannel    = EXTI0_1_IRQn,
             .NVIC_IRQChannelPriority = PIOS_IRQ_PRIO_LOW,
             .NVIC_IRQChannelCmd = ENABLE,
         },
     },
     .exti                            = {
         .init                        = {
-            .EXTI_Line    = EXTI_Line7, // matches above GPIO pin
+            .EXTI_Line    = EXTI_Line0, // matches above GPIO pin
             .EXTI_Mode    = EXTI_Mode_Interrupt,
             .EXTI_Trigger = EXTI_Trigger_Rising,
             .EXTI_LineCmd = ENABLE,

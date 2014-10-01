@@ -29,14 +29,22 @@
 #include <ubx_utils.h>
 #include <pios_hmc5x83.h>
 #include "inc/gps9protocol.h"
-
+#define MAG_RATE_HZ 30
 extern pios_hmc5x83_dev_t onboard_mag;
 
 void handleMag()
 {
+#ifdef PIOS_HMC5X83_HAS_GPIOS
     if (!PIOS_HMC5x83_NewDataAvailable(onboard_mag)) {
         return;
     }
+#else
+    static uint32_t lastUpdate = 0;
+    if(PIOS_DELAY_DiffuS(lastUpdate) < (1000000 / MAG_RATE_HZ)){
+        return;
+    }
+    lastUpdate = PIOS_DELAY_GetRaw();
+#endif
     static int16_t mag[3];
 
     if (PIOS_HMC5x83_ReadMag(onboard_mag, mag) == 0) {

@@ -40,7 +40,7 @@ struct int_param_s {
     void *arg;
 /* RPi hack, empty struct can cause warning */
 #else
-	unsigned int pin;
+    unsigned int pin;
 #endif
 };
 

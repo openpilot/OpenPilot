@@ -74,10 +74,10 @@ int32_t PIOS_DELAY_WaitmS(uint32_t mS);
 
 uint32_t PIOS_DELAY_GetuS();
 static void get_ms(unsigned long *count) {
-	if (count != NULL)
-	{
-		*count = PIOS_DELAY_GetuS() / 1000;
-	}
+    if (count != NULL)
+    {
+        *count = PIOS_DELAY_GetuS() / 1000;
+    }
 }
 
 static inline void __no_operation(void) {}

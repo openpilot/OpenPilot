@@ -76,9 +76,9 @@
 // ------------------------
 // BOOTLOADER_SETTINGS
 // ------------------------
-// #define BOARD_READABLE	true
-// #define BOARD_WRITABLE	true
-// #define MAX_DEL_RETRYS	3
+// #define BOARD_READABLE   true
+// #define BOARD_WRITABLE   true
+// #define MAX_DEL_RETRYS   3
 
 
 // ------------------------
@@ -109,9 +109,9 @@
 // PIOS_I2C
 // See also pios_board.c
 // ------------------------
-// #define PIOS_I2C_MAX_DEVS			3
+// #define PIOS_I2C_MAX_DEVS            3
 // extern uint32_t pios_i2c_mag_adapter_id;
-// #define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_mag_adapter_id)
+// #define PIOS_I2C_MAIN_ADAPTER            (pios_i2c_mag_adapter_id)
 
 // -------------------------
 // PIOS_USART
@@ -163,26 +163,26 @@ extern uint32_t pios_com_vcp_id;
 
 #define PIOS_SYSCLK 168000000
 // Peripherals that belongs to APB1 are:
-// DAC			|PWR				|CAN1,2
-// I2C1,2,3		|UART4,5			|USART3,2
-// I2S3Ext		|SPI3/I2S3		|SPI2/I2S2
-// I2S2Ext		|IWDG				|WWDG
+// DAC          |PWR                |CAN1,2
+// I2C1,2,3     |UART4,5            |USART3,2
+// I2S3Ext      |SPI3/I2S3      |SPI2/I2S2
+// I2S2Ext      |IWDG               |WWDG
 // RTC/BKP reg
 // TIM2,3,4,5,6,7,12,13,14
 
 // Calculated as SYSCLK / APBPresc * (APBPre == 1 ? 1 : 2)
 // Default APB1 Prescaler = 4
-// #define PIOS_PERIPHERAL_APB1_CLOCK					(PIOS_SYSCLK / 2)
+// #define PIOS_PERIPHERAL_APB1_CLOCK                   (PIOS_SYSCLK / 2)
 
 // Peripherals belonging to APB2
-// SDIO			|EXTI				|SYSCFG			|SPI1
+// SDIO         |EXTI               |SYSCFG         |SPI1
 // ADC1,2,3
 // USART1,6
 // TIM1,8,9,10,11
 //
 // Default APB2 Prescaler = 2
 //
-// #define PIOS_PERIPHERAL_APB2_CLOCK					PIOS_SYSCLK
+// #define PIOS_PERIPHERAL_APB2_CLOCK                   PIOS_SYSCLK
 
 
 // -------------------------
@@ -227,8 +227,8 @@ extern uint32_t pios_com_vcp_id;
 // -------------------------
 // Receiver DSM input
 // -------------------------
-// #define PIOS_DSM_MAX_DEVS			2
-// #define PIOS_DSM_NUM_INPUTS			12
+// #define PIOS_DSM_MAX_DEVS            2
+// #define PIOS_DSM_NUM_INPUTS          12
 
 // -------------------------
 // Servo outputs
@@ -240,7 +240,7 @@ extern uint32_t pios_com_vcp_id;
 // --------------------------
 // Timer controller settings
 // --------------------------
-// #define PIOS_TIM_MAX_DEVS			6
+// #define PIOS_TIM_MAX_DEVS            6
 
 // -------------------------
 // ADC

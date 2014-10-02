@@ -147,16 +147,16 @@ void PIOS_Board_Init(void)
 
     /* Configure IO ports */
 #if defined(PIOS_INCLUDE_I2C)
-	PIOS_I2C_init();
+    PIOS_I2C_init();
 #endif
 
-	/* Setup servo driver */
+    /* Setup servo driver */
 #if defined(PIOS_INCLUDE_SERVO)
-	PIOS_Servo_Init();
+    PIOS_Servo_Init();
 #endif
 
 #if defined(PIOS_INCLUDE_PWM)
-	/* Set up the receiver port.  Later this should be optional */
+    /* Set up the receiver port.  Later this should be optional */
     uint32_t pios_pwm_id;
 
     PIOS_PWM_Init(&pios_pwm_id);

@@ -117,10 +117,10 @@ int32_t PIOS_DELAY_WaitmS(uint32_t mS);
 
 uint32_t PIOS_DELAY_GetuS();
 static void get_ms(unsigned long *count) {
-	if (count != NULL)
-	{
-		*count = PIOS_DELAY_GetuS() / 1000;
-	}
+    if (count != NULL)
+    {
+        *count = PIOS_DELAY_GetuS() / 1000;
+    }
 }
 
 static inline int reg_int_cb(struct int_param_s *int_param) {return 0;}

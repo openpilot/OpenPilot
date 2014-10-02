@@ -708,7 +708,7 @@ static inline bool buzzerState(buzzertype type)
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSettingsData *actuatorSettings)
 {
-	switch (actuatorSettings->ChannelType[mixer_channel]) {
+    switch (actuatorSettings->ChannelType[mixer_channel]) {
     case ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER:
         PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel],
                        buzzerState(BUZZ_BUZZER) ? actuatorSettings->ChannelMax[mixer_channel] : actuatorSettings->ChannelMin[mixer_channel]);

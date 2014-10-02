@@ -3,7 +3,7 @@
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
  * @addtogroup   PIOS_PWM PWM Input Functions
- * @brief		Code to measure with PWM input
+ * @brief       Code to measure with PWM input
  * @{
  *
  * @file       pios_pwm.c
@@ -81,14 +81,14 @@ int32_t PIOS_PWM_Init(uint32_t *pwm_id)
 {
     PIOS_DEBUG_Assert(pwm_id);
 
-	struct pios_pwm_dev *pwm_dev;
+    struct pios_pwm_dev *pwm_dev;
 
     pwm_dev = (struct pios_pwm_dev *)PIOS_PWM_alloc();
     if (!pwm_dev) {
         goto out_fail;
     }
 
-	/* Do not need synchronization yet */
+    /* Do not need synchronization yet */
     for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
         pwm_dev->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
     }
@@ -111,7 +111,7 @@ out_fail:
 static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t channel)
 {
     struct pios_pwm_dev *pwm_dev = (struct pios_pwm_dev *)rcvr_id;
-	int32_t ret;
+    int32_t ret;
 
     if (!PIOS_PWM_validate(pwm_dev)) {
         /* Invalid device specified */
@@ -123,11 +123,11 @@ static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t channel)
         return PIOS_RCVR_INVALID;
     }
 
-	pthread_mutex_lock(&pwm_mutex);
-	ret = pwm_dev->CaptureValue[channel];
-	pthread_mutex_unlock(&pwm_mutex);
+    pthread_mutex_lock(&pwm_mutex);
+    ret = pwm_dev->CaptureValue[channel];
+    pthread_mutex_unlock(&pwm_mutex);
 
-	return ret;
+    return ret;
 }
 
 //-------------------------------------------------------------------------------
@@ -193,10 +193,10 @@ data[7] --> Button Axis identyfication
 #include <unistd.h>
 #include <poll.h>
 
-#define USB_JOYSTICK_FILE		"/dev/input/js0"
-#define USB_JOYSTICK_MSG_LEN	8
-#define USB_JOYSTICK_BUTTON		0x01
-#define USB_JOYSTICK_AXIS		0x02
+#define USB_JOYSTICK_FILE       "/dev/input/js0"
+#define USB_JOYSTICK_MSG_LEN    8
+#define USB_JOYSTICK_BUTTON     0x01
+#define USB_JOYSTICK_AXIS       0x02
 
 #define STACK_SIZE_BYTES     2048
 #define TASK_PRIORITY        (tskIDLE_PRIORITY + 4) // device driver
@@ -208,9 +208,9 @@ static void usbJoyTask(void *parameters);
 
 int32_t UsbJoyStart()
 {
-	/* can't open joystick file
-	 * no point to have task */
-	if (fd < 0) {
+    /* can't open joystick file
+     * no point to have task */
+    if (fd < 0) {
         return 0;
     }
 
@@ -230,20 +230,20 @@ int32_t UsbJoyStart()
  */
 int32_t UsbJoyInitialize()
 {
-	fd = -1;
-	fd = open(USB_JOYSTICK_FILE, O_RDONLY);
-	if (fd < 0) {
-		// ???
-		//AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_CRITICAL);
-		return 0;
-	}
+    fd = -1;
+    fd = open(USB_JOYSTICK_FILE, O_RDONLY);
+    if (fd < 0) {
+        // ???
+        //AlarmsSet(SYSTEMALARMS_ALARM_RECEIVER, SYSTEMALARMS_ALARM_CRITICAL);
+        return 0;
+    }
 
-	// switch to non-blocking I/0
-	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
+    // switch to non-blocking I/0
+    fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
-	// ???
-	//AlarmsClear(SYSTEMALARMS_ALARM_RECEIVER);
-	return 0;
+    // ???
+    //AlarmsClear(SYSTEMALARMS_ALARM_RECEIVER);
+    return 0;
 }
 
 MODULE_INITCALL(UsbJoyInitialize, UsbJoyStart);
@@ -255,112 +255,112 @@ MODULE_INITCALL(UsbJoyInitialize, UsbJoyStart);
  */
 static void usbJoyTask(__attribute__((unused)) void *parameters)
 {
-	//struct pollfd pfds;
-	uint8_t data[8];
-	int32_t capture_value;
-	int ret;
+    //struct pollfd pfds;
+    uint8_t data[8];
+    int32_t capture_value;
+    int ret;
 
-	while (1) {
-		/* smallest amount of data that we can read from this device is 8 bytes (USB_JOYSTICK_MSG_LEN)
-		 * if you try read less than this then you will get EINVAL error
-		 * as we already read smallest portion of data, there is no possibility for partial read
-		 * i.e. we can't read less than 8 bytes (joystick message) */
-		ret = read(fd, data, USB_JOYSTICK_MSG_LEN);
+    while (1) {
+        /* smallest amount of data that we can read from this device is 8 bytes (USB_JOYSTICK_MSG_LEN)
+         * if you try read less than this then you will get EINVAL error
+         * as we already read smallest portion of data, there is no possibility for partial read
+         * i.e. we can't read less than 8 bytes (joystick message) */
+        ret = read(fd, data, USB_JOYSTICK_MSG_LEN);
 
-		if (0 == ret) {
-			// End of file
-			break;
-		}
+        if (0 == ret) {
+            // End of file
+            break;
+        }
 
-		if (-1 == ret) {
-			if (EAGAIN != errno) {
-				// unidentified error
-				// should report error here and keep going
-			}
+        if (-1 == ret) {
+            if (EAGAIN != errno) {
+                // unidentified error
+                // should report error here and keep going
+            }
 
-			//pfds.fd = fd;
-			//pfds.events = POLLIN;
-			//ret = poll(&pfds, 1, -1);
-			//if (-1 == ret) {
-				//cout << "Error in poll: " << strerror(errno) << '.' << endl;
-			//}
+            //pfds.fd = fd;
+            //pfds.events = POLLIN;
+            //ret = poll(&pfds, 1, -1);
+            //if (-1 == ret) {
+                //cout << "Error in poll: " << strerror(errno) << '.' << endl;
+            //}
 
-			// poll cause problems because FreeRTOS port
-			// but it's proper solution for Linux
-			vTaskDelay(20);
-			continue;
-		}
+            // poll cause problems because FreeRTOS port
+            // but it's proper solution for Linux
+            vTaskDelay(20);
+            continue;
+        }
 
-		capture_value = (int16_t)((data[5] << 8) | data[4]);
+        capture_value = (int16_t)((data[5] << 8) | data[4]);
 /*  OpenPilot PWM mapping
-	PWM[0] = 0x03 Throttle Axis              | Throttle
-	PWM[1] = 0x02 Rotate Axis                | Yaw
-	PWM[2] = 0x01 Push / Pull  (Y) Axis      | Pitch
-	PWM[3] = 0x00 Left / Right (X) Axis      | Roll
-	PWM[4] = 0x07 Button 8
-	PWM[5] = 0x06 Button 7
-	PWM[6] = 0x08 Button 9
-	PWM[7] = 0x0A = Button 11 */
+    PWM[0] = 0x03 Throttle Axis              | Throttle
+    PWM[1] = 0x02 Rotate Axis                | Yaw
+    PWM[2] = 0x01 Push / Pull  (Y) Axis      | Pitch
+    PWM[3] = 0x00 Left / Right (X) Axis      | Roll
+    PWM[4] = 0x07 Button 8
+    PWM[5] = 0x06 Button 7
+    PWM[6] = 0x08 Button 9
+    PWM[7] = 0x0A = Button 11 */
 
-		if (data[6] & USB_JOYSTICK_AXIS) {
-			/*
-			 * Jostick raw data [-32767, 32767]
-			 * we are converting to our PWM range [0, 2000]
-			 *
-			 *          new_range * (raw_val - raw_min)
-			 * f(x) = ----------------------------------- + new_min
-			 *                   raw_range
-			 * new_range = 2000
-			 * raw_range = 65534
-			 * new_min = 0
-			 * raw_min = -32767
-			 */
-			double tmp;
+        if (data[6] & USB_JOYSTICK_AXIS) {
+            /*
+             * Jostick raw data [-32767, 32767]
+             * we are converting to our PWM range [0, 2000]
+             *
+             *          new_range * (raw_val - raw_min)
+             * f(x) = ----------------------------------- + new_min
+             *                   raw_range
+             * new_range = 2000
+             * raw_range = 65534
+             * new_min = 0
+             * raw_min = -32767
+             */
+            double tmp;
 
-			tmp = (2000.0 * (capture_value + 32767)) / 65534.0;
-			capture_value = floor(tmp + 0.5);
+            tmp = (2000.0 * (capture_value + 32767)) / 65534.0;
+            capture_value = floor(tmp + 0.5);
 
-			pthread_mutex_lock(&pwm_mutex);
-			switch (data[7])
-			{
-				// USB_JOYSTICK is statically mapped to first (and only) PWM device
-				case 0x00:
-					pios_pwm_devs[0].CaptureValue[3] = capture_value;
-					break;
-				case 0x01:
-					pios_pwm_devs[0].CaptureValue[2] = capture_value;
-					break;
-				case 0x02:
-					pios_pwm_devs[0].CaptureValue[1] = capture_value;
-					break;
-				case 0x03:
-					pios_pwm_devs[0].CaptureValue[0] = capture_value;
-					break;
-			}
-			pthread_mutex_unlock(&pwm_mutex);
-		}
+            pthread_mutex_lock(&pwm_mutex);
+            switch (data[7])
+            {
+                // USB_JOYSTICK is statically mapped to first (and only) PWM device
+                case 0x00:
+                    pios_pwm_devs[0].CaptureValue[3] = capture_value;
+                    break;
+                case 0x01:
+                    pios_pwm_devs[0].CaptureValue[2] = capture_value;
+                    break;
+                case 0x02:
+                    pios_pwm_devs[0].CaptureValue[1] = capture_value;
+                    break;
+                case 0x03:
+                    pios_pwm_devs[0].CaptureValue[0] = capture_value;
+                    break;
+            }
+            pthread_mutex_unlock(&pwm_mutex);
+        }
 
-		if (data[6] & USB_JOYSTICK_BUTTON) {
-			pthread_mutex_lock(&pwm_mutex);
-			switch (data[7])
-			{
-				// USB_JOYSTICK is statically mapped to first (and only) PWM device
-				case 0x07:
-					pios_pwm_devs[0].CaptureValue[4] = (capture_value == 1) ? 2000 : 0;
-					break;
-				case 0x06:
-					pios_pwm_devs[0].CaptureValue[5] = (capture_value == 1) ? 2000 : 0;
-					break;
-				case 0x08:
-					pios_pwm_devs[0].CaptureValue[6] = (capture_value == 1) ? 2000 : 0;
-					break;
-				case 0x0A:
-					pios_pwm_devs[0].CaptureValue[7] = (capture_value == 1) ? 2000 : 0;
-					break;
-			}
-			pthread_mutex_unlock(&pwm_mutex);
-		}
-	}
+        if (data[6] & USB_JOYSTICK_BUTTON) {
+            pthread_mutex_lock(&pwm_mutex);
+            switch (data[7])
+            {
+                // USB_JOYSTICK is statically mapped to first (and only) PWM device
+                case 0x07:
+                    pios_pwm_devs[0].CaptureValue[4] = (capture_value == 1) ? 2000 : 0;
+                    break;
+                case 0x06:
+                    pios_pwm_devs[0].CaptureValue[5] = (capture_value == 1) ? 2000 : 0;
+                    break;
+                case 0x08:
+                    pios_pwm_devs[0].CaptureValue[6] = (capture_value == 1) ? 2000 : 0;
+                    break;
+                case 0x0A:
+                    pios_pwm_devs[0].CaptureValue[7] = (capture_value == 1) ? 2000 : 0;
+                    break;
+            }
+            pthread_mutex_unlock(&pwm_mutex);
+        }
+    }
 }
 
 #endif /* PIOS_INCLUDE_PWM */

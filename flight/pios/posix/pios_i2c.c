@@ -61,8 +61,8 @@ static pthread_mutex_t i2c_mutex = PTHREAD_MUTEX_INITIALIZER;
 void PIOS_I2C_GetDiagnostics(struct pios_i2c_fault_history *data, uint8_t *counts)
 {
 #if defined(PIOS_I2C_DIAGNOSTICS)
-	// for now just fake history
-	struct pios_i2c_fault_history i2c_adapter_fault_history;
+    // for now just fake history
+    struct pios_i2c_fault_history i2c_adapter_fault_history;
     i2c_adapter_fault_history.type = PIOS_I2C_ERROR_EVENT;
 
     memcpy(data, &i2c_adapter_fault_history, sizeof(i2c_adapter_fault_history));
@@ -88,60 +88,60 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 {
     struct i2c_rdwr_ioctl_data data;
     struct i2c_msg msg[RPI_I2C_MAX_MESSAGES_P_TRANSFER];
-	int i;
-	int ret;
+    int i;
+    int ret;
 
-	(void)i2c_id; // not used for now
-	
-	if (-1 == i2c_fd)
-	{
-		return -1;
-	}
+    (void)i2c_id; // not used for now
+    
+    if (-1 == i2c_fd)
+    {
+        return -1;
+    }
 
-	if (num_txns > RPI_I2C_MAX_MESSAGES_P_TRANSFER)
-	{
-		return -1;
-	}
+    if (num_txns > RPI_I2C_MAX_MESSAGES_P_TRANSFER)
+    {
+        return -1;
+    }
 
-	for (i = 0; i < num_txns; ++i)
-	{
-		msg[i].addr = txn_list[i].addr;
-		switch (txn_list[i].rw)
-		{
-			case PIOS_I2C_TXN_WRITE:
-				msg[i].flags = 0;
-				break;
-			case PIOS_I2C_TXN_READ:
-				msg[i].flags = I2C_M_RD/* | I2C_M_NOSTART*/;
-				break;
-		}
-		msg[i].len = txn_list[i].len;
-		msg[i].buf = txn_list[i].buf;
-	}
+    for (i = 0; i < num_txns; ++i)
+    {
+        msg[i].addr = txn_list[i].addr;
+        switch (txn_list[i].rw)
+        {
+            case PIOS_I2C_TXN_WRITE:
+                msg[i].flags = 0;
+                break;
+            case PIOS_I2C_TXN_READ:
+                msg[i].flags = I2C_M_RD/* | I2C_M_NOSTART*/;
+                break;
+        }
+        msg[i].len = txn_list[i].len;
+        msg[i].buf = txn_list[i].buf;
+    }
 
-	data.msgs = msg;
-	data.nmsgs = num_txns;
-	ret = -1;
+    data.msgs = msg;
+    data.nmsgs = num_txns;
+    ret = -1;
 
-	pthread_mutex_lock(&i2c_mutex);
-	ret = ioctl(i2c_fd, I2C_RDWR, &data);
-	pthread_mutex_unlock(&i2c_mutex);
+    pthread_mutex_lock(&i2c_mutex);
+    ret = ioctl(i2c_fd, I2C_RDWR, &data);
+    pthread_mutex_unlock(&i2c_mutex);
 
-	return ret;
+    return ret;
 }
 
 uint32_t PIOS_I2C_init()
 {
-	i2c_fd = open(RPI_I2C_BUS_1, O_RDWR);
-	if (-1 == i2c_fd)
-	{
-		// Can't open I2C bus
-		AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_CRITICAL);
-		return -1;
-	}
+    i2c_fd = open(RPI_I2C_BUS_1, O_RDWR);
+    if (-1 == i2c_fd)
+    {
+        // Can't open I2C bus
+        AlarmsSet(SYSTEMALARMS_ALARM_I2C, SYSTEMALARMS_ALARM_CRITICAL);
+        return -1;
+    }
 
-	AlarmsClear(SYSTEMALARMS_ALARM_I2C);
-	return 0;
+    AlarmsClear(SYSTEMALARMS_ALARM_I2C);
+    return 0;
 }
 
 #endif /* PIOS_INCLUDE_I2C */

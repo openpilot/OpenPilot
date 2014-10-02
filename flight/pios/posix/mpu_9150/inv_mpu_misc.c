@@ -36,28 +36,28 @@
 
 unsigned short inv_row_2_scale(const signed char *row)
 {
-	unsigned short b;
+    unsigned short b;
 
-	if (row[0] > 0)
-		b = 0;
-	else if (row[0] < 0)
-		b = 4;
-	else if (row[1] > 0)
-		b = 1;
-	else if (row[1] < 0)
-		b = 5;
-	else if (row[2] > 0)
-		b = 2;
-	else if (row[2] < 0)
-		b = 6;
-	else
-		b = 7;
-	/* error */
-	return b;
+    if (row[0] > 0)
+        b = 0;
+    else if (row[0] < 0)
+        b = 4;
+    else if (row[1] > 0)
+        b = 1;
+    else if (row[1] < 0)
+        b = 5;
+    else if (row[2] > 0)
+        b = 2;
+    else if (row[2] < 0)
+        b = 6;
+    else
+        b = 7;
+    /* error */
+    return b;
 }
 
 /** Converts an orientation matrix made up of 0,+1,and -1 to a scalar
-*	representation.
+*   representation.
 * @param[in] mtx Orientation matrix to convert to a scalar.
 * @return Description of orientation matrix. The lowest 2 bits (0 and 1)
 * represent the column the one is on for the
@@ -73,12 +73,12 @@ unsigned short inv_row_2_scale(const signed char *row)
 unsigned short inv_orientation_matrix_to_scaler(const signed char *mtx)
 {
 
-	unsigned short scalar;
-	scalar = inv_row_2_scale(mtx);
-	scalar |= inv_row_2_scale(mtx + 3) << 3;
-	scalar |= inv_row_2_scale(mtx + 6) << 6;
+    unsigned short scalar;
+    scalar = inv_row_2_scale(mtx);
+    scalar |= inv_row_2_scale(mtx + 3) << 3;
+    scalar |= inv_row_2_scale(mtx + 6) << 6;
 
-	return scalar;
+    return scalar;
 }
 
 /**

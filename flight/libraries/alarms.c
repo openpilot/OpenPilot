@@ -78,75 +78,75 @@ typedef enum {
     SYSTEMALARMS_ALARM_CRITICAL=4
 } SystemAlarmsAlarmOptions;
 #endif
-	if (severity >= SYSTEMALARMS_ALARM_CRITICAL)
-	{
-		switch (alarm)
-		{
-			case SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_BOOTFAULT:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_BOOTFAULT.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_OUTOFMEMORY:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_OUTOFMEMORY.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_STACKOVERFLOW:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_STACKOVERFLOW.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_CPUOVERLOAD:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_CPUOVERLOAD.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_EVENTSYSTEM:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_EVENTSYSTEM.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_TELEMETRY:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_TELEMETRY.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_MANUALCONTROL:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_MANUALCONTROL.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_ACTUATOR:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_ACTUATOR.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_ATTITUDE:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_ATTITUDE.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_SENSORS:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_SENSORS.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_STABILIZATION:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_STABILIZATION.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_GUIDANCE:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_GUIDANCE.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_PATHPLAN:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_PATHPLAN.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_BATTERY:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_BATTERY.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_FLIGHTTIME:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_FLIGHTTIME.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_I2C:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_I2C.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_GPS:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_GPS.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_RECEIVER:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_RECEIVER.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_MAGNETOMETER:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_MAGNETOMETER.\n", __FILE__, __LINE__, __func__);
-				break;
-			case SYSTEMALARMS_ALARM_AIRSPEED:
-				printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_AIRSPEED.\n", __FILE__, __LINE__, __func__);
-				break;
-		}
-	}
+    if (severity >= SYSTEMALARMS_ALARM_CRITICAL)
+    {
+        switch (alarm)
+        {
+            case SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_BOOTFAULT:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_BOOTFAULT.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_OUTOFMEMORY:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_OUTOFMEMORY.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_STACKOVERFLOW:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_STACKOVERFLOW.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_CPUOVERLOAD:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_CPUOVERLOAD.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_EVENTSYSTEM:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_EVENTSYSTEM.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_TELEMETRY:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_TELEMETRY.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_MANUALCONTROL:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_MANUALCONTROL.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_ACTUATOR:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_ACTUATOR.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_ATTITUDE:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_ATTITUDE.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_SENSORS:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_SENSORS.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_STABILIZATION:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_STABILIZATION.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_GUIDANCE:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_GUIDANCE.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_PATHPLAN:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_PATHPLAN.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_BATTERY:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_BATTERY.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_FLIGHTTIME:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_FLIGHTTIME.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_I2C:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_I2C.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_GPS:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_GPS.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_RECEIVER:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_RECEIVER.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_MAGNETOMETER:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_MAGNETOMETER.\n", __FILE__, __LINE__, __func__);
+                break;
+            case SYSTEMALARMS_ALARM_AIRSPEED:
+                printf("%s:%d %s() --> allarm: SYSTEMALARMS_ALARM_AIRSPEED.\n", __FILE__, __LINE__, __func__);
+                break;
+        }
+    }
 }
 int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity)
 {

@@ -239,7 +239,6 @@ static void stabilizationInnerloopTask()
     float *rate = &rateDesired.Roll;
     float *actuatorDesiredAxis = &actuator.Roll;
     int t;
-    bool needPiroComp = false;
     float dT;
     dT = PIOS_DELTATIME_GetAverageSeconds(&timeval);
 
@@ -295,10 +294,9 @@ static void stabilizationInnerloopTask()
                                  );
                 pid_scaler ascaler = create_pid_scaler(t);
                 float factor = 1.0f - fabsf(stickinput[t]);
-                ascaler.i   *= factor; // this prevents Integral from getting too high while controlled manually
+                ascaler.i *= factor; // this prevents Integral from getting too high while controlled manually
                 float arate  = pid_apply_setpoint(&stabSettings.innerPids[t], &ascaler, rate[t], gyro_filtered[t], dT);
                 actuatorDesiredAxis[t] = (1.0f - factor * stickinput[t]) + factor * arate;
-                needPiroComp = true;
             }
             break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
@@ -332,7 +330,7 @@ static void stabilizationInnerloopTask()
         }
     }
 
-    if (needPiroComp && stabSettings.innerPids[0].iLim > 1e-3f && stabSettings.innerPids[1].iLim > 1e-3f) {
+    if (stabSettings.stabBank.EnablePiroComp == STABILIZATIONBANK_ENABLEPIROCOMP_TRUE && stabSettings.innerPids[0].iLim > 1e-3f && stabSettings.innerPids[1].iLim > 1e-3f) {
         // attempted piro compensation - rotate pitch and yaw integrals (experimental)
         float angleYaw = gyro_filtered[2] * dT;
         float sinYaw   = sin_lookup_deg(angleYaw);

@@ -467,10 +467,11 @@ static void parse_ubx_op_sys(struct UBXPacket *ubx, __attribute__((unused)) GPSP
     struct UBX_OP_SYSINFO *sysinfo = &ubx->payload.op_sysinfo;
     GPSExtendedStatusData data;
 
-    data.FlightTime           = sysinfo->flightTime;
-    data.HeapRemaining        = sysinfo->HeapRemaining;
-    data.IRQStackRemaining    = sysinfo->IRQStackRemaining;
-    data.SysModStackRemaining = sysinfo->SystemModStackRemaining;
+    data.FlightTime   = sysinfo->flightTime;
+    data.BoardType[0] = sysinfo->board_type;
+    data.BoardType[1] = sysinfo->board_revision;
+    memcpy(&data.FirmwareHash, &sysinfo->sha1sum, GPSEXTENDEDSTATUS_FIRMWAREHASH_NUMELEM);
+    memcpy(&data.FirmwareTag, &sysinfo->commit_tag_name, GPSEXTENDEDSTATUS_FIRMWARETAG_NUMELEM);
     data.Options = sysinfo->options;
     data.Status  = GPSEXTENDEDSTATUS_STATUS_GPSV9;
     GPSExtendedStatusSet(&data);

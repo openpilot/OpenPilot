@@ -33,8 +33,7 @@ DEBUG ?= YES
 # List of modules to include
 MODULES = ManualControl Stabilization GPS
 MODULES += PathPlanner
-MODULES += FixedWingPathFollower
-MODULES += VtolPathFollower
+MODULES += PathFollower
 MODULES += CameraStab
 MODULES += Telemetry
 MODULES += Logging
@@ -101,6 +100,7 @@ SRC += $(FLIGHTLIB)/sanitycheck.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 SRC += $(MATHLIB)/mathmisc.c
+SRC += $(MATHLIB)/butterworth.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
 SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c

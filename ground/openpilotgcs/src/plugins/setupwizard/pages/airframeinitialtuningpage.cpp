@@ -118,7 +118,7 @@ void AirframeInitialTuningPage::updateDescription(QJsonObject *templ)
         QString description;
         description.append("<b>").append(tr("Name of Vehicle: ")).append("</b>").append(templ->value("name").toString()).append("<br>");
         description.append("<b>").append(tr("Name of Owner: ")).append("</b>").append(templ->value("owner").toString());
-        if (templ->value("nick") != "") {
+        if (templ->value("nick") != QStringLiteral("")) {
             description.append(" (").append(templ->value("nick").toString()).append(")");
         }
         description.append("<br>");

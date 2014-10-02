@@ -296,7 +296,7 @@ static void stabilizationInnerloopTask()
                 float factor = 1.0f - fabsf(stickinput[t]);
                 ascaler.i *= factor; // this prevents Integral from getting too high while controlled manually
                 float arate  = pid_apply_setpoint(&stabSettings.innerPids[t], &ascaler, rate[t], gyro_filtered[t], dT);
-                actuatorDesiredAxis[t] = (1.0f - factor * stickinput[t]) + factor * arate;
+                actuatorDesiredAxis[t] = (1.0f - factor) * stickinput[t] + factor * arate;
             }
             break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
@@ -332,13 +332,13 @@ static void stabilizationInnerloopTask()
 
     if (stabSettings.stabBank.EnablePiroComp == STABILIZATIONBANK_ENABLEPIROCOMP_TRUE && stabSettings.innerPids[0].iLim > 1e-3f && stabSettings.innerPids[1].iLim > 1e-3f) {
         // attempted piro compensation - rotate pitch and yaw integrals (experimental)
-        float angleYaw = gyro_filtered[2] * dT;
-        float sinYaw   = sin_lookup_deg(angleYaw);
-        float cosYaw   = cos_lookup_deg(angleYaw);
+        float angleYaw = DEG2RAD(gyro_filtered[2] * dT);
+        float sinYaw   = sinf(angleYaw);
+        float cosYaw   = cosf(angleYaw);
         float rollAcc  = stabSettings.innerPids[0].iAccumulator / stabSettings.innerPids[0].iLim;
         float pitchAcc = stabSettings.innerPids[1].iAccumulator / stabSettings.innerPids[1].iLim;
-        stabSettings.innerPids[0].iAccumulator = stabSettings.innerPids[0].iLim * (cosYaw * rollAcc - sinYaw * pitchAcc);
-        stabSettings.innerPids[1].iAccumulator = stabSettings.innerPids[1].iLim * (cosYaw * pitchAcc + sinYaw * rollAcc);
+        stabSettings.innerPids[0].iAccumulator = stabSettings.innerPids[0].iLim * (cosYaw * rollAcc + sinYaw * pitchAcc);
+        stabSettings.innerPids[1].iAccumulator = stabSettings.innerPids[1].iLim * (cosYaw * pitchAcc - sinYaw * rollAcc);
     }
 
     {

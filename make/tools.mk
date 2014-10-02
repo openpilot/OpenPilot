@@ -61,14 +61,14 @@ ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
         ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2
         ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2/+md5
-        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.3/5.3.2/qt-opensource-linux-x64-5.3.2.run
-        QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.3/5.3.2/qt-opensource-linux-x64-5.3.2.run.md5
+        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-linux-x64-5.3.1.run
+        QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-linux-x64-5.3.1.run.md5
         QT_SDK_ARCH := gcc_64
     else
         ARM_SDK_URL := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2
         ARM_SDK_MD5_URL := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-linux.tar.bz2/+md5
-        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.3/5.3.2/qt-opensource-linux-x86-5.3.2.run
-        QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.3/5.3.2/qt-opensource-linux-x86-5.3.2.run.md5
+        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-linux-x86-5.3.1.run
+        QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-linux-x86-5.3.1.run.md5
         QT_SDK_ARCH := gcc
     endif
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
@@ -76,19 +76,19 @@ ifeq ($(UNAME), Linux)
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-mac.tar.bz2/+md5
-    QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.3/5.3.2/qt-opensource-mac-x64-clang-5.3.2.dmg
-    QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.3/5.3.2/qt-opensource-mac-x64-clang-5.3.2.dmg.md5
+    QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-mac-x64-clang-5.3.1.dmg
+    QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-mac-x64-clang-5.3.1.dmg.md5
     QT_SDK_ARCH := clang_64
-    QT_SDK_MAINTENANCE_TOOL := /Volumes/qt-opensource-mac-x64-clang-5.3.2/qt-opensource-mac-x64-clang-5.3.2.app/Contents/MacOS/qt-opensource-mac-x64-clang-5.3.2
-    QT_SDK_MOUNT_DIR := /Volumes/qt-opensource-mac-x64-clang-5.3.2
-    QT_SDK_INSTALLER_DAT := /Volumes/qt-opensource-mac-x64-clang-5.3.2/qt-opensource-mac-x64-clang-5.3.2.app/Contents/Resources/installer.dat
+    QT_SDK_MAINTENANCE_TOOL := /Volumes/qt-opensource-mac-x64-clang-5.3.1/qt-opensource-mac-x64-clang-5.3.1.app/Contents/MacOS/qt-opensource-mac-x64-clang-5.3.1
+    QT_SDK_MOUNT_DIR := /Volumes/qt-opensource-mac-x64-clang-5.3.1
+    QT_SDK_INSTALLER_DAT := /Volumes/qt-opensource-mac-x64-clang-5.3.1/qt-opensource-mac-x64-clang-5.3.1.app/Contents/Resources/installer.dat
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip
     ARM_SDK_MD5_URL:= https://launchpad.net/gcc-arm-embedded/4.8/4.8-2014-q1-update/+download/gcc-arm-none-eabi-4_8-2014q1-20140314-win32.zip/+md5
-    QT_SDK_URL     := http://download.qt-project.org/official_releases/qt/5.3/5.3.2/qt-opensource-windows-x86-mingw482_opengl-5.3.2.exe
-    QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.3/5.3.2/qt-opensource-windows-x86-mingw482_opengl-5.3.2.exe.md5
+    QT_SDK_URL     := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-windows-x86-mingw482_opengl-5.3.1.exe
+    QT_SDK_MD5_URL := http://download.qt-project.org/official_releases/qt/5.3/5.3.1/qt-opensource-windows-x86-mingw482_opengl-5.3.1.exe.md5
     QT_SDK_ARCH    := mingw482_32
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
     SDL_URL        := http://wiki.openpilot.org/download/attachments/18612236/SDL-devel-1.2.15-mingw32.tar.gz
@@ -103,7 +103,7 @@ GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0
 # When changing PYTHON_DIR, you must also update it in ground/openpilotgcs/src/python.pri
 # When changing SDL_DIR or OPENSSL_DIR, you must also update them in ground/openpilotgcs/openpilotgcs.pri
 ARM_SDK_DIR     := /opt/toolchain/raspberrypi/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian
-QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.3.2
+QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.3.1
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
 PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin
 NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
@@ -368,12 +368,12 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.2ThirdPartySoftware_Listing.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.1ThirdPartySoftware_Listing.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.2-0qt5_essentials.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.2-0i686-4.8.2-release-posix-dwarf-rt_v3-rev3-runtime.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.2-0icu_52_1_mingw_builds_32_4_8_2_posix_dwarf.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.2-0qt5_addons.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.1-0qt5_essentials.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.1-0i686-4.8.2-release-posix-dwarf-rt_v3-rev3-runtime.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.1-0icu_52_1_mingw_builds_32_4_8_2_posix_dwarf.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.win32_mingw482/5.3.1-0qt5_addons.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.tools.win32_mingw482/4.8.2i686-4.8.2-release-posix-dwarf-rt_v3-rev3.7z" | grep -v Extracting
 # Run patcher
 	@$(ECHO)
@@ -435,13 +435,13 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.2ThirdPartySoftware_Listing.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.1ThirdPartySoftware_Listing.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.2-0qt5_essentials.7z" | grep -v Extracting
-	$(V1) if [ -f "$(1)/qt.53.$(6)/5.3.2-0icu_52_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.2-0icu_52_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
-	$(V1) if [ -f "$(1)/qt.53.$(6)/5.3.2-0icu_52_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.2-0icu_52_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.2-0qt5_addons.7z" | grep -v Extracting
-# go to OpenPilot/tools/5.3.2/gcc_64 and call patcher.sh
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_essentials.7z" | grep -v Extracting
+	$(V1) if [ -f "$(1)/qt.53.$(6)/5.3.1-0icu_52_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0icu_52_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
+	$(V1) if [ -f "$(1)/qt.53.$(6)/5.3.1-0icu_52_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0icu_52_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_addons.7z" | grep -v Extracting
+# go to OpenPilot/tools/5.3.1/gcc_64 and call patcher.sh
 	@$(ECHO)
 	@$(ECHO) "Running patcher in" $$(call toprel, $(QT_SDK_PREFIX))
 	$(V1) $(CD) $(QT_SDK_PREFIX)
@@ -506,12 +506,12 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0qt-project-url.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.2ThirdPartySoftware_Listing.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/5.3.1ThirdPartySoftware_Listing.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0-0readme.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.2-0qt5_essentials.7z" | grep -v Extracting
-#	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6).essentials/5.3.2icu_path_patcher.sh.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.2-0qt5_addons.7z" | grep -v Extracting
-# go to OpenPilot/tools/5.3.2/gcc_64 and call patcher.sh
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_essentials.7z" | grep -v Extracting
+#	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6).essentials/5.3.1icu_path_patcher.sh.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.53.$(6)/5.3.1-0qt5_addons.7z" | grep -v Extracting
+# go to OpenPilot/tools/5.3.1/gcc_64 and call patcher.sh
 	@$(ECHO)
 	@$(ECHO) "Running patcher in" $$(call toprel, $(QT_SDK_PREFIX))
 	$(V1) $(CD) $(QT_SDK_PREFIX)

@@ -53,7 +53,7 @@ private slots:
 
 private:
     static const int LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS  = 1000;
-    static const int HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS = 2000;
+    static const int HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS = 1900;
     Ui::EscCalibrationPage *ui;
     bool m_isCalibrating;
 

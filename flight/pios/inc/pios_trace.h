@@ -36,7 +36,7 @@ extern unsigned int pios_trace_mask;
 
 #define PIOS_TRACE_OS			0x00000002
 #define PIOS_TRACE_ALLOCATE		0x00000004
-#define PIOS_TRACE_SCAN			0x00000008
+#define PIOS_TRACE_TEST			0x00000008
 #define PIOS_TRACE_BAD_BLOCKS		0x00000010
 #define PIOS_TRACE_ERASE		0x00000020
 #define PIOS_TRACE_GC			0x00000040
@@ -72,7 +72,7 @@ extern unsigned int pios_trace_mask;
 		printf("pios_trace: " fmt "\n", ##__VA_ARGS__); \
 } while (0)
 #else
-#define pios_trace(msk, fmt, ...) ((void)0)
+#define pios_trace(msk, fmt, ...) 
 #endif
 
 /* Trace control functions */

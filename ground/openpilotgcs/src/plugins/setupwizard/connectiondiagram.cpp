@@ -148,64 +148,24 @@ void ConnectionDiagram::setupGraphicsScene()
             break;
         }
 
+        QString prefix = "";
+        if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
+            prefix = "nano-";
+        }
         switch (m_configSource->getInputType()) {
         case VehicleConfigurationSource::INPUT_PWM:
-            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                elementsToShow << "pwm-nano";
-            } else {
-                elementsToShow << "pwm";
-            }
+            elementsToShow << QString("%1pwm").arg(prefix);
             break;
         case VehicleConfigurationSource::INPUT_PPM:
-            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                elementsToShow << "ppm-nano";
-            } else {
-                elementsToShow << "ppm";
-            }
+            elementsToShow << QString("%1ppm").arg(prefix);
             break;
         case VehicleConfigurationSource::INPUT_SBUS:
-            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                elementsToShow << "sbus-nano";
-            } else {
-                elementsToShow << "sbus";
-            }
+            elementsToShow << QString("%1sbus").arg(prefix);
             break;
         case VehicleConfigurationSource::INPUT_DSMX10:
         case VehicleConfigurationSource::INPUT_DSMX11:
         case VehicleConfigurationSource::INPUT_DSM2:
-            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                elementsToShow << "satellite-nano";
-            } else {
-                elementsToShow << "satellite";
-            }
-            break;
-        default:
-            break;
-        }
-
-        switch (m_configSource->getGpsType()) {
-        case VehicleConfigurationSource::GPS_DISABLED:
-            break;
-        case VehicleConfigurationSource::GPS_NMEA:
-            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                elementsToShow << "nano-generic-nmea";
-            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-                elementsToShow << "generic-nmea";
-            }
-            break;
-        case VehicleConfigurationSource::GPS_PLATINUM:
-            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                elementsToShow << "nano-OPGPS-v9";
-            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-                elementsToShow << "OPGPS-v9";
-            }
-            break;
-        case VehicleConfigurationSource::GPS_UBX:
-            if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                elementsToShow << "nano-OPGPS-v8-ublox";
-            } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-                elementsToShow << "OPGPS-v8-ublox";
-            }
+            elementsToShow << QString("%1satellite").arg(prefix);
             break;
         default:
             break;
@@ -215,22 +175,33 @@ void ConnectionDiagram::setupGraphicsScene()
             m_configSource->getAirspeedType() != VehicleConfigurationSource::AIRSPEED_ESTIMATE) {
             switch (m_configSource->getAirspeedType()) {
             case VehicleConfigurationSource::AIRSPEED_EAGLETREE:
-                if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                    elementsToShow << "nano-eagletree-speed-sensor";
-                } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-                    elementsToShow << "eagletree-speed-sensor";
-                }
+                elementsToShow << QString("%1eagletree-speed-sensor").arg(prefix);
                 break;
             case VehicleConfigurationSource::AIRSPEED_MS4525:
-                if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_NANO) {
-                    elementsToShow << "nano-ms4525-speed-sensor";
-                } else if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
-                    elementsToShow << "ms4525-speed-sensor";
-                }
+                elementsToShow << QString("%1ms4525-speed-sensor").arg(prefix);
                 break;
             default:
                 break;
             }
+        }
+
+        if (m_configSource->getInputType() == VehicleConfigurationSource::INPUT_SBUS) {
+            prefix = QString("flexi-%1").arg(prefix);
+        }
+        switch (m_configSource->getGpsType()) {
+        case VehicleConfigurationSource::GPS_DISABLED:
+            break;
+        case VehicleConfigurationSource::GPS_NMEA:
+            elementsToShow << QString("%1generic-nmea").arg(prefix);
+            break;
+        case VehicleConfigurationSource::GPS_PLATINUM:
+            elementsToShow << QString("%1OPGPS-v9").arg(prefix);
+            break;
+        case VehicleConfigurationSource::GPS_UBX:
+            elementsToShow << QString("%1OPGPS-v8-ublox").arg(prefix);
+            break;
+        default:
+            break;
         }
 
         setupGraphicsSceneItems(elementsToShow);

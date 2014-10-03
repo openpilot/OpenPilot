@@ -343,7 +343,7 @@ public:
     {
         QLineEdit *lineEdit = new QLineEdit(parent);
 
-        lineEdit->setInputMask(QString(maxLength(), 'H'));
+        lineEdit->setInputMask(QString(TreeItem::maxHexStringLength(m_field->getType()), 'H'));
 
         return lineEdit;
     }
@@ -400,36 +400,6 @@ private:
         bool ok;
 
         return str.toString().toUInt(&ok, 16);
-    }
-
-    int maxLength()
-    {
-        int maxLength = 0;
-
-        switch (m_field->getType()) {
-        case UAVObjectField::INT8:
-            maxLength = 2;
-            break;
-        case UAVObjectField::INT16:
-            maxLength = 4;
-            break;
-        case UAVObjectField::INT32:
-            maxLength = 8;
-            break;
-        case UAVObjectField::UINT8:
-            maxLength = 2;
-            break;
-        case UAVObjectField::UINT16:
-            maxLength = 4;
-            break;
-        case UAVObjectField::UINT32:
-            maxLength = 8;
-            break;
-        default:
-            Q_ASSERT(false);
-            break;
-        }
-        return maxLength;
     }
 };
 

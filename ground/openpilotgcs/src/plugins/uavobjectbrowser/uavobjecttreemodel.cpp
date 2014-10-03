@@ -188,7 +188,7 @@ void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
 
 void UAVObjectTreeModel::addArrayField(UAVObjectField *field, TreeItem *parent)
 {
-    TreeItem *item = new ArrayFieldTreeItem(field->getName());
+    TreeItem *item = new ArrayFieldTreeItem(field, field->getName());
 
     item->setHighlightManager(m_highlightManager);
     connect(item, SIGNAL(updateHighlight(TreeItem *)), this, SLOT(updateHighlight(TreeItem *)));

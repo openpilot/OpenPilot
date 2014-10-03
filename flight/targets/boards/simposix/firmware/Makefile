@@ -85,6 +85,7 @@ SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(FLIGHTLIB)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
+SRC += $(OPUAVOBJ)/uavobjectpersistence.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 

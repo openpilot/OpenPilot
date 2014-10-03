@@ -216,7 +216,7 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN     512
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN     512
 
-#define PIOS_COM_GPS_RX_BUF_LEN          32
+#define PIOS_COM_GPS_RX_BUF_LEN          128
 #define PIOS_COM_GPS_TX_BUF_LEN          32
 
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN    65

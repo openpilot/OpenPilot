@@ -65,12 +65,12 @@ int32_t PIOS_FLASHFS_Logfs_Init(
     // TODO The cfg is now set elsewhere 
     retval = pios_mount(PIOS_MOUNTPOINT_LOGFS);
     if (retval < 0) {
-        pios_trace (PIOS_TRACE_ERROR, "Couldn't mount %s", PIOS_MOUNTPOINT_LOGFS);
+        pios_trace(PIOS_TRACE_ERROR, "Couldn't mount %s", PIOS_MOUNTPOINT_LOGFS);
     }
     else {
         // Create the directory if it does not already exist
 	retval = pios_mkdir(PIOS_LOGFS_PATH, O_CREAT);
-        if (retval < 0) pios_trace (PIOS_TRACE_ERROR, "Couldn't mkdir %s", PIOS_LOGFS_PATH);
+        if (retval < 0) pios_trace(PIOS_TRACE_ERROR, "Couldn't mkdir %s", PIOS_LOGFS_PATH);
     }
 
     return retval;
@@ -85,15 +85,16 @@ int32_t PIOS_FLASHFS_Logfs_Destroy(
     dp = pios_opendir (PIOS_LOGFS_PATH);
     if (dp != NULL)
     {
-      while (ep = pios_readdir (dp)) {
+      while ((ep = pios_readdir(dp))) {
         pios_unlink (ep->d_name);
       }
       (void) pios_closedir (dp);
     }
     else
     {
-      pios_trace (PIOS_TRACE_ERROR, "Couldn't open the directory %s.", PIOS_LOGFS_PATH);
+      pios_trace(PIOS_TRACE_ERROR, "Couldn't open the directory %s.", PIOS_LOGFS_PATH);
     }
+    return 0;
 }
 
 /**********************************
@@ -128,7 +129,8 @@ int32_t PIOS_FLASHFS_ObjSave(
 {
     int fd;
     uint8_t filename[14];
-    uint8_t str[100];
+    char str[100];
+    uint32_t bytes_written = 0;
 
     // Get filename
     objectFilename(obj_id, obj_inst_id, filename);
@@ -137,15 +139,19 @@ int32_t PIOS_FLASHFS_ObjSave(
 
     // Open file
     fd = pios_open(str, O_RDWR, O_CREAT | O_TRUNC );
-    pios_trace (PIOS_TRACE_LOG, "pios_open (%s) retval=%d.", str, fd);
+    pios_trace(PIOS_TRACE_TEST, "pios_open (%s) retval=%d.", str, fd);
 
+    if (fd < 0) {
+	pios_trace(PIOS_TRACE_ERROR, "Couldn't open %s", PIOS_LOGFS_PATH);
+    }
+    else {
+        // Append object
+        bytes_written = pios_write(fd, obj_data, obj_size);
+        pios_trace(PIOS_TRACE_TEST, "pios_write bytes_written=%d obj_size=%d", bytes_written, obj_size);
 
-    // Append object
-    uint32_t bytes_written = 0;
-    bytes_written = pios_write(fd, obj_data, obj_size);
-
-    // Done, close file and unlock
-    pios_close(fd);
+        // Done, close file and unlock
+        pios_close(fd);
+    }
 
     if (bytes_written != obj_size) {
         return -7;
@@ -177,22 +183,28 @@ int32_t PIOS_FLASHFS_ObjLoad(
 {
     int fd;
     uint8_t filename[14];
-    uint8_t str[100];
+    char str[100];
+    uint32_t bytes_read = 0;
 
     // Get filename
     objectFilename(obj_id, obj_inst_id, filename);
     sprintf(str, "%s/%s", PIOS_LOGFS_PATH, filename);
 
     fd = pios_open(str, O_RDWR, O_CREAT | O_TRUNC );
-    pios_trace (PIOS_TRACE_LOG, "pios_open (%s) retval=%d.", str, fd);
+    pios_trace(PIOS_TRACE_TEST, "pios_open (%s) retval=%d.", str, fd);
 
-    // Load object
-    uint32_t bytes_read = 0;
-    bytes_read  = pios_read(fd, obj_data, obj_size);
-    pios_trace (PIOS_TRACE_LOG, "pios_read (%d) expected=%d.", obj_size, bytes_read);
+    if (fd < 0) {
+	pios_trace(PIOS_TRACE_ERROR, "Couldn't open %s", PIOS_LOGFS_PATH);
+    }
+    else {
+        // Load object
+        bytes_read  = pios_read(fd, (void *)obj_data, (uint32_t)obj_size);
+        pios_trace(PIOS_TRACE_TEST, "pios_read (%d) expected=%d.", obj_size, bytes_read);
 
-    // Done, close file and unlock
-    pios_close(fd);
+        // Done, close file and unlock
+        pios_close(fd);
+    }
+
     if (bytes_read != obj_size)
         return -1;
 
@@ -215,8 +227,7 @@ int32_t PIOS_FLASHFS_ObjDelete(
 	uint16_t obj_inst_id)
 {
     uint8_t filename[14];
-    int fd;
-    uint8_t str[100];
+    char str[100];
     int retval;
 
     // Get filename
@@ -224,8 +235,8 @@ int32_t PIOS_FLASHFS_ObjDelete(
     sprintf(str, "%s/%s", PIOS_LOGFS_PATH, filename);
 
     // Delete file
-    retval = pios_unlink(str);
-    pios_trace (PIOS_TRACE_LOG, "pios_unlink(%s) retval=%d" , str, retval);
+    retval = pios_unlink((char *)str);
+    pios_trace(PIOS_TRACE_TEST, "pios_unlink(%s) retval=%d" , str, retval);
 
     return 0;
 }
@@ -247,9 +258,9 @@ int32_t PIOS_FLASHFS_Format(
     retval = pios_format(PIOS_MOUNTPOINT_LOGFS,
 		       TRUE,  // unmount flag
 		       TRUE,  // force unmount flag
-		       TRUE)  // remount
+		       TRUE);  // remount
 
-    pios_trace (PIOS_TRACE_LOG, "pios_format (%s) retval=%d.", PIOS_MOUNTPOINT_LOGFS, retval);
+    pios_trace(PIOS_TRACE_TEST, "pios_format (%s) retval=%d.", PIOS_MOUNTPOINT_LOGFS, retval);
     return retval; 
 }
 

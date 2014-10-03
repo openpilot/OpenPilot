@@ -45,7 +45,6 @@
 #if INCLUDE_TEST_TASKS
 static uint8_t sdcard_available;
 #endif
-FILEINFO File;
 char Buffer[1024];
 uint32_t Cache;
 

@@ -116,6 +116,8 @@
 #define USB_LED_OFF
 #endif
 
+#define CONNECTED_LIVE                   8
+
 /* Local type definitions */
 
 struct pios_rfm22b_transition {
@@ -358,7 +360,7 @@ static const uint8_t reg_72[] = { 0x30, 0x48, 0x48, 0x48, 0x48, 0x60, 0x90, 0xCD
 
 static const uint8_t packet_time[] = { 80, 40, 25, 15, 13, 10, 8, 6, 5 };
 static const uint8_t packet_time_ppm[] = { 26, 25, 25, 15, 13, 10, 8, 6, 5 };
-static const uint8_t num_channels[] = { 4, 4, 4, 6, 8, 8, 10, 12, 16 };
+static const uint8_t num_channels[] = { 32, 32, 32, 32, 32, 32, 32, 32, 32 };
 
 static struct pios_rfm22b_dev *g_rfm22b_dev = NULL;
 
@@ -605,6 +607,8 @@ void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, enum rfm22b_datarate datar
             rfm22b_dev->channels[num_found++] = chan;
         }
     }
+
+    rfm22b_dev->num_channels = num_found;
 
     // Calculate the maximum packet length from the datarate.
     float bytes_per_period = (float)data_rate[datarate] * (float)(rfm22b_dev->packet_time - 2) / 9000;
@@ -1354,7 +1358,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->packet_start_ticks = 0;
     rfm22b_dev->tx_complete_ticks  = 0;
     rfm22b_dev->rfm22b_state       = RFM22B_STATE_INITIALIZING;
-    rfm22b_dev->on_sync_channel    = false;
+    rfm22b_dev->connected_timeout  = 0;
 
     // software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
     rfm22_write_claim(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
@@ -1798,8 +1802,8 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
         len += (radio_dev->tx_out_cb)(radio_dev->tx_out_context, p + len, max_data_len - len, NULL, &need_yield);
     }
 
-    // Always send a packet on the sync channel if this modem is a coordinator.
-    if ((len == 0) && ((radio_dev->channel_index != 0) || !rfm22_isCoordinator(radio_dev))) {
+    // Always send a packet if this modem is a coordinator.
+    if ((len == 0) && !rfm22_isCoordinator(radio_dev)) {
         return RADIO_EVENT_RX_MODE;
     }
 
@@ -1959,12 +1963,16 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
             (radio_dev->rx_in_cb)(radio_dev->rx_in_context, p, data_len, NULL, &rx_need_yield);
         }
 
-        // We only synchronize the clock on packets from our coordinator on the sync channel.
-        if (!rfm22_isCoordinator(radio_dev) && (radio_dev->rx_destination_id == rfm22_destinationID(radio_dev)) && (radio_dev->channel_index == 0)) {
+        /*
+         * If the packet is valid and destined for us we synchronize the clock.
+         */
+        if (!rfm22_isCoordinator(radio_dev) &&
+                radio_dev->rx_destination_id == rfm22_destinationID(radio_dev)) {
             rfm22_synchronizeClock(radio_dev);
             radio_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
-            radio_dev->on_sync_channel  = false;
         }
+
+        radio_dev->connected_timeout = CONNECTED_LIVE;
     } else {
         ret_event = RADIO_EVENT_RX_COMPLETE;
     }
@@ -2160,14 +2168,14 @@ static void rfm22_synchronizeClock(struct pios_rfm22b_dev *rfm22b_dev)
     portTickType start_time = rfm22b_dev->packet_start_ticks;
 
     // This packet was transmitted on channel 0, calculate the time delta that will force us to transmit on channel 0 at the time this packet started.
-    uint8_t num_chan    = num_channels[rfm22b_dev->datarate];
-    uint16_t frequency_hop_cycle_time = rfm22b_dev->packet_time * num_chan;
+    uint16_t frequency_hop_cycle_time = rfm22b_dev->packet_time * rfm22b_dev->num_channels;
     uint16_t time_delta = start_time % frequency_hop_cycle_time;
 
     // Calculate the adjustment for the preamble
     uint8_t offset = (uint8_t)ceil(35000.0F / data_rate[rfm22b_dev->datarate]);
 
-    rfm22b_dev->time_delta = frequency_hop_cycle_time - time_delta + offset;
+    rfm22b_dev->time_delta = frequency_hop_cycle_time - time_delta + offset +
+        rfm22b_dev->packet_time * rfm22b_dev->channel_index;
 }
 
 /**
@@ -2222,14 +2230,11 @@ static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev)
 static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t index)
 {
     // Make sure we don't index outside of the range.
-    uint8_t num_chan = num_channels[rfm22b_dev->datarate];
-    uint8_t idx = index % num_chan;
+    uint8_t idx = index % rfm22b_dev->num_channels;
 
     // Are we switching to a new channel?
     if (idx != rfm22b_dev->channel_index) {
-        // If the on_sync_channel flag is set, it means that we were on the sync channel, but no packet was received, so transition to a non-connected state.
-        if (!rfm22_isCoordinator(rfm22b_dev) && (rfm22b_dev->channel_index == 0) && rfm22b_dev->on_sync_channel) {
-            rfm22b_dev->on_sync_channel = false;
+        if (!rfm22_isCoordinator(rfm22b_dev) && rfm22b_dev->connected_timeout == 0) {
 
             // Set the link state to disconnected.
             if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
@@ -2240,14 +2245,14 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
                 }
             }
 
-            // Stay on the sync channel.
+            // Stay on first channel.
             idx = 0;
-        } else if (idx == 0) {
-            // If we're switching to the sync channel, set a flag that can be used to detect if a packet was received.
-            rfm22b_dev->on_sync_channel = true;
         }
 
         rfm22b_dev->channel_index = idx;
+        if (rfm22b_dev->connected_timeout > 0)
+            rfm22b_dev->connected_timeout--;
+
     }
 
     return rfm22b_dev->channels[idx];
@@ -2263,8 +2268,7 @@ static uint8_t rfm22_calcChannelFromClock(struct pios_rfm22b_dev *rfm22b_dev)
     portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
     // Divide time into 8ms blocks.  Coordinator sends in first 2 ms, and remote send in 5th and 6th ms.
     // Channel changes occur in the last 2 ms.
-    uint8_t num_chan  = num_channels[rfm22b_dev->datarate];
-    uint8_t n = (time / rfm22b_dev->packet_time) % num_chan;
+    uint8_t n = (time / rfm22b_dev->packet_time) % rfm22b_dev->num_channels;
 
     return rfm22_calcChannel(rfm22b_dev, n);
 }

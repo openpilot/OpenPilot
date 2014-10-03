@@ -446,31 +446,51 @@ static int32_t updateSensors(AccelStateData *accelState, GyroStateData *gyros)
 static struct pios_mpu6000_data mpu6000_data;
 static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *gyrosData)
 {
-    float accels[3], gyros[3];
+    float accels[3] = { 0 };
+    float gyros[3]  = { 0 };
+    float temp = 0;
+    uint8_t count   = 0;
 
 #if defined(PIOS_INCLUDE_MPU6000)
 
     xQueueHandle queue = PIOS_MPU6000_GetQueue();
+    BaseType_t ret     = xQueueReceive(queue, (void *)&mpu6000_data, SENSOR_PERIOD);
+    while (ret == pdTRUE) {
+        gyros[0]  += mpu6000_data.gyro_x;
+        gyros[1]  += mpu6000_data.gyro_y;
+        gyros[2]  += mpu6000_data.gyro_z;
 
-    if (xQueueReceive(queue, (void *)&mpu6000_data, SENSOR_PERIOD) == errQUEUE_EMPTY) {
+        accels[0] += mpu6000_data.accel_x;
+        accels[1] += mpu6000_data.accel_y;
+        accels[2] += mpu6000_data.accel_z;
+
+        temp += mpu6000_data.temperature;
+
+        count++;
+        // check if further samples are already in queue
+        ret = xQueueReceive(queue, (void *)&mpu6000_data, 0);
+    }
+
+    if (!count) {
         return -1; // Error, no data
     }
     // Do not read raw sensor data in simulation mode
     if (GyroStateReadOnly() || AccelStateReadOnly()) {
         return 0;
     }
+    float invcount = 1.0f / count;
     PERF_TIMED_SECTION_START(counterUpd);
-    gyros[0]  = mpu6000_data.gyro_x * gyro_scale.X;
-    gyros[1]  = mpu6000_data.gyro_y * gyro_scale.Y;
-    gyros[2]  = mpu6000_data.gyro_z * gyro_scale.Z;
+    gyros[0]  *= gyro_scale.X * invcount;
+    gyros[1]  *= gyro_scale.Y * invcount;
+    gyros[2]  *= gyro_scale.Z * invcount;
 
-    accels[0] = mpu6000_data.accel_x * accel_scale.X;
-    accels[1] = mpu6000_data.accel_y * accel_scale.Y;
-    accels[2] = mpu6000_data.accel_z * accel_scale.Z;
-
-    float ctemp = mpu6000_data.temperature > temp_calibrated_extent.max ? temp_calibrated_extent.max :
-                  (mpu6000_data.temperature < temp_calibrated_extent.min ? temp_calibrated_extent.min
-                   : mpu6000_data.temperature);
+    accels[0] *= accel_scale.X * invcount;
+    accels[1] *= accel_scale.Y * invcount;
+    accels[2] *= accel_scale.Z * invcount;
+    temp *= invcount;
+    float ctemp = temp > temp_calibrated_extent.max ? temp_calibrated_extent.max :
+                  (temp < temp_calibrated_extent.min ? temp_calibrated_extent.min
+                   : temp);
 
 
     if (apply_gyro_temp) {

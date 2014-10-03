@@ -39,6 +39,25 @@
 // Private types
 
 // Private functions
+static float applyExpo(float value, float expo);
+
+
+static float applyExpo(float value, float expo)
+{
+    float exp = powf(1.023293f, expo);
+
+    // magic number scales expo
+    // so that
+    // expo=100 yields value**10
+    // expo=0 yields value**1
+    // expo=-100 yields value**(1/10)
+    // (pow(10,1/100)~=1.023293)
+    if (value > 0.0f) {
+        return powf(value, exp);
+    } else {
+        return -powf(-value, exp);
+    }
+}
 
 
 /**
@@ -64,6 +83,9 @@ void stabilizedHandler(bool newinit)
     StabilizationBankData stabSettings;
     StabilizationBankGet(&stabSettings);
 
+    cmd.Roll  = applyExpo(cmd.Roll, stabSettings.StickExpo.Roll);
+    cmd.Pitch = applyExpo(cmd.Pitch, stabSettings.StickExpo.Pitch);
+    cmd.Yaw   = applyExpo(cmd.Yaw, stabSettings.StickExpo.Yaw);
     uint8_t *stab_settings;
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);

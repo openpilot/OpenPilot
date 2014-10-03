@@ -37,6 +37,7 @@ unsigned yaffs_trace_mask =
 	YAFFS_TRACE_ALLOCATE |
 	YAFFS_TRACE_BAD_BLOCKS |
 	YAFFS_TRACE_VERIFY |
+	YAFFS_TRACE_ALWAYS |
 	0;
 
 int random_seed;

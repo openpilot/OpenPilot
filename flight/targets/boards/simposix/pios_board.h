@@ -29,16 +29,9 @@
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
 
-/**
- * glue macros for file IO
- **/
-#define FILEINFO FILE *
-#define PIOS_FOPEN_READ(filename, file)                 (file = fopen((char *)filename, "r")) == NULL
-#define PIOS_FOPEN_WRITE(filename, file)                (file = fopen((char *)filename, "w")) == NULL
-#define PIOS_FREAD(file, bufferadr, length, resultadr)  (*resultadr = fread((uint8_t *)bufferadr, 1, length, *file)) != length
-#define PIOS_FWRITE(file, bufferadr, length, resultadr) *resultadr = fwrite((uint8_t *)bufferadr, 1, length, *file)
-#define PIOS_FCLOSE(file)                               fclose(file)
-#define PIOS_FUNLINK(file)                              unlink((char *)filename)
+// YAFFS Device Mount Points and directories
+#define PIOS_MOUNTPOINT_LOGFS "nor"    // Simposix nor simulation device mount point for use with logfs
+#define PIOS_LOGFS_PATH "nor/logfs"    // Directory for sole use by pios_logfs.c
 
 // ------------------------
 // Timers and Channels Used

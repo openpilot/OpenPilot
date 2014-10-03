@@ -29,6 +29,7 @@
 
 #include "yaffsfs.h"
 
+#define pios_stdio_startup()		yaffs_start_up()
 #define pios_open(path, oflag, mode)	yaffs_open(path, oflag, mode)
 #define pios_close(fd)			yaffs_close(fd)
 #define pios_fsync(fd)			yaffs_fsync(fd)
@@ -85,6 +86,9 @@
 #define pios_mknod(pathname, mode, dev) yaffs_mknod(pathname, mode, dev)
 #define pios_freespace(path) 		yaffs_freespace(path)
 #define pios_totalspace(path) 		yaffs_totalspace(path)
+
+#define pios_DIR			yaffs_DIR
+#define pios_dirent			yaffs_dirent
 
 
 #endif /* PIOS_STDIO_H */

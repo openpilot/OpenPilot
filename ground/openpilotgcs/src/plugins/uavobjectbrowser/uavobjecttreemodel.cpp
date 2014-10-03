@@ -230,6 +230,8 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
         data.append(field->getUnits());
         if (field->getUnits().toLower() == "hex") {
             item = new HexFieldTreeItem(field, index, data);
+        } else if (field->getUnits().toLower() == "char") {
+            item = new CharFieldTreeItem(field, index, data);
         } else {
             item = new IntFieldTreeItem(field, index, data);
         }

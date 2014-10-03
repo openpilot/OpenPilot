@@ -433,4 +433,75 @@ private:
     }
 };
 
+class CharFieldTreeItem : public FieldTreeItem {
+    Q_OBJECT
+public:
+    CharFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+        FieldTreeItem(index, data, parent), m_field(field)
+    {}
+
+    CharFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
+        FieldTreeItem(index, data, parent), m_field(field)
+    {}
+
+    QWidget *createEditor(QWidget *parent)
+    {
+        QLineEdit *lineEdit = new QLineEdit(parent);
+
+        lineEdit->setInputMask(QString(1, 'N'));
+
+        return lineEdit;
+    }
+
+    QVariant getEditorValue(QWidget *editor)
+    {
+        QLineEdit *lineEdit = static_cast<QLineEdit *>(editor);
+
+        return lineEdit->text();
+    }
+
+    void setEditorValue(QWidget *editor, QVariant value)
+    {
+        QLineEdit *lineEdit = static_cast<QLineEdit *>(editor);
+
+        lineEdit->setText(value.toString());
+    }
+
+    void setData(QVariant value, int column)
+    {
+        setChanged(m_field->getValue(m_index) != toUInt(value));
+        TreeItem::setData(value, column);
+    }
+
+    void apply()
+    {
+        m_field->setValue(toUInt(data()), m_index);
+        setChanged(false);
+    }
+
+    void update()
+    {
+        QVariant value = toChar(m_field->getValue(m_index));
+
+        if (data() != value || changed()) {
+            TreeItem::setData(value);
+            setHighlight(true);
+        }
+    }
+
+private:
+    UAVObjectField *m_field;
+
+    QVariant toChar(QVariant value)
+    {
+        return value.toChar();
+    }
+
+    QVariant toUInt(QVariant str)
+    {
+        return QVariant(str.toString().at(0).toLatin1());
+    }
+
+};
+
 #endif // FIELDTREEITEM_H

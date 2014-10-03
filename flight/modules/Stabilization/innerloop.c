@@ -293,7 +293,7 @@ static void stabilizationInnerloopTask()
                                  StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
                                  );
                 pid_scaler ascaler = create_pid_scaler(t);
-                float factor = 1.0f - fabsf(stickinput[t]);
+                float factor = 1.0f - (fabsf(stickinput[t]) * stabSettings.stabBank.AcroInsanityFactor);
                 ascaler.i *= factor; // this prevents Integral from getting too high while controlled manually
                 float arate  = pid_apply_setpoint(&stabSettings.innerPids[t], &ascaler, rate[t], gyro_filtered[t], dT);
                 actuatorDesiredAxis[t] = (1.0f - factor) * stickinput[t] + factor * arate;

@@ -45,7 +45,6 @@ void handleGPS()
         int32_t datacounter = PIOS_UBX_DDC_GetAvailableBytes(PIOS_I2C_GPS);
         if (datacounter > 0) {
             uint8_t toRead = (uint32_t)datacounter > BUFFER_SIZE - lastUnsentData ? BUFFER_SIZE - lastUnsentData : (uint8_t)datacounter;
-            //uint8_t toRead = (uint32_t)datacounter > BUFFER_SIZE ? BUFFER_SIZE  : (uint8_t)datacounter;
             uint8_t toSend = toRead;
             PIOS_UBX_DDC_ReadData(PIOS_I2C_GPS, buffer, toRead);
 
@@ -71,7 +70,7 @@ void handleGPS()
         if (datacounter > 0) {
             PIOS_UBX_DDC_WriteData(PIOS_I2C_GPS, buffer, datacounter);
         }
-        if(maxCount){
+        if (maxCount) {
             // Note: this delay is needed as querying too quickly the UBX module's I2C(DDC)
             // port causes a lot of weird issues (it stops sending nav sentences)
             vTaskDelay(2 * configTICK_RATE_HZ / 1000);
@@ -94,7 +93,7 @@ void setupGPS()
     cfgprt.fragments.data.txReady      = CFG_PRT_DATA_TXREADI_DISABLED;
     cfgprt.fragments.data.mode = CFG_PRT_DATA_MODE_ADDR;
     cfgprt.fragments.data.reserved3    = 0;
-    cfgprt.fragments.data.inProtoMask  = CFG_PRT_DATA_PROTO_UBX | CFG_PRT_DATA_PROTO_NMEA |CFG_PRT_DATA_PROTO_RTCM;
+    cfgprt.fragments.data.inProtoMask  = CFG_PRT_DATA_PROTO_UBX | CFG_PRT_DATA_PROTO_NMEA | CFG_PRT_DATA_PROTO_RTCM;
     cfgprt.fragments.data.outProtoMask = CFG_PRT_DATA_PROTO_UBX;
     cfgprt.fragments.data.flags = 0;
     cfgprt.fragments.data.reserved5    = 0;

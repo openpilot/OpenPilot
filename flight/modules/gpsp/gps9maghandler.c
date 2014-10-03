@@ -40,7 +40,7 @@ void handleMag()
     }
 #else
     static uint32_t lastUpdate = 0;
-    if(PIOS_DELAY_DiffuS(lastUpdate) < (1000000 / MAG_RATE_HZ)){
+    if (PIOS_DELAY_DiffuS(lastUpdate) < (1000000 / MAG_RATE_HZ)) {
         return;
     }
     lastUpdate = PIOS_DELAY_GetRaw();

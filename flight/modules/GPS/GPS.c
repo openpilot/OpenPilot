@@ -52,6 +52,10 @@
 #include "inc/ubx_autoconfig.h"
 #endif
 
+#include <pios_instrumentation_helper.h>
+PERF_DEFINE_COUNTER(counterBytesIn);
+PERF_DEFINE_COUNTER(counterRate);
+PERF_DEFINE_COUNTER(counterParse);
 // ****************
 // Private functions
 
@@ -79,16 +83,23 @@ void updateGpsSettings(UAVObjEvent *ev);
 // the new location with Set = true.
 #define GPS_HOMELOCATION_SET_DELAY 5000
 
+#define GPS_LOOP_DELAY_MS          6
+
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
         #define STACK_SIZE_BYTES   1024
 #else
 #if defined(PIOS_GPS_MINIMAL)
+        #define GPS_READ_BUFFER    32
         #define STACK_SIZE_BYTES   500
 #else
         #define STACK_SIZE_BYTES   650
 #endif // PIOS_GPS_MINIMAL
 #endif // PIOS_GPS_SETS_HOMELOCATION
+
+#ifndef GPS_READ_BUFFER
+#define GPS_READ_BUFFER            128
+#endif
 
 #define TASK_PRIORITY              (tskIDLE_PRIORITY + 1)
 
@@ -238,9 +249,16 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
     updateGpsSettings(0);
 #endif
+
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+    PERF_INIT_COUNTER(counterBytesIn, 0x97510001);
+    PERF_INIT_COUNTER(counterRate, 0x97510002);
+    PERF_INIT_COUNTER(counterParse, 0x97510003);
+    uint8_t c[GPS_READ_BUFFER];
+
     // Loop forever
     while (1) {
-        uint8_t c;
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER) && !defined(PIOS_GPS_MINIMAL)
         if (gpsSettings.DataProtocol == GPSSETTINGS_DATAPROTOCOL_UBX) {
             char *buffer   = 0;
@@ -255,12 +273,16 @@ static void gpsTask(__attribute__((unused)) void *parameters)
         }
 #endif
         // This blocks the task until there is something on the buffer
-        while (PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, xDelay) > 0) {
+        uint16_t cnt;
+        while ((cnt = PIOS_COM_ReceiveBuffer(gpsPort, c, GPS_READ_BUFFER, xDelay)) > 0) {
+            PERF_TIMED_SECTION_START(counterParse);
+            PERF_TRACK_VALUE(counterBytesIn, cnt);
+            PERF_MEASURE_PERIOD(counterRate);
             int res;
             switch (gpsSettings.DataProtocol) {
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
             case GPSSETTINGS_DATAPROTOCOL_NMEA:
-                res = parse_nmea_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
+                res = parse_nmea_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
                 break;
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
@@ -280,7 +302,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                     lastStatus = gpspositionsensor.AutoConfigStatus;
                 }
 #endif
-                res = parse_ubx_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
+                res = parse_ubx_stream(c, cnt, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
             }
             break;
 #endif
@@ -289,6 +311,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                 break;
             }
 
+            PERF_TIMED_SECTION_END(counterParse);
             if (res == PARSER_COMPLETE) {
                 timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
                 timeOfLastUpdateMs = timeNowMs;
@@ -336,6 +359,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                 AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
             }
         }
+        vTaskDelayUntil(&xLastWakeTime, GPS_LOOP_DELAY_MS / portTICK_RATE_MS);
     }
 }
 

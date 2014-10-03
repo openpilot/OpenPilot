@@ -343,11 +343,12 @@ struct UBX_MON_VER {
 // OP custom messages
 struct UBX_OP_SYSINFO {
     uint32_t flightTime;
-    uint16_t HeapRemaining;
-    uint16_t IRQStackRemaining;
-    uint16_t SystemModStackRemaining;
     uint16_t options;
-};
+    uint8_t  board_type;
+    uint8_t  board_revision;
+    uint8_t  commit_tag_name[26];
+    uint8_t  sha1sum[8];
+} __attribute__((packed));
 
 // OP custom messages
 struct UBX_OP_MAG {
@@ -400,7 +401,7 @@ extern struct UBX_ACK_NAK ubxLastNak;
 bool checksum_ubx_message(struct UBXPacket *);
 uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionSensorData *);
 
-int parse_ubx_stream(uint8_t, char *, GPSPositionSensorData *, struct GPS_RX_STATS *);
+int parse_ubx_stream(uint8_t *rx, uint8_t len, char *, GPSPositionSensorData *, struct GPS_RX_STATS *);
 void load_mag_settings();
 
 #endif /* UBX_H */

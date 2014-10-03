@@ -454,8 +454,8 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
 #if defined(PIOS_INCLUDE_MPU6000)
 
     xQueueHandle queue = PIOS_MPU6000_GetQueue();
-
-    if (xQueueReceive(queue, (void *)&mpu6000_data, SENSOR_PERIOD) == errQUEUE_EMPTY) {
+    BaseType_t ret     = xQueueReceive(queue, (void *)&mpu6000_data, SENSOR_PERIOD);
+    while (ret == pdTRUE) {
         gyros[0]  += mpu6000_data.gyro_x;
         gyros[1]  += mpu6000_data.gyro_y;
         gyros[2]  += mpu6000_data.gyro_z;
@@ -467,6 +467,8 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
         temp += mpu6000_data.temperature;
 
         count++;
+        // check if further samples are already in queue
+        ret = xQueueReceive(queue, (void *)&mpu6000_data, 0);
     }
 
     if (!count) {

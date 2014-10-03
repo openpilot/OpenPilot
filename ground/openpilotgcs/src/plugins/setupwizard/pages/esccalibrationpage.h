@@ -43,18 +43,22 @@ public:
     explicit EscCalibrationPage(SetupWizard *wizard, QWidget *parent = 0);
     ~EscCalibrationPage();
     bool validatePage();
+    void initializePage();
 
 private slots:
     void startStopButtonClicked();
+    void securityCheckBoxesToggled();
     void enableButtons(bool enable);
+    void resetAllSecurityCheckboxes();
 
 private:
-    const int LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS  = 1000;
-    const int HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS = 2000;
+    static const int LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS  = 1000;
+    static const int HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS = 1900;
     Ui::EscCalibrationPage *ui;
     bool m_isCalibrating;
 
     QList<OutputCalibrationUtil *> m_outputs;
+
 };
 
 #endif // ESCCALIBRATIONPAGE_H

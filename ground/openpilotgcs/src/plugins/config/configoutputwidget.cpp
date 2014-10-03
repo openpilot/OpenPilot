@@ -178,7 +178,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
         UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
     } else {
-        mdata   = accInitialData; // Restore metadata
+        mdata = accInitialData; // Restore metadata
     }
     obj->setMetadata(mdata);
     obj->updated();

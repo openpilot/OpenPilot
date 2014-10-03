@@ -58,7 +58,6 @@ private:
     bool m_isCalibrating;
 
     QList<OutputCalibrationUtil *> m_outputs;
-
 };
 
 #endif // ESCCALIBRATIONPAGE_H

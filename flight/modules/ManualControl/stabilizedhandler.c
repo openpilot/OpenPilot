@@ -29,6 +29,7 @@
  */
 
 #include "inc/manualcontrol.h"
+#include <mathmisc.h>
 #include <manualcontrolcommand.h>
 #include <stabilizationdesired.h>
 #include <flightmodesettings.h>
@@ -44,7 +45,8 @@ static float applyExpo(float value, float expo);
 
 static float applyExpo(float value, float expo)
 {
-    float exp = powf(1.023293f, expo);
+    // note: fastPow makes a small error, therefore result needs to be bound
+    float exp = boundf(fastPow(1.023293f, expo), -10.0f, 10.0f);
 
     // magic number scales expo
     // so that
@@ -53,9 +55,11 @@ static float applyExpo(float value, float expo)
     // expo=-100 yields value**(1/10)
     // (pow(10,1/100)~=1.023293)
     if (value > 0.0f) {
-        return powf(value, exp);
+        return boundf(fastPow(value, exp), 0.0f, 1.0f);
+    } else if (value < -0.0f) {
+        return boundf(-fastPow(-value, exp), -1.0f, 0.0f);
     } else {
-        return -powf(-value, exp);
+        return 0.0f;
     }
 }
 

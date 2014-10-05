@@ -411,26 +411,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox4, multi.VTOLMotorSW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox5, multi.VTOLMotorW);
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox6, multi.VTOLMotorNW);
-
-        // Now, read the 1st mixer R/P/Y levels and initialize the mix sliders.
-        // This assumes that all vectors are identical - if not, the user should use the
-        // "custom" setting.
-
-        int channel = m_aircraft->multiMotorChannelBox1->currentIndex() - 1;
-        if (channel > -1) {
-            // get motor 1 value for Pitch
-            double value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
-            m_aircraft->mrPitchMixLevel->setValue(qRound(value / 1.27));
-
-            // get motor 2 value for Yaw and Roll
-            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
-            value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
-            setYawMixLevel(qRound(value / 1.27));
-
-            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
-            value   = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
-            m_aircraft->mrRollMixLevel->setValue(-qRound(value / 1.27));
-        }
     } else if (frameType == "HexaCoax") {
         // Motors 1/2/3 4/5/6 are: NW/W NE/E S/SE
         setComboCurrentIndex(m_aircraft->multiMotorChannelBox1, multi.VTOLMotorNW);
@@ -480,7 +460,23 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
     // Now, read mixing values stored on board and applies values on sliders.
     m_aircraft->mrPitchMixLevel->setValue(getMixerValue(mixer, "MixerValuePitch"));
     m_aircraft->mrRollMixLevel->setValue(getMixerValue(mixer, "MixerValueRoll"));
-    m_aircraft->mrYawMixLevel->setValue(getMixerValue(mixer, "MixerValueYaw"));
+
+    // check sign from Yaw mixer value  (positive unreversed / negative reversed)
+    // and apply Yaw value stored on board
+    int channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
+
+    if (frameType == "Tri") {
+        channel = m_aircraft->triYawChannelBox->currentIndex() - 1;
+    }
+
+    if (channel > -1) {
+        double value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
+        if (value > 0) {
+            setYawMixLevel(getMixerValue(mixer, "MixerValueYaw"));
+        } else {
+            setYawMixLevel(-getMixerValue(mixer, "MixerValueYaw"));
+        }
+    }
 
     updateAirframe(frameType);
 }
@@ -741,9 +737,10 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
         int channel = m_aircraft->triYawChannelBox->currentIndex() - 1;
         if (channel > -1) {
             setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+            invertMotors = m_aircraft->MultirotorRevMixerCheckBox->isChecked();
 
             // Tricopter : Yaw mix slider value applies to servo (was fixed)
-            setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, getMixerValue(mixer, "MixerValueYaw") * 1.27);
+            setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, (invertMotors ? -1.0 : 1.0) * getMixerValue(mixer, "MixerValueYaw") * 1.27);
         }
 
         m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));

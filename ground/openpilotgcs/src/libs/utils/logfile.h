@@ -15,7 +15,7 @@ class QTCREATOR_UTILS_EXPORT LogFile : public QIODevice {
 public:
     explicit LogFile(QObject *parent = 0);
     qint64 bytesAvailable() const;
-    qint64 bytesToWrite()
+    qint64 bytesToWrite() const
     {
         return m_file.bytesToWrite();
     };

@@ -46,7 +46,7 @@ static float applyExpo(float value, float expo);
 static float applyExpo(float value, float expo)
 {
     // note: fastPow makes a small error, therefore result needs to be bound
-    float exp = boundf(fastPow(1.023293f, expo), -10.0f, 10.0f);
+    float exp = boundf(fastPow(1.023293f, expo), 0.1f, 10.0f);
 
     // magic number scales expo
     // so that

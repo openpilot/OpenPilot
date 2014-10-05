@@ -466,10 +466,6 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
     // and apply Yaw value stored on board
     int channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
 
-    if (frameType == "Tri") {
-        channel = m_aircraft->triYawChannelBox->currentIndex() - 1;
-    }
-
     if (channel > -1) {
         double value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
         if (value > 0) {
@@ -738,10 +734,9 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
         int channel = m_aircraft->triYawChannelBox->currentIndex() - 1;
         if (channel > -1) {
             setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
-            invertMotors = m_aircraft->MultirotorRevMixerCheckBox->isChecked();
 
             // Tricopter : Yaw mix slider value applies to servo (was fixed)
-            setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, (invertMotors ? -1.0 : 1.0) * getMixerValue(mixer, "MixerValueYaw") * 1.27);
+            setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, getMixerValue(mixer, "MixerValueYaw") * 1.27);
         }
 
         m_aircraft->mrStatusLabel->setText(tr("Configuration OK"));

@@ -460,6 +460,7 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
     // Now, read mixing values stored on board and applies values on sliders.
     m_aircraft->mrPitchMixLevel->setValue(getMixerValue(mixer, "MixerValuePitch"));
     m_aircraft->mrRollMixLevel->setValue(getMixerValue(mixer, "MixerValueRoll"));
+    m_aircraft->mrYawMixLevel->setValue(getMixerValue(mixer, "MixerValueYaw"));
 
     // check sign from Yaw mixer value  (positive unreversed / negative reversed)
     // and apply Yaw value stored on board

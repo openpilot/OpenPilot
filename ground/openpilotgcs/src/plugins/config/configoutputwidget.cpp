@@ -48,7 +48,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 
-ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent), wasItMe(false)
+ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     ui = new Ui_OutputWidget();
     ui->setupUi(this);
@@ -99,13 +99,6 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     addWidget(ui->spinningArmed);
 
     disconnect(this, SLOT(refreshWidgetsValues(UAVObject *)));
-
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVObject *obj = objManager->getObject(QString("ActuatorCommand"));
-    if (UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE) {
-        this->setEnabled(false);
-    }
-    connect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(disableIfNotMe(UAVObject *)));
 
     refreshWidgetsValues();
     updateEnableControls();
@@ -178,7 +171,6 @@ void ConfigOutputWidget::runChannelTests(bool state)
     ActuatorCommand *obj = ActuatorCommand::GetInstance(getObjectManager());
     UAVObject::Metadata mdata = obj->getMetadata();
     if (state) {
-        wasItMe = true;
         accInitialData = mdata;
         UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
         UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
@@ -186,8 +178,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
         UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
     } else {
-        wasItMe = false;
-        mdata   = accInitialData; // Restore metadata
+        mdata = accInitialData; // Restore metadata
     }
     obj->setMetadata(mdata);
     obj->updated();
@@ -424,15 +415,4 @@ void ConfigOutputWidget::openHelp()
 void ConfigOutputWidget::stopTests()
 {
     ui->channelOutTest->setChecked(false);
-}
-
-void ConfigOutputWidget::disableIfNotMe(UAVObject *obj)
-{
-    if (UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE) {
-        if (!wasItMe) {
-            this->setEnabled(false);
-        }
-    } else {
-        this->setEnabled(true);
-    }
 }

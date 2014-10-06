@@ -67,11 +67,8 @@ private:
 
     UAVObject::Metadata accInitialData;
 
-    bool wasItMe;
-
 private slots:
     void stopTests();
-    void disableIfNotMe(UAVObject *obj);
     virtual void refreshWidgetsValues(UAVObject *obj = NULL);
     void updateObjectsFromWidgets();
     void runChannelTests(bool state);

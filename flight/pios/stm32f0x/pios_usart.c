@@ -65,9 +65,9 @@ struct pios_usart_dev {
 
     uint32_t rx_dropped;
 
-    uint8_t tx_buffer[PIOS_UART_TX_BUFFER];
-    uint8_t tx_len;
-    uint8_t tx_pos;
+    uint8_t  tx_buffer[PIOS_UART_TX_BUFFER];
+    uint8_t  tx_len;
+    uint8_t  tx_pos;
 };
 
 static struct pios_usart_dev *PIOS_USART_validate(uint32_t usart_id)
@@ -288,9 +288,7 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
     bool tx_need_yield = false;
     if (USART_GetITStatus(usart_dev->cfg->regs, USART_IT_TXE) != RESET) {
         if (usart_dev->tx_out_cb) {
-            //uint8_t b;
-            //uint16_t bytes_to_send;
-            if(!usart_dev->tx_len){
+            if (!usart_dev->tx_len) {
                 usart_dev->tx_len = (usart_dev->tx_out_cb)(usart_dev->tx_out_context, usart_dev->tx_buffer, PIOS_UART_TX_BUFFER, NULL, &tx_need_yield);
                 usart_dev->tx_pos = 0;
             }

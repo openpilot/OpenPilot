@@ -401,6 +401,7 @@ static int32_t pios_hmc5x83_spi_claim_bus(pios_hmc5x83_dev_data_t *dev)
     if (PIOS_SPI_ClaimBus(dev->port_id) < 0) {
         return -1;
     }
+    PIOS_SPI_SetClockSpeed(dev->port_id, SPI_BaudRatePrescaler_16);
     PIOS_SPI_RC_PinSet(dev->port_id, dev->slave_num, 0);
     return 0;
 }

@@ -45,6 +45,7 @@
 
 /* C Lib includes */
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -56,6 +57,10 @@
 #elif defined(STM32F4XX)
 #include <stm32f4xx.h>
 #include <stm32f4xx_rcc.h>
+#elif defined(STM32F0)
+#include <stm32f0xx.h>
+#else
+#error "No Architecture defined"
 #endif
 
 /* PIOS board specific feature selection */

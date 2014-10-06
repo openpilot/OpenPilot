@@ -50,11 +50,8 @@ typedef struct {
 
 /* Exported functions ------------------------------------------------------- */
 void processComand(uint8_t *Receive_Buffer);
-uint32_t baseOfAdressType(uint8_t type);
-uint8_t isBiggerThanAvailable(uint8_t type, uint32_t size);
-void OPDfuIni(uint8_t discover);
 void DataDownload(DownloadAction);
-bool flash_read(uint8_t *buffer, uint32_t adr, DFUProgType type);
+
 #endif /* __OP_DFU_H */
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

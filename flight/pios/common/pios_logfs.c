@@ -59,6 +59,7 @@ int32_t PIOS_FLASHFS_Logfs_Init(
 	__attribute__((unused)) uintptr_t flash_id)
 {
     int retval;
+    pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_Logfs_Init");
    
     // TODO This interface should change to select the mount point.
     // TODO The flash driver relationship is now set elsewhere.
@@ -81,6 +82,7 @@ int32_t PIOS_FLASHFS_Logfs_Destroy(
 {
     pios_DIR *dp; 
     struct pios_dirent *ep;
+    pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_Logfs_Destroy");
 
     dp = pios_opendir (PIOS_LOGFS_PATH);
     if (dp != NULL)
@@ -132,13 +134,15 @@ int32_t PIOS_FLASHFS_ObjSave(
     char str[100];
     uint32_t bytes_written = 0;
 
+    pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_ObjSave");
+
     // Get filename
     objectFilename(obj_id, obj_inst_id, filename);
 
     sprintf(str, "%s/%s", PIOS_LOGFS_PATH, filename);
 
     // Open file
-    fd = pios_open(str, O_RDWR, O_CREAT | O_TRUNC );
+    fd = pios_open(str, O_CREAT | O_RDWR | O_TRUNC, S_IREAD | S_IWRITE);
     pios_trace(PIOS_TRACE_TEST, "pios_open (%s) retval=%d.", str, fd);
 
     if (fd < 0) {
@@ -185,12 +189,14 @@ int32_t PIOS_FLASHFS_ObjLoad(
     uint8_t filename[14];
     char str[100];
     uint32_t bytes_read = 0;
+    pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_ObjLoad");
 
     // Get filename
     objectFilename(obj_id, obj_inst_id, filename);
     sprintf(str, "%s/%s", PIOS_LOGFS_PATH, filename);
 
-    fd = pios_open(str, O_RDWR, O_CREAT | O_TRUNC );
+    fd = pios_open(str,O_RDONLY, S_IREAD | S_IWRITE);
+
     pios_trace(PIOS_TRACE_TEST, "pios_open (%s) retval=%d.", str, fd);
 
     if (fd < 0) {
@@ -229,6 +235,7 @@ int32_t PIOS_FLASHFS_ObjDelete(
     uint8_t filename[14];
     char str[100];
     int retval;
+    pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_ObjDelete");
 
     // Get filename
     objectFilename(obj_id, obj_inst_id, filename);
@@ -255,6 +262,7 @@ int32_t PIOS_FLASHFS_Format(
 	__attribute__((unused)) uintptr_t fs_id)
 {
     int retval;
+    pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_Format");
     retval = pios_format(PIOS_MOUNTPOINT_LOGFS,
 		       TRUE,  // unmount flag
 		       TRUE,  // force unmount flag
@@ -274,6 +282,7 @@ int32_t PIOS_FLASHFS_GetStats(
 	__attribute__((unused)) uintptr_t fs_id, 
 	__attribute__((unused)) struct PIOS_FLASHFS_Stats *stats)
 {
+    pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_GetStats");
     return 0;
 }
 

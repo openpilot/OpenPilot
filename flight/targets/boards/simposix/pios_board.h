@@ -30,8 +30,8 @@
 #define PIOS_BOARD_H
 
 // YAFFS Device Mount Points and directories
-#define PIOS_MOUNTPOINT_LOGFS "nor"    // Simposix nor simulation device mount point for use with logfs
-#define PIOS_LOGFS_PATH "nor/logfs"    // Directory for sole use by pios_logfs.c
+#define PIOS_MOUNTPOINT_LOGFS "/nor"    // Simposix nor simulation device mount point for use with logfs
+#define PIOS_LOGFS_PATH "/nor/logfs"    // Directory for sole use by pios_logfs.c
 
 // ------------------------
 // Timers and Channels Used

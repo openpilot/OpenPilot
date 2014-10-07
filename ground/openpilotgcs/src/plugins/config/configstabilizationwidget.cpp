@@ -279,10 +279,11 @@ void ConfigStabilizationWidget::throttleCurveUpdated()
 
 void ConfigStabilizationWidget::replotExpo(int value)
 {
-    double x[EXPO_CURVE_POINTS] = {0};
-    double y[EXPO_CURVE_POINTS] = {0};
+    double x[EXPO_CURVE_POINTS] = { 0 };
+    double y[EXPO_CURVE_POINTS] = { 0 };
     double factor = pow(1.03293, value);
-    double step = 1.0 / (EXPO_CURVE_POINTS - 1);
+    double step   = 1.0 / (EXPO_CURVE_POINTS - 1);
+
     for (int i = 0; i < EXPO_CURVE_POINTS; i++) {
         x[i] = i * step;
         y[i] = pow(x[i], factor);

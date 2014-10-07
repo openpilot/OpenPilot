@@ -55,7 +55,7 @@ private:
     // Milliseconds between automatic 'Instant Updates'
     static const int AUTOMATIC_UPDATE_RATE = 500;
 
-    static const int EXPO_CURVE_POINTS = 100;
+    static const int EXPO_CURVE_POINTS     = 100;
 
     int boardModel;
     int m_pidBankCount;

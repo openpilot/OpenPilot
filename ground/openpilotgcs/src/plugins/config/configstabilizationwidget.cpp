@@ -45,13 +45,15 @@
 
 #include "qwt/src/qwt.h"
 #include "qwt/src/qwt_plot.h"
-#include "qwt/src/qwt_plot_curve.h"
+#include "qwt/src/qwt_plot_canvas.h"
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
     boardModel(0), m_pidBankCount(0), m_currentPIDBank(0)
 {
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
+
+    setupExpoPlot();
 
     StabilizationSettings *stabSettings = qobject_cast<StabilizationSettings *>(getObject("StabilizationSettings"));
     Q_ASSERT(stabSettings);
@@ -148,6 +150,8 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     connect(this, SIGNAL(autoPilotConnected()), this, SLOT(onBoardConnected()));
 
+    connect(ui->expoSpinner, SIGNAL(valueChanged(int)), this, SLOT(replotExpo(int)));
+
     disableMouseWheelEvents();
     updateEnableControls();
 }
@@ -222,6 +226,25 @@ void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
     field->setValue(ui->enableThrustPIDScalingCheckBox->isChecked() ? "TRUE" : "FALSE");
 }
 
+void ConfigStabilizationWidget::setupExpoPlot()
+{
+    ui->expoPlot->setMouseTracking(false);
+    ui->expoPlot->setAxisScale(QwtPlot::xBottom, 0.0, 1.0, 0.25);
+    ui->expoPlot->setAxisScale(QwtPlot::yLeft, 0.0, 1.0, 0.25);
+    ui->expoPlot->canvas()->setFrameShape(QFrame::NoFrame);
+
+    m_expoPlotCurve.setRenderHint(QwtPlotCurve::RenderAntialiased);
+    m_expoPlotCurve.attach(ui->expoPlot);
+
+    m_plotGrid.setMajPen(QColor(Qt::gray));
+    m_plotGrid.setMinPen(QColor(Qt::lightGray));
+    m_plotGrid.enableXMin(false);
+    m_plotGrid.enableYMin(false);
+    m_plotGrid.attach(ui->expoPlot);
+
+    replotExpo(ui->expoSpinner->value());
+}
+
 void ConfigStabilizationWidget::resetThrottleCurveToDefault()
 {
     UAVDataObject *defaultStabBank = (UAVDataObject *)getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
@@ -252,6 +275,25 @@ void ConfigStabilizationWidget::resetThrottleCurveToDefault()
 void ConfigStabilizationWidget::throttleCurveUpdated()
 {
     setDirty(true);
+}
+
+void ConfigStabilizationWidget::replotExpo(int value)
+{
+    double x[EXPO_CURVE_POINTS] = {0};
+    double y[EXPO_CURVE_POINTS] = {0};
+    double factor = pow(1.03293, value);
+    double step = 1.0 / (EXPO_CURVE_POINTS - 1);
+    for (int i = 0; i < EXPO_CURVE_POINTS; i++) {
+        x[i] = i * step;
+        y[i] = pow(x[i], factor);
+        qDebug() << "x=" << x[i] << ",y=" << y[i];
+    }
+    m_expoPlotCurve.setSamples(x, y, EXPO_CURVE_POINTS);
+    int hue = 255 - ((value + 100) / 200.0 * 255);
+    qDebug() << "hue" << hue;
+    m_expoPlotCurve.setPen(QPen(QColor::fromHsl(hue, 200, 128), 3));
+    m_expoPlotCurve.show();
+    ui->expoPlot->replot();
 }
 
 void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)

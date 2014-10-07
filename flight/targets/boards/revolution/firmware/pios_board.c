@@ -905,9 +905,7 @@ void PIOS_Board_Init(void)
         pios_servo_cfg = &pios_servo_cfg_out_in;
         break;
     case HWSETTINGS_RM_RCVRPORT_TELEMETRY:
-        if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMTELEMETRY) {
-            PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
-        }
+        PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
         break;
     }
 

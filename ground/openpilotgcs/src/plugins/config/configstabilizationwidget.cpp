@@ -43,6 +43,10 @@
 #include "altitudeholdsettings.h"
 #include "stabilizationsettings.h"
 
+#include "qwt/src/qwt.h"
+#include "qwt/src/qwt_plot.h"
+#include "qwt/src/qwt_plot_curve.h"
+
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
     boardModel(0), m_pidBankCount(0), m_currentPIDBank(0)
 {
@@ -59,7 +63,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_pidTabBars.append(ui->advancedPIDBankTabBar);
     foreach(QTabBar * tabBar, m_pidTabBars) {
         for (int i = 0; i < m_pidBankCount; i++) {
-            tabBar->addTab(tr("PID Bank %1").arg(i + 1));
+            tabBar->addTab(tr("Settings Bank %1").arg(i + 1));
             tabBar->setTabData(i, QString("StabilizationSettingsBank%1").arg(i + 1));
         }
         tabBar->setExpanding(false);

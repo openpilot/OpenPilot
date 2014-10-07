@@ -24,6 +24,9 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include "pios_trace.h"
+#include "yaffsfs.h"
+
 /*
  * yaffsfs_SetError() and yaffsfs_GetError()
  * Do whatever to set the system error.
@@ -37,6 +40,7 @@ void yaffsfs_SetError(int err)
 	//Do whatever to set error
 	yaffsfs_lastError = err;
 	errno = err;
+	pios_trace(PIOS_TRACE_ERROR, "yaffsfs_SetError(%d) %s", err, yaffs_error_to_str(err) );
 }
 
 int yaffsfs_GetLastError(void)

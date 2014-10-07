@@ -74,7 +74,15 @@
 
 #define ZERO_ROT_ANGLE      0.00001f
 // Private types
+#define PIOS_INSTRUMENT_MODULE
+#include <pios_instrumentation_helper.h>
 
+PERF_DEFINE_COUNTER(counterGyroSamples);
+PERF_DEFINE_COUNTER(counterSensorPeriod);
+
+// Counters:
+// - 0x53000001 Sensor fetch rate(period)
+// - 0x53000002 number of gyro samples read for each loop
 
 // Private functions
 static void SensorsTask(void *parameters);
@@ -230,7 +238,8 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             vTaskDelay(10);
         }
     }
-
+    PERF_INIT_COUNTER(counterGyroSamples, 0x53000001);
+    PERF_INIT_COUNTER(counterSensorPeriod, 0x53000002);
     // Main task loop
     lastSysTime = xTaskGetTickCount();
     bool error = false;
@@ -343,6 +352,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                     accel_samples++;
                 }
 
+                PERF_MEASURE_PERIOD(counterSensorPeriod);
+                PERF_TRACK_VALUE(counterGyroSamples, gyro_samples);
+
                 if (gyro_samples == 0) {
                     PIOS_MPU6000_ReadGyros(&mpu6000_data);
                     error = true;
@@ -454,7 +466,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 #endif
-
+        vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
         lastSysTime = xTaskGetTickCount();
     }
 }

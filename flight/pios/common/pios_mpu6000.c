@@ -41,7 +41,7 @@ enum pios_mpu6000_dev_magic {
     PIOS_MPU6000_DEV_MAGIC = 0x9da9b3ed,
 };
 
-#define PIOS_MPU6000_MAX_DOWNSAMPLE 2
+#define PIOS_MPU6000_MAX_DOWNSAMPLE 5
 struct mpu6000_dev {
     uint32_t     spi_id;
     uint32_t     slave_num;
@@ -63,6 +63,7 @@ static int32_t PIOS_MPU6000_Validate(struct mpu6000_dev *dev);
 static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const *cfg);
 static int32_t PIOS_MPU6000_SetReg(uint8_t address, uint8_t buffer);
 static int32_t PIOS_MPU6000_GetReg(uint8_t address);
+static void PIOS_MPU6000_SetSpeed(const bool fast);
 
 #define GRAV                       9.81f
 
@@ -129,9 +130,7 @@ int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios
     dev->cfg = cfg;
 
     /* Configure the MPU6000 Sensor */
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_256);
     PIOS_MPU6000_Config(cfg);
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_16);
 
     /* Set up EXTI line */
     PIOS_EXTI_Init(cfg->exti_cfg);
@@ -234,11 +233,6 @@ int32_t PIOS_MPU6000_ConfigureRanges(
         return -1;
     }
 
-    // TODO: check that changing the SPI clock speed is safe
-    // to do here given that interrupts are enabled and the bus has
-    // not been claimed/is not claimed during this call
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_256);
-
     // update filter settings
     while (PIOS_MPU6000_SetReg(PIOS_MPU6000_DLPF_CFG_REG, filterSetting) != 0) {
         ;
@@ -267,7 +261,6 @@ int32_t PIOS_MPU6000_ConfigureRanges(
 
     dev->accel_range = accelRange;
 #endif
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_16);
     return 0;
 }
 
@@ -275,7 +268,7 @@ int32_t PIOS_MPU6000_ConfigureRanges(
  * @brief Claim the SPI bus for the accel communications and select this chip
  * @return 0 if successful, -1 for invalid device, -2 if unable to claim bus
  */
-static int32_t PIOS_MPU6000_ClaimBus()
+static int32_t PIOS_MPU6000_ClaimBus(bool fast_spi)
 {
     if (PIOS_MPU6000_Validate(dev) != 0) {
         return -1;
@@ -283,8 +276,19 @@ static int32_t PIOS_MPU6000_ClaimBus()
     if (PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
         return -2;
     }
+    PIOS_MPU6000_SetSpeed(fast_spi);
     PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
     return 0;
+}
+
+
+static void PIOS_MPU6000_SetSpeed(const bool fast)
+{
+    if (fast) {
+        PIOS_SPI_SetClockSpeed(dev->spi_id, dev->cfg->fast_prescaler);
+    } else {
+        PIOS_SPI_SetClockSpeed(dev->spi_id, dev->cfg->std_prescaler);
+    }
 }
 
 /**
@@ -293,7 +297,7 @@ static int32_t PIOS_MPU6000_ClaimBus()
  * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
  *                      task has is now eligible to run, else unchanged
  */
-static int32_t PIOS_MPU6000_ClaimBusISR(bool *woken)
+static int32_t PIOS_MPU6000_ClaimBusISR(bool *woken, bool fast_spi)
 {
     if (PIOS_MPU6000_Validate(dev) != 0) {
         return -1;
@@ -301,6 +305,7 @@ static int32_t PIOS_MPU6000_ClaimBusISR(bool *woken)
     if (PIOS_SPI_ClaimBusISR(dev->spi_id, woken) != 0) {
         return -2;
     }
+    PIOS_MPU6000_SetSpeed(fast_spi);
     PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
     return 0;
 }
@@ -342,7 +347,7 @@ static int32_t PIOS_MPU6000_GetReg(uint8_t reg)
 {
     uint8_t data;
 
-    if (PIOS_MPU6000_ClaimBus() != 0) {
+    if (PIOS_MPU6000_ClaimBus(false) != 0) {
         return -1;
     }
 
@@ -363,7 +368,7 @@ static int32_t PIOS_MPU6000_GetReg(uint8_t reg)
  */
 static int32_t PIOS_MPU6000_SetReg(uint8_t reg, uint8_t data)
 {
-    if (PIOS_MPU6000_ClaimBus() != 0) {
+    if (PIOS_MPU6000_ClaimBus(false) != 0) {
         return -1;
     }
 
@@ -393,7 +398,7 @@ int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data *data)
     uint8_t buf[7] = { PIOS_MPU6000_GYRO_X_OUT_MSB | 0x80, 0, 0, 0, 0, 0, 0 };
     uint8_t rec[7];
 
-    if (PIOS_MPU6000_ClaimBus() != 0) {
+    if (PIOS_MPU6000_ClaimBus(true) != 0) {
         return -1;
     }
 
@@ -504,7 +509,7 @@ static int32_t PIOS_MPU6000_GetInterruptStatusRegISR(bool *woken)
     /* Interrupt Status register can be read at high SPI clock speed */
     uint8_t data;
 
-    if (PIOS_MPU6000_ClaimBusISR(woken) != 0) {
+    if (PIOS_MPU6000_ClaimBusISR(woken, false) != 0) {
         return -1;
     }
     PIOS_SPI_TransferByte(dev->spi_id, (0x80 | PIOS_MPU6000_INT_STATUS_REG));
@@ -525,29 +530,16 @@ static int32_t PIOS_MPU6000_ResetFifoISR(bool *woken)
 {
     int32_t result = 0;
 
-    /* Register writes must be at < 1MHz SPI clock.
-     * Speed can only be changed when SPI bus semaphore is held, but
-     * device chip select must not be enabled, so we use the direct
-     * SPI bus claim call here */
-    if (PIOS_SPI_ClaimBusISR(dev->spi_id, woken) != 0) {
+    if (PIOS_MPU6000_ClaimBusISR(woken, false) != 0) {
         return -1;
     }
-    /* Reduce SPI clock speed. */
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_256);
-    /* Enable chip select */
-    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
     /* Reset FIFO. */
     if (PIOS_SPI_TransferByte(dev->spi_id, 0x7f & PIOS_MPU6000_USER_CTRL_REG) != 0) {
         result = -2;
     } else if (PIOS_SPI_TransferByte(dev->spi_id, (dev->cfg->User_ctl | PIOS_MPU6000_USERCTL_FIFO_RST)) != 0) {
         result = -2;
     }
-    /* Disable chip select. */
-    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
-    /* Increase SPI clock speed. */
-    PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_16);
-    /* Release the SPI bus semaphore. */
-    PIOS_SPI_ReleaseBusISR(dev->spi_id, woken);
+    PIOS_MPU6000_ReleaseBusISR(woken);
     return result;
 }
 
@@ -562,7 +554,7 @@ static int32_t PIOS_MPU6000_FifoDepthISR(bool *woken)
     uint8_t mpu6000_send_buf[3] = { PIOS_MPU6000_FIFO_CNT_MSB | 0x80, 0, 0 };
     uint8_t mpu6000_rec_buf[3];
 
-    if (PIOS_MPU6000_ClaimBusISR(woken) != 0) {
+    if (PIOS_MPU6000_ClaimBusISR(woken, false) != 0) {
         return -1;
     }
 
@@ -630,7 +622,7 @@ bool PIOS_MPU6000_IRQHandler(void)
         return woken;
     }
 
-    if (PIOS_MPU6000_ClaimBusISR(&woken) != 0) {
+    if (PIOS_MPU6000_ClaimBusISR(&woken, true) != 0) {
         return woken;
     }
 
@@ -650,7 +642,7 @@ bool PIOS_MPU6000_IRQHandler(void)
     // In the case where extras samples backed up grabbed an extra
     if (mpu6000_count >= PIOS_MPU6000_SAMPLES_BYTES * 2) {
         mpu6000_fifo_backup++;
-        if (PIOS_MPU6000_ClaimBusISR(&woken) != 0) {
+        if (PIOS_MPU6000_ClaimBusISR(&woken, true) != 0) {
             return woken;
         }
 

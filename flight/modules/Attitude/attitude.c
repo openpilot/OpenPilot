@@ -82,7 +82,7 @@ PERF_DEFINE_COUNTER(counterAtt);
 #define STACK_SIZE_BYTES    540
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
 
-#define SENSOR_PERIOD       4
+#define SENSOR_PERIOD       2
 #define UPDATE_RATE         25.0f
 
 // Interval in number of sample to recalculate temp bias
@@ -230,12 +230,6 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
 
     AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
-    // Set critical error and wait until the accel is producing data
-    while (PIOS_ADXL345_FifoElements() == 0) {
-        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
-        PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
-    }
-
     bool cc3d = BOARDISCC3D;
 
     if (cc3d) {
@@ -244,6 +238,11 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
 #endif
     } else {
 #if defined(PIOS_INCLUDE_ADXL345)
+        // Set critical error and wait until the accel is producing data
+        while (PIOS_ADXL345_FifoElements() == 0) {
+            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
+            PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
+        }
         accel_test = PIOS_ADXL345_Test();
 #endif
 
@@ -265,7 +264,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
     settingsUpdatedCb(AttitudeSettingsHandle());
 
     PIOS_DELTATIME_Init(&dtconfig, UPDATE_EXPECTED, UPDATE_MIN, UPDATE_MAX, UPDATE_ALPHA);
-
+    portTickType lastSysTime = xTaskGetTickCount();
     // Main task loop
     while (1) {
         FlightStatusData flightStatus;
@@ -325,6 +324,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             PERF_MEASURE_PERIOD(counterPeriod);
             AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
         }
+        vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
     }
 }
 
@@ -462,7 +462,7 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
 #if defined(PIOS_INCLUDE_MPU6000)
 
     xQueueHandle queue = PIOS_MPU6000_GetQueue();
-    BaseType_t ret     = xQueueReceive(queue, (void *)&mpu6000_data, SENSOR_PERIOD);
+    BaseType_t ret     = xQueueReceive(queue, (void *)&mpu6000_data, 0);
     while (ret == pdTRUE) {
         gyros[0]  += mpu6000_data.gyro_x;
         gyros[1]  += mpu6000_data.gyro_y;

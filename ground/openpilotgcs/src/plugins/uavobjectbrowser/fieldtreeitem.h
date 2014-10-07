@@ -343,7 +343,7 @@ public:
     {
         QLineEdit *lineEdit = new QLineEdit(parent);
 
-        lineEdit->setInputMask(QString(maxLength(), 'H'));
+        lineEdit->setInputMask(QString(TreeItem::maxHexStringLength(m_field->getType()), 'H'));
 
         return lineEdit;
     }
@@ -401,36 +401,77 @@ private:
 
         return str.toString().toUInt(&ok, 16);
     }
+};
 
-    int maxLength()
+class CharFieldTreeItem : public FieldTreeItem {
+    Q_OBJECT
+public:
+    CharFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+        FieldTreeItem(index, data, parent), m_field(field)
+    {}
+
+    CharFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
+        FieldTreeItem(index, data, parent), m_field(field)
+    {}
+
+    QWidget *createEditor(QWidget *parent)
     {
-        int maxLength = 0;
+        QLineEdit *lineEdit = new QLineEdit(parent);
 
-        switch (m_field->getType()) {
-        case UAVObjectField::INT8:
-            maxLength = 2;
-            break;
-        case UAVObjectField::INT16:
-            maxLength = 4;
-            break;
-        case UAVObjectField::INT32:
-            maxLength = 8;
-            break;
-        case UAVObjectField::UINT8:
-            maxLength = 2;
-            break;
-        case UAVObjectField::UINT16:
-            maxLength = 4;
-            break;
-        case UAVObjectField::UINT32:
-            maxLength = 8;
-            break;
-        default:
-            Q_ASSERT(false);
-            break;
-        }
-        return maxLength;
+        lineEdit->setInputMask(QString(1, 'N'));
+
+        return lineEdit;
     }
+
+    QVariant getEditorValue(QWidget *editor)
+    {
+        QLineEdit *lineEdit = static_cast<QLineEdit *>(editor);
+
+        return lineEdit->text();
+    }
+
+    void setEditorValue(QWidget *editor, QVariant value)
+    {
+        QLineEdit *lineEdit = static_cast<QLineEdit *>(editor);
+
+        lineEdit->setText(value.toString());
+    }
+
+    void setData(QVariant value, int column)
+    {
+        setChanged(m_field->getValue(m_index) != toUInt(value));
+        TreeItem::setData(value, column);
+    }
+
+    void apply()
+    {
+        m_field->setValue(toUInt(data()), m_index);
+        setChanged(false);
+    }
+
+    void update()
+    {
+        QVariant value = toChar(m_field->getValue(m_index));
+
+        if (data() != value || changed()) {
+            TreeItem::setData(value);
+            setHighlight(true);
+        }
+    }
+
+private:
+    UAVObjectField *m_field;
+
+    QVariant toChar(QVariant value)
+    {
+        return value.toChar();
+    }
+
+    QVariant toUInt(QVariant str)
+    {
+        return QVariant(str.toString().at(0).toLatin1());
+    }
+
 };
 
 #endif // FIELDTREEITEM_H

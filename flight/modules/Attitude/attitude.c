@@ -64,7 +64,7 @@
 
 #include "CoordinateConversions.h"
 #include <pios_notify.h>
-
+#include <mathmisc.h>
 
 #include <pios_instrumentation_helper.h>
 
@@ -79,16 +79,20 @@ PERF_DEFINE_COUNTER(counterAtt);
 // - 0xA7710004 number of accel samples read for each loop (cc only).
 
 // Private constants
-#define STACK_SIZE_BYTES 540
-#define TASK_PRIORITY    (tskIDLE_PRIORITY + 3)
+#define STACK_SIZE_BYTES    540
+#define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
 
-#define SENSOR_PERIOD    4
-#define UPDATE_RATE      25.0f
+#define SENSOR_PERIOD       4
+#define UPDATE_RATE         25.0f
 
-#define UPDATE_EXPECTED  (1.0f / 500.0f)
-#define UPDATE_MIN       1.0e-6f
-#define UPDATE_MAX       1.0f
-#define UPDATE_ALPHA     1.0e-2f
+// Interval in number of sample to recalculate temp bias
+#define TEMP_CALIB_INTERVAL 30
+#define TEMP_ALPHA          0.9f
+
+#define UPDATE_EXPECTED     (1.0f / 500.0f)
+#define UPDATE_MIN          1.0e-6f
+#define UPDATE_MAX          1.0f
+#define UPDATE_ALPHA        1.0e-2f
 
 // Private types
 
@@ -130,6 +134,10 @@ static bool apply_accel_temp = false;
 static AccelGyroSettingsgyro_temp_coeffData gyro_temp_coeff;;
 static AccelGyroSettingsaccel_temp_coeffData accel_temp_coeff;
 static AccelGyroSettingstemp_calibrated_extentData temp_calibrated_extent;
+static float temperature = 0;
+static float accel_temp_bias[3] = { 0 };
+static float gyro_temp_bias[3] = { 0 };
+static uint8_t temp_calibration_count = 0;
 
 // Accel and Gyro scaling (this is the product of sensor scale and adjustement in AccelGyroSettings
 static AccelGyroSettingsgyro_scaleData gyro_scale;
@@ -480,29 +488,44 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     }
     float invcount = 1.0f / count;
     PERF_TIMED_SECTION_START(counterUpd);
-    gyros[0]  *= gyro_scale.X * invcount;
-    gyros[1]  *= gyro_scale.Y * invcount;
-    gyros[2]  *= gyro_scale.Z * invcount;
+    gyros[0]   *= gyro_scale.X * invcount;
+    gyros[1]   *= gyro_scale.Y * invcount;
+    gyros[2]   *= gyro_scale.Z * invcount;
 
-    accels[0] *= accel_scale.X * invcount;
-    accels[1] *= accel_scale.Y * invcount;
-    accels[2] *= accel_scale.Z * invcount;
+    accels[0]  *= accel_scale.X * invcount;
+    accels[1]  *= accel_scale.Y * invcount;
+    accels[2]  *= accel_scale.Z * invcount;
     temp *= invcount;
-    float ctemp = temp > temp_calibrated_extent.max ? temp_calibrated_extent.max :
-                  (temp < temp_calibrated_extent.min ? temp_calibrated_extent.min
-                   : temp);
 
+    temperature = TEMP_ALPHA * temperature + (1 - TEMP_ALPHA) * temp;
+
+    if ((apply_gyro_temp || apply_accel_temp) && !temp_calibration_count) {
+        temp_calibration_count = TEMP_CALIB_INTERVAL;
+        float ctemp = boundf(temp, temp_calibrated_extent.max, temp_calibrated_extent.min);
+        if (apply_gyro_temp) {
+            gyro_temp_bias[0] = (gyro_temp_coeff.X + gyro_temp_coeff.X2 * ctemp) * ctemp;
+            gyro_temp_bias[1] = (gyro_temp_coeff.Y + gyro_temp_coeff.Y2 * ctemp) * ctemp;
+            gyro_temp_bias[2] = (gyro_temp_coeff.Z + gyro_temp_coeff.Z2 * ctemp) * ctemp;
+        }
+
+        if (apply_accel_temp) {
+            accel_temp_bias[0] = accel_temp_coeff.X * ctemp;
+            accel_temp_bias[1] = accel_temp_coeff.Y * ctemp;
+            accel_temp_bias[2] = accel_temp_coeff.Z * ctemp;
+        }
+    }
+    temp_calibration_count--;
 
     if (apply_gyro_temp) {
-        gyros[0] -= (gyro_temp_coeff.X + gyro_temp_coeff.X2 * ctemp) * ctemp;
-        gyros[1] -= (gyro_temp_coeff.Y + gyro_temp_coeff.Y2 * ctemp) * ctemp;
-        gyros[2] -= (gyro_temp_coeff.Z + gyro_temp_coeff.Z2 * ctemp) * ctemp;
+        gyros[0] -= gyro_temp_bias[0];
+        gyros[1] -= gyro_temp_bias[1];
+        gyros[2] -= gyro_temp_bias[2];
     }
 
     if (apply_accel_temp) {
-        accels[0] -= accel_temp_coeff.X * ctemp;
-        accels[1] -= accel_temp_coeff.Y * ctemp;
-        accels[2] -= accel_temp_coeff.Z * ctemp;
+        accels[0] -= accel_temp_bias[0];
+        accels[1] -= accel_temp_bias[1];
+        accels[2] -= accel_temp_bias[2];
     }
     // gyrosData->temperature  = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
     // accelsData->temperature = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;

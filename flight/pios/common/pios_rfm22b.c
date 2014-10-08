@@ -1803,8 +1803,8 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
         len += (radio_dev->tx_out_cb)(radio_dev->tx_out_context, p + len, max_data_len - len, NULL, &need_yield);
     }
 
-    // Always send a packet on the sync channel if this modem is a coordinator.
-    if ((len == 0) && ((radio_dev->channel_index != 0) || !rfm22_isCoordinator(radio_dev))) {
+    // Always send a packet if this modem is a coordinator.
+    if ((len == 0) && !rfm22_isCoordinator(radio_dev)) {
         return RADIO_EVENT_RX_MODE;
     }
 

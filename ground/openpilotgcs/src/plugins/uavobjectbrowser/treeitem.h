@@ -184,16 +184,22 @@ public:
         switch (type) {
         case UAVObjectField::INT8:
             return 2;
+
         case UAVObjectField::INT16:
             return 4;
+
         case UAVObjectField::INT32:
             return 8;
+
         case UAVObjectField::UINT8:
             return 2;
+
         case UAVObjectField::UINT16:
             return 4;
+
         case UAVObjectField::UINT32:
             return 8;
+
         default:
             Q_ASSERT(false);
         }
@@ -352,7 +358,7 @@ public:
     QVariant data(int column) const;
 
 private:
-    UAVObjectField*m_field;
+    UAVObjectField *m_field;
 };
 
 #endif // TREEITEM_H

@@ -120,4 +120,19 @@ static inline float y_on_curve(float x, const pointf points[], int num_points)
     return y_on_line(x, &points[end_point - 1], &points[end_point]);
 }
 
+/**
+ * Ultrafast pow() aproximation needed for expo
+ * Based on Algorithm by Martin Ankerl
+ */
+static inline float fastPow(float a, float b)
+{
+    union {
+        double  d;
+        int32_t x[2];
+    } u = { (double)a };
+    u.x[1] = (int32_t)(b * (u.x[1] - 1072632447) + 1072632447);
+    u.x[0] = 0;
+    return (float)u.d;
+}
+
 #endif /* MATHMISC_H */

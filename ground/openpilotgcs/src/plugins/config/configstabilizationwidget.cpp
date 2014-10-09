@@ -46,6 +46,7 @@
 #include "qwt/src/qwt.h"
 #include "qwt/src/qwt_plot.h"
 #include "qwt/src/qwt_plot_canvas.h"
+#include "qwt/src/qwt_scale_widget.h"
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
     boardModel(0), m_pidBankCount(0), m_currentPIDBank(0)
@@ -150,6 +151,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     connect(this, SIGNAL(autoPilotConnected()), this, SLOT(onBoardConnected()));
 
+    addWidget(ui->expoPlot);
     connect(ui->expoSpinnerRoll, SIGNAL(valueChanged(int)), this, SLOT(replotExpoRoll(int)));
     connect(ui->expoSpinnerPitch, SIGNAL(valueChanged(int)), this, SLOT(replotExpoPitch(int)));
     connect(ui->expoSpinnerYaw, SIGNAL(valueChanged(int)), this, SLOT(replotExpoYaw(int)));
@@ -231,9 +233,20 @@ void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
 void ConfigStabilizationWidget::setupExpoPlot()
 {
     ui->expoPlot->setMouseTracking(false);
-    ui->expoPlot->setAxisScale(QwtPlot::xBottom, 0.0, 1.0, 0.25);
-    ui->expoPlot->setAxisScale(QwtPlot::yLeft, 0.0, 1.0, 0.25);
+    ui->expoPlot->setAxisScale(QwtPlot::xBottom, 0, 100, 25);
+
+    QwtText title;
+    title.setText(tr("Input %"));
+    title.setFont(ui->expoPlot->axisFont(QwtPlot::xBottom));
+    ui->expoPlot->setAxisTitle(QwtPlot::xBottom, title);
+    ui->expoPlot->setAxisScale(QwtPlot::yLeft, 0, 100, 25);
+
+    title.setText(tr("Output %"));
+    title.setFont(ui->expoPlot->axisFont(QwtPlot::yLeft));
+    ui->expoPlot->setAxisTitle(QwtPlot::yLeft, title);
     ui->expoPlot->canvas()->setFrameShape(QFrame::NoFrame);
+    ui->expoPlot->canvas()->setCursor(QCursor());
+
 
     m_plotGrid.setMajPen(QColor(Qt::gray));
     m_plotGrid.setMinPen(QColor(Qt::lightGray));
@@ -306,8 +319,9 @@ void ConfigStabilizationWidget::replotExpo(int value, QwtPlotCurve &curve)
     double step   = 1.0 / (EXPO_CURVE_POINTS_COUNT - 1);
 
     for (int i = 0; i < EXPO_CURVE_POINTS_COUNT; i++) {
-        x[i] = i * step;
-        y[i] = pow(x[i], factor);
+        double val = i * step;
+        x[i] = val * 100.0;
+        y[i] = pow(val, factor) * 100.0;
     }
     curve.setSamples(x, y, EXPO_CURVE_POINTS_COUNT);
     ui->expoPlot->replot();

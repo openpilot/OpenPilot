@@ -136,8 +136,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>950</width>
-            <height>780</height>
+            <width>952</width>
+            <height>771</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -170,19 +170,640 @@ margin-top: -1px;
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>320</height>
+                  <height>340</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>320</height>
+                  <height>340</height>
                  </size>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_31">
                  <property name="topMargin">
-                  <number>1</number>
+                  <number>0</number>
                  </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="1" column="0">
+                  <widget class="QGroupBox" name="groupBox_9">
+                   <property name="title">
+                    <string>Acro+</string>
+                   </property>
+                   <layout class="QGridLayout" name="gridLayout_26">
+                    <item row="0" column="1">
+                     <widget class="QPushButton" name="pushButton_21">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Reset all values to GCS defaults</string>
+                      </property>
+                      <property name="autoFillBackground">
+                       <bool>false</bool>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="text">
+                       <string>Default</string>
+                      </property>
+                      <property name="objrelation" stdset="0">
+                       <stringlist>
+                        <string>button:default</string>
+                        <string>buttongroup:77</string>
+                       </stringlist>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="0" colspan="2">
+                     <layout class="QGridLayout" name="gridLayout_29">
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <item row="1" column="1">
+                       <widget class="QSlider" name="AttitudeResponsivenessSlider_2">
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>25</height>
+                         </size>
+                        </property>
+                        <property name="toolTip">
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Acro + slider can be adjusted to change the amount of manual control blending.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                        </property>
+                        <property name="minimum">
+                         <number>0</number>
+                        </property>
+                        <property name="maximum">
+                         <number>100</number>
+                        </property>
+                        <property name="singleStep">
+                         <number>1</number>
+                        </property>
+                        <property name="value">
+                         <number>50</number>
+                        </property>
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="tickPosition">
+                         <enum>QSlider::TicksBelow</enum>
+                        </property>
+                        <property name="tickInterval">
+                         <number>5</number>
+                        </property>
+                        <property name="objrelation" stdset="0">
+                         <stringlist>
+                          <string>objname:StabilizationSettingsBankX</string>
+                          <string>fieldname:AcroInsanityFactor</string>
+                          <string>scale:0.01</string>
+                          <string>buttongroup:77</string>
+                         </stringlist>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="2">
+                       <widget class="QSpinBox" name="spinBox_3">
+                        <property name="minimumSize">
+                         <size>
+                          <width>60</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>60</width>
+                          <height>22</height>
+                         </size>
+                        </property>
+                        <property name="minimum">
+                         <number>0</number>
+                        </property>
+                        <property name="maximum">
+                         <number>100</number>
+                        </property>
+                        <property name="value">
+                         <number>50</number>
+                        </property>
+                        <property name="objrelation" stdset="0">
+                         <stringlist>
+                          <string>objname:StabilizationSettingsBankX</string>
+                          <string>fieldname:AcroInsanityFactor</string>
+                          <string>scale:0.01</string>
+                          <string>buttongroup:77</string>
+                         </stringlist>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="label_13">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>80</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>Factor</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item row="0" column="1" rowspan="2">
+                  <widget class="QGroupBox" name="groupBox_7">
+                   <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="title">
+                    <string>Expo</string>
+                   </property>
+                   <layout class="QGridLayout" name="gridLayout_5">
+                    <property name="rightMargin">
+                     <number>9</number>
+                    </property>
+                    <item row="1" column="0">
+                     <widget class="QFrame" name="basicResponsivenessControls_2">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <layout class="QGridLayout" name="gridLayout_30">
+                       <property name="leftMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>1</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
+                       <item row="1" column="5">
+                        <widget class="QSpinBox" name="expoSpinnerRoll">
+                         <property name="minimumSize">
+                          <size>
+                           <width>60</width>
+                           <height>22</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>60</width>
+                           <height>22</height>
+                          </size>
+                         </property>
+                         <property name="minimum">
+                          <number>-100</number>
+                         </property>
+                         <property name="maximum">
+                          <number>100</number>
+                         </property>
+                         <property name="value">
+                          <number>0</number>
+                         </property>
+                         <property name="objrelation" stdset="0">
+                          <stringlist>
+                           <string>objname:StabilizationSettingsBankX</string>
+                           <string>fieldname:StickExpo</string>
+                           <string>haslimits:yes</string>
+                           <string>scale:1</string>
+                           <string>buttongroup:66</string>
+                           <string>element:Roll</string>
+                          </stringlist>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="label_14">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="palette">
+                          <palette>
+                           <active>
+                            <colorrole role="WindowText">
+                             <brush brushstyle="SolidPattern">
+                              <color alpha="255">
+                               <red>255</red>
+                               <green>0</green>
+                               <blue>0</blue>
+                              </color>
+                             </brush>
+                            </colorrole>
+                           </active>
+                           <inactive>
+                            <colorrole role="WindowText">
+                             <brush brushstyle="SolidPattern">
+                              <color alpha="255">
+                               <red>255</red>
+                               <green>0</green>
+                               <blue>0</blue>
+                              </color>
+                             </brush>
+                            </colorrole>
+                           </inactive>
+                           <disabled>
+                            <colorrole role="WindowText">
+                             <brush brushstyle="SolidPattern">
+                              <color alpha="255">
+                               <red>120</red>
+                               <green>120</green>
+                               <blue>120</blue>
+                              </color>
+                             </brush>
+                            </colorrole>
+                           </disabled>
+                          </palette>
+                         </property>
+                         <property name="text">
+                          <string>Roll</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="5">
+                        <widget class="QSpinBox" name="expoSpinnerPitch">
+                         <property name="minimumSize">
+                          <size>
+                           <width>60</width>
+                           <height>22</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>60</width>
+                           <height>22</height>
+                          </size>
+                         </property>
+                         <property name="minimum">
+                          <number>-100</number>
+                         </property>
+                         <property name="maximum">
+                          <number>100</number>
+                         </property>
+                         <property name="value">
+                          <number>0</number>
+                         </property>
+                         <property name="objrelation" stdset="0">
+                          <stringlist>
+                           <string>objname:StabilizationSettingsBankX</string>
+                           <string>fieldname:StickExpo</string>
+                           <string>haslimits:yes</string>
+                           <string>scale:1</string>
+                           <string>buttongroup:66</string>
+                           <string>element:Pitch</string>
+                          </stringlist>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="0" colspan="6">
+                        <widget class="QwtPlot" name="expoPlot" native="true">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="toolTip">
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This graph shows the Expo curves for all axis. The color of the curves corresponds with the colors of the slider labels below.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="label_15">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="palette">
+                          <palette>
+                           <active>
+                            <colorrole role="WindowText">
+                             <brush brushstyle="SolidPattern">
+                              <color alpha="255">
+                               <red>0</red>
+                               <green>170</green>
+                               <blue>0</blue>
+                              </color>
+                             </brush>
+                            </colorrole>
+                           </active>
+                           <inactive>
+                            <colorrole role="WindowText">
+                             <brush brushstyle="SolidPattern">
+                              <color alpha="255">
+                               <red>0</red>
+                               <green>170</green>
+                               <blue>0</blue>
+                              </color>
+                             </brush>
+                            </colorrole>
+                           </inactive>
+                           <disabled>
+                            <colorrole role="WindowText">
+                             <brush brushstyle="SolidPattern">
+                              <color alpha="255">
+                               <red>120</red>
+                               <green>120</green>
+                               <blue>120</blue>
+                              </color>
+                             </brush>
+                            </colorrole>
+                           </disabled>
+                          </palette>
+                         </property>
+                         <property name="text">
+                          <string>Pitch</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="5">
+                        <widget class="QSpinBox" name="expoSpinnerYaw">
+                         <property name="minimumSize">
+                          <size>
+                           <width>60</width>
+                           <height>22</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>60</width>
+                           <height>22</height>
+                          </size>
+                         </property>
+                         <property name="minimum">
+                          <number>-100</number>
+                         </property>
+                         <property name="maximum">
+                          <number>100</number>
+                         </property>
+                         <property name="value">
+                          <number>0</number>
+                         </property>
+                         <property name="objrelation" stdset="0">
+                          <stringlist>
+                           <string>objname:StabilizationSettingsBankX</string>
+                           <string>fieldname:StickExpo</string>
+                           <string>haslimits:yes</string>
+                           <string>scale:1</string>
+                           <string>buttongroup:66</string>
+                           <string>element:Yaw</string>
+                          </stringlist>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="0">
+                        <widget class="QLabel" name="label_16">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="palette">
+                          <palette>
+                           <active>
+                            <colorrole role="WindowText">
+                             <brush brushstyle="SolidPattern">
+                              <color alpha="255">
+                               <red>0</red>
+                               <green>0</green>
+                               <blue>255</blue>
+                              </color>
+                             </brush>
+                            </colorrole>
+                           </active>
+                           <inactive>
+                            <colorrole role="WindowText">
+                             <brush brushstyle="SolidPattern">
+                              <color alpha="255">
+                               <red>0</red>
+                               <green>0</green>
+                               <blue>255</blue>
+                              </color>
+                             </brush>
+                            </colorrole>
+                           </inactive>
+                           <disabled>
+                            <colorrole role="WindowText">
+                             <brush brushstyle="SolidPattern">
+                              <color alpha="255">
+                               <red>120</red>
+                               <green>120</green>
+                               <blue>120</blue>
+                              </color>
+                             </brush>
+                            </colorrole>
+                           </disabled>
+                          </palette>
+                         </property>
+                         <property name="text">
+                          <string>Yaw</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1" colspan="4">
+                        <widget class="QSlider" name="RateYawResponsivenessSlider_2">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>25</height>
+                          </size>
+                         </property>
+                         <property name="toolTip">
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Roll Expo slider can be adjusted to change the amount of Expo to use on Roll axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         </property>
+                         <property name="minimum">
+                          <number>-100</number>
+                         </property>
+                         <property name="maximum">
+                          <number>100</number>
+                         </property>
+                         <property name="value">
+                          <number>0</number>
+                         </property>
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="tickPosition">
+                          <enum>QSlider::TicksBelow</enum>
+                         </property>
+                         <property name="tickInterval">
+                          <number>20</number>
+                         </property>
+                         <property name="objrelation" stdset="0">
+                          <stringlist>
+                           <string>objname:StabilizationSettingsBankX</string>
+                           <string>fieldname:StickExpo</string>
+                           <string>haslimits:yes</string>
+                           <string>scale:1</string>
+                           <string>buttongroup:66</string>
+                           <string>element:Roll</string>
+                          </stringlist>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="1" colspan="4">
+                        <widget class="QSlider" name="RateYawResponsivenessSlider_4">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>25</height>
+                          </size>
+                         </property>
+                         <property name="toolTip">
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Yaw Expo slider can be adjusted to change the amount of Expo to use on Yaw axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         </property>
+                         <property name="minimum">
+                          <number>-100</number>
+                         </property>
+                         <property name="maximum">
+                          <number>100</number>
+                         </property>
+                         <property name="value">
+                          <number>0</number>
+                         </property>
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="tickPosition">
+                          <enum>QSlider::TicksBelow</enum>
+                         </property>
+                         <property name="tickInterval">
+                          <number>20</number>
+                         </property>
+                         <property name="objrelation" stdset="0">
+                          <stringlist>
+                           <string>objname:StabilizationSettingsBankX</string>
+                           <string>fieldname:StickExpo</string>
+                           <string>haslimits:yes</string>
+                           <string>scale:1</string>
+                           <string>buttongroup:66</string>
+                           <string>element:Yaw</string>
+                          </stringlist>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="1" colspan="4">
+                        <widget class="QSlider" name="RateYawResponsivenessSlider_3">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>25</height>
+                          </size>
+                         </property>
+                         <property name="toolTip">
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Pitch Expo slider can be adjusted to change the amount of Expo to use on Pitch axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         </property>
+                         <property name="minimum">
+                          <number>-100</number>
+                         </property>
+                         <property name="maximum">
+                          <number>100</number>
+                         </property>
+                         <property name="value">
+                          <number>0</number>
+                         </property>
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="tickPosition">
+                          <enum>QSlider::TicksBelow</enum>
+                         </property>
+                         <property name="tickInterval">
+                          <number>20</number>
+                         </property>
+                         <property name="objrelation" stdset="0">
+                          <stringlist>
+                           <string>objname:StabilizationSettingsBankX</string>
+                           <string>fieldname:StickExpo</string>
+                           <string>haslimits:yes</string>
+                           <string>scale:1</string>
+                           <string>buttongroup:66</string>
+                           <string>element:Pitch</string>
+                          </stringlist>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item row="0" column="0" alignment="Qt::AlignRight">
+                     <widget class="QPushButton" name="pushButton_12">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="toolTip">
+                       <string>Reset all values to GCS defaults</string>
+                      </property>
+                      <property name="text">
+                       <string>Default</string>
+                      </property>
+                      <property name="objrelation" stdset="0">
+                       <stringlist>
+                        <string>objname:StabilizationSettings</string>
+                        <string>button:default</string>
+                        <string>buttongroup:66</string>
+                       </stringlist>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
                  <item row="0" column="0">
                   <widget class="QGroupBox" name="basicResponsivenessGroupBox">
                    <property name="minimumSize">
@@ -2251,618 +2872,6 @@ border-radius: 5;</string>
                         </spacer>
                        </item>
                       </layout>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QGroupBox" name="groupBox_9">
-                   <property name="title">
-                    <string>Acro+</string>
-                   </property>
-                   <layout class="QGridLayout" name="gridLayout_26">
-                    <item row="0" column="1">
-                     <widget class="QPushButton" name="pushButton_21">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Reset all values to GCS defaults</string>
-                      </property>
-                      <property name="autoFillBackground">
-                       <bool>false</bool>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true"/>
-                      </property>
-                      <property name="text">
-                       <string>Default</string>
-                      </property>
-                      <property name="objrelation" stdset="0">
-                       <stringlist>
-                        <string>button:default</string>
-                        <string>buttongroup:77</string>
-                       </stringlist>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="0" colspan="2">
-                     <layout class="QGridLayout" name="gridLayout_29">
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <item row="1" column="1">
-                       <widget class="QSlider" name="AttitudeResponsivenessSlider_2">
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>25</height>
-                         </size>
-                        </property>
-                        <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Attitude Mode slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                        </property>
-                        <property name="minimum">
-                         <number>0</number>
-                        </property>
-                        <property name="maximum">
-                         <number>100</number>
-                        </property>
-                        <property name="singleStep">
-                         <number>1</number>
-                        </property>
-                        <property name="value">
-                         <number>50</number>
-                        </property>
-                        <property name="orientation">
-                         <enum>Qt::Horizontal</enum>
-                        </property>
-                        <property name="tickPosition">
-                         <enum>QSlider::TicksBelow</enum>
-                        </property>
-                        <property name="tickInterval">
-                         <number>5</number>
-                        </property>
-                        <property name="objrelation" stdset="0">
-                         <stringlist>
-                          <string>objname:StabilizationSettingsBankX</string>
-                          <string>fieldname:AcroInsanityFactor</string>
-                          <string>scale:0.01</string>
-                          <string>buttongroup:77</string>
-                         </stringlist>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="2">
-                       <widget class="QSpinBox" name="spinBox_3">
-                        <property name="minimumSize">
-                         <size>
-                          <width>60</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>60</width>
-                          <height>22</height>
-                         </size>
-                        </property>
-                        <property name="minimum">
-                         <number>0</number>
-                        </property>
-                        <property name="maximum">
-                         <number>100</number>
-                        </property>
-                        <property name="value">
-                         <number>50</number>
-                        </property>
-                        <property name="objrelation" stdset="0">
-                         <stringlist>
-                          <string>objname:StabilizationSettingsBankX</string>
-                          <string>fieldname:AcroInsanityFactor</string>
-                          <string>scale:0.01</string>
-                          <string>buttongroup:77</string>
-                         </stringlist>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="0">
-                       <widget class="QLabel" name="label_13">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>80</width>
-                          <height>0</height>
-                         </size>
-                        </property>
-                        <property name="text">
-                         <string>Factor</string>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item row="0" column="1" rowspan="2">
-                  <widget class="QGroupBox" name="groupBox_7">
-                   <property name="maximumSize">
-                    <size>
-                     <width>200</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="title">
-                    <string>Expo</string>
-                   </property>
-                   <layout class="QGridLayout" name="gridLayout_5">
-                    <item row="1" column="0">
-                     <widget class="QFrame" name="basicResponsivenessControls_2">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <layout class="QGridLayout" name="gridLayout_30">
-                       <property name="leftMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="topMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="rightMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="bottomMargin">
-                        <number>0</number>
-                       </property>
-                       <item row="1" column="5">
-                        <widget class="QSpinBox" name="expoSpinnerRoll">
-                         <property name="minimumSize">
-                          <size>
-                           <width>60</width>
-                           <height>22</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>60</width>
-                           <height>22</height>
-                          </size>
-                         </property>
-                         <property name="minimum">
-                          <number>-100</number>
-                         </property>
-                         <property name="maximum">
-                          <number>100</number>
-                         </property>
-                         <property name="value">
-                          <number>0</number>
-                         </property>
-                         <property name="objrelation" stdset="0">
-                          <stringlist>
-                           <string>objname:StabilizationSettingsBankX</string>
-                           <string>fieldname:StickExpo</string>
-                           <string>haslimits:yes</string>
-                           <string>scale:1</string>
-                           <string>buttongroup:66</string>
-                           <string>element:Roll</string>
-                          </stringlist>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="0">
-                        <widget class="QLabel" name="label_14">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="palette">
-                          <palette>
-                           <active>
-                            <colorrole role="WindowText">
-                             <brush brushstyle="SolidPattern">
-                              <color alpha="255">
-                               <red>255</red>
-                               <green>0</green>
-                               <blue>0</blue>
-                              </color>
-                             </brush>
-                            </colorrole>
-                           </active>
-                           <inactive>
-                            <colorrole role="WindowText">
-                             <brush brushstyle="SolidPattern">
-                              <color alpha="255">
-                               <red>255</red>
-                               <green>0</green>
-                               <blue>0</blue>
-                              </color>
-                             </brush>
-                            </colorrole>
-                           </inactive>
-                           <disabled>
-                            <colorrole role="WindowText">
-                             <brush brushstyle="SolidPattern">
-                              <color alpha="255">
-                               <red>120</red>
-                               <green>120</green>
-                               <blue>120</blue>
-                              </color>
-                             </brush>
-                            </colorrole>
-                           </disabled>
-                          </palette>
-                         </property>
-                         <property name="text">
-                          <string>Roll</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="2" column="5">
-                        <widget class="QSpinBox" name="expoSpinnerPitch">
-                         <property name="minimumSize">
-                          <size>
-                           <width>60</width>
-                           <height>22</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>60</width>
-                           <height>22</height>
-                          </size>
-                         </property>
-                         <property name="minimum">
-                          <number>-100</number>
-                         </property>
-                         <property name="maximum">
-                          <number>100</number>
-                         </property>
-                         <property name="value">
-                          <number>0</number>
-                         </property>
-                         <property name="objrelation" stdset="0">
-                          <stringlist>
-                           <string>objname:StabilizationSettingsBankX</string>
-                           <string>fieldname:StickExpo</string>
-                           <string>haslimits:yes</string>
-                           <string>scale:1</string>
-                           <string>buttongroup:66</string>
-                           <string>element:Pitch</string>
-                          </stringlist>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="0" colspan="6">
-                        <widget class="QwtPlot" name="expoPlot" native="true">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="2" column="0">
-                        <widget class="QLabel" name="label_15">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="palette">
-                          <palette>
-                           <active>
-                            <colorrole role="WindowText">
-                             <brush brushstyle="SolidPattern">
-                              <color alpha="255">
-                               <red>0</red>
-                               <green>170</green>
-                               <blue>0</blue>
-                              </color>
-                             </brush>
-                            </colorrole>
-                           </active>
-                           <inactive>
-                            <colorrole role="WindowText">
-                             <brush brushstyle="SolidPattern">
-                              <color alpha="255">
-                               <red>0</red>
-                               <green>170</green>
-                               <blue>0</blue>
-                              </color>
-                             </brush>
-                            </colorrole>
-                           </inactive>
-                           <disabled>
-                            <colorrole role="WindowText">
-                             <brush brushstyle="SolidPattern">
-                              <color alpha="255">
-                               <red>120</red>
-                               <green>120</green>
-                               <blue>120</blue>
-                              </color>
-                             </brush>
-                            </colorrole>
-                           </disabled>
-                          </palette>
-                         </property>
-                         <property name="text">
-                          <string>Pitch</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="3" column="5">
-                        <widget class="QSpinBox" name="expoSpinnerYaw">
-                         <property name="minimumSize">
-                          <size>
-                           <width>60</width>
-                           <height>22</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>60</width>
-                           <height>22</height>
-                          </size>
-                         </property>
-                         <property name="minimum">
-                          <number>-100</number>
-                         </property>
-                         <property name="maximum">
-                          <number>100</number>
-                         </property>
-                         <property name="value">
-                          <number>0</number>
-                         </property>
-                         <property name="objrelation" stdset="0">
-                          <stringlist>
-                           <string>objname:StabilizationSettingsBankX</string>
-                           <string>fieldname:StickExpo</string>
-                           <string>haslimits:yes</string>
-                           <string>scale:1</string>
-                           <string>buttongroup:66</string>
-                           <string>element:Yaw</string>
-                          </stringlist>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="3" column="0">
-                        <widget class="QLabel" name="label_16">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="palette">
-                          <palette>
-                           <active>
-                            <colorrole role="WindowText">
-                             <brush brushstyle="SolidPattern">
-                              <color alpha="255">
-                               <red>0</red>
-                               <green>0</green>
-                               <blue>255</blue>
-                              </color>
-                             </brush>
-                            </colorrole>
-                           </active>
-                           <inactive>
-                            <colorrole role="WindowText">
-                             <brush brushstyle="SolidPattern">
-                              <color alpha="255">
-                               <red>0</red>
-                               <green>0</green>
-                               <blue>255</blue>
-                              </color>
-                             </brush>
-                            </colorrole>
-                           </inactive>
-                           <disabled>
-                            <colorrole role="WindowText">
-                             <brush brushstyle="SolidPattern">
-                              <color alpha="255">
-                               <red>120</red>
-                               <green>120</green>
-                               <blue>120</blue>
-                              </color>
-                             </brush>
-                            </colorrole>
-                           </disabled>
-                          </palette>
-                         </property>
-                         <property name="text">
-                          <string>Yaw</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="1" colspan="4">
-                        <widget class="QSlider" name="RateYawResponsivenessSlider_2">
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>25</height>
-                          </size>
-                         </property>
-                         <property name="toolTip">
-                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate mode Yaw slider can be adjusted to value ranges whose responsiveness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                         </property>
-                         <property name="minimum">
-                          <number>-100</number>
-                         </property>
-                         <property name="maximum">
-                          <number>100</number>
-                         </property>
-                         <property name="value">
-                          <number>0</number>
-                         </property>
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                         <property name="tickPosition">
-                          <enum>QSlider::TicksBelow</enum>
-                         </property>
-                         <property name="tickInterval">
-                          <number>20</number>
-                         </property>
-                         <property name="objrelation" stdset="0">
-                          <stringlist>
-                           <string>objname:StabilizationSettingsBankX</string>
-                           <string>fieldname:StickExpo</string>
-                           <string>haslimits:yes</string>
-                           <string>scale:1</string>
-                           <string>buttongroup:66</string>
-                           <string>element:Roll</string>
-                          </stringlist>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="3" column="1" colspan="4">
-                        <widget class="QSlider" name="RateYawResponsivenessSlider_4">
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>25</height>
-                          </size>
-                         </property>
-                         <property name="toolTip">
-                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate mode Yaw slider can be adjusted to value ranges whose responsiveness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                         </property>
-                         <property name="minimum">
-                          <number>-100</number>
-                         </property>
-                         <property name="maximum">
-                          <number>100</number>
-                         </property>
-                         <property name="value">
-                          <number>0</number>
-                         </property>
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                         <property name="tickPosition">
-                          <enum>QSlider::TicksBelow</enum>
-                         </property>
-                         <property name="tickInterval">
-                          <number>20</number>
-                         </property>
-                         <property name="objrelation" stdset="0">
-                          <stringlist>
-                           <string>objname:StabilizationSettingsBankX</string>
-                           <string>fieldname:StickExpo</string>
-                           <string>haslimits:yes</string>
-                           <string>scale:1</string>
-                           <string>buttongroup:66</string>
-                           <string>element:Yaw</string>
-                          </stringlist>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="2" column="1" colspan="4">
-                        <widget class="QSlider" name="RateYawResponsivenessSlider_3">
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>25</height>
-                          </size>
-                         </property>
-                         <property name="toolTip">
-                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate mode Yaw slider can be adjusted to value ranges whose responsiveness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                         </property>
-                         <property name="minimum">
-                          <number>-100</number>
-                         </property>
-                         <property name="maximum">
-                          <number>100</number>
-                         </property>
-                         <property name="value">
-                          <number>0</number>
-                         </property>
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                         <property name="tickPosition">
-                          <enum>QSlider::TicksBelow</enum>
-                         </property>
-                         <property name="tickInterval">
-                          <number>20</number>
-                         </property>
-                         <property name="objrelation" stdset="0">
-                          <stringlist>
-                           <string>objname:StabilizationSettingsBankX</string>
-                           <string>fieldname:StickExpo</string>
-                           <string>haslimits:yes</string>
-                           <string>scale:1</string>
-                           <string>buttongroup:66</string>
-                           <string>element:Pitch</string>
-                          </stringlist>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item row="0" column="0" alignment="Qt::AlignRight">
-                     <widget class="QPushButton" name="pushButton_12">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="toolTip">
-                       <string>Reset all values to GCS defaults</string>
-                      </property>
-                      <property name="text">
-                       <string>Default</string>
-                      </property>
-                      <property name="objrelation" stdset="0">
-                       <stringlist>
-                        <string>objname:StabilizationSettings</string>
-                        <string>button:default</string>
-                        <string>buttongroup:66</string>
-                       </stringlist>
-                      </property>
                      </widget>
                     </item>
                    </layout>
@@ -8232,8 +8241,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>950</width>
-            <height>788</height>
+            <width>952</width>
+            <height>771</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -18061,7 +18070,7 @@ border-radius: 5;</string>
               <item>
                <widget class="QGroupBox" name="groupBox_10">
                 <property name="title">
-                 <string>Piro Compensation</string>
+                 <string>Pirouette Compensation</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_32">
                  <item row="1" column="0">
@@ -18073,7 +18082,7 @@ border-radius: 5;</string>
                     </size>
                    </property>
                    <property name="text">
-                    <string>Enable piro compensation</string>
+                    <string>Enable pirouette compensation</string>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -18224,8 +18233,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>950</width>
-            <height>788</height>
+            <width>952</width>
+            <height>771</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -24070,8 +24079,8 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>950</width>
-            <height>788</height>
+            <width>952</width>
+            <height>771</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">

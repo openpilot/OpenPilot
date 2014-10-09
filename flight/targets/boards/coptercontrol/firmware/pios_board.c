@@ -120,19 +120,20 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
     .exti_cfg   = &pios_exti_mpu6000_cfg,
     .Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
     // Clock at 8 khz, downsampled by 8 for 1000 Hz
-    .Smpl_rate_div_no_dlp = 15,
+    .Smpl_rate_div_no_dlp = 7,
     // Clock at 1 khz, downsampled by 2 for 1000 Hz
-    .Smpl_rate_div_dlp    = 1,
+    .Smpl_rate_div_dlp    = 0,
     .interrupt_cfg  = PIOS_MPU6000_INT_CLR_ANYRD,
     .interrupt_en   = PIOS_MPU6000_INTEN_DATA_RDY,
-    .User_ctl             = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
+    .User_ctl             = PIOS_MPU6000_USERCTL_DIS_I2C,
     .Pwr_mgmt_clk   = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
     .accel_range    = PIOS_MPU6000_ACCEL_8G,
     .gyro_range     = PIOS_MPU6000_SCALE_2000_DEG,
     .filter               = PIOS_MPU6000_LOWPASS_256_HZ,
     .orientation    = PIOS_MPU6000_TOP_180DEG,
-    .fast_prescaler = PIOS_SPI_PRESCALER_16,
-    .std_prescaler  = PIOS_SPI_PRESCALER_64
+    .fast_prescaler = PIOS_SPI_PRESCALER_4,
+    .std_prescaler  = PIOS_SPI_PRESCALER_64,
+    .max_downsample = 2
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 

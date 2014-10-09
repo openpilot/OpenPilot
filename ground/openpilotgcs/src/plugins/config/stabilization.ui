@@ -180,6 +180,9 @@ margin-top: -1px;
                  </size>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_31">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
                  <property name="topMargin">
                   <number>0</number>
                  </property>

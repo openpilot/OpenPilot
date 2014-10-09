@@ -27073,13 +27073,31 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>spinBox_2</tabstop>
   <tabstop>RateYawResponsivenessSlider</tabstop>
   <tabstop>spinBox_5</tabstop>
-  <tabstop>pushButton_12</tabstop>
-  <tabstop>AttitudeResponsivenessSlider_2</tabstop>
   <tabstop>pushButton_21</tabstop>
+  <tabstop>AttitudeResponsivenessSlider_2</tabstop>
   <tabstop>spinBox_3</tabstop>
+  <tabstop>pushButton_12</tabstop>
+  <tabstop>RateYawResponsivenessSlider_2</tabstop>
+  <tabstop>expoSpinnerRoll</tabstop>
+  <tabstop>RateYawResponsivenessSlider_3</tabstop>
+  <tabstop>expoSpinnerPitch</tabstop>
+  <tabstop>RateYawResponsivenessSlider_4</tabstop>
+  <tabstop>expoSpinnerYaw</tabstop>
+  <tabstop>checkBox_7</tabstop>
+  <tabstop>pushButton_20</tabstop>
+  <tabstop>horizontalSlider_76</tabstop>
+  <tabstop>spinBox_7</tabstop>
+  <tabstop>PitchPSlider</tabstop>
+  <tabstop>spinBox_PitchRateP</tabstop>
+  <tabstop>horizontalSlider_78</tabstop>
+  <tabstop>spinBox_12</tabstop>
+  <tabstop>horizontalSlider_79</tabstop>
+  <tabstop>spinBox_8</tabstop>
+  <tabstop>horizontalSlider_80</tabstop>
   <tabstop>spinBox_9</tabstop>
   <tabstop>horizontalSlider_81</tabstop>
   <tabstop>spinBox_10</tabstop>
+  <tabstop>checkBox_8</tabstop>
   <tabstop>pushButton_22</tabstop>
   <tabstop>horizontalSlider_82</tabstop>
   <tabstop>spinBox_13</tabstop>
@@ -27088,25 +27106,9 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>horizontalSlider_84</tabstop>
   <tabstop>spinBox_15</tabstop>
   <tabstop>lowThrottleZeroIntegral_8</tabstop>
-  <tabstop>checkBox_7</tabstop>
-  <tabstop>checkBox_8</tabstop>
-  <tabstop>pushButton_4</tabstop>
-  <tabstop>RateRollKp_2</tabstop>
-  <tabstop>RatePitchKp</tabstop>
-  <tabstop>RateYawKp</tabstop>
-  <tabstop>RateRollKi_2</tabstop>
-  <tabstop>RatePitchKi</tabstop>
-  <tabstop>RateYawKi</tabstop>
-  <tabstop>RollRateKd</tabstop>
-  <tabstop>PitchRateKd</tabstop>
-  <tabstop>YawRateKd</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>AttitudeRollKp</tabstop>
-  <tabstop>AttitudePitchKp_2</tabstop>
-  <tabstop>AttitudeYawKp</tabstop>
-  <tabstop>AttitudeRollKi</tabstop>
-  <tabstop>AttitudePitchKi_2</tabstop>
-  <tabstop>AttitudeYawKi</tabstop>
+  <tabstop>realTimeUpdates_8</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>advancedResponsivenessCheckBox</tabstop>
   <tabstop>pushButton_3</tabstop>
   <tabstop>rateRollKp_3</tabstop>
   <tabstop>ratePitchKp_4</tabstop>
@@ -27117,70 +27119,74 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>rateRollILimit_3</tabstop>
   <tabstop>ratePitchILimit_4</tabstop>
   <tabstop>rateYawILimit_3</tabstop>
-  <tabstop>checkBox_3</tabstop>
-  <tabstop>checkBox_2</tabstop>
-  <tabstop>pushButton_5</tabstop>
-  <tabstop>GyroTau</tabstop>
-  <tabstop>AccelKp</tabstop>
-  <tabstop>AccelKi</tabstop>
-  <tabstop>realTimeUpdates_6</tabstop>
-  <tabstop>stabilizationReloadBoardData_6</tabstop>
-  <tabstop>scrollArea_2</tabstop>
-  <tabstop>saveStabilizationToRAM_6</tabstop>
-  <tabstop>pushButton_23</tabstop>
-  <tabstop>horizontalSlider_76</tabstop>
-  <tabstop>spinBox_7</tabstop>
-  <tabstop>PitchPSlider</tabstop>
-  <tabstop>pushButton_20</tabstop>
-  <tabstop>spinBox_PitchRateP</tabstop>
-  <tabstop>horizontalSlider_78</tabstop>
-  <tabstop>saveStabilizationToSD_6</tabstop>
-  <tabstop>realTimeUpdates_8</tabstop>
-  <tabstop>advancedResponsivenessCheckBox</tabstop>
   <tabstop>enableThrustPIDScalingCheckBox</tabstop>
   <tabstop>ThrustPIDSource</tabstop>
   <tabstop>ThrustPIDTarget</tabstop>
   <tabstop>ThrustPIDAxis</tabstop>
   <tabstop>defaultThrottleCurveButton</tabstop>
+  <tabstop>checkBox_3</tabstop>
+  <tabstop>pushButton_4</tabstop>
+  <tabstop>RateRollKp_2</tabstop>
+  <tabstop>RatePitchKp</tabstop>
+  <tabstop>RateYawKp</tabstop>
+  <tabstop>RateRollKi_2</tabstop>
+  <tabstop>RatePitchKi</tabstop>
+  <tabstop>RateYawKi</tabstop>
+  <tabstop>RollRateKd</tabstop>
+  <tabstop>PitchRateKd</tabstop>
+  <tabstop>YawRateKd</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>AttitudeRollKp</tabstop>
+  <tabstop>AttitudePitchKp_2</tabstop>
+  <tabstop>AttitudeYawKp</tabstop>
+  <tabstop>AttitudeRollKi</tabstop>
+  <tabstop>AttitudePitchKi_2</tabstop>
+  <tabstop>AttitudeYawKi</tabstop>
+  <tabstop>enableThrustPIDScalingCheckBox_2</tabstop>
+  <tabstop>pushButton_13</tabstop>
   <tabstop>realTimeUpdates_12</tabstop>
   <tabstop>scrollArea_3</tabstop>
   <tabstop>pushButton_9</tabstop>
-  <tabstop>WeakLevelingRate</tabstop>
   <tabstop>WeakLevelingKp</tabstop>
+  <tabstop>WeakLevelingRate</tabstop>
   <tabstop>pushButton_6</tabstop>
   <tabstop>MaAxisLock</tabstop>
   <tabstop>MaxAxisLockRate</tabstop>
   <tabstop>pushButton_10</tabstop>
   <tabstop>RattitudeModeTransition</tabstop>
-  <tabstop>doubleSpinBox_4</tabstop>
-  <tabstop>doubleSpinBox_5</tabstop>
-  <tabstop>comboBox</tabstop>
-  <tabstop>doubleSpinBox_3</tabstop>
-  <tabstop>doubleSpinBox</tabstop>
-  <tabstop>comboBox_2</tabstop>
-  <tabstop>doubleSpinBox_2</tabstop>
-  <tabstop>doubleSpinBox_7</tabstop>
   <tabstop>pushButton_11</tabstop>
+  <tabstop>doubleSpinBox</tabstop>
+  <tabstop>doubleSpinBox_3</tabstop>
+  <tabstop>doubleSpinBox_4</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>doubleSpinBox_7</tabstop>
+  <tabstop>doubleSpinBox_2</tabstop>
+  <tabstop>doubleSpinBox_5</tabstop>
+  <tabstop>comboBox_2</tabstop>
+  <tabstop>pushButton_5</tabstop>
+  <tabstop>GyroTau</tabstop>
+  <tabstop>AccelKp</tabstop>
+  <tabstop>AccelKi</tabstop>
+  <tabstop>realTimeUpdates_6</tabstop>
   <tabstop>scrollArea_4</tabstop>
   <tabstop>pushButton_7</tabstop>
   <tabstop>AltKpSlider</tabstop>
-  <tabstop>AltKiSlider</tabstop>
-  <tabstop>AltKdSlider</tabstop>
   <tabstop>AltKp</tabstop>
+  <tabstop>AltKiSlider</tabstop>
   <tabstop>AltKi</tabstop>
+  <tabstop>AltKdSlider</tabstop>
   <tabstop>AltKd</tabstop>
-  <tabstop>AltThrRateSlider_2</tabstop>
-  <tabstop>AltThrExp_2</tabstop>
-  <tabstop>AltThrRate_2</tabstop>
-  <tabstop>AltThrExpSlider_2</tabstop>
   <tabstop>pushButton_8</tabstop>
+  <tabstop>AltThrExpSlider_2</tabstop>
+  <tabstop>AltThrExp_2</tabstop>
+  <tabstop>AltThrRateSlider_2</tabstop>
+  <tabstop>AltThrRate_2</tabstop>
   <tabstop>realTimeUpdates_7</tabstop>
-  <tabstop>horizontalSlider_80</tabstop>
-  <tabstop>horizontalSlider_79</tabstop>
-  <tabstop>spinBox_8</tabstop>
-  <tabstop>spinBox_12</tabstop>
-  <tabstop>expoSpinnerRoll</tabstop>
-  <tabstop>RateYawResponsivenessSlider_2</tabstop>
+  <tabstop>pushButton_23</tabstop>
+  <tabstop>stabilizationReloadBoardData_6</tabstop>
+  <tabstop>saveStabilizationToRAM_6</tabstop>
+  <tabstop>saveStabilizationToSD_6</tabstop>
  </tabstops>
  <resources>
   <include location="../coreplugin/core.qrc"/>

@@ -150,7 +150,9 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     connect(this, SIGNAL(autoPilotConnected()), this, SLOT(onBoardConnected()));
 
-    connect(ui->expoSpinner, SIGNAL(valueChanged(int)), this, SLOT(replotExpo(int)));
+    connect(ui->expoSpinnerRoll, SIGNAL(valueChanged(int)), this, SLOT(replotExpoRoll(int)));
+    connect(ui->expoSpinnerPitch, SIGNAL(valueChanged(int)), this, SLOT(replotExpoPitch(int)));
+    connect(ui->expoSpinnerYaw, SIGNAL(valueChanged(int)), this, SLOT(replotExpoYaw(int)));
 
     disableMouseWheelEvents();
     updateEnableControls();
@@ -233,16 +235,26 @@ void ConfigStabilizationWidget::setupExpoPlot()
     ui->expoPlot->setAxisScale(QwtPlot::yLeft, 0.0, 1.0, 0.25);
     ui->expoPlot->canvas()->setFrameShape(QFrame::NoFrame);
 
-    m_expoPlotCurve.setRenderHint(QwtPlotCurve::RenderAntialiased);
-    m_expoPlotCurve.attach(ui->expoPlot);
-
     m_plotGrid.setMajPen(QColor(Qt::gray));
     m_plotGrid.setMinPen(QColor(Qt::lightGray));
     m_plotGrid.enableXMin(false);
     m_plotGrid.enableYMin(false);
     m_plotGrid.attach(ui->expoPlot);
 
-    replotExpo(ui->expoSpinner->value());
+    m_expoPlotCurveRoll.setRenderHint(QwtPlotCurve::RenderAntialiased);
+    m_expoPlotCurveRoll.setPen(QPen(QColor(Qt::red).setAlpha(200), 3));
+    m_expoPlotCurveRoll.attach(ui->expoPlot);
+    replotExpoRoll(ui->expoSpinnerRoll->value());
+
+    m_expoPlotCurvePitch.setRenderHint(QwtPlotCurve::RenderAntialiased);
+    m_expoPlotCurvePitch.setPen(QPen(QColor(Qt::green).setAlpha(200), 3));
+    m_expoPlotCurvePitch.attach(ui->expoPlot);
+    replotExpoPitch(ui->expoSpinnerPitch->value());
+
+    m_expoPlotCurveYaw.setRenderHint(QwtPlotCurve::RenderAntialiased);
+    m_expoPlotCurveYaw.setPen(QPen(QColor(Qt::blue).setAlpha(200), 3));
+    m_expoPlotCurveYaw.attach(ui->expoPlot);
+    replotExpoYaw(ui->expoSpinnerYaw->value());
 }
 
 void ConfigStabilizationWidget::resetThrottleCurveToDefault()
@@ -277,7 +289,7 @@ void ConfigStabilizationWidget::throttleCurveUpdated()
     setDirty(true);
 }
 
-void ConfigStabilizationWidget::replotExpo(int value)
+void ConfigStabilizationWidget::replotExpo(int value, QwtPlotCurve &curve)
 {
     double x[EXPO_CURVE_POINTS] = { 0 };
     double y[EXPO_CURVE_POINTS] = { 0 };
@@ -287,14 +299,25 @@ void ConfigStabilizationWidget::replotExpo(int value)
     for (int i = 0; i < EXPO_CURVE_POINTS; i++) {
         x[i] = i * step;
         y[i] = pow(x[i], factor);
-        qDebug() << "x=" << x[i] << ",y=" << y[i];
     }
-    m_expoPlotCurve.setSamples(x, y, EXPO_CURVE_POINTS);
-    int hue = 255 - ((value + 100) / 200.0 * 255);
-    qDebug() << "hue" << hue;
-    m_expoPlotCurve.setPen(QPen(QColor::fromHsl(hue, 200, 128), 3));
-    m_expoPlotCurve.show();
+    curve.setSamples(x, y, EXPO_CURVE_POINTS);
+    curve.show();
     ui->expoPlot->replot();
+}
+
+void ConfigStabilizationWidget::replotExpoRoll(int value)
+{
+    replotExpo(value, m_expoPlotCurveRoll);
+}
+
+void ConfigStabilizationWidget::replotExpoPitch(int value)
+{
+    replotExpo(value, m_expoPlotCurvePitch);
+}
+
+void ConfigStabilizationWidget::replotExpoYaw(int value)
+{
+    replotExpo(value, m_expoPlotCurveYaw);
 }
 
 void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)

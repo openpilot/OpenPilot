@@ -61,7 +61,9 @@ private:
     int m_pidBankCount;
     int m_currentPIDBank;
 
-    QwtPlotCurve m_expoPlotCurve;
+    QwtPlotCurve m_expoPlotCurveRoll;
+    QwtPlotCurve m_expoPlotCurvePitch;
+    QwtPlotCurve m_expoPlotCurveYaw;
     QwtPlotGrid m_plotGrid;
 
     void updateThrottleCurveFromObject();
@@ -82,6 +84,9 @@ private slots:
     void pidBankChanged(int index);
     void resetThrottleCurveToDefault();
     void throttleCurveUpdated();
-    void replotExpo(int value);
+    void replotExpo(int value, QwtPlotCurve &curve);
+    void replotExpoRoll(int value);
+    void replotExpoPitch(int value);
+    void replotExpoYaw(int value);
 };
 #endif // ConfigStabilizationWidget_H

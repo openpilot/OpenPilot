@@ -242,17 +242,17 @@ void ConfigStabilizationWidget::setupExpoPlot()
     m_plotGrid.attach(ui->expoPlot);
 
     m_expoPlotCurveRoll.setRenderHint(QwtPlotCurve::RenderAntialiased);
-    m_expoPlotCurveRoll.setPen(QPen(QColor(Qt::red).setAlpha(200), 3));
+    m_expoPlotCurveRoll.setPen(QPen(QColor(Qt::red), 3));
     m_expoPlotCurveRoll.attach(ui->expoPlot);
     replotExpoRoll(ui->expoSpinnerRoll->value());
 
     m_expoPlotCurvePitch.setRenderHint(QwtPlotCurve::RenderAntialiased);
-    m_expoPlotCurvePitch.setPen(QPen(QColor(Qt::green).setAlpha(200), 3));
+    m_expoPlotCurvePitch.setPen(QPen(QColor(Qt::green), 3));
     m_expoPlotCurvePitch.attach(ui->expoPlot);
     replotExpoPitch(ui->expoSpinnerPitch->value());
 
     m_expoPlotCurveYaw.setRenderHint(QwtPlotCurve::RenderAntialiased);
-    m_expoPlotCurveYaw.setPen(QPen(QColor(Qt::blue).setAlpha(200), 3));
+    m_expoPlotCurveYaw.setPen(QPen(QColor(Qt::blue), 3));
     m_expoPlotCurveYaw.attach(ui->expoPlot);
     replotExpoYaw(ui->expoSpinnerYaw->value());
 }

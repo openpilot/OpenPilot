@@ -29,7 +29,6 @@
 
 #include "yaffsfs.h"
 
-#define pios_stdio_startup()		yaffs_start_up()
 #define pios_open(path, oflag, mode)	yaffs_open(path, oflag, mode)
 #define pios_close(fd)			yaffs_close(fd)
 #define pios_fsync(fd)			yaffs_fsync(fd)

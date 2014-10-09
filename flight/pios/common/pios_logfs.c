@@ -29,62 +29,61 @@
 
 #include <openpilot.h>
 
-struct flashfs_logfs_cfg; // TODO Is this needed?
-
-
 /**
- * Get an 8 character (plus extension) filename for the object.
+ * Get an object file name and device name and path name
+ * @param[in] fs_id flash device id
  * @param[in] obj The object handle.
  * @param[in] instId The instance ID
  * @param[in] file Filename string pointer -- must be 14 bytes long and allocated
+ * @param[in] path string pointer -- must be 26 bytes long and allocated
  */
-static void objectFilename(uint32_t obj_id, uint16_t obj_inst_id, uint8_t *filename)
+#define OBJECTPATHNAME_LEN 26
+static void getObjectPathAndName(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, char *filename)
 {
     uint32_t prefix = obj_id + (obj_inst_id / 256) * 16; // put upper 8 bit of instance id into object id modification,
                                                          // skip least sig nibble since that is used for meta object id
     uint8_t suffix  = obj_inst_id & 0xff;
 
-    snprintf((char *)filename, 13, "%08X.o%02X", prefix, suffix);
+    snprintf((char *)filename, OBJECTPATHNAME_LEN, "/dev%01u/logfs/%08X.o%02X", (unsigned)fs_id, prefix, suffix);
 }
-
 
 /**
- * @brief Initialize the flash object setting FS
- * @return 0 if success, -1 if failure
+ * Get an devicename
+ * @param[in] fs_id flash device id
+ * @param[in] devicename string pointer -- must be 8 bytes long and allocated
  */
-int32_t PIOS_FLASHFS_Logfs_Init(
-	__attribute__((unused)) uintptr_t *fs_id,
-	__attribute__((unused)) const struct flashfs_logfs_cfg *cfg, 
-	__attribute__((unused)) const struct pios_flash_driver *driver, 
-	__attribute__((unused)) uintptr_t flash_id)
+#define DEVICENAME_LEN 8
+static void getDeviceName(uintptr_t fs_id, char *devicename)
 {
-    int retval;
-    pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_Logfs_Init");
-   
-    // TODO This interface should change to select the mount point.
-    // TODO The flash driver relationship is now set elsewhere.
-    // TODO The cfg is now set elsewhere 
-    retval = pios_mount(PIOS_MOUNTPOINT_LOGFS);
-    if (retval < 0) {
-        pios_trace(PIOS_TRACE_ERROR, "Couldn't mount %s", PIOS_MOUNTPOINT_LOGFS);
-    }
-    else {
-        // Create the directory if it does not already exist
-	retval = pios_mkdir(PIOS_LOGFS_PATH, O_CREAT);
-        if (retval < 0) pios_trace(PIOS_TRACE_ERROR, "Couldn't mkdir %s", PIOS_LOGFS_PATH);
-    }
-
-    return retval;
+    snprintf((char *)devicename, DEVICENAME_LEN, "/dev%01u", (unsigned) fs_id);
 }
+
+/**
+ * Get an logfs path
+ * @param[in] fs_id flash device id
+ * @param[in] devicename string pointer -- must be 14 bytes long and allocated
+ */
+#define LOGFSPATH_LEN 14
+static void getLogfsPath(uintptr_t fs_id, char *devicename)
+{
+    snprintf((char *)devicename, LOGFSPATH_LEN, "/dev%01u/logfs", (unsigned)fs_id);
+}
+
+//Simplistic API takes the fs_id and maps to a path /dev0 eg.  not really necessary
+// but allows reuse existing API plus new API in parallel without too much conflict
 
 int32_t PIOS_FLASHFS_Logfs_Destroy(
 	__attribute__((unused)) uintptr_t fs_id)
 {
     pios_DIR *dp; 
     struct pios_dirent *ep;
+    char path[LOGFSPATH_LEN];
+    getLogfsPath(fs_id, path);
+
     pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_Logfs_Destroy");
 
-    dp = pios_opendir (PIOS_LOGFS_PATH);
+
+    dp = pios_opendir (path);
     if (dp != NULL)
     {
       while ((ep = pios_readdir(dp))) {
@@ -94,7 +93,7 @@ int32_t PIOS_FLASHFS_Logfs_Destroy(
     }
     else
     {
-      pios_trace(PIOS_TRACE_ERROR, "Couldn't open the directory %s.", PIOS_LOGFS_PATH);
+      pios_trace(PIOS_TRACE_ERROR, "Couldn't open the directory %s.", path);
     }
     return 0;
 }
@@ -130,23 +129,20 @@ int32_t PIOS_FLASHFS_ObjSave(
 	uint16_t obj_size)
 {
     int fd;
-    uint8_t filename[14];
-    char str[100];
+    char filename[OBJECTPATHNAME_LEN];
     uint32_t bytes_written = 0;
 
     pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_ObjSave");
 
     // Get filename
-    objectFilename(obj_id, obj_inst_id, filename);
-
-    sprintf(str, "%s/%s", PIOS_LOGFS_PATH, filename);
+    getObjectPathAndName(fs_id, obj_id, obj_inst_id, filename);
 
     // Open file
-    fd = pios_open(str, O_CREAT | O_RDWR | O_TRUNC, S_IREAD | S_IWRITE);
-    pios_trace(PIOS_TRACE_TEST, "pios_open (%s) retval=%d.", str, fd);
+    fd = pios_open(filename, O_CREAT | O_RDWR | O_TRUNC, S_IREAD | S_IWRITE);
+    pios_trace(PIOS_TRACE_TEST, "pios_open (%s) retval=%d.", filename, fd);
 
     if (fd < 0) {
-	pios_trace(PIOS_TRACE_ERROR, "Couldn't open %s", PIOS_LOGFS_PATH);
+	    pios_trace(PIOS_TRACE_ERROR, "Couldn't open %s", filename);
     }
     else {
         // Append object
@@ -186,21 +182,20 @@ int32_t PIOS_FLASHFS_ObjLoad(
 	uint16_t obj_size)
 {
     int fd;
-    uint8_t filename[14];
-    char str[100];
+    char filename[OBJECTPATHNAME_LEN];
     uint32_t bytes_read = 0;
+
     pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_ObjLoad");
 
     // Get filename
-    objectFilename(obj_id, obj_inst_id, filename);
-    sprintf(str, "%s/%s", PIOS_LOGFS_PATH, filename);
+    getObjectPathAndName(fs_id, obj_id, obj_inst_id, filename);
 
-    fd = pios_open(str,O_RDONLY, S_IREAD | S_IWRITE);
+    fd = pios_open(filename,O_RDONLY, S_IREAD | S_IWRITE);
 
-    pios_trace(PIOS_TRACE_TEST, "pios_open (%s) retval=%d.", str, fd);
+    pios_trace(PIOS_TRACE_TEST, "pios_open (%s) retval=%d.", filename, fd);
 
     if (fd < 0) {
-	pios_trace(PIOS_TRACE_ERROR, "Couldn't open %s", PIOS_LOGFS_PATH);
+	pios_trace(PIOS_TRACE_ERROR, "Couldn't open %s", filename);
     }
     else {
         // Load object
@@ -232,18 +227,16 @@ int32_t PIOS_FLASHFS_ObjDelete(
 	uint32_t obj_id, 
 	uint16_t obj_inst_id)
 {
-    uint8_t filename[14];
-    char str[100];
+    char filename[OBJECTPATHNAME_LEN];
     int retval;
     pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_ObjDelete");
 
     // Get filename
-    objectFilename(obj_id, obj_inst_id, filename);
-    sprintf(str, "%s/%s", PIOS_LOGFS_PATH, filename);
+    getObjectPathAndName(fs_id, obj_id, obj_inst_id, filename);
 
     // Delete file
-    retval = pios_unlink((char *)str);
-    pios_trace(PIOS_TRACE_TEST, "pios_unlink(%s) retval=%d" , str, retval);
+    retval = pios_unlink((char *)filename);
+    pios_trace(PIOS_TRACE_TEST, "pios_unlink(%s) retval=%d" , filename, retval);
 
     return 0;
 }
@@ -263,12 +256,17 @@ int32_t PIOS_FLASHFS_Format(
 {
     int retval;
     pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_Format");
-    retval = pios_format(PIOS_MOUNTPOINT_LOGFS,
+
+    // Convert fs_id into device name
+    char devicename[DEVICENAME_LEN];
+    getDeviceName(fs_id, devicename);
+
+    retval = pios_format(devicename,
 		       TRUE,  // unmount flag
 		       TRUE,  // force unmount flag
 		       TRUE);  // remount
 
-    pios_trace(PIOS_TRACE_TEST, "pios_format (%s) retval=%d.", PIOS_MOUNTPOINT_LOGFS, retval);
+    pios_trace(PIOS_TRACE_TEST, "pios_format (%s) retval=%d.", devicename, retval);
     return retval; 
 }
 
@@ -282,7 +280,17 @@ int32_t PIOS_FLASHFS_GetStats(
 	__attribute__((unused)) uintptr_t fs_id, 
 	__attribute__((unused)) struct PIOS_FLASHFS_Stats *stats)
 {
-    pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_GetStats");
+    // pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_GetStats");
+
+    // Convert fs_id into device name
+    char devicename[DEVICENAME_LEN];
+    getDeviceName(fs_id, devicename);
+
+    // Get yaffs statistics for that device
+    stats->num_free_slots = yaffs_freespace(devicename);
+    stats->num_active_slots = yaffs_totalspace(devicename) - stats->num_free_slots;
+
+    // Return device usage statistics
     return 0;
 }
 

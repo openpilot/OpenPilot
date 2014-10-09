@@ -34,6 +34,9 @@ struct PIOS_FLASHFS_Stats {
     uint16_t num_active_slots; /* slots in active state */
 };
 
+// define logfs subdirectory of a yaffs flash device
+#define PIOS_LOGFS_DIR "logfs"
+
 int32_t PIOS_FLASHFS_Format(uintptr_t fs_id);
 int32_t PIOS_FLASHFS_ObjSave(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t *obj_data, uint16_t obj_size);
 int32_t PIOS_FLASHFS_ObjLoad(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t *obj_data, uint16_t obj_size);

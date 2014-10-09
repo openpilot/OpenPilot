@@ -128,7 +128,7 @@ void yaffsfs_LockInit(void)
 	pthread_mutex_init(&mutex1, NULL);
 
 	/* Sneak in starting a background gc thread too */
-	pthread_create(&bc_gc_thread, NULL, bg_gc_func, NULL);
+	// pthread_create(&bc_gc_thread, NULL, bg_gc_func, NULL);
 }
 
 #else

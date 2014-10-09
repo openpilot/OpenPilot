@@ -33,7 +33,7 @@
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <taskinfo.h>
-#include "pios_stdio.h"
+
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -120,17 +120,13 @@ void PIOS_Board_Init(void)
     /* Delay system */
     PIOS_DELAY_Init();
 
-    // Initiaise the flash file system
-    if (pios_stdio_startup()) {
-        PIOS_Assert(0);
-    }
-
-    // Initialize logfs 
+    // Initialize logfs for settings.  This will be /dev0 with settings stored
+    // via the logfs object api in /dev0/logfs/
     if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, NULL, NULL, 0)) {
         PIOS_DEBUG_Assert(0);
     }
+    // re-use the simposix yaffs /dev0 nor simulation, which does not support being instanced twice.
     pios_user_fs_id = pios_uavo_settings_fs_id;
-
 
     /* Initialize the task monitor */
     if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {

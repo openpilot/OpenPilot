@@ -83,6 +83,7 @@
 static void updatePIDs(UAVObjEvent *ev);
 static uint8_t update(float *var, float val);
 static uint8_t updateUint8(uint8_t *var, float val);
+static uint8_t updateInt8(int8_t *var, float val);
 static float scale(float val, float inMin, float inMax, float outMin, float outMax);
 
 /**
@@ -331,8 +332,23 @@ static void updatePIDs(UAVObjEvent *ev)
             case TXPIDSETTINGS_PIDS_YAWATTITUDERESP:
                 needsUpdateBank |= updateUint8(&bank.YawMax, value);
                 break;
+            case TXPIDSETTINGS_PIDS_ROLLEXPO:
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Roll, value);
+                break;
+            case TXPIDSETTINGS_PIDS_PITCHEXPO:
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Pitch, value);
+                break;
+            case TXPIDSETTINGS_PIDS_ROLLPITCHEXPO:
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Roll, value);
+                break;
+            case TXPIDSETTINGS_PIDS_YAWEXPO:
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Yaw, value);
+                break;
             case TXPIDSETTINGS_PIDS_GYROTAU:
                 needsUpdateStab |= update(&stab.GyroTau, value);
+                break;
+            case TXPIDSETTINGS_PIDS_ACROPLUSFACTOR:
+                needsUpdateBank |= update(&bank.AcroInsanityFactor, value);
                 break;
             default:
                 PIOS_Assert(0);
@@ -422,6 +438,21 @@ static uint8_t update(float *var, float val)
 static uint8_t updateUint8(uint8_t *var, float val)
 {
     uint8_t roundedVal = (uint8_t)roundf(val);
+
+    if (*var != roundedVal) {
+        *var = roundedVal;
+        return 1;
+    }
+    return 0;
+}
+
+/**
+ * Updates var using val if needed.
+ * \returns 1 if updated, 0 otherwise
+ */
+static uint8_t updateInt8(int8_t *var, float val)
+{
+    int8_t roundedVal = (int8_t)roundf(val);
 
     if (*var != roundedVal) {
         *var = roundedVal;

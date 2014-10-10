@@ -340,6 +340,7 @@ static void updatePIDs(UAVObjEvent *ev)
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHEXPO:
                 needsUpdateBank |= updateInt8(&bank.StickExpo.Roll, value);
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Pitch, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWEXPO:
                 needsUpdateBank |= updateInt8(&bank.StickExpo.Yaw, value);

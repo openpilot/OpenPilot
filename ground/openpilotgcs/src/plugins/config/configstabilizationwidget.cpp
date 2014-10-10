@@ -315,7 +315,7 @@ void ConfigStabilizationWidget::replotExpo(int value, QwtPlotCurve &curve)
 {
     double x[EXPO_CURVE_POINTS_COUNT] = { 0 };
     double y[EXPO_CURVE_POINTS_COUNT] = { 0 };
-    double factor = pow(1.03293, value);
+    double factor = pow(EXPO_CURVE_CONSTANT, value);
     double step   = 1.0 / (EXPO_CURVE_POINTS_COUNT - 1);
 
     for (int i = 0; i < EXPO_CURVE_POINTS_COUNT; i++) {

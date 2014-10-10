@@ -46,14 +46,14 @@ static float applyExpo(float value, float expo);
 static float applyExpo(float value, float expo)
 {
     // note: fastPow makes a small error, therefore result needs to be bound
-    float exp = boundf(fastPow(1.023293f, expo), 0.1f, 10.0f);
+    float exp = boundf(fastPow(1.00695f, expo), 0.1f, 10.0f);
 
     // magic number scales expo
     // so that
     // expo=100 yields value**10
     // expo=0 yields value**1
     // expo=-100 yields value**(1/10)
-    // (pow(10,1/100)~=1.023293)
+    // (pow(10,1/100)~=1.00695)
     if (value > 0.0f) {
         return boundf(fastPow(value, exp), 0.0f, 1.0f);
     } else if (value < -0.0f) {

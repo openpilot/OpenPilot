@@ -65,7 +65,7 @@
 #include "CoordinateConversions.h"
 #include <pios_notify.h>
 #include <mathmisc.h>
-
+#include <pios_constants.h>
 #include <pios_instrumentation_helper.h>
 
 PERF_DEFINE_COUNTER(counterUpd);
@@ -82,7 +82,9 @@ PERF_DEFINE_COUNTER(counterAtt);
 #define STACK_SIZE_BYTES    540
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
 
+// Attitude module runs at 500Hz
 #define SENSOR_PERIOD       2
+
 #define UPDATE_RATE         25.0f
 
 // Interval in number of sample to recalculate temp bias
@@ -150,8 +152,7 @@ static volatile int32_t trim_accels[3];
 static volatile int32_t trim_samples;
 int32_t const MAX_TRIM_FLIGHT_SAMPLES = 65535;
 
-#define GRAV                       9.81f
-#define STD_CC_ACCEL_SCALE         (GRAV * 0.004f)
+#define STD_CC_ACCEL_SCALE         (PIOS_CONST_MKS_GRAV_ACCEL_F * 0.004f)
 /* 0.004f is gravity / LSB */
 #define STD_CC_ANALOG_GYRO_NEUTRAL 1665
 #define STD_CC_ANALOG_GYRO_GAIN    0.42f
@@ -324,7 +325,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             PERF_MEASURE_PERIOD(counterPeriod);
             AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
         }
-        vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
+        vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_PERIOD_MS);
     }
 }
 
@@ -462,7 +463,7 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
 #if defined(PIOS_INCLUDE_MPU6000)
 
     xQueueHandle queue = PIOS_MPU6000_GetQueue();
-    BaseType_t ret     = xQueueReceive(queue, (void *)&mpu6000_data, 0);
+    BaseType_t ret     = xQueueReceive(queue, (void *)&mpu6000_data, SENSOR_PERIOD);
     while (ret == pdTRUE) {
         gyros[0]  += mpu6000_data.gyro_x;
         gyros[1]  += mpu6000_data.gyro_y;
@@ -478,6 +479,7 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
         // check if further samples are already in queue
         ret = xQueueReceive(queue, (void *)&mpu6000_data, 0);
     }
+    PERF_TRACK_VALUE(counterAccelSamples, count);
 
     if (!count) {
         return -1; // Error, no data
@@ -610,24 +612,24 @@ __attribute__((optimize("O3"))) static void updateAttitude(AccelStateData *accel
     CrossProduct((const float *)accels_filtered, (const float *)grot_filtered, accel_err);
 
     // Account for accel magnitude
-    float accel_mag = sqrtf(accels_filtered[0] * accels_filtered[0] + accels_filtered[1] * accels_filtered[1] + accels_filtered[2] * accels_filtered[2]);
-    if (accel_mag < 1.0e-3f) {
+    float inv_accel_mag = fast_invsqrtf(accels_filtered[0] * accels_filtered[0] + accels_filtered[1] * accels_filtered[1] + accels_filtered[2] * accels_filtered[2]);
+    if (inv_accel_mag > 1e3f) {
         return;
     }
 
     // Account for filtered gravity vector magnitude
-    float grot_mag;
+    float inv_grot_mag;
 
     if (accel_filter_enabled) {
-        grot_mag = sqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
+        inv_grot_mag = fast_invsqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
     } else {
-        grot_mag = 1.0f;
+        inv_grot_mag = 1.0f;
     }
 
-    if (grot_mag < 1.0e-3f) {
+    if (inv_grot_mag > 1e3f) {
         return;
     }
-    const float invMag = 1.0f / (accel_mag * grot_mag);
+    const float invMag = (inv_accel_mag * inv_grot_mag);
     accel_err[0] *= invMag;
     accel_err[1] *= invMag;
     accel_err[2] *= invMag;
@@ -668,21 +670,20 @@ __attribute__((optimize("O3"))) static void updateAttitude(AccelStateData *accel
     }
 
     // Renomalize
-    float qmag = sqrtf(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
+    float inv_qmag = fast_invsqrtf(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
 
     // If quaternion has become inappropriately short or is nan reinit.
     // THIS SHOULD NEVER ACTUALLY HAPPEN
-    if ((fabsf(qmag) < 1e-3f) || isnan(qmag)) {
+    if ((fabsf(inv_qmag) > 1e3f) || isnan(inv_qmag)) {
         q[0] = 1;
         q[1] = 0;
         q[2] = 0;
         q[3] = 0;
     } else {
-        const float invQmag = 1.0f / qmag;
-        q[0] = q[0] * invQmag;
-        q[1] = q[1] * invQmag;
-        q[2] = q[2] * invQmag;
-        q[3] = q[3] * invQmag;
+        q[0] = q[0] * inv_qmag;
+        q[1] = q[1] * inv_qmag;
+        q[2] = q[2] * inv_qmag;
+        q[3] = q[3] * inv_qmag;
     }
 
     AttitudeStateData attitudeState;
@@ -800,7 +801,7 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         accelGyroSettings.accel_scale.X = trim_accels[0] / trim_samples;
         accelGyroSettings.accel_scale.Y = trim_accels[1] / trim_samples;
         // Z should average -grav
-        accelGyroSettings.accel_scale.Z = trim_accels[2] / trim_samples + GRAV;
+        accelGyroSettings.accel_scale.Z = trim_accels[2] / trim_samples + PIOS_CONST_MKS_GRAV_ACCEL_F;
         attitudeSettings.TrimFlight     = ATTITUDESETTINGS_TRIMFLIGHT_NORMAL;
         AttitudeSettingsSet(&attitudeSettings);
     } else {

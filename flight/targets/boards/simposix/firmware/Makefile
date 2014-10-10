@@ -70,6 +70,8 @@ UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
 include $(PIOS)/common/libraries/FreeRTOS/library.mk
+include $(PIOS)/common/libraries/yaffs2/library.mk
+include $(PIOS)/common/libraries/yaffs2/simposix/yaffs_impl.mk
 #include $(FLIGHTLIB)/PyMite/pymite.mk
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -103,7 +105,8 @@ SRC += $(MATHLIB)/mathmisc.c
 SRC += $(MATHLIB)/butterworth.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
-SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
+SRC += $(PIOSCORECOMMON)/pios_logfs.c
+SRC += $(PIOSCORECOMMON)/pios_trace.c
 SRC += $(PIOSCORECOMMON)/pios_debuglog.c
 SRC += $(PIOSCORECOMMON)/pios_callbackscheduler.c
 SRC += $(PIOSCORECOMMON)/pios_deltatime.c
@@ -155,7 +158,10 @@ CFLAGS += -finstrument-functions -ffixed-r10
 else
 CFLAGS += -Os
 endif
-   
+  
+# tracing
+# CFLAGS += -DPIOS_TRACE
+ 
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 

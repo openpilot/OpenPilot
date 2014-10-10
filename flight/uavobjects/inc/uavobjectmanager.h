@@ -203,8 +203,8 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId);
 int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId);
 #if defined(PIOS_INCLUDE_SDCARD)
-int32_t UAVObjSaveToFile(UAVObjHandle obj_handle, uint16_t instId, FILEINFO *file);
-int32_t UAVObjLoadFromFile(UAVObjHandle obj_handle, FILEINFO *file);
+int32_t UAVObjSaveToFile(UAVObjHandle obj_handle, uint16_t instId);
+int32_t UAVObjLoadFromFile(UAVObjHandle obj_handle);
 #endif
 int32_t UAVObjSaveSettings();
 int32_t UAVObjLoadSettings();

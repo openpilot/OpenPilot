@@ -85,7 +85,7 @@ public slots:
     virtual void configurationChanged(IUAVGadgetConfiguration *) {}
     virtual void configurationAdded(IUAVGadgetConfiguration *) {}
     virtual void configurationToBeDeleted(IUAVGadgetConfiguration *) {}
-    virtual void configurationNameChanged(QString, QString) {}
+    virtual void configurationNameChanged(IUAVGadgetConfiguration *config, QString, QString) {}
 private slots:
 private:
     QString m_classId;

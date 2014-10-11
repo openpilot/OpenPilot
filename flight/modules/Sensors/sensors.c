@@ -70,7 +70,8 @@
 
 // Interval in number of sample to recalculate temp bias
 #define TEMP_CALIB_INTERVAL 30
-#define TEMP_ALPHA          0.9f
+// LPF 5Hz at 500Hz rate
+#define TEMP_ALPHA          0.999504f
 
 #define ZERO_ROT_ANGLE      0.00001f
 // Private types
@@ -108,8 +109,8 @@ static float mag_transform[3][3] = {
 static volatile bool gyro_temp_calibrated  = false;
 static volatile bool accel_temp_calibrated = false;
 
-static float accel_temperature  = 0;
-static float gyro_temperature   = 0;
+static float accel_temperature  = NAN;
+static float gyro_temperature   = NAN;
 static float accel_temp_bias[3] = { 0 };
 static float gyro_temp_bias[3] = { 0 };
 static uint8_t temp_calibration_count = 0;
@@ -373,9 +374,14 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             PIOS_DEBUG_Assert(0);
         }
 
-        accel_temperature = TEMP_ALPHA * accelSensorData.temperature + (1 - TEMP_ALPHA) * accelSensorData.temperature;
-        gyro_temperature  = TEMP_ALPHA * gyroSensorData.temperature + (1 - TEMP_ALPHA) * gyroSensorData.temperature;
+        if (isnan(accel_temperature)) {
+            accel_temperature = accelSensorData.temperature;
+            gyro_temperature  = gyroSensorData.temperature;
+        }
 
+        accel_temperature = TEMP_ALPHA * accel_temperature + (1 - TEMP_ALPHA) * accelSensorData.temperature;
+        gyro_temperature  = TEMP_ALPHA * gyro_temperature + (1 - TEMP_ALPHA) * gyroSensorData.temperature;
+        gyroSensorData.temperature = gyro_temperature;
         if ((accel_temp_calibrated || gyro_temp_calibrated) && !temp_calibration_count) {
             temp_calibration_count = TEMP_CALIB_INTERVAL;
             if (accel_temp_calibrated) {
@@ -467,7 +473,6 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 #endif
         vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
-        lastSysTime = xTaskGetTickCount();
     }
 }
 

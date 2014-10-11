@@ -121,7 +121,7 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
     .Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
     // Clock at 8 khz, downsampled by 8 for 1000 Hz
     .Smpl_rate_div_no_dlp = 7,
-    // Clock at 1 khz, downsampled by 2 for 1000 Hz
+    // Clock at 1 khz, downsampled by 1 for 1000 Hz
     .Smpl_rate_div_dlp    = 0,
     .interrupt_cfg  = PIOS_MPU6000_INT_CLR_ANYRD,
     .interrupt_en   = PIOS_MPU6000_INTEN_DATA_RDY,

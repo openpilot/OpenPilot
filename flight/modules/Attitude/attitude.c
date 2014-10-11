@@ -89,7 +89,9 @@ PERF_DEFINE_COUNTER(counterAtt);
 
 // Interval in number of sample to recalculate temp bias
 #define TEMP_CALIB_INTERVAL 30
-#define TEMP_ALPHA          0.9f
+
+// LPF 5Hz at 500Hz rate
+#define TEMP_ALPHA          0.999504f
 
 #define UPDATE_EXPECTED     (1.0f / 500.0f)
 #define UPDATE_MIN          1.0e-6f
@@ -136,7 +138,7 @@ static bool apply_accel_temp = false;
 static AccelGyroSettingsgyro_temp_coeffData gyro_temp_coeff;;
 static AccelGyroSettingsaccel_temp_coeffData accel_temp_coeff;
 static AccelGyroSettingstemp_calibrated_extentData temp_calibrated_extent;
-static float temperature = 0;
+static float temperature = NAN;
 static float accel_temp_bias[3] = { 0 };
 static float gyro_temp_bias[3] = { 0 };
 static uint8_t temp_calibration_count = 0;
@@ -499,11 +501,14 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     accels[2]  *= accel_scale.Z * invcount;
     temp *= invcount;
 
+    if(isnan(temperature)){
+        temperature = temp;
+    }
     temperature = TEMP_ALPHA * temperature + (1 - TEMP_ALPHA) * temp;
 
     if ((apply_gyro_temp || apply_accel_temp) && !temp_calibration_count) {
         temp_calibration_count = TEMP_CALIB_INTERVAL;
-        float ctemp = boundf(temp, temp_calibrated_extent.max, temp_calibrated_extent.min);
+        float ctemp = boundf(temperature, temp_calibrated_extent.max, temp_calibrated_extent.min);
         if (apply_gyro_temp) {
             gyro_temp_bias[0] = (gyro_temp_coeff.X + gyro_temp_coeff.X2 * ctemp) * ctemp;
             gyro_temp_bias[1] = (gyro_temp_coeff.Y + gyro_temp_coeff.Y2 * ctemp) * ctemp;

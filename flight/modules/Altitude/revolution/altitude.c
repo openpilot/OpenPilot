@@ -53,7 +53,8 @@
 
 // Interval in number of sample to recalculate temp bias
 #define TEMP_CALIB_INTERVAL 10
-#define TEMP_ALPHA          0.9f
+// 5Hz @120Hz update
+#define TEMP_ALPHA          0.9979f
 
 // Private types
 
@@ -64,7 +65,7 @@ static RevoSettingsBaroTempCorrectionExtentData baroCorrectionExtent;
 static volatile bool tempCorrectionEnabled;
 
 static float baro_temp_bias   = 0;
-static float baro_temperature = 0;
+static float baro_temperature = NAN;
 static uint8_t temp_calibration_count = 0;
 
 // Private functions
@@ -175,6 +176,10 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
 
         temp  = PIOS_MS5611_GetTemperature();
         press = PIOS_MS5611_GetPressure();
+
+        if (isnan(baro_temperature)) {
+            baro_temperature = temp;
+        }
 
         baro_temperature = TEMP_ALPHA * baro_temperature + (1 - TEMP_ALPHA) * temp;
 

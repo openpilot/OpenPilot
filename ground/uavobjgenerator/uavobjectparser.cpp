@@ -25,7 +25,7 @@
  */
 
 #include "uavobjectparser.h"
-
+#include <QDebug>
 /**
  * Constructor
  */
@@ -441,6 +441,21 @@ QString UAVObjectParser::processObjectFields(QDomNode & childNode, ObjectInfo *i
         field->name = name;
     }
 
+    // Get description attribute if any
+    elemAttr = elemAttributes.namedItem("description");
+    if (!elemAttr.isNull()) {
+        field->description = elemAttr.nodeValue();
+    } else {
+        // Look for a child description node
+        QDomNode node = childNode.firstChildElement("description");
+        if (!node.isNull()) {
+            QDomNode description = node.firstChild();
+            if (!description.isNull()) {
+                field->description = description.nodeValue();
+            }
+        }
+    }
+
     // Get units attribute
     elemAttr = elemAttributes.namedItem("units");
     if (elemAttr.isNull()) {
@@ -572,6 +587,7 @@ QString UAVObjectParser::processObjectFields(QDomNode & childNode, ObjectInfo *i
     }
     // Add field to object
     info->fields.append(field);
+    qDebug() << "field added" << info->name << ", description" << field->description;
     // Done
     return QString();
 }

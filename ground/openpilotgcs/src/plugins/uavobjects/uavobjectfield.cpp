@@ -30,7 +30,7 @@
 #include <QDebug>
 #include <QtWidgets>
 
-UAVObjectField::UAVObjectField(const QString & name, const QString & units, FieldType type, quint32 numElements, const QStringList & options, const QString &limits)
+UAVObjectField::UAVObjectField(const QString & name, const QString & description, const QString & units, FieldType type, quint32 numElements, const QStringList & options, const QString &limits)
 {
     QStringList elementNames;
 
@@ -39,18 +39,19 @@ UAVObjectField::UAVObjectField(const QString & name, const QString & units, Fiel
         elementNames.append(QString("%1").arg(n));
     }
     // Initialize
-    constructorInitialize(name, units, type, elementNames, options, limits);
+    constructorInitialize(name, description, units, type, elementNames, options, limits);
 }
 
-UAVObjectField::UAVObjectField(const QString & name, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits)
+UAVObjectField::UAVObjectField(const QString & name, const QString & description, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits)
 {
-    constructorInitialize(name, units, type, elementNames, options, limits);
+    constructorInitialize(name, description, units, type, elementNames, options, limits);
 }
 
-void UAVObjectField::constructorInitialize(const QString & name, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits)
+void UAVObjectField::constructorInitialize(const QString & name, const QString & description, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits)
 {
     // Copy params
     this->name         = name;
+    this->description  = description;
     this->units        = units;
     this->type         = type;
     this->options      = options;
@@ -607,6 +608,11 @@ void UAVObjectField::clear()
 QString UAVObjectField::getName()
 {
     return name;
+}
+
+QString UAVObjectField::getDescription()
+{
+    return description;
 }
 
 QString UAVObjectField::getUnits()

@@ -52,13 +52,14 @@ public:
         int board;
     } LimitStruct;
 
-    UAVObjectField(const QString & name, const QString & units, FieldType type, quint32 numElements, const QStringList & options, const QString & limits = QString());
-    UAVObjectField(const QString & name, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString & limits = QString());
+    UAVObjectField(const QString & name, const QString & description, const QString & units, FieldType type, quint32 numElements, const QStringList & options, const QString & limits = QString());
+    UAVObjectField(const QString & name, const QString & description, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString & limits = QString());
     void initialize(quint8 *data, quint32 dataOffset, UAVObject *obj);
     UAVObject *getObject();
     FieldType getType();
     QString getTypeAsString();
     QString getName();
+    QString getDescription();
     QString getUnits();
     quint32 getNumElements();
     QStringList getElementNames();
@@ -91,6 +92,7 @@ signals:
 
 protected:
     QString name;
+    QString description;
     QString units;
     FieldType type;
     QStringList elementNames;
@@ -102,7 +104,7 @@ protected:
     UAVObject *obj;
     QMap<quint32, QList<LimitStruct> > elementLimits;
     void clear();
-    void constructorInitialize(const QString & name, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits);
+    void constructorInitialize(const QString & name, const QString & description, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits);
     void limitsInitialize(const QString &limits);
 };
 

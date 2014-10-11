@@ -250,7 +250,7 @@ QVariant ArrayFieldTreeItem::data(int column) const
                                   .arg(m_field->getValue(i).toUInt(&ok), TreeItem::maxHexStringLength(m_field->getType()),
                                        16, QChar('0')).toUpper());
             }
-            QString data =  QString("{%1}").arg(dataString);
+            QString data = QString("{%1}").arg(dataString);
             return data;
         } else {
             return QVariant();

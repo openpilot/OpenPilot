@@ -53,7 +53,7 @@ static float applyExpo(float value, float expo)
     // expo=100 yields value**10
     // expo=0 yields value**1
     // expo=-100 yields value**(1/10)
-    // (pow(2.0/100)~=1.00695)
+    // (pow(2.0,1/100)~=1.00695)
     if (value > 0.0f) {
         return boundf(fastPow(value, exp), 0.0f, 1.0f);
     } else if (value < -0.0f) {

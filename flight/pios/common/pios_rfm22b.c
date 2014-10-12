@@ -199,7 +199,7 @@ static bool rfm22_isConnected(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_isCoordinator(struct pios_rfm22b_dev *rfm22b_dev);
 static uint32_t rfm22_destinationID(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev);
-static void rfm22_synchronizeClock(struct pios_rfm22b_dev *rfm22b_dev);
+static void rfm22_synchronizeClock(struct pios_rfm22b_dev *rfm22b_dev, uint16_t txChan);
 static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, portTickType ticks);
 static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t index);
 static uint8_t rfm22_calcChannelFromClock(struct pios_rfm22b_dev *rfm22b_dev);
@@ -1764,9 +1764,16 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
         return RADIO_EVENT_RX_MODE;
     }
 
+    if (rfm22_isCoordinator(radio_dev)) {
+        max_data_len--;
+        p[0] = radio_dev->channel_index;
+        p++;
+        len++;
+    }
+
     // Should we append PPM data to the packet?
     if (radio_dev->ppm_send_mode) {
-        len = RFM22B_PPM_NUM_CHANNELS + (radio_dev->ppm_only_mode ? 2 : 1);
+        len += RFM22B_PPM_NUM_CHANNELS + (radio_dev->ppm_only_mode ? 2 : 1);
 
         // Ensure we can fit the PPM data in the packet.
         if (max_data_len < len) {
@@ -1815,13 +1822,14 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
     // Add the error correcting code.
     if (!radio_dev->ppm_only_mode) {
         if (len != 0) {
-            encode_data((unsigned char *)p, len, (unsigned char *)p);
+            encode_data((unsigned char *)radio_dev->tx_packet, len,
+                    (unsigned char *)radio_dev->tx_packet);
         }
         len += RS_ECC_NPARITY;
     }
 
     // Transmit the packet.
-    PIOS_RFM22B_TransmitPacket((uint32_t)radio_dev, p, len);
+    PIOS_RFM22B_TransmitPacket((uint32_t)radio_dev, radio_dev->tx_packet, len);
 
     return RADIO_EVENT_NUM_EVENTS;
 }
@@ -1886,6 +1894,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
     bool good_packet = true;
     bool corrected_packet = false;
     uint8_t data_len = rx_len;
+    uint8_t txChan = radio_dev->channel_index;
 
     // We don't rsencode ppm only packets.
     if (!radio_dev->ppm_only_mode) {
@@ -1901,6 +1910,17 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
                 // We corrected it
                 corrected_packet = true;
             }
+        }
+    }
+
+    if ((good_packet || corrected_packet) && !rfm22_isCoordinator(radio_dev) && data_len > 0) {
+        txChan = p[0];
+        p++;
+        data_len--;
+
+        if (radio_dev->channel_index != txChan) {
+            DEBUG_PRINTF (2, "%d: chan overlap %d %d\n\r", radio_dev->packet_start_ticks, txChan,
+                    radio_dev->channel_index);
         }
     }
 
@@ -1970,7 +1990,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
          */
         if (!rfm22_isCoordinator(radio_dev) &&
                 radio_dev->rx_destination_id == rfm22_destinationID(radio_dev)) {
-            rfm22_synchronizeClock(radio_dev);
+            rfm22_synchronizeClock(radio_dev, txChan);
             radio_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
         }
 
@@ -2160,12 +2180,12 @@ uint32_t rfm22_destinationID(struct pios_rfm22b_dev *rfm22b_dev)
 *****************************************************************************/
 
 /**
- * Synchronize the clock after a packet receive from our coordinator on the syncronization channel.
- * This function should be called when a packet is received on the synchronization channel.
+ * Synchronize the clock after a packet receive from our coordinator.
  *
  * @param[in] rfm22b_dev  The device structure
+ * @param[in] c The channel id the coordinator sent the packet on
  */
-static void rfm22_synchronizeClock(struct pios_rfm22b_dev *rfm22b_dev)
+static void rfm22_synchronizeClock(struct pios_rfm22b_dev *rfm22b_dev, uint16_t txChan)
 {
     portTickType start_time = rfm22b_dev->packet_start_ticks;
 
@@ -2177,7 +2197,7 @@ static void rfm22_synchronizeClock(struct pios_rfm22b_dev *rfm22b_dev)
     uint8_t offset = (uint8_t)ceil(35000.0F / data_rate[rfm22b_dev->datarate]);
 
     rfm22b_dev->time_delta = frequency_hop_cycle_time - time_delta + offset +
-        rfm22b_dev->packet_time * rfm22b_dev->channel_index;
+        rfm22b_dev->packet_time * txChan;
 }
 
 /**

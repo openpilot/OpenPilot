@@ -50,8 +50,11 @@ public:
         return m_widget;
     }
     void loadConfiguration(IUAVGadgetConfiguration *config);
+
 private slots:
-    void viewOptionsChangedSlot(bool categorized, bool scientific, bool metadata);
+    void viewOptionsChangedSlot(bool categorized, bool scientific, bool metadata, bool description);
+    void splitterChanged(QList<QVariant> &splitterSizes);
+
 private:
     UAVObjectBrowserWidget *m_widget;
     UAVObjectBrowserConfiguration *m_config;

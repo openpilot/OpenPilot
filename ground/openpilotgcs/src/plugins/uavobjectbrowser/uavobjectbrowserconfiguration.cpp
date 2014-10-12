@@ -35,7 +35,8 @@ UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QS
     m_recentlyUpdatedTimeout(500),
     m_useCategorizedView(false),
     m_useScientificView(false),
-    m_showMetaData(false)
+    m_showMetaData(false),
+    m_showDescription(false)
 {
     // if a saved configuration exists load it
     if (qSettings != 0) {
@@ -47,10 +48,14 @@ UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QS
         m_useCategorizedView       = qSettings->value("CategorizedView").toBool();
         m_useScientificView        = qSettings->value("ScientificView").toBool();
         m_showMetaData = qSettings->value("showMetaData").toBool();
+        m_showDescription = qSettings->value("showDescription").toBool();
+        m_splitterSizes = qSettings->value("splitterSizes").toList();
         m_recentlyUpdatedColor     = recent;
         m_manuallyChangedColor     = manual;
         m_recentlyUpdatedTimeout   = timeout;
         m_onlyHilightChangedValues = hilight;
+    } else {
+        m_splitterSizes << QVariant(300) << QVariant(300);
     }
 }
 
@@ -64,7 +69,9 @@ IUAVGadgetConfiguration *UAVObjectBrowserConfiguration::clone()
     m->m_onlyHilightChangedValues = m_onlyHilightChangedValues;
     m->m_useCategorizedView = m_useCategorizedView;
     m->m_useScientificView  = m_useScientificView;
+    m->m_splitterSizes = m_splitterSizes;
     m->m_showMetaData = m_showMetaData;
+    m->m_showDescription = m_showDescription;
     return m;
 }
 
@@ -81,4 +88,6 @@ void UAVObjectBrowserConfiguration::saveConfig(QSettings *qSettings) const
     qSettings->setValue("CategorizedView", m_useCategorizedView);
     qSettings->setValue("ScientificView", m_useScientificView);
     qSettings->setValue("showMetaData", m_showMetaData);
+    qSettings->setValue("showDescription", m_showDescription);
+    qSettings->setValue("splitterSizes", m_splitterSizes);
 }

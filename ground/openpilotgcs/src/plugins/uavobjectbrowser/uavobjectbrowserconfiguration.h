@@ -40,7 +40,9 @@ class UAVObjectBrowserConfiguration : public IUAVGadgetConfiguration {
     Q_PROPERTY(bool m_onlyHilightChangedValues READ onlyHighlightChangedValues WRITE setOnlyHighlightChangedValues)
     Q_PROPERTY(bool m_useCategorizedView READ categorizedView WRITE setCategorizedView)
     Q_PROPERTY(bool m_useScientificView READ scientificView WRITE setScientificView)
+    Q_PROPERTY(bool m_showDescription READ showDescription WRITE setShowDescription)
     Q_PROPERTY(bool m_showMetaData READ showMetaData WRITE setShowMetaData)
+    Q_PROPERTY(QList<QVariant> m_splitterSizes READ splitterSizes WRITE setSplitterSizes)
 public:
     explicit UAVObjectBrowserConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
 
@@ -75,6 +77,15 @@ public:
     {
         return m_showMetaData;
     }
+    bool showDescription() const
+    {
+        return m_showDescription;
+    }
+
+    QList<QVariant> splitterSizes() const
+    {
+        return m_splitterSizes;
+    }
 
 signals:
 
@@ -107,6 +118,15 @@ public slots:
     {
         m_showMetaData = value;
     }
+    void setShowDescription(bool value)
+    {
+        m_showDescription = value;
+    }
+
+    void setSplitterSizes(QList<QVariant> arg)
+    {
+        m_splitterSizes = arg;
+    }
 
 private:
     QColor m_recentlyUpdatedColor;
@@ -116,6 +136,8 @@ private:
     bool m_useCategorizedView;
     bool m_useScientificView;
     bool m_showMetaData;
+    bool m_showDescription;
+    QList<QVariant> m_splitterSizes;
 };
 
 #endif // UAVOBJECTBROWSERCONFIGURATION_H

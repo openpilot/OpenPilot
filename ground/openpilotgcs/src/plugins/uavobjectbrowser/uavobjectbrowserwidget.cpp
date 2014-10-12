@@ -50,15 +50,17 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_model = new UAVObjectTreeModel();
     m_browser->treeView->setModel(m_model);
     m_browser->treeView->setColumnWidth(0, 300);
-    // m_browser->treeView->expandAll();
     BrowserItemDelegate *m_delegate = new BrowserItemDelegate();
     m_browser->treeView->setItemDelegate(m_delegate);
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     m_browser->treeView->setSelectionBehavior(QAbstractItemView::SelectItems);
     showMetaData(m_viewoptions->cbMetaData->isChecked());
-    connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(currentChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);
+    showDescription(m_viewoptions->cbDescription->isChecked());
+    connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)),
+            this, SLOT(currentChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);
     connect(m_viewoptions->cbMetaData, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
     connect(m_viewoptions->cbCategorized, SIGNAL(toggled(bool)), this, SLOT(categorize(bool)));
+    connect(m_viewoptions->cbDescription, SIGNAL(toggled(bool)), this, SLOT(showDescription(bool)));
     connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveObject()));
     connect(m_browser->readSDButton, SIGNAL(clicked()), this, SLOT(loadObject()));
     connect(m_browser->eraseSDButton, SIGNAL(clicked()), this, SLOT(eraseObject()));
@@ -69,6 +71,8 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     connect(m_viewoptions->cbScientific, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
     connect(m_viewoptions->cbMetaData, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
     connect(m_viewoptions->cbCategorized, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
+    connect(m_viewoptions->cbDescription, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
+    connect(m_browser->splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved()));
     enableSendRequest(false);
 }
 
@@ -77,11 +81,21 @@ UAVObjectBrowserWidget::~UAVObjectBrowserWidget()
     delete m_browser;
 }
 
-void UAVObjectBrowserWidget::setViewOptions(bool categorized, bool scientific, bool metadata)
+void UAVObjectBrowserWidget::setViewOptions(bool categorized, bool scientific, bool metadata, bool description)
 {
     m_viewoptions->cbCategorized->setChecked(categorized);
     m_viewoptions->cbMetaData->setChecked(metadata);
     m_viewoptions->cbScientific->setChecked(scientific);
+    m_viewoptions->cbDescription->setChecked(description);
+}
+
+void UAVObjectBrowserWidget::setSplitterSizes(QList<QVariant> sizes)
+{
+    QList<int> sizs;
+    foreach (QVariant size, sizes) {
+        sizs << size.toInt();
+    }
+    m_browser->splitter->setSizes(sizs);
 }
 
 void UAVObjectBrowserWidget::showMetaData(bool show)
@@ -90,6 +104,11 @@ void UAVObjectBrowserWidget::showMetaData(bool show)
     foreach(QModelIndex index, metaIndexes) {
         m_browser->treeView->setRowHidden(index.row(), index.parent(), !show);
     }
+}
+
+void UAVObjectBrowserWidget::showDescription(bool show)
+{
+    m_browser->descriptionText->setVisible(show);
 }
 
 void UAVObjectBrowserWidget::categorize(bool categorize)
@@ -228,6 +247,7 @@ void UAVObjectBrowserWidget::currentChanged(const QModelIndex &current, const QM
         enable = false;
     }
     enableSendRequest(enable);
+    updateDescription();
 }
 
 void UAVObjectBrowserWidget::viewSlot()
@@ -244,7 +264,23 @@ void UAVObjectBrowserWidget::viewSlot()
 
 void UAVObjectBrowserWidget::viewOptionsChangedSlot()
 {
-    emit viewOptionsChanged(m_viewoptions->cbCategorized->isChecked(), m_viewoptions->cbScientific->isChecked(), m_viewoptions->cbMetaData->isChecked());
+    emit viewOptionsChanged(m_viewoptions->cbCategorized->isChecked(), m_viewoptions->cbScientific->isChecked(),
+                            m_viewoptions->cbMetaData->isChecked(), m_viewoptions->cbDescription->isChecked());
+}
+
+void UAVObjectBrowserWidget::splitterMoved()
+{
+    QList<QVariant> sizs;
+    foreach (int size, m_browser->splitter->sizes()) {
+        sizs << QVariant(size);
+    }
+
+    emit splitterChanged(sizs);
+}
+
+QString UAVObjectBrowserWidget::createObjectDescription(UAVObject *object)
+{
+    return object->getDescription();
 }
 
 void UAVObjectBrowserWidget::enableSendRequest(bool enable)
@@ -254,4 +290,17 @@ void UAVObjectBrowserWidget::enableSendRequest(bool enable)
     m_browser->saveSDButton->setEnabled(enable);
     m_browser->readSDButton->setEnabled(enable);
     m_browser->eraseSDButton->setEnabled(enable);
+}
+
+void UAVObjectBrowserWidget::updateDescription()
+{
+    ObjectTreeItem *objItem = findCurrentObjectTreeItem();
+    if (objItem) {
+        UAVObject *obj = objItem->object();
+        if (obj) {
+            m_browser->descriptionText->setText(createObjectDescription(obj));
+            return;
+        }
+    }
+    m_browser->descriptionText->setText("");
 }

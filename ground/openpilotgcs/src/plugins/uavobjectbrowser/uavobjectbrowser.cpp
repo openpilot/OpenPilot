@@ -32,7 +32,8 @@ UAVObjectBrowser::UAVObjectBrowser(QString classId, UAVObjectBrowserWidget *widg
     m_widget(widget),
     m_config(NULL)
 {
-    connect(m_widget, SIGNAL(viewOptionsChanged(bool, bool, bool)), this, SLOT(viewOptionsChangedSlot(bool, bool, bool)));
+    connect(m_widget, SIGNAL(viewOptionsChanged(bool, bool, bool, bool)), this, SLOT(viewOptionsChangedSlot(bool, bool, bool, bool)));
+    connect(m_widget, SIGNAL(splitterChanged(QList<QVariant>&)), this, SLOT(splitterChanged(QList<QVariant>&)));
 }
 
 UAVObjectBrowser::~UAVObjectBrowser()
@@ -49,14 +50,23 @@ void UAVObjectBrowser::loadConfiguration(IUAVGadgetConfiguration *config)
     m_widget->setManuallyChangedColor(m->manuallyChangedColor());
     m_widget->setRecentlyUpdatedTimeout(m->recentlyUpdatedTimeout());
     m_widget->setOnlyHilightChangedValues(m->onlyHighlightChangedValues());
-    m_widget->setViewOptions(m->categorizedView(), m->scientificView(), m->showMetaData());
+    m_widget->setViewOptions(m->categorizedView(), m->scientificView(), m->showMetaData(), m->showDescription());
+    m_widget->setSplitterSizes(m->splitterSizes());
 }
 
-void UAVObjectBrowser::viewOptionsChangedSlot(bool categorized, bool scientific, bool metadata)
+void UAVObjectBrowser::viewOptionsChangedSlot(bool categorized, bool scientific, bool metadata, bool description)
 {
     if (m_config) {
         m_config->setCategorizedView(categorized);
         m_config->setScientificView(scientific);
         m_config->setShowMetaData(metadata);
+        m_config->setShowDescription(description);
+    }
+}
+
+void UAVObjectBrowser::splitterChanged(QList<QVariant> &splitterSizes)
+{
+    if (m_config) {
+        m_config->setSplitterSizes(splitterSizes);
     }
 }

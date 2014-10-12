@@ -60,9 +60,11 @@ public:
     {
         m_onlyHilightChangedValues = hilight; m_model->setOnlyHilightChangedValues(hilight);
     }
-    void setViewOptions(bool categorized, bool scientific, bool metadata);
+    void setViewOptions(bool categorized, bool scientific, bool metadata, bool description);
+    void setSplitterSizes(QList<QVariant> sizes);
 public slots:
     void showMetaData(bool show);
+    void showDescription(bool show);
     void categorize(bool categorize);
     void useScientificNotation(bool scientific);
 
@@ -75,8 +77,11 @@ private slots:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
     void viewSlot();
     void viewOptionsChangedSlot();
+    void splitterMoved();
+    QString createObjectDescription(UAVObject* object);
 signals:
-    void viewOptionsChanged(bool categorized, bool scientific, bool metadata);
+    void viewOptionsChanged(bool categorized, bool scientific, bool metadata, bool description);
+    void splitterChanged(QList<QVariant> &sizes);
 private:
     QPushButton *m_requestUpdate;
     QPushButton *m_sendUpdate;
@@ -92,6 +97,7 @@ private:
 
     void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
     void enableSendRequest(bool enable);
+    void updateDescription();
     ObjectTreeItem *findCurrentObjectTreeItem();
 };
 

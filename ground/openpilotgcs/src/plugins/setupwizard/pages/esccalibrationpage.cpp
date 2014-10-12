@@ -41,6 +41,10 @@ EscCalibrationPage::EscCalibrationPage(SetupWizard *wizard, QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->startStopButton, SIGNAL(clicked()), this, SLOT(startStopButtonClicked()));
+
+    connect(ui->securityCheckBox1, SIGNAL(toggled(bool)), this, SLOT(securityCheckBoxesToggled()));
+    connect(ui->securityCheckBox2, SIGNAL(toggled(bool)), this, SLOT(securityCheckBoxesToggled()));
+    connect(ui->securityCheckBox3, SIGNAL(toggled(bool)), this, SLOT(securityCheckBoxesToggled()));
 }
 
 EscCalibrationPage::~EscCalibrationPage()
@@ -59,7 +63,17 @@ void EscCalibrationPage::enableButtons(bool enable)
     getWizard()->button(QWizard::CancelButton)->setEnabled(enable);
     getWizard()->button(QWizard::BackButton)->setEnabled(enable);
     getWizard()->button(QWizard::CustomButton1)->setEnabled(enable);
+    ui->securityCheckBox1->setEnabled(enable);
+    ui->securityCheckBox2->setEnabled(enable);
+    ui->securityCheckBox3->setEnabled(enable);
     QApplication::processEvents();
+}
+
+void EscCalibrationPage::resetAllSecurityCheckboxes()
+{
+    ui->securityCheckBox1->setChecked(false);
+    ui->securityCheckBox2->setChecked(false);
+    ui->securityCheckBox3->setChecked(false);
 }
 
 void EscCalibrationPage::startStopButtonClicked()
@@ -74,7 +88,7 @@ void EscCalibrationPage::startStopButtonClicked()
         MixerSettings *mSettings = MixerSettings::GetInstance(uavoManager);
         Q_ASSERT(mSettings);
         QString mixerTypePattern = "Mixer%1Type";
-        for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+        for (quint32 i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
             UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
             Q_ASSERT(field);
             if (field->getValue().toString() == field->getOptions().at(VehicleConfigurationHelper::MIXER_TYPE_MOTOR)) {
@@ -95,8 +109,21 @@ void EscCalibrationPage::startStopButtonClicked()
         }
         m_outputs.clear();
         m_isCalibrating = false;
+        resetAllSecurityCheckboxes();
         ui->startStopButton->setText(tr("Start"));
-        ui->startStopButton->setEnabled(true);
         enableButtons(true);
     }
+}
+
+void EscCalibrationPage::securityCheckBoxesToggled()
+{
+    ui->startStopButton->setEnabled(ui->securityCheckBox1->isChecked() &&
+                                    ui->securityCheckBox2->isChecked() &&
+                                    ui->securityCheckBox3->isChecked());
+}
+
+
+void EscCalibrationPage::initializePage()
+{
+    resetAllSecurityCheckboxes();
 }

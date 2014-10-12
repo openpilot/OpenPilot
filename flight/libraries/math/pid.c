@@ -89,9 +89,12 @@ float pid_apply_setpoint(struct pid *pid, const pid_scaler *scaler, const float 
     float diff  = ((deriv_gamma * setpoint - measured) - pid->lastErr);
     pid->lastErr = (deriv_gamma * setpoint - measured);
     if (pid->d > 0.0f && dT > 0.0f) {
+        // low pass filter derivative term. below formula is the same as
+        // dterm = (1-alpha)*pid->lastDer + alpha * (...)/dT
+        // with alpha = dT/(deriv_tau+dT)
         dterm = pid->lastDer + dT / (dT + deriv_tau) * ((scaler->d * diff * pid->d / dT) - pid->lastDer);
-        pid->lastDer = dterm; // ^ set constant to 1/(2*pi*f_cutoff)
-    } // 7.9577e-3  means 20 Hz f_cutoff
+        pid->lastDer = dterm;
+    }
 
     return (err * scaler->p * pid->p) + pid->iAccumulator / 1000.0f + dterm;
 }

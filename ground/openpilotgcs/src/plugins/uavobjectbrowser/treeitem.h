@@ -102,7 +102,7 @@ public:
     }
     int childCount() const;
     int columnCount() const;
-    QVariant data(int column = 1) const;
+    virtual QVariant data(int column = 1) const;
     QString description()
     {
         return m_description;
@@ -175,6 +175,33 @@ public:
             if (name == child->data(0).toString()) {
                 return child;
             }
+        }
+        return 0;
+    }
+
+    static int maxHexStringLength(UAVObjectField::FieldType type)
+    {
+        switch (type) {
+        case UAVObjectField::INT8:
+            return 2;
+
+        case UAVObjectField::INT16:
+            return 4;
+
+        case UAVObjectField::INT32:
+            return 8;
+
+        case UAVObjectField::UINT8:
+            return 2;
+
+        case UAVObjectField::UINT16:
+            return 4;
+
+        case UAVObjectField::UINT32:
+            return 8;
+
+        default:
+            Q_ASSERT(false);
         }
         return 0;
     }
@@ -324,8 +351,14 @@ public:
 class ArrayFieldTreeItem : public TreeItem {
     Q_OBJECT
 public:
-    ArrayFieldTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) : TreeItem(data, parent) {}
-    ArrayFieldTreeItem(const QVariant &data, TreeItem *parent = 0) : TreeItem(data, parent) {}
+    ArrayFieldTreeItem(UAVObjectField *field, const QList<QVariant> &data, TreeItem *parent = 0) : TreeItem(data, parent), m_field(field)
+    {}
+    ArrayFieldTreeItem(UAVObjectField *field, const QVariant &data, TreeItem *parent = 0) : TreeItem(data, parent), m_field(field)
+    {}
+    QVariant data(int column) const;
+
+private:
+    UAVObjectField *m_field;
 };
 
 #endif // TREEITEM_H

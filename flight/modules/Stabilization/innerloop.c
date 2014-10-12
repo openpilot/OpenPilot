@@ -33,6 +33,7 @@
 
 #include <openpilot.h>
 #include <pid.h>
+#include <sin_lookup.h>
 #include <callbackinfo.h>
 #include <ratedesired.h>
 #include <actuatordesired.h>
@@ -281,6 +282,23 @@ static void stabilizationInnerloopTask()
                 pid_scaler scaler = create_pid_scaler(t);
                 actuatorDesiredAxis[t] = pid_apply_setpoint(&stabSettings.innerPids[t], &scaler, rate[t], gyro_filtered[t], dT);
                 break;
+            case STABILIZATIONSTATUS_INNERLOOP_ACRO:
+            {
+                float stickinput[3];
+                stickinput[0] = boundf(rate[0] / stabSettings.stabBank.ManualRate.Roll, -1.0f, 1.0f);
+                stickinput[1] = boundf(rate[1] / stabSettings.stabBank.ManualRate.Pitch, -1.0f, 1.0f);
+                stickinput[2] = boundf(rate[2] / stabSettings.stabBank.ManualRate.Yaw, -1.0f, 1.0f);
+                rate[t] = boundf(rate[t],
+                                 -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t],
+                                 StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
+                                 );
+                pid_scaler ascaler = create_pid_scaler(t);
+                ascaler.i *= boundf(1.0f - (1.5f * fabsf(stickinput[t])), 0.0f, 1.0f); // this prevents Integral from getting too high while controlled manually
+                float arate  = pid_apply_setpoint(&stabSettings.innerPids[t], &ascaler, rate[t], gyro_filtered[t], dT);
+                float factor = fabsf(stickinput[t]) * stabSettings.stabBank.AcroInsanityFactor;
+                actuatorDesiredAxis[t] = factor * stickinput[t] + (1.0f - factor) * arate;
+            }
+            break;
             case STABILIZATIONSTATUS_INNERLOOP_DIRECT:
             default:
                 actuatorDesiredAxis[t] = rate[t];
@@ -311,6 +329,18 @@ static void stabilizationInnerloopTask()
             previous_mode[t] = 255;
         }
     }
+
+    if (stabSettings.stabBank.EnablePiroComp == STABILIZATIONBANK_ENABLEPIROCOMP_TRUE && stabSettings.innerPids[0].iLim > 1e-3f && stabSettings.innerPids[1].iLim > 1e-3f) {
+        // attempted piro compensation - rotate pitch and yaw integrals (experimental)
+        float angleYaw = DEG2RAD(gyro_filtered[2] * dT);
+        float sinYaw   = sinf(angleYaw);
+        float cosYaw   = cosf(angleYaw);
+        float rollAcc  = stabSettings.innerPids[0].iAccumulator / stabSettings.innerPids[0].iLim;
+        float pitchAcc = stabSettings.innerPids[1].iAccumulator / stabSettings.innerPids[1].iLim;
+        stabSettings.innerPids[0].iAccumulator = stabSettings.innerPids[0].iLim * (cosYaw * rollAcc + sinYaw * pitchAcc);
+        stabSettings.innerPids[1].iAccumulator = stabSettings.innerPids[1].iLim * (cosYaw * pitchAcc - sinYaw * rollAcc);
+    }
+
     {
         uint8_t armed;
         FlightStatusArmedGet(&armed);

@@ -228,3 +228,34 @@ QList<MetaObjectTreeItem *> TopTreeItem::getMetaObjectItems()
 {
     return m_metaObjectTreeItemsPerObjectIds.values();
 }
+
+QVariant ArrayFieldTreeItem::data(int column) const
+{
+    if (column == 1) {
+        if (m_field->getType() == UAVObjectField::UINT8 && m_field->getUnits().toLower() == "char") {
+            QString dataString;
+            for (uint i = 0; i < m_field->getNumElements(); ++i) {
+                dataString.append(m_field->getValue(i).toChar());
+            }
+            QString data = QString("'%1'").arg(dataString);
+            return data;
+        } else if (m_field->getUnits().toLower() == "hex") {
+            QString dataString;
+            for (uint i = 0; i < m_field->getNumElements(); ++i) {
+                if (i > 0) {
+                    dataString.append(' ');
+                }
+                bool ok;
+                dataString.append(QString("%1")
+                                  .arg(m_field->getValue(i).toUInt(&ok), TreeItem::maxHexStringLength(m_field->getType()),
+                                       16, QChar('0')).toUpper());
+            }
+            QString data = QString("{%1}").arg(dataString);
+            return data;
+        } else {
+            return QVariant();
+        }
+    } else {
+        return TreeItem::data(column);
+    }
+}

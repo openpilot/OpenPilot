@@ -43,6 +43,7 @@
 #include "airspeedsettings.h"
 #include <QtCore/qmath.h>
 #include <QJsonObject>
+#include "auxmagsettings.h"
 
 VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
     : m_configSource(configSource), m_uavoManager(0),
@@ -193,43 +194,48 @@ void VehicleConfigurationHelper::applyHardwareConfiguration()
         }
 
         if (m_configSource->getGpsType() != VehicleConfigurationSource::GPS_DISABLED) {
+            data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
+            data.GPSSpeed = HwSettings::GPSSPEED_57600;
+
+            if (m_configSource->getInputType() == VehicleConfigurationSource::INPUT_SBUS) {
+                data.RM_FlexiPort = HwSettings::RM_FLEXIPORT_GPS;
+            } else {
+                data.RM_MainPort = HwSettings::RM_MAINPORT_GPS;
+            }
+
             GPSSettings *gpsSettings = GPSSettings::GetInstance(m_uavoManager);
             Q_ASSERT(gpsSettings);
             GPSSettings::DataFields gpsData = gpsSettings->getData();
+            gpsData.UbxAutoConfig = GPSSettings::UBXAUTOCONFIG_DISABLED;
 
             switch (m_configSource->getGpsType()) {
             case VehicleConfigurationSource::GPS_NMEA:
-                data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
-                data.RM_MainPort     = HwSettings::RM_MAINPORT_GPS;
-                data.GPSSpeed        = HwSettings::GPSSPEED_57600;
                 gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_NMEA;
                 break;
             case VehicleConfigurationSource::GPS_UBX:
-                data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
-                data.RM_MainPort     = HwSettings::RM_MAINPORT_GPS;
-                data.GPSSpeed        = HwSettings::GPSSPEED_57600;
                 gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_UBX;
                 break;
             case VehicleConfigurationSource::GPS_PLATINUM:
-                data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 1;
-                data.RM_MainPort = HwSettings::RM_MAINPORT_GPS;
-                data.GPSSpeed    = HwSettings::GPSSPEED_115200;
-                /*
-                   gpsData.DataProtocol = GPSSettings::DATAPROTOCOL_UBLOX;
-                   AuxMagSettings *magSettings = AuxMagSettings::GetInstance(m_uavoManager);
-                   AuxMagSettings::DataFields magsData = magSettings->getData();
-                   magsData.usage = AuxMagSettings::Both;
-                   magSettings->setData(magsData);
-                   addModifiedObject(magSettings, tr("Writing External Mag sensor settings"));
-                 */
+            {
+                gpsData.DataProtocol  = GPSSettings::DATAPROTOCOL_UBX;
+                gpsData.UbxAutoConfig = GPSSettings::UBXAUTOCONFIG_CONFIGURE;
+                AuxMagSettings *magSettings = AuxMagSettings::GetInstance(m_uavoManager);
+                Q_ASSERT(magSettings);
+                AuxMagSettings::DataFields magsData = magSettings->getData();
+                magsData.Usage = AuxMagSettings::USAGE_BOTH;
+                magSettings->setData(magsData);
+                addModifiedObject(magSettings, tr("Writing External Mag sensor settings"));
                 break;
-            default:
-                data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 0;
+            }
+            case VehicleConfigurationSource::GPS_DISABLED:
+                // Should not be able to reach here
                 break;
             }
 
             gpsSettings->setData(gpsData);
             addModifiedObject(gpsSettings, tr("Writing GPS sensor settings"));
+        } else {
+            data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = 0;
         }
 
         if (m_configSource->getVehicleType() == VehicleConfigurationSource::VEHICLE_FIXEDWING &&
@@ -592,7 +598,7 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
     // Set Mixer types and values
     QString mixerTypePattern   = "Mixer%1Type";
     QString mixerVectorPattern = "Mixer%1Vector";
-    for (int i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
+    for (quint32 i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
         UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
         Q_ASSERT(field);
         field->setValue(field->getOptions().at(channels[i].type));
@@ -1371,7 +1377,7 @@ void VehicleConfigurationHelper::setupHexaCopter()
 
 void VehicleConfigurationHelper::setupOctoCopter()
 {
-    mixerChannelSettings channels[10];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
     SystemSettings::AirframeTypeOptions frame = SystemSettings::AIRFRAMETYPE_OCTO;
 
@@ -1758,7 +1764,7 @@ void VehicleConfigurationHelper::setupOctoCopter()
 
 void VehicleConfigurationHelper::setupElevon()
 {
-    mixerChannelSettings channels[10];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
     // Motor (Chan 3)
@@ -1800,7 +1806,7 @@ void VehicleConfigurationHelper::setupDualAileron()
     // 2. Setup GUI data
     // 3. Apply changes
 
-    mixerChannelSettings channels[10];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
     // Motor (Chan 3)
@@ -1860,7 +1866,7 @@ void VehicleConfigurationHelper::setupAileron()
     // 2. Setup GUI data
     // 3. Apply changes
 
-    mixerChannelSettings channels[10];
+    mixerChannelSettings channels[ActuatorSettings::CHANNELADDR_NUMELEM];
     GUIConfigDataUnion guiSettings = getGUIConfigData();
 
     // Motor (Chan 3)

@@ -75,7 +75,7 @@ void OutputCalibrationPage::setupActuatorMinMaxAndNeutral(int motorChannelStart,
             // Set to motor safe values
             m_actuatorSettings[servoid].channelMin     = 1000;
             m_actuatorSettings[servoid].channelNeutral = 1000;
-            m_actuatorSettings[servoid].channelMax     = 2000;
+            m_actuatorSettings[servoid].channelMax     = 1900;
         } else if (servoid < totalUsedChannels) {
             // Set to servo safe values
             m_actuatorSettings[servoid].channelMin     = 1500;
@@ -216,9 +216,6 @@ void OutputCalibrationPage::setupVehicle()
     default:
         break;
     }
-
-    VehicleConfigurationHelper helper(getWizard());
-    helper.setupVehicle(false);
 
     if (m_calibrationUtil) {
         delete m_calibrationUtil;

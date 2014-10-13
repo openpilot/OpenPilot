@@ -471,7 +471,6 @@ private:
     {
         return QVariant(str.toString().at(0).toLatin1());
     }
-
 };
 
 #endif // FIELDTREEITEM_H

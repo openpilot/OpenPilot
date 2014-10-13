@@ -95,7 +95,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -136,8 +136,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>971</width>
-            <height>712</height>
+            <width>973</width>
+            <height>703</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -7837,8 +7837,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>954</width>
-            <height>732</height>
+            <width>957</width>
+            <height>782</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -10696,7 +10696,7 @@ response (deg)</string>
                   <property name="checkable">
                    <bool>false</bool>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_27" rowstretch="0,0,0" columnminimumwidth="0,0">
+                  <layout class="QGridLayout" name="gridLayout_277" rowstretch="0,0,0" columnminimumwidth="0,0">
                    <property name="leftMargin">
                     <number>9</number>
                    </property>
@@ -18055,8 +18055,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>971</width>
-            <height>712</height>
+            <width>973</width>
+            <height>703</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -23998,8 +23998,8 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>971</width>
-            <height>712</height>
+            <width>973</width>
+            <height>703</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">

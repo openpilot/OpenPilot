@@ -292,7 +292,7 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
     Q_ASSERT(field);
     QString name = m_aircraft->nameEdit->text();
     for (uint i = 0; i < field->getNumElements(); ++i) {
-        if (i < name.length()) {
+        if (i < (uint)name.length()) {
             field->setValue(name.at(i).toLatin1(), i);
         } else {
             field->setValue(0, i);

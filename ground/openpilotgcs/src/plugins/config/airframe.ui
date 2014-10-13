@@ -20,13 +20,13 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="leftMargin">
-      <number>9</number>
+      <number>0</number>
      </property>
      <property name="topMargin">
-      <number>9</number>
+      <number>0</number>
      </property>
      <property name="rightMargin">
-      <number>9</number>
+      <number>0</number>
      </property>
      <property name="bottomMargin">
       <number>9</number>
@@ -61,7 +61,7 @@
       </spacer>
      </item>
      <item alignment="Qt::AlignLeft">
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="nameEdit">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -78,10 +78,10 @@
         <string/>
        </property>
        <property name="maxLength">
-        <number>10</number>
+        <number>20</number>
        </property>
        <property name="placeholderText">
-        <string>Enter name of vehicle. Max 10 characters.</string>
+        <string>Enter name of vehicle. Max 20 characters.</string>
        </property>
       </widget>
      </item>
@@ -242,7 +242,7 @@
                <x>0</x>
                <y>0</y>
                <width>820</width>
-               <height>427</height>
+               <height>435</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout">

@@ -2,7 +2,7 @@
     <object name="SystemSettings" singleinstance="true" settings="true" category="System">
         <description>Select airframe type.  Currently used by @ref ActuatorModule to choose mixing from @ref ActuatorDesired to @ref ActuatorCommand</description>
         <field name="AirframeType" units="" type="enum" elements="1" options="FixedWing,FixedWingElevon,FixedWingVtail,VTOL,HeliCP,QuadX,QuadP,QuadH,Hexa,Octo,Custom,HexaX,HexaH,OctoV,OctoCoaxP,OctoCoaxX,OctoX,HexaCoax,Tri,GroundVehicleCar,GroundVehicleDifferential,GroundVehicleMotorcycle" defaultvalue="QuadX"/>
-        <field name="VehicleName" units="char" type="uint8" elements="10" defaultvalue="0"/>
+        <field name="VehicleName" units="char" type="uint8" elements="20" defaultvalue="0"/>
 	<field name="ThrustControl" units="" type="enum" elements="1" options="Throttle,Collective,None" defaultvalue="Throttle" />
 		<!-- Which way the vehicle controls its thrust. Can be through
 			"Throttle" (quadcopter, simple brushless planes,

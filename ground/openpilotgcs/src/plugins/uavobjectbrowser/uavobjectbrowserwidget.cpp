@@ -280,7 +280,65 @@ void UAVObjectBrowserWidget::splitterMoved()
 
 QString UAVObjectBrowserWidget::createObjectDescription(UAVObject *object)
 {
-    return object->getDescription();
+    QString indent("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+    QString description;
+    description.append("<html><head></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">");
+    description.append("<b>").append(tr("Name:")).append(" </b>").append(object->getName())
+            .append("<br>");
+    description.append("<b>").append(tr("Type:")).append(" </b>")
+            .append(object->isSettingsObject() ? tr("Settings") : object->isMetaDataObject() ? tr("Metadata") : tr("Data"))
+            .append(indent);
+    description.append("<b>").append(tr("Category:")).append(" </b>").append(object->getCategory())
+            .append("<p>");
+    description.append("<b>").append(tr("Description:")).append(" </b>").append(object->getDescription().replace("@ref", ""))
+            .append("<hr><br>");
+    description.append("<b>").append(tr("Fields:")).append(" </b>")
+            .append("<br>");
+
+    foreach (UAVObjectField *field, object->getFields()) {
+        description.append(indent).append("<b>").append(tr("Name:")).append(" </b>").append(field->getName())
+                .append(indent);
+        description.append("<b>").append(tr("Size:")).append(" </b>").append(tr("%1 bytes").arg(field->getNumBytes()))
+                .append(indent);
+
+        description.append("<b>").append(tr("Type:")).append(" </b>").append(field->getTypeAsString());
+        int elements = field->getNumElements();
+        if (elements > 1) {
+            description.append("[").append(QString("%1").arg(field->getNumElements())).append("]");
+        }
+
+        description.append(indent).append("<b>").append(tr("Unit:")).append(" </b>").append(field->getUnits());
+
+        description.append("<br>");
+        if (field->getDescription() != "") {
+            description.append(indent).append("<b>").append(tr("Description:")).append(" </b>").append(field->getDescription());
+            description.append("<br>");
+        }
+
+        if (elements > 1) {
+            description.append(indent).append("<b>").append(tr("Elements:")).append(" </b>").append("<br>");
+            QStringList names = field->getElementNames();
+            for (uint i = 0; i < field->getNumElements(); i++) {
+                description.append(indent).append(indent).append("<b>").append(tr("Name:")).append(" </b>").append(names.at(i))
+                        .append(indent);
+                if (field->getMinLimit(i).toString() != "" && field->getMaxLimit(i).toString() != "") {
+                    description.append("<b>").append(tr("Limits:")).append(" </b>")
+                            .append(QString("%1 - %2").arg(field->getMinLimit(i).toString(), field->getMaxLimit(i).toString()));
+                }
+                description.append("<br>");
+            }
+            description.append("<p>");
+        } else {
+            if (field->getMinLimit(0).toString() != "" && field->getMaxLimit(0).toString() != "") {
+                description.append(indent).append("<b>").append(tr("Limits:")).append(" </b>")
+                        .append(QString("%1 - %2").arg(field->getMinLimit(0).toString(), field->getMaxLimit(0).toString()));
+                description.append("<p>");
+            }
+        }
+    }
+
+    description.append("</body></html>");
+    return description;
 }
 
 void UAVObjectBrowserWidget::enableSendRequest(bool enable)

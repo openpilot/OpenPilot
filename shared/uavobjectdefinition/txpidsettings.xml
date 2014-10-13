@@ -19,7 +19,8 @@
 			Pitch Attitude.Kp, Pitch Attitude.Ki, Pitch Attitude.ILimit, Pitch Attitude.Resp,
 			Roll+Pitch Attitude.Kp, Roll+Pitch Attitude.Ki, Roll+Pitch Attitude.ILimit, Roll+Pitch Attitude.Resp,
 			Yaw Attitude.Kp, Yaw Attitude.Ki, Yaw Attitude.ILimit, Yaw Attitude.Resp,
-			GyroTau"
+			Roll.Expo, Pitch.Expo, Roll+Pitch.Expo, Yaw.Expo,
+			GyroTau,AcroPlusFactor"
 		defaultvalue="Disabled"/>
         <field name="MinPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>
         <field name="MaxPID" units="" type="float" elementnames="Instance1,Instance2,Instance3" defaultvalue="0"/>

@@ -7971,12 +7971,12 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Control Coefficients</source>
-        <translation type="unfinished">Coefficients de Contrôle</translation>
+        <translation>Coefficients de Contrôle</translation>
     </message>
     <message>
         <location/>
         <source>Cruise Control</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8224,22 +8224,22 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Mode Transition</source>
-        <translation type="unfinished">Changement Mode</translation>
+        <translation>Changement Mode</translation>
     </message>
     <message>
         <location/>
         <source>Accel I</source>
-        <translation type="unfinished">I Accel</translation>
+        <translation>I Accel</translation>
     </message>
     <message>
         <location/>
         <source>Gyro Noise Filtering</source>
-        <translation type="unfinished">Filtrage Bruit Gyro</translation>
+        <translation>Filtrage Bruit Gyro</translation>
     </message>
     <message>
         <location/>
         <source>Accel P</source>
-        <translation type="unfinished">P Accel</translation>
+        <translation>P Accel</translation>
     </message>
     <message>
         <location/>
@@ -8270,7 +8270,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Targets</source>
-        <translation type="unfinished">Cible(s)</translation>
+        <translation>Cible(s)</translation>
     </message>
     <message>
         <location/>
@@ -8281,7 +8281,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Axis</source>
-        <translation type="unfinished">Axe(s)</translation>
+        <translation>Axe(s)</translation>
     </message>
     <message>
         <location/>
@@ -8293,21 +8293,21 @@ Useful if you have accidentally changed some settings.</source>
         <location/>
         <source>Rate mode
 response (deg/s)</source>
-        <translation type="unfinished">Réponse mode Rate
+        <translation>Réponse mode Rate
 (en degrés/seconde)</translation>
     </message>
     <message>
         <location/>
         <source>Attitude mode
 response (deg)</source>
-        <translation type="unfinished">Réponse mode Attitude
+        <translation>Réponse mode Attitude
 (en degrés)</translation>
     </message>
     <message>
         <location/>
         <source>Max rate limit
 (all modes) (deg/s)</source>
-        <translation type="unfinished">Limitation Vitesse Max
+        <translation>Limitation Vitesse Max
 (tous modes, en degrés/seconde)</translation>
     </message>
     <message>
@@ -8318,62 +8318,66 @@ response (deg)</source>
     <message>
         <location/>
         <source>Acro+</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:77</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Acro + slider can be adjusted to change the amount of manual control blending.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Acro+ peut être ajusté pour modifier la quantité de mixage du contrôle manuel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:AcroInsanityFactor</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Factor</source>
-        <translation type="unfinished"></translation>
+        <translation>Facteur</translation>
     </message>
     <message>
         <location/>
         <source>Expo</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:StickExpo</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:66</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This graph shows the Expo curves for all axis. The color of the curves corresponds with the colors of the slider labels below.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ce graphique affiche les courbes d&apos;Expo pour tous les axes. Les couleurs des courbes correspondent aux couleurs des axes ci-dessous.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Roll Expo slider can be adjusted to change the amount of Expo to use on Roll axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Expo Roll peut être ajusté pour modifier la quantité d&apos;exponentiel à utiliser sur la commande de Roll.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Yaw Expo slider can be adjusted to change the amount of Expo to use on Yaw axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Expo Yaw peut être ajusté pour modifier la quantité d&apos;exponentiel à utiliser sur la commande de Yaw.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Pitch Expo slider can be adjusted to change the amount of Expo to use on Pitch axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Expo Pitch peut être ajusté pour modifier la quantité d&apos;exponentiel à utiliser sur la commande de Pitch.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8388,27 +8392,29 @@ response (deg)</source>
     <message>
         <location/>
         <source>Attitude</source>
-        <translation type="unfinished">Attitude</translation>
+        <translation>Attitude</translation>
     </message>
     <message>
         <location/>
         <source>Pirouette Compensation</source>
-        <translation type="unfinished"></translation>
+        <translation>Compensation Pirouette</translation>
     </message>
     <message>
         <location/>
         <source>Enable pirouette compensation</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer compensation pirouette</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:EnablePiroComp</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:55</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11656,7 +11662,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+13"/>
         <source>Writing template settings for %1</source>
-        <translation type="unfinished">Écriture modèle de configuration pour %1</translation>
+        <translation>Écriture modèle de configuration pour %1</translation>
     </message>
     <message>
         <location line="+157"/>
@@ -13200,7 +13206,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>VCP Port</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13210,7 +13216,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Main Port</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13235,12 +13241,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>FlexiIO Port</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Flexi Port</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -15688,23 +15694,23 @@ A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished">Page d&apos;Assistant</translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+113"/>
         <source>Start</source>
-        <translation type="unfinished">Démarrer</translation>
+        <translation>Démarrer</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="-12"/>
         <source>Stop</source>
-        <translation type="unfinished">Arrêter</translation>
+        <translation>Arrêter</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.ui"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot ESC Calibration Procedure&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;As you have selected to use a MultiRotor and Fast / Flashed ESCs, we need to calibrate the endpoints of these ESCs so they can see the full throttle range sent from the flight controller. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the wizard will tell you to connect the battery to your aircraft, before doing so you absolutely &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#f30f1d;&quot;&gt;must remove the propellers from all motors&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The steps to perform this calibration are as follows:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;1. Confirm all safety questions&lt;br/&gt;2. Press the Start button when it becomes enabled&lt;br/&gt;3. Connect the battery to your airframe&lt;br/&gt;4. Wait for ESC calibration beep(s)&lt;br/&gt;5. Press the Stop button&lt;br/&gt;6. Wait for ESC confirmation beep(s)&lt;br/&gt;7. Disconnect battery&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Procédure OpenPilot Calibration ESC&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Comme vous avez choisi d&apos;utiliser un MultiRotor avec des ESC rapides / ESC flashés, il faut à présent définir les limites maxi/mini de ces ESC pour qu&apos;ils puissent interpréter correctement les signaux de gaz envoyés par la carte contrôleur. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette partie de l&apos;assistant vous demandera de connecter la batterie sur votre appareil mais avant de le faire vous devez &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#f30f1d;&quot;&gt;impérativement retirer toutes les hélices de tous les moteurs&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les étapes pour effectuer cet étalonnage sont les suivantes :&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;1. Valider les questions de sécurité,&lt;br/&gt;2. Appuyer sur le bouton Démarrer lorsqu&apos;il devient actif,&lt;br/&gt;3. Connecter la batterie sur l&apos;appareil,&lt;br/&gt;4. Attendre le(s) bip(s) de calibration de l&apos;ESC,&lt;br/&gt;5. Appuyer sur le bouton Arrêter,&lt;br/&gt;6. Attendre le(s) bip(s) de confirmation de l&apos;ESC,&lt;br/&gt;7. Débrancher la batterie.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -15714,7 +15720,8 @@ A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</
     <message>
         <location/>
         <source>The vehicle is NOT powered by any external power source but USB</source>
-        <translation>L&apos;appareil N&apos;EST PAS BRANCHE sur une source d&apos;alimentation externe mais sur port USB</translation>
+        <translation>L&apos;appareil N&apos;EST PAS BRANCHE sur une source d&apos;alimentation externe 
+mais uniquement sur port USB</translation>
     </message>
     <message>
         <location/>

@@ -35,7 +35,8 @@
 #include "stabilizationsettings.h"
 #include <QWidget>
 #include <QTimer>
-
+#include "qwt/src/qwt_plot_curve.h"
+#include "qwt/src/qwt_plot_grid.h"
 
 class ConfigStabilizationWidget : public ConfigTaskWidget {
     Q_OBJECT
@@ -52,14 +53,23 @@ private:
     QString m_stabilizationObjectsString;
 
     // Milliseconds between automatic 'Instant Updates'
-    static const int AUTOMATIC_UPDATE_RATE = 500;
+    static const int AUTOMATIC_UPDATE_RATE   = 500;
+
+    static const int EXPO_CURVE_POINTS_COUNT = 100;
+    static const double EXPO_CURVE_CONSTANT = 1.00695;
 
     int boardModel;
     int m_pidBankCount;
     int m_currentPIDBank;
 
+    QwtPlotCurve m_expoPlotCurveRoll;
+    QwtPlotCurve m_expoPlotCurvePitch;
+    QwtPlotCurve m_expoPlotCurveYaw;
+    QwtPlotGrid m_plotGrid;
+
     void updateThrottleCurveFromObject();
     void updateObjectFromThrottleCurve();
+    void setupExpoPlot();
 protected:
     QString mapObjectName(const QString objectName);
 
@@ -75,5 +85,9 @@ private slots:
     void pidBankChanged(int index);
     void resetThrottleCurveToDefault();
     void throttleCurveUpdated();
+    void replotExpo(int value, QwtPlotCurve &curve);
+    void replotExpoRoll(int value);
+    void replotExpoPitch(int value);
+    void replotExpoYaw(int value);
 };
 #endif // ConfigStabilizationWidget_H

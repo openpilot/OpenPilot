@@ -42,7 +42,7 @@ class UAVObjectBrowserConfiguration : public IUAVGadgetConfiguration {
     Q_PROPERTY(bool m_useScientificView READ scientificView WRITE setScientificView)
     Q_PROPERTY(bool m_showDescription READ showDescription WRITE setShowDescription)
     Q_PROPERTY(bool m_showMetaData READ showMetaData WRITE setShowMetaData)
-    Q_PROPERTY(QList<QVariant> m_splitterSizes READ splitterSizes WRITE setSplitterSizes)
+    Q_PROPERTY(QByteArray m_splitterState READ splitterState WRITE setSplitterState)
 public:
     explicit UAVObjectBrowserConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
 
@@ -82,9 +82,9 @@ public:
         return m_showDescription;
     }
 
-    QList<QVariant> splitterSizes() const
+    QByteArray splitterState() const
     {
-        return m_splitterSizes;
+        return m_splitterState;
     }
 
 signals:
@@ -123,9 +123,9 @@ public slots:
         m_showDescription = value;
     }
 
-    void setSplitterSizes(QList<QVariant> arg)
+    void setSplitterState(QByteArray arg)
     {
-        m_splitterSizes = arg;
+        m_splitterState = arg;
     }
 
 private:
@@ -137,7 +137,7 @@ private:
     bool m_useScientificView;
     bool m_showMetaData;
     bool m_showDescription;
-    QList<QVariant> m_splitterSizes;
+    QByteArray m_splitterState;
 };
 
 #endif // UAVOBJECTBROWSERCONFIGURATION_H

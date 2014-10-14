@@ -53,7 +53,7 @@ public:
 
 private slots:
     void viewOptionsChangedSlot(bool categorized, bool scientific, bool metadata, bool description);
-    void splitterChanged(QList<QVariant> &splitterSizes);
+    void splitterChanged(QByteArray state);
 
 private:
     UAVObjectBrowserWidget *m_widget;

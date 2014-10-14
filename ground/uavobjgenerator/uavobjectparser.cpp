@@ -587,7 +587,6 @@ QString UAVObjectParser::processObjectFields(QDomNode & childNode, ObjectInfo *i
     }
     // Add field to object
     info->fields.append(field);
-    qDebug() << "field added" << info->name << ", description" << field->description;
     // Done
     return QString();
 }

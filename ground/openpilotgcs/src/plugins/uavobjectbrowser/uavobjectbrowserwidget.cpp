@@ -54,6 +54,7 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_browser->treeView->setItemDelegate(m_delegate);
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     m_browser->treeView->setSelectionBehavior(QAbstractItemView::SelectItems);
+    m_browser->splitter->setChildrenCollapsible(false);
     showMetaData(m_viewoptions->cbMetaData->isChecked());
     showDescription(m_viewoptions->cbDescription->isChecked());
     connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)),
@@ -89,13 +90,9 @@ void UAVObjectBrowserWidget::setViewOptions(bool categorized, bool scientific, b
     m_viewoptions->cbDescription->setChecked(description);
 }
 
-void UAVObjectBrowserWidget::setSplitterSizes(QList<QVariant> sizes)
+void UAVObjectBrowserWidget::setSplitterState(QByteArray state)
 {
-    QList<int> sizs;
-    foreach (QVariant size, sizes) {
-        sizs << size.toInt();
-    }
-    m_browser->splitter->setSizes(sizs);
+    m_browser->splitter->restoreState(state);
 }
 
 void UAVObjectBrowserWidget::showMetaData(bool show)
@@ -270,19 +267,14 @@ void UAVObjectBrowserWidget::viewOptionsChangedSlot()
 
 void UAVObjectBrowserWidget::splitterMoved()
 {
-    QList<QVariant> sizs;
-    foreach (int size, m_browser->splitter->sizes()) {
-        sizs << QVariant(size);
-    }
-
-    emit splitterChanged(sizs);
+    emit splitterChanged(m_browser->splitter->saveState());
 }
 
 QString UAVObjectBrowserWidget::createObjectDescription(UAVObject *object)
 {
     QString description;
     description.append("<html><head></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">");
-    description.append("<table border='0' width='99%' cellpadding='5' cellspacing='0'><tbody><tr bgcolor='#ffcc00'>");
+    description.append("<table border='0' width='99%' cellpadding='5' cellspacing='0'><tbody><tr bgcolor='#498ae8'>");
     description.append("<td nowrap='nowrap'><b>").append(tr("Name:")).append(" </b>").append(object->getName());
     description.append("<br><b>").append(tr("Type:")).append(" </b>")
             .append(object->isSettingsObject() ? tr("Settings") : object->isMetaDataObject() ? tr("Metadata") : tr("Data"));
@@ -296,25 +288,28 @@ QString UAVObjectBrowserWidget::createObjectDescription(UAVObject *object)
     int fields = 0;
     foreach (UAVObjectField *field, object->getFields()) {
         fields++;
-        description.append("</tr><tr><td nowrap='nowrap' ").append(fields & 1 ? "bgcolor='#ffcc99'>" : "bgcolor='#ff9900'>");
+        QString bgColor = fields & 1 ? "bgcolor='#ffcc99'>" : "bgcolor='#ff9900'>";
+        description.append("</tr><tr><td nowrap='nowrap' ").append(bgColor);
         description.append("<b>").append(tr("Name:")).append(" </b>").append(field->getName())
-                .append("</td><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
+                .append("</td><td").append(bgColor);
         description.append("<b>").append(tr("Size:")).append(" </b>").append(tr("%1 bytes").arg(field->getNumBytes()))
                 .append("</td>");
 
-        description.append("<td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
+        description.append("<td").append(bgColor);
         description.append(tr("<b>Type:")).append(" </b>").append(field->getTypeAsString());
         int elements = field->getNumElements();
         if (elements > 1) {
             description.append("[").append(QString("%1").arg(field->getNumElements())).append("]");
         }
 
-        description.append("</td><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
-        description.append("<b>").append(tr("Unit:")).append(" </b>").append(field->getUnits());
+        description.append("</td><td").append(bgColor);
+        if (field->getUnits() != "") {
+            description.append("<b>").append(tr("Unit:")).append(" </b>").append(field->getUnits());
+        }
 
         description.append("</td></tr>");
         if (field->getDescription() != "") {
-            description.append("<tr><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
+            description.append("<tr><td").append(bgColor);
             description.append("<b>").append(tr("Description:")).append(" </b>").append(field->getDescription());
             description.append("</td></tr>");
         }

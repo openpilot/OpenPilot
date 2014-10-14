@@ -315,7 +315,10 @@ QString UAVObjectBrowserWidget::createObjectDescription(UAVObject *object)
         }
 
         if (elements > 1) {
-            description.append("<tr><td></td><td>").append("<b>").append(tr("Elements:")).append(" </b>").append("</td><td>");
+            description.append("<tr><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
+            description.append("</td><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
+            description.append("<b>").append(tr("Elements:")).append(" </b>");
+            description.append("</td><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
             QStringList names = field->getElementNames();
             for (uint i = 0; i < field->getNumElements(); i++) {
                 description.append( i == 0 ? tr("<b>Name: </b>") : " | ").append(names.at(i));
@@ -323,10 +326,12 @@ QString UAVObjectBrowserWidget::createObjectDescription(UAVObject *object)
                     description.append(QString(" %1 - %2 ").arg(field->getMinLimit(i).toString(), field->getMaxLimit(i).toString()));
                 }
             }
+            description.append("<td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
             description.append("</td></tr>");
         } else {
             if (field->getMinLimit(0).toString() != "" && field->getMaxLimit(0).toString() != "") {
-                description.append("<tr><td>").append(tr("<b> Limits: </b>")).append(" </b>")
+                description.append("<tr><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
+                description.append(tr("<b> Limits: </b>")).append(" </b>")
                         .append(QString(" %1 - %2 ").arg(field->getMinLimit(0).toString(), field->getMaxLimit(0).toString()));
                 description.append("</td></tr>");
             }

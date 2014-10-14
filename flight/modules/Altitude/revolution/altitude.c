@@ -53,8 +53,11 @@
 
 // Interval in number of sample to recalculate temp bias
 #define TEMP_CALIB_INTERVAL 10
-// 5Hz @120Hz update
-#define TEMP_ALPHA          0.9979f
+
+// LPF
+#define TEMP_DT             (1.0f / 120.0f)
+#define TEMP_LPF_FC         5.0f
+static const float temp_alpha = TEMP_DT / (TEMP_DT + 1.0f / (2.0f * M_PI_F * TEMP_LPF_FC));
 
 // Private types
 
@@ -181,7 +184,7 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
             baro_temperature = temp;
         }
 
-        baro_temperature = TEMP_ALPHA * baro_temperature + (1 - TEMP_ALPHA) * temp;
+        baro_temperature = temp_alpha * (temp - baro_temperature) + baro_temperature;
 
         if (tempCorrectionEnabled && !temp_calibration_count) {
             temp_calibration_count = TEMP_CALIB_INTERVAL;

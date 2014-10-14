@@ -82,18 +82,19 @@ PERF_DEFINE_COUNTER(counterAtt);
 #define STACK_SIZE_BYTES    540
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
 
-// Attitude module runs at 500Hz
-#define SENSOR_PERIOD       2
+// Attitude module loop interval (defined by sensor rate in pios_config.h)
+static const uint32_t sensor_period_ms = ((uint32_t)1000.0f / PIOS_SENSOR_RATE);
 
 #define UPDATE_RATE         25.0f
 
 // Interval in number of sample to recalculate temp bias
 #define TEMP_CALIB_INTERVAL 30
+// LPF
+#define TEMP_DT             (1.0f / PIOS_SENSOR_RATE)
+#define TEMP_LPF_FC         5.0f
+static const float temp_alpha = TEMP_DT / (TEMP_DT + 1.0f / (2.0f * M_PI_F * TEMP_LPF_FC));
 
-// LPF 5Hz at 500Hz rate
-#define TEMP_ALPHA          0.999504f
-
-#define UPDATE_EXPECTED     (1.0f / 500.0f)
+#define UPDATE_EXPECTED     (1.0f / PIOS_SENSOR_RATE)
 #define UPDATE_MIN          1.0e-6f
 #define UPDATE_MAX          1.0f
 #define UPDATE_ALPHA        1.0e-2f
@@ -327,7 +328,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             PERF_MEASURE_PERIOD(counterPeriod);
             AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
         }
-        vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_PERIOD_MS);
+        vTaskDelayUntil(&lastSysTime, sensor_period_ms / portTICK_PERIOD_MS);
     }
 }
 
@@ -465,7 +466,7 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
 #if defined(PIOS_INCLUDE_MPU6000)
 
     xQueueHandle queue = PIOS_MPU6000_GetQueue();
-    BaseType_t ret     = xQueueReceive(queue, (void *)&mpu6000_data, SENSOR_PERIOD);
+    BaseType_t ret     = xQueueReceive(queue, (void *)&mpu6000_data, sensor_period_ms);
     while (ret == pdTRUE) {
         gyros[0]  += mpu6000_data.gyro_x;
         gyros[1]  += mpu6000_data.gyro_y;
@@ -492,19 +493,19 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
     }
     float invcount = 1.0f / count;
     PERF_TIMED_SECTION_START(counterUpd);
-    gyros[0]   *= gyro_scale.X * invcount;
-    gyros[1]   *= gyro_scale.Y * invcount;
-    gyros[2]   *= gyro_scale.Z * invcount;
+    gyros[0]  *= gyro_scale.X * invcount;
+    gyros[1]  *= gyro_scale.Y * invcount;
+    gyros[2]  *= gyro_scale.Z * invcount;
 
-    accels[0]  *= accel_scale.X * invcount;
-    accels[1]  *= accel_scale.Y * invcount;
-    accels[2]  *= accel_scale.Z * invcount;
+    accels[0] *= accel_scale.X * invcount;
+    accels[1] *= accel_scale.Y * invcount;
+    accels[2] *= accel_scale.Z * invcount;
     temp *= invcount;
 
-    if(isnan(temperature)){
+    if (isnan(temperature)) {
         temperature = temp;
     }
-    temperature = TEMP_ALPHA * temperature + (1 - TEMP_ALPHA) * temp;
+    temperature = temp_alpha * (temp - temperature) + temperature;
 
     if ((apply_gyro_temp || apply_accel_temp) && !temp_calibration_count) {
         temp_calibration_count = TEMP_CALIB_INTERVAL;

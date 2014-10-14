@@ -58,7 +58,7 @@
 #include <accelgyrosettings.h>
 #include <flightstatus.h>
 #include <taskinfo.h>
-
+#include <pios_math.h>
 #include <CoordinateConversions.h>
 
 #include <pios_board_info.h>
@@ -66,12 +66,16 @@
 // Private constants
 #define STACK_SIZE_BYTES    1000
 #define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
-#define SENSOR_PERIOD       2
+
+static const uint32_t sensor_period_ms = ((uint32_t)1000.0f / PIOS_SENSOR_RATE);
 
 // Interval in number of sample to recalculate temp bias
 #define TEMP_CALIB_INTERVAL 30
-// LPF 5Hz at 500Hz rate
-#define TEMP_ALPHA          0.999504f
+
+// LPF
+#define TEMP_DT             (1.0f / PIOS_SENSOR_RATE)
+#define TEMP_LPF_FC         5.0f
+static const float temp_alpha = TEMP_DT / (TEMP_DT + 1.0f / (2.0f * M_PI_F * TEMP_LPF_FC));
 
 #define ZERO_ROT_ANGLE      0.00001f
 // Private types
@@ -255,7 +259,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 #endif
             lastSysTime = xTaskGetTickCount();
-            vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
+            vTaskDelayUntil(&lastSysTime, sensor_period_ms / portTICK_RATE_MS);
             AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
             error = false;
         } else {
@@ -284,7 +288,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 
                 count = 0;
                 while ((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0 && !error) {
-                    error = ((xTaskGetTickCount() - lastSysTime) > SENSOR_PERIOD) ? true : error;
+                    error = ((xTaskGetTickCount() - lastSysTime) > sensor_period_ms) ? true : error;
                 }
                 if (error) {
                     // Unfortunately if the BMA180 ever misses getting read, then it will not
@@ -379,9 +383,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             gyro_temperature  = gyroSensorData.temperature;
         }
 
-        accel_temperature = TEMP_ALPHA * accel_temperature + (1 - TEMP_ALPHA) * accelSensorData.temperature;
-        gyro_temperature  = TEMP_ALPHA * gyro_temperature + (1 - TEMP_ALPHA) * gyroSensorData.temperature;
-        gyroSensorData.temperature = gyro_temperature;
+        accel_temperature = temp_alpha * (accelSensorData.temperature - accel_temperature) + accel_temperature;
+        gyro_temperature  = temp_alpha * (gyroSensorData.temperature - gyro_temperature) + gyro_temperature;
+
         if ((accel_temp_calibrated || gyro_temp_calibrated) && !temp_calibration_count) {
             temp_calibration_count = TEMP_CALIB_INTERVAL;
             if (accel_temp_calibrated) {
@@ -472,7 +476,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
 #endif
-        vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
+        vTaskDelayUntil(&lastSysTime, sensor_period_ms / portTICK_RATE_MS);
     }
 }
 

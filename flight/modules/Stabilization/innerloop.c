@@ -54,7 +54,7 @@
 
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_CRITICAL
 
-#define UPDATE_EXPECTED   (1.0f / 666.0f)
+#define UPDATE_EXPECTED   (1.0f / PIOS_SENSOR_RATE)
 #define UPDATE_MIN        1.0e-6f
 #define UPDATE_MAX        1.0f
 #define UPDATE_ALPHA      1.0e-2f

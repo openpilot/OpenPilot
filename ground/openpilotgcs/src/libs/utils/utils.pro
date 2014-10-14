@@ -56,7 +56,8 @@ SOURCES += reloadpromptutils.cpp \
     svgimageprovider.cpp \
     hostosinfo.cpp \
     logfile.cpp \
-    crc.cpp
+    crc.cpp \
+    mustache.cpp
 
 SOURCES += xmlconfig.cpp
 
@@ -115,7 +116,8 @@ HEADERS += utils_global.h \
     svgimageprovider.h \
     hostosinfo.h \
     logfile.h \
-    crc.h
+    crc.h \
+    mustache.h
 
 
 HEADERS += xmlconfig.h

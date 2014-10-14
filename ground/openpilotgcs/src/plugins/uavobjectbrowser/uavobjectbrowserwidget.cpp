@@ -275,7 +275,9 @@ QString UAVObjectBrowserWidget::createObjectDescription(UAVObject *object)
     QString description;
     description.append("<html><head></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">");
     description.append("<table border='0' width='99%' cellpadding='5' cellspacing='0'><tbody><tr bgcolor='#498ae8'>");
-    description.append("<td nowrap='nowrap'><b>").append(tr("Name:")).append(" </b>").append(object->getName());
+
+    description.append("<td nowrap='nowrap'>");
+    description.append("<b>").append(tr("Name:")).append(" </b>").append(object->getName());
     description.append("<br><b>").append(tr("Type:")).append(" </b>")
             .append(object->isSettingsObject() ? tr("Settings") : object->isMetaDataObject() ? tr("Metadata") : tr("Data"));
     description.append("<br><b>").append(tr("Category:")).append(" </b>").append(object->getCategory());
@@ -283,56 +285,64 @@ QString UAVObjectBrowserWidget::createObjectDescription(UAVObject *object)
     description.append(tr("Description:")).append(" </b>").append(object->getDescription().replace("@ref", ""))
             .append("</td></tr><tr><td colspan='4' rowspan='1' valign='middle'><hr></td></tr>");
 
-    description.append("<tr><td><b>").append(tr("Fields:")).append(" </b></td>");
+    description.append("<tr><td><b>").append(tr("Fields:")).append(" </b></td></tr>");
 
     int fields = 0;
     foreach (UAVObjectField *field, object->getFields()) {
         fields++;
-        QString bgColor = fields & 1 ? "bgcolor='#ffcc99'>" : "bgcolor='#ff9900'>";
-        description.append("</tr><tr><td nowrap='nowrap' ").append(bgColor);
-        description.append("<b>").append(tr("Name:")).append(" </b>").append(field->getName())
-                .append("</td><td").append(bgColor);
-        description.append("<b>").append(tr("Size:")).append(" </b>").append(tr("%1 bytes").arg(field->getNumBytes()))
-                .append("</td>");
+        QString bgColor = fields & 1 ? "bgcolor='#76A9F3'" : "bgcolor='#98BDF3'";
+
+        description.append("<tr>");
+        description.append("<td nowrap='nowrap' ").append(bgColor).append(">");
+
+        description.append("<b>").append(tr("Name:")).append(" </b>").append(field->getName());
+        description.append("</td><td").append(bgColor);
+
+        description.append("<b>").append(tr("Size:")).append(" </b>").append(tr("%1 bytes").arg(field->getNumBytes()));
+
+        description.append("</td>");
 
         description.append("<td").append(bgColor);
-        description.append(tr("<b>Type:")).append(" </b>").append(field->getTypeAsString());
+        description.append(tr("<b>Type:&nbsp;")).append("</b>").append(field->getTypeAsString());
         int elements = field->getNumElements();
         if (elements > 1) {
             description.append("[").append(QString("%1").arg(field->getNumElements())).append("]");
         }
 
-        description.append("</td><td").append(bgColor);
+        description.append("</td>");
+        description.append("<td").append(bgColor).append(">");
         if (field->getUnits() != "") {
-            description.append("<b>").append(tr("Unit:")).append(" </b>").append(field->getUnits());
+            description.append("<b>").append(tr("Unit:&nbsp;")).append("</b>").append(field->getUnits());
         }
+        description.append("</td>");
 
-        description.append("</td></tr>");
+        description.append("</tr>");
+
         if (field->getDescription() != "") {
             description.append("<tr><td").append(bgColor);
-            description.append("<b>").append(tr("Description:")).append(" </b>").append(field->getDescription());
+            description.append("<b>").append(tr("Description:&nbsp;")).append("</b>").append(field->getDescription());
             description.append("</td></tr>");
         }
 
         if (elements > 1) {
-            description.append("<tr><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
-            description.append("</td><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
+            description.append("<tr><td").append(bgColor);
+            description.append("</td><td").append(bgColor);
             description.append("<b>").append(tr("Elements:")).append(" </b>");
-            description.append("</td><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
+            description.append("</td><td").append(bgColor);
             QStringList names = field->getElementNames();
             for (uint i = 0; i < field->getNumElements(); i++) {
-                description.append( i == 0 ? tr("<b>Name: </b>") : " | ").append(names.at(i));
+                description.append( i == 0 ? tr("<b>Name:&nbsp;</b>") : "&nbsp;|&nbsp;").append(names.at(i));
                 if (field->getMinLimit(i).toString() != "" && field->getMaxLimit(i).toString() != "") {
-                    description.append(QString(" %1 - %2 ").arg(field->getMinLimit(i).toString(), field->getMaxLimit(i).toString()));
+                    description.append(QString("%1&nbsp;-&nbsp;%2").arg(field->getMinLimit(i).toString(), field->getMaxLimit(i).toString()));
                 }
             }
-            description.append("<td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
+            description.append("<td").append(bgColor);
             description.append("</td></tr>");
         } else {
             if (field->getMinLimit(0).toString() != "" && field->getMaxLimit(0).toString() != "") {
-                description.append("<tr><td").append(fields & 1 ? " bgcolor='#ffcc99'>" : " bgcolor='#ff9900'>");
-                description.append(tr("<b> Limits: </b>")).append(" </b>")
-                        .append(QString(" %1 - %2 ").arg(field->getMinLimit(0).toString(), field->getMaxLimit(0).toString()));
+                description.append("<tr><td").append(bgColor);
+                description.append(tr("<b> Limits:&nbsp;</b>")).append(" </b>")
+                        .append(QString("%1&nbsp;-&nbsp;%2").arg(field->getMinLimit(0).toString(), field->getMaxLimit(0).toString()));
                 description.append("</td></tr>");
             }
         }

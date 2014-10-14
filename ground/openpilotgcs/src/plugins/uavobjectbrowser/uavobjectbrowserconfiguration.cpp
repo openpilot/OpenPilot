@@ -43,7 +43,7 @@ UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QS
         m_useCategorizedView       = qSettings->value("CategorizedView").toBool();
         m_useScientificView        = qSettings->value("ScientificView").toBool();
         m_showMetaData = qSettings->value("showMetaData").toBool();
-        m_showDescription = qSettings->value("showDescription").toBool();
+        m_showDescription          = qSettings->value("showDescription").toBool();
         m_splitterState = qSettings->value("splitterState").toByteArray();
         m_recentlyUpdatedColor     = qSettings->value("recentlyUpdatedColor").value<QColor>();
         m_manuallyChangedColor     = qSettings->value("manuallyChangedColor").value<QColor>();
@@ -64,7 +64,7 @@ IUAVGadgetConfiguration *UAVObjectBrowserConfiguration::clone()
     m->m_useScientificView  = m_useScientificView;
     m->m_splitterState = m_splitterState;
     m->m_showMetaData = m_showMetaData;
-    m->m_showDescription = m_showDescription;
+    m->m_showDescription    = m_showDescription;
     return m;
 }
 

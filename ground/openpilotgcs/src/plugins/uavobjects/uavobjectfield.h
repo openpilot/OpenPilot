@@ -45,7 +45,7 @@ class UAVOBJECTS_EXPORT UAVObjectField : public QObject {
 
 public:
     typedef enum { INT8 = 0, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, BITFIELD, STRING } FieldType;
-    typedef enum { EQUAL, NOT_EQUAL, BETWEEN, BIGGER, SMALLER } LimitType;
+    typedef enum { EQUAL, NOT_EQUAL, BETWEEN, BIGGER, SMALLER, UNDEFINED } LimitType;
     typedef struct {
         LimitType type;
         QList<QVariant> values;
@@ -85,6 +85,7 @@ public:
     void fromJson(const QJsonObject &jsonObject);
 
     bool isWithinLimits(QVariant var, quint32 index, int board = 0);
+    QString getLimitsAsString(quint32 index, int board = 0);
     QVariant getMaxLimit(quint32 index, int board = 0);
     QVariant getMinLimit(quint32 index, int board = 0);
 signals:

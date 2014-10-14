@@ -39,6 +39,7 @@
 #include <QtCore/QDebug>
 #include <QItemEditorFactory>
 #include "extensionsystem/pluginmanager.h"
+#include "utils/mustache.h"
 
 UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent)
 {
@@ -55,6 +56,7 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     m_browser->treeView->setSelectionBehavior(QAbstractItemView::SelectItems);
     m_browser->splitter->setChildrenCollapsible(false);
+    m_mustacheTemplate = loadFileIntoString(QString(":/uavobjectbrowser/resources/uavodescription.mustache"));
     showMetaData(m_viewoptions->cbMetaData->isChecked());
     showDescription(m_viewoptions->cbDescription->isChecked());
     connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)),
@@ -73,7 +75,7 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     connect(m_viewoptions->cbMetaData, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
     connect(m_viewoptions->cbCategorized, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
     connect(m_viewoptions->cbDescription, SIGNAL(toggled(bool)), this, SLOT(viewOptionsChangedSlot()));
-    connect(m_browser->splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved()));
+    connect(m_browser->splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(splitterMoved()));
     enableSendRequest(false);
 }
 
@@ -176,6 +178,17 @@ ObjectTreeItem *UAVObjectBrowserWidget::findCurrentObjectTreeItem()
     return objItem;
 }
 
+QString UAVObjectBrowserWidget::loadFileIntoString(QString fileName)
+{
+    QFile file(fileName);
+
+    file.open(QIODevice::ReadOnly);
+    QTextStream stream(&file);
+    QString line = stream.readAll();
+    file.close();
+    return line;
+}
+
 void UAVObjectBrowserWidget::saveObject()
 {
     this->setFocus();
@@ -272,84 +285,83 @@ void UAVObjectBrowserWidget::splitterMoved()
 
 QString UAVObjectBrowserWidget::createObjectDescription(UAVObject *object)
 {
-    QString description;
-    description.append("<html><head></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">");
-    description.append("<table border='0' width='99%' cellpadding='5' cellspacing='0'><tbody><tr bgcolor='#498ae8'>");
+    QString mustache(m_mustacheTemplate);
 
-    description.append("<td nowrap='nowrap'>");
-    description.append("<b>").append(tr("Name:")).append(" </b>").append(object->getName());
-    description.append("<br><b>").append(tr("Type:")).append(" </b>")
-            .append(object->isSettingsObject() ? tr("Settings") : object->isMetaDataObject() ? tr("Metadata") : tr("Data"));
-    description.append("<br><b>").append(tr("Category:")).append(" </b>").append(object->getCategory());
-    description.append("</td><td colspan='3' rowspan='1' valign='middle'><b>");
-    description.append(tr("Description:")).append(" </b>").append(object->getDescription().replace("@ref", ""))
-            .append("</td></tr><tr><td colspan='4' rowspan='1' valign='middle'><hr></td></tr>");
+    QVariantHash uavoHash;
 
-    description.append("<tr><td><b>").append(tr("Fields:")).append(" </b></td></tr>");
+    uavoHash["OBJECT_NAME_TITLE"] = tr("Name");
+    uavoHash["OBJECT_NAME"] = object->getName();
+    uavoHash["CATEGORY_TITLE"]    = tr("Category");
+    uavoHash["CATEGORY"]          = object->getCategory();
+    uavoHash["TYPE_TITLE"]        = tr("Type");
+    uavoHash["TYPE"] = object->isMetaDataObject() ? tr("Metadata") : object->isSettingsObject() ? tr("Setting") : tr("Data");
+    uavoHash["SIZE_TITLE"]        = tr("Size");
+    uavoHash["SIZE"] = object->getNumBytes();
+    uavoHash["DESCRIPTION_TITLE"] = tr("Description");
+    uavoHash["DESCRIPTION"]       = object->getDescription().replace("@ref", "");
+    uavoHash["MULTI_INSTANCE_TITLE"] = tr("Multi");
+    uavoHash["MULTI_INSTANCE"]    = object->isSingleInstance() ? tr("No") : tr("Yes");
+    uavoHash["FIELDS_NAME_TITLE"] = tr("Fields");
+    QVariantList fields;
+    foreach(UAVObjectField * field, object->getFields()) {
+        QVariantHash fieldHash;
 
-    int fields = 0;
-    foreach (UAVObjectField *field, object->getFields()) {
-        fields++;
-        QString bgColor = fields & 1 ? "bgcolor='#76A9F3'" : "bgcolor='#98BDF3'";
-
-        description.append("<tr>");
-        description.append("<td nowrap='nowrap' ").append(bgColor).append(">");
-
-        description.append("<b>").append(tr("Name:")).append(" </b>").append(field->getName());
-        description.append("</td><td").append(bgColor);
-
-        description.append("<b>").append(tr("Size:")).append(" </b>").append(tr("%1 bytes").arg(field->getNumBytes()));
-
-        description.append("</td>");
-
-        description.append("<td").append(bgColor);
-        description.append(tr("<b>Type:&nbsp;")).append("</b>").append(field->getTypeAsString());
-        int elements = field->getNumElements();
-        if (elements > 1) {
-            description.append("[").append(QString("%1").arg(field->getNumElements())).append("]");
+        fieldHash["FIELD_NAME_TITLE"] = tr("Name");
+        fieldHash["FIELD_NAME"] = field->getName();
+        fieldHash["FIELD_TYPE_TITLE"] = tr("Type");
+        fieldHash["FIELD_TYPE"] = QString("%1%2").arg(field->getTypeAsString(),
+                                                      (field->getNumElements() > 1 ? QString("[%1]").arg(field->getNumElements()) : QString()));
+        if (!field->getUnits().isEmpty()) {
+            fieldHash["FIELD_UNIT_TITLE"] = tr("Unit");
+            fieldHash["FIELD_UNIT"] = field->getUnits();
         }
+        if (!field->getOptions().isEmpty()) {
+            fieldHash["FIELD_OPTIONS_TITLE"] = tr("Options");
+            QVariantList options;
+            foreach(QString option, field->getOptions()) {
+                QVariantHash optionHash;
 
-        description.append("</td>");
-        description.append("<td").append(bgColor).append(">");
-        if (field->getUnits() != "") {
-            description.append("<b>").append(tr("Unit:&nbsp;")).append("</b>").append(field->getUnits());
-        }
-        description.append("</td>");
-
-        description.append("</tr>");
-
-        if (field->getDescription() != "") {
-            description.append("<tr><td").append(bgColor);
-            description.append("<b>").append(tr("Description:&nbsp;")).append("</b>").append(field->getDescription());
-            description.append("</td></tr>");
-        }
-
-        if (elements > 1) {
-            description.append("<tr><td").append(bgColor);
-            description.append("</td><td").append(bgColor);
-            description.append("<b>").append(tr("Elements:")).append(" </b>");
-            description.append("</td><td").append(bgColor);
-            QStringList names = field->getElementNames();
-            for (uint i = 0; i < field->getNumElements(); i++) {
-                description.append( i == 0 ? tr("<b>Name:&nbsp;</b>") : "&nbsp;|&nbsp;").append(names.at(i));
-                if (field->getMinLimit(i).toString() != "" && field->getMaxLimit(i).toString() != "") {
-                    description.append(QString("%1&nbsp;-&nbsp;%2").arg(field->getMinLimit(i).toString(), field->getMaxLimit(i).toString()));
+                optionHash["FIELD_OPTION"] = option;
+                if (!options.isEmpty()) {
+                    optionHash["FIELD_OPTION_DELIM"] = ", ";
                 }
+                options.append(optionHash);
             }
-            description.append("<td").append(bgColor);
-            description.append("</td></tr>");
-        } else {
-            if (field->getMinLimit(0).toString() != "" && field->getMaxLimit(0).toString() != "") {
-                description.append("<tr><td").append(bgColor);
-                description.append(tr("<b> Limits:&nbsp;</b>")).append(" </b>")
-                        .append(QString("%1&nbsp;-&nbsp;%2").arg(field->getMinLimit(0).toString(), field->getMaxLimit(0).toString()));
-                description.append("</td></tr>");
-            }
+            fieldHash["FIELD_OPTIONS"] = options;
         }
-    }
+        if (field->getElementNames().count() > 1) {
+            fieldHash["FIELD_ELEMENTS_TITLE"] = tr("Elements");
+            QVariantList elements;
+            for (int i = 0; i < field->getElementNames().count(); i++) {
+                QString element = field->getElementNames().at(i);
+                QVariantHash elementHash;
+                elementHash["FIELD_ELEMENT"] = element;
+                QString limitsString = field->getLimitsAsString(i);
+                if (!limitsString.isEmpty()) {
+                    elementHash["FIELD_ELEMENT_LIMIT"] = limitsString.prepend(" (").append(")");
+                }
+                if (!elements.isEmpty()) {
+                    elementHash["FIELD_ELEMENT_DELIM"] = ", ";
+                }
+                elements.append(elementHash);
+            }
+            fieldHash["FIELD_ELEMENTS"] = elements;
+        } else if (!field->getLimitsAsString(0).isEmpty()) {
+            fieldHash["FIELD_LIMIT_TITLE"] = tr("Limits");
+            fieldHash["FIELD_LIMIT"] = field->getLimitsAsString(0);
+        }
 
-    description.append("</tbody></table></body></html>");
-    return description;
+        if (!field->getDescription().isEmpty()) {
+            fieldHash["FIELD_DESCRIPTION_TITLE"] = tr("Description");
+            fieldHash["FIELD_DESCRIPTION"] = field->getDescription();
+        }
+
+        fields.append(fieldHash);
+    }
+    uavoHash["FIELDS"] = fields;
+    Mustache::QtVariantContext context(uavoHash);
+    Mustache::Renderer renderer;
+    return renderer.render(mustache, &context);
 }
 
 void UAVObjectBrowserWidget::enableSendRequest(bool enable)
@@ -364,6 +376,7 @@ void UAVObjectBrowserWidget::enableSendRequest(bool enable)
 void UAVObjectBrowserWidget::updateDescription()
 {
     ObjectTreeItem *objItem = findCurrentObjectTreeItem();
+
     if (objItem) {
         UAVObject *obj = objItem->object();
         if (obj) {

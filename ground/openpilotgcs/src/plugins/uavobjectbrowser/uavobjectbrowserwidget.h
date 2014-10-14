@@ -78,7 +78,7 @@ private slots:
     void viewSlot();
     void viewOptionsChangedSlot();
     void splitterMoved();
-    QString createObjectDescription(UAVObject* object);
+    QString createObjectDescription(UAVObject *object);
 signals:
     void viewOptionsChanged(bool categorized, bool scientific, bool metadata, bool description);
     void splitterChanged(QByteArray state);
@@ -94,11 +94,13 @@ private:
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
     bool m_onlyHilightChangedValues;
+    QString m_mustacheTemplate;
 
     void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
     void enableSendRequest(bool enable);
     void updateDescription();
     ObjectTreeItem *findCurrentObjectTreeItem();
+    QString loadFileIntoString(QString fileName);
 };
 
 #endif /* UAVOBJECTBROWSERWIDGET_H_ */

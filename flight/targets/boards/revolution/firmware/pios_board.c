@@ -880,17 +880,22 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_RCVRPORT_PPM:
     case HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS:
     case HWSETTINGS_RM_RCVRPORT_PPMPWM:
+    case HWSETTINGS_RM_RCVRPORT_PPMTELEMETRY:
 #if defined(PIOS_INCLUDE_PPM)
+        PIOS_Board_configure_ppm(&pios_ppm_cfg);
+
         if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS) {
             // configure servo outputs and the remaining 5 inputs as outputs
             pios_servo_cfg = &pios_servo_cfg_out_in_ppm;
         }
 
-        PIOS_Board_configure_ppm(&pios_ppm_cfg);
-
         // enable pwm on the remaining channels
         if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMPWM) {
             PIOS_Board_configure_pwm(&pios_pwm_ppm_cfg);
+        }
+
+        if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMTELEMETRY) {
+            PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
         }
 
         break;
@@ -898,6 +903,9 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RM_RCVRPORT_OUTPUTS:
         // configure only the servo outputs
         pios_servo_cfg = &pios_servo_cfg_out_in;
+        break;
+    case HWSETTINGS_RM_RCVRPORT_TELEMETRY:
+        PIOS_Board_configure_com(&pios_usart_rcvrport_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
         break;
     }
 

@@ -187,14 +187,12 @@ void ConfigStabilizationWidget::updateThrottleCurveFromObject()
     UAVObject *stabBank = getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
 
     Q_ASSERT(stabBank);
-    qDebug() << "updatingCurveFromObject" << stabBank->getName();
 
     UAVObjectField *field = stabBank->getField("ThrustPIDScaleCurve");
     Q_ASSERT(field);
 
     QList<double> curve;
     for (quint32 i = 0; i < field->getNumElements(); i++) {
-        qDebug() << field->getName() << field->getElementNames().at(i) << "=>" << field->getValue(i);
         curve.append(field->getValue(i).toDouble());
     }
 
@@ -214,7 +212,6 @@ void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
     UAVObject *stabBank = getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
 
     Q_ASSERT(stabBank);
-    qDebug() << "updatingObjectFromCurve" << stabBank->getName();
 
     UAVObjectField *field = stabBank->getField("ThrustPIDScaleCurve");
     Q_ASSERT(field);
@@ -222,7 +219,6 @@ void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
     QList<double> curve   = ui->thrustPIDScalingCurve->getCurve();
     for (quint32 i = 0; i < field->getNumElements(); i++) {
         field->setValue(curve.at(i), i);
-        qDebug() << field->getName() << field->getElementNames().at(i) << "<=" << curve.at(i);
     }
 
     field = stabBank->getField("EnableThrustPIDScaling");
@@ -351,10 +347,8 @@ void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)
 
     if (value && !realtimeUpdates->isActive()) {
         realtimeUpdates->start(AUTOMATIC_UPDATE_RATE);
-        qDebug() << "Instant Update timer started.";
     } else if (!value && realtimeUpdates->isActive()) {
         realtimeUpdates->stop();
-        qDebug() << "Instant Update timer stopped.";
     }
 }
 
@@ -451,7 +445,6 @@ void ConfigStabilizationWidget::pidBankChanged(int index)
     setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(index).toString(), true);
 
     m_currentPIDBank = index;
-    qDebug() << "current bank:" << m_currentPIDBank;
     updateThrottleCurveFromObject();
     setDirty(dirty);
 }

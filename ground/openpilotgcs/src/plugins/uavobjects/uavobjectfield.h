@@ -45,20 +45,21 @@ class UAVOBJECTS_EXPORT UAVObjectField : public QObject {
 
 public:
     typedef enum { INT8 = 0, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, BITFIELD, STRING } FieldType;
-    typedef enum { EQUAL, NOT_EQUAL, BETWEEN, BIGGER, SMALLER } LimitType;
+    typedef enum { EQUAL, NOT_EQUAL, BETWEEN, BIGGER, SMALLER, UNDEFINED } LimitType;
     typedef struct {
         LimitType type;
         QList<QVariant> values;
         int board;
     } LimitStruct;
 
-    UAVObjectField(const QString & name, const QString & units, FieldType type, quint32 numElements, const QStringList & options, const QString & limits = QString());
-    UAVObjectField(const QString & name, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString & limits = QString());
+    UAVObjectField(const QString & name, const QString & description, const QString & units, FieldType type, quint32 numElements, const QStringList & options, const QString & limits = QString());
+    UAVObjectField(const QString & name, const QString & description, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString & limits = QString());
     void initialize(quint8 *data, quint32 dataOffset, UAVObject *obj);
     UAVObject *getObject();
     FieldType getType();
     QString getTypeAsString();
     QString getName();
+    QString getDescription();
     QString getUnits();
     quint32 getNumElements();
     QStringList getElementNames();
@@ -84,6 +85,7 @@ public:
     void fromJson(const QJsonObject &jsonObject);
 
     bool isWithinLimits(QVariant var, quint32 index, int board = 0);
+    QString getLimitsAsString(quint32 index, int board = 0);
     QVariant getMaxLimit(quint32 index, int board = 0);
     QVariant getMinLimit(quint32 index, int board = 0);
 signals:
@@ -91,6 +93,7 @@ signals:
 
 protected:
     QString name;
+    QString description;
     QString units;
     FieldType type;
     QStringList elementNames;
@@ -102,7 +105,7 @@ protected:
     UAVObject *obj;
     QMap<quint32, QList<LimitStruct> > elementLimits;
     void clear();
-    void constructorInitialize(const QString & name, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits);
+    void constructorInitialize(const QString & name, const QString & description, const QString & units, FieldType type, const QStringList & elementNames, const QStringList & options, const QString &limits);
     void limitsInitialize(const QString &limits);
 };
 

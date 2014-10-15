@@ -1,6 +1,6 @@
 <xml>
     <object name="ManualControlCommand" singleinstance="true" settings="false" category="Control">
-        <description>The output from the @ref ManualControlModule which descodes the receiver inputs.  Overriden by GCS for fly-by-wire control.</description>
+        <description>The output from the @ref ManualControlModule which decodes the receiver inputs. Overriden by GCS for fly-by-wire control.</description>
         <field name="Connected" units="" type="enum" elements="1" options="False,True"/>
 	<field name="Throttle" units="%" type="float" elements="1"/>
 	<field name="Roll" units="%" type="float" elements="1"/>

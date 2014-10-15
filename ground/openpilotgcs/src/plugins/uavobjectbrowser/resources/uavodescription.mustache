@@ -1,0 +1,62 @@
+<html>
+    <head></head>
+    <body style="font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;">
+        <table width='100%' cellpadding="5">
+            <tr bgcolor='#308BC6'>
+                <td rowspan='1' colspan='4'><b>{{OBJECT_NAME_TITLE}}:&nbsp;</b>{{OBJECT_NAME}}</td>
+            </tr>
+            <tr>
+                <td colspan='1'><b>{{CATEGORY_TITLE}}:&nbsp;</b>{{CATEGORY}}</td>
+                <td colspan='1'><b>{{TYPE_TITLE}}:&nbsp;</b>{{TYPE}}</td>
+                <td colspan='1'><b>{{SIZE_TITLE}}:&nbsp;</b>{{SIZE}}&nbsp;bytes</td>
+                <td colspan='1'><b>{{MULTI_INSTANCE_TITLE}}:&nbsp;</b>{{MULTI_INSTANCE}}</td>
+            </tr>
+            <tr>
+                <td colspan='4' rowspan='1' valign='top'><b>{{DESCRIPTION_TITLE}}:&nbsp;</b>{{DESCRIPTION}}</td>
+            <tr bgcolor='#51A0D3'>
+                <td rowspan='1' colspan='4'><b>{{FIELDS_NAME_TITLE}}</td>
+            </tr>
+            {{#FIELDS}}
+            <tr>
+                <td colspan='4'>
+                    <table width='100%' cellpadding="5">
+                        <tr bgcolor='#7DBAE2'>
+                            <td rowspan='1' colspan='4'><b>{{FIELD_NAME_TITLE}}:&nbsp;</b>{{FIELD_NAME}}</td>
+                        </tr>
+                        <tr>
+                            <td rowspan='1' colspan='1'><b>{{FIELD_TYPE_TITLE}}:&nbsp;</b>{{FIELD_TYPE}}</td>
+                            {{#FIELD_UNIT_TITLE}}
+                            <td rowspan='1' colspan='2'><b>{{FIELD_UNIT_TITLE}}:&nbsp;</b>{{FIELD_UNIT}}</td>
+                            {{/FIELD_UNIT_TITLE}}
+                        </tr>
+                        {{#FIELD_OPTIONS_TITLE}}
+                        <tr>
+                            <td rowspan='1' colspan='2'><b>{{FIELD_OPTIONS_TITLE}}:&nbsp;
+                            </b>{{#FIELD_OPTIONS}}{{FIELD_OPTION_DELIM}}{{FIELD_OPTION}}{{/FIELD_OPTIONS}}</td>
+                        </tr>
+                        {{/FIELD_OPTIONS_TITLE}}
+                        {{#FIELD_ELEMENTS_TITLE}}
+                        <tr>
+                            <td rowspan='1' colspan='2'><b>{{FIELD_ELEMENTS_TITLE}}:&nbsp;
+                            </b>{{#FIELD_ELEMENTS}}{{FIELD_ELEMENT_DELIM}}{{FIELD_ELEMENT}}{{FIELD_ELEMENT_LIMIT}}{{/FIELD_ELEMENTS}}</td>
+                        </tr>
+                        {{/FIELD_ELEMENTS_TITLE}}
+                        {{^FIELD_ELEMENTS_TITLE}}
+                        {{#FIELD_LIMIT_TITLE}}
+                        <tr>
+                            <td rowspan='1' colspan='2'><b>{{FIELD_LIMIT_TITLE}}:&nbsp;</b>{{FIELD_LIMIT}}</td>
+                        </tr>
+                        {{/FIELD_LIMIT_TITLE}}
+                        {{/FIELD_ELEMENTS_TITLE}}
+                        {{#FIELD_DESCRIPTION_TITLE}}
+                        <tr>
+                            <td rowspan='1' colspan='2'><b>{{FIELD_DESCRIPTION_TITLE}}:&nbsp;</b>{{FIELD_DESCRIPTION}}</td>
+                        </tr>
+                        {{/FIELD_DESCRIPTION_TITLE}}
+                    </table>
+                </td>
+            </tr>
+            {{/FIELDS}}
+        </table>
+    </body>
+</html>

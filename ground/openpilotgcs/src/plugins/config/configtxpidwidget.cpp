@@ -145,6 +145,25 @@ static bool isAttitudeOption(int pidOption)
     }
 }
 
+static bool isExpoOption(int pidOption)
+{
+    switch (pidOption) {
+    case TxPIDSettings::PIDS_ROLLEXPO:
+    case TxPIDSettings::PIDS_PITCHEXPO:
+    case TxPIDSettings::PIDS_ROLLPITCHEXPO:
+    case TxPIDSettings::PIDS_YAWEXPO:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+static bool isAcroPlusFactorOption(int pidOption)
+{
+    return pidOption == TxPIDSettings::PIDS_ACROPLUSFACTOR;
+}
+
 template <class StabilizationSettingsBankX>
 static float defaultValueForPidOption(const StabilizationSettingsBankX *bank, int pidOption)
 {
@@ -260,6 +279,18 @@ static float defaultValueForPidOption(const StabilizationSettingsBankX *bank, in
     case TxPIDSettings::PIDS_YAWATTITUDERESP:
         return bank->getYawMax();
 
+    case TxPIDSettings::PIDS_ROLLEXPO:
+        return bank->getStickExpo_Roll();
+
+    case TxPIDSettings::PIDS_PITCHEXPO:
+        return bank->getStickExpo_Pitch();
+
+    case TxPIDSettings::PIDS_ROLLPITCHEXPO:
+        return bank->getStickExpo_Roll();
+
+    case TxPIDSettings::PIDS_YAWEXPO:
+        return bank->getStickExpo_Yaw();
+
     case -1: // The PID Option field was uninitialized.
         return 0.0f;
 
@@ -337,6 +368,20 @@ void ConfigTxPIDWidget::updateSpinBoxProperties(int selectedPidOption)
         maxPID->setSingleStep(1);
         minPID->setDecimals(0);
         maxPID->setDecimals(0);
+    } else if (isExpoOption(selectedPidOption)) {
+        minPID->setRange(-100, 100);
+        maxPID->setRange(-100, 100);
+        minPID->setSingleStep(1);
+        maxPID->setSingleStep(1);
+        minPID->setDecimals(0);
+        maxPID->setDecimals(0);
+    } else if (isAcroPlusFactorOption(selectedPidOption)) {
+        minPID->setRange(0, 1);
+        maxPID->setRange(0, 1);
+        minPID->setSingleStep(0.01);
+        maxPID->setSingleStep(0.01);
+        minPID->setDecimals(2);
+        maxPID->setDecimals(2);
     } else {
         minPID->setRange(0, 99.99);
         maxPID->setRange(0, 99.99);

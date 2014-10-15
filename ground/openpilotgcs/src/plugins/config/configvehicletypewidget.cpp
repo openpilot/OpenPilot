@@ -174,6 +174,7 @@ ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
 void ConfigVehicleTypeWidget::switchAirframeType(int index)
 {
     m_aircraft->airframesWidget->setCurrentWidget(getVehicleConfigWidget(index));
+    m_aircraft->tabWidget->setTabEnabled(1, index != 1);
 }
 
 /**

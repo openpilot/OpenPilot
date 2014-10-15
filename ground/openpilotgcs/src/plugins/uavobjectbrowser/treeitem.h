@@ -206,6 +206,19 @@ public:
         return 0;
     }
 
+    void setKnown(bool known)
+    {
+        m_known = known;
+        foreach (TreeItem *child, m_children) {
+            child->setKnown(known);
+        }
+        updateHighlight(this);
+    }
+    inline bool isKnown()
+    {
+        return m_known;
+    }
+
 signals:
     void updateHighlight(TreeItem *);
 
@@ -222,6 +235,8 @@ private:
     QTime m_highlightExpires;
     HighLightManager *m_highlightManager;
     static int m_highlightTimeMs;
+    bool m_known;
+
 public:
     static const int dataColumn = 1;
 };
@@ -271,7 +286,8 @@ public:
         TreeItem(data, parent), m_obj(0) {}
     void setObject(UAVObject *obj)
     {
-        m_obj = obj; setDescription(obj->getDescription());
+        m_obj = obj;
+        setDescription(obj->getDescription());
     }
     inline UAVObject *object()
     {

@@ -42,11 +42,13 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent, bool categorize, bool us
     m_useScientificFloatNotation(useScientificNotation),
     m_categorize(categorize),
     m_recentlyUpdatedTimeout(500), // ms
+    m_unknownObjectColor(QColor(Qt::gray)),
     m_recentlyUpdatedColor(QColor(255, 230, 230)),
     m_manuallyChangedColor(QColor(230, 230, 255))
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager);
 
     // Create highlight manager, let it run every 300 ms.
     m_highlightManager = new HighLightManager(300);
@@ -54,6 +56,12 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent, bool categorize, bool us
     connect(objManager, SIGNAL(newInstance(UAVObject *)), this, SLOT(newObject(UAVObject *)));
 
     TreeItem::setHighlightTime(m_recentlyUpdatedTimeout);
+
+    TelemetryManager *telManager = pm->getObject<TelemetryManager>();
+    Q_ASSERT(telManager);
+    m_telemetryManager = telManager;
+    connect(m_telemetryManager, SIGNAL(knownObjectsChanged(UAVObject*,bool)), this, SLOT(knownObjectsChanged(UAVObject*,bool)));
+
     setupModelData(objManager);
 }
 
@@ -112,15 +120,17 @@ void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
     if (existing) {
         addInstance(obj, existing);
     } else {
-        DataObjectTreeItem *dataTreeItem = new DataObjectTreeItem(obj->getName() + " (" + QString::number(obj->getNumBytes()) + " bytes)");
+        DataObjectTreeItem *dataTreeItem = new DataObjectTreeItem(obj->getName());
         dataTreeItem->setHighlightManager(m_highlightManager);
         connect(dataTreeItem, SIGNAL(updateHighlight(TreeItem *)), this, SLOT(updateHighlight(TreeItem *)));
         parent->insertChild(dataTreeItem);
         root->addObjectTreeItem(obj->getObjID(), dataTreeItem);
         UAVMetaObject *meta = obj->getMetaObject();
         MetaObjectTreeItem *metaTreeItem = addMetaObject(meta, dataTreeItem);
+        metaTreeItem->setKnown(root == m_nonSettingsTree || m_telemetryManager->isObjectKnown(obj));
         root->addMetaObjectTreeItem(meta->getObjID(), metaTreeItem);
         addInstance(obj, dataTreeItem);
+        dataTreeItem->setKnown(root == m_nonSettingsTree || m_telemetryManager->isObjectKnown(obj));
     }
 }
 
@@ -352,20 +362,24 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
+    TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
+
     if (index.column() == TreeItem::dataColumn && role == Qt::EditRole) {
-        TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
         return item->data(index.column());
     }
 
     if (role == Qt::ToolTipRole) {
-        TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
         return item->description();
     }
 
-    TreeItem *item = static_cast<TreeItem *>(index.internalPointer());
+    if (role == Qt::ForegroundRole) {
+        if (!dynamic_cast<TopTreeItem*>(item) && !item->isKnown()) {
+            return QVariant(m_unknownObjectColor);
+        }
+    }
 
     if (index.column() == 0 && role == Qt::BackgroundRole) {
-        if (!dynamic_cast<TopTreeItem *>(item) && item->highlighted()) {
+        if(!dynamic_cast<TopTreeItem*>(item) && item->highlighted()) {
             return QVariant(m_recentlyUpdatedColor);
         }
     }
@@ -483,4 +497,19 @@ void UAVObjectTreeModel::updateHighlight(TreeItem *item)
 
     Q_ASSERT(itemIndex != QModelIndex());
     emit dataChanged(itemIndex, itemIndex.sibling(itemIndex.row(), TreeItem::dataColumn));
+}
+
+void UAVObjectTreeModel::knownObjectsChanged(UAVObject *object, bool known)
+{
+    if (object->isSettingsObject()) {
+        TreeItem * item;
+        if (object->isMetaDataObject()) {
+            item = m_settingsTree->findMetaObjectTreeItemByObjectId(object->getObjID());
+        } else {
+            item = m_settingsTree->findDataObjectTreeItemByObjectId(object->getObjID());
+        }
+        if (item) {
+            item->setKnown(known);
+        }
+    }
 }

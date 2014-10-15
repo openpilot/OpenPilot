@@ -102,14 +102,16 @@ TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent) :
     m_data(data),
     m_parent(parent),
     m_highlight(false),
-    m_changed(false)
+    m_changed(false),
+    m_known(true)
 {}
 
 TreeItem::TreeItem(const QVariant &data, TreeItem *parent) :
     QObject(0),
     m_parent(parent),
     m_highlight(false),
-    m_changed(false)
+    m_changed(false),
+    m_known(true)
 {
     m_data << data << "" << "";
 }

@@ -256,6 +256,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
         Q_ASSERT(false);
     }
     item->setHighlightManager(m_highlightManager);
+    item->setDescription(field->getDescription());
     connect(item, SIGNAL(updateHighlight(TreeItem *)), this, SLOT(updateHighlight(TreeItem *)));
     parent->appendChild(item);
 }

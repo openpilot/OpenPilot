@@ -6,5 +6,6 @@
         <file>images/up_alt.png</file>
         <file>images/trash.png</file>
         <file>images/1343241276_eye.png</file>
+        <file>resources/uavodescription.mustache</file>
     </qresource>
 </RCC>

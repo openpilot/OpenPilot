@@ -2169,7 +2169,8 @@ static void rfm22_synchronizeClock(struct pios_rfm22b_dev *rfm22b_dev)
     portTickType start_time = rfm22b_dev->packet_start_ticks;
 
     // This packet was transmitted on channel 0, calculate the time delta that will force us to transmit on channel 0 at the time this packet started.
-    uint16_t frequency_hop_cycle_time = rfm22b_dev->packet_time * rfm22b_dev->num_channels;
+    uint8_t num_chan    = num_channels[rfm22b_dev->datarate];
+    uint16_t frequency_hop_cycle_time = rfm22b_dev->packet_time * num_chan;
     uint16_t time_delta = start_time % frequency_hop_cycle_time;
 
     // Calculate the adjustment for the preamble
@@ -2231,7 +2232,8 @@ static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev)
 static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t index)
 {
     // Make sure we don't index outside of the range.
-    uint8_t idx = index % rfm22b_dev->num_channels;
+    uint8_t num_chan = num_channels[rfm22b_dev->datarate];
+    uint8_t idx = index % num_chan;
 
     // Are we switching to a new channel?
     if (idx != rfm22b_dev->channel_index) {
@@ -2269,7 +2271,8 @@ static uint8_t rfm22_calcChannelFromClock(struct pios_rfm22b_dev *rfm22b_dev)
     portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
     // Divide time into 8ms blocks.  Coordinator sends in first 2 ms, and remote send in 5th and 6th ms.
     // Channel changes occur in the last 2 ms.
-    uint8_t n = (time / rfm22b_dev->packet_time) % rfm22b_dev->num_channels;
+    uint8_t num_chan  = num_channels[rfm22b_dev->datarate];
+    uint8_t n = (time / rfm22b_dev->packet_time) % num_chan;
 
     return rfm22_calcChannel(rfm22b_dev, n);
 }

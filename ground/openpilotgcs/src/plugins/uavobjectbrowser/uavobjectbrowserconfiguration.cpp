@@ -45,7 +45,7 @@ UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QS
         int timeout   = qSettings->value("recentlyUpdatedTimeout").toInt();
         bool hilight  = qSettings->value("onlyHilightChangedValues").toBool();
 
-        m_unknownObjectColor = qSettings->value("unknownObjectColor", QVariant(QColor(Qt::gray))).value<QColor>();
+        m_unknownObjectColor       = qSettings->value("unknownObjectColor", QVariant(QColor(Qt::gray))).value<QColor>();
         m_useCategorizedView       = qSettings->value("CategorizedView").toBool();
         m_useScientificView        = qSettings->value("ScientificView").toBool();
         m_showMetaData = qSettings->value("showMetaData").toBool();

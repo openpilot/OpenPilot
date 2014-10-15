@@ -48,6 +48,7 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent, bool categorize, bool us
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
     Q_ASSERT(objManager);
 
     // Create highlight manager, let it run every 300 ms.
@@ -60,7 +61,7 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent, bool categorize, bool us
     TelemetryManager *telManager = pm->getObject<TelemetryManager>();
     Q_ASSERT(telManager);
     m_telemetryManager = telManager;
-    connect(m_telemetryManager, SIGNAL(knownObjectsChanged(UAVObject*,bool)), this, SLOT(knownObjectsChanged(UAVObject*,bool)));
+    connect(m_telemetryManager, SIGNAL(knownObjectsChanged(UAVObject *, bool)), this, SLOT(knownObjectsChanged(UAVObject *, bool)));
 
     setupModelData(objManager);
 }
@@ -373,13 +374,13 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::ForegroundRole) {
-        if (!dynamic_cast<TopTreeItem*>(item) && !item->isKnown()) {
+        if (!dynamic_cast<TopTreeItem *>(item) && !item->isKnown()) {
             return QVariant(m_unknownObjectColor);
         }
     }
 
     if (index.column() == 0 && role == Qt::BackgroundRole) {
-        if(!dynamic_cast<TopTreeItem*>(item) && item->highlighted()) {
+        if (!dynamic_cast<TopTreeItem *>(item) && item->highlighted()) {
             return QVariant(m_recentlyUpdatedColor);
         }
     }
@@ -502,7 +503,7 @@ void UAVObjectTreeModel::updateHighlight(TreeItem *item)
 void UAVObjectTreeModel::knownObjectsChanged(UAVObject *object, bool known)
 {
     if (object->isSettingsObject()) {
-        TreeItem * item;
+        TreeItem *item;
         if (object->isMetaDataObject()) {
             item = m_settingsTree->findMetaObjectTreeItemByObjectId(object->getObjID());
         } else {

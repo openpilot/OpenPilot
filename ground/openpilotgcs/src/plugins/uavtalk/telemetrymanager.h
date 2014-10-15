@@ -47,7 +47,7 @@ public:
     void start(QIODevice *dev);
     void stop();
     bool isConnected();
-    bool isObjectKnown(UAVObject* object) const;
+    bool isObjectKnown(UAVObject *object) const;
 
 signals:
     void connected();
@@ -73,7 +73,7 @@ private:
     QIODevice *m_telemetryDevice;
     bool m_isAutopilotConnected;
     QThread m_telemetryReaderThread;
-    QSet<UAVObject*> m_knownObjects;
+    QSet<UAVObject *> m_knownObjects;
 };
 
 

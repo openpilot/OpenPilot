@@ -95,7 +95,7 @@ public slots:
 private slots:
     void highlightUpdatedObject(UAVObject *obj);
     void updateHighlight(TreeItem *);
-    void knownObjectsChanged(UAVObject*object, bool known);
+    void knownObjectsChanged(UAVObject *object, bool known);
 
 private:
     void setupModelData(UAVObjectManager *objManager);

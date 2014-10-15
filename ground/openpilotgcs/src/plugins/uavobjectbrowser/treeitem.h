@@ -209,7 +209,7 @@ public:
     void setKnown(bool known)
     {
         m_known = known;
-        foreach (TreeItem *child, m_children) {
+        foreach(TreeItem * child, m_children) {
             child->setKnown(known);
         }
         updateHighlight(this);

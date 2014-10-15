@@ -34,8 +34,7 @@
 using namespace Core;
 
 class UAVObjectBrowserConfiguration : public IUAVGadgetConfiguration {
-    Q_OBJECT
-    Q_PROPERTY(QColor m_unknownObjectColor READ unknownObjectColor WRITE setUnknownObjectColor)
+    Q_OBJECT Q_PROPERTY(QColor m_unknownObjectColor READ unknownObjectColor WRITE setUnknownObjectColor)
     Q_PROPERTY(QColor m_recentlyUpdatedColor READ recentlyUpdatedColor WRITE setRecentlyUpdatedColor)
     Q_PROPERTY(QColor m_manuallyChangedColor READ manuallyChangedColor WRITE setManuallyChangedColor)
     Q_PROPERTY(int m_recentlyUpdatedTimeout READ recentlyUpdatedTimeout WRITE setRecentlyUpdatedTimeout)

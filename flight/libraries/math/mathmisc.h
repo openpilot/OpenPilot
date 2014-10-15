@@ -119,6 +119,30 @@ static inline float y_on_curve(float x, const pointf points[], int num_points)
     // Find the y value on the selected line.
     return y_on_line(x, &points[end_point - 1], &points[end_point]);
 }
+// Fast inverse square root implementation from "quake3-1.32b/code/game/q_math.c"
+// http://en.wikipedia.org/wiki/Fast_inverse_square_root
+
+static inline float fast_invsqrtf(float number)
+{
+    float x2, y;
+    const float threehalfs = 1.5F;
+
+    union {
+        float    f;
+        uint32_t u;
+    } i;
+
+    x2  = number * 0.5F;
+    y   = number;
+
+    i.f = y; // evil floating point bit level hacking
+    i.u = 0x5f3759df - (i.u >> 1); // what the fxck?
+    y   = i.f;
+    y   = y * (threehalfs - (x2 * y * y));   // 1st iteration
+// y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+
+    return y;
+}
 
 /**
  * Ultrafast pow() aproximation needed for expo

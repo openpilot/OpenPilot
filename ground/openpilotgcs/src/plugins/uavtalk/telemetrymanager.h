@@ -29,12 +29,13 @@
 #define TELEMETRYMANAGER_H
 
 #include "uavtalk_global.h"
-#include "telemetrymonitor.h"
-#include "telemetry.h"
 #include "uavtalk.h"
 #include "uavobjectmanager.h"
 #include <QIODevice>
 #include <QObject>
+
+class Telemetry;
+class TelemetryMonitor;
 
 class UAVTALK_EXPORT TelemetryManager : public QObject {
     Q_OBJECT
@@ -46,6 +47,7 @@ public:
     void start(QIODevice *dev);
     void stop();
     bool isConnected();
+    bool isObjectKnown(UAVObject* object) const;
 
 signals:
     void connected();
@@ -53,6 +55,7 @@ signals:
     void telemetryUpdated(double txRate, double rxRate);
     void myStart();
     void myStop();
+    void knownObjectsChanged(UAVObject *object, bool known);
 
 private slots:
     void onConnect();
@@ -60,15 +63,17 @@ private slots:
     void onTelemetryUpdate(double txRate, double rxRate);
     void onStart();
     void onStop();
+    void onKnownObjectsChanged(UAVObject *object, bool known);
 
 private:
-    UAVObjectManager *objMngr;
-    UAVTalk *utalk;
-    Telemetry *telemetry;
-    TelemetryMonitor *telemetryMon;
-    QIODevice *device;
-    bool autopilotConnected;
-    QThread readerThread;
+    UAVObjectManager *m_uavobjectManager;
+    UAVTalk *m_uavTalk;
+    Telemetry *m_telemetry;
+    TelemetryMonitor *m_telemetryMonitor;
+    QIODevice *m_telemetryDevice;
+    bool m_isAutopilotConnected;
+    QThread m_telemetryReaderThread;
+    QSet<UAVObject*> m_knownObjects;
 };
 
 
@@ -77,7 +82,7 @@ class IODeviceReader : public QObject {
 public:
     IODeviceReader(UAVTalk *uavTalk);
 
-    UAVTalk *uavTalk;
+    UAVTalk *m_uavTalk;
 
 public slots:
     void read();

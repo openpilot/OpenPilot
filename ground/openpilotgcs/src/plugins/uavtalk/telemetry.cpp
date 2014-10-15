@@ -36,9 +36,11 @@
 /**
  * Constructor
  */
-Telemetry::Telemetry(UAVTalk *utalk, UAVObjectManager *objMngr) : objMngr(objMngr), utalk(utalk)
+Telemetry::Telemetry(TelemetryManager *telemetryManager, UAVTalk *utalk, UAVObjectManager *objMngr) : objMngr(objMngr), utalk(utalk)
 {
     mutex = new QMutex(QMutex::Recursive);
+
+    connect(this, SIGNAL(onKnownObjectsChanged(UAVObject*,bool)), telemetryManager, SLOT(onKnownObjectsChanged(UAVObject*,bool)));
 
     // Register all objects in the list
     QList< QList<UAVObject *> > objs = objMngr->getObjects();
@@ -81,6 +83,9 @@ Telemetry::~Telemetry()
  */
 void Telemetry::registerObject(UAVObject *obj)
 {
+    // Forget this object
+    emit onKnownObjectsChanged(obj, false);
+
     // Setup object for periodic updates
     addObject(obj);
 
@@ -235,10 +240,15 @@ void Telemetry::transactionCompleted(UAVObject *obj, bool success)
 
     if (transInfo) {
         if (success) {
+            // We now know tat the flight side knows of this object.
+            emit onKnownObjectsChanged(obj, true);
+
 #ifdef VERBOSE_TELEMETRY
             qDebug() << "Telemetry - transaction successful for object" << obj->toStringBrief();
 #endif
+
         } else {
+            emit onKnownObjectsChanged(obj, false);
             qWarning() << "Telemetry - !!! transaction failed for object" << obj->toStringBrief();
         }
 

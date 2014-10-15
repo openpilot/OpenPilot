@@ -26,16 +26,18 @@
  */
 
 #include "telemetrymanager.h"
+#include "telemetry.h"
+#include "telemetrymonitor.h"
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/icore.h>
 #include <coreplugin/threadmanager.h>
 
-TelemetryManager::TelemetryManager() : autopilotConnected(false)
+TelemetryManager::TelemetryManager() : m_isAutopilotConnected(false)
 {
     moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
     // Get UAVObjectManager instance
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    objMngr = pm->getObject<UAVObjectManager>();
+    m_uavobjectManager = pm->getObject<UAVObjectManager>();
 
     // connect to start stop signals
     connect(this, SIGNAL(myStart()), this, SLOT(onStart()), Qt::QueuedConnection);
@@ -47,24 +49,29 @@ TelemetryManager::~TelemetryManager()
 
 bool TelemetryManager::isConnected()
 {
-    return autopilotConnected;
+    return m_isAutopilotConnected;
+}
+
+bool TelemetryManager::isObjectKnown(UAVObject *object) const
+{
+    return m_knownObjects.contains(object);
 }
 
 void TelemetryManager::start(QIODevice *dev)
 {
-    device = dev;
+    m_telemetryDevice = dev;
     // OP-1383
     // take ownership of the device by moving it to the TelemetryManager thread (see TelemetryManager constructor)
     // this removes the following runtime Qt warning and incidentally fixes GCS crashes:
     // QObject: Cannot create children for a parent that is in a different thread.
     // (Parent is QSerialPort(0x56af73f8), parent's thread is QThread(0x23f69ae8), current thread is QThread(0x2649cfd8)
-    device->moveToThread(thread());
+    m_telemetryDevice->moveToThread(thread());
     emit myStart();
 }
 
 void TelemetryManager::onStart()
 {
-    utalk = new UAVTalk(device, objMngr);
+    m_uavTalk = new UAVTalk(m_telemetryDevice, m_uavobjectManager);
     if (false) {
         // UAVTalk must be thread safe and for that:
         // 1- all public methods must lock a mutex
@@ -73,25 +80,25 @@ void TelemetryManager::onStart()
         // It is assumed that the UAVObjectManager is thread safe
 
         // Create the reader and move it to the reader thread
-        IODeviceReader *reader = new IODeviceReader(utalk);
-        reader->moveToThread(&readerThread);
+        IODeviceReader *reader = new IODeviceReader(m_uavTalk);
+        reader->moveToThread(&m_telemetryReaderThread);
         // The reader will be deleted (later) when the thread finishes
-        connect(&readerThread, &QThread::finished, reader, &QObject::deleteLater);
+        connect(&m_telemetryReaderThread, &QThread::finished, reader, &QObject::deleteLater);
         // Connect IO device to reader
-        connect(device, SIGNAL(readyRead()), reader, SLOT(read()));
+        connect(m_telemetryDevice, SIGNAL(readyRead()), reader, SLOT(read()));
         // start the reader thread
-        readerThread.start();
+        m_telemetryReaderThread.start();
     } else {
         // Connect IO device to reader
-        connect(device, SIGNAL(readyRead()), utalk, SLOT(processInputStream()));
+        connect(m_telemetryDevice, SIGNAL(readyRead()), m_uavTalk, SLOT(processInputStream()));
     }
 
-    telemetry    = new Telemetry(utalk, objMngr);
-    telemetryMon = new TelemetryMonitor(objMngr, telemetry);
+    m_telemetry    = new Telemetry(this, m_uavTalk, m_uavobjectManager);
+    m_telemetryMonitor = new TelemetryMonitor(m_uavobjectManager, m_telemetry);
 
-    connect(telemetryMon, SIGNAL(connected()), this, SLOT(onConnect()));
-    connect(telemetryMon, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
-    connect(telemetryMon, SIGNAL(telemetryUpdated(double, double)), this, SLOT(onTelemetryUpdate(double, double)));
+    connect(m_telemetryMonitor, SIGNAL(connected()), this, SLOT(onConnect()));
+    connect(m_telemetryMonitor, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
+    connect(m_telemetryMonitor, SIGNAL(telemetryUpdated(double, double)), this, SLOT(onTelemetryUpdate(double, double)));
 }
 
 void TelemetryManager::stop()
@@ -99,29 +106,44 @@ void TelemetryManager::stop()
     emit myStop();
 
     if (false) {
-        readerThread.quit();
-        readerThread.wait();
+        m_telemetryReaderThread.quit();
+        m_telemetryReaderThread.wait();
     }
 }
 
 void TelemetryManager::onStop()
 {
-    telemetryMon->disconnect(this);
-    delete telemetryMon;
-    delete telemetry;
-    delete utalk;
+    foreach (UAVObject *object, m_knownObjects) {
+        onKnownObjectsChanged(object, false);
+    }
+    m_telemetryMonitor->disconnect(this);
+    delete m_telemetryMonitor;
+    delete m_telemetry;
+    delete m_uavTalk;
     onDisconnect();
+}
+
+void TelemetryManager::onKnownObjectsChanged(UAVObject *object, bool known)
+{
+    bool contains = m_knownObjects.contains(object);
+    if (known && !contains) {
+        m_knownObjects.insert(object);
+        emit knownObjectsChanged(object, known);
+    } else if (contains) {
+        m_knownObjects.remove(object);
+        emit knownObjectsChanged(object, known);
+    }
 }
 
 void TelemetryManager::onConnect()
 {
-    autopilotConnected = true;
+    m_isAutopilotConnected = true;
     emit connected();
 }
 
 void TelemetryManager::onDisconnect()
 {
-    autopilotConnected = false;
+    m_isAutopilotConnected = false;
     emit disconnected();
 }
 
@@ -130,10 +152,10 @@ void TelemetryManager::onTelemetryUpdate(double txRate, double rxRate)
     emit telemetryUpdated(txRate, rxRate);
 }
 
-IODeviceReader::IODeviceReader(UAVTalk *uavTalk) : uavTalk(uavTalk)
+IODeviceReader::IODeviceReader(UAVTalk *uavTalk) : m_uavTalk(uavTalk)
 {}
 
 void IODeviceReader::read()
 {
-    uavTalk->processInputStream();
+    m_uavTalk->processInputStream();
 }

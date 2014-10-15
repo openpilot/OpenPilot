@@ -31,6 +31,7 @@
 #include "uavtalk.h"
 #include "uavobjectmanager.h"
 #include "gcstelemetrystats.h"
+#include "telemetrymanager.h"
 #include <QMutex>
 #include <QMutexLocker>
 #include <QTimer>
@@ -73,13 +74,14 @@ public:
         quint32 rxCrcErrors;
     } TelemetryStats;
 
-    Telemetry(UAVTalk *utalk, UAVObjectManager *objMngr);
+    Telemetry(TelemetryManager *telemetryManager, UAVTalk *utalk, UAVObjectManager *objMngr);
     ~Telemetry();
     TelemetryStats getStats();
     void resetStats();
     void transactionTimeout(ObjectTransactionInfo *info);
 
 signals:
+    void onKnownObjectsChanged(UAVObject *object, bool known);
 
 private:
     // Constants

@@ -33,20 +33,22 @@
 #include <stdlib.h>
 #include <QDebug>
 
+#define VERBOSE_TELEMETRY = 1;
 /**
  * Constructor
  */
-Telemetry::Telemetry(TelemetryManager *telemetryManager, UAVTalk *utalk, UAVObjectManager *objMngr) : objMngr(objMngr), utalk(utalk)
+Telemetry::Telemetry(UAVTalk *utalk, UAVObjectManager *objMngr) : objMngr(objMngr), utalk(utalk)
 {
     mutex = new QMutex(QMutex::Recursive);
 
-    connect(this, SIGNAL(onKnownObjectsChanged(UAVObject *, bool)), telemetryManager, SLOT(onKnownObjectsChanged(UAVObject *, bool)));
-
     // Register all objects in the list
-    QList< QList<UAVObject *> > objs = objMngr->getObjects();
-    for (int objidx = 0; objidx < objs.length(); ++objidx) {
+    foreach(QList<UAVObject *> instances, objMngr->getObjects()) {
+        foreach(UAVObject * object, instances) {
+            // make sure we 'forget' all objects before we request it from the flight side
+            object->setIsKnown(false);
+        }
         // we only need to register one instance per object type
-        registerObject(objs[objidx][0]);
+        registerObject(instances.first());
     }
 
     // Listen to new object creations
@@ -76,6 +78,12 @@ Telemetry::Telemetry(TelemetryManager *telemetryManager, UAVTalk *utalk, UAVObje
 Telemetry::~Telemetry()
 {
     closeAllTransactions();
+    foreach(QList<UAVObject *> instances, objMngr->getObjects()) {
+        foreach(UAVObject * object, instances) {
+            // make sure we 'forget' all objects before we request it from the flight side
+            object->setIsKnown(false);
+        }
+    }
 }
 
 /**
@@ -83,9 +91,6 @@ Telemetry::~Telemetry()
  */
 void Telemetry::registerObject(UAVObject *obj)
 {
-    // Forget this object
-    emit onKnownObjectsChanged(obj, false);
-
     // Setup object for periodic updates
     addObject(obj);
 
@@ -241,13 +246,13 @@ void Telemetry::transactionCompleted(UAVObject *obj, bool success)
     if (transInfo) {
         if (success) {
             // We now know tat the flight side knows of this object.
-            emit onKnownObjectsChanged(obj, true);
+            obj->setIsKnown(true);
 
 #ifdef VERBOSE_TELEMETRY
             qDebug() << "Telemetry - transaction successful for object" << obj->toStringBrief();
 #endif
         } else {
-            emit onKnownObjectsChanged(obj, false);
+            obj->setIsKnown(false);
             qWarning() << "Telemetry - !!! transaction failed for object" << obj->toStringBrief();
         }
 

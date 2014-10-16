@@ -52,11 +52,6 @@ bool TelemetryManager::isConnected()
     return m_isAutopilotConnected;
 }
 
-bool TelemetryManager::isObjectKnown(UAVObject *object) const
-{
-    return m_knownObjects.contains(object);
-}
-
 void TelemetryManager::start(QIODevice *dev)
 {
     m_telemetryDevice = dev;
@@ -93,7 +88,7 @@ void TelemetryManager::onStart()
         connect(m_telemetryDevice, SIGNAL(readyRead()), m_uavTalk, SLOT(processInputStream()));
     }
 
-    m_telemetry = new Telemetry(this, m_uavTalk, m_uavobjectManager);
+    m_telemetry = new Telemetry(m_uavTalk, m_uavobjectManager);
     m_telemetryMonitor = new TelemetryMonitor(m_uavobjectManager, m_telemetry);
 
     connect(m_telemetryMonitor, SIGNAL(connected()), this, SLOT(onConnect()));
@@ -113,27 +108,11 @@ void TelemetryManager::stop()
 
 void TelemetryManager::onStop()
 {
-    foreach(UAVObject * object, m_knownObjects) {
-        onKnownObjectsChanged(object, false);
-    }
     m_telemetryMonitor->disconnect(this);
     delete m_telemetryMonitor;
     delete m_telemetry;
     delete m_uavTalk;
     onDisconnect();
-}
-
-void TelemetryManager::onKnownObjectsChanged(UAVObject *object, bool known)
-{
-    bool contains = m_knownObjects.contains(object);
-
-    if (known && !contains) {
-        m_knownObjects.insert(object);
-        emit knownObjectsChanged(object, known);
-    } else if (contains) {
-        m_knownObjects.remove(object);
-        emit knownObjectsChanged(object, known);
-    }
 }
 
 void TelemetryManager::onConnect()

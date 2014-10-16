@@ -47,7 +47,6 @@ public:
     void start(QIODevice *dev);
     void stop();
     bool isConnected();
-    bool isObjectKnown(UAVObject *object) const;
 
 signals:
     void connected();
@@ -55,7 +54,6 @@ signals:
     void telemetryUpdated(double txRate, double rxRate);
     void myStart();
     void myStop();
-    void knownObjectsChanged(UAVObject *object, bool known);
 
 private slots:
     void onConnect();
@@ -73,7 +71,6 @@ private:
     QIODevice *m_telemetryDevice;
     bool m_isAutopilotConnected;
     QThread m_telemetryReaderThread;
-    QSet<UAVObject *> m_knownObjects;
 };
 
 

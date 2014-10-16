@@ -33,7 +33,6 @@
 #include <stdlib.h>
 #include <QDebug>
 
-#define VERBOSE_TELEMETRY = 1;
 /**
  * Constructor
  */

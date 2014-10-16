@@ -29,7 +29,6 @@
 #define UAVOBJECTTREEMODEL_H
 
 #include "treeitem.h"
-#include "uavtalk/telemetrymanager.h"
 #include <QAbstractItemModel>
 #include <QtCore/QMap>
 #include <QtCore/QList>
@@ -93,9 +92,10 @@ public slots:
     void newObject(UAVObject *obj);
 
 private slots:
+    void updateHighlight(TreeItem *item);
+    void updateIsKnown(TreeItem *item);
     void highlightUpdatedObject(UAVObject *obj);
-    void updateHighlight(TreeItem *);
-    void knownObjectsChanged(UAVObject *object, bool known);
+    void isKnownChanged(UAVObject *object, bool isKnown);
 
 private:
     void setupModelData(UAVObjectManager *objManager);
@@ -126,7 +126,6 @@ private:
 
     // Highlight manager to handle highlighting of tree items.
     HighLightManager *m_highlightManager;
-    TelemetryManager *m_telemetryManager;
 };
 
 #endif // UAVOBJECTTREEMODEL_H

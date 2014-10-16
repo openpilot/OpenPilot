@@ -52,11 +52,13 @@ class FieldTreeItem : public TreeItem {
     Q_OBJECT
 public:
 
-    FieldTreeItem(int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-        TreeItem(data, parent), m_index(index) {}
+    FieldTreeItem(int index, const QList<QVariant> &data, UAVObjectField *field, TreeItem *parent = 0) :
+        TreeItem(data, parent), m_index(index), m_field(field)
+    {}
 
-    FieldTreeItem(int index, const QVariant &data, TreeItem *parent = 0) :
-        TreeItem(data, parent), m_index(index) {}
+    FieldTreeItem(int index, const QVariant &data, UAVObjectField *field, TreeItem *parent = 0) :
+        TreeItem(data, parent), m_index(index), m_field(field)
+    {}
 
     bool isEditable()
     {
@@ -67,19 +69,27 @@ public:
     virtual QVariant getEditorValue(QWidget *editor) = 0;
     virtual void setEditorValue(QWidget *editor, QVariant value) = 0;
     virtual void apply() {}
+    virtual bool isKnown()
+    {
+        return !m_field->getObject()->isSettingsObject() || m_field->getObject()->isKnown();
+    }
+
 
 protected:
     int m_index;
+    UAVObjectField *m_field;
 };
 
 class EnumFieldTreeItem : public FieldTreeItem {
     Q_OBJECT
 public:
     EnumFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_enumOptions(field->getOptions()), m_field(field) {}
+        FieldTreeItem(index, data, field, parent), m_enumOptions(field->getOptions())
+    {}
 
     EnumFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_enumOptions(field->getOptions()), m_field(field) {}
+        FieldTreeItem(index, data, field, parent), m_enumOptions(field->getOptions())
+    {}
 
     void setData(QVariant value, int column)
     {
@@ -148,20 +158,19 @@ public:
 
 private:
     QStringList m_enumOptions;
-    UAVObjectField *m_field;
 };
 
 class IntFieldTreeItem : public FieldTreeItem {
     Q_OBJECT
 public:
     IntFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {
         setMinMaxValues();
     }
 
     IntFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {
         setMinMaxValues();
     }
@@ -246,7 +255,6 @@ public:
     }
 
 private:
-    UAVObjectField *m_field;
     int m_minValue;
     int m_maxValue;
 };
@@ -255,10 +263,10 @@ class FloatFieldTreeItem : public FieldTreeItem {
     Q_OBJECT
 public:
     FloatFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, bool scientific = false, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field), m_useScientificNotation(scientific) {}
+        FieldTreeItem(index, data, field, parent), m_useScientificNotation(scientific) {}
 
     FloatFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, bool scientific = false, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field), m_useScientificNotation(scientific) {}
+        FieldTreeItem(index, data, field, parent), m_useScientificNotation(scientific) {}
 
     void setData(QVariant value, int column)
     {
@@ -324,7 +332,6 @@ public:
     }
 
 private:
-    UAVObjectField *m_field;
     bool m_useScientificNotation;
 };
 
@@ -332,11 +339,11 @@ class HexFieldTreeItem : public FieldTreeItem {
     Q_OBJECT
 public:
     HexFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {}
 
     HexFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {}
 
     QWidget *createEditor(QWidget *parent)
@@ -385,8 +392,6 @@ public:
     }
 
 private:
-    UAVObjectField *m_field;
-
     QVariant toHexString(QVariant value)
     {
         QString str;
@@ -407,11 +412,11 @@ class CharFieldTreeItem : public FieldTreeItem {
     Q_OBJECT
 public:
     CharFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {}
 
     CharFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-        FieldTreeItem(index, data, parent), m_field(field)
+        FieldTreeItem(index, data, field, parent)
     {}
 
     QWidget *createEditor(QWidget *parent)
@@ -460,8 +465,6 @@ public:
     }
 
 private:
-    UAVObjectField *m_field;
-
     QVariant toChar(QVariant value)
     {
         return value.toChar();

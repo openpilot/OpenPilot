@@ -314,6 +314,12 @@ public:
     MetaObjectTreeItem(UAVObject *object, const QVariant &data, TreeItem *parent = 0) :
         ObjectTreeItem(data, object, parent)
     {}
+
+    bool isKnown()
+    {
+        return parent()->isKnown();
+    }
+
 };
 
 class DataObjectTreeItem : public ObjectTreeItem {
@@ -374,7 +380,7 @@ public:
     QVariant data(int column) const;
     bool isKnown()
     {
-        return !m_field->getObject()->isSettingsObject() || m_field->getObject()->isKnown();
+        return parent()->isKnown();
     }
 
 private:

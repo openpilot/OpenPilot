@@ -71,7 +71,7 @@ public:
     virtual void apply() {}
     virtual bool isKnown()
     {
-        return !m_field->getObject()->isSettingsObject() || m_field->getObject()->isKnown();
+        return parent()->isKnown();
     }
 
 

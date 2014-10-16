@@ -95,7 +95,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="documentMode">
       <bool>false</bool>
@@ -18055,8 +18055,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>973</width>
-            <height>703</height>
+            <width>797</width>
+            <height>598</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -23998,8 +23998,8 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>973</width>
-            <height>703</height>
+            <width>517</width>
+            <height>520</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">

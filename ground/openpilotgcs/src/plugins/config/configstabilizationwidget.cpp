@@ -43,11 +43,18 @@
 #include "altitudeholdsettings.h"
 #include "stabilizationsettings.h"
 
+#include "qwt/src/qwt.h"
+#include "qwt/src/qwt_plot.h"
+#include "qwt/src/qwt_plot_canvas.h"
+#include "qwt/src/qwt_scale_widget.h"
+
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
     boardModel(0), m_pidBankCount(0), m_currentPIDBank(0)
 {
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
+
+    setupExpoPlot();
 
     StabilizationSettings *stabSettings = qobject_cast<StabilizationSettings *>(getObject("StabilizationSettings"));
     Q_ASSERT(stabSettings);
@@ -59,7 +66,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_pidTabBars.append(ui->advancedPIDBankTabBar);
     foreach(QTabBar * tabBar, m_pidTabBars) {
         for (int i = 0; i < m_pidBankCount; i++) {
-            tabBar->addTab(tr("PID Bank %1").arg(i + 1));
+            tabBar->addTab(tr("Settings Bank %1").arg(i + 1));
             tabBar->setTabData(i, QString("StabilizationSettingsBank%1").arg(i + 1));
         }
         tabBar->setExpanding(false);
@@ -144,6 +151,11 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     connect(this, SIGNAL(autoPilotConnected()), this, SLOT(onBoardConnected()));
 
+    addWidget(ui->expoPlot);
+    connect(ui->expoSpinnerRoll, SIGNAL(valueChanged(int)), this, SLOT(replotExpoRoll(int)));
+    connect(ui->expoSpinnerPitch, SIGNAL(valueChanged(int)), this, SLOT(replotExpoPitch(int)));
+    connect(ui->expoSpinnerYaw, SIGNAL(valueChanged(int)), this, SLOT(replotExpoYaw(int)));
+
     disableMouseWheelEvents();
     updateEnableControls();
 }
@@ -175,14 +187,12 @@ void ConfigStabilizationWidget::updateThrottleCurveFromObject()
     UAVObject *stabBank = getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
 
     Q_ASSERT(stabBank);
-    qDebug() << "updatingCurveFromObject" << stabBank->getName();
 
     UAVObjectField *field = stabBank->getField("ThrustPIDScaleCurve");
     Q_ASSERT(field);
 
     QList<double> curve;
     for (quint32 i = 0; i < field->getNumElements(); i++) {
-        qDebug() << field->getName() << field->getElementNames().at(i) << "=>" << field->getValue(i);
         curve.append(field->getValue(i).toDouble());
     }
 
@@ -202,7 +212,6 @@ void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
     UAVObject *stabBank = getObjectManager()->getObject(QString(m_pidTabBars.at(0)->tabData(m_currentPIDBank).toString()));
 
     Q_ASSERT(stabBank);
-    qDebug() << "updatingObjectFromCurve" << stabBank->getName();
 
     UAVObjectField *field = stabBank->getField("ThrustPIDScaleCurve");
     Q_ASSERT(field);
@@ -210,12 +219,60 @@ void ConfigStabilizationWidget::updateObjectFromThrottleCurve()
     QList<double> curve   = ui->thrustPIDScalingCurve->getCurve();
     for (quint32 i = 0; i < field->getNumElements(); i++) {
         field->setValue(curve.at(i), i);
-        qDebug() << field->getName() << field->getElementNames().at(i) << "<=" << curve.at(i);
     }
 
     field = stabBank->getField("EnableThrustPIDScaling");
     Q_ASSERT(field);
     field->setValue(ui->enableThrustPIDScalingCheckBox->isChecked() ? "TRUE" : "FALSE");
+}
+
+void ConfigStabilizationWidget::setupExpoPlot()
+{
+    ui->expoPlot->setMouseTracking(false);
+    ui->expoPlot->setAxisScale(QwtPlot::xBottom, 0, 100, 25);
+
+    QwtText title;
+    title.setText(tr("Input %"));
+    title.setFont(ui->expoPlot->axisFont(QwtPlot::xBottom));
+    ui->expoPlot->setAxisTitle(QwtPlot::xBottom, title);
+    ui->expoPlot->setAxisScale(QwtPlot::yLeft, 0, 100, 25);
+
+    title.setText(tr("Output %"));
+    title.setFont(ui->expoPlot->axisFont(QwtPlot::yLeft));
+    ui->expoPlot->setAxisTitle(QwtPlot::yLeft, title);
+    ui->expoPlot->canvas()->setFrameShape(QFrame::NoFrame);
+    ui->expoPlot->canvas()->setCursor(QCursor());
+
+
+    m_plotGrid.setMajPen(QColor(Qt::gray));
+    m_plotGrid.setMinPen(QColor(Qt::lightGray));
+    m_plotGrid.enableXMin(false);
+    m_plotGrid.enableYMin(false);
+    m_plotGrid.attach(ui->expoPlot);
+
+    m_expoPlotCurveRoll.setRenderHint(QwtPlotCurve::RenderAntialiased);
+    QColor rollColor(Qt::red);
+    rollColor.setAlpha(180);
+    m_expoPlotCurveRoll.setPen(QPen(rollColor, 2));
+    m_expoPlotCurveRoll.attach(ui->expoPlot);
+    replotExpoRoll(ui->expoSpinnerRoll->value());
+    m_expoPlotCurveRoll.show();
+
+    QColor pitchColor(Qt::green);
+    pitchColor.setAlpha(180);
+    m_expoPlotCurvePitch.setRenderHint(QwtPlotCurve::RenderAntialiased);
+    m_expoPlotCurvePitch.setPen(QPen(pitchColor, 2));
+    m_expoPlotCurvePitch.attach(ui->expoPlot);
+    replotExpoPitch(ui->expoSpinnerPitch->value());
+    m_expoPlotCurvePitch.show();
+
+    QColor yawColor(Qt::blue);
+    yawColor.setAlpha(180);
+    m_expoPlotCurveYaw.setRenderHint(QwtPlotCurve::RenderAntialiased);
+    m_expoPlotCurveYaw.setPen(QPen(yawColor, 2));
+    m_expoPlotCurveYaw.attach(ui->expoPlot);
+    replotExpoYaw(ui->expoSpinnerYaw->value());
+    m_expoPlotCurveYaw.show();
 }
 
 void ConfigStabilizationWidget::resetThrottleCurveToDefault()
@@ -250,6 +307,37 @@ void ConfigStabilizationWidget::throttleCurveUpdated()
     setDirty(true);
 }
 
+void ConfigStabilizationWidget::replotExpo(int value, QwtPlotCurve &curve)
+{
+    double x[EXPO_CURVE_POINTS_COUNT] = { 0 };
+    double y[EXPO_CURVE_POINTS_COUNT] = { 0 };
+    double factor = pow(EXPO_CURVE_CONSTANT, value);
+    double step   = 1.0 / (EXPO_CURVE_POINTS_COUNT - 1);
+
+    for (int i = 0; i < EXPO_CURVE_POINTS_COUNT; i++) {
+        double val = i * step;
+        x[i] = val * 100.0;
+        y[i] = pow(val, factor) * 100.0;
+    }
+    curve.setSamples(x, y, EXPO_CURVE_POINTS_COUNT);
+    ui->expoPlot->replot();
+}
+
+void ConfigStabilizationWidget::replotExpoRoll(int value)
+{
+    replotExpo(value, m_expoPlotCurveRoll);
+}
+
+void ConfigStabilizationWidget::replotExpoPitch(int value)
+{
+    replotExpo(value, m_expoPlotCurvePitch);
+}
+
+void ConfigStabilizationWidget::replotExpoYaw(int value)
+{
+    replotExpo(value, m_expoPlotCurveYaw);
+}
+
 void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)
 {
     ui->realTimeUpdates_6->setChecked(value);
@@ -259,10 +347,8 @@ void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)
 
     if (value && !realtimeUpdates->isActive()) {
         realtimeUpdates->start(AUTOMATIC_UPDATE_RATE);
-        qDebug() << "Instant Update timer started.";
     } else if (!value && realtimeUpdates->isActive()) {
         realtimeUpdates->stop();
-        qDebug() << "Instant Update timer stopped.";
     }
 }
 
@@ -359,7 +445,6 @@ void ConfigStabilizationWidget::pidBankChanged(int index)
     setWidgetBindingObjectEnabled(m_pidTabBars.at(0)->tabData(index).toString(), true);
 
     m_currentPIDBank = index;
-    qDebug() << "current bank:" << m_currentPIDBank;
     updateThrottleCurveFromObject();
     setDirty(dirty);
 }

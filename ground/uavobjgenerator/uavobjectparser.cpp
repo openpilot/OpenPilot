@@ -25,7 +25,7 @@
  */
 
 #include "uavobjectparser.h"
-
+#include <QDebug>
 /**
  * Constructor
  */
@@ -439,6 +439,21 @@ QString UAVObjectParser::processObjectFields(QDomNode & childNode, ObjectInfo *i
     } else {
         // this field is not a clone, so remember its name
         field->name = name;
+    }
+
+    // Get description attribute if any
+    elemAttr = elemAttributes.namedItem("description");
+    if (!elemAttr.isNull()) {
+        field->description = elemAttr.nodeValue();
+    } else {
+        // Look for a child description node
+        QDomNode node = childNode.firstChildElement("description");
+        if (!node.isNull()) {
+            QDomNode description = node.firstChild();
+            if (!description.isNull()) {
+                field->description = description.nodeValue();
+            }
+        }
     }
 
     // Get units attribute

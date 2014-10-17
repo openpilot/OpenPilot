@@ -11024,7 +11024,7 @@ border-radius: 5;</string>
                   <property name="checkable">
                    <bool>false</bool>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_27" rowstretch="0,0,0" columnminimumwidth="0,0">
+                  <layout class="QGridLayout" name="gridLayout_277" rowstretch="0,0,0" columnminimumwidth="0,0">
                    <property name="leftMargin">
                     <number>9</number>
                    </property>

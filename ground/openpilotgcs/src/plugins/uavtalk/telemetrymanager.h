@@ -61,7 +61,6 @@ private slots:
     void onTelemetryUpdate(double txRate, double rxRate);
     void onStart();
     void onStop();
-    void onKnownObjectsChanged(UAVObject *object, bool known);
 
 private:
     UAVObjectManager *m_uavobjectManager;

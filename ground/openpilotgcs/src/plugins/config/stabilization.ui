@@ -5455,7 +5455,7 @@ Then lower the value by 5 or so.</string>
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Lucida Grande,arial,sans-serif'; font-size:12px; color:#333333; background-color:#ffffff;&quot;&gt;This adjusts how much yaw stability your vehicle will have in Rate mode. A good starting point for Integral is double the Proportional value&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much yaw stability your vehicle will have in Rate mode. A good starting point for Integral is double the Proportional value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="maximum">
                        <number>100</number>
@@ -13971,7 +13971,7 @@ border-radius: 5;</string>
                          <enum>Qt::StrongFocus</enum>
                         </property>
                         <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Lucida Grande,arial,sans-serif'; font-size:12px; color:#333333; background-color:#ffffff;&quot;&gt;This adjusts how much yaw stability your vehicle will have in Rate mode. A good starting point for Integral is double the Proportional value&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much yaw stability your vehicle will have in Rate mode. A good starting point for Integral is double the Proportional value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                         </property>
                         <property name="styleSheet">
                          <string notr="true"/>

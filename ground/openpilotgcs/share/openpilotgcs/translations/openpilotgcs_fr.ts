@@ -2754,6 +2754,11 @@ p, li { white-space: pre-wrap; }
         <translation>Mettre en évidence les noeuds 
 uniquement lorsque les valeurs changent</translation>
     </message>
+    <message>
+        <location/>
+        <source>Unknown object color:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QuaZipFile</name>
@@ -3377,7 +3382,7 @@ uniquement lorsque les valeurs changent</translation>
 <context>
     <name>UAVObjectTreeModel</name>
     <message>
-        <location filename="../../../src/plugins/uavobjectbrowser/uavobjecttreemodel.cpp" line="+70"/>
+        <location filename="../../../src/plugins/uavobjectbrowser/uavobjecttreemodel.cpp" line="+73"/>
         <source>Property</source>
         <translation>Propriété</translation>
     </message>
@@ -3402,12 +3407,12 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Objets Données</translation>
     </message>
     <message>
-        <location line="+74"/>
+        <location line="+75"/>
         <source>Meta Data</source>
         <translation>Métadonnées</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+25"/>
         <source>Instance</source>
         <translation type="unfinished">Exemple</translation>
     </message>
@@ -5856,22 +5861,22 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Angle W</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Angle X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Angle Y</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Angle Z</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -5906,7 +5911,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>REVO</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7081,17 +7086,17 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>&lt;temperature&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>&lt;gradient&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>&lt;range&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9873,8 +9878,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Show description</source>
-        <translation type="unfinished"></translation>
+        <source>Show Description</source>
+        <translation>Afficher Description</translation>
     </message>
 </context>
 <context>
@@ -11249,7 +11254,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     <message>
         <location line="+12"/>
         <source>Export Wizard Vehicle Template</source>
-        <translation type="unfinished">Exporter Modèle Véhicule Assistant</translation>
+        <translation>Exporter Modèle Assistant Véhicule</translation>
     </message>
 </context>
 <context>
@@ -15252,47 +15257,47 @@ mais uniquement sur port USB</translation>
 <context>
     <name>UAVObjectBrowserWidget</name>
     <message>
-        <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowserwidget.cpp" line="+292"/>
+        <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowserwidget.cpp" line="+294"/>
         <location line="+17"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <location line="-15"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Catégorie</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+15"/>
         <source>Type</source>
-        <translation type="unfinished">Type</translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location line="-14"/>
         <source>Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Métadonnées</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Data</source>
-        <translation type="unfinished">Données</translation>
+        <translation>Données</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+55"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Description</translation>
     </message>
     <message>
         <location line="-53"/>
@@ -15302,37 +15307,37 @@ mais uniquement sur port USB</translation>
     <message>
         <location line="+1"/>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Non</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Oui</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Champs</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Unit</source>
-        <translation type="unfinished">Unité</translation>
+        <translation>Unité</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Options</source>
-        <translation type="unfinished">Options</translation>
+        <translation>Options</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Elements</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eléments</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Limits</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Limites</translation>
     </message>
 </context>
 </TS>

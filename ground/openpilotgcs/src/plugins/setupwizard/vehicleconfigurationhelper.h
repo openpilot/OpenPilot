@@ -57,16 +57,20 @@ public:
     VehicleConfigurationHelper(VehicleConfigurationSource *configSource);
     bool setupVehicle(bool save = true);
     bool setupHardwareSettings(bool save = true);
-    static const qint16 LEGACY_ESC_FREQUENCE;
-    static const qint16 RAPID_ESC_FREQUENCE;
+    static const qint16 LEGACY_ESC_FREQUENCY    = 50;
+    static const qint16 RAPID_ESC_FREQUENCY     = 500;
+    static const qint16 ANALOG_SERVO_FREQUENCY  = 50;
+    static const qint16 DIGITAL_SERVO_FREQUENCY = 333;
+    static const int MIXER_TYPE_NONE = 0;
+    static const int MIXER_TYPE_MOTOR = 1;
+    static const int MIXER_TYPE_REVERSABLEMOTOR = 2;
+    static const int MIXER_TYPE_SERVO = 3;
+
 
 signals:
     void saveProgress(int total, int current, QString description);
 
 private:
-    static const int MIXER_TYPE_DISABLED = 0;
-    static const int MIXER_TYPE_MOTOR    = 1;
-    static const int MIXER_TYPE_SERVO    = 2;
     static const float DEFAULT_ENABLED_ACCEL_TAU = 0.1;
 
     VehicleConfigurationSource *m_configSource;
@@ -79,10 +83,11 @@ private:
     void applyHardwareConfiguration();
     void applyVehicleConfiguration();
     void applyActuatorConfiguration();
-    void applyFlighModeConfiguration();
+    void applyFlightModeConfiguration();
     void applySensorBiasConfiguration();
     void applyStabilizationConfiguration();
     void applyManualControlDefaults();
+    void applyTemplateSettings();
 
     void applyMixerConfiguration(mixerChannelSettings channels[]);
 
@@ -103,6 +108,9 @@ private:
     void setupQuadCopter();
     void setupHexaCopter();
     void setupOctoCopter();
+    void setupElevon();
+    void setupDualAileron();
+    void setupAileron();
 
 private slots:
     void uAVOTransactionCompleted(UAVObject *object, bool success);

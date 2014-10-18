@@ -797,7 +797,6 @@ bool PIOS_RFM22B_TransmitPacket(uint32_t rfm22b_id, uint8_t *p, uint8_t len)
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable2, 0x00);
 
     // set the tx power
-    rfm22b_dev->tx_power = 0x7;
     rfm22_write(rfm22b_dev, RFM22_tx_power, RFM22_tx_pwr_lna_sw | rfm22b_dev->tx_power);
 
     // TUNE mode

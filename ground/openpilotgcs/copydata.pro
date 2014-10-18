@@ -3,7 +3,7 @@ include(openpilotgcs.pri)
 TEMPLATE = subdirs
 
 # Copy Qt runtime libraries into the build directory (to run or package)
-equals(copydata, 1) {
+equals(copyqt, 1) {
 
 GCS_LIBRARY_PATH
 
@@ -30,10 +30,10 @@ GCS_LIBRARY_PATH
                   libQt5Qml.so.5 \
                   libQt5DBus.so.5 \
                   libQt5QuickParticles.so.5 \
-                  libicui18n.so.51 \
-                  libicuuc.so.51 \
-                  libicudata.so.51 \
-                  libqgsttools_p.so.1
+                  libqgsttools_p.so.1 \
+                  libicui18n.so.52 \
+                  libicuuc.so.52 \
+                  libicudata.so.52
 
         data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_QT_LIBRARY_PATH\") $$addNewline()
         for(lib, QT_LIBS) {
@@ -142,9 +142,9 @@ GCS_LIBRARY_PATH
                   Qt5MultimediaWidgets$${DS}.dll \
                   Qt5Quick$${DS}.dll \
                   Qt5Qml$${DS}.dll \
-                  icuin51.dll \
-                  icudt51.dll \
-                  icuuc51.dll
+                  icuin52.dll \
+                  icudt52.dll \
+                  icuuc52.dll
         # it is more robust to take the following DLLs from Qt rather than from MinGW
         QT_DLLS += libgcc_s_dw2-1.dll \
                    libstdc++-6.dll \
@@ -233,14 +233,14 @@ GCS_LIBRARY_PATH
             ssleay32.dll \
             libeay32.dll
         for(dll, OPENSSL_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(OPENSSL_DIR)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$${OPENSSL_DIR}/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
         # copy OpenGL DLL
         OPENGL_DLLS = \
             opengl32_32/opengl32.dll
         for(dll, OPENGL_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(MESAWIN_DIR)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$${MESAWIN_DIR}/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
         data_copy.target = FORCE

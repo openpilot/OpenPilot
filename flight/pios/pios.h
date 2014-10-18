@@ -45,6 +45,7 @@
 
 /* C Lib includes */
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -56,6 +57,10 @@
 #elif defined(STM32F4XX)
 #include <stm32f4xx.h>
 #include <stm32f4xx_rcc.h>
+#elif defined(STM32F0)
+#include <stm32f0xx.h>
+#else
+#error "No Architecture defined"
 #endif
 
 /* PIOS board specific feature selection */
@@ -204,10 +209,10 @@
 #include <pios_hmc5843.h>
 #endif
 
-#ifdef PIOS_INCLUDE_HMC5883
-/* HMC5883 3-Axis Digital Compass */
-/* #define PIOS_HMC5883_HAS_GPIOS */
-#include <pios_hmc5883.h>
+#ifdef PIOS_INCLUDE_HMC5X83
+/* HMC5883/HMC5983 3-Axis Digital Compass */
+/* #define PIOS_HMC5x83_HAS_GPIOS */
+#include <pios_hmc5x83.h>
 #endif
 
 #ifdef PIOS_INCLUDE_BMP085

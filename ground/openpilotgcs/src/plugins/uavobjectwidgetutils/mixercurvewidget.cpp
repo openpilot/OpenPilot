@@ -36,7 +36,8 @@
 /*
  * Initialize the widget
  */
-MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
+MixerCurveWidget::MixerCurveWidget(QWidget *parent) :
+    QGraphicsView(parent), m_xAxisTextItem(0), m_yAxisTextItem(0)
 {
     // Create a layout, add a QGraphicsView and put the SVG inside.
     // The Mixer Curve widget looks like this:
@@ -54,50 +55,60 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setRenderHint(QPainter::Antialiasing);
 
-    curveMin = 0.0;
-    curveMax = 1.0;
+    m_curveMin = 0.0;
+    m_curveMax = 1.0;
 
     setFrameStyle(QFrame::NoFrame);
     setStyleSheet("background:transparent");
-
+    setRenderHint(QPainter::HighQualityAntialiasing, true);
     QGraphicsScene *scene  = new QGraphicsScene(this);
     QSvgRenderer *renderer = new QSvgRenderer();
-    plot = new QGraphicsSvgItem();
+    m_plot = new QGraphicsSvgItem();
     renderer->load(QString(":/uavobjectwidgetutils/images/curve-bg.svg"));
-    plot->setSharedRenderer(renderer);
+    m_plot->setSharedRenderer(renderer);
 
-    scene->addItem(plot);
-    plot->setZValue(-1);
+    scene->addItem(m_plot);
+    m_plot->setZValue(-1);
 
-    scene->setSceneRect(plot->boundingRect());
+    scene->setSceneRect(m_plot->boundingRect());
     setScene(scene);
 
+    setupXAxisLabel();
+    setupYAxisLabel();
     initNodes(MixerCurveWidget::NODE_NUMELEM);
 }
 
 MixerCurveWidget::~MixerCurveWidget()
 {
-    while (!nodeList.isEmpty()) {
-        delete nodeList.takeFirst();
+    while (!m_nodeList.isEmpty()) {
+        delete m_nodeList.takeFirst();
     }
 
-    while (!edgeList.isEmpty()) {
-        delete edgeList.takeFirst();
+    while (!m_edgeList.isEmpty()) {
+        delete m_edgeList.takeFirst();
+    }
+    if (m_xAxisTextItem) {
+        delete m_xAxisTextItem;
+        m_xAxisTextItem = NULL;
+    }
+    if (m_yAxisTextItem) {
+        delete m_yAxisTextItem;
+        m_yAxisTextItem = NULL;
     }
 }
 
 void MixerCurveWidget::setPositiveColor(QString color)
 {
-    for (int i = 0; i < nodeList.count(); i++) {
-        MixerNode *node = nodeList.at(i);
+    for (int i = 0; i < m_nodeList.count(); i++) {
+        MixerNode *node = m_nodeList.at(i);
         node->setPositiveColor(color);
     }
 }
 
 void MixerCurveWidget::setNegativeColor(QString color)
 {
-    for (int i = 0; i < nodeList.count(); i++) {
-        MixerNode *node = nodeList.at(i);
+    for (int i = 0; i < m_nodeList.count(); i++) {
+        MixerNode *node = m_nodeList.at(i);
         node->setNegativeColor(color);
     }
 }
@@ -120,8 +131,8 @@ void MixerCurveWidget::initCurve(const QList<double> *points)
 void MixerCurveWidget::initNodes(int numPoints)
 {
     // First of all, clear any existing list
-    if (nodeList.count()) {
-        foreach(MixerNode * node, nodeList) {
+    if (m_nodeList.count()) {
+        foreach(MixerNode * node, m_nodeList) {
             foreach(Edge * edge, node->edges()) {
                 if (edge->sourceNode() == node) {
                     scene()->removeItem(edge);
@@ -132,15 +143,15 @@ void MixerCurveWidget::initNodes(int numPoints)
             delete node;
         }
 
-        nodeList.clear();
+        m_nodeList.clear();
     }
 
     // Create the nodes and edges
     MixerNode *prevNode = 0;
     for (int i = 0; i < numPoints; i++) {
-        MixerNode *node = new MixerNode(this);
+        MixerNode *node = new MixerNode(this, m_plot);
 
-        nodeList.append(node);
+        m_nodeList.append(node);
         scene()->addItem(node);
 
         node->setPos(0, 0);
@@ -153,6 +164,31 @@ void MixerCurveWidget::initNodes(int numPoints)
     }
 }
 
+void MixerCurveWidget::setupXAxisLabel()
+{
+    if (!m_xAxisString.isEmpty()) {
+        if (m_xAxisTextItem) {
+            m_xAxisTextItem->setPlainText(m_xAxisString);
+        } else {
+            m_xAxisTextItem = new QGraphicsTextItem(m_xAxisString, m_plot);
+            scene()->addItem(m_xAxisTextItem);
+        }
+    }
+}
+
+void MixerCurveWidget::setupYAxisLabel()
+{
+    if (!m_yAxisString.isEmpty()) {
+        if (m_yAxisTextItem) {
+            m_yAxisTextItem->setPlainText(m_yAxisString);
+        } else {
+            m_yAxisTextItem = new QGraphicsTextItem(m_yAxisString, m_plot);
+            m_yAxisTextItem->setRotation(270);
+            scene()->addItem(m_yAxisTextItem);
+        }
+    }
+}
+
 /**
    Returns the current curve settings
  */
@@ -160,7 +196,7 @@ QList<double> MixerCurveWidget::getCurve()
 {
     QList<double> list;
 
-    foreach(MixerNode * node, nodeList) {
+    foreach(MixerNode * node, m_nodeList) {
         list.append(node->value());
     }
 
@@ -185,55 +221,51 @@ void MixerCurveWidget::initLinearCurve(int numPoints, double maxValue, double mi
  */
 void MixerCurveWidget::setCurve(const QList<double> *points)
 {
-    curveUpdating = true;
+    m_curveUpdating = true;
 
     int ptCnt = points->count();
-    if (nodeList.count() != ptCnt) {
+    if (m_nodeList.count() != ptCnt) {
         initNodes(ptCnt);
     }
 
-    double range = curveMax - curveMin;
+    double range = m_curveMax - m_curveMin;
 
-    qreal w = plot->boundingRect().width() / (ptCnt - 1);
-    qreal h = plot->boundingRect().height();
+    qreal w = m_plot->boundingRect().width() / (ptCnt - 1);
+    qreal h = m_plot->boundingRect().height();
     for (int i = 0; i < ptCnt; i++) {
-        double val = (points->at(i) < curveMin) ? curveMin : (points->at(i) > curveMax) ? curveMax : points->at(i);
+        double val = (points->at(i) < m_curveMin) ? m_curveMin : (points->at(i) > m_curveMax) ? m_curveMax : points->at(i);
 
         val += range;
-        val -= (curveMin + range);
+        val -= (m_curveMin + range);
         val /= range;
 
-        MixerNode *node = nodeList.at(i);
+        MixerNode *node = m_nodeList.at(i);
         node->setPos(w * i, h - (val * h));
         node->verticalMove(true);
 
         node->update();
     }
-    curveUpdating = false;
+    m_curveUpdating = false;
 
     update();
 
     emit curveUpdated();
 }
 
-
 void MixerCurveWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
-    // Thit fitInView method should only be called now, once the
-    // widget is shown, otherwise it cannot compute its values and
-    // the result is usually a ahrsbargraph that is way too small.
-
-    QRectF rect = plot->boundingRect();
-    fitInView(rect.adjusted(-15, -15, 15, 15), Qt::KeepAspectRatio);
+    positionAxisLabels();
+    setSceneRect(scene()->itemsBoundingRect());
+    fitInView(scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 void MixerCurveWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-
-    QRectF rect = plot->boundingRect();
-    fitInView(rect.adjusted(-15, -15, 15, 15), Qt::KeepAspectRatio);
+    positionAxisLabels();
+    setSceneRect(scene()->itemsBoundingRect());
+    fitInView(scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 void MixerCurveWidget::changeEvent(QEvent *event)
@@ -241,9 +273,24 @@ void MixerCurveWidget::changeEvent(QEvent *event)
     QGraphicsView::changeEvent(event);
 
     if (event->type() == QEvent::EnabledChange) {
-        foreach(MixerNode * node, nodeList) {
+        foreach(MixerNode * node, m_nodeList) {
             node->update();
         }
+    }
+}
+
+void MixerCurveWidget::positionAxisLabels()
+{
+    QRectF rect = m_plot->boundingRect();
+
+    if (m_xAxisTextItem) {
+        m_xAxisTextItem->setPos(rect.right() -
+                                m_xAxisTextItem->boundingRect().width(), rect.bottom() - 4);
+    }
+
+    if (m_yAxisTextItem) {
+        m_yAxisTextItem->setPos(rect.left() -
+                                m_yAxisTextItem->boundingRect().height(), m_yAxisTextItem->boundingRect().width());
     }
 }
 
@@ -251,40 +298,52 @@ void MixerCurveWidget::itemMoved(double itemValue)
 {
     Q_UNUSED(itemValue);
 
-    if (!curveUpdating) {
+    if (!m_curveUpdating) {
         emit curveUpdated();
     }
 }
 
 void MixerCurveWidget::setMin(double value)
 {
-    if (curveMin != value) {
+    if (m_curveMin != value) {
         emit curveMinChanged(value);
     }
 
-    curveMin = value;
+    m_curveMin = value;
 }
 
 void MixerCurveWidget::setMax(double value)
 {
-    if (curveMax != value) {
+    if (m_curveMax != value) {
         emit curveMaxChanged(value);
     }
 
-    curveMax = value;
+    m_curveMax = value;
 }
 
 double MixerCurveWidget::getMin()
 {
-    return curveMin;
+    return m_curveMin;
 }
 double MixerCurveWidget::getMax()
 {
-    return curveMax;
+    return m_curveMax;
 }
 double MixerCurveWidget::setRange(double min, double max)
 {
-    curveMin = min;
-    curveMax = max;
-    return curveMax - curveMin;
+    m_curveMin = min;
+    m_curveMax = max;
+    return m_curveMax - m_curveMin;
+}
+
+void MixerCurveWidget::setXAxisLabel(QString label)
+{
+    m_xAxisString = label;
+    setupXAxisLabel();
+}
+
+void MixerCurveWidget::setYAxisLabel(QString label)
+{
+    m_yAxisString = label;
+    setupYAxisLabel();
 }

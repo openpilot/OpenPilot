@@ -3,6 +3,8 @@
         <file>images/help2.png</file>
         <file>images/ahrs-calib.svg</file>
         <file>images/multirotor-shapes.svg</file>
+	<!-- these are different from the files in /setupwiz/resources -->
+        <file>images/fixedwing-shapes.svg</file>
         <file>images/ccpm_setup.svg</file>
         <file>images/PipXtreme.png</file>
         <file>images/help.png</file>

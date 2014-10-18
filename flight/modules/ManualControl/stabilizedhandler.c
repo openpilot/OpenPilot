@@ -29,7 +29,7 @@
  */
 
 #include "inc/manualcontrol.h"
-#include <pios_struct_helper.h>
+#include <mathmisc.h>
 #include <manualcontrolcommand.h>
 #include <stabilizationdesired.h>
 #include <flightmodesettings.h>
@@ -40,6 +40,28 @@
 // Private types
 
 // Private functions
+static float applyExpo(float value, float expo);
+
+
+static float applyExpo(float value, float expo)
+{
+    // note: fastPow makes a small error, therefore result needs to be bound
+    float exp = boundf(fastPow(1.00695f, expo), 0.5f, 2.0f);
+
+    // magic number scales expo
+    // so that
+    // expo=100 yields value**10
+    // expo=0 yields value**1
+    // expo=-100 yields value**(1/10)
+    // (pow(2.0,1/100)~=1.00695)
+    if (value > 0.0f) {
+        return boundf(fastPow(value, exp), 0.0f, 1.0f);
+    } else if (value < -0.0f) {
+        return boundf(-fastPow(-value, exp), -1.0f, 0.0f);
+    } else {
+        return 0.0f;
+    }
+}
 
 
 /**
@@ -65,32 +87,35 @@ void stabilizedHandler(bool newinit)
     StabilizationBankData stabSettings;
     StabilizationBankGet(&stabSettings);
 
+    cmd.Roll  = applyExpo(cmd.Roll, stabSettings.StickExpo.Roll);
+    cmd.Pitch = applyExpo(cmd.Pitch, stabSettings.StickExpo.Pitch);
+    cmd.Yaw   = applyExpo(cmd.Yaw, stabSettings.StickExpo.Yaw);
     uint8_t *stab_settings;
     FlightStatusData flightStatus;
     FlightStatusGet(&flightStatus);
     switch (flightStatus.FlightMode) {
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
-        stab_settings = cast_struct_to_array(settings.Stabilization1Settings, settings.Stabilization1Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization1SettingsToArray(settings.Stabilization1Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
-        stab_settings = cast_struct_to_array(settings.Stabilization2Settings, settings.Stabilization2Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization2SettingsToArray(settings.Stabilization2Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
-        stab_settings = cast_struct_to_array(settings.Stabilization3Settings, settings.Stabilization3Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization3SettingsToArray(settings.Stabilization3Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED4:
-        stab_settings = cast_struct_to_array(settings.Stabilization4Settings, settings.Stabilization4Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization4SettingsToArray(settings.Stabilization4Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED5:
-        stab_settings = cast_struct_to_array(settings.Stabilization5Settings, settings.Stabilization5Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization5SettingsToArray(settings.Stabilization5Settings);
         break;
     case FLIGHTSTATUS_FLIGHTMODE_STABILIZED6:
-        stab_settings = cast_struct_to_array(settings.Stabilization6Settings, settings.Stabilization6Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization6SettingsToArray(settings.Stabilization6Settings);
         break;
     default:
         // Major error, this should not occur because only enter this block when one of these is true
         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
-        stab_settings = cast_struct_to_array(settings.Stabilization1Settings, settings.Stabilization1Settings.Roll);
+        stab_settings = FlightModeSettingsStabilization1SettingsToArray(settings.Stabilization1Settings);
         return;
     }
 
@@ -101,6 +126,7 @@ void stabilizedHandler(bool newinit)
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd.Roll * stabSettings.RollMax :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd.Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd.Roll :
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ACRO) ? cmd.Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) ? cmd.Roll * stabSettings.RollMax :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd.Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd.Roll * stabSettings.RollMax :
@@ -113,6 +139,7 @@ void stabilizedHandler(bool newinit)
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd.Pitch * stabSettings.PitchMax :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd.Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd.Pitch :
+        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ACRO) ? cmd.Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) ? cmd.Pitch * stabSettings.PitchMax :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd.Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd.Pitch * stabSettings.PitchMax :
@@ -135,6 +162,7 @@ void stabilizedHandler(bool newinit)
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd.Yaw * stabSettings.YawMax :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd.Yaw * stabSettings.ManualRate.Yaw :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd.Yaw :
+            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ACRO) ? cmd.Yaw * stabSettings.ManualRate.Yaw :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) ? cmd.Yaw * stabSettings.YawMax :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd.Yaw * stabSettings.ManualRate.Yaw :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd.Yaw * stabSettings.YawMax :

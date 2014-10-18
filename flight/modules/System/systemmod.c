@@ -39,10 +39,13 @@
  */
 
 #include <openpilot.h>
-#include <pios_struct_helper.h>
 // private includes
 #include "inc/systemmod.h"
-#include "notification.h"
+
+#include <notification.h>
+#ifdef PIOS_INCLUDE_WS2811
+#include <lednotification.h>
+#endif
 
 // UAVOs
 #include <objectpersistence.h>
@@ -55,6 +58,7 @@
 #include <callbackinfo.h>
 #include <hwsettings.h>
 #include <pios_flashfs.h>
+#include <pios_notify.h>
 
 #ifdef PIOS_INCLUDE_INSTRUMENTATION
 #include <instrumentation.h>
@@ -420,9 +424,9 @@ static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_
     // By convention, there is a direct mapping between task monitor task_id's and members
     // of the TaskInfoXXXXElem enums
     PIOS_DEBUG_Assert(task_id < TASKINFO_RUNNING_NUMELEM);
-    cast_struct_to_array(taskData->Running, taskData->Running.System)[task_id] = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
-    ((uint16_t *)&taskData->StackRemaining)[task_id] = task_info->stack_remaining;
-    ((uint8_t *)&taskData->RunningTime)[task_id]     = task_info->running_time_percentage;
+    TaskInfoRunningToArray(taskData->Running)[task_id] = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
+    ((uint16_t *)&taskData->StackRemaining)[task_id]   = task_info->stack_remaining;
+    ((uint8_t *)&taskData->RunningTime)[task_id] = task_info->running_time_percentage;
 }
 
 static void callbackSchedulerForEachCallback(int16_t callback_id, const struct pios_callback_info *callback_info, void *context)
@@ -633,6 +637,9 @@ static void updateSystemAlarms()
 void vApplicationIdleHook(void)
 {
     NotificationOnboardLedsRun();
+#ifdef PIOS_INCLUDE_WS2811
+    LedNotificationExtLedsRun();
+#endif
 }
 /**
  * Called by the RTOS when a stack overflow is detected.

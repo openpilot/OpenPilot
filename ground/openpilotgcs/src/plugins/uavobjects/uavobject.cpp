@@ -31,6 +31,7 @@
 
 #include <QtEndian>
 #include <QDebug>
+#include <QtWidgets>
 
 using namespace Utils;
 
@@ -62,6 +63,7 @@ UAVObject::UAVObject(quint32 objID, bool isSingleInst, const QString & name)
     this->data         = 0;
     this->numBytes     = 0;
     this->mutex        = new QMutex(QMutex::Recursive);
+    m_isKnown = false;
 }
 
 /**
@@ -523,13 +525,67 @@ void UAVObject::toXML(QXmlStreamWriter *xmlWriter)
 {
     xmlWriter->writeStartElement("object");
     xmlWriter->writeAttribute("name", getName());
-    xmlWriter->writeAttribute("id", QString("%1-%2").arg(getObjID(), 1, 16).toUpper().arg(getInstID()));
+    xmlWriter->writeAttribute("id", QString("%1").arg(getObjID(), 1, 16).toUpper());
+    xmlWriter->writeAttribute("instance", QString("%1").arg(getInstID()));
     xmlWriter->writeStartElement("fields");
     foreach(UAVObjectField * field, fields) {
         field->toXML(xmlWriter);
     }
     xmlWriter->writeEndElement(); // fields
     xmlWriter->writeEndElement(); // object
+}
+
+void UAVObject::fromXML(QXmlStreamReader *xmlReader)
+{
+    // Check that we are the correct object by name, and that we are the same instance id
+    // but dont check id since we want to be able to be forward compatible.
+    if (xmlReader->name() == "object" &&
+        xmlReader->attributes().value("name") == getName() &&
+        xmlReader->attributes().value("instance") == QString("%1").arg(getInstID())) {
+        QXmlStreamReader::TokenType token = xmlReader->readNext();
+        if (token == QXmlStreamReader::StartElement && xmlReader->name() == "fields") {
+            while (xmlReader->readNextStartElement()) {
+                if (xmlReader->name() == "field") {
+                    QStringRef fieldName = xmlReader->attributes().value("name");
+                    if (fieldName != "") {
+                        getField(*fieldName.string())->fromXML(xmlReader);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void UAVObject::toJson(QJsonObject &jsonObject)
+{
+    jsonObject["name"]     = getName();
+    jsonObject["setting"]  = isSettingsObject();
+    jsonObject["id"] = QString("%1").arg(getObjID(), 1, 16).toUpper();
+    jsonObject["instance"] = (int)getInstID();
+    QJsonArray jSonFields;
+    foreach(UAVObjectField * field, fields) {
+        QJsonObject jSonField;
+
+        field->toJson(jSonField);
+        jSonFields.append(jSonField);
+    }
+    jsonObject["fields"] = jSonFields;
+}
+
+void UAVObject::fromJson(const QJsonObject &jsonObject)
+{
+    if (jsonObject["name"].toString() == getName() &&
+        jsonObject["instance"].toInt() == (int)getInstID()) {
+        QJsonArray jsonFields = jsonObject["fields"].toArray();
+        for (int i = 0; i < jsonFields.size(); i++) {
+            QJsonObject jsonField = jsonFields.at(i).toObject();
+            UAVObjectField *field = getField(jsonField["name"].toString());
+            if (field != NULL) {
+                field->fromJson(jsonField);
+            }
+        }
+        updated();
+    }
 }
 
 /**
@@ -546,6 +602,25 @@ void UAVObject::emitTransactionCompleted(bool success)
 void UAVObject::emitNewInstance(UAVObject *obj)
 {
     emit newInstance(obj);
+}
+
+bool UAVObject::isKnown() const
+{
+    QMutexLocker locker(mutex);
+
+    return m_isKnown;
+}
+
+void UAVObject::setIsKnown(bool isKnown)
+{
+    lock();
+    bool changed = m_isKnown != isKnown;
+    m_isKnown = isKnown;
+    unlock();
+
+    if (changed) {
+        emit isKnownChanged(this, isKnown);
+    }
 }
 
 bool UAVObject::isSettingsObject()

@@ -149,7 +149,6 @@ int32_t configuration_check()
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOCRUISE:
             ADDSEVERITY(!coptercontrol);
-            ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER));
             ADDSEVERITY(navCapableFusion);
             break;
         default:
@@ -263,6 +262,7 @@ FrameType_t GetCurrentFrameType()
     switch ((SystemSettingsAirframeTypeOptions)airframe_type) {
     case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
     case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
+    case SYSTEMSETTINGS_AIRFRAMETYPE_QUADH:
     case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
     case SYSTEMSETTINGS_AIRFRAMETYPE_OCTO:
     case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOX:

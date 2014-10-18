@@ -38,6 +38,7 @@
 #include <QObject>
 
 class XMLCONFIG_EXPORT XmlConfig : QObject {
+    Q_OBJECT
 public:
     static const QSettings::Format XmlSettingsFormat;
 

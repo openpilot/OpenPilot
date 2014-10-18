@@ -51,7 +51,6 @@
  */
 
 #include "openpilot.h"
-#include <pios_struct_helper.h>
 #include "txpidsettings.h"
 #include "accessorydesired.h"
 #include "manualcontrolcommand.h"
@@ -83,6 +82,8 @@
 // Private functions
 static void updatePIDs(UAVObjEvent *ev);
 static uint8_t update(float *var, float val);
+static uint8_t updateUint8(uint8_t *var, float val);
+static uint8_t updateInt8(int8_t *var, float val);
 static float scale(float val, float inMin, float inMax, float outMin, float outMax);
 
 /**
@@ -194,26 +195,26 @@ static void updatePIDs(UAVObjEvent *ev)
 
     // Loop through every enabled instance
     for (uint8_t i = 0; i < TXPIDSETTINGS_PIDS_NUMELEM; i++) {
-        if (cast_struct_to_array(inst.PIDs, inst.PIDs.Instance1)[i] != TXPIDSETTINGS_PIDS_DISABLED) {
+        if (TxPIDSettingsPIDsToArray(inst.PIDs)[i] != TXPIDSETTINGS_PIDS_DISABLED) {
             float value;
-            if (cast_struct_to_array(inst.Inputs, inst.Inputs.Instance1)[i] == TXPIDSETTINGS_INPUTS_THROTTLE) {
+            if (TxPIDSettingsInputsToArray(inst.Inputs)[i] == TXPIDSETTINGS_INPUTS_THROTTLE) {
                 ManualControlCommandThrottleGet(&value);
                 value = scale(value,
                               inst.ThrottleRange.Min,
                               inst.ThrottleRange.Max,
-                              cast_struct_to_array(inst.MinPID, inst.MinPID.Instance1)[i],
-                              cast_struct_to_array(inst.MaxPID, inst.MaxPID.Instance1)[i]);
+                              TxPIDSettingsMinPIDToArray(inst.MinPID)[i],
+                              TxPIDSettingsMaxPIDToArray(inst.MaxPID)[i]);
             } else if (AccessoryDesiredInstGet(
-                           cast_struct_to_array(inst.Inputs, inst.Inputs.Instance1)[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0,
+                           TxPIDSettingsInputsToArray(inst.Inputs)[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0,
                            &accessory) == 0) {
                 value = scale(accessory.AccessoryVal, -1.0f, 1.0f,
-                              cast_struct_to_array(inst.MinPID, inst.MinPID.Instance1)[i],
-                              cast_struct_to_array(inst.MaxPID, inst.MaxPID.Instance1)[i]);
+                              TxPIDSettingsMinPIDToArray(inst.MinPID)[i],
+                              TxPIDSettingsMaxPIDToArray(inst.MaxPID)[i]);
             } else {
                 continue;
             }
 
-            switch (cast_struct_to_array(inst.PIDs, inst.PIDs.Instance1)[i]) {
+            switch (TxPIDSettingsPIDsToArray(inst.PIDs)[i]) {
             case TXPIDSETTINGS_PIDS_ROLLRATEKP:
                 needsUpdateBank |= update(&bank.RollRatePID.Kp, value);
                 break;
@@ -226,6 +227,9 @@ static void updatePIDs(UAVObjEvent *ev)
             case TXPIDSETTINGS_PIDS_ROLLRATEILIMIT:
                 needsUpdateBank |= update(&bank.RollRatePID.ILimit, value);
                 break;
+            case TXPIDSETTINGS_PIDS_ROLLRATERESP:
+                needsUpdateBank |= update(&bank.ManualRate.Roll, value);
+                break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEKP:
                 needsUpdateBank |= update(&bank.RollPI.Kp, value);
                 break;
@@ -234,6 +238,9 @@ static void updatePIDs(UAVObjEvent *ev)
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEILIMIT:
                 needsUpdateBank |= update(&bank.RollPI.ILimit, value);
+                break;
+            case TXPIDSETTINGS_PIDS_ROLLATTITUDERESP:
+                needsUpdateBank |= updateUint8(&bank.RollMax, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKP:
                 needsUpdateBank |= update(&bank.PitchRatePID.Kp, value);
@@ -247,6 +254,9 @@ static void updatePIDs(UAVObjEvent *ev)
             case TXPIDSETTINGS_PIDS_PITCHRATEILIMIT:
                 needsUpdateBank |= update(&bank.PitchRatePID.ILimit, value);
                 break;
+            case TXPIDSETTINGS_PIDS_PITCHRATERESP:
+                needsUpdateBank |= update(&bank.ManualRate.Pitch, value);
+                break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEKP:
                 needsUpdateBank |= update(&bank.PitchPI.Kp, value);
                 break;
@@ -255,6 +265,9 @@ static void updatePIDs(UAVObjEvent *ev)
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEILIMIT:
                 needsUpdateBank |= update(&bank.PitchPI.ILimit, value);
+                break;
+            case TXPIDSETTINGS_PIDS_PITCHATTITUDERESP:
+                needsUpdateBank |= updateUint8(&bank.PitchMax, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKP:
                 needsUpdateBank |= update(&bank.RollRatePID.Kp, value);
@@ -272,6 +285,10 @@ static void updatePIDs(UAVObjEvent *ev)
                 needsUpdateBank |= update(&bank.RollRatePID.ILimit, value);
                 needsUpdateBank |= update(&bank.PitchRatePID.ILimit, value);
                 break;
+            case TXPIDSETTINGS_PIDS_ROLLPITCHRATERESP:
+                needsUpdateBank |= update(&bank.ManualRate.Roll, value);
+                needsUpdateBank |= update(&bank.ManualRate.Pitch, value);
+                break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKP:
                 needsUpdateBank |= update(&bank.RollPI.Kp, value);
                 needsUpdateBank |= update(&bank.PitchPI.Kp, value);
@@ -283,6 +300,10 @@ static void updatePIDs(UAVObjEvent *ev)
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEILIMIT:
                 needsUpdateBank |= update(&bank.RollPI.ILimit, value);
                 needsUpdateBank |= update(&bank.PitchPI.ILimit, value);
+                break;
+            case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDERESP:
+                needsUpdateBank |= updateUint8(&bank.RollMax, value);
+                needsUpdateBank |= updateUint8(&bank.PitchMax, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKP:
                 needsUpdateBank |= update(&bank.YawRatePID.Kp, value);
@@ -296,6 +317,9 @@ static void updatePIDs(UAVObjEvent *ev)
             case TXPIDSETTINGS_PIDS_YAWRATEILIMIT:
                 needsUpdateBank |= update(&bank.YawRatePID.ILimit, value);
                 break;
+            case TXPIDSETTINGS_PIDS_YAWRATERESP:
+                needsUpdateBank |= update(&bank.ManualRate.Yaw, value);
+                break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEKP:
                 needsUpdateBank |= update(&bank.YawPI.Kp, value);
                 break;
@@ -305,8 +329,27 @@ static void updatePIDs(UAVObjEvent *ev)
             case TXPIDSETTINGS_PIDS_YAWATTITUDEILIMIT:
                 needsUpdateBank |= update(&bank.YawPI.ILimit, value);
                 break;
+            case TXPIDSETTINGS_PIDS_YAWATTITUDERESP:
+                needsUpdateBank |= updateUint8(&bank.YawMax, value);
+                break;
+            case TXPIDSETTINGS_PIDS_ROLLEXPO:
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Roll, value);
+                break;
+            case TXPIDSETTINGS_PIDS_PITCHEXPO:
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Pitch, value);
+                break;
+            case TXPIDSETTINGS_PIDS_ROLLPITCHEXPO:
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Roll, value);
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Pitch, value);
+                break;
+            case TXPIDSETTINGS_PIDS_YAWEXPO:
+                needsUpdateBank |= updateInt8(&bank.StickExpo.Yaw, value);
+                break;
             case TXPIDSETTINGS_PIDS_GYROTAU:
                 needsUpdateStab |= update(&stab.GyroTau, value);
+                break;
+            case TXPIDSETTINGS_PIDS_ACROPLUSFACTOR:
+                needsUpdateBank |= update(&bank.AcroInsanityFactor, value);
                 break;
             default:
                 PIOS_Assert(0);
@@ -384,6 +427,36 @@ static uint8_t update(float *var, float val)
      * of numbers we see here*/
     if (fabsf(*var - val) > 1e-9f) {
         *var = val;
+        return 1;
+    }
+    return 0;
+}
+
+/**
+ * Updates var using val if needed.
+ * \returns 1 if updated, 0 otherwise
+ */
+static uint8_t updateUint8(uint8_t *var, float val)
+{
+    uint8_t roundedVal = (uint8_t)roundf(val);
+
+    if (*var != roundedVal) {
+        *var = roundedVal;
+        return 1;
+    }
+    return 0;
+}
+
+/**
+ * Updates var using val if needed.
+ * \returns 1 if updated, 0 otherwise
+ */
+static uint8_t updateInt8(int8_t *var, float val)
+{
+    int8_t roundedVal = (int8_t)roundf(val);
+
+    if (*var != roundedVal) {
+        *var = roundedVal;
         return 1;
     }
     return 0;

@@ -107,7 +107,7 @@ static const struct pios_tim_callbacks tim_out_callbacks = {
 
 int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg *cfg)
 {
-    PIOS_DEBUG_Assert(ppm_id);
+    PIOS_DEBUG_Assert(ppm_out_id);
     PIOS_DEBUG_Assert(cfg);
 
     // Allocate the device structure

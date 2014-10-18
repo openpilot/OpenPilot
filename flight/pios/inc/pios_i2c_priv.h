@@ -42,42 +42,6 @@ struct pios_i2c_adapter_cfg {
     struct stm32_irq  error;
 };
 
-enum i2c_adapter_state {
-    I2C_STATE_FSM_FAULT = 0, /* Must be zero so undefined transitions land here */
-
-    I2C_STATE_BUS_ERROR,
-
-    I2C_STATE_STOPPED,
-    I2C_STATE_STOPPING,
-    I2C_STATE_STARTING,
-
-    I2C_STATE_R_MORE_TXN_ADDR,
-    I2C_STATE_R_MORE_TXN_PRE_ONE,
-    I2C_STATE_R_MORE_TXN_PRE_FIRST,
-    I2C_STATE_R_MORE_TXN_PRE_MIDDLE,
-    I2C_STATE_R_MORE_TXN_PRE_LAST,
-    I2C_STATE_R_MORE_TXN_POST_LAST,
-
-    I2C_STATE_R_LAST_TXN_ADDR,
-    I2C_STATE_R_LAST_TXN_PRE_ONE,
-    I2C_STATE_R_LAST_TXN_PRE_FIRST,
-    I2C_STATE_R_LAST_TXN_PRE_MIDDLE,
-    I2C_STATE_R_LAST_TXN_PRE_LAST,
-    I2C_STATE_R_LAST_TXN_POST_LAST,
-
-    I2C_STATE_W_MORE_TXN_ADDR,
-    I2C_STATE_W_MORE_TXN_MIDDLE,
-    I2C_STATE_W_MORE_TXN_LAST,
-
-    I2C_STATE_W_LAST_TXN_ADDR,
-    I2C_STATE_W_LAST_TXN_MIDDLE,
-    I2C_STATE_W_LAST_TXN_LAST,
-
-    I2C_STATE_NACK,
-
-    I2C_STATE_NUM_STATES /* Must be last */
-};
-
 enum pios_i2c_adapter_magic {
     PIOS_I2C_DEV_MAGIC = 0xa9a9b8b8,
 };
@@ -99,7 +63,7 @@ struct pios_i2c_adapter {
     bool     bus_error;
     bool     nack;
 
-    volatile enum i2c_adapter_state curr_state;
+    volatile uint8_t curr_state;
     const struct pios_i2c_txn *first_txn;
     const struct pios_i2c_txn *active_txn;
     const struct pios_i2c_txn *last_txn;

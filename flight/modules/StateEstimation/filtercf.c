@@ -221,9 +221,9 @@ static filterResult complementaryFilter(struct data *this, float gyro[3], float 
 
     // During initialization and
     if (this->first_run) {
-#if defined(PIOS_INCLUDE_HMC5883)
+#if defined(PIOS_INCLUDE_HMC5X83)
         // wait until mags have been updated
-        if (!this->magUpdated) {
+        if (!this->magUpdated && this->useMag) {
             return FILTERRESULT_ERROR;
         }
 #else

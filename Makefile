@@ -197,7 +197,7 @@ export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
 # Define supported board lists
-ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix discoveryf4bare
+ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix discoveryf4bare gpsplatinum
 
 # Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
@@ -207,6 +207,7 @@ osd_short              := 'osd '
 revoproto_short        := 'revp'
 simposix_short         := 'posx'
 discoveryf4bare_short  := 'df4b'
+gpsplatinum_short      := 'gps9 '
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.
@@ -223,7 +224,7 @@ EF_BOARDS  := $(ALL_BOARDS)
 # SimPosix doesn't have a BL, BU or EF target so we need to
 # filter them out to prevent errors on the all_flight target.
 BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
-BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
+BU_BOARDS  := $(filter-out simposix gpsplatinum, $(BU_BOARDS))
 EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
 
 # Generate the targets for whatever boards are left in each list
@@ -438,7 +439,7 @@ sim_osx_%: uavobjects_flight
 ##############################
 
 .PHONY: all_ground
-all_ground: openpilotgcs
+all_ground: openpilotgcs uploader
 
 # Convenience target for the GCS
 .PHONY: gcs gcs_clean
@@ -477,6 +478,40 @@ openpilotgcs_make:
 openpilotgcs_clean:
 	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF))"
 	$(V1) [ ! -d "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)"
+
+################################
+#
+# Serial Uploader tool
+#
+################################
+
+.NOTPARALLEL:
+.PHONY: uploader
+uploader: uploader_qmake uploader_make
+
+.PHONY: uploader_qmake
+uploader_qmake:
+ifeq ($(QMAKE_SKIP),)
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF) && \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/src/experimental/USB_UPLOAD_TOOL/upload.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) \
+	) 
+else
+	@$(ECHO) "skipping qmake"
+endif
+
+.PHONY: uploader_make
+uploader_make:
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)/$(MAKE_DIR) && \
+	    $(MAKE) -w ; \
+	)
+
+.PHONY: uploader_clean
+uploader_clean:
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/uploader_$(GCS_BUILD_CONF))"
+	$(V1) [ ! -d "$(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/uploader_$(GCS_BUILD_CONF)"
+
 
 ################################
 #
@@ -638,7 +673,7 @@ uavo-collections_clean:
 #
 ##############################
 
-ALL_UNITTESTS := logfs
+ALL_UNITTESTS := logfs math lednotification
 
 # Build the directory for the unit tests
 UT_OUT_DIR := $(BUILD_DIR)/unit_tests
@@ -698,7 +733,8 @@ endif
 ##############################
 
 # Firmware files to package
-PACKAGE_FW_TARGETS  := $(filter-out fw_simposix fw_discoveryf4bare, $(FW_TARGETS))
+PACKAGE_FW_EXCLUDE  := fw_simposix $(if $(PACKAGE_FW_INCLUDE_DISCOVERYF4BARE),,fw_discoveryf4bare)
+PACKAGE_FW_TARGETS  := $(filter-out $(PACKAGE_FW_EXCLUDE), $(FW_TARGETS))
 PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.
@@ -739,6 +775,9 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
     export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
     export PACKAGE_NAME := OpenPilot
     export PACKAGE_SEP  := -
+
+    # Copy the Qt libraries regardless whether the building machine needs them to run GCS
+    export FORCE_COPY_QT := true
 
     # We can only package release builds
     ifneq ($(GCS_BUILD_CONF),release)
@@ -967,6 +1006,14 @@ help:
 	@$(ECHO) "                            Example: make gcs QMAKE_SKIP=1 MAKE_DIR=src/plugins/coreplugin"
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
+	@$(ECHO)
+	@$(ECHO) "   [Uploader Tool]"
+	@$(ECHO) "     uploader             - Build the serial uploader tool (debug|release)"
+	@$(ECHO) "                            Skip qmake: QMAKE_SKIP=1"
+	@$(ECHO) "                            Example: make uploader QMAKE_SKIP=1"
+	@$(ECHO) "     uploader_clean       - Remove the serial uploader tool (debug|release)"
+	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
+	@$(ECHO)
 	@$(ECHO)
 	@$(ECHO) "   [AndroidGCS]"
 	@$(ECHO) "     androidgcs           - Build the Android Ground Control System (GCS) application"

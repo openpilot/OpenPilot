@@ -63,13 +63,16 @@
 
 /* Select the sensors to include */
 // #define PIOS_INCLUDE_BMA180
-// #define PIOS_INCLUDE_HMC5883
+// #define PIOS_INCLUDE_HMC5X83
 // #define PIOS_INCLUDE_MPU6000
 // #define PIOS_MPU6000_ACCEL
 // #define PIOS_INCLUDE_L3GD20
 // #define PIOS_INCLUDE_MS5611
 // #define PIOS_INCLUDE_HCSR04
 #define PIOS_FLASH_ON_ACCEL /* true for second revo */
+
+#define PIOS_SENSOR_RATE    500.0f
+
 #define FLASH_FREERTOS
 /* Com systems to include */
 #define PIOS_INCLUDE_COM

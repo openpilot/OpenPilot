@@ -29,6 +29,7 @@
 
 UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QSettings *qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
+    m_unknownObjectColor(QColor(Qt::gray)),
     m_recentlyUpdatedColor(QColor(255, 230, 230)),
     m_manuallyChangedColor(QColor(230, 230, 255)),
     m_onlyHilightChangedValues(false),
@@ -40,6 +41,7 @@ UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QS
 {
     // if a saved configuration exists load it
     if (qSettings != 0) {
+        m_unknownObjectColor       = qSettings->value("unknownObjectColor", QVariant(QColor(Qt::gray))).value<QColor>();
         m_useCategorizedView       = qSettings->value("CategorizedView").toBool();
         m_useScientificView        = qSettings->value("ScientificView").toBool();
         m_showMetaData = qSettings->value("showMetaData").toBool();
@@ -64,6 +66,7 @@ IUAVGadgetConfiguration *UAVObjectBrowserConfiguration::clone()
     m->m_useScientificView  = m_useScientificView;
     m->m_splitterState = m_splitterState;
     m->m_showMetaData = m_showMetaData;
+    m->m_unknownObjectColor = m_unknownObjectColor;
     m->m_showDescription    = m_showDescription;
     return m;
 }
@@ -74,6 +77,7 @@ IUAVGadgetConfiguration *UAVObjectBrowserConfiguration::clone()
  */
 void UAVObjectBrowserConfiguration::saveConfig(QSettings *qSettings) const
 {
+    qSettings->setValue("unknownObjectColor", m_unknownObjectColor);
     qSettings->setValue("recentlyUpdatedColor", m_recentlyUpdatedColor);
     qSettings->setValue("manuallyChangedColor", m_manuallyChangedColor);
     qSettings->setValue("recentlyUpdatedTimeout", m_recentlyUpdatedTimeout);

@@ -44,21 +44,31 @@ class UAVObjectBrowserWidget : public QWidget {
 public:
     UAVObjectBrowserWidget(QWidget *parent = 0);
     ~UAVObjectBrowserWidget();
+
+    void setUnknownObjectColor(QColor color)
+    {
+        m_unknownObjectColor = color;
+        m_model->setUnknowObjectColor(color);
+    }
     void setRecentlyUpdatedColor(QColor color)
     {
-        m_recentlyUpdatedColor = color; m_model->setRecentlyUpdatedColor(color);
+        m_recentlyUpdatedColor = color;
+        m_model->setRecentlyUpdatedColor(color);
     }
     void setManuallyChangedColor(QColor color)
     {
-        m_manuallyChangedColor = color; m_model->setManuallyChangedColor(color);
+        m_manuallyChangedColor = color;
+        m_model->setManuallyChangedColor(color);
     }
     void setRecentlyUpdatedTimeout(int timeout)
     {
-        m_recentlyUpdatedTimeout = timeout; m_model->setRecentlyUpdatedTimeout(timeout);
+        m_recentlyUpdatedTimeout = timeout;
+        m_model->setRecentlyUpdatedTimeout(timeout);
     }
     void setOnlyHilightChangedValues(bool hilight)
     {
-        m_onlyHilightChangedValues = hilight; m_model->setOnlyHilightChangedValues(hilight);
+        m_onlyHilightChangedValues = hilight;
+        m_model->setOnlyHilightChangedValues(hilight);
     }
     void setViewOptions(bool categorized, bool scientific, bool metadata, bool description);
     void setSplitterState(QByteArray state);
@@ -91,6 +101,7 @@ private:
     UAVObjectTreeModel *m_model;
 
     int m_recentlyUpdatedTimeout;
+    QColor m_unknownObjectColor;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
     bool m_onlyHilightChangedValues;

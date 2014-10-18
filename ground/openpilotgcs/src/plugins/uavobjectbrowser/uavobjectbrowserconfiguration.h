@@ -34,7 +34,8 @@
 using namespace Core;
 
 class UAVObjectBrowserConfiguration : public IUAVGadgetConfiguration {
-    Q_OBJECT Q_PROPERTY(QColor m_recentlyUpdatedColor READ recentlyUpdatedColor WRITE setRecentlyUpdatedColor)
+    Q_OBJECT Q_PROPERTY(QColor m_unknownObjectColor READ unknownObjectColor WRITE setUnknownObjectColor)
+    Q_PROPERTY(QColor m_recentlyUpdatedColor READ recentlyUpdatedColor WRITE setRecentlyUpdatedColor)
     Q_PROPERTY(QColor m_manuallyChangedColor READ manuallyChangedColor WRITE setManuallyChangedColor)
     Q_PROPERTY(int m_recentlyUpdatedTimeout READ recentlyUpdatedTimeout WRITE setRecentlyUpdatedTimeout)
     Q_PROPERTY(bool m_onlyHilightChangedValues READ onlyHighlightChangedValues WRITE setOnlyHighlightChangedValues)
@@ -49,6 +50,10 @@ public:
     void saveConfig(QSettings *settings) const;
     IUAVGadgetConfiguration *clone();
 
+    QColor unknownObjectColor() const
+    {
+        return m_unknownObjectColor;
+    }
     QColor recentlyUpdatedColor() const
     {
         return m_recentlyUpdatedColor;
@@ -90,6 +95,10 @@ public:
 signals:
 
 public slots:
+    void setUnknownObjectColor(QColor color)
+    {
+        m_unknownObjectColor = color;
+    }
     void setRecentlyUpdatedColor(QColor color)
     {
         m_recentlyUpdatedColor = color;
@@ -129,6 +138,7 @@ public slots:
     }
 
 private:
+    QColor m_unknownObjectColor;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
     bool m_onlyHilightChangedValues;

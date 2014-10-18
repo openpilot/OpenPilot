@@ -88,6 +88,9 @@ private:
 class TreeItem : public QObject {
     Q_OBJECT
 public:
+    static const int TITLE_COLUMN = 0;
+    static const int DATA_COLUMN = 1;
+
     TreeItem(const QList<QVariant> &data, TreeItem *parent = 0);
     TreeItem(const QVariant &data, TreeItem *parent = 0);
     virtual ~TreeItem();
@@ -205,14 +208,31 @@ public:
         }
         return 0;
     }
+    void updateIsKnown(bool isKnown)
+    {
+        if (isKnown != this->isKnown()) {
+            m_changed = false;
+            foreach(TreeItem * child, m_children) {
+                child->updateIsKnown(isKnown);
+            }
+            emit updateIsKnown(this);
+        }
+    }
+    virtual bool isKnown()
+    {
+        return true;
+    }
 
 signals:
-    void updateHighlight(TreeItem *);
+    void updateHighlight(TreeItem *item);
+    void updateIsKnown(TreeItem *item);
 
 private slots:
 
 private:
+    static int m_highlightTimeMs;
     QList<TreeItem *> m_children;
+
     // m_data contains: [0] property name, [1] value, [2] unit
     QList<QVariant> m_data;
     QString m_description;
@@ -221,9 +241,6 @@ private:
     bool m_changed;
     QTime m_highlightExpires;
     HighLightManager *m_highlightManager;
-    static int m_highlightTimeMs;
-public:
-    static const int dataColumn = 1;
 };
 
 class DataObjectTreeItem;
@@ -265,18 +282,25 @@ private:
 class ObjectTreeItem : public TreeItem {
     Q_OBJECT
 public:
-    ObjectTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) :
-        TreeItem(data, parent), m_obj(0) {}
-    ObjectTreeItem(const QVariant &data, TreeItem *parent = 0) :
-        TreeItem(data, parent), m_obj(0) {}
-    void setObject(UAVObject *obj)
+    ObjectTreeItem(const QList<QVariant> &data, UAVObject *object, TreeItem *parent = 0) :
+        TreeItem(data, parent), m_obj(object)
     {
-        m_obj = obj; setDescription(obj->getDescription());
+        setDescription(m_obj->getDescription());
+    }
+    ObjectTreeItem(const QVariant &data, UAVObject *object, TreeItem *parent = 0) :
+        TreeItem(data, parent), m_obj(object)
+    {
+        setDescription(m_obj->getDescription());
     }
     inline UAVObject *object()
     {
         return m_obj;
     }
+    bool isKnown()
+    {
+        return !m_obj->isSettingsObject() || m_obj->isKnown();
+    }
+
 private:
     UAVObject *m_obj;
 };
@@ -284,25 +308,27 @@ private:
 class MetaObjectTreeItem : public ObjectTreeItem {
     Q_OBJECT
 public:
-    MetaObjectTreeItem(UAVObject *obj, const QList<QVariant> &data, TreeItem *parent = 0) :
-        ObjectTreeItem(data, parent)
+    MetaObjectTreeItem(UAVObject *object, const QList<QVariant> &data, TreeItem *parent = 0) :
+        ObjectTreeItem(data, object, parent)
+    {}
+    MetaObjectTreeItem(UAVObject *object, const QVariant &data, TreeItem *parent = 0) :
+        ObjectTreeItem(data, object, parent)
+    {}
+
+    bool isKnown()
     {
-        setObject(obj);
+        return parent()->isKnown();
     }
-    MetaObjectTreeItem(UAVObject *obj, const QVariant &data, TreeItem *parent = 0) :
-        ObjectTreeItem(data, parent)
-    {
-        setObject(obj);
-    }
+
 };
 
 class DataObjectTreeItem : public ObjectTreeItem {
     Q_OBJECT
 public:
-    DataObjectTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) :
-        ObjectTreeItem(data, parent) {}
-    DataObjectTreeItem(const QVariant &data, TreeItem *parent = 0) :
-        ObjectTreeItem(data, parent) {}
+    DataObjectTreeItem(const QList<QVariant> &data, UAVObject *object, TreeItem *parent = 0) :
+        ObjectTreeItem(data, object, parent) {}
+    DataObjectTreeItem(const QVariant &data, UAVObject *object, TreeItem *parent = 0) :
+        ObjectTreeItem(data, object, parent) {}
     virtual void apply()
     {
         foreach(TreeItem * child, treeChildren()) {
@@ -328,16 +354,12 @@ public:
 class InstanceTreeItem : public DataObjectTreeItem {
     Q_OBJECT
 public:
-    InstanceTreeItem(UAVObject *obj, const QList<QVariant> &data, TreeItem *parent = 0) :
-        DataObjectTreeItem(data, parent)
-    {
-        setObject(obj);
-    }
-    InstanceTreeItem(UAVObject *obj, const QVariant &data, TreeItem *parent = 0) :
-        DataObjectTreeItem(data, parent)
-    {
-        setObject(obj);
-    }
+    InstanceTreeItem(UAVObject *object, const QList<QVariant> &data, TreeItem *parent = 0) :
+        DataObjectTreeItem(data, object, parent)
+    {}
+    InstanceTreeItem(UAVObject *object, const QVariant &data, TreeItem *parent = 0) :
+        DataObjectTreeItem(data, object, parent)
+    {}
     virtual void apply()
     {
         TreeItem::apply();
@@ -356,6 +378,10 @@ public:
     ArrayFieldTreeItem(UAVObjectField *field, const QVariant &data, TreeItem *parent = 0) : TreeItem(data, parent), m_field(field)
     {}
     QVariant data(int column) const;
+    bool isKnown()
+    {
+        return parent()->isKnown();
+    }
 
 private:
     UAVObjectField *m_field;

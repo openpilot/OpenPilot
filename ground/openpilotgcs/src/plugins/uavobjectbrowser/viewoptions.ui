@@ -38,7 +38,7 @@
    <item>
     <widget class="QCheckBox" name="cbDescription">
      <property name="text">
-      <string>Show description</string>
+      <string>Show Description</string>
      </property>
     </widget>
    </item>

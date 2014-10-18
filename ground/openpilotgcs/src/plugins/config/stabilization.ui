@@ -136,8 +136,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>952</width>
-            <height>771</height>
+            <width>950</width>
+            <height>780</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -3435,7 +3435,7 @@ border-radius: 5;</string>
                        <enum>Qt::WheelFocus</enum>
                       </property>
                       <property name="toolTip">
-                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is double the  Proportional value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="maximum">
                        <number>100</number>
@@ -5339,7 +5339,7 @@ border-radius: 5;</string>
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is double the Proportional value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="maximum">
                        <number>100</number>
@@ -5455,7 +5455,7 @@ Then lower the value by 5 or so.</string>
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Lucida Grande,arial,sans-serif'; font-size:12px; color:#333333; background-color:#ffffff;&quot;&gt;This adjusts how much yaw stability your vehicle will have in Rate mode. A good starting point for Integral is double the Proportional value&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="maximum">
                        <number>100</number>
@@ -8244,8 +8244,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>952</width>
-            <height>771</height>
+            <width>950</width>
+            <height>780</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_29">
@@ -11024,7 +11024,7 @@ border-radius: 5;</string>
                   <property name="checkable">
                    <bool>false</bool>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_27" rowstretch="0,0,0" columnminimumwidth="0,0">
+                  <layout class="QGridLayout" name="gridLayout_277" rowstretch="0,0,0" columnminimumwidth="0,0">
                    <property name="leftMargin">
                     <number>9</number>
                    </property>
@@ -13371,7 +13371,7 @@ border-radius: 5;</string>
                          <enum>Qt::StrongFocus</enum>
                         </property>
                         <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is double the Proportional value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                         </property>
                         <property name="styleSheet">
                          <string notr="true"/>
@@ -13971,7 +13971,7 @@ border-radius: 5;</string>
                          <enum>Qt::StrongFocus</enum>
                         </property>
                         <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Lucida Grande,arial,sans-serif'; font-size:12px; color:#333333; background-color:#ffffff;&quot;&gt;This adjusts how much yaw stability your vehicle will have in Rate mode. A good starting point for Integral is double the Proportional value&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                         </property>
                         <property name="styleSheet">
                          <string notr="true"/>
@@ -14621,7 +14621,7 @@ border-radius: 5;</string>
                          <enum>Qt::StrongFocus</enum>
                         </property>
                         <property name="toolTip">
-                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is double the Proportional value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                         </property>
                         <property name="styleSheet">
                          <string notr="true"/>
@@ -18236,8 +18236,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>952</width>
-            <height>771</height>
+            <width>950</width>
+            <height>780</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0,0,0">
@@ -24082,8 +24082,8 @@ font:bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>952</width>
-            <height>771</height>
+            <width>950</width>
+            <height>780</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">

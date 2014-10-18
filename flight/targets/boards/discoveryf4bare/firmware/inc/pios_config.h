@@ -91,6 +91,9 @@
 // #define PIOS_INCLUDE_MPXV
 // #define PIOS_INCLUDE_ETASV3
 /* #define PIOS_INCLUDE_HCSR04 */
+
+#define PIOS_SENSOR_RATE 500.0f
+
 #define PIOS_INCLUDE_WS2811
 
 /* PIOS receiver drivers */

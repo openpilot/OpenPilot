@@ -216,7 +216,7 @@ static void readFirmwareInfo()
     struct fw_version_info *fwinfo = (struct fw_version_info *)(bdinfo->fw_base + bdinfo->fw_size);
 
     memcpy(&sysPkt.fragments.data.commit_tag_name, &fwinfo->commit_tag_name, sizeof(sysPkt.fragments.data.commit_tag_name));
-    memcpy(&sysPkt.fragments.data.sha1sum, &fwinfo->commit_tag_name, sizeof(sysPkt.fragments.data.sha1sum));
+    memcpy(&sysPkt.fragments.data.sha1sum, &fwinfo->sha1sum, sizeof(sysPkt.fragments.data.sha1sum));
 }
 
 /**

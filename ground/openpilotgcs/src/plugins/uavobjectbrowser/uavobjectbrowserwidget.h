@@ -60,9 +60,11 @@ public:
     {
         m_onlyHilightChangedValues = hilight; m_model->setOnlyHilightChangedValues(hilight);
     }
-    void setViewOptions(bool categorized, bool scientific, bool metadata);
+    void setViewOptions(bool categorized, bool scientific, bool metadata, bool description);
+    void setSplitterState(QByteArray state);
 public slots:
     void showMetaData(bool show);
+    void showDescription(bool show);
     void categorize(bool categorize);
     void useScientificNotation(bool scientific);
 
@@ -75,8 +77,11 @@ private slots:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
     void viewSlot();
     void viewOptionsChangedSlot();
+    void splitterMoved();
+    QString createObjectDescription(UAVObject *object);
 signals:
-    void viewOptionsChanged(bool categorized, bool scientific, bool metadata);
+    void viewOptionsChanged(bool categorized, bool scientific, bool metadata, bool description);
+    void splitterChanged(QByteArray state);
 private:
     QPushButton *m_requestUpdate;
     QPushButton *m_sendUpdate;
@@ -89,10 +94,13 @@ private:
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;
     bool m_onlyHilightChangedValues;
+    QString m_mustacheTemplate;
 
     void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
     void enableSendRequest(bool enable);
+    void updateDescription();
     ObjectTreeItem *findCurrentObjectTreeItem();
+    QString loadFileIntoString(QString fileName);
 };
 
 #endif /* UAVOBJECTBROWSERWIDGET_H_ */

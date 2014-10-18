@@ -103,6 +103,13 @@ void GpsSnrWidget::drawSat(int index)
         boxes[index]->setPos(x, y);
 
         QRectF boxRect    = boxes[index]->boundingRect();
+        
+        //Change color for SBAS sat (Egnos, etc..)
+        if (prn > 120 && prn < 158) {
+            boxes[index]->setBrush(QColor("#fd700b"));
+        } else {
+            boxes[index]->setBrush(QColor("Green"));
+        }
         QString prnString = QString().number(prn);
         if (prnString.length() == 1) {
             prnString = "0" + prnString;

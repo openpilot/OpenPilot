@@ -76,7 +76,7 @@ GpsConstellationWidget::GpsConstellationWidget(QWidget *parent) : QGraphicsView(
 
         satTexts[i] = new QGraphicsSimpleTextItem("##", satIcons[i]);
         satTexts[i]->setBrush(QColor("Black"));
-        satTexts[i]->setFont(QFont("Courier"));
+        satTexts[i]->setFont(QFont("Mono"));
     }
 }
 
@@ -126,10 +126,20 @@ void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int az
         opd += QPointF(-satIcons[index]->boundingRect().center().x(),
                        -satIcons[index]->boundingRect().center().y());
         satIcons[index]->setTransform(QTransform::fromTranslate(opd.x(), opd.y()), false);
-        if (snr) {
-            satIcons[index]->setElementId("satellite");
+        
+        //Show normal GPS or SBAS
+        if (prn > 120 && prn < 158) {
+            if (snr) {
+                satIcons[index]->setElementId("satellite-sbas");
+            } else {
+                satIcons[index]->setElementId("sat-sbas-notSeen");
+            }
         } else {
-            satIcons[index]->setElementId("sat-notSeen");
+            if (snr) {
+                satIcons[index]->setElementId("satellite");
+            } else {
+                satIcons[index]->setElementId("sat-notSeen");
+            }
         }
         satIcons[index]->show();
 

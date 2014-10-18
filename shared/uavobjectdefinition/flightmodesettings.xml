@@ -11,7 +11,7 @@
 		defaultvalue="Attitude,Attitude,AxisLock,Manual"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
 			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
 			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
@@ -22,7 +22,7 @@
 		defaultvalue="Attitude,Attitude,Rate,Manual"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
 			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
 			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
@@ -33,7 +33,7 @@
 		defaultvalue="Rate,Rate,Rate,Manual"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
 			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
 			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
@@ -44,7 +44,7 @@
 		defaultvalue="Attitude,Attitude,AxisLock,CruiseControl"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
 			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
 			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
@@ -55,7 +55,7 @@
 		defaultvalue="Attitude,Attitude,Rate,CruiseControl"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
 			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
 			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
@@ -66,7 +66,7 @@
 		defaultvalue="Rate,Rate,Rate,CruiseControl"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
 			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
 			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
 			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"

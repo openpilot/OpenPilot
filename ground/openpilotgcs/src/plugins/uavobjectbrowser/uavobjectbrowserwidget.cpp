@@ -51,11 +51,11 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_model = new UAVObjectTreeModel();
     m_browser->treeView->setModel(m_model);
     m_browser->treeView->setColumnWidth(0, 300);
+
     BrowserItemDelegate *m_delegate = new BrowserItemDelegate();
     m_browser->treeView->setItemDelegate(m_delegate);
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     m_browser->treeView->setSelectionBehavior(QAbstractItemView::SelectItems);
-    m_browser->splitter->setChildrenCollapsible(false);
     m_mustacheTemplate = loadFileIntoString(QString(":/uavobjectbrowser/resources/uavodescription.mustache"));
     showMetaData(m_viewoptions->cbMetaData->isChecked());
     showDescription(m_viewoptions->cbDescription->isChecked());
@@ -119,6 +119,7 @@ void UAVObjectBrowserWidget::categorize(bool categorize)
     m_model->setManuallyChangedColor(m_manuallyChangedColor);
     m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
     m_model->setOnlyHilightChangedValues(m_onlyHilightChangedValues);
+    m_model->setUnknowObjectColor(m_unknownObjectColor);
     m_browser->treeView->setModel(m_model);
     showMetaData(m_viewoptions->cbMetaData->isChecked());
     connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(currentChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);
@@ -134,6 +135,7 @@ void UAVObjectBrowserWidget::useScientificNotation(bool scientific)
     m_model->setRecentlyUpdatedColor(m_recentlyUpdatedColor);
     m_model->setManuallyChangedColor(m_manuallyChangedColor);
     m_model->setRecentlyUpdatedTimeout(m_recentlyUpdatedTimeout);
+    m_model->setUnknowObjectColor(m_unknownObjectColor);
     m_browser->treeView->setModel(m_model);
     showMetaData(m_viewoptions->cbMetaData->isChecked());
     connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(currentChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);

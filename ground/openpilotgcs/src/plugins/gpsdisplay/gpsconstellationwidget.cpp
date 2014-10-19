@@ -170,19 +170,18 @@ QPointF GpsConstellationWidget::polarToCoord(int elevation, int azimuth)
 {
     double x;
     double y;
-    double rad_elevation;
+    double vect_elevation;
     double rad_azimuth;
 
-
-    rad_elevation = M_PI * elevation / 180;
+    // Vector modulus scaled to circle and angle (azimut)
+    vect_elevation = 0.93 - (elevation / 90.00f) * 0.93;
     rad_azimuth   = M_PI * azimuth / 180;
 
-    x = cos(rad_elevation) * sin(rad_azimuth);
-    y = -cos(rad_elevation) * cos(rad_azimuth);
+    // Cartesian coordinates
+    x = ((world->boundingRect().width() * vect_elevation) / 2) * sin(rad_azimuth);
+    y = ((world->boundingRect().height() * vect_elevation) / 2) * -cos(rad_azimuth);
 
-    x = world->boundingRect().width() / 2 * x;
-    y = world->boundingRect().height() / 2 * y;
-
+    // Start from center
     x = (world->boundingRect().width() / 2) + x;
     y = (world->boundingRect().height() / 2) + y;
 

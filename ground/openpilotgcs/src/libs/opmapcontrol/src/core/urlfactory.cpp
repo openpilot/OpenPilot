@@ -109,7 +109,7 @@ void UrlFactory::TryCorrectGoogleVersions()
         qDebug() << "Correct GoogleVersion";
 #endif // DEBUG_URLFACTORY
        // setIsCorrectGoogleVersions(true);
-        QString url = "https://maps.google.com";
+        QString url = "https://maps.google.com/maps?output=classic";
 
         qheader.setUrl(QUrl(url));
         qheader.setRawHeader("User-Agent", UserAgent);
@@ -186,18 +186,18 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         QString sec2    = ""; // after &zoom=...
         GetSecGoogleWords(pos, sec1, sec2);
         TryCorrectGoogleVersions();
-        return QString("https://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleMap).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        return QString("http://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleMap).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
     case MapType::GoogleSatellite:
     {
-        QString server  = "khms";
+        QString server  = "khm";
         QString request = "kh";
         QString sec1    = ""; // after &x=...
         QString sec2    = ""; // after &zoom=...
         GetSecGoogleWords(pos, sec1, sec2);
         TryCorrectGoogleVersions();
-        return QString("https://%1%2.google.com/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleSatellite).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        return QString("http://%1%2.google.com/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleSatellite).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
     case MapType::GoogleLabels:
@@ -209,7 +209,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         GetSecGoogleWords(pos, sec1, sec2);
         TryCorrectGoogleVersions();
 
-        return QString("https://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabels).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        return QString("http://%1%2.google.com/%3/lyrs=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleLabels).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
     case MapType::GoogleTerrain:
@@ -220,7 +220,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type, const Point &pos, c
         QString sec2    = ""; // after &zoom=...
         GetSecGoogleWords(pos, sec1, sec2);
         TryCorrectGoogleVersions();
-        return QString("https://%1%2.google.com/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleTerrain).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
+        return QString("http://%1%2.google.com/%3/v=%4&hl=%5&x=%6%7&y=%8&z=%9&s=%10").arg(server).arg(GetServerNum(pos, 4)).arg(request).arg(VersionGoogleTerrain).arg(language).arg(pos.X()).arg(sec1).arg(pos.Y()).arg(zoom).arg(sec2);
     }
     break;
     case MapType::GoogleMapChina:

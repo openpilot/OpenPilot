@@ -129,8 +129,8 @@ void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int az
                        -satIcons[index]->boundingRect().center().y());
         satIcons[index]->setTransform(QTransform::fromTranslate(opd.x(), opd.y()), false);
 
-        // Show normal GPS or SBAS
-        if (prn > 120 && prn < 158) {
+        // Show normal GPS or SBAS (120 - 158 range)
+        if (prn > 119 && prn < 159) {
             if (snr) {
                 satIcons[index]->setElementId("satellite-sbas");
             } else {

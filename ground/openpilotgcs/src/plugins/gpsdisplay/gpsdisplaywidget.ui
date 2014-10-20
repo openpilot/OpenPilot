@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>768</width>
-    <height>600</height>
+    <width>901</width>
+    <height>651</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -52,7 +52,7 @@
         <widget class="GpsSnrWidget" name="gpsSnrWidget">
          <property name="minimumSize">
           <size>
-           <width>100</width>
+           <width>0</width>
            <height>0</height>
           </size>
          </property>
@@ -133,7 +133,7 @@
           <bool>false</bool>
          </property>
          <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+          <enum>QFrame::Panel</enum>
          </property>
          <property name="lineWidth">
           <number>0</number>
@@ -635,7 +635,7 @@
           </spacer>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout2" stretch="0,0,0,0,0">
+          <layout class="QHBoxLayout" name="horizontalLayout2" stretch="0,0,0,0,0,0">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -694,6 +694,9 @@
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
                <width>0</width>
@@ -744,6 +747,19 @@
               <set>QGraphicsView::DontAdjustForAntialiasing</set>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_14">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </item>

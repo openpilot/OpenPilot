@@ -40,6 +40,12 @@ EscCalibrationPage::EscCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     ui(new Ui::EscCalibrationPage), m_isCalibrating(false)
 {
     ui->setupUi(this);
+
+    ui->outputHigh->setEnabled(false);
+    ui->outputLow->setEnabled(true);
+    ui->outputLevel->setEnabled(true);
+    ui->outputLevel->setText(QString(tr("%1 µs")).arg(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
+
     connect(ui->startStopButton, SIGNAL(clicked()), this, SLOT(startStopButtonClicked()));
 
     connect(ui->securityCheckBox1, SIGNAL(toggled(bool)), this, SLOT(securityCheckBoxesToggled()));
@@ -82,6 +88,9 @@ void EscCalibrationPage::startStopButtonClicked()
         m_isCalibrating = true;
         ui->startStopButton->setEnabled(false);
         enableButtons(false);
+        ui->outputHigh->setEnabled(true);
+        ui->outputLow->setEnabled(false);
+        ui->outputLevel->setText(QString(tr("%1 µs")).arg(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         UAVObjectManager *uavoManager = pm->getObject<UAVObjectManager>();
         Q_ASSERT(uavoManager);
@@ -107,6 +116,9 @@ void EscCalibrationPage::startStopButtonClicked()
             output->stopChannelOutput();
             delete output;
         }
+        ui->outputHigh->setEnabled(false);
+        ui->outputLow->setEnabled(true);
+        ui->outputLevel->setText(QString(tr("%1 µs")).arg(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
         m_outputs.clear();
         m_isCalibrating = false;
         resetAllSecurityCheckboxes();

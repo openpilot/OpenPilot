@@ -75,7 +75,7 @@ int32_t configuration_check()
     bool navCapableFusion;
     switch (revoFusion) {
     case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAGGPSOUTDOOR:
-    case REVOSETTINGS_FUSIONALGORITHM_INS13GPSOUTDOOR:
+    case REVOSETTINGS_FUSIONALGORITHM_GPSNAVIGATIONINS13:
         navCapableFusion = true;
         break;
     default:

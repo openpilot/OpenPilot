@@ -2,7 +2,7 @@
     <object name="RevoSettings" singleinstance="true" settings="true" category="State">
         <description>Settings for the revo to control the algorithm and what is updated</description>
         <field name="FusionAlgorithm" units="" type="enum" elements="1" 
-        options="None,Complementary,Complementary+Mag,Complementary+Mag+GPSOutdoor,INS13Indoor,INS13GPSOutdoor" 
+        options="None,Basic (Complementary),Complementary+Mag,Complementary+Mag+GPSOutdoor,INS13Indoor,GPS Navigation (INS13)" 
         limits="%NE:None:Complementary+Mag:Complementary+Mag+GPSOutdoor:INS13Indoor;"
         defaultvalue="Complementary"/>
 

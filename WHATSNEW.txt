@@ -1,4 +1,4 @@
---- RELEASE-14.10-RC1 ---
+--- RELEASE-14.10 ---
 This release mainly focuses on flight performance, especially aimed at mini multirotors and adds support for the OpenPilot Platinum GPS (V9).
 This version supports the CopterControl, CC3D, Atom and the Revolution Flight controllers as well as the OPLink Modems.
 
@@ -68,6 +68,10 @@ NOTE: If you were using OPLink at power levels lower than 100mW, please redo a r
     * [OP-1534] - Add expo and acro insanity factor to TxPID
     * [OP-1535] - MPU handling optimization
     * [OP-1538] - UAVO Browser - embedded descriptions
+    * [OP-1545] - Added GUI to visualize the ESC calibration output level during calibration
+    * [OP-1548] - Change Fusion algorithm names to make clear their usage
+    * [OP-1552] - Changed text of menu for input setup wizard for clarity 
+
 
 ** New Feature
     * [OP-1222] - Add support for Fixed Wing configuration in Vehicle Setup Wizard
@@ -132,6 +136,8 @@ NOTE: If you were using OPLink at power levels lower than 100mW, please redo a r
     * [OP-1539] - AcroInsanityFactor limit parsing error
     * [OP-1540] - Fix GPS v9 reported sha1sum
     * [OP-1542] - Welcome Screen does not show latest available Update
+    * [OP-1547] - Wrong DSM port in SetupWizard
+    * [OP-1549] - Fix Map version retrieval url
 
 --- RELEASE-14.06.01 --- 
 This is the first maintenance release for 14.06.

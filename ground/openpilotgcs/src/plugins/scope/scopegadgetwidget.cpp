@@ -299,7 +299,7 @@ void ScopeGadgetWidget::setupSequentialPlot()
 ////    setAxisTitle(QwtPlot::xBottom, "Index");
 
     setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
-    setAxisScale(QwtPlot::xBottom, 0, m_xWindowSize);
+    setAxisScale(QwtPlot::xBottom, 0, m_plotDataSize);
     setAxisLabelRotation(QwtPlot::xBottom, 0.0);
     setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
 
@@ -327,7 +327,7 @@ void ScopeGadgetWidget::setupChronoPlot()
 
     setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw());
     uint NOW = QDateTime::currentDateTime().toTime_t();
-    setAxisScale(QwtPlot::xBottom, NOW - m_xWindowSize / 1000, NOW);
+    setAxisScale(QwtPlot::xBottom, NOW - m_plotDataSize / 1000, NOW);
 // setAxisLabelRotation(QwtPlot::xBottom, -15.0);
     setAxisLabelRotation(QwtPlot::xBottom, 0.0);
     setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
@@ -371,45 +371,34 @@ void ScopeGadgetWidget::setupChronoPlot()
 // scaleWidget->setMinBorderDist(0, fmw);
 }
 
-void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, int meanSamples, QString mathFunction, QPen pen, bool antialiased)
+void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubField, int scaleFactor, int meanSamples, QString mathFunction, QPen pen, bool antialiased)
 {
-    PlotData *plotData;
-
-    if (m_plotType == SequentialPlot) {
-        plotData = new SequentialPlotData(uavObject, uavFieldSubField);
-    } else if (m_plotType == ChronoPlot) {
-        plotData = new ChronoPlotData(uavObject, uavFieldSubField);
-    }
-    // else if (m_plotType == UAVObjectPlot)
-    // plotData = new UAVObjectPlotData(uavObject, uavField);
-
-    plotData->m_xWindowSize = m_xWindowSize;
-    plotData->scalePower    = scaleOrderFactor;
-    plotData->meanSamples   = meanSamples;
-    plotData->mathFunction  = mathFunction;
-
-    // If the y-bounds are supplied, set them
-    if (plotData->yMinimum != plotData->yMaximum) {
-        setAxisScale(QwtPlot::yLeft, plotData->yMinimum, plotData->yMaximum);
+    QString fieldName = fieldPlusSubField;
+    QString elementName;
+    if (fieldPlusSubField.contains("-")) {
+        QStringList fieldSubfield = fieldName.split("-", QString::SkipEmptyParts);
+        fieldName     = fieldSubfield.at(0);
+        elementName  = fieldSubfield.at(1);
     }
 
     // Create the curve
-    QString curveName = (plotData->uavObject) + "." + (plotData->uavField);
-    if (plotData->haveSubField) {
-        curveName = curveName.append("." + plotData->uavSubField);
+    QString curveName = objectName + "." + fieldName;
+    if (!elementName.isEmpty()) {
+        curveName.append("." + elementName);
     }
 
     // Get the uav object
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject((plotData->uavObject)));
+    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject(objectName));
     if (!obj) {
-        qDebug() << "Object " << plotData->uavObject << " is missing";
+        qDebug() << "Object " << objectName << " is missing";
         return;
     }
-    UAVObjectField *field = obj->getField(plotData->uavField);
+    UAVObjectField *field = obj->getField(fieldName);
     if (!field) {
-        qDebug() << "In scope gadget, in fields loaded from GCS config file, field" << plotData->uavField << " of object " << plotData->uavObject << " is missing";
+        qDebug() << "In scope gadget, in fields loaded from GCS config file, field" <<
+                    fieldName << " of object " << objectName << " is missing";
         return;
     }
     QString units = field->getUnits();
@@ -419,10 +408,10 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
     }
 
     QString curveNameScaled;
-    if (scaleOrderFactor == 0) {
+    if (scaleFactor == 0) {
         curveNameScaled = curveName + " (" + units + ")";
     } else {
-        curveNameScaled = curveName + " (x10^" + QString::number(scaleOrderFactor) + " " + units + ")";
+        curveNameScaled = curveName + " (x10^" + QString::number(scaleFactor) + " " + units + ")";
     }
 
     QwtPlotCurve *plotCurve = new QwtPlotCurve(curveNameScaled);
@@ -432,9 +421,22 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
     }
 
     plotCurve->setPen(pen);
-    plotCurve->setSamples(*plotData->xData, *plotData->yData);
     plotCurve->attach(this);
-    plotData->curve = plotCurve;
+
+    PlotData *plotData;
+
+    if (m_plotType == SequentialPlot) {
+        plotData = new SequentialPlotData(objectName, fieldName, elementName, plotCurve, scaleFactor,
+                                          meanSamples, mathFunction, m_plotDataSize);
+    } else if (m_plotType == ChronoPlot) {
+        plotData = new ChronoPlotData(objectName, fieldName, elementName, plotCurve, scaleFactor,
+                                      meanSamples, mathFunction, m_plotDataSize);
+    }
+
+    // If the y-bounds are supplied, set them
+    if (plotData->yMin() != plotData->yMax()) {
+        setAxisScale(QwtPlot::yLeft, plotData->yMin(), plotData->yMax());
+    }
 
     // Keep the curve details for later
     m_curvesData.insert(curveNameScaled, plotData);
@@ -449,22 +451,6 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
     replot();
     mutex.unlock();
 }
-
-// void ScopeGadgetWidget::removeCurvePlot(QString uavObject, QString uavField)
-// {
-// QString curveName = uavObject + "." + uavField;
-//
-// PlotData* plotData = m_curvesData.take(curveName);
-// m_curvesData.remove(curveName);
-// plotData->curve->detach();
-//
-// delete plotData->curve;
-// delete plotData;
-//
-// mutex.lock();
-// replot();
-// mutex.unlock();
-// }
 
 void ScopeGadgetWidget::uavObjectReceived(UAVObject *obj)
 {
@@ -485,14 +471,14 @@ void ScopeGadgetWidget::replotNewData()
     QMutexLocker locker(&mutex);
     foreach(PlotData * plotData, m_curvesData.values()) {
         plotData->removeStaleData();
-        plotData->curve->setSamples(*plotData->xData, *plotData->yData);
+        plotData->updatePlotCurveData();
     }
 
     QDateTime NOW = QDateTime::currentDateTime();
     double toTime = NOW.toTime_t();
     toTime += NOW.time().msec() / 1000.0;
     if (m_plotType == ChronoPlot) {
-        setAxisScale(QwtPlot::xBottom, toTime - m_xWindowSize, toTime);
+        setAxisScale(QwtPlot::xBottom, toTime - m_plotDataSize, toTime);
     }
 
 // qDebug() << "replotNewData from " << NOW.addSecs(- m_xWindowSize) << " to " << NOW;
@@ -505,9 +491,6 @@ void ScopeGadgetWidget::replotNewData()
 void ScopeGadgetWidget::clearCurvePlots()
 {
     foreach(PlotData * plotData, m_curvesData.values()) {
-        plotData->curve->detach();
-
-        delete plotData->curve;
         delete plotData;
     }
 
@@ -516,11 +499,12 @@ void ScopeGadgetWidget::clearCurvePlots()
 
 void ScopeGadgetWidget::saveState(QSettings *qSettings)
 {
+    /*
     // plot state
     int i = 1;
 
     foreach(PlotData * plotData, m_curvesData.values()) {
-        bool plotVisible = plotData->curve->isVisible();
+        bool plotVisible = plotData->isVisible();
 
         if (!plotVisible) {
             qSettings->setValue(QString("plot%1").arg(i), plotVisible);
@@ -529,17 +513,19 @@ void ScopeGadgetWidget::saveState(QSettings *qSettings)
     }
     // legend state
     qSettings->setValue("legendVisible", legend() != NULL);
+    */
 }
 
 void ScopeGadgetWidget::restoreState(QSettings *qSettings)
 {
+    /*
     // plot state
     int i = 1;
 
     foreach(PlotData * plotData, m_curvesData.values()) {
         bool visible = qSettings->value(QString("plot%1").arg(i), true).toBool();
 
-        showCurve(plotData->curve, !visible);
+        showCurve(plotData->m_plotCurve, !visible);
         i++;
     }
     // legend state
@@ -549,6 +535,7 @@ void ScopeGadgetWidget::restoreState(QSettings *qSettings)
     } else {
         deleteLegend();
     }
+    */
 }
 
 /*
@@ -621,10 +608,10 @@ int ScopeGadgetWidget::csvLoggingInsertHeader()
 
         foreach(PlotData * plotData2, m_curvesData.values()) {
             ts << ", ";
-            ts << plotData2->uavObject;
-            ts << "." << plotData2->uavField;
-            if (plotData2->haveSubField) {
-                ts << "." << plotData2->uavSubField;
+            ts << plotData2->objectName();
+            ts << "." << plotData2->fieldName();
+            if (!plotData2->elementName().isEmpty()) {
+                ts << "." << plotData2->elementName();
             }
         }
         ts << endl;
@@ -655,14 +642,14 @@ int ScopeGadgetWidget::csvLoggingAddData()
 
     foreach(PlotData * plotData2, m_curvesData.values()) {
         ss << ", ";
-        if (plotData2->xData->isEmpty()) {
+        if (plotData2->xData.isEmpty()) {
             ss << ", ";
-            if (plotData2->xData->isEmpty()) {} else {
-                ss << QString().sprintf("%3.10g", plotData2->yData->last());
+            if (plotData2->xData.isEmpty()) {} else {
+                ss << QString().sprintf("%3.10g", plotData2->yData.last());
                 m_csvLoggingDataValid = 1;
             }
         } else {
-            ss << QString().sprintf("%3.10g", plotData2->yData->last());
+            ss << QString().sprintf("%3.10g", plotData2->yData.last());
             m_csvLoggingDataValid = 1;
         }
     }

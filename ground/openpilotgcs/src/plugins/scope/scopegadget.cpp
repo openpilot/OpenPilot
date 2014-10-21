@@ -40,7 +40,7 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration *config)
     ScopeGadgetConfiguration *sgConfig = qobject_cast<ScopeGadgetConfiguration *>(config);
     ScopeGadgetWidget *widget = qobject_cast<ScopeGadgetWidget *>(m_widget);
 
-    widget->setXWindowSize(sgConfig->dataSize());
+    widget->setPlotDataSize(sgConfig->dataSize());
     widget->setRefreshInterval(sgConfig->refreshInterval());
 
     if (sgConfig->plotType() == SequentialPlot) {

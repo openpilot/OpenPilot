@@ -76,13 +76,13 @@ public:
         return m_plotType;
     }
 
-    void setXWindowSize(double xWindowSize)
+    void setPlotDataSize(double plotDataSize)
     {
-        m_xWindowSize = xWindowSize;
+        m_plotDataSize = plotDataSize;
     }
-    double xWindowSize()
+    double plotDataSize()
     {
-        return m_xWindowSize;
+        return m_plotDataSize;
     }
     void setRefreshInterval(double refreshInterval)
     {
@@ -142,7 +142,7 @@ private:
 
     PlotType m_plotType;
 
-    double m_xWindowSize;
+    double m_plotDataSize;
     int m_refreshInterval;
     QList<QString> m_connectedUAVObjects;
     QMap<QString, PlotData *> m_curvesData;

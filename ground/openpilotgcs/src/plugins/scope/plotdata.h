@@ -43,13 +43,7 @@
 /*!
    \brief Defines the different type of plots.
  */
-enum PlotType {
-    SequentialPlot,
-    ChronoPlot,
-    UAVObjectPlot,
-
-    NPlotTypes
-};
+enum PlotType {SequentialPlot, ChronoPlot};
 
 /*!
    \brief Base class that keeps the data for each curve in the plot.
@@ -58,29 +52,26 @@ class PlotData : public QObject {
     Q_OBJECT
 
 public:
-    PlotData(QString uavObject, QString uavField);
+    PlotData(QString objectName, QString fieldName, QString elementName,
+             QwtPlotCurve *plotCurve, int scaleOrderFactor, int meanSamples,
+             QString mathFunction, double plotDataSize);
     ~PlotData();
 
-    QString uavObject;
-    QString uavField;
-    QString uavSubField;
-    bool haveSubField;
-    int scalePower; // This is the power to which each value must be raised
-    int meanSamples;
-    double meanSum;
-    QString mathFunction;
-    double correctionSum;
-    int correctionCount;
-    double yMinimum;
-    double yMaximum;
-    double m_xWindowSize;
-    QwtPlotCurve *curve;
-    QVector<double> *xData;
-    QVector<double> *yData;
-    QVector<double> *yDataHistory;
+    QVector<double> xData;
+    QVector<double> yData;
+    QVector<double> yDataHistory;
+
+    QString objectName() const { return m_objectName; }
+    QString fieldName() const { return m_fieldName; }
+    QString elementName() const { return m_elementName; }
+
+    bool isVisible() const { return m_plotCurve->isVisible(); }
+
+    double yMin() const { return m_yMin;}
+    double yMax() const { return m_yMax;}
 
     virtual bool append(UAVObject *obj) = 0;
-    virtual PlotType plotType()    = 0;
+    virtual PlotType plotType() const    = 0;
     virtual void removeStaleData() = 0;
 
     void updatePlotCurveData();
@@ -88,8 +79,22 @@ public:
 protected:
     double valueAsDouble(UAVObject *obj, UAVObjectField *field);
 
-signals:
-    void dataChanged();
+    int m_scalePower; // This is the power to which each value must be raised
+    int m_meanSamples;
+    double m_meanSum;
+    QString m_mathFunction;
+    double m_correctionSum;
+    int m_correctionCount;
+    double m_plotDataSize;
+
+private:
+    QString m_objectName;
+    QString m_fieldName;
+    QString m_elementName;
+    double m_yMin;
+    double m_yMax;
+    QwtPlotCurve *m_plotCurve;
+
 };
 
 /*!
@@ -99,8 +104,10 @@ signals:
 class SequentialPlotData : public PlotData {
     Q_OBJECT
 public:
-    SequentialPlotData(QString uavObject, QString uavField)
-        : PlotData(uavObject, uavField) {}
+    SequentialPlotData(QString objectName, QString fieldName, QString elementName,
+                       QwtPlotCurve *plotCurve, int scaleFactor, int meanSamples,
+                       QString mathFunction, double plotDataSize)
+        : PlotData(objectName, fieldName, elementName, plotCurve, scaleFactor, meanSamples, mathFunction, plotDataSize) {}
     ~SequentialPlotData() {}
 
     /*!
@@ -111,7 +118,7 @@ public:
     /*!
        \brief The type of plot
      */
-    virtual PlotType plotType()
+    PlotType plotType() const
     {
         return SequentialPlot;
     }
@@ -119,7 +126,7 @@ public:
     /*!
        \brief Removes the old data from the buffer
      */
-    virtual void removeStaleData() {}
+    void removeStaleData() {}
 };
 
 /*!
@@ -128,47 +135,25 @@ public:
 class ChronoPlotData : public PlotData {
     Q_OBJECT
 public:
-    ChronoPlotData(QString uavObject, QString uavField)
-        : PlotData(uavObject, uavField)
+    ChronoPlotData(QString objectname, QString fieldname, QString elementName,
+                   QwtPlotCurve *plotCurve, int scaleFactor, int meanSamples,
+                   QString mathFunction, double plotDataSize)
+        : PlotData(objectname, fieldname, elementName, plotCurve, scaleFactor, meanSamples, mathFunction, plotDataSize)
     {
-        scalePower = 1;
     }
     ~ChronoPlotData() {}
 
     bool append(UAVObject *obj);
 
-    virtual PlotType plotType()
+    PlotType plotType() const
     {
         return ChronoPlot;
     }
 
-    virtual void removeStaleData();
-
-private:
+    void removeStaleData();
 
 private slots:
     void removeStaleDataTimeout();
-};
-
-/*!
-   \brief UAVObject plot use a fixed size buffer of data, where the horizontal axis values come from
-   a UAVObject field.
- */
-class UAVObjectPlotData : public PlotData {
-    Q_OBJECT
-public:
-    UAVObjectPlotData(QString uavObject, QString uavField)
-        : PlotData(uavObject, uavField) {}
-    ~UAVObjectPlotData() {}
-
-    bool append(UAVObject *obj);
-
-    virtual PlotType plotType()
-    {
-        return UAVObjectPlot;
-    }
-
-    virtual void removeStaleData() {}
 };
 
 #endif // PLOTDATA_H

@@ -1,4 +1,4 @@
-ï»¿#
+#
 # Project: OpenPilot
 # NSIS configuration file for OpenPilot GCS
 # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2013.
@@ -72,7 +72,7 @@
   VIAddVersionKey "Comments" "${INSTALLER_NAME}. ${BUILD_DESCRIPTION}"
   VIAddVersionKey "CompanyName" "The OpenPilot Team, http://www.openpilot.org"
   VIAddVersionKey "LegalTrademarks" "${PRODUCT_NAME} is a trademark of The OpenPilot Team"
-  VIAddVersionKey "LegalCopyright" "Â© 2010-2013 The OpenPilot Team"
+  VIAddVersionKey "LegalCopyright" "© 2010-2013 The OpenPilot Team"
   VIAddVersionKey "FileDescription" "${INSTALLER_NAME}"
 
 ;--------------------------------
@@ -93,7 +93,7 @@
 ;--------------------------------
 ; Branding
 
-  BrandingText "Â© 2010-2013 The OpenPilot Team, http://www.openpilot.org"
+  BrandingText "© 2010-2013 The OpenPilot Team, http://www.openpilot.org"
 
   !define MUI_ICON "${NSIS_DATA_TREE}\resources\openpilot.ico"
   !define MUI_HEADERIMAGE
@@ -301,7 +301,7 @@ Section ; create uninstall info
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayIcon" '"$INSTDIR\bin\openpilotgcs.exe"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "Publisher" "OpenPilot Team"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Italian Stallion"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Mini Me"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "URLInfoAbout" "http://www.openpilot.org"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "HelpLink" "http://wiki.openpilot.org"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "EstimatedSize" 100600

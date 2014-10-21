@@ -319,7 +319,6 @@ public:
     {
         return parent()->isKnown();
     }
-
 };
 
 class DataObjectTreeItem : public ObjectTreeItem {

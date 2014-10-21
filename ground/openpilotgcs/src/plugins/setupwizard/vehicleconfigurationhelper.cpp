@@ -727,7 +727,7 @@ void VehicleConfigurationHelper::applyManualControlDefaults()
     case VehicleConfigurationSource::INPUT_DSMX10:
     case VehicleConfigurationSource::INPUT_DSMX11:
     case VehicleConfigurationSource::INPUT_DSM2:
-        channelType = ManualControlSettings::CHANNELGROUPS_DSMMAINPORT;
+        channelType = ManualControlSettings::CHANNELGROUPS_DSMFLEXIPORT;
         break;
     default:
         break;

@@ -44,7 +44,6 @@ static bool PIOS_SPI_validate(__attribute__((unused)) struct pios_spi_dev *com_d
     /* Should check device magic here */
     return true;
 }
-#define SPI_MAX_BLOCK_PIO 128
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_spi_dev *PIOS_SPI_alloc(void)
@@ -433,7 +432,23 @@ int32_t PIOS_SPI_TransferByte(uint32_t spi_id, uint8_t b)
     return rx_byte;
 }
 
-static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
+/**
+ * Transfers a block of bytes via DMA.
+ * \param[in] spi SPI number (0 or 1)
+ * \param[in] send_buffer pointer to buffer which should be sent.<BR>
+ * If NULL, 0xff (all-one) will be sent.
+ * \param[in] receive_buffer pointer to buffer which should get the received values.<BR>
+ * If NULL, received bytes will be discarded.
+ * \param[in] len number of bytes which should be transfered
+ * \param[in] callback pointer to callback function which will be executed
+ * from DMA channel interrupt once the transfer is finished.
+ * If NULL, no callback function will be used, and PIOS_SPI_TransferBlock() will
+ * block until the transfer is finished.
+ * \return >= 0 if no error during transfer
+ * \return -1 if disabled SPI port selected
+ * \return -3 if function has been called during an ongoing DMA transfer
+ */
+int32_t PIOS_SPI_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
 {
     struct pios_spi_dev *spi_dev = (struct pios_spi_dev *)spi_id;
 
@@ -563,95 +578,6 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 
     /* No error */
     return 0;
-}
-
-/**
- * Transfers a block of bytes via PIO.
- *
- * \param[in] spi_id SPI device handle
- * \param[in] send_buffer pointer to buffer which should be sent.<BR>
- * If NULL, 0xff (all-one) will be sent.
- * \param[in] receive_buffer pointer to buffer which should get the received values.<BR>
- * If NULL, received bytes will be discarded.
- * \param[in] len number of bytes which should be transfered
- * \return >= 0 if no error during transfer
- * \return -1 if disabled SPI port selected
- * \return -3 if function has been called during an ongoing DMA transfer
- */
-static int32_t SPI_PIO_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len)
-{
-    struct pios_spi_dev *spi_dev = (struct pios_spi_dev *)spi_id;
-    uint8_t b;
-
-    bool valid = PIOS_SPI_validate(spi_dev);
-
-    PIOS_Assert(valid)
-
-    /* Exit if ongoing transfer */
-    if (DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel)) {
-        return -3;
-    }
-
-    /* Make sure the RXNE flag is cleared by reading the DR register */
-    b = spi_dev->cfg->regs->DR;
-
-    while (len--) {
-        /* get the byte to send */
-        b = send_buffer ? *(send_buffer++) : 0xff;
-
-        /* Start the transfer */
-        spi_dev->cfg->regs->DR = b;
-
-        /* Wait until there is a byte to read */
-        while (!(spi_dev->cfg->regs->SR & SPI_I2S_FLAG_RXNE)) {
-            ;
-        }
-
-        /* Read the rx'd byte */
-        b = spi_dev->cfg->regs->DR;
-
-        /* save the received byte */
-        if (receive_buffer) {
-            *(receive_buffer++) = b;
-        }
-
-        /* Wait until the TXE goes high */
-        while (!(spi_dev->cfg->regs->SR & SPI_I2S_FLAG_TXE)) {
-            ;
-        }
-    }
-
-    /* Wait for SPI transfer to have fully completed */
-    while (spi_dev->cfg->regs->SR & SPI_I2S_FLAG_BSY) {
-        ;
-    }
-
-    return 0;
-}
-
-
-/**
- * Transfers a block of bytes via PIO or DMA.
- * \param[in] spi_id SPI device handle
- * \param[in] send_buffer pointer to buffer which should be sent.<BR>
- * If NULL, 0xff (all-one) will be sent.
- * \param[in] receive_buffer pointer to buffer which should get the received values.<BR>
- * If NULL, received bytes will be discarded.
- * \param[in] len number of bytes which should be transfered
- * \param[in] callback pointer to callback function which will be executed
- * from DMA channel interrupt once the transfer is finished.
- * If NULL, no callback function will be used, and PIOS_SPI_TransferBlock() will
- * block until the transfer is finished.
- * \return >= 0 if no error during transfer
- * \return -1 if disabled SPI port selected
- * \return -3 if function has been called during an ongoing DMA transfer
- */
-int32_t PIOS_SPI_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
-{
-    if (callback || len > SPI_MAX_BLOCK_PIO) {
-        return SPI_DMA_TransferBlock(spi_id, send_buffer, receive_buffer, len, callback);
-    }
-    return SPI_PIO_TransferBlock(spi_id, send_buffer, receive_buffer, len);
 }
 
 /**

@@ -252,6 +252,9 @@ void ConfigTaskWidget::onAutopilotDisconnect()
 // dynamic widgets don't recieve the connected signal. This should be called instead.
 void ConfigTaskWidget::forceConnectedState()
 {
+    if (m_objectUtilManager) {
+        m_currentBoardId = m_objectUtilManager->getBoardModel();
+    }
     m_isConnected = true;
     setDirty(false);
 }

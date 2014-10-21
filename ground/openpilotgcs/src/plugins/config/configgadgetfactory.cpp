@@ -49,8 +49,8 @@ Core::IUAVGadget *ConfigGadgetFactory::createGadget(QWidget *parent)
 
     Core::Command *cmd = am->registerAction(new QAction(this), "ConfigPlugin.ShowInputWizard",
                                             QList<int>() << Core::Constants::C_GLOBAL_ID);
-    cmd->setDefaultKeySequence(QKeySequence("Ctrl+R"));
-    cmd->action()->setText(tr("Radio Setup Wizard"));
+    cmd->setDefaultKeySequence(QKeySequence("Ctrl+T"));
+    cmd->action()->setText(tr("Transmitter Setup Wizard"));
 
     Core::ModeManager::instance()->addAction(cmd, 1);
 

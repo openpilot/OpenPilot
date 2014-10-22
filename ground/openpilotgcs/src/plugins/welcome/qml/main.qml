@@ -116,14 +116,13 @@ Rectangle {
 
             height: 18
             anchors.horizontalCenter: parent.horizontalCenter
-            width: textOpVersion.width + textOpVersionAvailable.width + 16
+            width: textOpVersion.width + textOpVersionAvailable.width + this.spacing
             spacing: 16
 
             Text {
                 id: textOpVersion
                 color: "#c4c0c0"
                 text: welcomePlugin.versionString
-                verticalAlignment: Text.AlignTop
                 font.bold: true
                 styleColor: "#00000000"
                 font.pixelSize: 14
@@ -132,7 +131,6 @@ Rectangle {
                 id: textOpVersionAvailable
                 color: "#5fcf07"
                 text: welcomePlugin.newVersionText
-
                 font.bold: true
                 font.underline: true
                 styleColor: "#00000000"

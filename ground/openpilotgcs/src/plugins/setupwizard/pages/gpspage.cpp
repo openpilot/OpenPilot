@@ -71,14 +71,12 @@ void GpsPage::setupSelection(Selection *selection)
                        SetupWizard::GPS_PLATINUM);
 
     selection->addItem(tr("U-Blox Based"),
-                       tr("Select this option for the OpenPilot V8 GPS or generic U-Blox chipset GPSs connected"
-                          "to the Main Port of your controller."),
+                       tr("Select this option for the OpenPilot V8 GPS or generic U-Blox chipset GPSs."),
                        "OPGPS-v8-ublox",
                        SetupWizard::GPS_UBX);
 
     selection->addItem(tr("NMEA Based"),
-                       tr("Select this option for a generic NMEA based GPS connected to the Main Port of your"
-                          "controller."),
+                       tr("Select this option for a generic NMEA based GPS"),
                        "generic-nmea",
                        SetupWizard::GPS_NMEA);
 }

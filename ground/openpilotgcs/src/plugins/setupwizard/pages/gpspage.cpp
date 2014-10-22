@@ -65,7 +65,7 @@ void GpsPage::setupSelection(Selection *selection)
 
     selection->addItem(tr("OpenPilot Platinum"),
                        tr("Select this option to use the OpenPilot Platinum GPS with integrated Magnetometer "
-                          "and Microcontroller connected to the Main Port of your controller.\n\n"
+                          "and Microcontroller.\n\n"
                           "Note: for the OpenPilot v8 GPS please select the U-Blox option."),
                        "OPGPS-v9",
                        SetupWizard::GPS_PLATINUM);

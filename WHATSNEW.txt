@@ -12,7 +12,6 @@ Some key addition in this release:
 - Redesigned PFD artwork and addition of multifunctional slide out panels;
 - Support for additional Flexi-IO serial port for Revolution;
 - External (ws281x compatible) status LED support;
-- Several OPLink reliability improvements;
 - Considerable flight performance improvements  
 
 The full list of features, improvements and bugfixes in this release is accessible here:
@@ -128,7 +127,6 @@ NOTE: If you were using OPLink at power levels lower than 100mW, please redo a r
     * [OP-1510] - Don't force operating at 100mW
     * [OP-1513] - Filter every temperature measurement used for temperature calibration
     * [OP-1517] - Setup Wizard  - sets SBus and GPS to main port
-    * [OP-1522] - Improve Robustness of OPLink radio
     * [OP-1526] - Reverse all motors not working?
     * [OP-1532] - OPLINKMINI and Revo do not communicate correctly
     * [OP-1536] - The Revo ComBridge outputs garbage at the end of transmissions

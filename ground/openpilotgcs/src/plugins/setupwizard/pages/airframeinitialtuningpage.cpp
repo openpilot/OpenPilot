@@ -133,7 +133,12 @@ void AirframeInitialTuningPage::updateDescription(QJsonObject *templ)
         description.append("<b>").append(tr("Comments: ")).append("</b>").append(templ->value("comment").toString());
         ui->templateDescription->setText(description);
     } else {
-        ui->templateDescription->setText(tr("No vehicle selected!"));
+        ui->templateDescription->setText(tr("This option will use the current tuning settings saved on the controller, if your controller "
+                                            "is currently unconfigured, then the OpenPilot firmware defaults will be used.\n\n"
+                                            "It is suggested that if this is a first time configuration of your controller, rather than "
+                                            "use this option, instead select a tunning set that matches your own airframe as close as "
+                                            "possible from the list above or if you are not able to fine one, then select the generic item "
+                                            "from the list."));
     }
 }
 
@@ -181,7 +186,7 @@ void AirframeInitialTuningPage::loadValidFiles()
 
 void AirframeInitialTuningPage::setupTemplateList()
 {
-    QListWidgetItem *item = new QListWidgetItem(tr("Default Tuning"), ui->templateList);
+    QListWidgetItem *item = new QListWidgetItem(tr("Current Tuning"), ui->templateList);
 
     item->setData(Qt::UserRole + 1, QVariant::fromValue((QJsonObject *)NULL));
     foreach(QString templ, m_templates.keys()) {

@@ -63,6 +63,7 @@ UAVObject::UAVObject(quint32 objID, bool isSingleInst, const QString & name)
     this->data         = 0;
     this->numBytes     = 0;
     this->mutex        = new QMutex(QMutex::Recursive);
+    m_isKnown = false;
 }
 
 /**
@@ -601,6 +602,25 @@ void UAVObject::emitTransactionCompleted(bool success)
 void UAVObject::emitNewInstance(UAVObject *obj)
 {
     emit newInstance(obj);
+}
+
+bool UAVObject::isKnown() const
+{
+    QMutexLocker locker(mutex);
+
+    return m_isKnown;
+}
+
+void UAVObject::setIsKnown(bool isKnown)
+{
+    lock();
+    bool changed = m_isKnown != isKnown;
+    m_isKnown = isKnown;
+    unlock();
+
+    if (changed) {
+        emit isKnownChanged(this, isKnown);
+    }
 }
 
 bool UAVObject::isSettingsObject()

@@ -7,69 +7,69 @@
 	<!-- Note these options should be identical to those in StabilizationDesired.StabilizationMode -->
         <field name="Stabilization1Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw,Thrust"
-		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
+		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
 		defaultvalue="Attitude,Attitude,AxisLock,Manual"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude,\
-			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
-			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
+			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
+			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
+			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
 			/>
         <field name="Stabilization2Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw,Thrust"
-		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
+		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
 		defaultvalue="Attitude,Attitude,Rate,Manual"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude,\
-			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
-			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
+			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
+			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
+			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
 			/>
         <field name="Stabilization3Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw,Thrust"
-		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
+		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
 		defaultvalue="Rate,Rate,Rate,Manual"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude,\
-			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
-			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
+			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
+			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
+			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
 			/>
         <field name="Stabilization4Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw,Thrust"
-		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
+		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
 		defaultvalue="Attitude,Attitude,AxisLock,CruiseControl"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude,\
-			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
-			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
+			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
+			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
+			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
 			/>
         <field name="Stabilization5Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw,Thrust"
-		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
+		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
 		defaultvalue="Attitude,Attitude,Rate,CruiseControl"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude,\
-			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
-			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
+			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
+			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
+			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
 			/>
         <field name="Stabilization6Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw,Thrust"
-		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
+		options="Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,RelayRate,RelayAttitude,AltitudeHold,AltitudeVario,CruiseControl"
 		defaultvalue="Rate,Rate,Rate,CruiseControl"
 		limits="%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
 			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl; \
-			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude,\
-			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
-			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
+			%NE:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario:CruiseControl:Attitude:Rattitude:Acro+:WeakLeveling:VirtualBar; \
+			%NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude,\
+			%0401NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario,\
+			%0402NE:Rate:Attitude:AxisLock:WeakLeveling:VirtualBar:Acro+:Rattitude:RelayRate:RelayAttitude:AltitudeHold:AltitudeVario;"
 			/>
 
 	<!-- Note these options values should be identical to those defined in FlightMode -->

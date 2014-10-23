@@ -116,8 +116,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>772</width>
-            <height>514</height>
+            <width>774</width>
+            <height>505</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -542,8 +542,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>724</width>
-            <height>497</height>
+            <width>758</width>
+            <height>542</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_7" rowstretch="1,0,0,0">
@@ -1228,7 +1228,7 @@ margin:1px;
 font:bold;</string>
                 </property>
                 <property name="text">
-                 <string>PID Bank</string>
+                 <string>Settings Bank</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -2044,8 +2044,8 @@ Setup the flight mode channel on the RC Input tab if you have not done so alread
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>407</width>
-            <height>138</height>
+            <width>565</width>
+            <height>159</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

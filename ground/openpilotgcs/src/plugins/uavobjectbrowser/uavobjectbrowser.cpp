@@ -32,7 +32,8 @@ UAVObjectBrowser::UAVObjectBrowser(QString classId, UAVObjectBrowserWidget *widg
     m_widget(widget),
     m_config(NULL)
 {
-    connect(m_widget, SIGNAL(viewOptionsChanged(bool, bool, bool)), this, SLOT(viewOptionsChangedSlot(bool, bool, bool)));
+    connect(m_widget, SIGNAL(viewOptionsChanged(bool, bool, bool, bool)), this, SLOT(viewOptionsChangedSlot(bool, bool, bool, bool)));
+    connect(m_widget, SIGNAL(splitterChanged(QByteArray)), this, SLOT(splitterChanged(QByteArray)));
 }
 
 UAVObjectBrowser::~UAVObjectBrowser()
@@ -45,18 +46,28 @@ void UAVObjectBrowser::loadConfiguration(IUAVGadgetConfiguration *config)
     UAVObjectBrowserConfiguration *m = qobject_cast<UAVObjectBrowserConfiguration *>(config);
 
     m_config = m;
+    m_widget->setUnknownObjectColor(m->unknownObjectColor());
     m_widget->setRecentlyUpdatedColor(m->recentlyUpdatedColor());
     m_widget->setManuallyChangedColor(m->manuallyChangedColor());
     m_widget->setRecentlyUpdatedTimeout(m->recentlyUpdatedTimeout());
     m_widget->setOnlyHilightChangedValues(m->onlyHighlightChangedValues());
-    m_widget->setViewOptions(m->categorizedView(), m->scientificView(), m->showMetaData());
+    m_widget->setViewOptions(m->categorizedView(), m->scientificView(), m->showMetaData(), m->showDescription());
+    m_widget->setSplitterState(m->splitterState());
 }
 
-void UAVObjectBrowser::viewOptionsChangedSlot(bool categorized, bool scientific, bool metadata)
+void UAVObjectBrowser::viewOptionsChangedSlot(bool categorized, bool scientific, bool metadata, bool description)
 {
     if (m_config) {
         m_config->setCategorizedView(categorized);
         m_config->setScientificView(scientific);
         m_config->setShowMetaData(metadata);
+        m_config->setShowDescription(description);
+    }
+}
+
+void UAVObjectBrowser::splitterChanged(QByteArray state)
+{
+    if (m_config) {
+        m_config->setSplitterState(state);
     }
 }

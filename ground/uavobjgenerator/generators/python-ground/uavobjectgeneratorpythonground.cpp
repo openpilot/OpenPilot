@@ -29,10 +29,10 @@ using namespace std;
 
 bool UAVObjectGeneratorPythonGround::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
     // Load template and setup output directory
-    pythonCodePath = QDir( templatepath + QString("flight/Modules/FlightPlan/lib"));
+    pythonCodePath = QDir( templatepath + QString("flight/modules/FlightPlan/lib"));
     pythonOutputPath = QDir( outputpath + QString("python-ground") );
     pythonOutputPath.mkpath(pythonOutputPath.absolutePath());
-    pythonCodeTemplate = readFile( pythonCodePath.absoluteFilePath("uavobjecttemplate.pyt") );
+    pythonCodeTemplate = readFile( pythonCodePath.absoluteFilePath("uavobject.pyt.template") );
     if (pythonCodeTemplate.isEmpty()) {
         std::cerr << "Problem reading python templates" << endl;
         return false;

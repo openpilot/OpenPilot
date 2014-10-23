@@ -16,11 +16,11 @@ Item {
     property variant flightmodeColors : ["gray", "green", "green", "green", "green", "green", "green", "red", 
                                          "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan"]
 
-                      // Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,
+                      // Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,RelayRate,RelayAttitude,
                       // AltitudeHold,AltitudeVario,CruiseControl + Auto mode (VTOL/Wing pathfollower)
                       // grey : 'disabled' modes
 
-    property variant thrustmodeColors : ["green", "grey", "grey", "grey", "grey", "grey", "grey", "grey", "grey",  
+    property variant thrustmodeColors : ["green", "grey", "grey", "grey", "grey", "grey", "grey", "grey", "grey", "grey",  
                                          "green", "green", "green", "cyan"]
 
                       // SystemSettings.AirframeType 3 - 17 : VtolPathFollower, check ThrustControl
@@ -224,12 +224,12 @@ Item {
             anchors.fill: parent
             color: FlightStatus.FlightMode < 1 ? "grey" : warnings.thrustmodeColors[thrust_mode.toString()]
 
-                      // Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Rattitude,RelayRate,RelayAttitude,
+                      // Manual,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,Acro+,Rattitude,RelayRate,RelayAttitude,
                       // AltitudeHold,AltitudeVario,CruiseControl
                       // grey : 'disabled' modes
             Text {
                 anchors.centerIn: parent
-                text: ["MANUAL"," "," ", " ", " ", " ", " ", " ", " ",
+                text: ["MANUAL"," "," ", " ", " ", " ", " ", " ", " ", " ",
                        "ALT HOLD", "ALT VARIO", "CRUISECTRL", "AUTO"][thrust_mode.toString()]
                 font {
                     family: "Arial"

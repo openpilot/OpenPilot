@@ -105,7 +105,7 @@ void AirframeInitialTuningPage::updatePhoto(QJsonObject *templ)
         QByteArray imageData = QByteArray::fromBase64(templ->value("photo").toString().toLatin1());
         photo.loadFromData(imageData, "PNG");
     } else {
-        photo.load(":/core/images/opie_90x120.gif");
+        photo.load(":/core/images/openpilot_logo_500.png");
     }
     m_photoItem = ui->templateImage->scene()->addPixmap(photo);
     ui->templateImage->setSceneRect(ui->templateImage->scene()->itemsBoundingRect());
@@ -181,7 +181,7 @@ void AirframeInitialTuningPage::loadValidFiles()
 
 void AirframeInitialTuningPage::setupTemplateList()
 {
-    QListWidgetItem *item = new QListWidgetItem(tr("None"), ui->templateList);
+    QListWidgetItem *item = new QListWidgetItem(tr("Default Tuning"), ui->templateList);
 
     item->setData(Qt::UserRole + 1, QVariant::fromValue((QJsonObject *)NULL));
     foreach(QString templ, m_templates.keys()) {

@@ -35,6 +35,8 @@
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
 
+#include <QThread>
+
 EscCalibrationPage::EscCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
     ui(new Ui::EscCalibrationPage), m_isCalibrating(false)
@@ -44,7 +46,7 @@ EscCalibrationPage::EscCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     ui->outputHigh->setEnabled(false);
     ui->outputLow->setEnabled(true);
     ui->outputLevel->setEnabled(true);
-    ui->outputLevel->setText(QString(tr("%1 µs")).arg(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
+    ui->outputLevel->setText(QString(tr("%1 µs")).arg(0));
 
     connect(ui->startStopButton, SIGNAL(clicked()), this, SLOT(startStopButtonClicked()));
 
@@ -102,7 +104,7 @@ void EscCalibrationPage::startStopButtonClicked()
             Q_ASSERT(field);
             if (field->getValue().toString() == field->getOptions().at(VehicleConfigurationHelper::MIXER_TYPE_MOTOR)) {
                 OutputCalibrationUtil *output = new OutputCalibrationUtil();
-                output->startChannelOutput(i, LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
+                output->startChannelOutput(i, 0);
                 output->setChannelOutputValue(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
                 m_outputs << output;
             }
@@ -112,13 +114,22 @@ void EscCalibrationPage::startStopButtonClicked()
     } else {
         m_isCalibrating = false;
         ui->startStopButton->setEnabled(false);
+        ui->outputHigh->setEnabled(false);
+        foreach(OutputCalibrationUtil * output, m_outputs) {
+            output->setChannelOutputValue(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
+        }
+        ui->outputLevel->setText(QString(tr("%1 µs")).arg(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
+
+        qApp->processEvents(QEventLoop::AllEvents);
+        QThread::msleep(1000);
+
         foreach(OutputCalibrationUtil * output, m_outputs) {
             output->stopChannelOutput();
             delete output;
         }
+        ui->outputLevel->setText(QString(tr("%1 µs")).arg(0));
         ui->outputHigh->setEnabled(false);
         ui->outputLow->setEnabled(true);
-        ui->outputLevel->setText(QString(tr("%1 µs")).arg(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
         m_outputs.clear();
         m_isCalibrating = false;
         resetAllSecurityCheckboxes();

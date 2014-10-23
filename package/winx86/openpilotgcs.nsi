@@ -1,7 +1,7 @@
 ﻿#
 # Project: OpenPilot
 # NSIS configuration file for OpenPilot GCS
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2013.
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2014.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

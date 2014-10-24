@@ -170,14 +170,20 @@ void AirframeInitialTuningPage::loadValidFiles()
 
         if (file.open(QFile::ReadOnly)) {
             QByteArray jsonData = file.readAll();
-            QJsonDocument templateDoc = QJsonDocument::fromJson(jsonData);
-            QJsonObject json    = templateDoc.object();
-            if (json["type"].toInt() == getWizard()->getVehicleType() &&
-                json["subtype"].toInt() == getWizard()->getVehicleSubType()) {
-                QString uuid = json["uuid"].toString();
-                if (!m_templates.contains(uuid)) {
-                    m_templates[json["uuid"].toString()] = new QJsonObject(json);
+            QJsonParseError error;
+            QJsonDocument templateDoc = QJsonDocument::fromJson(jsonData, &error);
+            if (error.error == QJsonParseError::NoError) {
+                QJsonObject json    = templateDoc.object();
+                if (json["type"].toInt() == getWizard()->getVehicleType() &&
+                    json["subtype"].toInt() == getWizard()->getVehicleSubType()) {
+                    QString uuid = json["uuid"].toString();
+                    if (!m_templates.contains(uuid)) {
+                        m_templates[json["uuid"].toString()] = new QJsonObject(json);
+                    }
                 }
+            } else {
+                qDebug() << "Error parsing json file: "
+                         << fileName << ". Error was:" << error.errorString();
             }
         }
         file.close();

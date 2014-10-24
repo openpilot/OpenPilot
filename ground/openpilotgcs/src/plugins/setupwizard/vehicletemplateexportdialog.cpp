@@ -162,17 +162,6 @@ QString VehicleTemplateExportDialog::setupVehicleType()
     }
 }
 
-QString VehicleTemplateExportDialog::fixFilenameString(QString input, int truncate)
-{
-    return input.replace(' ', "").replace('|', "").replace('/', "")
-           .replace('\\', "").replace(':', "").replace('"', "")
-           .replace('\'', "").replace('?', "").replace('*', "")
-           .replace('>', "").replace('<', "")
-           .replace('}', "").replace('{', "")
-           .left(truncate);
-}
-
-
 void VehicleTemplateExportDialog::accept()
 {
     QJsonObject exportObject;
@@ -211,24 +200,23 @@ void VehicleTemplateExportDialog::accept()
 
     QJsonDocument saveDoc(exportObject);
 
-    QString fileName = QString("%1/%2/%3-%4-%5.optmpl")
-                       .arg(EXPORT_BASE_NAME)
-                       .arg(getTypeDirectory())
-                       .arg(fixFilenameString(ui->Name->text(), 20))
-                       .arg(fixFilenameString(ui->Type->text(), 30))
-                       .arg(fixFilenameString(uuid.toString().right(12)));
-    QFile saveFile(fileName);
-    QDir dir;
-    dir.mkpath(QFileInfo(saveFile).absoluteDir().absolutePath());
-    if (saveFile.open(QIODevice::WriteOnly)) {
-        saveFile.write(saveDoc.toJson());
-        saveFile.close();
-        QMessageBox::information(this, "Export", tr("Settings were exported to \n%1").arg(QFileInfo(saveFile).absoluteFilePath()), QMessageBox::Ok);
-    } else {
-        QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1.\nPlease try again.")
-                                 .arg(QFileInfo(saveFile).absoluteFilePath()), QMessageBox::Ok);
+    const char *fileType = ".optmpl";
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export settings"), "fileName""", QString("%1 (*%2)").arg(tr("OPTemplates", fileType)));
+
+    if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(fileType)) {
+            fileName.append(fileType);
+        }
+        QFile saveFile(fileName);
+        if (saveFile.open(QIODevice::WriteOnly)) {
+            saveFile.write(saveDoc.toJson());
+            saveFile.close();
+        } else {
+           QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1(%2).\nPlease try again.")
+                                     .arg(QFileInfo(saveFile).absoluteFilePath(), saveFile.error()), QMessageBox::Ok);
+        }
+        QDialog::accept();
     }
-    QDialog::accept();
 }
 
 void VehicleTemplateExportDialog::importImage()

@@ -68,7 +68,6 @@ private:
 
     QString getTypeDirectory();
     QString setupVehicleType();
-    QString fixFilenameString(QString input, int truncate = 100);
 };
 
 #endif // VEHICLETEMPLATEEXPORTDIALOG_H

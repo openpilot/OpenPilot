@@ -377,7 +377,7 @@ void OutputCalibrationPage::on_motorNeutralButton_toggled(bool checked)
     ui->motorNeutralSlider->setEnabled(checked);
     quint16 channel   = getCurrentChannel();
     quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
-    onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings[channel].channelNeutral, safeValue, ui->motorNeutralSlider);
+    onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings[channel].channelNeutral, 0, ui->motorNeutralSlider);
 }
 
 void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16 channel, quint16 value, quint16 safeValue, QSlider *slider)

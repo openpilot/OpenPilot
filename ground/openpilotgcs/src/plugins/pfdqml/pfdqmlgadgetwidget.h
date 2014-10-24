@@ -18,9 +18,9 @@
 #define PFDQMLGADGETWIDGET_H_
 
 #include "pfdqmlgadgetconfiguration.h"
-#include <QQuickView>
+#include <QtQuickWidgets/QQuickWidget>
 
-class PfdQmlGadgetWidget : public QQuickView {
+class PfdQmlGadgetWidget : public QQuickWidget {
     Q_OBJECT Q_PROPERTY(QString earthFile READ earthFile WRITE setEarthFile NOTIFY earthFileChanged)
     Q_PROPERTY(bool terrainEnabled READ terrainEnabled WRITE setTerrainEnabled NOTIFY terrainEnabledChanged)
 
@@ -37,7 +37,7 @@ class PfdQmlGadgetWidget : public QQuickView {
     Q_PROPERTY(double altitude READ altitude WRITE setAltitude NOTIFY altitudeChanged)
 
 public:
-    PfdQmlGadgetWidget(QWindow *parent = 0);
+    PfdQmlGadgetWidget(QWidget *parent = 0);
     ~PfdQmlGadgetWidget();
     void setQmlFile(QString fn);
 

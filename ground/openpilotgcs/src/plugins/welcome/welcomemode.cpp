@@ -49,7 +49,7 @@
 #include <QNetworkReply>
 
 #include <QtQuick>
-#include <QQuickView>
+#include <QtQuickWidgets/QQuickWidget>
 #include <QQmlEngine>
 #include <QQmlContext>
 
@@ -59,28 +59,13 @@ using namespace ExtensionSystem;
 using namespace Utils;
 
 namespace Welcome {
-struct WelcomeModePrivate {
-    WelcomeModePrivate();
-
-    QQuickView *quickView;
-};
-
-WelcomeModePrivate::WelcomeModePrivate()
-{}
 
 // ---  WelcomeMode
 WelcomeMode::WelcomeMode() :
-    m_d(new WelcomeModePrivate),
     m_priority(Core::Constants::P_MODE_WELCOME),
-    m_newVersionText("")
+    m_newVersionText(""), m_widget(NULL)
 {
-    m_d->quickView = new QQuickView;
-    m_d->quickView->setResizeMode(QQuickView::SizeRootObjectToView);
-    m_d->quickView->engine()->rootContext()->setContextProperty("welcomePlugin", this);
-    m_d->quickView->setSource(QUrl("qrc:/welcome/qml/main.qml"));
-    m_container = NULL;
-
-    QNetworkAccessManager *networkAccessManager = new QNetworkAccessManager;
+    QNetworkAccessManager *networkAccessManager = new QNetworkAccessManager();
 
     // Only attempt to request our version info if the network is accessible
     if (networkAccessManager->networkAccessible() == QNetworkAccessManager::Accessible) {
@@ -98,8 +83,6 @@ WelcomeMode::WelcomeMode() :
 
 WelcomeMode::~WelcomeMode()
 {
-    delete m_d->quickView;
-    delete m_d;
 }
 
 QString WelcomeMode::name() const
@@ -119,12 +102,13 @@ int WelcomeMode::priority() const
 
 QWidget *WelcomeMode::widget()
 {
-    if (!m_container) {
-        m_container = QWidget::createWindowContainer(m_d->quickView);
-        m_container->setMinimumSize(64, 64);
-        m_container->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    if (!m_widget) {
+        QQuickWidget *qWidget = new QQuickWidget(QUrl("qrc:/welcome/qml/main.qml"));
+        qWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+        qWidget->engine()->rootContext()->setContextProperty("welcomePlugin", this);
+        m_widget = qWidget;
     }
-    return m_container;
+    return m_widget;
 }
 
 const char *WelcomeMode::uniqueModeName() const

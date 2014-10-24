@@ -98,7 +98,7 @@ QGraphicsTextItem *createTextItem(QGraphicsSvgItem *parent, QString elementId, Q
 MonitorWidget::MonitorWidget(QWidget *parent) :
     QGraphicsView(parent), aspectRatioMode(Qt::KeepAspectRatio)
 {
-    setMinimumSize(180, 25);
+    setMinimumSize(195, 25);
 
     QGraphicsScene *scene = new QGraphicsScene();
 
@@ -109,6 +109,8 @@ MonitorWidget::MonitorWidget(QWidget *parent) :
     // no scroll bars
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    setStyleSheet("QGraphicsView{background:transparent;}");
 
     setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
 

@@ -101,7 +101,7 @@ void AirframeInitialTuningPage::updatePhoto(QJsonObject *templ)
     if (m_photoItem != NULL) {
         ui->templateImage->scene()->removeItem(m_photoItem);
     }
-    if (templ != NULL) {
+    if (templ != NULL && !templ->value("photo").isUndefined()) {
         QByteArray imageData = QByteArray::fromBase64(templ->value("photo").toString().toLatin1());
         photo.loadFromData(imageData, "PNG");
     } else {
@@ -136,7 +136,7 @@ void AirframeInitialTuningPage::updateDescription(QJsonObject *templ)
         ui->templateDescription->setText(tr("This option will use the current tuning settings saved on the controller, if your controller "
                                             "is currently unconfigured, then the OpenPilot firmware defaults will be used.\n\n"
                                             "It is suggested that if this is a first time configuration of your controller, rather than "
-                                            "use this option, instead select a tunning set that matches your own airframe as close as "
+                                            "use this option, instead select a tuning set that matches your own airframe as close as "
                                             "possible from the list above or if you are not able to fine one, then select the generic item "
                                             "from the list."));
     }
@@ -170,14 +170,20 @@ void AirframeInitialTuningPage::loadValidFiles()
 
         if (file.open(QFile::ReadOnly)) {
             QByteArray jsonData = file.readAll();
-            QJsonDocument templateDoc = QJsonDocument::fromJson(jsonData);
-            QJsonObject json    = templateDoc.object();
-            if (json["type"].toInt() == getWizard()->getVehicleType() &&
-                json["subtype"].toInt() == getWizard()->getVehicleSubType()) {
-                QString uuid = json["uuid"].toString();
-                if (!m_templates.contains(uuid)) {
-                    m_templates[json["uuid"].toString()] = new QJsonObject(json);
+            QJsonParseError error;
+            QJsonDocument templateDoc = QJsonDocument::fromJson(jsonData, &error);
+            if (error.error == QJsonParseError::NoError) {
+                QJsonObject json    = templateDoc.object();
+                if (json["type"].toInt() == getWizard()->getVehicleType() &&
+                    json["subtype"].toInt() == getWizard()->getVehicleSubType()) {
+                    QString uuid = json["uuid"].toString();
+                    if (!m_templates.contains(uuid)) {
+                        m_templates[json["uuid"].toString()] = new QJsonObject(json);
+                    }
                 }
+            } else {
+                qDebug() << "Error parsing json file: "
+                         << fileName << ". Error was:" << error.errorString();
             }
         }
         file.close();

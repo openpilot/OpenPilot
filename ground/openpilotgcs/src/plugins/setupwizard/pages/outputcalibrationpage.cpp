@@ -376,7 +376,12 @@ void OutputCalibrationPage::on_motorNeutralButton_toggled(bool checked)
     ui->motorNeutralButton->setText(checked ? tr("Stop") : tr("Start"));
     ui->motorNeutralSlider->setEnabled(checked);
     quint16 channel   = getCurrentChannel();
-    quint16 safeValue = m_actuatorSettings[channel].channelNeutral;
+    quint16 safeValue = 0;
+    if (!checked) {
+        // Set pwm output to 1000/low for 500ms before turning it to 0
+        m_calibrationUtil->setChannelOutputValue(1000);
+        QThread::msleep(500);
+    }
     onStartButtonToggle(ui->motorNeutralButton, channel, m_actuatorSettings[channel].channelNeutral, safeValue, ui->motorNeutralSlider);
 }
 

@@ -890,7 +890,7 @@ Item {
 
         Text {
              text: ["FixedWing", "FixedWingElevon", "FixedWingVtail", "VTOL", "HeliCP", "QuadX", "QuadP",
-                    "Hexa+", "Octo+", "Custom", "HexaX", "HexaH", "OctoV", "OctoCoaxP", "OctoCoaxX", "OctoX", "HexaCoax",
+                    "QuadH", "Hexa+", "Octo+", "Custom", "HexaX", "HexaH", "OctoV", "OctoCoaxP", "OctoCoaxX", "OctoX", "HexaCoax",
                     "Tricopter", "GroundVehicleCar", "GroundVehicleDiff", "GroundVehicleMoto"][SystemSettings.AirframeType]
              anchors.right: parent.right
              color: "white"

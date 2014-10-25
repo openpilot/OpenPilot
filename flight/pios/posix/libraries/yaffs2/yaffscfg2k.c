@@ -26,12 +26,25 @@
 
 
 #include <errno.h>
+#include <signal.h>
 
-unsigned yaffs_trace_mask =
-	YAFFS_TRACE_ERROR |
-	YAFFS_TRACE_BUG			 |
-	YAFFS_TRACE_ALWAYS | 
-	0;
+
+#include "pios.h"
+#include "pios_trace.h"
+#include "pios_stdio.h"
+
+#include <openpilot.h>
+#include "pios_flashfs.h" /* API for flash filesystem */
+#include "pios_flashfs_logfs_priv.h"
+
+#include <pios_stdio.h>
+
+
+unsigned yaffs_trace_mask = 0;
+	//YAFFS_TRACE_ERROR |
+	//YAFFS_TRACE_BUG			 |
+	//YAFFS_TRACE_ALWAYS |
+	//0;
 
 int random_seed;
 int simulate_power_failure = 0;
@@ -56,13 +69,71 @@ int yaffs_start_up(void)
 
 	return 0;
 }
-#include "pios.h"
-#include "pios_trace.h"
-#include "pios_stdio.h"
 
-#include <openpilot.h>
-#include "pios_flashfs.h" /* API for flash filesystem */
-#include "pios_flashfs_logfs_priv.h"
+
+
+void yaffsSigHandler ( int sig)
+{
+    char devicename[8];
+    int fs_id;
+
+	    pios_trace(PIOS_TRACE_TEST, "yaffsSigHandler sig=%d", sig);
+        switch (sig)
+        {
+          case SIGALRM:
+          case SIGQUIT:
+          case SIGTERM:
+          case SIGKILL:
+          case SIGINT:
+          case SIGUSR1:
+          case SIGUSR2:
+
+			   for (fs_id =0; fs_id < pios_flash_device_count; fs_id++)
+			   {
+			     snprintf(devicename,6, "/dev%01u", (unsigned) fs_id);
+
+			     pios_umount((const char *)devicename);
+
+			   }
+			   pios_flash_device_count=0;
+			   exit(1);
+               break;
+          default:
+		break;
+
+        }
+}
+
+static void yaffsSigSetup
+(
+void (*sighandler)(int sig)
+)
+{
+    //sigset_t block_sigusr;
+    struct sigaction sa;
+
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sa.sa_handler = sighandler;
+    if (sigaction(SIGQUIT, &sa, NULL))  return;
+
+
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sa.sa_handler = sighandler;
+    if (sigaction(SIGINT , &sa, NULL))  return;
+
+
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sa.sa_handler = sighandler;
+    if (sigaction(SIGTERM, &sa, NULL))  return;
+
+    return;
+}
+
+
+
 
 /**
  * @brief Initialize the flash object setting FS.  Each call creates a yaffs device
@@ -93,6 +164,11 @@ int32_t PIOS_FLASHFS_Logfs_Init(
 	// Simposix implementation uses a ram nor simulation which can be installed
     // as multiple instances
 	yaffs_nor_install_drv(devicename);
+
+
+	sigset_t sigset;
+	sigemptyset(&sigset);
+	yaffsSigSetup(yaffsSigHandler);
 
 	// Attempt to mount the device
     retval = pios_mount(devicename);

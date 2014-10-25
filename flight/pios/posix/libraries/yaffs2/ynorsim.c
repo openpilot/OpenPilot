@@ -19,6 +19,8 @@
 #include <unistd.h>
 #include <time.h>
 
+#include "pios_trace.h"
+
 #define YNORSIM_FNAME "emfile-nor"
 
 /* Set YNORSIM_BIT_CHANGES to a a value from 1..30 to
@@ -71,7 +73,7 @@ static void NorError(struct nor_sim *sim)
 static void ynorsim_save_image(struct nor_sim *sim)
 {
 	int h;
-
+	pios_trace(PIOS_TRACE_TEST, "ynorsim_save_image");
 	h = open(sim->fname, O_RDWR | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
 	write(h, sim->word, sim->file_size);
 	close(h);
@@ -80,7 +82,7 @@ static void ynorsim_save_image(struct nor_sim *sim)
 static void ynorsim_restore_image(struct nor_sim *sim)
 {
 	int h;
-
+	pios_trace(PIOS_TRACE_TEST, "ynorsim_restore_image");
 	h = open(sim->fname, O_RDONLY, S_IREAD | S_IWRITE);
 	memset(sim->word, 0xFF, sim->file_size);
 	read(h, sim->word, sim->file_size);
@@ -169,6 +171,7 @@ void ynorsim_wr32(struct nor_sim *sim, u32 * addr, u32 * buf, int nwords)
 void ynorsim_erase(struct nor_sim *sim, u32 * addr)
 {
 	/* Todo... bit flipping */
+	pios_trace(PIOS_TRACE_TEST, "ynorsim_erase");
 	memset(addr, 0xFF, sim->block_size_bytes);
 }
 

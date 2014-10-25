@@ -2723,7 +2723,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>This space shows a description of the selected UAVObject.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cet espace affiche une description de l&apos;UAVObject sélectionné.</translation>
     </message>
 </context>
 <context>
@@ -2757,7 +2757,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location/>
         <source>Unknown object color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Couleur d&apos;objet inconnu :</translation>
     </message>
 </context>
 <context>
@@ -2777,8 +2777,8 @@ uniquement lorsque les valeurs changent</translation>
     </message>
     <message>
         <location line="+17"/>
-        <source>Radio Setup Wizard</source>
-        <translation>Assistant Configuration Radio</translation>
+        <source>Transmitter Setup Wizard</source>
+        <translation>Assistant Configuration Émetteur</translation>
     </message>
 </context>
 <context>
@@ -4236,12 +4236,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Vehicle name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom Véhicule</translation>
     </message>
     <message>
         <location/>
         <source>Enter name of vehicle. Max 20 characters.</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrez le nom du véhicule : 20 caractères maximum.</translation>
     </message>
     <message>
         <location/>
@@ -4258,7 +4258,19 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Beware: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+ &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+ p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;LA MISE EN PLACE DE FEED FORWARD EXIGE DE LA PRUDENCE&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Attention : L&apos;activation du réglage Feed Forward lancera tous les moteurs à mi-gaz, vous avez été averti !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Dans un premier temps retirez vos hélices, puis pour affiner assurez-vous que le châssis est maintenu bien en place. Portez des lunettes et protégez-vous le visage et le corps.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -4728,7 +4740,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4744,27 +4756,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>RateKi</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>AttitudeKp</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>RateKp</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>AttitudeKi</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7993,11 +8005,6 @@ Useful if you have accidentally changed some settings.</source>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference. higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle doit monter ou descendre le véhicule pour compenser une certaine différence d&apos;altitude. Des valeurs plus élevées pourraient entraîner un maintien d&apos;altitude plus précis mais aussi des réactions plus violentes, des valeurs inférieures sont plus sûres et donnent un vol plus doux. La valeur par défaut devrait être bonne pour la plupart des appareils.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How much the vehicle should throttle up or down to compensate or achieve a certain vertical speed. Higher values lead to more aggressive throttle changes and could lead to oscillations. This is the most likely candidate to change depending on the crafts engine thrust. Heavy craft with weak engines might require higher values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine de combien le véhicule augmente ou diminue les gaz pour compenser ou atteindre une certaine vitesse verticale. Des valeurs plus élevées entraînent des variations de gaz plus agressives qui peuvent produire des oscillations. C&apos;est le paramètre à changer en fonction de la poussée moteur de l&apos;appareil. Des appareils chargés avec des moteurs faibles peuvent demander des valeurs plus élevées.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -8361,6 +8368,11 @@ response (deg)</source>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much yaw stability your vehicle will have in Rate mode. A good starting point for Integral is double the Proportional value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité en lacet de votre véhicule en mode Rate. Un bon point de départ pour l&apos;Intégrale est le double de la valeur Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference. Higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Détermine la vitesse à laquelle doit monter ou descendre le véhicule pour compenser une certaine différence d&apos;altitude. Des valeurs plus élevées pourraient entraîner un maintien d&apos;altitude plus précis mais aussi des réactions plus violentes, des valeurs inférieures sont plus sûres et donnent un vol plus doux. La valeur par défaut devrait être bonne pour la plupart des appareils.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -9200,7 +9212,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/controllerpage.cpp" line="+198"/>
+        <location filename="../../../src/plugins/setupwizard/pages/controllerpage.cpp" line="+201"/>
         <source>Connect</source>
         <translation>Connecter</translation>
     </message>
@@ -10976,7 +10988,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
 <context>
     <name>SetupWizard</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+63"/>
+        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+64"/>
         <source>OpenPilot Setup Wizard</source>
         <translation>Assistant Configuration OpenPilot</translation>
     </message>
@@ -12794,12 +12806,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Resets</source>
-        <translation type="unfinished">Réinitialisations</translation>
+        <translation>Réinitialisations</translation>
     </message>
     <message>
         <location/>
         <source>Timeouts</source>
-        <translation type="unfinished">Temps Dépassé</translation>
+        <translation>Temps Dépassé</translation>
     </message>
     <message>
         <location/>
@@ -13604,7 +13616,7 @@ p, li { white-space: pre-wrap; }
         <translation>Activité Projet</translation>
     </message>
     <message>
-        <location line="+130"/>
+        <location line="+131"/>
         <source>Commented on </source>
         <translation>Commenté sur </translation>
     </message>
@@ -14006,7 +14018,7 @@ Veuillez vérifier le fichier.
 <context>
     <name>MonitorWidget</name>
     <message>
-        <location filename="../../../src/plugins/telemetry/monitorwidget.cpp" line="+216"/>
+        <location filename="../../../src/plugins/telemetry/monitorwidget.cpp" line="+218"/>
         <source>Connected</source>
         <translation>Connecté</translation>
     </message>
@@ -14435,7 +14447,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>TelemetryPlugin</name>
     <message>
-        <location filename="../../../src/plugins/telemetry/telemetryplugin.cpp" line="+157"/>
+        <location filename="../../../src/plugins/telemetry/telemetryplugin.cpp" line="+149"/>
         <source>Firmware Version Mismatch!</source>
         <translation>Incompatibilité des Versions de Firmware !</translation>
     </message>
@@ -14564,7 +14576,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
 <context>
     <name>ConfigRevoWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+329"/>
+        <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+331"/>
         <source>Temperature: %1°C</source>
         <translation>Température : %1°C</translation>
     </message>
@@ -14585,23 +14597,6 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.ui"/>
         <source>WizardPage</source>
         <translation>Page d&apos;Assistant</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Initial Tuning&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;;&quot;&gt;This section of the OpenPilot Wizard allows you to select a set of initial tunning parameters for your airframe. Presented below is a list of common airframe types, select the one that matches your airframe the closest, if unsure select the generic variant.&lt;/span&gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Réglages de Départ&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;;&quot;&gt;Cette partie de l&apos;assistant de configuration vous permet de sélectionner des paramètres prédéfinis pour votre appareil. Vous trouverez ci-dessous une liste d&apos;appareils couramment utilisés, sélectionnez-en un qui correspond le mieux à votre appareil ou un modèle générique si vous avez un doute.&lt;/span&gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -14665,13 +14660,34 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+3"/>
-        <source>No vehicle selected!</source>
-        <translation>Pas de véhicule sélectionné !</translation>
+        <source>This option will use the current tuning settings saved on the controller, if your controller is currently unconfigured, then the OpenPilot firmware defaults will be used.
+
+It is suggested that if this is a first time configuration of your controller, rather than use this option, instead select a tuning set that matches your own airframe as close as possible from the list above or if you are not able to fine one, then select the generic item from the list.</source>
+        <translation>Cette option utilise les paramètres de réglage actuels enregistrés dans la carte, si votre contrôleur n&apos;est pas actuellement configuré, alors les paramètres par défaut du firmware OpenPilot seront utilisés.
+
+Il est suggéré que si cela est une première configuration de votre contrôleur, plutôt que d&apos;utiliser cette option, sélectionnez à la place un ensemble de réglages qui correspond le mieux à votre propre appareil dans la liste ci-dessus. Si vous n&apos;êtes pas en mesure d&apos;en choisir un, sélectionnez l&apos;élément générique de la liste.</translation>
     </message>
     <message>
-        <location line="+48"/>
-        <source>None</source>
-        <translation>Aucun</translation>
+        <location line="+59"/>
+        <source>Current Tuning</source>
+        <translation>Réglages Actuels</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/airframeinitialtuningpage.ui"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Initial Tuning&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;;&quot;&gt;This section of the OpenPilot Wizard allows you to select a set of initial tuning parameters for your airframe. Presented below is a list of common airframe types, select the one that matches your airframe the closest, if unsure select the generic variant.&lt;/span&gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Réglages de Départ&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2,sans-serif&apos;;&quot;&gt;Cette partie de l&apos;assistant de configuration vous permet de sélectionner des paramètres prédéfinis pour votre appareil. Vous trouverez ci-dessous une liste d&apos;appareils couramment utilisés, sélectionnez-en un qui correspond le mieux à votre appareil ou un modèle générique si vous avez un doute.&lt;/span&gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -14973,11 +14989,6 @@ p, li { white-space: pre-wrap; }
         <translation>Annuler</translation>
     </message>
     <message>
-        <location/>
-        <source>Ok</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.cpp" line="+87"/>
         <source>Fixed Wing - Aileron</source>
         <translation>Voilure Fixe - Aileron</translation>
@@ -15058,23 +15069,25 @@ p, li { white-space: pre-wrap; }
         <translation>Non Supporté</translation>
     </message>
     <message>
-        <location line="+65"/>
-        <source>Settings were exported to 
-%1</source>
-        <translation>Les paramètres ont été exportés vers
-%1</translation>
+        <location line="+43"/>
+        <source>Export settings</source>
+        <translation>Exporter réglages</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+0"/>
+        <source>OPTemplates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>Settings could not be exported to 
-%1.
+%1(%2).
 Please try again.</source>
-        <translation>Les paramètres n&apos;ont pas été exportés vers
-%1.
-Veuillez essayer à nouveau.</translation>
+        <translation>Les réglages ne peuvent être exportés vers
+%1(%2).</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>Import Image</source>
         <translation>Importer Image</translation>
     </message>
@@ -15082,6 +15095,11 @@ Veuillez essayer à nouveau.</translation>
         <location line="+0"/>
         <source>Images (*.png *.jpg)</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.ui"/>
+        <source>Export</source>
+        <translation>Exporter</translation>
     </message>
 </context>
 <context>
@@ -15186,32 +15204,32 @@ Veuillez sélectionner votre type de GPS ci-dessous :</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Select this option to use the OpenPilot Platinum GPS with integrated Magnetometer and Microcontroller connected to the Main Port of your controller.
+        <source>Select this option to use the OpenPilot Platinum GPS with integrated Magnetometer and Microcontroller.
 
 Note: for the OpenPilot v8 GPS please select the U-Blox option.</source>
-        <translation>Sélectionnez cette option pour utiliser le GPS OpenPilot Platinum avec Magnétomètre et Microcontrôleur intégré connecté sur le Main Port de votre contrôleur.
+        <translation>Sélectionnez cette option pour utiliser le GPS OpenPilot Platinum avec Magnétomètre et Microcontrôleur intégré.
 
 A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>U-Blox Based</source>
-        <translation>Basé sur U-Blox</translation>
+        <location line="+7"/>
+        <source>Select this option for the OpenPilot V8 GPS or generic U-Blox chipset based GPS.</source>
+        <translation>Sélectionnez cette option pour utiliser le GPS OpenPilot v8 ou un GPS U-Blox générique.</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Select this option for the OpenPilot V8 GPS or generic U-Blox chipset GPSs connectedto the Main Port of your controller.</source>
-        <translation>Sélectionnez cette option pour utiliser le GPS OpenPilot v8 ou un GPS U-Blox générique connecté sur le Main Port de votre contrôleur.</translation>
+        <location line="+5"/>
+        <source>Select this option for a generic NMEA based GPS.</source>
+        <translation>Sélectionnez cette option pour utiliser un GPS NMEA générique.</translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <source>U-Blox Based</source>
+        <translation>Basé sur U-Blox</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>NMEA Based</source>
         <translation>Basé sur NMEA</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Select this option for a generic NMEA based GPS connected to the Main Port of yourcontroller.</source>
-        <translation>Sélectionnez cette option pour utiliser un GPS NMEA générique connecté sur le Main Port de votre contrôleur.</translation>
     </message>
 </context>
 <context>
@@ -15223,12 +15241,20 @@ A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+113"/>
+        <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+136"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="-12"/>
+        <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="-87"/>
+        <location line="+46"/>
+        <location line="+26"/>
+        <location line="+9"/>
+        <source>%1 µs</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="-18"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
@@ -15245,13 +15271,33 @@ A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</
     <message>
         <location/>
         <source>The vehicle is NOT powered by any external power source but USB</source>
-        <translation>L&apos;appareil N&apos;EST PAS BRANCHE sur une source d&apos;alimentation externe 
+        <translation type="unfinished">L&apos;appareil N&apos;EST PAS BRANCHÉ sur une source d&apos;alimentation externe 
 mais uniquement sur port USB</translation>
     </message>
     <message>
         <location/>
         <source>I confirm I have read and understood the above instructions in full</source>
         <translation>Je confirme avoir lu et compris les instructions ci-dessus en totalité</translation>
+    </message>
+    <message>
+        <location/>
+        <source>ESC Output Level</source>
+        <translation>Niveau Sortie ESC</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Low/Off</source>
+        <translation>Bas / Arrêté</translation>
+    </message>
+    <message>
+        <location/>
+        <source>N/A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>High</source>
+        <translation>Haut</translation>
     </message>
 </context>
 <context>
@@ -15302,7 +15348,7 @@ mais uniquement sur port USB</translation>
     <message>
         <location line="-53"/>
         <source>Multi</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>

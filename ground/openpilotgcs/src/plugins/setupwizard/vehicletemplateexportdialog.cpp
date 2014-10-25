@@ -162,6 +162,16 @@ QString VehicleTemplateExportDialog::setupVehicleType()
     }
 }
 
+QString VehicleTemplateExportDialog::fixFilenameString(QString input, int truncate)
+{
+    return input.replace(' ', "").replace('|', "").replace('/', "")
+           .replace('\\', "").replace(':', "").replace('"', "")
+           .replace('\'', "").replace('?', "").replace('*', "")
+           .replace('>', "").replace('<', "")
+           .replace('}', "").replace('{', "")
+           .left(truncate);
+}
+
 void VehicleTemplateExportDialog::accept()
 {
     QJsonObject exportObject;
@@ -191,23 +201,44 @@ void VehicleTemplateExportDialog::accept()
     QUuid uuid = QUuid::createUuid();
     exportObject["uuid"]       = uuid.toString();
 
-    QByteArray bytes;
-    QBuffer buffer(&bytes);
-    buffer.open(QIODevice::WriteOnly);
-    m_image.scaled(IMAGE_SCALE_WIDTH, IMAGE_SCALE_HEIGHT, Qt::KeepAspectRatio,
-                   Qt::SmoothTransformation).save(&buffer, "PNG");
-    exportObject["photo"] = QString::fromLatin1(bytes.toBase64().data());
+    if (!m_image.isNull()) {
+        QByteArray bytes;
+        QBuffer buffer(&bytes);
+        buffer.open(QIODevice::WriteOnly);
+        m_image.scaled(IMAGE_SCALE_WIDTH, IMAGE_SCALE_HEIGHT, Qt::KeepAspectRatio,
+                       Qt::SmoothTransformation).save(&buffer, "PNG");
+        exportObject["photo"] = QString::fromLatin1(bytes.toBase64().data());
+    }
 
     QJsonDocument saveDoc(exportObject);
 
     const char *fileType = ".optmpl";
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export settings"), "fileName""", QString("%1 (*%2)").arg(tr("OPTemplates", fileType)));
 
-    if (!fileName.isEmpty()) {
-        if (!fileName.endsWith(fileType)) {
-            fileName.append(fileType);
+    QString fileName = QString("%1-%2-%3%4")
+            .arg(fixFilenameString(ui->Name->text(), 20))
+            .arg(fixFilenameString(ui->Type->text(), 30))
+            .arg(fixFilenameString(uuid.toString().right(12)))
+            .arg(fileType);
+
+    QString fullPath = QString("%1%2%3%4%5")
+            .arg(EXPORT_BASE_NAME)
+            .arg(QDir::separator())
+            .arg(getTypeDirectory())
+            .arg(QDir::separator())
+            .arg(fileName);
+
+    QDir dir = QFileInfo(QFile(fullPath)).absoluteDir();
+    if (!dir.exists()) {
+        fullPath = QString("%1%2%3").arg(QDir::homePath(), QDir::separator(), fileName);
+    }
+
+    fullPath = QFileDialog::getSaveFileName(this, tr("Export settings"), fullPath, QString("%1 (*%2)").arg(tr("OPTemplates", fileType)));
+
+    if (!fullPath.isEmpty()) {
+        if (!fullPath.endsWith(fileType)) {
+            fullPath.append(fileType);
         }
-        QFile saveFile(fileName);
+        QFile saveFile(fullPath);
         if (saveFile.open(QIODevice::WriteOnly)) {
             saveFile.write(saveDoc.toJson());
             saveFile.close();

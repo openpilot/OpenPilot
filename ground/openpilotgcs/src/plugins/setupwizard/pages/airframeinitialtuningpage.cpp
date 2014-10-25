@@ -101,7 +101,7 @@ void AirframeInitialTuningPage::updatePhoto(QJsonObject *templ)
     if (m_photoItem != NULL) {
         ui->templateImage->scene()->removeItem(m_photoItem);
     }
-    if (templ != NULL) {
+    if (templ != NULL && !templ->value("photo").isUndefined()) {
         QByteArray imageData = QByteArray::fromBase64(templ->value("photo").toString().toLatin1());
         photo.loadFromData(imageData, "PNG");
     } else {

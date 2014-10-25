@@ -80,13 +80,10 @@ void yaffsSigHandler ( int sig)
 	    pios_trace(PIOS_TRACE_TEST, "yaffsSigHandler sig=%d", sig);
         switch (sig)
         {
-          case SIGALRM:
           case SIGQUIT:
           case SIGTERM:
           case SIGKILL:
           case SIGINT:
-          case SIGUSR1:
-          case SIGUSR2:
 
 			   for (fs_id =0; fs_id < pios_flash_device_count; fs_id++)
 			   {
@@ -128,6 +125,11 @@ void (*sighandler)(int sig)
     sa.sa_flags = 0;
     sa.sa_handler = sighandler;
     if (sigaction(SIGTERM, &sa, NULL))  return;
+
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sa.sa_handler = sighandler;
+    if (sigaction(SIGKILL, &sa, NULL))  return;
 
     return;
 }

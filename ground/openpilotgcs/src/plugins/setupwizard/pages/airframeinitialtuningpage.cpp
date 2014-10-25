@@ -136,7 +136,7 @@ void AirframeInitialTuningPage::updateDescription(QJsonObject *templ)
         ui->templateDescription->setText(tr("This option will use the current tuning settings saved on the controller, if your controller "
                                             "is currently unconfigured, then the OpenPilot firmware defaults will be used.\n\n"
                                             "It is suggested that if this is a first time configuration of your controller, rather than "
-                                            "use this option, instead select a tunning set that matches your own airframe as close as "
+                                            "use this option, instead select a tuning set that matches your own airframe as close as "
                                             "possible from the list above or if you are not able to fine one, then select the generic item "
                                             "from the list."));
     }

@@ -13,7 +13,6 @@
 		<field name="RxMissed" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="RxFailure" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="UAVTalkErrors" units="" type="uint16" elements="1" defaultvalue="0"/>
-		<field name="TxResent" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="TxDropped" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="TxFailure" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="Resets" units="" type="uint8" elements="1" defaultvalue="0"/>

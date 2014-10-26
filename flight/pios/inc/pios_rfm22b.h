@@ -90,7 +90,6 @@ struct rfm22b_stats {
     uint8_t  rx_missed;
     uint8_t  rx_failure;
     uint8_t  tx_dropped;
-    uint8_t  tx_resent;
     uint8_t  tx_failure;
     uint8_t  resets;
     uint8_t  timeouts;

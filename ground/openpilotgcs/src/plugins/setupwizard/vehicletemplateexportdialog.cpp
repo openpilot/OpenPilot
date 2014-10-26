@@ -227,7 +227,7 @@ void VehicleTemplateExportDialog::accept()
             .arg(QDir::separator())
             .arg(fileName);
 
-    QDir dir = QFileInfo(QFile(fullPath)).absoluteDir();
+    QDir dir = QFileInfo(fullPath).absoluteDir();
     if (!dir.exists()) {
         fullPath = QString("%1%2%3").arg(QDir::homePath(), QDir::separator(), fileName);
     }

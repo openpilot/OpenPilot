@@ -232,7 +232,7 @@ void VehicleTemplateExportDialog::accept()
         fullPath = QString("%1%2%3").arg(QDir::homePath(), QDir::separator(), fileName);
     }
 
-    fullPath = QFileDialog::getSaveFileName(this, tr("Export settings"), fullPath, QString("%1 (*%2)").arg(tr("OPTemplates", fileType)));
+    fullPath = QFileDialog::getSaveFileName(this, tr("Export settings"), fullPath, QString("%1 (*%2)").arg(tr("OPTemplates"), fileType));
 
     if (!fullPath.isEmpty()) {
         if (!fullPath.endsWith(fileType)) {

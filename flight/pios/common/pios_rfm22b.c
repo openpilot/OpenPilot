@@ -414,7 +414,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
     rfm22b_dev->stats.rx_error     = 0;
     rfm22b_dev->stats.rx_missed    = 0;
     rfm22b_dev->stats.tx_dropped   = 0;
-    rfm22b_dev->stats.tx_resent    = 0;
     rfm22b_dev->stats.resets       = 0;
     rfm22b_dev->stats.timeouts     = 0;
     rfm22b_dev->stats.link_quality = 0;
@@ -1731,7 +1730,7 @@ static bool pios_rfm22_readStatus(struct pios_rfm22b_dev *rfm22b_dev)
  */
 static void rfm22_rxFailure(struct pios_rfm22b_dev *rfm22b_dev)
 {
-    rfm22b_dev->stats.rx_failure++;
+    rfm22b_add_rx_status(rfm22b_dev, RADIO_FAILURE_RX_PACKET);
     rfm22b_dev->rx_buffer_wr = 0;
     rfm22b_dev->packet_start_ticks = 0;
     rfm22b_dev->rfm22b_state = RFM22B_STATE_TRANSITION;
@@ -2099,7 +2098,7 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->stats.rx_good      = 0;
     rfm22b_dev->stats.rx_corrected = 0;
     rfm22b_dev->stats.rx_error     = 0;
-    rfm22b_dev->stats.tx_resent    = 0;
+    rfm22b_dev->stats.rx_failure    = 0;
     for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i) {
         uint32_t val = rfm22b_dev->rx_packet_stats[i];
         for (uint8_t j = 0; j < 16; ++j) {
@@ -2113,8 +2112,8 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
             case RADIO_ERROR_RX_PACKET:
                 rfm22b_dev->stats.rx_error++;
                 break;
-            case RADIO_RESENT_TX_PACKET:
-                rfm22b_dev->stats.tx_resent++;
+            case RADIO_FAILURE_RX_PACKET:
+                rfm22b_dev->stats.rx_failure++;
                 break;
             }
         }
@@ -2124,7 +2123,7 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
     // Note: This assumes that the number of packets sampled for the stats is 64.
     // Using this equation, error and resent packets are counted as -2, and corrected packets are counted as -1.
     // The range is 0 (all error or resent packets) to 128 (all good packets).
-    rfm22b_dev->stats.link_quality = 64 + rfm22b_dev->stats.rx_good - rfm22b_dev->stats.rx_error - rfm22b_dev->stats.tx_resent;
+    rfm22b_dev->stats.link_quality = 64 + rfm22b_dev->stats.rx_good - rfm22b_dev->stats.rx_error - rfm22b_dev->stats.rx_failure;
 }
 
 /**

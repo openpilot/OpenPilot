@@ -158,7 +158,6 @@ static void systemTask(__attribute__((unused)) void *parameters)
             oplinkStatus.RxMissed = radio_stats.rx_missed;
             oplinkStatus.RxFailure     = radio_stats.rx_failure;
             oplinkStatus.TxDropped     = radio_stats.tx_dropped;
-            oplinkStatus.TxResent = radio_stats.tx_resent;
             oplinkStatus.TxFailure     = radio_stats.tx_failure;
             oplinkStatus.Resets      = radio_stats.resets;
             oplinkStatus.Timeouts    = radio_stats.timeouts;

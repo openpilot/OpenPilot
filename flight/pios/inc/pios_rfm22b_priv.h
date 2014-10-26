@@ -578,7 +578,7 @@ enum pios_rfm22b_rx_packet_status {
     RADIO_GOOD_RX_PACKET      = 0x00,
     RADIO_CORRECTED_RX_PACKET = 0x01,
     RADIO_ERROR_RX_PACKET     = 0x2,
-    RADIO_RESENT_TX_PACKET    = 0x3
+    RADIO_FAILURE_RX_PACKET    = 0x3
 };
 
 typedef struct {

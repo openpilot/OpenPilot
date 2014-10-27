@@ -28,6 +28,6 @@ OTHER_FILES += pathactioneditor.pluginspec
 
 FORMS += pathactioneditor.ui
 
-RESOURCES += pathactioneditor.qrc
+RESOURCES +=
 
 

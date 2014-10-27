@@ -25419,7 +25419,7 @@ border-radius: 5;</string>
                  <item row="1" column="1">
                   <widget class="QSlider" name="AltKpSlider">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference. higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How fast the vehicle should climb or descent to compensate a certain altitude difference. Higher values could result in more accurate altitude hold but also more violent control actions, lower values are safer and ensure smoother flight. The default value should be fine for the majority of crafts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="maximum">
                     <number>100</number>

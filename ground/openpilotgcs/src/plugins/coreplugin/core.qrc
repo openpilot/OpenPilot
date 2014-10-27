@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/core">
+        <file>images/openpilot_logo_500.png</file>
         <file>images/openpilot_logo_256.png</file>
         <file>images/openpilot_logo_128.png</file>
         <file>images/openpilot_logo_64.png</file>

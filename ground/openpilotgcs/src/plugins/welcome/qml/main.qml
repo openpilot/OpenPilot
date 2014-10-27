@@ -4,6 +4,7 @@ Rectangle {
     id: container
     width: 1024
     height: 768
+    anchors.horizontalCenter: parent.horizontalCenter
 
     color: "#272727"
 
@@ -115,31 +116,25 @@ Rectangle {
 
             height: 18
             anchors.horizontalCenter: parent.horizontalCenter
-            width: textOpVersion.width + textOpVersionAvailable.width
+            width: textOpVersion.width + textOpVersionAvailable.width + this.spacing
             spacing: 16
 
             Text {
                 id: textOpVersion
                 color: "#c4c0c0"
                 text: welcomePlugin.versionString
-                verticalAlignment: Text.AlignTop
-                anchors.left: parent.anchors.left
                 font.bold: true
                 styleColor: "#00000000"
-                horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 14
             }
             Text {
                 id: textOpVersionAvailable
                 color: "#5fcf07"
                 text: welcomePlugin.newVersionText
-                anchors.rightMargin: 0
                 font.bold: true
                 font.underline: true
                 styleColor: "#00000000"
-                horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 14
-                anchors.left: textOpVersion.right
                 MouseArea{
                     id: mouseAreaOpVersionAvailable
                     hoverEnabled: true

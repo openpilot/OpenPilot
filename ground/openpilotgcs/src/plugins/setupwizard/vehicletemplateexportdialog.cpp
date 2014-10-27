@@ -172,7 +172,6 @@ QString VehicleTemplateExportDialog::fixFilenameString(QString input, int trunca
            .left(truncate);
 }
 
-
 void VehicleTemplateExportDialog::accept()
 {
     QJsonObject exportObject;
@@ -202,33 +201,53 @@ void VehicleTemplateExportDialog::accept()
     QUuid uuid = QUuid::createUuid();
     exportObject["uuid"]       = uuid.toString();
 
-    QByteArray bytes;
-    QBuffer buffer(&bytes);
-    buffer.open(QIODevice::WriteOnly);
-    m_image.scaled(IMAGE_SCALE_WIDTH, IMAGE_SCALE_HEIGHT, Qt::KeepAspectRatio,
-                   Qt::SmoothTransformation).save(&buffer, "PNG");
-    exportObject["photo"] = QString::fromLatin1(bytes.toBase64().data());
+    if (!m_image.isNull()) {
+        QByteArray bytes;
+        QBuffer buffer(&bytes);
+        buffer.open(QIODevice::WriteOnly);
+        m_image.scaled(IMAGE_SCALE_WIDTH, IMAGE_SCALE_HEIGHT, Qt::KeepAspectRatio,
+                       Qt::SmoothTransformation).save(&buffer, "PNG");
+        exportObject["photo"] = QString::fromLatin1(bytes.toBase64().data());
+    }
 
     QJsonDocument saveDoc(exportObject);
 
-    QString fileName = QString("%1/%2/%3-%4-%5.optmpl")
-                       .arg(EXPORT_BASE_NAME)
-                       .arg(getTypeDirectory())
-                       .arg(fixFilenameString(ui->Name->text(), 20))
-                       .arg(fixFilenameString(ui->Type->text(), 30))
-                       .arg(fixFilenameString(uuid.toString().right(12)));
-    QFile saveFile(fileName);
-    QDir dir;
-    dir.mkpath(QFileInfo(saveFile).absoluteDir().absolutePath());
-    if (saveFile.open(QIODevice::WriteOnly)) {
-        saveFile.write(saveDoc.toJson());
-        saveFile.close();
-        QMessageBox::information(this, "Export", tr("Settings were exported to \n%1").arg(QFileInfo(saveFile).absoluteFilePath()), QMessageBox::Ok);
-    } else {
-        QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1.\nPlease try again.")
-                                 .arg(QFileInfo(saveFile).absoluteFilePath()), QMessageBox::Ok);
+    const char *fileType = ".optmpl";
+
+    QString fileName = QString("%1-%2-%3%4")
+            .arg(fixFilenameString(ui->Name->text(), 20))
+            .arg(fixFilenameString(ui->Type->text(), 30))
+            .arg(fixFilenameString(uuid.toString().right(12)))
+            .arg(fileType);
+
+    QString fullPath = QString("%1%2%3%4%5")
+            .arg(EXPORT_BASE_NAME)
+            .arg(QDir::separator())
+            .arg(getTypeDirectory())
+            .arg(QDir::separator())
+            .arg(fileName);
+
+    QDir dir = QFileInfo(fullPath).absoluteDir();
+    if (!dir.exists()) {
+        fullPath = QString("%1%2%3").arg(QDir::homePath(), QDir::separator(), fileName);
     }
-    QDialog::accept();
+
+    fullPath = QFileDialog::getSaveFileName(this, tr("Export settings"), fullPath, QString("%1 (*%2)").arg(tr("OPTemplates", fileType)));
+
+    if (!fullPath.isEmpty()) {
+        if (!fullPath.endsWith(fileType)) {
+            fullPath.append(fileType);
+        }
+        QFile saveFile(fullPath);
+        if (saveFile.open(QIODevice::WriteOnly)) {
+            saveFile.write(saveDoc.toJson());
+            saveFile.close();
+        } else {
+           QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1(%2).\nPlease try again.")
+                                     .arg(QFileInfo(saveFile).absoluteFilePath(), saveFile.error()), QMessageBox::Ok);
+        }
+        QDialog::accept();
+    }
 }
 
 void VehicleTemplateExportDialog::importImage()

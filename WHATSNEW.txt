@@ -1,3 +1,22 @@
+--- RELEASE-14.10-RC4 --- 
+This release candidate does add the following fixes/enhancements over the previous RC3
+
+The full list of features, improvements and bugfixes in this RC4 is accessible here:
+http://progress.openpilot.org/issues/?filter=11862
+
+** Improvement	
+    * [OP-1571]	Cloud config enhancements.
+    * [OP-1556]	Improve ESC calibration.
+
+** Bug	
+    * [OP-1572] Wrong frame type displayed in PFD gadget
+    * [OP-1570]	The Vehicle gadget defaults as a quad x with + mixes 100 100 50
+    * [OP-1568]	Black tooltip over Telemetry monitor
+    * [OP-1567]	Fix bugs in Wizard
+    * [OP-1564]	Incorrect display of Thrust mode in PFD Module
+    * [OP-1562]	Welcome plugin warnings
+    * [OP-1559]	GPS setup wizard should not say "Main Port"
+
 --- RELEASE-14.10 ---
 This release mainly focuses on flight performance, especially aimed at mini multirotors and adds support for the OpenPilot Platinum GPS (V9).
 This version supports the CopterControl, CC3D, Atom and the Revolution Flight controllers as well as the OPLink Modems.
@@ -12,7 +31,6 @@ Some key addition in this release:
 - Redesigned PFD artwork and addition of multifunctional slide out panels;
 - Support for additional Flexi-IO serial port for Revolution;
 - External (ws281x compatible) status LED support;
-- Several OPLink reliability improvements;
 - Considerable flight performance improvements  
 
 The full list of features, improvements and bugfixes in this release is accessible here:
@@ -128,7 +146,6 @@ NOTE: If you were using OPLink at power levels lower than 100mW, please redo a r
     * [OP-1510] - Don't force operating at 100mW
     * [OP-1513] - Filter every temperature measurement used for temperature calibration
     * [OP-1517] - Setup Wizard  - sets SBus and GPS to main port
-    * [OP-1522] - Improve Robustness of OPLink radio
     * [OP-1526] - Reverse all motors not working?
     * [OP-1532] - OPLINKMINI and Revo do not communicate correctly
     * [OP-1536] - The Revo ComBridge outputs garbage at the end of transmissions

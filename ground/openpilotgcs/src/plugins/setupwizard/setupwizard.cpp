@@ -170,7 +170,7 @@ int SetupWizard::nextId() const
     }
 
     case PAGE_BIAS_CALIBRATION:
-        if (getVehicleType() == VEHICLE_MULTI && getEscType() == ESC_RAPID) {
+        if (getVehicleType() == VEHICLE_MULTI) {
             return PAGE_ESC_CALIBRATION;
         } else {
             return PAGE_OUTPUT_CALIBRATION;

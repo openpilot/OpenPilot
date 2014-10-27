@@ -16,7 +16,7 @@
 	<field name="PitchPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2.5,0,50" limits="%BE:0:10; %BE:0:10; "/>
 	<field name="YawPI" units="" type="float" elementnames="Kp,Ki,ILimit"/>
 
-	<field name="AcroInsanityFactor" units="percent" type="float" elements="1" defaultvalue="0.5" limits="%BE:0.0:1.0"/>
+	<field name="AcroInsanityFactor" units="percent" type="float" elements="1" defaultvalue="0.4" limits="%BE:0.0:1.0"/>
 
 	<field name="EnablePiroComp" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
 

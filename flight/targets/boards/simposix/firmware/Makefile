@@ -70,8 +70,12 @@ UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
 include $(PIOS)/common/libraries/FreeRTOS/library.mk
-include $(PIOS)/common/libraries/yaffs2/library.mk
-include $(PIOS)/posix/libraries/yaffs2/yaffs_impl.mk
+ifeq ($(USE_YAFFS),YES)
+SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
+include $(PIOS)/common/libraries/yaffs2/library.mk  # Only required for yaffs testing
+include $(PIOS)/posix/libraries/yaffs2/yaffs_impl.mk  # Only required for yaffs testing
+endif
+
 #include $(FLIGHTLIB)/PyMite/pymite.mk
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -105,7 +109,11 @@ SRC += $(MATHLIB)/mathmisc.c
 SRC += $(MATHLIB)/butterworth.c
 
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
-SRC += $(PIOSCORECOMMON)/pios_logfs.c
+ifeq ($(USE_YAFFS),YES)
+SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
+else
+SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
+endif
 SRC += $(PIOSCORECOMMON)/pios_trace.c
 SRC += $(PIOSCORECOMMON)/pios_debuglog.c
 SRC += $(PIOSCORECOMMON)/pios_callbackscheduler.c

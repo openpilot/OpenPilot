@@ -120,12 +120,14 @@ void PIOS_Board_Init(void)
     /* Delay system */
     PIOS_DELAY_Init();
 
-    // Initialize logfs for settings.  This will be /dev0 with settings stored
+    // Initialize logfs for settings.
+    // If linking in yaffs for testing, this will be /dev0 with settings stored
     // via the logfs object api in /dev0/logfs/
     if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, NULL, NULL, 0)) {
         PIOS_DEBUG_Assert(0);
     }
-    // re-use the simposix yaffs /dev0 nor simulation, which does not support being instanced twice.
+    // If linking in yaffs for testing, this will re-use the simposix yaffs /dev0 nor
+    // simulation, which does not support being instanced twice.
     pios_user_fs_id = pios_uavo_settings_fs_id;
 
     /* Initialize the task monitor */

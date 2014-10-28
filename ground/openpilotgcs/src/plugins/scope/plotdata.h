@@ -57,10 +57,6 @@ public:
              QString mathFunction, double plotDataSize);
     ~PlotData();
 
-    QVector<double> xData;
-    QVector<double> yData;
-    QVector<double> yDataHistory;
-
     QString objectName() const { return m_objectName; }
     QString fieldName() const { return m_fieldName; }
     QString elementName() const { return m_elementName; }
@@ -76,6 +72,9 @@ public:
 
     void updatePlotCurveData();
 
+    bool hasData() { return !m_xDataEntries.isEmpty(); }
+    double lastData() { return m_yDataEntries.last(); }
+
 protected:
     double valueAsDouble(UAVObject *obj, UAVObjectField *field);
 
@@ -86,6 +85,10 @@ protected:
     double m_correctionSum;
     int m_correctionCount;
     double m_plotDataSize;
+
+    QVector<double> m_xDataEntries;
+    QVector<double> m_yDataEntries;
+    QVector<double> m_yDataHistory;
 
 private:
     QString m_objectName;

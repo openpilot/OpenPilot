@@ -625,7 +625,7 @@ int ScopeGadgetWidget::csvLoggingAddData()
     if (!m_csvLoggingStarted) {
         return -1;
     }
-    m_csvLoggingDataValid = 0;
+    m_csvLoggingDataValid = false;
     QDateTime NOW = QDateTime::currentDateTime();
     QString tempString;
 
@@ -638,19 +638,13 @@ int ScopeGadgetWidget::csvLoggingAddData()
     ss << (NOW.toTime_t() - m_csvLoggingStartTime.toTime_t());
 #endif
     ss << ", " << m_csvLoggingConnected << ", " << m_csvLoggingDataUpdated;
-    m_csvLoggingDataUpdated = 0;
+    m_csvLoggingDataUpdated = false;
 
     foreach(PlotData * plotData2, m_curvesData.values()) {
         ss << ", ";
-        if (plotData2->xData.isEmpty()) {
-            ss << ", ";
-            if (plotData2->xData.isEmpty()) {} else {
-                ss << QString().sprintf("%3.10g", plotData2->yData.last());
-                m_csvLoggingDataValid = 1;
-            }
-        } else {
-            ss << QString().sprintf("%3.10g", plotData2->yData.last());
-            m_csvLoggingDataValid = 1;
+        if (plotData2->hasData()) {
+            ss << QString().sprintf("%3.10g", plotData2->lastData());
+            m_csvLoggingDataValid = true;
         }
     }
     ss << endl;

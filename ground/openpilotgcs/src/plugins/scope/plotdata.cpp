@@ -30,17 +30,19 @@
 #include <math.h>
 #include <QDebug>
 
-PlotData::PlotData(QString objectName, QString fieldName, QString elementName,
+PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
                    QwtPlotCurve *plotCurve, int scaleOrderFactor, int meanSamples,
                    QString mathFunction, double plotDataSize) :
     m_scalePower(scaleOrderFactor), m_meanSamples(meanSamples),
     m_mathFunction(mathFunction), m_plotDataSize(plotDataSize),
-    m_objectName(objectName), m_fieldName(fieldName),
-    m_elementName(elementName), m_plotCurve(plotCurve)
-
-{    
+    m_object(object), m_field(field),
+    m_element(element), m_plotCurve(plotCurve)
+{
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
 
+    if (!field->getElementNames().isEmpty()) {
+        m_elementName = field->getElementNames().at(element);
+    }
     m_meanSum         = 0.0f;
     m_correctionSum   = 0.0f;
     m_correctionCount = 0;
@@ -51,17 +53,7 @@ PlotData::PlotData(QString objectName, QString fieldName, QString elementName,
 double PlotData::valueAsDouble(UAVObject *obj, UAVObjectField *field)
 {
     Q_UNUSED(obj);
-    QVariant value;
-
-    if (!m_elementName.isEmpty()) {
-        int indexOfSubField = field->getElementNames().indexOf(QRegExp(elementName(), Qt::CaseSensitive, QRegExp::FixedString));
-        value = field->getValue(indexOfSubField);
-    } else {
-        value = field->getValue();
-    }
-
-    // qDebug() << "Data  (" << value.typeName() << ") " <<  value.toString();
-
+    QVariant value = field->getValue(m_element);
     return value.toDouble();
 }
 
@@ -78,12 +70,9 @@ void PlotData::updatePlotCurveData()
 
 bool SequentialPlotData::append(UAVObject *obj)
 {
-    if (objectName() == obj->getName()) {
-        // Get the field of interest
-        UAVObjectField *field = obj->getField(fieldName());
-
-        if (field) {
-            double currentValue = valueAsDouble(obj, field) * pow(10, m_scalePower);
+    if (m_object == obj) {
+        if (m_field) {
+            double currentValue = valueAsDouble(m_object, m_field) * pow(10, m_scalePower);
 
             // Perform scope math, if necessary
             if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
@@ -137,14 +126,11 @@ bool SequentialPlotData::append(UAVObject *obj)
 
 bool ChronoPlotData::append(UAVObject *obj)
 {
-    if (objectName() == obj->getName()) {
+    if (m_object == obj) {
         // Get the field of interest
-        UAVObjectField *field = obj->getField(fieldName());
-        // qDebug() << "uavObject: " << uavObject << ", uavField: " << uavField;
-
-        if (field) {
+        if (m_field) {
             QDateTime NOW = QDateTime::currentDateTime(); // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
-            double currentValue = valueAsDouble(obj, field) * pow(10, m_scalePower);
+            double currentValue = valueAsDouble(m_object, m_field) * pow(10, m_scalePower);
 
             // Perform scope math, if necessary
             if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {

@@ -39,6 +39,7 @@
 #include <QTimer>
 #include <QTime>
 #include <QVector>
+#include <uavdataobject.h>
 
 /*!
    \brief Defines the different type of plots.
@@ -52,13 +53,14 @@ class PlotData : public QObject {
     Q_OBJECT
 
 public:
-    PlotData(QString objectName, QString fieldName, QString elementName,
+    PlotData(UAVObject *object, UAVObjectField *field, int element,
              QwtPlotCurve *plotCurve, int scaleOrderFactor, int meanSamples,
              QString mathFunction, double plotDataSize);
     ~PlotData();
 
-    QString objectName() const { return m_objectName; }
-    QString fieldName() const { return m_fieldName; }
+    UAVObject *object() const { return m_object; }
+    UAVObjectField *field() const { return m_field; }
+    int element() const { return m_element; }
     QString elementName() const { return m_elementName; }
 
     bool isVisible() const { return m_plotCurve->isVisible(); }
@@ -90,10 +92,12 @@ protected:
     QVector<double> m_yDataEntries;
     QVector<double> m_yDataHistory;
 
-private:
-    QString m_objectName;
-    QString m_fieldName;
+    UAVObject *m_object;
+    UAVObjectField *m_field;
+    int m_element;
     QString m_elementName;
+
+private:
     double m_yMin;
     double m_yMax;
     QwtPlotCurve *m_plotCurve;
@@ -107,10 +111,10 @@ private:
 class SequentialPlotData : public PlotData {
     Q_OBJECT
 public:
-    SequentialPlotData(QString objectName, QString fieldName, QString elementName,
+    SequentialPlotData(UAVObject *object, UAVObjectField *field, int element,
                        QwtPlotCurve *plotCurve, int scaleFactor, int meanSamples,
                        QString mathFunction, double plotDataSize)
-        : PlotData(objectName, fieldName, elementName, plotCurve, scaleFactor, meanSamples, mathFunction, plotDataSize) {}
+        : PlotData(object, field, element, plotCurve, scaleFactor, meanSamples, mathFunction, plotDataSize) {}
     ~SequentialPlotData() {}
 
     /*!
@@ -138,10 +142,10 @@ public:
 class ChronoPlotData : public PlotData {
     Q_OBJECT
 public:
-    ChronoPlotData(QString objectname, QString fieldname, QString elementName,
+    ChronoPlotData(UAVObject *object, UAVObjectField *field, int element,
                    QwtPlotCurve *plotCurve, int scaleFactor, int meanSamples,
                    QString mathFunction, double plotDataSize)
-        : PlotData(objectname, fieldname, elementName, plotCurve, scaleFactor, meanSamples, mathFunction, plotDataSize)
+        : PlotData(object, field, element, plotCurve, scaleFactor, meanSamples, mathFunction, plotDataSize)
     {
     }
     ~ChronoPlotData() {}

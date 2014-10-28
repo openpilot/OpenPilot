@@ -371,10 +371,13 @@ void ScopeGadgetWidget::setupChronoPlot()
 // scaleWidget->setMinBorderDist(0, fmw);
 }
 
-void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubField, int scaleFactor, int meanSamples, QString mathFunction, QPen pen, bool antialiased)
+void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubField, int scaleFactor,
+                                     int meanSamples, QString mathFunction, QPen pen, bool antialiased)
 {
     QString fieldName = fieldPlusSubField;
     QString elementName;
+    int element = 0;
+
     if (fieldPlusSubField.contains("-")) {
         QStringList fieldSubfield = fieldName.split("-", QString::SkipEmptyParts);
         fieldName     = fieldSubfield.at(0);
@@ -390,17 +393,28 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
     // Get the uav object
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject(objectName));
-    if (!obj) {
-        qDebug() << "Object " << objectName << " is missing";
+    UAVDataObject *object = dynamic_cast<UAVDataObject *>(objManager->getObject(objectName));
+    if (!object) {
+        qDebug() << "Object" << objectName << "is missing";
         return;
     }
-    UAVObjectField *field = obj->getField(fieldName);
+
+    UAVObjectField *field = object->getField(fieldName);
     if (!field) {
         qDebug() << "In scope gadget, in fields loaded from GCS config file, field" <<
-                    fieldName << " of object " << objectName << " is missing";
+                    fieldName << "of object" << objectName << "is missing";
         return;
     }
+
+    if (!elementName.isEmpty()) {
+        element = field->getElementNames().indexOf(QRegExp(elementName, Qt::CaseSensitive, QRegExp::FixedString));
+        if (element < 0) {
+            qDebug() << "In scope gadget, in fields loaded from GCS config file, field" <<
+                        fieldName << "of object" << objectName << "element name" << elementName << "is missing";
+            return;
+        }
+    }
+
     QString units = field->getUnits();
 
     if (units == 0) {
@@ -426,10 +440,10 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
     PlotData *plotData;
 
     if (m_plotType == SequentialPlot) {
-        plotData = new SequentialPlotData(objectName, fieldName, elementName, plotCurve, scaleFactor,
+        plotData = new SequentialPlotData(object, field, element, plotCurve, scaleFactor,
                                           meanSamples, mathFunction, m_plotDataSize);
     } else if (m_plotType == ChronoPlot) {
-        plotData = new ChronoPlotData(objectName, fieldName, elementName, plotCurve, scaleFactor,
+        plotData = new ChronoPlotData(object, field, element, plotCurve, scaleFactor,
                                       meanSamples, mathFunction, m_plotDataSize);
     }
 
@@ -442,9 +456,9 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
     m_curvesData.insert(curveNameScaled, plotData);
 
     // Link to the new signal data only if this UAVObject has not been connected yet
-    if (!m_connectedUAVObjects.contains(obj->getName())) {
-        m_connectedUAVObjects.append(obj->getName());
-        connect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(uavObjectReceived(UAVObject *)));
+    if (!m_connectedUAVObjects.contains(object->getName())) {
+        m_connectedUAVObjects.append(object->getName());
+        connect(object, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(uavObjectReceived(UAVObject *)));
     }
 
     mutex.lock();
@@ -609,7 +623,7 @@ int ScopeGadgetWidget::csvLoggingInsertHeader()
         foreach(PlotData * plotData2, m_curvesData.values()) {
             ts << ", ";
             ts << plotData2->objectName();
-            ts << "." << plotData2->fieldName();
+            ts << "." << plotData2->field()->getName();
             if (!plotData2->elementName().isEmpty()) {
                 ts << "." << plotData2->elementName();
             }

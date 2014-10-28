@@ -334,12 +334,6 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
         elementName  = fieldSubfield.at(1);
     }
 
-    // Create the curve
-    QString curveName = objectName + "." + fieldName;
-    if (!elementName.isEmpty()) {
-        curveName.append("." + elementName);
-    }
-
     // Get the uav object
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -365,36 +359,16 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
         }
     }
 
-    QString units = field->getUnits();
-
-    if (units == 0) {
-        units = QString();
-    }
-
-    QString curveNameScaled;
-    if (scaleFactor == 0) {
-        curveNameScaled = curveName + " (" + units + ")";
-    } else {
-        curveNameScaled = curveName + " (x10^" + QString::number(scaleFactor) + " " + units + ")";
-    }
-
-    QwtPlotCurve *plotCurve = new QwtPlotCurve(curveNameScaled);
-
-    if (antialiased) {
-        plotCurve->setRenderHint(QwtPlotCurve::RenderAntialiased);
-    }
-
-    plotCurve->setPen(pen);
-    plotCurve->attach(this);
-
     PlotData *plotData;
 
     if (m_plotType == SequentialPlot) {
-        plotData = new SequentialPlotData(object, field, element, plotCurve, scaleFactor,
-                                          meanSamples, mathFunction, m_plotDataSize);
+        plotData = new SequentialPlotData(object, field, element, scaleFactor,
+                                          meanSamples, mathFunction, m_plotDataSize,
+                                          pen, antialiased);
     } else if (m_plotType == ChronoPlot) {
-        plotData = new ChronoPlotData(object, field, element, plotCurve, scaleFactor,
-                                      meanSamples, mathFunction, m_plotDataSize);
+        plotData = new ChronoPlotData(object, field, element, scaleFactor,
+                                      meanSamples, mathFunction, m_plotDataSize,
+                                      pen, antialiased);
     }
 
     // If the y-bounds are supplied, set them
@@ -402,8 +376,10 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
         setAxisScale(QwtPlot::yLeft, plotData->yMin(), plotData->yMax());
     }
 
+    plotData->attach(this);
+
     // Keep the curve details for later
-    m_curvesData.insert(curveNameScaled, plotData);
+    m_curvesData.insert(plotData->name(), plotData);
 
     // Link to the new signal data only if this UAVObject has not been connected yet
     if (!m_connectedUAVObjects.contains(object->getName())) {

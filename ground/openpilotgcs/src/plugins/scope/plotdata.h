@@ -53,10 +53,11 @@ class PlotData : public QObject {
     Q_OBJECT
 
 public:
-    PlotData(UAVObject *object, UAVObjectField *field, int element,
-             QwtPlotCurve *plotCurve, int scaleOrderFactor, int meanSamples,
-             QString mathFunction, double plotDataSize);
+    PlotData(UAVObject *object, UAVObjectField *field, int element, int scaleOrderFactor, int meanSamples,
+             QString mathFunction, double plotDataSize, QPen pen, bool antialiased);
     ~PlotData();
+
+    QString name() { return m_curveName; }
 
     UAVObject *object() const { return m_object; }
     UAVObjectField *field() const { return m_field; }
@@ -76,6 +77,8 @@ public:
 
     bool hasData() { return !m_xDataEntries.isEmpty(); }
     double lastData() { return m_yDataEntries.last(); }
+
+    void attach(QwtPlot *plot);
 
 protected:
     double valueAsDouble(UAVObject *obj, UAVObjectField *field);
@@ -103,6 +106,7 @@ private:
     double m_yMin;
     double m_yMax;
     QwtPlotCurve *m_plotCurve;
+    QString m_curveName;
 };
 
 /*!
@@ -113,9 +117,10 @@ class SequentialPlotData : public PlotData {
     Q_OBJECT
 public:
     SequentialPlotData(UAVObject *object, UAVObjectField *field, int element,
-                       QwtPlotCurve *plotCurve, int scaleFactor, int meanSamples,
-                       QString mathFunction, double plotDataSize)
-        : PlotData(object, field, element, plotCurve, scaleFactor, meanSamples, mathFunction, plotDataSize) {}
+                       int scaleFactor, int meanSamples, QString mathFunction,
+                       double plotDataSize, QPen pen, bool antialiased)
+        : PlotData(object, field, element, scaleFactor, meanSamples,
+                   mathFunction, plotDataSize, pen, antialiased) {}
     ~SequentialPlotData() {}
 
     /*!
@@ -144,9 +149,10 @@ class ChronoPlotData : public PlotData {
     Q_OBJECT
 public:
     ChronoPlotData(UAVObject *object, UAVObjectField *field, int element,
-                   QwtPlotCurve *plotCurve, int scaleFactor, int meanSamples,
-                   QString mathFunction, double plotDataSize)
-        : PlotData(object, field, element, plotCurve, scaleFactor, meanSamples, mathFunction, plotDataSize)
+                   int scaleFactor, int meanSamples, QString mathFunction,
+                   double plotDataSize, QPen pen, bool antialiased)
+        : PlotData(object, field, element, scaleFactor, meanSamples,
+                   mathFunction, plotDataSize, pen, antialiased)
     {
     }
     ~ChronoPlotData() {}

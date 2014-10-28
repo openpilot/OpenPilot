@@ -31,18 +31,37 @@
 #include <QDebug>
 
 PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
-                   QwtPlotCurve *plotCurve, int scaleOrderFactor, int meanSamples,
-                   QString mathFunction, double plotDataSize) :
+                   int scaleOrderFactor, int meanSamples, QString mathFunction,
+                   double plotDataSize, QPen pen, bool antialiased) :
     m_scalePower(scaleOrderFactor), m_meanSamples(meanSamples),
     m_mathFunction(mathFunction), m_plotDataSize(plotDataSize),
-    m_object(object), m_field(field),
-    m_element(element), m_plotCurve(plotCurve)
+    m_object(object), m_field(field), m_element(element)
 {
+    if (m_field->getNumElements() > 1) {
+        m_elementName = m_field->getElementNames().at(m_element);
+    }
+
+    // Create the curve
+    m_curveName.append(QString("%1.%2").arg(m_object->getName()).arg(m_field->getName()));
+    if (!m_elementName.isEmpty()) {
+        m_curveName.append(QString(".%1").arg(m_elementName));
+    }
+
+    if (m_scalePower == 0) {
+        m_curveName.append(QString(" (%1)").arg(m_field->getUnits()));
+    } else {
+        m_curveName.append(QString(" (x10^%1 %2)").arg(m_scalePower).arg(m_field->getUnits()));
+    }
+
+    m_plotCurve = new QwtPlotCurve(m_curveName);
+
+    if (antialiased) {
+        m_plotCurve->setRenderHint(QwtPlotCurve::RenderAntialiased);
+    }
+
+    m_plotCurve->setPen(pen);
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
 
-    if (!field->getElementNames().isEmpty()) {
-        m_elementName = field->getElementNames().at(element);
-    }
     m_meanSum         = 0.0f;
     m_correctionSum   = 0.0f;
     m_correctionCount = 0;
@@ -66,6 +85,11 @@ PlotData::~PlotData()
 void PlotData::updatePlotCurveData()
 {
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
+}
+
+void PlotData::attach(QwtPlot *plot)
+{
+    m_plotCurve->attach(plot);
 }
 
 void PlotData::calcMathFunction(double currentValue)

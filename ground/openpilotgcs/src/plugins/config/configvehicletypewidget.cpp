@@ -27,6 +27,7 @@
 #include "configvehicletypewidget.h"
 #include "systemsettings.h"
 #include "actuatorsettings.h"
+#include "configgadgetfactory.h"
 
 #include "cfg_vehicletypes/configccpmwidget.h"
 #include "cfg_vehicletypes/configfixedwingwidget.h"
@@ -120,6 +121,9 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     if (!settings->useExpertMode()) {
         m_aircraft->saveAircraftToRAM->setVisible(false);
     }
+
+    ConfigGadgetFactory *configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
+    connect(m_aircraft->vehicleSetupWizardButton, SIGNAL(clicked()), configGadgetFactory, SIGNAL(onOpenVehicleConfigurationWizard()));
 
     SystemSettings *syssettings = SystemSettings::GetInstance(getObjectManager());
     Q_ASSERT(syssettings);

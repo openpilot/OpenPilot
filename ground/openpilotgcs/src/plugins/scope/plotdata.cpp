@@ -103,85 +103,62 @@ void PlotData::calcMathFunction(double currentValue)
 
 bool SequentialPlotData::append(UAVObject *obj)
 {
-    if (m_object == obj) {
-        if (m_field) {
-            double currentValue = valueAsDouble(m_object, m_field) * pow(10, m_scalePower);
+    if (m_object == obj && m_field) {
+        double currentValue = valueAsDouble(m_object, m_field) * pow(10, m_scalePower);
 
-            // Perform scope math, if necessary
-            if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
-                calcMathFunction(currentValue);
-            } else {
-                m_yDataEntries.append(currentValue);
-            }
-
-            if (m_yDataEntries.size() > m_plotDataSize) {
-                // If new data overflows the window, remove old data...
-                m_yDataEntries.pop_front();
-            } else {
-                // ...otherwise, add a new y point at position xData
-                m_xDataEntries.insert(m_xDataEntries.size(), m_xDataEntries.size());
-            }
-
-            return true;
+        // Perform scope math, if necessary
+        if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
+            calcMathFunction(currentValue);
+        } else {
+            m_yDataEntries.append(currentValue);
         }
-    }
 
+        if (m_yDataEntries.size() > m_plotDataSize) {
+            // If new data overflows the window, remove old data...
+            m_yDataEntries.pop_front();
+        } else {
+            // ...otherwise, add a new y point at position xData
+            m_xDataEntries.insert(m_xDataEntries.size(), m_xDataEntries.size());
+        }
+        return true;
+    }
     return false;
 }
 
 bool ChronoPlotData::append(UAVObject *obj)
 {
-    if (m_object == obj) {
+    if (m_object == obj && m_field) {
         // Get the field of interest
-        if (m_field) {
-            QDateTime NOW = QDateTime::currentDateTime(); // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
-            double currentValue = valueAsDouble(m_object, m_field) * pow(10, m_scalePower);
+        QDateTime NOW = QDateTime::currentDateTime(); // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
+        double currentValue = valueAsDouble(m_object, m_field) * pow(10, m_scalePower);
 
-            // Perform scope math, if necessary
-            if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
-                calcMathFunction(currentValue);
-            } else {
-                m_yDataEntries.append(currentValue);
-            }
-
-            double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;
-            m_xDataEntries.append(valueX);
-
-            // Remove stale data
-            removeStaleData();
-            return true;
+        // Perform scope math, if necessary
+        if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
+            calcMathFunction(currentValue);
+        } else {
+            m_yDataEntries.append(currentValue);
         }
-    }
 
+        double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;
+        m_xDataEntries.append(valueX);
+
+        // Remove stale data
+        removeStaleData();
+        return true;
+    }
     return false;
 }
 
 void ChronoPlotData::removeStaleData()
 {
-    double newestValue;
-    double oldestValue;
-
-    while (1) {
-        if (m_xDataEntries.size() == 0) {
-            break;
-        }
-
-        newestValue = m_xDataEntries.last();
-        oldestValue = m_xDataEntries.first();
-
-        if (newestValue - oldestValue > m_plotDataSize) {
+    while (!m_xDataEntries.isEmpty() &&
+           (m_xDataEntries.last() - m_xDataEntries.first()) > m_plotDataSize) {
             m_yDataEntries.pop_front();
             m_xDataEntries.pop_front();
-        } else {
-            break;
-        }
     }
-
-    // qDebug() << "removeStaleData ";
 }
 
 void ChronoPlotData::removeStaleDataTimeout()
 {
     removeStaleData();
-    // qDebug() << "removeStaleDataTimeout";
 }

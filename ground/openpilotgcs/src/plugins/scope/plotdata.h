@@ -97,11 +97,12 @@ protected:
     int m_element;
     QString m_elementName;
 
+    virtual void calcMathFunction(double currentValue);
+
 private:
     double m_yMin;
     double m_yMax;
     QwtPlotCurve *m_plotCurve;
-
 };
 
 /*!

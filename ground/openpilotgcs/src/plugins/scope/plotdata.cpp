@@ -68,6 +68,39 @@ void PlotData::updatePlotCurveData()
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
 }
 
+void PlotData::calcMathFunction(double currentValue)
+{
+    // Put the new value at the back
+    m_yDataHistory.append(currentValue);
+
+    // calculate average value
+    m_meanSum += currentValue;
+    if (m_yDataHistory.size() > m_meanSamples) {
+        m_meanSum -= m_yDataHistory.first();
+        m_yDataHistory.pop_front();
+    }
+    // make sure to correct the sum every meanSamples steps to prevent it
+    // from running away due to floating point rounding errors
+    m_correctionSum += currentValue;
+    if (++m_correctionCount >= m_meanSamples) {
+        m_meanSum = m_correctionSum;
+        m_correctionSum = 0.0f;
+        m_correctionCount = 0;
+    }
+
+    double boxcarAvg = m_meanSum / m_yDataHistory.size();
+    if (m_mathFunction == "Standard deviation") {
+        // Calculate square of sample standard deviation, with Bessel's correction
+        double stdSum = 0;
+        for (int i = 0; i < m_yDataHistory.size(); i++) {
+            stdSum += pow(m_yDataHistory.at(i) - boxcarAvg, 2) / (m_meanSamples - 1);
+        }
+        m_yDataEntries.append(sqrt(stdSum));
+    } else {
+        m_yDataEntries.append(boxcarAvg);
+    }
+}
+
 bool SequentialPlotData::append(UAVObject *obj)
 {
     if (m_object == obj) {
@@ -76,44 +109,16 @@ bool SequentialPlotData::append(UAVObject *obj)
 
             // Perform scope math, if necessary
             if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
-                // Put the new value at the front
-                m_yDataHistory.append(currentValue);
-
-                // calculate average value
-                m_meanSum += currentValue;
-                if (m_yDataHistory.size() > m_meanSamples) {
-                    m_meanSum -= m_yDataHistory.first();
-                    m_yDataHistory.pop_front();
-                }
-
-                // make sure to correct the sum every meanSamples steps to prevent it
-                // from running away due to floating point rounding errors
-                m_correctionSum += currentValue;
-                if (++m_correctionCount >= m_meanSamples) {
-                    m_meanSum = m_correctionSum;
-                    m_correctionSum = 0.0f;
-                    m_correctionCount = 0;
-                }
-
-                double boxcarAvg = m_meanSum / m_yDataHistory.size();
-
-                if (m_mathFunction == "Standard deviation") {
-                    // Calculate square of sample standard deviation, with Bessel's correction
-                    double stdSum = 0;
-                    for (int i = 0; i < m_yDataHistory.size(); i++) {
-                        stdSum += pow(m_yDataHistory.at(i) - boxcarAvg, 2) / (m_meanSamples - 1);
-                    }
-                    m_yDataEntries.append(sqrt(stdSum));
-                } else {
-                    m_yDataEntries.append(boxcarAvg);
-                }
+                calcMathFunction(currentValue);
             } else {
                 m_yDataEntries.append(currentValue);
             }
 
-            if (m_yDataEntries.size() > m_plotDataSize) { // If new data overflows the window, remove old data...
+            if (m_yDataEntries.size() > m_plotDataSize) {
+                // If new data overflows the window, remove old data...
                 m_yDataEntries.pop_front();
-            } else { // ...otherwise, add a new y point at position xData
+            } else {
+                // ...otherwise, add a new y point at position xData
                 m_xDataEntries.insert(m_xDataEntries.size(), m_xDataEntries.size());
             }
 
@@ -134,44 +139,13 @@ bool ChronoPlotData::append(UAVObject *obj)
 
             // Perform scope math, if necessary
             if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
-                // Put the new value at the back
-                m_yDataHistory.append(currentValue);
-
-                // calculate average value
-                m_meanSum += currentValue;
-                if (m_yDataHistory.size() > m_meanSamples) {
-                    m_meanSum -= m_yDataHistory.first();
-                    m_yDataHistory.pop_front();
-                }
-                // make sure to correct the sum every meanSamples steps to prevent it
-                // from running away due to floating point rounding errors
-                m_correctionSum += currentValue;
-                if (++m_correctionCount >= m_meanSamples) {
-                    m_meanSum = m_correctionSum;
-                    m_correctionSum = 0.0f;
-                    m_correctionCount = 0;
-                }
-
-                double boxcarAvg = m_meanSum / m_yDataHistory.size();
-                // qDebug()<<mathFunction;
-                if (m_mathFunction == "Standard deviation") {
-                    // Calculate square of sample standard deviation, with Bessel's correction
-                    double stdSum = 0;
-                    for (int i = 0; i < m_yDataHistory.size(); i++) {
-                        stdSum += pow(m_yDataHistory.at(i) - boxcarAvg, 2) / (m_meanSamples - 1);
-                    }
-                    m_yDataEntries.append(sqrt(stdSum));
-                } else {
-                    m_yDataEntries.append(boxcarAvg);
-                }
+                calcMathFunction(currentValue);
             } else {
                 m_yDataEntries.append(currentValue);
             }
 
             double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;
             m_xDataEntries.append(valueX);
-
-            // qDebug() << "Data  " << uavObject << "." << field->getName() << " X,Y:" << valueX << "," <<  valueY;
 
             // Remove stale data
             removeStaleData();

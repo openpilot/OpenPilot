@@ -57,7 +57,7 @@ public:
              QString mathFunction, double plotDataSize, QPen pen, bool antialiased);
     ~PlotData();
 
-    QString name() { return m_curveName; }
+    QString plotName() const { return m_plotName; }
 
     UAVObject *object() const { return m_object; }
     UAVObjectField *field() const { return m_field; }
@@ -65,25 +65,22 @@ public:
     QString elementName() const { return m_elementName; }
 
     bool isVisible() const { return m_plotCurve->isVisible(); }
-
-    double yMin() const { return m_yMin;}
-    double yMax() const { return m_yMax;}
+    void setVisible(bool visible) { return m_plotCurve->setVisible(visible); }
 
     virtual bool append(UAVObject *obj) = 0;
     virtual PlotType plotType() const    = 0;
     virtual void removeStaleData() = 0;
 
-    void updatePlotCurveData();
+    void updatePlotData();
 
-    bool hasData() { return !m_xDataEntries.isEmpty(); }
+    bool hasData() const { return !m_xDataEntries.isEmpty(); }
     double lastData() { return m_yDataEntries.last(); }
 
     void attach(QwtPlot *plot);
 
 protected:
-    double valueAsDouble(UAVObject *obj, UAVObjectField *field);
-
-    int m_scalePower; // This is the power to which each value must be raised
+    // This is the power to which each value must be raised
+    int m_scalePower;
     int m_meanSamples;
     double m_meanSum;
     QString m_mathFunction;
@@ -103,10 +100,8 @@ protected:
     virtual void calcMathFunction(double currentValue);
 
 private:
-    double m_yMin;
-    double m_yMax;
     QwtPlotCurve *m_plotCurve;
-    QString m_curveName;
+    QString m_plotName;
 };
 
 /*!
@@ -123,22 +118,8 @@ public:
                    mathFunction, plotDataSize, pen, antialiased) {}
     ~SequentialPlotData() {}
 
-    /*!
-       \brief Append new data to the plot
-     */
     bool append(UAVObject *obj);
-
-    /*!
-       \brief The type of plot
-     */
-    PlotType plotType() const
-    {
-        return SequentialPlot;
-    }
-
-    /*!
-       \brief Removes the old data from the buffer
-     */
+    PlotType plotType() const { return SequentialPlot; }
     void removeStaleData() {}
 };
 
@@ -158,16 +139,8 @@ public:
     ~ChronoPlotData() {}
 
     bool append(UAVObject *obj);
-
-    PlotType plotType() const
-    {
-        return ChronoPlot;
-    }
-
+    PlotType plotType() const { return ChronoPlot; }
     void removeStaleData();
-
-private slots:
-    void removeStaleDataTimeout();
 };
 
 #endif // PLOTDATA_H

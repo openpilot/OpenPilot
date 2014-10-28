@@ -37,23 +37,23 @@ PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
     m_mathFunction(mathFunction), m_plotDataSize(plotDataSize),
     m_object(object), m_field(field), m_element(element)
 {
-    if (m_field->getNumElements() > 1) {
+    if (!m_field->getNumElements() > 1) {
         m_elementName = m_field->getElementNames().at(m_element);
     }
 
     // Create the curve
-    m_curveName.append(QString("%1.%2").arg(m_object->getName()).arg(m_field->getName()));
+    m_plotName.append(QString("%1.%2").arg(m_object->getName()).arg(m_field->getName()));
     if (!m_elementName.isEmpty()) {
-        m_curveName.append(QString(".%1").arg(m_elementName));
+        m_plotName.append(QString(".%1").arg(m_elementName));
     }
 
     if (m_scalePower == 0) {
-        m_curveName.append(QString(" (%1)").arg(m_field->getUnits()));
+        m_plotName.append(QString(" (%1)").arg(m_field->getUnits()));
     } else {
-        m_curveName.append(QString(" (x10^%1 %2)").arg(m_scalePower).arg(m_field->getUnits()));
+        m_plotName.append(QString(" (x10^%1 %2)").arg(m_scalePower).arg(m_field->getUnits()));
     }
 
-    m_plotCurve = new QwtPlotCurve(m_curveName);
+    m_plotCurve = new QwtPlotCurve(m_plotName);
 
     if (antialiased) {
         m_plotCurve->setRenderHint(QwtPlotCurve::RenderAntialiased);
@@ -65,15 +65,6 @@ PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
     m_meanSum         = 0.0f;
     m_correctionSum   = 0.0f;
     m_correctionCount = 0;
-    m_yMin        = 0;
-    m_yMax        = 0;
-}
-
-double PlotData::valueAsDouble(UAVObject *obj, UAVObjectField *field)
-{
-    Q_UNUSED(obj);
-    QVariant value = field->getValue(m_element);
-    return value.toDouble();
 }
 
 PlotData::~PlotData()
@@ -82,7 +73,7 @@ PlotData::~PlotData()
     delete m_plotCurve;
 }
 
-void PlotData::updatePlotCurveData()
+void PlotData::updatePlotData()
 {
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
 }
@@ -128,7 +119,7 @@ void PlotData::calcMathFunction(double currentValue)
 bool SequentialPlotData::append(UAVObject *obj)
 {
     if (m_object == obj && m_field) {
-        double currentValue = valueAsDouble(m_object, m_field) * pow(10, m_scalePower);
+        double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
 
         // Perform scope math, if necessary
         if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
@@ -154,7 +145,7 @@ bool ChronoPlotData::append(UAVObject *obj)
     if (m_object == obj && m_field) {
         // Get the field of interest
         QDateTime NOW = QDateTime::currentDateTime(); // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
-        double currentValue = valueAsDouble(m_object, m_field) * pow(10, m_scalePower);
+        double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
 
         // Perform scope math, if necessary
         if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
@@ -180,9 +171,4 @@ void ChronoPlotData::removeStaleData()
             m_yDataEntries.pop_front();
             m_xDataEntries.pop_front();
     }
-}
-
-void ChronoPlotData::removeStaleDataTimeout()
-{
-    removeStaleData();
 }

@@ -371,15 +371,10 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
                                       pen, antialiased);
     }
 
-    // If the y-bounds are supplied, set them
-    if (plotData->yMin() != plotData->yMax()) {
-        setAxisScale(QwtPlot::yLeft, plotData->yMin(), plotData->yMax());
-    }
-
     plotData->attach(this);
 
     // Keep the curve details for later
-    m_curvesData.insert(plotData->name(), plotData);
+    m_curvesData.insert(plotData->plotName(), plotData);
 
     // Link to the new signal data only if this UAVObject has not been connected yet
     if (!m_connectedUAVObjects.contains(object->getName())) {
@@ -411,7 +406,7 @@ void ScopeGadgetWidget::replotNewData()
     QMutexLocker locker(&mutex);
     foreach(PlotData * plotData, m_curvesData.values()) {
         plotData->removeStaleData();
-        plotData->updatePlotCurveData();
+        plotData->updatePlotData();
     }
 
     QDateTime NOW = QDateTime::currentDateTime();
@@ -437,7 +432,6 @@ void ScopeGadgetWidget::clearCurvePlots()
 
 void ScopeGadgetWidget::saveState(QSettings *qSettings)
 {
-    /*
     // plot state
     int i = 1;
 
@@ -451,19 +445,15 @@ void ScopeGadgetWidget::saveState(QSettings *qSettings)
     }
     // legend state
     qSettings->setValue("legendVisible", legend() != NULL);
-    */
 }
 
 void ScopeGadgetWidget::restoreState(QSettings *qSettings)
 {
-    /*
     // plot state
     int i = 1;
 
     foreach(PlotData * plotData, m_curvesData.values()) {
-        bool visible = qSettings->value(QString("plot%1").arg(i), true).toBool();
-
-        showCurve(plotData->m_plotCurve, !visible);
+        plotData->setVisible(qSettings->value(QString("plot%1").arg(i), true).toBool());
         i++;
     }
     // legend state
@@ -473,7 +463,6 @@ void ScopeGadgetWidget::restoreState(QSettings *qSettings)
     } else {
         deleteLegend();
     }
-    */
 }
 
 /*

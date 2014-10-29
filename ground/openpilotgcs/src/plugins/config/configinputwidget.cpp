@@ -591,6 +591,7 @@ void ConfigInputWidget::wzBack()
 void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
 {
     ui->wzText2->clear();
+    ui->wzNext->setText(tr("Next"));
 
     switch (step) {
     case wizardWelcome:
@@ -863,13 +864,13 @@ void ConfigInputWidget::setChannel(int newChan)
     if (manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("Accessory") ||
         manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan).contains("FlightMode")) {
         ui->wzNext->setEnabled(true);
+        ui->wzNext->setText(tr("Next/Skip"));
         ui->wzText->setText(ui->wzText->text() + tr(" Alternatively, click Next to skip this channel."));
     } else {
         ui->wzNext->setEnabled(false);
     }
 
     setMoveFromCommand(newChan);
-
     currentChannelNum = newChan;
     channelDetected   = false;
 }

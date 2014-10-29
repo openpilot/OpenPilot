@@ -214,18 +214,18 @@ void VehicleTemplateExportDialog::accept()
 
     const char *fileType = ".optmpl";
 
-    QString fileName = QString("%1-%2-%3%4")
-            .arg(fixFilenameString(ui->Name->text(), 20))
-            .arg(fixFilenameString(ui->Type->text(), 30))
-            .arg(fixFilenameString(uuid.toString().right(12)))
-            .arg(fileType);
+    QString fileName     = QString("%1-%2-%3%4")
+                           .arg(fixFilenameString(ui->Name->text(), 20))
+                           .arg(fixFilenameString(ui->Type->text(), 30))
+                           .arg(fixFilenameString(uuid.toString().right(12)))
+                           .arg(fileType);
 
     QString fullPath = QString("%1%2%3%4%5")
-            .arg(EXPORT_BASE_NAME)
-            .arg(QDir::separator())
-            .arg(getTypeDirectory())
-            .arg(QDir::separator())
-            .arg(fileName);
+                       .arg(EXPORT_BASE_NAME)
+                       .arg(QDir::separator())
+                       .arg(getTypeDirectory())
+                       .arg(QDir::separator())
+                       .arg(fileName);
 
     QDir dir = QFileInfo(fullPath).absoluteDir();
     if (!dir.exists()) {
@@ -243,7 +243,7 @@ void VehicleTemplateExportDialog::accept()
             saveFile.write(saveDoc.toJson());
             saveFile.close();
         } else {
-           QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1(%2).\nPlease try again.")
+            QMessageBox::information(this, "Export", tr("Settings could not be exported to \n%1(%2).\nPlease try again.")
                                      .arg(QFileInfo(saveFile).absoluteFilePath(), saveFile.error()), QMessageBox::Ok);
         }
         QDialog::accept();

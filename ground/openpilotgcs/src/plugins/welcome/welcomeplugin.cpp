@@ -55,11 +55,11 @@ WelcomePlugin::~WelcomePlugin()
     // The below code is commented out to avoid having the application
     // crash when it is terminated. TODO: Fix a real solution.
     /*
-    if (m_welcomeMode) {
+       if (m_welcomeMode) {
         removeObject(m_welcomeMode);
         delete m_welcomeMode;
-    }
-    */
+       }
+     */
 }
 
 /*! Initializes the plugin. Returns true on success.

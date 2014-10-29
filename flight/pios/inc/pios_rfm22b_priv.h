@@ -780,7 +780,7 @@ struct pios_rfm22b_dev {
     portTickType packet_start_ticks;
     portTickType tx_complete_ticks;
     portTickType time_delta;
-    uint8_t      connected_timeout;
+    portTickType last_conntact;
 };
 
 

@@ -116,7 +116,7 @@
 #define USB_LED_OFF
 #endif
 
-#define CONNECTED_LIVE                   8
+#define CONNECTED_TIMEOUT              (250 / portTICK_RATE_MS) /* ms */
 
 /* Local type definitions */
 
@@ -1359,7 +1359,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->packet_start_ticks = 0;
     rfm22b_dev->tx_complete_ticks  = 0;
     rfm22b_dev->rfm22b_state       = RFM22B_STATE_INITIALIZING;
-    rfm22b_dev->connected_timeout  = 0;
+    rfm22b_dev->last_conntact  = 0;
 
     // software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
     rfm22_write_claim(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
@@ -1993,7 +1993,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
             radio_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
         }
 
-        radio_dev->connected_timeout = CONNECTED_LIVE;
+        radio_dev->last_conntact = xTaskGetTickCount();
     } else {
         ret_event = RADIO_EVENT_RX_COMPLETE;
     }
@@ -2255,7 +2255,9 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
 
     // Are we switching to a new channel?
     if (idx != rfm22b_dev->channel_index) {
-        if (!rfm22_isCoordinator(rfm22b_dev) && rfm22b_dev->connected_timeout == 0) {
+        if (!rfm22_isCoordinator(rfm22b_dev) &&
+                pios_rfm22_time_difference_ms(rfm22b_dev->last_conntact, xTaskGetTickCount()) >=
+                    CONNECTED_TIMEOUT) {
 
             // Set the link state to disconnected.
             if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
@@ -2271,9 +2273,6 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
         }
 
         rfm22b_dev->channel_index = idx;
-        if (rfm22b_dev->connected_timeout > 0)
-            rfm22b_dev->connected_timeout--;
-
     }
 
     return rfm22b_dev->channels[idx];

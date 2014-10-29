@@ -10705,19 +10705,24 @@ Voulez-vous toujours continuer ?</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+1140"/>
+        <location line="+1141"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
         <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1139"/>
+        <location line="-1140"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+228"/>
+        <location line="+217"/>
+        <source>Next</source>
+        <translation>Suivant</translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>Welcome to the inputs configuration wizard.
 
 Please follow the instructions on the screen and only move your controls when asked to.
@@ -10899,11 +10904,16 @@ Bougez le manche %1.</translation>
     </message>
     <message>
         <location line="+7"/>
+        <source>Next/Skip</source>
+        <translation type="unfinished">Suivant / Sauter</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source> Alternatively, click Next to skip this channel.</source>
         <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+651"/>
+        <location line="+650"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
         <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
     </message>

@@ -10498,19 +10498,24 @@ Voulez-vous toujours continuer ?</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+1140"/>
+        <location line="+1141"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
         <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
         <translation>Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
-        <location line="-1139"/>
+        <location line="-1140"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
         <translatorcomment>redirigé vers / sur ?</translatorcomment>
         <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
-        <location line="+228"/>
+        <location line="+217"/>
+        <source>Next</source>
+        <translation>Suivant</translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>Welcome to the inputs configuration wizard.
 
 Please follow the instructions on the screen and only move your controls when asked to.
@@ -10692,11 +10697,16 @@ Bougez le manche %1.</translation>
     </message>
     <message>
         <location line="+7"/>
+        <source>Next/Skip</source>
+        <translation>Suivant / Sauter</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source> Alternatively, click Next to skip this channel.</source>
         <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
-        <location line="+651"/>
+        <location line="+650"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
         <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
     </message>
@@ -10988,7 +10998,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
 <context>
     <name>SetupWizard</name>
     <message>
-        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+64"/>
+        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+65"/>
         <source>OpenPilot Setup Wizard</source>
         <translation>Assistant Configuration OpenPilot</translation>
     </message>
@@ -15069,7 +15079,7 @@ p, li { white-space: pre-wrap; }
         <translation>Non Supporté</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+74"/>
         <source>Export settings</source>
         <translation>Exporter réglages</translation>
     </message>
@@ -15241,25 +15251,25 @@ A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+136"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="-87"/>
-        <location line="+46"/>
-        <location line="+26"/>
+        <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+49"/>
+        <location line="+49"/>
+        <location line="+31"/>
         <location line="+9"/>
+        <location line="+10"/>
         <source>%1 µs</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-18"/>
+        <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.ui"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.ui"/>
+        <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot ESC Calibration Procedure&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;As you have selected to use a MultiRotor and Fast / Flashed ESCs, we need to calibrate the endpoints of these ESCs so they can see the full throttle range sent from the flight controller. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the wizard will tell you to connect the battery to your aircraft, before doing so you absolutely &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#f30f1d;&quot;&gt;must remove the propellers from all motors&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The steps to perform this calibration are as follows:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;1. Confirm all safety questions&lt;br/&gt;2. Press the Start button when it becomes enabled&lt;br/&gt;3. Connect the battery to your airframe&lt;br/&gt;4. Wait for ESC calibration beep(s)&lt;br/&gt;5. Press the Stop button&lt;br/&gt;6. Wait for ESC confirmation beep(s)&lt;br/&gt;7. Disconnect battery&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Procédure OpenPilot Calibration ESC&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Comme vous avez choisi d&apos;utiliser un MultiRotor avec des ESC rapides / ESC flashés, il faut à présent définir les limites maxi/mini de ces ESC pour qu&apos;ils puissent interpréter correctement les signaux de gaz envoyés par la carte contrôleur. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette partie de l&apos;assistant vous demandera de connecter la batterie sur votre appareil mais avant de le faire vous devez &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#f30f1d;&quot;&gt;impérativement retirer toutes les hélices de tous les moteurs&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les étapes pour effectuer cet étalonnage sont les suivantes :&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;1. Valider les questions de sécurité,&lt;br/&gt;2. Appuyer sur le bouton Démarrer lorsqu&apos;il devient actif,&lt;br/&gt;3. Connecter la batterie sur l&apos;appareil,&lt;br/&gt;4. Attendre le(s) bip(s) de calibration de l&apos;ESC,&lt;br/&gt;5. Appuyer sur le bouton Arrêter,&lt;br/&gt;6. Attendre le(s) bip(s) de confirmation de l&apos;ESC,&lt;br/&gt;7. Débrancher la batterie.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -15280,9 +15290,8 @@ mais uniquement sur port USB</translation>
         <translation>Je confirme avoir lu et compris les instructions ci-dessus en totalité</translation>
     </message>
     <message>
-        <location/>
         <source>ESC Output Level</source>
-        <translation>Niveau Sortie ESC</translation>
+        <translation type="vanished">Niveau Sortie ESC</translation>
     </message>
     <message>
         <location/>

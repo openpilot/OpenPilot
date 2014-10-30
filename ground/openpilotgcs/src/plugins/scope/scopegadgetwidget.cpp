@@ -64,10 +64,11 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent),
     m_plotLegend(NULL)
 {
     setMouseTracking(true);
-    //plotLayout()->setCanvasMargin(20, QwtPlot::yRight);
+
     QwtPlotCanvas * plotCanvas = dynamic_cast<QwtPlotCanvas *>(canvas());
     if (plotCanvas) {
-        plotCanvas->setFrameStyle(QFrame::NoFrame);
+        plotCanvas->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+        plotCanvas->setBorderRadius(8);
     }
 
     axisWidget(QwtPlot::yLeft)->setMargin(2);
@@ -250,9 +251,7 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 
     // Add grid lines
     QwtPlotGrid *grid = new QwtPlotGrid;
-    grid->setMajorPen(QPen(Qt::gray, 0, Qt::DashLine));
-    grid->setMinorPen(QPen(Qt::lightGray, 0, Qt::DotLine));
-    grid->setPen(QPen(Qt::darkGray, 1, Qt::DotLine));
+    grid->setPen(Qt::darkGray, 1, Qt::DotLine);
     grid->attach(this);
 
     // Only start the timer if we are already connected

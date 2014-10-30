@@ -31,6 +31,7 @@
 #include "plotdata.h"
 
 #include "qwt/src/qwt.h"
+#include "qwt/src/qwt_legend.h"
 #include "qwt/src/qwt_plot.h"
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_scale_draw.h"
@@ -129,7 +130,7 @@ protected:
 private slots:
     void uavObjectReceived(UAVObject *);
     void replotNewData();
-    void showCurve(QwtPlotItem *item, bool on);
+    void showCurve(QVariant itemInfo, bool visible, int index);
     void startPlotting();
     void stopPlotting();
     void csvLoggingConnect();
@@ -166,7 +167,8 @@ private:
     QString m_csvLoggingBuffer;
     QFile m_csvLoggingFile;
 
-    QMutex mutex;
+    QMutex m_mutex;
+    QwtLegend* m_plotLegend;
 
     int csvLoggingInsertHeader();
     int csvLoggingAddData();

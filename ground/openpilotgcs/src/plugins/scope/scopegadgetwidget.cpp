@@ -35,8 +35,6 @@
 #include "coreplugin/connectionmanager.h"
 
 #include "qwt/src/qwt_plot_curve.h"
-#include "qwt/src/qwt_legend.h"
-#include "qwt/src/qwt_legend_item.h"
 #include "qwt/src/qwt_plot_grid.h"
 
 #include <iostream>
@@ -51,10 +49,29 @@
 #include <QMutexLocker>
 #include <QWheelEvent>
 
-ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
+#include <qwt/src/qwt_legend_label.h>
+#include <qwt/src/qwt_plot_canvas.h>
+#include <qwt/src/qwt_plot_layout.h>
+
+ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent),
+    m_csvLoggingStarted(false), m_csvLoggingEnabled(false),
+    m_csvLoggingHeaderSaved(false), m_csvLoggingDataSaved(false),
+    m_csvLoggingNameSet(false), m_csvLoggingDataValid(false),
+    m_csvLoggingDataUpdated(false), m_csvLoggingConnected(false),
+    m_csvLoggingNewFileOnConnect(false),
+    m_csvLoggingStartTime(QDateTime::currentDateTime()),
+    m_csvLoggingPath("./csvlogging/"),
+    m_plotLegend(NULL)
 {
     setMouseTracking(true);
-    // canvas()->setMouseTracking(true);
+    //plotLayout()->setCanvasMargin(20, QwtPlot::yRight);
+    QwtPlotCanvas * plotCanvas = dynamic_cast<QwtPlotCanvas *>(canvas());
+    if (plotCanvas) {
+        plotCanvas->setFrameStyle(QFrame::NoFrame);
+    }
+
+    axisWidget(QwtPlot::yLeft)->setMargin(2);
+    axisWidget(QwtPlot::xBottom)->setMargin(2);
 
     // Setup the timer that replots data
     replotTimer = new QTimer(this);
@@ -67,17 +84,6 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     connect(cm, SIGNAL(deviceAboutToDisconnect()), this, SLOT(stopPlotting()));
     connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(startPlotting()));
 
-    m_csvLoggingStarted     = 0;
-    m_csvLoggingEnabled     = 0;
-    m_csvLoggingHeaderSaved = 0;
-    m_csvLoggingDataSaved   = 0;
-    m_csvLoggingDataUpdated = 0;
-    m_csvLoggingNameSet     = 0;
-    m_csvLoggingConnected   = 0;
-    m_csvLoggingNewFileOnConnect = 0;
-    m_csvLoggingPath = QString("./csvlogging/");
-    m_csvLoggingStartTime   = QDateTime::currentDateTime();
-
     // Listen to autopilot connection events
     connect(cm, SIGNAL(deviceAboutToDisconnect()), this, SLOT(csvLoggingDisconnect()));
     connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(csvLoggingConnect()));
@@ -87,7 +93,6 @@ ScopeGadgetWidget::~ScopeGadgetWidget()
 {
     if (replotTimer) {
         replotTimer->stop();
-
         delete replotTimer;
         replotTimer = NULL;
     }
@@ -116,13 +121,13 @@ void ScopeGadgetWidget::mouseReleaseEvent(QMouseEvent *e)
 void ScopeGadgetWidget::mouseDoubleClickEvent(QMouseEvent *e)
 {
     // On double-click, toggle legend
-    mutex.lock();
+    m_mutex.lock();
     if (legend()) {
         deleteLegend();
     } else {
         addLegend();
     }
-    mutex.unlock();
+    m_mutex.unlock();
 
     // On double-click, reset plot zoom
     setAxisAutoScale(QwtPlot::yLeft, true);
@@ -152,7 +157,7 @@ void ScopeGadgetWidget::wheelEvent(QWheelEvent *e)
 
         double zoomScale = 1.1; // THIS IS AN ARBITRARY CONSTANT, AND PERHAPS SHOULD BE IN A DEFINE INSTEAD OF BURIED HERE
 
-        mutex.lock(); // DOES THIS mutex.lock NEED TO BE HERE? I DON'T KNOW, I JUST COPIED IT FROM THE ABOVE CODE
+        m_mutex.lock(); // DOES THIS mutex.lock NEED TO BE HERE? I DON'T KNOW, I JUST COPIED IT FROM THE ABOVE CODE
         // Set the scale
         if (e->delta() < 0) {
             setAxisScale(QwtPlot::yLeft,
@@ -163,7 +168,7 @@ void ScopeGadgetWidget::wheelEvent(QWheelEvent *e)
                          (yInterval.minValue() - zoomLine) / zoomScale + zoomLine,
                          (yInterval.maxValue() - zoomLine) / zoomScale + zoomLine);
         }
-        mutex.unlock();
+        m_mutex.unlock();
     }
     QwtPlot::wheelEvent(e);
 }
@@ -193,9 +198,9 @@ void ScopeGadgetWidget::stopPlotting()
 
 void ScopeGadgetWidget::deleteLegend()
 {
-    if (legend()) {
-        disconnect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), this, 0);
+    if (m_plotLegend) {
         insertLegend(NULL, QwtPlot::TopLegend);
+        m_plotLegend = NULL;
     }
 }
 
@@ -206,32 +211,30 @@ void ScopeGadgetWidget::addLegend()
     }
 
     // Show a legend at the top
-    QwtLegend *legend = new QwtLegend();
-    legend->setItemMode(QwtLegend::CheckableItem);
-    legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
-    legend->setToolTip(tr("Click legend to show/hide scope trace.\nDouble click legend or plot to show/hide legend."));
+    m_plotLegend = new QwtLegend(this);
+    m_plotLegend->setDefaultItemMode(QwtLegendData::Checkable);
+    m_plotLegend->setFrameStyle(QFrame::NoFrame);
+    m_plotLegend->setToolTip(tr("Click legend to show/hide scope trace.\nDouble click legend or plot to show/hide legend."));
 
     // set colors
-    QPalette pal = legend->palette();
-    pal.setColor(legend->backgroundRole(), QColor(100, 100, 100));
+    QPalette pal = m_plotLegend->palette();
+    pal.setColor(m_plotLegend->backgroundRole(), QColor(100, 100, 100));
     pal.setColor(QPalette::Text, QColor(0, 0, 0));
-    legend->setPalette(pal);
+    m_plotLegend->setPalette(pal);
 
-    insertLegend(legend, QwtPlot::TopLegend);
+    insertLegend(m_plotLegend, QwtPlot::TopLegend);
 
     // Update the checked/unchecked state of the legend items
     // -> this is necessary when hiding a legend where some plots are
     // not visible, and then un-hiding it.
-    foreach(QwtPlotItem * item, this->itemList()) {
-        bool on    = item->isVisible();
-        QWidget *w = legend->find(item);
-
-        if (w && w->inherits("QwtLegendItem")) {
-            ((QwtLegendItem *)w)->setChecked(!on);
+    foreach(QwtPlotItem * plotItem, itemList()) {
+        QWidget *legendWidget = m_plotLegend->legendWidget(QwtPlot::itemToInfo(plotItem));
+        if (legendWidget && legendWidget->inherits("QwtLegendLabel")) {
+            ((QwtLegendLabel *)legendWidget)->setChecked(!plotItem->isVisible());
         }
     }
 
-    connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), this, SLOT(showCurve(QwtPlotItem *, bool)));
+    connect(m_plotLegend, SIGNAL(checked(QVariant, bool, int)), this, SLOT(showCurve(QVariant,bool,int)));
 }
 
 void ScopeGadgetWidget::preparePlot(PlotType plotType)
@@ -247,8 +250,8 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 
     // Add grid lines
     QwtPlotGrid *grid = new QwtPlotGrid;
-    grid->setMajPen(QPen(Qt::gray, 0, Qt::DashLine));
-    grid->setMinPen(QPen(Qt::lightGray, 0, Qt::DotLine));
+    grid->setMajorPen(QPen(Qt::gray, 0, Qt::DashLine));
+    grid->setMinorPen(QPen(Qt::lightGray, 0, Qt::DotLine));
     grid->setPen(QPen(Qt::darkGray, 1, Qt::DotLine));
     grid->attach(this);
 
@@ -263,19 +266,21 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     }
 }
 
-void ScopeGadgetWidget::showCurve(QwtPlotItem *item, bool on)
+void ScopeGadgetWidget::showCurve(QVariant itemInfo, bool visible, int index)
 {
-    item->setVisible(!on);
-    if (legend()) {
-        QWidget *w = legend()->find(item);
-        if (w && w->inherits("QwtLegendItem")) {
-            ((QwtLegendItem *)w)->setChecked(on);
+    Q_UNUSED(index);
+    QwtPlotItem *item = infoToItem(itemInfo);
+    item->setVisible(!visible);
+    if (m_plotLegend) {
+        QWidget *legendItem = legend()->find((WId)item);
+        if (legendItem && legendItem->inherits("QwtLegendLabel")) {
+            ((QwtLegendLabel *)legendItem)->setChecked(visible);
         }
     }
 
-    mutex.lock();
+    m_mutex.lock();
     replot();
-    mutex.unlock();
+    m_mutex.unlock();
 }
 
 void ScopeGadgetWidget::setupSequentialPlot()
@@ -286,11 +291,6 @@ void ScopeGadgetWidget::setupSequentialPlot()
     setAxisScale(QwtPlot::xBottom, 0, m_plotDataSize);
     setAxisLabelRotation(QwtPlot::xBottom, 0.0);
     setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
-
-    QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
-
-    // reduce the gap between the scope canvas and the axis scale
-    scaleWidget->setMargin(0);
 
     // reduce the axis font size
     QFont fnt(axisFont(QwtPlot::xBottom));
@@ -308,11 +308,6 @@ void ScopeGadgetWidget::setupChronoPlot()
     setAxisScale(QwtPlot::xBottom, NOW - m_plotDataSize / 1000, NOW);
     setAxisLabelRotation(QwtPlot::xBottom, 0.0);
     setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
-
-    QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
-
-    // reduce the gap between the scope canvas and the axis scale
-    scaleWidget->setMargin(0);
 
     // reduce the axis font size
     QFont fnt(axisFont(QwtPlot::xBottom));
@@ -382,9 +377,9 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
         connect(object, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(uavObjectReceived(UAVObject *)));
     }
 
-    mutex.lock();
+    m_mutex.lock();
     replot();
-    mutex.unlock();
+    m_mutex.unlock();
 }
 
 void ScopeGadgetWidget::uavObjectReceived(UAVObject *obj)
@@ -403,7 +398,7 @@ void ScopeGadgetWidget::replotNewData()
         return;
     }
 
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_mutex);
     foreach(PlotData * plotData, m_curvesData.values()) {
         plotData->removeStaleData();
         plotData->updatePlotData();

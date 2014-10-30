@@ -29,11 +29,18 @@
 #include "scopegadgetconfiguration.h"
 #include "scopegadgetwidget.h"
 
+#include <QVBoxLayout>
 #include <qcolor.h>
 
 ScopeGadget::ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent) :
     IUAVGadget(classId, parent), m_widget(widget)
-{}
+{
+    m_wrapper = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->setContentsMargins(4, 4, 4, 4);
+    layout->addWidget(m_widget);
+    m_wrapper->setLayout(layout);
+}
 
 void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {

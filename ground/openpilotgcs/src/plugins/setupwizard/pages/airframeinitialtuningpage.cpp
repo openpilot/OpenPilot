@@ -173,7 +173,7 @@ void AirframeInitialTuningPage::loadValidFiles()
             QJsonParseError error;
             QJsonDocument templateDoc = QJsonDocument::fromJson(jsonData, &error);
             if (error.error == QJsonParseError::NoError) {
-                QJsonObject json    = templateDoc.object();
+                QJsonObject json = templateDoc.object();
                 if (json["type"].toInt() == getWizard()->getVehicleType() &&
                     json["subtype"].toInt() == getWizard()->getVehicleSubType()) {
                     QString uuid = json["uuid"].toString();

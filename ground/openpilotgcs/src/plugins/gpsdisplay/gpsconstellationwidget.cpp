@@ -62,6 +62,8 @@ GpsConstellationWidget::GpsConstellationWidget(QWidget *parent) : QGraphicsView(
     scene->setSceneRect(world->boundingRect());
     setScene(scene);
 
+    QFontDatabase::addApplicationFont(":/gpsgadget/font/digital-7_mono.ttf");
+
     // Now create 'maxSatellites' satellite icons which we will move around on the map:
     for (int i = 0; i < MAX_SATTELITES; i++) {
         satellites[i][0] = 0;
@@ -76,7 +78,7 @@ GpsConstellationWidget::GpsConstellationWidget(QWidget *parent) : QGraphicsView(
 
         satTexts[i] = new QGraphicsSimpleTextItem("##", satIcons[i]);
         satTexts[i]->setBrush(QColor("Black"));
-        satTexts[i]->setFont(QFont("Courier"));
+        satTexts[i]->setFont(QFont("Digital-7"));
     }
 }
 
@@ -126,10 +128,20 @@ void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int az
         opd += QPointF(-satIcons[index]->boundingRect().center().x(),
                        -satIcons[index]->boundingRect().center().y());
         satIcons[index]->setTransform(QTransform::fromTranslate(opd.x(), opd.y()), false);
-        if (snr) {
-            satIcons[index]->setElementId("satellite");
+
+        // Show normal GPS or SBAS (120 - 158 range)
+        if (prn > 119 && prn < 159) {
+            if (snr) {
+                satIcons[index]->setElementId("satellite-sbas");
+            } else {
+                satIcons[index]->setElementId("sat-sbas-notSeen");
+            }
         } else {
-            satIcons[index]->setElementId("sat-notSeen");
+            if (snr) {
+                satIcons[index]->setElementId("satellite");
+            } else {
+                satIcons[index]->setElementId("sat-notSeen");
+            }
         }
         satIcons[index]->show();
 
@@ -141,8 +153,10 @@ void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int az
         satTexts[index]->setText(prnString);
         QRectF textRect = satTexts[index]->boundingRect();
 
+        // Fixed scale, looks better for numbers 01,11,126...
+        qreal scale     = 1.40;
+
         QTransform matrix;
-        qreal scale     = 0.70 * (iconRect.width() / textRect.width());
         matrix.translate(iconRect.width() / 2, iconRect.height() / 2);
         matrix.scale(scale, scale);
         matrix.translate(-textRect.width() / 2, -textRect.height() / 2);
@@ -160,19 +174,18 @@ QPointF GpsConstellationWidget::polarToCoord(int elevation, int azimuth)
 {
     double x;
     double y;
-    double rad_elevation;
+    double vect_elevation;
     double rad_azimuth;
 
+    // Vector modulus scaled to circle and angle (azimut)
+    vect_elevation = 0.79 - (elevation / 90.00f) * 0.79;
+    rad_azimuth    = M_PI * azimuth / 180;
 
-    rad_elevation = M_PI * elevation / 180;
-    rad_azimuth   = M_PI * azimuth / 180;
+    // Cartesian coordinates
+    x = ((world->boundingRect().width() * vect_elevation) / 2) * sin(rad_azimuth);
+    y = ((world->boundingRect().height() * vect_elevation) / 2) * -cos(rad_azimuth);
 
-    x = cos(rad_elevation) * sin(rad_azimuth);
-    y = -cos(rad_elevation) * cos(rad_azimuth);
-
-    x = world->boundingRect().width() / 2 * x;
-    y = world->boundingRect().height() / 2 * y;
-
+    // Start from center
     x = (world->boundingRect().width() / 2) + x;
     y = (world->boundingRect().height() / 2) + y;
 

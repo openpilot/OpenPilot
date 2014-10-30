@@ -160,8 +160,8 @@ void EscCalibrationPage::stopButtonClicked()
 void EscCalibrationPage::securityCheckBoxesToggled()
 {
     ui->startButton->setEnabled(ui->securityCheckBox1->isChecked() &&
-                                    ui->securityCheckBox2->isChecked() &&
-                                    ui->securityCheckBox3->isChecked());
+                                ui->securityCheckBox2->isChecked() &&
+                                ui->securityCheckBox3->isChecked());
 }
 
 

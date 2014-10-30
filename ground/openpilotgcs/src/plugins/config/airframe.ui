@@ -90,6 +90,29 @@
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Minimum</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="vehicleSetupWizardButton">
+       <property name="text">
+        <string>Vehicle Setup Wizard...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
@@ -389,8 +412,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>838</width>
-               <height>445</height>
+               <width>293</width>
+               <height>300</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -925,6 +948,24 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>nameEdit</tabstop>
+  <tabstop>vehicleSetupWizardButton</tabstop>
+  <tabstop>airframesScrollArea</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>decelTime</tabstop>
+  <tabstop>accelTime</tabstop>
+  <tabstop>feedForwardSlider</tabstop>
+  <tabstop>maxAccelSlider</tabstop>
+  <tabstop>ffTestBox1</tabstop>
+  <tabstop>ffTestBox2</tabstop>
+  <tabstop>ffTestBox3</tabstop>
+  <tabstop>textBrowser</tabstop>
+  <tabstop>airframeHelp</tabstop>
+  <tabstop>saveAircraftToRAM</tabstop>
+  <tabstop>saveAircraftToSD</tabstop>
+  <tabstop>tabWidget</tabstop>
+ </tabstops>
  <resources>
   <include location="../coreplugin/core.qrc"/>
  </resources>

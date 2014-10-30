@@ -31,13 +31,12 @@
 #include "vehicleconfigurationhelper.h"
 #include "manualcontrolsettings.h"
 
+bool OutputCalibrationUtil::c_prepared = false;
+ActuatorCommand::Metadata OutputCalibrationUtil::c_savedActuatorCommandMetaData;
+
 OutputCalibrationUtil::OutputCalibrationUtil(QObject *parent) :
     QObject(parent), m_outputChannel(-1), m_safeValue(1000)
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-
-    m_uavObjectManager = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(m_uavObjectManager);
 }
 
 OutputCalibrationUtil::~OutputCalibrationUtil()
@@ -45,22 +44,17 @@ OutputCalibrationUtil::~OutputCalibrationUtil()
     stopChannelOutput();
 }
 
-void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValue)
+void OutputCalibrationUtil::startOutputCalibration()
 {
-    if (m_outputChannel < 0 && channel < ActuatorCommand::CHANNEL_NUMELEM) {
-        // Start output...
-        m_outputChannel = channel;
-        m_safeValue     = safeValue;
+    if (!c_prepared) {
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
+        Q_ASSERT(uavObjectManager);
 
-        qDebug() << "Starting output for channel " << m_outputChannel + 1 << "...";
-
-        ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
+        ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(uavObjectManager);
         Q_ASSERT(actuatorCommand);
         UAVObject::Metadata metaData     = actuatorCommand->getMetadata();
-        m_savedActuatorCommandMetadata = metaData;
-
-        // Store current data for later restore
-        m_savedActuatorCommandData     = actuatorCommand->getData();
+        c_savedActuatorCommandMetaData = metaData;
 
         // Enable actuator control from GCS...
         // Store current metadata for later restore
@@ -73,41 +67,77 @@ void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValu
         // Apply changes
         actuatorCommand->setMetadata(metaData);
         actuatorCommand->updated();
+        c_prepared = true;
+        qDebug() << "OutputCalibrationUtil started.";
+    }
+}
 
-        qDebug() << "Output for channel " << m_outputChannel + 1 << " started.";
+void OutputCalibrationUtil::stopOutputCalibration()
+{
+    if (c_prepared) {
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
+        Q_ASSERT(uavObjectManager);
+
+        // Restore metadata to what it was before
+        ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(uavObjectManager);
+        Q_ASSERT(actuatorCommand);
+        actuatorCommand->setMetadata(c_savedActuatorCommandMetaData);
+        actuatorCommand->updated();
+        c_prepared = false;
+        qDebug() << "OutputCalibrationUtil stopped.";
+    }
+}
+
+void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValue)
+{
+    if (c_prepared) {
+        if (m_outputChannel < 0 && channel < ActuatorCommand::CHANNEL_NUMELEM) {
+            // Start output...
+            m_outputChannel = channel;
+            m_safeValue     = safeValue;
+            qDebug() << "Output for channel " << m_outputChannel + 1 << " started.";
+        }
+    } else {
+        qDebug() << "OutputCalibrationUtil not started.";
     }
 }
 
 void OutputCalibrationUtil::stopChannelOutput()
 {
-    if (m_outputChannel >= 0) {
-        qDebug() << "Stopping output for channel " << m_outputChannel + 1 << "...";
-        // Stop output...
-        setChannelOutputValue(m_safeValue);
-        qDebug() << "Settings output for channel " << m_outputChannel + 1 << " to " << m_safeValue;
+    if (c_prepared) {
+        if (m_outputChannel >= 0) {
+            qDebug() << "Stopping output for channel " << m_outputChannel + 1 << "...";
+            // Stop output...
+            setChannelOutputValue(m_safeValue);
+            qDebug() << "Settings output for channel " << m_outputChannel + 1 << " to " << m_safeValue;
+            qDebug() << "Output for channel " << m_outputChannel + 1 << " stopped.";
 
-        // Restore metadata to what it was before
-        ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
-        Q_ASSERT(actuatorCommand);
-        // actuatorCommand->setData(m_savedActuatorCommandData);
-        actuatorCommand->setMetadata(m_savedActuatorCommandMetadata);
-        actuatorCommand->updated();
-
-        qDebug() << "Output for channel " << m_outputChannel + 1 << " stopped.";
-
-        m_outputChannel = -1;
+            m_outputChannel = -1;
+        }
+    } else {
+        qDebug() << "OutputCalibrationUtil not started.";
     }
 }
 
 void OutputCalibrationUtil::setChannelOutputValue(quint16 value)
 {
-    if (m_outputChannel >= 0) {
-        // Set output value
-        qDebug() << "Setting output value for channel " << m_outputChannel << " to " << value << ".";
-        ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
-        Q_ASSERT(actuatorCommand);
-        ActuatorCommand::DataFields data = actuatorCommand->getData();
-        data.Channel[m_outputChannel] = value;
-        actuatorCommand->setData(data);
+    if (c_prepared) {
+        if (m_outputChannel >= 0) {
+            // Set output value
+            qDebug() << "Setting output value for channel " << m_outputChannel << " to " << value << ".";
+            ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+            UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
+            Q_ASSERT(uavObjectManager);
+
+            ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(uavObjectManager);
+            Q_ASSERT(actuatorCommand);
+
+            ActuatorCommand::DataFields data = actuatorCommand->getData();
+            data.Channel[m_outputChannel] = value;
+            actuatorCommand->setData(data);
+        } else {
+            qDebug() << "OutputCalibrationUtil not started.";
+        }
     }
 }

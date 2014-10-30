@@ -274,7 +274,6 @@ void OutputCalibrationPage::setupVehicleHighlightedPart()
 void OutputCalibrationPage::setWizardPage()
 {
     qDebug() << "Wizard index: " << m_currentWizardIndex;
-    m_calibrationUtil->stopChannelOutput();
 
     QApplication::processEvents();
 
@@ -386,6 +385,7 @@ void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16
         if (checkAlarms()) {
             enableButtons(false);
             enableServoSliders(true);
+            OutputCalibrationUtil::startOutputCalibration();
             m_calibrationUtil->startChannelOutput(channel, safeValue);
             slider->setValue(value);
             m_calibrationUtil->setChannelOutputValue(value);
@@ -394,6 +394,7 @@ void OutputCalibrationPage::onStartButtonToggle(QAbstractButton *button, quint16
         }
     } else {
         m_calibrationUtil->stopChannelOutput();
+        OutputCalibrationUtil::stopOutputCalibration();
         enableServoSliders(false);
         enableButtons(true);
     }

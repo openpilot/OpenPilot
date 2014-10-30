@@ -102,6 +102,7 @@ void EscCalibrationPage::startButtonClicked()
         MixerSettings *mSettings = MixerSettings::GetInstance(uavoManager);
         Q_ASSERT(mSettings);
         QString mixerTypePattern = "Mixer%1Type";
+        OutputCalibrationUtil::startOutputCalibration();
         for (quint32 i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
             UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
             Q_ASSERT(field);
@@ -145,6 +146,7 @@ void EscCalibrationPage::stopButtonClicked()
             output->stopChannelOutput();
             delete output;
         }
+        OutputCalibrationUtil::stopOutputCalibration();
         ui->outputLevel->setText(QString(tr("%1 µs")).arg(OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
         ui->outputHigh->setEnabled(false);
         ui->outputLow->setEnabled(true);

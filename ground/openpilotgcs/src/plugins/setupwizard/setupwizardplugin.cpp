@@ -29,6 +29,7 @@
 #include <QDebug>
 #include <QtPlugin>
 #include <QStringList>
+#include <configgadgetfactory.h>
 #include <extensionsystem/pluginmanager.h>
 
 #include <coreplugin/coreconstants.h>
@@ -77,6 +78,10 @@ bool SetupWizardPlugin::initialize(const QStringList & args, QString *errMsg)
     ac->menu()->addSeparator();
     ac->appendGroup("Wizard");
     ac->addAction(cmd, "Wizard");
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    ConfigGadgetFactory *configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
+    connect(configGadgetFactory, SIGNAL(onOpenVehicleConfigurationWizard()), this, SLOT(showSetupWizard()));
 
     return true;
 }

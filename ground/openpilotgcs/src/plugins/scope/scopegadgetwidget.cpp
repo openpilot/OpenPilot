@@ -270,6 +270,7 @@ void ScopeGadgetWidget::showCurve(QVariant itemInfo, bool visible, int index)
     Q_UNUSED(index);
     QwtPlotItem *item = infoToItem(itemInfo);
     item->setVisible(!visible);
+    emit visibilityChanged(item);
     if (m_plotLegend) {
         QWidget *legendItem = legend()->find((WId)item);
         if (legendItem && legendItem->inherits("QwtLegendLabel")) {
@@ -364,7 +365,7 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
                                       meanSamples, mathFunction, m_plotDataSize,
                                       pen, antialiased);
     }
-
+    connect(this, SIGNAL(visibilityChanged(QwtPlotItem*)), plotData, SLOT(visibilityChanged(QwtPlotItem*)));
     plotData->attach(this);
 
     // Keep the curve details for later
@@ -384,7 +385,7 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
 void ScopeGadgetWidget::uavObjectReceived(UAVObject *obj)
 {
     foreach(PlotData * plotData, m_curvesData.values()) {
-        if (plotData->append(obj)) {
+        if (plotData->append(obj, this)) {
             m_csvLoggingDataUpdated = 1;
         }
     }

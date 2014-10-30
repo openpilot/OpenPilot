@@ -118,6 +118,8 @@ public:
     {
         m_csvLoggingPath = value;
     }
+signals:
+    void visibilityChanged(QwtPlotItem *item);
 
 protected:
     void mousePressEvent(QMouseEvent *e);

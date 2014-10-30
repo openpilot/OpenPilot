@@ -35,6 +35,7 @@
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_scale_draw.h"
 #include "qwt/src/qwt_scale_widget.h"
+#include <qwt/src/qwt_plot_marker.h>
 
 #include <QTimer>
 #include <QTime>
@@ -64,10 +65,10 @@ public:
     int element() const { return m_element; }
     QString elementName() const { return m_elementName; }
 
-    bool isVisible() const { return m_plotCurve->isVisible(); }
-    void setVisible(bool visible) { return m_plotCurve->setVisible(visible); }
+    bool isVisible() const;
+    void setVisible(bool visible);
 
-    virtual bool append(UAVObject *obj) = 0;
+    virtual bool append(UAVObject *obj, QwtPlot* plot) = 0;
     virtual PlotType plotType() const    = 0;
     virtual void removeStaleData() = 0;
 
@@ -77,6 +78,9 @@ public:
     double lastData() { return m_yDataEntries.last(); }
 
     void attach(QwtPlot *plot);
+
+public slots:
+    void visibilityChanged(QwtPlotItem *item);
 
 protected:
     // This is the power to which each value must be raised
@@ -96,12 +100,13 @@ protected:
     UAVObjectField *m_field;
     int m_element;
     QString m_elementName;
-
-    virtual void calcMathFunction(double currentValue);
-
-private:
     QwtPlotCurve *m_plotCurve;
     QString m_plotName;
+    QList<QwtPlotMarker *> m_enumMarkerList;
+    bool m_isVisible;
+    QPen m_pen;
+    bool isEnumPlot;
+    virtual void calcMathFunction(double currentValue);
 };
 
 /*!
@@ -118,7 +123,7 @@ public:
                    mathFunction, plotDataSize, pen, antialiased) {}
     ~SequentialPlotData() {}
 
-    bool append(UAVObject *obj);
+    bool append(UAVObject *obj, QwtPlot* plot);
     PlotType plotType() const { return SequentialPlot; }
     void removeStaleData() {}
 };
@@ -138,7 +143,7 @@ public:
     }
     ~ChronoPlotData() {}
 
-    bool append(UAVObject *obj);
+    bool append(UAVObject *obj, QwtPlot* plot);
     PlotType plotType() const { return ChronoPlot; }
     void removeStaleData();
 };

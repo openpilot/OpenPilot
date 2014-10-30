@@ -34,14 +34,15 @@ PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
                    int scaleOrderFactor, int meanSamples, QString mathFunction,
                    double plotDataSize, QPen pen, bool antialiased) :
     m_scalePower(scaleOrderFactor), m_meanSamples(meanSamples),
-    m_mathFunction(mathFunction), m_plotDataSize(plotDataSize),
-    m_object(object), m_field(field), m_element(element)
+    m_meanSum(0.0f), m_mathFunction(mathFunction), m_correctionSum(0.0f),
+    m_correctionCount(0), m_plotDataSize(plotDataSize),
+    m_object(object), m_field(field), m_element(element),
+    m_plotCurve(NULL), m_isVisible(true), m_pen(pen), isEnumPlot(false)
 {
     if (!m_field->getNumElements() > 1) {
         m_elementName = m_field->getElementNames().at(m_element);
     }
 
-    // Create the curve
     m_plotName.append(QString("%1.%2").arg(m_object->getName()).arg(m_field->getName()));
     if (!m_elementName.isEmpty()) {
         m_plotName.append(QString(".%1").arg(m_elementName));
@@ -53,24 +54,36 @@ PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
         m_plotName.append(QString(" (x10^%1 %2)").arg(m_scalePower).arg(m_field->getUnits()));
     }
 
+    // Create the curve
     m_plotCurve = new QwtPlotCurve(m_plotName);
 
     if (antialiased) {
         m_plotCurve->setRenderHint(QwtPlotCurve::RenderAntialiased);
     }
 
-    m_plotCurve->setPen(pen);
+    m_plotCurve->setPen(m_pen);
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
-
-    m_meanSum         = 0.0f;
-    m_correctionSum   = 0.0f;
-    m_correctionCount = 0;
+    isEnumPlot = m_field->getType() == UAVObjectField::ENUM;
 }
 
 PlotData::~PlotData()
 {
+    while (!m_enumMarkerList.isEmpty()) {
+        QwtPlotMarker *marker = m_enumMarkerList.takeFirst();
+        marker->detach();
+        delete marker;
+    }
     m_plotCurve->detach();
     delete m_plotCurve;
+}
+
+bool PlotData::isVisible() const {
+    return m_plotCurve->isVisible();
+}
+
+void PlotData::setVisible(bool visible) {
+    m_plotCurve->setVisible(visible);
+    visibilityChanged(m_plotCurve);
 }
 
 void PlotData::updatePlotData()
@@ -81,6 +94,15 @@ void PlotData::updatePlotData()
 void PlotData::attach(QwtPlot *plot)
 {
     m_plotCurve->attach(plot);
+}
+
+void PlotData::visibilityChanged(QwtPlotItem *item)
+{
+    if (m_plotCurve == item) {
+        foreach (QwtPlotMarker* marker, m_enumMarkerList) {
+            m_plotCurve->isVisible() ? marker->attach(m_plotCurve->plot()) : marker->detach();
+        }
+    }
 }
 
 void PlotData::calcMathFunction(double currentValue)
@@ -116,50 +138,85 @@ void PlotData::calcMathFunction(double currentValue)
     }
 }
 
-bool SequentialPlotData::append(UAVObject *obj)
+bool SequentialPlotData::append(UAVObject *obj, QwtPlot *plot)
 {
     if (m_object == obj && m_field) {
-        double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
+        if (!isEnumPlot) {
+            double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
 
-        // Perform scope math, if necessary
-        if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
-            calcMathFunction(currentValue);
-        } else {
-            m_yDataEntries.append(currentValue);
-        }
+            // Perform scope math, if necessary
+            if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
+                calcMathFunction(currentValue);
+            } else {
+                m_yDataEntries.append(currentValue);
+            }
 
-        if (m_yDataEntries.size() > m_plotDataSize) {
-            // If new data overflows the window, remove old data...
-            m_yDataEntries.pop_front();
+            if (m_yDataEntries.size() > m_plotDataSize) {
+                // If new data overflows the window, remove old data...
+                m_yDataEntries.pop_front();
+            } else {
+                // ...otherwise, add a new y point at position xData
+                m_xDataEntries.insert(m_xDataEntries.size(), m_xDataEntries.size());
+            }
+            return true;
         } else {
-            // ...otherwise, add a new y point at position xData
-            m_xDataEntries.insert(m_xDataEntries.size(), m_xDataEntries.size());
+
         }
-        return true;
     }
     return false;
 }
 
-bool ChronoPlotData::append(UAVObject *obj)
+bool ChronoPlotData::append(UAVObject *obj, QwtPlot *plot)
 {
     if (m_object == obj && m_field) {
         // Get the field of interest
         QDateTime NOW = QDateTime::currentDateTime(); // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
-        double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
 
-        // Perform scope math, if necessary
-        if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
-            calcMathFunction(currentValue);
+        double xValue = NOW.toTime_t() + NOW.time().msec() / 1000.0;
+        if (!isEnumPlot) {
+            double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
+
+            // Perform scope math, if necessary
+            if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
+                calcMathFunction(currentValue);
+            } else {
+                m_yDataEntries.append(currentValue);
+            }
+
+            m_xDataEntries.append(xValue);
+
+            // Remove stale data
+            removeStaleData();
+            return true;
         } else {
-            m_yDataEntries.append(currentValue);
+            // Enum markers
+            QString value = m_field->getValue(m_element).toString();
+
+            QwtPlotMarker *marker = m_enumMarkerList.isEmpty() ? NULL : m_enumMarkerList.last();
+            if (!marker || marker->title() != value) {
+                marker = new QwtPlotMarker(value);
+                QwtText label(QString(" %1 ").arg(value));
+                label.setColor(QColor(Qt::black));
+                label.setBorderPen(QPen(QColor(Qt::black), 1));
+                label.setBorderRadius(3);
+                QColor labelBackColor = QColor(Qt::white);
+                labelBackColor.setAlpha(160);
+                label.setBackgroundBrush(labelBackColor);
+                label.font().setPointSize(7);
+                marker->setLabel(label);
+                marker->setTitle(value);
+                marker->setLabelOrientation(Qt::Vertical);
+                marker->setLabelAlignment(Qt::AlignTop);
+                marker->setLineStyle(QwtPlotMarker::VLine);
+                marker->setXValue(xValue);
+                marker->setLinePen(QPen(m_pen.color(), 1, Qt::DashLine));
+                if (m_plotCurve->isVisible()) {
+                    marker->attach(plot);
+                }
+                m_enumMarkerList.append(marker);
+            }
+            removeStaleData();
         }
-
-        double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;
-        m_xDataEntries.append(valueX);
-
-        // Remove stale data
-        removeStaleData();
-        return true;
     }
     return false;
 }
@@ -170,5 +227,11 @@ void ChronoPlotData::removeStaleData()
            (m_xDataEntries.last() - m_xDataEntries.first()) > m_plotDataSize) {
             m_yDataEntries.pop_front();
             m_xDataEntries.pop_front();
+    }
+    while (!m_enumMarkerList.isEmpty() &&
+           (m_enumMarkerList.last()->xValue() - m_enumMarkerList.first()->xValue()) > m_plotDataSize) {
+        QwtPlotMarker* marker = m_enumMarkerList.takeFirst();
+        marker->detach();
+        delete marker;
     }
 }

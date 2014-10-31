@@ -33,7 +33,10 @@
 #include "openpilot.h"
 #include "gpspositionsensor.h"
 #include "gpsextendedstatus.h"
+#ifndef PIOS_GPS_MINIMAL
 #include "auxmagsensor.h"
+#endif
+
 #include "GPS.h"
 
 #define UBX_HW_VERSION_8 80000

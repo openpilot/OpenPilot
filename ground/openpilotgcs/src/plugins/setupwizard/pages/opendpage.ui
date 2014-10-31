@@ -30,7 +30,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:12pt; font-weight:600;&quot;&gt;Congratulations!&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:12pt; font-weight:600;&quot;&gt;Setup wizard is completed.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:10pt;&quot;&gt;This part of the setup procedure is now complete and you are one step away from completing the setup of your OpenPilot controller.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:10pt;&quot;&gt;To complete the setup please click the Radio Setup Wizard button below to close this wizard and go directly to the Radio Setup Wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:10pt;&quot;&gt;To complete the setup please click the button below to close this wizard and go directly to the Transmitter Setup Wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -53,14 +53,14 @@ p, li { white-space: pre-wrap; }
        <property name="icon">
         <iconset resource="../wizardResources.qrc">
          <normaloff>:/setupwizard/resources/bttn-txwizard-off.png</normaloff>
-         <normalon>:/setupwizard/resources/bttn-txwizard-on.png</normalon>
-         <activeoff>:/setupwizard/resources/bttn-txwizard-off.png</activeoff>
-         <activeon>:/setupwizard/resources/bttn-txwizard-off.png</activeon>:/setupwizard/resources/bttn-txwizard-off.png</iconset>
+         <normalon>:/setupwizard/resources/bttn-txwizard-off.png</normalon>
+         <activeoff>:/setupwizard/resources/bttn-txwizard-on.png</activeoff>
+         <activeon>:/setupwizard/resources/bttn-txwizard-on.png</activeon>:/setupwizard/resources/bttn-txwizard-off.png</iconset>
        </property>
        <property name="iconSize">
         <size>
-         <width>200</width>
-         <height>100</height>
+         <width>300</width>
+         <height>120</height>
         </size>
        </property>
        <property name="autoRaise">

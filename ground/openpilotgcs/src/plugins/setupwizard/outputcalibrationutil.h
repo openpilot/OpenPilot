@@ -29,10 +29,6 @@
 #define OUTPUTCALIBRATIONUTIL_H
 
 #include <QObject>
-#include <QList>
-#include "uavobject.h"
-#include "uavobjectmanager.h"
-#include "vehicleconfigurationsource.h"
 #include "actuatorcommand.h"
 
 
@@ -44,6 +40,8 @@ public:
 
     static void startOutputCalibration();
     static void stopOutputCalibration();
+    static ActuatorCommand * getActuatorCommandObject();
+
 public slots:
     void startChannelOutput(quint16 channel, quint16 safeValue);
     void stopChannelOutput();

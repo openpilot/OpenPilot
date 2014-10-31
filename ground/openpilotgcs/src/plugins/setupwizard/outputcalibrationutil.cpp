@@ -26,7 +26,8 @@
  */
 
 #include "outputcalibrationutil.h"
-#include "actuatorcommand.h"
+#include "uavobject.h"
+#include "uavobjectmanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
 #include "manualcontrolsettings.h"
@@ -44,15 +45,24 @@ OutputCalibrationUtil::~OutputCalibrationUtil()
     stopChannelOutput();
 }
 
+ActuatorCommand * OutputCalibrationUtil::getActuatorCommandObject()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+
+    UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(uavObjectManager);
+
+    ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(uavObjectManager);
+    Q_ASSERT(actuatorCommand);
+
+    return actuatorCommand;
+}
+
 void OutputCalibrationUtil::startOutputCalibration()
 {
     if (!c_prepared) {
-        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-        UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
-        Q_ASSERT(uavObjectManager);
-
-        ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(uavObjectManager);
-        Q_ASSERT(actuatorCommand);
+        ActuatorCommand *actuatorCommand = getActuatorCommandObject();
         UAVObject::Metadata metaData     = actuatorCommand->getMetadata();
         c_savedActuatorCommandMetaData = metaData;
 
@@ -75,13 +85,7 @@ void OutputCalibrationUtil::startOutputCalibration()
 void OutputCalibrationUtil::stopOutputCalibration()
 {
     if (c_prepared) {
-        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-        UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
-        Q_ASSERT(uavObjectManager);
-
-        // Restore metadata to what it was before
-        ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(uavObjectManager);
-        Q_ASSERT(actuatorCommand);
+        ActuatorCommand *actuatorCommand = getActuatorCommandObject();
         actuatorCommand->setMetadata(c_savedActuatorCommandMetaData);
         actuatorCommand->updated();
         c_prepared = false;
@@ -126,13 +130,7 @@ void OutputCalibrationUtil::setChannelOutputValue(quint16 value)
         if (m_outputChannel >= 0) {
             // Set output value
             qDebug() << "Setting output value for channel " << m_outputChannel << " to " << value << ".";
-            ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-            UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
-            Q_ASSERT(uavObjectManager);
-
-            ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(uavObjectManager);
-            Q_ASSERT(actuatorCommand);
-
+            ActuatorCommand *actuatorCommand = getActuatorCommandObject();
             ActuatorCommand::DataFields data = actuatorCommand->getData();
             data.Channel[m_outputChannel] = value;
             actuatorCommand->setData(data);

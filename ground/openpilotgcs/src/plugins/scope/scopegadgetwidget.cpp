@@ -363,10 +363,14 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
     } else if (m_plotType == ChronoPlot) {
         plotData = new ChronoPlotData(object, field, element, scaleFactor,
                                       meanSamples, mathFunction, m_plotDataSize,
-                                      pen, antialiased);
+                                      pen, antialiased);        
     }
     connect(this, SIGNAL(visibilityChanged(QwtPlotItem*)), plotData, SLOT(visibilityChanged(QwtPlotItem*)));
     plotData->attach(this);
+
+    if (plotData->wantsInitialData()) {
+        plotData->append(object);
+    }
 
     // Keep the curve details for later
     m_curvesData.insert(plotData->plotName(), plotData);
@@ -385,7 +389,7 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
 void ScopeGadgetWidget::uavObjectReceived(UAVObject *obj)
 {
     foreach(PlotData * plotData, m_curvesData.values()) {
-        if (plotData->append(obj, this)) {
+        if (plotData->append(obj)) {
             m_csvLoggingDataUpdated = 1;
         }
     }
@@ -564,7 +568,7 @@ int ScopeGadgetWidget::csvLoggingAddData()
     foreach(PlotData * plotData2, m_curvesData.values()) {
         ss << ", ";
         if (plotData2->hasData()) {
-            ss << QString().sprintf("%3.10g", plotData2->lastData());
+            ss << plotData2->lastDataAsString();
             m_csvLoggingDataValid = true;
         }
     }

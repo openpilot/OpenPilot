@@ -37,7 +37,7 @@ PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
     m_meanSum(0.0f), m_mathFunction(mathFunction), m_correctionSum(0.0f),
     m_correctionCount(0), m_plotDataSize(plotDataSize),
     m_object(object), m_field(field), m_element(element),
-    m_plotCurve(NULL), m_isVisible(true), m_pen(pen), isEnumPlot(false)
+    m_plotCurve(NULL), m_isVisible(true), m_pen(pen), m_isEnumPlot(false)
 {
     if (!m_field->getNumElements() > 1) {
         m_elementName = m_field->getElementNames().at(m_element);
@@ -63,7 +63,7 @@ PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
 
     m_plotCurve->setPen(m_pen);
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
-    isEnumPlot = m_field->getType() == UAVObjectField::ENUM;
+    m_isEnumPlot = m_field->getType() == UAVObjectField::ENUM;
 }
 
 PlotData::~PlotData()
@@ -89,6 +89,22 @@ void PlotData::setVisible(bool visible) {
 void PlotData::updatePlotData()
 {
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
+}
+
+bool PlotData::hasData() const {
+    if (!m_isEnumPlot) {
+        return !m_xDataEntries.isEmpty();
+    } else {
+        return !m_enumMarkerList.isEmpty();
+    }
+}
+
+QString PlotData::lastDataAsString() {
+    if (!m_isEnumPlot) {
+        return QString().sprintf("%3.10g", m_yDataEntries.last());
+    } else {
+        return m_enumMarkerList.last()->title().text();
+    }
 }
 
 void PlotData::attach(QwtPlot *plot)
@@ -138,10 +154,33 @@ void PlotData::calcMathFunction(double currentValue)
     }
 }
 
-bool SequentialPlotData::append(UAVObject *obj, QwtPlot *plot)
+QwtPlotMarker *PlotData::createMarker(QString value)
+{
+    QwtPlotMarker *marker = new QwtPlotMarker(value);
+    marker->setZ(10);
+    QwtText label(QString(" %1 ").arg(value));
+    label.setColor(QColor(Qt::black));
+    label.setBorderPen(QPen(m_pen.color(), 1));
+    label.setBorderRadius(2);
+    QColor labelBackColor = QColor(Qt::white);
+    labelBackColor.setAlpha(200);
+    label.setBackgroundBrush(labelBackColor);
+    QFont fnt(label.font());
+    fnt.setPointSize(8);
+    label.setFont(fnt);
+    marker->setLabel(label);
+    marker->setTitle(value);
+    marker->setLabelOrientation(Qt::Vertical);
+    marker->setLabelAlignment(Qt::AlignBottom);
+    marker->setLineStyle(QwtPlotMarker::VLine);
+    marker->setLinePen(QPen(m_pen.color(), 1, Qt::DashDotLine));
+    return marker;
+}
+
+bool SequentialPlotData::append(UAVObject *obj)
 {
     if (m_object == obj && m_field) {
-        if (!isEnumPlot) {
+        if (!m_isEnumPlot) {
             double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
 
             // Perform scope math, if necessary
@@ -160,20 +199,34 @@ bool SequentialPlotData::append(UAVObject *obj, QwtPlot *plot)
             }
             return true;
         } else {
+            // Enum markers
+            QString value = m_field->getValue(m_element).toString();
 
+            QwtPlotMarker *marker = m_enumMarkerList.isEmpty() ? NULL : m_enumMarkerList.last();
+            if (!marker || marker->title() != value) {
+
+                marker = createMarker(value);
+                marker->setXValue(m_enumMarkerList.size());
+
+                if (m_plotCurve->isVisible()) {
+                    marker->attach(m_plotCurve->plot());
+                }
+                m_enumMarkerList.append(marker);
+            }
         }
     }
     return false;
 }
 
-bool ChronoPlotData::append(UAVObject *obj, QwtPlot *plot)
+bool ChronoPlotData::append(UAVObject *obj)
 {
     if (m_object == obj && m_field) {
         // Get the field of interest
-        QDateTime NOW = QDateTime::currentDateTime(); // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
+        // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
+        QDateTime NOW = QDateTime::currentDateTime();
 
         double xValue = NOW.toTime_t() + NOW.time().msec() / 1000.0;
-        if (!isEnumPlot) {
+        if (!m_isEnumPlot) {
             double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
 
             // Perform scope math, if necessary
@@ -185,38 +238,24 @@ bool ChronoPlotData::append(UAVObject *obj, QwtPlot *plot)
 
             m_xDataEntries.append(xValue);
 
-            // Remove stale data
-            removeStaleData();
-            return true;
         } else {
             // Enum markers
             QString value = m_field->getValue(m_element).toString();
 
             QwtPlotMarker *marker = m_enumMarkerList.isEmpty() ? NULL : m_enumMarkerList.last();
             if (!marker || marker->title() != value) {
-                marker = new QwtPlotMarker(value);
-                QwtText label(QString(" %1 ").arg(value));
-                label.setColor(QColor(Qt::black));
-                label.setBorderPen(QPen(QColor(Qt::black), 1));
-                label.setBorderRadius(3);
-                QColor labelBackColor = QColor(Qt::white);
-                labelBackColor.setAlpha(160);
-                label.setBackgroundBrush(labelBackColor);
-                label.font().setPointSize(7);
-                marker->setLabel(label);
-                marker->setTitle(value);
-                marker->setLabelOrientation(Qt::Vertical);
-                marker->setLabelAlignment(Qt::AlignTop);
-                marker->setLineStyle(QwtPlotMarker::VLine);
+
+                marker = createMarker(value);
                 marker->setXValue(xValue);
-                marker->setLinePen(QPen(m_pen.color(), 1, Qt::DashLine));
+
                 if (m_plotCurve->isVisible()) {
-                    marker->attach(plot);
+                    marker->attach(m_plotCurve->plot());
                 }
                 m_enumMarkerList.append(marker);
             }
-            removeStaleData();
         }
+        removeStaleData();
+        return true;
     }
     return false;
 }

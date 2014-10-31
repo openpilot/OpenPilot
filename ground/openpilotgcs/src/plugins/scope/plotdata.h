@@ -68,14 +68,16 @@ public:
     bool isVisible() const;
     void setVisible(bool visible);
 
-    virtual bool append(UAVObject *obj, QwtPlot* plot) = 0;
+    bool wantsInitialData() { return m_isEnumPlot; }
+
+    virtual bool append(UAVObject *obj) = 0;
     virtual PlotType plotType() const    = 0;
     virtual void removeStaleData() = 0;
 
     void updatePlotData();
 
-    bool hasData() const { return !m_xDataEntries.isEmpty(); }
-    double lastData() { return m_yDataEntries.last(); }
+    bool hasData() const;
+    QString lastDataAsString();
 
     void attach(QwtPlot *plot);
 
@@ -105,8 +107,10 @@ protected:
     QList<QwtPlotMarker *> m_enumMarkerList;
     bool m_isVisible;
     QPen m_pen;
-    bool isEnumPlot;
+    bool m_isEnumPlot;
     virtual void calcMathFunction(double currentValue);
+    QwtPlotMarker *createMarker(QString value);
+
 };
 
 /*!
@@ -123,7 +127,7 @@ public:
                    mathFunction, plotDataSize, pen, antialiased) {}
     ~SequentialPlotData() {}
 
-    bool append(UAVObject *obj, QwtPlot* plot);
+    bool append(UAVObject *obj);
     PlotType plotType() const { return SequentialPlot; }
     void removeStaleData() {}
 };
@@ -143,7 +147,7 @@ public:
     }
     ~ChronoPlotData() {}
 
-    bool append(UAVObject *obj, QwtPlot* plot);
+    bool append(UAVObject *obj);
     PlotType plotType() const { return ChronoPlot; }
     void removeStaleData();
 };

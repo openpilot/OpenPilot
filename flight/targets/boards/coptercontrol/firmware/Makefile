@@ -118,8 +118,6 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
     SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
     SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
-    SRC += $(OPUAVSYNTHDIR)/relaytuningsettings.c
-    SRC += $(OPUAVSYNTHDIR)/relaytuning.c
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
     SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c

@@ -63,6 +63,7 @@ private:
     QString getTemplateKey(QJsonObject *templ);
     void updatePhoto(QJsonObject *templ);
     void updateDescription(QJsonObject *templ);
+    bool airframeIsCompatible(int vehicleType, int vehicleSubType);
 };
 
 Q_DECLARE_METATYPE(QJsonObject *)

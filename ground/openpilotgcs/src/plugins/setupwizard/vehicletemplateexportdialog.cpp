@@ -41,6 +41,7 @@
 #include "stabilizationsettingsbank1.h"
 #include "stabilizationsettingsbank2.h"
 #include "stabilizationsettingsbank3.h"
+#include "mixersettings.h"
 #include "ekfconfiguration.h"
 
 const char *VehicleTemplateExportDialog::EXPORT_BASE_NAME      = "../share/openpilotgcs/cloudconfig";
@@ -181,6 +182,7 @@ void VehicleTemplateExportDialog::accept()
     objectsToExport << StabilizationSettingsBank1::GetInstance(m_uavoManager);
     objectsToExport << StabilizationSettingsBank2::GetInstance(m_uavoManager);
     objectsToExport << StabilizationSettingsBank3::GetInstance(m_uavoManager);
+    objectsToExport << MixerSettings::GetInstance(m_uavoManager);
     objectsToExport << EKFConfiguration::GetInstance(m_uavoManager);
     m_uavoManager->toJson(exportObject, objectsToExport);
 

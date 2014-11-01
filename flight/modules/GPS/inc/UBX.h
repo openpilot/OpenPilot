@@ -373,7 +373,6 @@ typedef union {
 #if !defined(PIOS_GPS_MINIMAL)
     struct UBX_NAV_TIMEUTC nav_timeutc;
     struct UBX_NAV_SVINFO  nav_svinfo;
-#endif
     // Ack Class
     struct UBX_ACK_ACK     ack_ack;
     struct UBX_ACK_NAK     ack_nak;
@@ -381,6 +380,7 @@ typedef union {
     struct UBX_MON_VER     mon_ver;
     struct UBX_OP_SYSINFO  op_sysinfo;
     struct UBX_OP_MAG op_mag;
+#endif
 } UBXPayload;
 
 struct UBXHeader {

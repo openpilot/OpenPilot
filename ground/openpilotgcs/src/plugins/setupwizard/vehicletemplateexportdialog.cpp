@@ -152,6 +152,11 @@ QString VehicleTemplateExportDialog::setupVehicleType()
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_X;
         return tr("Multirotor - Hexacopter X");
 
+    case SystemSettings::AIRFRAMETYPE_HEXAH:
+        m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
+        m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_H;
+        return tr("Multirotor - Hexacopter H");
+
     case SystemSettings::AIRFRAMETYPE_HEXACOAX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y;

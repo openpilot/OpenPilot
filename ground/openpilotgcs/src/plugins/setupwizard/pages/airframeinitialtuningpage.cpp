@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       airframestabfixedwingpage.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @file       airframeinitialtuningpage.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup AirframeStabFixedwingPage
+ * @addtogroup AirframeInitialTuningPage
  * @{
  * @brief
  *****************************************************************************/

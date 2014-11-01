@@ -3792,14 +3792,6 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Flot Données GPS</translation>
     </message>
     <message>
-        <source>Displays the SNR for each detected sat.
-Satellite number (PRN) is displayed inside the green bar.
-Sat SNR is displayed above (in dBHz)</source>
-        <translation type="vanished">Affiche le SNR pour chaque satellite détecté.
-Le numéro du satellite (PRN) est affiché sur une barre verte.
-Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
-    </message>
-    <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Displays the SNR for each detected sat. Satellite number (PRN) is displayed inside the green bar (GPS) or orange bar (SBAS). Sat SNR is displayed above (in dBHz)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Affiche le SNR pour chaque satellite détecté. Le numéro du satellite (PRN) est affiché sur une barre verte (GPS) ou orange (SBAS). Le SNR du satellite est affiché au-dessus (en dBHz)</translation>
@@ -13504,24 +13496,6 @@ loaded in the current workspace.</source>
 Configuration n&apos;est pas chargé dans l&apos;espace de travail actuel.</translation>
     </message>
     <message>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Congratulations!&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Setup wizard is completed.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;This part of the setup procedure is now complete and you are one step away from completing the setup of your OpenPilot controller.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To complete the setup please click the Radio Setup Wizard button below to close this wizard and go directly to the Radio Setup Wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Félicitations !&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;L&apos;Assistant de Configuration est terminé.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Cette partie de la procédure de configuration est maintenant terminée et il vous reste une étape pour arriver au terme de la configuration de votre contrôleur OpenPilot.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Pour terminer la configuration veuillez appuyer sur le bouton ci-dessous pour fermer cet assistant et aller directement à l&apos;Assistant de Configuration Radio.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../../../src/plugins/setupwizard/pages/opendpage.ui"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -14923,11 +14897,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Put comments here that doesn&apos;t fit in the categories above</source>
-        <translation>Indiquez ici les commentaires  ne correspondant pas aux catégories ci-dessus</translation>
-    </message>
-    <message>
-        <location/>
         <source>Photo:</source>
         <translation>Photo :</translation>
     </message>
@@ -15058,6 +15027,11 @@ Please try again.</source>
         <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.ui"/>
         <source>Export</source>
         <translation>Exporter</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Put comments here that don&apos;t fit in the categories above</source>
+        <translation>Indiquez ici les commentaires  ne correspondant pas aux catégories ci-dessus</translation>
     </message>
 </context>
 <context>

@@ -989,8 +989,8 @@ void ConfigCcpmWidget::setMixer()
     QList<double> curve1 = m_aircraft->ThrottleCurve->getCurve();
     QList<double> curve2 = m_aircraft->PitchCurve->getCurve();
     for (i = 0; i < 5; i++) {
-        mixerSettingsData.ThrottleCurve1[i] = curve1.at(i);
-        mixerSettingsData.ThrottleCurve2[i] = curve2.at(i);
+        mixerSettingsData.ThrottleCurve1[i] = curve1.at(i) * 100;
+        mixerSettingsData.ThrottleCurve2[i] = curve2.at(i) * 100;
     }
 
     // mapping of collective input to curve 2...

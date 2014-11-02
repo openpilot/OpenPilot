@@ -8,7 +8,7 @@
         <field name="FeedForward" units="" type="float" elements="1" defaultvalue="0"/>
         <field name="AccelTime" units="ms" type="uint16" elements="1" defaultvalue="0"/>
         <field name="DecelTime" units="ms" type="uint16" elements="1" defaultvalue="0"/>
-	<field name="ThrottleCurve1" units="percent" type="float" elementnames="0,25,50,75,100" defaultvalue="0,0,0,0,0"/>
+	<field name="ThrottleCurve1" units="percent" type="int8" elementnames="0,25,50,75,100" defaultvalue="0,0,0,0,0"/>
         <field name="Curve2Source" units="" type="enum" elements="1" defaultvalue="Throttle">
 		<options>
 			<option>Throttle</option>
@@ -24,7 +24,7 @@
 		        <option>Accessory5</option>
 		</options>
 	</field>
-        <field name="ThrottleCurve2" units="percent" type="float" elementnames="0,25,50,75,100" defaultvalue="0,0.25,0.5,0.75,1"/>
+        <field name="ThrottleCurve2" units="percent" type="int8" elementnames="0,25,50,75,100" defaultvalue="0,25,50,75,100"/>
 	<field name="Mixer1Type" units="" type="enum" elements="1" defaultvalue="Disabled">
 		<options>
 			<option>Disabled</option>

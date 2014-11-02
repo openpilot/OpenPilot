@@ -298,7 +298,7 @@ void VehicleConfig::setThrottleCurve(UAVDataObject *mixer, MixerThrottleCurveEle
 
     if (field && (field->getNumElements() == (unsigned int)curve.length())) {
         for (int i = 0; i < curve.length(); i++) {
-            field->setValue(curve.at(i), i);
+            field->setValue(curve.at(i) * 100, i);
         }
     }
 }
@@ -322,7 +322,7 @@ void VehicleConfig::getThrottleCurve(UAVDataObject *mixer, MixerThrottleCurveEle
     if (field) {
         curve->clear();
         for (unsigned int i = 0; i < field->getNumElements(); i++) {
-            curve->append(field->getValue(i).toDouble());
+            curve->append(field->getValue(i).toDouble() * 0.01);
         }
     }
 }

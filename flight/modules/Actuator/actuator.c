@@ -85,7 +85,7 @@ static volatile bool mixer_settings_updated;
 static void actuatorTask(void *parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
 static void setFailsafe(const ActuatorSettingsData *actuatorSettings, const MixerSettingsData *mixerSettings);
-static float MixerCurve(const float throttle, const float *curve, uint8_t elements);
+static float MixerCurve(const float throttle, const int8_t *curve, uint8_t elements);
 static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSettingsData *actuatorSettings);
 static void actuator_update_rate_if_changed(const ActuatorSettingsData *actuatorSettings, bool force_update);
 static void MixerSettingsUpdatedCb(UAVObjEvent *ev);
@@ -528,7 +528,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
  * Interpolate a throttle curve. Throttle input should be in the range 0 to 1.
  * Output is in the range 0 to 1.
  */
-static float MixerCurve(const float throttle, const float *curve, uint8_t elements)
+static float MixerCurve(const float throttle, const int8_t *curve, uint8_t elements)
 {
     float scale = throttle * (float)(elements - 1);
     int idx1    = scale;
@@ -548,7 +548,7 @@ static float MixerCurve(const float throttle, const float *curve, uint8_t elemen
             idx1 = elements - 1;
         }
     }
-    return curve[idx1] * (1.0f - scale) + curve[idx2] * scale;
+    return (curve[idx1] / 100.0f) * (1.0f - scale) + (curve[idx2] / 100.0f) * scale;
 }
 
 

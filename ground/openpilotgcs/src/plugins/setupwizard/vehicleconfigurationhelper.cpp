@@ -739,12 +739,6 @@ void VehicleConfigurationHelper::applyManualControlDefaults()
     cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_PITCH]      = channelType;
     cData.ChannelGroups[ManualControlSettings::CHANNELGROUPS_FLIGHTMODE] = channelType;
 
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_THROTTLE]   = 1;
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_ROLL]       = 2;
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_YAW] = 3;
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_PITCH]      = 4;
-    cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_FLIGHTMODE] = 5;
-
     mcSettings->setData(cData);
     addModifiedObject(mcSettings, tr("Writing manual control defaults"));
 }

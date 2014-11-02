@@ -132,7 +132,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         ++index;
     }
 
-    addWidgetBinding("ManualControlSettings", "Deadband", ui->deadband, 0, 0.01f);
+    addWidgetBinding("ManualControlSettings", "Deadband", ui->deadband, 0, 1);
 
     connect(ui->configurationWizard, SIGNAL(clicked()), this, SLOT(goToWizard()));
     connect(ui->stackedWidget, SIGNAL(currentChanged(int)), this, SLOT(disableWizardButton(int)));

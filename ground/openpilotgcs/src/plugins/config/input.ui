@@ -224,13 +224,13 @@
                        <string>Stick deadband in percents of full range (0-10), zero to disable</string>
                       </property>
                       <property name="decimals">
-                       <number>1</number>
+                       <number>0</number>
                       </property>
                       <property name="maximum">
                        <double>10.000000000000000</double>
                       </property>
                       <property name="singleStep">
-                       <double>0.100000000000000</double>
+                       <double>1</double>
                       </property>
                      </widget>
                     </item>

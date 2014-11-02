@@ -77,7 +77,7 @@ static void receiverTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral);
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 static bool validInputRange(int16_t min, int16_t max, uint16_t value);
-static void applyDeadband(float *value, float deadband);
+static void applyDeadband(float *value, uint8_t deadband);
 
 #ifdef USE_INPUT_LPF
 static void applyLPF(float *value, ManualControlSettingsResponseTimeElem channel, ManualControlSettingsData *settings, float dT);
@@ -643,8 +643,9 @@ bool validInputRange(int16_t min, int16_t max, uint16_t value)
 /**
  * @brief Apply deadband to Roll/Pitch/Yaw channels
  */
-static void applyDeadband(float *value, float deadband)
+static void applyDeadband(float *value, uint8_t deadband)
 {
+    deadband *= 0.01f;
     if (fabsf(*value) < deadband) {
         *value = 0.0f;
     } else if (*value > 0.0f) {

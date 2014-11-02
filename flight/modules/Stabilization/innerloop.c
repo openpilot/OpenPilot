@@ -148,11 +148,11 @@ static pid_scaler create_pid_scaler(int axis)
         const pid_curve_scaler curve_scaler = {
             .x      = get_pid_scale_source_value(),
             .points = {
-                { 0.00f, stabSettings.stabBank.ThrustPIDScaleCurve[0] },
-                { 0.25f, stabSettings.stabBank.ThrustPIDScaleCurve[1] },
-                { 0.50f, stabSettings.stabBank.ThrustPIDScaleCurve[2] },
-                { 0.75f, stabSettings.stabBank.ThrustPIDScaleCurve[3] },
-                { 1.00f, stabSettings.stabBank.ThrustPIDScaleCurve[4] }
+                { 0.00f, stabSettings.stabBank.ThrustPIDScaleCurve[0] * 0.01f },
+                { 0.25f, stabSettings.stabBank.ThrustPIDScaleCurve[1] * 0.01f },
+                { 0.50f, stabSettings.stabBank.ThrustPIDScaleCurve[2] * 0.01f },
+                { 0.75f, stabSettings.stabBank.ThrustPIDScaleCurve[3] * 0.01f },
+                { 1.00f, stabSettings.stabBank.ThrustPIDScaleCurve[4] * 0.01f }
             }
         };
 

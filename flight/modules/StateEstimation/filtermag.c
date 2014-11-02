@@ -159,7 +159,7 @@ static filterResult filter(stateFilter *self, stateEstimation *state)
 static bool checkMagValidity(struct data *this, float error, bool setAlarms)
 {
     #define ALARM_THRESHOLD 5
-
+    
     // set errors
     if (error < this->revoSettings.MagnetometerMaxDeviation.Warning) {
         this->warningcount = 0;
@@ -198,7 +198,7 @@ static float getMagError(struct data *this, float mag[3])
     // vector norm
     float magnitude = vector_lengthf(mag, 3);
     // absolute value of relative error against Be
-    float error     = fabsf(magnitude - this->magBe) * this->invMagBe;
+    float error     = fabsf(magnitude - this->magBe) * this->invMagBe * 100;
 
     return error;
 }

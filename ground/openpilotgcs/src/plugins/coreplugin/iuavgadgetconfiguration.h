@@ -69,7 +69,7 @@ public:
         m_locked = locked;
     }
 
-    virtual void saveConfig(QSettings * /*settings*/) const {};
+    virtual void saveConfig(QSettings * /*settings*/) const {}
     virtual void saveConfig(QSettings *settings, UAVConfigInfo * /*configInfo*/) const
     {
         saveConfig(settings);

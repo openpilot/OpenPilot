@@ -26,7 +26,7 @@
  */
 
 #ifndef FGSIMULATOR_H
-#define FGSIMULATOR_H_H
+#define FGSIMULATOR_H
 
 #include <QObject>
 #include "simulator.h"

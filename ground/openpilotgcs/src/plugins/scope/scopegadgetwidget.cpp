@@ -373,7 +373,7 @@ void ScopeGadgetWidget::setupChronoPlot()
 
 void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, int meanSamples, QString mathFunction, QPen pen, bool antialiased)
 {
-    PlotData *plotData;
+    PlotData *plotData = NULL;
 
     if (m_plotType == SequentialPlot) {
         plotData = new SequentialPlotData(uavObject, uavFieldSubField);

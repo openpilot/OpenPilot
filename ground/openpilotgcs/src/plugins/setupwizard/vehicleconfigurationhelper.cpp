@@ -98,12 +98,12 @@ bool VehicleConfigurationHelper::setupHardwareSettings(bool save)
     return result;
 }
 
-bool VehicleConfigurationHelper::isApplicable(UAVObject *object)
+bool VehicleConfigurationHelper::isApplicable(UAVObject *dataObj)
 {
     switch (m_configSource->getControllerType()) {
     case VehicleConfigurationSource::CONTROLLER_CC:
     case VehicleConfigurationSource::CONTROLLER_CC3D:
-        if (object->getName() == "EKFConfiguration") {
+        if (dataObj->getName() == "EKFConfiguration") {
             return false;
         }
     default:
@@ -765,7 +765,7 @@ void VehicleConfigurationHelper::applyTemplateSettings()
         foreach(UAVObject * object, updatedObjects) {
             UAVDataObject *dataObj = dynamic_cast<UAVDataObject *>(object);
 
-            if (dataObj != NULL && isApplicable(object)) {
+            if (dataObj != NULL && isApplicable(dataObj)) {
                 addModifiedObject(dataObj, tr("Writing template settings for %1").arg(object->getName()));
             }
         }

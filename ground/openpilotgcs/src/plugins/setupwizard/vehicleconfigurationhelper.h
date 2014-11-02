@@ -57,7 +57,7 @@ public:
     VehicleConfigurationHelper(VehicleConfigurationSource *configSource);
     bool setupVehicle(bool save = true);
     bool setupHardwareSettings(bool save = true);
-    bool isApplicable(UAVObject *object);
+    bool isApplicable(UAVObject *dataObj);
     static const qint16 LEGACY_ESC_FREQUENCY    = 50;
     static const qint16 RAPID_ESC_FREQUENCY     = 500;
     static const qint16 ANALOG_SERVO_FREQUENCY  = 50;

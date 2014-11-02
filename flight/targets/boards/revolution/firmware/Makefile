@@ -103,6 +103,8 @@ endif
 
 # Optional component libraries
 include $(FLIGHTLIB)/rscode/library.mk
+include $(PIOS)/common/libraries/yaffs2/library.mk
+
 
 #include $(FLIGHTLIB)/PyMite/pymite.mk
 

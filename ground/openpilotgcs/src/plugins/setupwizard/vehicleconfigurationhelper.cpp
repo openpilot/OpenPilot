@@ -758,8 +758,16 @@ void VehicleConfigurationHelper::applyTemplateSettings()
         foreach(UAVObject * object, updatedObjects) {
             UAVDataObject *dataObj = dynamic_cast<UAVDataObject *>(object);
 
+            // Do not apply EKFConfiguration for CC and CC3D boards
             if (dataObj != NULL) {
-                addModifiedObject(dataObj, QString(tr("Writing template settings for %1")).arg(object->getName()));
+                if (m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC ||
+                    m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_CC3D) {
+                    if (object->getName() != "EKFConfiguration") {
+                        addModifiedObject(dataObj, QString(tr("Writing template settings for %1")).arg(object->getName()));
+                    }
+                } else {
+                    addModifiedObject(dataObj, QString(tr("Writing template settings for %1")).arg(object->getName()));
+                }
             }
         }
     }

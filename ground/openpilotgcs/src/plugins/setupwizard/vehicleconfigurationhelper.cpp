@@ -105,10 +105,7 @@ bool VehicleConfigurationHelper::isApplicable(UAVObject *object)
     case VehicleConfigurationSource::CONTROLLER_CC3D:
         if (object->getName() == "EKFConfiguration") {
             return false;
-        } else {
-            return true;
         }
-        break;
     default:
         return true;
     }

@@ -15,7 +15,7 @@
 	<field name="ResponseTime" units="ms" type="uint16" defaultvalue="0"
 	       elementnames="Roll,Pitch,Yaw,Collective,Accessory0,Accessory1,Accessory2"/>
 
-        <field name="Deadband" units="%" type="float" elements="1" defaultvalue="0"/>
+        <field name="Deadband" units="%" type="float" elements="1" defaultvalue="2"/>
 
 
 	<!-- Note these options values should be identical to those defined in FlightMode -->

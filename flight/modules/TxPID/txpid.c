@@ -349,7 +349,7 @@ static void updatePIDs(UAVObjEvent *ev)
                 needsUpdateStab |= update(&stab.GyroTau, value);
                 break;
             case TXPIDSETTINGS_PIDS_ACROPLUSFACTOR:
-                needsUpdateBank |= update(&bank.AcroInsanityFactor, value);
+                needsUpdateBank |= updateUint8(&bank.AcroInsanityFactor, value);
                 break;
             default:
                 PIOS_Assert(0);

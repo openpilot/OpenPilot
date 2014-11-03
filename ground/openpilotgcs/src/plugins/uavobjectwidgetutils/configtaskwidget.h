@@ -86,6 +86,7 @@ public:
     void setValue(const QVariant &value);
 
     void updateObjectFieldFromValue();
+    void updateValueFromObjectField();
 
 private:
     UAVObject *m_object;

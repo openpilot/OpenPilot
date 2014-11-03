@@ -68,13 +68,17 @@ private:
     QwtPlotCurve m_expoPlotCurvePitch;
     QwtPlotCurve m_expoPlotCurveYaw;
     QwtPlotGrid m_plotGrid;
-    QSignalMapper *m_PIDCopyFromSignalMapper;
-    QSignalMapper *m_PIDCopyToSignalMapper;
-    QSignalMapper *m_PIDSwapSignalMapper;
+    QSignalMapper m_PIDCopyFromSignalMapper;
+    QSignalMapper m_PIDCopyToSignalMapper;
+    QSignalMapper m_PIDSwapSignalMapper;
 
     void updateThrottleCurveFromObject();
     void updateObjectFromThrottleCurve();
     void setupExpoPlot();
+    void setupPIDBanksGUI();
+    void resetStabBank(int bank);
+    void restoreStabBank(int bank);
+
 protected:
     QString mapObjectName(const QString objectName);
 

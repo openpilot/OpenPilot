@@ -295,8 +295,12 @@ void ConfigTaskWidget::refreshWidgetsValues(UAVObject *obj)
     emit refreshWidgetsValuesRequested();
     QList<WidgetBinding *> bindings = obj == NULL ? m_widgetBindingsPerObject.values() : m_widgetBindingsPerObject.values(obj);
     foreach(WidgetBinding * binding, bindings) {
-        if (binding->isEnabled() && binding->field() != NULL && binding->widget() != NULL) {
-            setWidgetFromField(binding->widget(), binding->field(), binding);
+        if (binding->field() != NULL && binding->widget() != NULL) {
+            if (binding->isEnabled()) {
+                setWidgetFromField(binding->widget(), binding->field(), binding);
+            } else {
+                binding->updateValueFromObjectField();
+            }
         }
     }
     setDirty(dirtyBack);
@@ -1204,6 +1208,13 @@ void WidgetBinding::updateObjectFieldFromValue()
 {
     if (m_value.isValid()) {
         m_field->setValue(m_value, m_index);
+    }
+}
+
+void WidgetBinding::updateValueFromObjectField()
+{
+    if (m_field->getValue(m_index).isValid()) {
+        m_value = m_field->getValue(m_index);
     }
 }
 

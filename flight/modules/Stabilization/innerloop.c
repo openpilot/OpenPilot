@@ -47,7 +47,6 @@
 #include <actuatordesired.h>
 
 #include <stabilization.h>
-#include <relay_tuning.h>
 #include <virtualflybar.h>
 #include <cruisecontrol.h>
 
@@ -253,13 +252,6 @@ static void stabilizationInnerloopTask()
             switch (StabilizationStatusInnerLoopToArray(enabled)[t]) {
             case STABILIZATIONSTATUS_INNERLOOP_VIRTUALFLYBAR:
                 stabilization_virtual_flybar(gyro_filtered[t], rate[t], &actuatorDesiredAxis[t], dT, reinit, t, &stabSettings.settings);
-                break;
-            case STABILIZATIONSTATUS_INNERLOOP_RELAYTUNING:
-                rate[t] = boundf(rate[t],
-                                 -StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t],
-                                 StabilizationBankMaximumRateToArray(stabSettings.stabBank.MaximumRate)[t]
-                                 );
-                stabilization_relay_rate(rate[t] - gyro_filtered[t], &actuatorDesiredAxis[t], t, reinit);
                 break;
             case STABILIZATIONSTATUS_INNERLOOP_AXISLOCK:
                 if (fabsf(rate[t]) > stabSettings.settings.MaxAxisLockRate) {

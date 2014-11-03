@@ -128,8 +128,6 @@ void stabilizedHandler(bool newinit)
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ACRO) ? cmd.Roll * stabSettings.ManualRate.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) ? cmd.Roll * stabSettings.RollMax :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd.Roll * stabSettings.ManualRate.Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd.Roll * stabSettings.RollMax :
         0; // this is an invalid mode
 
     stabilization.Pitch =
@@ -141,8 +139,6 @@ void stabilizedHandler(bool newinit)
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ACRO) ? cmd.Pitch * stabSettings.ManualRate.Pitch :
         (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) ? cmd.Pitch * stabSettings.PitchMax :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd.Pitch * stabSettings.ManualRate.Pitch :
-        (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd.Pitch * stabSettings.PitchMax :
         0; // this is an invalid mode
 
     // TOOD: Add assumption about order of stabilization desired and manual control stabilization mode fields having same order
@@ -164,8 +160,6 @@ void stabilizedHandler(bool newinit)
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd.Yaw :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ACRO) ? cmd.Yaw * stabSettings.ManualRate.Yaw :
             (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATTITUDE) ? cmd.Yaw * stabSettings.YawMax :
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ? cmd.Yaw * stabSettings.ManualRate.Yaw :
-            (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYATTITUDE) ? cmd.Yaw * stabSettings.YawMax :
             0; // this is an invalid mode
     }
 

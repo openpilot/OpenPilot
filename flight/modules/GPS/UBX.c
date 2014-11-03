@@ -37,9 +37,12 @@
 #include "inc/UBX.h"
 #include "inc/GPS.h"
 #include <string.h>
+
+#ifndef PIOS_GPS_MINIMAL
 #include <auxmagsupport.h>
 
 static bool useMag = false;
+#endif
 static GPSPositionSensorSensorTypeOptions sensorType = GPSPOSITIONSENSOR_SENSORTYPE_UNKNOWN;
 
 static bool usePvt = false;
@@ -54,7 +57,6 @@ typedef struct {
 } ubx_message_handler;
 
 // parsing functions, roughly ordered by reception rate (higher rate messages on top)
-static void parse_ubx_op_mag(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 
 static void parse_ubx_nav_pvt(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 static void parse_ubx_nav_posllh(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
@@ -66,31 +68,31 @@ static void parse_ubx_nav_timeutc(struct UBXPacket *ubx, GPSPositionSensorData *
 static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 
 static void parse_ubx_op_sys(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
-#endif
+static void parse_ubx_op_mag(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
+
 static void parse_ubx_ack_ack(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 static void parse_ubx_ack_nak(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 
 static void parse_ubx_mon_ver(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
-
+#endif
 
 const ubx_message_handler ubx_handler_table[] = {
-    { .msgClass = UBX_CLASS_OP_CUST, .msgID = UBX_ID_OP_MAG,      .handler = &parse_ubx_op_mag      },
-
-    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_PVT,     .handler = &parse_ubx_nav_pvt     },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_POSLLH,  .handler = &parse_ubx_nav_posllh  },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_VELNED,  .handler = &parse_ubx_nav_velned  },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_SOL,     .handler = &parse_ubx_nav_sol     },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_DOP,     .handler = &parse_ubx_nav_dop     },
+    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_PVT,     .handler = &parse_ubx_nav_pvt     },
 #ifndef PIOS_GPS_MINIMAL
+    { .msgClass = UBX_CLASS_OP_CUST, .msgID = UBX_ID_OP_MAG,      .handler = &parse_ubx_op_mag      },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_SVINFO,  .handler = &parse_ubx_nav_svinfo  },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_TIMEUTC, .handler = &parse_ubx_nav_timeutc },
 
     { .msgClass = UBX_CLASS_OP_CUST, .msgID = UBX_ID_OP_SYS,      .handler = &parse_ubx_op_sys      },
-#endif
     { .msgClass = UBX_CLASS_ACK,     .msgID = UBX_ID_ACK_ACK,     .handler = &parse_ubx_ack_ack     },
     { .msgClass = UBX_CLASS_ACK,     .msgID = UBX_ID_ACK_NAK,     .handler = &parse_ubx_ack_nak     },
 
     { .msgClass = UBX_CLASS_MON,     .msgID = UBX_ID_MON_VER,     .handler = &parse_ubx_mon_ver     },
+#endif
 };
 #define UBX_HANDLER_TABLE_SIZE NELEMENTS(ubx_handler_table)
 
@@ -405,9 +407,7 @@ static void parse_ubx_nav_timeutc(struct UBXPacket *ubx, __attribute__((unused))
         return;
     }
 }
-#endif /* if !defined(PIOS_GPS_MINIMAL) */
 
-#if !defined(PIOS_GPS_MINIMAL)
 static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
 {
     uint8_t chan;
@@ -434,7 +434,6 @@ static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, __attribute__((unused)) 
 
     GPSSatellitesSet(&svdata);
 }
-#endif /* if !defined(PIOS_GPS_MINIMAL) */
 
 static void parse_ubx_ack_ack(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
 {
@@ -460,8 +459,6 @@ static void parse_ubx_mon_ver(struct UBXPacket *ubx, __attribute__((unused)) GPS
                    ((ubxHwVersion >= 70000) ? GPSPOSITIONSENSOR_SENSORTYPE_UBX7 : GPSPOSITIONSENSOR_SENSORTYPE_UBX);
 }
 
-
-#if !defined(PIOS_GPS_MINIMAL)
 static void parse_ubx_op_sys(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
 {
     struct UBX_OP_SYSINFO *sysinfo = &ubx->payload.op_sysinfo;
@@ -476,7 +473,7 @@ static void parse_ubx_op_sys(struct UBXPacket *ubx, __attribute__((unused)) GPSP
     data.Status  = GPSEXTENDEDSTATUS_STATUS_GPSV9;
     GPSExtendedStatusSet(&data);
 }
-#endif
+
 static void parse_ubx_op_mag(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
 {
     if (!useMag) {
@@ -486,6 +483,7 @@ static void parse_ubx_op_mag(struct UBXPacket *ubx, __attribute__((unused)) GPSP
     float mags[3] = { mag->x, mag->y, mag->z };
     auxmagsupport_publish_samples(mags, AUXMAGSENSOR_STATUS_OK);
 }
+#endif /* if !defined(PIOS_GPS_MINIMAL) */
 
 
 // UBX message parser
@@ -531,6 +529,8 @@ uint32_t parse_ubx_message(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosi
     return id;
 }
 
+#if !defined(PIOS_GPS_MINIMAL)
+
 void load_mag_settings()
 {
     auxmagsupport_reload_settings();
@@ -544,4 +544,5 @@ void load_mag_settings()
         useMag = true;
     }
 }
+#endif
 #endif // PIOS_INCLUDE_GPS_UBX_PARSER

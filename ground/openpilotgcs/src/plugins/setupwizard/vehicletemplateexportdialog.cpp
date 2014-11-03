@@ -41,6 +41,7 @@
 #include "stabilizationsettingsbank1.h"
 #include "stabilizationsettingsbank2.h"
 #include "stabilizationsettingsbank3.h"
+#include "mixersettings.h"
 #include "ekfconfiguration.h"
 
 const char *VehicleTemplateExportDialog::EXPORT_BASE_NAME      = "../share/openpilotgcs/cloudconfig";
@@ -111,6 +112,11 @@ QString VehicleTemplateExportDialog::setupVehicleType()
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
         return tr("Multirotor - Quadrocopter X");
 
+    case SystemSettings::AIRFRAMETYPE_QUADH:
+        m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
+        m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_H;
+        return tr("Multirotor - Quadrocopter H");
+
     case SystemSettings::AIRFRAMETYPE_QUADP:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS;
@@ -145,6 +151,11 @@ QString VehicleTemplateExportDialog::setupVehicleType()
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
         m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_X;
         return tr("Multirotor - Hexacopter X");
+
+    case SystemSettings::AIRFRAMETYPE_HEXAH:
+        m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
+        m_subType = VehicleConfigurationSource::MULTI_ROTOR_HEXA_H;
+        return tr("Multirotor - Hexacopter H");
 
     case SystemSettings::AIRFRAMETYPE_HEXACOAX:
         m_type    = VehicleConfigurationSource::VEHICLE_MULTI;
@@ -181,6 +192,7 @@ void VehicleTemplateExportDialog::accept()
     objectsToExport << StabilizationSettingsBank1::GetInstance(m_uavoManager);
     objectsToExport << StabilizationSettingsBank2::GetInstance(m_uavoManager);
     objectsToExport << StabilizationSettingsBank3::GetInstance(m_uavoManager);
+    objectsToExport << MixerSettings::GetInstance(m_uavoManager);
     objectsToExport << EKFConfiguration::GetInstance(m_uavoManager);
     m_uavoManager->toJson(exportObject, objectsToExport);
 

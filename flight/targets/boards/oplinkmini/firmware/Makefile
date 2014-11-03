@@ -48,6 +48,9 @@ ifndef TESTAPP
     SRC += $(OPUAVOBJ)/uavobjectpersistence.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
 
+    ## Misc library functions
+    SRC += $(FLIGHTLIB)/sha1.c
+
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/oplinkstatus.c
     SRC += $(OPUAVSYNTHDIR)/oplinksettings.c

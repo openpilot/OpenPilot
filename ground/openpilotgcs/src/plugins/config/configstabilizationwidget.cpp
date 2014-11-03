@@ -37,6 +37,9 @@
 #include <QList>
 #include <QTabBar>
 #include <QMessageBox>
+#include <QToolButton>
+#include <QMenu>
+#include <QAction>
 
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
@@ -49,7 +52,10 @@
 #include "qwt/src/qwt_scale_widget.h"
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
-    boardModel(0), m_pidBankCount(0), m_currentPIDBank(0)
+    boardModel(0), m_pidBankCount(0), m_currentPIDBank(0),
+    m_PIDCopyFromSignalMapper(new QSignalMapper()),
+    m_PIDCopyToSignalMapper(new QSignalMapper()),
+    m_PIDSwapSignalMapper(new QSignalMapper())
 {
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
@@ -64,10 +70,67 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     // Set up fake tab widget stuff for pid banks support
     m_pidTabBars.append(ui->basicPIDBankTabBar);
     m_pidTabBars.append(ui->advancedPIDBankTabBar);
+
+    m_defaultPIDMenuAction = new QAction(QIcon(":configgadget/images/gear.png"), QString(), this);
+    QAction *restoreAllAction = new QAction(tr("Restore all to saved"), this);
+    connect(restoreAllAction, SIGNAL(triggered()), this, SLOT(restoreAllPIDBanks()));
+    QAction *resetAllAction = new QAction(tr("Reset all to default"), this);
+    connect(resetAllAction, SIGNAL(triggered()), this, SLOT(resetAllPIDBanks()));
+    QAction *restoreCurrentAction = new QAction(tr("Restore to saved"), this);
+    connect(restoreCurrentAction, SIGNAL(triggered()), this, SLOT(restoreCurrentAction()));
+    QAction *resetCurrentAction = new QAction(tr("Reset to default"), this);
+    connect(resetCurrentAction, SIGNAL(triggered()), this, SLOT(resetCurrentPIDBank()));
+    QAction *copyCurrentAction = new QAction(tr("Copy to others"), this);
+    connect(copyCurrentAction, SIGNAL(triggered()), this, SLOT(copyCurrentPIDBank()));
+    connect(m_PIDCopyFromSignalMapper, SIGNAL(mapped(int)), this, SLOT(copyFromBankToCurrent(int)));
+    connect(m_PIDCopyToSignalMapper, SIGNAL(mapped(int)), this, SLOT(copyToBankFromCurrent(int)));
+    connect(m_PIDSwapSignalMapper, SIGNAL(mapped(int)), this, SLOT(swapBankAndCurrent(int)));
+
     foreach(QTabBar * tabBar, m_pidTabBars) {
         for (int i = 0; i < m_pidBankCount; i++) {
             tabBar->addTab(tr("Settings Bank %1").arg(i + 1));
             tabBar->setTabData(i, QString("StabilizationSettingsBank%1").arg(i + 1));
+            QToolButton *tabButton = new QToolButton();
+            connect(this, SIGNAL(enableControlsChanged(bool)), tabButton, SLOT(setEnabled(bool)));
+            tabButton->setDefaultAction(m_defaultPIDMenuAction);
+            tabButton->setAutoRaise(true);
+            tabButton->setPopupMode(QToolButton::MenuButtonPopup);
+            QMenu *tabMenu = new QMenu();
+            QMenu *restoreMenu = new QMenu(tr("Restore"));
+            QMenu *resetMenu = new QMenu(tr("Reset"));
+            QMenu *copyMenu = new QMenu(tr("Copy"));
+            QMenu *swapMenu = new QMenu(tr("Swap"));
+            QAction *menuAction;
+            for (int j = 0; j < m_pidBankCount; j++) {
+                if (j == i) {
+                    restoreMenu->addAction(restoreCurrentAction);
+                    resetMenu->addAction(resetCurrentAction);
+                    copyMenu->addAction(copyCurrentAction);
+                } else {
+                    menuAction = new QAction(tr("Copy from %1").arg(j + 1), this);
+                    connect(menuAction, SIGNAL(triggered()), m_PIDCopyFromSignalMapper, SLOT(map()));
+                    m_PIDCopyFromSignalMapper->setMapping(menuAction, j + 1);
+                    copyMenu->addAction(menuAction);
+
+                    menuAction = new QAction(tr("Copy to %1").arg(j + 1), this);
+                    connect(menuAction, SIGNAL(triggered()), m_PIDCopyToSignalMapper, SLOT(map()));
+                    m_PIDCopyToSignalMapper->setMapping(menuAction, j + 1);
+                    copyMenu->addAction(menuAction);
+
+                    menuAction = new QAction(tr("Swap with %1").arg(j + 1), this);
+                    connect(menuAction, SIGNAL(triggered()), m_PIDSwapSignalMapper, SLOT(map()));
+                    m_PIDSwapSignalMapper->setMapping(menuAction, j + 1);
+                    swapMenu->addAction(menuAction);
+                }
+            }
+            restoreMenu->addAction(restoreAllAction);
+            resetMenu->addAction(resetAllAction);
+            tabMenu->addMenu(copyMenu);
+            tabMenu->addMenu(swapMenu);
+            tabMenu->addMenu(resetMenu);
+            tabMenu->addMenu(restoreMenu);
+            tabButton->setMenu(tabMenu);
+            tabBar->setTabButton(i, QTabBar::RightSide, tabButton);
         }
         tabBar->setExpanding(false);
         connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
@@ -163,6 +226,18 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
 {
     // Do nothing
+    if (m_PIDCopyFromSignalMapper) {
+        delete m_PIDCopyFromSignalMapper;
+        m_PIDCopyFromSignalMapper = NULL;
+    }
+    if (m_PIDCopyToSignalMapper) {
+        delete m_PIDCopyToSignalMapper;
+        m_PIDCopyToSignalMapper = NULL;
+    }
+    if (m_PIDSwapSignalMapper) {
+        delete m_PIDSwapSignalMapper;
+        m_PIDSwapSignalMapper = NULL;
+    }
 }
 
 void ConfigStabilizationWidget::refreshWidgetsValues(UAVObject *o)
@@ -336,6 +411,46 @@ void ConfigStabilizationWidget::replotExpoPitch(int value)
 void ConfigStabilizationWidget::replotExpoYaw(int value)
 {
     replotExpo(value, m_expoPlotCurveYaw);
+}
+
+void ConfigStabilizationWidget::restoreAllPIDBanks()
+{
+    qDebug() << "restoreAllPIDBanks";
+}
+
+void ConfigStabilizationWidget::resetAllPIDBanks()
+{
+    qDebug() << "resetAllPIDBanks";
+}
+
+void ConfigStabilizationWidget::restoreCurrentAction()
+{
+    qDebug() << "restoreCurrentAction";
+}
+
+void ConfigStabilizationWidget::resetCurrentPIDBank()
+{
+    qDebug() << "resetCurrentPIDBank";
+}
+
+void ConfigStabilizationWidget::copyCurrentPIDBank()
+{
+    qDebug() << "copyCurrentPIDBank";
+}
+
+void ConfigStabilizationWidget::copyFromBankToCurrent(int bank)
+{
+    qDebug() << "copyFromBankToCurrent" << bank;
+}
+
+void ConfigStabilizationWidget::copyToBankFromCurrent(int bank)
+{
+    qDebug() << "copyToBankFromCurrent" << bank;
+}
+
+void ConfigStabilizationWidget::swapBankAndCurrent(int bank)
+{
+    qDebug() << "swapBankAndCurrent" << bank;
 }
 
 void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)

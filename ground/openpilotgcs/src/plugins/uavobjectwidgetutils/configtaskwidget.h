@@ -173,6 +173,7 @@ signals:
     // fired when the autopilot disconnects
     void autoPilotDisconnected();
     void defaultRequested(int group);
+    void enableControlsChanged(bool enable);
 
 private slots:
     void objectUpdated(UAVObject *object);

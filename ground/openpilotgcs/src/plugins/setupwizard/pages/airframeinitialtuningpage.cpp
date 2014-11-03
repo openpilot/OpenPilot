@@ -159,14 +159,14 @@ bool AirframeInitialTuningPage::airframeIsCompatible(int vehicleType, int vehicl
 
     int wizSubType = getWizard()->getVehicleSubType();
     switch (vehicleType) {
-        case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
-        case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
-        {
-            return wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_H ||
-                    wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
-        }
-        default:
-            return vehicleSubType == wizSubType;
+    case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
+    case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
+    {
+        return wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_H ||
+               wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
+    }
+    default:
+        return vehicleSubType == wizSubType;
     }
 }
 

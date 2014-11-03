@@ -170,7 +170,7 @@ private:
     QFile m_csvLoggingFile;
 
     QMutex m_mutex;
-    QwtLegend* m_plotLegend;
+    QwtLegend *m_plotLegend;
 
     int csvLoggingInsertHeader();
     int csvLoggingAddData();

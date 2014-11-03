@@ -45,7 +45,7 @@
 /*!
    \brief Defines the different type of plots.
  */
-enum PlotType {SequentialPlot, ChronoPlot};
+enum PlotType { SequentialPlot, ChronoPlot };
 
 /*!
    \brief Base class that keeps the data for each curve in the plot.
@@ -58,20 +58,38 @@ public:
              QString mathFunction, double plotDataSize, QPen pen, bool antialiased);
     ~PlotData();
 
-    QString plotName() const { return m_plotName; }
+    QString plotName() const
+    {
+        return m_plotName;
+    }
 
-    UAVObject *object() const { return m_object; }
-    UAVObjectField *field() const { return m_field; }
-    int element() const { return m_element; }
-    QString elementName() const { return m_elementName; }
+    UAVObject *object() const
+    {
+        return m_object;
+    }
+    UAVObjectField *field() const
+    {
+        return m_field;
+    }
+    int element() const
+    {
+        return m_element;
+    }
+    QString elementName() const
+    {
+        return m_elementName;
+    }
 
     bool isVisible() const;
     void setVisible(bool visible);
 
-    bool wantsInitialData() { return m_isEnumPlot; }
+    bool wantsInitialData()
+    {
+        return m_isEnumPlot;
+    }
 
     virtual bool append(UAVObject *obj) = 0;
-    virtual PlotType plotType() const    = 0;
+    virtual PlotType plotType() const   = 0;
     virtual void removeStaleData() = 0;
 
     void updatePlotData();
@@ -110,7 +128,6 @@ protected:
     bool m_isEnumPlot;
     virtual void calcMathFunction(double currentValue);
     QwtPlotMarker *createMarker(QString value);
-
 };
 
 /*!
@@ -128,7 +145,10 @@ public:
     ~SequentialPlotData() {}
 
     bool append(UAVObject *obj);
-    PlotType plotType() const { return SequentialPlot; }
+    PlotType plotType() const
+    {
+        return SequentialPlot;
+    }
     void removeStaleData() {}
 };
 
@@ -143,12 +163,14 @@ public:
                    double plotDataSize, QPen pen, bool antialiased)
         : PlotData(object, field, element, scaleFactor, meanSamples,
                    mathFunction, plotDataSize, pen, antialiased)
-    {
-    }
+    {}
     ~ChronoPlotData() {}
 
     bool append(UAVObject *obj);
-    PlotType plotType() const { return ChronoPlot; }
+    PlotType plotType() const
+    {
+        return ChronoPlot;
+    }
     void removeStaleData();
 };
 

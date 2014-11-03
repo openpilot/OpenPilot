@@ -65,7 +65,7 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent),
 {
     setMouseTracking(true);
 
-    QwtPlotCanvas * plotCanvas = dynamic_cast<QwtPlotCanvas *>(canvas());
+    QwtPlotCanvas *plotCanvas = dynamic_cast<QwtPlotCanvas *>(canvas());
     if (plotCanvas) {
         plotCanvas->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
         plotCanvas->setBorderRadius(8);
@@ -103,6 +103,7 @@ ScopeGadgetWidget::~ScopeGadgetWidget()
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     foreach(QString uavObjName, m_connectedUAVObjects) {
         UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject(uavObjName));
+
         disconnect(obj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(uavObjectReceived(UAVObject *)));
     }
 
@@ -230,12 +231,13 @@ void ScopeGadgetWidget::addLegend()
     // not visible, and then un-hiding it.
     foreach(QwtPlotItem * plotItem, itemList()) {
         QWidget *legendWidget = m_plotLegend->legendWidget(QwtPlot::itemToInfo(plotItem));
+
         if (legendWidget && legendWidget->inherits("QwtLegendLabel")) {
             ((QwtLegendLabel *)legendWidget)->setChecked(!plotItem->isVisible());
         }
     }
 
-    connect(m_plotLegend, SIGNAL(checked(QVariant, bool, int)), this, SLOT(showCurve(QVariant,bool,int)));
+    connect(m_plotLegend, SIGNAL(checked(QVariant, bool, int)), this, SLOT(showCurve(QVariant, bool, int)));
 }
 
 void ScopeGadgetWidget::preparePlot(PlotType plotType)
@@ -325,8 +327,8 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
 
     if (fieldPlusSubField.contains("-")) {
         QStringList fieldSubfield = fieldName.split("-", QString::SkipEmptyParts);
-        fieldName     = fieldSubfield.at(0);
-        elementName  = fieldSubfield.at(1);
+        fieldName   = fieldSubfield.at(0);
+        elementName = fieldSubfield.at(1);
     }
 
     // Get the uav object
@@ -341,7 +343,7 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
     UAVObjectField *field = object->getField(fieldName);
     if (!field) {
         qDebug() << "In scope gadget, in fields loaded from GCS config file, field" <<
-                    fieldName << "of object" << objectName << "is missing";
+            fieldName << "of object" << objectName << "is missing";
         return;
     }
 
@@ -349,7 +351,7 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
         element = field->getElementNames().indexOf(QRegExp(elementName, Qt::CaseSensitive, QRegExp::FixedString));
         if (element < 0) {
             qDebug() << "In scope gadget, in fields loaded from GCS config file, field" <<
-                        fieldName << "of object" << objectName << "element name" << elementName << "is missing";
+                fieldName << "of object" << objectName << "element name" << elementName << "is missing";
             return;
         }
     }
@@ -363,9 +365,9 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
     } else if (m_plotType == ChronoPlot) {
         plotData = new ChronoPlotData(object, field, element, scaleFactor,
                                       meanSamples, mathFunction, m_plotDataSize,
-                                      pen, antialiased);        
+                                      pen, antialiased);
     }
-    connect(this, SIGNAL(visibilityChanged(QwtPlotItem*)), plotData, SLOT(visibilityChanged(QwtPlotItem*)));
+    connect(this, SIGNAL(visibilityChanged(QwtPlotItem *)), plotData, SLOT(visibilityChanged(QwtPlotItem *)));
     plotData->attach(this);
 
     if (plotData->wantsInitialData()) {

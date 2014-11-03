@@ -240,7 +240,7 @@ void ConfigStabilizationWidget::setupExpoPlot()
     title.setText(tr("Output %"));
     title.setFont(ui->expoPlot->axisFont(QwtPlot::yLeft));
     ui->expoPlot->setAxisTitle(QwtPlot::yLeft, title);
-    QwtPlotCanvas * plotCanvas = dynamic_cast<QwtPlotCanvas *>(ui->expoPlot->canvas());
+    QwtPlotCanvas *plotCanvas = dynamic_cast<QwtPlotCanvas *>(ui->expoPlot->canvas());
     if (plotCanvas) {
         plotCanvas->setFrameStyle(QFrame::NoFrame);
     }

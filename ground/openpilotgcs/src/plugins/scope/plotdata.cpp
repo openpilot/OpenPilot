@@ -77,11 +77,13 @@ PlotData::~PlotData()
     delete m_plotCurve;
 }
 
-bool PlotData::isVisible() const {
+bool PlotData::isVisible() const
+{
     return m_plotCurve->isVisible();
 }
 
-void PlotData::setVisible(bool visible) {
+void PlotData::setVisible(bool visible)
+{
     m_plotCurve->setVisible(visible);
     visibilityChanged(m_plotCurve);
 }
@@ -91,7 +93,8 @@ void PlotData::updatePlotData()
     m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
 }
 
-bool PlotData::hasData() const {
+bool PlotData::hasData() const
+{
     if (!m_isEnumPlot) {
         return !m_xDataEntries.isEmpty();
     } else {
@@ -99,7 +102,8 @@ bool PlotData::hasData() const {
     }
 }
 
-QString PlotData::lastDataAsString() {
+QString PlotData::lastDataAsString()
+{
     if (!m_isEnumPlot) {
         return QString().sprintf("%3.10g", m_yDataEntries.last());
     } else {
@@ -115,7 +119,7 @@ void PlotData::attach(QwtPlot *plot)
 void PlotData::visibilityChanged(QwtPlotItem *item)
 {
     if (m_plotCurve == item) {
-        foreach (QwtPlotMarker* marker, m_enumMarkerList) {
+        foreach(QwtPlotMarker * marker, m_enumMarkerList) {
             m_plotCurve->isVisible() ? marker->attach(m_plotCurve->plot()) : marker->detach();
         }
     }
@@ -157,6 +161,7 @@ void PlotData::calcMathFunction(double currentValue)
 QwtPlotMarker *PlotData::createMarker(QString value)
 {
     QwtPlotMarker *marker = new QwtPlotMarker(value);
+
     marker->setZ(10);
     QwtText label(QString(" %1 ").arg(value));
     label.setColor(QColor(Qt::black));
@@ -204,7 +209,6 @@ bool SequentialPlotData::append(UAVObject *obj)
 
             QwtPlotMarker *marker = m_enumMarkerList.isEmpty() ? NULL : m_enumMarkerList.last();
             if (!marker || marker->title() != value) {
-
                 marker = createMarker(value);
                 marker->setXValue(m_enumMarkerList.size());
 
@@ -237,14 +241,12 @@ bool ChronoPlotData::append(UAVObject *obj)
             }
 
             m_xDataEntries.append(xValue);
-
         } else {
             // Enum markers
             QString value = m_field->getValue(m_element).toString();
 
             QwtPlotMarker *marker = m_enumMarkerList.isEmpty() ? NULL : m_enumMarkerList.last();
             if (!marker || marker->title() != value) {
-
                 marker = createMarker(value);
                 marker->setXValue(xValue);
 
@@ -264,12 +266,12 @@ void ChronoPlotData::removeStaleData()
 {
     while (!m_xDataEntries.isEmpty() &&
            (m_xDataEntries.last() - m_xDataEntries.first()) > m_plotDataSize) {
-            m_yDataEntries.pop_front();
-            m_xDataEntries.pop_front();
+        m_yDataEntries.pop_front();
+        m_xDataEntries.pop_front();
     }
     while (!m_enumMarkerList.isEmpty() &&
            (m_enumMarkerList.last()->xValue() - m_enumMarkerList.first()->xValue()) > m_plotDataSize) {
-        QwtPlotMarker* marker = m_enumMarkerList.takeFirst();
+        QwtPlotMarker *marker = m_enumMarkerList.takeFirst();
         marker->detach();
         delete marker;
     }

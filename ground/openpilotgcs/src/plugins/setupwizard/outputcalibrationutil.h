@@ -40,7 +40,7 @@ public:
 
     static void startOutputCalibration();
     static void stopOutputCalibration();
-    static ActuatorCommand * getActuatorCommandObject();
+    static ActuatorCommand *getActuatorCommandObject();
 
 public slots:
     void startChannelOutput(quint16 channel, quint16 safeValue);

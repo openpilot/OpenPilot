@@ -47,7 +47,7 @@
 #define YNOR_PREMARKER          (0xF6)
 #define YNOR_POSTMARKER         (0xF0)
 
-#define FORMAT_OFFSET		(CHUNKS_PER_BLOCK * BYTES_PER_CHUNK)
+#define FORMAT_OFFSET		BLOCK_SIZE_IN_BYTES
 #define FORMAT_VALUE		0x1234
 
 /* Compile this for a simulation */
@@ -55,13 +55,22 @@
 
 static struct nor_sim *nor_sim;
 
-#define nor_drv_FlashInit() do {nor_sim = ynorsim_initialise("emfile-nor", BLOCKS_IN_DEVICE, BLOCK_SIZE_IN_BYTES); } while(0)
+#define nor_drv_FlashInit() do {nor_sim = ynorsim_initialise("emfile-nor", BLOCKS_IN_DEVICE, BLOCK_SIZE_IN_BYTES+16); } while(0)
 #define nor_drv_FlashDeinit() ynorsim_shutdown(nor_sim)
 #define nor_drv_FlashWrite32(addr,buf,nwords) ynorsim_wr32(nor_sim,addr,buf,nwords)
 #define nor_drv_FlashRead32(addr,buf,nwords) ynorsim_rd32(nor_sim,addr,buf,nwords)
 #define nor_drv_FlashEraseBlock(addr) ynorsim_erase(nor_sim,addr)
 #define DEVICE_BASE     ynorsim_get_base(nor_sim)
 
+static	int nor_drv_CheckBad(struct yaffs_dev *dev, int block_no)
+{
+	return YAFFS_OK;
+}
+
+static int nor_drv_MarkBad(struct yaffs_dev *dev, int block_no)
+{
+	return YAFFS_OK;
+}
 
 
 static u32 *Block2Addr(struct yaffs_dev *dev, int blockNumber)
@@ -71,7 +80,7 @@ static u32 *Block2Addr(struct yaffs_dev *dev, int blockNumber)
 	dev=dev;
 
 	addr = (u8*)DEVICE_BASE;
-	addr += blockNumber * BLOCK_SIZE_IN_BYTES;
+	addr += blockNumber * (BLOCK_SIZE_IN_BYTES + 16);
 
 	return (u32 *) addr;
 }
@@ -101,25 +110,7 @@ static u32 *Chunk2DataAddr(struct yaffs_dev *dev, int chunk_id)
 	return (u32 *)addr;
 }
 
-static u32 *Chunk2SpareAddr(struct yaffs_dev *dev, int chunk_id)
-{
-	u8 *addr;
 
-	addr = (u8*) Chunk2DataAddr(dev, chunk_id);
-	addr += SPARE_AREA_OFFSET;
-	return (u32 *)addr;
-}
-
-
-static void nor_drv_AndBytes(u8*target, const u8 *src, int nbytes)
-{
-	while(nbytes > 0){
-		*target &= *src;
-		target++;
-		src++;
-		nbytes--;
-	}
-}
 
 static int nor_drv_WriteChunkToNAND(struct yaffs_dev *dev,int nand_chunk,
 				    const u8 *data, int data_len,
@@ -129,13 +120,6 @@ static int nor_drv_WriteChunkToNAND(struct yaffs_dev *dev,int nand_chunk,
 
 
 	(void) oob_len;
-
-	/* We should only be getting called for one of 3 reasons:
-         * Writing a chunk: data and spare will not be NULL
-         * Writing a deletion marker: data will be NULL, spare not NULL
-         * Writing a bad block marker: data will be NULL, spare not NULL
-         */
-
 
 	if(data) {
 		/* Write the data */
@@ -204,9 +188,6 @@ static int nor_drv_EraseBlockInNAND(struct yaffs_dev *dev, int blockNumber)
 
 	if(blockNumber < 0 || blockNumber >= BLOCKS_IN_DEVICE)
 	{
-		yaffs_trace(YAFFS_TRACE_ALWAYS,
-			"Attempt to erase non-existant block %d\n",
-			blockNumber);
 		return YAFFS_FAIL;
 	}
 	else
@@ -274,11 +255,11 @@ struct yaffs_dev *yaffs_nor_install_drv(const char *name)
 
 	// using inband_tags means the spare area does not need to be
 	// supported in the above methods
-	param->inband_tags = TRUE;
-	param->is_yaffs2 = TRUE;
+	param->inband_tags = 1;
+	param->is_yaffs2 = 1;
 	param->n_caches = 10;
 	param->refresh_period = 1000;
-	param->empty_lost_n_found = TRUE;
+	param->empty_lost_n_found = 1;
 	param->n_caches = 10;
 	param->disable_soft_del = 0;
 
@@ -287,6 +268,8 @@ struct yaffs_dev *yaffs_nor_install_drv(const char *name)
 	drv->drv_erase_fn = nor_drv_EraseBlockInNAND;
 	drv->drv_initialise_fn = nor_drv_InitialiseNAND;
 	drv->drv_deinitialise_fn = nor_drv_Deinitialise_flash_fn;
+	drv->drv_check_bad_fn = nor_drv_CheckBad;
+	drv->drv_mark_bad_fn = nor_drv_MarkBad;
 
 	dev->driver_context = (void *) nor_sim;
 

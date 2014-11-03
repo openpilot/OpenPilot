@@ -71,7 +71,6 @@ UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 # optional component libraries
 include $(PIOS)/common/libraries/FreeRTOS/library.mk
 ifeq ($(USE_YAFFS),YES)
-SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
 include $(PIOS)/common/libraries/yaffs2/library.mk  # Only required for yaffs testing
 include $(PIOS)/posix/libraries/yaffs2/yaffs_impl.mk  # Only required for yaffs testing
 endif

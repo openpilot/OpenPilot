@@ -240,12 +240,14 @@ void ConfigStabilizationWidget::setupExpoPlot()
     title.setText(tr("Output %"));
     title.setFont(ui->expoPlot->axisFont(QwtPlot::yLeft));
     ui->expoPlot->setAxisTitle(QwtPlot::yLeft, title);
-    ui->expoPlot->canvas()->setFrameShape(QFrame::NoFrame);
+    QwtPlotCanvas * plotCanvas = dynamic_cast<QwtPlotCanvas *>(ui->expoPlot->canvas());
+    if (plotCanvas) {
+        plotCanvas->setFrameStyle(QFrame::NoFrame);
+    }
     ui->expoPlot->canvas()->setCursor(QCursor());
 
-
-    m_plotGrid.setMajPen(QColor(Qt::gray));
-    m_plotGrid.setMinPen(QColor(Qt::lightGray));
+    m_plotGrid.setMajorPen(QColor(Qt::gray));
+    m_plotGrid.setMinorPen(QColor(Qt::lightGray));
     m_plotGrid.enableXMin(false);
     m_plotGrid.enableYMin(false);
     m_plotGrid.attach(ui->expoPlot);

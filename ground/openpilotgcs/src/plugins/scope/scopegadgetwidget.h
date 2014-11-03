@@ -31,6 +31,7 @@
 #include "plotdata.h"
 
 #include "qwt/src/qwt.h"
+#include "qwt/src/qwt_legend.h"
 #include "qwt/src/qwt_plot.h"
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_scale_draw.h"
@@ -76,13 +77,13 @@ public:
         return m_plotType;
     }
 
-    void setXWindowSize(double xWindowSize)
+    void setPlotDataSize(double plotDataSize)
     {
-        m_xWindowSize = xWindowSize;
+        m_plotDataSize = plotDataSize;
     }
-    double xWindowSize()
+    double plotDataSize()
     {
-        return m_xWindowSize;
+        return m_plotDataSize;
     }
     void setRefreshInterval(double refreshInterval)
     {
@@ -117,6 +118,8 @@ public:
     {
         m_csvLoggingPath = value;
     }
+signals:
+    void visibilityChanged(QwtPlotItem *item);
 
 protected:
     void mousePressEvent(QMouseEvent *e);
@@ -129,7 +132,7 @@ protected:
 private slots:
     void uavObjectReceived(UAVObject *);
     void replotNewData();
-    void showCurve(QwtPlotItem *item, bool on);
+    void showCurve(QVariant itemInfo, bool visible, int index);
     void startPlotting();
     void stopPlotting();
     void csvLoggingConnect();
@@ -142,7 +145,7 @@ private:
 
     PlotType m_plotType;
 
-    double m_xWindowSize;
+    double m_plotDataSize;
     int m_refreshInterval;
     QList<QString> m_connectedUAVObjects;
     QMap<QString, PlotData *> m_curvesData;
@@ -166,7 +169,8 @@ private:
     QString m_csvLoggingBuffer;
     QFile m_csvLoggingFile;
 
-    QMutex mutex;
+    QMutex m_mutex;
+    QwtLegend* m_plotLegend;
 
     int csvLoggingInsertHeader();
     int csvLoggingAddData();

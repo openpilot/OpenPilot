@@ -154,15 +154,15 @@ void ConfigStabilizationWidget::setupStabBanksGUI()
     m_stabTabBars.append(ui->advancedPIDBankTabBar);
 
     QAction *defaultStabMenuAction = new QAction(QIcon(":configgadget/images/gear.png"), QString(), this);
-    QAction *restoreAllAction     = new QAction(tr("Restore all to saved"), this);
+    QAction *restoreAllAction     = new QAction(tr("all to saved"), this);
     connect(restoreAllAction, SIGNAL(triggered()), this, SLOT(restoreAllStabBanks()));
-    QAction *resetAllAction       = new QAction(tr("Reset all to default"), this);
+    QAction *resetAllAction       = new QAction(tr("all to default"), this);
     connect(resetAllAction, SIGNAL(triggered()), this, SLOT(resetAllStabBanks()));
-    QAction *restoreCurrentAction = new QAction(tr("Restore to saved"), this);
+    QAction *restoreCurrentAction = new QAction(tr("to saved"), this);
     connect(restoreCurrentAction, SIGNAL(triggered()), this, SLOT(restoreCurrentAction()));
-    QAction *resetCurrentAction   = new QAction(tr("Reset to default"), this);
+    QAction *resetCurrentAction   = new QAction(tr("to default"), this);
     connect(resetCurrentAction, SIGNAL(triggered()), this, SLOT(resetCurrentStabBank()));
-    QAction *copyCurrentAction    = new QAction(tr("Copy to others"), this);
+    QAction *copyCurrentAction    = new QAction(tr("to others"), this);
     connect(copyCurrentAction, SIGNAL(triggered()), this, SLOT(copyCurrentStabBank()));
     connect(&m_stabSettingsCopyFromSignalMapper, SIGNAL(mapped(int)), this, SLOT(copyFromBankToCurrent(int)));
     connect(&m_stabSettingsCopyToSignalMapper, SIGNAL(mapped(int)), this, SLOT(copyToBankFromCurrent(int)));
@@ -191,17 +191,17 @@ void ConfigStabilizationWidget::setupStabBanksGUI()
                     resetMenu->addAction(resetCurrentAction);
                     copyMenu->addAction(copyCurrentAction);
                 } else {
-                    menuAction = new QAction(tr("Copy from %1").arg(j + 1), this);
+                    menuAction = new QAction(tr("from %1").arg(j + 1), this);
                     connect(menuAction, SIGNAL(triggered()), &m_stabSettingsCopyFromSignalMapper, SLOT(map()));
                     m_stabSettingsCopyFromSignalMapper.setMapping(menuAction, j);
                     copyMenu->addAction(menuAction);
 
-                    menuAction = new QAction(tr("Copy to %1").arg(j + 1), this);
+                    menuAction = new QAction(tr("to %1").arg(j + 1), this);
                     connect(menuAction, SIGNAL(triggered()), &m_stabSettingsCopyToSignalMapper, SLOT(map()));
                     m_stabSettingsCopyToSignalMapper.setMapping(menuAction, j);
                     copyMenu->addAction(menuAction);
 
-                    menuAction = new QAction(tr("Swap with %1").arg(j + 1), this);
+                    menuAction = new QAction(tr("with %1").arg(j + 1), this);
                     connect(menuAction, SIGNAL(triggered()), &m_stabSettingsSwapSignalMapper, SLOT(map()));
                     m_stabSettingsSwapSignalMapper.setMapping(menuAction, j);
                     swapMenu->addAction(menuAction);

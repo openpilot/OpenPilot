@@ -50,9 +50,8 @@ public:
 private:
     Ui_StabilizationWidget *ui;
     QTimer *realtimeUpdates;
-    QList<QTabBar *> m_pidTabBars;
+    QList<QTabBar *> m_stabTabBars;
     QString m_stabilizationObjectsString;
-    QAction *m_defaultPIDMenuAction;
 
     // Milliseconds between automatic 'Instant Updates'
     static const int AUTOMATIC_UPDATE_RATE   = 500;
@@ -61,21 +60,23 @@ private:
     static const double EXPO_CURVE_CONSTANT  = 1.00695;
 
     int boardModel;
-    int m_pidBankCount;
-    int m_currentPIDBank;
+    int m_stabSettingsBankCount;
+    int m_currentStabSettingsBank;
 
     QwtPlotCurve m_expoPlotCurveRoll;
     QwtPlotCurve m_expoPlotCurvePitch;
     QwtPlotCurve m_expoPlotCurveYaw;
     QwtPlotGrid m_plotGrid;
-    QSignalMapper m_PIDCopyFromSignalMapper;
-    QSignalMapper m_PIDCopyToSignalMapper;
-    QSignalMapper m_PIDSwapSignalMapper;
+    QSignalMapper m_stabSettingsCopyFromSignalMapper;
+    QSignalMapper m_stabSettingsCopyToSignalMapper;
+    QSignalMapper m_stabSettingsSwapSignalMapper;
+
+    UAVObject *getStabBankObject(int bank);
 
     void updateThrottleCurveFromObject();
     void updateObjectFromThrottleCurve();
     void setupExpoPlot();
-    void setupPIDBanksGUI();
+    void setupStabBanksGUI();
     void resetStabBank(int bank);
     void restoreStabBank(int bank);
 
@@ -91,7 +92,7 @@ private slots:
     void linkCheckBoxes(bool value);
     void processLinkedWidgets(QWidget *);
     void onBoardConnected();
-    void pidBankChanged(int index);
+    void stabBankChanged(int index);
     void resetThrottleCurveToDefault();
     void throttleCurveUpdated();
     void replotExpo(int value, QwtPlotCurve &curve);
@@ -99,12 +100,13 @@ private slots:
     void replotExpoPitch(int value);
     void replotExpoYaw(int value);
 
-    void restoreAllPIDBanks();
-    void resetAllPIDBanks();
+    void restoreAllStabBanks();
+    void resetAllStabBanks();
     void restoreCurrentAction();
-    void resetCurrentPIDBank();
-    void copyCurrentPIDBank();
+    void resetCurrentStabBank();
+    void copyCurrentStabBank();
 
+    void copyFromBankToBank(int fromBank, int toBank);
     void copyFromBankToCurrent(int bank);
     void copyToBankFromCurrent(int bank);
     void swapBankAndCurrent(int bank);

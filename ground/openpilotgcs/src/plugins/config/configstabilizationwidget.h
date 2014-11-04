@@ -35,6 +35,7 @@
 #include "stabilizationsettings.h"
 #include <QWidget>
 #include <QTimer>
+#include <QSignalMapper>
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_plot_grid.h"
 
@@ -51,6 +52,7 @@ private:
     QTimer *realtimeUpdates;
     QList<QTabBar *> m_pidTabBars;
     QString m_stabilizationObjectsString;
+    QAction *m_defaultPIDMenuAction;
 
     // Milliseconds between automatic 'Instant Updates'
     static const int AUTOMATIC_UPDATE_RATE   = 500;
@@ -66,10 +68,17 @@ private:
     QwtPlotCurve m_expoPlotCurvePitch;
     QwtPlotCurve m_expoPlotCurveYaw;
     QwtPlotGrid m_plotGrid;
+    QSignalMapper m_PIDCopyFromSignalMapper;
+    QSignalMapper m_PIDCopyToSignalMapper;
+    QSignalMapper m_PIDSwapSignalMapper;
 
     void updateThrottleCurveFromObject();
     void updateObjectFromThrottleCurve();
     void setupExpoPlot();
+    void setupPIDBanksGUI();
+    void resetStabBank(int bank);
+    void restoreStabBank(int bank);
+
 protected:
     QString mapObjectName(const QString objectName);
 
@@ -89,5 +98,15 @@ private slots:
     void replotExpoRoll(int value);
     void replotExpoPitch(int value);
     void replotExpoYaw(int value);
+
+    void restoreAllPIDBanks();
+    void resetAllPIDBanks();
+    void restoreCurrentAction();
+    void resetCurrentPIDBank();
+    void copyCurrentPIDBank();
+
+    void copyFromBankToCurrent(int bank);
+    void copyToBankFromCurrent(int bank);
+    void swapBankAndCurrent(int bank);
 };
 #endif // ConfigStabilizationWidget_H

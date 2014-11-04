@@ -37,6 +37,9 @@
 #include <QList>
 #include <QTabBar>
 #include <QMessageBox>
+#include <QToolButton>
+#include <QMenu>
+#include <QAction>
 
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
@@ -56,29 +59,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     setupExpoPlot();
 
-    StabilizationSettings *stabSettings = qobject_cast<StabilizationSettings *>(getObject("StabilizationSettings"));
-    Q_ASSERT(stabSettings);
-
-    m_pidBankCount = stabSettings->getField("FlightModeMap")->getOptions().count();
-
-    // Set up fake tab widget stuff for pid banks support
-    m_pidTabBars.append(ui->basicPIDBankTabBar);
-    m_pidTabBars.append(ui->advancedPIDBankTabBar);
-    foreach(QTabBar * tabBar, m_pidTabBars) {
-        for (int i = 0; i < m_pidBankCount; i++) {
-            tabBar->addTab(tr("Settings Bank %1").arg(i + 1));
-            tabBar->setTabData(i, QString("StabilizationSettingsBank%1").arg(i + 1));
-        }
-        tabBar->setExpanding(false);
-        connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
-    }
-
-    for (int i = 0; i < m_pidBankCount; i++) {
-        if (i > 0) {
-            m_stabilizationObjectsString.append(",");
-        }
-        m_stabilizationObjectsString.append(m_pidTabBars.at(0)->tabData(i).toString());
-    }
+    setupPIDBanksGUI();
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
@@ -160,6 +141,92 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     updateEnableControls();
 }
 
+void ConfigStabilizationWidget::setupPIDBanksGUI()
+{
+    StabilizationSettings *stabSettings = qobject_cast<StabilizationSettings *>(getObject("StabilizationSettings"));
+    Q_ASSERT(stabSettings);
+
+    m_pidBankCount = stabSettings->getField("FlightModeMap")->getOptions().count();
+
+    // Set up fake tab widget stuff for pid banks support
+    m_pidTabBars.append(ui->basicPIDBankTabBar);
+    m_pidTabBars.append(ui->advancedPIDBankTabBar);
+
+    m_defaultPIDMenuAction = new QAction(QIcon(":configgadget/images/gear.png"), QString(), this);
+    QAction *restoreAllAction = new QAction(tr("Restore all to saved"), this);
+    connect(restoreAllAction, SIGNAL(triggered()), this, SLOT(restoreAllPIDBanks()));
+    QAction *resetAllAction = new QAction(tr("Reset all to default"), this);
+    connect(resetAllAction, SIGNAL(triggered()), this, SLOT(resetAllPIDBanks()));
+    QAction *restoreCurrentAction = new QAction(tr("Restore to saved"), this);
+    connect(restoreCurrentAction, SIGNAL(triggered()), this, SLOT(restoreCurrentAction()));
+    QAction *resetCurrentAction = new QAction(tr("Reset to default"), this);
+    connect(resetCurrentAction, SIGNAL(triggered()), this, SLOT(resetCurrentPIDBank()));
+    QAction *copyCurrentAction = new QAction(tr("Copy to others"), this);
+    connect(copyCurrentAction, SIGNAL(triggered()), this, SLOT(copyCurrentPIDBank()));
+    connect(&m_PIDCopyFromSignalMapper, SIGNAL(mapped(int)), this, SLOT(copyFromBankToCurrent(int)));
+    connect(&m_PIDCopyToSignalMapper, SIGNAL(mapped(int)), this, SLOT(copyToBankFromCurrent(int)));
+    connect(&m_PIDSwapSignalMapper, SIGNAL(mapped(int)), this, SLOT(swapBankAndCurrent(int)));
+
+    foreach(QTabBar * tabBar, m_pidTabBars) {
+        for (int i = 0; i < m_pidBankCount; i++) {
+            tabBar->addTab(tr("Settings Bank %1").arg(i + 1));
+            tabBar->setTabData(i, QString("StabilizationSettingsBank%1").arg(i + 1));
+            QToolButton *tabButton = new QToolButton();
+            connect(this, SIGNAL(enableControlsChanged(bool)), tabButton, SLOT(setEnabled(bool)));
+            tabButton->setDefaultAction(m_defaultPIDMenuAction);
+            tabButton->setAutoRaise(true);
+            tabButton->setPopupMode(QToolButton::InstantPopup);
+            tabButton->setToolTip(tr("The actions in this menu acts on all fields in the settings banks,\n"
+                                     "not only the ones visible on this tab or in this GUI."));
+            QMenu *tabMenu = new QMenu();
+            QMenu *restoreMenu = new QMenu(tr("Restore"));
+            QMenu *resetMenu = new QMenu(tr("Reset"));
+            QMenu *copyMenu = new QMenu(tr("Copy"));
+            QMenu *swapMenu = new QMenu(tr("Swap"));
+            QAction *menuAction;
+            for (int j = 0; j < m_pidBankCount; j++) {
+                if (j == i) {
+                    restoreMenu->addAction(restoreCurrentAction);
+                    resetMenu->addAction(resetCurrentAction);
+                    copyMenu->addAction(copyCurrentAction);
+                } else {
+                    menuAction = new QAction(tr("Copy from %1").arg(j + 1), this);
+                    connect(menuAction, SIGNAL(triggered()), &m_PIDCopyFromSignalMapper, SLOT(map()));
+                    m_PIDCopyFromSignalMapper.setMapping(menuAction, j);
+                    copyMenu->addAction(menuAction);
+
+                    menuAction = new QAction(tr("Copy to %1").arg(j + 1), this);
+                    connect(menuAction, SIGNAL(triggered()), &m_PIDCopyToSignalMapper, SLOT(map()));
+                    m_PIDCopyToSignalMapper.setMapping(menuAction, j);
+                    copyMenu->addAction(menuAction);
+
+                    menuAction = new QAction(tr("Swap with %1").arg(j + 1), this);
+                    connect(menuAction, SIGNAL(triggered()), &m_PIDSwapSignalMapper, SLOT(map()));
+                    m_PIDSwapSignalMapper.setMapping(menuAction, j);
+                    swapMenu->addAction(menuAction);
+                }
+            }
+            restoreMenu->addAction(restoreAllAction);
+            resetMenu->addAction(resetAllAction);
+            tabMenu->addMenu(copyMenu);
+            tabMenu->addMenu(swapMenu);
+            tabMenu->addMenu(resetMenu);
+            tabMenu->addMenu(restoreMenu);
+            tabButton->setMenu(tabMenu);
+            tabBar->setTabButton(i, QTabBar::RightSide, tabButton);
+        }
+        tabBar->setExpanding(false);
+        connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(pidBankChanged(int)));
+    }
+
+    for (int i = 0; i < m_pidBankCount; i++) {
+        if (i > 0) {
+            m_stabilizationObjectsString.append(",");
+        }
+        m_stabilizationObjectsString.append(m_pidTabBars.at(0)->tabData(i).toString());
+    }
+}
+
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
 {
     // Do nothing
@@ -168,7 +235,6 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
 void ConfigStabilizationWidget::refreshWidgetsValues(UAVObject *o)
 {
     ConfigTaskWidget::refreshWidgetsValues(o);
-
     updateThrottleCurveFromObject();
 
     ui->basicResponsivenessCheckBox->setChecked(ui->rateRollKp_3->value() == ui->ratePitchKp_4->value() &&
@@ -338,6 +404,138 @@ void ConfigStabilizationWidget::replotExpoPitch(int value)
 void ConfigStabilizationWidget::replotExpoYaw(int value)
 {
     replotExpo(value, m_expoPlotCurveYaw);
+}
+
+void ConfigStabilizationWidget::restoreAllPIDBanks()
+{
+    qDebug() << "restoreAllPIDBanks";
+    for (int i = 0; i < m_pidBankCount; i++) {
+        restoreStabBank(i);
+    }
+}
+
+void ConfigStabilizationWidget::resetAllPIDBanks()
+{
+    qDebug() << "resetAllPIDBanks";
+    for (int i = 0; i < m_pidBankCount; i++) {
+        resetStabBank(i);
+    }
+}
+
+void ConfigStabilizationWidget::restoreCurrentAction()
+{
+    qDebug() << "restoreCurrentAction";
+    restoreStabBank(m_currentPIDBank);
+}
+
+void ConfigStabilizationWidget::resetStabBank(int bank)
+{
+    UAVDataObject *stabBankObject =
+            dynamic_cast<UAVDataObject *>(getObject(QString("StabilizationSettingsBank%1").arg(bank + 1)));
+    if (stabBankObject) {
+        UAVDataObject * defaultStabBankObject = stabBankObject->dirtyClone();
+        quint8 data[stabBankObject->getNumBytes()];
+        defaultStabBankObject->pack(data);
+        stabBankObject->unpack(data);
+     }
+}
+
+void ConfigStabilizationWidget::restoreStabBank(int bank)
+{
+    UAVObject *stabBankObject =
+            getObject(QString("StabilizationSettingsBank%1").arg(bank + 1));
+    if (stabBankObject) {
+        ObjectPersistence *objectPersistenceObject = ObjectPersistence::GetInstance(getObjectManager());
+        QTimer updateTimer(this);
+        QEventLoop eventLoop(this);
+        connect(&updateTimer, SIGNAL(timeout()), &eventLoop, SLOT(quit()));
+        connect(objectPersistenceObject, SIGNAL(objectUpdated(UAVObject *)), &eventLoop, SLOT(quit()));
+
+        ObjectPersistence::DataFields data;
+        data.Operation  = ObjectPersistence::OPERATION_LOAD;
+        data.Selection  = ObjectPersistence::SELECTION_SINGLEOBJECT;
+        data.ObjectID   = stabBankObject->getObjID();
+        data.InstanceID = stabBankObject->getInstID();
+        objectPersistenceObject->setData(data);
+        objectPersistenceObject->updated();
+        updateTimer.start(500);
+        eventLoop.exec();
+        if (updateTimer.isActive()) {
+            stabBankObject->requestUpdate();
+        }
+        updateTimer.stop();
+    }
+}
+
+void ConfigStabilizationWidget::resetCurrentPIDBank()
+{
+    qDebug() << "resetCurrentPIDBank";
+    resetStabBank(m_currentPIDBank);
+}
+
+void ConfigStabilizationWidget::copyCurrentPIDBank()
+{
+    qDebug() << "copyCurrentPIDBank";
+    UAVObject *fromStabBankObject =
+            getObject(QString("StabilizationSettingsBank%1").arg(m_currentPIDBank + 1));
+    if (fromStabBankObject) {
+        quint8 fromStabBankObjectData[fromStabBankObject->getNumBytes()];
+        fromStabBankObject->pack(fromStabBankObjectData);
+        for (int i = 0; i < m_pidBankCount; i++) {
+            if (i != m_currentPIDBank) {
+                UAVObject *toStabBankObject =
+                        getObject(QString("StabilizationSettingsBank%1").arg(i + 1));
+                if (toStabBankObject) {
+                    toStabBankObject->unpack(fromStabBankObjectData);
+                }
+            }
+        }
+    }
+}
+
+void ConfigStabilizationWidget::copyFromBankToCurrent(int bank)
+{
+    qDebug() << "copyFromBankToCurrent" << bank;
+    UAVObject *fromStabBankObject =
+            getObject(QString("StabilizationSettingsBank%1").arg(bank + 1));
+    UAVObject *toStabBankObject =
+            getObject(QString("StabilizationSettingsBank%1").arg(m_currentPIDBank + 1));
+    if (fromStabBankObject && toStabBankObject) {
+        quint8 data[fromStabBankObject->getNumBytes()];
+        fromStabBankObject->pack(data);
+        toStabBankObject->unpack(data);
+    }
+}
+
+void ConfigStabilizationWidget::copyToBankFromCurrent(int bank)
+{
+    qDebug() << "copyToBankFromCurrent" << bank;
+    UAVObject *fromStabBankObject =
+            getObject(QString("StabilizationSettingsBank%1").arg(m_currentPIDBank + 1));
+    UAVObject *toStabBankObject =
+            getObject(QString("StabilizationSettingsBank%1").arg(bank + 1));
+    if (fromStabBankObject && toStabBankObject) {
+        quint8 data[fromStabBankObject->getNumBytes()];
+        fromStabBankObject->pack(data);
+        toStabBankObject->unpack(data);
+    }
+}
+
+void ConfigStabilizationWidget::swapBankAndCurrent(int bank)
+{
+    qDebug() << "swapBankAndCurrent" << bank;
+    UAVObject *fromStabBankObject =
+            getObject(QString("StabilizationSettingsBank%1").arg(m_currentPIDBank + 1));
+    UAVObject *toStabBankObject =
+            getObject(QString("StabilizationSettingsBank%1").arg(bank + 1));
+    if (fromStabBankObject && toStabBankObject) {
+        quint8 fromStabBankObjectData[fromStabBankObject->getNumBytes()];
+        quint8 toStabBankObjectData[toStabBankObject->getNumBytes()];
+        fromStabBankObject->pack(fromStabBankObjectData);
+        toStabBankObject->pack(toStabBankObjectData);
+        toStabBankObject->unpack(fromStabBankObjectData);
+        fromStabBankObject->unpack(toStabBankObjectData);
+    }
 }
 
 void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)

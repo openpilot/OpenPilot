@@ -31,6 +31,7 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include <QToolButton>
 
 ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent), m_currentBoardId(-1), m_isConnected(false), m_isWidgetUpdatesAllowed(true),
     m_saveButton(NULL), m_isDirty(false), m_outOfLimitsStyle("background-color: rgb(255, 0, 0);"), m_realtimeUpdateTimer(NULL)
@@ -294,8 +295,12 @@ void ConfigTaskWidget::refreshWidgetsValues(UAVObject *obj)
     emit refreshWidgetsValuesRequested();
     QList<WidgetBinding *> bindings = obj == NULL ? m_widgetBindingsPerObject.values() : m_widgetBindingsPerObject.values(obj);
     foreach(WidgetBinding * binding, bindings) {
-        if (binding->isEnabled() && binding->field() != NULL && binding->widget() != NULL) {
-            setWidgetFromField(binding->widget(), binding->field(), binding);
+        if (binding->field() != NULL && binding->widget() != NULL) {
+            if (binding->isEnabled()) {
+                setWidgetFromField(binding->widget(), binding->field(), binding);
+            } else {
+                binding->updateValueFromObjectField();
+            }
         }
     }
     setDirty(dirtyBack);
@@ -361,6 +366,7 @@ void ConfigTaskWidget::enableControls(bool enable)
             }
         }
     }
+    emit enableControlsChanged(enable);
 }
 
 bool ConfigTaskWidget::shouldObjectBeSaved(UAVObject *object)
@@ -809,6 +815,8 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget *widget, const char *f
         connect(cb, SIGNAL(stateChanged(int)), this, function, Qt::UniqueConnection);
     } else if (QPushButton * cb = qobject_cast<QPushButton *>(widget)) {
         connect(cb, SIGNAL(clicked()), this, function, Qt::UniqueConnection);
+    } else if (QToolButton * cb = qobject_cast<QToolButton *>(widget)) {
+        connect(cb, SIGNAL(clicked()), this, function, Qt::UniqueConnection);
     } else {
         qDebug() << __FUNCTION__ << "widget binding not implemented" << widget->metaObject()->className();
     }
@@ -836,6 +844,8 @@ void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget *widget, const char
     } else if (QCheckBox * cb = qobject_cast<QCheckBox *>(widget)) {
         disconnect(cb, SIGNAL(stateChanged(int)), this, function);
     } else if (QPushButton * cb = qobject_cast<QPushButton *>(widget)) {
+        disconnect(cb, SIGNAL(clicked()), this, function);
+    } else if (QToolButton * cb = qobject_cast<QToolButton *>(widget)) {
         disconnect(cb, SIGNAL(clicked()), this, function);
     } else {
         qDebug() << __FUNCTION__ << "widget binding not implemented" << widget->metaObject()->className();
@@ -1198,6 +1208,13 @@ void WidgetBinding::updateObjectFieldFromValue()
 {
     if (m_value.isValid()) {
         m_field->setValue(m_value, m_index);
+    }
+}
+
+void WidgetBinding::updateValueFromObjectField()
+{
+    if (m_field->getValue(m_index).isValid()) {
+        m_value = m_field->getValue(m_index);
     }
 }
 

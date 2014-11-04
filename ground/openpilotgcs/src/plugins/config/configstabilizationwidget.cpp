@@ -144,6 +144,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 void ConfigStabilizationWidget::setupStabBanksGUI()
 {
     StabilizationSettings *stabSettings = qobject_cast<StabilizationSettings *>(getObject("StabilizationSettings"));
+
     Q_ASSERT(stabSettings);
 
     m_stabSettingsBankCount = stabSettings->getField("FlightModeMap")->getOptions().count();
@@ -153,15 +154,15 @@ void ConfigStabilizationWidget::setupStabBanksGUI()
     m_stabTabBars.append(ui->advancedPIDBankTabBar);
 
     QAction *defaultStabMenuAction = new QAction(QIcon(":configgadget/images/gear.png"), QString(), this);
-    QAction *restoreAllAction = new QAction(tr("Restore all to saved"), this);
+    QAction *restoreAllAction     = new QAction(tr("Restore all to saved"), this);
     connect(restoreAllAction, SIGNAL(triggered()), this, SLOT(restoreAllStabBanks()));
-    QAction *resetAllAction = new QAction(tr("Reset all to default"), this);
+    QAction *resetAllAction       = new QAction(tr("Reset all to default"), this);
     connect(resetAllAction, SIGNAL(triggered()), this, SLOT(resetAllStabBanks()));
     QAction *restoreCurrentAction = new QAction(tr("Restore to saved"), this);
     connect(restoreCurrentAction, SIGNAL(triggered()), this, SLOT(restoreCurrentAction()));
-    QAction *resetCurrentAction = new QAction(tr("Reset to default"), this);
+    QAction *resetCurrentAction   = new QAction(tr("Reset to default"), this);
     connect(resetCurrentAction, SIGNAL(triggered()), this, SLOT(resetCurrentStabBank()));
-    QAction *copyCurrentAction = new QAction(tr("Copy to others"), this);
+    QAction *copyCurrentAction    = new QAction(tr("Copy to others"), this);
     connect(copyCurrentAction, SIGNAL(triggered()), this, SLOT(copyCurrentStabBank()));
     connect(&m_stabSettingsCopyFromSignalMapper, SIGNAL(mapped(int)), this, SLOT(copyFromBankToCurrent(int)));
     connect(&m_stabSettingsCopyToSignalMapper, SIGNAL(mapped(int)), this, SLOT(copyToBankFromCurrent(int)));
@@ -178,11 +179,11 @@ void ConfigStabilizationWidget::setupStabBanksGUI()
             tabButton->setPopupMode(QToolButton::InstantPopup);
             tabButton->setToolTip(tr("The functions in this menu effects on fields in the settings banks,\n"
                                      "not only the ones visible on screen."));
-            QMenu *tabMenu = new QMenu();
+            QMenu *tabMenu     = new QMenu();
             QMenu *restoreMenu = new QMenu(tr("Restore"));
-            QMenu *resetMenu = new QMenu(tr("Reset"));
-            QMenu *copyMenu = new QMenu(tr("Copy"));
-            QMenu *swapMenu = new QMenu(tr("Swap"));
+            QMenu *resetMenu   = new QMenu(tr("Reset"));
+            QMenu *copyMenu    = new QMenu(tr("Copy"));
+            QMenu *swapMenu    = new QMenu(tr("Swap"));
             QAction *menuAction;
             for (int j = 0; j < m_stabSettingsBankCount; j++) {
                 if (j == i) {
@@ -235,6 +236,7 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
 void ConfigStabilizationWidget::refreshWidgetsValues(UAVObject *o)
 {
     ConfigTaskWidget::refreshWidgetsValues(o);
+
     updateThrottleCurveFromObject();
 
     ui->basicResponsivenessCheckBox->setChecked(ui->rateRollKp_3->value() == ui->ratePitchKp_4->value() &&
@@ -423,25 +425,28 @@ void ConfigStabilizationWidget::restoreCurrentAction()
     restoreStabBank(m_currentStabSettingsBank);
 }
 
-UAVObject * ConfigStabilizationWidget::getStabBankObject(int bank) {
+UAVObject *ConfigStabilizationWidget::getStabBankObject(int bank)
+{
     return getObject(QString("StabilizationSettingsBank%1").arg(bank + 1));
 }
 
 void ConfigStabilizationWidget::resetStabBank(int bank)
 {
     UAVDataObject *stabBankObject =
-            dynamic_cast<UAVDataObject *>(getStabBankObject(bank));
+        dynamic_cast<UAVDataObject *>(getStabBankObject(bank));
+
     if (stabBankObject) {
-        UAVDataObject * defaultStabBankObject = stabBankObject->dirtyClone();
+        UAVDataObject *defaultStabBankObject = stabBankObject->dirtyClone();
         quint8 data[stabBankObject->getNumBytes()];
         defaultStabBankObject->pack(data);
         stabBankObject->unpack(data);
-     }
+    }
 }
 
 void ConfigStabilizationWidget::restoreStabBank(int bank)
 {
     UAVObject *stabBankObject = getStabBankObject(bank);
+
     if (stabBankObject) {
         ObjectPersistence *objectPersistenceObject = ObjectPersistence::GetInstance(getObjectManager());
         QTimer updateTimer(this);
@@ -473,6 +478,7 @@ void ConfigStabilizationWidget::resetCurrentStabBank()
 void ConfigStabilizationWidget::copyCurrentStabBank()
 {
     UAVObject *fromStabBankObject = getStabBankObject(m_currentStabSettingsBank);
+
     if (fromStabBankObject) {
         quint8 fromStabBankObjectData[fromStabBankObject->getNumBytes()];
         fromStabBankObject->pack(fromStabBankObjectData);
@@ -487,9 +493,11 @@ void ConfigStabilizationWidget::copyCurrentStabBank()
     }
 }
 
-void ConfigStabilizationWidget::copyFromBankToBank(int fromBank, int toBank) {
+void ConfigStabilizationWidget::copyFromBankToBank(int fromBank, int toBank)
+{
     UAVObject *fromStabBankObject = getStabBankObject(fromBank);
-    UAVObject *toStabBankObject = getStabBankObject(toBank);
+    UAVObject *toStabBankObject   = getStabBankObject(toBank);
+
     if (fromStabBankObject && toStabBankObject) {
         quint8 data[fromStabBankObject->getNumBytes()];
         fromStabBankObject->pack(data);
@@ -510,7 +518,8 @@ void ConfigStabilizationWidget::copyToBankFromCurrent(int bank)
 void ConfigStabilizationWidget::swapBankAndCurrent(int bank)
 {
     UAVObject *fromStabBankObject = getStabBankObject(m_currentStabSettingsBank);
-    UAVObject *toStabBankObject = getStabBankObject(bank);
+    UAVObject *toStabBankObject   = getStabBankObject(bank);
+
     if (fromStabBankObject && toStabBankObject) {
         quint8 fromStabBankObjectData[fromStabBankObject->getNumBytes()];
         quint8 toStabBankObjectData[toStabBankObject->getNumBytes()];

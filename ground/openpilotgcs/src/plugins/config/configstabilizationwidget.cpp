@@ -177,7 +177,7 @@ void ConfigStabilizationWidget::setupStabBanksGUI()
             tabButton->setDefaultAction(defaultStabMenuAction);
             tabButton->setAutoRaise(true);
             tabButton->setPopupMode(QToolButton::InstantPopup);
-            tabButton->setToolTip(tr("The functions in this menu effects on fields in the settings banks,\n"
+            tabButton->setToolTip(tr("The functions in this menu effect all fields in the settings banks,\n"
                                      "not only the ones visible on screen."));
             QMenu *tabMenu     = new QMenu();
             QMenu *restoreMenu = new QMenu(tr("Restore"));

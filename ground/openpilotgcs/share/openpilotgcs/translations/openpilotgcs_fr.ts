@@ -5140,7 +5140,7 @@ AxisLock: La caméra se souvient de l&apos;orientation. L&apos;entrée contrôle
     <message>
         <location/>
         <source>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</source>
-        <translation type="unfinished">Vitesse maximale sur le Yaw pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
+        <translation>Vitesse maximale sur le Yaw pour une entrée de 100% en mode AxisLock, en degrés/s.</translation>
     </message>
     <message>
         <location/>
@@ -9267,7 +9267,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To continue, the wizard needs to determine the configuration required for the type of OpenPilot controller you have. When connected, the wizard will attempt to automatically detect the type of board.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;If the board is already connected and successfully detected, the board type will already be displayed. You can &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;Disconnect&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; and select another device if you need to detect another board.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;If your board is not connected, please connect the board to a USB port on your computer and select the device from the list below. Then press &lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt; font-weight:600;&quot;&gt;Connect&lt;/span&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -10950,7 +10950,7 @@ Bougez le manche %1.</translation>
 <context>
     <name>ScopeGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+222"/>
+        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+219"/>
         <source>Click legend to show/hide scope trace.
 Double click legend or plot to show/hide legend.</source>
         <translation>Cliquer sur la légende pour afficher/cacher le tracé du graphique.
@@ -11256,7 +11256,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Échoué !</translation>
     </message>
     <message>
-        <location line="+130"/>
+        <location line="+143"/>
         <source>Writing External Mag sensor settings</source>
         <translation>Écriture paramètres Compas Externe</translation>
     </message>
@@ -11318,7 +11318,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
         <translation>Écriture paramètres véhicule</translation>
     </message>
     <message>
-        <location line="+43"/>
+        <location line="+37"/>
         <source>Writing manual control defaults</source>
         <translation>Écriture contrôles manuels par défaut</translation>
     </message>
@@ -13090,7 +13090,13 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot Revolution Calibration Procedure&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The calibration procedure for the OpenPilot Revolution controller is not yet implemented in this setup wizard. To calibrate your OpenPilot Revolution controller please use the calibration utility found in the configuration plugin after you have finished this wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Future versions of will have an easy to use calibration procedure implemented.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Cantarell&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Procédure de Calibration Revolution OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;La procédure de calibration de la carte Révolution OpenPilot n&apos;est pas encore implémentée dans cet assistant de configuration. Pour calibrer la carte Revolution OpenPilot, veuillez utiliser l&apos;utilitaire de configuration dans l&apos;onglet configuration à la fin de cet assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Les futures versions possèderont une procédure de calibration facile à utiliser.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -14012,12 +14018,12 @@ Veuillez vérifier le fichier.
 <context>
     <name>ConfigStabilizationWidget</name>
     <message>
-        <location filename="../../../src/plugins/config/configstabilizationwidget.cpp" line="+69"/>
+        <location filename="../../../src/plugins/config/configstabilizationwidget.cpp" line="+173"/>
         <source>Settings Bank %1</source>
         <translation>Banque Paramètres %1</translation>
     </message>
     <message>
-        <location line="+70"/>
+        <location line="-53"/>
         <source>Thrust</source>
         <translation>Poussée</translation>
     </message>
@@ -14027,7 +14033,74 @@ Veuillez vérifier le fichier.
         <translation>Facteur d&apos;ajustement</translation>
     </message>
     <message>
-        <location line="+95"/>
+        <location line="+36"/>
+        <source>all to saved</source>
+        <translation>tout vers enregistré</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>all to default</source>
+        <translation>tout par défaut</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>to saved</source>
+        <translation>vers enregistré</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>to default</source>
+        <translation>vers défaut</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>to others</source>
+        <translation>vers les autres</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>The functions in this menu effect all fields in the settings banks,
+not only the ones visible on screen.</source>
+        <translation>Les fonctions dans ce menu modifient tous les champs dans les banques Pid,
+pas seulement les champs visibles à l&apos;écran.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Restore</source>
+        <translation>Restaurer</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Reset</source>
+        <translation>Réinitialiser</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Copy</source>
+        <translation>Copier</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Swap</source>
+        <translation>Échanger</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>from %1</source>
+        <translation>depuis %1</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>to %1</source>
+        <translation>vers %1</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>with %1</source>
+        <translation>avec %1</translation>
+    </message>
+    <message>
+        <location line="+99"/>
         <source>Input %</source>
         <translation>Entrée %</translation>
     </message>
@@ -14614,7 +14687,7 @@ It is suggested that if this is a first time configuration of your controller, r
 Il est suggéré que si cela est une première configuration de votre contrôleur, plutôt que d&apos;utiliser cette option, sélectionnez à la place un ensemble de réglages qui correspond le mieux à votre propre appareil dans la liste ci-dessus. Si vous n&apos;êtes pas en mesure d&apos;en choisir un, sélectionnez l&apos;élément générique de la liste.</translation>
     </message>
     <message>
-        <location line="+59"/>
+        <location line="+77"/>
         <source>Current Tuning</source>
         <translation>Réglages Actuels</translation>
     </message>
@@ -14685,22 +14758,24 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/selectionpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished">Page d&apos;Assistant</translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
         <source>placeholder_text</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Select:</source>
-        <translation type="unfinished">Sélectionner :</translation>
+        <translation>Sélectionner :</translation>
     </message>
 </context>
 <context>
@@ -14916,7 +14991,7 @@ p, li { white-space: pre-wrap; }
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.cpp" line="+87"/>
+        <location filename="../../../src/plugins/setupwizard/vehicletemplateexportdialog.cpp" line="+88"/>
         <source>Fixed Wing - Aileron</source>
         <translation>Voilure Fixe - Aileron</translation>
     </message>
@@ -14944,6 +15019,11 @@ p, li { white-space: pre-wrap; }
         <location line="+5"/>
         <source>Multirotor - Quadrocopter X</source>
         <translation>Multirotor - Quadricoptère X</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Multirotor - Quadrocopter H</source>
+        <translation>Multirotor - Quadricoptère H</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -14982,6 +15062,11 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+5"/>
+        <source>Multirotor - Hexacopter H</source>
+        <translation>Multirotor - Hexacoptère H</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Multirotor - Hexacopter Y6</source>
         <translation>Multirotor - Hexacoptère Y6</translation>
     </message>
@@ -14996,7 +15081,7 @@ p, li { white-space: pre-wrap; }
         <translation>Non Supporté</translation>
     </message>
     <message>
-        <location line="+74"/>
+        <location line="+75"/>
         <source>Export settings</source>
         <translation>Exporter réglages</translation>
     </message>
@@ -15327,6 +15412,26 @@ p, li { white-space: pre-wrap; }
         <location line="+17"/>
         <source>Limits</source>
         <translation>Limites</translation>
+    </message>
+</context>
+<context>
+    <name>QwtPlotRenderer</name>
+    <message>
+        <location filename="../../../src/libs/qwt/src/qwt_plot_renderer.cpp" line="+979"/>
+        <location line="+3"/>
+        <location line="+3"/>
+        <source>Documents</source>
+        <translation>Documents</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Images</source>
+        <translation>Images</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Export File Name</source>
+        <translation>Nom Fichier Exporté</translation>
     </message>
 </context>
 </TS>

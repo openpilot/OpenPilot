@@ -25,14 +25,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "configpipxtremewidget.h"
+#include "configoplinkwidget.h"
 
 #include <coreplugin/generalsettings.h>
 #include <oplinksettings.h>
 #include <oplinkstatus.h>
 #include <QMessageBox>
 
-ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigOPLinkWidget::ConfigOPLinkWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_oplink = new Ui_OPLinkWidget();
     m_oplink->setupUi(this);
@@ -77,7 +77,6 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     addWidgetBinding("OPLinkStatus", "RxFailure", m_oplink->RxFailure);
     addWidgetBinding("OPLinkStatus", "UAVTalkErrors", m_oplink->UAVTalkErrors);
     addWidgetBinding("OPLinkStatus", "TxDropped", m_oplink->Dropped);
-    addWidgetBinding("OPLinkStatus", "TxResent", m_oplink->Resent);
     addWidgetBinding("OPLinkStatus", "TxFailure", m_oplink->TxFailure);
     addWidgetBinding("OPLinkStatus", "Resets", m_oplink->Resets);
     addWidgetBinding("OPLinkStatus", "Timeouts", m_oplink->Timeouts);
@@ -105,13 +104,13 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     updateEnableControls();
 }
 
-ConfigPipXtremeWidget::~ConfigPipXtremeWidget()
+ConfigOPLinkWidget::~ConfigOPLinkWidget()
 {}
 
 /*!
    \brief Called by updates to @OPLinkStatus
  */
-void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
+void ConfigOPLinkWidget::updateStatus(UAVObject *object)
 {
     // Request and update of the setting object if we haven't received it yet.
     if (!settingsUpdated) {
@@ -219,7 +218,7 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 /*!
    \brief Called by updates to @OPLinkSettings
  */
-void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
+void ConfigOPLinkWidget::updateSettings(UAVObject *object)
 {
     Q_UNUSED(object);
 
@@ -270,20 +269,20 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
     }
 }
 
-void ConfigPipXtremeWidget::updateEnableControls()
+void ConfigOPLinkWidget::updateEnableControls()
 {
     enableControls(true);
     ppmOnlyChanged();
 }
 
-void ConfigPipXtremeWidget::disconnected()
+void ConfigOPLinkWidget::disconnected()
 {
     if (settingsUpdated) {
         settingsUpdated = false;
     }
 }
 
-void ConfigPipXtremeWidget::bind()
+void ConfigOPLinkWidget::bind()
 {
     QPushButton *bindButton = qobject_cast<QPushButton *>(sender());
 
@@ -309,7 +308,7 @@ void ConfigPipXtremeWidget::bind()
     }
 }
 
-void ConfigPipXtremeWidget::ppmOnlyChanged()
+void ConfigOPLinkWidget::ppmOnlyChanged()
 {
     bool is_ppm_only = m_oplink->PPMOnly->isChecked();
 

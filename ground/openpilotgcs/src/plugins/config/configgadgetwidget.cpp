@@ -36,7 +36,7 @@
 #include "configtxpidwidget.h"
 #include "configrevohwwidget.h"
 #include "config_cc_hw_widget.h"
-#include "configpipxtremewidget.h"
+#include "configoplinkwidget.h"
 #include "configrevowidget.h"
 #include "defaultattitudewidget.h"
 #include "defaulthwsettingswidget.h"
@@ -240,7 +240,7 @@ void ConfigGadgetWidget::updateOPLinkStatus(UAVObject *)
         icon->addFile(":/configgadget/images/pipx-normal.png", QSize(), QIcon::Normal, QIcon::Off);
         icon->addFile(":/configgadget/images/pipx-selected.png", QSize(), QIcon::Selected, QIcon::Off);
 
-        QWidget *qwd = new ConfigPipXtremeWidget(this);
+        QWidget *qwd = new ConfigOPLinkWidget(this);
         stackWidget->insertTab(ConfigGadgetWidget::oplink, qwd, *icon, QString("OPLink"));
         oplinkConnected = true;
     }

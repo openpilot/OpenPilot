@@ -40,11 +40,12 @@
 #include <pios_stdio.h>
 
 
-unsigned yaffs_trace_mask = 0;
-	//YAFFS_TRACE_ERROR |
-	//YAFFS_TRACE_BUG			 |
-	//YAFFS_TRACE_ALWAYS |
-	//0;
+unsigned yaffs_trace_mask =
+	YAFFS_TRACE_ERROR |
+	YAFFS_TRACE_BUG			 |
+	YAFFS_TRACE_ALWAYS |
+	YAFFS_TRACE_MTD |
+	0;
 
 int random_seed;
 int simulate_power_failure = 0;
@@ -165,7 +166,7 @@ int32_t PIOS_FLASHFS_Logfs_Init(
 
 	// Simposix implementation uses a ram nor simulation which can be installed
     // as multiple instances
-	yaffs_nor_install_drv(devicename);
+	yaffs_nor_install_drv(devicename, cfg, driver, flash_id);
 
 
 	sigset_t sigset;

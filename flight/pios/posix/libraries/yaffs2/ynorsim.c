@@ -111,13 +111,15 @@ int32_t PIOS_Flash_Norsim_ReadData(uintptr_t flash_id, uint32_t addr_val, uint8_
 	pios_trace(PIOS_TRACE_TEST, "PIOS_Flash_Norsim_ReadData");
 	uint16_t nwords = len / 4;
 	u32 *buf = (u32 *)data;
-	u32 *addr = sim->word + (u32 *)addr_val;
+	u32 *addr = sim->word + addr_val;
 	while (nwords > 0) {
 			*buf = *addr;
 			buf++;
 			addr++;
 			nwords--;
 	}
+
+	return 0;
 }
 
 
@@ -161,13 +163,15 @@ int32_t PIOS_Flash_Norsim_WriteData(uintptr_t flash_id, uint32_t addr_val, uint8
 	pios_trace(PIOS_TRACE_TEST, "PIOS_Flash_Norsim_WriteData");
 	uint16_t nwords = len / 4;
 	u32 *buf = (u32 *)data;
-	u32 *addr = sim->word + (u32 *)addr_val;
+	u32 *addr = sim->word + addr_val;
 	while (nwords > 0) {
 		ynorsim_wr_one_word32(sim, addr, *buf);
 		addr++;
 		buf++;
 		nwords--;
 	}
+
+	return 0;
 }
 
 int32_t PIOS_Flash_Norsim_EraseSector(uintptr_t flash_id, uint32_t addr)
@@ -176,6 +180,8 @@ int32_t PIOS_Flash_Norsim_EraseSector(uintptr_t flash_id, uint32_t addr)
 	sim = &_norSimData[flash_id];
 	pios_trace(PIOS_TRACE_TEST, "PIOS_Flash_Norsim_EraseSector");
 	memset(sim->word + addr, 0xFF, sim->block_size_bytes);
+
+	return 0;
 }
 
 int32_t PIOS_Flash_Norsim_EraseChip(uintptr_t flash_id)
@@ -188,9 +194,9 @@ int32_t PIOS_Flash_Norsim_EraseChip(uintptr_t flash_id)
 }
 
 void ynorsim_initialise(char *name,
-                                   uintptr_t flash_id,
-                                   int n_blocks,
-				   int block_size_bytes)
+                        uintptr_t flash_id,
+                        int n_blocks,
+				        int block_size_bytes)
 {
 	struct nor_sim *sim;
 	sim = &_norSimData[flash_id];
@@ -202,8 +208,7 @@ void ynorsim_initialise(char *name,
 	sim->word = malloc(sim->file_size);
 	sim->fname = strdup(name);
 
-	if(!sim->word)
-		return NULL;
+	if(!sim->word) return;
 
 	ynorsim_ready(sim);
 	return;

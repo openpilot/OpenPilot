@@ -17,8 +17,24 @@
 #ifndef __YAFFS_NOR_DRV_H__
 #define __YAFFS_NOR_DRV_H__
 
+#include <stdint.h>
+
 struct yaffs_dev;
-struct yaffs_dev *yaffs_nor_install_drv(const char *name);
+struct flashfs_logfs_cfg;
+struct pios_flash_driver;
+
+struct pios_yaffs_driver_context
+{
+const struct flashfs_logfs_cfg *cfg;
+const struct pios_flash_driver *driver;
+uintptr_t flash_id;
+};
+
+
+void yaffs_nor_install_drv(const char *name,
+                           const struct flashfs_logfs_cfg *cfg,
+                           const struct pios_flash_driver *driver,
+                           uintptr_t flash_id);
 
 #endif
 

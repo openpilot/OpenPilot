@@ -386,7 +386,7 @@ static int nor_drv_MarkBad(struct yaffs_dev *dev, int block_no)
 }
 
 
-struct yaffs_dev *yaffs_nor_install_drv(const char *name,
+void yaffs_nor_install_drv(const char *name,
 		const struct flashfs_logfs_cfg *cfg,
 		const struct pios_flash_driver *driver,
 		uintptr_t flash_id)

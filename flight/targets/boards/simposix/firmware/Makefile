@@ -73,6 +73,7 @@ include $(PIOS)/common/libraries/FreeRTOS/library.mk
 ifeq ($(USE_YAFFS),YES)
 include $(PIOS)/common/libraries/yaffs2/library.mk  # Only required for yaffs testing
 include $(PIOS)/posix/libraries/yaffs2/yaffs_impl.mk  # Only required for yaffs testing
+CFLAGS += -DPIOS_YAFFS
 endif
 
 #include $(FLIGHTLIB)/PyMite/pymite.mk
@@ -167,7 +168,7 @@ CFLAGS += -Os
 endif
   
 # tracing
-# CFLAGS += -DPIOS_TRACE
+CFLAGS += -DPIOS_TRACE
  
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)

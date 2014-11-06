@@ -122,7 +122,7 @@ void PIOS_Board_Init(void)
 
     // Initialize logfs for settings.
 
-#if defined(PIOS_USE_YAFFS)
+#if defined(PIOS_YAFFS)
     // If linking in yaffs for testing, this will be /dev0 with settings stored
     // via the logfs object api in /dev0/logfs/
     if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_yaffs_norsim_cfg, &pios_norsim_flash_driver, 0)) {

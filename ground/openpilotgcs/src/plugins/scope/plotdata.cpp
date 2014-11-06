@@ -39,7 +39,7 @@ PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
     m_object(object), m_field(field), m_element(element),
     m_plotCurve(NULL), m_isVisible(true), m_pen(pen), m_isEnumPlot(false)
 {
-    if (!m_field->getNumElements() > 1) {
+    if (m_field->getNumElements() > 1) {
         m_elementName = m_field->getElementNames().at(m_element);
     }
 

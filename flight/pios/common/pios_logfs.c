@@ -289,6 +289,9 @@ int32_t PIOS_FLASHFS_GetStats(
     // Get yaffs statistics for that device
     stats->num_free_slots = yaffs_freespace(devicename);
     stats->num_active_slots = yaffs_totalspace(devicename) - stats->num_free_slots;
+    //TODO add in bad block count/stats
+    //TODO mount status?
+    //TODO Error conditions???
 
     // Return device usage statistics
     return 0;

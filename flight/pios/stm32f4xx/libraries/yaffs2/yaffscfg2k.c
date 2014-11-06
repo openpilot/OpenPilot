@@ -77,6 +77,13 @@ int32_t PIOS_FLASHFS_Logfs_Init(
     char devicename[8];
     char logfs_path[12];
 
+    /* Make sure the underlying flash driver provides the minimal set of required methods */
+    PIOS_Assert(driver->start_transaction);
+    PIOS_Assert(driver->end_transaction);
+    PIOS_Assert(driver->erase_sector);
+    PIOS_Assert(driver->write_data);
+    PIOS_Assert(driver->read_data);
+
     // Initialise the yaffs OS subsystem
     if (yaffs_start_up()) {
         PIOS_Assert(0);

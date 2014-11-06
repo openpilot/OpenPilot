@@ -17,14 +17,15 @@
 #define __Y_NORSIM_H__
 
 #include "yaffs_guts.h"
+#include "pios_flash.h"
 
-struct nor_sim;
 
-void ynorsim_rd32(struct nor_sim *sim, u32 *addr, u32 *data, int nwords);
-void ynorsim_wr32(struct nor_sim *sim, u32 *addr, u32 *data, int nwords);
-void ynorsim_erase(struct nor_sim *sim, u32 *addr);
-void ynorsim_shutdown(struct nor_sim *sim);
-struct nor_sim *ynorsim_initialise(char *name, int n_blocks, int block_size_bytes);
-u32 * ynorsim_get_base(struct nor_sim *sim);
+
+void ynorsim_shutdown(uintptr_t flash_id);
+void ynorsim_initialise(char *name,
+                                   uintptr_t flash_id,
+                                   int n_blocks,
+				   int block_size_bytes);
+extern const struct pios_flash_driver pios_norsim_flash_driver;
 
 #endif

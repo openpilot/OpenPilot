@@ -121,11 +121,19 @@ void PIOS_Board_Init(void)
     PIOS_DELAY_Init();
 
     // Initialize logfs for settings.
+
+#if defined(PIOS_USE_YAFFS)
     // If linking in yaffs for testing, this will be /dev0 with settings stored
     // via the logfs object api in /dev0/logfs/
+    if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_yaffs_norsim_cfg, &pios_norsim_flash_driver, 0)) {
+        PIOS_DEBUG_Assert(0);
+    }
+#else
     if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, NULL, NULL, 0)) {
         PIOS_DEBUG_Assert(0);
     }
+#endif
+
     // If linking in yaffs for testing, this will re-use the simposix yaffs /dev0 nor
     // simulation, which does not support being instanced twice.
     pios_user_fs_id = pios_uavo_settings_fs_id;

@@ -70,6 +70,23 @@ const struct pios_udp_cfg pios_udp_aux_cfg = {
 
 #endif /* PIOS_INCLUDE_COM */
 
+
 #if defined(PIOS_INCLUDE_FLASH)
 #include "pios_flashfs_logfs_priv.h"
+#include "pios_flash_internal_priv.h"
+
+#if defined(PIOS_USE_YAFFS)
+static const struct flashfs_logfs_cfg flashfs_yaffs_norsim_cfg = {
+    .fs_magic      = 0x99abceff,
+    .total_fs_size = 0x00200000, /* 2M bytes (32 sectors = entire chip) */
+    .arena_size    = 0x0000FE00, /* multiple of slot size but less than sector_size */
+    .slot_size     = 0x00000200, /* 512 bytes chunk size for yaffs*/
+
+    .start_offset  = 0x00000000, /* start offset */
+    .sector_size   = 0x00010000, /* 64K bytes */
+    .page_size     = 0x00000100, /* 256 bytes */
+};
 #endif
+
+#endif
+

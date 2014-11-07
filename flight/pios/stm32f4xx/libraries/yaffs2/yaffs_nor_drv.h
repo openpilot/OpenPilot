@@ -17,6 +17,8 @@
 #ifndef __YAFFS_NOR_DRV_H__
 #define __YAFFS_NOR_DRV_H__
 
+#include <stdint.h>
+
 struct yaffs_dev;
 struct flashfs_logfs_cfg;
 struct pios_flash_driver;

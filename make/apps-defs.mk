@@ -89,7 +89,12 @@ SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
 ## PIOS Hardware (Common)
+ifeq ($(USE_YAFFS),YES)
+SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
+else
 SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
+endif
+
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_debuglog.c
 endif

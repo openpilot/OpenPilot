@@ -103,7 +103,14 @@ endif
 
 # Optional component libraries
 include $(FLIGHTLIB)/rscode/library.mk
-include $(PIOS)/common/libraries/yaffs2/library.mk
+ifeq ($(USE_YAFFS),YES)
+include $(PIOS)/common/libraries/yaffs2/library.mk  # Only required for yaffs testing
+include $(PIOS)/stm32f4xx/libraries/yaffs2/yaffs_impl.mk  # Only required for yaffs testing
+CFLAGS += -DPIOS_YAFFS
+EXTRAINCDIRS  += $(PIOS)/posix/libraries/yaffs2
+endif
+
+
 
 
 #include $(FLIGHTLIB)/PyMite/pymite.mk

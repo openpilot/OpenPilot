@@ -223,5 +223,5 @@ void yaffs_bug_fn(const char *file_name, int line_no)
 {
 	pios_trace(PIOS_TRACE_ERROR, "yaffsfs_SetError(%s) %d",
 						 file_name, line_no);
-	PIOS_ASSERT(0);
+	PIOS_Assert(0);
 }

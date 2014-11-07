@@ -26,6 +26,7 @@ void ynorsim_initialise(char *name,
                                    uintptr_t flash_id,
                                    int n_blocks,
 				   int block_size_bytes);
+
 extern const struct pios_flash_driver pios_norsim_flash_driver;
 
 #endif

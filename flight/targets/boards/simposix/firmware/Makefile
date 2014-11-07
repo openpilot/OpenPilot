@@ -74,6 +74,7 @@ ifeq ($(USE_YAFFS),YES)
 include $(PIOS)/common/libraries/yaffs2/library.mk  # Only required for yaffs testing
 include $(PIOS)/posix/libraries/yaffs2/yaffs_impl.mk  # Only required for yaffs testing
 CFLAGS += -DPIOS_YAFFS
+EXTRAINCDIRS  += $(PIOS)/posix/libraries/yaffs2
 endif
 
 #include $(FLIGHTLIB)/PyMite/pymite.mk

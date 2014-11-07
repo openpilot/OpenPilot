@@ -34,6 +34,9 @@
 #include <manualcontrolsettings.h>
 #include <taskinfo.h>
 
+#if defined(PIOS_YAFFS)
+#include <ynorsim.h>
+#endif
 
 /*
  * Pull in the board-specific static HW definitions.

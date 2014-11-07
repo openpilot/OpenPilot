@@ -118,30 +118,32 @@ static uintptr_t Chunk2DataAddr(struct yaffs_dev *dev, int chunk_id)
 
 
 
-static int nor_drv_FlashWrite32(struct yaffs_dev *dev, uintptr_t addr, const u8* buf,u32 write_len)
+static int nor_drv_FlashWrite32(struct yaffs_dev *dev, uintptr_t addr, const uint8_t* buf,u32 write_len)
 {
 	struct pios_yaffs_driver_context *context =
 	    (struct pios_yaffs_driver_context *)dev->driver_context;
 	int retval = YAFFS_OK;
+	uint16_t write_size;
 
 	if (context->driver->start_transaction(context->flash_id) == 0)
 	{
-	  uintptr_t page_offset = 0;
+	  uintptr_t write_offset = addr;
 	  while (write_len > 0 && retval == YAFFS_OK)
 	  {
 	 	     /* Individual writes must fit entirely within a single page buffer. */
-	 	     uint16_t write_size = MIN(write_len, context->cfg->page_size);
+	 	     write_size = MIN(write_len, context->cfg->page_size);
 	 	     if (context->driver->write_data(context->flash_id,
-	 		                                      (uintptr_t)(addr + page_offset),
-	 		                                      (uint8_t *)(buf + page_offset),
+	 		                                      write_offset,
+	 		                                      (uint8_t *)buf,
 	 		                                      write_size) != 0)
 	 	     {
 	 		            /* Failed to read the object data to the slot */
 	 		            retval = YAFFS_FAIL;
 	 	     }
 
-	 	     page_offset += write_size;
+	 	     write_offset += write_size;
 	 	     write_len    -= write_size;
+	 	     buf += write_size;
 	  }
 
 	  context->driver->end_transaction(context->flash_id);
@@ -176,34 +178,35 @@ static int nor_drv_WriteChunkToNAND(struct yaffs_dev *dev,
 
 
 
-static int nor_drv_FlashRead32(struct yaffs_dev *dev, uintptr_t addr,u8* buf,u32 read_len)
+static int nor_drv_FlashRead32(struct yaffs_dev *dev, uintptr_t addr,uint8_t* buf,u32 read_len)
 {
 	struct pios_yaffs_driver_context *context =
 	    (struct pios_yaffs_driver_context *)dev->driver_context;
 	int retval = YAFFS_OK;
+	uint16_t read_size;
 
 	if (context->driver->start_transaction(context->flash_id) == 0)
 	{
-
-	 uint16_t page_offset = 0;
-	 while (read_len > 0 && retval == YAFFS_OK)
-	 {
-	     /* Individual reads must fit entirely within a single page buffer. */
-	     uint16_t read_size     = MIN(read_len, context->cfg->page_size);
-	     if (context->driver->read_data(context->flash_id,
-	    		 	 	 	 	 	 	 	 (uintptr_t)addr + page_offset,
-		                                      buf + page_offset,
-		                                      read_size) != 0)
+		uintptr_t read_offset = 0;
+	     while (read_len > 0 && retval == YAFFS_OK)
 	     {
+	    	 /* Individual reads must fit entirely within a single page buffer. */
+	    	 read_size     = MIN(read_len, context->cfg->page_size);
+	    	 if (context->driver->read_data(context->flash_id,
+	    		 	 	 	 	 	 	read_offset,
+		                                buf,
+		                                read_size) != 0)
+	    	 {
 		            /* Failed to read the object data to the slot */
 		            retval = YAFFS_FAIL;
+	    	 }
+
+	    	 read_offset += read_size;
+	    	 read_len    -= read_size;
+	    	 buf		 += read_size;
 	     }
 
-	     page_offset += read_size;
-	     read_len    -= read_size;
-	}
-
-	  context->driver->end_transaction(context->flash_id);
+	     context->driver->end_transaction(context->flash_id);
 	}
 	else
 	{
@@ -311,7 +314,7 @@ static int nor_drv_IsBlockFormatted(struct yaffs_dev *dev, int blockNumber)
 	struct pios_yaffs_driver_context *context =
 			    (struct pios_yaffs_driver_context *)dev->driver_context;
 
-	return (arena_hdr.magic = context->cfg->fs_magic && arena_hdr.state == ARENA_STATE_FORMATTED);
+	return (arena_hdr.magic == context->cfg->fs_magic && arena_hdr.state == ARENA_STATE_FORMATTED);
 }
 
 static int nor_drv_EraseBlockInNAND(struct yaffs_dev *dev, int blockNumber)
@@ -369,7 +372,14 @@ static	int nor_drv_CheckBad(struct yaffs_dev *dev, int block_no)
 	struct pios_yaffs_driver_context *context =
 			    (struct pios_yaffs_driver_context *)dev->driver_context;
 
-	return (arena_hdr.magic == context->cfg->fs_magic && arena_hdr.state == ARENA_STATE_BAD);
+	if ( arena_hdr.magic == context->cfg->fs_magic && arena_hdr.state == ARENA_STATE_BAD)
+	{
+		return YAFFS_FAIL;
+	}
+	else
+	{
+		return YAFFS_OK;
+	}
 }
 
 static int nor_drv_MarkBad(struct yaffs_dev *dev, int block_no)
@@ -385,7 +395,6 @@ static int nor_drv_MarkBad(struct yaffs_dev *dev, int block_no)
 	};
 
 	return nor_drv_FlashWrite32(dev, formatAddr, (u8*)&arena_hdr, sizeof(arena_hdr));
-
 }
 
 

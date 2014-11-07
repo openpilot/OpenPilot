@@ -282,7 +282,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 500 Hz for multirotor airframes.
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
 </string>
                 </property>
                 <item>
@@ -322,7 +322,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>500</string>
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -345,7 +345,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 500 Hz for multirotor airframes.
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
 </string>
                 </property>
                 <item>
@@ -385,7 +385,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>500</string>
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -430,7 +430,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 500 Hz for multirotor airframes.
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
 </string>
                 </property>
                 <item>
@@ -470,7 +470,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>500</string>
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -493,7 +493,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 500 Hz for multirotor airframes.
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
 </string>
                 </property>
                 <item>
@@ -533,7 +533,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>500</string>
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -566,7 +566,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 500 Hz for multirotor airframes.
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
 </string>
                 </property>
                 <item>
@@ -606,7 +606,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>500</string>
+                  <string>490</string>
                  </property>
                 </item>
                </widget>
@@ -629,7 +629,7 @@
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Setup &quot;RapidESC&quot; here: usual value is 500 Hz for multirotor airframes.
+                 <string>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
 </string>
                 </property>
                 <item>
@@ -669,7 +669,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>500</string>
+                  <string>490</string>
                  </property>
                 </item>
                </widget>

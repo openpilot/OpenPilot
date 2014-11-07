@@ -89,6 +89,8 @@ private:
     void applyManualControlDefaults();
     void applyTemplateSettings();
 
+    bool isApplicable(UAVObject *dataObj);
+
     void applyMixerConfiguration(mixerChannelSettings channels[]);
 
     GUIConfigDataUnion getGUIConfigData();

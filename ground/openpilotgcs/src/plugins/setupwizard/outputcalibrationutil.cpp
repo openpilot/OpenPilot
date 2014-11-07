@@ -37,23 +37,23 @@ ActuatorCommand::Metadata OutputCalibrationUtil::c_savedActuatorCommandMetaData;
 
 OutputCalibrationUtil::OutputCalibrationUtil(QObject *parent) :
     QObject(parent), m_outputChannel(-1), m_safeValue(1000)
-{
-}
+{}
 
 OutputCalibrationUtil::~OutputCalibrationUtil()
 {
     stopChannelOutput();
 }
 
-ActuatorCommand * OutputCalibrationUtil::getActuatorCommandObject()
+ActuatorCommand *OutputCalibrationUtil::getActuatorCommandObject()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
     Q_ASSERT(pm);
 
     UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(uavObjectManager);
 
-    ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(uavObjectManager);
+    ActuatorCommand *actuatorCommand   = ActuatorCommand::GetInstance(uavObjectManager);
     Q_ASSERT(actuatorCommand);
 
     return actuatorCommand;

@@ -364,7 +364,7 @@
             <enum>Qt::ScrollBarAlwaysOff</enum>
            </property>
            <property name="placeholderText">
-            <string>Put comments here that doesn't fit in the categories above</string>
+            <string>Put comments here that don't fit in the categories above</string>
            </property>
           </widget>
          </item>

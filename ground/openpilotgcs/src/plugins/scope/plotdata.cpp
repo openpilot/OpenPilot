@@ -30,220 +30,249 @@
 #include <math.h>
 #include <QDebug>
 
-PlotData::PlotData(QString p_uavObject, QString p_uavField)
+PlotData::PlotData(UAVObject *object, UAVObjectField *field, int element,
+                   int scaleOrderFactor, int meanSamples, QString mathFunction,
+                   double plotDataSize, QPen pen, bool antialiased) :
+    m_scalePower(scaleOrderFactor), m_meanSamples(meanSamples),
+    m_meanSum(0.0f), m_mathFunction(mathFunction), m_correctionSum(0.0f),
+    m_correctionCount(0), m_plotDataSize(plotDataSize),
+    m_object(object), m_field(field), m_element(element),
+    m_plotCurve(NULL), m_isVisible(true), m_pen(pen), m_isEnumPlot(false)
 {
-    uavObject = p_uavObject;
-
-    if (p_uavField.contains("-")) {
-        QStringList fieldSubfield = p_uavField.split("-", QString::SkipEmptyParts);
-        uavField     = fieldSubfield.at(0);
-        uavSubField  = fieldSubfield.at(1);
-        haveSubField = true;
-    } else {
-        uavField     = p_uavField;
-        haveSubField = false;
+    if (m_field->getNumElements() > 1) {
+        m_elementName = m_field->getElementNames().at(m_element);
     }
 
-    xData           = new QVector<double>();
-    yData           = new QVector<double>();
-    yDataHistory    = new QVector<double>();
-
-    curve           = 0;
-    scalePower      = 0;
-    meanSamples = 1;
-    meanSum         = 0.0f;
-// mathFunction=0;
-    correctionSum   = 0.0f;
-    correctionCount = 0;
-    yMinimum        = 0;
-    yMaximum        = 0;
-
-    m_xWindowSize   = 0;
-}
-
-double PlotData::valueAsDouble(UAVObject *obj, UAVObjectField *field)
-{
-    Q_UNUSED(obj);
-    QVariant value;
-
-    if (haveSubField) {
-        int indexOfSubField = field->getElementNames().indexOf(QRegExp(uavSubField, Qt::CaseSensitive, QRegExp::FixedString));
-        value = field->getValue(indexOfSubField);
-    } else {
-        value = field->getValue();
+    m_plotName.append(QString("%1.%2").arg(m_object->getName()).arg(m_field->getName()));
+    if (!m_elementName.isEmpty()) {
+        m_plotName.append(QString(".%1").arg(m_elementName));
     }
 
-    // qDebug() << "Data  (" << value.typeName() << ") " <<  value.toString();
+    if (m_scalePower == 0) {
+        m_plotName.append(QString(" (%1)").arg(m_field->getUnits()));
+    } else {
+        m_plotName.append(QString(" (x10^%1 %2)").arg(m_scalePower).arg(m_field->getUnits()));
+    }
 
-    return value.toDouble();
+    // Create the curve
+    m_plotCurve = new QwtPlotCurve(m_plotName);
+
+    if (antialiased) {
+        m_plotCurve->setRenderHint(QwtPlotCurve::RenderAntialiased);
+    }
+
+    m_plotCurve->setPen(m_pen);
+    m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
+    m_isEnumPlot = m_field->getType() == UAVObjectField::ENUM;
 }
 
 PlotData::~PlotData()
 {
-    delete xData;
-    delete yData;
-    delete yDataHistory;
+    while (!m_enumMarkerList.isEmpty()) {
+        QwtPlotMarker *marker = m_enumMarkerList.takeFirst();
+        marker->detach();
+        delete marker;
+    }
+    m_plotCurve->detach();
+    delete m_plotCurve;
 }
 
+bool PlotData::isVisible() const
+{
+    return m_plotCurve->isVisible();
+}
+
+void PlotData::setVisible(bool visible)
+{
+    m_plotCurve->setVisible(visible);
+    visibilityChanged(m_plotCurve);
+}
+
+void PlotData::updatePlotData()
+{
+    m_plotCurve->setSamples(m_xDataEntries, m_yDataEntries);
+}
+
+bool PlotData::hasData() const
+{
+    if (!m_isEnumPlot) {
+        return !m_xDataEntries.isEmpty();
+    } else {
+        return !m_enumMarkerList.isEmpty();
+    }
+}
+
+QString PlotData::lastDataAsString()
+{
+    if (!m_isEnumPlot) {
+        return QString().sprintf("%3.10g", m_yDataEntries.last());
+    } else {
+        return m_enumMarkerList.last()->title().text();
+    }
+}
+
+void PlotData::attach(QwtPlot *plot)
+{
+    m_plotCurve->attach(plot);
+}
+
+void PlotData::visibilityChanged(QwtPlotItem *item)
+{
+    if (m_plotCurve == item) {
+        foreach(QwtPlotMarker * marker, m_enumMarkerList) {
+            m_plotCurve->isVisible() ? marker->attach(m_plotCurve->plot()) : marker->detach();
+        }
+    }
+}
+
+void PlotData::calcMathFunction(double currentValue)
+{
+    // Put the new value at the back
+    m_yDataHistory.append(currentValue);
+
+    // calculate average value
+    m_meanSum += currentValue;
+    if (m_yDataHistory.size() > m_meanSamples) {
+        m_meanSum -= m_yDataHistory.first();
+        m_yDataHistory.pop_front();
+    }
+    // make sure to correct the sum every meanSamples steps to prevent it
+    // from running away due to floating point rounding errors
+    m_correctionSum += currentValue;
+    if (++m_correctionCount >= m_meanSamples) {
+        m_meanSum = m_correctionSum;
+        m_correctionSum = 0.0f;
+        m_correctionCount = 0;
+    }
+
+    double boxcarAvg = m_meanSum / m_yDataHistory.size();
+    if (m_mathFunction == "Standard deviation") {
+        // Calculate square of sample standard deviation, with Bessel's correction
+        double stdSum = 0;
+        for (int i = 0; i < m_yDataHistory.size(); i++) {
+            stdSum += pow(m_yDataHistory.at(i) - boxcarAvg, 2) / (m_meanSamples - 1);
+        }
+        m_yDataEntries.append(sqrt(stdSum));
+    } else {
+        m_yDataEntries.append(boxcarAvg);
+    }
+}
+
+QwtPlotMarker *PlotData::createMarker(QString value)
+{
+    QwtPlotMarker *marker = new QwtPlotMarker(value);
+
+    marker->setZ(10);
+    QwtText label(QString(" %1 ").arg(value));
+    label.setColor(QColor(Qt::black));
+    label.setBorderPen(QPen(m_pen.color(), 1));
+    label.setBorderRadius(2);
+    QColor labelBackColor = QColor(Qt::white);
+    labelBackColor.setAlpha(200);
+    label.setBackgroundBrush(labelBackColor);
+    QFont fnt(label.font());
+    fnt.setPointSize(8);
+    label.setFont(fnt);
+    marker->setLabel(label);
+    marker->setTitle(value);
+    marker->setLabelOrientation(Qt::Vertical);
+    marker->setLabelAlignment(Qt::AlignBottom);
+    marker->setLineStyle(QwtPlotMarker::VLine);
+    marker->setLinePen(QPen(m_pen.color(), 1, Qt::DashDotLine));
+    return marker;
+}
 
 bool SequentialPlotData::append(UAVObject *obj)
 {
-    if (uavObject == obj->getName()) {
-        // Get the field of interest
-        UAVObjectField *field = obj->getField(uavField);
-
-        if (field) {
-            double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
+    if (m_object == obj && m_field) {
+        if (!m_isEnumPlot) {
+            double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
 
             // Perform scope math, if necessary
-            if (mathFunction == "Boxcar average" || mathFunction == "Standard deviation") {
-                // Put the new value at the front
-                yDataHistory->append(currentValue);
-
-                // calculate average value
-                meanSum += currentValue;
-                if (yDataHistory->size() > meanSamples) {
-                    meanSum -= yDataHistory->first();
-                    yDataHistory->pop_front();
-                }
-
-                // make sure to correct the sum every meanSamples steps to prevent it
-                // from running away due to floating point rounding errors
-                correctionSum += currentValue;
-                if (++correctionCount >= meanSamples) {
-                    meanSum = correctionSum;
-                    correctionSum = 0.0f;
-                    correctionCount = 0;
-                }
-
-                double boxcarAvg = meanSum / yDataHistory->size();
-
-                if (mathFunction == "Standard deviation") {
-                    // Calculate square of sample standard deviation, with Bessel's correction
-                    double stdSum = 0;
-                    for (int i = 0; i < yDataHistory->size(); i++) {
-                        stdSum += pow(yDataHistory->at(i) - boxcarAvg, 2) / (meanSamples - 1);
-                    }
-                    yData->append(sqrt(stdSum));
-                } else {
-                    yData->append(boxcarAvg);
-                }
+            if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
+                calcMathFunction(currentValue);
             } else {
-                yData->append(currentValue);
+                m_yDataEntries.append(currentValue);
             }
 
-            if (yData->size() > m_xWindowSize) { // If new data overflows the window, remove old data...
-                yData->pop_front();
-            } else { // ...otherwise, add a new y point at position xData
-                xData->insert(xData->size(), xData->size());
+            if (m_yDataEntries.size() > m_plotDataSize) {
+                // If new data overflows the window, remove old data...
+                m_yDataEntries.pop_front();
+            } else {
+                // ...otherwise, add a new y point at position xData
+                m_xDataEntries.insert(m_xDataEntries.size(), m_xDataEntries.size());
             }
-
-            // notify the gui of changes in the data
-            // dataChanged();
             return true;
+        } else {
+            // Enum markers
+            QString value = m_field->getValue(m_element).toString();
+
+            QwtPlotMarker *marker = m_enumMarkerList.isEmpty() ? NULL : m_enumMarkerList.last();
+            if (!marker || marker->title() != value) {
+                marker = createMarker(value);
+                marker->setXValue(m_enumMarkerList.size());
+
+                if (m_plotCurve->isVisible()) {
+                    marker->attach(m_plotCurve->plot());
+                }
+                m_enumMarkerList.append(marker);
+            }
         }
     }
-
     return false;
 }
 
 bool ChronoPlotData::append(UAVObject *obj)
 {
-    if (uavObject == obj->getName()) {
+    if (m_object == obj && m_field) {
         // Get the field of interest
-        UAVObjectField *field = obj->getField(uavField);
-        // qDebug() << "uavObject: " << uavObject << ", uavField: " << uavField;
+        // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
+        QDateTime NOW = QDateTime::currentDateTime();
 
-        if (field) {
-            QDateTime NOW = QDateTime::currentDateTime(); // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
-            double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
+        double xValue = NOW.toTime_t() + NOW.time().msec() / 1000.0;
+        if (!m_isEnumPlot) {
+            double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
 
             // Perform scope math, if necessary
-            if (mathFunction == "Boxcar average" || mathFunction == "Standard deviation") {
-                // Put the new value at the back
-                yDataHistory->append(currentValue);
-
-                // calculate average value
-                meanSum += currentValue;
-                if (yDataHistory->size() > meanSamples) {
-                    meanSum -= yDataHistory->first();
-                    yDataHistory->pop_front();
-                }
-                // make sure to correct the sum every meanSamples steps to prevent it
-                // from running away due to floating point rounding errors
-                correctionSum += currentValue;
-                if (++correctionCount >= meanSamples) {
-                    meanSum = correctionSum;
-                    correctionSum = 0.0f;
-                    correctionCount = 0;
-                }
-
-                double boxcarAvg = meanSum / yDataHistory->size();
-// qDebug()<<mathFunction;
-                if (mathFunction == "Standard deviation") {
-                    // Calculate square of sample standard deviation, with Bessel's correction
-                    double stdSum = 0;
-                    for (int i = 0; i < yDataHistory->size(); i++) {
-                        stdSum += pow(yDataHistory->at(i) - boxcarAvg, 2) / (meanSamples - 1);
-                    }
-                    yData->append(sqrt(stdSum));
-                } else {
-                    yData->append(boxcarAvg);
-                }
+            if (m_mathFunction == "Boxcar average" || m_mathFunction == "Standard deviation") {
+                calcMathFunction(currentValue);
             } else {
-                yData->append(currentValue);
+                m_yDataEntries.append(currentValue);
             }
 
-            double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;
-            xData->append(valueX);
+            m_xDataEntries.append(xValue);
+        } else {
+            // Enum markers
+            QString value = m_field->getValue(m_element).toString();
 
-            // qDebug() << "Data  " << uavObject << "." << field->getName() << " X,Y:" << valueX << "," <<  valueY;
+            QwtPlotMarker *marker = m_enumMarkerList.isEmpty() ? NULL : m_enumMarkerList.last();
+            if (!marker || marker->title() != value) {
+                marker = createMarker(value);
+                marker->setXValue(xValue);
 
-            // Remove stale data
-            removeStaleData();
-
-            // notify the gui of chages in the data
-            // dataChanged();
-            return true;
+                if (m_plotCurve->isVisible()) {
+                    marker->attach(m_plotCurve->plot());
+                }
+                m_enumMarkerList.append(marker);
+            }
         }
+        removeStaleData();
+        return true;
     }
-
     return false;
 }
 
 void ChronoPlotData::removeStaleData()
 {
-    double newestValue;
-    double oldestValue;
-
-    while (1) {
-        if (xData->size() == 0) {
-            break;
-        }
-
-        newestValue = xData->last();
-        oldestValue = xData->first();
-
-        if (newestValue - oldestValue > m_xWindowSize) {
-            yData->pop_front();
-            xData->pop_front();
-        } else {
-            break;
-        }
+    while (!m_xDataEntries.isEmpty() &&
+           (m_xDataEntries.last() - m_xDataEntries.first()) > m_plotDataSize) {
+        m_yDataEntries.pop_front();
+        m_xDataEntries.pop_front();
     }
-
-    // qDebug() << "removeStaleData ";
-}
-
-void ChronoPlotData::removeStaleDataTimeout()
-{
-    removeStaleData();
-    // dataChanged();
-    // qDebug() << "removeStaleDataTimeout";
-}
-
-bool UAVObjectPlotData::append(UAVObject *obj)
-{
-    Q_UNUSED(obj);
-    return false;
+    while (!m_enumMarkerList.isEmpty() &&
+           (m_enumMarkerList.last()->xValue() - m_enumMarkerList.first()->xValue()) > m_plotDataSize) {
+        QwtPlotMarker *marker = m_enumMarkerList.takeFirst();
+        marker->detach();
+        delete marker;
+    }
 }

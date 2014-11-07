@@ -77,8 +77,7 @@ ifndef TESTAPP
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/uavobjectpersistence.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-    SRC += $(FLIGHTLIB)/auxmagsupport.c
-
+    
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/accessorydesired.c
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
@@ -119,8 +118,6 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
     SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
     SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
-    SRC += $(OPUAVSYNTHDIR)/relaytuningsettings.c
-    SRC += $(OPUAVSYNTHDIR)/relaytuning.c
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
     SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
@@ -130,7 +127,6 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/airspeedstate.c
     SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
     SRC += $(OPUAVSYNTHDIR)/perfcounter.c
-    SRC += $(OPUAVSYNTHDIR)/auxmagsensor.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

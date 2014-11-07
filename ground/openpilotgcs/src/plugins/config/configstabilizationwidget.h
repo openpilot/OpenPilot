@@ -35,6 +35,7 @@
 #include "stabilizationsettings.h"
 #include <QWidget>
 #include <QTimer>
+#include <QSignalMapper>
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_plot_grid.h"
 
@@ -49,7 +50,7 @@ public:
 private:
     Ui_StabilizationWidget *ui;
     QTimer *realtimeUpdates;
-    QList<QTabBar *> m_pidTabBars;
+    QList<QTabBar *> m_stabTabBars;
     QString m_stabilizationObjectsString;
 
     // Milliseconds between automatic 'Instant Updates'
@@ -59,17 +60,26 @@ private:
     static const double EXPO_CURVE_CONSTANT  = 1.00695;
 
     int boardModel;
-    int m_pidBankCount;
-    int m_currentPIDBank;
+    int m_stabSettingsBankCount;
+    int m_currentStabSettingsBank;
 
     QwtPlotCurve m_expoPlotCurveRoll;
     QwtPlotCurve m_expoPlotCurvePitch;
     QwtPlotCurve m_expoPlotCurveYaw;
     QwtPlotGrid m_plotGrid;
+    QSignalMapper m_stabSettingsCopyFromSignalMapper;
+    QSignalMapper m_stabSettingsCopyToSignalMapper;
+    QSignalMapper m_stabSettingsSwapSignalMapper;
+
+    UAVObject *getStabBankObject(int bank);
 
     void updateThrottleCurveFromObject();
     void updateObjectFromThrottleCurve();
     void setupExpoPlot();
+    void setupStabBanksGUI();
+    void resetStabBank(int bank);
+    void restoreStabBank(int bank);
+
 protected:
     QString mapObjectName(const QString objectName);
 
@@ -82,12 +92,23 @@ private slots:
     void linkCheckBoxes(bool value);
     void processLinkedWidgets(QWidget *);
     void onBoardConnected();
-    void pidBankChanged(int index);
+    void stabBankChanged(int index);
     void resetThrottleCurveToDefault();
     void throttleCurveUpdated();
     void replotExpo(int value, QwtPlotCurve &curve);
     void replotExpoRoll(int value);
     void replotExpoPitch(int value);
     void replotExpoYaw(int value);
+
+    void restoreAllStabBanks();
+    void resetAllStabBanks();
+    void restoreCurrentAction();
+    void resetCurrentStabBank();
+    void copyCurrentStabBank();
+
+    void copyFromBankToBank(int fromBank, int toBank);
+    void copyFromBankToCurrent(int bank);
+    void copyToBankFromCurrent(int bank);
+    void swapBankAndCurrent(int bank);
 };
 #endif // ConfigStabilizationWidget_H

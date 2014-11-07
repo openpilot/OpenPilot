@@ -58,8 +58,8 @@ private:
     static const int HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS = 1900;
     Ui::EscCalibrationPage *ui;
     bool m_isCalibrating;
-
-    QList<OutputCalibrationUtil *> m_outputs;
+    OutputCalibrationUtil m_outputUtil;
+    QList<quint16> m_outputChannels;
 };
 
 #endif // ESCCALIBRATIONPAGE_H

@@ -102,17 +102,19 @@ void EscCalibrationPage::startButtonClicked()
         MixerSettings *mSettings = MixerSettings::GetInstance(uavoManager);
         Q_ASSERT(mSettings);
         QString mixerTypePattern = "Mixer%1Type";
+
         OutputCalibrationUtil::startOutputCalibration();
         for (quint32 i = 0; i < ActuatorSettings::CHANNELADDR_NUMELEM; i++) {
             UAVObjectField *field = mSettings->getField(mixerTypePattern.arg(i + 1));
             Q_ASSERT(field);
             if (field->getValue().toString() == field->getOptions().at(VehicleConfigurationHelper::MIXER_TYPE_MOTOR)) {
-                OutputCalibrationUtil *output = new OutputCalibrationUtil();
-                output->startChannelOutput(i, OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
-                output->setChannelOutputValue(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
-                m_outputs << output;
+                m_outputChannels << i;
             }
         }
+        m_outputUtil.startChannelOutput(m_outputChannels, OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
+        QThread::msleep(100);
+        m_outputUtil.setChannelOutputValue(HIGH_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
+
         ui->stopButton->setEnabled(true);
     }
 }
@@ -124,35 +126,29 @@ void EscCalibrationPage::stopButtonClicked()
         ui->outputHigh->setEnabled(false);
 
         // Set to low pwm out
-        foreach(OutputCalibrationUtil * output, m_outputs) {
-            output->setChannelOutputValue(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
-        }
+        m_outputUtil.setChannelOutputValue(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS);
         ui->outputLevel->setText(QString(tr("%1 µs")).arg(LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
         QApplication::processEvents();
         QThread::msleep(2000);
 
         // Ramp down to off pwm out
         for (int i = LOW_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS; i >= OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS; i -= 10) {
-            foreach(OutputCalibrationUtil * output, m_outputs) {
-                output->setChannelOutputValue(i);
-            }
+            m_outputUtil.setChannelOutputValue(i);
             ui->outputLevel->setText(QString(tr("%1 µs")).arg(i));
             QApplication::processEvents();
             QThread::msleep(200);
         }
 
         // Stop output
-        foreach(OutputCalibrationUtil * output, m_outputs) {
-            output->stopChannelOutput();
-            delete output;
-        }
+        m_outputUtil.stopChannelOutput();
         OutputCalibrationUtil::stopOutputCalibration();
+
         ui->outputLevel->setText(QString(tr("%1 µs")).arg(OFF_PWM_OUTPUT_PULSE_LENGTH_MICROSECONDS));
         ui->outputHigh->setEnabled(false);
         ui->outputLow->setEnabled(true);
         ui->nonconnectedLabel->setEnabled(true);
         ui->connectedLabel->setEnabled(false);
-        m_outputs.clear();
+        m_outputChannels.clear();
         m_isCalibrating = false;
         resetAllSecurityCheckboxes();
         enableButtons(true);

@@ -62,6 +62,7 @@ int yaffs_start_up(void)
 #include "pios_flashfs.h" /* API for flash filesystem */
 #include "pios_flashfs_logfs_priv.h"
 
+#define MAX_DEVICENAME_LEN 8
 /**
  * @brief Initialize the flash object setting FS.  Each call creates a yaffs device
  * @return 0 if success, -1 if failure
@@ -74,7 +75,7 @@ int32_t PIOS_FLASHFS_Logfs_Init(
 {
     int retval;
     pios_trace(PIOS_TRACE_TEST, "PIOS_FLASHFS_Logfs_Init");
-    char devicename[8];
+    char devicename[MAX_DEVICENAME_LEN];
     char logfs_path[12];
 
     /* Make sure the underlying flash driver provides the minimal set of required methods */
@@ -96,7 +97,7 @@ int32_t PIOS_FLASHFS_Logfs_Init(
     snprintf(devicename,6, "/dev%01u", (unsigned) *fs_id);
 
     // stm32f4 implementation uses
-    yaffs_nor_install_drv(devicename, cfg, driver, flash_id);
+    yaffs_nor_install_drv(devicename, MAX_DEVICENAME_LEN, cfg, driver, flash_id);
 
     // Attempt to mount the device
     retval = pios_mount(devicename);

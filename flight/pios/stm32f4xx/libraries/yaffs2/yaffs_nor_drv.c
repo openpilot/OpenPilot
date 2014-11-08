@@ -408,13 +408,14 @@ static int nor_drv_MarkBad(struct yaffs_dev *dev, int block_no)
 
 
 void yaffs_nor_install_drv(const char *name,
+                           uint16_t max_name_len,
 		const struct flashfs_logfs_cfg *cfg,
 		const struct pios_flash_driver *driver,
 		uintptr_t flash_id)
 {
 
 	struct yaffs_dev *dev = pios_malloc(sizeof(struct yaffs_dev));
-	char *name_copy = strdup(name);
+	char *name_copy = pios_strndup(name, max_name_len);
 	struct yaffs_param *param;
 	struct yaffs_driver *drv;
 

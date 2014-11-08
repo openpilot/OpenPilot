@@ -681,11 +681,24 @@ const struct pios_rfm22b_cfg *PIOS_BOARD_HW_DEFS_GetRfm22Cfg(uint32_t board_revi
 #include "pios_flash_jedec_priv.h"
 #include "pios_flash_internal_priv.h"
 
+#if defined(PIOS_YAFFS)
+	static const struct flashfs_logfs_cfg flashfs_external_yaffs_cfg = {
+	    .fs_magic      = 0x99bbcfef,
+	    .total_fs_size = 0x00100000, /* 2M bytes (32 sectors = entire chip) */
+	    .arena_size    = 0x0000FE00, /* multiple of slot size but less than sector_size */
+	    .slot_size     = 0x00000200, /* 512 bytes chunk size for yaffs*/
+
+	    .start_offset  = 0x00000000, /* start offset */
+	    .sector_size   = 0x00010000, /* 64K bytes */
+	    .page_size     = 0x00000100, /* 256 bytes */
+	};
+#else
+
 static const struct flashfs_logfs_cfg flashfs_external_user_cfg = {
     .fs_magic      = 0x99abceff,
-    .total_fs_size = 0x001C0000, /* 2M bytes (32 sectors = entire chip) */
+    .total_fs_size = 0x001C0000, /* 1.8M bytes (32 sectors = entire chip) */
     .arena_size    = 0x0000FE00, /* multiple of slot size but less than sector_size */
-    .slot_size     = 0x00000200, /* 512 bytes chunk size for yaffs*/
+    .slot_size     = 0x00000100, /* 512 bytes chunk size for yaffs*/
 
     .start_offset  = 0x00040000, /* start offset */
     .sector_size   = 0x00010000, /* 64K bytes */
@@ -694,7 +707,7 @@ static const struct flashfs_logfs_cfg flashfs_external_user_cfg = {
 
 static const struct flashfs_logfs_cfg flashfs_external_system_cfg = {
     .fs_magic      = 0x99bbcdef,
-    .total_fs_size = 0x00040000, /* 2M bytes (32 sectors = entire chip) */
+    .total_fs_size = 0x00040000, /* 262KB (32 sectors = entire chip) */
     .arena_size    = 0x00010000, /* 256 * slot size */
     .slot_size     = 0x00000100, /* 256 bytes */
 
@@ -702,7 +715,7 @@ static const struct flashfs_logfs_cfg flashfs_external_system_cfg = {
     .sector_size   = 0x00010000, /* 64K bytes */
     .page_size     = 0x00000100, /* 256 bytes */
 };
-
+#endif
 
 static const struct pios_flash_internal_cfg flash_internal_cfg = {};
 

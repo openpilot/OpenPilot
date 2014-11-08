@@ -32,6 +32,7 @@ uintptr_t flash_id;
 
 
 void yaffs_nor_install_drv(const char *name,
+                           uint16_t max_name_len,
                            const struct flashfs_logfs_cfg *cfg,
                            const struct pios_flash_driver *driver,
                            uintptr_t flash_id);

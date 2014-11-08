@@ -109,5 +109,18 @@ size_t pios_strnlen(const char *str, size_t n)
    return (*(unsigned char *) s1) - (*(unsigned char *) s2);
  }
 
+ char *pios_strndup(const char *s, uint16_t max_string_length)
+ {
+         char *new;
+
+         new = pios_malloc(max_string_length);
+         if(new) {
+                 pios_strncpy(new, s, max_string_length);
+         }
+
+         return new;
+
+ }
+
 
 

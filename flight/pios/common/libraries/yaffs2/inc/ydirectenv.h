@@ -68,10 +68,19 @@ void yaffs_qsort(void *aa, size_t n, size_t es,
 #define inline __inline__
 #endif
 
+#ifdef USE_SIM_POSIX
 #define kmalloc(x, flags) pios_malloc(x)
 #define kfree(x)   pios_free(x)
 #define vmalloc(x) pios_malloc(x)
 #define vfree(x) pios_free(x)
+#else
+#define kmalloc(x, flags) pvPortMalloc(x)
+#define kfree(x)   vPortFree(x)
+#define vmalloc(x) pvPortMalloc(x)
+#define vfree(x) vPortFree(x)
+
+#endif
+
 
 #define cond_resched()  do {} while (0)
 

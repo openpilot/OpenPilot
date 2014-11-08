@@ -145,7 +145,7 @@ inline void rot_about_axis_x(const float rotation, float R[3][3])
     R[2][2] = c;
 }
 
-inline void rot_about_axis_y(const float rotation, float R[3][3])
+static inline void rot_about_axis_y(const float rotation, float R[3][3])
 {
     float s = sinf(rotation);
     float c = cosf(rotation);
@@ -163,7 +163,7 @@ inline void rot_about_axis_y(const float rotation, float R[3][3])
     R[2][2] = c;
 }
 
-inline void rot_about_axis_z(const float rotation, float R[3][3])
+static inline void rot_about_axis_z(const float rotation, float R[3][3])
 {
     float s = sinf(rotation);
     float c = cosf(rotation);

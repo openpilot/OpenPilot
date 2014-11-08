@@ -79,7 +79,7 @@ static const float temp_alpha = TEMP_DT / (TEMP_DT + 1.0f / (2.0f * M_PI_F * TEM
 
 #define ZERO_ROT_ANGLE      0.00001f
 // Private types
-#define PIOS_INSTRUMENT_MODULE
+//#define PIOS_INSTRUMENT_MODULE
 #include <pios_instrumentation_helper.h>
 
 PERF_DEFINE_COUNTER(counterGyroSamples);

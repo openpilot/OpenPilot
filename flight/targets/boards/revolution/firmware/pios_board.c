@@ -394,6 +394,12 @@ void PIOS_Board_Init(void)
         PIOS_DEBUG_Assert(0);
     }
 
+#if defined(PIOS_YAFFS)
+    if (PIOS_FLASHFS_Logfs_Init(&pios_user_fs_id, &flashfs_external_yaffs_cfg, &pios_jedec_flash_driver, flash_id)) {
+        PIOS_DEBUG_Assert(0);
+    }
+    pios_uavo_settings_fs_id = pios_user_fs_id;
+#else
     if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_external_system_cfg, &pios_jedec_flash_driver, flash_id)) {
         PIOS_DEBUG_Assert(0);
     }
@@ -401,6 +407,7 @@ void PIOS_Board_Init(void)
     if (PIOS_FLASHFS_Logfs_Init(&pios_user_fs_id, &flashfs_external_user_cfg, &pios_jedec_flash_driver, flash_id)) {
         PIOS_DEBUG_Assert(0);
     }
+#endif
 
 #endif /* if defined(PIOS_INCLUDE_FLASH) */
 

@@ -40,4 +40,6 @@ int pios_strcmp(const char *s1, const char *s2);
 
 int pios_strncmp(const char *s1, const char *s2, size_t n);
 
+char *pios_strndup(const char *s, uint16_t max_string_length);
+
 #endif /* PIOS_STRING_H */

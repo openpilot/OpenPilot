@@ -37,15 +37,15 @@ static int yaffsfs_lastError;
 
 void yaffsfs_SetError(int err)
 {
-	//Do whatever to set error
-	yaffsfs_lastError = err;
-	errno = err;
-	pios_trace(PIOS_TRACE_ERROR, "yaffsfs_SetError(%d) %s", err, yaffs_error_to_str(err) );
+    // Do whatever to set error
+    yaffsfs_lastError = err;
+    errno = err;
+    pios_trace(PIOS_TRACE_ERROR, "yaffsfs_SetError(%d) %s", err, yaffs_error_to_str(err));
 }
 
 int yaffsfs_GetLastError(void)
 {
-	return yaffsfs_lastError;
+    return yaffsfs_lastError;
 }
 
 /*
@@ -57,9 +57,10 @@ int yaffsfs_GetLastError(void)
  */
 int yaffsfs_CheckMemRegion(const void *addr, size_t size, int write_request)
 {
-	if(!addr)
-		return -1;
-	return 0;
+    if (!addr) {
+        return -1;
+    }
+    return 0;
 }
 
 /*
@@ -80,71 +81,70 @@ static pthread_t bc_gc_thread;
 
 void yaffsfs_Lock(void)
 {
-	pthread_mutex_lock( &mutex1 );
+    pthread_mutex_lock(&mutex1);
 }
 
 void yaffsfs_Unlock(void)
 {
-	pthread_mutex_unlock( &mutex1 );
+    pthread_mutex_unlock(&mutex1);
 }
 
 static void *bg_gc_func(void *dummy)
 {
-	struct yaffs_dev *dev;
-	int urgent = 0;
-	int result;
-	int next_urgent;
+    struct yaffs_dev *dev;
+    int urgent = 0;
+    int result;
+    int next_urgent;
 
-	/* Sleep for a bit to allow start up */
-	sleep(2);
+    /* Sleep for a bit to allow start up */
+    sleep(2);
 
 
-	while (1) {
-		/* Iterate through devices, do bg gc updating ungency */
-		yaffs_dev_rewind();
-		next_urgent = 0;
+    while (1) {
+        /* Iterate through devices, do bg gc updating ungency */
+        yaffs_dev_rewind();
+        next_urgent = 0;
 
-		while ((dev = yaffs_next_dev()) != NULL) {
-			result = yaffs_do_background_gc_reldev(dev, urgent);
-			if (result > 0)
-				next_urgent = 1;
-		}
+        while ((dev = yaffs_next_dev()) != NULL) {
+            result = yaffs_do_background_gc_reldev(dev, urgent);
+            if (result > 0) {
+                next_urgent = 1;
+            }
+        }
 
-		urgent = next_urgent;
+        urgent = next_urgent;
 
-		if (next_urgent)
-			sleep(1);
-		else
-			sleep(5);
-	}
+        if (next_urgent) {
+            sleep(1);
+        } else {
+            sleep(5);
+        }
+    }
 
-	/* Don't ever return. */
-	return NULL;
+    /* Don't ever return. */
+    return NULL;
 }
 
 void yaffsfs_LockInit(void)
 {
-	/* Initialise lock */
-	pthread_mutex_init(&mutex1, NULL);
+    /* Initialise lock */
+    pthread_mutex_init(&mutex1, NULL);
 
-	/* Sneak in starting a background gc thread too */
-	// pthread_create(&bc_gc_thread, NULL, bg_gc_func, NULL);
+    /* Sneak in starting a background gc thread too */
+    // pthread_create(&bc_gc_thread, NULL, bg_gc_func, NULL);
 }
 
-#else
+#else /* if 1 */
 
 void yaffsfs_Lock(void)
-{
-}
+{}
 
 void yaffsfs_Unlock(void)
-{
-}
+{}
 
 void yaffsfs_LockInit(void)
-{
-}
-#endif
+{}
+#endif /* if 1 */
 
 /*
  * yaffsfs_CurrentTime() retrns a 32-bit timestamp.
@@ -154,7 +154,7 @@ void yaffsfs_LockInit(void)
 
 u32 yaffsfs_CurrentTime(void)
 {
-	return time(NULL);
+    return time(NULL);
 }
 
 
@@ -167,41 +167,45 @@ u32 yaffsfs_CurrentTime(void)
 
 #ifdef CONFIG_YAFFS_TEST_MALLOC
 
-static int yaffs_kill_alloc = 0;
+static int yaffs_kill_alloc  = 0;
 static size_t total_malloced = 0;
-static size_t malloc_limit = 0 & 6000000;
+static size_t malloc_limit   = 0 & 6000000;
 
 void *yaffsfs_malloc(size_t size)
 {
-	void * this;
-	if(yaffs_kill_alloc)
-		return NULL;
-	if(malloc_limit && malloc_limit <(total_malloced + size) )
-		return NULL;
+    void *this;
 
-	this = malloc(size);
-	if(this)
-		total_malloced += size;
-	return this;
+    if (yaffs_kill_alloc) {
+        return NULL;
+    }
+    if (malloc_limit && malloc_limit < (total_malloced + size)) {
+        return NULL;
+    }
+
+    this = malloc(size);
+    if (this) {
+        total_malloced += size;
+    }
+    return this;
 }
 
-#else
+#else /* ifdef CONFIG_YAFFS_TEST_MALLOC */
 
 void *yaffsfs_malloc(size_t size)
 {
-	return malloc(size);
+    return malloc(size);
 }
 
-#endif
+#endif /* ifdef CONFIG_YAFFS_TEST_MALLOC */
 
 void yaffsfs_free(void *ptr)
 {
-	free(ptr);
+    free(ptr);
 }
 
 void yaffsfs_OSInitialisation(void)
 {
-	yaffsfs_LockInit();
+    yaffsfs_LockInit();
 }
 
 /*
@@ -211,7 +215,7 @@ void yaffsfs_OSInitialisation(void)
 
 void yaffs_bug_fn(const char *file_name, int line_no)
 {
-	printf("yaffs bug detected %s:%d\n",
-		file_name, line_no);
-	assert(0);
+    printf("yaffs bug detected %s:%d\n",
+           file_name, line_no);
+    assert(0);
 }

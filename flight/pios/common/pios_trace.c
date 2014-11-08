@@ -26,7 +26,6 @@
  */
 
 
-
 #include "pios_trace.h"
 
 unsigned pios_trace_mask = 0;
@@ -34,12 +33,11 @@ unsigned pios_trace_mask = 0;
 
 unsigned pios_set_trace(unsigned tm)
 {
-	pios_trace_mask = tm;
-	return pios_trace_mask;
+    pios_trace_mask = tm;
+    return pios_trace_mask;
 }
 
 unsigned pios_get_trace(void)
 {
-	return pios_trace_mask;
+    return pios_trace_mask;
 }
-

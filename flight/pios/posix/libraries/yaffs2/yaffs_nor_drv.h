@@ -21,5 +21,3 @@ struct yaffs_dev;
 struct yaffs_dev *yaffs_nor_install_drv(const char *name);
 
 #endif
-
-

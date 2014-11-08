@@ -71,11 +71,11 @@ void pathFollowerHandler(bool newinit)
         case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
             plan_setup_CourseLock();
             break;
-        case FLIGHTSTATUS_FLIGHTMODE_MAGICROAM:
-            plan_setup_MagicRoam();
+        case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+            plan_setup_PositionRoam();
             break;
-        case FLIGHTSTATUS_FLIGHTMODE_MAGICLEASH:
-            plan_setup_MagicLeash();
+        case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
+            plan_setup_HomeLeash();
             break;
         case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
             plan_setup_AbsolutePosition();
@@ -98,11 +98,11 @@ void pathFollowerHandler(bool newinit)
     case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
         plan_run_CourseLock();
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_MAGICROAM:
-        plan_run_MagicRoam();
+    case FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM:
+        plan_run_PositionRoam();
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_MAGICLEASH:
-        plan_run_MagicLeash();
+    case FLIGHTSTATUS_FLIGHTMODE_HOMELEASH:
+        plan_run_HomeLeash();
         break;
     case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
         plan_run_AbsolutePosition();

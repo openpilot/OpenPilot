@@ -186,12 +186,12 @@ void plan_setup_CourseLock()
     plan_setup_PositionVario();
 }
 
-void plan_setup_MagicRoam()
+void plan_setup_PositionRoam()
 {
     plan_setup_PositionVario();
 }
 
-void plan_setup_MagicLeash()
+void plan_setup_HomeLeash()
 {
     plan_setup_PositionVario();
 }
@@ -382,12 +382,12 @@ void plan_run_CourseLock()
     plan_run_PositionVario(COURSE);
 }
 
-void plan_run_MagicRoam()
+void plan_run_PositionRoam()
 {
     plan_run_PositionVario(FPV);
 }
 
-void plan_run_MagicLeash()
+void plan_run_HomeLeash()
 {
     plan_run_PositionVario(LOS);
 }

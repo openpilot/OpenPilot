@@ -68,6 +68,9 @@ void pathFollowerHandler(bool newinit)
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
             plan_setup_positionHold();
             break;
+        case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
+            plan_setup_CourseLock();
+            break;
         case FLIGHTSTATUS_FLIGHTMODE_MAGICROAM:
             plan_setup_MagicRoam();
             break;
@@ -92,6 +95,9 @@ void pathFollowerHandler(bool newinit)
     }
 
     switch (flightMode) {
+    case FLIGHTSTATUS_FLIGHTMODE_COURSELOCK:
+        plan_run_CourseLock();
+        break;
     case FLIGHTSTATUS_FLIGHTMODE_MAGICROAM:
         plan_run_MagicRoam();
         break;

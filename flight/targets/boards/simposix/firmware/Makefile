@@ -112,6 +112,7 @@ SRC += $(MATHLIB)/butterworth.c
 SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
 ifeq ($(USE_YAFFS),YES)
 SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
+SRC += $(PIOSCORECOMMON)/pios_string.c # Used for yaffs testing
 else
 SRC += $(PIOSCORECOMMON)/pios_dosfs_logfs.c
 endif

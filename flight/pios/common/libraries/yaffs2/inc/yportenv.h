@@ -20,14 +20,13 @@
 #include "pios.h"
 
 /* Definition of types */
-#if 0
-#ifdef CONFIG_YAFFS_DEFINES_TYPES
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
+#ifdef USE_SIM_POSIX
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef int32_t s32;
 #endif
-#endif
+
 
 
 #ifdef CONFIG_YAFFS_PROVIDE_DEFS

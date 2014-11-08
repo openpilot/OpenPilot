@@ -45,12 +45,6 @@
 #define ADDSEVERITY(check) severity = (severity != SYSTEMALARMS_ALARM_OK ? severity : ((check) ? SYSTEMALARMS_ALARM_OK : SYSTEMALARMS_ALARM_CRITICAL))
 
 
-/****************************
-* Current checks:
-* 1. If a flight mode switch allows autotune and autotune module not running
-* 2. If airframe is a multirotor and either manual is available or a stabilization mode uses "none"
-****************************/
-
 // ! Check a stabilization mode switch position for safety
 static bool check_stabilization_settings(int index, bool multirotor, bool coptercontrol);
 
@@ -126,9 +120,6 @@ int32_t configuration_check()
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_STABILIZED6:
             ADDSEVERITY(check_stabilization_settings(6, multirotor, coptercontrol));
-            break;
-        case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
-            ADDSEVERITY(PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE));
             break;
         case FLIGHTMODESETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
         {

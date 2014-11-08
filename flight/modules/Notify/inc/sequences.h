@@ -40,7 +40,6 @@ typedef enum {
     NOTIFY_SEQUENCE_ARMED_FM_STABILIZED4 = 4,
     NOTIFY_SEQUENCE_ARMED_FM_STABILIZED5 = 5,
     NOTIFY_SEQUENCE_ARMED_FM_STABILIZED6 = 6,
-    NOTIFY_SEQUENCE_ARMED_FM_AUTOTUNE    = 7,
     NOTIFY_SEQUENCE_ARMED_FM_GPS      = 8,
     NOTIFY_SEQUENCE_ARMED_FM_RTH      = 9,
     NOTIFY_SEQUENCE_ARMED_FM_LAND     = 10,
@@ -116,9 +115,6 @@ const LedSequence_t notifications[] = {
                                                    { .time_off = 100, .time_on  = 100, .color = COLOR_PURPLE, .repeats = 1, },
                                                    { .time_off = 500, .time_on  = 100, .color = COLOR_BLUE,   .repeats = 1, },
                                                      }, },
-    [NOTIFY_SEQUENCE_ARMED_FM_AUTOTUNE] =          { .repeats  = -1,  .steps    = {
-                                                   { .time_off = 800, .time_on  = 200, .color = COLOR_BLUE, .repeats = 1, },
-                                                     }, },
     [NOTIFY_SEQUENCE_ARMED_FM_GPS] =               { .repeats  = -1,  .steps    = {
                                                    { .time_off = 800, .time_on  = 200, .color = COLOR_GREEN, .repeats = 1, },
                                                      }, },
@@ -172,7 +168,6 @@ const LedSequence_t *flightModeMap[] = {
     [FLIGHTSTATUS_FLIGHTMODE_STABILIZED5]      = &notifications[NOTIFY_SEQUENCE_ARMED_FM_STABILIZED5],
     [FLIGHTSTATUS_FLIGHTMODE_STABILIZED6]      = &notifications[NOTIFY_SEQUENCE_ARMED_FM_STABILIZED6],
     [FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER]      = &notifications[NOTIFY_SEQUENCE_ARMED_FM_AUTO],
-    [FLIGHTSTATUS_FLIGHTMODE_AUTOTUNE]         = &notifications[NOTIFY_SEQUENCE_ARMED_FM_AUTOTUNE],
     [FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD]     = &notifications[NOTIFY_SEQUENCE_ARMED_FM_GPS],
     [FLIGHTSTATUS_FLIGHTMODE_COURSELOCK]       = &notifications[NOTIFY_SEQUENCE_ARMED_FM_GPS],
     [FLIGHTSTATUS_FLIGHTMODE_POSITIONROAM]     = &notifications[NOTIFY_SEQUENCE_ARMED_FM_GPS],

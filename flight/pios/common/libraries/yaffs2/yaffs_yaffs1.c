@@ -63,7 +63,7 @@ int yaffs1_scan(struct yaffs_dev *dev)
 			bi->block_state = state = YAFFS_BLOCK_STATE_DEAD;
 
 		yaffs_trace(YAFFS_TRACE_SCAN_DEBUG,
-			"Block scanning block %d state %d seq %d",
+			"Block scanning block %d state %d seq %lu",
 			blk, state, seq_number);
 
 		if (state == YAFFS_BLOCK_STATE_DEAD) {

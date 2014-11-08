@@ -61,6 +61,9 @@ int yaffsfs_GetLastError(void)
  */
 int yaffsfs_CheckMemRegion(const void *addr, size_t size, int write_request)
 {
+    size = size;
+    write_request = write_request;
+
 	if(!addr)
 		return -1;
 	return 0;
@@ -135,7 +138,7 @@ static void *bg_gc_func(void *dummy)
 void yaffsfs_LockInit(void)
 {
 	/* Initialise lock */
-	pthread_mutex_init(&mutex1, NULL);
+
 	_yaffs_sem_lock = xSemaphoreCreateMutex();  // what about deinit?
 	/* Sneak in starting a background gc thread too */
 	// pthread_create(&bc_gc_thread, NULL, bg_gc_func, NULL);
@@ -168,47 +171,6 @@ u32 yaffsfs_CurrentTime(void)
 }
 
 
-/*
- * yaffsfs_malloc()
- * yaffsfs_free()
- *
- * Functions to allocate and free memory.
- */
-
-#ifdef CONFIG_YAFFS_TEST_MALLOC
-
-static int yaffs_kill_alloc = 0;
-static size_t total_malloced = 0;
-static size_t malloc_limit = 0 & 6000000;
-
-void *yaffsfs_malloc(size_t size)
-{
-	void * this;
-	if(yaffs_kill_alloc)
-		return NULL;
-	if(malloc_limit && malloc_limit <(total_malloced + size) )
-		return NULL;
-
-	this = pios_malloc(size);
-	if(this)
-		total_malloced += size;
-	return this;
-}
-
-#else
-
-void *yaffsfs_malloc(size_t size)
-{
-	return pios_malloc(size);
-}
-
-#endif
-
-void yaffsfs_free(void *ptr)
-{
-	pios_free(ptr);
-}
-
 void yaffsfs_OSInitialisation(void)
 {
 	yaffsfs_LockInit();
@@ -223,5 +185,7 @@ void yaffs_bug_fn(const char *file_name, int line_no)
 {
 	pios_trace(PIOS_TRACE_ERROR, "yaffsfs_SetError(%s) %d",
 						 file_name, line_no);
+	line_no = line_no;
+	file_name = file_name;
 	PIOS_Assert(0);
 }

@@ -40,6 +40,7 @@
 static void yaffs_dump_packed_tags2_tags_only(
 				const struct yaffs_packed_tags2_tags_only *ptt)
 {
+	ptt = ptt;
 	yaffs_trace(YAFFS_TRACE_MTD,
 		"packed tags obj %d chunk %d byte %d seq %d",
 		ptt->obj_id, ptt->chunk_id, ptt->n_bytes, ptt->seq_number);
@@ -52,6 +53,7 @@ static void yaffs_dump_packed_tags2(const struct yaffs_packed_tags2 *pt)
 
 static void yaffs_dump_tags2(const struct yaffs_ext_tags *t)
 {
+	t = t;
 	yaffs_trace(YAFFS_TRACE_MTD,
 		"ext.tags eccres %d blkbad %d chused %d obj %d chunk%d byte %d del %d ser %d seq %d",
 		t->ecc_result, t->block_bad, t->chunk_used, t->obj_id,

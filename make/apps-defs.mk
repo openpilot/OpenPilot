@@ -90,7 +90,7 @@ SRC += $(MATHLIB)/pid.c
 
 ## PIOS Hardware (Common)
 ifeq ($(USE_YAFFS),YES)
-SRC += $(PIOSCORECOMMON)/pios_logfs.c # Used for yaffs testing
+SRC += $(PIOSCOMMON)/pios_logfs.c # Used for yaffs testing
 else
 SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
 endif

@@ -167,6 +167,8 @@ static int nor_drv_WriteChunkToNAND(struct yaffs_dev *dev,
 	// always null/zero as per yaffs_tagsmarshall.c
 	uintptr_t dataAddr = Chunk2DataAddr(dev,nand_chunk);
 	int retval = YAFFS_FAIL;
+	oob = oob;
+	oob_len = oob_len;
 
 	if(data) {
 		/* Write the data */
@@ -178,7 +180,7 @@ static int nor_drv_WriteChunkToNAND(struct yaffs_dev *dev,
 
 
 
-static int nor_drv_FlashRead32(struct yaffs_dev *dev, uintptr_t addr,uint8_t* buf,u32 read_len)
+static int nor_drv_FlashRead32(struct yaffs_dev *dev, uintptr_t addr, uint8_t* buf, u32 read_len)
 {
 	struct pios_yaffs_driver_context *context =
 	    (struct pios_yaffs_driver_context *)dev->driver_context;
@@ -187,13 +189,13 @@ static int nor_drv_FlashRead32(struct yaffs_dev *dev, uintptr_t addr,uint8_t* bu
 
 	if (context->driver->start_transaction(context->flash_id) == 0)
 	{
-		uintptr_t read_offset = 0;
+	     uintptr_t read_offset = addr;
 	     while (read_len > 0 && retval == YAFFS_OK)
 	     {
 	    	 /* Individual reads must fit entirely within a single page buffer. */
 	    	 read_size     = MIN(read_len, context->cfg->page_size);
 	    	 if (context->driver->read_data(context->flash_id,
-	    		 	 	 	 	 	 	read_offset,
+	    		 	 	 	read_offset,
 		                                buf,
 		                                read_size) != 0)
 	    	 {
@@ -203,7 +205,7 @@ static int nor_drv_FlashRead32(struct yaffs_dev *dev, uintptr_t addr,uint8_t* bu
 
 	    	 read_offset += read_size;
 	    	 read_len    -= read_size;
-	    	 buf		 += read_size;
+	    	 buf         += read_size;
 	     }
 
 	     context->driver->end_transaction(context->flash_id);
@@ -219,18 +221,22 @@ static int nor_drv_FlashRead32(struct yaffs_dev *dev, uintptr_t addr,uint8_t* bu
 
 static int nor_drv_ReadChunkFromNAND(struct yaffs_dev *dev,
                                      int nand_chunk,
-					u8 *data, int data_len,
-					u8 *oob, int oob_len,
+					u8 *data,
+					int data_len,
+					u8 *oob,
+					int oob_len,
 					enum yaffs_ecc_result *ecc_result)
 {
 
 
 	uintptr_t dataAddr = Chunk2DataAddr(dev,nand_chunk);
 	int retval = YAFFS_FAIL;
+	oob = oob;
+	oob_len = oob_len;
 
 	if (data) {
-	    PIOS_Assert(data_len == dev->param.total_bytes_per_chunk);
-        retval = nor_drv_FlashRead32(dev, dataAddr,data,dev->param.total_bytes_per_chunk);
+	    PIOS_Assert((u32)data_len == dev->param.total_bytes_per_chunk);
+            retval = nor_drv_FlashRead32(dev, dataAddr,data,dev->param.total_bytes_per_chunk);
 	}
 
 	//TODO How to implement ECC
@@ -351,10 +357,13 @@ static int nor_drv_InitialiseNAND(struct yaffs_dev *dev)
 static int nor_drv_Deinitialise_flash_fn(struct yaffs_dev *dev)
 {
 
+  dev = dev;
+
+#if defined(USE_NORSIM)
+
 	struct pios_yaffs_driver_context *context =
 				    (struct pios_yaffs_driver_context *)dev->driver_context;
 
-#if defined(USE_NORSIM)
 	ynorsim_shutdown(context->flash_id);
 #endif
 

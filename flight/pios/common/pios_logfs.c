@@ -44,7 +44,7 @@ static void getObjectPathAndName(uintptr_t fs_id, uint32_t obj_id, uint16_t obj_
                                                          // skip least sig nibble since that is used for meta object id
     uint8_t suffix  = obj_inst_id & 0xff;
 
-    snprintf((char *)filename, OBJECTPATHNAME_LEN, "/dev%01u/logfs/%08X.o%02X", (unsigned)fs_id, prefix, suffix);
+    snprintf((char *)filename, OBJECTPATHNAME_LEN, "/dev%01u/logfs/%08X.o%02X", (unsigned)fs_id, (uint16_t)prefix, suffix);
 }
 
 /**
@@ -235,10 +235,10 @@ int32_t PIOS_FLASHFS_ObjDelete(
     getObjectPathAndName(fs_id, obj_id, obj_inst_id, filename);
 
     // Delete file
-    retval = pios_unlink((char *)filename);
+    retval = pios_unlink((char *)filename);  // 0 for success, -1 for fail
     pios_trace(PIOS_TRACE_TEST, "pios_unlink(%s) retval=%d" , filename, retval);
 
-    return 0;
+    return retval;
 }
 
 /**
@@ -262,9 +262,9 @@ int32_t PIOS_FLASHFS_Format(
     getDeviceName(fs_id, devicename);
 
     retval = pios_format(devicename,
-		       TRUE,  // unmount flag
-		       TRUE,  // force unmount flag
-		       TRUE);  // remount
+		       1,  // unmount flag
+		       1,  // force unmount flag
+		       1);  // remount
 
     pios_trace(PIOS_TRACE_TEST, "pios_format (%s) retval=%d.", devicename, retval);
     return retval; 

@@ -29,7 +29,7 @@ int yaffs_mark_bad(struct yaffs_dev *dev, int block_no);
 int yaffs_query_init_block_state(struct yaffs_dev *dev,
 				 int block_no,
 				 enum yaffs_block_state *state,
-				 unsigned *seq_number);
+				 u32 *seq_number);
 
 int yaffs_erase_block(struct yaffs_dev *dev, int flash_block);
 

@@ -163,7 +163,7 @@ static int yaffs_tags_marshall_query_block(struct yaffs_dev *dev, int block_no,
 	}
 
 	yaffs_trace(YAFFS_TRACE_MTD,
-		"block query returns  seq %d state %d",
+		"block query returns  seq %lu state %d",
 		*seq_number, *state);
 
 	if (retval == 0)

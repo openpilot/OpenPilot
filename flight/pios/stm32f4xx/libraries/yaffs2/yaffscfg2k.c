@@ -111,7 +111,10 @@ int32_t PIOS_FLASHFS_Logfs_Init(
 
         // Create the logfs directory if it does not already exist
     	retval = pios_mkdir(logfs_path, O_CREAT);
-        if (retval < 0) pios_trace(PIOS_TRACE_ERROR, "Couldn't mkdir %s", logfs_path);
+        if (retval < 0)
+        {
+            pios_trace(PIOS_TRACE_ERROR, "Couldn't mkdir %s", logfs_path);
+        }
     }
 
 

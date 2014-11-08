@@ -22,6 +22,7 @@
 
 #include "pios.h"
 #include "pios_mem.h"
+#include "pios_string.h"
 
 #include "stdint.h"
 #include "stdlib.h"
@@ -47,16 +48,8 @@ void yaffs_bug_fn(const char *file_name, int line_no);
 #define yaffs_strcpy(a, b)	pios_strcpy(a, b)
 #define yaffs_strncpy(a, b, c)	pios_strncpy(a, b, c)
 #define yaffs_strnlen(s, m)	pios_strnlen(s, m)
-#ifdef CONFIG_YAFFS_CASE_INSENSITIVE
-#define yaffs_strcmp(a, b)	strcasecmp(a, b)
-#define yaffs_strncmp(a, b, c)	strncasecmp(a, b, c)
-#else
 #define yaffs_strcmp(a, b)	pios_strcmp(a, b)
 #define yaffs_strncmp(a, b, c)	pios_strncmp(a, b, c)
-#endif
-
-
-
 
 
 #define hweight8(x)	yaffs_hweight8(x)

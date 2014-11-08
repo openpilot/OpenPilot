@@ -1790,7 +1790,7 @@ void VehicleConfigurationHelper::setupElevon()
     channels[0].pitch     = -100;
     channels[0].yaw       = 0;
 
-    // Elevon Servo 1 (Chan 2)
+    // Elevon Servo 2 (Chan 2)
     channels[1].type      = MIXER_TYPE_SERVO;
     channels[1].throttle1 = 0;
     channels[1].throttle2 = 0;

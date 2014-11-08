@@ -165,26 +165,33 @@ void plan_run_land()
 /**
  * @brief positionvario functionality
  */
-static bool vario_hold = true;
+static bool vario_hold    = true;
 static float hold_position[3];
+static float vario_course = 0;
 
 static void plan_setup_PositionVario()
 {
     vario_hold = true;
+    AttitudeStateYawGet(&vario_course);
     plan_setup_positionHold();
 }
 
-void plan_setup_PositionVarioFPV()
+void plan_setup_CourseLock()
 {
     plan_setup_PositionVario();
 }
 
-void plan_setup_PositionVarioLOS()
+void plan_setup_MagicRoam()
 {
     plan_setup_PositionVario();
 }
 
-void plan_setup_PositionVarioNSEW()
+void plan_setup_MagicLeash()
+{
+    plan_setup_PositionVario();
+}
+
+void plan_setup_AbsolutePosition()
 {
     plan_setup_PositionVario();
 }
@@ -218,7 +225,7 @@ static bool normalizeDeadband(float controlVector[4])
     return moving;
 }
 
-typedef enum { FPV, LOS, NSEW } vario_type;
+typedef enum { COURSE, FPV, LOS, NSEW } vario_type;
 
 static void getVector(float controlVector[4], vario_type type)
 {
@@ -249,6 +256,9 @@ static void getVector(float controlVector[4], vario_type type)
     // rotate north and east - rotation angle based on type
     float angle;
     switch (type) {
+    case COURSE:
+        angle = vario_course;
+        break;
     case NSEW:
         angle = 0.0f;
         // NSEW no rotation takes place
@@ -349,17 +359,23 @@ static void plan_run_PositionVario(vario_type type)
         PathDesiredSet(&pathDesired);
     }
 }
-void plan_run_PositionVarioFPV()
+
+void plan_run_CourseLock()
+{
+    plan_run_PositionVario(COURSE);
+}
+
+void plan_run_MagicRoam()
 {
     plan_run_PositionVario(FPV);
 }
 
-void plan_run_PositionVarioLOS()
+void plan_run_MagicLeash()
 {
     plan_run_PositionVario(LOS);
 }
 
-void plan_run_PositionVarioNSEW()
+void plan_run_AbsolutePosition()
 {
     plan_run_PositionVario(NSEW);
 }

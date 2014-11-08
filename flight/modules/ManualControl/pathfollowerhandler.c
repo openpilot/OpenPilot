@@ -68,14 +68,14 @@ void pathFollowerHandler(bool newinit)
         case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
             plan_setup_positionHold();
             break;
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
-            plan_setup_PositionVarioFPV();
+        case FLIGHTSTATUS_FLIGHTMODE_MAGICROAM:
+            plan_setup_MagicRoam();
             break;
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
-            plan_setup_PositionVarioLOS();
+        case FLIGHTSTATUS_FLIGHTMODE_MAGICLEASH:
+            plan_setup_MagicLeash();
             break;
-        case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
-            plan_setup_PositionVarioNSEW();
+        case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
+            plan_setup_AbsolutePosition();
             break;
 
         case FLIGHTSTATUS_FLIGHTMODE_LAND:
@@ -92,14 +92,14 @@ void pathFollowerHandler(bool newinit)
     }
 
     switch (flightMode) {
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOFPV:
-        plan_run_PositionVarioFPV();
+    case FLIGHTSTATUS_FLIGHTMODE_MAGICROAM:
+        plan_run_MagicRoam();
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIOLOS:
-        plan_run_PositionVarioLOS();
+    case FLIGHTSTATUS_FLIGHTMODE_MAGICLEASH:
+        plan_run_MagicLeash();
         break;
-    case FLIGHTSTATUS_FLIGHTMODE_POSITIONVARIONSEW:
-        plan_run_PositionVarioNSEW();
+    case FLIGHTSTATUS_FLIGHTMODE_ABSOLUTEPOSITION:
+        plan_run_AbsolutePosition();
         break;
     case FLIGHTSTATUS_FLIGHTMODE_LAND:
         plan_run_land();

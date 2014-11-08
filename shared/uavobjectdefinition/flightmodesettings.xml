@@ -78,31 +78,31 @@
                units=""
                type="enum"
                elements="6"
-               options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,Autotune,PositionHold,PositionVarioFPV,PositionVarioLOS,PositionVarioNSEW,ReturnToBase,Land,PathPlanner,POI,AutoCruise"
+               options="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6,Autotune,PositionHold,CourseLock,MagicRoam,MagicLeash,AbsolutePosition,ReturnToBase,Land,PathPlanner,POI,AutoCruise"
                defaultvalue="Stabilized1,Stabilized2,Stabilized3,Stabilized4,Stabilized5,Stabilized6"
                limits="\
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;\
                        \
-                       %0401NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
-                       %0402NE:Autotune:PositionHold:PositionVarioFPV:PositionVarioLOS:PositionVarioNSEW:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0401NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
+                       %0402NE:Autotune:PositionHold:CourseLock:MagicRoam:MagicLeash:AbsolutePosition:ReturnToBase:Land:PathPlanner:POI:AutoCruise,\
                        %0903NE:POI:PathPlanner:Autotune:AutoCruise:Land;"/>
 
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>

@@ -68,6 +68,14 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     flightModeSettingsObj = FlightModeSettings::GetInstance(getObjectManager());
     flightStatusObj = FlightStatus::GetInstance(getObjectManager());
     receiverActivityObj   = ReceiverActivity::GetInstance(getObjectManager());
+    accessoryDesiredObj0  = AccessoryDesired::GetInstance(getObjectManager(), 0);
+    accessoryDesiredObj1  = AccessoryDesired::GetInstance(getObjectManager(), 1);
+    accessoryDesiredObj2  = AccessoryDesired::GetInstance(getObjectManager(), 2);
+
+    // Only instance 0 is present if the board is not connected.
+    // The other instances are populated lazily.
+    Q_ASSERT(accessoryDesiredObj0);
+
     ui = new Ui_InputWidget();
     ui->setupUi(this);
 
@@ -400,14 +408,6 @@ void ConfigInputWidget::goToWizard()
     previousFlightModeSettingsData = flightModeSettingsData;
     flightModeSettingsData.Arming  = FlightModeSettings::ARMING_ALWAYSDISARMED;
     flightModeSettingsObj->setData(flightModeSettingsData);
-
-    accessoryDesiredObj0           = AccessoryDesired::GetInstance(getObjectManager(), 0);
-    accessoryDesiredObj1           = AccessoryDesired::GetInstance(getObjectManager(), 1);
-    accessoryDesiredObj2           = AccessoryDesired::GetInstance(getObjectManager(), 2);
-
-    // Only instance 0 is present if the board is not connected.
-    // The other instances are populated lazily.
-    Q_ASSERT(accessoryDesiredObj0);
 
     // Use faster input update rate.
     fastMdata();

@@ -58,7 +58,10 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     skipflag(false),
     nextDelayedTimer(),
     nextDelayedTick(0),
-    nextDelayedLatestActivityTick(0)
+    nextDelayedLatestActivityTick(0),
+    accessoryDesiredObj0(NULL),
+    accessoryDesiredObj1(NULL),
+    accessoryDesiredObj2(NULL)
 {
     manualCommandObj      = ManualControlCommand::GetInstance(getObjectManager());
     manualSettingsObj     = ManualControlSettings::GetInstance(getObjectManager());
@@ -401,6 +404,10 @@ void ConfigInputWidget::goToWizard()
     accessoryDesiredObj0           = AccessoryDesired::GetInstance(getObjectManager(), 0);
     accessoryDesiredObj1           = AccessoryDesired::GetInstance(getObjectManager(), 1);
     accessoryDesiredObj2           = AccessoryDesired::GetInstance(getObjectManager(), 2);
+
+    // Only instance 0 is present if the board is not connected.
+    // The other instances are populated lazily.
+    Q_ASSERT(accessoryDesiredObj0);
 
     // Use faster input update rate.
     fastMdata();
@@ -1293,15 +1300,54 @@ void ConfigInputWidget::moveTxControls()
     }
 }
 
+AccessoryDesired *ConfigInputWidget::getAccessoryDesiredInstance(int instance)
+{
+    switch (instance) {
+    case 0:
+        if (accessoryDesiredObj0 == NULL) {
+            accessoryDesiredObj0 = AccessoryDesired::GetInstance(getObjectManager(), 0);
+        }
+        return accessoryDesiredObj0;
+
+    case 1:
+        if (accessoryDesiredObj1 == NULL) {
+            accessoryDesiredObj1 = AccessoryDesired::GetInstance(getObjectManager(), 1);
+        }
+        return accessoryDesiredObj1;
+
+    case 2:
+        if (accessoryDesiredObj2 == NULL) {
+            accessoryDesiredObj2 = AccessoryDesired::GetInstance(getObjectManager(), 2);
+        }
+        return accessoryDesiredObj2;
+
+    default:
+        Q_ASSERT(false);
+    }
+
+    return NULL;
+}
+
+float ConfigInputWidget::getAccessoryDesiredValue(int instance)
+{
+    AccessoryDesired *accessoryDesiredObj = getAccessoryDesiredInstance(instance);
+
+    if (accessoryDesiredObj == NULL) {
+        Q_ASSERT(false);
+        return 0.0f;
+    }
+
+    AccessoryDesired::DataFields data = accessoryDesiredObj->getData();
+
+    return data.AccessoryVal;
+}
+
 void ConfigInputWidget::moveSticks()
 {
     QTransform trans;
 
-    manualCommandData     = manualCommandObj->getData();
-    flightStatusData      = flightStatusObj->getData();
-    accessoryDesiredData0 = accessoryDesiredObj0->getData();
-    accessoryDesiredData1 = accessoryDesiredObj1->getData();
-    accessoryDesiredData2 = accessoryDesiredObj2->getData();
+    manualCommandData = manualCommandObj->getData();
+    flightStatusData  = flightStatusObj->getData();
 
     switch (transmitterMode) {
     case mode1:
@@ -1342,9 +1388,10 @@ void ConfigInputWidget::moveSticks()
         m_txFlightMode->setElementId("flightModeRight");
         m_txFlightMode->setTransform(m_txFlightModeROrig, false);
     }
-    m_txAccess0->setTransform(QTransform(m_txAccess0Orig).translate(accessoryDesiredData0.AccessoryVal * ACCESS_MAX_MOVE * 10, 0), false);
-    m_txAccess1->setTransform(QTransform(m_txAccess1Orig).translate(accessoryDesiredData1.AccessoryVal * ACCESS_MAX_MOVE * 10, 0), false);
-    m_txAccess2->setTransform(QTransform(m_txAccess2Orig).translate(accessoryDesiredData2.AccessoryVal * ACCESS_MAX_MOVE * 10, 0), false);
+
+    m_txAccess0->setTransform(QTransform(m_txAccess0Orig).translate(getAccessoryDesiredValue(0) * ACCESS_MAX_MOVE * 10, 0), false);
+    m_txAccess1->setTransform(QTransform(m_txAccess1Orig).translate(getAccessoryDesiredValue(1) * ACCESS_MAX_MOVE * 10, 0), false);
+    m_txAccess2->setTransform(QTransform(m_txAccess2Orig).translate(getAccessoryDesiredValue(2) * ACCESS_MAX_MOVE * 10, 0), false);
 }
 
 void ConfigInputWidget::dimOtherControls(bool value)

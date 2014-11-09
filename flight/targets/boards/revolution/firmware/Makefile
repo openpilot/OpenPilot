@@ -103,15 +103,16 @@ endif
 
 # Optional component libraries
 include $(FLIGHTLIB)/rscode/library.mk
+
 ifeq ($(USE_YAFFS),YES)
-include $(PIOS)/common/libraries/yaffs2/library.mk  # Only required for yaffs testing
-include $(PIOS)/stm32f4xx/libraries/yaffs2/yaffs_impl.mk  # Only required for yaffs testing
 CFLAGS += -DPIOS_YAFFS
 EXTRAINCDIRS  += $(PIOS)/posix/libraries/yaffs2
+include $(PIOS)/common/libraries/yaffs2/library.mk  # Only required for yaffs testing
+include $(PIOS)/stm32f4xx/libraries/yaffs2/yaffs_impl.mk  # Only required for yaffs testing
+SRC += $(PIOSCOMMON)/pios_logfs.c # Used for yaffs testing
+SRC += $(PIOSCOMMON)/pios_string.c # string functions used in yaffs
+USE_LOGFS_NOT_YAFFS = NO
 endif
-
-
-
 
 #include $(FLIGHTLIB)/PyMite/pymite.mk
 

@@ -88,13 +88,13 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
-## PIOS Hardware (Common)
-ifeq ($(USE_YAFFS),YES)
-SRC += $(PIOSCOMMON)/pios_logfs.c # Used for yaffs testing
-SRC += $(PIOSCOMMON)/pios_string.c # string functions used in yaffs
-else
+## For Revo which can optionally use YAFFS, we need
+## to exclude the old logfs methods which would otherwise
+## create a linker conflict
+ifneq ($(USE_LOGFS_NOT_YAFFS),NO)
 SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
 endif
+
 
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_debuglog.c

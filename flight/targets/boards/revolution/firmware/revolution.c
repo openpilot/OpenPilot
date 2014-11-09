@@ -66,7 +66,7 @@ static void Stack_Change_Weak() __attribute__((weakref("Stack_Change")));
 
 /* Local Variables */
 #define INIT_TASK_PRIORITY (tskIDLE_PRIORITY + configMAX_PRIORITIES - 1) // max priority
-#define INIT_TASK_STACK    (1024 / 4)                                                                              // XXX this seems excessive
+#define INIT_TASK_STACK    (1024 / 2)
 static xTaskHandle initTaskHandle;
 
 /* Function Prototypes */

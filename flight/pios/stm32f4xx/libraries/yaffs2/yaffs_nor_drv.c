@@ -124,6 +124,7 @@ static int nor_drv_FlashWrite32(struct yaffs_dev *dev, uintptr_t addr, const uin
 	    (struct pios_yaffs_driver_context *)dev->driver_context;
 	int retval = YAFFS_OK;
 	uint16_t write_size;
+	static uint16_t pio_write_size = 128;
 
 	if (context->driver->start_transaction(context->flash_id) == 0)
 	{
@@ -131,7 +132,8 @@ static int nor_drv_FlashWrite32(struct yaffs_dev *dev, uintptr_t addr, const uin
 	  while (write_len > 0 && retval == YAFFS_OK)
 	  {
 	 	     /* Individual writes must fit entirely within a single page buffer. */
-	 	     write_size = MIN(write_len, context->cfg->page_size);
+	 	     write_size = MIN(write_len, pio_write_size);
+	 	     //write_size = MIN(write_len, context->cfg->page_size);
 	 	     if (context->driver->write_data(context->flash_id,
 	 		                                      write_offset,
 	 		                                      (uint8_t *)buf,
@@ -186,6 +188,7 @@ static int nor_drv_FlashRead32(struct yaffs_dev *dev, uintptr_t addr, uint8_t* b
 	    (struct pios_yaffs_driver_context *)dev->driver_context;
 	int retval = YAFFS_OK;
 	uint16_t read_size;
+	static uint16_t pio_read_size = 128;
 
 	if (context->driver->start_transaction(context->flash_id) == 0)
 	{
@@ -193,7 +196,8 @@ static int nor_drv_FlashRead32(struct yaffs_dev *dev, uintptr_t addr, uint8_t* b
 	     while (read_len > 0 && retval == YAFFS_OK)
 	     {
 	    	 /* Individual reads must fit entirely within a single page buffer. */
-	    	 read_size     = MIN(read_len, context->cfg->page_size);
+	    	 read_size     = MIN(read_len, pio_read_size);
+	    	 //read_size     = MIN(read_len, context->cfg->page_size);
 	    	 if (context->driver->read_data(context->flash_id,
 	    		 	 	 	read_offset,
 		                                buf,

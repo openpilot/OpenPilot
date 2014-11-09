@@ -1,17 +1,18 @@
-/*
- * YAFFS: Yet Another Flash File System. A NAND-flash specific file system.
+/**
+ ******************************************************************************
+ * @addtogroup Yaffs lower layer
+ * @{
+ * @addtogroup   Yaffs lower layer
+ * @brief Interface yaffs to PIOS flash driver or simposix nor simulator
+ * @{
  *
- * Copyright (C) 2002-2011 Aleph One Ltd.
- *   for Toby Churchill Ltd and Brightstar Engineering
+ * @file       yaffs_nor_drv.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      yaffs flash file system
+ * @see        The GNU Public License (GPL) Version 3
+ * @notes
  *
- * Created by Charles Manning <charles@aleph1.co.uk>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- */
-
-// TODO Add in OP's copyright
+ *****************************************************************************/
 
 /* This code is intended to be used with "regular" NOR that is bit-modifyable.
  *
@@ -21,9 +22,8 @@
  *  command, or it can be erased one sector at a time using the
  *  SECTOR ERASE command.
  *
- *  yaffs2 will manage 32 blocks (i.e. sectors) with chunks of 4 pages per chunk
+ *  yaffs2 will manage 32 blocks (i.e. sectors) with chunks of 2 pages per chunk
  *  Each chunk will have an inband tag managed by yaffs marshalling code.
- *  TODO add description of the format marker.
  */
 
 #include "pios.h"
@@ -38,10 +38,8 @@
 #include "yaffs_flashif.h"
 #include "yaffs_guts.h"
 
-// #define USE_NORSIM
-
 #if defined(USE_NORSIM)
-#include "ynorsim.h"
+#include "ynorsim.h"  // only used in simposix
 #endif
 
 
@@ -413,9 +411,9 @@ static int nor_drv_MarkBad(struct yaffs_dev *dev, int block_no)
 
 void yaffs_nor_install_drv(const char *name,
                            uint16_t max_name_len,
-		const struct flashfs_logfs_cfg *cfg,
-		const struct pios_flash_driver *driver,
-		uintptr_t flash_id)
+			   const struct flashfs_logfs_cfg *cfg,
+			   const struct pios_flash_driver *driver,
+			   uintptr_t flash_id)
 {
 
 	struct yaffs_dev *dev = pios_malloc(sizeof(struct yaffs_dev));
@@ -470,8 +468,6 @@ void yaffs_nor_install_drv(const char *name,
 	param->n_caches = 10;
 	param->disable_soft_del = 0;
 
-	//How to enable yaffs ecc???
-
 	// the tagsmarshall takes care of the following yaffs2 methods
 	// with support for inband tags
 	// writeChunkWithTagsToNAND
@@ -491,7 +487,7 @@ void yaffs_nor_install_drv(const char *name,
 	dev->driver_context = (void *) context;
 
 
-#if defined(USE_NORSIM)
+#if defined(USE_NORSIM) // only used in simposix
 	int blocks_in_device = param->end_block - param->start_block +1;
 	ynorsim_initialise("emfile-nor", flash_id, blocks_in_device, cfg->sector_size);
 #endif

@@ -1,18 +1,18 @@
-/*
- * YAFFS: Yet another Flash File System . A NAND-flash specific file system.
+/**
+ ******************************************************************************
+ * @addtogroup Yaffs lower layer
+ * @{
+ * @addtogroup   Yaffs lower layer
+ * @brief Interface yaffs to PIOS flash driver or simposix nor simulator
+ * @{
  *
- * Copyright (C) 2002-2011 Aleph One Ltd.
- *   for Toby Churchill Ltd and Brightstar Engineering
+ * @file       yaffs_nor_drv.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
+ * @brief      yaffs flash file system
+ * @see        The GNU Public License (GPL) Version 3
+ * @notes
  *
- * Created by Charles Manning <charles@aleph1.co.uk>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License version 2.1 as
- * published by the Free Software Foundation.
- *
- * Note: Only YAFFS headers are LGPL, YAFFS C code is covered by GPL.
- */
-
+ *****************************************************************************/
 
 #ifndef __YAFFS_NOR_DRV_H__
 #define __YAFFS_NOR_DRV_H__

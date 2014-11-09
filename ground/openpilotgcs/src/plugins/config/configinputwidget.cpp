@@ -1581,7 +1581,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
             manualSettingsData.ChannelMax[i]     = manualCommandData.Channel[i];
         }
 
-        fastMdata();
+        fastMdataSingle(manualCommandObj, &manualControlMdata);
 
         connect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject *)), this, SLOT(updateCalibration()));
     } else {
@@ -1590,7 +1590,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         manualCommandData  = manualCommandObj->getData();
         manualSettingsData = manualSettingsObj->getData();
 
-        restoreMdata();
+        restoreMdataSingle(manualCommandObj, &manualControlMdata);
 
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
             manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];

@@ -167,7 +167,7 @@ void plan_run_land()
  */
 static bool vario_hold    = true;
 static float hold_position[3];
-static float vario_control_lowpass[4];
+static float vario_control_lowpass[3];
 static float vario_course = 0.0f;
 
 static void plan_setup_PositionVario()
@@ -176,7 +176,6 @@ static void plan_setup_PositionVario()
     vario_control_lowpass[0] = 0.0f;
     vario_control_lowpass[1] = 0.0f;
     vario_control_lowpass[2] = 0.0f;
-    vario_control_lowpass[3] = 0.0f;
     AttitudeStateYawGet(&vario_course);
     plan_setup_positionHold();
 }
@@ -316,11 +315,9 @@ static void plan_run_PositionVario(vario_type type)
     vario_control_lowpass[0] = alpha * vario_control_lowpass[0] + (1.0f - alpha) * controlVector[0];
     vario_control_lowpass[1] = alpha * vario_control_lowpass[1] + (1.0f - alpha) * controlVector[1];
     vario_control_lowpass[2] = alpha * vario_control_lowpass[2] + (1.0f - alpha) * controlVector[2];
-    vario_control_lowpass[3] = alpha * vario_control_lowpass[3] + (1.0f - alpha) * controlVector[3];
     controlVector[0] = vario_control_lowpass[0];
     controlVector[1] = vario_control_lowpass[1];
     controlVector[2] = vario_control_lowpass[2];
-    controlVector[3] = vario_control_lowpass[3];
 
     // check if movement is desired
     if (normalizeDeadband(controlVector) == false) {

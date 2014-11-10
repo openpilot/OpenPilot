@@ -247,18 +247,18 @@ void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
         if (channel > -1) {
             // If for some reason the actuators were incoherent, we might fail here, hence the check.
             m_aircraft->elevonSlider1->setValue(
-                getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL) * 100);
+                getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL) / 1.27);
             m_aircraft->elevonSlider2->setValue(
-                getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH) * -100);
+                -getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH) / 1.27);
         }
     } else if (frameType == "FixedWingVtail") {
         int channel = m_aircraft->fwElevator1ChannelBox->currentIndex() - 1;
         if (channel > -1) {
             // If for some reason the actuators were incoherent, we might fail here, hence the check.
             m_aircraft->elevonSlider1->setValue(
-                getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW) * 100);
+                getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW) / 1.27);
             m_aircraft->elevonSlider2->setValue(
-                getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH) * 100);
+                getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH) / 1.27);
         }
     }
 }

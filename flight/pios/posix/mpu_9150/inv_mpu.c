@@ -704,7 +704,7 @@ int mpu_read_reg(unsigned char reg, unsigned char *data)
  *  @brief      Initialize hardware.
  *  Initial configuration:\n
  *  Gyro FSR: +/- 2000DPS\n
- *  Accel FSR +/- 2G\n
+ *  Accel FSR +/- 8G\n  RPi hack (was 2G)
  *  DLPF: 42Hz\n
  *  FIFO rate: 50Hz\n
  *  Clock source: Gyro PLL\n
@@ -803,7 +803,10 @@ int mpu_init(struct int_param_s *int_param)
 
     if (mpu_set_gyro_fsr(2000))
         return -1;
+/* RPi hack
     if (mpu_set_accel_fsr(2))
+*/
+    if (mpu_set_accel_fsr(8))
         return -1;
     if (mpu_set_lpf(42))
         return -1;

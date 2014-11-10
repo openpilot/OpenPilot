@@ -250,7 +250,7 @@ static void mpuTask(__attribute__((unused)) void *parameters)
         pthread_mutex_unlock(&mpu_9150_mutex);
 
         //* Looks like vTaskDelay in posix works like sleep_ms() */
-        vTaskDelay(35);
+        vTaskDelay(12);
     }
 }
 
@@ -282,7 +282,7 @@ float PIOS_MPU6000_GetScale() {
 }
 float PIOS_MPU6000_GetAccelScale() {
     //PIOS_MPU6000_ACCEL_8G:
-    return GRAV / 4096.0f;
+    return GRAV / 4.096f;
 }
 
 #endif /* PIOS_INCLUDE_MPU6000 */

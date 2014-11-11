@@ -690,6 +690,10 @@ void VehicleConfigurationHelper::applyMixerConfiguration(mixerChannelSettings ch
         break;
     }
     case VehicleConfigurationSource::VEHICLE_FIXEDWING:
+        mSettings->setMixerValueRoll(100);
+        mSettings->setMixerValuePitch(100);
+        mSettings->setMixerValueYaw(100);
+        break;
     case VehicleConfigurationSource::VEHICLE_HELI:
     case VehicleConfigurationSource::VEHICLE_SURFACE:
         // TODO: Implement mixer / sliders settings for other vehicle types?
@@ -1828,7 +1832,7 @@ void VehicleConfigurationHelper::setupDualAileron()
     channels[0].type      = MIXER_TYPE_SERVO;
     channels[0].throttle1 = 0;
     channels[0].throttle2 = 0;
-    channels[0].roll      = -100;
+    channels[0].roll      = 100;
     channels[0].pitch     = 0;
     channels[0].yaw       = 0;
 

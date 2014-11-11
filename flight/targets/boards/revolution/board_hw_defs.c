@@ -683,8 +683,8 @@ const struct pios_rfm22b_cfg *PIOS_BOARD_HW_DEFS_GetRfm22Cfg(uint32_t board_revi
 
 #if defined(PIOS_YAFFS)
 	static const struct flashfs_logfs_cfg flashfs_external_yaffs_cfg = {
-	    .fs_magic      = 0x99bbcfef,
-	    .total_fs_size = 0x00100000, /* 2M bytes (32 sectors = entire chip) */
+	    .fs_magic      = 0x99bbcfee,
+	    .total_fs_size = 0x00200000, /* 2M bytes (32 sectors = entire chip) */
 	    .arena_size    = 0x0000FE00, /* multiple of slot size but less than sector_size */
 	    .slot_size     = 0x00000200, /* 512 bytes chunk size for yaffs*/
 

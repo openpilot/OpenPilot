@@ -807,18 +807,13 @@ void ConfigMultiRotorWidget::setupQuadMotor(int channel, double pitch, double ro
 
     Q_ASSERT(mixer);
 
-    // Normalize mixer values, allow a well balanced mixer saved
-    pitch = (pitch < 0) ? qFloor(pitch * 127) : qCeil(pitch * 127);
-    roll  = (roll < 0) ? qFloor(roll * 127) : qCeil(roll * 127);
-    yaw   = (yaw < 0) ? qFloor(yaw * 127) : qCeil(yaw * 127);
-
     setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
 
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2, 0);
-    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, roll);
-    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, pitch);
-    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, yaw);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, roll * 127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, pitch * 127);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, yaw * 127);
 }
 
 /**

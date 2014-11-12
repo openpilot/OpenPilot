@@ -2344,7 +2344,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Go</source>
-        <translation type="unfinished">Y aller</translation>
+        <translation>Y aller</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
@@ -6180,9 +6180,8 @@ p, li { white-space: pre-wrap; }
         <translation>Options de Configuration et Calibration</translation>
     </message>
     <message>
-        <location/>
         <source>Start Configuration Wizard</source>
-        <translation>Démarrer l&apos;Assistant de Configuration</translation>
+        <translation type="vanished">Démarrer l&apos;Assistant de Configuration</translation>
     </message>
     <message>
         <location/>
@@ -6489,6 +6488,11 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <source>Settings Bank</source>
         <translation>Banque Paramètres</translation>
     </message>
+    <message>
+        <location/>
+        <source>Start Transmitter Setup Wizard</source>
+        <translation>Démarrer l&apos;Assistant Configuration Émetteur</translation>
+    </message>
 </context>
 <context>
     <name>MixerCurve</name>
@@ -6731,15 +6735,24 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <translation>Test en Temps Réel</translation>
     </message>
     <message>
-        <location/>
         <source>Setup &quot;RapidESC&quot; here: usual value is 500 Hz for multirotor airframes.
 </source>
-        <translation>Configurer ici &quot;TurboPWM&quot; : 500Hz est une valeur classique pour les multirotors.</translation>
+        <translation type="vanished">Configurer ici &quot;TurboPWM&quot; : 500Hz est une valeur classique pour les multirotors.</translation>
+    </message>
+    <message>
+        <source>500</source>
+        <translation type="vanished">500</translation>
     </message>
     <message>
         <location/>
-        <source>500</source>
-        <translation>500</translation>
+        <source>Setup &quot;RapidESC&quot; here: usual value is 490 Hz for multirotor airframes.
+</source>
+        <translation>Configurer ici &quot;RapidESC&quot; : 490Hz est une valeur classique pour les multirotors.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>490</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11159,13 +11172,21 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
-        <source>Standard ESC (50 Hz)</source>
-        <translation>Contrôleur Standard (50 Hz)</translation>
+        <source>Standard ESC (%1 Hz)</source>
+        <translation>Contrôleur Standard (%1 Hz)</translation>
     </message>
     <message>
         <location line="+3"/>
+        <source>Rapid ESC (%1 Hz)</source>
+        <translation>Contrôleur Rapide (%1 Hz)</translation>
+    </message>
+    <message>
+        <source>Standard ESC (50 Hz)</source>
+        <translation type="vanished">Contrôleur Standard (50 Hz)</translation>
+    </message>
+    <message>
         <source>Rapid ESC (500 Hz)</source>
-        <translation>Contrôleur Rapide (500Hz)</translation>
+        <translation type="vanished">Contrôleur Rapide (500Hz)</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -15265,8 +15286,8 @@ A noter : Pour le GPS OpenPilot v8, veuillez choisir l&apos;option GPS U-Blox.</
         <location filename="../../../src/plugins/setupwizard/pages/esccalibrationpage.cpp" line="+49"/>
         <location line="+49"/>
         <location line="+32"/>
+        <location line="+7"/>
         <location line="+9"/>
-        <location line="+11"/>
         <source>%1 µs</source>
         <translation></translation>
     </message>

@@ -370,10 +370,10 @@ QString SetupWizard::getSummaryText()
     summary.append("<b>").append(tr("Speed Controller (ESC) type: ")).append("</b>");
     switch (getEscType()) {
     case ESC_STANDARD:
-        summary.append(tr("Standard ESC (50 Hz)"));
+        summary.append(tr("Standard ESC (%1 Hz)").arg(VehicleConfigurationHelper::LEGACY_ESC_FREQUENCY));
         break;
     case ESC_RAPID:
-        summary.append(tr("Rapid ESC (500 Hz)"));
+        summary.append(tr("Rapid ESC (%1 Hz)").arg(VehicleConfigurationHelper::RAPID_ESC_FREQUENCY));
         break;
     default:
         summary.append(tr("Unknown"));

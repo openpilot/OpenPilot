@@ -74,7 +74,8 @@ void ControllerPage::initializePage()
 bool ControllerPage::isComplete() const
 {
     return m_telemtryManager->isConnected() && ui->boardTypeCombo->currentIndex() > 0 &&
-           m_connectionManager->getCurrentDevice().getConName().startsWith("USB:", Qt::CaseInsensitive);
+           (m_connectionManager->getCurrentDevice().getConName().startsWith("USB:", Qt::CaseInsensitive) ||
+            m_connectionManager->getCurrentDevice().getConName().startsWith("Serial:", Qt::CaseInsensitive));
 }
 
 bool ControllerPage::validatePage()

@@ -33,6 +33,7 @@
 #include "uavobject.h"
 #include "coreplugin/icore.h"
 #include "coreplugin/connectionmanager.h"
+#include <coreplugin/icore.h>
 
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_plot_grid.h"
@@ -48,6 +49,10 @@
 #include <QPushButton>
 #include <QMutexLocker>
 #include <QWheelEvent>
+#include <QMenu>
+#include <QAction>
+#include <QClipboard>
+#include <QApplication>
 
 #include <qwt/src/qwt_legend_label.h>
 #include <qwt/src/qwt_plot_canvas.h>
@@ -88,6 +93,9 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent),
     // Listen to autopilot connection events
     connect(cm, SIGNAL(deviceAboutToDisconnect()), this, SLOT(csvLoggingDisconnect()));
     connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(csvLoggingConnect()));
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint &  )), this, SLOT(popUpMenu(const QPoint &)));
 }
 
 ScopeGadgetWidget::~ScopeGadgetWidget()
@@ -623,4 +631,45 @@ void ScopeGadgetWidget::csvLoggingDisconnect()
     if (m_csvLoggingNewFileOnConnect) {
         csvLoggingStop();
     }
+}
+
+void ScopeGadgetWidget::popUpMenu(const QPoint &mousePosition)
+{
+    Q_UNUSED(mousePosition);
+
+    QMenu menu;
+    QAction * action = menu.addAction(tr("Clear"));
+    connect(action, &QAction::triggered, this, &ScopeGadgetWidget::clearPlot);
+    action = menu.addAction(tr("Copy to Clipboard"));
+    connect(action, &QAction::triggered, this, &ScopeGadgetWidget::copyToClipboardAsImage);
+    menu.addSeparator();
+    action = menu.addAction(tr("Options..."));
+    connect(action, &QAction::triggered, this, &ScopeGadgetWidget::showOptionDialog);
+    menu.exec(QCursor::pos());
+}
+
+void ScopeGadgetWidget::clearPlot()
+{
+    m_mutex.lock();
+    foreach (PlotData * plot, m_curvesData.values()) {
+        plot->clear();
+    }
+    m_mutex.unlock();
+    replot();
+}
+
+void ScopeGadgetWidget::copyToClipboardAsImage()
+{
+    QPixmap pixmap =  QWidget::grab();
+    if(pixmap.isNull()){
+        qDebug("Failed to capture the plot");
+        return;
+    }
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setPixmap(pixmap);
+}
+
+void ScopeGadgetWidget::showOptionDialog()
+{
+    Core::ICore::instance()->showOptionsDialog("ScopeGadget", m_name);
 }

@@ -93,6 +93,7 @@ public:
     virtual void removeStaleData() = 0;
 
     void updatePlotData();
+    void clear();
 
     bool hasData() const;
     QString lastDataAsString();

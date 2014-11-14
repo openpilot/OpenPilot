@@ -69,6 +69,7 @@ public:
     ScopeGadgetWidget(QWidget *parent = 0);
     ~ScopeGadgetWidget();
 
+    void setName (QString name) { m_name = name; }
     void setupSequentialPlot();
     void setupChronoPlot();
     void setupUAVObjectPlot();
@@ -137,12 +138,17 @@ private slots:
     void stopPlotting();
     void csvLoggingConnect();
     void csvLoggingDisconnect();
+    void popUpMenu(const QPoint &mousePosition);
+    void clearPlot();
+    void copyToClipboardAsImage();
+    void showOptionDialog();
 
 private:
 
     void preparePlot(PlotType plotType);
     void setupExamplePlot();
 
+    QString m_name;
     PlotType m_plotType;
 
     double m_plotDataSize;

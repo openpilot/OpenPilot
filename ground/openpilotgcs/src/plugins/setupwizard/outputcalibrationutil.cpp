@@ -93,7 +93,8 @@ void OutputCalibrationUtil::stopOutputCalibration()
     }
 }
 
-void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValue) {
+void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValue)
+{
     QList<quint16> channels;
     channels.append(channel);
     startChannelOutput(channels, safeValue);
@@ -125,9 +126,9 @@ void OutputCalibrationUtil::setChannelOutputValue(quint16 value)
     if (c_prepared) {
         ActuatorCommand *actuatorCommand = getActuatorCommandObject();
         ActuatorCommand::DataFields data = actuatorCommand->getData();
-        foreach (quint32 channel, m_outputChannels) {
+        foreach(quint32 channel, m_outputChannels) {
             // Set output value
-            if (channel <= ActuatorCommand::CHANNEL_NUMELEM){
+            if (channel <= ActuatorCommand::CHANNEL_NUMELEM) {
                 qDebug() << "OutputCalibrationUtil setting output value for channel " << channel << " to " << value << ".";
                 data.Channel[channel] = value;
             } else {

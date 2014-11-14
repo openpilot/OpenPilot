@@ -1,7 +1,24 @@
+--- RELEASE-14.10-RC6 ---
+This release candidate does add the following fixes/enhancements over the previous RC5
+
+The full list of features, improvements and bugfixes in this RC6 is accessible here:
+http://progress.openpilot.org/issues/?filter=11865
+
+
+** Improvement
+    * [OP-1556]	Improve ESC calibration.
+
+** Bug
+    * [OP-1605]	OP-1603 Normalize fixed wing mixers and mixing slider jitter while saving
+    * [OP-1604]	Radio wizard crashes
+    * [OP-1603]	Fixed Wing (elevon) : Wizard and Config mixer differs
+    * [OP-1564]	Incorrect display of Thrust mode in PFD Module
+
+
 --- RELEASE-14.10-RC5 ---
 This release candidate does add the following fixes/enhancements over the previous RC4
 
-The full list of features, improvements and bugfixes in this RC4 is accessible here:
+The full list of features, improvements and bugfixes in this RC5 is accessible here:
 http://progress.openpilot.org/issues/?filter=11864
 
 

@@ -114,7 +114,14 @@ int32_t PIOS_FLASHFS_Logfs_Init(
     	retval = pios_mkdir(logfs_path, O_CREAT);
         if (retval < 0)
         {
-            pios_trace(PIOS_TRACE_ERROR, "Couldn't mkdir %s", logfs_path);
+            if (yaffsfs_GetLastError() == -EEXIST)
+            {
+                retval = 0;
+            }
+            else
+            {
+                pios_trace(PIOS_TRACE_ERROR, "Couldn't mkdir %s", logfs_path);
+            }
         }
     }
 

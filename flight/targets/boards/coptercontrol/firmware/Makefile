@@ -116,15 +116,15 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/gpsvelocitysensor.c
     SRC += $(OPUAVSYNTHDIR)/gpssettings.c
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
-    SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
+#    SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
     SRC += $(OPUAVSYNTHDIR)/receiveractivity.c
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
     SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/ratedesired.c
-    SRC += $(OPUAVSYNTHDIR)/barosensor.c
+#    SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
-    SRC += $(OPUAVSYNTHDIR)/airspeedstate.c
+#    SRC += $(OPUAVSYNTHDIR)/airspeedstate.c
     SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
     SRC += $(OPUAVSYNTHDIR)/perfcounter.c
 else

@@ -69,7 +69,6 @@ public:
     ScopeGadgetWidget(QWidget *parent = 0);
     ~ScopeGadgetWidget();
 
-    void setName (QString name) { m_name = name; }
     void setupSequentialPlot();
     void setupChronoPlot();
     void setupUAVObjectPlot();
@@ -148,7 +147,6 @@ private:
     void preparePlot(PlotType plotType);
     void setupExamplePlot();
 
-    QString m_name;
     PlotType m_plotType;
 
     double m_plotDataSize;

@@ -195,6 +195,11 @@ void ScopeGadgetWidget::showEvent(QShowEvent *e)
 void ScopeGadgetWidget::startPlotting()
 {
     if (replotTimer && !replotTimer->isActive()) {
+        foreach (PlotData *plot, m_curvesData.values()) {
+            if (plot->wantsInitialData()) {
+                plot->append(NULL);
+            }
+        }
         replotTimer->start(m_refreshInterval);
     }
 }
@@ -377,10 +382,6 @@ void ScopeGadgetWidget::addCurvePlot(QString objectName, QString fieldPlusSubFie
     }
     connect(this, SIGNAL(visibilityChanged(QwtPlotItem *)), plotData, SLOT(visibilityChanged(QwtPlotItem *)));
     plotData->attach(this);
-
-    if (plotData->wantsInitialData()) {
-        plotData->append(object);
-    }
 
     // Keep the curve details for later
     m_curvesData.insert(plotData->plotName(), plotData);
@@ -671,5 +672,5 @@ void ScopeGadgetWidget::copyToClipboardAsImage()
 
 void ScopeGadgetWidget::showOptionDialog()
 {
-    Core::ICore::instance()->showOptionsDialog("ScopeGadget", m_name);
+    Core::ICore::instance()->showOptionsDialog("ScopeGadget", objectName());
 }

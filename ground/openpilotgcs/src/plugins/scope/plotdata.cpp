@@ -201,6 +201,10 @@ QwtPlotMarker *PlotData::createMarker(QString value)
 
 bool SequentialPlotData::append(UAVObject *obj)
 {
+    if (obj == NULL) {
+        obj = m_object;
+    }
+
     if (m_object == obj && m_field) {
         if (!m_isEnumPlot) {
             double currentValue = m_field->getValue(m_element).toDouble() * pow(10, m_scalePower);
@@ -241,6 +245,10 @@ bool SequentialPlotData::append(UAVObject *obj)
 
 bool ChronoPlotData::append(UAVObject *obj)
 {
+    if (obj == NULL) {
+        obj = m_object;
+    }
+
     if (m_object == obj && m_field) {
         // Get the field of interest
         // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME

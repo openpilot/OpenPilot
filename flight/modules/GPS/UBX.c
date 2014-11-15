@@ -58,12 +58,12 @@ typedef struct {
 
 // parsing functions, roughly ordered by reception rate (higher rate messages on top)
 
-static void parse_ubx_nav_pvt(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 static void parse_ubx_nav_posllh(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 static void parse_ubx_nav_velned(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 static void parse_ubx_nav_sol(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 static void parse_ubx_nav_dop(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 #ifndef PIOS_GPS_MINIMAL
+static void parse_ubx_nav_pvt(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 static void parse_ubx_nav_timeutc(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 static void parse_ubx_nav_svinfo(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition);
 
@@ -81,8 +81,8 @@ const ubx_message_handler ubx_handler_table[] = {
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_VELNED,  .handler = &parse_ubx_nav_velned  },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_SOL,     .handler = &parse_ubx_nav_sol     },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_DOP,     .handler = &parse_ubx_nav_dop     },
-    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_PVT,     .handler = &parse_ubx_nav_pvt     },
 #ifndef PIOS_GPS_MINIMAL
+    { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_PVT,     .handler = &parse_ubx_nav_pvt     },
     { .msgClass = UBX_CLASS_OP_CUST, .msgID = UBX_ID_OP_MAG,      .handler = &parse_ubx_op_mag      },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_SVINFO,  .handler = &parse_ubx_nav_svinfo  },
     { .msgClass = UBX_CLASS_NAV,     .msgID = UBX_ID_NAV_TIMEUTC, .handler = &parse_ubx_nav_timeutc },
@@ -336,7 +336,7 @@ static void parse_ubx_nav_velned(struct UBXPacket *ubx, GPSPositionSensorData *G
         }
     }
 }
-
+#if !defined(PIOS_GPS_MINIMAL)
 static void parse_ubx_nav_pvt(struct UBXPacket *ubx, GPSPositionSensorData *GpsPosition)
 {
     lastPvtTime = PIOS_DELAY_GetuS();
@@ -364,7 +364,7 @@ static void parse_ubx_nav_pvt(struct UBXPacket *ubx, GPSPositionSensorData *GpsP
     } else {
         GpsPosition->Status = GPSPOSITIONSENSOR_STATUS_NOFIX;
     }
-#if !defined(PIOS_GPS_MINIMAL)
+
     if (pvt->valid & PVT_VALID_VALIDTIME) {
         // Time is valid, set GpsTime
         GPSTimeData GpsTime;
@@ -378,10 +378,8 @@ static void parse_ubx_nav_pvt(struct UBXPacket *ubx, GPSPositionSensorData *GpsP
 
         GPSTimeSet(&GpsTime);
     }
-#endif
 }
 
-#if !defined(PIOS_GPS_MINIMAL)
 static void parse_ubx_nav_timeutc(struct UBXPacket *ubx, __attribute__((unused)) GPSPositionSensorData *GpsPosition)
 {
     if (usePvt) {

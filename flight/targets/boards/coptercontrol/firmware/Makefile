@@ -122,9 +122,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/callbackinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/ratedesired.c
-    SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
-    SRC += $(OPUAVSYNTHDIR)/airspeedstate.c
     SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
     SRC += $(OPUAVSYNTHDIR)/perfcounter.c
 else

@@ -96,7 +96,7 @@ void PlotData::updatePlotData()
 void PlotData::clear()
 {
     m_meanSum = 0.0f;
-    m_correctionSum = 0.0f;
+    m_correctionSum   = 0.0f;
     m_correctionCount = 0;
     m_xDataEntries.clear();
     m_yDataEntries.clear();

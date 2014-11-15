@@ -95,7 +95,7 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent),
     connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(csvLoggingConnect()));
 
     setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, SIGNAL(customContextMenuRequested(const QPoint &  )), this, SLOT(popUpMenu(const QPoint &)));
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(popUpMenu(const QPoint &)));
 }
 
 ScopeGadgetWidget::~ScopeGadgetWidget()
@@ -195,7 +195,7 @@ void ScopeGadgetWidget::showEvent(QShowEvent *e)
 void ScopeGadgetWidget::startPlotting()
 {
     if (replotTimer && !replotTimer->isActive()) {
-        foreach (PlotData *plot, m_curvesData.values()) {
+        foreach(PlotData * plot, m_curvesData.values()) {
             if (plot->wantsInitialData()) {
                 plot->append(NULL);
             }
@@ -639,7 +639,7 @@ void ScopeGadgetWidget::popUpMenu(const QPoint &mousePosition)
     Q_UNUSED(mousePosition);
 
     QMenu menu;
-    QAction * action = menu.addAction(tr("Clear"));
+    QAction *action = menu.addAction(tr("Clear"));
     connect(action, &QAction::triggered, this, &ScopeGadgetWidget::clearPlot);
     action = menu.addAction(tr("Copy to Clipboard"));
     connect(action, &QAction::triggered, this, &ScopeGadgetWidget::copyToClipboardAsImage);
@@ -652,7 +652,7 @@ void ScopeGadgetWidget::popUpMenu(const QPoint &mousePosition)
 void ScopeGadgetWidget::clearPlot()
 {
     m_mutex.lock();
-    foreach (PlotData * plot, m_curvesData.values()) {
+    foreach(PlotData * plot, m_curvesData.values()) {
         plot->clear();
     }
     m_mutex.unlock();
@@ -661,8 +661,9 @@ void ScopeGadgetWidget::clearPlot()
 
 void ScopeGadgetWidget::copyToClipboardAsImage()
 {
-    QPixmap pixmap =  QWidget::grab();
-    if(pixmap.isNull()){
+    QPixmap pixmap = QWidget::grab();
+
+    if (pixmap.isNull()) {
         qDebug("Failed to capture the plot");
         return;
     }

@@ -752,8 +752,7 @@ bool PIOS_RFM22B_ReceivePacket(uint32_t rfm22b_id, uint8_t *p)
     // enable RX interrupts
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, RFM22_ie1_encrcerror | RFM22_ie1_enpkvalid |
                 RFM22_ie1_enrxffafull | RFM22_ie1_enfferr);
-    rfm22_write(rfm22b_dev, RFM22_interrupt_enable2, RFM22_ie2_enpreainval | RFM22_ie2_enpreaval |
-                RFM22_ie2_enswdet);
+    rfm22_write(rfm22b_dev, RFM22_interrupt_enable2, RFM22_ie2_enpreaval | RFM22_ie2_enswdet);
 
     // enable the receiver
     rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_rxon);

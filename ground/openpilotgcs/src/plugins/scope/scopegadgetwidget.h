@@ -137,6 +137,10 @@ private slots:
     void stopPlotting();
     void csvLoggingConnect();
     void csvLoggingDisconnect();
+    void popUpMenu(const QPoint &mousePosition);
+    void clearPlot();
+    void copyToClipboardAsImage();
+    void showOptionDialog();
 
 private:
 

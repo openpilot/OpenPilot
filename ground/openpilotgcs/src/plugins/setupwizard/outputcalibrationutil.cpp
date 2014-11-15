@@ -36,24 +36,24 @@ bool OutputCalibrationUtil::c_prepared = false;
 ActuatorCommand::Metadata OutputCalibrationUtil::c_savedActuatorCommandMetaData;
 
 OutputCalibrationUtil::OutputCalibrationUtil(QObject *parent) :
-    QObject(parent), m_outputChannel(-1), m_safeValue(1000)
-{
-}
+    QObject(parent), m_safeValue(1000)
+{}
 
 OutputCalibrationUtil::~OutputCalibrationUtil()
 {
     stopChannelOutput();
 }
 
-ActuatorCommand * OutputCalibrationUtil::getActuatorCommandObject()
+ActuatorCommand *OutputCalibrationUtil::getActuatorCommandObject()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
     Q_ASSERT(pm);
 
     UAVObjectManager *uavObjectManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(uavObjectManager);
 
-    ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(uavObjectManager);
+    ActuatorCommand *actuatorCommand   = ActuatorCommand::GetInstance(uavObjectManager);
     Q_ASSERT(actuatorCommand);
 
     return actuatorCommand;
@@ -95,13 +95,16 @@ void OutputCalibrationUtil::stopOutputCalibration()
 
 void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValue)
 {
+    QList<quint16> channels;
+    channels.append(channel);
+    startChannelOutput(channels, safeValue);
+}
+
+void OutputCalibrationUtil::startChannelOutput(QList<quint16> channels, quint16 safeValue)
+{
     if (c_prepared) {
-        if (m_outputChannel < 0 && channel < ActuatorCommand::CHANNEL_NUMELEM) {
-            // Start output...
-            m_outputChannel = channel;
-            m_safeValue     = safeValue;
-            qDebug() << "Output for channel " << m_outputChannel + 1 << " started.";
-        }
+        m_outputChannels = channels;
+        m_safeValue = safeValue;
     } else {
         qDebug() << "OutputCalibrationUtil not started.";
     }
@@ -110,15 +113,9 @@ void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValu
 void OutputCalibrationUtil::stopChannelOutput()
 {
     if (c_prepared) {
-        if (m_outputChannel >= 0) {
-            qDebug() << "Stopping output for channel " << m_outputChannel + 1 << "...";
-            // Stop output...
-            setChannelOutputValue(m_safeValue);
-            qDebug() << "Settings output for channel " << m_outputChannel + 1 << " to " << m_safeValue;
-            qDebug() << "Output for channel " << m_outputChannel + 1 << " stopped.";
-
-            m_outputChannel = -1;
-        }
+        setChannelOutputValue(m_safeValue);
+        m_outputChannels.clear();
+        qDebug() << "OutputCalibrationUtil output stopped.";
     } else {
         qDebug() << "OutputCalibrationUtil not started.";
     }
@@ -127,15 +124,20 @@ void OutputCalibrationUtil::stopChannelOutput()
 void OutputCalibrationUtil::setChannelOutputValue(quint16 value)
 {
     if (c_prepared) {
-        if (m_outputChannel >= 0) {
+        ActuatorCommand *actuatorCommand = getActuatorCommandObject();
+        ActuatorCommand::DataFields data = actuatorCommand->getData();
+        foreach(quint32 channel, m_outputChannels) {
             // Set output value
-            qDebug() << "Setting output value for channel " << m_outputChannel << " to " << value << ".";
-            ActuatorCommand *actuatorCommand = getActuatorCommandObject();
-            ActuatorCommand::DataFields data = actuatorCommand->getData();
-            data.Channel[m_outputChannel] = value;
-            actuatorCommand->setData(data);
-        } else {
-            qDebug() << "OutputCalibrationUtil not started.";
+            if (channel <= ActuatorCommand::CHANNEL_NUMELEM) {
+                qDebug() << "OutputCalibrationUtil setting output value for channel " << channel << " to " << value << ".";
+                data.Channel[channel] = value;
+            } else {
+                qDebug() << "OutputCalibrationUtil could not set output value for channel " << channel
+                         << " to " << value << "." << "Channel out of bounds" << channel << ".";
+            }
         }
+        actuatorCommand->setData(data);
+    } else {
+        qDebug() << "OutputCalibrationUtil not started.";
     }
 }

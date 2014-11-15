@@ -1,3 +1,50 @@
+--- RELEASE-14.10-RC6 ---
+This release candidate does add the following fixes/enhancements over the previous RC5
+
+The full list of features, improvements and bugfixes in this RC6 is accessible here:
+http://progress.openpilot.org/issues/?filter=11865
+
+
+** Improvement
+    * [OP-1556]	Improve ESC calibration.
+
+** Bug
+    * [OP-1605]	OP-1603 Normalize fixed wing mixers and mixing slider jitter while saving
+    * [OP-1604]	Radio wizard crashes
+    * [OP-1603]	Fixed Wing (elevon) : Wizard and Config mixer differs
+    * [OP-1564]	Incorrect display of Thrust mode in PFD Module
+
+
+--- RELEASE-14.10-RC5 ---
+This release candidate does add the following fixes/enhancements over the previous RC4
+
+The full list of features, improvements and bugfixes in this RC5 is accessible here:
+http://progress.openpilot.org/issues/?filter=11864
+
+
+** Improvement
+    * [OP-1590]	Copy Bank function for multiple stabilization banks
+    * [OP-1589]	Save mixer with cloud config
+    * [OP-1588]	Makes sure all Relay tuning is removed, UAVOs still exist for example
+    * [OP-1582]	Change TX Wizard button to show skip / next on aux channels
+    * [OP-1581]	Add vehicle setup wizard button on the vehicle config page
+    * [OP-1580]	Upgrade Qwt libs to 6.1.1
+    * [OP-1566]	Add stop button to ESC calibration in Wizard
+    * [OP-1556]	Improve ESC calibration.
+    * [OP-1554]	Allows for enum values in plot showing them as labels
+    * [OP-1552]	Rename Radio Setup Wizard in tools menu
+    * [OP-1543]	Make GPS plugin look sexy
+
+** Bug
+    * [OP-1586] Test outputs can fail to stop motors in some cases
+    * [OP-1584] High RAM usage on CC
+    * [OP-1574] Missing ESC throttle range calibration screen when 50Hz rate is selected
+    * [OP-1573] Revo disarms in PATHPLANNER flight modes if throttle is low.
+    * [OP-1567] Fix bugs in Wizard
+    * [OP-1592] OP-1567 "Cloud config" fails on cc3d
+    * [OP-1577] OP-1567 Fixed Wing Wizard Images truncated and missing information
+
+
 --- RELEASE-14.10-RC4 --- 
 This release candidate does add the following fixes/enhancements over the previous RC3
 

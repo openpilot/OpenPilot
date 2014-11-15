@@ -40,17 +40,18 @@ public:
 
     static void startOutputCalibration();
     static void stopOutputCalibration();
-    static ActuatorCommand * getActuatorCommandObject();
+    static ActuatorCommand *getActuatorCommandObject();
 
 public slots:
     void startChannelOutput(quint16 channel, quint16 safeValue);
+    void startChannelOutput(QList<quint16> channels, quint16 safeValue);
     void stopChannelOutput();
     void setChannelOutputValue(quint16 value);
 
 private:
     static bool c_prepared;
     static ActuatorCommand::Metadata c_savedActuatorCommandMetaData;
-    qint16 m_outputChannel;
+    QList<quint16> m_outputChannels;
     quint16 m_safeValue;
 };
 

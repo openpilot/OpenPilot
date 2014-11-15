@@ -17,7 +17,6 @@
 
         <field name="Deadband" units="%" type="uint8" elements="1" defaultvalue="2"/>
 
-
 	<!-- Note these options values should be identical to those defined in FlightMode -->
         <field name="FlightModeNumber" units="" type="uint8" elements="1" defaultvalue="3"/>
 

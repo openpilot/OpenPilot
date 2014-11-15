@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       airframestabfixedwingpage.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @file       airframeinitialtuningpage.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2014.
  * @addtogroup
  * @{
- * @addtogroup AirframeStabFixedwingPage
+ * @addtogroup AirframeInitialTuningPage
  * @{
  * @brief
  *****************************************************************************/
@@ -151,6 +151,25 @@ void AirframeInitialTuningPage::templateSelectionChanged()
     }
 }
 
+bool AirframeInitialTuningPage::airframeIsCompatible(int vehicleType, int vehicleSubType)
+{
+    if (vehicleType != getWizard()->getVehicleType()) {
+        return false;
+    }
+
+    int wizSubType = getWizard()->getVehicleSubType();
+    switch (vehicleType) {
+    case VehicleConfigurationSource::MULTI_ROTOR_QUAD_H:
+    case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
+    {
+        return wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_H ||
+               wizSubType == VehicleConfigurationSource::MULTI_ROTOR_QUAD_X;
+    }
+    default:
+        return vehicleSubType == wizSubType;
+    }
+}
+
 void AirframeInitialTuningPage::loadValidFiles()
 {
     ui->templateList->clear();
@@ -174,8 +193,7 @@ void AirframeInitialTuningPage::loadValidFiles()
             QJsonDocument templateDoc = QJsonDocument::fromJson(jsonData, &error);
             if (error.error == QJsonParseError::NoError) {
                 QJsonObject json = templateDoc.object();
-                if (json["type"].toInt() == getWizard()->getVehicleType() &&
-                    json["subtype"].toInt() == getWizard()->getVehicleSubType()) {
+                if (airframeIsCompatible(json["type"].toInt(), json["subtype"].toInt())) {
                     QString uuid = json["uuid"].toString();
                     if (!m_templates.contains(uuid)) {
                         m_templates[json["uuid"].toString()] = new QJsonObject(json);

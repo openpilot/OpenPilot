@@ -113,6 +113,7 @@ private:
     void setupElevon();
     void setupDualAileron();
     void setupAileron();
+    void setupVtail();
 
 private slots:
     void uAVOTransactionCompleted(UAVObject *object, bool success);

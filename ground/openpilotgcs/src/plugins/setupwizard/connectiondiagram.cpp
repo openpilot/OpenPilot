@@ -139,6 +139,9 @@ void ConnectionDiagram::setupGraphicsScene()
             case VehicleConfigurationSource::FIXED_WING_ELEVON:
                 elementsToShow << "elevon";
                 break;
+            case VehicleConfigurationSource::FIXED_WING_VTAIL:
+                elementsToShow << "vtail";
+                break;
             default:
                 break;
             }

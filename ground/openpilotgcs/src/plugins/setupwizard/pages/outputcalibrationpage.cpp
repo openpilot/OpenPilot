@@ -213,6 +213,17 @@ void OutputCalibrationPage::setupVehicle()
 
         getWizard()->setActuatorSettings(m_actuatorSettings);
         break;
+    case SetupWizard::FIXED_WING_VTAIL:
+        loadSVGFile(FIXEDWING_SVG_FILE);
+        m_wizardIndexes << 0 << 1 << 2 << 2 << 2 << 2;
+        m_vehicleElementIds << "vtail" << "vtail-frame" << "vtail-motor" << "vtail-ail-left" << "vtail-ail-right" << "vtail-rudder-left" << "vtail-rudder-right";
+        m_vehicleHighlightElementIndexes << 0 << 1 << 2 << 3 << 4 << 5;
+        m_channelIndex << 0 << 2 << 0 << 5 << 3 << 1;
+
+        setupActuatorMinMaxAndNeutral(2, 2, 5);
+
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        break;
     default:
         break;
     }

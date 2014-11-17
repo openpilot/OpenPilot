@@ -1,3 +1,14 @@
+--- RELEASE-14.10-RC7 --- 
+This release candidate does add the following fixes/enhancements over the previous RC6
+
+The full list of features, improvements and bugfixes in this RC7 is accessible here:
+http://progress.openpilot.org/issues/?filter=11866
+
+** Bug	
+    * [OP-1601]	Still not enough ram on CC for gps to be usable
+    * [OP-1618] High CPU load caused by radio module driver
+
+
 --- RELEASE-14.10-RC6 ---
 This release candidate does add the following fixes/enhancements over the previous RC5
 

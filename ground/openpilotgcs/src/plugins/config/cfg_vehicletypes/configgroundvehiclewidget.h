@@ -54,9 +54,12 @@ public:
 
 protected:
     void enableControls(bool enable);
+    void resizeEvent(QResizeEvent *);
+    void showEvent(QShowEvent *);
 
 private:
     Ui_GroundConfigWidget *m_aircraft;
+    QGraphicsSvgItem *groundimg;
 
     virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);

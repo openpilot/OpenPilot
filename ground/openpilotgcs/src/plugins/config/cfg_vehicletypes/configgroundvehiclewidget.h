@@ -59,7 +59,7 @@ protected:
 
 private:
     Ui_GroundConfigWidget *m_aircraft;
-    QGraphicsSvgItem *groundimg;
+    QGraphicsSvgItem *m_vehicleImg;
 
     virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);

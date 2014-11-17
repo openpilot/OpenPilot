@@ -103,19 +103,19 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
     Q_ASSERT(m_aircraft);
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/configgadget/images/ground-shapes.svg"));
-    groundimg = new QGraphicsSvgItem();
-    groundimg->setSharedRenderer(renderer);
+    m_vehicleImg = new QGraphicsSvgItem();
+    m_vehicleImg->setSharedRenderer(renderer);
 
     UAVDataObject *system = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("SystemSettings")));
     Q_ASSERT(system);
-    QPointer<UAVObjectField> field = system->getField(QString("AirframeType"));
+    QPointer<UAVObjectField> frameTypeSaved = system->getField(QString("AirframeType"));
 
     m_aircraft->differentialSteeringSlider1->setEnabled(false);
     m_aircraft->differentialSteeringSlider2->setEnabled(false);
 
     if (frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)") {
         // Tank
-        groundimg->setElementId("tank");
+        m_vehicleImg->setElementId("tank");
         setComboCurrentIndex(m_aircraft->groundVehicleType,
                              m_aircraft->groundVehicleType->findText("Differential (tank)"));
         m_aircraft->gvMotor1ChannelBox->setEnabled(true);
@@ -137,13 +137,13 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
         m_aircraft->gvThrottleCurve2GroupBox->setTitle("Right throttle curve");
 
         // If new setup, set sliders to defaults 
-        if (field->getValue().toString() != "GroundVehicleDifferential") {   
+        if (frameTypeSaved->getValue().toString() != "GroundVehicleDifferential") {   
             m_aircraft->differentialSteeringSlider1->setValue(100);
             m_aircraft->differentialSteeringSlider2->setValue(100);
         }
     } else if (frameType == "GroundVehicleMotorcycle" || frameType == "Motorcycle") {
         // Motorcycle
-        groundimg->setElementId("motorbike");
+        m_vehicleImg->setElementId("motorbike");
         setComboCurrentIndex(m_aircraft->groundVehicleType, m_aircraft->groundVehicleType->findText("Motorcycle"));
         m_aircraft->gvMotor1ChannelBox->setEnabled(false);
         m_aircraft->gvMotor2ChannelBox->setEnabled(true);
@@ -161,7 +161,7 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
         m_aircraft->gvThrottleCurve2GroupBox->setTitle("Rear throttle curve");
     } else {
         // Car
-        groundimg->setElementId("car");
+        m_vehicleImg->setElementId("car");
         setComboCurrentIndex(m_aircraft->groundVehicleType, m_aircraft->groundVehicleType->findText("Turnable (car)"));
 
         m_aircraft->gvMotor1ChannelBox->setEnabled(true);
@@ -181,9 +181,9 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
     }
 
     QGraphicsScene *scene = new QGraphicsScene();
-    scene->addItem(groundimg);
-    scene->setSceneRect(groundimg->boundingRect());
-    m_aircraft->groundShape->fitInView(groundimg, Qt::KeepAspectRatio);
+    scene->addItem(m_vehicleImg);
+    scene->setSceneRect(m_vehicleImg->boundingRect());
+    m_aircraft->groundShape->fitInView(m_vehicleImg, Qt::KeepAspectRatio);
     m_aircraft->groundShape->setScene(scene);
 }
 
@@ -535,14 +535,14 @@ bool ConfigGroundVehicleWidget::throwConfigError(QString airframeType)
 
 void ConfigGroundVehicleWidget::resizeEvent(QResizeEvent *)
 {
-    if (groundimg) {
-        m_aircraft->groundShape->fitInView(groundimg, Qt::KeepAspectRatio);
+    if (m_vehicleImg) {
+        m_aircraft->groundShape->fitInView(m_vehicleImg, Qt::KeepAspectRatio);
     }
 }
 
 void ConfigGroundVehicleWidget::showEvent(QShowEvent *)
 {
-    if (groundimg) {
-        m_aircraft->groundShape->fitInView(groundimg, Qt::KeepAspectRatio);
+    if (m_vehicleImg) {
+        m_aircraft->groundShape->fitInView(m_vehicleImg, Qt::KeepAspectRatio);
     }
 }

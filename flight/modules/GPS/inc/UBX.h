@@ -369,8 +369,8 @@ typedef union {
     struct UBX_NAV_DOP     nav_dop;
     struct UBX_NAV_SOL     nav_sol;
     struct UBX_NAV_VELNED  nav_velned;
-    struct UBX_NAV_PVT     nav_pvt;
 #if !defined(PIOS_GPS_MINIMAL)
+    struct UBX_NAV_PVT     nav_pvt;
     struct UBX_NAV_TIMEUTC nav_timeutc;
     struct UBX_NAV_SVINFO  nav_svinfo;
     // Ack Class

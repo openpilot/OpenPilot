@@ -138,8 +138,8 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
 
         // If new setup, set sliders to defaults 
         if (frameTypeSaved->getValue().toString() != "GroundVehicleDifferential") {   
-            m_aircraft->differentialSteeringSlider1->setValue(100);
-            m_aircraft->differentialSteeringSlider2->setValue(100);
+            m_aircraft->differentialSteeringSlider1->setValue(50);
+            m_aircraft->differentialSteeringSlider2->setValue(50);
         }
     } else if (frameType == "GroundVehicleMotorcycle" || frameType == "Motorcycle") {
         // Motorcycle
@@ -257,12 +257,7 @@ void ConfigGroundVehicleWidget::refreshWidgetsValues(QString frameType)
     setComboCurrentIndex(m_aircraft->gvSteering2ChannelBox, config.ground.GroundVehicleSteering2);
 
     if (frameType == "GroundVehicleDifferential") {
-        // CURRENTLY BROKEN UNTIL WE DECIDE HOW DIFFERENTIAL SHOULD BEHAVE
-        // If the vehicle type is "differential", restore the slider setting
-
         // Find the channel number for Motor1
-        // obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-        // Q_ASSERT(obj);
         int channel = m_aircraft->gvMotor1ChannelBox->currentIndex() - 1;
         if (channel > -1) {
             // If for some reason the actuators were incoherent, we might fail here, hence the check.

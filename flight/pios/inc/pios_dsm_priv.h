@@ -109,13 +109,6 @@
  */
 // #define DSM_LOST_FRAME_COUNTER
 
-/* DSM protocol variations */
-enum pios_dsm_proto {
-    PIOS_DSM_PROTO_DSM2,
-    PIOS_DSM_PROTO_DSMX10BIT,
-    PIOS_DSM_PROTO_DSMX11BIT,
-};
-
 /* DSM receiver instance configuration */
 struct pios_dsm_cfg {
     struct stm32_gpio bind;

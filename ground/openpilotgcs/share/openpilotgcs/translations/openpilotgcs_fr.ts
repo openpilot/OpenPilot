@@ -450,7 +450,7 @@
     <message>
         <location filename="../../../src/libs/utils/consoleprocess.cpp" line="+49"/>
         <source>Cannot set up communication channel: %1</source>
-        <translation>Impossible d&apos;établir le canal de communication : %1</translation>
+        <translation>Impossible d&apos;établir le canal de communication : %1</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -460,12 +460,12 @@
     <message>
         <location line="+5"/>
         <source>Cannot create temporary file: %1</source>
-        <translation>Impossible de créer un fichier temporaire : %1</translation>
+        <translation>Impossible de créer un fichier temporaire : %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Cannot create temporary directory &apos;%1&apos;: %2</source>
-        <translation>Impossible de créer un dossier temporaire &apos;%1&apos; : %2</translation>
+        <translation>Impossible de créer un dossier temporaire &apos;%1&apos; : %2</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -475,7 +475,7 @@
     <message>
         <location line="+5"/>
         <source>Cannot change to working directory &apos;%1&apos;: %2</source>
-        <translation>Impossible de changer le répertoire de travail &apos;%1&apos; : %2</translation>
+        <translation>Impossible de changer le répertoire de travail &apos;%1&apos; : %2</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -495,12 +495,12 @@
     <message>
         <location filename="../../../src/libs/utils/consoleprocess_win.cpp" line="+126"/>
         <source>The process &apos;%1&apos; could not be started: %2</source>
-        <translation>Le processus &apos;%1&apos; ne peut pas être démarré : %2</translation>
+        <translation>Le processus &apos;%1&apos; ne peut pas être démarré : %2</translation>
     </message>
     <message>
         <location line="+72"/>
         <source>Cannot obtain a handle to the inferior: %1</source>
-        <translation>Impossible d&apos;obtenir le descripteur du processus : %1</translation>
+        <translation>Impossible d&apos;obtenir le descripteur du processus : %1</translation>
     </message>
     <message>
         <location line="+30"/>
@@ -536,37 +536,37 @@
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.ui"/>
         <source>Class name:</source>
-        <translation>Nom de la classe :</translation>
+        <translation>Nom de la classe :</translation>
     </message>
     <message>
         <location/>
         <source>Base class:</source>
-        <translation>Classe parent :</translation>
+        <translation>Classe parent :</translation>
     </message>
     <message>
         <location/>
         <source>Header file:</source>
-        <translation>Fichier d&apos;en-tête :</translation>
+        <translation>Fichier d&apos;en-tête :</translation>
     </message>
     <message>
         <location/>
         <source>Source file:</source>
-        <translation>Fichier source :</translation>
+        <translation>Fichier source :</translation>
     </message>
     <message>
         <location/>
         <source>Generate form:</source>
-        <translation>Générer l&apos;interface graphique :</translation>
+        <translation>Générer l&apos;interface graphique :</translation>
     </message>
     <message>
         <location/>
         <source>Form file:</source>
-        <translation>Fichier d&apos;interface :</translation>
+        <translation>Fichier d&apos;interface :</translation>
     </message>
     <message>
         <location/>
         <source>Path:</source>
-        <translation>Chemin :</translation>
+        <translation>Chemin :</translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.cpp" line="+428"/>
@@ -596,7 +596,7 @@
     <message>
         <location/>
         <source>Type information:</source>
-        <translation>Information de type :</translation>
+        <translation>Information de type :</translation>
     </message>
     <message>
         <location/>
@@ -656,7 +656,7 @@
     <message>
         <location line="+20"/>
         <source>Path:</source>
-        <translation>Chemin :</translation>
+        <translation>Chemin :</translation>
     </message>
 </context>
 <context>
@@ -697,12 +697,12 @@
     <message>
         <location/>
         <source>Name:</source>
-        <translation>Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <location/>
         <source>Create in:</source>
-        <translation>Créer dans :</translation>
+        <translation>Créer dans :</translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/projectintropage.cpp" line="+61"/>
@@ -756,12 +756,12 @@
     <message>
         <location/>
         <source>Name:</source>
-        <translation>Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <location/>
         <source>Path:</source>
-        <translation>Chemin :</translation>
+        <translation>Chemin :</translation>
     </message>
 </context>
 <context>
@@ -780,7 +780,7 @@
     <message>
         <location line="+3"/>
         <source>The file %1 has changed outside Qt Creator. Do you want to reload it?</source>
-        <translation>Le fichier %1 a été modifié en dehors de Qt Creator. Voulez-vous le charger à nouveau ?</translation>
+        <translation>Le fichier %1 a été modifié en dehors de Qt Creator. Voulez-vous le charger à nouveau ?</translation>
     </message>
 </context>
 <context>
@@ -788,38 +788,38 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/plugindetailsview.ui"/>
         <source>Name:</source>
-        <translation>Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <location/>
         <source>Version:</source>
-        <translation>Version :</translation>
+        <translation>Version :</translation>
     </message>
     <message>
         <location/>
         <source>Compatibility Version:</source>
-        <translation>Version compatible :</translation>
+        <translation>Version compatible :</translation>
     </message>
     <message>
         <location/>
         <source>Url:</source>
-        <translation>Url :</translation>
+        <translation>Url :</translation>
     </message>
     <message>
         <location/>
         <source>Location:</source>
-        <translation>Emplacement :</translation>
+        <translation>Emplacement :</translation>
     </message>
     <message>
         <location/>
         <source>Description:</source>
-        <translation>Description :</translation>
+        <translation>Description :</translation>
     </message>
     <message>
         <location/>
         <source>Copyright:</source>
         <translatorcomment>Droit d&apos;auteur ? [Platypus]oui pour moi même si peu utilisé</translatorcomment>
-        <translation>Copyright :</translation>
+        <translation>Copyright :</translation>
     </message>
     <message>
         <location/>
@@ -829,7 +829,7 @@
     <message>
         <location/>
         <source>Dependencies:</source>
-        <translation>Dépendances :</translation>
+        <translation>Dépendances :</translation>
     </message>
     <message>
         <location/>
@@ -842,7 +842,7 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginerrorview.ui"/>
         <source>State:</source>
-        <translation>État :</translation>
+        <translation>État :</translation>
     </message>
     <message>
         <location/>
@@ -855,12 +855,12 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+412"/>
         <source>File does not exist: %1</source>
-        <translation>Le fichier n&apos;existe pas : %1</translation>
+        <translation>Le fichier n&apos;existe pas : %1</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Could not open file for read: %1</source>
-        <translation>Impossible d&apos;ouvrir le fichier en lecture : %1</translation>
+        <translation>Impossible d&apos;ouvrir le fichier en lecture : %1</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -1323,7 +1323,7 @@ Raison : %3</translation>
     <message>
         <location line="+5"/>
         <source>Internal error: have no plugin instance to initialize</source>
-        <translation>Erreur interne : pas d&apos;instance de l&apos;extension à initialiser</translation>
+        <translation>Erreur interne : pas d&apos;instance de l&apos;extension à initialiser</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -1364,7 +1364,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Filter:</source>
-        <translation>Filtre :</translation>
+        <translation>Filtre :</translation>
     </message>
     <message>
         <location/>
@@ -1404,7 +1404,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Shortcut:</source>
-        <translation>Raccourci :</translation>
+        <translation>Raccourci :</translation>
     </message>
     <message>
         <location/>
@@ -1427,7 +1427,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Text1:</source>
-        <translation>Texte 1 :</translation>
+        <translation>Texte 1 :</translation>
     </message>
     <message>
         <location/>
@@ -1437,12 +1437,12 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Text2:</source>
-        <translation>Texte 2 :</translation>
+        <translation>Texte 2 :</translation>
     </message>
     <message>
         <location/>
         <source>Text3:</source>
-        <translation>Texte 3 :</translation>
+        <translation>Texte 3 :</translation>
     </message>
 </context>
 <context>
@@ -1561,7 +1561,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Name:</source>
-        <translation>Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+10"/>
@@ -4877,10 +4877,10 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;This is an experimental plugin for the GCS that is going to make your aircraft shake, etc, so test with lots of space and be &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:600;&quot;&gt;very very wary&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt; for it creating bad tuning values.  Basically there is no reason to think this will work at all.&lt;br /&gt;&lt;br /&gt;To use autotuning, here are the steps:&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;This is an experimental plugin for the GCS that is going to make your aircraft shake, etc, so test with lots of space and be &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:600;&quot;&gt;very very wary&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt; for it creating bad tuning values.  Basically there is no reason to think this will work at all.&lt;br /&gt;&lt;br /&gt;To use autotuning, here are the steps:&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;On the &lt;span style=&quot; font-style:italic;&quot;&gt;Input configuration&lt;/span&gt; tab, &lt;span style=&quot; font-style:italic;&quot;&gt;Flight Mode Switch Settings&lt;/span&gt;, set one of your flight modes to &amp;quot;Autotune&amp;quot;.&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Take off, change flight mode to autotune, keep it in the air while it&apos;s shaking.&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Land and disarm.  (note - you &lt;span style=&quot; font-weight:600;&quot;&gt;MUST&lt;/span&gt; stay in autotune mode through this point, leaving autotune before disarming aborts the process)&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Land and disarm.  (note - you &lt;span style=&quot; font-weight:600;&quot;&gt;MUST&lt;/span&gt; stay in autotune mode through this point, leaving autotune before disarming aborts the process)&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We&apos;d recommend checking your stabilization settings before trying them out (ie: compare to what you currently use, if they are VASTLY different, probably a good indication bad things will happen).&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly the new settings.&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you&apos;re ready to proceed, click the &lt;span style=&quot; font-style:italic;&quot;&gt;Enable Autotune Module&lt;/span&gt; checkbox above this text, click &lt;span style=&quot; font-style:italic;&quot;&gt;save&lt;/span&gt; and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -11152,17 +11152,7 @@ Double clic sur la légende ou le tracé pour afficher/cacher la légende.</tran
     </message>
     <message>
         <location line="+3"/>
-        <source>Spektrum satellite (DSM2)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Spektrum satellite (DSMX10BIT)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Spektrum satellite (DSMX11BIT)</source>
+        <source>Spektrum satellite (DSM)</source>
         <translation></translation>
     </message>
     <message>
@@ -14879,7 +14869,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Name:</source>
-        <translation>Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <location/>
